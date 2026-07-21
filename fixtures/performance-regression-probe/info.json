@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-performance-regression-probe",
+  "version": "0.1.0",
+  "title": "MIR Performance Regression Probe",
+  "author": "MIR performance harness",
+  "description": "Non-shipped exact-archive phase and telemetry probe for paired release qualification.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8", "more-infinite-research"]
+}

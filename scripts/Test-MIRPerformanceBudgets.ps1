@@ -89,8 +89,43 @@ if ($telemetrySource -notmatch 'WITNESS_LIMIT\s*=\s*64') {
   throw "Compiler telemetry witness limit differs from the governed performance policy."
 }
 
+$campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
+$campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
+if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.0" -or
+    [string]$campaign.factorio_line -ne "2.1" -or [string]$campaign.factorio_version -ne "2.1.11") {
+  throw "Performance campaign authority must be the schema-2 MIR 3.2.0 Factorio 2.1.11 campaign."
+}
+if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
+    [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
+    [string]$campaign.run_policy.order -ne "paired-balanced") {
+  throw "Performance campaign authority does not declare the governed paired run policy."
+}
+$campaignLaneIds = @($campaign.lanes.id + $campaign.phase_lanes.id | Sort-Object)
+$budgetLaneIds = @($regressionLanes.id | Sort-Object)
+if (($campaignLaneIds -join "`n") -ne ($budgetLaneIds -join "`n")) {
+  throw "Performance campaign and regression budget lane sets differ."
+}
+foreach ($requiredPath in @(
+  "fixtures\performance-regression-probe\info.json",
+  "fixtures\performance-regression-probe\probe.lua",
+  "fixtures\performance-regression-probe\data.lua",
+  "fixtures\performance-regression-probe\data-final-fixes.lua",
+  "scripts\Measure-MIRPerformanceRegression.ps1",
+  "scripts\validation\PerformanceCampaign.ps1"
+)) {
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $requiredPath) -PathType Leaf)) {
+    throw "Performance campaign producer authority is absent: $requiredPath"
+  }
+}
+$producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
+foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly")) {
+  if ($producerSource -notmatch [regex]::Escape($snippet)) {
+    throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
+  }
+}
+
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR performance manifest declares $($budgets.Count) budgets and complete bounded compiler telemetry."
+  Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
   exit 0
 }
 

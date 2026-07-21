@@ -20,6 +20,8 @@ measurement_policy:
   - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
   - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.
   - Paired evidence preserves maximum-observed artifact-volume counters and per-run telemetry fingerprints for diagnostics-off and diagnostics-on candidate runs.
+  - A non-shipped symmetric probe times equivalent recipe snapshot planning final graph assertion and postcondition boundaries in both exact archives without changing either package.
+  - Compiler phase lanes use measured diagnostics-off probe rows while artifact volume uses the candidate public CompilerEvidence telemetry from diagnostics-off and diagnostics-on rows.
 
 required_surfaces:
   - base

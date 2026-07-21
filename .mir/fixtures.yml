@@ -158,6 +158,15 @@ real_mod_gates:
     status: required
 
 fixtures:
+  performance-regression-probe:
+    requires_features: []
+    path: fixtures/performance-regression-probe
+    shipped: false
+    validates:
+      - exact-archive-paired-phase-timing
+      - diagnostics-artifact-volume-export
+      - baseline-candidate-symmetric-instrumentation
+
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/space-exploration-recipe-removal

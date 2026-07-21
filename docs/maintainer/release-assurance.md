@@ -121,6 +121,19 @@ The canonical full and backport profiles cannot pass F4 until all of these relea
 
 Schema-3 performance evidence must bind the exact prior release, candidate, source commit, Factorio binary, machine, mod closure, settings, scenarios, and harness. It uses at least one warm-up and five balanced measured pairs. Every governed lane must meet the 20 percent median ceiling or its small absolute-noise allowance, and any declared absolute ceiling. It also preserves maximum-observed compiler artifact-volume counters plus the telemetry fingerprint for every measured diagnostics-off and diagnostics-on candidate run, so timing changes can be separated from plan, coverage, context-copy, closure-cache, and sanitation volume.
 
+Create that evidence with the governed producer before rerunning the full plan:
+
+```powershell
+.\scripts\Measure-MIRPerformanceRegression.ps1 `
+  -Candidate artifacts\candidate\more-infinite-research_3.2.0.zip `
+  -PriorRelease dist\more-infinite-research_3.1.9.zip `
+  -FactorioBin C:\Factorio-2.1.11\bin\x64\factorio.exe `
+  -LocalModZipDir C:\Factorio-mods-2.1 `
+  -ExpectedSourceCommit (git rev-parse HEAD)
+```
+
+The campaign uses the non-shipped `fixtures/performance-regression-probe` symmetrically for exact-archive diagnostics-off phase timing. The probe does not enter either release ZIP. Medium and large ecosystem lanes remain load observations over their exact resolved closures.
+
 The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
 
 `runtime.upgrade` is one F4 matrix result with five mandatory, independently hashed rows: base/default, Space Age native owner, automatic family creation, base continuation, and mod-set configuration change. The configuration-change row removes its source-only compatibility fixture before loading the candidate and proves current research, fractional progress, generated lifecycle state, and removal of only the dangling recipe target.

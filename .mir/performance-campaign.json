@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "release": "3.2.0",
+  "factorio_line": "2.1",
+  "factorio_version": "2.1.11",
+  "baseline": {
+    "version": "3.1.9",
+    "archive_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
+    "package_content_sha256": "394963C9CBA792619C78D26F03B4B0298AAE5FD8DA45FAB3A959CF66E25119B3"
+  },
+  "candidate": {
+    "version": "3.2.0",
+    "archive_sha256": "FC6ECE8CC09F2F68140D5506141FD2873BE5668C6AE1D7FCB7EC6DC32A3788EB",
+    "package_content_sha256": "3C9B7BAA78316E3635758131D3A9C8FDB0618BA6704D245906F10C76CE99B547"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "manual_scenarios": "fixtures/compat-matrix/local-library-scenarios.json",
+  "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_lanes": [
+    "diagnostics-off.factorio-total",
+    "diagnostics-on.factorio-total"
+  ],
+  "phase_lanes": [
+    {"id": "compiler.snapshot", "probe_phase": "snapshot"},
+    {"id": "compiler.graph", "probe_phase": "graph"},
+    {"id": "compiler.planning", "probe_phase": "planning"},
+    {"id": "compiler.postconditions", "probe_phase": "postconditions"}
+  ],
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-default",
+      "official_mods": [],
+      "settings": {}
+    },
+    {
+      "id": "space-age.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "space-age-default",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-1-bz-suite-space-age",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-1-krastorio-spaced-out",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-off",
+      "official_mods": [],
+      "settings": {"mir-debug-generation-report": false}
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-on",
+      "official_mods": [],
+      "settings": {"mir-debug-generation-report": true}
+    }
+  ]
+}

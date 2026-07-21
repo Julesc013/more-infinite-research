@@ -166,8 +166,12 @@
       "inputs": [
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
+        ".mir/performance-campaign.json",
+        "fixtures/performance-regression-probe/**",
         "scripts/Test-MIRPerformanceBudgets.ps1",
         "scripts/Test-MIRPerformanceRegression.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "scripts/validation/PerformanceCampaign.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
         "prototypes/mir/report/compiler_telemetry.lua"
       ]
@@ -199,8 +203,12 @@
         ".mir/evidence/*-performance-regression.json",
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
+        ".mir/performance-campaign.json",
+        "fixtures/performance-regression-probe/**",
         "verification/schema/runtime-performance-evidence.schema.json",
         "scripts/Test-MIRPerformanceRegression.ps1",
+        "scripts/Measure-MIRPerformanceRegression.ps1",
+        "scripts/validation/PerformanceCampaign.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
         "scripts/validation/PackageIdentity.ps1"
       ]
