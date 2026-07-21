@@ -340,7 +340,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Local Krastorio 2 Spaced Out stack. The local library must include Krastorio2 assets and any required companion dependencies for this to load."
+      "notes": "Local Krastorio 2 Spaced Out stack. The local library must include Krastorio2 assets and any required companion dependencies for this to load. The exact closure is expected to leave recycling with a dangling uranium-rounds-magazine-recycling unlock, which MIR removes under the reviewed sanitation budget."
     },
     {
       "name": "local-2-1-krastorio-base",

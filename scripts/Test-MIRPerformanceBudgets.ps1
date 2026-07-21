@@ -123,6 +123,10 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE",
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
 }
+$campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1")
+if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
+  throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
+}
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
 $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count

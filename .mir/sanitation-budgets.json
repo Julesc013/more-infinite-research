@@ -32,7 +32,16 @@
     "local-2-1-space-age-mega-smash": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-space-age-mega-smash-with-resource-overhauls": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-bz-suite-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
-    "local-2-1-krastorio-spaced-out": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-krastorio-spaced-out": {
+      "expected_external_prunes": [
+        {
+          "technology": "recycling",
+          "effect_type": "unlock-recipe",
+          "target": "uranium-rounds-magazine-recycling"
+        }
+      ],
+      "maximum_unreviewed_external_prunes": 0
+    },
     "local-2-1-krastorio-base": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-krastorio-space-exploration": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-bob-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},

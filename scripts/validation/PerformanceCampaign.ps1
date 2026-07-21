@@ -5,6 +5,7 @@ function Get-MIRPerformanceHarnessFiles {
   $authorities = @(
     ".mir/performance-budgets.json",
     ".mir/performance-campaign.json",
+    ".mir/sanitation-budgets.json",
     "fixtures/compat-matrix/local-library-scenarios.json",
     "fixtures/performance-regression-probe",
     "scripts/Invoke-MIRCompatAudit.ps1",
