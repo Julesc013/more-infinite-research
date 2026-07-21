@@ -107,9 +107,10 @@ $graph = [ordered]@{
     independent_pair_count = @($pairs | Where-Object {-not $_.overlap}).Count
     blocked_pair_count = @($pairs | Where-Object {$_.classification -eq "BLOCKED_MISSING_DELTA_POLICY"}).Count
   }
-  policy_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $policyFile).Hash
-  capsules_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $capsulesFile).Hash
-  delta_policies_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $deltaFile).Hash
+  input_hash_basis = "canonical-json"
+  policy_sha256 = Get-MIRTextSha256 (($policy | ConvertTo-Json -Depth 100 -Compress))
+  capsules_sha256 = Get-MIRTextSha256 (($capsules | ConvertTo-Json -Depth 100 -Compress))
+  delta_policies_sha256 = Get-MIRTextSha256 (($deltas | ConvertTo-Json -Depth 100 -Compress))
 }
 $graph.graph_sha256 = Get-MIRTextSha256 (($graph | ConvertTo-Json -Depth 100 -Compress))
 $destination = Resolve-MIRPath $OutputPath

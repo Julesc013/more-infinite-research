@@ -4,57 +4,132 @@
   "nodes": [
     {
       "id": "atan-ash",
-      "exact_mods": ["atan-ash"],
-      "evidence": ["fixtures/atan-ash", "fixtures/assert-atan-ash-separation"],
+      "exact_mods": [
+        "atan-ash"
+      ],
+      "evidence": [
+        "fixtures/atan-ash",
+        "fixtures/assert-atan-ash-separation"
+      ],
       "footprints": {
-        "recipe_output_families": ["ash-separation"],
-        "technology_effect_owners": ["recipe-productivity:ash-separation"],
-        "technology_prerequisite_components": ["chemical-science-progression"],
+        "recipe_output_families": [
+          "ash-separation"
+        ],
+        "technology_effect_owners": [
+          "recipe-productivity:ash-separation"
+        ],
+        "technology_prerequisite_components": [
+          "chemical-science-progression"
+        ],
         "science_lab_families": [],
         "surface_planet_gates": [],
-        "prototype_targets": ["recipe:atan-ash-seperation"],
+        "prototype_targets": [
+          "recipe:atan-ash-seperation"
+        ],
         "data_final_fixes_replacements": []
       }
     },
     {
       "id": "big-mining-drill",
-      "exact_mods": ["big-mining-drill"],
-      "evidence": ["fixtures/big-mining-drill", "fixtures/assert-big-mining-drill-productivity"],
+      "exact_mods": [
+        "big-mining-drill"
+      ],
+      "evidence": [
+        "fixtures/big-mining-drill",
+        "fixtures/assert-big-mining-drill-productivity"
+      ],
       "footprints": {
-        "recipe_output_families": ["mining-drill-manufacturing"],
-        "technology_effect_owners": ["recipe-productivity:mining-drill-manufacturing"],
-        "technology_prerequisite_components": ["production-science-progression"],
+        "recipe_output_families": [
+          "mining-drill-manufacturing"
+        ],
+        "technology_effect_owners": [
+          "recipe-productivity:mining-drill-manufacturing"
+        ],
+        "technology_prerequisite_components": [
+          "production-science-progression"
+        ],
         "science_lab_families": [],
         "surface_planet_gates": [],
-        "prototype_targets": ["entity:big-mining-drill", "recipe:big-mining-drill"],
+        "prototype_targets": [
+          "entity:big-mining-drill",
+          "recipe:big-mining-drill"
+        ],
         "data_final_fixes_replacements": []
       }
     },
     {
       "id": "space-age",
-      "exact_mods": ["space-age"],
-      "evidence": ["approved-delta/3.1.9-to-3.2.0.json"],
+      "exact_mods": [
+        "space-age"
+      ],
+      "evidence": [
+        "approved-delta/3.1.9-to-3.2.0.json"
+      ],
       "footprints": {
-        "recipe_output_families": ["carbon", "mining-drill-manufacturing", "sulfur"],
-        "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:mining-drill-manufacturing", "recipe-productivity:sulfur"],
-        "technology_prerequisite_components": ["space-science-progression"],
-        "science_lab_families": ["space-age-labs"],
-        "surface_planet_gates": ["aquilo", "fulgora", "gleba", "space-platform", "vulcanus"],
-        "prototype_targets": ["entity:big-mining-drill", "recipe:carbon", "recipe:sulfur"],
+        "recipe_output_families": [
+          "carbon",
+          "mining-drill-manufacturing",
+          "sulfur"
+        ],
+        "technology_effect_owners": [
+          "recipe-productivity:carbon",
+          "recipe-productivity:mining-drill-manufacturing",
+          "recipe-productivity:sulfur"
+        ],
+        "technology_prerequisite_components": [
+          "space-science-progression"
+        ],
+        "science_lab_families": [
+          "space-age-labs"
+        ],
+        "surface_planet_gates": [
+          "aquilo",
+          "fulgora",
+          "gleba",
+          "space-platform",
+          "vulcanus"
+        ],
+        "prototype_targets": [
+          "entity:big-mining-drill",
+          "recipe:carbon",
+          "recipe:sulfur"
+        ],
         "data_final_fixes_replacements": []
       }
     },
     {
       "id": "space-age-galore",
-      "exact_mods": ["space-age", "space-age-galore"],
-      "evidence": ["fixtures/space-age-galore-overlap", "approved-delta/3.1.9-to-3.2.0.json"],
+      "exact_mods": [
+        "space-age",
+        "space-age-galore"
+      ],
+      "evidence": [
+        "fixtures/space-age-galore-overlap",
+        "approved-delta/3.1.9-to-3.2.0.json"
+      ],
       "footprints": {
-        "recipe_output_families": ["carbon", "sulfur"],
-        "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:sulfur"],
-        "technology_prerequisite_components": ["space-science-progression"],
-        "science_lab_families": ["space-age-labs"],
-        "surface_planet_gates": ["vulcanus"],
-        "prototype_targets": ["recipe:carbon", "recipe:sulfur", "recipe:vgal-coal-crushing"],
+        "recipe_output_families": [
+          "carbon",
+          "sulfur"
+        ],
+        "technology_effect_owners": [
+          "recipe-productivity:carbon",
+          "recipe-productivity:sulfur"
+        ],
+        "technology_prerequisite_components": [
+          "space-science-progression"
+        ],
+        "science_lab_families": [
+          "space-age-labs"
+        ],
+        "surface_planet_gates": [
+          "vulcanus"
+        ],
+        "prototype_targets": [
+          "recipe:carbon",
+          "recipe:sulfur",
+          "recipe:vgal-coal-crushing"
+        ],
         "data_final_fixes_replacements": []
       }
     }
@@ -62,7 +137,10 @@
   "pairs": [
     {
       "pair_id": "atan-ash+x+big-mining-drill",
-      "capsules": ["atan-ash", "big-mining-drill"],
+      "capsules": [
+        "atan-ash",
+        "big-mining-drill"
+      ],
       "overlap": false,
       "shared_footprints": [],
       "classification": "independent-composition-smoke",
@@ -70,7 +148,10 @@
     },
     {
       "pair_id": "atan-ash+x+space-age",
-      "capsules": ["atan-ash", "space-age"],
+      "capsules": [
+        "atan-ash",
+        "space-age"
+      ],
       "overlap": false,
       "shared_footprints": [],
       "classification": "independent-composition-smoke",
@@ -78,7 +159,10 @@
     },
     {
       "pair_id": "atan-ash+x+space-age-galore",
-      "capsules": ["atan-ash", "space-age-galore"],
+      "capsules": [
+        "atan-ash",
+        "space-age-galore"
+      ],
       "overlap": false,
       "shared_footprints": [],
       "classification": "independent-composition-smoke",
@@ -86,7 +170,10 @@
     },
     {
       "pair_id": "big-mining-drill+x+space-age",
-      "capsules": ["big-mining-drill", "space-age"],
+      "capsules": [
+        "big-mining-drill",
+        "space-age"
+      ],
       "overlap": true,
       "shared_footprints": [
         "prototype_targets:entity:big-mining-drill",
@@ -98,7 +185,10 @@
     },
     {
       "pair_id": "big-mining-drill+x+space-age-galore",
-      "capsules": ["big-mining-drill", "space-age-galore"],
+      "capsules": [
+        "big-mining-drill",
+        "space-age-galore"
+      ],
       "overlap": false,
       "shared_footprints": [],
       "classification": "independent-composition-smoke",
@@ -106,7 +196,10 @@
     },
     {
       "pair_id": "space-age+x+space-age-galore",
-      "capsules": ["space-age", "space-age-galore"],
+      "capsules": [
+        "space-age",
+        "space-age-galore"
+      ],
       "overlap": true,
       "shared_footprints": [
         "prototype_targets:recipe:carbon",
@@ -130,8 +223,9 @@
     "independent_pair_count": 4,
     "blocked_pair_count": 0
   },
-  "policy_sha256": "E787B9ABA0D80960DDE985314C7051EA815887D8641F8722B43165427822852B",
-  "capsules_sha256": "F600D91D33BB76F6A2CAF6074E1CA852B26827EA2F84624716FC2BB754125F0B",
-  "delta_policies_sha256": "F246A3E6B115C1766E87BF91F4A61D1CD2B87E7D5CA071ABDFCA8D0C6D647CD4",
-  "graph_sha256": "2ADCDB46890BD6E7C5F89CF367480FAE41EBFC32A0067C7408DA0F2F1327525F"
+  "input_hash_basis": "canonical-json",
+  "policy_sha256": "93B33E515A6DA28A56F77AD6CA09F15AB133BFB80356BC584C791591F1FC1F48",
+  "capsules_sha256": "72D990B49F5B014647349D94D484E098763B3C5972B5503001602A47185AE6F5",
+  "delta_policies_sha256": "B00104FB0481353218702D5EE8580AC2E1F123878014BC6417D0F98EDEDA749F",
+  "graph_sha256": "15B5F9060E95F71CACE852A984C2559EBB1FC94F135BA657A722E8DE97D55749"
 }

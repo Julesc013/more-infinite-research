@@ -8,6 +8,9 @@ try {
   $canonicalPath = Join-Path $RepoRoot ".mir\mod-interaction-graph.json"
   $canonical = Get-Content -Raw -LiteralPath $canonicalPath | ConvertFrom-Json
   if ($generated.graph_sha256 -ne $canonical.graph_sha256) { throw "Committed mod interaction graph is stale." }
+  if ($generated.input_hash_basis -ne "canonical-json") {
+    throw "Mod interaction graph inputs must use checkout-invariant canonical JSON fingerprints."
+  }
   if ($generated.summary.node_count -ne 4 -or $generated.summary.pair_count -ne 6 `
       -or $generated.summary.overlapping_pair_count -ne 2 -or $generated.summary.blocked_pair_count -ne 0) {
     throw "Mod interaction graph summary differs from the reviewed four-capsule campaign."
