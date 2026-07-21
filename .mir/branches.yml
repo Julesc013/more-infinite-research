@@ -301,11 +301,11 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 935025
-      archive_sha256: A856EA9A5E7B63396B6652C5FEBF47F1DF62D2607FF38D4AF8EF9C6E2C4AEF45
-      package_content_sha256: 02674C2D29FA587781AF2E3B6861793425C1565DC687E0767959C19503DEE115
-      package_source_sha256: 02674C2D29FA587781AF2E3B6861793425C1565DC687E0767959C19503DEE115
-      package_source_commit: 99d34d5d6cb5e6cbbb99f648911b057e3497714a
+      archive_bytes: 935164
+      archive_sha256: C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B
+      package_content_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
+      package_source_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
+      package_source_commit: e19b54fc7daddabcba5c5a6ab6c9bd82d8fe09ba
       superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
       approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
       approved_delta_gate: pending-exact-post-2.4.9-return-candidate
