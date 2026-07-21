@@ -13,6 +13,65 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Approved-delta artifact is absent: $artifactPath"
 }
 $artifact = Get-Content -Raw -LiteralPath $artifactPath | ConvertFrom-Json
+
+function Get-MIRDeltaCanonicalJson {
+  param($Value)
+  return ($Value | ConvertTo-Json -Depth 100 -Compress)
+}
+
+function Test-MIRDeltaExactStringAddition {
+  param($Before, $After, [string]$ExpectedAdded)
+  $beforeValues = @($Before | ForEach-Object { [string]$_ })
+  $afterValues = @($After | ForEach-Object { [string]$_ })
+  $added = @($afterValues | Where-Object { $beforeValues -notcontains $_ })
+  $removed = @($beforeValues | Where-Object { $afterValues -notcontains $_ })
+  return $removed.Count -eq 0 -and $added.Count -eq 1 -and $added[0] -eq $ExpectedAdded
+}
+
+function Test-MIRDeltaExactEffectRemoval {
+  param($Before, $After, [string]$ExpectedRecipe)
+  $removed = @($Before | Where-Object { [string]$_.recipe -eq $ExpectedRecipe })
+  $retained = @($Before | Where-Object { [string]$_.recipe -ne $ExpectedRecipe })
+  return $removed.Count -eq 1 -and
+    [string]$removed[0].type -eq "change-recipe-productivity" -and
+    [double]$removed[0].change -eq 0.1 -and
+    (Get-MIRDeltaCanonicalJson -Value $retained) -eq (Get-MIRDeltaCanonicalJson -Value @($After))
+}
+
+function Test-MIRDeltaScienceSet {
+  param($Value)
+  $rows = @($Value)
+  $names = @($rows | ForEach-Object { [string]$_.name } | Sort-Object)
+  return $rows.Count -eq 4 -and
+    @($rows | Where-Object { [string]$_.type -ne "item" -or [double]$_.amount -ne 1 }).Count -eq 0 -and
+    ($names -join "|") -eq "automation-science-pack|chemical-science-pack|logistic-science-pack|production-science-pack"
+}
+
+function Test-MIRDeltaSteelTechnology {
+  param($Value, [switch]$Native)
+  $expectedName = if ($Native) { "steel-plate-productivity" } else { "recipe-prod-research_steel-1" }
+  $expectedFormula = if ($Native) { "1.5^L*1000" } else { "8000*2^(L-1)" }
+  if ($null -eq $Value -or [string]$Value.name -ne $expectedName -or
+    [string]$Value.count_formula -ne $expectedFormula -or [double]$Value.research_time -ne 60 -or
+    [string]$Value.maximum_level -ne "infinite" -or $Value.upgrade -ne $true -or
+    -not (Test-MIRDeltaScienceSet -Value $Value.science_ingredients)) {
+    return $false
+  }
+  $effects = @($Value.effects)
+  if (@($effects | Where-Object {
+    [string]$_.type -ne "change-recipe-productivity" -or [double]$_.change -ne 0.1
+  }).Count -ne 0) {
+    return $false
+  }
+  $recipes = @($effects | ForEach-Object { [string]$_.recipe } | Sort-Object)
+  if ($Native) {
+    return ($recipes -join "|") -in @(
+      "casting-steel|steel-plate",
+      "casting-steel|mir-fixture-adopt-steel-plate|steel-plate"
+    )
+  }
+  return ($recipes -join "|") -eq "steel-plate"
+}
 if ($artifact.schema -ne 1 -or $artifact.kind -ne "mir-approved-delta") {
   throw "Approved-delta artifact must use schema 1 and kind mir-approved-delta."
 }
@@ -63,14 +122,27 @@ $actualScenarios = @($artifact.scenario_evidence.scenario | Sort-Object -Unique)
 if (($actualScenarios -join "`n") -ne (($expectedScenarios | Sort-Object) -join "`n")) {
   throw "Approved-delta scenario coverage differs from the governed seven-scenario matrix."
 }
+$expectedScenarioRows = @{
+  "approved-delta-automatic-family-controls" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
+  "approved-delta-base" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
+  "approved-delta-base-continuations" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
+  "approved-delta-compat-atan" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
+  "approved-delta-compat-space-age-galore" = @{ baseline = 70; current = 71; differences = 27; technology_differences = 1 }
+  "approved-delta-native-owner-adoption" = @{ baseline = 70; current = 71; differences = 29; technology_differences = 3 }
+  "approved-delta-space-age" = @{ baseline = 70; current = 71; differences = 27; technology_differences = 1 }
+}
 foreach ($scenario in @($artifact.scenario_evidence)) {
   if ([string]::IsNullOrWhiteSpace([string]$scenario.baseline_fingerprint) -or
     [string]::IsNullOrWhiteSpace([string]$scenario.current_fingerprint)) {
     throw "Approved-delta scenario lacks normalized fingerprints: $($scenario.scenario)"
   }
-  if ($scenario.baseline_technology_count -ne $scenario.current_technology_count -or
-    $scenario.technology_difference_count -ne 0) {
-    throw "Approved-delta scenario changes normalized technology output: $($scenario.scenario)"
+  $expectedRow = $expectedScenarioRows[[string]$scenario.scenario]
+  if ($null -eq $expectedRow -or
+    [int]$scenario.baseline_technology_count -ne $expectedRow.baseline -or
+    [int]$scenario.current_technology_count -ne $expectedRow.current -or
+    [int]$scenario.difference_count -ne $expectedRow.differences -or
+    [int]$scenario.technology_difference_count -ne $expectedRow.technology_differences) {
+    throw "Approved-delta scenario counts differ from the exact reviewed 3.2 transition: $($scenario.scenario)"
   }
 }
 
@@ -96,13 +168,102 @@ if ($artifact.summary.difference_count -ne $differences.Count -or
   $artifact.summary.intentional_count -ne $differences.Count) {
   throw "Approved-delta summary counts differ from its rows."
 }
+if ($differences.Count -ne 200) {
+  throw "Approved-delta difference count differs from the exact reviewed 3.2 transition."
+}
 
-$forbiddenBehaviorPaths = @($differences | Where-Object {
-  $_.field -match '\.(technologies|technology_ids|generated_registry|settings)\.' -or
+$expectedReasonCounts = [ordered]@{
+  "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch." = 5
+  "Scenario binds the two exact MIR package versions under comparison." = 7
+  "3.2 hardens GenerationPlan authority and target-neutral CompilerEvidence contracts." = 77
+  "3.2 publishes compact public coverage and reserves the complete recipe ledger for explicit internal diagnostics." = 49
+  "3.2 adds the explicitly reviewed steel productivity stream and its stable startup-setting family." = 42
+  "3.2 adds the explicitly reviewed steel productivity stream and stable generated identity." = 4
+  "3.2 adds the explicitly reviewed base steel productivity technology." = 4
+  "3.2 adopts safe steel recipes into the existing Space Age steel productivity owner." = 3
+  "3.2 adds exactly one reviewed steel stream identity for the active base or Space Age ownership model." = 7
+  "3.2 removes the reviewed copper scrap-recovery loop from material productivity ownership." = 1
+  "3.2 removes the reviewed iron scrap-recovery loop from material productivity ownership." = 1
+}
+foreach ($entry in $expectedReasonCounts.GetEnumerator()) {
+  $count = @($differences | Where-Object reason -eq $entry.Key).Count
+  if ($count -ne $entry.Value) {
+    throw "Approved-delta disposition count drifted for '$($entry.Key)': expected $($entry.Value), found $count."
+  }
+}
+if (@($differences | Where-Object { -not $expectedReasonCounts.Contains([string]$_.reason) }).Count -ne 0) {
+  throw "Approved-delta contains an unknown intentional disposition."
+}
+
+$behaviorDifferences = @($differences | Where-Object {
+  $_.field -match '\.(technologies|technology_ids|generated_registry|settings)(\.|$)' -or
   $_.field -match '^package\.(runtime_namespaces|migrations)'
 })
-if ($forbiddenBehaviorPaths.Count -gt 0) {
-  throw "Approved-delta contains unaccepted technology, registry, setting, runtime namespace, or migration changes."
+foreach ($difference in $behaviorDifferences) {
+  $path = [string]$difference.field
+  if ($path -match '^package\.(runtime_namespaces|migrations)') {
+    throw "Approved-delta changes a runtime namespace or migration contract: $path"
+  }
+  if ($path -match '^scenarios\.[^.]+\.settings\.(ips-[^.]+-research_steel)$') {
+    $expectedSettings = @{
+      "ips-cost-base-research_steel" = @{ type = "number"; value = 8000 }
+      "ips-cost-growth-research_steel" = @{ type = "number"; value = 2 }
+      "ips-effect-per-level-research_steel" = @{ type = "number"; value = 10 }
+      "ips-enable-research_steel" = @{ type = "boolean"; value = $true }
+      "ips-max-level-research_steel" = @{ type = "number"; value = 0 }
+      "ips-research-time-research_steel" = @{ type = "number"; value = 60 }
+    }
+    $setting = $Matches[1]
+    if (-not $expectedSettings.ContainsKey($setting) -or $null -ne $difference.before -or
+      [string]$difference.after.value_type -ne [string]$expectedSettings[$setting].type -or
+      $difference.after.current_value -ne $expectedSettings[$setting].value) {
+      throw "Approved-delta contains an unexpected steel setting transition: $path"
+    }
+    continue
+  }
+  if ($path -match '^scenarios\.[^.]+\.generated_registry\.recipe-prod-research_steel-1$') {
+    if ($null -ne $difference.before -or [string]$difference.after.key -ne "research_steel" -or
+      [string]$difference.after.kind -ne "stream" -or [string]$difference.after.name -ne "recipe-prod-research_steel-1") {
+      throw "Approved-delta contains an unexpected steel registry transition: $path"
+    }
+    continue
+  }
+  if ($path -match '^scenarios\.[^.]+\.technology_ids$') {
+    $expectedAdded = if ($path -match '(compat-space-age-galore|native-owner-adoption|space-age)\.technology_ids$') {
+      "steel-plate-productivity"
+    } else {
+      "recipe-prod-research_steel-1"
+    }
+    if (-not (Test-MIRDeltaExactStringAddition -Before $difference.before -After $difference.after -ExpectedAdded $expectedAdded)) {
+      throw "Approved-delta technology identity transition is not the exact reviewed steel addition: $path"
+    }
+    continue
+  }
+  if ($path -match '^scenarios\.[^.]+\.technologies\.recipe-prod-research_steel-1$') {
+    if ($null -ne $difference.before -or -not (Test-MIRDeltaSteelTechnology -Value $difference.after)) {
+      throw "Approved-delta base steel technology differs from its reviewed design: $path"
+    }
+    continue
+  }
+  if ($path -match '^scenarios\.[^.]+\.technologies\.steel-plate-productivity$') {
+    if ($null -ne $difference.before -or -not (Test-MIRDeltaSteelTechnology -Value $difference.after -Native)) {
+      throw "Approved-delta native steel owner differs from its reviewed design: $path"
+    }
+    continue
+  }
+  if ($path -eq 'scenarios.approved-delta-native-owner-adoption.technologies.recipe-prod-research_copper-1.effects') {
+    if (-not (Test-MIRDeltaExactEffectRemoval -Before $difference.before -After $difference.after -ExpectedRecipe "mir-fixture-scrap-copper-plate-recovery")) {
+      throw "Approved-delta copper change is not the exact reviewed scrap-recovery removal."
+    }
+    continue
+  }
+  if ($path -eq 'scenarios.approved-delta-native-owner-adoption.technologies.recipe-prod-research_iron-1.effects') {
+    if (-not (Test-MIRDeltaExactEffectRemoval -Before $difference.before -After $difference.after -ExpectedRecipe "mir-fixture-scrap-iron-plate-recovery")) {
+      throw "Approved-delta iron change is not the exact reviewed scrap-recovery removal."
+    }
+    continue
+  }
+  throw "Approved-delta contains an unbounded technology, registry, or setting change: $path"
 }
 foreach ($scenario in $expectedScenarios) {
   $prefix = "scenarios.$scenario.mod_data_contracts."
@@ -112,7 +273,10 @@ foreach ($scenario in $expectedScenarios) {
   if (-not @($differences.field | Where-Object { $_ -like "$prefix*generation-plan*" })) {
     throw "Approved-delta scenario lacks the GenerationPlan authority transition: $scenario"
   }
+  if (-not @($differences.field | Where-Object { $_ -like "$prefix*coverage-report*" })) {
+    throw "Approved-delta scenario lacks the compact public coverage transition: $scenario"
+  }
 }
 
 $binding = if ($ValidateStructureOnly) { "governed artifact structure" } else { "the exact active candidate" }
-Write-Host "[ok] MIR approved delta binds $binding, seven exact-package scenarios, $($differences.Count) intentional differences, and no technology drift."
+Write-Host "[ok] MIR approved delta binds $binding, seven exact-package scenarios, $($differences.Count) intentional differences, one reviewed steel identity per scenario, and exact scrap-recovery exclusions."

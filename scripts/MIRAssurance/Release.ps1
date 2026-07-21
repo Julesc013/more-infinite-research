@@ -24,7 +24,10 @@ function Invoke-MIRAssuranceSeal {
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   $nonGeneratedStatus = @($status | Where-Object {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }
-    $path -notlike "artifacts/assurance/*" -and $path -notlike "out/*"
+    $path -notlike "artifacts/assurance/*" -and
+      $path -notlike "out/*" -and
+      $path -notlike "approved-delta/*" -and
+      $path -notlike ".mir/evidence/*"
   })
   if ($nonGeneratedStatus.Count -ne 0) {
     throw "Refusing to seal a dirty source tree. Commit the exact candidate source first."

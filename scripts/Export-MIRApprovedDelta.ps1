@@ -244,8 +244,154 @@ function Add-ValueDifferences {
   }
 }
 
+function Test-ExactStringArrayAddition {
+  param(
+    $Before,
+    $After,
+    [Parameter(Mandatory)][string]$ExpectedAdded
+  )
+
+  $beforeValues = @($Before | ForEach-Object { [string]$_ })
+  $afterValues = @($After | ForEach-Object { [string]$_ })
+  $added = @($afterValues | Where-Object { $beforeValues -notcontains $_ })
+  $removed = @($beforeValues | Where-Object { $afterValues -notcontains $_ })
+  return $removed.Count -eq 0 -and $added.Count -eq 1 -and $added[0] -eq $ExpectedAdded
+}
+
+function Test-ExactRecipeEffectRemoval {
+  param(
+    $Before,
+    $After,
+    [Parameter(Mandatory)][string]$ExpectedRecipe
+  )
+
+  $beforeRows = @($Before)
+  $removed = @($beforeRows | Where-Object { [string]$_.recipe -eq $ExpectedRecipe })
+  $retained = @($beforeRows | Where-Object { [string]$_.recipe -ne $ExpectedRecipe })
+  if ($removed.Count -ne 1 -or
+    [string]$removed[0].type -ne "change-recipe-productivity" -or
+    [double]$removed[0].change -ne 0.1) {
+    return $false
+  }
+  return (Get-CanonicalJson -Value $retained) -eq (Get-CanonicalJson -Value @($After))
+}
+
+function Test-ExactScienceSet {
+  param($Value)
+
+  $rows = @($Value)
+  if ($rows.Count -ne 4 -or @($rows | Where-Object {
+    [string]$_.type -ne "item" -or [double]$_.amount -ne 1
+  }).Count -ne 0) {
+    return $false
+  }
+  $names = @($rows | ForEach-Object { [string]$_.name } | Sort-Object)
+  return ($names -join "|") -eq "automation-science-pack|chemical-science-pack|logistic-science-pack|production-science-pack"
+}
+
+function Test-ExactGeneratedSteelTechnology {
+  param($Value)
+
+  if ($null -eq $Value -or [string]$Value.name -ne "recipe-prod-research_steel-1" -or
+    [string]$Value.count_formula -ne "8000*2^(L-1)" -or [double]$Value.research_time -ne 60 -or
+    [string]$Value.maximum_level -ne "infinite" -or $Value.upgrade -ne $true) {
+    return $false
+  }
+  $effects = @($Value.effects)
+  if ($effects.Count -ne 1 -or [string]$effects[0].type -ne "change-recipe-productivity" -or
+    [string]$effects[0].recipe -ne "steel-plate" -or [double]$effects[0].change -ne 0.1) {
+    return $false
+  }
+  $prerequisites = @($Value.prerequisites | ForEach-Object { [string]$_ } | Sort-Object)
+  return ($prerequisites -join "|") -eq "automation-science-pack|chemical-science-pack|logistic-science-pack|production-science-pack" -and
+    (Test-ExactScienceSet -Value $Value.science_ingredients)
+}
+
+function Test-ExactNativeSteelTechnology {
+  param($Value)
+
+  if ($null -eq $Value -or [string]$Value.name -ne "steel-plate-productivity" -or
+    [string]$Value.count_formula -ne "1.5^L*1000" -or [double]$Value.research_time -ne 60 -or
+    [string]$Value.maximum_level -ne "infinite" -or $Value.upgrade -ne $true -or
+    (@($Value.prerequisites | ForEach-Object { [string]$_ }) -join "|") -ne "production-science-pack" -or
+    -not (Test-ExactScienceSet -Value $Value.science_ingredients)) {
+    return $false
+  }
+  $effectRows = @($Value.effects)
+  if ($effectRows.Count -lt 2 -or $effectRows.Count -gt 3 -or @($effectRows | Where-Object {
+    [string]$_.type -ne "change-recipe-productivity" -or [double]$_.change -ne 0.1
+  }).Count -ne 0) {
+    return $false
+  }
+  $recipes = @($effectRows | ForEach-Object { [string]$_.recipe } | Sort-Object)
+  return ($recipes -join "|") -in @(
+    "casting-steel|steel-plate",
+    "casting-steel|mir-fixture-adopt-steel-plate|steel-plate"
+  )
+}
+
+function Test-ExactSteelSettingAddition {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
+
+  if ($null -ne $Before -or $Path -notmatch '\.settings\.(ips-[^.]+-research_steel)$') {
+    return $false
+  }
+  $setting = $Matches[1]
+  $expected = @{
+    "ips-cost-base-research_steel" = @{ type = "number"; value = 8000 }
+    "ips-cost-growth-research_steel" = @{ type = "number"; value = 2 }
+    "ips-effect-per-level-research_steel" = @{ type = "number"; value = 10 }
+    "ips-enable-research_steel" = @{ type = "boolean"; value = $true }
+    "ips-max-level-research_steel" = @{ type = "number"; value = 0 }
+    "ips-research-time-research_steel" = @{ type = "number"; value = 60 }
+  }
+  if (-not $expected.ContainsKey($setting)) { return $false }
+  return [string]$After.value_type -eq [string]$expected[$setting].type -and
+    $After.current_value -eq $expected[$setting].value
+}
+
+function Test-ExactCoverageContractDifference {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
+
+  if ($Path -match '\.mod_data_contracts\.more-infinite-research-coverage-report-internal$') {
+    return $null -eq $Before -and
+      [string]$After.data_type -eq "more-infinite-research.coverage-report-internal" -and
+      [int]$After.schema -eq 1 -and
+      [string]$After.contract_shape.kind -eq "object" -and
+      $null -ne $After.contract_shape.fields.rows -and
+      $null -ne $After.contract_shape.fields.summary
+  }
+  $prefix = '^scenarios\.[^.]+\.mod_data_contracts\.more-infinite-research-coverage-report\.'
+  if ($Path -notmatch $prefix) { return $false }
+  $suffix = $Path -replace $prefix, ''
+  switch ($suffix) {
+    "contract_shape.fields.coverage_fingerprint" { return $null -eq $Before -and [string]$After -eq "string" }
+    "contract_shape.fields.coverage_report_schema" { return $null -eq $Before -and [string]$After -eq "number" }
+    "contract_shape.fields.fingerprint" { return [string]$Before -eq "string" -and $null -eq $After }
+    "contract_shape.fields.public_fingerprint" { return $null -eq $Before -and [string]$After -eq "string" }
+    "contract_shape.fields.rows" { return [string]$Before.kind -eq "map" -and $null -eq $After }
+    "data_type" {
+      return [string]$Before -eq "more-infinite-research.coverage-report" -and
+        [string]$After -eq "more-infinite-research.coverage-public"
+    }
+    default { return $false }
+  }
+}
+
 function Get-DifferenceDisposition {
-  param([Parameter(Mandatory)][string]$Path)
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
   if ($Path -match '^package\.(version|archive_sha256|package_content_sha256|runtime_source_fingerprints|settings_source_fingerprints)') {
     return [ordered]@{
       reason = "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch."
@@ -268,6 +414,83 @@ function Get-DifferenceDisposition {
       intentional = $true
       migration_impact = "Diagnostic consumers must accept the documented 3.2 schema; save identity is unaffected."
       required_evidence = @("compiler-contracts", "base-generation-integrity", "schema drift static gate")
+    }
+  }
+  if (Test-ExactCoverageContractDifference -Path $Path -Before $Before -After $After) {
+    return [ordered]@{
+      reason = "3.2 publishes compact public coverage and reserves the complete recipe ledger for explicit internal diagnostics."
+      intentional = $true
+      migration_impact = "Coverage mod-data consumers must migrate to the compact public schema or explicitly request the internal diagnostic artifact; save identity is unaffected."
+      required_evidence = @("compiler-contracts", "coverage-report schema reference", "public compiler artifact schema drift gate")
+    }
+  }
+  if (Test-ExactSteelSettingAddition -Path $Path -Before $Before -After $After) {
+    return [ordered]@{
+      reason = "3.2 adds the explicitly reviewed steel productivity stream and its stable startup-setting family."
+      intentional = $true
+      migration_impact = "Existing saves receive a new default-enabled base steel productivity stream; Space Age binds the same settings to the native steel owner."
+      required_evidence = @("3.2 steel technology golden plan", "native-owner settings matrix", "3.2 release notes")
+    }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.generated_registry\.recipe-prod-research_steel-1$' -and
+    $null -eq $Before -and [string]$After.key -eq "research_steel" -and
+    [string]$After.kind -eq "stream" -and [string]$After.name -eq "recipe-prod-research_steel-1") {
+    return [ordered]@{
+      reason = "3.2 adds the explicitly reviewed steel productivity stream and stable generated identity."
+      intentional = $true
+      migration_impact = "Base saves may receive recipe-prod-research_steel-1; Space Age continues to use its native steel owner."
+      required_evidence = @("3.2 steel technology golden plan", "base and Space Age generation integrity", "3.2 release notes")
+    }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.technologies\.recipe-prod-research_steel-1$' -and
+    $null -eq $Before -and (Test-ExactGeneratedSteelTechnology -Value $After)) {
+    return [ordered]@{
+      reason = "3.2 adds the explicitly reviewed base steel productivity technology."
+      intentional = $true
+      migration_impact = "Base saves gain one stable infinite steel-plate productivity technology with reviewed +10% effects and progression."
+      required_evidence = @("3.2 steel technology golden plan", "generation integrity", "human balance review")
+    }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.technologies\.steel-plate-productivity$' -and
+    $null -eq $Before -and (Test-ExactNativeSteelTechnology -Value $After)) {
+    return [ordered]@{
+      reason = "3.2 adopts safe steel recipes into the existing Space Age steel productivity owner."
+      intentional = $true
+      migration_impact = "Space Age retains one visible native steel owner; MIR does not create a duplicate technology."
+      required_evidence = @("native-owner adoption fixture", "Space Age generation integrity", "upgrade matrix")
+    }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.technology_ids$') {
+    $expectedAdded = if ($Path -match '(compat-space-age-galore|native-owner-adoption|space-age)\.technology_ids$') {
+      "steel-plate-productivity"
+    } else {
+      "recipe-prod-research_steel-1"
+    }
+    if (Test-ExactStringArrayAddition -Before $Before -After $After -ExpectedAdded $expectedAdded) {
+      return [ordered]@{
+        reason = "3.2 adds exactly one reviewed steel stream identity for the active base or Space Age ownership model."
+        intentional = $true
+        migration_impact = "One stable steel identity enters the normalized technology catalog without removing prior identities."
+        required_evidence = @("3.2 steel technology golden plan", "base and Space Age exact-package scenarios")
+      }
+    }
+  }
+  if ($Path -eq 'scenarios.approved-delta-native-owner-adoption.technologies.recipe-prod-research_copper-1.effects' -and
+    (Test-ExactRecipeEffectRemoval -Before $Before -After $After -ExpectedRecipe "mir-fixture-scrap-copper-plate-recovery")) {
+    return [ordered]@{
+      reason = "3.2 removes the reviewed copper scrap-recovery loop from material productivity ownership."
+      intentional = $true
+      migration_impact = "Unsafe scrap-input recovery recipes no longer receive copper productivity."
+      required_evidence = @("scrap-recovery exclusion fixture", "native-owner adoption scenario", "3.2 changelog")
+    }
+  }
+  if ($Path -eq 'scenarios.approved-delta-native-owner-adoption.technologies.recipe-prod-research_iron-1.effects' -and
+    (Test-ExactRecipeEffectRemoval -Before $Before -After $After -ExpectedRecipe "mir-fixture-scrap-iron-plate-recovery")) {
+    return [ordered]@{
+      reason = "3.2 removes the reviewed iron scrap-recovery loop from material productivity ownership."
+      intentional = $true
+      migration_impact = "Unsafe scrap-input recovery recipes no longer receive iron productivity."
+      required_evidence = @("scrap-recovery exclusion fixture", "native-owner adoption scenario", "3.2 changelog")
     }
   }
   return [ordered]@{
@@ -378,7 +601,7 @@ foreach ($scenario in $scenarioNames) {
 
 $differences = @()
 foreach ($difference in @($rawDifferences | Sort-Object path)) {
-  $disposition = Get-DifferenceDisposition -Path $difference.path
+  $disposition = Get-DifferenceDisposition -Path $difference.path -Before $difference.before -After $difference.after
   $beforeValue = $difference.before
   $afterValue = $difference.after
   if ($difference.path -like "*.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.rows.value_shapes") {
