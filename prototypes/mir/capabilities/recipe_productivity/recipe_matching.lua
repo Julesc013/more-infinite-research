@@ -152,7 +152,7 @@ local function gather_by_items(items, patterns, options)
 
   local seen, list = {}, {}
   for _, rname in ipairs(recipe_facts.candidate_names(want, candidate_categories, candidate_patterns)) do
-    local r = recipe_facts.get(rname)
+    local r = recipe_facts.view(rname)
     if not should_skip_recipe(rname, r, options) then
       local outs = {}
       for _, output_name in ipairs(r.productive_result_names or {}) do outs[output_name] = true end

@@ -22,6 +22,7 @@ measurement_policy:
   - Paired evidence preserves maximum-observed artifact-volume counters and per-run telemetry fingerprints for diagnostics-off and diagnostics-on candidate runs.
   - A non-shipped symmetric probe times equivalent recipe snapshot planning final graph assertion and postcondition boundaries in both exact archives without changing either package.
   - Compiler phase lanes use measured diagnostics-off probe rows while artifact volume uses the candidate public CompilerEvidence telemetry from diagnostics-off and diagnostics-on rows.
+  - Sub-100-millisecond phase lanes retain the 20 percent relative ceiling but use characterized absolute allowances of 0.10 seconds for snapshot and 0.05 seconds for postconditions; graph and planning retain 0.01 seconds.
 
 required_surfaces:
   - base

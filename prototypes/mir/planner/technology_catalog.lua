@@ -11,11 +11,12 @@ local function alternative_id(design)
   return design.materialization.kind .. ":" .. tostring(target)
 end
 
-function M.from_generation_rows(rows, context_material)
+function M.from_generation_rows(rows, context_material, options)
+  options = options or {}
   local candidates, qualifications, by_id = {}, {}, {}
   for _, row in ipairs(rows or {}) do
     local design = row.technology_design or technology_design.from_generation_row(row)
-    technology_design.validate(design)
+    if not options.trusted_designs then technology_design.validate(design) end
     local candidate = technology_candidate.from_design(design, row, {validated = true})
     local existing = by_id[candidate.candidate_id]
     if existing and existing.candidate_fingerprint ~= candidate.candidate_fingerprint then

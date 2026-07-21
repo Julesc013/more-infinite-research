@@ -26,6 +26,8 @@ local technology_migration = require("__more-infinite-research__.prototypes.mir.
 local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
+local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
+local relationships = require("__more-infinite-research__.prototypes.mir.index.relationships")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -464,6 +466,15 @@ local candidate = technology_candidate.from_design(normalized_design, design_row
 local qualification = technology_qualification.from_design(normalized_design, design_row)
 local lifecycle_catalog = technology_catalog.from_generation_rows({design_row}, {fixture = "lifecycle"})
 technology_catalog.validate(lifecycle_catalog)
+local trusted_lifecycle_catalog = technology_catalog.from_generation_rows(
+  {design_row},
+  {fixture = "lifecycle"},
+  {trusted_designs = true}
+)
+technology_catalog.validate(trusted_lifecycle_catalog)
+if fingerprint.of(lifecycle_catalog) ~= fingerprint.of(trusted_lifecycle_catalog) then
+  fail("trusted technology catalog construction differs from the defensive path")
+end
 if candidate.candidate_id ~= normalized_design.candidate_id
   or candidate.semantic_identity.capability ~= "recipe-productivity"
   or qualification.decision ~= "qualified"
@@ -950,6 +961,15 @@ local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
 
 local production_context = compiler_context.current()
+local relationship_view = relationships.view("output")
+if relationship_view ~= relationships.view("output")
+  or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
+  fail("relationship index view is not stable or snapshot-equivalent")
+end
+local recipe_view = recipe_facts.view("iron-plate")
+if recipe_view and recipe_view ~= recipe_facts.view("iron-plate") then
+  fail("recipe fact view is not stable within one CompilerContext")
+end
 local production_catalog = production_context:state_snapshot("technology_candidate_catalog")
 local production_qualifications = production_context:state_snapshot("technology_qualifications")
 local production_plan = production_context:state_snapshot("generation_plan")

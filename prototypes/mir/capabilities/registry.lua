@@ -116,7 +116,7 @@ end
 
 local function entity_backed_candidates(registry, wanted_entity_types)
   local recipes_by_item = recipe_outputs_by_item(registry)
-  local indexes = registry.indexes or relationships.snapshot()
+  local indexes = registry.indexes or relationships.view()
   local candidates = {}
   local seen = {}
 

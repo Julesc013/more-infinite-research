@@ -42,7 +42,7 @@ function O.has_recipe_productivity_effect(tech, recipe_name)
 end
 
 function O.recipe_allows_productivity(recipe_name)
-  local fact = recipe_facts.get(recipe_name)
+  local fact = recipe_facts.view(recipe_name)
   if not fact or fact.allow_productivity ~= true then return false end
   for _, variant in ipairs(fact.variants or {}) do
     if variant.effective_allow_productivity ~= true then return false end
@@ -142,7 +142,7 @@ end
 function O.external_recipe_productivity_owner_records(recipe_name, options)
   local records = {}
   local snapshot_phase = options and options.snapshot_phase or "input"
-  local owner_names = relationships.snapshot(snapshot_phase).technologies_by_recipe_effect[recipe_name] or {}
+  local owner_names = relationships.view(snapshot_phase).technologies_by_recipe_effect[recipe_name] or {}
   for _, tech_name in ipairs(owner_names) do
     local tech = data_raw.technology(tech_name)
     if tech.max_level == "infinite" and not O.is_mir_recipe_productivity_tech(tech_name) then

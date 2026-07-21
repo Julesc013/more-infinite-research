@@ -69,7 +69,7 @@ function M.pack_production_status(pack_name, visiting_packs)
 end
 
 function M.researchable_unlockers_for_recipe(recipe_name)
-  local recipe = canonical_recipe_facts.get(recipe_name)
+  local recipe = canonical_recipe_facts.view(recipe_name)
   if not recipe or recipe_facts.recipe_enabled_without_research(recipe) then return {} end
   local out = {}
   for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do

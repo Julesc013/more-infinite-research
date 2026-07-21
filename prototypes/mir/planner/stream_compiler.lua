@@ -415,14 +415,17 @@ local function compile(context, return_view)
   local artifact = finalized:artifact_view()
   local catalog
   if diagnostics.enabled() then
-    catalog = technology_catalog.from_generation_rows(artifact.rows, artifact.source_fingerprints)
-    technology_catalog.validate(catalog)
+    catalog = technology_catalog.from_generation_rows(
+      artifact.rows,
+      artifact.source_fingerprints,
+      {trusted_designs = true}
+    )
   end
   telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
   if catalog then
-    context:set_state("technology_candidate_catalog", technology_catalog.snapshot(catalog))
-    context:set_state("technology_qualifications", deepcopy(catalog.qualifications))
+    context:set_state("technology_candidate_catalog", catalog)
+    context:set_state("technology_qualifications", catalog.qualifications)
   end
   context:set_state("generation_plan", artifact)
   return return_view and artifact or deepcopy(artifact)

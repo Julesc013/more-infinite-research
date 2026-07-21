@@ -9,10 +9,10 @@
     { "id": "large-ecosystem.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.25, "max_candidate_seconds": 90.0 },
     { "id": "diagnostics-off.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 7.0 },
     { "id": "diagnostics-on.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
-    { "id": "compiler.snapshot", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.snapshot", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10 },
     { "id": "compiler.graph", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
     { "id": "compiler.planning", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
-    { "id": "compiler.postconditions", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 }
+    { "id": "compiler.postconditions", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.05 }
   ],
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },

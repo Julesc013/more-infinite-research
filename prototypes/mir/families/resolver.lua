@@ -51,7 +51,7 @@ local function candidates_for_rule(rule, indexes, seeds)
   end
   for _, seed in ipairs(seeds or {}) do
     if seed.family == rule.id and seed.stream == stream then
-      local fact = recipe_facts.get(seed.recipe)
+      local fact = recipe_facts.view(seed.recipe)
       local item_name = infer_seed_item(seed, fact)
       if not item_name then
         error("CompatibilityPack candidate seed requires an exact item for ambiguous recipe " .. seed.recipe, 2)
@@ -80,7 +80,7 @@ local function build()
   local context = compiler_context.current()
   local canonical = context:state_view("family_resolution")
   if canonical then return canonical end
-  local indexes = relationships.snapshot()
+  local indexes = relationships.view()
   local rules = rule_registry.snapshot().rules
   local seeds = policy_authority.candidate_seeds()
   local attachments, decisions, ownership = {}, {}, {}
@@ -99,7 +99,7 @@ local function build()
     local target_stream = operator_dsl.grouping_stream(rule.operators)
     for _, candidate in ipairs(candidates_for_rule(rule, indexes, seeds)) do
         local item_name, recipe_name = candidate.item, candidate.recipe
-        local fact = recipe_facts.get(recipe_name)
+        local fact = recipe_facts.view(recipe_name)
         local eligible, blocker = operator_dsl.eligibility(rule.operators, fact, item_name)
         local pack_decision = policy_authority.resolve_candidate({
           recipe = recipe_name,

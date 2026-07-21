@@ -124,6 +124,12 @@ function M.snapshot(phase)
   return deepcopy(build(phase))
 end
 
+-- Internal compiler consumers share the context-owned immutable index. Public
+-- exports and callers that need ownership must continue to use snapshot().
+function M.view(phase)
+  return build(phase)
+end
+
 function M.entity_type(name)
   return build("input").entity_type_by_name[name]
 end

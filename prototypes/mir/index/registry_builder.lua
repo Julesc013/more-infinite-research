@@ -127,7 +127,7 @@ end
 local function build_recipe_facts(unlocks)
   local facts = {}
   for _, name in ipairs(canonical_recipe_facts.all_names()) do
-    local recipe = canonical_recipe_facts.get(name)
+    local recipe = canonical_recipe_facts.view(name)
     local owner_records = productivity_owners.external_recipe_productivity_owner_records(name, {snapshot_phase = "output"})
     local owner_names = {}
     for _, owner in ipairs(owner_records) do
@@ -471,7 +471,7 @@ function R.build()
     owners = owners,
     rule_mutations = rule_mutations,
     loop_risks = loop_risks,
-    indexes = relationships.snapshot("output"),
+    indexes = relationships.view("output"),
     summary = {
       recipes = table_count(recipes),
       technologies = table_count(technologies),
