@@ -123,6 +123,13 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE",
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
 }
+$compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+$compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+$durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
+if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
+    $durationProjectionCount -lt 2) {
+  throw "Compatibility performance lanes require authoritative Factorio process duration in load and campaign evidence."
+}
 
 if ($ValidateManifestOnly) {
   Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."

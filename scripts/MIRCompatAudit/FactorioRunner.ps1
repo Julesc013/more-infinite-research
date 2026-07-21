@@ -207,6 +207,7 @@ disable-blueprint-storage=true
     "--disable-audio"
   )
 
+  $timer = [Diagnostics.Stopwatch]::StartNew()
   $process = Start-Process -FilePath $factorioBinResolved -ArgumentList $args -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
   $timedOut = $false
   $waitMilliseconds = [Math]::Max(1, $ScenarioTimeoutSeconds) * 1000
@@ -219,6 +220,7 @@ disable-blueprint-storage=true
       # Best effort cleanup; the timed_out result is the important artifact.
     }
   }
+  $timer.Stop()
 
   $auditRows = @()
   $sanitationRows = @()
@@ -235,6 +237,7 @@ disable-blueprint-storage=true
     exit_code = $exitCode
     timed_out = $timedOut
     timeout_seconds = $ScenarioTimeoutSeconds
+    duration_seconds = [Math]::Round($timer.Elapsed.TotalSeconds, 6)
     save = $savePath
     stdout = $logPath
     stderr = "$logPath.err"

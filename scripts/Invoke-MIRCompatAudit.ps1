@@ -941,6 +941,7 @@ function Invoke-MIRScenarioLoad {
       exit_code = $null
       timed_out = $false
       timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+      duration_seconds = 0.0
       skipped = $true
       skip_reason = "dependency_resolution_failure"
       passed = $false
@@ -977,6 +978,7 @@ function Invoke-MIRScenarioLoad {
     exit_code = $result.exit_code
     timed_out = $result.timed_out
     timeout_seconds = $result.timeout_seconds
+    duration_seconds = [double]$result.duration_seconds
     skipped = $false
     skip_reason = ""
     passed = $result.passed
@@ -1416,6 +1418,7 @@ if ($RunLoadTests) {
         exit_code = $result.exit_code
         timed_out = [bool]$result.timed_out
         timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+        duration_seconds = [double]$result.duration_seconds
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
         sanitation_budget = [ordered]@{

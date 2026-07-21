@@ -167,12 +167,16 @@
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
         ".mir/performance-campaign.json",
+        "fixtures/compat-matrix/local-library-scenarios.json",
         "fixtures/performance-regression-probe/**",
+        "scripts/Invoke-MIRCompatAudit.ps1",
+        "scripts/MIRCompatAudit/**",
         "scripts/Test-MIRPerformanceBudgets.ps1",
         "scripts/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
         "scripts/validation/PerformanceCampaign.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
+        "scripts/validation/SettingsOverrides.ps1",
         "prototypes/mir/report/compiler_telemetry.lua"
       ]
     },
@@ -204,13 +208,17 @@
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
         ".mir/performance-campaign.json",
+        "fixtures/compat-matrix/local-library-scenarios.json",
         "fixtures/performance-regression-probe/**",
+        "scripts/Invoke-MIRCompatAudit.ps1",
+        "scripts/MIRCompatAudit/**",
         "verification/schema/runtime-performance-evidence.schema.json",
         "scripts/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
         "scripts/validation/PerformanceCampaign.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/PackageIdentity.ps1"
+        "scripts/validation/PackageIdentity.ps1",
+        "scripts/validation/SettingsOverrides.ps1"
       ]
     },
     {
