@@ -148,6 +148,11 @@ foreach ($requiredSealField in @(
 if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
   throw "Candidate sealing still accepts an arbitrary evidence summary."
 }
+$publishedSnapshotIntegrity = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Test-MIRPublishedSnapshotIntegrity.ps1")
+if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
+  $publishedSnapshotIntegrity -match 'Measure-Object -Property Length -Sum') {
+  throw "Published snapshot byte counts must come from canonical Git blobs, not checkout line endings."
+}
 
 $coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
 . $coreScript

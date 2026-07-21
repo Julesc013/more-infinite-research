@@ -56,10 +56,23 @@ try {
             $failures.Add("$($entry.version): snapshot tree $actualTree does not match $($entry.tree)")
         }
 
-        $files = @(Get-ChildItem -LiteralPath $snapshotPath -File -Recurse -Force)
-        $byteCount = ($files | Measure-Object -Property Length -Sum).Sum
-        if ($files.Count -ne [int]$entry.files) {
-            $failures.Add("$($entry.version): file count $($files.Count) does not match $($entry.files)")
+        $treeFileRows = @(& git ls-tree -r -l $actualTree)
+        if ($LASTEXITCODE -ne 0) {
+            $failures.Add("$($entry.version): unable to enumerate canonical snapshot blobs")
+            continue
+        }
+        $treeFileCount = 0
+        $byteCount = [long]0
+        foreach ($row in $treeFileRows) {
+            if ([string]$row -notmatch '^\d+\s+blob\s+[0-9a-f]+\s+(\d+)\t') {
+                $failures.Add("$($entry.version): unexpected Git tree row '$row'")
+                continue
+            }
+            $treeFileCount++
+            $byteCount += [long]$Matches[1]
+        }
+        if ($treeFileCount -ne [int]$entry.files) {
+            $failures.Add("$($entry.version): file count $treeFileCount does not match $($entry.files)")
         }
         if ([long]$byteCount -ne [long]$entry.bytes) {
             $failures.Add("$($entry.version): byte count $byteCount does not match $($entry.bytes)")
