@@ -118,10 +118,13 @@ foreach ($requiredPath in @(
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly")) {
+foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
   if ($producerSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
+}
+if ($producerSource -notmatch '\$PackageLabel\s+-eq\s+"candidate"\s+-and\s+\[string\]\$scenarios\[0\]\.result\s+-ne\s+"passed"') {
+  throw "Performance campaign must apply current sanitation claim gates to the candidate without imposing them on the sealed baseline."
 }
 $campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1")
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {

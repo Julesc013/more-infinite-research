@@ -132,7 +132,7 @@ Create that evidence with the governed producer before rerunning the full plan:
   -ExpectedSourceCommit (git rev-parse HEAD)
 ```
 
-The campaign uses the non-shipped `fixtures/performance-regression-probe` symmetrically for exact-archive diagnostics-off phase timing. The probe does not enter either release ZIP. Medium and large ecosystem lanes remain load observations over their exact resolved closures.
+The campaign uses the non-shipped `fixtures/performance-regression-probe` symmetrically for exact-archive diagnostics-off phase timing. The probe does not enter either release ZIP. Medium and large ecosystem lanes remain load observations over their exact resolved closures. Candidate ecosystem rows must also satisfy the current sanitation claim gate. The sealed prior-release baseline must pass its Factorio process, timeout, dependency, and closure checks, but is not required to emit a sanitation ledger introduced by the candidate.
 
 The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
 

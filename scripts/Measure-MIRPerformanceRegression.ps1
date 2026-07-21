@@ -10,7 +10,8 @@ param(
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
   [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
-  [switch]$ProbeSmokeOnly
+  [switch]$ProbeSmokeOnly,
+  [string]$CompatSmokeLaneId = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -276,11 +277,18 @@ disable-blueprint-storage=true
 }
 
 function Get-MIRCampaignClosureRows {
-  param([Parameter(Mandatory)]$CampaignEvidence, [Parameter(Mandatory)][string]$LaneId)
+  param(
+    [Parameter(Mandatory)]$CampaignEvidence,
+    [Parameter(Mandatory)][string]$LaneId,
+    [Parameter(Mandatory)][ValidateSet("baseline", "candidate")][string]$PackageLabel
+  )
   $scenarios = @($CampaignEvidence.scenarios)
-  if ($scenarios.Count -ne 1 -or [string]$scenarios[0].result -ne "passed" -or
-      [string]$scenarios[0].process_result -ne "passed" -or [bool]$scenarios[0].timed_out) {
+  if ($scenarios.Count -ne 1 -or [string]$scenarios[0].process_result -ne "passed" -or
+      [bool]$scenarios[0].timed_out -or [int]$scenarios[0].dependency_failure_count -ne 0) {
     throw "Compatibility performance run did not produce one passing scenario for $LaneId."
+  }
+  if ($PackageLabel -eq "candidate" -and [string]$scenarios[0].result -ne "passed") {
+    throw "Candidate compatibility performance run did not satisfy its governed claim gate for $LaneId."
   }
   return @(
     foreach ($entry in @($scenarios[0].dependency_closure | Sort-Object name, version)) {
@@ -335,7 +343,7 @@ function Invoke-MIRCompatPerformanceRun {
     throw "Compatibility performance run lacks campaign evidence for $($Lane.id)."
   }
   $campaignEvidence = Get-Content -Raw -LiteralPath $campaignEvidencePath | ConvertFrom-Json
-  $closureRows = @(Get-MIRCampaignClosureRows -CampaignEvidence $campaignEvidence -LaneId ([string]$Lane.id))
+  $closureRows = @(Get-MIRCampaignClosureRows -CampaignEvidence $campaignEvidence -LaneId ([string]$Lane.id) -PackageLabel $PackageLabel)
   $factorioSeconds = [double]$campaignEvidence.scenarios[0].duration_seconds
   if ($factorioSeconds -le 0) {
     throw "Compatibility performance run lacks a positive Factorio process duration for $($Lane.id)."
@@ -471,6 +479,32 @@ if ($ProbeSmokeOnly) {
   }
   $smoke | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $script:RunRoot "probe-smoke.json") -Encoding UTF8
   Write-Host "[ok] exact-archive performance probe smoke passed: $($script:RunRoot)"
+  exit 0
+}
+
+if (-not [string]::IsNullOrWhiteSpace($CompatSmokeLaneId)) {
+  $matchingLanes = @($lanes | Where-Object { [string]$_.id -eq $CompatSmokeLaneId })
+  if ($matchingLanes.Count -ne 1 -or [string]$matchingLanes[0].runner -ne "compat-audit") {
+    throw "CompatSmokeLaneId must identify exactly one compat-audit lane."
+  }
+  $lane = $matchingLanes[0]
+  $baselineSmoke = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel baseline -Phase "compat-smoke" -Index 1
+  $candidateSmoke = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel candidate -Phase "compat-smoke" -Index 1
+  $baselineClosureSha = Get-MIRStringSha256 -Value (@($baselineSmoke.closure_rows) -join "`n")
+  $candidateClosureSha = Get-MIRStringSha256 -Value (@($candidateSmoke.closure_rows) -join "`n")
+  if ($baselineClosureSha -ne $candidateClosureSha) {
+    throw "Compatibility smoke closure differs between baseline and candidate for $CompatSmokeLaneId."
+  }
+  [ordered]@{
+    schema = 1
+    kind = "mir-performance-compat-smoke"
+    status = "passed"
+    lane = $CompatSmokeLaneId
+    baseline_seconds = [double]$baselineSmoke.seconds
+    candidate_seconds = [double]$candidateSmoke.seconds
+    closure_sha256 = $baselineClosureSha
+  } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $script:RunRoot "compat-smoke.json") -Encoding UTF8
+  Write-Host "[ok] compatibility performance smoke passed: $($script:RunRoot)"
   exit 0
 }
 
