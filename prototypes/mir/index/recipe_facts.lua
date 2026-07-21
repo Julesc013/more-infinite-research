@@ -361,6 +361,28 @@ function M.view(recipe_name)
   return build().facts[recipe_name]
 end
 
+function M.index_view()
+  return build()
+end
+
+function M.for_each(callback)
+  if type(callback) ~= "function" then error("recipe_facts.for_each expects a callback", 2) end
+  local index = build()
+  for _, recipe_name in ipairs(index.names) do callback(recipe_name, index.facts[recipe_name]) end
+end
+
+function M.summary()
+  local index = build()
+  return {schema = index.schema, recipe_count = #index.names}
+end
+
+function M.fingerprint()
+  local context = compiler_context.current()
+  return context:state_view("recipe_index_fingerprint", function()
+    return require("prototypes.mir.core.fingerprint").of(build())
+  end)
+end
+
 function M.recipes_by_output_view(name)
   return build().by_output[name] or {}
 end

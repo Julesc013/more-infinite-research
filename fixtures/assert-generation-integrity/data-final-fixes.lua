@@ -68,7 +68,11 @@ local function assert_compiler_telemetry()
   for _, counter in ipairs({
     "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
     "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
-    "rejected_operations", "diagnostic_rows"
+    "rejected_operations", "diagnostic_rows", "generation_plan_rows", "generation_plan_public_bytes",
+    "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
+    "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
+    "context_snapshot_bytes", "technology_closure_cache_entries", "technology_closure_cached_nodes",
+    "sanitation_scanned_technologies", "sanitation_scanned_effects"
   }) do
     if type(telemetry.counters[counter]) ~= "number" then
       fail("compiler telemetry counter is missing: " .. counter)
@@ -86,8 +90,10 @@ end
 local function assert_compiler_evidence()
   local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
   local evidence = prototype and prototype.data
+  local internal_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
+  local internal = internal_prototype and internal_prototype.data
   local plan = compilation_plan.snapshot()
-  if not evidence or evidence.schema ~= 2
+  if not evidence or evidence.schema ~= 1 or evidence.kind ~= "mir-compiler-evidence-public"
     or evidence.semantic_fingerprint ~= plan.semantic_fingerprint
     or evidence.compilation_fingerprint ~= plan.compilation_fingerprint
     or evidence.qualification_fingerprint ~= plan.qualification_fingerprint
@@ -96,12 +102,16 @@ local function assert_compiler_evidence()
     or type(evidence.input_sanitation_fingerprint) ~= "string"
     or type(evidence.output_sanitation_fingerprint) ~= "string"
     or type(evidence.evidence_fingerprint) ~= "string"
-    or not evidence.input_sanitation_ledger or evidence.input_sanitation_ledger.pass ~= "input"
-    or not evidence.output_sanitation_ledger or evidence.output_sanitation_ledger.pass ~= "output"
-    or evidence.input_sanitation_ledger.sanitized_target_inventory_fingerprint
-      ~= evidence.output_sanitation_ledger.sanitized_target_inventory_fingerprint
+    or evidence.target_inventory_unchanged ~= true
+    or not evidence.input_sanitation or evidence.input_sanitation.pass ~= "input"
+    or not evidence.output_sanitation or evidence.output_sanitation.pass ~= "output"
+    or not internal or internal.schema ~= 2
+    or not internal.input_sanitation_ledger or internal.input_sanitation_ledger.pass ~= "input"
+    or not internal.output_sanitation_ledger or internal.output_sanitation_ledger.pass ~= "output"
+    or internal.input_sanitation_ledger.sanitized_target_inventory_fingerprint
+      ~= internal.output_sanitation_ledger.sanitized_target_inventory_fingerprint
   then
-    fail("content-addressed compiler evidence or sanitation ledgers are missing")
+    fail("compact compiler evidence or debug sanitation ledgers are missing")
   end
 end
 

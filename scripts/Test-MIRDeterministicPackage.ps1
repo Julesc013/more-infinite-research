@@ -51,3 +51,4 @@ try {
 }
 
 Write-Host "[ok] MIR deterministic package SHA-256 $leftHash"
+& (Join-Path $repo "scripts\Test-MIRPackageComposition.ps1") -RepoRoot $repo

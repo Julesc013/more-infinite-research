@@ -404,6 +404,13 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/superseded/2.5.0-precanonical-candidate.md
+    title: "Superseded Precanonical 2.5.0 Candidate"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/superseded/completed-task-ledger.md
     title: "2.x Completed Task Ledger"
     status: archived
@@ -1005,6 +1012,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - manual-release-review-attestation
+  - path: docs/maintainer/playtest-intake.md
+    title: "Playtest Intake"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - structured-playtest-intake
   - path: docs/maintainer/README.md
     title: "Maintainer Guide"
     status: current

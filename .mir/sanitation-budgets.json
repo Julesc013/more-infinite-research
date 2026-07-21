@@ -59,5 +59,16 @@
     },
     "local-2-0-nullius": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-ultracube": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0}
+  },
+  "local_mod_zips": {
+    "local-2.1-aai-containers": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-aai-industry": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-aai-loaders": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-big-mining-drill": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-biolabs-in-space": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-equipment-gantry": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-FluidMustFlow": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-jetpack": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2.1-robot_attrition": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0}
   }
 }

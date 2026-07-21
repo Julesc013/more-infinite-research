@@ -108,6 +108,14 @@ foreach ($required in @(
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
+$ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
+if ($ecosystemTest.Count -ne 1 -or
+    [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
+    [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
+    [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
+  throw "runtime.ecosystem must execute the exact candidate ZIP and must not rebuild distribution bytes."
+}
+
 foreach ($target in @("2.0", "2.1")) {
   $profilePath = Join-Path $RepoRoot "validation\profiles\factorio-$target.json"
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json

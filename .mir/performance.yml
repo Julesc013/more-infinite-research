@@ -19,6 +19,7 @@ measurement_policy:
   - Factorio runtime materializes 60000 technologies below the engine hard limit of 65535 while the same compiler graph implementation validates 100000 in-memory planned technologies.
   - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
   - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.
+  - Paired evidence preserves maximum-observed artifact-volume counters and per-run telemetry fingerprints for diagnostics-off and diagnostics-on candidate runs.
 
 required_surfaces:
   - base
@@ -48,6 +49,20 @@ compiler_telemetry:
     - accepted_operations
     - rejected_operations
     - diagnostic_rows
+    - generation_plan_rows
+    - generation_plan_public_bytes
+    - generation_plan_internal_bytes
+    - technology_design_count
+    - technology_design_canonical_bytes
+    - coverage_rows
+    - coverage_public_bytes
+    - coverage_internal_bytes
+    - context_state_keys
+    - context_snapshot_bytes
+    - technology_closure_cache_entries
+    - technology_closure_cached_nodes
+    - sanitation_scanned_technologies
+    - sanitation_scanned_effects
   required_phases:
     - snapshot
     - graph

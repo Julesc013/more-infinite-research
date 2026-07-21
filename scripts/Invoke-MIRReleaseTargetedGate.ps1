@@ -12,8 +12,11 @@ param(
   [string]$PullBranch = "",
   [string]$OutputRoot = "",
   [string]$PackageOutputDir = "",
+  [string]$CandidateZip = "",
+  [string]$CandidateSourceCommit = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$SkipBuild,
+  [switch]$SkipCleanGitStatus,
   [switch]$SkipStrictGate,
   [switch]$SkipRepairSmokes,
   [Alias("SkipRepresentativeScenario")]
@@ -155,6 +158,9 @@ function Write-MIRReleaseGateSummary {
     output_root = $script:resolvedOutputRoot
     package_output_dir = $script:packageOutputDir
     factorio_bin = $script:resolvedFactorioBin
+    candidate_zip = $script:resolvedCandidateZip
+    candidate_sha256 = if ($script:resolvedCandidateZip) { (Get-FileHash -Algorithm SHA256 -LiteralPath $script:resolvedCandidateZip).Hash } else { "" }
+    candidate_source_commit = $CandidateSourceCommit
     local_mod_dir = $script:resolvedLocalModDir
     repair_smoke_mod_names = @($RepairSmokeModNames)
     representative_scenario_name = $RepresentativeScenarioName
@@ -163,6 +169,7 @@ function Write-MIRReleaseGateSummary {
     factorio_line = $FactorioLine
     scenario_timeout_seconds = $ScenarioTimeoutSeconds
     skip_build = [bool]$SkipBuild
+    skip_clean_git_status = [bool]$SkipCleanGitStatus
     skip_strict_gate = [bool]$SkipStrictGate
     skip_repair_smokes = [bool]$SkipRepairSmokes
     skip_representative_scenario = [bool]$SkipBZSuite
@@ -182,6 +189,8 @@ function Write-MIRReleaseGateSummary {
   $md += ('- Repo: `{0}`' -f $repo.Path)
   $md += ('- Output root: `{0}`' -f $script:resolvedOutputRoot)
   $md += ('- Package output dir: `{0}`' -f $script:packageOutputDir)
+$md += ('- Candidate ZIP: `{0}`' -f $script:resolvedCandidateZip)
+$md += ('- Candidate SHA-256: `{0}`' -f $(if ($script:resolvedCandidateZip) { (Get-FileHash -Algorithm SHA256 -LiteralPath $script:resolvedCandidateZip).Hash } else { "" }))
 $md += ('- Factorio: `{0}`' -f $script:resolvedFactorioBin)
 $md += ('- Factorio line: `{0}`' -f $FactorioLine)
 $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
@@ -225,6 +234,13 @@ $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
 
 $script:releaseGateResults = @()
 $script:resolvedFactorioBin = Resolve-MIRReleaseGateFactorioBinary -Path $FactorioBin
+$script:resolvedCandidateZip = ""
+if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+  $script:resolvedCandidateZip = (Resolve-Path -LiteralPath $CandidateZip).Path
+}
+if (-not [string]::IsNullOrWhiteSpace($CandidateSourceCommit) -and $CandidateSourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
+  throw "CandidateSourceCommit must be a full 40-character git commit."
+}
 $script:resolvedLocalModDir = ""
 $script:packageOutputDir = $PackageOutputDir
 if ([string]::IsNullOrWhiteSpace($script:packageOutputDir)) {
@@ -263,6 +279,7 @@ Write-Host "[release] repo: $($repo.Path)"
 Write-Host "[release] mod: $modName $modVersion (Factorio $targetFactorioVersion)"
 Write-Host "[release] Factorio: $script:resolvedFactorioBin"
 Write-Host "[release] Factorio line: $FactorioLine"
+Write-Host "[release] candidate ZIP: $script:resolvedCandidateZip"
 Write-Host "[release] local mod dir: $script:resolvedLocalModDir ($localZipCount zips)"
 Write-Host "[release] repair smoke mods: $($RepairSmokeModNames -join ', ')"
 Write-Host "[release] representative scenario: $RepresentativeScenarioName"
@@ -313,6 +330,8 @@ try {
         -Tier LocalModZips `
         -FactorioBin $script:resolvedFactorioBin `
         -FactorioLine $FactorioLine `
+        -ModUnderTestZip $script:resolvedCandidateZip `
+        -ModUnderTestSourceCommit $CandidateSourceCommit `
         -LocalModZipDirs @($script:resolvedLocalModDir) `
         -LocalModLibraryDirs @($script:resolvedLocalModDir) `
         -LocalModNames @($RepairSmokeModNames) `
@@ -331,6 +350,8 @@ try {
         -FactorioBin $script:resolvedFactorioBin `
         -FactorioLine $FactorioLine `
         -FactorioVersions @($AuditFactorioVersions) `
+        -ModUnderTestZip $script:resolvedCandidateZip `
+        -ModUnderTestSourceCommit $CandidateSourceCommit `
         -MaxCandidates 0 `
         -CatalogPages 0 `
         -RunManualScenarios `
@@ -355,10 +376,12 @@ try {
     }
   }
 
-  Invoke-MIRReleaseGateStep -Name "clean-git-status" -Action {
-    $status = @(& git -C $repo status --short)
-    if ($status.Count -gt 0) {
-      throw "Git status is not clean after release gate:`n$($status -join "`n")"
+  if (-not $SkipCleanGitStatus) {
+    Invoke-MIRReleaseGateStep -Name "clean-git-status" -Action {
+      $status = @(& git -C $repo status --short)
+      if ($status.Count -gt 0) {
+        throw "Git status is not clean after release gate:`n$($status -join "`n")"
+      }
     }
   }
 } catch {
@@ -372,5 +395,9 @@ try {
 }
 
 Write-Host "[release] targeted release checks passed: $script:resolvedOutputRoot"
-$packageCandidate = Join-Path $script:packageOutputDir ("{0}_{1}.zip" -f $modName, $modVersion)
+$packageCandidate = if ($script:resolvedCandidateZip) {
+  $script:resolvedCandidateZip
+} else {
+  Join-Path $script:packageOutputDir ("{0}_{1}.zip" -f $modName, $modVersion)
+}
 Write-Host "[release] package candidate: $packageCandidate"

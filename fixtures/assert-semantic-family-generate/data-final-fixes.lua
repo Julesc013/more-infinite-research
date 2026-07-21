@@ -39,7 +39,7 @@ for technology_name, recipe_name in pairs(expected) do
   if #(technology.prerequisites or {}) == 0 then fail(technology_name .. " has no reachable science prerequisite frontier") end
 end
 
-local coverage = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report"]
+local coverage = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report-internal"]
 if not (coverage and coverage.data and coverage.data.summary) then
   fail("missing coverage report artifact")
 end

@@ -54,6 +54,7 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+. (Join-Path $PSScriptRoot "validation\SettingsOverrides.ps1")
 
 $resolvedSanitationBudgetPath = (Resolve-Path -LiteralPath $SanitationBudgetPath).Path
 $sanitationPolicy = Get-Content -Raw -LiteralPath $resolvedSanitationBudgetPath | ConvertFrom-Json
@@ -955,13 +956,12 @@ function Invoke-MIRScenarioLoad {
   $userData = New-MIRCompatUserDataDir -Root $runRoot
   $modsDir = Join-Path $userData "mods"
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
-  if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) {
-    Enable-MIRCopiedGenerationReport -ModsDir $modsDir
-  }
+  Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine
+  Enable-CopiedDiagnostics -ModsDir $modsDir
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
-  $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
+  $enabledMods = @("more-infinite-research", "mir-validation-settings-overrides") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
   $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
@@ -1351,8 +1351,20 @@ if ($RunLoadTests) {
       $dependencyFailureCount = @($scenario.dependency_failures).Count
       $expectedPlan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
       $maximumDependencyFailures = [int](Get-MIRObjectProperty -Object $expectedPlan -Name "maximum_dependency_failures" -Default 0)
-      $budgetProperty = $sanitationPolicy.campaigns.PSObject.Properties[[string]$scenario.name]
-      if ($null -eq $budgetProperty) { throw "Scenario $($scenario.name) has no governed sanitation budget." }
+      $budgetScope = if ([string]$scenario.type -eq "local_zip") { "local_mod_zips" } else { "campaigns" }
+      $budgetKey = if ($budgetScope -eq "local_mod_zips") {
+        "local-$FactorioLine-$($scenario.name)"
+      } else {
+        [string]$scenario.name
+      }
+      $budgetScopeProperty = $sanitationPolicy.PSObject.Properties[$budgetScope]
+      if ($null -eq $budgetScopeProperty) {
+        throw "Sanitation policy has no '$budgetScope' budget scope for scenario $($scenario.name)."
+      }
+      $budgetProperty = $budgetScopeProperty.Value.PSObject.Properties[$budgetKey]
+      if ($null -eq $budgetProperty) {
+        throw "Scenario $($scenario.name) has no governed sanitation budget '$budgetKey' in scope '$budgetScope'."
+      }
       $sanitationBudget = $budgetProperty.Value
       $expectedPrunes = @($sanitationBudget.expected_external_prunes)
       $maximumUnreviewedPrunes = [int]$sanitationBudget.maximum_unreviewed_external_prunes
@@ -1407,6 +1419,8 @@ if ($RunLoadTests) {
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
         sanitation_budget = [ordered]@{
+          scope = $budgetScope
+          key = $budgetKey
           expected_external_prunes = $expectedPrunes
           maximum_unreviewed_external_prunes = $maximumUnreviewedPrunes
         }

@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -14,11 +14,17 @@ superseded_by: []
 
 `GenerationPlan` is the side-effect-free boundary between stream planning and prototype emission. The compiler creates every row, validates the complete set, and only then passes the finalized snapshot to mutation code.
 
-The exported stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
+The internal stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
+
+## Public And Internal Publication
+
+Normal Factorio loads publish `more-infinite-research-generation-plan` with data type `more-infinite-research.generation-plan-public`. This schema-1 projection contains the plan, source, and public fingerprints, the validation summary, and concise rows with stream ID, action, reason, technology ID, effect count and identities, subject fingerprint, and qualification fingerprint.
+
+The complete schema-3 plan, including stream specifications, gates, diagnostics, fields, and `TechnologyDesign`, is published as `more-infinite-research-generation-plan-internal` with data type `more-infinite-research.generation-plan-internal` only when generation diagnostics are enabled or automatic compiler preview/report mode requests detailed artifacts. Validation fixtures use that explicit internal surface. Consumers must not infer the complete internal schema from the compact public prototype.
 
 `CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects. Accepted base extensions carry a continuation-manifest identity and schema-2 `TechnologyDesign`; the plan rebuilds their projection after sanitation and cross-operation policy. `compilation_fingerprint` identifies selected accepted and rejected operations plus policies, `qualification_fingerprint` additionally binds exact gates and evidence, and `run_fingerprint` binds qualification to operational telemetry. `semantic_fingerprint` remains a compatibility alias for qualification, while `fingerprint` aliases compilation.
 
-After postconditions pass, target-neutral `CompilerEvidence` schema 2 binds compilation, qualification, run, telemetry, deterministic pre-index and post-emission sanitation ledgers, individual ledger fingerprints, and an evidence-envelope fingerprint. Factorio 2.1 publishes the canonical object through a `mod-data` adapter; reduced targets may use the validation-log adapter. Unknown external prototype ownership is recorded explicitly rather than guessed.
+After postconditions pass, target-neutral internal `CompilerEvidence` schema 2 binds compilation, qualification, run, telemetry, deterministic pre-index and post-emission sanitation ledgers, individual ledger fingerprints, and an evidence-envelope fingerprint. Factorio 2.1 publishes its compact schema-1 public projection through a `mod-data` adapter and publishes the full internal object only in detailed diagnostic modes; reduced targets may use the validation-log adapter. Unknown external prototype ownership is recorded explicitly rather than guessed.
 
 Every schema-3 row contains:
 

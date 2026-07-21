@@ -391,7 +391,7 @@ function M.compile(context)
   end
   local plan = generation_plan.new({
     source_fingerprints = {
-      facts = fingerprint.of(recipe_facts.snapshot()),
+      facts = recipe_facts.fingerprint(),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
       providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),

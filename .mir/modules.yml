@@ -222,6 +222,7 @@ modules:
     - prototypes/mir/report/coverage.lua
     - prototypes/mir/report/diagnostics_sink.lua
     - prototypes/mir/report/compiler_telemetry.lua
+    - prototypes/mir/report/public_compiler_artifacts.lua
   compatibility:
     - prototypes/mir/compatibility/registry.lua
     - prototypes/mir/compatibility/profiles.lua
@@ -376,6 +377,12 @@ target_layers:
       - policy
       - domain
     may_mutate_data_raw: false
+  integrity:
+    path: prototypes/mir/integrity
+    may_require:
+      - domain
+      - platform
+    may_mutate_data_raw: false
   emit:
     path: prototypes/mir/emit
     may_require:
@@ -385,7 +392,9 @@ target_layers:
   report:
     path: prototypes/mir/report
     may_require:
+      - core
       - domain
+      - integrity
     may_mutate_data_raw: false
   compatibility:
     path: prototypes/mir/compatibility
@@ -461,6 +470,8 @@ validation_tooling:
     museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
     backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
+    package_composition: scripts/Measure-MIRPackageComposition.ps1
+    package_composition_gate: scripts/Test-MIRPackageComposition.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
     structured_evidence: scripts/validation/ResultAggregation.ps1
@@ -489,6 +500,7 @@ validation_tooling:
     runtime_performance_evidence_schema: verification/schema/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: verification/schema/manual-release-attestation.schema.json
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
+    pipeline_documentation: scripts/Update-MIRPipelineDocumentation.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
     compiler_gate: scripts/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml

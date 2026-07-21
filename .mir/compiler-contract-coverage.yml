@@ -76,6 +76,15 @@
     "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority", "native-owner-patch-design-authority"
   ],
   "compiler_context_schema": 2,
+  "public_compiler_artifact_schema": 1,
+  "public_compiler_artifact_kinds": [
+    "mir-generation-plan-public", "mir-coverage-public", "mir-compiler-evidence-public"
+  ],
+  "public_compiler_mod_data_types": [
+    "more-infinite-research.generation-plan-public",
+    "more-infinite-research.coverage-public",
+    "more-infinite-research.compiler-evidence-public"
+  ],
   "context_owned_state": [
     "recipe-index", "relationship-indexes", "active-compatibility-packs", "compatibility-policy-authority", "family-resolution",
     "technology-candidate-catalog", "technology-qualifications", "generation-plan", "compilation-plan",

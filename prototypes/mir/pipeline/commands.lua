@@ -212,7 +212,8 @@ function M.run(id, context)
   return true
 end
 
-function M.run_all()
+function M.run_all(options)
+  options = options or {}
   local context = compiler_context.new()
   local ok, result = pcall(function()
     for _, id in ipairs(M.order()) do M.run(id, context) end
@@ -221,6 +222,7 @@ function M.run_all()
     pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)
     error(result, 2)
   end
+  if options.return_snapshot == false then return context end
   return context:snapshot()
 end
 

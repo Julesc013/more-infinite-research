@@ -215,40 +215,6 @@ Date: 2026-07-12
     - Added a complete 3.0.5 inventory for all 477 dropdown, checkbox, numeric, and profile-import settings.
 
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.0
-Date: 2026-07-12
-
-  Internal:
-
-    - Retained as a superseded internal candidate archive; this version was not published.
-
-  Changes:
-
-    - Ported the accepted 3.2.0 plan-first automatic compiler contracts to the maintained Factorio 2.0 line.
-    - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
-    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
-    - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
-    - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
-    - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
-    - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
-    - Replaced the automatic compiler preset with separate action and research-creation controls.
-    - Added an independent reviewed-data requirement and outcome-first tooltips.
-    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
-    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
-    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
-    - Added stable automatic-compiler and provider diagnostic codes.
-    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
-    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
-    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
-    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
-
-  Bugfixes:
-
-    - Preserved iterative prerequisite-cycle repair and strict generated-graph safety checks.
-    - Published compiled generation plans only after authoritative safety checks complete.
-    - Preserved the exact 2.3.5-to-2.4.0 settings and saved-runtime upgrade contract.
-
----------------------------------------------------------------------------------------------------
 Version: 2.4.5
 Date: 2026-07-14
 

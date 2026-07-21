@@ -114,6 +114,9 @@ local_campaign_manifest:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
     validator: scripts/Test-MIRSanitationBudgets.ps1
+    scopes:
+      manifest_scenarios: campaigns
+      release_targeted_repair_smokes: local_mod_zips
     unknown_repair_disposition: REVIEW_REQUIRED
   independent_aai_scenarios:
     - local-2-1-aai-loaders

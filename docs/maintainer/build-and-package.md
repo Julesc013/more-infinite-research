@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -27,6 +27,16 @@ Run the local reproducibility gate with:
 ```
 
 It builds two independent archives, requires identical SHA-256 values, and verifies canonical entry order and timestamps. Before release, repeat the comparison from a second clean worktree or CI checkout to prove checkout-independent identity.
+
+Measure and review package composition with:
+
+```powershell
+.\scripts\Measure-MIRPackageComposition.ps1 `
+  -Explanation "Reviewed package growth explanation" `
+  -RequireReviewedExplanation
+```
+
+The schema-1 report records archive identity, compressed and uncompressed totals by package category, the largest entries, and exact added, removed, and changed paths relative to 3.1.9. Growth over the configured thresholds, a new category, or an unclassified path requires a written explanation. This is a review gate, not an arbitrary small package-size cap; the ordinary package gate remains authoritative for forbidden repository-only paths.
 
 ## Published Archives
 

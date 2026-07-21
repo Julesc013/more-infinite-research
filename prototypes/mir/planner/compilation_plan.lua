@@ -12,6 +12,8 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evidence")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
+local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 
 local M = {}
 local normalized_base_operation
@@ -458,22 +460,46 @@ end
 function M.publish(context)
   local plan = M.compile(context)
   local mod_data = require("prototypes.mir.emit.mod_data")
-  mod_data.emit_generation_plan(plan.stream_plan)
+  local include_internal = diagnostics.enabled()
+  local public_plan = public_artifacts.generation_plan(plan.stream_plan)
+  telemetry.count("generation_plan_rows", #(plan.stream_plan.rows or {}))
+  telemetry.count("generation_plan_public_bytes", #fingerprint.canonical(public_plan))
+  local technology_design_count = 0
+  local technology_design_canonical_bytes = 0
+  for _, row in ipairs(plan.stream_plan.rows or {}) do
+    if row.technology_design then
+      technology_design_count = technology_design_count + 1
+      if include_internal then
+        technology_design_canonical_bytes = technology_design_canonical_bytes
+          + #fingerprint.canonical(row.technology_design)
+      end
+    end
+  end
+  telemetry.count("technology_design_count", technology_design_count)
+  telemetry.count("technology_design_canonical_bytes", technology_design_canonical_bytes)
+  mod_data.emit_generation_plan(public_plan)
+  if include_internal then
+    telemetry.count("generation_plan_internal_bytes", #fingerprint.canonical(plan.stream_plan))
+    mod_data.emit_internal_generation_plan(plan.stream_plan)
+  end
   local input_ledger = deepcopy(plan.input_sanitation_ledger)
   local output_ledger = context and context:artifact("output_sanitation_ledger") or nil
-  local evidence = compiler_evidence.build({
+  local evidence_input = {
     compilation_plan_schema = plan.schema,
     compilation_fingerprint = plan.compilation_fingerprint,
     qualification_fingerprint = plan.qualification_fingerprint,
-    telemetry = telemetry.snapshot(),
     input_sanitation_ledger = input_ledger,
     output_sanitation_ledger = output_ledger
-  })
-  require("prototypes.mir.emit.compiler_evidence_adapter").publish(evidence)
+  }
   if target_line.feature_enabled("productivity_family_adoption") then
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
   end
-  require("prototypes.mir.report.coverage").publish()
+  require("prototypes.mir.report.coverage").publish(context, {include_internal = include_internal})
+  telemetry.observe_max("context_state_keys", context and context:state_key_count() or 0)
+  evidence_input.telemetry = telemetry.snapshot()
+  local public_evidence = public_artifacts.compiler_evidence(evidence_input)
+  local internal_evidence = include_internal and compiler_evidence.build(evidence_input) or nil
+  require("prototypes.mir.emit.compiler_evidence_adapter").publish(public_evidence, internal_evidence)
   return true
 end
 

@@ -67,6 +67,8 @@ local function prerequisite_order(root_name)
 
   prerequisite_order_cache[root_name] = {order = order, failure = failure}
   telemetry.observe_max("technology_prerequisite_closure_max", #order)
+  telemetry.count("technology_closure_cache_entries", 1)
+  telemetry.count("technology_closure_cached_nodes", #order)
   return order, failure
 end
 

@@ -35,7 +35,7 @@ local function build(phase)
   local canonical = compiler_context.current():state_view("relationship_indexes", function() return {} end)
   if canonical[phase] then return canonical[phase] end
 
-  local recipe_index = recipe_facts.snapshot()
+  local recipe_index = recipe_facts.index_view()
   local out = {
     schema = 2,
     phase = phase,

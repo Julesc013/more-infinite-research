@@ -51,7 +51,7 @@ git diff --check
 git status
 ```
 
-The full plan expands `runtime.upgrade` into five required archetypes in one schema-bound matrix result. Do not substitute the historical six-assertion native-owner proof. Ecosystem campaign rows must also pass their exact `.mir/sanitation-budgets.json` budget; `REVIEW_REQUIRED` is not a pass.
+The full plan expands `runtime.upgrade` into five required archetypes in one schema-bound matrix result. Do not substitute the historical six-assertion native-owner proof. Ecosystem campaign rows and target-qualified local repair smokes must also pass their exact `.mir/sanitation-budgets.json` budget; `REVIEW_REQUIRED` is not a pass.
 
 If README, changelog, locale, or any other package-visible file changes, rebuild `dist/more-infinite-research_<version>.zip`, regenerate candidate-bound evidence, and update the recorded size and SHA-256 before promotion. Do not dispatch the protected workflow until the exact approved delta, runtime performance evidence, and package manual attestation can satisfy F4.
 

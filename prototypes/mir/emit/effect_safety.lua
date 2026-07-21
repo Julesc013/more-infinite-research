@@ -142,6 +142,8 @@ function S.sanitize_all_technology_effects(options)
   local summary = {
     schema = 1,
     pass = options.pass or "unspecified",
+    scanned_technology_count = 0,
+    scanned_effect_count = 0,
     pruned_effect_count = 0,
     affected_technology_count = 0,
     generated_technology_count = 0,
@@ -158,6 +160,8 @@ function S.sanitize_all_technology_effects(options)
     local owner, owning_mod, owning_mod_known = owner_record(name)
     local original_effects = deepcopy((technology and technology.effects) or {})
     local original_effect_count = #original_effects
+    summary.scanned_technology_count = summary.scanned_technology_count + 1
+    summary.scanned_effect_count = summary.scanned_effect_count + original_effect_count
     local kept, removed, retained_effect_order, retained_effect_identities = S.sanitize_effects(
       original_effects, name, owner)
     if #removed > 0 then
@@ -181,6 +185,8 @@ function S.sanitize_all_technology_effects(options)
       })
     end
   end
+  telemetry.count("sanitation_scanned_technologies", summary.scanned_technology_count)
+  telemetry.count("sanitation_scanned_effects", summary.scanned_effect_count)
   return summary
 end
 

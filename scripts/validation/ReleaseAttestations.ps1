@@ -117,8 +117,8 @@ function Test-MIRRuntimePerformanceEvidence {
   $evidencePath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Path
   if (-not (Test-Path -LiteralPath $evidencePath -PathType Leaf)) { throw "Runtime performance evidence is absent: $evidencePath" }
   $evidence = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json
-  if ([int]$evidence.schema -ne 2 -or [string]$evidence.kind -ne "mir-runtime-performance-regression") {
-    throw "Runtime performance evidence must use mir-runtime-performance-regression schema 2."
+  if ([int]$evidence.schema -ne 3 -or [string]$evidence.kind -ne "mir-runtime-performance-regression") {
+    throw "Runtime performance evidence must use mir-runtime-performance-regression schema 3."
   }
   if ([string]$evidence.status -ne "passed") { throw "Runtime performance evidence is not passed." }
   $candidateSha = Get-MIRReleaseSha256 -Path $candidatePath
@@ -166,6 +166,36 @@ function Test-MIRRuntimePerformanceEvidence {
     $pair = (@($runOrder[$index], $runOrder[$index + 1]) | Sort-Object) -join ","
     if ($pair -ne "baseline,candidate") {
       throw "Runtime performance run order is not balanced within each measured pair."
+    }
+  }
+
+  if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
+      [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
+    throw "Runtime performance evidence lacks the governed artifact-volume aggregation."
+  }
+  $volumeMeasurements = @($evidence.artifact_volume.measurements)
+  $volumeSurfaces = @($volumeMeasurements | ForEach-Object { [string]$_.surface })
+  $actualVolumeSurfaces = (@($volumeSurfaces | Sort-Object) -join "`n")
+  $expectedVolumeSurfaces = (@("diagnostics-off", "diagnostics-on") | Sort-Object) -join "`n"
+  if ($actualVolumeSurfaces -ne $expectedVolumeSurfaces -or
+      @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+    throw "Runtime performance evidence must contain exactly diagnostics-off and diagnostics-on artifact-volume measurements."
+  }
+  $performancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance.yml")
+  $counterBlock = [regex]::Match($performancePolicy, '(?ms)required_counters:\s*(?<block>.*?)\s+required_phases:')
+  if (-not $counterBlock.Success) { throw "Performance policy does not expose its required telemetry counter block." }
+  $requiredVolumeCounters = @([regex]::Matches($counterBlock.Groups['block'].Value, '(?m)^\s*-\s+(?<name>[a-z0-9_-]+)\s*$') | ForEach-Object { $_.Groups['name'].Value })
+  foreach ($measurement in $volumeMeasurements) {
+    $fingerprints = @($measurement.telemetry_fingerprints | ForEach-Object { [string]$_ })
+    if ([int]$measurement.measured_runs -lt $minimumRuns -or $fingerprints.Count -ne [int]$measurement.measured_runs -or
+        @($fingerprints | Where-Object { $_ -notmatch '^[0-9A-Fa-f]{64}$' }).Count -gt 0) {
+      throw "Artifact-volume measurement '$($measurement.surface)' does not bind every measured candidate run."
+    }
+    $counterNames = @($measurement.counters.PSObject.Properties.Name)
+    foreach ($counterName in $requiredVolumeCounters) {
+      if ($counterNames -notcontains $counterName -or [long]$measurement.counters.$counterName -lt 0) {
+        throw "Artifact-volume measurement '$($measurement.surface)' lacks governed counter '$counterName'."
+      }
     }
   }
 

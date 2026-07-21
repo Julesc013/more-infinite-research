@@ -108,25 +108,6 @@ function Copy-MIRModUnderTest {
   return $target
 }
 
-function Enable-MIRCopiedGenerationReport {
-  param([Parameter(Mandatory)][string]$ModsDir)
-
-  $overridePath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\test_overrides.lua"
-  if (-not (Test-Path -LiteralPath $overridePath)) {
-    throw "Unable to find copied MIR settings override module: $overridePath"
-  }
-
-  $overrides = Get-Content -Raw -LiteralPath $overridePath
-  if (-not $overrides.Contains("return overrides")) {
-    throw "Copied MIR settings override module is missing its return marker."
-  }
-  $overrides = $overrides.Replace(
-    "return overrides",
-    "overrides[`"mir-debug-generation-report`"] = true`r`nreturn overrides"
-  )
-  Set-Content -LiteralPath $overridePath -Value $overrides -Encoding UTF8
-}
-
 function Copy-MIRCachedModZips {
   param(
     [Parameter(Mandatory)][string]$CacheDir,

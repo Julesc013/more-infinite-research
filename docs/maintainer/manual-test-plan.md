@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-21
 supersedes: []
 superseded_by: []
 ---
 # Manual Test Plan
 
-Updated: 2026-07-18
+Updated: 2026-07-21
 
 This document defines named manual saves and scenarios. Runtime fixture validation is necessary, but it does not replace save-level gameplay validation.
 
@@ -28,6 +28,22 @@ The exact required package item IDs are:
 - `save-ui`;
 - `human-balance`;
 - `configuration-change-give-item-safety` (with a connected player, research an external `give-item` technology, record inventory, trigger the MIR adoption-signature change, and prove no duplicate item or unrelated force-state loss).
+
+Prepare the candidate-bound workspace with `scripts/New-MIRInteractiveReviewPacket.ps1`. Its pending template is a worksheet only; it is not schema-2 release evidence and cannot satisfy the release gate. Run base and Space Age from separate user-data and mod directories, and retain only captures from the exact candidate and Factorio binary recorded in the final attestation.
+
+Use these review criteria:
+
+| Item | Required judgment |
+| --- | --- |
+| `technology-tree-visual` | Generated nodes occupy sensible positions; arrows are understandable; finite-to-infinite continuations are sequential; native-owner adoption does not create duplicates; disabled streams do not leave unexplained gaps. |
+| `icon-visual` | Base fallbacks and Space Age assets render at normal and high UI scale; overlays remain legible; no missing-asset placeholder appears. |
+| `locale-fit-and-truncation` | Technology, setting, and help text is readable in the reviewed locales at ordinary UI widths, with no misleading truncation. |
+| `settings-ux` | Conservative defaults, automatic-compiler attachment/creation controls, native-owner notes, and dropdowns are understandable and unclipped. |
+| `save-ui` | Existing levels, selected research, fractional progress, native-owner values, mod removal/re-addition, and startup-setting changes survive save/reload. |
+| `human-balance` | Representative early, late, continuation, native-owner, direct-effect, modded-attachment, skipped, and sanitation decisions have recorded cost/effect/progression verdicts. |
+| `configuration-change-give-item-safety` | A connected-player external `give-item` effect is neither duplicated nor lost, and unrelated recipe/force state remains unchanged after the MIR signature change. |
+
+For each balance sample record the technology ID, first generated level, science set, prerequisite milestone, effect per level, first-level cost, growth factor, research time, maximum useful level before a cap, target-recipe count, ownership, and subjective verdict. The packet generator creates a machine-readable worksheet with these fields.
 
 Waivers do not count as passed package review. If an item cannot pass, keep the attestation absent or failed and leave the F4 gate blocked. GitHub release text, Mod Portal presentation, screenshots, links, and final public claims belong to a separate pre-publication checklist; they do not prevent sealing unchanged package bytes, but they do prevent publication.
 

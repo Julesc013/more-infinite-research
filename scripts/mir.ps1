@@ -40,11 +40,13 @@ Usage:
 Common overrides:
   --factorio <path>   Factorio binary path
   --factorio-line <2.0|2.1>
+  --candidate <path>  Exact MIR candidate ZIP for candidate-bound runtime work
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
   --link-mode <mode>  Copy, Hardlink, or Symlink local zips into scenario mod dirs
   --skip-strict-gate  Reuse an already completed strict gate in a composed assurance run
+  --skip-clean-git-status  Leave source authority to the composed assurance and sealing gates
 "@
 }
 
@@ -85,6 +87,7 @@ function New-MIRProfileOverrides {
   $factorio = Get-MIRArgValue -Items $Items -Name "--factorio"
   $factorioLine = Get-MIRArgValue -Items $Items -Name "--factorio-line"
   $mods = Get-MIRArgValue -Items $Items -Name "--mods"
+  $candidate = Get-MIRArgValue -Items $Items -Name "--candidate"
   $output = Get-MIRArgValue -Items $Items -Name "--output"
   $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
   $linkMode = Get-MIRArgValue -Items $Items -Name "--link-mode"
@@ -101,6 +104,9 @@ function New-MIRProfileOverrides {
     $overrides.local_mod_zip_dirs = @($mods)
     $overrides.local_mod_library_dirs = @($mods)
   }
+  if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+    $overrides.candidate_zip = $candidate
+  }
   if (-not [string]::IsNullOrWhiteSpace($output)) {
     $overrides.output_root = $output
   }
@@ -116,6 +122,12 @@ function New-MIRProfileOverrides {
   }
   if (Test-MIRArgSwitch -Items $Items -Name "--skip-strict-gate") {
     $overrides.skip_strict_gate = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-build") {
+    $overrides.skip_build = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-clean-git-status") {
+    $overrides.skip_clean_git_status = $true
   }
 
   return $overrides
@@ -204,6 +216,7 @@ function Invoke-MIRRunProfile {
       $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $candidateZip = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "candidate_zip"
       $repairSmokeModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "repair_smoke_mod_names"
       $representativeScenarioName = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "representative_scenario_name"
       $manualScenariosPath = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "manual_scenarios_path"
@@ -213,6 +226,7 @@ function Invoke-MIRRunProfile {
       if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
+      if ($candidateZip) { $params.CandidateZip = [string]$candidateZip }
       if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
       if ($representativeScenarioName) { $params.RepresentativeScenarioName = [string]$representativeScenarioName }
       if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
@@ -223,6 +237,7 @@ function Invoke-MIRRunProfile {
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_repair_smokes") { $params.SkipRepairSmokes = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_representative_scenario") { $params.SkipRepresentativeScenario = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_build") { $params.SkipBuild = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_clean_git_status") { $params.SkipCleanGitStatus = $true }
       & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
     }
     "overnight-local" {

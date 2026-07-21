@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/playtest-report.schema.json",
+  "title": "MIR identity-bound playtest observation",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "created_at",
+    "candidate",
+    "factorio",
+    "environment",
+    "observation",
+    "compiler",
+    "attachments"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "mir-playtest-report" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "candidate": { "$ref": "#/$defs/candidate" },
+    "factorio": { "$ref": "#/$defs/factorio" },
+    "environment": { "$ref": "#/$defs/environment" },
+    "observation": { "$ref": "#/$defs/observation" },
+    "compiler": { "$ref": "#/$defs/compiler" },
+    "attachments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/attachment" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "nullable_sha256": {
+      "oneOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "portable_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:[\\/]|[\\/]).+"
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["version", "archive_sha256", "content_sha256", "source_commit", "package_source_sha256"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "archive_sha256": { "$ref": "#/$defs/sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "source_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{40}$" },
+        "package_source_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "factorio": {
+      "type": "object",
+      "required": ["version", "binary_sha256"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "binary_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "mod_archive": {
+      "type": "object",
+      "required": ["file", "bytes", "sha256"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "official_mod": {
+      "type": "object",
+      "required": ["name", "version", "file_count", "content_sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "file_count": { "type": "integer", "minimum": 1 },
+        "content_sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "mod_list_sha256",
+        "mod_archives",
+        "official_mods",
+        "mod_closure_sha256",
+        "startup_settings_sha256",
+        "save_sha256"
+      ],
+      "properties": {
+        "mod_list_sha256": { "$ref": "#/$defs/sha256" },
+        "mod_archives": { "type": "array", "items": { "$ref": "#/$defs/mod_archive" } },
+        "official_mods": { "type": "array", "items": { "$ref": "#/$defs/official_mod" } },
+        "mod_closure_sha256": { "$ref": "#/$defs/sha256" },
+        "startup_settings_sha256": { "$ref": "#/$defs/nullable_sha256" },
+        "save_sha256": { "$ref": "#/$defs/nullable_sha256" }
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": ["category", "technology", "recipe", "expected", "actual", "severity"],
+      "properties": {
+        "category": {
+          "enum": [
+            "startup-failure",
+            "missing-technology",
+            "unexpected-technology",
+            "wrong-recipe-membership",
+            "duplicate-owner",
+            "wrong-prerequisite",
+            "wrong-science",
+            "unreachable-technology",
+            "technology-too-early",
+            "technology-too-late",
+            "effect-too-large",
+            "effect-too-small",
+            "cost-too-large",
+            "cost-too-small",
+            "icon-or-locale",
+            "settings-ux",
+            "save-or-upgrade",
+            "performance",
+            "sanitation-review-required"
+          ]
+        },
+        "technology": { "type": ["string", "null"] },
+        "recipe": { "type": ["string", "null"] },
+        "expected": { "type": "string", "minLength": 1 },
+        "actual": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["release-blocker", "compatibility", "balance", "cosmetic", "information"] }
+      },
+      "additionalProperties": false
+    },
+    "compiler": {
+      "type": "object",
+      "required": [
+        "generation_plan_fingerprint",
+        "compiler_evidence_fingerprint",
+        "coverage_fingerprint",
+        "sanitation_summary",
+        "telemetry_summary"
+      ],
+      "properties": {
+        "generation_plan_fingerprint": { "$ref": "#/$defs/nullable_sha256" },
+        "compiler_evidence_fingerprint": { "$ref": "#/$defs/nullable_sha256" },
+        "coverage_fingerprint": { "$ref": "#/$defs/nullable_sha256" },
+        "sanitation_summary": { "type": "object" },
+        "telemetry_summary": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "attachment": {
+      "type": "object",
+      "required": ["kind", "path", "sha256"],
+      "properties": {
+        "kind": { "enum": ["environment", "log", "screenshot", "save", "compiler-artifact"] },
+        "path": { "$ref": "#/$defs/portable_path" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

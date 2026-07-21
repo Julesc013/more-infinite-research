@@ -330,6 +330,7 @@ release_artifacts:
         artifact: dist/more-infinite-research_2.5.0.zip
         sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
         structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+        history_document: docs/archive/superseded/2.5.0-precanonical-candidate.md
         status: superseded-unpublished-candidate
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4

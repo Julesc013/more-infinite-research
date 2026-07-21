@@ -14,7 +14,21 @@ local REQUIRED_COUNTERS = {
   "candidate_operations",
   "accepted_operations",
   "rejected_operations",
-  "diagnostic_rows"
+  "diagnostic_rows",
+  "generation_plan_rows",
+  "generation_plan_public_bytes",
+  "generation_plan_internal_bytes",
+  "technology_design_count",
+  "technology_design_canonical_bytes",
+  "coverage_rows",
+  "coverage_public_bytes",
+  "coverage_internal_bytes",
+  "context_state_keys",
+  "context_snapshot_bytes",
+  "technology_closure_cache_entries",
+  "technology_closure_cached_nodes",
+  "sanitation_scanned_technologies",
+  "sanitation_scanned_effects"
 }
 local REQUIRED_PHASES = {"snapshot", "graph", "planning", "postconditions"}
 local WITNESS_LIMIT = 64

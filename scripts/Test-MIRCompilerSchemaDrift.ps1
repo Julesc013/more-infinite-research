@@ -17,7 +17,20 @@ if ($scenarioManifest.schema -ne 3) { throw "Runtime scenario manifest schema dr
 $contractCoverage = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
 $technologyDesignText = Read-MIRText "prototypes\mir\domain\technology\technology_design.lua"
 $technologyDesignDoc = Read-MIRText "docs\reference\schemas\technology-design.md"
+$publicArtifactsText = Read-MIRText "prototypes\mir\report\public_compiler_artifacts.lua"
+$modDataText = Read-MIRText "prototypes\mir\emit\mod_data.lua"
 if ([int]$contractCoverage.technology_design_schema -ne 2) { throw "TechnologyDesign governed schema must be 2." }
+if ([int]$contractCoverage.public_compiler_artifact_schema -ne 1) { throw "Public compiler artifact schema must be 1." }
+foreach ($kind in @($contractCoverage.public_compiler_artifact_kinds)) {
+  if (-not $publicArtifactsText.Contains('kind = "' + [string]$kind + '"')) {
+    throw "Public compiler artifact projector is missing governed kind: $kind"
+  }
+}
+foreach ($dataType in @($contractCoverage.public_compiler_mod_data_types)) {
+  if (-not $modDataText.Contains('data_type = "' + [string]$dataType + '"')) {
+    throw "Mod-data adapter is missing governed public data type: $dataType"
+  }
+}
 foreach ($value in @($contractCoverage.technology_design_dimensions) +
   @($contractCoverage.technology_design_subject_categories) +
   @($contractCoverage.technology_design_fingerprints) +
@@ -74,6 +87,7 @@ foreach ($row in @(
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
   "| CompilerEvidence | 2 |",
+  "| Public compiler artifact projections | 1 |",
   "| RecipeFactV2 | 2 |",
   "| Runtime scenario declaration | 3 |",
   "| Campaign scenario declaration | 2 |"

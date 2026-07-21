@@ -76,18 +76,33 @@ See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and val
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
-1. **Startup-only prototype extensions** such as the opt-in pipeline extent multiplier.
-2. **Exact-version compatibility schema repairs** for known upstream loader-schema breaks such as ATAN `2.1` recipe fields.
-3. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
-4. **Generated stream technology creation.**
-5. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
-6. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
-7. **Base technology infinite extensions.**
-8. **Optional weapon shooting speed overlap adjustment.**
-9. **Max-level enforcement.**
-10. **Compiler diagnostics and compatibility planner reporting.**
-11. **Generated-technology effect safety validation.**
-12. **Optional diagnostics report flush.**
+<!-- BEGIN GENERATED MIR PIPELINE -->
+This table is generated from `prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+
+| Phase | Command | Kind | Implementation | Depends on |
+| ---: | --- | --- | --- | --- |
+| 10 | `compatibility-repairs` | mutation | `prototypes/mir/compatibility/repairs/registry.lua` | none |
+| 15 | `sanitize-input-technology-effects` | sanitation | `prototypes/mir/emit/effect_safety.lua` | `compatibility-repairs` |
+| 20 | `module-permissions` | mutation | `prototypes/mir/pipeline/module_permissions.lua` | `sanitize-input-technology-effects` |
+| 20 | `prototype-limits` | mutation | `prototypes/mir/pipeline/prototype_limits.lua` | `compatibility-repairs`, `module-permissions` |
+| 20 | `pipeline-extent` | mutation | `prototypes/mir/pipeline/extent.lua` | `compatibility-repairs`, `prototype-limits` |
+| 30 | `prepare-competing-productivity` | plan | `prototypes/mir/policy/competing_productivity.lua` | `pipeline-extent` |
+| 30 | `prepare-competing-base-extensions` | plan | `prototypes/mir/policy/competing_base_extensions.lua` | `prepare-competing-productivity` |
+| 35 | `compile-generation-plan` | plan | `prototypes/mir/planner/compilation_plan.lua` | `prepare-competing-base-extensions` |
+| 40 | `emit-streams` | emission | `prototypes/mir/emit/stream_executor.lua` | `compile-generation-plan` |
+| 50 | `apply-competing-productivity` | mutation | `prototypes/mir/pipeline/mutations/competing_productivity.lua` | `emit-streams` |
+| 50 | `emit-base-extensions` | emission | `prototypes/mir/emit/base_extensions.lua` | `apply-competing-productivity` |
+| 60 | `apply-competing-base-extensions` | mutation | `prototypes/mir/pipeline/mutations/competing_base_extensions.lua` | `emit-base-extensions` |
+| 70 | `weapon-speed-adjustments` | mutation | `prototypes/mir/pipeline/mutations/weapon_speed.lua` | `apply-competing-base-extensions` |
+| 70 | `max-level-control` | mutation | `prototypes/mir/pipeline/mutations/max_level.lua` | `weapon-speed-adjustments` |
+| 75 | `assert-technology-safety` | assertion | `prototypes/mir/emit/effect_safety.lua` | `max-level-control` |
+| 80 | `emit-compatibility-diagnostics` | report | `prototypes/mir/compatibility/diagnostics/registry.lua` | `assert-technology-safety` |
+| 80 | `emit-compiler-reports` | report | `prototypes/mir/planner/compiler.lua` | `emit-compatibility-diagnostics` |
+| 80 | `emit-compatibility-planner` | report | `prototypes/mir/compatibility/planner.lua` | `emit-compiler-reports` |
+| 90 | `assert-plan-output` | assertion | `prototypes/mir/planner/output_validator.lua` | `emit-compatibility-planner` |
+| 95 | `publish-compiler-artifacts` | publication | `prototypes/mir/planner/compilation_plan.lua` | `assert-plan-output` |
+| 100 | `flush-diagnostics` | report | `prototypes/mir/report/diagnostics_sink.lua` | `publish-compiler-artifacts` |
+<!-- END GENERATED MIR PIPELINE -->
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -445,7 +460,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/mir/planner/stream_compiler.lua` | Owns the generated stream loop. |
 | `prototypes/mir/emit/base_extensions.lua` | Extends finite vanilla technology chains. |
 | `prototypes/mir/emit/effect_safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
-| `prototypes/mir/emit/mod_data.lua` | Emits MIR mod-data prototypes used by runtime state reconciliation. |
+| `prototypes/mir/emit/mod_data.lua` | Emits compact public compiler artifacts on normal loads and separately named full internal artifacts in debug/report modes. |
 | `prototypes/mir/policy/weapon_speed.lua` | Removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation only under the configured coverage policy. |
 | `prototypes/mir/policy/native_effect_coverage.lua` | Identifies exact, enabled, reachable infinite native-effect owners for ownership and overlap decisions. |
 | `prototypes/mir/policy/max_level.lua` | Applies stream max levels after generation. |

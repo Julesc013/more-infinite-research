@@ -1,4 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 local Context = {}
@@ -69,13 +70,32 @@ function Context:has_state(name)
   return self.state[name] ~= nil
 end
 
+function Context:state_key_count()
+  local count = 0
+  for _ in pairs(self.state) do count = count + 1 end
+  return count
+end
+
 function Context:snapshot()
-  return deepcopy({
+  local payload = {
     schema = self.schema,
     command_state = self.command_state,
     artifacts = self.artifacts,
     state = self.state
-  })
+  }
+  local telemetry_state = self.state.compiler_telemetry
+  if telemetry_state and telemetry_state.counters then
+    telemetry_state.counters.context_state_keys = self:state_key_count()
+    local measured_bytes = tonumber(telemetry_state.counters.context_snapshot_bytes) or 0
+    for _ = 1, 4 do
+      telemetry_state.counters.context_snapshot_bytes = measured_bytes
+      local next_bytes = #fingerprint.canonical(payload)
+      if next_bytes == measured_bytes then break end
+      measured_bytes = next_bytes
+    end
+    telemetry_state.counters.context_snapshot_bytes = measured_bytes
+  end
+  return deepcopy(payload)
 end
 
 return M

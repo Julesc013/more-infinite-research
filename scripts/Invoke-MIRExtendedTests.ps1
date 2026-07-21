@@ -22,6 +22,8 @@ param(
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [string]$OutputRoot = ".\artifacts\extended-tests",
+  [string]$ModUnderTestZip = "",
+  [string]$ModUnderTestSourceCommit = "",
   [string]$FromLockfile,
   [string]$ManualScenariosPath,
   [string[]]$ScenarioNames = @(),
@@ -200,6 +202,8 @@ function Invoke-MIRCompatAuditTier {
     CatalogPages = $CatalogPages
     ScenarioTimeoutSeconds = $ScenarioTimeoutSeconds
   }
+  if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) { $auditParams.ModUnderTestZip = $ModUnderTestZip }
+  if (-not [string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit)) { $auditParams.ModUnderTestSourceCommit = $ModUnderTestSourceCommit }
 
   if (-not [string]::IsNullOrWhiteSpace($FromLockfile) -and -not $RunManualScenarios) {
     $auditParams.FromLockfile = $FromLockfile
@@ -409,6 +413,8 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   collect_all = [bool]$CollectAll
   continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
   offline = [bool]$Offline
+  mod_under_test_zip = $ModUnderTestZip
+  mod_under_test_source_commit = $ModUnderTestSourceCommit
   from_lockfile = $FromLockfile
   manual_scenarios_path = $ManualScenariosPath
   local_mod_zip_dirs = @($LocalModZipDirs)
@@ -439,6 +445,8 @@ $md += ('- Fail on audit failures: `{0}`' -f ([bool]$FailOnAuditFailures))
 $md += ('- Collect all audit scenarios: `{0}`' -f ([bool]$CollectAll))
 $md += ('- Continue on dependency failure: `{0}`' -f ([bool]$ContinueOnDependencyFailure))
 $md += ('- Offline: `{0}`' -f ([bool]$Offline))
+$md += ('- Mod under test ZIP: `{0}`' -f $ModUnderTestZip)
+$md += ('- Mod under test source commit: `{0}`' -f $ModUnderTestSourceCommit)
 $md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
 if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
   $md += ('- Manual scenarios path: `{0}`' -f $ManualScenariosPath)

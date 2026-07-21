@@ -119,7 +119,7 @@ local stress_fingerprint = fingerprint.of({
   rejected_planned_technology_count = stress.rejected_planned_technology_count,
   cyclic_components = stress_components
 })
-log("[mir-fixture] synthetic-graph fingerprints coverage=" .. tostring(prototype.data.fingerprint)
+log("[mir-fixture] synthetic-graph fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
   .. " compilation=" .. tostring(plan.semantic_fingerprint)
   .. " in_memory=" .. tostring(stress_fingerprint))

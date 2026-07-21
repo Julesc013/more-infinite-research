@@ -127,6 +127,8 @@
       "requires_factorio": false,
       "inputs": [
         "scripts/Build-MIRPackage.ps1",
+        "scripts/Measure-MIRPackageComposition.ps1",
+        "scripts/Test-MIRPackageComposition.ps1",
         "scripts/validation/PackageIdentity.ps1",
         "info.json",
         "package-source"
@@ -271,7 +273,7 @@
       "id": "runtime.ecosystem",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --no-git-pull --skip-strict-gate",
+      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
       "requires_factorio": true,
       "inputs": [
         "candidate",

@@ -96,6 +96,9 @@ campaigns:
   sanitation_budget:
     authority: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
+    scopes:
+      manifest_scenarios: campaigns
+      release_targeted_repair_smokes: local_mod_zips
     maximum_unreviewed_external_prunes: 0
     mismatch_disposition: REVIEW_REQUIRED
   exact_mir_archive_sha256_required: true

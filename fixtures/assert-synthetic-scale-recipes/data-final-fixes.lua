@@ -102,7 +102,7 @@ local stress_fingerprint = fingerprint.of({
   by_ingredient = index_fingerprint(stress.by_ingredient),
   by_category = index_fingerprint(stress.by_category)
 })
-log("[mir-fixture] synthetic-recipes fingerprints coverage=" .. tostring(prototype.data.fingerprint)
+log("[mir-fixture] synthetic-recipes fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
   .. " compilation=" .. tostring(plan.semantic_fingerprint)
   .. " in_memory=" .. tostring(stress_fingerprint))

@@ -6,6 +6,8 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
+& (Join-Path $repo "scripts\Update-MIRPipelineDocumentation.ps1") -RepoRoot $repo -Check
+
 function Assert-MIRModuleManifestSemantics {
   $manifestPath = Join-Path $repo ".mir\modules.yml"
   $lines = Get-Content -LiteralPath $manifestPath
@@ -396,7 +398,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "commands.run_all()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'commands.run_all({return_snapshot = false})'
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -458,7 +460,8 @@ foreach ($commandId in @(
     -Text $commandCatalogText `
     -Needle ('["' + $commandId + '"]')
 }
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all()"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all(options)"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "if options.return_snapshot == false then return context end"
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle 'pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)'
 
 Assert-MIRNoPatternInLuaFile `
@@ -491,7 +494,8 @@ foreach ($contextNeedle in @(
   "function M.current()",
   "function Context:state_view(name, factory)",
   "function Context:set_state(name, value)",
-  "function Context:state_snapshot(name)"
+  "function Context:state_snapshot(name)",
+  "function Context:state_key_count()"
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_context.lua" -Text $compilerContextText -Needle $contextNeedle
 }
@@ -553,6 +557,21 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDa
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'target_line.mod_data_supported()'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "data_raw.extend({"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "more-infinite-research-compiler-evidence"
+foreach ($publicArtifactNeedle in @(
+  "more-infinite-research-generation-plan-internal",
+  "more-infinite-research-coverage-report-internal",
+  "more-infinite-research-compiler-evidence-internal",
+  "more-infinite-research.generation-plan-public",
+  "more-infinite-research.coverage-public",
+  "more-infinite-research.compiler-evidence-public"
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle $publicArtifactNeedle
+}
+
+$publicArtifactsText = Read-MIRFile -RelativePath "prototypes/mir/report/public_compiler_artifacts.lua"
+foreach ($projection in @("function M.generation_plan(artifact)", "function M.coverage(artifact)", "function M.compiler_evidence(input)")) {
+  Assert-MIRContains -RelativePath "prototypes/mir/report/public_compiler_artifacts.lua" -Text $publicArtifactsText -Needle $projection
+}
 
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
