@@ -781,7 +781,9 @@
         "fixtures": [
           "mir-fixture-assert-compiler-contracts"
         ],
-        "settings": {},
+        "settings": {
+          "mir-debug-generation-report": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [

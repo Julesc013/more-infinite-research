@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-21
 supersedes: []
 superseded_by: []
 ---
@@ -18,9 +18,9 @@ The internal stream plan artifact is schema 3. It contains a deterministic plan 
 
 ## Public And Internal Publication
 
-Normal Factorio loads publish `more-infinite-research-generation-plan` with data type `more-infinite-research.generation-plan-public`. This schema-1 projection contains the plan, source, and public fingerprints, the validation summary, and concise rows with stream ID, action, reason, technology ID, effect count and identities, subject fingerprint, and qualification fingerprint.
+Normal Factorio loads publish `more-infinite-research-generation-plan` with data type `more-infinite-research.generation-plan-public`. This schema-1 projection contains the plan, source, and public fingerprints, the validation summary, and concise rows with stream ID, action, reason, technology ID, effect count and identities, and a decision fingerprint. Materializing rows also carry their subject and qualification fingerprints. Skip rows do not construct a complete `TechnologyDesign` during normal loads.
 
-The complete schema-3 plan, including stream specifications, gates, diagnostics, fields, and `TechnologyDesign`, is published as `more-infinite-research-generation-plan-internal` with data type `more-infinite-research.generation-plan-internal` only when generation diagnostics are enabled or automatic compiler preview/report mode requests detailed artifacts. Validation fixtures use that explicit internal surface. Consumers must not infer the complete internal schema from the compact public prototype.
+The complete schema-3 plan, including stream specifications, gates, diagnostics, fields, and materializing `TechnologyDesign` records, is published as `more-infinite-research-generation-plan-internal` with data type `more-infinite-research.generation-plan-internal` only when generation diagnostics are enabled or automatic compiler preview/report mode requests detailed artifacts. In that mode the TechnologyCatalog constructs diagnostic designs and qualifications for skipped rows on demand. Validation fixtures use that explicit internal surface. Consumers must not infer the complete internal schema from the compact public prototype.
 
 `CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects. Accepted base extensions carry a continuation-manifest identity and schema-2 `TechnologyDesign`; the plan rebuilds their projection after sanitation and cross-operation policy. `compilation_fingerprint` identifies selected accepted and rejected operations plus policies, `qualification_fingerprint` additionally binds exact gates and evidence, and `run_fingerprint` binds qualification to operational telemetry. `semantic_fingerprint` remains a compatibility alias for qualification, while `fingerprint` aliases compilation.
 

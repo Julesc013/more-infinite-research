@@ -31,6 +31,7 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local technology_catalog = require("prototypes.mir.planner.technology_catalog")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 
 local M = {}
 
@@ -373,11 +374,11 @@ local function plan_stream(key, raw_spec)
     })
 end
 
-function M.compile(context)
+local function compile(context, return_view)
   context = context or compiler_context.current()
   compiler_context.activate(context)
   local cached = context:state_view("generation_plan")
-  if cached then return deepcopy(cached) end
+  if cached then return return_view and cached or deepcopy(cached) end
   telemetry.start_phase("stream_compiler")
   local streams = C.snapshot()
   local native_owner_inputs = {}
@@ -403,21 +404,36 @@ function M.compile(context)
   for _, key in ipairs(table_utils.sorted_keys(streams)) do
     table.insert(rows, plan_stream(key, streams[key]))
   end
-  rows = effect_ownership.resolve(rows)
+  rows = effect_ownership.resolve(rows, {defer_design_refresh = true})
   for _, row in ipairs(rows) do
-    row.technology_design = technology_design.from_generation_row(row)
-    plan:add(row)
+    if row.action ~= "skip" then
+      row.technology_design = technology_design.from_generation_row(row)
+    end
+    plan:add_owned_derived(row)
   end
   local finalized = plan:finalize()
-  local artifact = finalized:artifact()
-  local catalog = technology_catalog.from_generation_rows(artifact.rows, artifact.source_fingerprints)
-  technology_catalog.validate(catalog)
-  telemetry.count("stream_rows", finalized:count())
+  local artifact = finalized:artifact_view()
+  local catalog
+  if diagnostics.enabled() then
+    catalog = technology_catalog.from_generation_rows(artifact.rows, artifact.source_fingerprints)
+    technology_catalog.validate(catalog)
+  end
+  telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
-  context:set_state("technology_candidate_catalog", technology_catalog.snapshot(catalog))
-  context:set_state("technology_qualifications", deepcopy(catalog.qualifications))
+  if catalog then
+    context:set_state("technology_candidate_catalog", technology_catalog.snapshot(catalog))
+    context:set_state("technology_qualifications", deepcopy(catalog.qualifications))
+  end
   context:set_state("generation_plan", artifact)
-  return finalized
+  return return_view and artifact or deepcopy(artifact)
+end
+
+function M.compile(context)
+  return compile(context, false)
+end
+
+function M.compile_view(context)
+  return compile(context, true)
 end
 
 function M.accept(plan, context)
@@ -431,9 +447,9 @@ function M.latest_artifact(context)
   return context:state_snapshot("generation_plan")
 end
 
-function M.accept_artifact(artifact, context)
+function M.accept_artifact(artifact, context, options)
   context = context or compiler_context.current()
-  context:set_state("generation_plan", deepcopy(artifact))
+  context:set_state("generation_plan", options and options.trusted and artifact or deepcopy(artifact))
 end
 
 function M.assert_output(context)

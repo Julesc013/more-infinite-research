@@ -270,7 +270,7 @@ mutation_commands:
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
-    - candidate and qualification catalogs are context-owned compiler artifacts and do not publish or promote identities
+    - candidate and qualification catalogs are context-owned internal compiler artifacts constructed only when diagnostics or automatic preview/report mode requests them; they do not publish or promote identities
     - approval promotion demotion quarantine and migration records are independently fingerprinted governance decisions
     - approved structural applicability is a fingerprinted data-only envelope with exact mods positive examples negative examples and bounded new matches
     - family providers compose only registered data-only operators and the central resolver does not dispatch legacy strategies

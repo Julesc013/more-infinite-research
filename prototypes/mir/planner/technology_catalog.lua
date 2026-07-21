@@ -14,11 +14,9 @@ end
 function M.from_generation_rows(rows, context_material)
   local candidates, qualifications, by_id = {}, {}, {}
   for _, row in ipairs(rows or {}) do
-    if not row.technology_design then
-      error("Technology catalog row lacks TechnologyDesign: " .. tostring(row.stream_key), 2)
-    end
-    technology_design.validate(row.technology_design)
-    local candidate = technology_candidate.from_design(row.technology_design, row)
+    local design = row.technology_design or technology_design.from_generation_row(row)
+    technology_design.validate(design)
+    local candidate = technology_candidate.from_design(design, row, {validated = true})
     local existing = by_id[candidate.candidate_id]
     if existing and existing.candidate_fingerprint ~= candidate.candidate_fingerprint then
       error("TechnologyCandidate identity has contradictory discovery material: " .. candidate.candidate_id, 2)
@@ -29,14 +27,15 @@ function M.from_generation_rows(rows, context_material)
       table.insert(candidates, candidate)
     end
     table.insert(by_id[candidate.candidate_id].alternatives, {
-      alternative_id = alternative_id(row.technology_design),
+      alternative_id = alternative_id(design),
       action = row.action,
-      materialization = deepcopy(row.technology_design.materialization),
-      design_fingerprint = row.technology_design.design_fingerprint,
-      prototype_fingerprint = row.technology_design.prototype_fingerprint,
-      qualification_fingerprint = row.technology_design.qualification_fingerprint
+      materialization = deepcopy(design.materialization),
+      design_fingerprint = design.design_fingerprint,
+      prototype_fingerprint = design.prototype_fingerprint,
+      qualification_fingerprint = design.qualification_fingerprint
     })
-    table.insert(qualifications, technology_qualification.from_design(row.technology_design, row))
+    table.insert(qualifications,
+      technology_qualification.from_design(design, row, nil, {validated = true}))
   end
   table.sort(candidates, function(left, right) return left.candidate_id < right.candidate_id end)
   for _, candidate in ipairs(candidates) do

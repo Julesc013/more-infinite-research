@@ -128,8 +128,9 @@ local function assert_registry(operation)
   assert_equal(operation.technology_name, "registry key", expected.key, actual.key)
 end
 
-function M.assert_compilation_artifact(artifact)
+function M.assert_compilation_artifact(artifact, options)
   if not artifact or artifact.schema ~= 2 then error("CompilationPlan schema 2 artifact is required", 2) end
+  options = options or {}
   local checked = 0
   for _, operation in ipairs(artifact.operations or {}) do
     local technology = data_raw.technology(operation.technology_name)
@@ -137,8 +138,10 @@ function M.assert_compilation_artifact(artifact)
       if not operation.technology_design then
         fail(operation.technology_name, "TechnologyDesign is missing")
       end
-      technology_design.validate(operation.technology_design)
-      local expected = technology_design.prototype_projection(operation.technology_design)
+      if not options.designs_validated then
+        technology_design.validate(operation.technology_design)
+      end
+      local expected = technology_design.prototype_projection(operation.technology_design, {validated = true})
       M.assert_technology_shape(expected, operation.technology,
         operation.technology_name .. " planned TechnologyDesign projection")
       M.assert_technology_shape(expected, technology, operation.technology_name)
@@ -149,8 +152,10 @@ function M.assert_compilation_artifact(artifact)
       if not operation.technology_design then
         fail(operation.technology_name, "patch-existing TechnologyDesign is missing")
       end
-      technology_design.validate(operation.technology_design)
-      local design_projection = technology_design.prototype_projection(operation.technology_design)
+      if not options.designs_validated then
+        technology_design.validate(operation.technology_design)
+      end
+      local design_projection = technology_design.prototype_projection(operation.technology_design, {validated = true})
       if operation.technology_design.materialization.kind ~= "patch-existing"
         or operation.technology_design.materialization.target ~= operation.technology_name then
         fail(operation.technology_name, "patch-existing TechnologyDesign target differs")
@@ -179,7 +184,7 @@ function M.assert_artifact(artifact)
       table.insert(operations, {
         operation = "emit_stream",
         technology_name = row.technology_name,
-        technology = technology_design.prototype_projection(row.technology_design)
+        technology = technology_design.prototype_projection(row.technology_design, {validated = true})
       })
     elseif row.action == "adopt" then
       technology_design.assert_generation_row(row)

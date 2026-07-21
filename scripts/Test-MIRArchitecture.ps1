@@ -540,7 +540,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_design_adapter.emit(design,"
 
 $technologyDesignAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_design_adapter.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "technology_design.prototype_projection(design)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "technology_design.prototype_projection(design, {validated = true})"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "data_raw.extend({deepcopy(technology)})"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "generated_registry.register(technology.name,"
 
@@ -662,7 +662,7 @@ foreach ($relativePath in @(
 $adoptionTransactionText = Read-MIRFile -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "owner.effects = staged.effects"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "plan.input_fingerprint"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "technology_design.prototype_projection(design)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "technology_design.prototype_projection(design, {validated = true})"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle 'design.materialization.kind ~= "patch-existing"'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "design.context.patch_input_fingerprint ~= plan.input_fingerprint"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "design.materialization.configured_fields"

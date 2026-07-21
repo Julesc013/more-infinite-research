@@ -72,7 +72,8 @@ local function convert_empty_row_to_skip(row, first_identity)
   row.diagnostics.effects = "0"
 end
 
-function M.resolve(raw_rows)
+function M.resolve(raw_rows, options)
+  options = options or {}
   local rows = deepcopy(raw_rows or {})
   local claims_by_identity = {}
   local materializing_counts = {}
@@ -150,8 +151,10 @@ function M.resolve(raw_rows)
     if a.action ~= b.action then return a.action < b.action end
     return tostring(a.manifest_id) < tostring(b.manifest_id)
   end)
-  for _, row in ipairs(rows) do
-    if row.action == "emit" then row.technology_design = technology_design.from_generation_row(row) end
+  if not options.defer_design_refresh then
+    for _, row in ipairs(rows) do
+      if row.action == "emit" then row.technology_design = technology_design.from_generation_row(row) end
+    end
   end
   return rows, {conflict_count = conflict_count}
 end

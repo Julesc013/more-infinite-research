@@ -59,8 +59,8 @@ function M.validate(record)
   return true
 end
 
-function M.from_design(design, row, quality_metrics)
-  technology_design.validate(design)
+function M.from_design(design, row, quality_metrics, options)
+  if not (options and options.validated) then technology_design.validate(design) end
   row = row or {}
   local contributing = {}
   for _, gate_name in ipairs(GATE_ORDER) do

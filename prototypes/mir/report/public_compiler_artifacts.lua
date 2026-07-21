@@ -32,7 +32,7 @@ function M.generation_plan(artifact)
   for _, row in ipairs(artifact.rows or {}) do
     local design = row.technology_design or {}
     local identities = sorted_effect_identities(row_effects(row))
-    table.insert(rows, {
+    local public_row = {
       schema = 1,
       stream_id = row.stream_key,
       action = row.action,
@@ -41,8 +41,16 @@ function M.generation_plan(artifact)
       effect_count = #identities,
       effect_identities = identities,
       subject_fingerprint = design.subject_fingerprint,
-      qualification_fingerprint = design.qualification_fingerprint
-    })
+      qualification_fingerprint = design.qualification_fingerprint,
+      decision_fingerprint = fingerprint.of({
+        stream_id = row.stream_key,
+        action = row.action,
+        reason = row.reason or row.action,
+        technology_id = row.technology_name or (row.adoption and row.adoption.owner),
+        gates = row.gates
+      })
+    }
+    table.insert(rows, public_row)
   end
   local public = {
     schema = 1,

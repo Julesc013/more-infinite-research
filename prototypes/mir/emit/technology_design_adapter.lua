@@ -11,7 +11,7 @@ function M.emit(design, registration)
   if kind ~= "create" and kind ~= "continuation" then
     error("TechnologyDesign emitter cannot materialize kind " .. tostring(kind) .. ".", 2)
   end
-  local technology = technology_design.prototype_projection(design)
+  local technology = technology_design.prototype_projection(design, {validated = true})
   technology.type = "technology"
   if data_raw.technology(technology.name) then
     error("TechnologyDesign output identity already exists: " .. tostring(technology.name), 2)

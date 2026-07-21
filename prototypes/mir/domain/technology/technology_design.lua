@@ -377,7 +377,7 @@ function M.schema_authority()
   return deepcopy(SCHEMA)
 end
 
-function M.validate(design)
+local function validate(design, verify_fingerprints)
   if type(design) ~= "table" or design.schema ~= SCHEMA.schema then
     error("TechnologyDesign schema 2 record is required.", 2)
   end
@@ -477,20 +477,26 @@ function M.validate(design)
     or not same(design.members, design.provenance.fields.members.value) then
     error("TechnologyDesign subjects or members differ from provenance.", 2)
   end
-  local expected_subject = fingerprint.of(subject_material(design))
-  local expected_design = fingerprint.of(design_material(design))
-  local expected_prototype = fingerprint.of(prototype_projection_unvalidated(design))
-  if design.subject_fingerprint ~= expected_subject
-    or design.design_fingerprint ~= expected_design
-    or design.prototype_fingerprint ~= expected_prototype then
-    error("TechnologyDesign semantic identity fingerprints differ: " .. design.candidate_id, 2)
-  end
-  local expected_qualification = fingerprint.of(qualification_material(design))
-  if design.qualification_fingerprint ~= expected_qualification
-    or design.semantic_fingerprint ~= expected_qualification then
-    error("TechnologyDesign qualification fingerprint differs: " .. design.candidate_id, 2)
+  if verify_fingerprints then
+    local expected_subject = fingerprint.of(subject_material(design))
+    local expected_design = fingerprint.of(design_material(design))
+    local expected_prototype = fingerprint.of(prototype_projection_unvalidated(design))
+    if design.subject_fingerprint ~= expected_subject
+      or design.design_fingerprint ~= expected_design
+      or design.prototype_fingerprint ~= expected_prototype then
+      error("TechnologyDesign semantic identity fingerprints differ: " .. design.candidate_id, 2)
+    end
+    local expected_qualification = fingerprint.of(qualification_material(design))
+    if design.qualification_fingerprint ~= expected_qualification
+      or design.semantic_fingerprint ~= expected_qualification then
+      error("TechnologyDesign qualification fingerprint differs: " .. design.candidate_id, 2)
+    end
   end
   return true
+end
+
+function M.validate(design)
+  return validate(design, true)
 end
 
 function M.refresh_fingerprints(design)
@@ -500,6 +506,34 @@ function M.refresh_fingerprints(design)
   design.qualification_fingerprint = fingerprint.of(qualification_material(design))
   design.semantic_fingerprint = design.qualification_fingerprint
   return design
+end
+
+function M.with_qualification(design, row, options)
+  if not (options and options.validated) then M.validate(design) end
+  if type(row) ~= "table" or type(row.gates) ~= "table" then
+    error("TechnologyDesign qualification update requires a GenerationPlan row.", 2)
+  end
+  local identity = design.design.identity.value
+  if design.design.ownership.value.action ~= row.action
+    or identity.stream_key ~= row.stream_key
+    or identity.manifest_id ~= row.manifest_id
+    or design.technology_id ~= (row.technology_name or ((row.adoption or {}).owner)) then
+    error("TechnologyDesign qualification update changed design identity: " .. tostring(row.stream_key), 2)
+  end
+  local result
+  if options and options.share_immutable then
+    result = {}
+    for key, value in pairs(design) do result[key] = value end
+    result.context = deepcopy(design.context)
+  else
+    result = deepcopy(design)
+  end
+  result.gates = deepcopy(row.gates)
+  result.context.action_reason = row.reason
+  result.context.target_profile_fingerprint = row.target_profile_fingerprint
+  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.semantic_fingerprint = result.qualification_fingerprint
+  return result
 end
 
 function M.from_generation_row(row)
@@ -658,8 +692,10 @@ function M.from_generation_row(row)
       patch_output_fingerprint = adoption.output_fingerprint
     }
   }
+  -- Construction owns every field in this new record. Prove the structural
+  -- and cross-field invariants once, then compute the fingerprints once.
+  validate(result, false)
   M.refresh_fingerprints(result)
-  M.validate(result)
   return result
 end
 
@@ -719,8 +755,8 @@ function M.graph_projection(design)
   })
 end
 
-function M.prototype_projection(design)
-  M.validate(design)
+function M.prototype_projection(design, options)
+  if not (options and options.validated) then M.validate(design) end
   return deepcopy(prototype_projection_unvalidated(design))
 end
 
@@ -754,8 +790,8 @@ function M.save_identity_projection(design)
   })
 end
 
-function M.prototype_shape(design)
-  return M.prototype_projection(design)
+function M.prototype_shape(design, options)
+  return M.prototype_projection(design, options)
 end
 
 function M.diff(before, after)
@@ -835,7 +871,10 @@ function M.assert_generation_row(row)
   end
   M.validate(row.technology_design)
   local design = row.technology_design
-  local projection = M.prototype_projection(design)
+  -- The full validation above already recomputes and verifies the prototype
+  -- fingerprint. Re-entering prototype_projection() would validate the same
+  -- immutable design a second time before returning this exact projection.
+  local projection = deepcopy(prototype_projection_unvalidated(design))
   if row.action == "adopt" then
     local adoption = row.adoption or {}
     if design.materialization.kind ~= "patch-existing"

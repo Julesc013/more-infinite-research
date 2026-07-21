@@ -76,8 +76,8 @@ function M.validate(candidate)
   return true
 end
 
-function M.from_design(design, row)
-  technology_design.validate(design)
+function M.from_design(design, row, options)
+  if not (options and options.validated) then technology_design.validate(design) end
   row = row or {}
   local provider_ids = sorted_unique(row.provider_ids or {})
   local family_ids = sorted_unique(row.family_ids or {})

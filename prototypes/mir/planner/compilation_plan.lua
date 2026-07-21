@@ -18,19 +18,39 @@ local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local M = {}
 local normalized_base_operation
 
-local function rebuild_stream_artifact(stream_artifact, rows)
-  local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
-  for _, row in ipairs(rows) do
-    row.technology_design = technology_design.from_generation_row(row)
-    plan:add(row)
+local function copy_row_with_design_view(source_row)
+  local row = {}
+  for key, value in pairs(source_row) do
+    row[key] = key == "technology_design" and value or deepcopy(value)
   end
-  return plan:finalize():artifact()
+  return row
+end
+
+local function copy_operation_without_design(source_operation)
+  local operation = {}
+  for key, value in pairs(source_operation) do
+    if key ~= "technology_design" then operation[key] = deepcopy(value) end
+  end
+  return operation
+end
+
+local function rebuild_stream_artifact(stream_artifact, rows, rebuild_design_by_index)
+  local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
+  for index, row in ipairs(rows) do
+    if row.action == "skip" then
+      row.technology_design = nil
+    elseif not row.technology_design or (rebuild_design_by_index and rebuild_design_by_index[index]) then
+      row.technology_design = technology_design.from_generation_row(row)
+    end
+    plan:add_owned_derived(row)
+  end
+  return plan:finalize():artifact_view()
 end
 
 local function sanitize_stream_artifact(stream_artifact)
   local rows, removed_count, skipped_count = {}, 0, 0
   for _, source_row in ipairs(stream_artifact.rows or {}) do
-    local row = deepcopy(source_row)
+    local row = copy_row_with_design_view(source_row)
     if row.action == "emit" then
       local kept, removed = effect_safety.sanitize_effects(
         row.fields.effects,
@@ -65,10 +85,21 @@ local function sanitize_stream_artifact(stream_artifact)
           evidence = {"effect-contracts:all-targets-exist"}
         }
       end
+      -- Rebuild only when sanitation changed prototype semantics, ensuring the
+      -- preliminary graph and final operation both consume the retained set.
+      -- Zero-removal rows need only one qualification refresh after graph proof.
+      if #removed > 0 then
+        row.technology_design = row.action == "emit"
+          and technology_design.from_generation_row(row) or nil
+      end
     end
     table.insert(rows, row)
   end
-  return rebuild_stream_artifact(stream_artifact, rows), {
+  return {
+    schema = 3,
+    source_fingerprints = stream_artifact.source_fingerprints,
+    rows = rows
+  }, {
     removed_effect_count = removed_count,
     skipped_stream_count = skipped_count
   }
@@ -98,7 +129,10 @@ local function sanitize_base_operations(base_plan)
 end
 
 local function apply_graph_decisions(stream_artifact, graph_summary)
-  local rows = deepcopy(stream_artifact.rows or {})
+  local rows = {}
+  for _, source_row in ipairs(stream_artifact.rows or {}) do
+    table.insert(rows, copy_row_with_design_view(source_row))
+  end
   for _, row in ipairs(rows) do
     if row.action == "emit" then
       local rejection = graph_summary.rejected[row.technology_name]
@@ -119,13 +153,23 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
           evidence = {"technology-graph:missing-proof"},
           reason = "missing_graph_proof"
         }
+        row.technology_design = technology_design.with_qualification(
+          row.technology_design,
+          row,
+          {validated = true, share_immutable = true}
+        )
       end
-    else
+    elseif row.action == "adopt" then
       row.gates.prerequisites_acyclic = {
         passed = true,
         status = "not-applicable",
         evidence = {"decision:non-materializing-row"}
       }
+      row.technology_design = technology_design.with_qualification(
+        row.technology_design,
+        row,
+        {validated = true, share_immutable = true}
+      )
     end
   end
   return rebuild_stream_artifact(stream_artifact, rows)
@@ -149,7 +193,8 @@ local function apply_base_graph_decisions(base_operations, graph_summary)
   return accepted, rejected
 end
 
-local function materialized_stream_operations(artifact)
+local function materialized_stream_operations(artifact, options)
+  options = options or {}
   local out = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
@@ -157,19 +202,17 @@ local function materialized_stream_operations(artifact)
         error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
       end
       local design = row.technology_design
-      technology_design.assert_generation_row(row)
       table.insert(out, {
         schema = 2,
         operation = "emit_stream",
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.technology_name,
-        technology_design = deepcopy(design),
-        technology = technology_design.prototype_shape(design),
+        technology_design = options.include_design == false and nil or deepcopy(design),
+        technology = technology_design.prototype_shape(design, {validated = true}),
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
-      technology_design.assert_generation_row(row)
       table.insert(out, {
         schema = 2,
         operation = "native_owner_binding",
@@ -177,7 +220,7 @@ local function materialized_stream_operations(artifact)
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.adoption.owner,
-        technology_design = deepcopy(row.technology_design),
+        technology_design = options.include_design == false and nil or deepcopy(row.technology_design),
         effects = deepcopy(row.adoption.effects),
         configured_fields = deepcopy(row.adoption.configured_fields),
         input_fingerprint = row.adoption.input_fingerprint,
@@ -195,7 +238,7 @@ normalized_base_operation = function(operation)
   out.manifest_id = out.manifest_id or ("base-extension:" .. tostring(out.key) .. ":" .. tostring(out.technology_name))
   out.registry = {kind = "base_extension", key = out.key}
   out.technology_design = technology_design.from_base_extension_operation(out)
-  out.technology = technology_design.prototype_projection(out.technology_design)
+  out.technology = technology_design.prototype_projection(out.technology_design, {validated = true})
   out.technology.type = "technology"
   return out
 end
@@ -353,7 +396,10 @@ local function qualification_material(artifact)
     schema = artifact.schema,
     compilation_fingerprint = artifact.compilation_fingerprint,
     input_sanitation_fingerprint = fingerprint.of(artifact.input_sanitation_ledger or {}),
-    stream_plan = artifact.stream_plan,
+    stream_plan = {
+      schema = artifact.stream_plan.schema,
+      plan_fingerprint = artifact.stream_plan.plan_fingerprint
+    },
     validation_summary = artifact.validation_summary
   }
 end
@@ -375,11 +421,18 @@ local function attach_run_evidence(artifact)
 end
 
 function M.finalize(stream_plan, base_plan, compiler_inputs)
-  local stream_artifact = type(stream_plan.artifact) == "function" and stream_plan:artifact() or deepcopy(stream_plan)
+  local stream_artifact
+  if type(stream_plan.artifact) == "function" then
+    stream_artifact = stream_plan:artifact()
+  elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
+    stream_artifact = stream_plan
+  else
+    stream_artifact = deepcopy(stream_plan)
+  end
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
   local stream_effect_integrity
   stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact)
-  local operations = materialized_stream_operations(stream_artifact)
+  local operations = materialized_stream_operations(stream_artifact, {include_design = false})
   local stream_operations = deepcopy(operations)
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan)
   local finalized_base = {}
@@ -387,7 +440,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     local normalized = apply_weapon_overlap_policy(operation, stream_operations, stream_artifact.rows)
     normalized = normalized_base_operation(normalized)
     table.insert(finalized_base, normalized)
-    table.insert(operations, deepcopy(normalized))
+    table.insert(operations, copy_operation_without_design(normalized))
   end
   normalized_base = finalized_base
   validate_operations(operations)
@@ -441,13 +494,14 @@ function M.compile(context)
   local latest = context:state_view("compilation_plan")
   if latest then return latest end
   telemetry.start_phase("planning")
-  local stream_plan = stream_compiler.compile(context)
+  local stream_plan = stream_compiler.compile_view(context)
   local base_plan = base_extensions.plan_all()
   latest = M.finalize(stream_plan, base_plan, {
-    input_sanitation_ledger = context:artifact("input_sanitation_ledger")
+    input_sanitation_ledger = context:artifact("input_sanitation_ledger"),
+    stream_plan_trusted = true
   })
   context:set_state("compilation_plan", latest)
-  stream_compiler.accept_artifact(latest.stream_plan, context)
+  stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
   telemetry.finish_phase("planning")
   return latest
 end
@@ -528,7 +582,14 @@ function M.snapshot(context)
 end
 
 function M.assert_output(context)
-  return require("prototypes.mir.planner.output_validator").assert_compilation_artifact(M.snapshot(context))
+  -- CompilationPlan construction owns TechnologyDesign validation and keeps the
+  -- artifact context-local. The final assertion still compares every planned
+  -- projection with live prototype output, but does not deep-copy or revalidate that trusted
+  -- internal artifact. Public artifact validation remains strict by default.
+  return require("prototypes.mir.planner.output_validator").assert_compilation_artifact(
+    M.compile(context),
+    {designs_validated = true}
+  )
 end
 
 return M

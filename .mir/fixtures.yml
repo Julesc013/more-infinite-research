@@ -675,7 +675,13 @@ fixtures:
       - technology-design-typed-subjects
       - technology-candidate-schema-1-normalization
       - technology-qualification-schema-1-hard-gates
+      - technology-design-qualification-refresh-parity
+      - technology-design-qualification-refresh-identity-rejection
+      - partial-effect-sanitation-technology-design-rebuild
       - context-owned-candidate-and-qualification-catalogs
+      - report-mode-explicit-candidate-catalog-request
+      - skipped-row-technology-design-report-mode-synthesis
+      - public-generation-plan-decision-fingerprints
       - technology-approval-exact-design-binding
       - machine-readable-technology-applicability-envelope
       - positive-negative-applicability-examples

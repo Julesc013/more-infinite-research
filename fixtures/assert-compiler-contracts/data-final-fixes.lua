@@ -441,6 +441,25 @@ if normalized_design.semantic_fingerprint
   ~= technology_design.from_generation_row(design_row).semantic_fingerprint then
   fail("TechnologyDesign semantic fingerprint is not deterministic")
 end
+local qualification_row = deepcopy(design_row)
+qualification_row.gates.effect_valid.evidence = {"fixture:qualification-refresh"}
+local refreshed_qualification_design = technology_design.with_qualification(
+  normalized_design,
+  qualification_row,
+  {validated = true, share_immutable = true}
+)
+local rebuilt_qualification_design = technology_design.from_generation_row(qualification_row)
+if fingerprint.of(refreshed_qualification_design) ~= fingerprint.of(rebuilt_qualification_design) then
+  fail("TechnologyDesign qualification-only refresh differs from a complete rebuild")
+end
+if normalized_design.gates.effect_valid.evidence[1] == "fixture:qualification-refresh" then
+  fail("TechnologyDesign qualification-only refresh mutated its source design")
+end
+local mismatched_qualification_row = deepcopy(qualification_row)
+mismatched_qualification_row.technology_name = "mismatched-technology-design"
+expect_error("TechnologyDesign qualification identity", "changed design identity", function()
+  technology_design.with_qualification(normalized_design, mismatched_qualification_row)
+end)
 local candidate = technology_candidate.from_design(normalized_design, design_row)
 local qualification = technology_qualification.from_design(normalized_design, design_row)
 local lifecycle_catalog = technology_catalog.from_generation_rows({design_row}, {fixture = "lifecycle"})
@@ -681,6 +700,35 @@ expect_error("CompilationPlan cross collision", "technology-name collision", fun
     technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
 end)
+
+local partial_sanitation_row = emitted_row(
+  "partial-effect-sanitation-stream",
+  "partial-effect-sanitation-tech",
+  "iron-gear-wheel"
+)
+table.insert(partial_sanitation_row.fields.effects, {
+  type = "change-recipe-productivity",
+  recipe = "definitely-missing-partial-sanitation-recipe",
+  change = 0.1
+})
+partial_sanitation_row.technology_design = technology_design.from_generation_row(partial_sanitation_row)
+local partial_sanitation_source = generation_plan.new()
+partial_sanitation_source:add(partial_sanitation_row)
+partial_sanitation_source:finalize()
+local partial_sanitation_plan = compilation_plan.finalize(partial_sanitation_source, {})
+local partial_sanitation_operation = partial_sanitation_plan.operations[1]
+local partial_sanitation_design = partial_sanitation_operation
+  and partial_sanitation_operation.technology_design
+if not partial_sanitation_operation
+  or #partial_sanitation_operation.technology.effects ~= 1
+  or partial_sanitation_operation.technology.effects[1].recipe ~= "iron-gear-wheel"
+  or not partial_sanitation_design
+  or #partial_sanitation_design.design.effects.value ~= 1
+  or partial_sanitation_design.design.effects.value[1].recipe ~= "iron-gear-wheel"
+  or partial_sanitation_plan.validation_summary.effect_integrity.streams.removed_effect_count ~= 1 then
+  fail("CompilationPlan partial effect sanitation did not rebuild TechnologyDesign from retained effects")
+end
+
 local missing_prerequisite_plan = compilation_plan.finalize(generation_plan.new():finalize(), {{
     operation = "emit_base_extension",
     key = "missing-prerequisite",
@@ -904,11 +952,38 @@ expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function()
 local production_context = compiler_context.current()
 local production_catalog = production_context:state_snapshot("technology_candidate_catalog")
 local production_qualifications = production_context:state_snapshot("technology_qualifications")
+local production_plan = production_context:state_snapshot("generation_plan")
+local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+local public_plan = public_plan_prototype and public_plan_prototype.data
 if not production_catalog or not production_qualifications
+  or not production_plan or not public_plan
   or #production_catalog.candidates == 0
-  or #production_catalog.qualifications ~= #production_qualifications then
+  or #production_catalog.qualifications ~= #production_qualifications
+  or #production_catalog.qualifications ~= #production_plan.rows then
   fail("CompilerContext does not own the technology candidate and qualification catalogs")
 end
+local public_rows = {}
+for _, row in ipairs(public_plan.rows or {}) do public_rows[row.stream_id] = row end
+local skipped_design_count = 0
+for _, row in ipairs(production_plan.rows or {}) do
+  local public_row = public_rows[row.stream_key]
+  if not public_row or type(public_row.decision_fingerprint) ~= "string" then
+    fail("public GenerationPlan row lacks a decision fingerprint")
+  end
+  if row.action == "skip" then
+    skipped_design_count = skipped_design_count + 1
+    if row.technology_design ~= nil
+      or public_row.subject_fingerprint ~= nil
+      or public_row.qualification_fingerprint ~= nil then
+      fail("skipped GenerationPlan row eagerly constructed or published a TechnologyDesign")
+    end
+  elseif not row.technology_design
+    or type(public_row.subject_fingerprint) ~= "string"
+    or type(public_row.qualification_fingerprint) ~= "string" then
+    fail("materializing GenerationPlan row lacks its public design fingerprints")
+  end
+end
+if skipped_design_count == 0 then fail("compiler-contract fixture did not exercise skipped-row design deferral") end
 local first_context = compiler_context.new()
 first_context:set_state("fixture-derived-state", {value = 1})
 first_context:record_artifact("fixture-artifact", {value = 2})

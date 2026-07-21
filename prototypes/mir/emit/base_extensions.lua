@@ -528,7 +528,7 @@ local function plan_chain(key)
     diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status)
   }
   operation.technology_design = technology_design.from_base_extension_operation(operation)
-  operation.technology = technology_design.prototype_projection(operation.technology_design)
+  operation.technology = technology_design.prototype_projection(operation.technology_design, {validated = true})
   operation.technology.type = "technology"
   return operation
 end
