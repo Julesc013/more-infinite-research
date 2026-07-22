@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -145,7 +145,7 @@ Ecosystem evidence is candidate-bound: the release-targeted gate must pass the e
 ./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 
-Seal schema 4 records the candidate ID, immutable package-source commit and material hash, and later qualification-source commit and tree separately. The legacy `source_commit` and `source_tree` fields remain qualification-source aliases for evidence compatibility. For a candidate whose material hash was captured from a dirty precommit worktree, `package_source_material` also records each affected path, its eventual Git blob, and its captured worktree hash. This makes the original mixed index/worktree identity reproducible without pretending that checkout newline conversion can recover those historical bytes.
+Seal schema 4 records the candidate ID, immutable package-source commit and material hash, and later qualification-source commit and tree separately. The legacy `source_commit` and `source_tree` fields remain qualification-source aliases for evidence compatibility. A clean candidate uses `git-commit-normalized-package-v1`, binding the exact source tree and package file count while deriving the normalized package-source hash directly from committed package files. A historical candidate whose material hash was captured from a dirty precommit worktree uses `git-index-with-captured-worktree-v1`; its descriptor records each affected path, eventual Git blob, and captured worktree hash. The two explicit variants preserve clean commit authority without pretending that checkout newline conversion can recover older mixed index/worktree bytes.
 
 Seal creation requires the package-source commit to be an ancestor of qualification, proves that package roots are unchanged, re-evaluates the recorded package material identity against identical Git blobs at both commits, and deterministically reconstructs the exact archive and content identities from narrow committed-source archives at both commits. This allows assurance, evidence, and release-governance commits to qualify frozen candidate bytes without misrepresenting them as package source.
 

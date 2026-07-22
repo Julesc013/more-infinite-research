@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-21",
+  "updated_at": "2026-07-23",
   "published_baselines": {
     "factorio-2.1": {
       "mir_version": "3.1.9",
@@ -24,50 +24,36 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C5",
+      "candidate_id": "C6",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 935250,
-      "package_source_commit": "35b18f0f59406e263e43618101230004dc801f26",
-      "package_source_sha256": "28F746285D3F3B8AB22D654CBBF5BFF043D9BE6899E2CD6BD09F7359F670D7FE",
+      "archive_bytes": 942170,
+      "archive_entries": 231,
+      "package_source_commit": "ecb8b0545d3cef1badf1b46a9b4c2170cf0aceee",
+      "package_source_tree": "420b4315861214fd4275a62106cbaef834e5ff02",
+      "package_source_sha256": "7A0BCB4E1C1DCFE77CDCEEC33CB5B3F03E38E821E05527BA8FE78A0CC50D2B91",
       "package_source_material": {
         "schema": 1,
-        "hash_algorithm": "git-index-with-captured-worktree-v1",
-        "source_parent_commit": "3479204bc1c2bb3239338fde227c67af277d375f",
-        "changed_files": [
-          {
-            "path": "README.md",
-            "git_blob": "9d1238f5965e5c2a5f323e1cc2c2f2a947509d7c",
-            "captured_worktree_sha256": "FBE0F9F6965139F72E53FFCA6113D1ABE282F900FD8993F1A4FAC88F259F32E4"
-          },
-          {
-            "path": "changelog.txt",
-            "git_blob": "016e35baf6c975989c9d32b41f6379c09ff59c6f",
-            "captured_worktree_sha256": "5A722935DEDACBE615F2B69BAABCEB62D7426D292067BE2F3A9FC0CFBB5149BD"
-          },
-          {
-            "path": "info.json",
-            "git_blob": "a7589a74fc9c6b67cb6f87bfa6eef6b416d354d9",
-            "captured_worktree_sha256": "EFFD479F683ACDEF5B6EFD8992B95D596B6B1223C05A527F623ED4D63448702F"
-          },
-          {
-            "path": "prototypes/mir/streams/generated_stream_manifest.json",
-            "git_blob": "fc8c7409a918fc6650e92411e897ce37ce77ee27",
-            "captured_worktree_sha256": "4EBB521AAE70AB902CB89F1924F9612CA6D15CB52398740BF12A1B0844729EBC"
-          }
-        ]
+        "hash_algorithm": "git-commit-normalized-package-v1",
+        "source_tree": "420b4315861214fd4275a62106cbaef834e5ff02",
+        "file_count": 231
       },
-      "archive_sha256": "64909FFE85B7C002CF1F9B3B3D5E7F5D4DE754AE513452923D1E0C4792AFDD82",
-      "package_content_sha256": "C3B79ACBF9B9E2506BDA64603CD4E19B11B8C2FE685469AD35E8791963E47C41",
+      "archive_sha256": "CDAA5A6ECB190C81C3DD9069A27D639C670EB0A6DAF56103871920A361CCF3E8",
+      "package_content_sha256": "7A0BCB4E1C1DCFE77CDCEEC33CB5B3F03E38E821E05527BA8FE78A0CC50D2B91",
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
-      "status": "rebuilding-after-package-visible-change",
+      "status": "awaiting-fresh-candidate-qualification",
       "supersedes_candidate": {
-        "candidate_id": "C4",
-        "archive_sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B",
-        "reason": "Factorio 2.1.11 dependency floor and stable stream-manifest policy corrections"
+        "candidate_id": "C5",
+        "archive_bytes": 935250,
+        "archive_entries": 229,
+        "archive_sha256": "64909FFE85B7C002CF1F9B3B3D5E7F5D4DE754AE513452923D1E0C4792AFDD82",
+        "package_content_sha256": "C3B79ACBF9B9E2506BDA64603CD4E19B11B8C2FE685469AD35E8791963E47C41",
+        "package_source_commit": "35b18f0f59406e263e43618101230004dc801f26",
+        "package_source_sha256": "28F746285D3F3B8AB22D654CBBF5BFF043D9BE6899E2CD6BD09F7359F670D7FE",
+        "reason": "bounded compiler-platform hardening changed package-visible Lua after C5 assurance defects were stabilized"
       }
     },
     "factorio-2.0": {

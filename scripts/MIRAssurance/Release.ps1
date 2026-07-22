@@ -46,9 +46,15 @@ function Get-MIRAssuranceReleaseCandidateAuthority {
       throw "Release authority $field must be an uppercase SHA-256 digest."
     }
   }
-  if ([int]$authority.package_source_material.schema -ne 1 -or
-      [string]$authority.package_source_material.hash_algorithm -ne "git-index-with-captured-worktree-v1" -or
-      @($authority.package_source_material.changed_files).Count -eq 0) {
+  $material = $authority.package_source_material
+  $materialAlgorithm = [string]$material.hash_algorithm
+  $legacyMaterial = $materialAlgorithm -eq "git-index-with-captured-worktree-v1" -and
+    [string]$material.source_parent_commit -match '^[0-9a-f]{40}$' -and
+    @($material.changed_files).Count -gt 0
+  $cleanMaterial = $materialAlgorithm -eq "git-commit-normalized-package-v1" -and
+    [string]$material.source_tree -match '^[0-9a-f]{40}$' -and
+    [int]$material.file_count -gt 0
+  if ([int]$material.schema -ne 1 -or (-not $legacyMaterial -and -not $cleanMaterial)) {
     throw "Release authority package_source_material is invalid."
   }
   if ([long]$authority.archive_bytes -le 0) { throw "Release authority archive_bytes must be positive." }
@@ -519,33 +525,28 @@ function Invoke-MIRAssuranceSelfTest {
       -PackageSourceCommit ([string]$authority.package_source_commit) `
       -ContentCommit $qualificationCommit `
       -Material $authority.package_source_material
-    if ([string]$authority.candidate_id -ne "C5" -or
+    if ([string]$authority.candidate_id -ne "C6" -or
         [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
-        [int]$packageMaterial.file_count -ne 229 -or
+        [int]$packageMaterial.file_count -ne 231 -or
         -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
-      throw "C5 package-source and qualification-source authority self-test failed."
+      throw "C6 package-source and qualification-source authority self-test failed."
     }
     $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
-    $tamperedMaterial.changed_files[0].captured_worktree_sha256 = "0" * 64
-    $tamperedHash = Get-MIRAssurancePackageAuthorityHash `
-      -PackageSourceCommit ([string]$authority.package_source_commit) `
-      -ContentCommit $qualificationCommit `
-      -Material $tamperedMaterial
-    if ([string]$tamperedHash.sha256 -eq [string]$authority.package_source_sha256) {
-      throw "Tampered package-source worktree material did not invalidate the authority hash."
+    if ([string]$tamperedMaterial.hash_algorithm -eq "git-commit-normalized-package-v1") {
+      $tamperedMaterial.source_tree = "0" * 40
+    } else {
+      $tamperedMaterial.changed_files[0].captured_worktree_sha256 = "0" * 64
     }
-    $wrongBlobMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
-    $wrongBlobMaterial.changed_files[0].git_blob = "0" * 40
-    $wrongBlobRejected = $false
+    $tamperedRejected = $false
     try {
       $null = Get-MIRAssurancePackageAuthorityHash `
         -PackageSourceCommit ([string]$authority.package_source_commit) `
         -ContentCommit $qualificationCommit `
-        -Material $wrongBlobMaterial
-    } catch { $wrongBlobRejected = $true }
-    if (-not $wrongBlobRejected) {
-      throw "Tampered package-source Git blob was not rejected."
+        -Material $tamperedMaterial
+    } catch { $tamperedRejected = $true }
+    if (-not $tamperedRejected) {
+      throw "Tampered package-source material was not rejected."
     }
   }
 

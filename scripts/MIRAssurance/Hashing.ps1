@@ -92,6 +92,28 @@ function Get-MIRAssuranceCommitPackageBlobs {
   return $blobs
 }
 
+function Get-MIRAssuranceCommitPackageSourceHash {
+  param([Parameter(Mandatory)][string]$Commit)
+
+  $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
+  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-package-source-" + [guid]::NewGuid().ToString("N"))
+  $sourceArchive = Join-Path $temporaryRoot "source.zip"
+  $sourceRoot = Join-Path $temporaryRoot "source"
+  try {
+    New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
+    . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+    $roots = @(Get-MIRPackageSourceRoots)
+    & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @roots 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
+    Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
+    return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot
+  } finally {
+    if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
+      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+    }
+  }
+}
+
 function Get-MIRAssurancePackageAuthorityHash {
   param(
     [Parameter(Mandatory)][string]$PackageSourceCommit,
@@ -101,10 +123,40 @@ function Get-MIRAssurancePackageAuthorityHash {
 
   $packageCommit = Resolve-MIRAssuranceCommit -Commit $PackageSourceCommit
   $contentCommit = Resolve-MIRAssuranceCommit -Commit $(if ($ContentCommit) { $ContentCommit } else { $packageCommit })
-  $parent = Resolve-MIRAssuranceCommit -Commit "$packageCommit^"
-  if ([int]$Material.schema -ne 1 -or [string]$Material.hash_algorithm -ne "git-index-with-captured-worktree-v1") {
+  if ([int]$Material.schema -ne 1) {
     throw "Unsupported package-source material descriptor."
   }
+  $algorithm = [string]$Material.hash_algorithm
+  if ($algorithm -eq "git-commit-normalized-package-v1") {
+    if ([string]$Material.source_tree -notmatch '^[0-9a-f]{40}$' -or [int]$Material.file_count -le 0) {
+      throw "Clean-commit package-source material descriptor is invalid."
+    }
+    $packageTree = @(& git -C $repo rev-parse "$packageCommit^{tree}" 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $packageTree.Count -ne 1 -or [string]$packageTree[0] -ne [string]$Material.source_tree) {
+      throw "Clean-commit package-source material descriptor has the wrong source tree."
+    }
+    $packageBlobs = Get-MIRAssuranceCommitPackageBlobs -Commit $packageCommit
+    $contentBlobs = Get-MIRAssuranceCommitPackageBlobs -Commit $contentCommit
+    if ($packageBlobs.Count -ne [int]$Material.file_count -or $contentBlobs.Count -ne $packageBlobs.Count) {
+      throw "Clean-commit package-source material file count changed."
+    }
+    foreach ($entry in $packageBlobs.GetEnumerator()) {
+      if (-not $contentBlobs.Contains($entry.Key) -or [string]$contentBlobs[$entry.Key] -ne [string]$entry.Value) {
+        throw "Package file '$($entry.Key)' changed after the clean package-source commit."
+      }
+    }
+    return [pscustomobject]@{
+      package_source_commit = $packageCommit
+      content_commit = $contentCommit
+      sha256 = Get-MIRAssuranceCommitPackageSourceHash -Commit $contentCommit
+      file_count = $packageBlobs.Count
+      source_delta_file_count = 0
+    }
+  }
+  if ($algorithm -ne "git-index-with-captured-worktree-v1") {
+    throw "Unsupported package-source material descriptor."
+  }
+  $parent = Resolve-MIRAssuranceCommit -Commit "$packageCommit^"
   if ((Resolve-MIRAssuranceCommit -Commit ([string]$Material.source_parent_commit)) -ne $parent) {
     throw "Package-source material descriptor has the wrong source parent."
   }
