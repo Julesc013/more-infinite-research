@@ -149,6 +149,8 @@ Seal schema 4 records the candidate ID, immutable package-source commit and mate
 
 Seal creation requires the package-source commit to be an ancestor of qualification, proves that package roots are unchanged, re-evaluates the recorded package material identity against identical Git blobs at both commits, and deterministically reconstructs the exact archive and content identities from narrow committed-source archives at both commits. This allows assurance, evidence, and release-governance commits to qualify frozen candidate bytes without misrepresenting them as package source.
 
+`candidate_content_sha256` and `package_source_sha256` use the same canonical package identity: the ZIP's versioned root directory is removed, text line endings are normalized to LF, entries are ordered by package-relative path, and each row binds normalized length plus SHA-256. Plans, domain manifests, build receipts, performance evidence, manual attestations, release authority, and seals must use this identity; the raw archive SHA-256 separately binds compression and complete ZIP bytes.
+
 Schema 4 also binds the performance-evidence and manual-attestation paths, file hashes, and passed statuses. `check-seal` independently repeats the source ancestry, package-root, material-identity, and two-commit reconstruction checks alongside the candidate, plan, bundle, verifier, producer, and other repository identities. Promotion checks cannot tag, push, create a GitHub release, or upload to the Mod Portal.
 
 ## Backports

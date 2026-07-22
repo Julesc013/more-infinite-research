@@ -311,24 +311,13 @@ function Get-MIRAssuranceHarnessFiles {
 
 function Get-MIRAssuranceZipContentHash {
   param([Parameter(Mandatory)][string]$Path)
-  Add-Type -AssemblyName System.IO.Compression
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    $rows = foreach ($entry in @($archive.Entries | Sort-Object FullName)) {
-      if ($entry.FullName.EndsWith("/")) { continue }
-      $stream = $entry.Open()
-      $sha = [Security.Cryptography.SHA256]::Create()
-      try {
-        $hash = ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace("-", "")
-        "$($entry.FullName)`t$($entry.Length)`t$hash"
-      } finally {
-        $sha.Dispose()
-        $stream.Dispose()
-      }
-    }
-    return Get-MIRAssuranceTextHash -Text (($rows | Sort-Object) -join "`n")
-  } finally { $archive.Dispose() }
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  return Get-MIRZipContentFingerprint -Path $Path
+}
+
+function Get-MIRAssurancePackageSourceHash {
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  return Get-MIRPackageSourceFingerprint -RepoRoot $repo
 }
 
 function Resolve-MIRAssurancePath {
@@ -576,7 +565,7 @@ function Get-MIRAssurancePlan {
     source_commit=(& git -C $repo rev-parse HEAD).Trim()
     source_tree=(& git -C $repo rev-parse "HEAD^{tree}").Trim()
     candidate_descriptor=(Get-MIRAssuranceCandidateDescriptor -Context $Context)
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
+    package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
     verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))

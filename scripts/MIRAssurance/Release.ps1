@@ -532,6 +532,13 @@ function Invoke-MIRAssuranceSelfTest {
         -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
       throw "C6 package-source and qualification-source authority self-test failed."
     }
+    $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
+    if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
+        [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
+        [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256 -or
+        (Get-MIRAssurancePackageSourceHash) -ne [string]$authority.package_source_sha256) {
+      throw "C6 candidate, normalized content, and current package-source identities do not match release authority."
+    }
     $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
     if ([string]$tamperedMaterial.hash_algorithm -eq "git-commit-normalized-package-v1") {
       $tamperedMaterial.source_tree = "0" * 40

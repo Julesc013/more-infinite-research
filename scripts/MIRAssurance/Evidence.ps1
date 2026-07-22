@@ -1347,11 +1347,10 @@ function Invoke-MIRAssuranceGate {
 
 function Get-MIRAssuranceBuildFingerprint {
   param([Parameter(Mandatory)]$Context)
-  $packageFiles = @(Get-MIRAssurancePackageFiles)
   $material = [ordered]@{
     schema=$buildReceiptSchema
     target=[string]$Context.target
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths $packageFiles)
+    package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "scripts\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "scripts\validation\PackageIdentity.ps1"))
     info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "info.json"))

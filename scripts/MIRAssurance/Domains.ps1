@@ -82,7 +82,7 @@ function Get-MIRAssuranceDomainManifest {
     $item = Get-Item -LiteralPath $Context.candidate
     "$($item.FullName)|$($item.Length)|$($item.LastWriteTimeUtc.Ticks)"
   } else {
-    "source|$(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))"
+    "source|$(Get-MIRAssurancePackageSourceHash)"
   }
   if ($script:MIRAssuranceDomainManifestCache.ContainsKey($candidateIdentity)) {
     return $script:MIRAssuranceDomainManifestCache[$candidateIdentity]
@@ -97,7 +97,7 @@ function Get-MIRAssuranceDomainManifest {
     state=if ($candidateExists) { "present" } else { "source-fallback" }
     path=if ($candidateExists) { Get-MIRAssuranceRepoRelativePath -Path $Context.candidate } else { "" }
     sha256=if ($candidateExists) { Get-MIRAssuranceSha256 -Path $Context.candidate } else { "" }
-    content_sha256=if ($candidateExists) { Get-MIRAssuranceZipContentHash -Path $Context.candidate } else { Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles) }
+    content_sha256=if ($candidateExists) { Get-MIRAssuranceZipContentHash -Path $Context.candidate } else { Get-MIRAssurancePackageSourceHash }
   }
 
   if ($candidateExists) {
