@@ -39,7 +39,9 @@
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
-    "TechnologyCatalog": 1,
+    "TechnologyCatalog": 2,
+    "TechnologyQualityAssessment": 1,
+    "TechnologyPromotionAdmission": 1,
     "TechnologyApplicabilityEnvelope": 1
   },
   "technology_applicability_predicates": [
@@ -86,8 +88,11 @@
     "more-infinite-research.compiler-evidence-public"
   ],
   "context_owned_state": [
-    "recipe-index", "relationship-indexes", "active-compatibility-packs", "compatibility-policy-authority", "family-resolution",
-    "technology-candidate-catalog", "technology-qualifications", "generation-plan", "compilation-plan",
+    "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
+    "technology-researchability-cache", "prerequisite-order-cache", "pack-production-reachability-cache",
+    "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
+    "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",
+    "technology-qualifications", "generation-plan", "compilation-plan", "technology-graph-parity",
     "generated-technology-registry", "productivity-family-adoption",
     "coverage-report", "compiler-telemetry", "diagnostics"
   ],

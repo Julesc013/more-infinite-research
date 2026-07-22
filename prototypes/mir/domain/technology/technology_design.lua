@@ -699,6 +699,19 @@ function M.from_generation_row(row)
   return result
 end
 
+function M.as_diagnostic_alternative(design, reason)
+  M.validate(design)
+  local result = deepcopy(design)
+  result.materialization = {kind = "diagnose"}
+  result.design.ownership.value.action = "diagnose"
+  result.provenance.fields["ownership.action"].value = "diagnose"
+  result.context.runtime_action = "diagnose"
+  result.context.action_reason = reason or "safe-diagnostic-alternative"
+  M.refresh_fingerprints(result)
+  M.validate(result)
+  return result
+end
+
 function M.from_base_extension_operation(operation)
   if type(operation) ~= "table" or type(operation.technology) ~= "table" then
     error("TechnologyDesign base continuation operation is required.", 2)

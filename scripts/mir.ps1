@@ -27,6 +27,9 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
+  .\scripts\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
+  .\scripts\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
   .\scripts\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
   .\scripts\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
   .\scripts\mir.ps1 report latest
@@ -406,6 +409,50 @@ switch ($area) {
   "manifests" {
     if ($verb -ne "check") { throw "Unknown manifests command: $verb" }
     & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ManifestsOnly
+  }
+  "technology" {
+    $catalog = Get-MIRArgValue -Items $Args -Name "--catalog"
+    $candidateId = Get-MIRArgValue -Items $Args -Name "--candidate"
+    $output = Get-MIRArgValue -Items $Args -Name "--output"
+    if ([string]::IsNullOrWhiteSpace($catalog) -or [string]::IsNullOrWhiteSpace($output)) {
+      throw "technology commands require --catalog and --output."
+    }
+    switch ($verb) {
+      "quality-assessment" {
+        $profilePath = Get-MIRArgValue -Items $Args -Name "--profile"
+        if ([string]::IsNullOrWhiteSpace($candidateId) -or [string]::IsNullOrWhiteSpace($profilePath)) {
+          throw "technology quality-assessment requires --candidate and --profile."
+        }
+        $params = @{CatalogPath=$catalog; CandidateId=$candidateId; ProfilePath=$profilePath; OutputPath=$output}
+        $metrics = Get-MIRArgValue -Items $Args -Name "--metrics"
+        if ($metrics) { $params.MetricsPath = $metrics }
+        & (Join-Path $scriptRoot "New-MIRTechnologyQualityAssessment.ps1") @params
+      }
+      "review-dossier" {
+        if ([string]::IsNullOrWhiteSpace($candidateId)) { throw "technology review-dossier requires --candidate." }
+        $params = @{CatalogPath=$catalog; CandidateId=$candidateId; OutputPath=$output}
+        $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"
+        if ($assessment) { $params.AssessmentPath = $assessment }
+        & (Join-Path $scriptRoot "New-MIRTechnologyReviewDossier.ps1") @params
+      }
+      "promotion-gate" {
+        $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"
+        $approval = Get-MIRArgValue -Items $Args -Name "--approval"
+        $promotion = Get-MIRArgValue -Items $Args -Name "--promotion"
+        $profilePath = Get-MIRArgValue -Items $Args -Name "--profile"
+        foreach ($value in @($assessment, $approval, $promotion, $profilePath)) {
+          if ([string]::IsNullOrWhiteSpace($value)) { throw "technology promotion-gate requires --assessment, --approval, --promotion, and --profile." }
+        }
+        $params = @{
+          CatalogPath=$catalog; AssessmentPath=$assessment; ApprovalPath=$approval
+          PromotionPath=$promotion; ProfilePath=$profilePath; OutputPath=$output
+        }
+        $migration = Get-MIRArgValue -Items $Args -Name "--migration"
+        if ($migration) { $params.MigrationPath = $migration }
+        & (Join-Path $scriptRoot "Test-MIRTechnologyPromotionAdmission.ps1") @params
+      }
+      default { throw "Unknown technology command: $verb" }
+    }
   }
   "release" {
     switch ($verb) {

@@ -4,10 +4,12 @@
     "TechnologyCandidate": 1,
     "TechnologyDesign": 2,
     "TechnologyQualification": 1,
+    "TechnologyQualityAssessment": 1,
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
-    "TechnologyCatalog": 1,
+    "TechnologyCatalog": 2,
+    "TechnologyPromotionAdmission": 1,
     "TechnologyApplicabilityEnvelope": 1
   },
   "approval_decisions": ["approved", "quarantined", "demoted"],
@@ -38,10 +40,17 @@
     "quarantine and demotion never silently delete or rename a released technology",
     "released identity changes require a TechnologyMigration record",
     "candidate and qualification catalogs are context-owned and non-publishing",
+    "the schema-2 shadow catalog exists before current selection is bound and has no mutation authority",
+    "every selectable alternative has an exact qualification and rejected alternatives cannot be selected",
+    "promotion admission requires a passing exact quality assessment, approval, applicability envelope, evidence, identity edge, and migration policy",
     "offline governance records use canonical SHA-256 transport fingerprints"
   ],
   "tooling": {
     "catalog_export": "scripts/Export-MIRTechnologyCatalog.ps1",
+    "quality_assessment": "scripts/New-MIRTechnologyQualityAssessment.ps1",
+    "review_dossier": "scripts/New-MIRTechnologyReviewDossier.ps1",
+    "promotion_admission": "scripts/Test-MIRTechnologyPromotionAdmission.ps1",
+    "quality_profiles": ".mir/technology-quality-profiles.json",
     "design_diff": "scripts/Compare-MIRTechnologyDesigns.ps1",
     "lifecycle_record": "scripts/New-MIRTechnologyLifecycleRecord.ps1",
     "validation": "scripts/Test-MIRTechnologyLifecycle.ps1"

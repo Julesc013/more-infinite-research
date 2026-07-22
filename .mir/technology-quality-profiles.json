@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "profiles": [
+    {
+      "profile_id": "technology-candidate-default-v1",
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 5,
+      "maximum_science_tier_span": 4,
+      "maximum_cross_version_additions": 64,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.5
+    }
+  ]
+}

@@ -21,16 +21,50 @@ function Get-MIRProperty {
   return $property.Value
 }
 
+function New-MIRQualification {
+  param($Row, $Design, [string]$Action, [bool]$Diagnostic)
+  $failed = @()
+  if (-not $Diagnostic) {
+    foreach ($gateProperty in @($Row.gates.PSObject.Properties | Sort-Object Name)) {
+      if ([string]$gateProperty.Value.status -eq "failed") {
+        $failed += [ordered]@{
+          gate = $gateProperty.Name
+          reason = [string]$gateProperty.Value.reason
+          evidence = @($gateProperty.Value.evidence)
+        }
+      }
+    }
+  }
+  $material = [ordered]@{
+    schema = 1
+    candidate_id = [string]$Design.candidate_id
+    design_fingerprint = [string]$Design.design_fingerprint
+    context_fingerprint = [string]$Design.qualification_fingerprint
+    hard_gates = if ($Diagnostic) { [ordered]@{} } else { $Row.gates }
+    quality_metrics = [ordered]@{status="UNMEASURED"}
+    decision = if ($failed.Count -gt 0) { "rejected" } elseif ($Action -in @("emit", "adopt", "diagnose")) { "qualified" } else { "proposal" }
+    primary_rejection = if ($failed.Count -gt 0) { $failed[0] } else { $null }
+    contributing_rejections = $failed
+    validation_evidence = if ($Diagnostic) { "candidate-catalog-safe-diagnostic" } else { [string]$Design.maturity.validation_evidence }
+  }
+  $record = [ordered]@{}
+  foreach ($entry in $material.GetEnumerator()) { $record[$entry.Key] = $entry.Value }
+  $record.qualification_fingerprint_sha256 = Get-MIRJsonSha256 $material
+  return $record
+}
+
 $plan = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $GenerationPlanPath) | ConvertFrom-Json
-$candidateMap = @{}
+$candidates = @()
 $qualifications = @()
+$alternativeQualifications = @()
+$selections = @()
 
 foreach ($row in @(Get-MIRProperty $plan "rows" @())) {
   $design = Get-MIRProperty $row "technology_design"
   if ($null -eq $design) { throw "GenerationPlan row lacks TechnologyDesign: $($row.stream_key)" }
   $candidateId = [string]$design.candidate_id
   if ([string]::IsNullOrWhiteSpace($candidateId)) { throw "TechnologyDesign candidate_id is required." }
-
+  $selectionKey = "$($row.stream_key):$($row.manifest_id)"
   $candidateMaterial = [ordered]@{
     schema = 1
     candidate_id = $candidateId
@@ -40,86 +74,87 @@ foreach ($row in @(Get-MIRProperty $plan "rows" @())) {
       provider_ids = @($row.provider_ids | ForEach-Object { [string]$_ } | Sort-Object -Unique)
       family_ids = @($row.family_ids | ForEach-Object { [string]$_ } | Sort-Object -Unique)
       source = [string]$row.source
-      evidence = [ordered]@{
-        manifest_id = [string]$row.manifest_id
-        stream_key = [string]$row.stream_key
-        action = [string]$row.action
-      }
+      evidence = [ordered]@{manifest_id=[string]$row.manifest_id; stream_key=[string]$row.stream_key; action=[string]$row.action}
+      feature_signature = Get-MIRJsonSha256 ([ordered]@{semantic_identity=$design.semantic_identity; subjects=$design.subjects})
     }
   }
-  $candidateFingerprint = Get-MIRJsonSha256 $candidateMaterial
-  if ($candidateMap.ContainsKey($candidateId) -and
-      $candidateMap[$candidateId].candidate_fingerprint_sha256 -ne $candidateFingerprint) {
-    throw "Candidate identity has contradictory discovery material: $candidateId"
-  }
-  if (-not $candidateMap.ContainsKey($candidateId)) {
-    $candidate = [ordered]@{}
-    foreach ($entry in $candidateMaterial.GetEnumerator()) { $candidate[$entry.Key] = $entry.Value }
-    $candidate["candidate_fingerprint_sha256"] = $candidateFingerprint
-    $candidate["alternatives"] = @()
-    $candidateMap[$candidateId] = $candidate
-  }
+  $candidate = [ordered]@{}
+  foreach ($entry in $candidateMaterial.GetEnumerator()) { $candidate[$entry.Key] = $entry.Value }
+  $candidate.candidate_fingerprint_sha256 = Get-MIRJsonSha256 $candidateMaterial
+  $candidate.selection_key = $selectionKey
+  $candidate.alternatives = @()
 
-  $target = [string](Get-MIRProperty $design.materialization "target" (Get-MIRProperty $design "technology_id" $candidateId))
-  $alternative = [ordered]@{
-    alternative_id = "$($design.materialization.kind):$target"
-    action = [string]$row.action
-    materialization = $design.materialization
-    design_fingerprint = [string]$design.design_fingerprint
-    prototype_fingerprint = [string]$design.prototype_fingerprint
-    qualification_fingerprint = [string]$design.qualification_fingerprint
+  $entries = @()
+  if ([string]$row.action -in @("emit", "adopt")) {
+    $target = [string](Get-MIRProperty $design.materialization "target" (Get-MIRProperty $design "technology_id" $candidateId))
+    $entries += [pscustomobject]@{Action=[string]$row.action; Id="$($design.materialization.kind):$target"; Design=$design; Diagnostic=$false}
   }
-  $candidateMap[$candidateId]["alternatives"] = @($candidateMap[$candidateId]["alternatives"]) + @($alternative)
+  $diagnosticDesignFingerprint = Get-MIRJsonSha256 ([ordered]@{design_fingerprint=[string]$design.design_fingerprint; materialization="diagnose"})
+  $diagnosticDesign = [ordered]@{
+    candidate_id=$candidateId
+    design_fingerprint=$diagnosticDesignFingerprint
+    prototype_fingerprint=(Get-MIRJsonSha256 ([ordered]@{candidate_id=$candidateId; prototype="none"}))
+    qualification_fingerprint=(Get-MIRJsonSha256 ([ordered]@{candidate_id=$candidateId; action="diagnose"}))
+    materialization=[ordered]@{kind="diagnose"}
+    maturity=[ordered]@{validation_evidence="candidate-catalog-safe-diagnostic"}
+  }
+  $entries += [pscustomobject]@{Action="diagnose"; Id="diagnose:$candidateId"; Design=$diagnosticDesign; Diagnostic=$true}
 
-  $failed = @()
-  foreach ($gateProperty in @($row.gates.PSObject.Properties | Sort-Object Name)) {
-    if ([string]$gateProperty.Value.status -eq "failed") {
-      $failed += [ordered]@{
-        gate = $gateProperty.Name
-        reason = [string]$gateProperty.Value.reason
-        evidence = @($gateProperty.Value.evidence)
-      }
+  foreach ($entry in $entries) {
+    $qualification = New-MIRQualification -Row $row -Design $entry.Design -Action $entry.Action -Diagnostic $entry.Diagnostic
+    $alternative = [ordered]@{
+      alternative_id=$entry.Id
+      action=$entry.Action
+      materialization=$entry.Design.materialization
+      design_fingerprint=[string]$entry.Design.design_fingerprint
+      prototype_fingerprint=[string]$entry.Design.prototype_fingerprint
+      qualification_fingerprint=[string]$qualification.qualification_fingerprint_sha256
+      qualification_decision=[string]$qualification.decision
+    }
+    $candidate.alternatives = @($candidate.alternatives) + @($alternative)
+    $qualifications += $qualification
+    $alternativeQualifications += [ordered]@{
+      candidate_id=$candidateId; alternative_id=$entry.Id
+      design_fingerprint=$alternative.design_fingerprint
+      qualification_fingerprint=$alternative.qualification_fingerprint
+      decision=$alternative.qualification_decision
     }
   }
-  if ($failed.Count -eq 0 -and [string]$row.action -eq "skip") {
-    $failed += [ordered]@{gate="materialization"; reason=[string]$row.reason; evidence=@("generation-plan:$($row.reason)")}
+  $candidate.alternatives = @($candidate.alternatives | Sort-Object alternative_id)
+  $selectedAction = if ([string]$row.action -in @("emit", "adopt")) { [string]$row.action } else { "diagnose" }
+  $selected = @($candidate.alternatives | Where-Object { $_.action -eq $selectedAction })[0]
+  if (-not $selected -or $selected.qualification_decision -ne "qualified") {
+    throw "TechnologyCatalog selected alternative is absent or rejected: $candidateId/$selectedAction"
   }
-  $qualificationMaterial = [ordered]@{
-    schema = 1
-    candidate_id = $candidateId
-    design_fingerprint = [string]$design.design_fingerprint
-    context_fingerprint = [string]$design.qualification_fingerprint
-    hard_gates = $row.gates
-    quality_metrics = [ordered]@{status="unmeasured"}
-    decision = if ($failed.Count -gt 0) { "rejected" } elseif ([string]$row.action -in @("emit", "adopt")) { "qualified" } else { "proposal" }
-    primary_rejection = if ($failed.Count -gt 0) { $failed[0] } else { $null }
-    contributing_rejections = $failed
+  $selections += [ordered]@{
+    selection_key=$selectionKey; candidate_id=$candidateId; alternative_id=$selected.alternative_id
+    action=$selected.action; reason=[string]$row.reason
+    design_fingerprint=$selected.design_fingerprint; qualification_fingerprint=$selected.qualification_fingerprint
   }
-  $qualification = [ordered]@{}
-  foreach ($entry in $qualificationMaterial.GetEnumerator()) { $qualification[$entry.Key] = $entry.Value }
-  $qualification["qualification_fingerprint_sha256"] = Get-MIRJsonSha256 $qualificationMaterial
-  $qualifications += $qualification
+  $candidates += $candidate
 }
 
-$candidates = @($candidateMap.Values | Sort-Object { $_["candidate_id"] })
-foreach ($candidate in $candidates) {
-  $candidate["alternatives"] = @($candidate["alternatives"] | Sort-Object { $_["alternative_id"] })
-}
-$qualifications = @($qualifications | Sort-Object { $_["candidate_id"] }, { $_["design_fingerprint"] })
-$catalogMaterial = [ordered]@{
-  schema = 1
-  kind = "mir-technology-catalog"
-  source_plan_fingerprint = [string](Get-MIRProperty $plan "plan_fingerprint" "")
-  candidates = $candidates
-  qualifications = $qualifications
+$candidates = @($candidates | Sort-Object candidate_id)
+$qualifications = @($qualifications | Sort-Object candidate_id, design_fingerprint)
+$alternativeQualifications = @($alternativeQualifications | Sort-Object candidate_id, alternative_id)
+$selections = @($selections | Sort-Object candidate_id)
+$preselectionMaterial = [ordered]@{
+  schema=2; candidates=$candidates; qualifications=$qualifications
+  alternative_qualifications=$alternativeQualifications
+  source_plan_fingerprint=[string](Get-MIRProperty $plan "plan_fingerprint" "")
+  mutation_authority=$false; selection_authority="generation-plan-shadow"
 }
 $catalog = [ordered]@{}
-foreach ($entry in $catalogMaterial.GetEnumerator()) { $catalog[$entry.Key] = $entry.Value }
-$catalog["candidate_catalog_sha256"] = Get-MIRJsonSha256 $candidates
-$catalog["qualification_catalog_sha256"] = Get-MIRJsonSha256 $qualifications
-$catalog["catalog_sha256"] = Get-MIRJsonSha256 $catalogMaterial
+foreach ($entry in $preselectionMaterial.GetEnumerator()) { $catalog[$entry.Key] = $entry.Value }
+$catalog.kind = "mir-technology-catalog"
+$catalog.current_selections = $selections
+$catalog.candidate_catalog_sha256 = Get-MIRJsonSha256 $candidates
+$catalog.qualification_catalog_sha256 = Get-MIRJsonSha256 $qualifications
+$catalog.preselection_catalog_sha256 = Get-MIRJsonSha256 $preselectionMaterial
+$catalog.selection_sha256 = Get-MIRJsonSha256 $selections
+$catalog.catalog_sha256 = Get-MIRJsonSha256 ([ordered]@{preselection=$catalog.preselection_catalog_sha256; selections=$catalog.selection_sha256})
 
 $parent = Split-Path -Parent $OutputPath
 if ($parent -and -not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent | Out-Null }
 $catalog | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
-Write-Host "[ok] wrote MIR technology catalog $OutputPath candidates=$($candidates.Count) qualifications=$($qualifications.Count)"
+Write-Host "[ok] wrote MIR TechnologyCatalog schema 2 $OutputPath candidates=$($candidates.Count) alternatives=$($alternativeQualifications.Count)"

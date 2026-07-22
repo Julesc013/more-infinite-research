@@ -18,7 +18,9 @@ S.technology_qualification = 1
 S.technology_approval = 1
 S.technology_promotion = 1
 S.technology_migration = 1
-S.technology_catalog = 1
+S.technology_catalog = 2
+S.technology_quality_assessment = 1
+S.technology_promotion_admission = 1
 S.target_profile = 2
 
 function S.with_schema(kind, row)

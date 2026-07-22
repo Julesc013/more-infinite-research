@@ -21,6 +21,7 @@ local family_registry = require("prototypes.mir.families.registry")
 local provider_registry = require("prototypes.mir.providers.registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
@@ -167,6 +168,8 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     source = spec.automatic_family and "family-rule" or "fixed-stream",
     provider_ids = family_resolver.provider_ids_for_stream(key),
     family_ids = family_resolver.family_ids_for_stream(key),
+    provider_decision_fingerprints = family_resolver.decision_fingerprints_for_stream(key),
+    risk_fingerprints = family_resolver.risk_fingerprints_for_stream(key),
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, extra.failed_gates)
@@ -393,11 +396,13 @@ local function compile(context, return_view)
   local plan = generation_plan.new({
     source_fingerprints = {
       facts = recipe_facts.fingerprint(),
+      risks = recipe_risk_facts.fingerprint(),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
       providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),
-      native_owners = fingerprint.of(native_owner_inputs)
+      native_owners = fingerprint.of(native_owner_inputs),
+      provider_decisions = family_resolver.snapshot().decision_set_fingerprint
     }
   })
   local rows = {}
@@ -405,6 +410,14 @@ local function compile(context, return_view)
     table.insert(rows, plan_stream(key, streams[key]))
   end
   rows = effect_ownership.resolve(rows, {defer_design_refresh = true})
+  local catalog
+  if diagnostics.enabled() then
+    catalog = technology_catalog.from_preselection_rows(
+      rows,
+      plan.source_fingerprints,
+      {trusted_designs = true}
+    )
+  end
   for _, row in ipairs(rows) do
     if row.action ~= "skip" then
       row.technology_design = technology_design.from_generation_row(row)
@@ -413,19 +426,16 @@ local function compile(context, return_view)
   end
   local finalized = plan:finalize()
   local artifact = finalized:artifact_view()
-  local catalog
-  if diagnostics.enabled() then
-    catalog = technology_catalog.from_generation_rows(
-      artifact.rows,
-      artifact.source_fingerprints,
-      {trusted_designs = true}
-    )
-  end
+  if catalog then catalog = technology_catalog.bind_selections(catalog, artifact.rows) end
   telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
   if catalog then
+    telemetry.count("technology_catalog_candidates", #catalog.candidates)
+    telemetry.count("technology_catalog_alternatives", #catalog.alternative_qualifications)
+    telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(catalog))
     context:set_state("technology_candidate_catalog", catalog)
     context:set_state("technology_qualifications", catalog.qualifications)
+    context:record_artifact("technology_candidate_catalog", catalog)
   end
   context:set_state("generation_plan", artifact)
   return return_view and artifact or deepcopy(artifact)

@@ -78,7 +78,7 @@ function M.from_design(design, row, quality_metrics, options)
     primary = {gate = "materialization", reason = row.reason, evidence = {"generation-plan:" .. row.reason}}
   end
   local decision = primary and "rejected" or
-    ((row.action == "emit" or row.action == "adopt") and "qualified" or "proposal")
+    ((row.action == "emit" or row.action == "adopt" or row.action == "diagnose") and "qualified" or "proposal")
   local record = {
     schema = SCHEMA,
     candidate_id = design.candidate_id,
