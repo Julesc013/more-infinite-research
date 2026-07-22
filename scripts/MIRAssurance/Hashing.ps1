@@ -64,3 +64,109 @@ function Get-MIRAssuranceTreeHash {
   return $script:MIRAssuranceTreeHashCache[$treeCacheKey]
 }
 
+function Resolve-MIRAssuranceCommit {
+  param([Parameter(Mandatory)][string]$Commit)
+
+  $resolved = @(& git -C $repo rev-parse "$Commit^{commit}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $resolved.Count -ne 1 -or [string]$resolved[0] -notmatch '^[0-9a-fA-F]{40}$') {
+    throw "Unable to resolve Git commit: $Commit"
+  }
+  return ([string]$resolved[0]).ToLowerInvariant()
+}
+
+function Get-MIRAssuranceCommitPackageBlobs {
+  param([Parameter(Mandatory)][string]$Commit)
+
+  $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  $roots = @(Get-MIRPackageSourceRoots)
+  $blobs = [ordered]@{}
+  foreach ($line in @(& git -C $repo ls-tree -r $resolvedCommit -- @roots 2>$null)) {
+    if ($line -notmatch '^\d+\s+blob\s+([0-9a-fA-F]+)\t(.+)$') { continue }
+    $path = ([string]$Matches[2]).Replace("\", "/")
+    $blobs[$path] = ([string]$Matches[1]).ToLowerInvariant()
+  }
+  if ($LASTEXITCODE -ne 0 -or $blobs.Count -eq 0) {
+    throw "Unable to enumerate package files at commit $resolvedCommit."
+  }
+  return $blobs
+}
+
+function Get-MIRAssurancePackageAuthorityHash {
+  param(
+    [Parameter(Mandatory)][string]$PackageSourceCommit,
+    [string]$ContentCommit = "",
+    [Parameter(Mandatory)]$Material
+  )
+
+  $packageCommit = Resolve-MIRAssuranceCommit -Commit $PackageSourceCommit
+  $contentCommit = Resolve-MIRAssuranceCommit -Commit $(if ($ContentCommit) { $ContentCommit } else { $packageCommit })
+  $parent = Resolve-MIRAssuranceCommit -Commit "$packageCommit^"
+  if ([int]$Material.schema -ne 1 -or [string]$Material.hash_algorithm -ne "git-index-with-captured-worktree-v1") {
+    throw "Unsupported package-source material descriptor."
+  }
+  if ((Resolve-MIRAssuranceCommit -Commit ([string]$Material.source_parent_commit)) -ne $parent) {
+    throw "Package-source material descriptor has the wrong source parent."
+  }
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  $roots = @(Get-MIRPackageSourceRoots)
+  $changedPaths = @(& git -C $repo diff --name-only $parent $packageCommit -- @roots 2>$null | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to inspect the package-source commit delta." }
+  $changed = @{}
+  foreach ($entry in @($Material.changed_files)) {
+    $path = ([string]$entry.path).Replace("\", "/")
+    if ([string]::IsNullOrWhiteSpace($path) -or $changed.ContainsKey($path)) {
+      throw "Package-source material paths must be nonempty and unique."
+    }
+    if ([string]$entry.git_blob -notmatch '^[0-9a-f]{40}$' -or [string]$entry.captured_worktree_sha256 -notmatch '^[0-9A-F]{64}$') {
+      throw "Package-source material identity is invalid for $path."
+    }
+    $changed[$path] = $entry
+  }
+  if (@(Compare-Object -ReferenceObject $changedPaths -DifferenceObject @($changed.Keys | Sort-Object)).Count -ne 0) {
+    throw "Package-source material paths do not match the package-source commit delta."
+  }
+  $packageBlobs = Get-MIRAssuranceCommitPackageBlobs -Commit $packageCommit
+  $contentBlobs = Get-MIRAssuranceCommitPackageBlobs -Commit $contentCommit
+  if ($packageBlobs.Count -ne $contentBlobs.Count) {
+    throw "Package file count changed after the package-source commit."
+  }
+  $rows = foreach ($entry in $packageBlobs.GetEnumerator()) {
+    $path = [string]$entry.Key
+    if (-not $contentBlobs.Contains($path) -or [string]$contentBlobs[$path] -ne [string]$entry.Value) {
+      throw "Package file '$path' changed after the package-source commit."
+    }
+    $identity = if ($changed.ContainsKey($path)) {
+      $captured = $changed[$path]
+      if ([string]$captured.git_blob -ne [string]$entry.Value) {
+        throw "Captured package-source blob does not match '$path'."
+      }
+      "worktree-sha256:" + [string]$captured.captured_worktree_sha256
+    } else {
+      [string]$entry.Value
+    }
+    "$path`t$identity"
+  }
+  return [pscustomobject]@{
+    package_source_commit = $packageCommit
+    content_commit = $contentCommit
+    sha256 = Get-MIRAssuranceTextHash -Text (($rows | Sort-Object) -join "`n")
+    file_count = $packageBlobs.Count
+    source_delta_file_count = $changed.Count
+  }
+}
+
+function Test-MIRAssurancePackageRootsEqual {
+  param(
+    [Parameter(Mandatory)][string]$ReferenceCommit,
+    [Parameter(Mandatory)][string]$DifferenceCommit
+  )
+
+  $reference = Resolve-MIRAssuranceCommit -Commit $ReferenceCommit
+  $difference = Resolve-MIRAssuranceCommit -Commit $DifferenceCommit
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  $roots = @(Get-MIRPackageSourceRoots)
+  & git -C $repo diff --quiet $reference $difference -- @roots
+  return $LASTEXITCODE -eq 0
+}
+

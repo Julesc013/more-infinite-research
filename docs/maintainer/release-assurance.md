@@ -12,7 +12,7 @@ superseded_by: []
 
 # Release Assurance And Candidate Sealing
 
-MIR release assurance is a persistent content-addressed evidence system. It plans stable test instances from effective inputs, reuses only trusted exact passing proof, adopts matching in-progress workers, and evaluates one aggregate gate. Candidate sealing remains a separate promotion step that binds one exact qualified ZIP and evidence bundle; sealing never rebuilds or publishes.
+MIR release assurance is a persistent content-addressed evidence system. It plans stable test instances from effective inputs, reuses only trusted exact passing proof, adopts matching in-progress workers, and evaluates one aggregate gate. Candidate sealing remains a separate promotion step that binds one exact qualified ZIP and evidence bundle; sealing never replaces or publishes the candidate archive.
 
 ## Authorities
 
@@ -145,7 +145,11 @@ Ecosystem evidence is candidate-bound: the release-targeted gate must pass the e
 ./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 
-Seal schema 4 binds the performance-evidence and manual-attestation paths, file hashes, and passed statuses. `check-seal` revalidates those bindings along with the candidate, plan, bundle, verifier, producer, and source identities. Promotion checks cannot tag, push, create a GitHub release, or upload to the Mod Portal.
+Seal schema 4 records the candidate ID, immutable package-source commit and material hash, and later qualification-source commit and tree separately. The legacy `source_commit` and `source_tree` fields remain qualification-source aliases for evidence compatibility. For a candidate whose material hash was captured from a dirty precommit worktree, `package_source_material` also records each affected path, its eventual Git blob, and its captured worktree hash. This makes the original mixed index/worktree identity reproducible without pretending that checkout newline conversion can recover those historical bytes.
+
+Seal creation requires the package-source commit to be an ancestor of qualification, proves that package roots are unchanged, re-evaluates the recorded package material identity against identical Git blobs at both commits, and deterministically reconstructs the exact archive and content identities from narrow committed-source archives at both commits. This allows assurance, evidence, and release-governance commits to qualify frozen candidate bytes without misrepresenting them as package source.
+
+Schema 4 also binds the performance-evidence and manual-attestation paths, file hashes, and passed statuses. `check-seal` independently repeats the source ancestry, package-root, material-identity, and two-commit reconstruction checks alongside the candidate, plan, bundle, verifier, producer, and other repository identities. Promotion checks cannot tag, push, create a GitHub release, or upload to the Mod Portal.
 
 ## Backports
 

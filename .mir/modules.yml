@@ -516,7 +516,7 @@ validation_tooling:
     - matching workers are adopted through explicit process or CI-job leases bound to host identity process incarnation trust class and expiry and duplicate fingerprint work is never cancelled in progress
     - the aggregate verification gate requires exact evidence for every planned instance and never trusts mutable job status
     - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives
-    - candidate seals bind exact qualified bytes and canonical repository identities without publishing
+    - candidate seals bind the stable candidate ID immutable package-source commit later qualification-source commit unchanged package roots and exact qualified bytes without publishing
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
     - portable museum compilation and catalog validation require no historical installation and emit finite target-era Lua with an explicit target-matching info.json factorio_version
     - exact museum runtime validation resolves tracked installation IDs through local or protected-runner configuration and binds exact binary and base-data fingerprints

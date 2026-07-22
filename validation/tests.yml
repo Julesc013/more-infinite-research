@@ -30,6 +30,7 @@
         "validation/tests.yml",
         "validation/domains.yml",
         "validation/trust.json",
+        ".mir/releases.json",
         "verification/schema/**",
         "validation/profiles/**"
       ]

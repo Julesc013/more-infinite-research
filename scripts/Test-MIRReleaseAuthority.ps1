@@ -37,6 +37,40 @@ if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev"
     [string]$modern.qualification -ne "not-release-qualified") {
   throw "Canonical modern development release must remain MIR 3.2.0 on dev and not release-qualified."
 }
+$c5Authority = [ordered]@{
+  candidate_id = "C5"
+  archive = "dist/more-infinite-research_3.2.0.zip"
+  archive_bytes = 935250
+  package_source_commit = "35b18f0f59406e263e43618101230004dc801f26"
+  package_source_sha256 = "28F746285D3F3B8AB22D654CBBF5BFF043D9BE6899E2CD6BD09F7359F670D7FE"
+  archive_sha256 = "64909FFE85B7C002CF1F9B3B3D5E7F5D4DE754AE513452923D1E0C4792AFDD82"
+  package_content_sha256 = "C3B79ACBF9B9E2506BDA64603CD4E19B11B8C2FE685469AD35E8791963E47C41"
+}
+foreach ($field in $c5Authority.Keys) {
+  if ([string]$modern.$field -ne [string]$c5Authority[$field]) {
+    throw "Canonical C5 authority field '$field' changed. C6 is required if candidate bytes change."
+  }
+}
+if ([int]$modern.package_source_material.schema -ne 1 -or
+    [string]$modern.package_source_material.hash_algorithm -ne "git-index-with-captured-worktree-v1" -or
+    @($modern.package_source_material.changed_files).Count -ne 4) {
+  throw "Canonical C5 package-source material descriptor must bind its four captured worktree files."
+}
+& git -C $repo merge-base --is-ancestor ([string]$modern.package_source_commit) HEAD
+if ($LASTEXITCODE -ne 0) { throw "C5 package-source commit is not an ancestor of release-engineering HEAD." }
+. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+$packageRoots = @(Get-MIRPackageSourceRoots)
+$changedPackagePaths = @(& git -C $repo diff --name-only ([string]$modern.package_source_commit) HEAD -- @packageRoots)
+if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+  throw "Package-visible paths changed after immutable C5 package source: $($changedPackagePaths -join ', ')"
+}
+$candidatePath = Join-Path $repo ([string]$modern.archive)
+if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf) -or
+    (Get-Item -LiteralPath $candidatePath).Length -ne [long]$modern.archive_bytes -or
+    (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$modern.archive_sha256 -or
+    (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$modern.package_content_sha256) {
+  throw "Canonical C5 archive no longer matches its immutable authority row."
+}
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
     [string]$backport.status -ne "planned-after-3.2-freeze" -or $null -ne $backport.archive) {
   throw "Canonical Factorio 2.0 backport must remain unbuilt MIR 2.5.0 after the 3.2 source freeze."

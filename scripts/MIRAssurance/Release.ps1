@@ -1,6 +1,154 @@
 . (Join-Path $PSScriptRoot "Hashing.ps1")
 . (Join-Path (Split-Path -Parent $PSScriptRoot) "validation\ReleaseAttestations.ps1")
 
+function Get-MIRAssuranceCandidateArchiveIdentity {
+  param([Parameter(Mandatory)][string]$Path)
+
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Candidate does not exist: $Path" }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    $entryCount = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith("/") }).Count
+  } finally {
+    $archive.Dispose()
+  }
+  return [pscustomobject]@{
+    bytes = (Get-Item -LiteralPath $Path).Length
+    entries = $entryCount
+    sha256 = Get-MIRAssuranceSha256 -Path $Path
+    content_sha256 = Get-MIRAssuranceZipContentHash -Path $Path
+  }
+}
+
+function Get-MIRAssuranceReleaseCandidateAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  $ledgerPath = Join-Path $repo ".mir\releases.json"
+  $ledger = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json
+  if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne "canonical-release-ledger") {
+    throw "Canonical release ledger is invalid."
+  }
+  $targetKey = "factorio-$($Context.target)"
+  $property = $ledger.development.PSObject.Properties[$targetKey]
+  if ($null -eq $property) { throw "Canonical release ledger has no development authority for $targetKey." }
+  $authority = $property.Value
+  if ([string]$authority.mir_version -ne [string]$Context.info.version) {
+    throw "Release authority version does not match the candidate version."
+  }
+  if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$') {
+    throw "Release authority candidate_id is invalid."
+  }
+  if ([string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$') {
+    throw "Release authority package_source_commit must be a full lowercase Git commit."
+  }
+  foreach ($field in @("package_source_sha256", "archive_sha256", "package_content_sha256")) {
+    if ([string]$authority.$field -notmatch '^[0-9A-F]{64}$') {
+      throw "Release authority $field must be an uppercase SHA-256 digest."
+    }
+  }
+  if ([int]$authority.package_source_material.schema -ne 1 -or
+      [string]$authority.package_source_material.hash_algorithm -ne "git-index-with-captured-worktree-v1" -or
+      @($authority.package_source_material.changed_files).Count -eq 0) {
+    throw "Release authority package_source_material is invalid."
+  }
+  if ([long]$authority.archive_bytes -le 0) { throw "Release authority archive_bytes must be positive." }
+  $null = Resolve-MIRAssuranceCommit -Commit ([string]$authority.package_source_commit)
+  return $authority
+}
+
+function Get-MIRAssuranceCommitCandidateIdentity {
+  param([Parameter(Mandatory)][string]$Commit)
+
+  $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
+  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
+  $sourceRoot = Join-Path $temporaryRoot "source"
+  $sourceArchive = Join-Path $temporaryRoot "source.zip"
+  try {
+    New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
+    . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+    $archivePaths = @(
+      @(Get-MIRPackageSourceRoots)
+      "scripts/Build-MIRPackage.ps1"
+      "scripts/validation/PackageIdentity.ps1"
+    )
+    & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @archivePaths 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
+    Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
+    $powerShell = (Get-Process -Id $PID).Path
+    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot "scripts\Build-MIRPackage.ps1") -OutputDir "authority-dist" | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Deterministic package reconstruction failed for $resolvedCommit." }
+    $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRoot "info.json") | ConvertFrom-Json
+    $candidate = Join-Path $sourceRoot "authority-dist\$($info.name)_$($info.version).zip"
+    $identity = Get-MIRAssuranceCandidateArchiveIdentity -Path $candidate
+    return [pscustomobject]@{
+      commit = $resolvedCommit
+      bytes = [long]$identity.bytes
+      entries = [int]$identity.entries
+      sha256 = [string]$identity.sha256
+      content_sha256 = [string]$identity.content_sha256
+    }
+  } finally {
+    if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
+      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+    }
+  }
+}
+
+function Get-MIRAssuranceSealSourceAuthority {
+  param(
+    [Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)][string]$QualificationCommit
+  )
+
+  $qualification = Resolve-MIRAssuranceCommit -Commit $QualificationCommit
+  $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+  $packageCommit = Resolve-MIRAssuranceCommit -Commit ([string]$authority.package_source_commit)
+  & git -C $repo merge-base --is-ancestor $packageCommit $qualification
+  if ($LASTEXITCODE -ne 0) { throw "Package-source commit is not an ancestor of the qualification commit." }
+  if (-not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $qualification)) {
+    throw "Package-visible paths changed between package source and qualification."
+  }
+  $packageMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $packageCommit -Material $authority.package_source_material
+  $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $qualification -Material $authority.package_source_material
+  if ([string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256) {
+    throw "Package-source commit does not reproduce the canonical package-source identity."
+  }
+  if ([string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256) {
+    throw "Qualification commit does not preserve the canonical package-source identity."
+  }
+  $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
+  if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
+      [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
+      [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256) {
+    throw "Candidate archive does not match canonical release authority."
+  }
+  $packageBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $packageCommit
+  $qualificationBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $qualification
+  foreach ($build in @($packageBuild, $qualificationBuild)) {
+    if ([long]$build.bytes -ne [long]$candidateIdentity.bytes -or
+        [int]$build.entries -ne [int]$candidateIdentity.entries -or
+        [string]$build.sha256 -ne [string]$candidateIdentity.sha256 -or
+        [string]$build.content_sha256 -ne [string]$candidateIdentity.content_sha256) {
+      throw "Commit $($build.commit) does not reproduce the exact candidate archive and content identities."
+    }
+  }
+  $qualificationTree = @(& git -C $repo rev-parse "$qualification^{tree}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $qualificationTree.Count -ne 1) {
+    throw "Unable to resolve the qualification source tree."
+  }
+  return [pscustomobject]@{
+    candidate = $authority
+    package_source_commit = $packageCommit
+    package_source_sha256 = [string]$authority.package_source_sha256
+    package_source_material = $authority.package_source_material
+    qualification_source_commit = $qualification
+    qualification_source_tree = [string]$qualificationTree[0]
+    candidate_identity = $candidateIdentity
+    package_source_build = $packageBuild
+    qualification_source_build = $qualificationBuild
+  }
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -35,6 +183,10 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_commit -ne $commit) { throw "Verification plan source commit is not the current source commit." }
   if ([string]$plan.candidate_descriptor_sha256 -ne [string](Get-MIRAssuranceCandidateDescriptor -Context $Context).descriptor_sha256) {
     throw "Verification plan candidate descriptor is not the current candidate."
+  }
+  $sourceAuthority = Get-MIRAssuranceSealSourceAuthority -Context $Context -QualificationCommit $commit
+  if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
+    throw "Verification plan source tree is not the qualification source tree."
   }
   $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
@@ -75,15 +227,20 @@ function Invoke-MIRAssuranceSeal {
     target=$Context.target
     canonical_dev_anchor=$canonicalDevAnchor
     branch=$branch
-    source_commit=$commit
-    source_tree=[string]$plan.source_tree
+    candidate_id=[string]$sourceAuthority.candidate.candidate_id
+    package_source_commit=[string]$sourceAuthority.package_source_commit
+    package_source_sha256=[string]$sourceAuthority.package_source_sha256
+    package_source_material=$sourceAuthority.package_source_material
+    qualification_source_commit=[string]$sourceAuthority.qualification_source_commit
+    qualification_source_tree=[string]$sourceAuthority.qualification_source_tree
+    source_commit=[string]$sourceAuthority.qualification_source_commit
+    source_tree=[string]$sourceAuthority.qualification_source_tree
     source_clean=($nonGeneratedStatus.Count -eq 0)
     candidate=(Get-MIRAssuranceRepoRelativePath -Path $Context.candidate)
-    candidate_sha256=(Get-MIRAssuranceSha256 -Path $Context.candidate)
-    candidate_content_sha256=(Get-MIRAssuranceZipContentHash -Path $Context.candidate)
+    candidate_sha256=[string]$sourceAuthority.candidate_identity.sha256
+    candidate_content_sha256=[string]$sourceAuthority.candidate_identity.content_sha256
     candidate_descriptor_sha256=[string]$plan.candidate_descriptor_sha256
     candidate_domain_manifest_sha256=[string]$domainManifest.manifest_sha256
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
     target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $targetsPath)
     verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
     domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
@@ -127,11 +284,20 @@ function Invoke-MIRAssuranceCheckSeal {
   $checks = [ordered]@{
     seal_digest=$false
     candidate_exists=(Test-Path -LiteralPath $candidate -PathType Leaf)
+    candidate_id=$false
+    candidate_authority=$false
     candidate_sha256=$false
     candidate_content_sha256=$false
     candidate_descriptor_sha256=$false
     candidate_domain_manifest_sha256=$false
-    package_source_sha256=$false
+    source_aliases=$false
+    package_source_is_ancestor=$false
+    package_source_identity=$false
+    qualification_package_source_identity=$false
+    package_roots_unchanged=$false
+    package_roots_unchanged_to_head=$false
+    package_source_candidate=$false
+    qualification_source_candidate=$false
     target_profile_sha256=$false
     verification_profile_sha256=$false
     domain_policy_sha256=$false
@@ -140,7 +306,10 @@ function Invoke-MIRAssuranceCheckSeal {
     trust_policy_sha256=$false
     source_is_ancestor=$false
     source_tree=$false
+    qualification_source_is_ancestor=$false
+    qualification_source_tree=$false
     verification_plan_sha256=$false
+    verification_plan_source=$false
     plan_material_sha256=$false
     required_test_set_sha256=$false
     evidence_bundle_sha256=$false
@@ -156,15 +325,60 @@ function Invoke-MIRAssuranceCheckSeal {
   $sealMaterial = ConvertTo-MIRAssuranceOrderedMap -Object $seal
   $sealMaterial.Remove("seal_sha256")
   $checks.seal_digest=((Get-MIRAssuranceJsonHash -Value $sealMaterial) -eq [string]$seal.seal_sha256)
+  $candidateIdentity = $null
   if ($checks.candidate_exists) {
-    $checks.candidate_sha256=((Get-MIRAssuranceSha256 -Path $candidate) -eq [string]$seal.candidate_sha256)
-    $checks.candidate_content_sha256=((Get-MIRAssuranceZipContentHash -Path $candidate) -eq [string]$seal.candidate_content_sha256)
+    $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $candidate
+    $checks.candidate_sha256=([string]$candidateIdentity.sha256 -eq [string]$seal.candidate_sha256)
+    $checks.candidate_content_sha256=([string]$candidateIdentity.content_sha256 -eq [string]$seal.candidate_content_sha256)
     $sealContext = $Context.PSObject.Copy()
     $sealContext.candidate = $candidate
     $checks.candidate_domain_manifest_sha256=([string](Get-MIRAssuranceDomainManifest -Context $sealContext -RequireCandidate).manifest_sha256 -eq [string]$seal.candidate_domain_manifest_sha256)
     $checks.candidate_descriptor_sha256=([string](Get-MIRAssuranceCandidateDescriptor -Context $sealContext).descriptor_sha256 -eq [string]$seal.candidate_descriptor_sha256)
+    try {
+      $candidateAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $sealContext
+      $checks.candidate_id=([string]$candidateAuthority.candidate_id -eq [string]$seal.candidate_id)
+      $checks.candidate_authority=(
+        [string]$candidateAuthority.package_source_commit -eq [string]$seal.package_source_commit -and
+        [string]$candidateAuthority.package_source_sha256 -eq [string]$seal.package_source_sha256 -and
+        (Get-MIRAssuranceJsonHash -Value $candidateAuthority.package_source_material) -eq (Get-MIRAssuranceJsonHash -Value $seal.package_source_material) -and
+        [long]$candidateAuthority.archive_bytes -eq [long]$candidateIdentity.bytes -and
+        [string]$candidateAuthority.archive_sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$candidateAuthority.package_content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+    } catch {}
   }
-  $checks.package_source_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles)) -eq [string]$seal.package_source_sha256)
+  $checks.source_aliases=(
+    [string]$seal.source_commit -eq [string]$seal.qualification_source_commit -and
+    [string]$seal.source_tree -eq [string]$seal.qualification_source_tree
+  )
+  try {
+    $packageCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.package_source_commit)
+    $qualificationCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.qualification_source_commit)
+    & git -C $repo merge-base --is-ancestor $packageCommit $qualificationCommit
+    $checks.package_source_is_ancestor=($LASTEXITCODE -eq 0)
+    $checks.package_roots_unchanged=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $qualificationCommit)
+    $checks.package_roots_unchanged_to_head=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit HEAD)
+    $packageMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $packageCommit -Material $seal.package_source_material
+    $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $qualificationCommit -Material $seal.package_source_material
+    $checks.package_source_identity=([string]$packageMaterial.sha256 -eq [string]$seal.package_source_sha256)
+    $checks.qualification_package_source_identity=([string]$qualificationMaterial.sha256 -eq [string]$seal.package_source_sha256)
+    if ($null -ne $candidateIdentity) {
+      $packageBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $packageCommit
+      $qualificationBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $qualificationCommit
+      $checks.package_source_candidate=(
+        [long]$packageBuild.bytes -eq [long]$candidateIdentity.bytes -and
+        [int]$packageBuild.entries -eq [int]$candidateIdentity.entries -and
+        [string]$packageBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$packageBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+      $checks.qualification_source_candidate=(
+        [long]$qualificationBuild.bytes -eq [long]$candidateIdentity.bytes -and
+        [int]$qualificationBuild.entries -eq [int]$candidateIdentity.entries -and
+        [string]$qualificationBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$qualificationBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+    }
+  } catch {}
   $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $targetsPath) -eq [string]$seal.target_profile_sha256)
   $checks.verification_profile_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
   $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
@@ -175,11 +389,22 @@ function Invoke-MIRAssuranceCheckSeal {
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
   $sourceTree = @(& git -C $repo rev-parse "$([string]$seal.source_commit)^{tree}" 2>$null)
   $checks.source_tree=($LASTEXITCODE -eq 0 -and [string]$sourceTree[0] -eq [string]$seal.source_tree)
+  & git -C $repo merge-base --is-ancestor ([string]$seal.qualification_source_commit) HEAD
+  $checks.qualification_source_is_ancestor=($LASTEXITCODE -eq 0)
+  $qualificationTree = @(& git -C $repo rev-parse "$([string]$seal.qualification_source_commit)^{tree}" 2>$null)
+  $checks.qualification_source_tree=(
+    $LASTEXITCODE -eq 0 -and
+    [string]$qualificationTree[0] -eq [string]$seal.qualification_source_tree
+  )
   if (Test-Path -LiteralPath $planPath -PathType Leaf) {
     $checks.verification_plan_sha256=((Get-MIRAssuranceSha256 -Path $planPath) -eq [string]$seal.verification_plan_sha256)
     if ($checks.verification_plan_sha256) {
       try {
         $plan = Get-Content -Raw -LiteralPath $planPath | ConvertFrom-Json
+        $checks.verification_plan_source=(
+          [string]$plan.source_commit -eq [string]$seal.qualification_source_commit -and
+          [string]$plan.source_tree -eq [string]$seal.qualification_source_tree
+        )
         $checks.plan_material_sha256=([string]$plan.plan_material_sha256 -eq [string]$seal.plan_material_sha256)
         $checks.required_test_set_sha256=([string]$plan.required_test_set_sha256 -eq [string]$seal.required_test_set_sha256)
       } catch {}
@@ -281,6 +506,47 @@ function Invoke-MIRAssuranceSelfTest {
   })
   if ((Get-MIRAssuranceJsonHash -Value $dependencyA) -ne (Get-MIRAssuranceJsonHash -Value $dependencyB)) {
     throw "Version-only metadata unexpectedly invalidated the dependency contract."
+  }
+
+  if ([string]$Context.target -eq "2.1" -and [string]$Context.info.version -eq "3.2.0") {
+    $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+    $packageMaterial = Get-MIRAssurancePackageAuthorityHash `
+      -PackageSourceCommit ([string]$authority.package_source_commit) `
+      -ContentCommit ([string]$authority.package_source_commit) `
+      -Material $authority.package_source_material
+    $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash `
+      -PackageSourceCommit ([string]$authority.package_source_commit) `
+      -ContentCommit $qualificationCommit `
+      -Material $authority.package_source_material
+    if ([string]$authority.candidate_id -ne "C5" -or
+        [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
+        [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
+        [int]$packageMaterial.file_count -ne 229 -or
+        -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
+      throw "C5 package-source and qualification-source authority self-test failed."
+    }
+    $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
+    $tamperedMaterial.changed_files[0].captured_worktree_sha256 = "0" * 64
+    $tamperedHash = Get-MIRAssurancePackageAuthorityHash `
+      -PackageSourceCommit ([string]$authority.package_source_commit) `
+      -ContentCommit $qualificationCommit `
+      -Material $tamperedMaterial
+    if ([string]$tamperedHash.sha256 -eq [string]$authority.package_source_sha256) {
+      throw "Tampered package-source worktree material did not invalidate the authority hash."
+    }
+    $wrongBlobMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
+    $wrongBlobMaterial.changed_files[0].git_blob = "0" * 40
+    $wrongBlobRejected = $false
+    try {
+      $null = Get-MIRAssurancePackageAuthorityHash `
+        -PackageSourceCommit ([string]$authority.package_source_commit) `
+        -ContentCommit $qualificationCommit `
+        -Material $wrongBlobMaterial
+    } catch { $wrongBlobRejected = $true }
+    if (-not $wrongBlobRejected) {
+      throw "Tampered package-source Git blob was not rejected."
+    }
   }
 
   $selfTestId = "self-test.synthetic"

@@ -158,6 +158,12 @@ foreach ($requiredSealField in @(
   "mir_version",
   "target",
   "canonical_dev_anchor",
+  "candidate_id",
+  "package_source_commit",
+  "package_source_sha256",
+  "package_source_material",
+  "qualification_source_commit",
+  "qualification_source_tree",
   "candidate_descriptor_sha256",
   "plan_material_sha256",
   "required_test_set_sha256",
@@ -176,6 +182,18 @@ foreach ($requiredSealField in @(
 }
 if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
   throw "Candidate sealing still accepts an arbitrary evidence summary."
+}
+foreach ($requiredSourceCheck in @(
+  "package_source_is_ancestor",
+  "package_source_identity",
+  "qualification_package_source_identity",
+  "package_roots_unchanged",
+  "package_source_candidate",
+  "qualification_source_candidate"
+)) {
+  if ($releaseAssurance -notmatch [regex]::Escape($requiredSourceCheck)) {
+    throw "Candidate seal verification omits source-authority check: $requiredSourceCheck"
+  }
 }
 $publishedSnapshotIntegrity = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Test-MIRPublishedSnapshotIntegrity.ps1")
 if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or

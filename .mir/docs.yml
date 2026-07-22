@@ -1729,6 +1729,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - release-assurance-contract
+      - package-qualification-source-authority
       - runtime-performance-release-gate
       - protected-release-capsule-transfer
   - path: docs/releases/notes/release-notes-3.1.9.md
