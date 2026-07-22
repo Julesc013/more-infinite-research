@@ -73,9 +73,10 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Raise the synthetic scale campaign to 100,000 canonical recipes, technologies, effects, and graph edges while preserving deterministic fingerprints and bounded diagnostics.
 - [x] Move compiler snapshots and indexes into explicit snapshot-scoped context ownership and complete the governed design, lifecycle, policy, synthesis, and interaction-campaign sequence.
 - [x] Record the historical exact 3.1.9-to-3.2.0 upgrade and local 125-test F0-F4 checkpoint against candidate SHA-256 `3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C`.
-- [ ] Regenerate the seven-scenario approved delta and expanded upgrade/configuration-change evidence against the replacement candidate.
-- [ ] Establish and bind the qualified 3.1.9 runtime performance regression evidence required directly by the revised F4 profile.
-- [ ] Qualify Factorio 2.1.8 floor smoke and the final Factorio 2.1.11 protected profile, or raise the dependency floor.
+- [x] Regenerate the seven-scenario approved delta and expanded five-archetype upgrade/configuration-change evidence against candidate `C4B08D60...` on Factorio 2.1.11.
+- [x] Establish and bind the qualified 3.1.9 runtime performance regression evidence required directly by the revised F4 profile.
+- [x] Complete the local exact-candidate Factorio 2.1.11 full profile; all 128 machine-verifiable tests pass and only `manual.release-review` remains failed locally.
+- [ ] Qualify Factorio 2.1.8 floor smoke or raise the dependency floor, then run the final Factorio 2.1.11 protected profile.
 - [x] Expand the 3.1.9-to-3.2.0 upgrade harness across base, Space Age native-owner, automatic-family, base-continuation, and mod-set configuration-change archetypes.
 - [ ] Run the protected-release full profile and create the release seal; local `untrusted-local` evidence is intentionally ineligible.
 - [ ] Complete the exact-candidate package manual attestation, then complete the separate public-presentation review.

@@ -24,13 +24,32 @@ function Resolve-MIRUpgradePath {
 function Copy-MIRUpgradeLogEvidence {
   param(
     [Parameter(Mandatory)][string]$Source,
-    [Parameter(Mandatory)][string]$Destination
+    [Parameter(Mandatory)][string]$Destination,
+    [string]$FactorioBinaryPath = ""
   )
+  $factorioPaths = if ([string]::IsNullOrWhiteSpace($FactorioBinaryPath)) {
+    @()
+  } else {
+    @($FactorioBinaryPath, $FactorioBinaryPath.Replace('\', '/')) | Sort-Object -Unique
+  }
+  $factorioInstallPaths = if ([string]::IsNullOrWhiteSpace($FactorioBinaryPath)) {
+    @()
+  } else {
+    $factorioInstallRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $FactorioBinaryPath))
+    @($factorioInstallRoot, $factorioInstallRoot.Replace('\', '/')) | Sort-Object -Unique
+  }
   $normalized = @(
     Get-Content -LiteralPath $Source |
       Where-Object { $_ -notmatch 'System info:|Memory info:|\s\[[0-9]+\]:\s' } |
       ForEach-Object {
-        $_.TrimEnd() `
+        $line = $_.TrimEnd()
+        foreach ($factorioPath in $factorioPaths) {
+          $line = $line -replace [regex]::Escape($factorioPath), '<factorio-binary>'
+        }
+        foreach ($factorioInstallPath in $factorioInstallPaths) {
+          $line = $line -replace [regex]::Escape($factorioInstallPath), '<factorio-install>'
+        }
+        $line `
           -replace '(?i)[A-Z]:\\Program Files\\Steam\\steamapps\\common\\Factorio', '<factorio-install>' `
           -replace '(?i)[A-Z]:/Program Files/Steam/steamapps/common/Factorio', '<factorio-install>' `
           -replace '(?i)[A-Z]:\\Users\\[^\\]+\\AppData\\Local\\Temp\\mir-upgrade-[^\\\s"]+', '<temp-upgrade-root>' `
@@ -147,7 +166,7 @@ if (-not $createText.Contains($sourceMarker)) {
   throw "MIR $FromVersion upgrade source proof marker is missing: $sourceMarker. Temporary root: $root"
 }
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
-Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
@@ -173,7 +192,7 @@ if (-not $loadText.Contains($loadMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-load.txt"
-Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence -FactorioBinaryPath $factorio
 
 $assertions = if ($Archetype) {
   $common = @(

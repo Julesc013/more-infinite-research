@@ -312,18 +312,20 @@ waves:
     superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     exact_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-post-2.4.9-return-candidate
+    exact_approved_delta_gate: passed-local-exact-2.1.11-candidate
     exact_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-post-2.4.9-return-candidate
+    exact_upgrade_gate: passed-local-exact-2.1.11-candidate
     locale_gate: passed-source-unchanged-50-locales-21250-values
-    locale_runtime_gate: pending-exact-post-2.4.9-return-candidate
-    runtime_performance_gate: pending-qualified-3.1.9-baseline
+    locale_runtime_gate: passed-local-exact-2.1.11-candidate
+    runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+    runtime_performance_gate: passed-local-exact-2.1.11-candidate
+    minimum_factorio_gate: pending-exact-2.1.8-or-floor-raise
     protected_release_gate: pending
     interactive_gate: pending-exact-post-2.4.9-return-candidate
     assurance_seal: pending
-    release_gate: awaiting-external-performance-manual-and-protected-qualification
+    release_gate: awaiting-minimum-version-manual-and-protected-qualification
     publication_status: unreleased
-    status: post-2.4.9-return-candidate-awaiting-external-qualification
+    status: locally-automated-qualified-awaiting-human-and-protected-qualification
 
   mir_2_4_0:
     version: "2.4.0"

@@ -2,11 +2,11 @@
   "schema": 1,
   "kind": "mir-upgrade-matrix",
   "status": "passed",
-  "generated_at": "2026-07-19T07:29:28.8938133Z",
-  "source_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+  "generated_at": "2026-07-22T03:17:27.1601397Z",
+  "source_commit": "30b983cdb3f4a6321a8c850dab32dd354c1c75c2",
   "factorio": {
-    "version": "2.1.10.86940",
-    "binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3"
+    "version": "2.1.11.86962",
+    "binary_sha256": "E38B9FB580C4DEBF4B5BBB4E76FCF328D667E72792CD29CB52CAB4AB3935FDD3"
   },
   "baseline": {
     "version": "3.1.9",
@@ -16,7 +16,7 @@
   "candidate": {
     "version": "3.2.0",
     "archive": "more-infinite-research_3.2.0.zip",
-    "archive_sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E"
+    "archive_sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B"
   },
   "required_archetypes": [
     "base-default",
@@ -30,7 +30,7 @@
       "id": "base-default",
       "status": "passed",
       "result": ".mir/evidence/3.2.0-upgrade-base-default.json",
-      "result_sha256": "929DBFDA8DA75628386945BC4ABB85720A460D6FFC1A9DB5E001A7980C4F650C",
+      "result_sha256": "C25C079FAE64664FBBC213D8305ED699405397B9480B136B4175C3D37EC59CAE",
       "assertions": [
         "startup-profile-retained",
         "technology-level-retained",
@@ -45,7 +45,7 @@
       "id": "space-age-native-owner",
       "status": "passed",
       "result": ".mir/evidence/3.2.0-upgrade-space-age-native-owner.json",
-      "result_sha256": "757A099BE323636E38B1A2D1C415B4BAD1AC90E260BC57EDE7468148F35D80DD",
+      "result_sha256": "E5FA2452C5AEAB685283E8112AC28CA6F6EE4E12084F77A58506623693E79163",
       "assertions": [
         "startup-profile-retained",
         "technology-level-retained",
@@ -60,7 +60,7 @@
       "id": "automatic-family-creation",
       "status": "passed",
       "result": ".mir/evidence/3.2.0-upgrade-automatic-family-creation.json",
-      "result_sha256": "85F6E5B342E80095581D2CBE2EFD0077966D39D2E093A6602BDC3882F146E91A",
+      "result_sha256": "DF4CCCC79483783CA6192C7D173F5AFE6DE06E770A89ABCCD33117BE9F1EB7C9",
       "assertions": [
         "startup-profile-retained",
         "technology-level-retained",
@@ -76,7 +76,7 @@
       "id": "base-continuations",
       "status": "passed",
       "result": ".mir/evidence/3.2.0-upgrade-base-continuations.json",
-      "result_sha256": "9D1C83B99925048D85E596E8C9D84B00B4D38CDB6FB36EF94D3F000F836A279F",
+      "result_sha256": "8425E68665198D51FDC9E67A0C923CDAA23E60791035888CF106C650A5091CC3",
       "assertions": [
         "startup-profile-retained",
         "technology-level-retained",
@@ -91,7 +91,7 @@
       "id": "mod-set-configuration-change",
       "status": "passed",
       "result": ".mir/evidence/3.2.0-upgrade-mod-set-configuration-change.json",
-      "result_sha256": "9B09039821CC92CD2A327568E13CFDE88E6B3FAF75713AF29A5344AF11C6703B",
+      "result_sha256": "8035C86D1C5A0313B6CCC83183EF5DBD664266EB10E8D42111CC7D6B0781836A",
       "assertions": [
         "startup-profile-retained",
         "technology-level-retained",

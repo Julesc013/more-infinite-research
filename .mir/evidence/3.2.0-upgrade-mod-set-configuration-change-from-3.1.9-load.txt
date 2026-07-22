@@ -1,92 +1,92 @@
-   0.001 2026-07-19 17:29:14; Factorio 2.1.10 (build 86940, win64, steam, space-age)
+   0.001 2026-07-22 13:17:19; Factorio 2.1.11 (build 86962, win64, steam, space-age)
    0.002 Operating system: Windows 10 (build 19045)
    0.002 Not rotating logs.
-   0.002 Program arguments: "<factorio-install>\bin\x64\factorio.exe" "--config" "<temp-upgrade-root>\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "<temp-upgrade-root>\mods" "--create" "<temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip"
-   0.002 Config path: <temp-upgrade-root>/config.ini
+   0.002 Program arguments: "<factorio-binary>" "--config" "<temp-upgrade-root>\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "<temp-upgrade-root>\mods" "--create" "<temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip"
+   0.003 Config path: <temp-upgrade-root>/config.ini
    0.003 Read data path: <factorio-install>/data
-   0.003 Write data path: <temp-upgrade-root>/userdata [11008/450559MB]
+   0.003 Write data path: <temp-upgrade-root>/userdata [7633/450559MB]
    0.003 Binaries path: <factorio-install>/bin
-   0.074 Running in headless mode
-   0.074 Audio is disabled
-   0.076 Info ModManager.cpp:450: FeatureFlag expansion = false
-   0.076 Info ModManager.cpp:450: FeatureFlag expansion-shaders = false
-   0.077 Info ModManager.cpp:450: FeatureFlag freezing = false
-   0.077 Info ModManager.cpp:450: FeatureFlag quality = false
-   0.077 Info ModManager.cpp:450: FeatureFlag rail-bridges = false
-   0.077 Info ModManager.cpp:450: FeatureFlag segmented-units = false
-   0.077 Info ModManager.cpp:450: FeatureFlag space-travel = false
-   0.077 Info ModManager.cpp:450: FeatureFlag spoiling = false
-   0.080 Loading mod settings more-infinite-research 3.1.9 (settings.lua)
-   0.108 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings.lua)
-   0.110 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings-updates.lua)
-   0.124 Loading mod core 0.0.0 (data.lua)
-   0.146 Loading mod base 2.1.10 (data.lua)
-   0.485 Loading mod mir-fixture-upgrade-modset-source 0.1.0 (data.lua)
-   0.497 Loading mod more-infinite-research 3.1.9 (data.lua)
-   0.518 Loading mod mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (data.lua)
-   0.532 Loading mod base 2.1.10 (data-updates.lua)
-   0.545 Loading mod more-infinite-research 3.1.9 (data-updates.lua)
-   0.557 Loading mod more-infinite-research 3.1.9 (data-final-fixes.lua)
-   1.459 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
-   2.105 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_agricultural_growth_speed because missing required mod space-age.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_air_scrubbing_clean_filter because no_matching_recipes.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_armor_components because no_matching_recipes.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_artificial_soil because no_matching_recipes.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_ash_separation because no_matching_recipes.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_assembling_machine because automatic_research_creation_disabled.
-   2.106 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_lab because automatic_research_creation_disabled.
-   2.107 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_bacteria_cultivation because no_matching_recipes.
-   2.107 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_bioflux because no_matching_recipes.
-   2.107 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_breeding because no_matching_recipes.
-   2.107 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_carbon because no_matching_recipes.
-   2.107 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_carbon_fiber because no_matching_recipes.
-   2.108 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_cargo_bay_unloading_distance because missing required mod space-age.
-   2.108 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_cargo_landing_pad_count because missing required mod space-age.
-   2.109 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_holmium because no_matching_recipes.
-   2.109 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_ice because no_matching_recipes.
-   2.110 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_lithium because no_matching_recipes.
-   2.110 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_molten_metals because no_matching_recipes.
-   2.110 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_quantum_processor because no_matching_recipes.
-   2.111 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_supercapacitor because no_matching_recipes.
-   2.111 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_superconductor because no_matching_recipes.
-   2.111 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_thruster_fuel_productivity because missing required fluid thruster-fuel.
-   2.111 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_thruster_oxidizer_productivity because missing required fluid thruster-oxidizer.
-   2.112 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_tungsten because no_matching_recipes.
-   2.208 Checksum for core: 2818056893
-   2.208 Checksum of base: 1969736101
-   2.209 Checksum of mir-fixture-upgrade-modset-source: 2909642831
-   2.209 Checksum of more-infinite-research: 2560381311
-   2.209 Checksum of mir-fixture-assert-upgrade-3-1-9-to-3-2-0: 2968240681
-   2.445 Prototype list checksum: 603400755
-   2.517 Info PlayerData.cpp:566: Cloud player-data.json unavailable
-   2.518 Info PlayerData.cpp:582: Local player-data.json unavailable
-   2.520 Info GlobalContext.cpp:1316: Resetting config.
-   2.520 Factorio initialised
-   2.521 Info Create.cpp:32: Creating new map <temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip
-   2.528 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
-   4.198 Loading level.dat: 628481 bytes.
-   4.198 Info Scenario.cpp:152: Map version 2.1.10-3
-   4.212 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
-   4.220 Checksum for script __level__/control.lua: 3613714447
-   4.237 Checksum for script __more-infinite-research__/control.lua: 3403398592
-   4.240 Checksum for script __mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua: 29004709
-   4.241 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:137: [mir-fixture] upgrade source initialization started archetype=mod-set-configuration-change
-   4.241 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:144: [mir-fixture] upgrade source technology resolved archetype=mod-set-configuration-change technology=recipe-prod-research_iron-1
-   4.241 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:99: [mir-fixture] source target check archetype=mod-set-configuration-change recipe=mir-upgrade-removed-iron-plate recipe_exists=true effect_exists=true
-   4.241 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:146: [mir-fixture] upgrade source profile asserted archetype=mod-set-configuration-change
-   4.243 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:148: [mir-fixture] upgrade source research initialized archetype=mod-set-configuration-change
-   4.243 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:159: [mir-fixture] 3.1.9 upgrade source proof complete archetype=mod-set-configuration-change
-   4.453 Goodbye
-   0.002 2026-07-19 17:29:18; Factorio 2.1.10 (build 86940, win64, steam, space-age)
-   0.002 Operating system: Windows 10 (build 19045)
-   0.002 Not rotating logs.
-   0.002 Program arguments: "<factorio-install>\bin\x64\factorio.exe" "--config" "<temp-upgrade-root>\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "<temp-upgrade-root>\mods" "--benchmark" "<temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1" "--benchmark-sanitize"
-   0.002 Config path: <temp-upgrade-root>/config.ini
-   0.002 Read data path: <factorio-install>/data
-   0.002 Write data path: <temp-upgrade-root>/userdata [11007/450559MB]
-   0.002 Binaries path: <factorio-install>/bin
-   0.066 Running in headless mode
-   0.066 Audio is disabled
+   0.076 Running in headless mode
+   0.076 Audio is disabled
+   0.079 Info ModManager.cpp:450: FeatureFlag expansion = false
+   0.079 Info ModManager.cpp:450: FeatureFlag expansion-shaders = false
+   0.079 Info ModManager.cpp:450: FeatureFlag freezing = false
+   0.079 Info ModManager.cpp:450: FeatureFlag quality = false
+   0.079 Info ModManager.cpp:450: FeatureFlag rail-bridges = false
+   0.079 Info ModManager.cpp:450: FeatureFlag segmented-units = false
+   0.079 Info ModManager.cpp:450: FeatureFlag space-travel = false
+   0.079 Info ModManager.cpp:450: FeatureFlag spoiling = false
+   0.083 Loading mod settings more-infinite-research 3.1.9 (settings.lua)
+   0.115 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings.lua)
+   0.117 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings-updates.lua)
+   0.139 Loading mod core 0.0.0 (data.lua)
+   0.163 Loading mod base 2.1.11 (data.lua)
+   0.574 Loading mod mir-fixture-upgrade-modset-source 0.1.0 (data.lua)
+   0.590 Loading mod more-infinite-research 3.1.9 (data.lua)
+   0.607 Loading mod mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (data.lua)
+   0.620 Loading mod base 2.1.11 (data-updates.lua)
+   0.632 Loading mod more-infinite-research 3.1.9 (data-updates.lua)
+   0.649 Loading mod more-infinite-research 3.1.9 (data-final-fixes.lua)
+   1.339 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_agricultural_growth_speed because missing required mod space-age.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_air_scrubbing_clean_filter because no_matching_recipes.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_armor_components because no_matching_recipes.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_artificial_soil because no_matching_recipes.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_ash_separation because no_matching_recipes.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_assembling_machine because automatic_research_creation_disabled.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_lab because automatic_research_creation_disabled.
+   1.958 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_bacteria_cultivation because no_matching_recipes.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_bioflux because no_matching_recipes.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_breeding because no_matching_recipes.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_carbon because no_matching_recipes.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_carbon_fiber because no_matching_recipes.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_cargo_bay_unloading_distance because missing required mod space-age.
+   1.959 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_cargo_landing_pad_count because missing required mod space-age.
+   1.960 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_holmium because no_matching_recipes.
+   1.961 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_ice because no_matching_recipes.
+   1.961 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_lithium because no_matching_recipes.
+   1.961 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_molten_metals because no_matching_recipes.
+   1.961 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_quantum_processor because no_matching_recipes.
+   1.962 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_supercapacitor because no_matching_recipes.
+   1.962 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_superconductor because no_matching_recipes.
+   1.962 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_thruster_fuel_productivity because missing required fluid thruster-fuel.
+   1.962 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_thruster_oxidizer_productivity because missing required fluid thruster-oxidizer.
+   1.962 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_tungsten because no_matching_recipes.
+   2.070 Checksum for core: 2818056893
+   2.071 Checksum of base: 4112488081
+   2.071 Checksum of mir-fixture-upgrade-modset-source: 2428171346
+   2.071 Checksum of more-infinite-research: 2560381311
+   2.071 Checksum of mir-fixture-assert-upgrade-3-1-9-to-3-2-0: 1975765374
+   2.369 Prototype list checksum: 603400755
+   2.450 Info PlayerData.cpp:566: Cloud player-data.json unavailable
+   2.450 Info PlayerData.cpp:582: Local player-data.json unavailable
+   2.454 Info GlobalContext.cpp:1316: Resetting config.
+   2.454 Factorio initialised
+   2.455 Info Create.cpp:32: Creating new map <temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip
+   2.463 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   4.057 Loading level.dat: 610914 bytes.
+   4.057 Info Scenario.cpp:152: Map version 2.1.11-1
+   4.071 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   4.081 Checksum for script __level__/control.lua: 3613714447
+   4.097 Checksum for script __more-infinite-research__/control.lua: 3403398592
+   4.099 Checksum for script __mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua: 2116847305
+   4.100 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:137: [mir-fixture] upgrade source initialization started archetype=mod-set-configuration-change
+   4.100 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:144: [mir-fixture] upgrade source technology resolved archetype=mod-set-configuration-change technology=recipe-prod-research_iron-1
+   4.101 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:99: [mir-fixture] source target check archetype=mod-set-configuration-change recipe=mir-upgrade-removed-iron-plate recipe_exists=true effect_exists=true
+   4.101 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:146: [mir-fixture] upgrade source profile asserted archetype=mod-set-configuration-change
+   4.103 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:148: [mir-fixture] upgrade source research initialized archetype=mod-set-configuration-change
+   4.103 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:159: [mir-fixture] 3.1.9 upgrade source proof complete archetype=mod-set-configuration-change
+   4.315 Goodbye
+   0.001 2026-07-22 13:17:24; Factorio 2.1.11 (build 86962, win64, steam, space-age)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.001 Not rotating logs.
+   0.001 Program arguments: "<factorio-binary>" "--config" "<temp-upgrade-root>\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "<temp-upgrade-root>\mods" "--benchmark" "<temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1" "--benchmark-sanitize"
+   0.001 Config path: <temp-upgrade-root>/config.ini
+   0.001 Read data path: <factorio-install>/data
+   0.001 Write data path: <temp-upgrade-root>/userdata [7632/450559MB]
+   0.001 Binaries path: <factorio-install>/bin
+   0.065 Running in headless mode
+   0.065 Audio is disabled
    0.068 Info ModManager.cpp:450: FeatureFlag expansion = false
    0.068 Info ModManager.cpp:450: FeatureFlag expansion-shaders = false
    0.068 Info ModManager.cpp:450: FeatureFlag freezing = false
@@ -95,57 +95,57 @@
    0.068 Info ModManager.cpp:450: FeatureFlag segmented-units = false
    0.068 Info ModManager.cpp:450: FeatureFlag space-travel = false
    0.068 Info ModManager.cpp:450: FeatureFlag spoiling = false
-   0.071 Loading mod settings more-infinite-research 3.2.0 (settings.lua)
+   0.072 Loading mod settings more-infinite-research 3.2.0 (settings.lua)
    0.100 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings.lua)
    0.102 Loading mod settings mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (settings-updates.lua)
-   0.115 Loading mod core 0.0.0 (data.lua)
-   0.137 Loading mod base 2.1.10 (data.lua)
-   0.479 Loading mod more-infinite-research 3.2.0 (data.lua)
-   0.495 Loading mod mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (data.lua)
-   0.505 Loading mod base 2.1.10 (data-updates.lua)
-   0.515 Loading mod more-infinite-research 3.2.0 (data-updates.lua)
-   0.526 Loading mod more-infinite-research 3.2.0 (data-final-fixes.lua)
-   1.177 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_agricultural_growth_speed because missing required mod space-age.
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_air_scrubbing_clean_filter because no_matching_recipes.
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_armor_components because no_matching_recipes.
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_artificial_soil because no_matching_recipes.
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_ash_separation because no_matching_recipes.
-   7.984 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_auto_assembling_machine because automatic_research_creation_disabled.
-   7.985 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_auto_lab because automatic_research_creation_disabled.
-   7.985 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_bacteria_cultivation because no_matching_recipes.
-   8.035 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_bioflux because no_matching_recipes.
-   8.035 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_breeding because no_matching_recipes.
-   8.054 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_carbon because no_matching_recipes.
-   8.054 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_carbon_fiber because no_matching_recipes.
-   8.054 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_cargo_bay_unloading_distance because missing required mod space-age.
-   8.054 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_cargo_landing_pad_count because missing required mod space-age.
-   8.197 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_holmium because no_matching_recipes.
-   8.197 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_ice because no_matching_recipes.
-   8.241 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_lithium because no_matching_recipes.
-   8.272 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_molten_metals because no_matching_recipes.
-   8.302 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_quantum_processor because no_matching_recipes.
-   8.361 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_supercapacitor because no_matching_recipes.
-   8.361 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_superconductor because no_matching_recipes.
-   8.361 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_thruster_fuel_productivity because missing required fluid thruster-fuel.
-   8.361 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_thruster_oxidizer_productivity because missing required fluid thruster-oxidizer.
-   8.361 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_tungsten because no_matching_recipes.
-   8.963 Checksum for core: 2818056893
-   8.963 Checksum of base: 1969736101
-   8.963 Checksum of more-infinite-research: 4089628160
-   8.963 Checksum of mir-fixture-assert-upgrade-3-1-9-to-3-2-0: 2968240681
-   9.233 Prototype list checksum: 3756215622
-   9.360 Info PlayerData.cpp:566: Cloud player-data.json unavailable
-   9.360 Info PlayerData.cpp:582: Local player-data.json unavailable
-   9.362 Info GlobalContext.cpp:1316: Resetting config.
-   9.362 Factorio initialised
-   9.363 Loading map <temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip: 497695 bytes.
-   9.508 Loading level.dat: 628844 bytes.
-   9.508 Info Scenario.cpp:152: Map version 2.1.10-3
-   9.531 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
-   9.534 Loading script.dat: 1717 bytes.
-   9.540 Checksum for script __level__/control.lua: 3613714447
-   9.555 Checksum for script __more-infinite-research__/control.lua: 1843491464
-   9.557 Checksum for script __mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua: 29004709
-   9.559 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:181: [mir-fixture] 3.1.9 to 3.2.0 upgrade proof complete archetype=mod-set-configuration-change
-   9.640 Goodbye
+   0.120 Loading mod core 0.0.0 (data.lua)
+   0.144 Loading mod base 2.1.11 (data.lua)
+   0.495 Loading mod more-infinite-research 3.2.0 (data.lua)
+   0.510 Loading mod mir-fixture-assert-upgrade-3-1-9-to-3-2-0 0.1.0 (data.lua)
+   0.522 Loading mod base 2.1.11 (data-updates.lua)
+   0.533 Loading mod more-infinite-research 3.2.0 (data-updates.lua)
+   0.543 Loading mod more-infinite-research 3.2.0 (data-final-fixes.lua)
+   0.754 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
+   1.457 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_agricultural_growth_speed because missing required mod space-age.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_air_scrubbing_clean_filter because no_matching_recipes.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_armor_components because no_matching_recipes.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_artificial_soil because no_matching_recipes.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_ash_separation because no_matching_recipes.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_auto_assembling_machine because automatic_research_creation_disabled.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_auto_lab because automatic_research_creation_disabled.
+   1.458 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_bacteria_cultivation because no_matching_recipes.
+   1.469 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_bioflux because no_matching_recipes.
+   1.469 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_breeding because no_matching_recipes.
+   1.479 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_carbon because no_matching_recipes.
+   1.479 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_carbon_fiber because no_matching_recipes.
+   1.479 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_cargo_bay_unloading_distance because missing required mod space-age.
+   1.479 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_cargo_landing_pad_count because missing required mod space-age.
+   1.546 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_holmium because no_matching_recipes.
+   1.546 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_ice because no_matching_recipes.
+   1.567 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_lithium because no_matching_recipes.
+   1.583 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_molten_metals because no_matching_recipes.
+   1.596 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_quantum_processor because no_matching_recipes.
+   1.625 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_supercapacitor because no_matching_recipes.
+   1.625 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_superconductor because no_matching_recipes.
+   1.625 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_thruster_fuel_productivity because missing required fluid thruster-fuel.
+   1.625 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_thruster_oxidizer_productivity because missing required fluid thruster-oxidizer.
+   1.625 Script @__more-infinite-research__/prototypes/mir/emit/stream_executor.lua:40: [more-infinite-research] Skipping stream research_tungsten because no_matching_recipes.
+   1.799 Checksum for core: 2818056893
+   1.799 Checksum of base: 4112488081
+   1.799 Checksum of more-infinite-research: 3900500595
+   1.799 Checksum of mir-fixture-assert-upgrade-3-1-9-to-3-2-0: 1975765374
+   2.058 Prototype list checksum: 3035377604
+   2.148 Info PlayerData.cpp:566: Cloud player-data.json unavailable
+   2.148 Info PlayerData.cpp:582: Local player-data.json unavailable
+   2.151 Info GlobalContext.cpp:1316: Resetting config.
+   2.152 Factorio initialised
+   2.153 Loading map <temp-upgrade-root>\mir-3.1.9-mod-set-configuration-change-save.zip: 478361 bytes.
+   2.299 Loading level.dat: 611277 bytes.
+   2.299 Info Scenario.cpp:152: Map version 2.1.11-1
+   2.326 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   2.330 Loading script.dat: 1717 bytes.
+   2.337 Checksum for script __level__/control.lua: 3613714447
+   2.354 Checksum for script __more-infinite-research__/control.lua: 2426231921
+   2.356 Checksum for script __mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua: 2116847305
+   2.358 Script @__mir-fixture-assert-upgrade-3-1-9-to-3-2-0__/control.lua:181: [mir-fixture] 3.1.9 to 3.2.0 upgrade proof complete archetype=mod-set-configuration-change
+   2.444 Goodbye

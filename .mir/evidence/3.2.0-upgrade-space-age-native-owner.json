@@ -1,20 +1,20 @@
 {
   "schema": 2,
   "status": "passed",
-  "generated_at": "2026-07-19T07:28:45.6909273Z",
-  "git_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+  "generated_at": "2026-07-22T03:17:05.1508892Z",
+  "git_commit": "30b983cdb3f4a6321a8c850dab32dd354c1c75c2",
   "archetype": "space-age-native-owner",
-  "factorio_binary_version": "2.1.10.86940",
-  "factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "factorio_binary_version": "2.1.11.86962",
+  "factorio_binary_sha256": "E38B9FB580C4DEBF4B5BBB4E76FCF328D667E72792CD29CB52CAB4AB3935FDD3",
   "from": {
     "version": "3.1.9",
-    "path": "dist\\more-infinite-research_3.1.9.zip",
+    "path": ".\\dist\\more-infinite-research_3.1.9.zip",
     "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
   },
   "to": {
     "version": "3.2.0",
-    "path": "dist\\more-infinite-research_3.2.0.zip",
-    "sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E"
+    "path": ".\\dist\\more-infinite-research_3.2.0.zip",
+    "sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B"
   },
   "source_only_fixtures": [],
   "assertions": [
@@ -27,7 +27,7 @@
     "space-age-native-owner-retained"
   ],
   "create_log": "3.2.0-upgrade-space-age-native-owner-from-3.1.9-create.txt",
-  "create_log_sha256": "850BB98DCF89B1ABF4CB53894DCD754FA593E15E9AB1A2FFF919C6BBC5DBDF95",
+  "create_log_sha256": "02B0658E38D72CBC34D0230EB11D0B1F566E7C6A62CCF9D3E0920323769E227E",
   "load_log": "3.2.0-upgrade-space-age-native-owner-from-3.1.9-load.txt",
-  "load_log_sha256": "254946732ADA2EEA29C4C429F6BA2DE5A230E27D042CD69F2FA458D4DFADE951"
+  "load_log_sha256": "BC93DAD86C8956CC6E926FBB01A237F77FE10740CEC16BA98C3EED2174F967ED"
 }
