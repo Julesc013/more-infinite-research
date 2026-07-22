@@ -461,9 +461,11 @@ validation_tooling:
     native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
+    museum_synthetic_installation: fixtures/museum/synthetic-installation
     museum_compiler: scripts/Museum/MuseumCompiler.psm1
     museum_build: scripts/Build-MIRMuseumTarget.ps1
     museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
+    museum_exact_runtime_gate: scripts/Test-MIRMuseumExact.ps1
     museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
     museum_qualification: scripts/New-MIRMuseumQualification.ps1
     museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
@@ -516,7 +518,8 @@ validation_tooling:
     - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives
     - candidate seals bind exact qualified bytes and canonical repository identities without publishing
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
-    - museum compilation runs only in the development environment and emits finite target-era Lua with an explicit target-matching info.json factorio_version
+    - portable museum compilation and catalog validation require no historical installation and emit finite target-era Lua with an explicit target-matching info.json factorio_version
+    - exact museum runtime validation resolves tracked installation IDs through local or protected-runner configuration and binds exact binary and base-data fingerprints
     - museum target selection resolves canonical feature IDs from .mir/canonical-lower-features.json and cannot own an independent feature list
     - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
     - each museum technology is emitted from a stable manifest row and a matching-base effect proof

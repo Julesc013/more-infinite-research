@@ -4,6 +4,8 @@ param(
   [string]$FactorioVersion,
   [string]$QualificationSummaryPath = "",
   [string]$PackagePath = "",
+  [string]$InstallationRoot = "",
+  [string]$RegistryPath = "",
   [string]$OutputPath = ""
 )
 
@@ -12,6 +14,9 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 Import-Module (Join-Path $PSScriptRoot "Museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $target = Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion
+$installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $InstallationRoot -RegistryPath $RegistryPath
+$installationValidation = Test-MIRMuseumExactInstallation -Catalog $catalog -Target $target -Installation $installation
+if (-not $installationValidation.passed) { throw ($installationValidation.errors -join "`n") }
 if ([string]::IsNullOrWhiteSpace($QualificationSummaryPath)) { $QualificationSummaryPath = Join-Path $repo ".mir\evidence\$($target.version)-qualification-summary.json" }
 if ([string]::IsNullOrWhiteSpace($PackagePath)) { $PackagePath = Join-Path $repo "dist\$($catalog.mod_name)_$($target.version).zip" }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = Join-Path $repo ".mir\evidence\$($target.version)-candidate-seal.json" }
@@ -75,7 +80,9 @@ $record = [ordered]@{
   }
   target_profile_sha256 = Get-StringSha256 ($profileText + "`n")
   validation_harness_fingerprint = Get-FileSetFingerprint $harnessPaths
-  factorio_binary_sha256 = Get-MIRSha256 ([string]$target.binary).Replace('/', '\')
+  installation_id = [string]$target.installation_id
+  factorio_binary_sha256 = [string]$installationValidation.binary_sha256
+  factorio_base_data_sha256 = [string]$installationValidation.base_data_sha256
   qualification_summary_sha256 = Get-RepositoryTextSha256 $QualificationSummaryPath
   release_actions = "not-run-maintainer-only"
 }

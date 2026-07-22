@@ -158,6 +158,16 @@ real_mod_gates:
     status: required
 
 fixtures:
+  museum-synthetic-installation:
+    requires_features: []
+    path: fixtures/museum/synthetic-installation
+    shipped: false
+    validates:
+      - portable-museum-renderer-determinism
+      - museum-installation-schema
+      - binary-and-base-data-fingerprint-rejection
+      - base-evidence-and-icon-contracts
+
   performance-regression-probe:
     requires_features: []
     path: fixtures/performance-regression-probe

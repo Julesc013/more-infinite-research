@@ -2,7 +2,9 @@ param(
   [Parameter(Mandatory)]
   [ValidateSet("0.12", "0.11", "0.10", "0.9", "0.8", "0.7", "0.6")]
   [string]$FactorioVersion,
-  [string]$SealPath = ""
+  [string]$SealPath = "",
+  [string]$InstallationRoot = "",
+  [string]$RegistryPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,6 +12,9 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 Import-Module (Join-Path $PSScriptRoot "Museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $target = Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion
+$installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $InstallationRoot -RegistryPath $RegistryPath
+$installationValidation = Test-MIRMuseumExactInstallation -Catalog $catalog -Target $target -Installation $installation
+if (-not $installationValidation.passed) { throw ($installationValidation.errors -join "`n") }
 if ([string]::IsNullOrWhiteSpace($SealPath)) { $SealPath = Join-Path $repo ".mir\evidence\$($target.version)-candidate-seal.json" }
 if (-not [IO.Path]::IsPathRooted($SealPath)) { $SealPath = Join-Path $repo $SealPath }
 if (@(& git -C $repo status --short).Count -ne 0) { throw "Candidate worktree is not clean." }
@@ -59,7 +64,11 @@ $currentBlob = (& git -C $repo hash-object $packagePath).Trim()
 if ([string]::IsNullOrWhiteSpace($blob) -or $blob -ne $currentBlob) { throw "Sealed source commit does not contain the exact candidate ZIP." }
 $summaryPath = Join-Path $repo ".mir\evidence\$($target.version)-qualification-summary.json"
 if ((Get-RepositoryTextSha256 $summaryPath) -ne [string]$seal.qualification_summary_sha256) { throw "Qualification summary hash mismatch." }
-if ((Get-MIRSha256 ([string]$target.binary).Replace('/', '\')) -ne [string]$seal.factorio_binary_sha256) { throw "Factorio binary hash mismatch." }
+if ([string]$seal.installation_id -ne [string]$target.installation_id -or
+    [string]$installationValidation.binary_sha256 -ne [string]$seal.factorio_binary_sha256 -or
+    [string]$installationValidation.base_data_sha256 -ne [string]$seal.factorio_base_data_sha256) {
+  throw "Factorio installation identity or fingerprint mismatch."
+}
 [pscustomobject][ordered]@{
   schema = 1
   status = "passed"

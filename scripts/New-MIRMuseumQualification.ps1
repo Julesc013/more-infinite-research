@@ -4,6 +4,8 @@ param(
   [string]$FactorioVersion,
   [Parameter(Mandatory)][string]$RuntimeProofPath,
   [string]$PackagePath = "",
+  [string]$InstallationRoot = "",
+  [string]$RegistryPath = "",
   [string]$OutputPath = ""
 )
 
@@ -12,7 +14,8 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 Import-Module (Join-Path $PSScriptRoot "Museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $target = Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion
-$validation = Test-MIRMuseumTarget -Catalog $catalog -Target $target -RequireExactPatch
+$installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $InstallationRoot -RegistryPath $RegistryPath
+$validation = Test-MIRMuseumExactInstallation -Catalog $catalog -Target $target -Installation $installation
 if (-not $validation.passed) { throw ($validation.errors -join "`n") }
 if ([string]::IsNullOrWhiteSpace($PackagePath)) { $PackagePath = Join-Path $repo "dist\$($catalog.mod_name)_$($target.version).zip" }
 if (-not [IO.Path]::IsPathRooted($PackagePath)) { $PackagePath = Join-Path $repo $PackagePath }
@@ -23,7 +26,9 @@ if (-not [IO.Path]::IsPathRooted($OutputPath)) { $OutputPath = Join-Path $repo $
 $runtime = Get-Content -Raw -LiteralPath $RuntimeProofPath | ConvertFrom-Json
 if ([string]$runtime.status -ne "passed" -or [string]$runtime.factorio -ne $FactorioVersion) { throw "Runtime proof is not a passed $FactorioVersion record." }
 if ([string]$runtime.exact_patch -ne [string]$target.exact_patch) { throw "Runtime proof patch mismatch." }
-if ([string]$runtime.binary_sha256 -ne (Get-MIRSha256 ([string]$target.binary).Replace('/', '\'))) { throw "Runtime proof binary mismatch." }
+if ([string]$runtime.installation_id -ne [string]$target.installation_id) { throw "Runtime proof installation ID mismatch." }
+if ([string]$runtime.binary_sha256 -ne [string]$validation.binary_sha256) { throw "Runtime proof binary mismatch." }
+if ([string]$runtime.base_data_sha256 -ne [string]$validation.base_data_sha256) { throw "Runtime proof base-data mismatch." }
 if ([string]$runtime.package_mode -ne "zip") { throw "Qualification requires exact ZIP runtime proof." }
 $expectedDeploymentMode = if ([string]$target.package_mode -eq "extract-required") { "exact-zip-extracted" } else { "zip-native" }
 if ($FactorioVersion -ne "0.12" -and [string]$runtime.runtime_deployment_mode -ne $expectedDeploymentMode) {
@@ -52,10 +57,17 @@ $record = [ordered]@{
   mir_version = [string]$target.version
   branch = [string]$target.branch
   source_commit = (& git -C $repo rev-parse HEAD).Trim()
+  installation_id = [string]$target.installation_id
   binary = [ordered]@{
-    path = (Resolve-Path -LiteralPath ([string]$target.binary).Replace('/', '\')).Path
+    path = (Resolve-Path -LiteralPath ([string]$installation.binary)).Path
     architecture = "win64-x64"
-    sha256 = Get-MIRSha256 ([string]$target.binary).Replace('/', '\')
+    sha256 = [string]$validation.binary_sha256
+  }
+  base_data = [ordered]@{
+    path = (Resolve-Path -LiteralPath ([string]$installation.base_data)).Path
+    file_count = [int]$validation.base_file_count
+    bytes = [long]$validation.base_data_bytes
+    sha256 = [string]$validation.base_data_sha256
   }
   package = [ordered]@{
     path = (Resolve-Path -LiteralPath $PackagePath).Path.Substring($repo.Path.Length + 1).Replace('\', '/')

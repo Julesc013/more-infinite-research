@@ -7,7 +7,7 @@ function Get-MIRMuseumCatalog {
   $catalogPath = (Resolve-Path -LiteralPath $Path).Path
   $repoRoot = Split-Path -Parent (Split-Path -Parent $catalogPath)
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
-  if ([int]$catalog.schema -ne 1) { throw "Unsupported museum catalog schema '$($catalog.schema)'." }
+  if ([int]$catalog.schema -ne 2) { throw "Unsupported museum catalog schema '$($catalog.schema)'." }
   if ([string]::IsNullOrWhiteSpace([string]$catalog.canonical_feature_model)) { throw "Museum catalog does not name the canonical feature model." }
   $modelPath = if ([IO.Path]::IsPathRooted([string]$catalog.canonical_feature_model)) {
     [string]$catalog.canonical_feature_model
@@ -64,6 +64,94 @@ function Get-MIRSha256 {
   return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()
 }
 
+function Get-MIRTextSha256 {
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Text)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+}
+
+function Test-MIRRelativeInstallationPath {
+  param([Parameter(Mandatory)][string]$Path)
+  if ([string]::IsNullOrWhiteSpace($Path) -or [IO.Path]::IsPathRooted($Path)) { return $false }
+  $normalized = $Path.Replace('\', '/')
+  if ($normalized.StartsWith('/') -or $normalized -match '(^|/)\.\.(/|$)') { return $false }
+  return $true
+}
+
+function Get-MIRMuseumTreeIdentity {
+  param([Parameter(Mandatory)][string]$Root)
+  $resolved = (Resolve-Path -LiteralPath $Root).Path
+  $files = @(
+    Get-ChildItem -LiteralPath $resolved -Recurse -File |
+      ForEach-Object {
+        [pscustomobject]@{
+          full = $_.FullName
+          relative = [IO.Path]::GetRelativePath($resolved, $_.FullName).Replace('\', '/')
+          bytes = [long]$_.Length
+        }
+      } |
+      Sort-Object relative
+  )
+  $rows = @(
+    foreach ($file in $files) {
+      "$($file.relative)`t$($file.bytes)`t$(Get-MIRSha256 -Path $file.full)"
+    }
+  )
+  return [pscustomobject][ordered]@{
+    root = $resolved
+    file_count = $files.Count
+    bytes = [long](($files | Measure-Object -Property bytes -Sum).Sum)
+    sha256 = Get-MIRTextSha256 -Text (($rows -join "`n") + "`n")
+  }
+}
+
+function Resolve-MIRMuseumInstallation {
+  param(
+    [Parameter(Mandatory)]$Target,
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [string]$InstallationRoot = "",
+    [string]$RegistryPath = ""
+  )
+
+  $source = "explicit-root"
+  $root = $InstallationRoot
+  if ([string]::IsNullOrWhiteSpace($root) -and -not [string]::IsNullOrWhiteSpace([string]$env:MIR_MUSEUM_ROOT)) {
+    $root = Join-Path ([string]$env:MIR_MUSEUM_ROOT) ([string]$Target.installation_id)
+    $source = "MIR_MUSEUM_ROOT"
+  }
+  if ([string]::IsNullOrWhiteSpace($root)) {
+    if ([string]::IsNullOrWhiteSpace($RegistryPath)) {
+      $RegistryPath = if ($env:MIR_MUSEUM_INSTALLATION_REGISTRY) {
+        [string]$env:MIR_MUSEUM_INSTALLATION_REGISTRY
+      } else {
+        Join-Path $RepoRoot ".mir\museum-installations.local.json"
+      }
+    }
+    if (-not [IO.Path]::IsPathRooted($RegistryPath)) { $RegistryPath = Join-Path $RepoRoot $RegistryPath }
+    if (-not (Test-Path -LiteralPath $RegistryPath -PathType Leaf)) {
+      throw "Museum installation '$($Target.installation_id)' is unresolved. Supply -InstallationRoot, MIR_MUSEUM_ROOT, or a registry via -RegistryPath/MIR_MUSEUM_INSTALLATION_REGISTRY."
+    }
+    $registry = Get-Content -Raw -LiteralPath $RegistryPath | ConvertFrom-Json
+    if ([int]$registry.schema -ne 1) { throw "Unsupported museum installation registry schema '$($registry.schema)'." }
+    $entry = $registry.installations.PSObject.Properties[[string]$Target.installation_id]
+    if ($null -eq $entry -or [string]::IsNullOrWhiteSpace([string]$entry.Value.root)) {
+      throw "Museum installation registry does not define '$($Target.installation_id)'."
+    }
+    $root = [string]$entry.Value.root
+    if (-not [IO.Path]::IsPathRooted($root)) { $root = Join-Path (Split-Path -Parent $RegistryPath) $root }
+    $source = "registry:$([IO.Path]::GetFullPath($RegistryPath))"
+  }
+
+  $resolvedRoot = [IO.Path]::GetFullPath($root)
+  return [pscustomobject][ordered]@{
+    installation_id = [string]$Target.installation_id
+    source = $source
+    root = $resolvedRoot
+    binary = [IO.Path]::GetFullPath((Join-Path $resolvedRoot ([string]$Target.binary_relative_path).Replace('/', '\')))
+    base_data = [IO.Path]::GetFullPath((Join-Path $resolvedRoot ([string]$Target.base_relative_path).Replace('/', '\')))
+  }
+}
+
 function Set-MIRUtf8Text {
   param(
     [Parameter(Mandatory)][string]$Path,
@@ -114,8 +202,7 @@ function Get-MIRMuseumExpandedRows {
 function Test-MIRMuseumTarget {
   param(
     [Parameter(Mandatory)]$Catalog,
-    [Parameter(Mandatory)]$Target,
-    [switch]$RequireExactPatch
+    [Parameter(Mandatory)]$Target
   )
 
   $errors = [System.Collections.Generic.List[string]]::new()
@@ -126,19 +213,15 @@ function Test-MIRMuseumTarget {
   if ([string]$Target.branch -ne "tmp/$factorio") { $errors.Add("Branch must be tmp/$factorio.") }
   if ([string]$Target.locale_format -ne "cfg-sections") { $errors.Add("Unsupported locale format '$($Target.locale_format)'.") }
   if ([string]$Target.configuration -ne "loaded-config-lua") { $errors.Add("Configuration must be loaded-config-lua.") }
-
-  $binaryPath = ([string]$Target.binary).Replace('/', '\')
-  $baseData = ([string]$Target.base_data).Replace('/', '\')
-  if (-not (Test-Path -LiteralPath $binaryPath -PathType Leaf)) { $errors.Add("Missing target binary: $binaryPath") }
-  $baseExists = Test-Path -LiteralPath $baseData -PathType Container
-  if (-not $baseExists) { $errors.Add("Missing target base data: $baseData") }
-
-  if ($baseExists -and (Test-Path -LiteralPath (Join-Path $baseData "info.json"))) {
-    $baseInfo = Get-Content -Raw -LiteralPath (Join-Path $baseData "info.json") | ConvertFrom-Json
-    if ([string]$baseInfo.version -ne [string]$Target.exact_patch) {
-      $message = "Installed base patch $($baseInfo.version) does not match required $($Target.exact_patch)."
-      if ($RequireExactPatch) { $errors.Add($message) } else { $warnings.Add($message) }
-    }
+  if ([string]$Target.installation_id -ne "factorio-$($Target.exact_patch)") { $errors.Add("Installation ID must be factorio-$($Target.exact_patch).") }
+  if (-not (Test-MIRRelativeInstallationPath -Path ([string]$Target.binary_relative_path))) { $errors.Add("Target binary_relative_path must be a safe relative path.") }
+  if (-not (Test-MIRRelativeInstallationPath -Path ([string]$Target.base_relative_path))) { $errors.Add("Target base_relative_path must be a safe relative path.") }
+  if ([string]$Target.binary_sha256 -notmatch '^[0-9A-F]{64}$') { $errors.Add("Target binary_sha256 must be an uppercase SHA-256 digest.") }
+  if ([string]$Target.base_data_sha256 -notmatch '^[0-9A-F]{64}$') { $errors.Add("Target base_data_sha256 must be an uppercase SHA-256 digest.") }
+  if ([int]$Target.base_file_count -le 0) { $errors.Add("Target base_file_count must be positive.") }
+  if ([long]$Target.base_data_bytes -le 0) { $errors.Add("Target base_data_bytes must be positive.") }
+  if ($Target.PSObject.Properties.Name -contains "binary" -or $Target.PSObject.Properties.Name -contains "base_data") {
+    $errors.Add("Tracked museum targets must not contain workstation-specific binary or base_data paths.")
   }
 
   $allowedScience = @("science-pack-1", "science-pack-2", "science-pack-3", "alien-science-pack")
@@ -176,24 +259,13 @@ function Test-MIRMuseumTarget {
     if ([int]$family.base_count -le 0 -or [int]$family.count_step -lt 0) { $errors.Add("Family '$($family.id)' has invalid research counts.") }
     if ([int]$family.time -le 0) { $errors.Add("Family '$($family.id)' has invalid research time.") }
     if ([string]::IsNullOrWhiteSpace([string]$family.prerequisite)) { $errors.Add("Family '$($family.id)' has no prerequisite.") }
+    if (-not (Test-MIRRelativeInstallationPath -Path ([string]$family.evidence_file))) { $errors.Add("Family '$($family.id)' has an unsafe evidence path.") }
+    if (-not (Test-MIRRelativeInstallationPath -Path ("graphics/technology/" + [string]$family.icon))) { $errors.Add("Family '$($family.id)' has an unsafe icon path.") }
     if ([string]$family.effect.type -notin @($Target.allowed_effects | ForEach-Object { [string]$_ })) { $errors.Add("Unsupported effect '$($family.effect.type)' for target $factorio.") }
     if ([double]$family.effect.modifier -le 0) { $errors.Add("Family '$($family.id)' has a nonpositive modifier.") }
     if ([string]$family.effect.type -in @("ammo-damage", "gun-speed") -and [string]::IsNullOrWhiteSpace([string]$family.effect.ammo_category)) { $errors.Add("Family '$($family.id)' requires ammo_category.") }
     if ([string]$family.effect.type -eq "turret-attack" -and [string]::IsNullOrWhiteSpace([string]$family.effect.turret_id)) { $errors.Add("Family '$($family.id)' requires turret_id.") }
 
-    if ($baseExists) {
-      $evidencePath = Join-Path $baseData ([string]$family.evidence_file).Replace('/', '\')
-      if (-not (Test-Path -LiteralPath $evidencePath -PathType Leaf)) {
-        $errors.Add("Missing evidence file for '$($family.id)': $evidencePath")
-      } else {
-        $evidence = Get-Content -Raw -LiteralPath $evidencePath
-        if ($evidence -notmatch [regex]::Escape('name = "' + [string]$family.prerequisite + '"')) { $errors.Add("Evidence does not contain prerequisite '$($family.prerequisite)'.") }
-        if ($evidence -notmatch [regex]::Escape('type = "' + [string]$family.effect.type + '"')) { $errors.Add("Evidence does not contain effect '$($family.effect.type)'.") }
-      }
-
-      $iconPath = Join-Path $baseData ("graphics\technology\" + [string]$family.icon)
-      if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) { $errors.Add("Missing icon '$($family.icon)' for target $factorio.") }
-    }
   }
 
   $rows = @(Get-MIRMuseumExpandedRows -Target $Target)
@@ -212,6 +284,77 @@ function Test-MIRMuseumTarget {
     warnings = @($warnings)
     passed = $errors.Count -eq 0
     generated_count = $rows.Count
+  }
+}
+
+function Test-MIRMuseumExactInstallation {
+  param(
+    [Parameter(Mandatory)]$Catalog,
+    [Parameter(Mandatory)]$Target,
+    [Parameter(Mandatory)]$Installation
+  )
+
+  $portable = Test-MIRMuseumTarget -Catalog $Catalog -Target $Target
+  $errors = [System.Collections.Generic.List[string]]::new()
+  foreach ($errorMessage in @($portable.errors)) { $errors.Add([string]$errorMessage) }
+  $binary = [string]$Installation.binary
+  $baseData = [string]$Installation.base_data
+  $binarySha256 = ""
+  $baseIdentity = $null
+
+  if ([string]$Installation.installation_id -ne [string]$Target.installation_id) {
+    $errors.Add("Resolved installation ID does not match target '$($Target.installation_id)'.")
+  }
+  if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) {
+    $errors.Add("Missing target binary: $binary")
+  } else {
+    $binarySha256 = Get-MIRSha256 -Path $binary
+    if ($binarySha256 -ne [string]$Target.binary_sha256) { $errors.Add("Target binary fingerprint mismatch.") }
+  }
+  if (-not (Test-Path -LiteralPath $baseData -PathType Container)) {
+    $errors.Add("Missing target base data: $baseData")
+  } else {
+    $baseIdentity = Get-MIRMuseumTreeIdentity -Root $baseData
+    if ([int]$baseIdentity.file_count -ne [int]$Target.base_file_count -or
+        [long]$baseIdentity.bytes -ne [long]$Target.base_data_bytes -or
+        [string]$baseIdentity.sha256 -ne [string]$Target.base_data_sha256) {
+      $errors.Add("Target base-data fingerprint mismatch.")
+    }
+    $baseInfoPath = Join-Path $baseData "info.json"
+    if (-not (Test-Path -LiteralPath $baseInfoPath -PathType Leaf)) {
+      $errors.Add("Target base data does not contain info.json.")
+    } else {
+      $baseInfo = Get-Content -Raw -LiteralPath $baseInfoPath | ConvertFrom-Json
+      if ([string]$baseInfo.version -ne [string]$Target.exact_patch) {
+        $errors.Add("Installed base patch $($baseInfo.version) does not match required $($Target.exact_patch).")
+      }
+    }
+
+    foreach ($family in @($Target.families)) {
+      $evidencePath = Join-Path $baseData ([string]$family.evidence_file).Replace('/', '\')
+      if (-not (Test-Path -LiteralPath $evidencePath -PathType Leaf)) {
+        $errors.Add("Missing evidence file for '$($family.id)': $evidencePath")
+      } else {
+        $evidence = Get-Content -Raw -LiteralPath $evidencePath
+        if ($evidence -notmatch [regex]::Escape('name = "' + [string]$family.prerequisite + '"')) { $errors.Add("Evidence does not contain prerequisite '$($family.prerequisite)'.") }
+        if ($evidence -notmatch [regex]::Escape('type = "' + [string]$family.effect.type + '"')) { $errors.Add("Evidence does not contain effect '$($family.effect.type)'.") }
+      }
+      $iconPath = Join-Path $baseData ("graphics\technology\" + [string]$family.icon)
+      if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) { $errors.Add("Missing icon '$($family.icon)' for target $($Target.factorio).") }
+    }
+  }
+
+  return [pscustomobject][ordered]@{
+    target = [string]$Target.factorio
+    installation_id = [string]$Target.installation_id
+    binary = $binary
+    binary_sha256 = $binarySha256
+    base_data = $baseData
+    base_file_count = if ($baseIdentity) { [int]$baseIdentity.file_count } else { 0 }
+    base_data_bytes = if ($baseIdentity) { [long]$baseIdentity.bytes } else { 0 }
+    base_data_sha256 = if ($baseIdentity) { [string]$baseIdentity.sha256 } else { "" }
+    errors = @($errors)
+    passed = $errors.Count -eq 0
   }
 }
 
@@ -463,4 +606,4 @@ function New-MIRMuseumPackage {
   }
 }
 
-Export-ModuleMember -Function Get-MIRMuseumCatalog, Get-MIRMuseumTarget, Get-MIRSha256, Get-MIRMuseumExpandedRows, Test-MIRMuseumTarget, New-MIRMuseumTargetSource, Test-MIRMuseumRenderedSource, Get-MIRMuseumZipIdentity, New-MIRMuseumPackage, Set-MIRUtf8Text
+Export-ModuleMember -Function Get-MIRMuseumCatalog, Get-MIRMuseumTarget, Get-MIRSha256, Get-MIRTextSha256, Get-MIRMuseumTreeIdentity, Resolve-MIRMuseumInstallation, Get-MIRMuseumExpandedRows, Test-MIRMuseumTarget, Test-MIRMuseumExactInstallation, New-MIRMuseumTargetSource, Test-MIRMuseumRenderedSource, Get-MIRMuseumZipIdentity, New-MIRMuseumPackage, Set-MIRUtf8Text

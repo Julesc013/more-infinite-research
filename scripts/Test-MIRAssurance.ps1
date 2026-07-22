@@ -108,6 +108,35 @@ foreach ($required in @(
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
+$portableMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "static.museum" })
+$exactMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.museum-exact" })
+if ($portableMuseumTest.Count -ne 1 -or
+    [bool]$portableMuseumTest[0].requires_factorio -or
+    [string]$portableMuseumTest[0].command -ne "./scripts/Test-MIRMuseumCompiler.ps1" -or
+    @($portableMuseumTest[0].inputs) -notcontains "fixtures/museum/synthetic-installation/**") {
+  throw "static.museum must remain portable and bind the repository-owned synthetic installation fixture."
+}
+if ($exactMuseumTest.Count -ne 1 -or
+    [string]$exactMuseumTest[0].kind -ne "runtime" -or
+    [string]$exactMuseumTest[0].command -ne "./scripts/Test-MIRMuseumExact.ps1" -or
+    @($exactMuseumTest[0].inputs) -notcontains "museum-installations") {
+  throw "runtime.museum-exact must be a separately fingerprinted exact-installation runtime test."
+}
+if (@($config.profiles.'museum-exact').Count -ne 2 -or
+    @($config.profiles.'museum-exact') -notcontains "static.museum" -or
+    @($config.profiles.'museum-exact') -notcontains "runtime.museum-exact") {
+  throw "The museum-exact profile must contain only portable museum validation and exact target runtime execution."
+}
+foreach ($modernProfile in @("fast", "full", "backport")) {
+  if (@($config.profiles.$modernProfile) -contains "runtime.museum-exact") {
+    throw "runtime.museum-exact must not block the modern $modernProfile profile."
+  }
+}
+$museumCatalogText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\museum-targets.json")
+if ($museumCatalogText -match '"(binary|base_data)"\s*:' -or $museumCatalogText -match '(?i)[A-Z]:[/\\]') {
+  throw "Tracked museum target policy contains a workstation-specific installation path."
+}
+
 $ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
 if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or

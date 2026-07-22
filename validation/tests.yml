@@ -114,9 +114,26 @@
       "inputs": [
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
+        "fixtures/museum/synthetic-installation/**",
         "scripts/Museum/**",
         "scripts/Build-MIRMuseumTarget.ps1",
         "scripts/Test-MIRMuseumCompiler.ps1"
+      ]
+    },
+    {
+      "id": "runtime.museum-exact",
+      "kind": "runtime",
+      "layer": "F4",
+      "command": "./scripts/Test-MIRMuseumExact.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "museum-installations",
+        ".mir/canonical-lower-features.json",
+        ".mir/museum-targets.json",
+        "scripts/Museum/**",
+        "scripts/Build-MIRMuseumTarget.ps1",
+        "scripts/Test-MIRMuseumRuntime.ps1",
+        "scripts/Test-MIRMuseumExact.ps1"
       ]
     },
     {

@@ -32,6 +32,30 @@ function Get-MIRAssuranceInputFingerprint {
     "candidate" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.candidate -MissingLabel "candidate" }
     "factorio" { return Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath $Context.factorio }
     "factorio-installation" { return Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath $Context.factorio }
+    "museum-installations" {
+      Import-Module (Join-Path $repo "scripts\Museum\MuseumCompiler.psm1") -Force
+      $museumCatalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
+      $installations = @(
+        foreach ($museumTarget in @($museumCatalog.targets)) {
+          $installation = Resolve-MIRMuseumInstallation -Target $museumTarget -RepoRoot $repo
+          $validation = Test-MIRMuseumExactInstallation -Catalog $museumCatalog -Target $museumTarget -Installation $installation
+          if (-not $validation.passed) { throw ($validation.errors -join "`n") }
+          [ordered]@{
+            target=[string]$museumTarget.factorio
+            installation_id=[string]$museumTarget.installation_id
+            binary_sha256=[string]$validation.binary_sha256
+            base_file_count=[int]$validation.base_file_count
+            base_data_bytes=[long]$validation.base_data_bytes
+            base_data_sha256=[string]$validation.base_data_sha256
+          }
+        }
+      )
+      return [ordered]@{
+        kind="museum-installations"
+        installations=$installations
+        sha256=(Get-MIRAssuranceJsonHash -Value $installations)
+      }
+    }
     "prior-release" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.prior_release -MissingLabel "prior-release" }
     "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)

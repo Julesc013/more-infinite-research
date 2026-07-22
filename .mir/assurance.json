@@ -16,6 +16,7 @@
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
+    "museum-exact": ["static.museum", "runtime.museum-exact"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
@@ -76,7 +77,7 @@
     },
     {
       "id": "museum-tooling",
-      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
+      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^fixtures/museum/", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
       "tests": ["static.museum"]
     },
     {
