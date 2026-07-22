@@ -1,10 +1,14 @@
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
 local recipe_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 local technology_researchability_reason = nil
-local science_pack_resolution_cache = {}
+
+local function science_pack_resolution_cache()
+  return compiler_context.current():state_view("science_pack_production", function() return {} end)
+end
 
 function M.configure(dependencies)
   technology_researchability_reason = assert(
@@ -17,7 +21,8 @@ function M.pack_production_status(pack_name, visiting_packs)
   if not technology_researchability_reason then
     error("MIR pack production reachability dependencies were not configured.", 2)
   end
-  local cached = science_pack_resolution_cache[pack_name]
+  local cache = science_pack_resolution_cache()
+  local cached = cache[pack_name]
   if cached then return cached.status, cached.prerequisite end
   if not pack_name or not pack_registry.science_pack_exists(pack_name) then return "unreachable", nil end
 
@@ -25,7 +30,7 @@ function M.pack_production_status(pack_name, visiting_packs)
   if visiting_packs[pack_name] then return "unreachable", nil end
   local recipe_status = recipe_facts.pack_recipe_status(pack_name)
   if recipe_status and recipe_status.initially_available then
-    science_pack_resolution_cache[pack_name] = {status = "initial"}
+    cache[pack_name] = {status = "initial"}
     return "initial", nil
   end
 
@@ -48,12 +53,12 @@ function M.pack_production_status(pack_name, visiting_packs)
       })
       if not rejection then
         visiting_packs[pack_name] = nil
-        science_pack_resolution_cache[pack_name] = {status = "research", prerequisite = technology_name}
+        cache[pack_name] = {status = "research", prerequisite = technology_name}
         return "research", technology_name
       end
     end
     visiting_packs[pack_name] = nil
-    science_pack_resolution_cache[pack_name] = {status = "unreachable"}
+    cache[pack_name] = {status = "unreachable"}
     return "unreachable", nil
   end
 
@@ -61,10 +66,10 @@ function M.pack_production_status(pack_name, visiting_packs)
     visiting_packs = visiting_packs,
     visiting_technologies = {}
   }) == nil then
-    science_pack_resolution_cache[pack_name] = {status = "non-recipe", prerequisite = pack_name}
+    cache[pack_name] = {status = "non-recipe", prerequisite = pack_name}
     return "non-recipe", pack_name
   end
-  science_pack_resolution_cache[pack_name] = {status = "non-recipe"}
+  cache[pack_name] = {status = "non-recipe"}
   return "non-recipe", nil
 end
 

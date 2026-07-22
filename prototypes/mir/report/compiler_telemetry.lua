@@ -28,9 +28,24 @@ local REQUIRED_COUNTERS = {
   "technology_closure_cache_entries",
   "technology_closure_cached_nodes",
   "sanitation_scanned_technologies",
-  "sanitation_scanned_effects"
+  "sanitation_scanned_effects",
+  "recipe_risk_facts",
+  "recipe_hard_risk_count",
+  "recipe_review_risk_count",
+  "provider_candidates",
+  "provider_cardinality_review_required",
+  "provider_review_required",
+  "family_members",
+  "stream_rows",
+  "technology_catalog_candidates",
+  "technology_catalog_alternatives",
+  "technology_catalog_canonical_bytes",
+  "technology_graph_parity_rows"
 }
-local REQUIRED_PHASES = {"snapshot", "graph", "planning", "postconditions"}
+local REQUIRED_PHASES = {
+  "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
+  "graph", "planning", "postconditions"
+}
 local WITNESS_LIMIT = 64
 
 local function state()

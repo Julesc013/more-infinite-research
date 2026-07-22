@@ -3,11 +3,18 @@ local lab_compatibility = require("prototypes.mir.capabilities.science_integrati
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
 local recipe_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 local pack_production_status = nil
-local technology_reachability_cache = {}
-local prerequisite_order_cache = {}
+
+local function technology_reachability_cache()
+  return compiler_context.current():state_view("technology_researchability", function() return {} end)
+end
+
+local function prerequisite_order_cache()
+  return compiler_context.current():state_view("prerequisite_order_cache", function() return {} end)
+end
 
 function M.configure(dependencies)
   pack_production_status = assert(dependencies.pack_production_status, "technology researchability requires pack production status")
@@ -23,7 +30,8 @@ local function sorted_prerequisites(technology)
 end
 
 local function prerequisite_order(root_name)
-  local cached = prerequisite_order_cache[root_name]
+  local cache = prerequisite_order_cache()
+  local cached = cache[root_name]
   if cached then return cached.order, cached.failure end
 
   local visited, visiting, order = {}, {}, {}
@@ -65,7 +73,7 @@ local function prerequisite_order(root_name)
     end
   end
 
-  prerequisite_order_cache[root_name] = {order = order, failure = failure}
+  cache[root_name] = {order = order, failure = failure}
   telemetry.observe_max("technology_prerequisite_closure_max", #order)
   telemetry.count("technology_closure_cache_entries", 1)
   telemetry.count("technology_closure_cached_nodes", #order)
@@ -73,15 +81,16 @@ local function prerequisite_order(root_name)
 end
 
 local function enabled_and_reachable(tech_name)
-  if technology_reachability_cache[tech_name] ~= nil then return technology_reachability_cache[tech_name] end
+  local cache = technology_reachability_cache()
+  if cache[tech_name] ~= nil then return cache[tech_name] end
   local technology = data_raw.technology(tech_name)
   if not technology or technology.enabled == false then
-    technology_reachability_cache[tech_name] = false
+    cache[tech_name] = false
     return false
   end
   local _, failure = prerequisite_order(tech_name)
-  technology_reachability_cache[tech_name] = failure == nil
-  return technology_reachability_cache[tech_name]
+  cache[tech_name] = failure == nil
+  return cache[tech_name]
 end
 
 local function research_mechanism_reason(technology, context)

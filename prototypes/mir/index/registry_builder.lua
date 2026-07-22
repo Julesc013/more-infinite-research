@@ -1,8 +1,10 @@
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local relationships = require("prototypes.mir.index.relationships")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 
 local R = {}
 
@@ -345,80 +347,25 @@ local function build_rule_mutation_facts(recipe_facts, machine_facts, lab_facts)
   return facts
 end
 
-local RISK_PATTERNS = {
-  {flag = "recycling_loop", patterns = {"recycl"}, categories = {recycling = true}},
-  {flag = "cleaning_or_recovery_loop", patterns = {"clean", "recover", "recovery", "wash", "washing", "scrub", "scrubbing"}},
-  {flag = "voiding_or_destruction", patterns = {"void", "vent", "flare", "sink", "destroy", "disposal"}},
-  {flag = "barrel_or_container_return", patterns = {"barrel", "canister", "container", "capsule", "empty%-", "fill%-"}},
-  {flag = "matter_or_transmutation", patterns = {"matter", "transmut", "conversion", "convert"}}
-}
-
-local function contains_pattern(name, patterns)
-  local text = string.lower(name or "")
-  for _, pattern in ipairs(patterns or {}) do
-    if string.find(text, pattern) then return true end
-  end
-  return false
-end
-
-local function category_set(categories)
-  local out = {}
-  for _, category in ipairs(categories or {}) do out[category] = true end
-  return out
-end
-
-local function io_intersection(ingredients, results)
-  local ingredient_names = {}
-  for _, ingredient in ipairs(ingredients or {}) do ingredient_names[ingredient.name] = true end
-  local out = {}
-  for _, result in ipairs(results or {}) do
-    if ingredient_names[result.name] then table.insert(out, result.name) end
-  end
-  table.sort(out)
-  return out
-end
-
-local function build_loop_risk_facts(recipe_facts)
+local function build_loop_risk_facts()
   local facts = {}
-  for _, name in ipairs(sorted_keys(recipe_facts)) do
-    local recipe = recipe_facts[name]
-    local flags = {}
-    local seen = {}
-    local categories = category_set(recipe.categories)
-
-    for _, risk in ipairs(RISK_PATTERNS) do
-      local matched = contains_pattern(name, risk.patterns)
-      if not matched and risk.categories then
-        for category, _ in pairs(risk.categories) do
-          if categories[category] then matched = true end
-        end
-      end
-      if matched then push_unique(flags, seen, risk.flag) end
-    end
-
-    local repeated = io_intersection(recipe.ingredients, recipe.results)
-    if #repeated > 0 then
-      push_unique(flags, seen, "catalyst_or_self_return", nil)
-      if #recipe.results == 1 then
-        push_unique(flags, seen, "self_producing_recipe", nil)
-      end
-    end
-
-    if recipe.hidden then
-      push_unique(flags, seen, "hidden_internal", nil)
-    end
-
-    if #recipe.results > 1 and contains_pattern(name, {"ore", "fragment", "scrap", "core"}) then
-      push_unique(flags, seen, "multi_output_resource_loop", nil)
-    end
-
-    if #flags > 0 then
+  local risk_index = recipe_risk_facts.snapshot()
+  for _, name in ipairs(risk_index.names or {}) do
+    local risk = risk_index.facts[name]
+    if #(risk.hard_flags or {}) > 0 or #(risk.review_flags or {}) > 0 then
+      local flags = {}
+      for _, value in ipairs(risk.hard_flags or {}) do table.insert(flags, value) end
+      for _, value in ipairs(risk.review_flags or {}) do table.insert(flags, value) end
+      table.sort(flags)
       table.insert(facts, {
         subject = name,
         subject_type = "recipe",
         risk_flags = flags,
-        shared_inputs_outputs = repeated,
-        confidence = 0.75
+        hard_flags = deepcopy(risk.hard_flags),
+        review_flags = deepcopy(risk.review_flags),
+        shared_inputs_outputs = deepcopy(risk.shared_input_output),
+        confidence = risk.evidence_confidence,
+        risk_fingerprint = risk.risk_fingerprint
       })
     end
   end
@@ -453,7 +400,7 @@ function R.build()
   local labs = build_lab_facts()
   local owners = build_owner_facts()
   local rule_mutations = build_rule_mutation_facts(recipes, machines, labs)
-  local loop_risks = build_loop_risk_facts(recipes)
+  local loop_risks = build_loop_risk_facts()
 
   local generated_technologies = 0
   for _, tech_name in ipairs(sorted_keys(technologies)) do

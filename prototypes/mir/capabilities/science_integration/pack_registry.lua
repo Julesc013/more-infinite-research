@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
@@ -19,7 +20,6 @@ local VANILLA_PACK_ORDER = {
   "promethium-science-pack"
 }
 
-local lab_inputs_cache = nil
 
 local function science_packs_require_tool_prototypes()
   local automation_pack = lookup.item_prototype("automation-science-pack")
@@ -34,6 +34,8 @@ function M.research_pack_prototype(name)
 end
 
 function M.all_lab_inputs()
+  local context = compiler_context.current()
+  local lab_inputs_cache = context:state_view("lab_input_index")
   if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
   local out, seen = {}, {}
   for _, lab in pairs(data_raw.prototypes("lab")) do
@@ -45,7 +47,7 @@ function M.all_lab_inputs()
     end
   end
   table.sort(out)
-  lab_inputs_cache = out
+  context:set_state("lab_input_index", out)
   return deepcopy(out)
 end
 

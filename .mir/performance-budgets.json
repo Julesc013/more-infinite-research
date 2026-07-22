@@ -2,6 +2,16 @@
   "schema": 2,
   "release": "3.2.0",
   "factorio_line": "2.1",
+  "compiler_stage_budgets": [
+    { "id": "recipe-risk-facts", "phase": "recipe_risk_facts", "max_seconds": 0.5 },
+    { "id": "provider-discovery", "phase": "provider_discovery", "max_seconds": 0.5 },
+    { "id": "stream-compiler", "phase": "stream_compiler", "max_seconds": 0.5 }
+  ],
+  "compiler_counter_bounds": [
+    { "id": "provider-candidates", "counter": "provider_candidates", "maximum": 4096 },
+    { "id": "provider-review-required", "counter": "provider_review_required", "maximum": 512 },
+    { "id": "catalog-alternatives", "counter": "technology_catalog_alternatives", "maximum": 512 }
+  ],
   "regression_lanes": [
     { "id": "base.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
     { "id": "space-age.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.15, "max_candidate_seconds": 18.0 },

@@ -25,6 +25,21 @@ $budgets = @($manifest.budgets)
 if ($budgets.Count -eq 0) { throw "Performance budget manifest contains no budgets." }
 $regressionLanes = @($manifest.regression_lanes)
 if ($regressionLanes.Count -eq 0) { throw "Performance budget manifest contains no regression lanes." }
+$compilerStageBudgets = @($manifest.compiler_stage_budgets)
+$compilerCounterBounds = @($manifest.compiler_counter_bounds)
+if (($compilerStageBudgets.id -join ",") -ne "recipe-risk-facts,provider-discovery,stream-compiler") {
+  throw "Performance budget manifest omits the governed C6 compiler stages."
+}
+foreach ($budget in $compilerStageBudgets) {
+  if ([string]::IsNullOrWhiteSpace([string]$budget.phase) -or [double]$budget.max_seconds -le 0) {
+    throw "Compiler stage performance budget is invalid: $($budget.id)"
+  }
+}
+foreach ($bound in $compilerCounterBounds) {
+  if ([string]::IsNullOrWhiteSpace([string]$bound.counter) -or [int]$bound.maximum -le 0) {
+    throw "Compiler counter bound is invalid: $($bound.id)"
+  }
+}
 
 $requiredIds = @(
   "base", "space-age", "scoped-caps-off", "scoped-caps-on", "diagnostics-off",
@@ -66,9 +81,15 @@ $requiredTelemetryCounters = @(
   "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
   "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
   "context_snapshot_bytes", "technology_closure_cache_entries", "technology_closure_cached_nodes",
-  "sanitation_scanned_technologies", "sanitation_scanned_effects"
+  "sanitation_scanned_technologies", "sanitation_scanned_effects", "recipe_risk_facts",
+  "recipe_hard_risk_count", "recipe_review_risk_count", "provider_candidates",
+  "provider_cardinality_review_required", "provider_review_required", "family_members", "stream_rows",
+  "technology_catalog_candidates", "technology_catalog_alternatives", "technology_catalog_canonical_bytes",
+  "technology_graph_parity_rows"
 )
-$requiredTelemetryPhases = @("snapshot", "graph", "planning", "postconditions")
+$requiredTelemetryPhases = @(
+  "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler", "graph", "planning", "postconditions"
+)
 foreach ($name in @($requiredTelemetryCounters + $requiredTelemetryPhases)) {
   if ($performancePolicy -notmatch "(?m)^\s*-\s+$([regex]::Escape($name))\s*$") {
     throw "Performance policy is missing required telemetry name '$name'."

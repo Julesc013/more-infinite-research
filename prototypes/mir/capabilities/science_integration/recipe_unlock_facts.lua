@@ -2,9 +2,9 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local recipe_unlocks = require("prototypes.mir.index.recipe_unlocks")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local science_pack_recipe_status_cache = nil
 
 function M.recipe_outputs_item(recipe, item_name)
   local recipe_name = type(recipe) == "table" and recipe.name or recipe
@@ -23,8 +23,10 @@ function M.recipe_enabled_without_research(recipe)
 end
 
 local function build_science_pack_recipe_status_cache()
-  if science_pack_recipe_status_cache then return science_pack_recipe_status_cache end
-  science_pack_recipe_status_cache = {}
+  local context = compiler_context.current()
+  local cached = context:state_view("science_pack_recipe_status")
+  if cached then return cached end
+  local science_pack_recipe_status_cache = {}
   local lab_inputs = pack_registry.all_lab_inputs()
   for _, pack_name in ipairs(lab_inputs) do
     science_pack_recipe_status_cache[pack_name] = {
@@ -46,7 +48,7 @@ local function build_science_pack_recipe_status_cache()
     end
   end
   for _, status in pairs(science_pack_recipe_status_cache) do table.sort(status.recipes) end
-  return science_pack_recipe_status_cache
+  return context:set_state("science_pack_recipe_status", science_pack_recipe_status_cache)
 end
 
 function M.pack_recipe_status(pack_name)

@@ -1,4 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 
 local M = {}
 local SCHEMA = 1
@@ -153,7 +154,7 @@ function M.candidate_items(dsl, indexes)
   return items
 end
 
-function M.eligibility(dsl, fact, item_name)
+function M.eligibility(dsl, fact, item_name, risk_fact)
   if type(dsl) ~= "table" or dsl.schema ~= SCHEMA then error("Family operator DSL schema 1 record is required.", 2) end
   if not fact then return false, "recipe_fact_missing" end
   for _, selector in ipairs(dsl.selectors) do
@@ -168,15 +169,11 @@ function M.eligibility(dsl, fact, item_name)
       local safe, blocker = safe_placeable_output(fact, item_name)
       if not safe then return false, blocker end
     elseif selector.operator == "risk.none" then
-      if fact.source_class == "recycling" and contains(selector.risks, "recycling_loop") then
-        return false, "recycling_recipe"
-      end
-      if has_self_return(fact) and contains(selector.risks, "catalyst_or_self_return") then
-        return false, "self_return_risk"
-      end
+      local disposition, blocker = recipe_risk_facts.primary_disposition(risk_fact)
+      if disposition ~= "PASS" then return false, blocker, disposition end
     end
   end
-  return true, nil
+  return true, nil, "PASS"
 end
 
 local function item_tier(indexes, item_name)
