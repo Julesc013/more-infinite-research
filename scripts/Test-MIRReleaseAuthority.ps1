@@ -139,8 +139,12 @@ foreach ($forbiddenVersion in @("1.9.5", "2.5.0")) {
   }
 }
 $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.0" })
-if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "development-candidate") {
-  throw "The tracked MIR 3.2.0 archive must be classified exactly once as a development candidate."
+if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "development-candidate" -or
+    [string]$candidateRows[0].path -ne [string]$modern.archive -or
+    [long]$candidateRows[0].bytes -ne [long]$modern.archive_bytes -or
+    [string]$candidateRows[0].sha256 -ne [string]$modern.archive_sha256 -or
+    [string]$candidateRows[0].source_ref -ne [string]$modern.package_source_commit) {
+  throw "The tracked MIR 3.2.0 development distribution must exactly mirror canonical candidate authority."
 }
 
 Write-Host "[ok] canonical release ledger and branch, wave, distribution, queue, and promotion views agree."
