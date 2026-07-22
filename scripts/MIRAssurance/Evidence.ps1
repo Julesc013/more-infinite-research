@@ -258,6 +258,24 @@ function Get-MIRAssuranceProducer {
   }
 }
 
+function Get-MIRAssuranceHostIdentity {
+  if (-not [string]::IsNullOrWhiteSpace([string]$env:MIR_HOST_IDENTITY)) {
+    return [string]$env:MIR_HOST_IDENTITY
+  }
+  $machine = [Environment]::MachineName
+  if (-not [string]::IsNullOrWhiteSpace([string]$env:RUNNER_NAME)) {
+    return "github:$([string]$env:RUNNER_NAME)@$machine"
+  }
+  return "host:$machine"
+}
+
+function Get-MIRAssuranceProcessStartedAt {
+  param([int]$ProcessId = $PID)
+  $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+  if ($null -eq $process) { return "" }
+  return ([DateTimeOffset]$process.StartTime.ToUniversalTime()).ToString("o")
+}
+
 function Get-MIRAssuranceEvidenceProducer {
   param(
     [Parameter(Mandatory)]$Test,
@@ -493,32 +511,81 @@ function Get-MIRAssuranceRunningEvidence {
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Fingerprint.test_id -InputKey $Fingerprint.input_key
   if (-not (Test-Path -LiteralPath $paths.running -PathType Leaf)) { return $null }
   try { $running = Get-Content -Raw -LiteralPath $paths.running | ConvertFrom-Json }
-  catch { return $null }
-  if ([string]$running.test_id -ne [string]$Fingerprint.test_id -or [string]$running.input_key -ne [string]$Fingerprint.input_key) { return $null }
+  catch {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
+  if ([int]$running.schema -ne 2 -or
+      [string]$running.test_id -ne [string]$Fingerprint.test_id -or
+      [string]$running.input_key -ne [string]$Fingerprint.input_key -or
+      [string]$running.fingerprint_sha256 -ne [string]$Fingerprint.fingerprint_sha256) {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
   if ($null -ne $Context -and -not (Test-MIRAssuranceTrustedProducer -Producer $running.producer -Context $Context)) {
     Remove-Item -LiteralPath $paths.running -Force
     return $null
   }
   try { $expires = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.expires_at }
-  catch { return $null }
+  catch {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
   if ($expires -le [DateTimeOffset]::UtcNow) {
     Remove-Item -LiteralPath $paths.running -Force
     return $null
   }
-  if ([string]$running.producer.workflow -eq "local" -and [int]$running.process_id -gt 0) {
-    $process = Get-Process -Id ([int]$running.process_id) -ErrorAction SilentlyContinue
-    $startedAtValid = $true
-    try { $startedAt = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.started_at }
-    catch {
-      $startedAt = [DateTimeOffset]::MinValue
-      $startedAtValid = $false
+
+  $hostIdentity = [string]$running.host_identity
+  if ([string]::IsNullOrWhiteSpace($hostIdentity)) {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
+  switch ([string]$running.lease_scope) {
+    "process" {
+      if ($hostIdentity -ne (Get-MIRAssuranceHostIdentity) -or [int]$running.process_id -le 0) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      try { $expectedProcessStart = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.process_started_at }
+      catch {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $process = Get-Process -Id ([int]$running.process_id) -ErrorAction SilentlyContinue
+      if ($null -eq $process) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $actualProcessStart = [DateTimeOffset]$process.StartTime.ToUniversalTime()
+      if ($actualProcessStart.UtcTicks -ne $expectedProcessStart.UtcTicks) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
     }
-    $processIsOwner = [int]$running.process_id -eq $PID -or (
-      $null -ne $process -and (
-        -not $startedAtValid -or $process.StartTime.ToUniversalTime() -le $startedAt.UtcDateTime.AddSeconds(5)
-      )
-    )
-    if (-not $processIsOwner) {
+    "ci-job" {
+      $runId = [string]$running.workflow_run_id
+      $runAttempt = [string]$running.workflow_run_attempt
+      $job = [string]$running.workflow_job
+      if ([string]::IsNullOrWhiteSpace($runId) -or
+          [string]::IsNullOrWhiteSpace($runAttempt) -or
+          [string]::IsNullOrWhiteSpace($job) -or
+          $runId -ne [string]$running.producer.run_id -or
+          $runAttempt -ne [string]$running.producer.run_attempt -or
+          $job -ne [string]$running.producer.job) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $currentProducer = Get-MIRAssuranceProducer
+      $sameJob = $runId -eq [string]$currentProducer.run_id -and
+        $runAttempt -eq [string]$currentProducer.run_attempt -and
+        $job -eq [string]$currentProducer.job
+      if ($sameJob -and $hostIdentity -ne (Get-MIRAssuranceHostIdentity)) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+    }
+    default {
       Remove-Item -LiteralPath $paths.running -Force
       return $null
     }
@@ -561,16 +628,24 @@ function Write-MIRAssuranceRunningEvidence {
   New-Item -ItemType Directory -Force -Path $paths.root | Out-Null
   $ttl = [int]$Context.verification_profile.running_evidence_ttl_minutes
   if ($ttl -le 0) { $ttl = 360 }
+  $producer = Get-MIRAssuranceProducer
+  $leaseScope = if ($env:GITHUB_ACTIONS) { "ci-job" } else { "process" }
   $running = [ordered]@{
-    schema=1
+    schema=2
     test_id=[string]$Fingerprint.test_id
     input_key=[string]$Fingerprint.input_key
     fingerprint_sha256=[string]$Fingerprint.fingerprint_sha256
     target=[string]$Fingerprint.target
-    producer=(Get-MIRAssuranceProducer)
+    producer=$producer
+    lease_scope=$leaseScope
+    host_identity=(Get-MIRAssuranceHostIdentity)
+    process_id=$PID
+    process_started_at=(Get-MIRAssuranceProcessStartedAt)
+    workflow_run_id=[string]$producer.run_id
+    workflow_run_attempt=[string]$producer.run_attempt
+    workflow_job=[string]$producer.job
     started_at=[DateTimeOffset]::UtcNow.ToString("o")
     expires_at=[DateTimeOffset]::UtcNow.AddMinutes($ttl).ToString("o")
-    process_id=$PID
   }
   Write-MIRAssuranceAtomicJson -Value $running -Path $paths.running
   return $running

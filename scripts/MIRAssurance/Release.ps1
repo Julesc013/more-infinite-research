@@ -430,31 +430,143 @@ function Invoke-MIRAssuranceSelfTest {
   }
   Remove-Item -LiteralPath $resolvedSelfTestRoot -Recurse -Force
 
-  $runningKey = Get-MIRAssuranceTextHash -Text ([guid]::NewGuid().ToString("N"))
-  $runningFingerprint = [ordered]@{
-    schema=$evidenceSchema
-    test_id="self-test.running"
-    target=[string]$Context.target
-    input_key=$runningKey
-    fingerprint_sha256=$runningKey
-    definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition")
-  }
-  $running = Write-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context
-  if ($null -eq (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
-    throw "Matching live worker evidence was not adoptable."
-  }
-  $running.process_id = [int]::MaxValue
-  $runningPaths = Get-MIRAssuranceEvidencePaths -TestId $runningFingerprint.test_id -InputKey $runningFingerprint.input_key
-  [IO.File]::WriteAllText($runningPaths.running, (($running | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
-  if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
-    throw "Dead local worker evidence was incorrectly adoptable."
-  }
-  if (Test-Path -LiteralPath $runningPaths.root) {
-    $resolvedRunningRoot = [IO.Path]::GetFullPath($runningPaths.root)
-    if (-not $resolvedRunningRoot.StartsWith($resolvedEvidenceRoot, [StringComparison]::OrdinalIgnoreCase)) {
-      throw "Refusing to remove running self-test evidence outside the evidence root."
+  $newRunningCase = {
+    param([Parameter(Mandatory)][string]$Label)
+    $key = Get-MIRAssuranceTextHash -Text "$Label-$([guid]::NewGuid().ToString('N'))"
+    $caseFingerprint = [ordered]@{
+      schema=$evidenceSchema
+      test_id="self-test.running.$Label"
+      target=[string]$Context.target
+      input_key=$key
+      fingerprint_sha256=$key
+      definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition-$Label")
     }
-    Remove-Item -LiteralPath $resolvedRunningRoot -Recurse -Force
+    $marker = Write-MIRAssuranceRunningEvidence -Fingerprint $caseFingerprint -Context $Context
+    return [pscustomobject]@{
+      fingerprint=$caseFingerprint
+      marker=$marker
+      paths=(Get-MIRAssuranceEvidencePaths -TestId $caseFingerprint.test_id -InputKey $caseFingerprint.input_key)
+    }
+  }
+  $writeRunningCase = {
+    param([Parameter(Mandatory)]$Case)
+    Write-MIRAssuranceAtomicJson -Value $Case.marker -Path $Case.paths.running
+  }
+  $assertRemovedAndRun = {
+    param([Parameter(Mandatory)]$Case, [Parameter(Mandatory)][string]$Message)
+    $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $Case.fingerprint -Context $Context -TestId $Case.fingerprint.test_id
+    if ($decision.disposition -ne "RUN" -or (Test-Path -LiteralPath $Case.paths.running -PathType Leaf)) {
+      throw $Message
+    }
+  }
+
+  # 1. A same-host process lease waits while the exact process incarnation is alive.
+  $liveProcess = & $newRunningCase "live-process"
+  $liveProcess.marker.lease_scope = "process"
+  $liveProcess.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $liveProcess.marker.process_id = $PID
+  $liveProcess.marker.process_started_at = Get-MIRAssuranceProcessStartedAt
+  & $writeRunningCase $liveProcess
+  $liveDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $liveProcess.fingerprint -Context $Context -TestId $liveProcess.fingerprint.test_id
+  if ($liveDecision.disposition -ne "WAIT") { throw "Same-host live process evidence was not adoptable." }
+
+  # 2. A missing process invalidates its same-host lease.
+  $deadProcess = & $newRunningCase "dead-process"
+  $deadProcess.marker.lease_scope = "process"
+  $deadProcess.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $deadProcess.marker.process_id = [int]::MaxValue
+  & $writeRunningCase $deadProcess
+  & $assertRemovedAndRun $deadProcess "Dead same-host process evidence was incorrectly adoptable."
+
+  # 3. A reused PID cannot adopt a lease created by a different process incarnation.
+  $reusedPid = & $newRunningCase "reused-pid"
+  $reusedPid.marker.lease_scope = "process"
+  $reusedPid.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $reusedPid.marker.process_id = $PID
+  $reusedPid.marker.process_started_at = [DateTimeOffset]::UtcNow.AddDays(-1).ToString("o")
+  & $writeRunningCase $reusedPid
+  & $assertRemovedAndRun $reusedPid "A reused PID with a different process start time was incorrectly adoptable."
+
+  # 4. A trusted, unexpired marker from another CI job is adopted without inspecting its remote PID.
+  $remoteJob = & $newRunningCase "remote-job"
+  $remoteRunId = "remote-$([guid]::NewGuid().ToString('N'))"
+  $remoteJob.marker.lease_scope = "ci-job"
+  $remoteJob.marker.host_identity = "remote-host-$([guid]::NewGuid().ToString('N'))"
+  $remoteJob.marker.process_id = [int]::MaxValue
+  $remoteJob.marker.workflow_run_id = $remoteRunId
+  $remoteJob.marker.workflow_run_attempt = "1"
+  $remoteJob.marker.workflow_job = "remote-worker"
+  $remoteJob.marker.producer.run_id = $remoteRunId
+  $remoteJob.marker.producer.run_attempt = "1"
+  $remoteJob.marker.producer.job = "remote-worker"
+  & $writeRunningCase $remoteJob
+  $remoteDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $remoteJob.fingerprint -Context $Context -TestId $remoteJob.fingerprint.test_id
+  if ($remoteDecision.disposition -ne "WAIT") { throw "Trusted unexpired remote-job evidence was not adoptable." }
+
+  # 5. An expired remote-job marker is removed and scheduled again.
+  $expiredRemote = & $newRunningCase "expired-remote"
+  $expiredRunId = "remote-$([guid]::NewGuid().ToString('N'))"
+  $expiredRemote.marker.lease_scope = "ci-job"
+  $expiredRemote.marker.host_identity = "expired-remote-host"
+  $expiredRemote.marker.workflow_run_id = $expiredRunId
+  $expiredRemote.marker.workflow_run_attempt = "1"
+  $expiredRemote.marker.workflow_job = "expired-worker"
+  $expiredRemote.marker.producer.run_id = $expiredRunId
+  $expiredRemote.marker.producer.run_attempt = "1"
+  $expiredRemote.marker.producer.job = "expired-worker"
+  $expiredRemote.marker.expires_at = [DateTimeOffset]::UtcNow.AddMinutes(-1).ToString("o")
+  & $writeRunningCase $expiredRemote
+  & $assertRemovedAndRun $expiredRemote "Expired remote-job evidence was incorrectly adoptable."
+
+  # 6. A marker from another trust class is rejected even when its lease is unexpired.
+  $untrustedLease = & $newRunningCase "untrusted-producer"
+  $untrustedLease.marker.producer.trust_class = "different-trust-class"
+  & $writeRunningCase $untrustedLease
+  & $assertRemovedAndRun $untrustedLease "Running evidence from a different trust class was incorrectly adoptable."
+
+  # 7. An explicit rerun bypasses an otherwise valid marker.
+  $explicitRerun = & $newRunningCase "explicit-rerun"
+  $originalRerunTests = @($Context.rerun_tests)
+  try {
+    $Context.rerun_tests = @($explicitRerun.fingerprint.test_id)
+    $rerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $explicitRerun.fingerprint -Context $Context -TestId $explicitRerun.fingerprint.test_id
+    if ($rerunDecision.disposition -ne "RUN" -or $rerunDecision.reason -ne "explicit-rerun") {
+      throw "Explicit rerun did not bypass running evidence."
+    }
+  } finally {
+    $Context.rerun_tests = $originalRerunTests
+  }
+
+  # 8. Reuse-disabled execution bypasses an otherwise valid marker.
+  $reuseDisabled = & $newRunningCase "reuse-disabled"
+  $originalReuseEnabled = [bool]$Context.reuse_enabled
+  try {
+    $Context.reuse_enabled = $false
+    $noReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $reuseDisabled.fingerprint -Context $Context -TestId $reuseDisabled.fingerprint.test_id
+    if ($noReuseDecision.disposition -ne "RUN" -or $noReuseDecision.reason -ne "reuse-disabled") {
+      throw "Reuse-disabled execution did not bypass running evidence."
+    }
+  } finally {
+    $Context.reuse_enabled = $originalReuseEnabled
+  }
+
+  foreach ($runningCase in @(
+    $liveProcess,
+    $deadProcess,
+    $reusedPid,
+    $remoteJob,
+    $expiredRemote,
+    $untrustedLease,
+    $explicitRerun,
+    $reuseDisabled
+  )) {
+    if (Test-Path -LiteralPath $runningCase.paths.root) {
+      $resolvedRunningRoot = [IO.Path]::GetFullPath($runningCase.paths.root)
+      if (-not $resolvedRunningRoot.StartsWith($resolvedEvidenceRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to remove running self-test evidence outside the evidence root."
+      }
+      Remove-Item -LiteralPath $resolvedRunningRoot -Recurse -Force
+    }
   }
 
   $emptyPlanRejected = $false
@@ -482,5 +594,5 @@ function Invoke-MIRAssuranceSelfTest {
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
 
-  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, trust, freshness binding, blocking, and version-only reuse tests passed."
+  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
 }
