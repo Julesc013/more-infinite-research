@@ -109,99 +109,124 @@ docs:
       - compatibility-compiler-charter
   - path: docs/releases/3.2.0-technology-design-foundations-report.md
     title: "3.2.0 Technology Design Foundations Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-technology-design-hardening-report.md
     title: "3.2.0 Technology Design Hardening Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-approved-delta-report.md
     title: "3.2.0 Approved Delta Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.1.9-to-3.2.0-approved-delta
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: 1370ca88c06061714e2799ae93c425956b6be0fc
+    checkpoint_candidate_sha256: A856EA9A5E7B63396B6652C5FEBF47F1DF62D2607FF38D4AF8EF9C6E2C4AEF45
   - path: docs/releases/3.2.0-compiler-context-ownership-report.md
     title: "3.2.0 Compiler Context Ownership Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-compiler-context-ownership
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-base-continuation-design-report.md
     title: "3.2.0 Base Continuation Design Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-base-continuation-design
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-native-owner-patch-design-report.md
     title: "3.2.0 Native-Owner Patch Design Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-native-owner-patch-design
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-technology-lifecycle-report.md
     title: "3.2.0 Technology Lifecycle Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-technology-lifecycle-records
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-policy-operator-corpus-report.md
     title: "3.2.0 Policy, Operator, And Review Corpus Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-compatibility-policy-authority
-      - 3.2.0-family-operator-dsl
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: c87199cb8053ceaa838608c1df0849611ba01540
+    checkpoint_candidate_sha256: FDC6AFA183AC384A72D1B2C6A5E15E1816C57675D56B4988AE4384E230E1FB78
   - path: docs/releases/3.2.0-offline-rule-synthesis-report.md
     title: "3.2.0 Offline Rule Synthesis Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-offline-rule-synthesis
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-mod-interaction-campaign-report.md
     title: "3.2.0 Mod Interaction Campaign Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-mod-interaction-campaigns
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: not-recorded
+    checkpoint_candidate_sha256: not-recorded
   - path: docs/releases/3.2.0-scale-and-order-report.md
     title: "3.2.0 Scale And Order Invariance Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-scale-and-order-invariance
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: 3d4ee88f580fecf5bca9b962a22e42dc06ba0e63
+    checkpoint_candidate_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
   - path: docs/releases/3.2.0-ecosystem-qualification-report.md
     title: "3.2.0 Ecosystem Qualification Report"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for:
-      - 3.2.0-ecosystem-qualification
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    checkpoint_source_commit: 565e68398315762af653daf2ed6c1d40b93a4136
+    checkpoint_candidate_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
   - path: docs/releases/3.2.0-release-readiness-report.md
     title: "MIR 3.2.0 Release Readiness Report"
     status: current
@@ -210,6 +235,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.0-release-readiness
+  - path: docs/architecture/current-architecture-matrix.md
+    title: "Current MIR Compiler Architecture Matrix"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - current-compiler-architecture
+      - canonical-recipe-risk-and-provider-decisions
+      - technology-candidate-promotion-lifecycle
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

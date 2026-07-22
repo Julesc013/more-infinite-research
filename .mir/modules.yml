@@ -1,5 +1,7 @@
 schema: 1
 
+canonical_architecture_matrix: docs/architecture/current-architecture-matrix.md
+
 current_roots:
   factorio_shell:
     root_files:
@@ -123,6 +125,7 @@ modules:
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_facts.lua
+    - prototypes/mir/index/recipe_risk_facts.lua
     - prototypes/mir/index/relationships.lua
     - prototypes/mir/index/recipe_unlocks.lua
     - prototypes/mir/index/productivity_owners.lua
@@ -147,6 +150,7 @@ modules:
     - prototypes/mir/domain/technology/technology_candidate.lua
     - prototypes/mir/domain/technology/technology_design.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
+    - prototypes/mir/domain/technology/technology_quality_assessment.lua
     - prototypes/mir/domain/technology/technology_approval.lua
     - prototypes/mir/domain/technology/applicability_envelope.lua
     - prototypes/mir/domain/technology/technology_promotion.lua
@@ -422,6 +426,9 @@ rules:
   - Historical branches provide behavior evidence and do not define a parallel core.
   - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.9.
   - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
+  - ProviderDecision schema 3 is the canonical family-resolution decision; capability diagnostics adapt it without rediscovery.
+  - RecipeRiskFact is the sole recipe-risk authority consumed by family rules providers packs plans and diagnostics.
+  - Provider cardinality overflow is review-required and cannot silently reach emission.
   - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
   - Top-level MIR Lua module dependencies must remain acyclic.
   - Mutable state derived from prototypes settings active mods or a compilation pass is owned by CompilerContext schema 2.
@@ -432,7 +439,14 @@ compiler_context:
   schema: 2
   owns:
     - recipe-index
+    - recipe-risk-index
     - relationship-indexes
+    - mod-progression-cache
+    - technology-researchability-cache
+    - prerequisite-order-cache
+    - pack-production-reachability-cache
+    - recipe-unlock-science-cache
+    - lab-input-index
     - active-compatibility-packs
     - compatibility-policy-authority
     - family-resolution
@@ -443,6 +457,9 @@ compiler_context:
     - coverage-report
     - compiler-telemetry
     - diagnostics
+    - technology-candidate-catalog
+    - technology-qualifications
+    - technology-graph-parity
   immutable_process_catalogs:
     - prototypes/mir/providers/registry.lua
     - prototypes/mir/families/registry.lua
@@ -485,6 +502,13 @@ validation_tooling:
     sanitation_budgets: scripts/Test-MIRSanitationBudgets.ps1
     evidence_hygiene: scripts/Test-MIREvidenceHygiene.ps1
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
+    candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
+    technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
+    technology_quality_profiles: .mir/technology-quality-profiles.json
+    technology_quality_assessment: scripts/New-MIRTechnologyQualityAssessment.ps1
+    technology_review_dossier: scripts/New-MIRTechnologyReviewDossier.ps1
+    technology_promotion_admission: scripts/Test-MIRTechnologyPromotionAdmission.ps1
+    technology_lifecycle_gate: scripts/Test-MIRTechnologyLifecycle.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
     offline_rule_synthesis_gate: scripts/Test-MIRRuleSynthesis.ps1
     mod_interaction_graph: scripts/New-MIRModInteractionGraph.ps1

@@ -110,7 +110,9 @@ local commands = {
         context:artifact("input_sanitation_ledger"), ledger)
       context:record_artifact("output_sanitation_ledger", ledger)
       require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
-      require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()
+      local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
+        .assert_registered_technologies(require("prototypes.mir.planner.compilation_plan").compile(context))
+      context:record_artifact("technology_graph_parity", graph_parity)
     end
   },
   ["emit-compatibility-diagnostics"] = {

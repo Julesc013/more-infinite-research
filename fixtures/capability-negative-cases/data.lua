@@ -11,6 +11,16 @@ local function container_entity(name)
   return entity
 end
 
+local function machine_entity(name)
+  local base = data.raw["assembling-machine"] and data.raw["assembling-machine"]["assembling-machine-1"]
+  if not base then return nil end
+  local entity = table.deepcopy(base)
+  entity.name = name
+  entity.minable = {mining_time = 0.1, result = name}
+  entity.next_upgrade = nil
+  return entity
+end
+
 local function item(name, place_result)
   return {
     type = "item",
@@ -109,6 +119,52 @@ local prototypes = {
     {{type = "item", name = "mir-drill-like-container", amount = 1}}
   )
 }
+
+if not (data.raw["recipe-category"] and data.raw["recipe-category"].recycling) then
+  table.insert(prototypes, {type = "recipe-category", name = "recycling"})
+end
+
+local function add_placeable_risk(name, recipe_options, ingredients, results)
+  local entity = machine_entity(name)
+  if entity then table.insert(prototypes, entity) end
+  table.insert(prototypes, item(name, name))
+  table.insert(prototypes, recipe(
+    name,
+    ingredients or {{type = "item", name = "iron-plate", amount = 1}},
+    results or {{type = "item", name = name, amount = 1}},
+    recipe_options
+  ))
+end
+
+add_placeable_risk("mir-hidden-placeable-machine", {hidden = true})
+add_placeable_risk("mir-parameter-placeable-machine", {parameter = true})
+add_placeable_risk("mir-productivity-disabled-machine", {allow_productivity = false})
+add_placeable_risk("mir-zero-cap-placeable-machine", {maximum_productivity = 0})
+add_placeable_risk("mir-recycling-placeable-machine", {categories = {"recycling"}})
+add_placeable_risk(
+  "mir-self-return-placeable-machine",
+  {},
+  {{type = "item", name = "mir-self-return-placeable-machine", amount = 1}},
+  {{type = "item", name = "mir-self-return-placeable-machine", amount = 1}}
+)
+add_placeable_risk(
+  "mir-nondeterministic-placeable-machine",
+  {},
+  nil,
+  {{type = "item", name = "mir-nondeterministic-placeable-machine", amount = 1, probability = 0.5}}
+)
+add_placeable_risk(
+  "mir-ambiguous-placeable-machine",
+  {},
+  nil,
+  {
+    {type = "item", name = "mir-ambiguous-placeable-machine", amount = 1},
+    {type = "item", name = "mir-loop-waste", amount = 1}
+  }
+)
+add_placeable_risk("mir-voiding-placeable-machine", {})
+add_placeable_risk("mir-matter-transmutation-placeable-machine", {})
+add_placeable_risk("mir-recovery-placeable-machine", {})
 
 local loader_like = container_entity("mir-loader-like-container")
 if loader_like then table.insert(prototypes, loader_like) end

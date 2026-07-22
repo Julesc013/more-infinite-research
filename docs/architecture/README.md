@@ -5,13 +5,15 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
 # Architecture
 
 More Infinite Research is organized around a compatibility-first data-stage pipeline.
+
+Use the [current compiler architecture matrix](current-architecture-matrix.md) for the active fact, decision, lifecycle, graph, emission, and evidence authorities. Historical checkpoint reports do not override that matrix.
 
 ## Data Stage Flow
 

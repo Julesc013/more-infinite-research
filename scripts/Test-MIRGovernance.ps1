@@ -8,7 +8,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $docsRoot = Join-Path $repo "docs"
 $mirRoot = Join-Path $repo ".mir"
 
-$allowedStatuses = @("current", "draft", "deprecated", "archived")
+$allowedStatuses = @("current", "draft", "historical-checkpoint", "deprecated", "archived")
 $allowedDocTypes = @("tutorial", "how-to", "reference", "explanation", "adr", "release-plan", "archive")
 $allowedAudiences = @("player", "modpack-author", "maintainer", "developer", "release-manager")
 $forbiddenDocNames = @("notes.md", "misc.md", "old.md", "new.md", "ideas.md", "dump.md")
@@ -213,6 +213,14 @@ foreach ($docPath in $docFiles) {
     $supersededBy = Get-MIRFrontmatterString -Fields $frontmatter -Name "superseded_by" -RelativePath $docPath
     if ($supersededBy -eq "[]") {
       throw "$docPath is archived but superseded_by is empty."
+    }
+  }
+  if ($status -eq "historical-checkpoint") {
+    $supersededBy = Get-MIRFrontmatterString -Fields $frontmatter -Name "superseded_by" -RelativePath $docPath
+    $sourceCommit = Get-MIRFrontmatterString -Fields $frontmatter -Name "checkpoint_source_commit" -RelativePath $docPath
+    $candidateSha = Get-MIRFrontmatterString -Fields $frontmatter -Name "checkpoint_candidate_sha256" -RelativePath $docPath
+    if ($supersededBy -eq "[]" -or [string]::IsNullOrWhiteSpace($sourceCommit) -or [string]::IsNullOrWhiteSpace($candidateSha)) {
+      throw "$docPath historical checkpoint lacks replacement or source/candidate metadata."
     }
   }
 

@@ -28,6 +28,9 @@ local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pip
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local relationships = require("__more-infinite-research__.prototypes.mir.index.relationships")
+local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
+local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
+local science_packs = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -195,9 +198,23 @@ for index, provider in ipairs(providers.providers) do
   if provider.family_rule.provider_id ~= provider.id
     or provider.emission_adapter.mutates_prototypes ~= false
     or provider.runtime_handler.required ~= false
+    or type(provider.default_policy.cardinality) ~= "table"
   then
     fail("CompilerProvider contract metadata is incomplete: " .. provider.id)
   end
+end
+
+local cardinality_rows, cardinality = family_resolver.apply_cardinality_guard({
+  {final_state = "attach", decision = "attach", blocker = nil},
+  {final_state = "attach", decision = "attach", blocker = nil},
+  {final_state = "diagnose", decision = "diagnose", blocker = "recycling_loop"}
+}, {maximum_candidates = 2, maximum_attachments = 2, maximum_review_required = 2}, 3)
+if cardinality.status ~= "REVIEW_REQUIRED"
+  or cardinality_rows[1].decision ~= "review-required"
+  or cardinality_rows[2].decision ~= "review-required"
+  or cardinality_rows[3].decision ~= "diagnose"
+  or type(cardinality_rows[1].decision_fingerprint) ~= "string" then
+  fail("provider cardinality overflow did not stop expansion before emission while preserving hard rejection")
 end
 local reversed_providers = {schema = 1, providers = {}}
 for index = #providers.providers, 1, -1 do table.insert(reversed_providers.providers, providers.providers[index]) end
@@ -479,9 +496,13 @@ if candidate.candidate_id ~= normalized_design.candidate_id
   or candidate.semantic_identity.capability ~= "recipe-productivity"
   or qualification.decision ~= "qualified"
   or qualification.design_fingerprint ~= normalized_design.design_fingerprint
+  or lifecycle_catalog.schema ~= 2
+  or lifecycle_catalog.mutation_authority ~= false
   or #lifecycle_catalog.candidates ~= 1
-  or #lifecycle_catalog.candidates[1].alternatives ~= 1
-  or #lifecycle_catalog.qualifications ~= 1 then
+  or #lifecycle_catalog.candidates[1].alternatives ~= 2
+  or #lifecycle_catalog.qualifications ~= 2
+  or #lifecycle_catalog.alternative_qualifications ~= 2
+  or #lifecycle_catalog.current_selections ~= 1 then
   fail("technology candidate catalog and qualification records are inconsistent")
 end
 local approval_envelope = applicability_envelope.new({
@@ -961,6 +982,13 @@ local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
 
 local production_context = compiler_context.current()
+local production_graph_parity = production_context:artifact("technology_graph_parity")
+if not production_graph_parity or production_graph_parity.schema ~= 1
+  or production_graph_parity.valid ~= true
+  or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
+  or type(production_graph_parity.parity_fingerprint) ~= "string" then
+  fail("emitted and planned technology graphs do not have exact parity evidence")
+end
 local relationship_view = relationships.view("output")
 if relationship_view ~= relationships.view("output")
   or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
@@ -970,16 +998,26 @@ local recipe_view = recipe_facts.view("iron-plate")
 if recipe_view and recipe_view ~= recipe_facts.view("iron-plate") then
   fail("recipe fact view is not stable within one CompilerContext")
 end
+local risk_source = recipe_facts.index_view()
+local permuted_risk_source = {schema = risk_source.schema, facts = risk_source.facts, names = {}}
+for index = #risk_source.names, 1, -1 do table.insert(permuted_risk_source.names, risk_source.names[index]) end
+local canonical_risks = recipe_risk_facts.index_facts(risk_source, relationships.view("input"))
+local permuted_risks = recipe_risk_facts.index_facts(permuted_risk_source, relationships.view("input"))
+if canonical_risks.risk_index_fingerprint ~= permuted_risks.risk_index_fingerprint then
+  fail("RecipeRiskFact canonicalization depends on prototype insertion order")
+end
 local production_catalog = production_context:state_snapshot("technology_candidate_catalog")
 local production_qualifications = production_context:state_snapshot("technology_qualifications")
 local production_plan = production_context:state_snapshot("generation_plan")
 local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
 local public_plan = public_plan_prototype and public_plan_prototype.data
-if not production_catalog or not production_qualifications
+if not production_catalog or production_catalog.schema ~= 2 or production_catalog.mutation_authority ~= false
+  or not production_qualifications
   or not production_plan or not public_plan
   or #production_catalog.candidates == 0
   or #production_catalog.qualifications ~= #production_qualifications
-  or #production_catalog.qualifications ~= #production_plan.rows then
+  or #production_catalog.current_selections ~= #production_plan.rows
+  or #production_catalog.alternative_qualifications < #production_plan.rows then
   fail("CompilerContext does not own the technology candidate and qualification catalogs")
 end
 local public_rows = {}
@@ -1004,13 +1042,51 @@ for _, row in ipairs(production_plan.rows or {}) do
   end
 end
 if skipped_design_count == 0 then fail("compiler-contract fixture did not exercise skipped-row design deferral") end
+local canonical_decisions = {}
+for _, row in ipairs(family_resolver.snapshot().decisions or {}) do
+  if row.rule == "loader-manufacturing" or row.rule == "mining-drill-manufacturing" then
+    canonical_decisions[row.decision_fingerprint] = row
+  end
+end
+local projected_decisions = 0
+for _, row in ipairs((production_context:state_view("diagnostics") or {}).rows or {}) do
+  if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
+    projected_decisions = projected_decisions + 1
+    local canonical = canonical_decisions[row.decision_fingerprint]
+    if not canonical or row.planner_decision_fingerprint ~= canonical.decision_fingerprint
+      or row.risk_fingerprint ~= canonical.risk_fingerprint then
+      fail("capability diagnostics did not project the exact planner decision and risk fingerprints")
+    end
+  end
+end
+local canonical_decision_count = 0
+for _ in pairs(canonical_decisions) do canonical_decision_count = canonical_decision_count + 1 end
+if projected_decisions ~= canonical_decision_count then
+  fail("capability diagnostics omitted or duplicated canonical provider decisions")
+end
 local first_context = compiler_context.new()
 first_context:set_state("fixture-derived-state", {value = 1})
 first_context:record_artifact("fixture-artifact", {value = 2})
+science_packs.all_lab_inputs()
+science_packs.pack_production_status("automation-science-pack")
+science_packs.technology_is_enabled_and_reachable("automation")
+science_packs.mod_progression_packs_for({"automation-science-pack"})
+for _, key in ipairs({
+  "lab_input_index", "science_pack_recipe_status", "science_pack_production",
+  "technology_researchability", "prerequisite_order_cache", "mod_progression_cache"
+}) do
+  if not first_context:has_state(key) then fail("science/progression cache was not context-owned: " .. key) end
+end
 local second_context = compiler_context.new()
 if second_context:has_state("fixture-derived-state")
   or second_context:artifact("fixture-artifact") ~= nil then
   fail("CompilerContext instances leaked derived state or artifacts")
+end
+for _, key in ipairs({
+  "lab_input_index", "science_pack_recipe_status", "science_pack_production",
+  "technology_researchability", "prerequisite_order_cache", "mod_progression_cache"
+}) do
+  if second_context:has_state(key) then fail("science/progression cache crossed CompilerContext boundary: " .. key) end
 end
 compiler_context.activate(first_context)
 local first_snapshot = first_context:snapshot()

@@ -580,6 +580,18 @@ fixtures:
       - mining-drill-recipe-candidates
       - native-mining-owner-observation
 
+  capability-negative-cases:
+    requires_features: [recipe_productivity]
+    path: fixtures/capability-negative-cases
+    assertion_path: fixtures/assert-capability-negative-cases
+    validates:
+      - canonical-recipe-risk-hard-flags
+      - canonical-recipe-risk-review-flags
+      - plausible-placeable-output-negative-cases
+      - hard-risk-cannot-be-overridden
+      - review-risk-requires-exact-pack-or-review
+      - planner-risk-fingerprint-parity
+
   omega-drill:
     requires_features: [recipe_productivity]
     path: fixtures/omega-drill
@@ -713,6 +725,16 @@ fixtures:
       - registered-family-generation-remains-extensible
       - data-only-compiler-provider-contract
       - stable-provider-order-and-fingerprint
+      - canonical-recipe-risk-permutation-invariance
+      - provider-cardinality-overflow-review-required
+      - hard-risk-preserved-during-cardinality-overflow
+      - provider-diagnostic-planner-decision-fingerprint-parity
+      - no-duplicate-loader-or-mining-discovery
+      - technology-catalog-schema-2-preselection
+      - every-catalog-alternative-independently-qualified
+      - rejected-catalog-alternative-cannot-be-selected
+      - emitted-planned-technology-graph-parity
+      - science-and-progression-cache-context-isolation
       - duplicate-provider-id-rejection
       - provider-snapshot-copy-isolation
       - compiler-context-state-and-artifact-isolation

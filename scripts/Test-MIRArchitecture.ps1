@@ -424,7 +424,8 @@ foreach ($needle in @(
   '.sanitize_all_technology_effects({pass = "input"})',
   '.sanitize_all_technology_effects({pass = "output"})',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
-  'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
+  '.assert_registered_technologies(require("prototypes.mir.planner.compilation_plan").compile(context))',
+  'context:record_artifact("technology_graph_parity", graph_parity)',
   'require("prototypes.mir.planner.compilation_plan").publish(context)',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {

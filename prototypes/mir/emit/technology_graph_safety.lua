@@ -1,6 +1,8 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 
@@ -110,18 +112,19 @@ local function new_inspection_state(options)
   return {
     technology_lookup = options.technology_lookup or data_raw.technology,
     is_generated = options.is_generated or generated_registry.contains,
-    complete = {},
-    external_cycle_keys = {},
-    external_cycles = {}
+    complete = {}
   }
 end
 
 function M.inspect_reachable(root_name, options)
   local state = new_inspection_state(options)
   inspect_root(root_name, state)
+  local checked = 0
+  for _ in pairs(state.complete) do checked = checked + 1 end
   return {
-    external_cycle_count = #state.external_cycles,
-    external_cycles = state.external_cycles
+    valid = true,
+    root = root_name,
+    checked_node_count = checked
   }
 end
 
@@ -143,9 +146,22 @@ local function assert_science_reachable(name, technology)
   end
 end
 
-function M.assert_registered_technologies()
+local function planned_technologies(plan)
+  local out = {}
+  for _, operation in ipairs((plan and plan.operations) or {}) do
+    if operation.operation == "emit_stream" or operation.operation == "emit_base_extension" then
+      out[operation.technology_name] = operation
+    end
+  end
+  return out
+end
+
+function M.assert_registered_technologies(plan)
   local state = new_inspection_state()
-  for _, name in ipairs(generated_registry.sorted_names()) do
+  local registered = generated_registry.sorted_names()
+  local planned = planned_technologies(plan)
+  local parity = {}
+  for _, name in ipairs(registered) do
     local technology = data_raw.technology(name)
     if not technology then
       error("MIR registered generated technology is missing: " .. name .. ".", 2)
@@ -156,12 +172,50 @@ function M.assert_registered_technologies()
 
     inspect_root(name, state)
     assert_science_reachable(name, technology)
+    if plan then
+      local operation = planned[name]
+      if not operation then error("MIR emitted technology is absent from CompilationPlan: " .. name .. ".", 2) end
+      local expected = sorted_prerequisites(operation.technology)
+      local actual = sorted_prerequisites(technology)
+      if fingerprint.of(expected) ~= fingerprint.of(actual) then
+        error("MIR emitted technology prerequisites differ from CompilationPlan: " .. name .. ".", 2)
+      end
+      local proof = plan.validation_summary and plan.validation_summary.technology_graph
+        and plan.validation_summary.technology_graph.proofs[name]
+      if not proof or proof.status ~= "passed" then
+        error("MIR emitted technology lacks an accepted planner graph proof: " .. name .. ".", 2)
+      end
+      table.insert(parity, {
+        technology_name = name,
+        prerequisites = actual,
+        prerequisite_fingerprint = fingerprint.of(actual),
+        enabled = technology.enabled ~= false,
+        science_lab_status = "reachable",
+        scc_class = "acyclic",
+        planner_proof = "passed"
+      })
+    end
   end
-
-  return {
-    external_cycle_count = #state.external_cycles,
-    external_cycles = state.external_cycles
+  if plan then
+    local registered_set = {}
+    for _, name in ipairs(registered) do registered_set[name] = true end
+    for name in pairs(planned) do
+      if not registered_set[name] then error("CompilationPlan accepted technology was not emitted: " .. name .. ".", 2) end
+    end
+  end
+  local checked = 0
+  for _ in pairs(state.complete) do checked = checked + 1 end
+  local result = {
+    schema = 1,
+    valid = true,
+    registered_technology_count = #registered,
+    planned_technology_count = (function() local count = 0; for _ in pairs(planned) do count = count + 1 end; return count end)(),
+    checked_node_count = checked,
+    technologies = parity
   }
+  result.parity_fingerprint = fingerprint.of(result)
+  telemetry.count("technology_graph_parity_rows", #parity)
+  return result
 end
 
 return M
