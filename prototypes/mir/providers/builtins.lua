@@ -14,6 +14,12 @@ local COMMON_DENY_RISKS = {
   "voiding_or_destruction", "matter_or_transmutation", "hidden_internal"
 }
 
+local COMMON_CARDINALITY = {
+  maximum_candidates = 256,
+  maximum_attachments = 128,
+  maximum_review_required = 64
+}
+
 local function structural_rule(provider_id, row)
   row.schema = 2
   row.provider_id = provider_id
@@ -26,6 +32,7 @@ local function structural_rule(provider_id, row)
   row.prerequisites = {strategy = "inherit-target-stream"}
   row.targets = {requires_features = {"recipe_productivity"}}
   row.default_action = "attach-existing"
+  row.cardinality = COMMON_CARDINALITY
   row.support_claim = {level = "structural-attachment", public = false}
   local discovery_selector
   if row.selector.output_item.place_result_entity_types then
@@ -91,7 +98,11 @@ local function provider(id, family, rule)
     family = family,
     normalization = {kind = "canonical-recipe-item-entity", version = 1},
     semantic_signature = {kind = "prototype-structure", version = 1},
-    default_policy = {action = "attach-existing", fail_closed = true},
+    default_policy = {
+      action = "attach-existing",
+      fail_closed = true,
+      cardinality = COMMON_CARDINALITY
+    },
     setting_descriptors = {
       "mir-automatic-productivity-action", "mir-automatic-create-research", "mir-automatic-require-reviewed-data"
     },

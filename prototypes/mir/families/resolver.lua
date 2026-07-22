@@ -7,11 +7,20 @@ local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local competing_productivity = require("prototypes.mir.policy.competing_productivity")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local operator_dsl = require("prototypes.mir.families.operator_dsl")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 
 local HARD_BLOCKERS = {
   recipe_fact_missing = true,
+  recycling_loop = true,
+  hidden_internal = true,
+  productivity_disabled = true,
+  catalyst_or_self_return = true,
+  non_deterministic_output = true,
+  ambiguous_placeable_output = true,
   recipe_productivity_not_allowed = true,
   variant_productivity_not_allowed = true,
   zero_productivity_cap = true,
@@ -23,6 +32,64 @@ local HARD_BLOCKERS = {
   non_deterministic_placeable_output = true,
   existing_recipe_productivity_owner = true
 }
+
+local function decision_fingerprint(row)
+  local material = {}
+  for field, value in pairs(row) do
+    if field ~= "decision_fingerprint" then material[field] = value end
+  end
+  return fingerprint.of(material)
+end
+
+local function count_state(rows, state)
+  local count = 0
+  for _, row in ipairs(rows or {}) do if row.final_state == state then count = count + 1 end end
+  return count
+end
+
+local function apply_cardinality_guard(rows, limits, candidate_count)
+  limits = limits or {}
+  local attached = count_state(rows, "attach")
+  local review_required = count_state(rows, "review-required")
+  local reasons = {}
+  if candidate_count > (limits.maximum_candidates or math.huge) then
+    table.insert(reasons, "provider_candidate_cardinality_exceeded")
+  end
+  if attached > (limits.maximum_attachments or math.huge) then
+    table.insert(reasons, "provider_attachment_cardinality_exceeded")
+  end
+  if review_required > (limits.maximum_review_required or math.huge) then
+    table.insert(reasons, "provider_review_cardinality_exceeded")
+  end
+  local status = #reasons > 0 and "REVIEW_REQUIRED" or "PASS"
+  local cardinality = {
+    candidate_count = candidate_count,
+    attachment_count = attached,
+    review_required_count = review_required,
+    limits = deepcopy(limits),
+    status = status,
+    reasons = reasons
+  }
+  cardinality.cardinality_fingerprint = fingerprint.of(cardinality)
+  if status == "REVIEW_REQUIRED" then
+    for _, row in ipairs(rows) do
+      if row.final_state ~= "diagnose" or not HARD_BLOCKERS[row.blocker] then
+        row.final_state = "review-required"
+        row.decision = "review-required"
+        row.blocker = reasons[1]
+        row.risk_disposition = "REVIEW_REQUIRED"
+      end
+      row.cardinality = deepcopy(cardinality)
+      row.decision_fingerprint = decision_fingerprint(row)
+    end
+  else
+    for _, row in ipairs(rows) do
+      row.cardinality = deepcopy(cardinality)
+      row.decision_fingerprint = decision_fingerprint(row)
+    end
+  end
+  return cardinality
+end
 
 local function infer_seed_item(seed, fact)
   if seed.item then return seed.item end
@@ -83,7 +150,8 @@ local function build()
   local indexes = relationships.view()
   local rules = rule_registry.snapshot().rules
   local seeds = policy_authority.candidate_seeds()
-  local attachments, decisions, ownership = {}, {}, {}
+  local attachments, decisions, ownership, provider_cardinality = {}, {}, {}, {}
+  telemetry.start_phase("provider_discovery")
 
   for _, seed in ipairs(seeds) do
     local matched = false
@@ -97,10 +165,16 @@ local function build()
 
   for _, rule in ipairs(rules) do
     local target_stream = operator_dsl.grouping_stream(rule.operators)
-    for _, candidate in ipairs(candidates_for_rule(rule, indexes, seeds)) do
+    local candidates = candidates_for_rule(rule, indexes, seeds)
+    local rule_decisions = {}
+    telemetry.count("provider_candidates", #candidates)
+    for _, candidate in ipairs(candidates) do
         local item_name, recipe_name = candidate.item, candidate.recipe
         local fact = recipe_facts.view(recipe_name)
-        local eligible, blocker = operator_dsl.eligibility(rule.operators, fact, item_name)
+        local risk_fact = recipe_risk_facts.view(recipe_name)
+        local risk_disposition, risk_blocker = recipe_risk_facts.primary_disposition(risk_fact)
+        local eligible, blocker = operator_dsl.eligibility(rule.operators, fact, item_name, risk_fact)
+        if risk_disposition ~= "PASS" then blocker = risk_blocker; eligible = false end
         local pack_decision = policy_authority.resolve_candidate({
           recipe = recipe_name,
           item = item_name,
@@ -108,11 +182,14 @@ local function build()
           stream = target_stream,
           blocker = blocker
         })
-        if pack_decision.action == "attach" and (blocker == nil or policy_authority.blocker_is_reviewable(blocker)) then
+        if pack_decision.action == "attach" and risk_disposition ~= "HARD_REJECTED"
+          and (blocker == nil or policy_authority.blocker_is_reviewable(blocker)) then
           eligible, blocker = true, nil
+          if risk_disposition == "REVIEW_REQUIRED" then risk_disposition = "EXACT_REVIEWED" end
         elseif pack_decision.action == "diagnose" then
           eligible, blocker = false, pack_decision.reason or blocker
         end
+        if risk_disposition == "HARD_REJECTED" then eligible, blocker = false, risk_blocker end
         if blocker and HARD_BLOCKERS[blocker] then eligible = false end
         local external_owners = productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
           ignore_owner = competing_productivity.ignores_existing_owner,
@@ -124,9 +201,11 @@ local function build()
         if tonumber(pack_decision.change) then change = tonumber(pack_decision.change) end
 
         local decision = operator_dsl.grouping_action(rule.operators)
-        if not eligible then decision = "diagnose" end
-        table.insert(decisions, {
-          schema = 2,
+        if not eligible then
+          decision = risk_disposition == "REVIEW_REQUIRED" and "review-required" or "diagnose"
+        end
+        local decision_row = {
+          schema = 3,
           provider_id = rule.provider_id,
           rule = rule.id,
           source_key = "recipe:" .. recipe_name,
@@ -149,9 +228,23 @@ local function build()
           candidate_source = candidate.source,
           compatibility_pack = candidate.pack or pack_decision.pack,
           evidence = candidate.evidence or pack_decision.evidence
-        })
+        }
+        decision_row.risk_fingerprint = risk_fact and risk_fact.risk_fingerprint or "missing"
+        decision_row.risk_hard_flags = deepcopy((risk_fact and risk_fact.hard_flags) or {"recipe_fact_missing"})
+        decision_row.risk_review_flags = deepcopy((risk_fact and risk_fact.review_flags) or {})
+        decision_row.risk_disposition = risk_disposition
+        table.insert(rule_decisions, decision_row)
+    end
 
-        if eligible and decision == "attach" then
+    local cardinality = apply_cardinality_guard(rule_decisions, rule.cardinality, #candidates)
+    provider_cardinality[rule.provider_id] = cardinality
+    if cardinality.status == "REVIEW_REQUIRED" then telemetry.count("provider_cardinality_review_required", 1) end
+    for _, decision_row in ipairs(rule_decisions) do
+        table.insert(decisions, decision_row)
+        if decision_row.final_state == "review-required" then telemetry.count("provider_review_required", 1) end
+        if decision_row.final_state == "attach" then
+          local recipe_name = decision_row.recipe
+          local target_stream = decision_row.target_stream
           local previous = ownership[recipe_name]
           if previous and previous ~= target_stream then
             error("FamilyRule attachment is ambiguous for recipe " .. recipe_name, 2)
@@ -160,9 +253,11 @@ local function build()
           attachments[target_stream] = attachments[target_stream] or {}
           table.insert(attachments[target_stream], {
             recipe = recipe_name,
-            change = change,
+            change = decision_row.change,
             rule = rule.id,
-            provider_id = rule.provider_id
+            provider_id = rule.provider_id,
+            risk_fingerprint = decision_row.risk_fingerprint,
+            decision_fingerprint = decision_row.decision_fingerprint
           })
         end
     end
@@ -176,9 +271,22 @@ local function build()
   end
   table.sort(decisions, function(a, b)
     if a.rule ~= b.rule then return a.rule < b.rule end
-    return a.recipe < b.recipe
+    if a.recipe ~= b.recipe then return a.recipe < b.recipe end
+    return tostring(a.item) < tostring(b.item)
   end)
-  canonical = {schema = 2, attachments = attachments, decisions = decisions}
+  telemetry.count("family_members", (function()
+    local count = 0
+    for _, rows in pairs(attachments) do count = count + #rows end
+    return count
+  end)())
+  telemetry.finish_phase("provider_discovery")
+  canonical = {
+    schema = 3,
+    attachments = attachments,
+    decisions = decisions,
+    provider_cardinality = provider_cardinality,
+    decision_set_fingerprint = fingerprint.of(decisions)
+  }
   return context:set_state("family_resolution", canonical)
 end
 
@@ -209,6 +317,40 @@ function M.family_ids_for_stream(stream_key)
   end
   table.sort(ids)
   return ids
+end
+
+function M.decisions_for_stream(stream_key)
+  local out = {}
+  for _, decision in ipairs(build().decisions or {}) do
+    if decision.target_stream == stream_key then table.insert(out, deepcopy(decision)) end
+  end
+  return out
+end
+
+function M.decision_fingerprints_for_stream(stream_key)
+  local out = {}
+  for _, decision in ipairs(build().decisions or {}) do
+    if decision.target_stream == stream_key then table.insert(out, decision.decision_fingerprint) end
+  end
+  table.sort(out)
+  return out
+end
+
+function M.risk_fingerprints_for_stream(stream_key)
+  local seen, out = {}, {}
+  for _, decision in ipairs(build().decisions or {}) do
+    if decision.target_stream == stream_key and not seen[decision.risk_fingerprint] then
+      seen[decision.risk_fingerprint] = true
+      table.insert(out, decision.risk_fingerprint)
+    end
+  end
+  table.sort(out)
+  return out
+end
+
+function M.apply_cardinality_guard(rows, limits, candidate_count)
+  local copy = deepcopy(rows or {})
+  return copy, apply_cardinality_guard(copy, limits or {}, candidate_count or #copy)
 end
 
 function M.snapshot()

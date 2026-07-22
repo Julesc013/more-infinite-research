@@ -3,8 +3,7 @@ local contract = require("prototypes.mir.capabilities.contract")
 local fact_registry = require("prototypes.mir.index.registry_builder")
 local policies = require("prototypes.mir.policy.capabilities")
 local schema = require("prototypes.mir.core.schema")
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local relationships = require("prototypes.mir.index.relationships")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local family_resolver = require("prototypes.mir.families.resolver")
 
 local C = {}
@@ -53,6 +52,11 @@ local RESOLVERS = {
   }
 }
 
+local CANONICAL_RULES = {
+  ["logistics-loader-manufacturing"] = { ["loader-manufacturing"] = true },
+  ["mining-drill-manufacturing"] = { ["mining-drill-manufacturing"] = true }
+}
+
 local function sorted_keys(tbl)
   return fact_registry.sorted_keys(tbl or {})
 end
@@ -78,165 +82,61 @@ local function format_bool(value)
   return "false"
 end
 
-local function entity_prototype(name)
-  if not name then return nil, nil end
-  local entity_type = relationships.entity_type(name)
-  return entity_type and data_raw.prototype(entity_type, name) or nil, entity_type
-end
-
-local function recipe_outputs_by_item(registry)
-  if registry.indexes and registry.indexes.recipes_by_output then
-    return registry.indexes.recipes_by_output
-  end
-  local by_item = {}
-  for _, recipe_name in ipairs(sorted_keys(registry.recipes)) do
-    local recipe = registry.recipes[recipe_name]
-    for _, result in ipairs(recipe.results or {}) do
-      by_item[result.name] = by_item[result.name] or {}
-      table.insert(by_item[result.name], recipe_name)
-    end
-  end
-  return by_item
-end
-
-local function recipe_owner_maps(registry)
-  local mir = {}
-  local external = {}
-
-  for _, owner in ipairs(registry.owners or {}) do
-    if owner.subject_type == "recipe" and owner.subject then
-      local target = owner.mod_owner == "more-infinite-research" and mir or external
-      target[owner.subject] = target[owner.subject] or {}
-      table.insert(target[owner.subject], owner.technology)
-    end
-  end
-
-  return mir, external
-end
-
-local function entity_backed_candidates(registry, wanted_entity_types)
-  local recipes_by_item = recipe_outputs_by_item(registry)
-  local indexes = registry.indexes or relationships.view()
-  local candidates = {}
-  local seen = {}
-
-  for _, item_name in ipairs(sorted_keys(indexes.items)) do
-    local item = indexes.items[item_name]
-    local item_type = item.prototype_type
-    local place_result = item.place_result
-    if place_result then
-      local _, entity_type = entity_prototype(place_result)
-      if entity_type and wanted_entity_types[entity_type] then
-        for _, recipe_name in ipairs(recipes_by_item[item_name] or {}) do
-          local key = recipe_name .. "|" .. item_name
-          if not seen[key] then
-            seen[key] = true
-            table.insert(candidates, {
-              item = item_name,
-              item_type = item_type,
-              recipe = recipe_name,
-              recipe_fact = registry.recipes[recipe_name],
-              entity = place_result,
-              entity_type = entity_type
-            })
-          end
-        end
-      end
-    end
-  end
-
-  table.sort(candidates, function(a, b)
-    if a.recipe ~= b.recipe then return a.recipe < b.recipe end
-    return a.item < b.item
-  end)
-
-  return candidates
-end
-
-local function ownership_decision(recipe_name, mir_owners, external_owners)
-  if mir_owners[recipe_name] and #mir_owners[recipe_name] > 0 then
-    return "generate_stream", true, "", mir_owners[recipe_name]
-  end
-  if external_owners[recipe_name] and #external_owners[recipe_name] > 0 then
-    return "diagnose_only", false, join_names(external_owners[recipe_name]), external_owners[recipe_name]
-  end
-  return "propose_stream", false, "no_existing_recipe_productivity_owner", {}
-end
-
-local function evidence_for(candidate)
-  return table.concat({
-    "item_type:" .. tostring(candidate.item_type),
-    "item_place_result:" .. tostring(candidate.entity),
-    "entity_type:" .. tostring(candidate.entity_type),
-    "recipe_outputs_item:" .. tostring(candidate.item)
-  }, ",")
-end
-
-local function emit_recipe_capability_decisions(registry, resolver, wanted_entity_types, classified_candidates)
-  local mir_owners, external_owners = recipe_owner_maps(registry)
+local function emit_recipe_capability_decisions(registry, resolver, classified_candidates)
   local generated = 0
   local proposed = 0
   local diagnosed = 0
-  local candidates = classified_candidates or entity_backed_candidates(registry, wanted_entity_types)
+  local candidates = classified_candidates or {}
 
   for _, candidate in ipairs(candidates) do
-    local recipe = candidate.recipe_fact or {}
-    local decision, emitted, blockers, owners
-    if candidate.decision then
-      decision = candidate.decision
-      emitted = candidate.emitted
-      blockers = candidate.blockers
-      owners = candidate.owners
-    else
-      decision, emitted, blockers, owners = ownership_decision(candidate.recipe, mir_owners, external_owners)
-    end
-    if emitted then
-      generated = generated + 1
-    elseif decision == "propose_stream" then
-      proposed = proposed + 1
-    else
-      diagnosed = diagnosed + 1
-    end
-
-    D.decision({
-      key = candidate.recipe,
+      local row = candidate.provider_decision
+      local emitted = row.decision == "attach"
+      if emitted then generated = generated + 1
+      elseif row.decision == "propose" then proposed = proposed + 1
+      else diagnosed = diagnosed + 1 end
+      D.decision({
+        key = row.recipe,
+        status = "diagnostic",
+        reason = "canonical_provider_decision_projection",
+        subject_type = "recipe",
+        subject = row.recipe,
+        capability = resolver.id,
+        family = row.rule,
+        subfamily = resolver.subfamily,
+        confidence = row.risk_disposition == "PASS" and "family=1,owner=1,total=1" or "family=1,owner=1,total=0.75",
+        source = "provider-decision:" .. row.provider_id,
+        policy = row.policy_scope,
+        decision = row.decision,
+        emitted = format_bool(emitted),
+        blockers = row.blocker or "",
+        risks = join_names(row.risk_hard_flags) .. (#(row.risk_review_flags or {}) > 0 and "," .. join_names(row.risk_review_flags) or ""),
+        stable_stream_id = emitted and (row.target_stream or "") or "",
+        recipe = row.recipe,
+        recipes = row.recipe,
+        target = row.item,
+        effect = "change-recipe-productivity",
+        evidence = join_names((row.diagnostic_provenance or {}).evidence),
+        provider_id = row.provider_id,
+        decision_fingerprint = row.decision_fingerprint,
+        planner_decision_fingerprint = row.decision_fingerprint,
+        risk_fingerprint = row.risk_fingerprint,
+        risk_disposition = row.risk_disposition,
+        cardinality_fingerprint = row.cardinality and row.cardinality.cardinality_fingerprint
+      })
+  end
+    D.compatibility_plan({
+      key = "capability:" .. resolver.id,
       status = "diagnostic",
-      reason = emitted and "entity_backed_recipe_stream_generated" or "entity_backed_recipe_stream_not_emitted",
-      subject_type = "recipe",
-      subject = candidate.recipe,
+      reason = "canonical_provider_decision_summary",
       capability = resolver.id,
       family = resolver.family,
       subfamily = resolver.subfamily,
-      confidence = recipe.allow_productivity and "family=0.95,owner=1,total=0.95" or "family=0.95,owner=0.5,total=0.7",
-      source = resolver.source,
-      policy = resolver.policy,
-      decision = decision,
-      emitted = format_bool(emitted),
-      blockers = blockers,
-      risks = recipe.allow_productivity and "" or "recipe_productivity_not_explicitly_allowed",
-      stable_stream_id = emitted and join_names(owners) or "",
-      recipe = candidate.recipe,
-      recipes = candidate.recipe,
-      target = candidate.item,
-      effect = "change-recipe-productivity",
-      evidence = evidence_for(candidate)
+      total = tostring(#candidates),
+      generated = tostring(generated),
+      unknown = tostring(proposed),
+      warnings = tostring(diagnosed),
+      evidence = "FamilyRule.ProviderDecision"
     })
-  end
-
-  D.compatibility_plan({
-    key = "capability:" .. resolver.id,
-    status = "diagnostic",
-    reason = "capability_resolver_summary",
-    capability = resolver.id,
-    family = resolver.family,
-    subfamily = resolver.subfamily,
-    total = tostring(#candidates),
-    generated = tostring(generated),
-    unknown = tostring(proposed),
-    warnings = tostring(diagnosed),
-    evidence = "entity_backed_item_recipe_scan"
-  })
-
   return #candidates, generated, proposed, diagnosed
 end
 
@@ -317,10 +217,12 @@ local function emit_native_modifier_decisions(registry, resolver, discovered_row
   return total, 0, 0, warnings
 end
 
-local function emit_family_rule_decisions()
+local function emit_family_rule_decisions(excluded_rules)
   local rows = family_resolver.snapshot().decisions
-  local attached, proposed, diagnosed = 0, 0, 0
+  local attached, proposed, diagnosed, total = 0, 0, 0, 0
   for _, row in ipairs(rows) do
+    if not (excluded_rules and excluded_rules[row.rule]) then
+    total = total + 1
     if row.decision == "attach" then attached = attached + 1
     elseif row.decision == "propose" then proposed = proposed + 1
     else diagnosed = diagnosed + 1 end
@@ -329,7 +231,6 @@ local function emit_family_rule_decisions()
       status = "diagnostic",
       reason = "semantic_family_rule_decision",
       subject_type = "recipe",
-      subject = row.recipe,
       capability = row.capability,
       family = row.rule,
       source = "family-rule:" .. row.rule,
@@ -341,15 +242,22 @@ local function emit_family_rule_decisions()
       recipe = row.recipe,
       target = row.item,
       effect = "change-recipe-productivity",
-      evidence = "recipe-output:item-place-result:entity-type"
+      evidence = "recipe-output:item-place-result:entity-type",
+      provider_id = row.provider_id,
+      decision_fingerprint = row.decision_fingerprint,
+      planner_decision_fingerprint = row.decision_fingerprint,
+      risk_fingerprint = row.risk_fingerprint,
+      risk_disposition = row.risk_disposition,
+      cardinality_fingerprint = row.cardinality and row.cardinality.cardinality_fingerprint
     })
+    end
   end
   D.compatibility_plan({
     key = "family_rule_registry",
     status = "diagnostic",
     reason = "semantic_family_rules_resolved",
     capability = "recipe-productivity",
-    total = tostring(#rows),
+    total = tostring(total),
     generated = tostring(attached),
     unknown = tostring(proposed),
     warnings = tostring(diagnosed),
@@ -365,24 +273,31 @@ local function require_stage(state, expected, next_stage)
   return state
 end
 
-local function discover_recipe_state(registry, resolver, wanted_entity_types)
+local function discover_recipe_state(registry, resolver)
+  local candidates = {}
+  local wanted_rules = CANONICAL_RULES[resolver.id] or {}
+  for _, row in ipairs(family_resolver.snapshot().decisions or {}) do
+    if wanted_rules[row.rule] then table.insert(candidates, {provider_decision = row}) end
+  end
   return {
     stage = "discovered",
     registry = registry,
     resolver = resolver,
-    wanted_entity_types = wanted_entity_types,
-    candidates = entity_backed_candidates(registry, wanted_entity_types)
+    candidates = candidates
   }
 end
 
 local function classify_recipe_state(state)
   require_stage(state, "discovered", "classified")
-  local mir_owners, external_owners = recipe_owner_maps(state.registry)
   for _, candidate in ipairs(state.candidates) do
-    candidate.decision, candidate.emitted, candidate.blockers, candidate.owners =
-      ownership_decision(candidate.recipe, mir_owners, external_owners)
-    candidate.risks = candidate.recipe_fact.allow_productivity
-      and {} or {"recipe_productivity_not_explicitly_allowed"}
+    local row = candidate.provider_decision
+    candidate.recipe = row.recipe
+    candidate.item = row.item
+    candidate.decision = row.decision
+    candidate.emitted = row.decision == "attach"
+    candidate.blockers = row.blocker
+    candidate.risks = deepcopy(row.risk_hard_flags or {})
+    for _, risk in ipairs(row.risk_review_flags or {}) do table.insert(candidate.risks, risk) end
   end
   return state
 end
@@ -397,9 +312,9 @@ local function validate_recipe_state(state)
   require_stage(state, "proposed", "validated")
   for _, candidate in ipairs(state.candidates) do
     candidate.valid = candidate.item ~= nil
-      and candidate.entity ~= nil
       and candidate.recipe ~= nil
       and candidate.proposal ~= nil
+      and candidate.provider_decision ~= nil
     if not candidate.valid then error("Invalid entity-backed capability candidate.", 2) end
   end
   return state
@@ -410,7 +325,6 @@ local function materialize_recipe_state(state)
   state.result = {emit_recipe_capability_decisions(
     state.registry,
     state.resolver,
-    state.wanted_entity_types,
     state.candidates
   )}
   return state
@@ -514,7 +428,10 @@ function C.emit(registry)
     warnings = warnings + result[4]
   end
 
-  emit_family_rule_decisions()
+  emit_family_rule_decisions({
+    ["loader-manufacturing"] = true,
+    ["mining-drill-manufacturing"] = true
+  })
 
   D.compatibility_plan({
     key = "capability_registry",
