@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-22
 supersedes: []
 superseded_by: []
 ---
@@ -334,7 +334,7 @@ Known legacy `1.9.x` exclusions:
 
 Keep these architecture pieces from the tested current-line source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
 
-Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build from the active `1.9.x` metadata.
+Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.11` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build from the active `1.9.x` metadata.
 
 ## Opportunistic Integrations
 
@@ -393,9 +393,9 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 3. Recycler only.
 4. Quality enabled with its dependencies.
 5. Base-only with default `research_cargo_landing_pad_count`, verifying the generated technology is skipped because Space Age is absent.
-6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance and cargo landing pad count research appear after their required unlocks.
-7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` disabled, verifying the checkbox skips the generated technology cleanly.
-8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
+6. Space Age 2.1.11+ enabled, verifying cargo bay unloading distance and cargo landing pad count research appear after their required unlocks.
+7. Space Age 2.1.11+ with `research_cargo_landing_pad_count` disabled, verifying the checkbox skips the generated technology cleanly.
+8. Space Age 2.1.11+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
 9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant recipe ownership.
 10. Startup pipeline extent fixture runs with non-default dropdown multipliers, verifying common fluid boxes are mutated only when enabled.
 11. Space Age with Panglia or a Panglia-like fixture, verifying extra rocket fuel and low density structure recipes adopt into vanilla productivity technologies.
@@ -618,7 +618,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's 99-dash format and one-line bullets at or below 132 characters.
-- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails, Quality, and Space Exploration ordering, and visible optional Recycler and Space Age ordering dependencies only.
+- Confirm `info.json` declares `base >= 2.1.11`, hidden optional Elevated Rails, Quality, and Space Exploration ordering, and visible optional Recycler and Space Age ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included runtime source, locale, migrations, README, changelog, license, thumbnail, and no forbidden artifacts for the archive built from the current source tree.
 - Confirm package validation reports packaged source and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.

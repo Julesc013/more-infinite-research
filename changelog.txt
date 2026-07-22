@@ -22,6 +22,7 @@ Version: 3.2.0
     - Kept additional automatic recipe-family generation disabled by default.
     - Added steel plate productivity: base games receive one MIR chain, while Space Age keeps and extends its native owner.
     - Preserved every MIR 3.1.9 technology while moving design and lifecycle handling behind common contracts.
+    - Raised the Factorio, Recycler, and Space Age dependency floor to 2.1.11, the oldest fully qualified patch.
 
   Bugfixes:
 
@@ -32,6 +33,7 @@ Version: 3.2.0
     - Retained valid planet unlocks when resolving abstract space-location effect targets.
     - Preserved unrelated force recipe state during MIR configuration changes without globally reapplying technology effects.
     - Replaced recursive researchability traversal and prevented fatal safety assertions from suppressing diagnostic flushing.
+    - Corrected four stable stream manifest policies to match native-owner binding for their Space Age families.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.9

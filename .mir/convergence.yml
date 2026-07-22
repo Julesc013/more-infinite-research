@@ -145,6 +145,18 @@ superseded_candidates:
     reason: exact disabled vanilla science technology regression changed package documentation and validation evidence
     status: superseded-unpublished-candidate
 
+  - source_commit: e19b54fc7daddabcba5c5a6ab6c9bd82d8fe09ba
+    evidence_commit: 3479204bc1c2bb3239338fde227c67af277d375f
+    candidate_id: C4
+    artifact: dist/more-infinite-research_3.2.0.zip
+    sha256: C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B
+    package_content_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
+    size_bytes: 935164
+    entries: 229
+    forbidden_entries: 0
+    reason: Factorio 2.1.11 dependency floor and stable stream-manifest policy corrections required new package bytes
+    status: superseded-locally-qualified-candidate
+
 candidate:
   artifact: dist/more-infinite-research_3.2.0.zip
   source_commit: pending

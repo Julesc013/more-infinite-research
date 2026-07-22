@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-22
 supersedes: []
 superseded_by: []
 ---
@@ -33,7 +33,7 @@ It is built for players who want more *long-term scaling for late-game megabases
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`. Space Age is optional.
 
 *Recipe productivity researches are infinite, but each recipe's Factorio `maximum_productivity` cap still applies. MIR leaves the engine's +300% recipe default unchanged unless you explicitly select another value under startup settings > Limits. Explicit productivity caps do not rewrite recycling-category recipes; recycler returns have their own separate control. The separate non-zero power floor is also off by default.*
 

@@ -8,7 +8,7 @@
   "running_evidence_ttl_minutes": 360,
   "trusted_repository": "self",
   "qualification_factorio_version": "2.1.11",
-  "minimum_factorio_version": "2.1.8",
+  "minimum_factorio_version": "2.1.11",
   "upgrade": {
     "from_version": "3.1.9",
     "to_version": "3.2.0",

@@ -12,6 +12,25 @@ function Assert-MIRText { param([string]$Path, [string]$Needle)
 
 $streamManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\streams\generated_stream_manifest.json") | ConvertFrom-Json
 if ($streamManifest.schema -ne 1) { throw "Generated stream manifest schema drifted from 1." }
+$streamAuthorityText = Read-MIRText ".mir\streams.yml"
+foreach ($manifestProperty in @($streamManifest.streams.PSObject.Properties)) {
+  $rowPattern = "(?ms)^    " + [regex]::Escape([string]$manifestProperty.Name) + ":\r?\n(?<body>.*?)(?=^    [A-Za-z0-9_.-]+:\r?\n|\z)"
+  $authorityRow = [regex]::Match($streamAuthorityText, $rowPattern)
+  if (-not $authorityRow.Success) {
+    throw ".mir/streams.yml is missing generated stream authority row: $($manifestProperty.Name)"
+  }
+  $policyMatch = [regex]::Match(
+    $authorityRow.Groups["body"].Value,
+    "(?m)^      policy:\s*(?<value>[^\r\n#]+?)\s*$"
+  )
+  if (-not $policyMatch.Success) {
+    throw ".mir/streams.yml stream row is missing policy metadata: $($manifestProperty.Name)"
+  }
+  $authorityPolicy = $policyMatch.Groups["value"].Value.Trim()
+  if ([string]$manifestProperty.Value.policy -ne $authorityPolicy) {
+    throw "Generated stream manifest policy differs from .mir/streams.yml for $($manifestProperty.Name): '$($manifestProperty.Value.policy)' != '$authorityPolicy'"
+  }
+}
 $scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
 if ($scenarioManifest.schema -ne 3) { throw "Runtime scenario manifest schema drifted from 3." }
 $contractCoverage = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
@@ -108,4 +127,4 @@ foreach ($docCheck in @(
   Assert-MIRText $docCheck.Path $docCheck.Needle
 }
 
-Write-Host "[ok] MIR compiler code, manifests, authority table, and schema reference versions agree."
+Write-Host "[ok] MIR compiler code, stream policies, manifests, authority table, and schema reference versions agree."

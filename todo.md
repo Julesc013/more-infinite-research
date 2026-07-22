@@ -76,10 +76,10 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Regenerate the seven-scenario approved delta and expanded five-archetype upgrade/configuration-change evidence against candidate `C4B08D60...` on Factorio 2.1.11.
 - [x] Establish and bind the qualified 3.1.9 runtime performance regression evidence required directly by the revised F4 profile.
 - [x] Complete the local exact-candidate Factorio 2.1.11 full profile; all 128 machine-verifiable tests pass and only `manual.release-review` remains failed locally.
-- [ ] Qualify Factorio 2.1.8 floor smoke or raise the dependency floor, then run the final Factorio 2.1.11 protected profile.
+- [x] Raise the dependency floor to Factorio 2.1.11, correct the four governed native-owner stream policies, and build C5.
 - [x] Expand the 3.1.9-to-3.2.0 upgrade harness across base, Space Age native-owner, automatic-family, base-continuation, and mod-set configuration-change archetypes.
-- [ ] Run the protected-release full profile and create the release seal; local `untrusted-local` evidence is intentionally ineligible.
-- [ ] Complete the exact-candidate package manual attestation, then complete the separate public-presentation review.
+- [ ] Run all C5 candidate-bound automated work, then the protected-release full profile and release seal; C4 evidence is historical.
+- [ ] Complete the exact-C5 package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.

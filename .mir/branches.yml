@@ -293,6 +293,7 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
+      candidate_id: C5
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
@@ -301,26 +302,28 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 935164
-      archive_sha256: C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B
-      package_content_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
-      package_source_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
-      package_source_commit: e19b54fc7daddabcba5c5a6ab6c9bd82d8fe09ba
+      archive_bytes: 935250
+      archive_sha256: 64909FFE85B7C002CF1F9B3B3D5E7F5D4DE754AE513452923D1E0C4792AFDD82
+      package_content_sha256: C3B79ACBF9B9E2506BDA64603CD4E19B11B8C2FE685469AD35E8791963E47C41
+      package_source_sha256: 28F746285D3F3B8AB22D654CBBF5BFF043D9BE6899E2CD6BD09F7359F670D7FE
+      package_source_commit: pending
+      superseded_candidate_id: C4
+      superseded_candidate_sha256: C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B
       superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
-      approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: passed-local-exact-2.1.11-candidate
-      upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: passed-local-exact-2.1.11-candidate
+      superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
+      approved_delta_gate: pending-exact-c5
+      superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+      upgrade_gate: pending-exact-c5
       locale_gate: passed-source-unchanged-50-locales-21250-values
-      locale_runtime_gate: passed-local-exact-2.1.11-candidate
-      fast_static_gate: passed-local-exact-candidate
-      runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-      runtime_performance_gate: passed-local-exact-2.1.11-candidate
-      manual_attestation_gate: pending-exact-post-2.4.9-return-candidate
-      minimum_factorio_gate: pending-exact-2.1.8-or-floor-raise
-      release_gate: awaiting-minimum-version-manual-and-protected-qualification
+      locale_runtime_gate: pending-exact-c5
+      fast_static_gate: pending-exact-c5
+      superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+      runtime_performance_gate: pending-exact-c5
+      manual_attestation_gate: pending-exact-c5
+      minimum_factorio_gate: passed-floor-raised-to-2.1.11
+      release_gate: awaiting-c5-requalification-manual-and-protected-qualification
       publication_status: unreleased
-      status: locally-automated-qualified-awaiting-human-and-protected-qualification
+      status: c5-built-awaiting-candidate-bound-requalification
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

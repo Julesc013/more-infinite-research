@@ -24,18 +24,24 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
+      "candidate_id": "C5",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 935164,
-      "package_source_commit": "e19b54fc7daddabcba5c5a6ab6c9bd82d8fe09ba",
-      "package_source_sha256": "8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE",
-      "archive_sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B",
-      "package_content_sha256": "8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE",
+      "archive_bytes": 935250,
+      "package_source_commit": "pending",
+      "package_source_sha256": "28F746285D3F3B8AB22D654CBBF5BFF043D9BE6899E2CD6BD09F7359F670D7FE",
+      "archive_sha256": "64909FFE85B7C002CF1F9B3B3D5E7F5D4DE754AE513452923D1E0C4792AFDD82",
+      "package_content_sha256": "C3B79ACBF9B9E2506BDA64603CD4E19B11B8C2FE685469AD35E8791963E47C41",
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
-      "status": "awaiting-external-qualification"
+      "status": "rebuilding-after-package-visible-change",
+      "supersedes_candidate": {
+        "candidate_id": "C4",
+        "archive_sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B",
+        "reason": "Factorio 2.1.11 dependency floor and stable stream-manifest policy corrections"
+      }
     },
     "factorio-2.0": {
       "mir_version": "2.5.0",

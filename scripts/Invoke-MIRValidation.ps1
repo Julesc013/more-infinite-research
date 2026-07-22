@@ -237,12 +237,12 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     }
   } elseif ($isFactorio21Line) {
     $requiredDeps = @(
-      "base >= 2.1.8",
+      "base >= 2.1.11",
       "(?) elevated-rails",
-      "? recycler >= 2.1.8",
+      "? recycler >= 2.1.11",
       "(?) quality",
       "(?) space-exploration",
-      "? space-age >= 2.1.8"
+      "? space-age >= 2.1.11"
     )
     foreach ($requiredDep in $requiredDeps) {
       if ($deps -notcontains $requiredDep) {

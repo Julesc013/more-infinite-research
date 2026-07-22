@@ -6,7 +6,7 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
