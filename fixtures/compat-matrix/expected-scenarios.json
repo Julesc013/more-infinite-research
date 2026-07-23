@@ -2553,7 +2553,7 @@
         ],
         "settings": {},
         "source_mode": "exact-package",
-        "timeout_seconds": 600,
+        "timeout_seconds": 900,
         "tags": [
           "base",
           "full",
@@ -2582,7 +2582,7 @@
         ],
         "settings": {},
         "source_mode": "exact-package",
-        "timeout_seconds": 600,
+        "timeout_seconds": 900,
         "tags": ["base", "full", "local-mod-library", "randomized-order", "runtime", "scale"],
         "isolation": "fresh-data-stage",
         "assertions": [

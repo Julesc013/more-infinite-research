@@ -2,8 +2,8 @@ local function fail(message)
   error("MIR synthetic scale validation failed: " .. message)
 end
 
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local technology_graph = require("__more-infinite-research__.prototypes.mir.planner.technology_graph")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local generation_plan = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-generation-plan"]
 
@@ -30,8 +30,9 @@ if summary.duplicate_owners ~= 0 then fail("duplicate recipe owners were found")
 if summary.recipe_fact_scan_count ~= 1 then fail("recipe facts were rebuilt") end
 if summary.technology_scan_count ~= 1 then fail("technology coverage scan count changed") end
 
-local plan = compilation_plan.snapshot()
-local telemetry = plan and plan.telemetry
+local evidence_prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-compiler-evidence"]
+local evidence = evidence_prototype and evidence_prototype.data
+local telemetry = evidence and {counters = evidence.counts, phases = evidence.phases}
 if not telemetry or telemetry.counters.technologies < 60000
   or telemetry.counters.effects < 60000
   or telemetry.counters.graph_edges < 60000 then
@@ -84,7 +85,8 @@ for position = 1, STRESS_TOTAL do
   })
 end
 
-local stress = technology_graph.validate_operations(stress_operations)
+local stress = compiler_context.with_active(
+  compiler_context.new(), technology_graph.validate_operations, stress_operations)
 if stress.node_count < STRESS_TOTAL or stress.edge_count < STRESS_TOTAL
   or stress.cyclic_component_count < 1001
   or stress.rejected_planned_technology_count ~= STRESS_TOTAL then
@@ -121,5 +123,5 @@ local stress_fingerprint = fingerprint.of({
 })
 log("[mir-fixture] synthetic-graph fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
-  .. " compilation=" .. tostring(plan.semantic_fingerprint)
+  .. " compilation=" .. tostring(evidence.semantic_fingerprint)
   .. " in_memory=" .. tostring(stress_fingerprint))

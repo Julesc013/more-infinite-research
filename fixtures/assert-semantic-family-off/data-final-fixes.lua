@@ -1,7 +1,12 @@
 local function fail(message) error("MIR automatic productivity disabled validation failed: " .. message) end
-local artifact = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator").snapshot()
-for _, row in ipairs(artifact.stream_plan.rows or {}) do
-  if row.spec and row.spec.automatic_family and row.reason ~= "automatic_productivity_disabled" then
+local artifact_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+local artifact = artifact_prototype and artifact_prototype.data
+if not artifact or artifact.kind ~= "mir-generation-plan-public" then
+  fail("published generation-plan artifact is missing")
+end
+for _, row in ipairs(artifact.rows or {}) do
+  if (row.stream_id == "research_auto_assembling_machine" or row.stream_id == "research_auto_lab")
+    and row.reason ~= "automatic_productivity_disabled" then
     fail("automatic family row has wrong disabled-action reason " .. tostring(row.reason))
   end
 end

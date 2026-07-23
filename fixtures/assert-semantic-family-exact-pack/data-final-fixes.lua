@@ -11,14 +11,18 @@ for _, technology_name in ipairs({
   end
 end
 
-local artifact = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator").snapshot()
+local artifact_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+local artifact = artifact_prototype and artifact_prototype.data
+if not artifact or artifact.kind ~= "mir-generation-plan-public" then
+  fail("published generation-plan artifact is missing")
+end
 local blocked = {}
-for _, row in ipairs((artifact and artifact.stream_plan and artifact.stream_plan.rows) or {}) do
-  if row.stream_key == "research_auto_assembling_machine" or row.stream_key == "research_auto_lab" then
+for _, row in ipairs(artifact.rows or {}) do
+  if row.stream_id == "research_auto_assembling_machine" or row.stream_id == "research_auto_lab" then
     if row.action ~= "skip" or row.reason ~= "automatic_family_not_reviewed" then
-      fail("experimental family has wrong reviewed-data decision: " .. tostring(row.stream_key) .. "/" .. tostring(row.reason))
+      fail("experimental family has wrong reviewed-data decision: " .. tostring(row.stream_id) .. "/" .. tostring(row.reason))
     end
-    blocked[row.stream_key] = true
+    blocked[row.stream_id] = true
   end
 end
 if not blocked.research_auto_assembling_machine or not blocked.research_auto_lab then

@@ -837,6 +837,7 @@ fixtures:
       - independent-creation-and-review-controls
       - reviewed-data-rejects-experimental-family-authorization
       - reviewed-data-safe-attachment-baseline
+      - published-artifact-assertions-without-ambient-compiler-context
       - unrelated-pack-family-remains-disabled
 
   synthetic-scale-graph:
@@ -849,6 +850,7 @@ fixtures:
       - 60000-materialized-technologies-below-factorio-65535-engine-limit
       - 60000-materialized-technology-effects
       - 60000-materialized-technology-graph-edges
+      - published-compiler-telemetry-with-isolated-stress-context
       - shallow-acyclic-factorio-engine-graph
       - 100000-in-memory-compiler-technologies
       - 100000-in-memory-compiler-effects
@@ -857,6 +859,7 @@ fixtures:
       - 1000-small-in-memory-strongly-connected-components
       - deterministic-randomized-insertion-order
       - bounded-64-node-scc-diagnostics
+      - 900-second-portable-graph-stress-budget
       - high-family-candidate-fanout
       - single-recipe-fact-scan
       - single-technology-coverage-scan
@@ -872,6 +875,7 @@ fixtures:
       - 100000-in-memory-canonical-recipe-facts
       - 1000-structural-family-candidates
       - deterministic-randomized-insertion-order
+      - published-compiler-telemetry-with-isolated-stress-context
       - high-family-candidate-fanout
       - single-recipe-fact-scan
       - single-technology-coverage-scan

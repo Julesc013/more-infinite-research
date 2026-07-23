@@ -2,8 +2,8 @@ local function fail(message)
   error("MIR synthetic recipe scale validation failed: " .. message)
 end
 
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local generation_plan = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-generation-plan"]
 local prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report"]
@@ -26,8 +26,9 @@ if summary.duplicate_owners ~= 0 then fail("duplicate recipe owners were found")
 if summary.recipe_fact_scan_count ~= 1 then fail("recipe facts were rebuilt") end
 if summary.technology_scan_count ~= 1 then fail("technology coverage scan count changed") end
 
-local plan = compilation_plan.snapshot()
-local telemetry = plan and plan.telemetry
+local evidence_prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-compiler-evidence"]
+local evidence = evidence_prototype and evidence_prototype.data
+local telemetry = evidence and {counters = evidence.counts, phases = evidence.phases}
 if not telemetry or telemetry.counters.recipes < 1000
   or telemetry.counters.recipe_index_scans ~= 1 then
   fail("compiler telemetry did not observe the high-fanout recipe campaign")
@@ -62,7 +63,8 @@ for position = 1, STRESS_TOTAL do
   }
 end
 
-local stress = recipe_facts.index_prototypes(stress_prototypes)
+local stress = compiler_context.with_active(
+  compiler_context.new(), recipe_facts.index_prototypes, stress_prototypes)
 if #stress.names ~= STRESS_TOTAL
   or #(stress.by_output["mir-synthetic-recipe-machine"] or {}) ~= 1000
   or #(stress.by_output["mir-synthetic-recipe-filler"] or {}) ~= 99000
@@ -104,5 +106,5 @@ local stress_fingerprint = fingerprint.of({
 })
 log("[mir-fixture] synthetic-recipes fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
-  .. " compilation=" .. tostring(plan.semantic_fingerprint)
+  .. " compilation=" .. tostring(evidence.semantic_fingerprint)
   .. " in_memory=" .. tostring(stress_fingerprint))
