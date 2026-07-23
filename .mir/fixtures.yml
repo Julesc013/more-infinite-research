@@ -640,6 +640,9 @@ fixtures:
       - finalized-generation-plan-registry-projection
       - finalized-compiler-evidence-base-continuation-projection
       - closed-compiler-context-export-safety
+      - exact-3.1.9-legacy-registry-projection
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
       - startup-setting-value-parity
       - runtime-namespace-parity
       - migration-contract-parity

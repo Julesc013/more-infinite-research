@@ -128,41 +128,56 @@ end
 local plan_prototype = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-generation-plan"]
 local plan = plan_prototype and plan_prototype.data
-if not (plan and plan.schema == 1 and plan.kind == "mir-generation-plan-public") then
-  error("MIR approved-delta export requires the finalized public GenerationPlan")
-end
-
 local evidence_prototype = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-compiler-evidence-internal"]
 local evidence = evidence_prototype and evidence_prototype.data
-if not (evidence and evidence.schema == 2 and evidence.compiler_result) then
-  error("MIR approved-delta export requires finalized internal CompilerEvidence")
-end
-
--- The private generated registry belongs to the CompilerContext lifetime. The
--- approved-delta fixture loads after that scope closes, so reconstruct its
--- stable public contract from immutable artifacts emitted by the completed
--- compiler run instead of reopening mutable compiler state.
 local technology_names, registry_rows = {}, {}
-for _, row in ipairs(plan.rows or {}) do
-  if row.action == "emit" and row.technology_id then
-    technology_names[row.technology_id] = true
-    registry_rows[row.technology_id] = {
-      name = row.technology_id,
-      kind = "stream",
-      key = row.stream_id
-    }
+
+local finalized_artifacts = plan
+  and plan.schema == 1
+  and plan.kind == "mir-generation-plan-public"
+  and evidence
+  and evidence.schema == 2
+  and evidence.compiler_result
+
+if finalized_artifacts then
+  -- The C11 private generated registry belongs to the CompilerContext
+  -- lifetime. Reconstruct its stable comparison projection from immutable
+  -- artifacts emitted by the completed compiler run.
+  for _, row in ipairs(plan.rows or {}) do
+    if row.action == "emit" and row.technology_id then
+      technology_names[row.technology_id] = true
+      registry_rows[row.technology_id] = {
+        name = row.technology_id,
+        kind = "stream",
+        key = row.stream_id
+      }
+    end
   end
-end
-for _, candidate in ipairs(evidence.compiler_result.base_continuations or {}) do
-  if candidate.action == "create" and candidate.technology_name then
-    technology_names[candidate.technology_name] = true
-    registry_rows[candidate.technology_name] = {
-      name = candidate.technology_name,
-      kind = "base_extension",
-      key = candidate.key
-    }
+  for _, candidate in ipairs(evidence.compiler_result.base_continuations or {}) do
+    if candidate.action == "create" and candidate.technology_name then
+      technology_names[candidate.technology_name] = true
+      registry_rows[candidate.technology_name] = {
+        name = candidate.technology_name,
+        kind = "base_extension",
+        key = candidate.key
+      }
+    end
   end
+elseif mods and mods["more-infinite-research"] == "3.1.9" then
+  -- The frozen 3.1.9 baseline predates finalized compiler artifacts and its
+  -- registry is not context-scoped. This exact-version adapter exists only to
+  -- reproduce the sealed baseline side of the governed delta.
+  local legacy_registry = require(
+    "__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry"
+  )
+  for _, name in ipairs(legacy_registry.sorted_names()) do
+    technology_names[name] = true
+    local entry = legacy_registry.get(name)
+    if entry then registry_rows[name] = normalize(entry) end
+  end
+else
+  error("MIR approved-delta export requires finalized C11 compiler artifacts")
 end
 
 local adoption = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]

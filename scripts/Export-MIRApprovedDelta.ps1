@@ -41,6 +41,7 @@ function Get-ValueFingerprint {
 
 function Get-ApprovedDeltaProducerFingerprint {
   $paths = @(
+    "scripts/Export-MIRApprovedDelta.ps1",
     "fixtures/compat-matrix/expected-scenarios.json",
     "fixtures/export-approved-delta/data-final-fixes.lua",
     "fixtures/export-approved-delta/info.json",
@@ -553,6 +554,21 @@ if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) {
 if ($currentSourceCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
   throw "Approved-delta exporter source differs. Expected $ExpectedSourceCommit actual $currentSourceCommit"
 }
+$releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
+$releaseAuthority = $releaseLedger.development."factorio-2.1"
+$packageSourceCommit = [string]$releaseAuthority.package_source_commit
+if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+  throw "Approved-delta export requires the canonical C11 package-source commit."
+}
+& git -C $repo merge-base --is-ancestor $packageSourceCommit $currentSourceCommit
+if ($LASTEXITCODE -ne 0) {
+  throw "Approved-delta package-source commit is not an ancestor of the qualification source."
+}
+[string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
+& git -C $repo diff --quiet $packageSourceCommit $currentSourceCommit -- @packageRoots
+if ($LASTEXITCODE -ne 0) {
+  throw "Package-visible source changed after the approved-delta package-source commit."
+}
 
 $scenarioNames = @(
   "approved-delta-automatic-family-controls",
@@ -591,6 +607,11 @@ $baselineContract = Get-PackageContract -PackagePath $baselinePath
 $currentContract = Get-PackageContract -PackagePath $currentPath
 if ($currentContract.package_content_sha256 -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
   throw "Approved-delta current package content does not match ExpectedSourceCommit package source."
+}
+if ([string]$releaseAuthority.archive_sha256 -ne $currentContract.archive_sha256 -or
+    [string]$releaseAuthority.package_content_sha256 -ne $currentContract.package_content_sha256 -or
+    [string]$releaseAuthority.package_source_sha256 -ne $currentContract.package_content_sha256) {
+  throw "Approved-delta current package does not match the canonical C11 release authority."
 }
 $rawDifferences = [Collections.Generic.List[object]]::new()
 Add-ValueDifferences -Results $rawDifferences -Path "package" -Before $baselineContract -After $currentContract
@@ -648,13 +669,15 @@ $output = [pscustomobject][ordered]@{
   }
   current = [ordered]@{
     version = $currentContract.version
-    source_commit = $currentSourceCommit
+    source_commit = $packageSourceCommit
+    package_source_commit = $packageSourceCommit
     archive_sha256 = $currentContract.archive_sha256
     package_content_sha256 = $currentContract.package_content_sha256
   }
   exporter = [ordered]@{
     fixture = "fixtures/export-approved-delta"
     script = "scripts/Export-MIRApprovedDelta.ps1"
+    qualification_source_commit = $currentSourceCommit
     producer_sha256 = Get-ApprovedDeltaProducerFingerprint
     factorio_binary_version = if ($SkipExecution) { "reused-raw-evidence" } else { [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion }
     scenarios = $scenarioNames
