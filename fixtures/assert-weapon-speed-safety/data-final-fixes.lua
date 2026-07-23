@@ -2,9 +2,14 @@ local function fail(message)
   error("MIR weapon speed validation failed: " .. message)
 end
 
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local generated_registry = require("__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry")
 local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
 local weapon_speed_mutation = require("__more-infinite-research__.prototypes.mir.pipeline.mutations.weapon_speed")
+
+local function with_isolated_compiler_context(callback)
+  return compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), callback)
+end
 
 local function has_gun_speed(tech, ammo_category)
   for _, effect in ipairs((tech and tech.effects) or {}) do
@@ -46,11 +51,13 @@ end
 local techs = data.raw.technology or {}
 
 local function exact_infinite_owner(name, category)
-  return native_effect_coverage.technology_has_exact_effect(name, {
-    type = "gun-speed",
-    ammo_category = category,
-    modifier = 0.1
-  })
+  return with_isolated_compiler_context(function()
+    return native_effect_coverage.technology_has_exact_effect(name, {
+      type = "gun-speed",
+      ammo_category = category,
+      modifier = 0.1
+    })
+  end)
 end
 
 local dedicated_names = {
@@ -62,10 +69,13 @@ local prefer_mir_setting = settings.startup["mir-prefer-this-mod-for-competing-t
 local prefer_mir = not prefer_mir_setting or prefer_mir_setting.value ~= false
 
 local function replacement_coverage(category)
-  if native_effect_coverage.technology_has_effect_identity(dedicated_names[category], {
-    type = "gun-speed",
-    ammo_category = category
-  }, { positive_numeric_value = true }) then return true end
+  local dedicated_coverage = with_isolated_compiler_context(function()
+    return native_effect_coverage.technology_has_effect_identity(dedicated_names[category], {
+      type = "gun-speed",
+      ammo_category = category
+    }, { positive_numeric_value = true })
+  end)
+  if dedicated_coverage then return true end
   if prefer_mir then return false end
 
   for name, _ in pairs(techs) do
@@ -103,21 +113,41 @@ end
 local mode_setting = settings.startup["mir-adjust-vanilla-weapon-speed-techs"]
 local mode = mode_setting and mode_setting.value or "only-when-dedicated-tech-enabled"
 local generated_count = 0
-local generated_names = generated_registry.sorted_names()
-local registry_visible = #generated_names > 0
-if not registry_visible then
+local generated_names, generated_seen = {}, {}
+local plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+local plan = plan_prototype and plan_prototype.data
+local artifacts_visible = plan and plan.schema == 1 and plan.kind == "mir-generation-plan-public"
+for _, row in ipairs((plan and plan.rows) or {}) do
+  if row.action == "emit" and row.technology_id and not generated_seen[row.technology_id] then
+    generated_seen[row.technology_id] = true
+    table.insert(generated_names, row.technology_id)
+  end
+end
+local evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
+local evidence = evidence_prototype and evidence_prototype.data
+for _, candidate in ipairs((evidence and evidence.compiler_result
+  and evidence.compiler_result.base_continuations) or {}) do
+  if candidate.action == "create" and candidate.technology_name
+    and not generated_seen[candidate.technology_name] then
+    generated_seen[candidate.technology_name] = true
+    table.insert(generated_names, candidate.technology_name)
+  end
+end
+if not artifacts_visible then
   -- Factorio 2.0 isolates cross-mod require state. Inspect final prototypes for
-  -- assertions while MIR itself continues to use its private registry.
+  -- assertions while MIR itself continues to use scoped compiler state.
   for name, tech in pairs(techs) do
     if string.match(name, "^weapon%-shooting%-speed%-%d+$")
       and tech.unit
       and tech.unit.count_formula
+      and not generated_seen[name]
     then
+      generated_seen[name] = true
       table.insert(generated_names, name)
     end
   end
-  table.sort(generated_names)
 end
+table.sort(generated_names)
 
 for _, name in ipairs(generated_names) do
   local tech = techs[name]
@@ -176,21 +206,30 @@ if external_owner then
     fail("external owner does not provide exact reachable infinite replacement coverage")
   end
 
-  if native_effect_coverage.technology_is_researchable_infinite(
-    "mir-fixture-unreachable-weapon-speed-owner"
-  ) then
+  local unreachable_owner_accepted = with_isolated_compiler_context(function()
+    return native_effect_coverage.technology_is_researchable_infinite(
+      "mir-fixture-unreachable-weapon-speed-owner"
+    )
+  end)
+  if unreachable_owner_accepted then
     fail("science-unreachable external owner was accepted as replacement coverage")
   end
 
-  if registry_visible then
+  if artifacts_visible then
     local external_continuation = table.deepcopy(external_owner)
     external_continuation.name = "weapon-shooting-speed-99"
     external_continuation.localised_name = "MIR fixture external weapon speed continuation"
     data:extend({external_continuation})
 
-    -- Re-run the cleanup after the external continuation exists. Old broad
-    -- name scanning would mutate it; registry-scoped cleanup must not.
-    weapon_speed_mutation.apply()
+    -- Re-run the cleanup after the external continuation exists. The
+    -- production CompilerContext is closed by this fixture stage, so replay
+    -- the published generated identities inside an explicit isolated context.
+    -- Old broad name scanning would mutate the external continuation;
+    -- registry-scoped cleanup must not.
+    with_isolated_compiler_context(function()
+      for _, name in ipairs(generated_names) do generated_registry.register(name) end
+      weapon_speed_mutation.apply()
+    end)
 
     if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
       or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")

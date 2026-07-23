@@ -1,5 +1,3 @@
-local registry = require("__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry")
-
 local function sorted_keys(values)
   local out = {}
   for key, _ in pairs(values or {}) do table.insert(out, key) end
@@ -127,20 +125,55 @@ local function shape(value, seen, depth)
   return result
 end
 
-local technology_names = {}
-for _, name in ipairs(registry.sorted_names()) do technology_names[name] = true end
+local plan_prototype = data.raw["mod-data"]
+  and data.raw["mod-data"]["more-infinite-research-generation-plan"]
+local plan = plan_prototype and plan_prototype.data
+if not (plan and plan.schema == 1 and plan.kind == "mir-generation-plan-public") then
+  error("MIR approved-delta export requires the finalized public GenerationPlan")
+end
+
+local evidence_prototype = data.raw["mod-data"]
+  and data.raw["mod-data"]["more-infinite-research-compiler-evidence-internal"]
+local evidence = evidence_prototype and evidence_prototype.data
+if not (evidence and evidence.schema == 2 and evidence.compiler_result) then
+  error("MIR approved-delta export requires finalized internal CompilerEvidence")
+end
+
+-- The private generated registry belongs to the CompilerContext lifetime. The
+-- approved-delta fixture loads after that scope closes, so reconstruct its
+-- stable public contract from immutable artifacts emitted by the completed
+-- compiler run instead of reopening mutable compiler state.
+local technology_names, registry_rows = {}, {}
+for _, row in ipairs(plan.rows or {}) do
+  if row.action == "emit" and row.technology_id then
+    technology_names[row.technology_id] = true
+    registry_rows[row.technology_id] = {
+      name = row.technology_id,
+      kind = "stream",
+      key = row.stream_id
+    }
+  end
+end
+for _, candidate in ipairs(evidence.compiler_result.base_continuations or {}) do
+  if candidate.action == "create" and candidate.technology_name then
+    technology_names[candidate.technology_name] = true
+    registry_rows[candidate.technology_name] = {
+      name = candidate.technology_name,
+      kind = "base_extension",
+      key = candidate.key
+    }
+  end
+end
 
 local adoption = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
 for _, binding in ipairs((adoption and adoption.data and adoption.data.bindings) or {}) do
   if binding.owner then technology_names[binding.owner] = true end
 end
 
-local technologies, registry_rows = {}, {}
+local technologies = {}
 for _, name in ipairs(sorted_keys(technology_names)) do
   local technology = data.raw.technology and data.raw.technology[name]
   if technology then technologies[name] = normalized_technology(technology) end
-  local entry = registry.get(name)
-  if entry then registry_rows[name] = normalize(entry) end
 end
 
 local setting_rows = {}

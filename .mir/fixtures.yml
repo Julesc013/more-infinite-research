@@ -529,6 +529,9 @@ fixtures:
       - external-owner-suppresses-dedicated-streams-when-preferred
       - dedicated-weapon-prerequisites
       - scaled-weapon-overlap
+      - finalized-artifact-generated-identity-projection
+      - isolated-context-weapon-policy-replay
+      - closed-compiler-context-assertion-safety
 
   air-scrubbing:
     requires_features: [recipe_productivity]
@@ -632,6 +635,9 @@ fixtures:
       - atan-compatibility-parity
       - space-age-galore-effect-ownership-parity
       - generated-registry-identity-parity
+      - finalized-generation-plan-registry-projection
+      - finalized-compiler-evidence-base-continuation-projection
+      - closed-compiler-context-export-safety
       - startup-setting-value-parity
       - runtime-namespace-parity
       - migration-contract-parity
