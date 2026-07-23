@@ -118,6 +118,8 @@ if (-not $SkipPSScriptAnalyzer -and (Get-Command Invoke-ScriptAnalyzer -ErrorAct
   }
 }
 
+& (Join-Path $scriptRoot "Test-MIRArtifactCleanup.ps1") -RepoRoot $RepoRoot
+
 if ($failures.Count -gt 0) {
   $failures | Format-Table -AutoSize | Out-String | Write-Host
   throw "PowerShell quality checks failed with $($failures.Count) issue(s)."

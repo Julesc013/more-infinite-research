@@ -5,19 +5,21 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
 # Maintainer Guide
 
-Updated: 2026-07-09
+Updated: 2026-07-23
 
 This guide describes the intended 3.0 workflow for adding compatibility without copying generator logic into per-mod files.
 
 Use `docs/architecture/module-boundaries.md` for where new files belong. New shipped Lua should go under `prototypes/mir/` unless it is a thin Factorio root entrypoint, locale, migration, or graphics asset. Development-only docs, scripts, fixtures, tests, build output, task ledgers, and release archives stay outside the shipped package.
 
 Use [settings governance](settings-governance.md) for startup setting IDs, visibility metadata, provider-gated settings, visible official technology settings, and backport behavior.
+
+Use [local artifact retention and storage](artifact-retention.md) to preserve the shared `testmods_*` libraries while removing completed run staging data safely.
 
 ## Adding Or Moving Shipped Lua
 

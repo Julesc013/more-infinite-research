@@ -1039,6 +1039,14 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/artifact-retention.md
+    title: "Local Artifact Retention And Storage"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - local-artifact-retention
   - path: docs/maintainer/developer-tools.md
     title: "Developer Tools"
     status: current

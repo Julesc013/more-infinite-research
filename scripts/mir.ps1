@@ -27,6 +27,8 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
+  .\scripts\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
   .\scripts\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
   .\scripts\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
   .\scripts\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
@@ -491,6 +493,21 @@ switch ($area) {
   "package" {
     if ($verb -ne "build") { throw "Unknown package command: $verb" }
     & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+  }
+  "storage" {
+    if ($verb -notin @("audit", "clean")) { throw "Unknown storage command: $verb" }
+    $olderThanText = Get-MIRArgValue -Items $Args -Name "--older-than-days" -Default "7"
+    [int]$olderThanDays = 0
+    if (-not [int]::TryParse($olderThanText, [ref]$olderThanDays) -or $olderThanDays -lt 0) {
+      throw "--older-than-days must be a non-negative integer."
+    }
+    $params = @{
+      RepoRoot = $repo.Path
+      OlderThanDays = $olderThanDays
+      AllWorktrees = (Test-MIRArgSwitch -Items $Args -Name "--all-worktrees")
+    }
+    if ($verb -eq "clean" -and (Test-MIRArgSwitch -Items $Args -Name "--apply")) { $params.Apply = $true }
+    & (Join-Path $scriptRoot "Remove-MIRStaleArtifacts.ps1") @params
   }
   "report" {
     switch ($verb) {

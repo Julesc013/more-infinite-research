@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -27,6 +27,8 @@ Use `scripts/mir.ps1` first:
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 audit top25 --space-age
+.\scripts\mir.ps1 storage audit --all-worktrees
+.\scripts\mir.ps1 storage clean --all-worktrees --apply
 .\scripts\mir.ps1 report latest
 .\scripts\mir.ps1 report missing-deps --run <path>
 .\scripts\mir.ps1 report observations --run <path>
@@ -48,6 +50,8 @@ Common overrides:
 ```
 
 `mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+
+`storage audit` reports protected, recent, and cleanup-eligible artifact roots without deleting anything. `storage clean` is also a preview unless `--apply` is explicit. See [local artifact retention and storage](artifact-retention.md) for the protected storage classes, seven-day default, immediate post-run cleanup, hardlink accounting, and deletion safeguards.
 
 `release docs-only` and `release docs-refresh` are aliases for the fast post-gate documentation path. Use them only after the current release candidate has already passed the full release gate and the remaining edits are docs, release notes, changelog text, or the release archive. The command rebuilds the package, runs static/package validation, checks whitespace, and rejects non-doc/package changes so code, prototype, script, fixture, or locale edits still require the full release gate.
 
