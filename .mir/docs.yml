@@ -344,12 +344,20 @@ docs:
     checkpoint_candidate_sha256: 1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B
   - path: docs/releases/3.2.0-c8-compiler-platform-overhaul.md
     title: "MIR 3.2.0 C8 Compiler Platform Overhaul"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.2.0-c9-deterministic-compiler-boundary.md
+    title: "MIR 3.2.0 C9 Deterministic Compiler Boundary"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c8-compiler-platform
+      - mir-3.2.0-c9-compiler-platform
+      - mir-3.2.0-c9-candidate-identity
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

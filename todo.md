@@ -80,7 +80,8 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Expand the 3.1.9-to-3.2.0 upgrade harness across base, Space Age native-owner, automatic-family, base-continuation, and mod-set configuration-change archetypes.
 - [x] Complete bounded C7 architectural convergence from the unqualified C6 foundation without adding gameplay scope.
 - [x] Complete the governed C8 compiler-platform overhaul from the unqualified C7 foundation and freeze its exact package-source and archive identities.
-- [ ] Run all final-candidate-bound automated work only after C8 architecture, tuning, promotion records, and package-visible behavior are frozen.
+- [x] Complete the governed C9 deterministic compiler-boundary overhaul from the unqualified C8 foundation and freeze its exact package-source and archive identities.
+- [ ] Run all final-candidate-bound automated work only after C9 architecture, tuning, promotion records, and package-visible behavior are frozen.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.

@@ -19,16 +19,16 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C8` |
+| Candidate | `C9` |
 | Branch | `dev` |
-| Package source commit | `4b73ed41e0761eb5d81cddf538ad89712b301054` |
-| Package source tree | `e8364ead3aba4a1385f7667d4c8be8598fd0ba7f` |
-| Package source SHA-256 | `8AF5A69147DBBEA863B552E14F4FF710CFCE68E4F2C332D1FCA601DAA0001CF1` |
+| Package source commit | `56719eba490874b46c18be94e68ffb71a5ae455b` |
+| Package source tree | `d0c44e16a0913188b73fd522d46383febd48da67` |
+| Package source SHA-256 | `CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `969200` |
-| Archive entries | `264` |
-| Archive SHA-256 | `5D161E3C05B4223BE87F6C52A2AF65994228CD2626C33BF4B14003FE6A74BFD5` |
-| Package content SHA-256 | `8AF5A69147DBBEA863B552E14F4FF710CFCE68E4F2C332D1FCA601DAA0001CF1` |
+| Archive bytes | `991829` |
+| Archive entries | `284` |
+| Archive SHA-256 | `CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E` |
+| Package content SHA-256 | `CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3` |
 | Qualification | `not-release-qualified` |
 | Publication | `unreleased` |
 | Status | `awaiting-fresh-candidate-qualification` |
@@ -37,11 +37,11 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C7` |
-| Package source commit | `b532e91a227cc4b17526edbb1388c7836e0a6dbe` |
-| Archive bytes | `958994` |
-| Archive entries | `256` |
-| Archive SHA-256 | `1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B` |
-| Reason | governed compiler-platform contracts changed packaged Lua and README after the C7 fixed-point candidate |
+| Candidate | `C8` |
+| Package source commit | `4b73ed41e0761eb5d81cddf538ad89712b301054` |
+| Archive bytes | `969200` |
+| Archive entries | `264` |
+| Archive SHA-256 | `5D161E3C05B4223BE87F6C52A2AF65994228CD2626C33BF4B14003FE6A74BFD5` |
+| Reason | immutable snapshot, total-gate, transformation-operation, and environment-identity contracts changed packaged Lua and README after C8 |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.
