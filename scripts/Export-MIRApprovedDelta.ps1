@@ -387,6 +387,42 @@ function Test-ExactCoverageContractDifference {
   }
 }
 
+function Test-ExactTechnologyCatalogContractAddition {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
+
+  if ($null -ne $Before -or
+      $Path -notmatch '^scenarios\.[^.]+\.mod_data_contracts\.(?<catalog>more-infinite-research-technology-catalog(?:-internal)?)$' -or
+      [string]$After.contract_shape.kind -ne "object") {
+    return $false
+  }
+
+  $actualFields = @($After.contract_shape.fields.PSObject.Properties.Name | Sort-Object)
+  if ($Matches.catalog -eq "more-infinite-research-technology-catalog") {
+    $expectedFields = @(
+      "catalog_fingerprint", "counts", "kind", "provider_summary", "public_fingerprint",
+      "reason_histogram", "samples", "schema", "selected", "technology_catalog_schema", "truncation"
+    ) | Sort-Object
+    return [string]$After.data_type -eq "more-infinite-research.technology-catalog-public" -and
+      [int]$After.schema -eq 1 -and
+      ($actualFields -join "|") -eq ($expectedFields -join "|")
+  }
+
+  $expectedFields = @(
+    "alternative_qualifications", "base_candidates", "candidate_catalog_fingerprint", "candidates",
+    "catalog_fingerprint", "compilation_plan_fingerprint", "context_fingerprint", "current_selections",
+    "generation_plan_fingerprint", "mutation_authority", "phase", "preselection_catalog_fingerprint",
+    "qualification_catalog_fingerprint", "qualifications", "schema", "selection_authority",
+    "selection_fingerprint"
+  ) | Sort-Object
+  return [string]$After.data_type -eq "more-infinite-research.technology-catalog-v3-internal" -and
+    [int]$After.schema -eq 3 -and
+    ($actualFields -join "|") -eq ($expectedFields -join "|")
+}
+
 function Get-DifferenceDisposition {
   param(
     [Parameter(Mandatory)][string]$Path,
@@ -415,6 +451,14 @@ function Get-DifferenceDisposition {
       intentional = $true
       migration_impact = "Diagnostic consumers must accept the documented 3.2 schema; save identity is unaffected."
       required_evidence = @("compiler-contracts", "base-generation-integrity", "schema drift static gate")
+    }
+  }
+  if (Test-ExactTechnologyCatalogContractAddition -Path $Path -Before $Before -After $After) {
+    return [ordered]@{
+      reason = "3.2 adds bounded public and explicit internal TechnologyCatalog evidence contracts."
+      intentional = $true
+      migration_impact = "Diagnostic consumers may read the bounded public schema; complete internal catalog data remains an explicit diagnostics surface and save identity is unaffected."
+      required_evidence = @("technology lifecycle schema gate", "public artifact budget gate", "compiler-contracts", "catalog publication reference")
     }
   }
   if (Test-ExactCoverageContractDifference -Path $Path -Before $Before -After $After) {

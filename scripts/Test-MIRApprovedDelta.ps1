@@ -19,6 +19,60 @@ function Get-MIRDeltaCanonicalJson {
   return ($Value | ConvertTo-Json -Depth 100 -Compress)
 }
 
+function Get-MIRDeltaProducerFingerprint {
+  $paths = @(
+    "scripts/Export-MIRApprovedDelta.ps1",
+    "fixtures/compat-matrix/expected-scenarios.json",
+    "fixtures/export-approved-delta/data-final-fixes.lua",
+    "fixtures/export-approved-delta/info.json",
+    "scripts/validation/FactorioProcess.ps1",
+    "scripts/validation/PackageIdentity.ps1",
+    "scripts/validation/ResultAggregation.ps1",
+    "scripts/validation/ScenarioRegistry.ps1",
+    "scripts/validation/SettingsOverrides.ps1",
+    "scripts/validation/TargetProfiles.ps1"
+  )
+  $rows = @(
+    foreach ($relative in $paths) {
+      $file = Join-Path $repo $relative
+      "$relative=$((Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash)"
+    }
+  )
+  return Get-MIRStringSha256 -Value ($rows -join "`n")
+}
+
+function Test-MIRDeltaTechnologyCatalogAddition {
+  param($Difference)
+
+  $path = [string]$Difference.field
+  $after = $Difference.after
+  if ($null -ne $Difference.before -or
+      $path -notmatch '^scenarios\.[^.]+\.mod_data_contracts\.(?<catalog>more-infinite-research-technology-catalog(?:-internal)?)$' -or
+      [string]$after.contract_shape.kind -ne "object") {
+    return $false
+  }
+  $actualFields = @($after.contract_shape.fields.PSObject.Properties.Name | Sort-Object)
+  if ($Matches.catalog -eq "more-infinite-research-technology-catalog") {
+    $expectedFields = @(
+      "catalog_fingerprint", "counts", "kind", "provider_summary", "public_fingerprint",
+      "reason_histogram", "samples", "schema", "selected", "technology_catalog_schema", "truncation"
+    ) | Sort-Object
+    return [string]$after.data_type -eq "more-infinite-research.technology-catalog-public" -and
+      [int]$after.schema -eq 1 -and
+      ($actualFields -join "|") -eq ($expectedFields -join "|")
+  }
+  $expectedFields = @(
+    "alternative_qualifications", "base_candidates", "candidate_catalog_fingerprint", "candidates",
+    "catalog_fingerprint", "compilation_plan_fingerprint", "context_fingerprint", "current_selections",
+    "generation_plan_fingerprint", "mutation_authority", "phase", "preselection_catalog_fingerprint",
+    "qualification_catalog_fingerprint", "qualifications", "schema", "selection_authority",
+    "selection_fingerprint"
+  ) | Sort-Object
+  return [string]$after.data_type -eq "more-infinite-research.technology-catalog-v3-internal" -and
+    [int]$after.schema -eq 3 -and
+    ($actualFields -join "|") -eq ($expectedFields -join "|")
+}
+
 function Test-MIRDeltaExactStringAddition {
   param($Before, $After, [string]$ExpectedAdded)
   $beforeValues = @($Before | ForEach-Object { [string]$_ })
@@ -82,6 +136,22 @@ if ($artifact.baseline.version -ne "3.1.9" -or $artifact.baseline.archive_sha256
 if ($artifact.current.version -ne "3.2.0" -or [string]::IsNullOrWhiteSpace([string]$artifact.current.archive_sha256)) {
   throw "Approved-delta current side does not bind an exact 3.2.0 archive."
 }
+$releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
+$releaseAuthority = $releaseLedger.development."factorio-2.1"
+$packageSourceCommit = [string]$releaseAuthority.package_source_commit
+if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$' -or
+    [string]$artifact.current.source_commit -ne $packageSourceCommit -or
+    [string]$artifact.current.package_source_commit -ne $packageSourceCommit) {
+  throw "Approved-delta current side does not bind the canonical C11 package-source commit."
+}
+$qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
+if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$') {
+  throw "Approved-delta exporter does not bind a full qualification-source commit."
+}
+$expectedProducerSha256 = Get-MIRDeltaProducerFingerprint
+if ([string]$artifact.exporter.producer_sha256 -ne $expectedProducerSha256) {
+  throw "Approved-delta exporter fingerprint differs from the current governed producer."
+}
 if (-not $ValidateStructureOnly) {
   $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
   if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
@@ -94,6 +164,19 @@ if (-not $ValidateStructureOnly) {
   if ($currentCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
     throw "Approved-delta exact-candidate validation requires the clean package source at ExpectedSourceCommit."
   }
+  & git -C $repo merge-base --is-ancestor $packageSourceCommit $qualificationSourceCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Approved-delta package source is not an ancestor of its qualification source."
+  }
+  & git -C $repo merge-base --is-ancestor $qualificationSourceCommit $ExpectedSourceCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Approved-delta qualification source is not an ancestor of ExpectedSourceCommit."
+  }
+  [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
+  & git -C $repo diff --quiet $packageSourceCommit $ExpectedSourceCommit -- @packageRoots
+  if ($LASTEXITCODE -ne 0) {
+    throw "Package-visible source changed after approved-delta package-source authority."
+  }
   $candidateSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $candidatePath).Hash
   $candidateContentSha = Get-MIRZipContentFingerprint -Path $candidatePath
   if ($candidateContentSha -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
@@ -101,12 +184,11 @@ if (-not $ValidateStructureOnly) {
   }
   if ([string]$artifact.current.archive_sha256 -ne $candidateSha -or
       [string]$artifact.current.package_content_sha256 -ne $candidateContentSha -or
-      [string]$artifact.current.source_commit -ne $ExpectedSourceCommit) {
+      [string]$releaseAuthority.archive_sha256 -ne $candidateSha -or
+      [string]$releaseAuthority.package_content_sha256 -ne $candidateContentSha -or
+      [string]$releaseAuthority.package_source_sha256 -ne $candidateContentSha) {
     throw "Approved-delta current side does not bind the exact candidate, package content, and source authority."
   }
-}
-if ([string]::IsNullOrWhiteSpace([string]$artifact.exporter.producer_sha256)) {
-  throw "Approved-delta exporter does not bind its exact producer fingerprint."
 }
 
 $expectedScenarios = @(
@@ -168,14 +250,15 @@ if ($artifact.summary.difference_count -ne $differences.Count -or
   $artifact.summary.intentional_count -ne $differences.Count) {
   throw "Approved-delta summary counts differ from its rows."
 }
-if ($differences.Count -ne 200) {
+if ($differences.Count -ne 221) {
   throw "Approved-delta difference count differs from the exact reviewed 3.2 transition."
 }
 
 $expectedReasonCounts = [ordered]@{
-  "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch." = 5
+  "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch." = 12
   "Scenario binds the two exact MIR package versions under comparison." = 7
   "3.2 hardens GenerationPlan authority and target-neutral CompilerEvidence contracts." = 77
+  "3.2 adds bounded public and explicit internal TechnologyCatalog evidence contracts." = 14
   "3.2 publishes compact public coverage and reserves the complete recipe ledger for explicit internal diagnostics." = 49
   "3.2 adds the explicitly reviewed steel productivity stream and its stable startup-setting family." = 42
   "3.2 adds the explicitly reviewed steel productivity stream and stable generated identity." = 4
@@ -275,6 +358,11 @@ foreach ($scenario in $expectedScenarios) {
   }
   if (-not @($differences.field | Where-Object { $_ -like "$prefix*coverage-report*" })) {
     throw "Approved-delta scenario lacks the compact public coverage transition: $scenario"
+  }
+  $catalogRows = @($differences | Where-Object { $_.field -like "$prefix*technology-catalog*" })
+  if ($catalogRows.Count -ne 2 -or
+      @($catalogRows | Where-Object { -not (Test-MIRDeltaTechnologyCatalogAddition -Difference $_) }).Count -ne 0) {
+    throw "Approved-delta scenario lacks the exact public/internal TechnologyCatalog transition: $scenario"
   }
 }
 
