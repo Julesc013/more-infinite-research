@@ -12,6 +12,8 @@
       "maximum_cross_version_additions": 64,
       "maximum_cross_version_removals": 0,
       "maximum_provider_phase_seconds": 0.5
+      ,"maximum_provider_canonical_bytes": 1048576
+      ,"maximum_provider_witnesses": 64
     }
   ]
 }

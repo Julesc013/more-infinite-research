@@ -419,9 +419,7 @@ local function compile(context, return_view)
   catalog = technology_catalog.bind_selections(catalog, rows)
   technology_selection_policy.assert_generation_projection(catalog.current_selections, rows)
   for _, row in ipairs(rows) do
-    if row.action ~= "skip" then
-      row.technology_design = technology_design.from_generation_row(row)
-    end
+    row.technology_design = technology_design.from_generation_row(row)
     plan:add_owned_derived(row)
   end
   local finalized = plan:finalize()
@@ -433,11 +431,8 @@ local function compile(context, return_view)
   telemetry.count("technology_catalog_candidates", #catalog.candidates)
   telemetry.count("technology_catalog_alternatives", #catalog.alternative_qualifications)
   telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(catalog))
-  context:set_state("technology_candidate_catalog", catalog)
-  context:set_state("technology_qualifications", catalog.qualifications)
-  if diagnostics.enabled() then
-    context:record_artifact("technology_candidate_catalog", catalog)
-  end
+  -- The preselection catalog is deliberately transient. CompilationPlan owns
+  -- the one canonical schema-3 catalog after sanitation and graph decisions.
   context:set_state("generation_plan", artifact)
   return return_view and artifact or deepcopy(artifact)
 end

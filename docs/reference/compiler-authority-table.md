@@ -22,15 +22,21 @@ This table names one machine authority, validator, and reference contract for ea
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
 | CompilerProvider | 1 | `prototypes/mir/providers/contract.lua` | `prototypes/mir/providers/registry.lua` and compiler-contract fixture | normalized FamilyRule provider adapter |
 | Provider pipeline and budget | 1 | `prototypes/mir/providers/pipeline/` | compiler-contract and scale fixtures | schema-3 ProviderDecision projection |
+| ProviderMetrics | 1 | `prototypes/mir/providers/provider_metrics.lua` | compiler-contract fixture and TechnologyQualityAssessment | exact provider/environment measurements and provenance |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
 | TechnologyDesign | 2 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator, semantic schema-drift checks, and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
 | Technology hard gate | 1 | `prototypes/mir/domain/technology/gate.lua` | TechnologyDesign, SafetyQualification, and compiler-contract fixture | evidence-bearing planner and verifier decisions |
 | SafetyQualification | 1 | `prototypes/mir/domain/technology/safety_qualification.lua` | TechnologyCatalog and compiler-contract fixture | deterministic selection eligibility |
 | DesignAssessment | 1 | `prototypes/mir/domain/technology/design_assessment.lua` | lifecycle and compiler-contract fixtures | design review independent from safety |
-| PromotionAuthorization | 1 | `prototypes/mir/domain/technology/promotion_authorization.lua` and `promotion_registry.lua` | CompatibilityPack registry and compiler-contract fixture | reviewed automatic creation trust |
-| TechnologyCatalog | 2 | `prototypes/mir/planner/technology_catalog.lua` and `technology_selection_policy.lua` | GenerationPlan projection and compiler-contract fixture | canonical alternative inventory and current selection |
+| PromotionAuthorization | 1 | `.mir/technology-governance.json`, generated `promotion_registry.lua`, and `promotion_authorization.lua` | governance generator check, CompatibilityPack registry, and compiler-contract fixture | reviewed automatic creation trust |
+| TechnologyQualityAssessment | 2 | `prototypes/mir/domain/technology/technology_quality_assessment.lua` and `.mir/technology-quality-profiles.json` | lifecycle and compiler-contract fixtures | monotonic complete/incomplete quality result |
+| TechnologyCatalog | 3 | `prototypes/mir/planner/technology_catalog.lua` and `technology_selection_policy.lua` | exact GenerationPlan/CompilationPlan projection and compiler-contract fixture | canonical post-graph alternative inventory and current selection |
 | GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
 | CompilationPlan | 2 | `prototypes/mir/planner/compilation_plan.lua` | global operation finalization and output parity | governed stream and base-extension emission |
+| CompilerInput | 1 | `prototypes/mir/domain/compiler/compiler_input.lua` | compiler-contract fixture | immutable exact compilation request |
+| CompilerResult | 1 | `prototypes/mir/domain/compiler/compiler_result.lua` | compiler-contract fixture | immutable exact compilation result |
+| EnvironmentIdentity | 1 | `prototypes/mir/domain/environment_identity.lua` and Factorio adapter | compiler-contract fixture | exact target profile, mod closure, fixture, and configuration identity |
+| Compiler orchestration | 1 | `prototypes/mir/pipeline/compiler_orchestrator.lua` | architecture gate and compiler-contract fixture | compile/apply/assert/publish sequencing and context ownership |
 | Shared technology graph | 1 | `prototypes/mir/graph/` | planner/emitter parity and compiler-contract fixtures | virtual and realized graph qualification |
 | CompilerContext | 3 | `prototypes/mir/pipeline/compiler_context.lua` | architecture and compiler-contract fixtures | run-owned services, state epochs, caches, and artifacts |
 | CompilerEvidence | 2 | `prototypes/mir/domain/evidence/compiler_evidence.lua` | postcondition publication, transport adapters, and content fingerprints | assurance evidence and sanitation review |

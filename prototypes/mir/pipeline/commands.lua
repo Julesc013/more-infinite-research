@@ -41,7 +41,8 @@ local commands = {
     requires_features = {"pipeline_extent"},
     implementation = "prototypes/mir/pipeline/extent.lua",
     apply = function()
-      local multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier()
+      local value = require("prototypes.mir.settings.effective").get("mir-pipeline-extent-multiplier")
+      local multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier(value)
       if multiplier ~= 1 then require("prototypes.mir.pipeline.extent").apply(multiplier) end
     end
   },
@@ -60,14 +61,14 @@ local commands = {
   ["compile-generation-plan"] = {
     kind = "plan",
     requires_features = {},
-    implementation = "prototypes/mir/planner/compilation_plan.lua",
-    apply = function(context) require("prototypes.mir.planner.compilation_plan").compile(context) end
+    implementation = "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").compile(context) end
   },
   ["emit-streams"] = {
     kind = "emission",
     requires_features = {},
     implementation = "prototypes/mir/emit/stream_executor.lua",
-    apply = function(context) require("prototypes.mir.planner.compilation_plan").apply_streams(context) end
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").apply_streams(context) end
   },
   ["apply-competing-productivity"] = {
     kind = "mutation",
@@ -79,7 +80,7 @@ local commands = {
     kind = "emission",
     requires_features = {},
     implementation = "prototypes/mir/emit/base_extensions.lua",
-    apply = function(context) require("prototypes.mir.planner.compilation_plan").apply_base_extensions(context) end
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").apply_base_extensions(context) end
   },
   ["apply-competing-base-extensions"] = {
     kind = "mutation",
@@ -111,7 +112,7 @@ local commands = {
       context:record_artifact("output_sanitation_ledger", ledger)
       require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
       local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
-        .assert_registered_technologies(require("prototypes.mir.planner.compilation_plan").compile(context))
+        .assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))
       context:record_artifact("technology_graph_parity", graph_parity)
     end
   },
@@ -137,13 +138,13 @@ local commands = {
     kind = "assertion",
     requires_features = {},
     implementation = "prototypes/mir/planner/output_validator.lua",
-    apply = function(context) require("prototypes.mir.planner.compilation_plan").assert_output(context) end
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").assert_output(context) end
   },
   ["publish-compiler-artifacts"] = {
     kind = "publication",
     requires_features = {},
-    implementation = "prototypes/mir/planner/compilation_plan.lua",
-    apply = function(context) require("prototypes.mir.planner.compilation_plan").publish(context) end
+    implementation = "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").publish(context) end
   },
   ["flush-diagnostics"] = {
     kind = "report",

@@ -738,11 +738,15 @@ fixtures:
       - hard-risk-preserved-during-cardinality-overflow
       - provider-diagnostic-planner-decision-fingerprint-parity
       - no-duplicate-loader-or-mining-discovery
-      - technology-catalog-schema-2-preselection
+      - technology-catalog-schema-3-final-post-sanitation-post-graph
       - technology-catalog-always-built
+      - rejected-technology-design-preservation
+      - exact-technology-catalog-publication
       - deterministic-order-independent-catalog-selection
       - generation-plan-catalog-projection
+      - compilation-plan-catalog-projection
       - every-catalog-alternative-independently-qualified
+      - total-authoritatively-resolved-final-hard-gate-vector
       - rejected-catalog-alternative-cannot-be-selected
       - emitted-planned-technology-graph-parity
       - shared-virtual-actual-graph-semantic-parity
@@ -751,6 +755,12 @@ fixtures:
       - duplicate-provider-id-rejection
       - provider-snapshot-copy-isolation
       - provider-pipeline-stage-isolation
+      - provider-metrics-identifiers-partitions-environment-and-provenance
+      - provider-metrics-real-disposition-depth-time-byte-and-witness-measurements
+      - incomplete-quality-measurement-never-passes
+      - monotone-quality-severity
+      - ambiguous-provider-seed-review-required-without-crash
+      - cross-family-attachment-ambiguity-review-required-without-crash
       - reviewed-attachment-preserving-cardinality-budget
       - new-unreviewed-only-cardinality-suppression
       - compiler-context-state-and-artifact-isolation
@@ -759,6 +769,9 @@ fixtures:
       - compiler-context-state-epoch-replacement
       - compiler-context-state-freeze
       - compiler-context-observationally-pure-snapshot
+      - immutable-compiler-input-and-result-contracts
+      - iterative-deep-researchability-chain
+      - iterative-wide-researchability-fan-in
       - planning-only-provider-emission-adapters
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion

@@ -13,7 +13,7 @@ local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mi
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
 local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
+local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 

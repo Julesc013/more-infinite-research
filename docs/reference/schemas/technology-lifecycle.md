@@ -24,15 +24,15 @@ MIR uses one governed record chain for fixed and procedural technology work. `.m
 | `SafetyQualification` schema 1 | Evaluates one design in one exact context and returns `qualified`, `proposal`, or `rejected` from explicit hard-gate states. |
 | `DesignAssessment` schema 1 | Records design-quality evaluation independently from hard safety and promotion trust. |
 | `PromotionAuthorization` schema 1 | Binds a named authorization, exact subject, trust class, provider version, and evidence without changing safety or quality. |
-| `TechnologyQualityAssessment` schema 1 | Applies one governed quality profile to an exact candidate, design, qualification, metric set, and evidence set without granting promotion authority. |
+| `TechnologyQualityAssessment` schema 2 | Applies one exact governed profile to an exact candidate, design, qualification, ProviderMetrics set, provenance set, and evidence set without granting promotion authority. Missing metrics remain incomplete and review-required. |
 | `TechnologyApproval` schema 1 | Records an approved, quarantined, or demoted maintainer decision with applicability, exact selected alternative, field locks, adaptive envelopes, evidence, reviewer, and time. |
 | `TechnologyApplicabilityEnvelope` schema 1 | Binds approved scope to exact Factorio lines, features, mods, finite structural predicates, positive and negative examples, and a maximum count of newly matched subjects. |
 | `TechnologyPromotion` schema 1 | Advances an identity through one permitted transition and binds an approval plus exact design fingerprint. |
 | `TechnologyMigration` schema 1 | Governs released identity changes and their save behavior. |
-| `TechnologyCatalog` schema 2 | Canonically inventories every applicable materializing and safe diagnostic alternative with its exact qualification, then records deterministic current selections. It has no mutation or publication authority. |
+| `TechnologyCatalog` schema 3 | Canonically inventories every materializing, rejected, and safe diagnostic alternative with its exact design and total qualification after sanitation and graph proof, then records deterministic selections and exact GenerationPlan/CompilationPlan bindings. It has no mutation or publication authority. |
 | `TechnologyPromotionAdmission` schema 1 | Fails closed over the exact catalog alternative, passing quality assessment, approval, applicability envelope, evidence, identity edge, migration policy, and field locks. |
 
-Every compilation materializes the context-owned schema-2 catalog before the GenerationPlan is finalized. The catalog's pure selection policy sorts independent alternatives, excludes rejections, and records one current selection per candidate. The GenerationPlan must be an exact projection of those selections. Diagnostics control only whether detailed internal projections are published; they do not control whether the canonical catalog exists. The catalog cannot publish or mutate a prototype.
+Every compilation materializes the context-owned schema-3 catalog after sanitation and graph proof. The catalog's pure selection policy sorts independent alternatives, excludes rejections, records one current selection per candidate, and preserves rejected designs for audit. Every hard-gate key is present and resolved as passed, failed, or not-applicable with authority. GenerationPlan and CompilationPlan are exact projections of the catalog selections. Diagnostics control only additional views; they do not control whether the exact canonical catalog is published. The catalog cannot publish or mutate a prototype.
 
 Reviewed automatic generation is not authorized by an external pack's self-description. A pack must reference an exact authorization in MIR's source-owned promotion registry, and the pack ID, family ID, provider ID, provider version, trust class, and authorization ID must all match. Only `mir-reviewed` and `protected-release` satisfy reviewed mode; `fixture-only`, `local-user`, and `external-mod-author` remain non-promoting evidence classes.
 
@@ -50,10 +50,10 @@ Released identity changes require a migration strategy: `retain-hidden-alias`, `
 
 ## Review tools
 
-Export a full GenerationPlan artifact into a durable catalog:
+Validate and copy the exact compiler-produced catalog artifact without reconstructing semantics:
 
 ```powershell
-.\scripts\Export-MIRTechnologyCatalog.ps1 -GenerationPlanPath out\generation-plan.json -OutputPath out\technology-catalog.json
+.\scripts\Export-MIRTechnologyCatalog.ps1 -CatalogPath out\technology-catalog.compiler.json -OutputPath out\technology-catalog.json
 ```
 
 Evaluate the selected alternative against a governed profile, produce a deterministic review dossier, and enforce promotion admission:
@@ -78,6 +78,8 @@ Create deterministic approval, quarantine, demotion, promotion, or migration rec
 
 Exact approved design fingerprints return `APPROVED`. Unchanged designs return `UNCHANGED`; adaptive changes return `TARGETED_REVIEW`; unreviewed changes return `REVIEW_REQUIRED`; locked drift returns `REJECTED_LOCK_VIOLATION`.
 
-Passing hard safety gates never creates approval, advances identity, expands applicability, or raises a public compatibility claim.
+Quality profile selection is mandatory. A missing measurement is `INCOMPLETE` and therefore `REVIEW_REQUIRED`; it is never interpreted as zero. Status ordering is monotonic: `PASS < REVIEW_REQUIRED < FAIL`.
+
+Passing hard safety gates never creates approval, advances identity, expands applicability, or raises a public compatibility claim. Promotion authorizations and lifecycle records are generated from `.mir/technology-governance.json`; source-owned governance, not a hand-edited Lua table, is authoritative.
 
 An approved decision must carry both a non-empty exact mod closure and a machine-readable applicability envelope. A label is not an envelope. The envelope is independently fingerprinted, requires positive and negative examples, and fails closed when its target line, feature set, mod closure, structural predicates, or `maximum_new_matches` bound is not satisfied. See [TechnologyApplicabilityEnvelope](technology-applicability-envelope.md).

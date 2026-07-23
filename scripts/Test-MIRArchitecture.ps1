@@ -321,6 +321,11 @@ $requiredMirFiles = @(
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/compilation_plan.lua",
+  "prototypes/mir/pipeline/compiler_orchestrator.lua",
+  "prototypes/mir/domain/compiler/compiler_input.lua",
+  "prototypes/mir/domain/compiler/compiler_result.lua",
+  "prototypes/mir/domain/environment_identity.lua",
+  "prototypes/mir/providers/provider_metrics.lua",
   "prototypes/mir/planner/stream_compiler.lua",
   "prototypes/mir/planner/generation_plan.lua",
   "prototypes/mir/planner/output_validator.lua",
@@ -409,24 +414,24 @@ Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $d
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "ran before dependency"
 foreach ($needle in @(
   'require("prototypes.mir.compatibility.repairs.registry").apply()',
-  'require("prototypes.mir.settings.pipeline_extent").multiplier()',
+  'require("prototypes.mir.settings.pipeline_extent").multiplier(value)',
   'require("prototypes.mir.pipeline.extent").apply(multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
-  'require("prototypes.mir.planner.compilation_plan").compile(context)',
-  'require("prototypes.mir.planner.compilation_plan").apply_streams(context)',
-  'require("prototypes.mir.planner.compilation_plan").apply_base_extensions(context)',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").compile(context)',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").apply_streams(context)',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").apply_base_extensions(context)',
   'require("prototypes.mir.pipeline.mutations.competing_productivity").apply()',
   'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply()',
   'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
   'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
-  'require("prototypes.mir.planner.compilation_plan").assert_output(context)',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").assert_output(context)',
   '.sanitize_all_technology_effects({pass = "input"})',
   '.sanitize_all_technology_effects({pass = "output"})',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
-  '.assert_registered_technologies(require("prototypes.mir.planner.compilation_plan").compile(context))',
+  '.assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))',
   'context:record_artifact("technology_graph_parity", graph_parity)',
-  'require("prototypes.mir.planner.compilation_plan").publish(context)',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").publish(context)',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
@@ -483,10 +488,11 @@ foreach ($forbiddenPlannerDependency in @(
     throw "Stream planning must not import emission dependency '$forbiddenPlannerDependency'."
   }
 }
-Assert-MIRContains `
-  -RelativePath "prototypes/mir/planner/compilation_plan.lua" `
-  -Text $compilationPlanText `
-  -Needle "function M.publish(context)"
+$compilerOrchestratorText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua" -Text $compilerOrchestratorText -Needle "function M.publish(context)"
+if ($compilationPlanText -match 'require\("prototypes\.mir\.emit\.') {
+  throw "Pure CompilationPlan must have zero planner-to-emission imports."
+}
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
 foreach ($contextNeedle in @(
@@ -510,7 +516,7 @@ foreach ($contextOwnedModule in @(
   "prototypes/mir/families/resolver.lua",
   "prototypes/mir/compatibility/packs/registry.lua",
   "prototypes/mir/planner/stream_compiler.lua",
-  "prototypes/mir/planner/compilation_plan.lua",
+  "prototypes/mir/pipeline/compiler_orchestrator.lua",
   "prototypes/mir/report/compiler_telemetry.lua",
   "prototypes/mir/report/diagnostics_sink.lua",
   "prototypes/mir/report/coverage.lua",
@@ -526,7 +532,7 @@ foreach ($forbiddenContextCache in @(
   @{ Path = "prototypes/mir/families/resolver.lua"; Pattern = '(?m)^local\s+canonical\s*=' },
   @{ Path = "prototypes/mir/compatibility/packs/registry.lua"; Pattern = '(?m)^local\s+canonical_snapshot\s*=' },
   @{ Path = "prototypes/mir/planner/stream_compiler.lua"; Pattern = '(?m)^local\s+latest_plan\s*=' },
-  @{ Path = "prototypes/mir/planner/compilation_plan.lua"; Pattern = '(?m)^local\s+latest\s*=' },
+  @{ Path = "prototypes/mir/pipeline/compiler_orchestrator.lua"; Pattern = '(?m)^local\s+latest\s*=' },
   @{ Path = "prototypes/mir/report/coverage.lua"; Pattern = '(?m)^local\s+latest\s*=' }
 )) {
   Assert-MIRNoPatternInLuaFile -RelativePath $forbiddenContextCache.Path -Pattern $forbiddenContextCache.Pattern `
@@ -590,11 +596,13 @@ Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -T
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.technology_catalog")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile(context)"
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'context:set_state("technology_candidate_catalog"'
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua" -Text $compilerOrchestratorText -Needle 'context:set_state("technology_candidate_catalog"'
 
 $technologyCatalogText = Read-MIRFile -RelativePath "prototypes/mir/planner/technology_catalog.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "technology_candidate.from_design"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "technology_qualification.from_design"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle 'local SCHEMA = 3'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "function M.finalize(rows, context_material, compilation_operations, options)"
 if ($technologyCatalogText -match 'data\.raw|data:extend|generated_registry|mod_data') {
   throw "Technology candidate catalog must remain a non-publishing planning artifact."
 }
@@ -663,6 +671,29 @@ foreach ($policyConsumer in @(
   if ($policyConsumerText.Contains('prototypes.mir.compatibility.packs.registry')) {
     throw "Planning consumer bypasses the compatibility policy authority: $policyConsumer"
   }
+}
+
+$compatibilityClaimPath = "fixtures/compat-matrix/claims.json"
+$compatibilityClaimRecord = (Read-MIRFile -RelativePath $compatibilityClaimPath) | ConvertFrom-Json -Depth 100
+$allowedMaturity = @("unverified", "observed", "load-checked", "fixture-qualified", "release-qualified")
+$allowedBehavior = @("diagnostic", "coexistence", "generated", "repaired")
+$allowedScope = @("single-observation", "named-behavior", "partial-family", "family", "pack")
+foreach ($claim in @($compatibilityClaimRecord.claims)) {
+  if ($allowedMaturity -notcontains [string]$claim.maturity -or
+      $allowedBehavior -notcontains [string]$claim.behavior -or
+      $allowedScope -notcontains [string]$claim.scope) {
+    throw "Compatibility claim '$($claim.mod)' lacks valid independent maturity, behavior, and scope dimensions."
+  }
+}
+$claimRegistryText = Read-MIRFile -RelativePath "prototypes/mir/compatibility/claim_registry.lua"
+foreach ($dimension in @("maturity", "behavior", "scope")) {
+  $dimensionCount = [regex]::Matches($claimRegistryText, "(?m)^    $dimension = ").Count
+  if ($dimensionCount -ne @($compatibilityClaimRecord.claims).Count) {
+    throw "Runtime compatibility claims must carry explicit $dimension values for every claim."
+  }
+}
+if ($claimRegistryText -match "DIMENSIONS\[claim\.claim_level\]") {
+  throw "Compatibility dimensions must not be derived from aggregate claim_level."
 }
 
 foreach ($relativePath in @(
@@ -840,5 +871,10 @@ Assert-MIRNoPatternInLuaTree `
   -Message "MIR runtime modules must not perform prototype-stage work."
 
 Assert-MIRNoTopLevelRequireCycles
+
+& (Get-MIRPath -RelativePath "scripts/Update-MIRTechnologyGovernance.ps1") -Check
+if ($LASTEXITCODE -ne 0) {
+  throw "Generated technology governance registry is stale."
+}
 
 Write-Host "[ok] MIR architecture boundary lint passed."

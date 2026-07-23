@@ -497,6 +497,32 @@ function Invoke-MIRAssuranceSelfTest {
     if ($actual.classes -notcontains $case.class) { throw "Classifier self-test failed for $($case.path)." }
   }
 
+  $fixtureFingerprint = Get-MIRAssuranceScenarioFixtureFingerprint -Test ([pscustomobject]@{
+    id = "scenario/2.1/compiler-contracts"
+    scenario = [pscustomobject]@{
+      group = "local-mod-library"
+      fixtures = @("mir-fixture-assert-compiler-contracts")
+    }
+  })
+  if (@($fixtureFingerprint.patterns) -notcontains "fixtures/assert-compiler-contracts/**") {
+    throw "Scenario fixture fingerprint did not resolve the fixture mod ID to its repository directory."
+  }
+  if (@($fixtureFingerprint.patterns) -contains "fixtures/mir-fixture-assert-compiler-contracts/**") {
+    throw "Scenario fixture fingerprint incorrectly treated a fixture mod ID as a repository directory."
+  }
+  if ([int]$fixtureFingerprint.file_count -lt 3) {
+    throw "Scenario fixture fingerprint did not capture the compiler-contract fixture source files."
+  }
+  $unknownFixtureRejected = $false
+  try {
+    $null = Get-MIRAssuranceFixturePathByModId -ModId "mir-fixture-does-not-exist"
+  } catch {
+    $unknownFixtureRejected = $true
+  }
+  if (-not $unknownFixtureRejected) {
+    throw "Unknown scenario fixture mod ID was accepted by the evidence fingerprint resolver."
+  }
+
   $baseMaterial = [ordered]@{test="a"; candidate="a"; binary="a"; harness="a"; settings="a"}
   $base = Get-MIRAssuranceJsonHash -Value $baseMaterial
   foreach ($field in @("candidate", "binary", "harness", "settings")) {

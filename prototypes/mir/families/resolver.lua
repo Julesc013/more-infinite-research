@@ -14,6 +14,10 @@ local provider_hazard_policy = require("prototypes.mir.providers.pipeline.hazard
 local provider_owner_arbitration = require("prototypes.mir.providers.pipeline.owner_arbitration")
 local provider_decision = require("prototypes.mir.providers.pipeline.decision")
 local provider_budget = require("prototypes.mir.providers.pipeline.budget")
+local provider_metrics = require("prototypes.mir.providers.provider_metrics")
+local researchability_index = require("prototypes.mir.graph.researchability_index")
+local recipe_unlocks = require("prototypes.mir.index.recipe_unlocks")
+local environment_adapter = require("prototypes.mir.platform.factorio.environment_identity")
 
 local M = {}
 
@@ -52,7 +56,10 @@ local function build()
   local indexes = relationships.view()
   local rules = rule_registry.snapshot().rules
   local seeds = policy_authority.candidate_seeds()
-  local attachments, decisions, ownership, provider_cardinality = {}, {}, {}, {}
+  local attachments, decisions, provider_cardinality, metrics_by_provider = {}, {}, {}, {}
+  local attachment_claims, rules_by_provider, phase_seconds = {}, {}, {}
+  local researchability = context:state_view("technology_researchability_index", researchability_index.build)
+  local environment = environment_adapter.current()
   telemetry.start_phase("provider_discovery")
 
   for _, seed in ipairs(seeds) do
@@ -66,6 +73,9 @@ local function build()
   end
 
   for _, rule in ipairs(rules) do
+    local clock_available = os and type(os.clock) == "function"
+    local phase_started = clock_available and os.clock() or nil
+    rules_by_provider[rule.provider_id] = rule
     local target_stream = operator_dsl.grouping_stream(rule.operators)
     local candidates = candidates_for_rule(rule, indexes, seeds)
     local rule_decisions = {}
@@ -76,6 +86,9 @@ local function build()
       local pack_decision = provider_pack_policy.resolve(rule, target_stream, candidate, classified.blocker)
       local resolved = provider_hazard_policy.resolve(
         classified, pack_decision, HARD_BLOCKERS, policy_authority.blocker_is_reviewable)
+      if classified.ambiguity then
+        resolved = {eligible = false, blocker = classified.blocker, risk_disposition = "REVIEW_REQUIRED"}
+      end
       classified.eligible = resolved.eligible
       classified.blocker = resolved.blocker
       classified.risk_disposition = resolved.risk_disposition
@@ -88,8 +101,16 @@ local function build()
       if not classified.eligible then
         action = classified.risk_disposition == "REVIEW_REQUIRED" and "review-required" or "diagnose"
       end
-      table.insert(rule_decisions, provider_decision.build(
-        rule, target_stream, candidate, classified, pack_decision, change, action))
+      local decision_row = provider_decision.build(
+        rule, target_stream, candidate, classified, pack_decision, change, action)
+      local earliest_depth
+      for _, unlocker in ipairs(recipe_unlocks.for_recipe(candidate.recipe)) do
+        local depth = researchability.unlock_depths[unlocker]
+        if type(depth) == "number" then earliest_depth = earliest_depth and math.min(earliest_depth, depth) or depth end
+      end
+      decision_row.unlock_depth = earliest_depth
+      provider_decision.refresh_fingerprint(decision_row)
+      table.insert(rule_decisions, decision_row)
     end
 
     local cardinality = provider_budget.apply(rule_decisions, rule.cardinality, #candidates, {
@@ -101,27 +122,69 @@ local function build()
     provider_cardinality[rule.provider_id] = cardinality
     if cardinality.status == "REVIEW_REQUIRED" then telemetry.count("provider_cardinality_review_required", 1) end
     for _, decision_row in ipairs(rule_decisions) do
-        table.insert(decisions, decision_row)
-        if decision_row.final_state == "review-required" then telemetry.count("provider_review_required", 1) end
-        if decision_row.final_state == "attach" then
-          local recipe_name = decision_row.recipe
-          local target_stream = decision_row.target_stream
-          local previous = ownership[recipe_name]
-          if previous and previous ~= target_stream then
-            error("FamilyRule attachment is ambiguous for recipe " .. recipe_name, 2)
-          end
-          ownership[recipe_name] = target_stream
-          attachments[target_stream] = attachments[target_stream] or {}
-          table.insert(attachments[target_stream], {
-            recipe = recipe_name,
-            change = decision_row.change,
-            rule = rule.id,
-            provider_id = rule.provider_id,
-            risk_fingerprint = decision_row.risk_fingerprint,
-            decision_fingerprint = decision_row.decision_fingerprint
-          })
-        end
+      table.insert(decisions, decision_row)
+      if decision_row.final_state == "review-required" then telemetry.count("provider_review_required", 1) end
+      if decision_row.final_state == "attach" then
+        attachment_claims[decision_row.recipe] = attachment_claims[decision_row.recipe] or {}
+        table.insert(attachment_claims[decision_row.recipe], decision_row)
+      end
     end
+    phase_seconds[rule.provider_id] = phase_started and math.max(0, os.clock() - phase_started) or nil
+  end
+
+  local claimed_recipes = {}
+  for recipe_name in pairs(attachment_claims) do table.insert(claimed_recipes, recipe_name) end
+  table.sort(claimed_recipes)
+  for _, recipe_name in ipairs(claimed_recipes) do
+    local claims, streams = attachment_claims[recipe_name], {}
+    for _, claim in ipairs(claims) do streams[claim.target_stream] = true end
+    local stream_names = {}
+    for stream_name in pairs(streams) do table.insert(stream_names, stream_name) end
+    table.sort(stream_names)
+    if #stream_names > 1 then
+      for _, claim in ipairs(claims) do
+        claim.final_state = "review-required"
+        claim.decision = "review-required"
+        claim.blocker = "ambiguous_family_attachment"
+        claim.risk_disposition = "REVIEW_REQUIRED"
+        claim.ambiguity = {code = "ambiguous_family_attachment", candidate_streams = deepcopy(stream_names)}
+        provider_decision.refresh_fingerprint(claim)
+        telemetry.count("provider_review_required", 1)
+      end
+    else
+      table.sort(claims, function(left, right)
+        if left.provider_id ~= right.provider_id then return left.provider_id < right.provider_id end
+        return left.decision_fingerprint < right.decision_fingerprint
+      end)
+      local claim = claims[1]
+      attachments[claim.target_stream] = attachments[claim.target_stream] or {}
+      table.insert(attachments[claim.target_stream], {
+        recipe = recipe_name,
+        change = claim.change,
+        rule = claim.rule,
+        provider_id = claim.provider_id,
+        risk_fingerprint = claim.risk_fingerprint,
+        decision_fingerprint = claim.decision_fingerprint
+      })
+    end
+  end
+
+  for provider_id, rule in pairs(rules_by_provider) do
+    local provider_rows = {}
+    for _, row in ipairs(decisions) do
+      if row.provider_id == provider_id then table.insert(provider_rows, row) end
+    end
+    metrics_by_provider[provider_id] = provider_metrics.build(
+      rule,
+      provider_rows,
+      provider_cardinality[provider_id],
+      {
+        researchability_index = researchability,
+        environment_identity = environment,
+        environment_fingerprint = environment.environment_fingerprint,
+        phase_seconds = phase_seconds[provider_id]
+      }
+    )
   end
 
   for _, rows in pairs(attachments) do
@@ -146,6 +209,8 @@ local function build()
     attachments = attachments,
     decisions = decisions,
     provider_cardinality = provider_cardinality,
+    provider_metrics = metrics_by_provider,
+    environment_fingerprint = environment.environment_fingerprint,
     decision_set_fingerprint = fingerprint.of(decisions)
   }
   return context:set_state("family_resolution", canonical)
@@ -216,6 +281,10 @@ end
 
 function M.snapshot()
   return deepcopy(build())
+end
+
+function M.metrics_for_provider(provider_id)
+  return deepcopy(build().provider_metrics[provider_id])
 end
 
 return M

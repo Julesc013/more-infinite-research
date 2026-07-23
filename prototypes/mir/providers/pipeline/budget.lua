@@ -22,7 +22,14 @@ function M.apply(rows, limits, candidate_count, scope, hard_blockers)
   -- first discovery is governed by the absolute and new-member budgets.
   local growth_percent = retained_count == 0 and 0 or (new_count * 100 / retained_count)
   local semantic_clusters = {}
-  for _, row in ipairs(rows) do if row.item then semantic_clusters[row.item] = true end end
+  local earliest_depth, latest_depth
+  for _, row in ipairs(rows) do
+    if row.partition_key then semantic_clusters[row.partition_key] = true end
+    if type(row.unlock_depth) == "number" then
+      earliest_depth = earliest_depth and math.min(earliest_depth, row.unlock_depth) or row.unlock_depth
+      latest_depth = latest_depth and math.max(latest_depth, row.unlock_depth) or row.unlock_depth
+    end
+  end
   local semantic_cluster_count = 0
   for _ in pairs(semantic_clusters) do semantic_cluster_count = semantic_cluster_count + 1 end
   local reasons = {}
@@ -36,7 +43,8 @@ function M.apply(rows, limits, candidate_count, scope, hard_blockers)
   exceeds(new_count, limits.maximum_unreviewed, "provider_unreviewed_budget_exceeded")
   exceeds(growth_percent, limits.maximum_growth_percent, "provider_growth_percent_budget_exceeded")
   exceeds(semantic_cluster_count, limits.maximum_semantic_clusters, "provider_semantic_cluster_budget_exceeded")
-  exceeds(1, limits.maximum_progression_span, "provider_progression_span_budget_exceeded")
+  local progression_span = earliest_depth and latest_depth and (latest_depth - earliest_depth) or 0
+  exceeds(progression_span, limits.maximum_progression_span, "provider_progression_span_budget_exceeded")
   local budget = {
     schema = 2,
     scope = deepcopy(scope or {}),
@@ -47,7 +55,9 @@ function M.apply(rows, limits, candidate_count, scope, hard_blockers)
     growth_percent = growth_percent,
     review_required_count = review_count,
     semantic_cluster_count = semantic_cluster_count,
-    progression_span = 1,
+    earliest_unlock_depth = earliest_depth,
+    latest_unlock_depth = latest_depth,
+    progression_span = progression_span,
     limits = deepcopy(limits),
     status = #reasons > 0 and "REVIEW_REQUIRED" or "PASS",
     reasons = reasons

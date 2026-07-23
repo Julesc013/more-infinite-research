@@ -8,6 +8,7 @@ function M.candidate(raw, rule)
   out.schema = 1
   out.provider_id = rule.provider_id
   out.family = rule.id
+  out.partition_key = rule.id .. ":" .. tostring((rule.operators.partitioner or {}).operator or "unpartitioned")
   out.identity = rule.provider_id .. "\0" .. out.recipe .. "\0" .. out.item
   out.candidate_fingerprint = fingerprint.of(out)
   return out

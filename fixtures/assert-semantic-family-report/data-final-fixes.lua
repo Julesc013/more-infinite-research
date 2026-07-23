@@ -1,5 +1,5 @@
 local function fail(message) error("MIR automatic productivity preview validation failed: " .. message) end
-local artifact = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan").snapshot()
+local artifact = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator").snapshot()
 local decisions = require("__more-infinite-research__.prototypes.mir.families.resolver").snapshot().decisions
 if #decisions == 0 then fail("preview action recorded no family decisions") end
 for _, row in ipairs(artifact.stream_plan.rows or {}) do

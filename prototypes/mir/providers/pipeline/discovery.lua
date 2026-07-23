@@ -5,7 +5,7 @@ local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local M = {}
 
 local function infer_seed_item(seed, fact)
-  if seed.item then return seed.item end
+  if seed.item then return seed.item, {seed.item} end
   local names, seen = {}, {}
   for _, result in ipairs((fact and fact.results) or {}) do
     if result.type == "item" and result.name and not seen[result.name] then
@@ -13,8 +13,9 @@ local function infer_seed_item(seed, fact)
       table.insert(names, result.name)
     end
   end
-  if #names == 1 then return names[1] end
-  return nil
+  table.sort(names)
+  if #names == 1 then return names[1], names end
+  return nil, names
 end
 
 function M.candidates(rule, indexes, seeds)
@@ -30,9 +31,9 @@ function M.candidates(rule, indexes, seeds)
   for _, seed in ipairs(seeds or {}) do
     if seed.family == rule.id and seed.stream == stream then
       local fact = recipe_facts.view(seed.recipe)
-      local item_name = infer_seed_item(seed, fact)
+      local item_name, item_candidates = infer_seed_item(seed, fact)
       if not item_name then
-        error("CompatibilityPack candidate seed requires an exact item for ambiguous recipe " .. seed.recipe, 2)
+        item_name = "<review-required>"
       end
       by_key[seed.recipe .. "\0" .. item_name] = {
         recipe = seed.recipe,
@@ -41,7 +42,12 @@ function M.candidates(rule, indexes, seeds)
         pack = seed.pack,
         evidence = deepcopy(seed.evidence),
         change = seed.change,
-        tier = seed.tier
+        tier = seed.tier,
+        ambiguity = #item_candidates == 1 and nil or {
+          code = "ambiguous_candidate_seed",
+          candidate_items = item_candidates,
+          evidence = {"compatibility-pack-seed:exact-item-required"}
+        }
       }
     end
   end

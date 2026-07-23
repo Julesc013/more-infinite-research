@@ -44,8 +44,8 @@
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
-    "TechnologyCatalog": 2,
-    "TechnologyQualityAssessment": 1,
+    "TechnologyCatalog": 3,
+    "TechnologyQualityAssessment": 2,
     "TechnologyPromotionAdmission": 1,
     "TechnologyApplicabilityEnvelope": 1
   },
@@ -102,6 +102,7 @@
     "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
     "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",
     "technology-qualifications", "generation-plan", "compilation-plan", "technology-graph-parity",
+    "compiler-input", "compiler-result", "provider-metrics", "environment-identity",
     "generated-technology-registry", "productivity-family-adoption",
     "coverage-report", "compiler-telemetry", "diagnostics", "context-services", "state-epochs"
   ],

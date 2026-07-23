@@ -2,7 +2,7 @@ local function fail(message)
   error("MIR synthetic recipe scale validation failed: " .. message)
 end
 
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
+local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local generation_plan = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-generation-plan"]

@@ -237,13 +237,24 @@ docs:
       - mir-3.2.0-release-readiness
   - path: docs/releases/3.2.0-c7-compiler-fixed-point-report.md
     title: "MIR 3.2.0 C7 Compiler Fixed-Point Report"
-    status: current
+    status: historical-checkpoint
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.0-c7-fixed-point-implementation
       - mir-3.2.0-c7-candidate-identity
+    superseded_by: docs/releases/3.2.0-c8-compiler-platform-overhaul.md
+    checkpoint_source_commit: b532e91a227cc4b17526edbb1388c7836e0a6dbe
+    checkpoint_candidate_sha256: 1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B
+  - path: docs/releases/3.2.0-c8-compiler-platform-overhaul.md
+    title: "MIR 3.2.0 C8 Compiler Platform Overhaul"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-c8-compiler-platform
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current
@@ -317,6 +328,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - technology-lifecycle-schemas
+  - path: docs/reference/schemas/compiler-runtime-contracts.md
+    title: "Compiler Runtime Contracts"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-runtime-contracts
+      - provider-metrics-schema
+      - environment-identity-schema
   - path: docs/reference/schemas/technology-applicability-envelope.md
     title: "TechnologyApplicabilityEnvelope Schema"
     status: current

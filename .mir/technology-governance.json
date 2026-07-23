@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "authority": "mir-technology-governance-v1",
+  "authorizations": [
+    {
+      "authorization_id": "mir.reviewed.compiler-contract-fixture-v1",
+      "trust_class": "mir-reviewed",
+      "pack": "pack-operational",
+      "family": "assembling-machine-manufacturing",
+      "stream": "research_auto_assembling_machine",
+      "provider_version": "family-rule-v3",
+      "applicability_envelope": {"fixture": "assert-compiler-contracts"}
+    },
+    {
+      "authorization_id": "mir.reviewed.semantic-family-fixture-v1",
+      "trust_class": "mir-reviewed",
+      "pack": "semantic-family-fixture",
+      "family": "assembling-machine-manufacturing",
+      "stream": "research_auto_assembling_machine",
+      "provider_version": "family-rule-v3",
+      "applicability_envelope": {"mod": "mir-fixture-semantic-family-attach", "version": "0.1.0"}
+    },
+    {
+      "authorization_id": "mir.reviewed.upgrade-automatic-family-v1",
+      "trust_class": "mir-reviewed",
+      "pack": "mir-upgrade-automatic-family",
+      "family": "assembling-machine-manufacturing",
+      "stream": "research_auto_assembling_machine",
+      "provider_version": "family-rule-v3",
+      "applicability_envelope": {"mod": "mir-fixture-assert-upgrade-3-1-9-to-3-2-0", "version": "0.1.0"}
+    }
+  ],
+  "approvals": [],
+  "promotions": [],
+  "applicability_envelopes": [],
+  "migrations": []
+}

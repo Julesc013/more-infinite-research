@@ -11,7 +11,7 @@ for _, technology_name in ipairs({
   end
 end
 
-local artifact = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan").snapshot()
+local artifact = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator").snapshot()
 local blocked = {}
 for _, row in ipairs((artifact and artifact.stream_plan and artifact.stream_plan.rows) or {}) do
   if row.stream_key == "research_auto_assembling_machine" or row.stream_key == "research_auto_lab" then

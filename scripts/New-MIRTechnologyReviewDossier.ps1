@@ -14,7 +14,7 @@ function Get-MIRJsonSha256 {
   return ([BitConverter]::ToString($hash)).Replace("-", "")
 }
 $catalog = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $CatalogPath) | ConvertFrom-Json
-if ([int]$catalog.schema -ne 2) { throw "TechnologyCatalog schema 2 is required." }
+if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final") { throw "Final TechnologyCatalog schema 3 is required." }
 $candidate = @($catalog.candidates | Where-Object { [string]$_.candidate_id -eq $CandidateId })
 $selection = @($catalog.current_selections | Where-Object { [string]$_.candidate_id -eq $CandidateId })
 if ($candidate.Count -ne 1 -or $selection.Count -ne 1) { throw "Review dossier candidate or selection is ambiguous: $CandidateId" }
@@ -23,7 +23,7 @@ if ($assessment -and [string]$assessment.candidate_id -ne $CandidateId) { throw 
 $selected = @($candidate[0].alternatives | Where-Object { [string]$_.alternative_id -eq [string]$selection[0].alternative_id })[0]
 $dossier = [ordered]@{
   schema=1; kind="mir-technology-review-dossier"; candidate_id=$CandidateId
-  catalog_sha256=[string]$catalog.catalog_sha256
+  catalog_fingerprint=[string]$catalog.catalog_fingerprint
   candidate=$candidate[0]; current_selection=$selection[0]; selected_alternative=$selected
   rejected_alternatives=@($candidate[0].alternatives | Where-Object { [string]$_.alternative_id -ne [string]$selection[0].alternative_id })
   quality_assessment=$assessment

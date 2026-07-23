@@ -88,6 +88,7 @@ modules:
     - prototypes/mir/platform/factorio/target_line.lua
     - prototypes/mir/platform/factorio/target_profiles.lua
     - prototypes/mir/platform/factorio/runtime_state.lua
+    - prototypes/mir/platform/factorio/environment_identity.lua
   settings:
     - prototypes/mir/settings/registry.lua
     - prototypes/mir/settings/catalog.lua
@@ -115,6 +116,7 @@ modules:
   pipeline:
     - prototypes/mir/pipeline/commands.lua
     - prototypes/mir/pipeline/compiler_context.lua
+    - prototypes/mir/pipeline/compiler_orchestrator.lua
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
@@ -139,6 +141,9 @@ modules:
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/facts/recipe_semantics.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
+    - prototypes/mir/domain/compiler/compiler_input.lua
+    - prototypes/mir/domain/compiler/compiler_result.lua
+    - prototypes/mir/domain/environment_identity.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/effects/metadata.lua
     - prototypes/mir/domain/native_owner/contract.lua
@@ -155,6 +160,7 @@ modules:
     - prototypes/mir/domain/technology/design_assessment.lua
     - prototypes/mir/domain/technology/promotion_authorization.lua
     - prototypes/mir/domain/technology/promotion_registry.lua
+    - prototypes/mir/domain/technology/generated_promotion_registry.lua
     - prototypes/mir/domain/technology/effect_safety_policy.lua
     - prototypes/mir/domain/technology/technology_quality_assessment.lua
     - prototypes/mir/domain/technology/technology_approval.lua
@@ -193,6 +199,7 @@ modules:
     - prototypes/mir/providers/contract.lua
     - prototypes/mir/providers/builtins.lua
     - prototypes/mir/providers/registry.lua
+    - prototypes/mir/providers/provider_metrics.lua
     - prototypes/mir/providers/pipeline/discovery.lua
     - prototypes/mir/providers/pipeline/normalization.lua
     - prototypes/mir/providers/pipeline/classification.lua
@@ -233,6 +240,7 @@ modules:
     - prototypes/mir/planner/science.lua
   integrity:
     - prototypes/mir/integrity/effect_contracts.lua
+    - prototypes/mir/integrity/technology_effects.lua
   emit:
     - prototypes/mir/emit/technology_replacement.lua
     - prototypes/mir/emit/technology_graph_safety.lua
@@ -301,16 +309,17 @@ mutation_commands:
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
-    - the schema-2 TechnologyCatalog is a context-owned canonical inventory built for every compilation before deterministic current selection; it has no mutation or publication authority
+    - the schema-3 TechnologyCatalog is finalized once after sanitation and graph proof, preserves rejected designs, publishes as one exact artifact, and has no mutation authority
     - every GenerationPlan is an exact projection of the catalog selection policy
     - SafetyQualification DesignAssessment and PromotionAuthorization are independent fingerprinted decisions
     - only MIR-owned mir-reviewed or protected-release promotion authorizations may satisfy reviewed automatic generation
     - approval promotion demotion quarantine and migration records are independently fingerprinted governance decisions
     - approved structural applicability is a fingerprinted data-only envelope with exact mods positive examples negative examples and bounded new matches
     - family providers flow through explicit discovery normalization classification pack-policy hazard-policy owner-arbitration decision and budget stages
+    - ProviderMetrics binds provider version family partition exact environment measured dispositions unlock depth timing bytes witnesses and per-metric provenance
     - provider budgets suppress only new-unreviewed proposals and preserve exact-reviewed attachments and hard-blocker diagnostics
     - compatibility policy authority is the only planning facade that composes overlays active packs claims and policy fingerprints
-    - stream planning cannot import the stream executor or adoption mutation transaction
+    - planner modules have zero imports of emit modules; pipeline compiler orchestration owns all planning-to-emission sequencing
     - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
@@ -336,6 +345,8 @@ mutation_commands:
     - assert-plan-output
     - publish-compiler-artifacts
     - flush-diagnostics
+
+dependency_matrix: .mir/module-dependencies.json
 
 target_layers:
   stage:
@@ -480,8 +491,9 @@ rules:
   - RecipeRiskFact is the sole recipe-risk authority consumed by family rules providers packs plans and diagnostics.
   - Provider cardinality overflow is review-required and cannot silently reach emission.
   - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
-  - Top-level MIR Lua module dependencies are checked against .mir/module-dependencies.json, including an exact bounded legacy-cycle baseline.
+  - Top-level MIR Lua module dependencies are checked against the exhaustive schema-2 .mir/module-dependencies.json matrix with zero exceptions.
   - Domain graph and planner layers cannot import emit implementation modules.
+  - Every observed cross-layer import must appear in the exact schema-2 dependency matrix; dependency exceptions are forbidden.
   - Mutable state derived from prototypes settings active mods or a compilation pass is owned by CompilerContext schema 3.
   - CompilerContext services are context-owned, freezeable, and never configured through process-global callbacks.
   - State replacement requires an explicit matching epoch and snapshots are observationally pure.
@@ -512,6 +524,10 @@ compiler_context:
     - diagnostics
     - technology-candidate-catalog
     - technology-qualifications
+    - compiler-input
+    - compiler-result
+    - provider-metrics
+    - environment-identity
     - technology-graph-parity
     - context-services
     - state-epochs
@@ -560,6 +576,8 @@ validation_tooling:
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
+    technology_governance_source: .mir/technology-governance.json
+    technology_governance_generator: scripts/Update-MIRTechnologyGovernance.ps1
     technology_quality_assessment: scripts/New-MIRTechnologyQualityAssessment.ps1
     technology_review_dossier: scripts/New-MIRTechnologyReviewDossier.ps1
     technology_promotion_admission: scripts/Test-MIRTechnologyPromotionAdmission.ps1

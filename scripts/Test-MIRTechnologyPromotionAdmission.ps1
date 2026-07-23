@@ -26,7 +26,7 @@ $profiles = Read-MIRJson $ProfilePath
 $migration = if ($MigrationPath) { Read-MIRJson $MigrationPath } else { $null }
 $rejected = @()
 $review = @()
-if ([int]$catalog.schema -ne 2 -or [bool]$catalog.mutation_authority) { $rejected += "catalog-authority" }
+if ([int]$catalog.schema -ne 3 -or [string]$catalog.phase -ne "final" -or [bool]$catalog.mutation_authority) { $rejected += "catalog-authority" }
 $candidate = @($catalog.candidates | Where-Object { [string]$_.candidate_id -eq [string]$promotion.candidate_id })
 $selection = @($catalog.current_selections | Where-Object { [string]$_.candidate_id -eq [string]$promotion.candidate_id })
 if ($candidate.Count -ne 1 -or $selection.Count -ne 1) { $rejected += "candidate-selection-cardinality" }
@@ -66,7 +66,7 @@ $status = if ($rejected.Count -gt 0) { "REJECTED" } elseif ($review.Count -gt 0)
 $record = [ordered]@{
   schema=1; record_type="TechnologyPromotionAdmission"; status=$status
   candidate_id=[string]$promotion.candidate_id; technology_id=[string]$promotion.technology_id
-  catalog_sha256=[string]$catalog.catalog_sha256; assessment_fingerprint=[string]$assessment.assessment_fingerprint
+  catalog_fingerprint=[string]$catalog.catalog_fingerprint; assessment_fingerprint=[string]$assessment.assessment_fingerprint
   approval_fingerprint=[string]$approval.approval_fingerprint_sha256; promotion_fingerprint=[string]$promotion.promotion_fingerprint_sha256
   rejected_reasons=@($rejected | Sort-Object -Unique); review_reasons=@($review | Sort-Object -Unique)
 }

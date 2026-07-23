@@ -6,7 +6,9 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $policyPath = Join-Path $repo ".mir\module-dependencies.json"
 $policy = Get-Content -Raw -LiteralPath $policyPath | ConvertFrom-Json
-if ($policy.schema -ne 1) { throw "Module dependency policy schema must be 1." }
+if ($policy.schema -ne 2 -or [string]$policy.edge_policy -ne "exact-observed-cross-layer-v1") {
+  throw "Module dependency policy schema 2 exact matrix is required."
+}
 
 function Get-RelativePath([string]$Path) {
   return [IO.Path]::GetRelativePath($repo, $Path).Replace('\', '/')
@@ -22,19 +24,28 @@ function Get-Layer([string]$RelativePath) {
 }
 
 $exceptionSet = @{}
-foreach ($exception in $policy.exceptions) {
-  $exceptionSet[([string]$exception.source + "`n" + [string]$exception.target)] = $true
-}
+foreach ($exception in $policy.exceptions) { $exceptionSet[([string]$exception.source + "`n" + [string]$exception.target)] = $true }
+if ($exceptionSet.Count -ne 0) { throw "Module dependency exceptions are not permitted in schema 2." }
 
 $forbidden = @{}
 foreach ($edge in $policy.forbidden_edges) {
-  $forbidden[([string]$edge.from + "`n" + [string]$edge.to)] = $true
+  $forbidden[[string]$edge] = $true
+}
+$allowed = @{}
+foreach ($edge in $policy.allowed_edges) {
+  if ([string]$edge -notmatch '^[a-z]+->[a-z]+$' -or $allowed.ContainsKey([string]$edge)) {
+    throw "Module dependency allowed edge is invalid or duplicated: $edge"
+  }
+  $allowed[[string]$edge] = $true
 }
 
 $moduleFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\mir") -Recurse -File -Filter "*.lua"
 $graph = @{}
+$observedEdges = @{}
 foreach ($file in $moduleFiles) {
   $source = Get-RelativePath $file.FullName
+  $sourceLayer = Get-Layer $source
+  if (-not $sourceLayer) { throw "MIR Lua source has no governed layer: $source" }
   $graph[$source] = [Collections.Generic.List[string]]::new()
   $text = Get-Content -Raw -LiteralPath $file.FullName
   foreach ($match in [regex]::Matches($text, 'require\s*\(\s*["''](prototypes\.mir\.[A-Za-z0-9_\.]+)["'']\s*\)')) {
@@ -46,12 +57,19 @@ foreach ($file in $moduleFiles) {
     $graph[$source].Add($target)
     $fromLayer = Get-Layer $source
     $toLayer = Get-Layer $target
-    $edgeKey = [string]$fromLayer + "`n" + [string]$toLayer
-    $exceptionKey = $source + "`n" + $target
-    if ($forbidden[$edgeKey] -and -not $exceptionSet[$exceptionKey]) {
+    if (-not $toLayer) { throw "MIR Lua require target has no governed layer: $target" }
+    $edgeKey = [string]$fromLayer + "->" + [string]$toLayer
+    if ($fromLayer -ne $toLayer) { $observedEdges[$edgeKey] = $true }
+    if ($forbidden[$edgeKey]) {
       throw "Forbidden MIR module dependency: $source ($fromLayer) -> $target ($toLayer)"
     }
+    if ($fromLayer -ne $toLayer -and -not $allowed[$edgeKey]) {
+      throw "Undeclared MIR module dependency: $source ($fromLayer) -> $target ($toLayer)"
+    }
   }
+}
+foreach ($edge in $allowed.Keys) {
+  if (-not $observedEdges[$edge]) { throw "Stale allowed MIR module edge is no longer observed: $edge" }
 }
 
 $visiting, $visited = @{}, @{}
@@ -114,4 +132,4 @@ foreach ($id in $commandIds.Keys) {
   }
 }
 
-Write-Host "[ok] MIR module dependencies, require cycles, overlays, and command authority passed."
+Write-Host "[ok] exact MIR module dependency matrix, zero planner-to-emit exceptions, require cycles, overlays, and command authority passed."

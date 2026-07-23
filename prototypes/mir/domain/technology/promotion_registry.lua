@@ -2,38 +2,15 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
+local generated = require("prototypes.mir.domain.technology.generated_promotion_registry")
 
 -- MIR owns this source registry. A compatibility pack may reference an entry,
 -- but cannot create or upgrade its trust class at runtime.
-local RECORDS = {
-  ["mir.reviewed.semantic-family-fixture-v1"] = {
-    authorization_id = "mir.reviewed.semantic-family-fixture-v1",
-    trust_class = "mir-reviewed",
-    pack = "semantic-family-fixture",
-    family = "assembling-machine-manufacturing",
-    stream = "research_auto_assembling_machine",
-    provider_version = "family-rule-v3",
-    applicability_envelope = {mod = "mir-fixture-semantic-family-attach", version = "0.1.0"}
-  },
-  ["mir.reviewed.compiler-contract-fixture-v1"] = {
-    authorization_id = "mir.reviewed.compiler-contract-fixture-v1",
-    trust_class = "mir-reviewed",
-    pack = "pack-operational",
-    family = "assembling-machine-manufacturing",
-    stream = "research_auto_assembling_machine",
-    provider_version = "family-rule-v3",
-    applicability_envelope = {fixture = "assert-compiler-contracts"}
-  },
-  ["mir.reviewed.upgrade-automatic-family-v1"] = {
-    authorization_id = "mir.reviewed.upgrade-automatic-family-v1",
-    trust_class = "mir-reviewed",
-    pack = "mir-upgrade-automatic-family",
-    family = "assembling-machine-manufacturing",
-    stream = "research_auto_assembling_machine",
-    provider_version = "family-rule-v3",
-    applicability_envelope = {mod = "mir-fixture-assert-upgrade-3-1-9-to-3-2-0", version = "0.1.0"}
-  }
-}
+local RECORDS = {}
+for _, record in ipairs(generated.authorizations or {}) do
+  if RECORDS[record.authorization_id] then error("Duplicate generated promotion authorization: " .. record.authorization_id) end
+  RECORDS[record.authorization_id] = deepcopy(record)
+end
 
 local function material(record)
   local out = deepcopy(record)
@@ -62,7 +39,16 @@ function M.snapshot()
     table.insert(out, copied)
   end
   table.sort(out, function(left, right) return left.authorization_id < right.authorization_id end)
-  return {schema = 1, records = out, trust_authority = "mir-owned-source"}
+  return {
+    schema = 1,
+    records = out,
+    trust_authority = "mir-owned-source",
+    governance_authority = generated.authority,
+    approvals = deepcopy(generated.approvals),
+    promotions = deepcopy(generated.promotions),
+    applicability_envelopes = deepcopy(generated.applicability_envelopes),
+    migrations = deepcopy(generated.migrations)
+  }
 end
 
 return M

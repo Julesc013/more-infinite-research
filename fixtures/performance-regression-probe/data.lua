@@ -1,6 +1,6 @@
 local probe = require("probe")
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
+local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local graph_safety = require("__more-infinite-research__.prototypes.mir.emit.technology_graph_safety")
 local commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 

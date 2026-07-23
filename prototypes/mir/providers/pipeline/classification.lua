@@ -7,6 +7,17 @@ local M = {}
 function M.evaluate(rule, candidate)
   local fact = recipe_facts.view(candidate.recipe)
   local risk_fact = recipe_risk_facts.view(candidate.recipe)
+  if candidate.ambiguity then
+    return {
+      fact = fact,
+      risk_fact = risk_fact,
+      risk_disposition = "REVIEW_REQUIRED",
+      risk_blocker = candidate.ambiguity.code,
+      eligible = false,
+      blocker = candidate.ambiguity.code,
+      ambiguity = candidate.ambiguity
+    }
+  end
   local risk_disposition, risk_blocker = recipe_risk_facts.primary_disposition(risk_fact)
   local eligible, blocker = operator_dsl.eligibility(rule.operators, fact, candidate.item, risk_fact)
   if risk_disposition ~= "PASS" then blocker = risk_blocker; eligible = false end

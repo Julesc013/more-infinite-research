@@ -5,11 +5,12 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local effect_safety_policy = require("prototypes.mir.domain.technology.effect_safety_policy")
+local technology_effects = require("prototypes.mir.integrity.technology_effects")
 
 local S = {}
 
-S.assert_effect_allowed = effect_safety_policy.assert_effect_allowed
-S.assert_effects_allowed = effect_safety_policy.assert_effects_allowed
+S.assert_effect_allowed = technology_effects.assert_effect_allowed
+S.assert_effects_allowed = technology_effects.assert_effects_allowed
 
 local function assert_effect_target_exists(effect, technology_name)
   local valid, reason, target = effect_contracts.target_status(effect)
@@ -39,30 +40,7 @@ local function log_pruned_effect(technology_name, effect, reason, target, owner)
     .. tostring(reason))
 end
 
-function S.sanitize_effects(effects, context, owner)
-  local kept, removed, retained_effect_order, retained_effect_identities = {}, {}, {}, {}
-  for effect_index, effect in ipairs(effects or {}) do
-    local valid, reason, target = effect_contracts.target_status(effect)
-    if valid then
-      table.insert(kept, effect)
-      table.insert(retained_effect_order, effect_index)
-      local identity = effect_contracts.identity(effect)
-      table.insert(retained_effect_identities, identity ~= "" and identity or fingerprint.of(effect))
-    else
-      table.insert(removed, {
-        original_effect_index = effect_index,
-        type = effect and effect.type,
-        target = target,
-        reason = reason,
-        removed_effect_fingerprint = fingerprint.of(effect or {})
-      })
-      log_pruned_effect(context, effect, reason, target, owner or "unknown")
-      telemetry.count("effects_pruned", 1)
-      telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type) .. ":" .. tostring(target))
-    end
-  end
-  return kept, removed, retained_effect_order, retained_effect_identities
-end
+S.sanitize_effects = technology_effects.sanitize_effects
 
 function S.prune_missing_recipe_effects(technology, technology_name)
   local effects = technology and technology.effects or {}

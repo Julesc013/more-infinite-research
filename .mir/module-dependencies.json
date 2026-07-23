@@ -1,68 +1,55 @@
 {
-  "schema": 1,
+  "schema": 2,
+  "edge_policy": "exact-observed-cross-layer-v1",
   "layers": [
-    {"name": "domain", "prefix": "prototypes/mir/domain/"},
-    {"name": "graph", "prefix": "prototypes/mir/graph/"},
-    {"name": "planner", "prefix": "prototypes/mir/planner/"},
-    {"name": "presentation", "prefix": "prototypes/mir/presentation/"},
-    {"name": "emit", "prefix": "prototypes/mir/emit/"},
-    {"name": "providers", "prefix": "prototypes/mir/providers/"},
-    {"name": "compatibility", "prefix": "prototypes/mir/compatibility/"},
-    {"name": "pipeline", "prefix": "prototypes/mir/pipeline/"},
-    {"name": "platform", "prefix": "prototypes/mir/platform/"},
-    {"name": "core", "prefix": "prototypes/mir/core/"}
+    {"name":"stage","prefix":"prototypes/mir/stage/"},
+    {"name":"runtime","prefix":"prototypes/mir/runtime/"},
+    {"name":"core","prefix":"prototypes/mir/core/"},
+    {"name":"platform","prefix":"prototypes/mir/platform/"},
+    {"name":"settings","prefix":"prototypes/mir/settings/"},
+    {"name":"streams","prefix":"prototypes/mir/streams/"},
+    {"name":"pipeline","prefix":"prototypes/mir/pipeline/"},
+    {"name":"domain","prefix":"prototypes/mir/domain/"},
+    {"name":"index","prefix":"prototypes/mir/index/"},
+    {"name":"policy","prefix":"prototypes/mir/policy/"},
+    {"name":"capabilities","prefix":"prototypes/mir/capabilities/"},
+    {"name":"families","prefix":"prototypes/mir/families/"},
+    {"name":"providers","prefix":"prototypes/mir/providers/"},
+    {"name":"graph","prefix":"prototypes/mir/graph/"},
+    {"name":"presentation","prefix":"prototypes/mir/presentation/"},
+    {"name":"planner","prefix":"prototypes/mir/planner/"},
+    {"name":"integrity","prefix":"prototypes/mir/integrity/"},
+    {"name":"emit","prefix":"prototypes/mir/emit/"},
+    {"name":"report","prefix":"prototypes/mir/report/"},
+    {"name":"compatibility","prefix":"prototypes/mir/compatibility/"}
   ],
-  "forbidden_edges": [
-    {"from": "domain", "to": "emit"},
-    {"from": "graph", "to": "emit"},
-    {"from": "planner", "to": "emit"}
+  "allowed_edges": [
+    "capabilities->compatibility","capabilities->core","capabilities->families","capabilities->graph","capabilities->index","capabilities->pipeline","capabilities->platform","capabilities->policy","capabilities->report","capabilities->settings","capabilities->streams",
+    "compatibility->core","compatibility->domain","compatibility->index","compatibility->pipeline","compatibility->platform","compatibility->report",
+    "domain->core","domain->index","domain->integrity","domain->pipeline",
+    "emit->capabilities","emit->core","emit->domain","emit->graph","emit->integrity","emit->pipeline","emit->planner","emit->platform","emit->policy","emit->presentation","emit->report","emit->settings",
+    "families->compatibility","families->core","families->graph","families->index","families->pipeline","families->platform","families->providers","families->report",
+    "graph->capabilities","graph->core","graph->domain","graph->platform","graph->report",
+    "index->compatibility","index->core","index->domain","index->integrity","index->pipeline","index->platform","index->report",
+    "integrity->core","integrity->domain","integrity->platform","integrity->report",
+    "pipeline->compatibility","pipeline->core","pipeline->domain","pipeline->emit","pipeline->planner","pipeline->platform","pipeline->policy","pipeline->report","pipeline->settings",
+    "planner->capabilities","planner->compatibility","planner->core","planner->domain","planner->families","planner->graph","planner->index","planner->integrity","planner->pipeline","planner->platform","planner->policy","planner->presentation","planner->providers","planner->report","planner->settings","planner->streams",
+    "platform->core","platform->domain",
+    "policy->capabilities","policy->compatibility","policy->core","policy->domain","policy->index","policy->planner","policy->platform","policy->report","policy->settings","policy->streams",
+    "presentation->core","presentation->platform","presentation->settings",
+    "providers->compatibility","providers->core","providers->domain","providers->families","providers->index","providers->policy",
+    "report->core","report->domain","report->emit","report->families","report->index","report->integrity","report->pipeline","report->platform","report->settings",
+    "runtime->platform","runtime->settings",
+    "settings->core","settings->domain","settings->platform","settings->streams",
+    "stage->compatibility","stage->pipeline","stage->platform","stage->report","stage->runtime","stage->settings","stage->streams",
+    "streams->compatibility","streams->core","streams->domain","streams->platform"
   ],
-  "exceptions": [
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/base_extensions.lua",
-      "reason": "bounded legacy orchestration bridge pending base-extension planner extraction"
-    },
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/stream_executor.lua",
-      "reason": "bounded legacy orchestration bridge invoked only by pipeline commands"
-    },
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/effect_safety.lua",
-      "reason": "bounded legacy integrity bridge; pure blocked-effect policy is already domain-owned"
-    },
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/mod_data.lua",
-      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
-    },
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
-      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
-    },
-    {
-      "source": "prototypes/mir/planner/compilation_plan.lua",
-      "target": "prototypes/mir/emit/compiler_evidence_adapter.lua",
-      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
-    }
-  ],
+  "forbidden_edges": ["domain->emit","graph->emit","planner->emit"],
+  "exceptions": [],
   "overlay_policy": {
     "path": "prototypes/mir/compatibility/overlays",
-    "forbidden_tokens": ["data.raw", "data:extend", "data_raw."]
+    "forbidden_tokens": ["data.raw","data:extend","data_raw."]
   },
-  "cycle_exceptions": [
-    {
-      "members": [
-        "prototypes/mir/settings/catalog.lua",
-        "prototypes/mir/settings/effective.lua",
-        "prototypes/mir/settings/pipeline_extent.lua",
-        "prototypes/mir/settings/profile_codec.lua"
-      ],
-      "reason": "existing lazy settings facade cycle; frozen baseline blocks new members or new cycles"
-    }
-  ],
+  "cycle_exceptions": [],
   "command_authority": "prototypes/mir/pipeline/commands.lua"
 }

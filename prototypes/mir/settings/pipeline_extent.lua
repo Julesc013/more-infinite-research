@@ -19,11 +19,6 @@ local multiplier_by_value = {
   ["1000"] = 10
 }
 
-local function startup_setting(name)
-  local effective_settings = require("prototypes.mir.settings.effective")
-  return effective_settings.get(name)
-end
-
 function S.parse(value)
   if value == nil then return 1 end
 
@@ -40,8 +35,8 @@ function S.parse(value)
   return numeric
 end
 
-function S.multiplier()
-  return S.parse(startup_setting("mir-pipeline-extent-multiplier"))
+function S.multiplier(value)
+  return S.parse(value)
 end
 
 return S

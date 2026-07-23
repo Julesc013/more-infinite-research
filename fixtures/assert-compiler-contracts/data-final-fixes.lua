@@ -555,7 +555,7 @@ if candidate.candidate_id ~= normalized_design.candidate_id
   or candidate.semantic_identity.capability ~= "recipe-productivity"
   or qualification.decision ~= "qualified"
   or qualification.design_fingerprint ~= normalized_design.design_fingerprint
-  or lifecycle_catalog.schema ~= 2
+  or lifecycle_catalog.schema ~= 3
   or lifecycle_catalog.mutation_authority ~= false
   or #lifecycle_catalog.candidates ~= 1
   or #lifecycle_catalog.candidates[1].alternatives ~= 2
@@ -582,6 +582,10 @@ do
     status = "PASS",
     evidence_sha256 = {"ASSESSMENT-EVIDENCE"}
   })
+  if assessment.schema ~= 2 or assessment.measurement_status ~= "INCOMPLETE"
+    or assessment.status ~= "REVIEW_REQUIRED" then
+    fail("incomplete quality evidence was represented as a passing measurement")
+  end
   local promotion_record = c7_contracts.promotion.new({
     authorization_id = "promotion-authorization/compiler-contract/1",
     candidate_id = candidate.candidate_id,
@@ -1079,6 +1083,54 @@ if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("m
 local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
 
+do
+  local exact_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input").new({
+    environment_fingerprint = "ENVIRONMENT",
+    target_profile_fingerprint = "TARGET",
+    generation_plan_fingerprint = "PLAN",
+    input_sanitation_fingerprint = "SANITATION",
+    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"},
+    environment_identity = {schema = 1, record_type = "EnvironmentIdentity"}
+  })
+  local input_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input").snapshot(exact_input)
+  input_snapshot.source_fingerprints.fixtures = "MUTATED"
+  if exact_input.source_fingerprints.fixtures ~= "COMPILER-CONTRACTS" then
+    fail("CompilerInput snapshot mutated its immutable source contract")
+  end
+  local exact_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result").new({
+    input_fingerprint = exact_input.input_fingerprint,
+    technology_catalog_fingerprint = "CATALOG",
+    generation_plan_fingerprint = "PLAN",
+    compilation_plan_fingerprint = "COMPILATION",
+    qualification_fingerprint = "QUALIFICATION",
+    operation_fingerprints = {"OPERATION"},
+    rejected_candidates = {},
+    status = "PASS"
+  })
+  require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result").validate(exact_result)
+
+  local deep = {}
+  for index = 1, 5000 do
+    deep["deep-" .. index] = {prerequisites = index == 1 and {} or {"deep-" .. (index - 1)}}
+  end
+  local deep_index = require("__more-infinite-research__.prototypes.mir.graph.researchability_index").build_from(deep)
+  if deep_index.schema ~= 2 or deep_index.max_unlock_depth ~= 4999
+    or deep_index.structural_failures["deep-5000"] ~= false then
+    fail("iterative researchability did not resolve a 5000-node chain")
+  end
+  local wide, prerequisites = {}, {}
+  for index = 1, 2000 do
+    local name = "wide-leaf-" .. index
+    wide[name] = {prerequisites = {}}
+    table.insert(prerequisites, name)
+  end
+  wide["wide-root"] = {prerequisites = prerequisites}
+  local wide_index = require("__more-infinite-research__.prototypes.mir.graph.researchability_index").build_from(wide)
+  if wide_index.unlock_depths["wide-root"] ~= 1 or wide_index.node_count ~= 2001 then
+    fail("iterative researchability did not resolve a wide prerequisite fan-in")
+  end
+end
+
 local production_context = compiler_context.current()
 local production_graph_parity = production_context:artifact("technology_graph_parity")
 if not production_graph_parity or production_graph_parity.schema ~= 2
@@ -1113,9 +1165,19 @@ local production_qualifications = production_context:state_snapshot("technology_
 local production_plan = production_context:state_snapshot("generation_plan")
 local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
 local public_plan = public_plan_prototype and public_plan_prototype.data
-if not production_catalog or production_catalog.schema ~= 2 or production_catalog.mutation_authority ~= false
+if not production_catalog or production_catalog.schema ~= 3 or production_catalog.phase ~= "final"
+  or production_catalog.mutation_authority ~= false
   or not production_qualifications
   or not production_plan or not public_plan
+  or not (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
+  or (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"].data.catalog_fingerprint
+    ~= production_catalog.catalog_fingerprint
+  or not production_context:state_view("compiler_input")
+  or not production_context:state_view("compiler_result")
+  or production_context:state_view("compiler_result").input_fingerprint
+    ~= production_context:state_view("compiler_input").input_fingerprint
+  or production_context:state_view("compiler_result").technology_catalog_fingerprint
+    ~= production_catalog.catalog_fingerprint
   or #production_catalog.candidates == 0
   or #production_catalog.qualifications ~= #production_qualifications
   or #production_catalog.current_selections ~= #production_plan.rows
@@ -1132,10 +1194,11 @@ for _, row in ipairs(production_plan.rows or {}) do
   end
   if row.action == "skip" then
     skipped_design_count = skipped_design_count + 1
-    if row.technology_design ~= nil
-      or public_row.subject_fingerprint ~= nil
-      or public_row.qualification_fingerprint ~= nil then
-      fail("skipped GenerationPlan row eagerly constructed or published a TechnologyDesign")
+    if row.technology_design == nil
+      or type(row.technology_design.design_fingerprint) ~= "string"
+      or public_row.subject_fingerprint ~= row.technology_design.subject_fingerprint
+      or public_row.qualification_fingerprint ~= row.technology_design.qualification_fingerprint then
+      fail("skipped GenerationPlan row did not preserve and project its exact TechnologyDesign fingerprints")
     end
   elseif not row.technology_design
     or type(public_row.subject_fingerprint) ~= "string"
@@ -1145,6 +1208,23 @@ for _, row in ipairs(production_plan.rows or {}) do
 end
 if skipped_design_count == 0 then fail("compiler-contract fixture did not exercise skipped-row design deferral") end
 local canonical_decisions = {}
+if next(family_resolver.snapshot().provider_metrics or {}) == nil then
+  fail("ProviderMetrics authority emitted no provider records")
+end
+for provider_id, metrics in pairs(family_resolver.snapshot().provider_metrics or {}) do
+  if metrics.record_type ~= "ProviderMetrics" or metrics.provider_id ~= provider_id
+    or type(metrics.provider_version) ~= "string" or type(metrics.family_id) ~= "string"
+    or type(metrics.partition_key) ~= "string" or type(metrics.environment_fingerprint) ~= "string"
+    or type(metrics.metrics.candidate_count.value) ~= "number"
+    or metrics.metrics.candidate_count.measurement_status ~= "COMPLETE"
+    or metrics.metrics.semantic_cluster_count.source ~= "family-operator-partitioner"
+    or type(metrics.metrics.canonical_bytes.value) ~= "number"
+    or (metrics.metrics.provider_phase_time.measurement_status == "COMPLETE"
+      and type(metrics.metrics.provider_phase_time.value) ~= "number")
+    or type(metrics.metrics_fingerprint) ~= "string" then
+    fail("ProviderMetrics did not bind real identifiers, counts, partition, environment, timing, bytes, and provenance")
+  end
+end
 for _, row in ipairs(family_resolver.snapshot().decisions or {}) do
   if row.rule == "loader-manufacturing" or row.rule == "mining-drill-manufacturing" then
     canonical_decisions[row.decision_fingerprint] = row

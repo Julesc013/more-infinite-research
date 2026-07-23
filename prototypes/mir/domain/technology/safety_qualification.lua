@@ -65,15 +65,18 @@ function M.from_design(design, row, _, options)
   row = row or {}
   local contributing = {}
   local unresolved = {}
+  local hard_gates = {}
   for _, gate_name in ipairs(GATE_ORDER) do
-    local gate = row.gates and row.gates[gate_name]
-    if gate then
-      gate_contract.validate(gate)
-      if gate.status == "failed" then
-        table.insert(contributing, {gate = gate_name, reason = gate.reason, evidence = deepcopy(gate.evidence)})
-      elseif gate.status == "pending" or gate.status == "superseded" then
-        table.insert(unresolved, gate_name)
-      end
+    local gate = row.gates and row.gates[gate_name] or gate_contract.not_applicable(
+      "safety-qualification:total-gate-vector",
+      {"safety-qualification:not-applicable:" .. gate_name}
+    )
+    gate_contract.validate(gate)
+    hard_gates[gate_name] = deepcopy(gate)
+    if gate.status == "failed" then
+      table.insert(contributing, {gate = gate_name, reason = gate.reason, evidence = deepcopy(gate.evidence)})
+    elseif gate.status == "pending" or gate.status == "superseded" then
+      table.insert(unresolved, gate_name)
     end
   end
   local primary = contributing[1]
@@ -90,7 +93,7 @@ function M.from_design(design, row, _, options)
     candidate_id = design.candidate_id,
     design_fingerprint = design.design_fingerprint,
     context_fingerprint = fingerprint.of(design.context),
-    hard_gates = deepcopy(row.gates or {}),
+    hard_gates = hard_gates,
     decision = decision,
     unresolved_gates = deepcopy(unresolved),
     primary_rejection = deepcopy(primary),

@@ -1,21 +1,17 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
-local base_extensions = require("prototypes.mir.emit.base_extensions")
-local stream_executor = require("prototypes.mir.emit.stream_executor")
-local stream_compiler = require("prototypes.mir.planner.stream_compiler")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local fingerprint = require("prototypes.mir.core.fingerprint")
-local effect_safety = require("prototypes.mir.emit.effect_safety")
+local technology_effects = require("prototypes.mir.integrity.technology_effects")
 local effective_settings = require("prototypes.mir.settings.effective")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
-local compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evidence")
-local compiler_context = require("prototypes.mir.pipeline.compiler_context")
-local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
-local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local safety_qualification = require("prototypes.mir.domain.technology.safety_qualification")
+local technology_catalog = require("prototypes.mir.planner.technology_catalog")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
+local compiler_result = require("prototypes.mir.domain.compiler.compiler_result")
 
 local M = {}
 local normalized_base_operation
@@ -39,9 +35,7 @@ end
 local function rebuild_stream_artifact(stream_artifact, rows, rebuild_design_by_index)
   local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
   for index, row in ipairs(rows) do
-    if row.action == "skip" then
-      row.technology_design = nil
-    elseif not row.technology_design or (rebuild_design_by_index and rebuild_design_by_index[index]) then
+    if not row.technology_design or (rebuild_design_by_index and rebuild_design_by_index[index]) then
       row.technology_design = technology_design.from_generation_row(row)
     end
     plan:add_owned_derived(row)
@@ -54,7 +48,7 @@ local function sanitize_stream_artifact(stream_artifact)
   for _, source_row in ipairs(stream_artifact.rows or {}) do
     local row = copy_row_with_design_view(source_row)
     if row.action == "emit" then
-      local kept, removed = effect_safety.sanitize_effects(
+      local kept, removed = technology_effects.sanitize_effects(
         row.fields.effects,
         "CompilationPlan " .. tostring(row.technology_name),
         "generated"
@@ -88,8 +82,7 @@ local function sanitize_stream_artifact(stream_artifact)
       -- preliminary graph and final operation both consume the retained set.
       -- Zero-removal rows need only one qualification refresh after graph proof.
       if #removed > 0 then
-        row.technology_design = row.action == "emit"
-          and technology_design.from_generation_row(row) or nil
+        row.technology_design = technology_design.from_generation_row(row)
       end
     end
     table.insert(rows, row)
@@ -108,7 +101,7 @@ local function sanitize_base_operations(base_plan)
   local operations, removed_count, skipped_count = {}, 0, 0
   for _, source_operation in ipairs(base_plan or {}) do
     local operation = normalized_base_operation(source_operation)
-    local kept, removed = effect_safety.sanitize_effects(
+    local kept, removed = technology_effects.sanitize_effects(
       (operation.technology and operation.technology.effects) or {},
       "CompilationPlan " .. tostring(operation.technology_name),
       "generated"
@@ -153,6 +146,7 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
           rejection.code,
           rejection.evidence
         )
+        row.technology_design = technology_design.from_generation_row(row)
       else
         local proof = graph_summary.proofs[row.technology_name]
         row.gates.prerequisites_acyclic = proof and deepcopy(proof) or gate_contract.failed(
@@ -338,7 +332,7 @@ local function validate_operations(operations)
 
   for _, operation in ipairs(operations) do
     local expected_effects = operation.effects or (operation.technology and operation.technology.effects) or {}
-    effect_safety.assert_effects_allowed(expected_effects, "CompilationPlan " .. tostring(operation.technology_name))
+    technology_effects.assert_effects_allowed(expected_effects, "CompilationPlan " .. tostring(operation.technology_name))
     for _, effect in ipairs(expected_effects) do
       local identity = generation_plan.effect_identity(effect)
       if identity ~= "" then
@@ -420,6 +414,7 @@ local function compilation_material(artifact)
   end
   return {
     schema = artifact.schema,
+    input_fingerprint = artifact.compiler_input and artifact.compiler_input.input_fingerprint,
     source_fingerprints = artifact.source_fingerprints,
     operations = operations,
     rejected_operations = rejected
@@ -435,6 +430,7 @@ local function qualification_material(artifact)
       schema = artifact.stream_plan.schema,
       plan_fingerprint = artifact.stream_plan.plan_fingerprint
     },
+    technology_catalog_fingerprint = artifact.technology_catalog_fingerprint,
     validation_summary = artifact.validation_summary
   }
 end
@@ -510,8 +506,18 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
+  local exact_input = compiler_inputs and compiler_inputs.compiler_input or compiler_input.new({
+    source_fingerprints = source_fingerprints,
+    environment_identity = (compiler_inputs or {}).environment_identity,
+    environment_fingerprint = (compiler_inputs or {}).environment_fingerprint,
+    target_profile_fingerprint = source_fingerprints.target_profile or "unspecified",
+    generation_plan_fingerprint = stream_artifact.plan_fingerprint or "unspecified",
+    input_sanitation_fingerprint = fingerprint.of((compiler_inputs or {}).input_sanitation_ledger or {})
+  })
+  compiler_input.validate(exact_input)
   local artifact = {
     schema = 2,
+    compiler_input = compiler_input.snapshot(exact_input),
     source_fingerprints = source_fingerprints,
     input_sanitation_ledger = deepcopy((compiler_inputs or {}).input_sanitation_ledger),
     operations = operations,
@@ -520,114 +526,46 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     validation_summary = validation_summary
   }
   artifact.compilation_fingerprint = fingerprint.of(compilation_material(artifact))
+  artifact.technology_catalog = technology_catalog.finalize(
+    stream_artifact.rows,
+    source_fingerprints,
+    operations,
+    {
+      generation_plan_fingerprint = stream_artifact.plan_fingerprint,
+      compilation_plan_fingerprint = artifact.compilation_fingerprint,
+      trusted_designs = true
+    }
+  )
+  artifact.technology_catalog_fingerprint = artifact.technology_catalog.catalog_fingerprint
   artifact.qualification_fingerprint = fingerprint.of(qualification_material(artifact))
   artifact.semantic_fingerprint = artifact.qualification_fingerprint
   artifact.fingerprint = artifact.compilation_fingerprint
-  return attach_run_evidence(artifact)
-end
-
-function M.compile(context)
-  context = context or compiler_context.current()
-  compiler_context.activate(context)
-  local latest = context:state_view("compilation_plan")
-  if latest then return latest end
-  telemetry.start_phase("planning")
-  local stream_plan = stream_compiler.compile_view(context)
-  local base_plan = base_extensions.plan_all()
-  latest = M.finalize(stream_plan, base_plan, {
-    input_sanitation_ledger = context:artifact("input_sanitation_ledger"),
-    stream_plan_trusted = true
-  })
-  context:set_state("compilation_plan", latest)
-  stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
-  telemetry.finish_phase("planning")
-  return latest
-end
-
-function M.apply_streams(context)
-  local plan = M.compile(context)
-  stream_executor.apply(plan.stream_plan)
-end
-
-function M.publish(context)
-  local plan = M.compile(context)
-  local mod_data = require("prototypes.mir.emit.mod_data")
-  local include_internal = diagnostics.enabled()
-  local public_plan = public_artifacts.generation_plan(plan.stream_plan)
-  telemetry.count("generation_plan_rows", #(plan.stream_plan.rows or {}))
-  telemetry.count("generation_plan_public_bytes", #fingerprint.canonical(public_plan))
-  local technology_design_count = 0
-  local technology_design_canonical_bytes = 0
-  for _, row in ipairs(plan.stream_plan.rows or {}) do
-    if row.technology_design then
-      technology_design_count = technology_design_count + 1
-      if include_internal then
-        technology_design_canonical_bytes = technology_design_canonical_bytes
-          + #fingerprint.canonical(row.technology_design)
-      end
+  local operation_fingerprints = {}
+  for _, operation in ipairs(operations) do
+    table.insert(operation_fingerprints, fingerprint.of(compilation_operation_material(operation)))
+  end
+  table.sort(operation_fingerprints)
+  local rejected_candidates = {}
+  for _, row in ipairs(stream_artifact.rows or {}) do
+    if row.action == "skip" then
+      table.insert(rejected_candidates, {
+        candidate_id = row.technology_design.candidate_id,
+        design_fingerprint = row.technology_design.design_fingerprint,
+        reason = row.reason
+      })
     end
   end
-  telemetry.count("technology_design_count", technology_design_count)
-  telemetry.count("technology_design_canonical_bytes", technology_design_canonical_bytes)
-  mod_data.emit_generation_plan(public_plan)
-  if include_internal then
-    telemetry.count("generation_plan_internal_bytes", #fingerprint.canonical(plan.stream_plan))
-    mod_data.emit_internal_generation_plan(plan.stream_plan)
-  end
-  local input_ledger = deepcopy(plan.input_sanitation_ledger)
-  local output_ledger = context and context:artifact("output_sanitation_ledger") or nil
-  local evidence_input = {
-    compilation_plan_schema = plan.schema,
-    compilation_fingerprint = plan.compilation_fingerprint,
-    qualification_fingerprint = plan.qualification_fingerprint,
-    input_sanitation_ledger = input_ledger,
-    output_sanitation_ledger = output_ledger
-  }
-  if target_line.feature_enabled("productivity_family_adoption") then
-    require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
-  end
-  require("prototypes.mir.report.coverage").publish(context, {include_internal = include_internal})
-  telemetry.observe_max("context_state_keys", context and context:state_key_count() or 0)
-  evidence_input.telemetry = telemetry.snapshot()
-  local public_evidence = public_artifacts.compiler_evidence(evidence_input)
-  local internal_evidence = include_internal and compiler_evidence.build(evidence_input) or nil
-  require("prototypes.mir.emit.compiler_evidence_adapter").publish(public_evidence, internal_evidence)
-  return true
-end
-
-function M.apply_base_extensions(context)
-  local plan = M.compile(context)
-  base_extensions.apply_plan(plan.base_extension_operations)
-end
-
-function M.snapshot(context)
-  local plan = M.compile(context)
-  local snapshot = {
-    schema = plan.schema,
-    fingerprint = plan.fingerprint,
-    compilation_fingerprint = plan.compilation_fingerprint,
-    qualification_fingerprint = plan.qualification_fingerprint,
-    semantic_fingerprint = plan.semantic_fingerprint,
-    source_fingerprints = plan.source_fingerprints,
-    input_sanitation_ledger = plan.input_sanitation_ledger,
-    operations = plan.operations,
-    stream_plan = plan.stream_plan,
-    base_extension_operations = plan.base_extension_operations,
-    validation_summary = plan.validation_summary
-  }
-  attach_run_evidence(snapshot)
-  return deepcopy(snapshot)
-end
-
-function M.assert_output(context)
-  -- CompilationPlan construction owns TechnologyDesign validation and keeps the
-  -- artifact context-local. The final assertion still compares every planned
-  -- projection with live prototype output, but does not deep-copy or revalidate that trusted
-  -- internal artifact. Public artifact validation remains strict by default.
-  return require("prototypes.mir.planner.output_validator").assert_compilation_artifact(
-    M.compile(context),
-    {designs_validated = true}
-  )
+  artifact.compiler_result = compiler_result.new({
+    input_fingerprint = exact_input.input_fingerprint,
+    technology_catalog_fingerprint = artifact.technology_catalog_fingerprint,
+    generation_plan_fingerprint = stream_artifact.plan_fingerprint,
+    compilation_plan_fingerprint = artifact.compilation_fingerprint,
+    qualification_fingerprint = artifact.qualification_fingerprint,
+    operation_fingerprints = operation_fingerprints,
+    rejected_candidates = rejected_candidates,
+    status = "PASS"
+  })
+  return attach_run_evidence(artifact)
 end
 
 return M

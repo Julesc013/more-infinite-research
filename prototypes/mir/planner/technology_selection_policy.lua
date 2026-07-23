@@ -62,6 +62,39 @@ function M.assert_generation_projection(selections, rows)
       error("SelectionPolicy projection differs from GenerationPlan: " .. key
         .. " selected=" .. tostring(selection.action) .. " row=" .. tostring(row.action), 2)
     end
+    if row.technology_design and selection.design_fingerprint ~= row.technology_design.design_fingerprint
+      and row.action ~= "skip" then
+      error("SelectionPolicy design differs from GenerationPlan: " .. key, 2)
+    end
+  end
+  local row_count = #(rows or {})
+  if #selections ~= row_count then
+    error("SelectionPolicy selection count differs from GenerationPlan.", 2)
+  end
+  return true
+end
+
+function M.assert_compilation_projection(selections, rows, operations)
+  local operation_by_stream = {}
+  for _, operation in ipairs(operations or {}) do
+    if operation.stream_key then
+      if operation_by_stream[operation.stream_key] then
+        error("SelectionPolicy compilation projection has duplicate stream operation: " .. operation.stream_key, 2)
+      end
+      operation_by_stream[operation.stream_key] = operation
+    end
+  end
+  for _, row in ipairs(rows or {}) do
+    local operation = operation_by_stream[row.stream_key]
+    if row.action == "emit" or row.action == "adopt" then
+      if not operation or not row.technology_design
+        or not operation.technology_design
+        or operation.technology_design.design_fingerprint ~= row.technology_design.design_fingerprint then
+        error("SelectionPolicy compilation projection differs for stream: " .. tostring(row.stream_key), 2)
+      end
+    elseif operation then
+      error("SelectionPolicy rejected row reached CompilationPlan: " .. tostring(row.stream_key), 2)
+    end
   end
   return true
 end

@@ -65,22 +65,48 @@ try {
   $after | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $afterPath -Encoding UTF8
   $drift | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $driftPath -Encoding UTF8
 
-  $plan = [ordered]@{
-    schema=3; plan_fingerprint="fixture-plan"; rows=@([ordered]@{
-      schema=3; stream_key="fixture"; manifest_id="fixture"; action="emit"; source="fixture"
-      provider_ids=@("fixture-provider"); family_ids=@("fixture-family"); technology_design=$after
-      gates=[ordered]@{target_supported=[ordered]@{status="passed"; evidence=@("fixture")}}
-    })
+  $materialAlternative = [ordered]@{
+    alternative_id="emit:create:mir-fixture-technology"; action="emit"; disposition="materialize"
+    technology_design=$after; design_fingerprint=$after.design_fingerprint
+    prototype_fingerprint=$after.prototype_fingerprint; qualification_fingerprint="qualification-material"
+    qualification_decision="qualified"; materialization=[ordered]@{kind="create"}
   }
-  $planPath = Join-Path $tempRoot "generation-plan.json"
+  $diagnosticDesign = Copy-FixtureMap $after
+  $diagnosticDesign["design_fingerprint"] = "design-diagnostic"
+  $diagnosticDesign["prototype_fingerprint"] = "prototype-diagnostic"
+  $diagnosticDesign["materialization"] = [ordered]@{kind="diagnose"}
+  $diagnosticAlternative = [ordered]@{
+    alternative_id="diagnose:diagnose:fixture"; action="diagnose"; disposition="safe-diagnostic"
+    technology_design=$diagnosticDesign; design_fingerprint="design-diagnostic"
+    prototype_fingerprint="prototype-diagnostic"; qualification_fingerprint="qualification-diagnostic"
+    qualification_decision="qualified"; materialization=[ordered]@{kind="diagnose"}
+  }
+  $catalogSource = [ordered]@{
+    schema=3; phase="final"; mutation_authority=$false; selection_authority="deterministic-policy-v2"
+    generation_plan_fingerprint="fixture-plan"; compilation_plan_fingerprint="fixture-compilation"
+    candidates=@([ordered]@{candidate_id=$after.candidate_id; alternatives=@($materialAlternative,$diagnosticAlternative)})
+    qualifications=@([ordered]@{candidate_id=$after.candidate_id},[ordered]@{candidate_id=$after.candidate_id})
+    alternative_qualifications=@(
+      [ordered]@{candidate_id=$after.candidate_id; alternative_id=$materialAlternative.alternative_id},
+      [ordered]@{candidate_id=$after.candidate_id; alternative_id=$diagnosticAlternative.alternative_id}
+    )
+    current_selections=@([ordered]@{
+      candidate_id=$after.candidate_id; alternative_id=$materialAlternative.alternative_id; action="emit"
+      design_fingerprint=$after.design_fingerprint; qualification_fingerprint="qualification-material"
+    })
+    candidate_catalog_fingerprint="fixture-candidates"; qualification_catalog_fingerprint="fixture-qualifications"
+    preselection_catalog_fingerprint="fixture-preselection"; selection_fingerprint="fixture-selection"
+    catalog_fingerprint="fixture-catalog"
+  }
+  $catalogSourcePath = Join-Path $tempRoot "catalog-source.json"
   $catalogPath = Join-Path $tempRoot "catalog.json"
-  $plan | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath $planPath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\Export-MIRTechnologyCatalog.ps1") -GenerationPlanPath $planPath -OutputPath $catalogPath
+  $catalogSource | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath $catalogSourcePath -Encoding UTF8
+  & (Join-Path $RepoRoot "scripts\Export-MIRTechnologyCatalog.ps1") -CatalogPath $catalogSourcePath -OutputPath $catalogPath
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
-  if ($catalog.schema -ne 2 -or @($catalog.candidates).Count -ne 1 -or @($catalog.qualifications).Count -ne 2 `
+  if ($catalog.schema -ne 3 -or $catalog.phase -ne "final" -or @($catalog.candidates).Count -ne 1 -or @($catalog.qualifications).Count -ne 2 `
       -or @($catalog.alternative_qualifications).Count -ne 2 -or @($catalog.current_selections).Count -ne 1 `
-      -or [bool]$catalog.mutation_authority -or [string]::IsNullOrWhiteSpace([string]$catalog.catalog_sha256)) {
-    throw "Technology catalog exporter did not produce a non-mutating schema-2 preselection catalog."
+      -or [bool]$catalog.mutation_authority -or [string]::IsNullOrWhiteSpace([string]$catalog.catalog_fingerprint)) {
+    throw "Technology catalog exporter did not preserve the final non-mutating schema-3 catalog."
   }
   $catalogSelection = @($catalog.current_selections)[0]
 
@@ -100,7 +126,7 @@ try {
         maximum_new_matches=0
       }
     }
-    selected_alternative="create:mir-fixture-technology"
+    selected_alternative=$catalogSelection.alternative_id
     approved_design_fingerprint=$after.design_fingerprint
     qualification_fingerprint=$catalogSelection.qualification_fingerprint
     locked_fields=@("identity.technology_id", "presentation.localised_name")
@@ -124,6 +150,7 @@ try {
     effect_per_level=0.1; cost_l1=100; cost_l5=506; cost_l10=1310; cost_l20=6640
     useful_levels_before_cap=20; true_positive_count=1; false_positive_count=0; false_negative_count=0
     cross_version_add_count=0; cross_version_remove_count=0; provider_phase_time=0.01
+    provider_canonical_bytes=2048; provider_witness_count=2
     evidence_sha256=@("negative-fixture", "positive-fixture")
   }
   $qualityMetricsPath = Join-Path $tempRoot "quality-metrics.json"
@@ -132,6 +159,7 @@ try {
   & (Join-Path $RepoRoot "scripts\New-MIRTechnologyQualityAssessment.ps1") `
     -CatalogPath $catalogPath -CandidateId $after.candidate_id `
     -ProfilePath (Join-Path $RepoRoot ".mir\technology-quality-profiles.json") `
+    -ProfileId "technology-candidate-default-v1" `
     -MetricsPath $qualityMetricsPath -OutputPath $assessmentPath
   $assessment = Get-Content -Raw -LiteralPath $assessmentPath | ConvertFrom-Json
   if ($assessment.status -ne "PASS" -or $assessment.design_fingerprint -ne $catalogSelection.design_fingerprint `

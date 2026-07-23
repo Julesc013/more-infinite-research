@@ -4,14 +4,16 @@ local technology_candidate = require("prototypes.mir.domain.technology.technolog
 local technology_qualification = require("prototypes.mir.domain.technology.technology_qualification")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
+local safety_qualification = require("prototypes.mir.domain.technology.safety_qualification")
 local selection_policy = require("prototypes.mir.planner.technology_selection_policy")
 
 local M = {}
-local SCHEMA = 2
+local SCHEMA = 3
+local PHASES = {preselection = true, final = true}
 
-local function alternative_id(design)
+local function alternative_id(design, action)
   local target = design.materialization.target or design.technology_id or design.candidate_id
-  return design.materialization.kind .. ":" .. tostring(target)
+  return tostring(action) .. ":" .. design.materialization.kind .. ":" .. tostring(target)
 end
 
 local function selection_key(row)
@@ -32,11 +34,29 @@ local function safe_diagnostic_row(row)
   return copy
 end
 
-local function alternative_record(design, qualification, action)
+local function final_qualification_row(row)
+  local copy = deepcopy(row)
+  if copy.action ~= "emit" and copy.action ~= "adopt" then
+    copy.gates = copy.gates or {}
+    for gate_name, gate in pairs(copy.gates) do
+      if gate.status == "pending" or gate.status == "superseded" then
+        copy.gates[gate_name] = gate_contract.not_applicable(
+          "technology-catalog:final-rejected-alternative",
+          {"technology-catalog:unreached-after-rejection:" .. gate_name}
+        )
+      end
+    end
+  end
+  return copy
+end
+
+local function alternative_record(design, qualification, action, disposition)
   return {
-    alternative_id = alternative_id(design),
+    alternative_id = alternative_id(design, action),
     action = action,
+    disposition = disposition,
     materialization = deepcopy(design.materialization),
+    technology_design = deepcopy(design),
     design_fingerprint = design.design_fingerprint,
     prototype_fingerprint = design.prototype_fingerprint,
     qualification_fingerprint = qualification.qualification_fingerprint,
@@ -52,7 +72,10 @@ local function preselection_material(catalog)
     alternative_qualifications = catalog.alternative_qualifications,
     context_fingerprint = catalog.context_fingerprint,
     mutation_authority = catalog.mutation_authority,
-    selection_authority = catalog.selection_authority
+    selection_authority = catalog.selection_authority,
+    phase = catalog.phase,
+    generation_plan_fingerprint = catalog.generation_plan_fingerprint,
+    compilation_plan_fingerprint = catalog.compilation_plan_fingerprint
   }
 end
 
@@ -68,15 +91,18 @@ function M.from_preselection_rows(rows, context_material, options)
   options = options or {}
   local candidates, qualifications, alternative_qualifications, by_id = {}, {}, {}, {}
   for _, row in ipairs(rows or {}) do
+    if options.phase == "final" then row = final_qualification_row(row) end
     local primary_design = row.technology_design or technology_design.from_generation_row(row)
     if not options.trusted_designs then technology_design.validate(primary_design) end
     local diagnostic_design = technology_design.as_diagnostic_alternative(primary_design, row.reason)
     local diagnostic_row = safe_diagnostic_row(row)
     local designs = {}
     if row.action == "emit" or row.action == "adopt" then
-      table.insert(designs, {design = primary_design, row = row, action = row.action})
+      table.insert(designs, {design = primary_design, row = row, action = row.action, disposition = "materialize"})
+    else
+      table.insert(designs, {design = primary_design, row = row, action = "reject", disposition = "rejected"})
     end
-    table.insert(designs, {design = diagnostic_design, row = diagnostic_row, action = "diagnose"})
+    table.insert(designs, {design = diagnostic_design, row = diagnostic_row, action = "diagnose", disposition = "safe-diagnostic"})
 
     local candidate = technology_candidate.from_design(primary_design, row, {validated = true})
     if by_id[candidate.candidate_id] then
@@ -94,7 +120,7 @@ function M.from_preselection_rows(rows, context_material, options)
         {status = "UNMEASURED"},
         {validated = true}
       )
-      local alternative = alternative_record(entry.design, qualification, entry.action)
+      local alternative = alternative_record(entry.design, qualification, entry.action, entry.disposition)
       table.insert(candidate.alternatives, alternative)
       table.insert(qualifications, qualification)
       table.insert(alternative_qualifications, {
@@ -118,13 +144,16 @@ function M.from_preselection_rows(rows, context_material, options)
   end)
   local catalog = {
     schema = SCHEMA,
+    phase = options.phase or "preselection",
     candidates = candidates,
     qualifications = qualifications,
     alternative_qualifications = alternative_qualifications,
     current_selections = {},
     context_fingerprint = fingerprint.of(context_material or {}),
     mutation_authority = false,
-    selection_authority = "deterministic-policy-v1"
+    selection_authority = "deterministic-policy-v2",
+    generation_plan_fingerprint = options.generation_plan_fingerprint or "pending",
+    compilation_plan_fingerprint = options.compilation_plan_fingerprint or "pending"
   }
   catalog.candidate_catalog_fingerprint = fingerprint.of(candidates)
   catalog.qualification_catalog_fingerprint = fingerprint.of(qualifications)
@@ -146,6 +175,17 @@ function M.bind_selections(catalog, rows)
   return result
 end
 
+function M.finalize(rows, context_material, compilation_operations, options)
+  options = options or {}
+  options.phase = "final"
+  local catalog = M.from_preselection_rows(rows, context_material, options)
+  catalog = M.bind_selections(catalog, rows)
+  selection_policy.assert_generation_projection(catalog.current_selections, rows)
+  selection_policy.assert_compilation_projection(catalog.current_selections, rows, compilation_operations or {})
+  M.validate(catalog)
+  return catalog
+end
+
 function M.from_generation_rows(rows, context_material, options)
   return M.bind_selections(M.from_preselection_rows(rows, context_material, options), rows)
 end
@@ -154,8 +194,11 @@ function M.validate(catalog)
   if type(catalog) ~= "table" or catalog.schema ~= SCHEMA
     or type(catalog.candidates) ~= "table" or type(catalog.qualifications) ~= "table"
     or type(catalog.alternative_qualifications) ~= "table" or type(catalog.current_selections) ~= "table"
-    or catalog.mutation_authority ~= false or catalog.selection_authority ~= "deterministic-policy-v1" then
-    error("TechnologyCatalog schema 2 canonical preselection inventory is required.", 2)
+    or not PHASES[catalog.phase]
+    or catalog.mutation_authority ~= false or catalog.selection_authority ~= "deterministic-policy-v2"
+    or type(catalog.generation_plan_fingerprint) ~= "string"
+    or type(catalog.compilation_plan_fingerprint) ~= "string" then
+    error("TechnologyCatalog schema 3 canonical inventory is required.", 2)
   end
   local alternatives, qualifications = {}, {}
   for _, qualification in ipairs(catalog.qualifications) do
@@ -173,7 +216,22 @@ function M.validate(catalog)
       if not qualifications[alternative.qualification_fingerprint] then
         error("TechnologyCatalog alternative lacks an exact qualification: " .. key, 2)
       end
+      if type(alternative.technology_design) ~= "table"
+        or alternative.technology_design.design_fingerprint ~= alternative.design_fingerprint then
+        error("TechnologyCatalog alternative lacks its exact preserved TechnologyDesign: " .. key, 2)
+      end
       alternatives[key] = alternative
+    end
+  end
+  if catalog.phase == "final" then
+    for _, qualification in ipairs(catalog.qualifications) do
+      for _, gate_name in ipairs(safety_qualification.schema_authority().gate_order) do
+        local gate = qualification.hard_gates[gate_name]
+        if not gate or not gate_contract.is_authoritatively_resolved(gate) then
+          error("TechnologyCatalog final qualification has an unresolved hard gate: "
+            .. qualification.candidate_id .. "/" .. gate_name, 2)
+        end
+      end
     end
   end
   for _, mapping in ipairs(catalog.alternative_qualifications) do
@@ -199,7 +257,7 @@ function M.validate(catalog)
     or catalog.preselection_catalog_fingerprint ~= fingerprint.of(preselection_material(catalog))
     or catalog.selection_fingerprint ~= fingerprint.of(catalog.current_selections)
     or catalog.catalog_fingerprint ~= fingerprint.of(catalog_material(catalog)) then
-    error("TechnologyCatalog schema 2 fingerprints are invalid.", 2)
+    error("TechnologyCatalog schema 3 fingerprints are invalid.", 2)
   end
   return true
 end

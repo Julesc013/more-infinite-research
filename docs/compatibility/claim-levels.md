@@ -5,15 +5,25 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
 # Compatibility Claims
 
-Updated: 2026-07-07
+Updated: 2026-07-23
 
 Compatibility claims are machine-readable statements about what MIR has actually proved. They prevent public docs from saying "full support" when the evidence only proves load compatibility, diagnostic observation, or one narrow family.
+
+Claim level is not a substitute for behavior detail. Every claim also records three independent dimensions:
+
+| Dimension | Values | Question answered |
+| --- | --- | --- |
+| `maturity` | `unverified`, `observed`, `load-checked`, `fixture-qualified`, `release-qualified` | How strong is the evidence? |
+| `behavior` | `diagnostic`, `coexistence`, `generated`, `repaired` | What does MIR actually do? |
+| `scope` | `single-observation`, `named-behavior`, `partial-family`, `family`, `pack` | How broad is the proved boundary? |
+
+Raising one dimension never raises another implicitly. For example, a release-qualified diagnostic family is still diagnostic behavior and family scope.
 
 ## Claim Levels
 
@@ -33,6 +43,9 @@ Compatibility claims are machine-readable statements about what MIR has actually
 {
   "mod": "atan-air-scrubbing",
   "claim_level": "full-family-support",
+  "maturity": "fixture-qualified",
+  "behavior": "generated",
+  "scope": "family",
   "factorio_lines": {
     "upstream_advertised": ["2.0"],
     "tested": ["2.1"]
@@ -67,6 +80,7 @@ The claim linter should fail when:
 - a claim references a generated stream with no manifest row;
 - a claim says `full-family-support` without positive and negative fixtures;
 - a claim implies an upstream Factorio line that has not been tested;
+- a claim omits maturity, behavior, or scope, or uses a value outside the manifest enums;
 - public text says MIR changes throughput, mining yield, caps, beacons, module rules, pollution removal, recovery loops, or external balance without an implemented policy and fixture.
 
 ## Public Wording
