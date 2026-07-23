@@ -114,10 +114,17 @@ $promotion = Read-MIRText ".github/workflows/assurance-promotion.yml"
 foreach ($required in @(
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*dev:\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='MIR 3\.2\.0'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C6\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*CDAA5A6ECB190C81C3DD9069A27D639C670EB0A6DAF56103871920A361CCF3E8\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*ecb8b0545d3cef1badf1b46a9b4c2170cf0aceee\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='tmp/2\.0'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_3_2_0:\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C6\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*CDAA5A6ECB190C81C3DD9069A27D639C670EB0A6DAF56103871920A361CCF3E8\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*ecb8b0545d3cef1badf1b46a9b4c2170cf0aceee\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_2_5_0:\s*$'},
   @{Path="todo.md"; Text=$todo; Pattern='MIR 3\.2\.0 verifier hardening'},
+  @{Path="todo.md"; Text=$todo; Pattern='bounded C7 architectural convergence from the unqualified C6 foundation'},
   @{Path=".github/workflows/assurance-promotion.yml"; Text=$promotion; Pattern='mir-3\.2\.0-factorio-2\.1\.json'}
 )) {
   if ([string]$required.Text -notmatch [string]$required.Pattern) {

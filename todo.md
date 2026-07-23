@@ -78,8 +78,9 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Complete the local exact-candidate Factorio 2.1.11 full profile; all 128 machine-verifiable tests pass and only `manual.release-review` remains failed locally.
 - [x] Raise the dependency floor to Factorio 2.1.11, correct the four governed native-owner stream policies, and build C5.
 - [x] Expand the 3.1.9-to-3.2.0 upgrade harness across base, Space Age native-owner, automatic-family, base-continuation, and mod-set configuration-change archetypes.
-- [ ] Run all C5 candidate-bound automated work, then the protected-release full profile and release seal; C4 evidence is historical.
-- [ ] Complete the exact-C5 package manual attestation, then complete the separate public-presentation review.
+- [ ] Complete bounded C7 architectural convergence from the unqualified C6 foundation without adding gameplay scope.
+- [ ] Run all final-candidate-bound automated work only after C7 architecture, tuning, promotion records, and package-visible behavior are frozen.
+- [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
