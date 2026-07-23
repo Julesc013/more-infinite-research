@@ -334,12 +334,12 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
 
 Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
   $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
   if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
     throw "Stream compiler count formulas must use compact multiplication syntax."
   }
-  if ($baseExtensionsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
-    throw "Base extension count formulas must use compact multiplication syntax."
+  if ($baseContinuationsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
+    throw "Base continuation count formulas must use compact multiplication syntax."
   }
 }
 
@@ -435,7 +435,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
   $technologyDesignAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_design_adapter.lua")
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
+  $technologyOperationExecutorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_operation_executor.lua")
   $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
   $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
   $integrityContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")
@@ -451,8 +452,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
     @{ File = "prototypes\mir\emit\technology_design_adapter.lua"; Text = $technologyDesignAdapterText; Snippet = 'generated_registry.register(technology.name,' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'technology_design_adapter.emit(operation.technology_design,' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
+    @{ File = "prototypes\mir\emit\technology_operation_executor.lua"; Text = $technologyOperationExecutorText; Snippet = 'technology_design_adapter.emit(design, {' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "input"})' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "output"})' },
@@ -655,7 +656,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\resolver.lua")
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
   $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
@@ -777,7 +778,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'if policy == "configured" then' },
     @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'if policy() == "engine-default" then' },
     @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
@@ -785,10 +786,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data_raw.technology(new_name) then' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'if data_raw.technology(new_name) then' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = '"target_exists"' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset="space-age"' },
@@ -1538,13 +1539,15 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
 
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $dataFinalFixesStagePath = Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua"
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
   $capabilityContractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
   $capabilityPolicyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
   $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
-  $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
+  $compilerDiagnosticsPath = Join-Path $repo "prototypes\mir\report\compiler_diagnostics.lua"
+  $pipelineCommandsPath = Join-Path $repo "prototypes\mir\pipeline\commands.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
@@ -1553,13 +1556,17 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
     throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
   }
-  if (-not (Test-Path -LiteralPath $compilerPath)) {
-    throw "Missing compiler diagnostics module: prototypes\mir\planner\compiler.lua"
-  }
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
     throw "Missing capability registry: prototypes\mir\capabilities\registry.lua"
   }
-  foreach ($path in @($capabilityContractPath, $capabilityPolicyPath, $schemaPath)) {
+  foreach ($path in @(
+      $dataFinalFixesStagePath,
+      $compilerDiagnosticsPath,
+      $pipelineCommandsPath,
+      $capabilityContractPath,
+      $capabilityPolicyPath,
+      $schemaPath
+    )) {
     if (-not (Test-Path -LiteralPath $path)) {
       throw "Missing 2.2.0 capability kernel artifact: $path"
     }
@@ -1573,10 +1580,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
   $schemaText = Get-Content -Raw -LiteralPath $schemaPath
-  $compilerText = Get-Content -Raw -LiteralPath $compilerPath
+  $compilerDiagnosticsText = Get-Content -Raw -LiteralPath $compilerDiagnosticsPath
+  $pipelineCommandsText = Get-Content -Raw -LiteralPath $pipelineCommandsPath
+  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath $dataFinalFixesStagePath
 
   $requiredSnippets = @(
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.planner.compiler").emit()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.stage.data_final_fixes").run()' },
+    @{ File = "prototypes\mir\stage\data_final_fixes.lua"; Text = $dataFinalFixesStageText; Snippet = 'commands.run_all({return_snapshot = false})' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'require("prototypes.mir.report.compiler_diagnostics").emit()' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
@@ -1610,13 +1621,13 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'canonical_provider_decision_projection' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'planner_decision_fingerprint = row.decision_fingerprint' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,materialize,result' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, {' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'D.fact_registry({' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'decision_export.emit(D, {' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'capabilities.emit(registry)' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },

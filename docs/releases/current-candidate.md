@@ -5,7 +5,7 @@ applies_to: "3.2.0"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
 ---
@@ -19,16 +19,16 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C9` |
+| Candidate | `C10` |
 | Branch | `dev` |
-| Package source commit | `56719eba490874b46c18be94e68ffb71a5ae455b` |
-| Package source tree | `d0c44e16a0913188b73fd522d46383febd48da67` |
-| Package source SHA-256 | `CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3` |
+| Package source commit | `6f9297bae1aee2e018ae7298e0661e99aa591028` |
+| Package source tree | `c589d2956dc844557cc0483bb1b0a190995e3940` |
+| Package source SHA-256 | `3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `991829` |
-| Archive entries | `284` |
-| Archive SHA-256 | `CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E` |
-| Package content SHA-256 | `CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3` |
+| Archive bytes | `1000085` |
+| Archive entries | `286` |
+| Archive SHA-256 | `C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695` |
+| Package content SHA-256 | `3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66` |
 | Qualification | `not-release-qualified` |
 | Publication | `unreleased` |
 | Status | `awaiting-fresh-candidate-qualification` |
@@ -37,11 +37,11 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C8` |
-| Package source commit | `4b73ed41e0761eb5d81cddf538ad89712b301054` |
-| Archive bytes | `969200` |
-| Archive entries | `264` |
-| Archive SHA-256 | `5D161E3C05B4223BE87F6C52A2AF65994228CD2626C33BF4B14003FE6A74BFD5` |
-| Reason | immutable snapshot, total-gate, transformation-operation, and environment-identity contracts changed packaged Lua and README after C8 |
+| Candidate | `C9` |
+| Package source commit | `56719eba490874b46c18be94e68ffb71a5ae455b` |
+| Archive bytes | `991829` |
+| Archive entries | `284` |
+| Archive SHA-256 | `CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E` |
+| Reason | execution-mode, exact plan/journal/result, normalized snapshot, bounded public-artifact, telemetry, and preview contracts changed packaged Lua after C9 |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.
