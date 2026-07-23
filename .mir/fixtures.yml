@@ -824,6 +824,8 @@ fixtures:
       - predeclared-settings-stage-mode
       - full-recipe-coverage-accounting
       - coverage-artifact-fingerprint
+      - scenario-scoped-reviewed-exact-candidate-seeds
+      - shared-unreviewed-provider-budget-remains-fail-closed
 
   semantic-family-modes:
     requires_features: [recipe_productivity]
