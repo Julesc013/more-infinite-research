@@ -293,7 +293,7 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
-      candidate_id: C10
+      candidate_id: C11
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
@@ -302,28 +302,28 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 1000085
-      archive_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
-      package_content_sha256: 3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66
-      package_source_sha256: 3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66
-      package_source_commit: 6f9297bae1aee2e018ae7298e0661e99aa591028
-      superseded_candidate_id: C9
-      superseded_candidate_sha256: CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E
+      archive_bytes: 1000145
+      archive_sha256: 3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED
+      package_content_sha256: A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA
+      package_source_sha256: A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA
+      package_source_commit: dc4b1e12695dc915666b04caddbabce570942a74
+      superseded_candidate_id: C10
+      superseded_candidate_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
       superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
       superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: pending-exact-c10
+      approved_delta_gate: pending-exact-c11
       superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: pending-exact-c10
+      upgrade_gate: pending-exact-c11
       locale_gate: passed-source-unchanged-50-locales-21250-values
-      locale_runtime_gate: pending-exact-c10
-      fast_static_gate: passed-local-c10-pending-hosted-c10
+      locale_runtime_gate: pending-exact-c11
+      fast_static_gate: passed-local-c11-pending-hosted-c11
       superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-      runtime_performance_gate: pending-exact-c10
-      manual_attestation_gate: pending-exact-c10
+      runtime_performance_gate: pending-exact-c11
+      manual_attestation_gate: pending-exact-c11
       minimum_factorio_gate: passed-floor-raised-to-2.1.11
-      release_gate: awaiting-c10-requalification-manual-and-protected-qualification
+      release_gate: awaiting-c11-requalification-manual-and-protected-qualification
       publication_status: unreleased
-      status: c10-built-awaiting-candidate-bound-requalification
+      status: c11-built-awaiting-candidate-bound-requalification
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

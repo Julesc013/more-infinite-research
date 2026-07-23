@@ -37,42 +37,42 @@ if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev"
     [string]$modern.qualification -ne "not-release-qualified") {
   throw "Canonical modern development release must remain MIR 3.2.0 on dev and not release-qualified."
 }
-$c10Authority = [ordered]@{
-  candidate_id = "C10"
+$c11Authority = [ordered]@{
+  candidate_id = "C11"
   archive = "dist/more-infinite-research_3.2.0.zip"
-  archive_bytes = 1000085
+  archive_bytes = 1000145
   archive_entries = 286
-  package_source_commit = "6f9297bae1aee2e018ae7298e0661e99aa591028"
-  package_source_tree = "c589d2956dc844557cc0483bb1b0a190995e3940"
-  package_source_sha256 = "3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66"
-  archive_sha256 = "C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695"
-  package_content_sha256 = "3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66"
+  package_source_commit = "dc4b1e12695dc915666b04caddbabce570942a74"
+  package_source_tree = "68e37991bf360ba437101f042835ca7dfc14bc4f"
+  package_source_sha256 = "A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA"
+  archive_sha256 = "3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED"
+  package_content_sha256 = "A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA"
 }
-foreach ($field in $c10Authority.Keys) {
-  if ([string]$modern.$field -ne [string]$c10Authority[$field]) {
-    throw "Canonical C10 authority field '$field' changed. C11 is required if candidate bytes change."
+foreach ($field in $c11Authority.Keys) {
+  if ([string]$modern.$field -ne [string]$c11Authority[$field]) {
+    throw "Canonical C11 authority field '$field' changed. C12 is required if candidate bytes change."
   }
 }
 if ([int]$modern.package_source_material.schema -ne 1 -or
     [string]$modern.package_source_material.hash_algorithm -ne "git-commit-normalized-package-v1" -or
     [string]$modern.package_source_material.source_tree -ne [string]$modern.package_source_tree -or
     [int]$modern.package_source_material.file_count -ne 286) {
-  throw "Canonical C10 package-source material descriptor must bind its clean source tree and 286 package files."
+  throw "Canonical C11 package-source material descriptor must bind its clean source tree and 286 package files."
 }
 & git -C $repo merge-base --is-ancestor ([string]$modern.package_source_commit) HEAD
-if ($LASTEXITCODE -ne 0) { throw "C10 package-source commit is not an ancestor of release-engineering HEAD." }
+if ($LASTEXITCODE -ne 0) { throw "C11 package-source commit is not an ancestor of release-engineering HEAD." }
 $packageSourceTree = @(& git -C $repo rev-parse "$([string]$modern.package_source_commit)^{tree}")
 if ($LASTEXITCODE -ne 0 -or $packageSourceTree.Count -ne 1 -or [string]$packageSourceTree[0] -ne [string]$modern.package_source_tree) {
-  throw "C10 package-source tree does not match the canonical authority row."
+  throw "C11 package-source tree does not match the canonical authority row."
 }
 . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $packageRoots = @(Get-MIRPackageSourceRoots)
 $changedPackagePaths = @(& git -C $repo diff --name-only ([string]$modern.package_source_commit) HEAD -- @packageRoots)
 if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
-  throw "Package-visible paths changed after immutable C10 package source: $($changedPackagePaths -join ', ')"
+  throw "Package-visible paths changed after immutable C11 package source: $($changedPackagePaths -join ', ')"
 }
 if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$modern.package_source_sha256) {
-  throw "Current package roots do not reproduce the canonical C10 package-source identity."
+  throw "Current package roots do not reproduce the canonical C11 package-source identity."
 }
 $candidatePath = Join-Path $repo ([string]$modern.archive)
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -83,25 +83,30 @@ if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf) -or
     $candidateEntries -ne [int]$modern.archive_entries -or
     (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$modern.archive_sha256 -or
     (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$modern.package_content_sha256) {
-  throw "Canonical C10 archive no longer matches its immutable authority row."
+  throw "Canonical C11 archive no longer matches its immutable authority row."
 }
 $superseded = $modern.supersedes_candidate
-if ([string]$superseded.candidate_id -ne "C9" -or [long]$superseded.archive_bytes -ne 991829 -or
-    [int]$superseded.archive_entries -ne 284 -or
-    [string]$superseded.archive_sha256 -ne "CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E" -or
-    [string]$superseded.package_content_sha256 -ne "CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3" -or
-    [string]$superseded.package_source_commit -ne "56719eba490874b46c18be94e68ffb71a5ae455b" -or
-    [string]$superseded.package_source_tree -ne "d0c44e16a0913188b73fd522d46383febd48da67" -or
-    [string]$superseded.package_source_sha256 -ne "CE655B2C1074F0946A70FEC5E6FCF761BCCC63A87ECD952BEC2810920B661AF3") {
-  throw "C10 must retain the complete immutable C9 authority as its superseded candidate."
+if ([string]$superseded.candidate_id -ne "C10" -or [long]$superseded.archive_bytes -ne 1000085 -or
+    [int]$superseded.archive_entries -ne 286 -or
+    [string]$superseded.archive_sha256 -ne "C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695" -or
+    [string]$superseded.package_content_sha256 -ne "3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66" -or
+    [string]$superseded.package_source_commit -ne "6f9297bae1aee2e018ae7298e0661e99aa591028" -or
+    [string]$superseded.package_source_tree -ne "c589d2956dc844557cc0483bb1b0a190995e3940" -or
+    [string]$superseded.package_source_sha256 -ne "3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66") {
+  throw "C11 must retain the complete immutable C10 authority as its superseded candidate."
 }
-$delta = Read-MIRText ".mir/evidence/3.2.0-c9-to-c10-delta.json" | ConvertFrom-Json
+$delta = Read-MIRText ".mir/evidence/3.2.0-c10-to-c11-delta.json" | ConvertFrom-Json
 if ([int]$delta.schema -ne 1 -or [string]$delta.record_type -ne "MIRCandidateArchiveDelta" -or [string]$delta.status -ne "PASS" -or
     [string]$delta.baseline.archive_sha256 -ne [string]$superseded.archive_sha256 -or
     [string]$delta.candidate.archive_sha256 -ne [string]$modern.archive_sha256 -or
-    [int]$delta.summary.added -ne 2 -or [int]$delta.summary.changed -ne 22 -or [int]$delta.summary.removed -ne 0 -or
-    [int]$delta.summary.unchanged -ne 262 -or [int]$delta.summary.unexpected -ne 0) {
-  throw "Tracked C9-to-C10 archive delta does not match the two immutable candidate authorities."
+    [int]$delta.summary.added -ne 0 -or [int]$delta.summary.changed -ne 2 -or [int]$delta.summary.removed -ne 0 -or
+    [int]$delta.summary.unchanged -ne 284 -or [int]$delta.summary.unexpected -ne 0) {
+  throw "Tracked C10-to-C11 archive delta does not match the two immutable candidate authorities."
+}
+$deltaPaths = @($delta.changes | ForEach-Object { [string]$_.path } | Sort-Object)
+$expectedDeltaPaths = @("changelog.txt", "prototypes/mir/providers/pipeline/discovery.lua")
+if (($deltaPaths -join "`n") -ne ($expectedDeltaPaths -join "`n") -or @($delta.changes | Where-Object { -not [bool]$_.allowed }).Count -ne 0) {
+  throw "C10-to-C11 delta must contain only the exact candidate-seed correction and shipped changelog entry."
 }
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
     [string]$backport.status -ne "planned-after-3.2-freeze" -or $null -ne $backport.archive) {
@@ -115,17 +120,18 @@ $promotion = Read-MIRText ".github/workflows/assurance-promotion.yml"
 foreach ($required in @(
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*dev:\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='MIR 3\.2\.0'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C10\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*6f9297bae1aee2e018ae7298e0661e99aa591028\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C11\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*dc4b1e12695dc915666b04caddbabce570942a74\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='tmp/2\.0'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_3_2_0:\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C10\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*6f9297bae1aee2e018ae7298e0661e99aa591028\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C11\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*dc4b1e12695dc915666b04caddbabce570942a74\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_2_5_0:\s*$'},
   @{Path="todo.md"; Text=$todo; Pattern='MIR 3\.2\.0 verifier hardening'},
   @{Path="todo.md"; Text=$todo; Pattern='governed C10 compiler contract-closure overhaul from the unqualified C9 foundation'},
+  @{Path="todo.md"; Text=$todo; Pattern='exact-singleton candidate-seed ambiguity defect as C11'},
   @{Path=".github/workflows/assurance-promotion.yml"; Text=$promotion; Pattern='mir-3\.2\.0-factorio-2\.1\.json'}
 )) {
   if ([string]$required.Text -notmatch [string]$required.Pattern) {

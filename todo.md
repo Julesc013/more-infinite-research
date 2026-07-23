@@ -82,7 +82,8 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Complete the governed C8 compiler-platform overhaul from the unqualified C7 foundation and freeze its exact package-source and archive identities.
 - [x] Complete the governed C9 deterministic compiler-boundary overhaul from the unqualified C8 foundation and freeze its exact package-source and archive identities.
 - [x] Complete the governed C10 compiler contract-closure overhaul from the unqualified C9 foundation and freeze its exact package-source and archive identities.
-- [ ] Run all final-candidate-bound automated work only after C10 architecture, tuning, promotion records, and package-visible behavior are frozen.
+- [x] Correct C10's exact-singleton candidate-seed ambiguity defect as C11 and freeze its exact package-source and archive identities.
+- [ ] Run all final-candidate-bound automated work only after C11 architecture, tuning, promotion records, and package-visible behavior are frozen.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.

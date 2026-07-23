@@ -361,13 +361,23 @@ docs:
     checkpoint_candidate_sha256: CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E
   - path: docs/releases/3.2.0-c10-compiler-contract-closure.md
     title: "MIR 3.2.0 C10 Compiler Contract Closure"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c11-candidate-seed-correction.md
+    checkpoint_source_commit: 6f9297bae1aee2e018ae7298e0661e99aa591028
+    checkpoint_candidate_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
+  - path: docs/releases/3.2.0-c11-candidate-seed-correction.md
+    title: "MIR 3.2.0 C11 Candidate Seed Correction"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c10-compiler-platform
-      - mir-3.2.0-c10-candidate-identity
+      - mir-3.2.0-c11-compiler-platform
+      - mir-3.2.0-c11-candidate-identity
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

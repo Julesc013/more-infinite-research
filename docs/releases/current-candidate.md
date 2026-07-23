@@ -19,16 +19,16 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C10` |
+| Candidate | `C11` |
 | Branch | `dev` |
-| Package source commit | `6f9297bae1aee2e018ae7298e0661e99aa591028` |
-| Package source tree | `c589d2956dc844557cc0483bb1b0a190995e3940` |
-| Package source SHA-256 | `3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66` |
+| Package source commit | `dc4b1e12695dc915666b04caddbabce570942a74` |
+| Package source tree | `68e37991bf360ba437101f042835ca7dfc14bc4f` |
+| Package source SHA-256 | `A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1000085` |
+| Archive bytes | `1000145` |
 | Archive entries | `286` |
-| Archive SHA-256 | `C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695` |
-| Package content SHA-256 | `3C80C5C72AA1E08325464315B902FA95090221177ADABCE2B0A18083404DEF66` |
+| Archive SHA-256 | `3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED` |
+| Package content SHA-256 | `A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA` |
 | Qualification | `not-release-qualified` |
 | Publication | `unreleased` |
 | Status | `awaiting-fresh-candidate-qualification` |
@@ -37,11 +37,11 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C9` |
-| Package source commit | `56719eba490874b46c18be94e68ffb71a5ae455b` |
-| Archive bytes | `991829` |
-| Archive entries | `284` |
-| Archive SHA-256 | `CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E` |
-| Reason | execution-mode, exact plan/journal/result, normalized snapshot, bounded public-artifact, telemetry, and preview contracts changed packaged Lua after C9 |
+| Candidate | `C10` |
+| Package source commit | `6f9297bae1aee2e018ae7298e0661e99aa591028` |
+| Archive bytes | `1000085` |
+| Archive entries | `286` |
+| Archive SHA-256 | `C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695` |
+| Reason | fresh C10 full qualification exposed incorrect ambiguity classification for an exact singleton CompatibilityPack candidate seed; C11 changes only the compiler discovery fix and its shipped changelog entry |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.
