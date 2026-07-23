@@ -221,6 +221,8 @@ fixtures:
       - decomposed-science-authority-parity
       - stable-science-rejection-reason-codes
       - shared-pack-production-reachability-cache
+      - isolated-context-science-facade-validation
+      - closed-compiler-context-assertion-safety
 
   external-technology-cycle:
     requires_features: []
