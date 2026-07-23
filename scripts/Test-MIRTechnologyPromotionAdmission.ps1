@@ -40,7 +40,8 @@ if ($selection.Count -eq 1) {
   if ([string]$assessment.qualification_fingerprint -ne [string]$selection[0].qualification_fingerprint) { $rejected += "assessment-qualification" }
 }
 $profile = @($profiles.profiles | Where-Object { [string]$_.profile_id -eq [string]$assessment.profile_id })
-if ($profile.Count -ne 1) { $rejected += "assessment-profile" }
+if ([int]$profiles.schema -ne 2 -or [string]$profiles.authority -ne "mir-technology-quality-profiles-v2"
+  -or $profile.Count -ne 1) { $rejected += "assessment-profile" }
 if ([string]$assessment.status -ne "PASS") { $review += "assessment-not-pass:$($assessment.status)" }
 if ([string]$approval.decision -ne "approved") { $rejected += "approval-decision" }
 if ([string]$approval.candidate_selector.candidate_id -ne [string]$promotion.candidate_id) { $rejected += "approval-candidate" }

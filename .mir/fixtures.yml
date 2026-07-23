@@ -764,12 +764,25 @@ fixtures:
       - reviewed-attachment-preserving-cardinality-budget
       - new-unreviewed-only-cardinality-suppression
       - compiler-context-state-and-artifact-isolation
-      - compiler-context-schema-3-service-isolation
+      - compiler-context-schema-4-service-isolation
       - compiler-context-service-freeze
       - compiler-context-state-epoch-replacement
       - compiler-context-state-freeze
       - compiler-context-observationally-pure-snapshot
       - immutable-compiler-input-and-result-contracts
+      - compilation-snapshot-and-policy-snapshot-fingerprints
+      - pure-compiler-deterministic-replay
+      - pure-compiler-missing-hard-gate-rejection
+      - not-applicable-gate-predicate-and-input-proof
+      - not-applicable-gate-tamper-rejection
+      - qualified-only-final-transformation-plan
+      - transformation-operation-plan-and-mutation-journal
+      - identical-provider-claim-collapse-with-provenance
+      - conflicting-same-stream-provider-claim-review-required
+      - compiler-context-new-does-not-activate
+      - compiler-context-a-b-a-nested-restoration
+      - compiler-context-error-restoration
+      - base-continuation-accepted-and-rejected-catalog-inventory
       - iterative-deep-researchability-chain
       - iterative-wide-researchability-fan-in
       - planning-only-provider-emission-adapters

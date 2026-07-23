@@ -40,7 +40,7 @@ The settings stage also registers `mir-settings-profile-import`. MIR does not de
 
 MIR generation belongs here. The data-final-fixes pipeline must still prove that targets exist, labs can research the selected science packs, recipe productivity is safe, ownership policy allows emission, loop risk is acceptable, and the stream has a stable manifest row. A visible and enabled setting is not enough to generate a technology.
 
-`prototypes/mir/settings/effective.lua` is the data-stage read boundary for profile imports. Prototype-stage modules should read startup settings through that effective-settings layer so imported profile values apply consistently. Imported values are used only when the current branch still registers the setting ID and the value type matches the current setting's type.
+`prototypes/mir/settings/effective.lua` is the data-stage read boundary for profile imports. Its decoded import state belongs to the active CompilerContext, so separate qualification runs cannot share settings caches. Prototype-stage modules should read startup settings through that effective-settings layer so imported profile values apply consistently. Imported values are used only when the current branch still registers the setting ID and the value type matches the current setting's type.
 
 ## Runtime Stage
 
@@ -49,6 +49,8 @@ MIR generation belongs here. The data-final-fixes pipeline must still prove that
 MIR should omit `control.lua` unless runtime behavior is required. If it exists, it stays a thin wrapper into `prototypes/mir/stage/control.lua` and runtime modules under `prototypes/mir/runtime/`.
 
 Runtime settings-profile commands are export and validation helpers only. `/mir-settings-export` writes a profile string to `script-output`, and `/mir-settings-import-check` validates a pasted string. Runtime code cannot make startup generation use a new profile until the user stores the string in `mir-settings-profile-import` and restarts.
+
+`prototypes/mir/runtime/startup_settings.lua` is the runtime read boundary. It resolves immutable startup values and valid imported overrides directly, without reading or activating CompilerContext. Runtime environment observations cannot authorize compiler qualification decisions.
 
 ## Hidden Settings
 

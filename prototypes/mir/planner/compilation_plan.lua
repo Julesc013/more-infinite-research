@@ -12,9 +12,53 @@ local safety_qualification = require("prototypes.mir.domain.technology.safety_qu
 local technology_catalog = require("prototypes.mir.planner.technology_catalog")
 local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local compiler_result = require("prototypes.mir.domain.compiler.compiler_result")
+local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
+local compilation_snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
+local policy_snapshot_adapter = require("prototypes.mir.pipeline.policy_snapshot_adapter")
+local environment_adapter = require("prototypes.mir.platform.factorio.environment_identity")
+local effect_target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory")
 
 local M = {}
 local normalized_base_operation
+
+local function default_base_gates(operation)
+  local input_fingerprint = fingerprint.of({key = operation.key, technology_name = operation.technology_name})
+  local passed = function(evaluator, evidence) return gate_contract.passed(evaluator, {evidence}) end
+  return {
+    target_supported = passed("target-profile", "base-continuation:target-supported"),
+    effect_valid = gate_contract.pending("effect-contracts"),
+    owner_conflict_free = passed("base-continuation-planner", "base-continuation:owner-free"),
+    science_compatible = passed("science-selector", "base-continuation:science-resolved"),
+    lab_compatible = passed("lab-compatibility", "base-continuation:lab-resolved"),
+    prerequisites_acyclic = gate_contract.pending("technology-graph"),
+    loop_safe = gate_contract.not_applicable(
+      "base-continuation-planner", "candidate-transforms-recipe-graph", input_fingerprint,
+      {"base-continuation:no-recipe-graph-transformation"}),
+    progression_safe = gate_contract.pending("technology-graph"),
+    migration_safe = passed("base-continuation-manifest", "base-continuation:stable-chain"),
+    output_identity_safe = passed("base-continuation-planner", "base-continuation:output-absent")
+  }
+end
+
+local function default_compiler_input(stream_artifact, base_plan, sanitation_ledger)
+  local policy = policy_snapshot_adapter.capture()
+  local snapshot = compilation_snapshot_contract.new({
+    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
+    effect_target_inventory = effect_target_inventory.capture(),
+    provider_inputs = {},
+    stream_inputs = {plan = stream_artifact}, base_continuation_inputs = {operations = base_plan or {}},
+    source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
+  })
+  local environment = environment_adapter.current({
+    effective_settings = policy.effective_settings, policy_snapshot = policy})
+  return compiler_input.new({
+    source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {}),
+    compilation_snapshot = snapshot,
+    policy_snapshot = policy,
+    runtime_environment = environment,
+    input_sanitation_fingerprint = fingerprint.of(sanitation_ledger or {})
+  })
+end
 
 local function copy_row_with_design_view(source_row)
   local row = {}
@@ -43,7 +87,7 @@ local function rebuild_stream_artifact(stream_artifact, rows, rebuild_design_by_
   return plan:finalize():artifact_view()
 end
 
-local function sanitize_stream_artifact(stream_artifact)
+local function sanitize_stream_artifact(stream_artifact, target_inventory)
   local rows, removed_count, skipped_count = {}, 0, 0
   for _, source_row in ipairs(stream_artifact.rows or {}) do
     local row = copy_row_with_design_view(source_row)
@@ -51,7 +95,8 @@ local function sanitize_stream_artifact(stream_artifact)
       local kept, removed = technology_effects.sanitize_effects(
         row.fields.effects,
         "CompilationPlan " .. tostring(row.technology_name),
-        "generated"
+        "generated",
+        target_inventory
       )
       row.fields.effects = kept
       removed_count = removed_count + #removed
@@ -97,26 +142,46 @@ local function sanitize_stream_artifact(stream_artifact)
   }
 end
 
-local function sanitize_base_operations(base_plan)
-  local operations, removed_count, skipped_count = {}, 0, 0
+local function sanitize_base_operations(base_plan, target_inventory)
+  local operations, removed_count, skipped_count, rejected_candidates = {}, 0, 0, {}
   for _, source_operation in ipairs(base_plan or {}) do
     local operation = normalized_base_operation(source_operation)
     local kept, removed = technology_effects.sanitize_effects(
       (operation.technology and operation.technology.effects) or {},
       "CompilationPlan " .. tostring(operation.technology_name),
-      "generated"
+      "generated",
+      target_inventory
     )
     removed_count = removed_count + #removed
     if operation.technology then operation.technology.effects = kept end
     if #kept > 0 or #removed == 0 then
+      operation.gates.effect_valid = gate_contract.passed(
+        "effect-contracts",
+        {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
+      )
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
       table.insert(operations, operation)
     else
       skipped_count = skipped_count + 1
+      operation.gates.effect_valid = gate_contract.failed(
+        "effect-contracts", "no_valid_effect_targets", {"effect-contracts:all-targets-missing"})
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      table.insert(rejected_candidates, {
+        candidate_id = "base-continuation/" .. tostring(operation.key),
+        key = operation.key,
+        action = "reject",
+        reason = "no_valid_effect_targets",
+        gates = deepcopy(operation.gates),
+        technology_design = deepcopy(operation.technology_design),
+        candidate_fingerprint = fingerprint.of({key = operation.key, reason = "no_valid_effect_targets",
+          gates = operation.gates})
+      })
     end
   end
   return operations, {
     removed_effect_count = removed_count,
-    skipped_base_extension_count = skipped_count
+    skipped_base_extension_count = skipped_count,
+    rejected_candidates = rejected_candidates
   }
 end
 
@@ -172,10 +237,14 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
       )
       row.gates.prerequisites_acyclic = gate_contract.not_applicable(
         "technology-graph",
+        "native-owner-patch-changes-prerequisites",
+        row.adoption.input_fingerprint,
         {"native-owner-binding:prerequisites-unchanged"}
       )
       row.gates.progression_safe = gate_contract.not_applicable(
         "technology-graph",
+        "native-owner-patch-changes-progression",
+        row.adoption.input_fingerprint,
         {"native-owner-binding:progression-unchanged"}
       )
       row.gates.output_identity_safe = gate_contract.passed(
@@ -195,16 +264,36 @@ end
 local function apply_base_graph_decisions(base_operations, graph_summary)
   local accepted, rejected = {}, {}
   for _, operation in ipairs(base_operations or {}) do
+    local updated = deepcopy(operation)
     local rejection = graph_summary.rejected[operation.technology_name]
     if rejection then
+      updated.gates.prerequisites_acyclic = gate_contract.failed(
+        "technology-graph", rejection.code, deepcopy(rejection.evidence))
+      updated.gates.progression_safe = deepcopy(updated.gates.prerequisites_acyclic)
+      updated.technology_design = technology_design.from_base_extension_operation(updated)
       table.insert(rejected, {
+        candidate_id = "base-continuation/" .. tostring(operation.key),
+        key = operation.key,
         technology_name = operation.technology_name,
         manifest_id = operation.manifest_id,
+        action = "reject",
+        reason = rejection.code,
         code = rejection.code,
-        evidence = deepcopy(rejection.evidence)
+        evidence = deepcopy(rejection.evidence),
+        gates = deepcopy(updated.gates),
+        technology_design = deepcopy(updated.technology_design),
+        candidate_fingerprint = fingerprint.of({key = operation.key, reason = rejection.code,
+          gates = updated.gates})
       })
     else
-      table.insert(accepted, operation)
+      local proof = graph_summary.proofs[operation.technology_name]
+      updated.gates.prerequisites_acyclic = proof and deepcopy(proof) or gate_contract.failed(
+        "technology-graph", "missing_graph_proof", {"technology-graph:missing-proof"})
+      updated.gates.progression_safe = deepcopy(updated.gates.prerequisites_acyclic)
+      updated.technology_design = technology_design.from_base_extension_operation(updated)
+      updated.technology = technology_design.prototype_projection(updated.technology_design, {validated = true})
+      updated.technology.type = "technology"
+      table.insert(accepted, updated)
     end
   end
   return accepted, rejected
@@ -266,6 +355,8 @@ normalized_base_operation = function(operation)
   out.schema = 2
   out.manifest_id = out.manifest_id or ("base-extension:" .. tostring(out.key) .. ":" .. tostring(out.technology_name))
   out.registry = {kind = "base_extension", key = out.key}
+  if type(out.gates) ~= "table" or next(out.gates) == nil then out.gates = default_base_gates(out) end
+  hard_gate_authority.assert_total(out.gates)
   out.technology_design = technology_design.from_base_extension_operation(out)
   out.technology = technology_design.prototype_projection(out.technology_design, {validated = true})
   out.technology.type = "technology"
@@ -453,6 +544,7 @@ end
 
 function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_artifact
+  local planned_base_candidates = deepcopy((compiler_inputs and compiler_inputs.base_candidates) or {})
   if type(stream_plan.artifact) == "function" then
     stream_artifact = stream_plan:artifact()
   elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
@@ -462,13 +554,15 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
   local stream_effect_integrity
-  stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact)
+  local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
+    or effect_target_inventory.capture()
+  stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact, target_inventory)
   -- This projection is input to the authoritative graph evaluator, not an
   -- emission authorization. Pending graph gates remain explicit proposals.
   local operations = materialized_stream_operations(
     stream_artifact, {include_design = false, virtual_projection = true})
   local stream_operations = deepcopy(operations)
-  local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan)
+  local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
   local finalized_base = {}
   for _, operation in ipairs(normalized_base) do
     local normalized = apply_weapon_overlap_policy(operation, stream_operations, stream_artifact.rows)
@@ -506,14 +600,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
-  local exact_input = compiler_inputs and compiler_inputs.compiler_input or compiler_input.new({
-    source_fingerprints = source_fingerprints,
-    environment_identity = (compiler_inputs or {}).environment_identity,
-    environment_fingerprint = (compiler_inputs or {}).environment_fingerprint,
-    target_profile_fingerprint = source_fingerprints.target_profile or "unspecified",
-    generation_plan_fingerprint = stream_artifact.plan_fingerprint or "unspecified",
-    input_sanitation_fingerprint = fingerprint.of((compiler_inputs or {}).input_sanitation_ledger or {})
-  })
+  local exact_input = compiler_inputs and compiler_inputs.compiler_input
+    or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   compiler_input.validate(exact_input)
   local artifact = {
     schema = 2,
@@ -526,6 +614,32 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     validation_summary = validation_summary
   }
   artifact.compilation_fingerprint = fingerprint.of(compilation_material(artifact))
+  local base_candidates_by_id = {}
+  for _, candidate in ipairs(planned_base_candidates) do base_candidates_by_id[candidate.candidate_id] = candidate end
+  for _, candidate in ipairs(base_effect_integrity.rejected_candidates or {}) do
+    base_candidates_by_id[candidate.candidate_id] = candidate
+  end
+  for _, candidate in ipairs(graph_rejected_base or {}) do
+    base_candidates_by_id[candidate.candidate_id] = candidate
+  end
+  for _, operation in ipairs(normalized_base) do
+    local candidate_id = "base-continuation/" .. tostring(operation.key)
+    base_candidates_by_id[candidate_id] = {
+      schema = 1,
+      candidate_id = candidate_id,
+      key = operation.key,
+      action = "create",
+      technology_name = operation.technology_name,
+      design_fingerprint = operation.technology_design.design_fingerprint,
+      technology_design = deepcopy(operation.technology_design),
+      gates = deepcopy(operation.gates),
+      candidate_fingerprint = fingerprint.of({key = operation.key, technology_name = operation.technology_name,
+        design_fingerprint = operation.technology_design.design_fingerprint, gates = operation.gates})
+    }
+  end
+  local final_base_candidates = {}
+  for _, candidate in pairs(base_candidates_by_id) do table.insert(final_base_candidates, candidate) end
+  table.sort(final_base_candidates, function(left, right) return left.candidate_id < right.candidate_id end)
   artifact.technology_catalog = technology_catalog.finalize(
     stream_artifact.rows,
     source_fingerprints,
@@ -533,7 +647,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     {
       generation_plan_fingerprint = stream_artifact.plan_fingerprint,
       compilation_plan_fingerprint = artifact.compilation_fingerprint,
-      trusted_designs = true
+      trusted_designs = true,
+      base_candidates = final_base_candidates
     }
   )
   artifact.technology_catalog_fingerprint = artifact.technology_catalog.catalog_fingerprint
@@ -555,6 +670,127 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       })
     end
   end
+  for _, candidate in ipairs(final_base_candidates) do
+    if candidate.action == "reject" then table.insert(rejected_candidates, {
+      candidate_id = candidate.candidate_id,
+      design_fingerprint = candidate.design_fingerprint,
+      reason = candidate.reason,
+      candidate_class = "base-continuation"
+    }) end
+  end
+  local accepted_candidates = {}
+  for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
+    if selection.action ~= "diagnose" then table.insert(accepted_candidates, deepcopy(selection)) end
+  end
+  for _, candidate in ipairs(final_base_candidates) do
+    if candidate.action == "create" then table.insert(accepted_candidates, {
+      candidate_id = candidate.candidate_id,
+      design_fingerprint = candidate.design_fingerprint,
+      action = candidate.action,
+      candidate_class = "base-continuation"
+    }) end
+  end
+  table.sort(accepted_candidates, function(left, right)
+    return tostring(left.candidate_id) < tostring(right.candidate_id)
+  end)
+  table.sort(rejected_candidates, function(left, right)
+    return tostring(left.candidate_id) < tostring(right.candidate_id)
+  end)
+
+  local provider_claims, review_required_candidates = {}, {}
+  for _, decision in ipairs(exact_input.compilation_snapshot.provider_inputs.decisions or {}) do
+    local projection = {
+      provider_id = decision.provider_id,
+      provider_version = decision.provider_version,
+      candidate_family = decision.candidate_family,
+      subject = {prototype_type = decision.prototype_type, prototype_name = decision.prototype_name},
+      target_stream = decision.target_stream,
+      final_state = decision.final_state,
+      claim_fingerprint = decision.claim_fingerprint,
+      decision_fingerprint = decision.decision_fingerprint,
+      risk_fingerprint = decision.risk_fingerprint,
+      risk_disposition = decision.risk_disposition
+    }
+    table.insert(provider_claims, projection)
+    if decision.final_state == "review-required" or decision.risk_disposition == "REVIEW_REQUIRED" then
+      table.insert(review_required_candidates, deepcopy(projection))
+    end
+  end
+  table.sort(provider_claims, function(left, right)
+    if tostring(left.claim_fingerprint) ~= tostring(right.claim_fingerprint) then
+      return tostring(left.claim_fingerprint) < tostring(right.claim_fingerprint)
+    end
+    return tostring(left.provider_id) < tostring(right.provider_id)
+  end)
+  table.sort(review_required_candidates, function(left, right)
+    return tostring(left.claim_fingerprint) < tostring(right.claim_fingerprint)
+  end)
+
+  local design_by_candidate = {}
+  for _, candidate in ipairs(artifact.technology_catalog.candidates or {}) do
+    for _, alternative in ipairs(candidate.alternatives or {}) do
+      design_by_candidate[candidate.candidate_id .. "/" .. alternative.alternative_id] = alternative.technology_design
+    end
+  end
+  local quality_dispositions, promotion_dispositions = {}, {}
+  local promotion_blocked = false
+  for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
+    if selection.action ~= "diagnose" then
+      local design = design_by_candidate[selection.candidate_id .. "/" .. selection.alternative_id] or {}
+      local identity = design.identity or {}
+      local released = identity.identity_state == "released"
+      local profile_id = selection.action == "adopt"
+        and "existing-stream-attachment-v1" or "process-family-experimental-v1"
+      table.insert(quality_dispositions, {
+        candidate_id = selection.candidate_id,
+        design_fingerprint = selection.design_fingerprint,
+        profile_id = profile_id,
+        status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
+        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+      })
+      table.insert(promotion_dispositions, {
+        candidate_id = selection.candidate_id,
+        design_fingerprint = selection.design_fingerprint,
+        identity_state = identity.identity_state,
+        status = released and "NOT_APPLICABLE_ALREADY_RELEASED" or "INELIGIBLE_MISSING_ADMISSION"
+      })
+      if not released then promotion_blocked = true end
+    end
+  end
+  for _, candidate in ipairs(final_base_candidates) do
+    if candidate.action == "create" then
+      local identity = (candidate.technology_design or {}).identity or {}
+      local released = identity.identity_state == "released"
+      table.insert(quality_dispositions, {
+        candidate_id = candidate.candidate_id,
+        design_fingerprint = candidate.design_fingerprint,
+        profile_id = "base-continuation-v1",
+        status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
+        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+      })
+      table.insert(promotion_dispositions, {
+        candidate_id = candidate.candidate_id,
+        design_fingerprint = candidate.design_fingerprint,
+        identity_state = identity.identity_state,
+        status = released and "NOT_APPLICABLE_ALREADY_RELEASED" or "INELIGIBLE_MISSING_ADMISSION"
+      })
+      if not released then promotion_blocked = true end
+    end
+  end
+  table.sort(quality_dispositions, function(left, right) return left.candidate_id < right.candidate_id end)
+  table.sort(promotion_dispositions, function(left, right) return left.candidate_id < right.candidate_id end)
+
+  local sanitation_dispositions = {}
+  local sanitation = artifact.input_sanitation_ledger or {}
+  if #sanitation > 0 then
+    sanitation_dispositions = deepcopy(sanitation)
+  else
+    for key, value in pairs(sanitation) do
+      table.insert(sanitation_dispositions, {key = tostring(key), disposition = deepcopy(value)})
+    end
+    table.sort(sanitation_dispositions, function(left, right) return left.key < right.key end)
+  end
+  local has_review = #review_required_candidates > 0
   artifact.compiler_result = compiler_result.new({
     input_fingerprint = exact_input.input_fingerprint,
     technology_catalog_fingerprint = artifact.technology_catalog_fingerprint,
@@ -562,8 +798,21 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     compilation_plan_fingerprint = artifact.compilation_fingerprint,
     qualification_fingerprint = artifact.qualification_fingerprint,
     operation_fingerprints = operation_fingerprints,
+    accepted_candidates = accepted_candidates,
     rejected_candidates = rejected_candidates,
-    status = "PASS"
+    review_required_candidates = review_required_candidates,
+    provider_claims = provider_claims,
+    base_continuations = final_base_candidates,
+    quality_dispositions = quality_dispositions,
+    promotion_dispositions = promotion_dispositions,
+    sanitation_dispositions = sanitation_dispositions,
+    dimensions = {
+      execution = "PLANNED",
+      safety = "QUALIFIED",
+      review = has_review and "REQUIRED" or "NOT_REQUIRED",
+      promotion = promotion_blocked and "BLOCKED" or "NOT_APPLICABLE",
+      release = promotion_blocked and "BLOCKED" or (has_review and "REVIEW_REQUIRED" or "ELIGIBLE")
+    }
   })
   return attach_run_evidence(artifact)
 end

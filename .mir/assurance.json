@@ -37,7 +37,7 @@
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$"],
+      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {
@@ -67,7 +67,7 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!MIRAssurance/)(?!(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.github/workflows/", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!MIRAssurance/)(?!(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {

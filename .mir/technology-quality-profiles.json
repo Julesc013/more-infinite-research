@@ -1,19 +1,207 @@
 {
-  "schema": 1,
+  "schema": 2,
+  "authority": "mir-technology-quality-profiles-v2",
   "profiles": [
     {
-      "profile_id": "technology-candidate-default-v1",
+      "profile_id": "existing-stream-attachment-v1",
+      "candidate_class": "existing-stream-attachment",
+      "minimum_members": 1,
+      "maximum_members": 512,
+      "maximum_semantic_clusters": 128,
+      "maximum_progression_span": 128,
       "maximum_owner_conflicts": 0,
       "maximum_false_positives": 0,
       "maximum_false_negatives": 0,
       "minimum_accepting_labs": 1,
       "minimum_useful_levels_before_cap": 5,
-      "maximum_science_tier_span": 4,
-      "maximum_cross_version_additions": 64,
+      "maximum_science_tier_span": 6,
+      "maximum_cross_version_additions": 128,
       "maximum_cross_version_removals": 0,
-      "maximum_provider_phase_seconds": 0.5
-      ,"maximum_provider_canonical_bytes": 1048576
-      ,"maximum_provider_witnesses": 64
+      "maximum_provider_phase_seconds": 0.5,
+      "maximum_provider_canonical_bytes": 1048576,
+      "maximum_provider_witnesses": 256,
+      "required_semantic_evidence": [
+        "exact-stream-identity",
+        "exact-attachment-delta",
+        "zero-ownership-ambiguity"
+      ],
+      "required_observational_evidence": [
+        "exact-target-load",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "native-owner-patch-v1",
+      "candidate_class": "native-owner-patch",
+      "minimum_members": 1,
+      "maximum_members": 64,
+      "maximum_semantic_clusters": 16,
+      "maximum_progression_span": 64,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 5,
+      "maximum_science_tier_span": 6,
+      "maximum_cross_version_additions": 0,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.25,
+      "maximum_provider_canonical_bytes": 524288,
+      "maximum_provider_witnesses": 128,
+      "required_semantic_evidence": [
+        "exact-pre-ownership-fingerprint",
+        "exact-post-ownership-fingerprint",
+        "bounded-native-field-delta"
+      ],
+      "required_observational_evidence": [
+        "exact-target-load",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "base-continuation-v1",
+      "candidate_class": "base-continuation",
+      "minimum_members": 1,
+      "maximum_members": 1,
+      "maximum_semantic_clusters": 1,
+      "maximum_progression_span": 16,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 10,
+      "maximum_science_tier_span": 4,
+      "maximum_cross_version_additions": 1,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.1,
+      "maximum_provider_canonical_bytes": 131072,
+      "maximum_provider_witnesses": 32,
+      "required_semantic_evidence": [
+        "exact-base-owner",
+        "progression-proof",
+        "effect-target-proof"
+      ],
+      "required_observational_evidence": [
+        "base-load",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "new-machine-manufacturing-v1",
+      "candidate_class": "new-machine-manufacturing",
+      "minimum_members": 2,
+      "maximum_members": 64,
+      "maximum_semantic_clusters": 16,
+      "maximum_progression_span": 32,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 10,
+      "maximum_science_tier_span": 3,
+      "maximum_cross_version_additions": 16,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.25,
+      "maximum_provider_canonical_bytes": 524288,
+      "maximum_provider_witnesses": 128,
+      "required_semantic_evidence": [
+        "family-coherence",
+        "exact-machine-membership",
+        "progression-proof"
+      ],
+      "required_observational_evidence": [
+        "exact-target-load",
+        "representative-balance-review",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "new-lab-manufacturing-v1",
+      "candidate_class": "new-lab-manufacturing",
+      "minimum_members": 2,
+      "maximum_members": 16,
+      "maximum_semantic_clusters": 8,
+      "maximum_progression_span": 16,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 2,
+      "minimum_useful_levels_before_cap": 10,
+      "maximum_science_tier_span": 2,
+      "maximum_cross_version_additions": 8,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.2,
+      "maximum_provider_canonical_bytes": 262144,
+      "maximum_provider_witnesses": 64,
+      "required_semantic_evidence": [
+        "family-coherence",
+        "lab-acceptance-matrix",
+        "progression-proof"
+      ],
+      "required_observational_evidence": [
+        "base-and-space-age-load",
+        "technology-tree-review",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "exact-overhaul-material-v1",
+      "candidate_class": "exact-overhaul-material",
+      "minimum_members": 1,
+      "maximum_members": 128,
+      "maximum_semantic_clusters": 32,
+      "maximum_progression_span": 64,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 10,
+      "maximum_science_tier_span": 4,
+      "maximum_cross_version_additions": 32,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.4,
+      "maximum_provider_canonical_bytes": 1048576,
+      "maximum_provider_witnesses": 256,
+      "required_semantic_evidence": [
+        "exact-overhaul-profile",
+        "exact-material-membership",
+        "progression-proof"
+      ],
+      "required_observational_evidence": [
+        "named-ecosystem-load",
+        "representative-balance-review",
+        "upgrade-and-removal"
+      ]
+    },
+    {
+      "profile_id": "process-family-experimental-v1",
+      "candidate_class": "process-family-experimental",
+      "minimum_members": 2,
+      "maximum_members": 64,
+      "maximum_semantic_clusters": 16,
+      "maximum_progression_span": 32,
+      "maximum_owner_conflicts": 0,
+      "maximum_false_positives": 0,
+      "maximum_false_negatives": 0,
+      "minimum_accepting_labs": 1,
+      "minimum_useful_levels_before_cap": 10,
+      "maximum_science_tier_span": 4,
+      "maximum_cross_version_additions": 16,
+      "maximum_cross_version_removals": 0,
+      "maximum_provider_phase_seconds": 0.25,
+      "maximum_provider_canonical_bytes": 524288,
+      "maximum_provider_witnesses": 128,
+      "required_semantic_evidence": [
+        "cycle-analysis",
+        "catalyst-accounting",
+        "byproduct-accounting",
+        "net-flow-proof"
+      ],
+      "required_observational_evidence": [
+        "named-ecosystem-load",
+        "experimental-design-review",
+        "upgrade-and-removal"
+      ]
     }
   ]
 }

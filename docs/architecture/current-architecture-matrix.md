@@ -42,6 +42,6 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 - All science, progression, provider, catalog, diagnostic, telemetry, services, and state epochs belong to the active CompilerContext.
 - `.mir/module-dependencies.json` and `Test-MIRModuleDependencies.ps1` enforce the exhaustive cross-layer matrix, reject every planner-to-emitter import, and permit no exception.
 
-## C8 boundary
+## Candidate boundary
 
-C5, C6, and C7 remain immutable historical archives identified in release authority. This overhaul changes packaged Lua and therefore becomes C8 after deterministic packaging records exact archive, content, package-source, and entry-count identities. Qualification evidence must bind registered C8 and a definitive post-freeze C8 plan; no earlier candidate evidence transfers.
+Historical candidate archives remain immutable in release authority. The current development candidate and all archive, package-source, and qualification fields are generated in [Current Development Candidate](../releases/current-candidate.md) from `.mir/releases.json`; this architecture document does not duplicate mutable candidate identity. Qualification evidence transfers only when every bound package and assurance fingerprint is identical.

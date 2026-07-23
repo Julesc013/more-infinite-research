@@ -5,10 +5,11 @@ local M = {}
 
 local ACTION_RANK = {adopt = 10, emit = 20, diagnose = 90}
 
-local function selected_alternative(candidate, requested_action)
+local function selected_alternative(candidate, requested_action, allow_proposals)
   local qualified = {}
   for _, alternative in ipairs(candidate.alternatives or {}) do
-    if alternative.qualification_decision == "qualified" or alternative.qualification_decision == "proposal" then
+    if alternative.qualification_decision == "qualified"
+      or (allow_proposals and alternative.qualification_decision == "proposal") then
       table.insert(qualified, alternative)
     end
   end
@@ -23,7 +24,7 @@ local function selected_alternative(candidate, requested_action)
   return qualified[1]
 end
 
-function M.select(catalog, rows)
+local function select(catalog, rows, allow_proposals)
   local rows_by_key = {}
   for _, row in ipairs(rows or {}) do
     rows_by_key[tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)] = row
@@ -33,7 +34,7 @@ function M.select(catalog, rows)
     local row = rows_by_key[candidate.selection_key]
     if not row then error("SelectionPolicy candidate lacks a planning row: " .. candidate.selection_key, 2) end
     local requested = (row.action == "emit" or row.action == "adopt") and row.action or "diagnose"
-    local selected = selected_alternative(candidate, requested)
+    local selected = selected_alternative(candidate, requested, allow_proposals)
     if not selected then error("SelectionPolicy candidate has no qualified alternative: " .. candidate.candidate_id, 2) end
     table.insert(selections, {
       selection_key = candidate.selection_key,
@@ -48,6 +49,19 @@ function M.select(catalog, rows)
   end
   table.sort(selections, function(left, right) return left.candidate_id < right.candidate_id end)
   return deepcopy(selections), fingerprint.of(selections)
+end
+
+function M.select_prequalification(catalog, rows)
+  return select(catalog, rows, true)
+end
+
+function M.select_final(catalog, rows)
+  return select(catalog, rows, false)
+end
+
+function M.select(catalog, rows)
+  return catalog.phase == "final" and M.select_final(catalog, rows)
+    or M.select_prequalification(catalog, rows)
 end
 
 function M.assert_generation_projection(selections, rows)

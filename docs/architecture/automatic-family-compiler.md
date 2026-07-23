@@ -66,6 +66,8 @@ Cardinality policy is scoped by provider, family, partition, and profile. It mea
 
 Family modules are open-ended data declarations behind one stable policy contract. Adding a family requires a manifest row, stable identity, positive and negative structural fixtures, balance and migration review, and target capability evidence; it does not require another player-facing compiler mode. Compatibility packs refine exact ecosystems but cannot mutate prototypes or weaken hard gates.
 
+The compiler boundary compiles captured state through `compile(snapshot, policy)`. Provider claims no longer resolve by provider ID: exact semantic duplicates collapse, while different effect, partition, authority, evidence, or risk material for the same stream is `REVIEW_REQUIRED`. Final catalog selection admits only structurally qualified alternatives. Preview catalogs may retain proposals, but proposals never become transformation operations.
+
 Each gate requires focused pure tests, static validation, deterministic plan evidence, a generated-ID parity check, and target runtime validation before it can become a release candidate.
 
 `fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 identities. `automatic-family-technology-ids.json` separately locks reviewed 3.1.0 generic-family identities. Both must pass before runtime validation; a future family technology must update its reviewed golden explicitly rather than appearing as incidental compiler output.

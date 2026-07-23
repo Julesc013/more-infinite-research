@@ -47,6 +47,7 @@ runtime_boundaries:
     runtime_modules:
       - prototypes/mir/runtime/scripted_techs.lua
       - prototypes/mir/runtime/settings_resolver.lua
+      - prototypes/mir/runtime/startup_settings.lua
       - prototypes/mir/runtime/settings_profile.lua
       - prototypes/mir/runtime/productivity_family_adoption.lua
       - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
@@ -89,6 +90,7 @@ modules:
     - prototypes/mir/platform/factorio/target_profiles.lua
     - prototypes/mir/platform/factorio/runtime_state.lua
     - prototypes/mir/platform/factorio/environment_identity.lua
+    - prototypes/mir/platform/factorio/effect_target_inventory.lua
   settings:
     - prototypes/mir/settings/registry.lua
     - prototypes/mir/settings/catalog.lua
@@ -117,6 +119,8 @@ modules:
     - prototypes/mir/pipeline/commands.lua
     - prototypes/mir/pipeline/compiler_context.lua
     - prototypes/mir/pipeline/compiler_orchestrator.lua
+    - prototypes/mir/pipeline/compilation_snapshot_adapter.lua
+    - prototypes/mir/pipeline/policy_snapshot_adapter.lua
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
@@ -143,9 +147,16 @@ modules:
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/compiler/compiler_input.lua
     - prototypes/mir/domain/compiler/compiler_result.lua
+    - prototypes/mir/domain/compiler/compilation_snapshot.lua
+    - prototypes/mir/domain/compiler/policy_snapshot.lua
+    - prototypes/mir/domain/compiler/transformation_operation.lua
+    - prototypes/mir/domain/compiler/transformation_plan.lua
+    - prototypes/mir/domain/compiler/mutation_journal.lua
     - prototypes/mir/domain/environment_identity.lua
+    - prototypes/mir/domain/qualification_environment_identity.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/effects/metadata.lua
+    - prototypes/mir/domain/effects/generated_target_contracts.lua
     - prototypes/mir/domain/native_owner/contract.lua
     - prototypes/mir/domain/native_owner/cost_model.lua
     - prototypes/mir/domain/streams/stream_spec.lua
@@ -161,6 +172,9 @@ modules:
     - prototypes/mir/domain/technology/promotion_authorization.lua
     - prototypes/mir/domain/technology/promotion_registry.lua
     - prototypes/mir/domain/technology/generated_promotion_registry.lua
+    - prototypes/mir/domain/technology/generated_hard_gate_authority.lua
+    - prototypes/mir/domain/technology/generated_quality_profiles.lua
+    - prototypes/mir/domain/technology/hard_gate_authority.lua
     - prototypes/mir/domain/technology/effect_safety_policy.lua
     - prototypes/mir/domain/technology/technology_quality_assessment.lua
     - prototypes/mir/domain/technology/technology_approval.lua
@@ -207,6 +221,7 @@ modules:
     - prototypes/mir/providers/pipeline/hazard_policy.lua
     - prototypes/mir/providers/pipeline/owner_arbitration.lua
     - prototypes/mir/providers/pipeline/decision.lua
+    - prototypes/mir/providers/pipeline/provider_claim.lua
     - prototypes/mir/providers/pipeline/budget.lua
   graph:
     - prototypes/mir/graph/snapshot.lua
@@ -223,6 +238,8 @@ modules:
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/compilation_plan.lua
+    - prototypes/mir/planner/base_continuations.lua
+    - prototypes/mir/planner/base_continuation_builder.lua
     - prototypes/mir/planner/stream_compiler.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
@@ -250,6 +267,8 @@ modules:
     - prototypes/mir/emit/technology_design_adapter.lua
     - prototypes/mir/emit/stream_executor.lua
     - prototypes/mir/emit/base_extensions.lua
+    - prototypes/mir/emit/base_continuation_executor.lua
+    - prototypes/mir/emit/technology_operation_executor.lua
     - prototypes/mir/emit/effect_safety.lua
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
@@ -261,6 +280,7 @@ modules:
     - prototypes/mir/report/coverage.lua
     - prototypes/mir/report/diagnostics_sink.lua
     - prototypes/mir/report/compiler_telemetry.lua
+    - prototypes/mir/report/compiler_diagnostics.lua
     - prototypes/mir/report/public_compiler_artifacts.lua
   compatibility:
     - prototypes/mir/compatibility/registry.lua
@@ -284,6 +304,7 @@ modules:
   runtime:
     - prototypes/mir/runtime/scripted_techs.lua
     - prototypes/mir/runtime/settings_resolver.lua
+    - prototypes/mir/runtime/startup_settings.lua
     - prototypes/mir/runtime/settings_profile.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
     - prototypes/mir/runtime/state.lua
@@ -300,6 +321,9 @@ mutation_commands:
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
+    - CompilationSnapshot schema 1 and PolicySnapshot schema 1 are the only inputs to the pure planner compiler API
+    - RuntimeEnvironmentIdentity and QualificationEnvironmentIdentity bind runtime behavior and assurance machinery separately
+    - every technology create or patch is a TransformationOperation in one TransformationPlan and produces one MutationJournal entry
     - output validation compares numeric effects graph presentation save identity and generated-registry projections
     - input technology sanitation runs after compatibility repairs and before every index or planning pass and records content-addressed original retained removed and sanitized effects
     - final technology safety reruns target-aware sanitation before reporting and output validation as a defensive postcondition
@@ -310,6 +334,7 @@ mutation_commands:
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
     - the schema-3 TechnologyCatalog is finalized once after sanitation and graph proof, preserves rejected designs, publishes as one exact artifact, and has no mutation authority
+    - the TechnologyCatalog includes accepted and rejected base continuation candidates under the same hard-gate authority
     - every GenerationPlan is an exact projection of the catalog selection policy
     - SafetyQualification DesignAssessment and PromotionAuthorization are independent fingerprinted decisions
     - only MIR-owned mir-reviewed or protected-release promotion authorizations may satisfy reviewed automatic generation
@@ -320,7 +345,8 @@ mutation_commands:
     - provider budgets suppress only new-unreviewed proposals and preserve exact-reviewed attachments and hard-blocker diagnostics
     - compatibility policy authority is the only planning facade that composes overlays active packs claims and policy fingerprints
     - planner modules have zero imports of emit modules; pipeline compiler orchestration owns all planning-to-emission sequencing
-    - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned stream executor
+    - stream and base continuation planning are separate from emission and both use the shared technology operation executor
+    - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned technology operation executor
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:
@@ -375,6 +401,9 @@ target_layers:
     path: prototypes/mir/pipeline
     may_require:
       - core
+      - domain
+      - pipeline
+      - families
       - platform
       - settings
     may_mutate_data_raw: true
@@ -394,6 +423,7 @@ target_layers:
       - domain
       - platform
       - index
+      - pipeline
     may_mutate_data_raw: false
   capabilities:
     path: prototypes/mir/capabilities
@@ -494,7 +524,7 @@ rules:
   - Top-level MIR Lua module dependencies are checked against the exhaustive schema-2 .mir/module-dependencies.json matrix with zero exceptions.
   - Domain graph and planner layers cannot import emit implementation modules.
   - Every observed cross-layer import must appear in the exact schema-2 dependency matrix; dependency exceptions are forbidden.
-  - Mutable state derived from prototypes settings active mods or a compilation pass is owned by CompilerContext schema 3.
+  - Mutable state derived from prototypes settings active mods or a compilation pass is owned by CompilerContext schema 4.
   - CompilerContext services are context-owned, freezeable, and never configured through process-global callbacks.
   - State replacement requires an explicit matching epoch and snapshots are observationally pure.
   - The shared graph kernel owns snapshot SCC condensation reachability researchability qualification diff and evidence semantics for virtual and actual graphs.
@@ -502,7 +532,7 @@ rules:
 
 compiler_context:
   path: prototypes/mir/pipeline/compiler_context.lua
-  schema: 3
+  schema: 4
   owns:
     - recipe-index
     - recipe-risk-index

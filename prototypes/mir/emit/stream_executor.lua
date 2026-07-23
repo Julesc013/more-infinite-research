@@ -1,7 +1,6 @@
 local D = require("prototypes.mir.report.diagnostics_sink")
-local adoption_transaction = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
-local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
+local technology_operation_executor = require("prototypes.mir.emit.technology_operation_executor")
 
 local M = {}
 
@@ -11,7 +10,7 @@ local function assert_artifact(artifact)
   end
 end
 
-function M.apply(artifact)
+function M.apply(artifact, journal, transformations_by_stream)
   assert_artifact(artifact)
   for _, row in ipairs(artifact.rows) do
     for _, conflict in ipairs((row.effect_ownership and row.effect_ownership.lost) or {}) do
@@ -30,12 +29,14 @@ function M.apply(artifact)
       if not row.technology_design then
         error("Stream executor requires TechnologyDesign schema 2 for " .. tostring(row.stream_key) .. ".", 2)
       end
-      local technology = stream_emitter.emit(row.technology_design)
+      local technology = technology_operation_executor.apply_stream_row(
+        row, journal, transformations_by_stream and transformations_by_stream[row.stream_key])
       if D.enabled() and not row.direct_effects then
         log("[more-infinite-research] Registered technology " .. technology.name)
       end
     elseif row.action == "adopt" then
-      adoption_transaction.apply(row.adoption, row.technology_design)
+      technology_operation_executor.apply_stream_row(
+        row, journal, transformations_by_stream and transformations_by_stream[row.stream_key])
     elseif row.reason ~= "disabled" then
       log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
     end

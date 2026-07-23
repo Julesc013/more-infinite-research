@@ -3,9 +3,13 @@ local generated_registry = require("prototypes.mir.domain.facts.generated_techno
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local prepared_replacements = nil
+
+local function prepared(context)
+  return (context or compiler_context.current()):state_view("competing_base_extension_preparation")
+end
 
 local COMPETING_BASE_EXTENSIONS = {
   ["Better_Robots_Extended"] = {
@@ -64,7 +68,9 @@ local function should_remove_base_extension(name, tech, spec)
 end
 
 function M.prepare()
-  prepared_replacements = {}
+  local context = compiler_context.current()
+  local replacements = {}
+  context:set_once("competing_base_extension_preparation", replacements)
   if not prefer_this_mod_for_competing_techs() then return end
   if not mods then return end
 
@@ -74,7 +80,7 @@ function M.prepare()
         if base_extension_enabled(key) then
           for name, tech in pairs(data_raw.prototypes("technology")) do
             if should_remove_base_extension(name, tech, spec) then
-              table.insert(prepared_replacements, {
+              table.insert(replacements, {
                 name = name,
                 key = key,
                 mod_name = mod_name
@@ -86,15 +92,15 @@ function M.prepare()
     end
   end
 
-  table.sort(prepared_replacements, function(a, b) return a.name < b.name end)
-  for _, entry in ipairs(prepared_replacements) do
+  table.sort(replacements, function(a, b) return a.name < b.name end)
+  for _, entry in ipairs(replacements) do
     log("[more-infinite-research] Prepared competing base extension for transactional replacement from "
       .. entry.mod_name .. " for " .. entry.key .. ": " .. entry.name)
   end
 end
 
 function M.ignores_existing_owner(name)
-  for _, entry in ipairs(prepared_replacements or {}) do
+  for _, entry in ipairs(prepared() or {}) do
     if entry.name == name then return true end
   end
   return false
@@ -102,7 +108,7 @@ end
 
 function M.replacement_plan()
   local plan = {}
-  for _, entry in ipairs(prepared_replacements or {}) do
+  for _, entry in ipairs(prepared() or {}) do
     local replacements = generated_registry.sorted_names({ kind = "base_extension", key = entry.key })
     local replacement_name = replacements[1]
     table.insert(plan, {

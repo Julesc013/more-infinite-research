@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 & (Join-Path $repo "scripts\Update-MIRPipelineDocumentation.ps1") -RepoRoot $repo -Check
+& (Join-Path $repo "scripts\Update-MIRGeneratedAuthorityDocs.ps1") -RepoRoot $repo -Check
 
 function Assert-MIRModuleManifestSemantics {
   $manifestPath = Join-Path $repo ".mir\modules.yml"
@@ -321,9 +322,18 @@ $requiredMirFiles = @(
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/compilation_plan.lua",
+  "prototypes/mir/planner/base_continuations.lua",
+  "prototypes/mir/planner/base_continuation_builder.lua",
   "prototypes/mir/pipeline/compiler_orchestrator.lua",
+  "prototypes/mir/pipeline/compilation_snapshot_adapter.lua",
+  "prototypes/mir/pipeline/policy_snapshot_adapter.lua",
   "prototypes/mir/domain/compiler/compiler_input.lua",
   "prototypes/mir/domain/compiler/compiler_result.lua",
+  "prototypes/mir/domain/compiler/compilation_snapshot.lua",
+  "prototypes/mir/domain/compiler/policy_snapshot.lua",
+  "prototypes/mir/domain/compiler/transformation_operation.lua",
+  "prototypes/mir/domain/compiler/transformation_plan.lua",
+  "prototypes/mir/domain/compiler/mutation_journal.lua",
   "prototypes/mir/domain/environment_identity.lua",
   "prototypes/mir/providers/provider_metrics.lua",
   "prototypes/mir/planner/stream_compiler.lua",
@@ -341,6 +351,8 @@ $requiredMirFiles = @(
   "prototypes/mir/emit/technology_design_adapter.lua",
   "prototypes/mir/emit/stream_executor.lua",
   "prototypes/mir/emit/base_extensions.lua",
+  "prototypes/mir/emit/base_continuation_executor.lua",
+  "prototypes/mir/emit/technology_operation_executor.lua",
   "prototypes/mir/emit/icon_builder.lua",
   "prototypes/mir/emit/effect_safety.lua",
   "prototypes/mir/emit/mod_data.lua",
@@ -471,7 +483,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $c
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle 'pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)'
 
 Assert-MIRNoPatternInLuaFile `
-  -RelativePath "prototypes/mir/emit/base_extensions.lua" `
+  -RelativePath "prototypes/mir/planner/base_continuations.lua" `
   -Pattern 'deepcopy\s*\(\s*base_tech\s*\)' `
   -Message "Base extensions must use the explicit allowlisted builder instead of deep-copying foreign technologies."
 
@@ -493,11 +505,27 @@ Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.
 if ($compilationPlanText -match 'require\("prototypes\.mir\.emit\.') {
   throw "Pure CompilationPlan must have zero planner-to-emission imports."
 }
+$pureCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/compiler.lua"
+foreach ($forbiddenPureCompilerToken in @("data.raw", "settings.", "mods", "os.clock", "compiler_telemetry", "compiler_context")) {
+  if ($pureCompilerText -match [regex]::Escape($forbiddenPureCompilerToken)) {
+    throw "Pure compiler imports or reads ambient authority: $forbiddenPureCompilerToken"
+  }
+}
+foreach ($pureCompilerNeedle in @(
+  'function M.compile(snapshot, policy)',
+  'compilation_snapshot.validate(snapshot)',
+  'policy_snapshot.validate(policy)',
+  'transformation_plan.new('
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle
+}
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
 foreach ($contextNeedle in @(
-  "schema = 3",
+  "schema = 4",
   "function M.activate(context)",
+  "function M.with_active(context, callback, ...)",
+  "function M.is_active(context)",
   "function M.current()",
   "function Context:set_service(name, implementation)",
   "function Context:freeze_services()",
@@ -509,6 +537,10 @@ foreach ($contextNeedle in @(
   "function Context:state_key_count()"
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_context.lua" -Text $compilerContextText -Needle $contextNeedle
+}
+$newContextBody = [regex]::Match($compilerContextText, '(?s)function M\.new\(\)(?<body>.*?)\r?\nend').Groups['body'].Value
+if ($newContextBody -match 'active\s*=') {
+  throw "CompilerContext.new must not implicitly activate the new context."
 }
 foreach ($contextOwnedModule in @(
   "prototypes/mir/index/recipe_facts.lua",
@@ -533,7 +565,10 @@ foreach ($forbiddenContextCache in @(
   @{ Path = "prototypes/mir/compatibility/packs/registry.lua"; Pattern = '(?m)^local\s+canonical_snapshot\s*=' },
   @{ Path = "prototypes/mir/planner/stream_compiler.lua"; Pattern = '(?m)^local\s+latest_plan\s*=' },
   @{ Path = "prototypes/mir/pipeline/compiler_orchestrator.lua"; Pattern = '(?m)^local\s+latest\s*=' },
-  @{ Path = "prototypes/mir/report/coverage.lua"; Pattern = '(?m)^local\s+latest\s*=' }
+  @{ Path = "prototypes/mir/report/coverage.lua"; Pattern = '(?m)^local\s+latest\s*=' },
+  @{ Path = "prototypes/mir/settings/effective.lua"; Pattern = '(?m)^local\s+import_(?:loaded|profile|error)\s*=' },
+  @{ Path = "prototypes/mir/policy/competing_productivity.lua"; Pattern = '(?m)^local\s+prepared_removable_techs\s*=' },
+  @{ Path = "prototypes/mir/policy/competing_base_extensions.lua"; Pattern = '(?m)^local\s+prepared_replacements\s*=' }
 )) {
   Assert-MIRNoPatternInLuaFile -RelativePath $forbiddenContextCache.Path -Pattern $forbiddenContextCache.Pattern `
     -Message "Data-derived compiler state must be owned by CompilerContext, not a module-level cache."
@@ -555,9 +590,24 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "data_raw.extend({deepcopy(technology)})"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "generated_registry.register(technology.name,"
 
-$baseExtensionsText = Read-MIRFile -RelativePath "prototypes/mir/emit/base_extensions.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/base_extensions.lua" -Text $baseExtensionsText -Needle "technology_design.from_base_extension_operation(operation)"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/base_extensions.lua" -Text $baseExtensionsText -Needle "technology_design_adapter.emit(operation.technology_design,"
+$baseExtensionsText = Read-MIRFile -RelativePath "prototypes/mir/planner/base_continuations.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/base_continuations.lua" -Text $baseExtensionsText -Needle "technology_design.from_base_extension_operation(operation)"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/base_continuations.lua" -Text $baseExtensionsText -Needle "local plan, candidates, names = {}, {}, {}"
+if ($baseExtensionsText -match 'require\("prototypes\.mir\.emit\.') {
+  throw "Base continuation planning imports an emission module."
+}
+$technologyOperationExecutor = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_operation_executor.lua"
+foreach ($executorNeedle in @("function M.create(", "function M.patch(", "function M.apply_stream_row(", "function M.apply_base_continuation(")) {
+  Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
+}
+$effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
+if ($effectContractsText -match 'platform\.factorio|data_raw|\bsettings\b|\bmods\b') {
+  throw "Pure effect contracts retain Factorio platform or ambient state access."
+}
+foreach ($gateConsumer in @("prototypes/mir/planner/generation_plan.lua", "prototypes/mir/domain/technology/safety_qualification.lua")) {
+  $gateConsumerText = Read-MIRFile -RelativePath $gateConsumer
+  Assert-MIRContains -RelativePath $gateConsumer -Text $gateConsumerText -Needle 'require("prototypes.mir.domain.technology.hard_gate_authority")'
+}
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
@@ -608,13 +658,12 @@ if ($technologyCatalogText -match 'data\.raw|data:extend|generated_registry|mod_
 }
 
 $streamExecutorText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_executor.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.transactions.productivity_family_adoption")'
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle "function M.apply(artifact)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.technology_operation_executor")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle "function M.apply(artifact, journal, transformations_by_stream)"
 
 $integrityContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.identity(effect)"
-Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.target_status(effect)"
+Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.target_status(effect, inventory)"
 foreach ($identityConsumer in @(
   "prototypes/mir/planner/generation_plan.lua",
   "prototypes/mir/index/relationships.lua"

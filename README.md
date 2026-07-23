@@ -91,7 +91,7 @@ This table is generated from `prototypes/mir/pipeline/commands.lua`; run `./scri
 | 35 | `compile-generation-plan` | plan | `prototypes/mir/pipeline/compiler_orchestrator.lua` | `prepare-competing-base-extensions` |
 | 40 | `emit-streams` | emission | `prototypes/mir/emit/stream_executor.lua` | `compile-generation-plan` |
 | 50 | `apply-competing-productivity` | mutation | `prototypes/mir/pipeline/mutations/competing_productivity.lua` | `emit-streams` |
-| 50 | `emit-base-extensions` | emission | `prototypes/mir/emit/base_extensions.lua` | `apply-competing-productivity` |
+| 50 | `emit-base-extensions` | emission | `prototypes/mir/planner/base_continuations.lua + prototypes/mir/emit/base_continuation_executor.lua` | `apply-competing-productivity` |
 | 60 | `apply-competing-base-extensions` | mutation | `prototypes/mir/pipeline/mutations/competing_base_extensions.lua` | `emit-base-extensions` |
 | 70 | `weapon-speed-adjustments` | mutation | `prototypes/mir/pipeline/mutations/weapon_speed.lua` | `apply-competing-base-extensions` |
 | 70 | `max-level-control` | mutation | `prototypes/mir/pipeline/mutations/max_level.lua` | `weapon-speed-adjustments` |

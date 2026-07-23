@@ -11,7 +11,7 @@ superseded_by: []
 ---
 # Architecture Decision Records
 
-Updated: 2026-07-12
+Updated: 2026-07-23
 
 ADRs record durable 3.0 compatibility-compiler decisions. They should be short, specific, and updated by adding a new ADR rather than rewriting history.
 
@@ -34,3 +34,11 @@ Initial ADR set:
 - `0015`: Canonical stream descriptors.
 - `0018`: Automatic generated ID policy.
 - `0019`: TargetProfileV2.
+- `0020`: Compilation snapshot boundary.
+- `0021`: Hard-gate and not-applicable proof.
+- `0022`: Unified technology catalog.
+- `0023`: Transformation operations and mutation journal.
+- `0024`: Declarative compiler extension.
+- `0025`: Safety, quality, and promotion separation.
+- `0026`: Runtime and qualification environments.
+- `0027`: Compiler schema compatibility.

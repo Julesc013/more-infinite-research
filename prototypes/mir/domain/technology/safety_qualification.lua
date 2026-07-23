@@ -2,13 +2,11 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 
 local M = {}
 local SCHEMA = 1
-local GATE_ORDER = {
-  "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
-  "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
-}
+local GATE_ORDER = hard_gate_authority.order()
 local DECISIONS = {qualified = true, proposal = true, rejected = true, quarantined = true}
 
 local function material(record)
@@ -50,6 +48,7 @@ function M.validate(record)
     or not DECISIONS[record.decision] then
     error("SafetyQualification decision material is invalid.", 2)
   end
+  hard_gate_authority.assert_total(record.hard_gates)
   for _, gate in pairs(record.hard_gates) do gate_contract.validate(gate) end
   if record.primary_rejection ~= nil and type(record.primary_rejection) ~= "table" then
     error("SafetyQualification primary rejection is invalid.", 2)
@@ -67,10 +66,10 @@ function M.from_design(design, row, _, options)
   local unresolved = {}
   local hard_gates = {}
   for _, gate_name in ipairs(GATE_ORDER) do
-    local gate = row.gates and row.gates[gate_name] or gate_contract.not_applicable(
-      "safety-qualification:total-gate-vector",
-      {"safety-qualification:not-applicable:" .. gate_name}
-    )
+    local gate = row.gates and row.gates[gate_name]
+    if gate == nil then
+      error("SafetyQualification candidate is missing required hard gate: " .. gate_name, 2)
+    end
     gate_contract.validate(gate)
     hard_gates[gate_name] = deepcopy(gate)
     if gate.status == "failed" then

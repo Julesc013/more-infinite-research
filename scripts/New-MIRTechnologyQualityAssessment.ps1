@@ -35,7 +35,9 @@ $selection = @($catalog.current_selections | Where-Object { [string]$_.candidate
 if ($selection.Count -ne 1) { throw "Technology candidate must have exactly one current selection: $CandidateId" }
 
 $profileAuthority = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $ProfilePath) | ConvertFrom-Json
-if ([int]$profileAuthority.schema -ne 1) { throw "Technology quality profile schema is invalid." }
+if ([int]$profileAuthority.schema -ne 2 -or [string]$profileAuthority.authority -ne "mir-technology-quality-profiles-v2") {
+  throw "Technology quality profile schema is invalid."
+}
 $profile = @($profileAuthority.profiles | Where-Object { [string]$_.profile_id -eq $ProfileId })
 if ($profile.Count -ne 1) { throw "Technology quality ProfileId must resolve exactly once: $ProfileId" }
 $profile = $profile[0]
@@ -90,6 +92,10 @@ if ($missing.Count -gt 0) {
   $reasons += "incomplete-metrics:" + ($missing -join ",")
 }
 if ($missing.Count -eq 0) {
+  if ($values.member_count -lt [double]$profile.minimum_members) { $status = Get-MIRWorstStatus $status "REVIEW_REQUIRED"; $reasons += "insufficient-members" }
+  if ($values.member_count -gt [double]$profile.maximum_members) { $status = Get-MIRWorstStatus $status "REVIEW_REQUIRED"; $reasons += "excessive-members" }
+  if ($values.semantic_cluster_count -gt [double]$profile.maximum_semantic_clusters) { $status = Get-MIRWorstStatus $status "REVIEW_REQUIRED"; $reasons += "excessive-semantic-clusters" }
+  if ($values.progression_span -gt [double]$profile.maximum_progression_span) { $status = Get-MIRWorstStatus $status "REVIEW_REQUIRED"; $reasons += "wide-progression-span" }
   if ($values.owner_conflict_count -gt [double]$profile.maximum_owner_conflicts) { $status = Get-MIRWorstStatus $status "FAIL"; $reasons += "owner-conflicts" }
   if ($values.false_positive_count -gt [double]$profile.maximum_false_positives) { $status = Get-MIRWorstStatus $status "FAIL"; $reasons += "false-positives" }
   if ($values.false_negative_count -gt [double]$profile.maximum_false_negatives) { $status = Get-MIRWorstStatus $status "FAIL"; $reasons += "false-negatives" }

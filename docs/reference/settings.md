@@ -206,7 +206,7 @@ Only cataloged setting names beginning with `ips-` or `mir-` are exported, and `
 
 The encoded JSON is canonicalized before compression: object keys are sorted, schema `1` carries explicit `format` and `codec` fields, and future schema migration is centralized in the codec's decode path.
 
-`prototypes/mir/settings/effective.lua` reads the import setting once during prototype loading. An imported value applies only when:
+`prototypes/mir/settings/effective.lua` reads the import setting once per explicit CompilerContext during prototype loading. `prototypes/mir/runtime/startup_settings.lua` independently resolves the same immutable startup values for runtime handlers without accessing compiler state. An imported value applies only when:
 
 - the profile schema is supported;
 - the setting exists in the current branch;

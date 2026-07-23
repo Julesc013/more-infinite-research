@@ -7,6 +7,7 @@
     "SafetyQualification": 1,
     "DesignAssessment": 1,
     "PromotionAuthorization": 1,
+    "TechnologyQualityProfile": 2,
     "TechnologyQualityAssessment": 2,
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
@@ -51,6 +52,7 @@
     "GenerationPlan is a projection of deterministic TechnologyCatalog selection policy",
     "every selectable alternative has an exact qualification and rejected alternatives cannot be selected",
     "promotion admission requires a passing exact quality assessment, approval, applicability envelope, evidence, identity edge, and migration policy",
+    "every enabled candidate class selects one of seven explicit schema-2 quality profiles and no generic fallback profile exists",
     "offline governance records use canonical SHA-256 transport fingerprints"
   ],
   "tooling": {

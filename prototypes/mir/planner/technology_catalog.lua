@@ -28,6 +28,8 @@ local function safe_diagnostic_row(row)
   for gate_name in pairs(row.gates or {}) do
     copy.gates[gate_name] = gate_contract.not_applicable(
       "candidate-catalog:diagnostic-alternative",
+      "alternative-materializes-prototype",
+      fingerprint.of({selection_key = selection_key(row), gate = gate_name, action = "diagnose"}),
       {"candidate-catalog:safe-diagnostic-alternative"}
     )
   end
@@ -42,6 +44,8 @@ local function final_qualification_row(row)
       if gate.status == "pending" or gate.status == "superseded" then
         copy.gates[gate_name] = gate_contract.not_applicable(
           "technology-catalog:final-rejected-alternative",
+          "rejected-alternative-reaches-gate",
+          fingerprint.of({selection_key = selection_key(row), gate = gate_name, reason = copy.reason}),
           {"technology-catalog:unreached-after-rejection:" .. gate_name}
         )
       end
@@ -75,7 +79,8 @@ local function preselection_material(catalog)
     selection_authority = catalog.selection_authority,
     phase = catalog.phase,
     generation_plan_fingerprint = catalog.generation_plan_fingerprint,
-    compilation_plan_fingerprint = catalog.compilation_plan_fingerprint
+    compilation_plan_fingerprint = catalog.compilation_plan_fingerprint,
+    base_candidates = catalog.base_candidates
   }
 end
 
@@ -153,7 +158,8 @@ function M.from_preselection_rows(rows, context_material, options)
     mutation_authority = false,
     selection_authority = "deterministic-policy-v2",
     generation_plan_fingerprint = options.generation_plan_fingerprint or "pending",
-    compilation_plan_fingerprint = options.compilation_plan_fingerprint or "pending"
+    compilation_plan_fingerprint = options.compilation_plan_fingerprint or "pending",
+    base_candidates = deepcopy(options.base_candidates or {})
   }
   catalog.candidate_catalog_fingerprint = fingerprint.of(candidates)
   catalog.qualification_catalog_fingerprint = fingerprint.of(qualifications)
@@ -200,6 +206,9 @@ function M.validate(catalog)
     or type(catalog.compilation_plan_fingerprint) ~= "string" then
     error("TechnologyCatalog schema 3 canonical inventory is required.", 2)
   end
+  if type(catalog.base_candidates) ~= "table" then
+    error("TechnologyCatalog base continuation inventory is required.", 2)
+  end
   local alternatives, qualifications = {}, {}
   for _, qualification in ipairs(catalog.qualifications) do
     technology_qualification.validate(qualification)
@@ -244,8 +253,9 @@ function M.validate(catalog)
   end
   for _, selection in ipairs(catalog.current_selections) do
     local alternative = alternatives[selection.candidate_id .. "/" .. selection.alternative_id]
-    if not alternative or (alternative.qualification_decision ~= "qualified"
-        and alternative.qualification_decision ~= "proposal")
+    local acceptable = alternative and (alternative.qualification_decision == "qualified"
+      or (catalog.phase ~= "final" and alternative.qualification_decision == "proposal"))
+    if not acceptable
       or alternative.action ~= selection.action
       or alternative.design_fingerprint ~= selection.design_fingerprint
       or alternative.qualification_fingerprint ~= selection.qualification_fingerprint then

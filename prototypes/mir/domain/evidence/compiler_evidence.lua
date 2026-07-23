@@ -22,6 +22,12 @@ function M.build(input)
       qualification_fingerprint = input.qualification_fingerprint,
       telemetry_fingerprint = telemetry_fingerprint
     }),
+    compiler_input_fingerprint = input.compiler_input_fingerprint,
+    compiler_result_fingerprint = input.compiler_result_fingerprint,
+    technology_catalog_fingerprint = input.technology_catalog_fingerprint,
+    technology_graph_parity = deepcopy(input.technology_graph_parity),
+    provider_resolution = deepcopy(input.provider_resolution or {}),
+    provider_decision_diagnostics = deepcopy(input.provider_decision_diagnostics or {}),
     input_sanitation_ledger = deepcopy(input.input_sanitation_ledger),
     input_sanitation_fingerprint = fingerprint.of(input.input_sanitation_ledger or {}),
     output_sanitation_ledger = deepcopy(input.output_sanitation_ledger),

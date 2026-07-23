@@ -1,12 +1,10 @@
 local deepcopy = require("__more-infinite-research__.prototypes.mir.core.deepcopy")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local family_registry = require("__more-infinite-research__.prototypes.mir.families.registry")
-local family_operator_dsl = require("__more-infinite-research__.prototypes.mir.families.operator_dsl")
 local provider_registry = require("__more-infinite-research__.prototypes.mir.providers.registry")
 local diagnostic_codes = require("__more-infinite-research__.prototypes.mir.domain.diagnostics.codes")
 local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibility.packs.schema")
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
-local compatibility_policy = require("__more-infinite-research__.prototypes.mir.compatibility.policy_authority")
 local precedence = require("__more-infinite-research__.prototypes.mir.compatibility.packs.precedence")
 local generation_plan = require("__more-infinite-research__.prototypes.mir.planner.generation_plan")
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
@@ -17,8 +15,6 @@ local effect_contracts = require("__more-infinite-research__.prototypes.mir.inte
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
-local technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate")
-local technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification")
 local c7_contracts = {
   gate = require("__more-infinite-research__.prototypes.mir.domain.technology.gate"),
   safety = require("__more-infinite-research__.prototypes.mir.domain.technology.safety_qualification"),
@@ -26,10 +22,16 @@ local c7_contracts = {
   promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_authorization"),
   registry = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_registry")
 }
-local technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval")
 local applicability_envelope = require("__more-infinite-research__.prototypes.mir.domain.technology.applicability_envelope")
 local technology_promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_promotion")
-local technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
+local focused_contracts = {
+  family_operator_dsl = require("__more-infinite-research__.prototypes.mir.families.operator_dsl"),
+  compatibility_policy = require("__more-infinite-research__.prototypes.mir.compatibility.policy_authority"),
+  technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate"),
+  technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification"),
+  technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval"),
+  technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
+}
 local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
@@ -38,6 +40,19 @@ local relationships = require("__more-infinite-research__.prototypes.mir.index.r
 local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
 local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
 local science_packs = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
+local c9_contracts = {
+  compiler_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input"),
+  compiler_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result"),
+  compilation_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.compilation_snapshot"),
+  policy_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.policy_snapshot"),
+  runtime_environment = require("__more-infinite-research__.prototypes.mir.domain.environment_identity"),
+  compiler = require("__more-infinite-research__.prototypes.mir.planner.compiler"),
+  hard_gate_authority = require("__more-infinite-research__.prototypes.mir.domain.technology.hard_gate_authority"),
+  provider_claim = require("__more-infinite-research__.prototypes.mir.providers.pipeline.provider_claim"),
+  transformation_operation = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_operation"),
+  transformation_plan = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_plan"),
+  mutation_journal = require("__more-infinite-research__.prototypes.mir.domain.compiler.mutation_journal")
+}
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -72,7 +87,9 @@ end
 
 local function skip_row(stream_key, manifest_id)
   local function proof(evidence)
-    return c7_contracts.gate.not_applicable("compiler-contract-fixture", {evidence})
+    return c7_contracts.gate.not_applicable(
+      "compiler-contract-fixture", "fixture-row-materializes",
+      fingerprint.of({stream_key = stream_key, evidence = evidence}), {evidence})
   end
   return {
     schema = 3,
@@ -279,7 +296,7 @@ expect_error("incomplete FamilyRule safety requirements", "hard evidence require
 local behavioral_rule = deepcopy(rules)
 behavioral_rule.rules[1].callback = function() end
 expect_error("behavioral FamilyRule", "FamilyRule must be data-only", function() family_registry.validate(behavioral_rule) end)
-local operator_schema = family_operator_dsl.schema_authority()
+local operator_schema = focused_contracts.family_operator_dsl.schema_authority()
 if operator_schema.schema ~= 1
   or #operator_schema.operators.selectors < 6
   or rules.rules[1].operators.effect_model.operator == nil then
@@ -510,8 +527,8 @@ mismatched_qualification_row.technology_name = "mismatched-technology-design"
 expect_error("TechnologyDesign qualification identity", "changed design identity", function()
   technology_design.with_qualification(normalized_design, mismatched_qualification_row)
 end)
-local candidate = technology_candidate.from_design(normalized_design, design_row)
-local qualification = technology_qualification.from_design(normalized_design, design_row)
+local candidate = focused_contracts.technology_candidate.from_design(normalized_design, design_row)
+local qualification = focused_contracts.technology_qualification.from_design(normalized_design, design_row)
 do
   local pending_row = deepcopy(design_row)
   pending_row.gates.progression_safe = c7_contracts.gate.pending("compiler-contract:pending-progression")
@@ -638,12 +655,15 @@ local expansion_matches, expansion_reason = applicability_envelope.matches(appro
 if expansion_matches or expansion_reason ~= "new-matches" then
   fail("technology applicability envelope did not fail closed on an unreviewed match")
 end
-local policy_snapshot = compatibility_policy.snapshot()
+local policy_snapshot
+compiler_context.with_active(compiler_context.new(), function()
+  policy_snapshot = focused_contracts.compatibility_policy.snapshot()
+end)
 if policy_snapshot.schema ~= 1 or type(policy_snapshot.policy_fingerprint) ~= "string"
   or type(policy_snapshot.active_packs) ~= "table" or type(policy_snapshot.claims) ~= "table" then
   fail("context-owned compatibility policy authority is incomplete")
 end
-local approval = technology_approval.new({
+local approval = focused_contracts.technology_approval.new({
   approval_id = "approval/compiler-contract/1",
   decision = "approved",
   candidate_selector = {candidate_id = candidate.candidate_id},
@@ -669,7 +689,7 @@ local promotion = technology_promotion.new({
   introduced_in = "3.2.0",
   evidence = {qualification.qualification_fingerprint}
 })
-local migration = technology_migration.new({
+local migration = focused_contracts.technology_migration.new({
   migration_id = "migration/compiler-contract/1",
   from_technology_id = "old-fixture-technology",
   to_technology_id = normalized_design.technology_id,
@@ -823,11 +843,17 @@ if rejected_unrecognized or rejected_reason ~= "unrecognized_cost_formula" then
   fail("unsafe unrecognized cost formula override did not fail closed")
 end
 
+focused_contracts.compilation_context = compiler_context.new()
+focused_contracts.finalize_compilation = function(...)
+  return compiler_context.with_active(
+    focused_contracts.compilation_context, compilation_plan.finalize, ...)
+end
+
 local collision_plan = generation_plan.new()
 collision_plan:add(emitted_row("collision-stream", "collision-tech"))
 collision_plan:finalize()
 expect_error("CompilationPlan cross collision", "technology-name collision", function()
-  compilation_plan.finalize(collision_plan, {{
+  focused_contracts.finalize_compilation(collision_plan, {{
     operation = "emit_base_extension",
     key = "collision-base",
     technology_name = "collision-tech",
@@ -849,7 +875,7 @@ partial_sanitation_row.technology_design = technology_design.from_generation_row
 local partial_sanitation_source = generation_plan.new()
 partial_sanitation_source:add(partial_sanitation_row)
 partial_sanitation_source:finalize()
-local partial_sanitation_plan = compilation_plan.finalize(partial_sanitation_source, {})
+local partial_sanitation_plan = focused_contracts.finalize_compilation(partial_sanitation_source, {})
 local partial_sanitation_operation = partial_sanitation_plan.operations[1]
 local partial_sanitation_design = partial_sanitation_operation
   and partial_sanitation_operation.technology_design
@@ -863,7 +889,7 @@ if not partial_sanitation_operation
   fail("CompilationPlan partial effect sanitation did not rebuild TechnologyDesign from retained effects")
 end
 
-local missing_prerequisite_plan = compilation_plan.finalize(generation_plan.new():finalize(), {{
+local missing_prerequisite_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {{
     operation = "emit_base_extension",
     key = "missing-prerequisite",
     technology_name = "missing-prerequisite-tech",
@@ -900,7 +926,7 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
-local continuation_design_plan = compilation_plan.finalize(generation_plan.new():finalize(), {{
+local continuation_design_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {{
   operation = "emit_base_extension",
   key = "compiler-contract-continuation",
   manifest_id = "base-continuation/compiler-contract-continuation",
@@ -934,7 +960,7 @@ expect_error("presentation output parity", "localized name differs", function()
     "presentation-parity-test"
   )
 end)
-local cyclic_plan = compilation_plan.finalize(generation_plan.new():finalize(), {
+local cyclic_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
     {
       operation = "emit_base_extension",
       key = "cycle-a",
@@ -1001,8 +1027,8 @@ for index = 1, #witness - 1 do
   end
 end
 
-local semantic_plan_a = compilation_plan.finalize(generation_plan.new():finalize(), {})
-local semantic_plan_b = compilation_plan.finalize(generation_plan.new():finalize(), {})
+local semantic_plan_a = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {})
+local semantic_plan_b = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {})
 if semantic_plan_a.semantic_fingerprint ~= semantic_plan_b.semantic_fingerprint
   or semantic_plan_a.fingerprint ~= semantic_plan_a.compilation_fingerprint
   or semantic_plan_a.semantic_fingerprint ~= semantic_plan_a.qualification_fingerprint then
@@ -1018,7 +1044,9 @@ local dangling_effect_candidate = {
     {type = "change-recipe-productivity", recipe = "mir-fixture-definitely-missing-recipe", change = 0.01}
   }
 }
-local dangling_effect_result = effect_safety.prune_missing_recipe_effects(
+local dangling_effect_result = compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.prune_missing_recipe_effects,
   dangling_effect_candidate,
   "compiler-contract-dangling-effect")
 if dangling_effect_result.pruned_effect_count ~= 1
@@ -1027,7 +1055,11 @@ if dangling_effect_result.pruned_effect_count ~= 1
 then
   fail("final effect safety did not prune only the missing recipe-productivity target")
 end
-effect_safety.assert_effects_allowed(dangling_effect_candidate.effects, "compiler-contract-dangling-effect")
+compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.assert_effects_allowed,
+  dangling_effect_candidate.effects,
+  "compiler-contract-dangling-effect")
 
 local generic_effect_candidate = {
   effects = {
@@ -1045,23 +1077,29 @@ local generic_effect_candidate = {
     {type = "give-item", item = "iron-plate", quality = "mir-fixture-definitely-missing-quality", count = 1}
   }
 }
-local kept_generic, removed_generic, retained_effect_order, retained_effect_identities = effect_safety.sanitize_effects(
+local kept_generic, removed_generic, retained_effect_order, retained_effect_identities = compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.sanitize_effects,
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
-if #kept_generic ~= 6 or #removed_generic ~= 6
+if #kept_generic ~= 5 or #removed_generic ~= 7
   or removed_generic[1].original_effect_index ~= 2
   or removed_generic[2].original_effect_index ~= 4
-  or removed_generic[3].original_effect_index ~= 6
-  or removed_generic[4].original_effect_index ~= 8
-  or removed_generic[5].original_effect_index ~= 10
-  or removed_generic[6].original_effect_index ~= 12
+  or removed_generic[3].original_effect_index ~= 5
+  or removed_generic[4].original_effect_index ~= 6
+  or removed_generic[5].original_effect_index ~= 8
+  or removed_generic[6].original_effect_index ~= 10
+  or removed_generic[7].original_effect_index ~= 12
   or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
-  or #retained_effect_identities ~= 6
+  or #retained_effect_identities ~= 5
   or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3
-  or retained_effect_order[3] ~= 5 or retained_effect_order[4] ~= 7
-  or retained_effect_order[5] ~= 9 or retained_effect_order[6] ~= 11 then
-  fail("generic effect contracts did not retain valid targets and prune missing targets")
+  or retained_effect_order[3] ~= 7 or retained_effect_order[4] ~= 9
+  or retained_effect_order[5] ~= 11 then
+  fail("generic effect contracts did not retain valid targets and prune missing targets"
+    .. ": kept=" .. tostring(#kept_generic)
+    .. " removed=" .. tostring(#removed_generic)
+    .. " retained-order=" .. table.concat(retained_effect_order, ","))
 end
 local default_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate"})
 local normal_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "normal"})
@@ -1082,33 +1120,125 @@ end
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
+do
+  if fingerprint.of({[10] = "ten", [2] = "two", label = "mixed"})
+    ~= fingerprint.of({label = "mixed", [2] = "two", [10] = "ten"}) then
+    fail("sparse numeric map fingerprint is iteration-order dependent")
+  end
+  if fingerprint.of({[10] = "ten", [2] = "two", label = "mixed"})
+    == fingerprint.of({[2] = "two", [10] = "different", label = "mixed"}) then
+    fail("sparse numeric map fingerprint does not bind numeric-keyed values")
+  end
+end
 
 do
-  local exact_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input").new({
-    environment_fingerprint = "ENVIRONMENT",
-    target_profile_fingerprint = "TARGET",
-    generation_plan_fingerprint = "PLAN",
-    input_sanitation_fingerprint = "SANITATION",
-    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"},
-    environment_identity = {schema = 1, record_type = "EnvironmentIdentity"}
+  local exact_compilation_snapshot = c9_contracts.compilation_snapshot.new({
+    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
+    effect_target_inventory = {}, stream_inputs = {}, base_continuation_inputs = {},
+    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
   })
-  local input_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input").snapshot(exact_input)
+  local exact_policy_snapshot = c9_contracts.policy_snapshot.new({
+    effective_settings = {}, compatibility_policy = {}, stream_policy = {}, promotion_authority = {},
+    hard_gate_authority = c9_contracts.hard_gate_authority.snapshot(), effect_contract_authority = effect_contracts.snapshot(),
+    quality_profiles = {}, transformation_policy = {}, weapon_overlap_mode = "off"
+  })
+  local exact_runtime_environment = c9_contracts.runtime_environment.new({
+    factorio_line = "2.1", target_profile_fingerprint = "TARGET", loaded_mod_closure = {base = "2.1.11"}
+  })
+  local exact_input = c9_contracts.compiler_input.new({
+    compilation_snapshot = exact_compilation_snapshot,
+    policy_snapshot = exact_policy_snapshot,
+    runtime_environment = exact_runtime_environment,
+    input_sanitation_fingerprint = "SANITATION",
+    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
+  })
+  local input_snapshot = c9_contracts.compiler_input.snapshot(exact_input)
   input_snapshot.source_fingerprints.fixtures = "MUTATED"
   if exact_input.source_fingerprints.fixtures ~= "COMPILER-CONTRACTS" then
     fail("CompilerInput snapshot mutated its immutable source contract")
   end
-  local exact_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result").new({
+  local exact_result = c9_contracts.compiler_result.new({
     input_fingerprint = exact_input.input_fingerprint,
     technology_catalog_fingerprint = "CATALOG",
     generation_plan_fingerprint = "PLAN",
     compilation_plan_fingerprint = "COMPILATION",
     qualification_fingerprint = "QUALIFICATION",
     operation_fingerprints = {"OPERATION"},
-    rejected_candidates = {},
-    status = "PASS"
+    accepted_candidates = {},
+    rejected_candidates = {}
   })
-  require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result").validate(exact_result)
+  c9_contracts.compiler_result.validate(exact_result)
+  if exact_input.schema ~= 2 or exact_result.schema ~= 2
+    or exact_result.dimensions.safety ~= "QUALIFIED" then
+    fail("CompilerInput/CompilerResult schema 2 authority is incomplete")
+  end
 
+  local pure_snapshot = c9_contracts.compilation_snapshot.new({
+    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
+    effect_target_inventory = {}, stream_inputs = {rows = {design_row}}, base_continuation_inputs = {},
+    source_fingerprints = {fixtures = "PURE-COMPILER"}
+  })
+  local pure_result = c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot)
+  local pure_replay = c9_contracts.compiler.compile(deepcopy(pure_snapshot), deepcopy(exact_policy_snapshot))
+  if pure_result.status ~= "PASS" or #pure_result.transformation_plan.operations ~= 1
+    or pure_result.compilation_fingerprint ~= pure_replay.compilation_fingerprint then
+    fail("pure compiler replay did not produce one deterministic qualified operation")
+  end
+  expect_error("pure compiler missing hard gate", "missing", function()
+    local tampered_snapshot = deepcopy(pure_snapshot)
+    tampered_snapshot.stream_inputs.rows[1].gates.output_identity_safe = nil
+    tampered_snapshot = c9_contracts.compilation_snapshot.new(tampered_snapshot)
+    c9_contracts.compiler.compile(tampered_snapshot, exact_policy_snapshot)
+  end)
+  expect_error("N/A gate missing applicability proof", "requires evaluator, predicate", function()
+    c7_contracts.gate.not_applicable("compiler-contract-fixture", nil, nil, {"invalid"})
+  end)
+  local valid_na = c7_contracts.gate.not_applicable(
+    "compiler-contract-fixture", "fixture-applicability", "FIXTURE-INPUT", {"not-applicable"})
+  expect_error("tampered N/A input fingerprint", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(valid_na)
+    tampered.applicability.input_fingerprint = "TAMPERED"
+    c7_contracts.gate.validate(tampered)
+  end)
+
+  local operation = c9_contracts.transformation_operation.new({
+    operation_id = "technology/create/compiler-contract", phase = "technology-materialization",
+    action = "create", subject = {type = "technology", id = "compiler-contract"},
+    authority_fingerprint = exact_policy_snapshot.policy_fingerprint,
+    payload = {technology = "compiler-contract"}, evidence = {fixture = true}
+  })
+  local operation_plan = c9_contracts.transformation_plan.new({phase = "fixture",
+    compilation_snapshot_fingerprint = pure_snapshot.snapshot_fingerprint,
+    policy_fingerprint = exact_policy_snapshot.policy_fingerprint, operations = {operation}})
+  local journal = c9_contracts.mutation_journal.new(operation_plan.plan_fingerprint)
+  journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  if #journal:snapshot().entries ~= 1 then fail("MutationJournal did not bind its exact operation") end
+
+  local function claim(provider_id, change)
+    local row = {
+      provider_id = provider_id, rule = "fixture-rule", prototype_type = "recipe",
+      prototype_name = "iron-gear-wheel", recipe = "iron-gear-wheel", item = "iron-gear-wheel",
+      target_stream = "fixture-stream", candidate_family = "fixture-family", partition_key = "fixture",
+      change = change, final_state = "attach", policy_scope = "automatic-productivity",
+      promotion_class = "exact-reviewed", compatibility_pack = "fixture-pack", target_support = {"2.1"},
+      evidence = {fixture = "provider-claim"}, risk_fingerprint = "RISK", risk_hard_flags = {},
+      risk_review_flags = {}, risk_disposition = "PASS", decision_fingerprint = provider_id
+    }
+    return c9_contracts.provider_claim.bind(row)
+  end
+  local duplicate_claims = c9_contracts.provider_claim.arbitrate({claim("provider-b", 0.01), claim("provider-a", 0.01)})
+  if duplicate_claims.status ~= "PASS" or #duplicate_claims.attachment.provider_ids ~= 2
+    or duplicate_claims.attachment.provider_ids[1] ~= "provider-a" then
+    fail("identical provider claims did not collapse deterministically with preserved identities")
+  end
+  local conflicting_claims = c9_contracts.provider_claim.arbitrate({claim("provider-a", 0.01), claim("provider-b", 0.02)})
+  if conflicting_claims.status ~= "REVIEW_REQUIRED"
+    or conflicting_claims.code ~= "conflicting_same_stream_claim" then
+    fail("different same-stream provider claims did not fail closed")
+  end
+end
+
+do
   local deep = {}
   for index = 1, 5000 do
     deep["deep-" .. index] = {prerequisites = index == 1 and {} or {"deep-" .. (index - 1)}}
@@ -1131,8 +1261,9 @@ do
   end
 end
 
-local production_context = compiler_context.current()
-local production_graph_parity = production_context:artifact("technology_graph_parity")
+local production_evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
+local production_evidence = production_evidence_prototype and production_evidence_prototype.data
+local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
 if not production_graph_parity or production_graph_parity.schema ~= 2
   or production_graph_parity.valid ~= true
   or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
@@ -1143,41 +1274,40 @@ if not production_graph_parity or production_graph_parity.schema ~= 2
   or type(production_graph_parity.parity_fingerprint) ~= "string" then
   fail("emitted and planned technology graphs do not have exact parity evidence")
 end
-local relationship_view = relationships.view("output")
-if relationship_view ~= relationships.view("output")
-  or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
-  fail("relationship index view is not stable or snapshot-equivalent")
-end
-local recipe_view = recipe_facts.view("iron-plate")
-if recipe_view and recipe_view ~= recipe_facts.view("iron-plate") then
-  fail("recipe fact view is not stable within one CompilerContext")
-end
-local risk_source = recipe_facts.index_view()
-local permuted_risk_source = {schema = risk_source.schema, facts = risk_source.facts, names = {}}
-for index = #risk_source.names, 1, -1 do table.insert(permuted_risk_source.names, risk_source.names[index]) end
-local canonical_risks = recipe_risk_facts.index_facts(risk_source, relationships.view("input"))
-local permuted_risks = recipe_risk_facts.index_facts(permuted_risk_source, relationships.view("input"))
-if canonical_risks.risk_index_fingerprint ~= permuted_risks.risk_index_fingerprint then
-  fail("RecipeRiskFact canonicalization depends on prototype insertion order")
-end
-local production_catalog = production_context:state_snapshot("technology_candidate_catalog")
-local production_qualifications = production_context:state_snapshot("technology_qualifications")
-local production_plan = production_context:state_snapshot("generation_plan")
+compiler_context.with_active(focused_contracts.compilation_context, function()
+  local relationship_view = relationships.view("output")
+  if relationship_view ~= relationships.view("output")
+    or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
+    fail("relationship index view is not stable or snapshot-equivalent")
+  end
+  local recipe_view = recipe_facts.view("iron-plate")
+  if recipe_view and recipe_view ~= recipe_facts.view("iron-plate") then
+    fail("recipe fact view is not stable within one CompilerContext")
+  end
+  local risk_source = recipe_facts.index_view()
+  local permuted_risk_source = {schema = risk_source.schema, facts = risk_source.facts, names = {}}
+  for index = #risk_source.names, 1, -1 do table.insert(permuted_risk_source.names, risk_source.names[index]) end
+  local canonical_risks = recipe_risk_facts.index_facts(risk_source, relationships.view("input"))
+  local permuted_risks = recipe_risk_facts.index_facts(permuted_risk_source, relationships.view("input"))
+  if canonical_risks.risk_index_fingerprint ~= permuted_risks.risk_index_fingerprint then
+    fail("RecipeRiskFact canonicalization depends on prototype insertion order")
+  end
+end)
+local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
+local production_catalog = production_catalog_prototype and production_catalog_prototype.data
+local production_qualifications = production_catalog and production_catalog.qualifications
+local production_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+local production_plan = production_plan_prototype and production_plan_prototype.data
 local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
 local public_plan = public_plan_prototype and public_plan_prototype.data
 if not production_catalog or production_catalog.schema ~= 3 or production_catalog.phase ~= "final"
   or production_catalog.mutation_authority ~= false
   or not production_qualifications
   or not production_plan or not public_plan
-  or not (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
-  or (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"].data.catalog_fingerprint
-    ~= production_catalog.catalog_fingerprint
-  or not production_context:state_view("compiler_input")
-  or not production_context:state_view("compiler_result")
-  or production_context:state_view("compiler_result").input_fingerprint
-    ~= production_context:state_view("compiler_input").input_fingerprint
-  or production_context:state_view("compiler_result").technology_catalog_fingerprint
-    ~= production_catalog.catalog_fingerprint
+  or not production_evidence
+  or type(production_evidence.compiler_input_fingerprint) ~= "string"
+  or type(production_evidence.compiler_result_fingerprint) ~= "string"
+  or production_evidence.technology_catalog_fingerprint ~= production_catalog.catalog_fingerprint
   or #production_catalog.candidates == 0
   or #production_catalog.qualifications ~= #production_qualifications
   or #production_catalog.current_selections ~= #production_plan.rows
@@ -1207,46 +1337,52 @@ for _, row in ipairs(production_plan.rows or {}) do
   end
 end
 if skipped_design_count == 0 then fail("compiler-contract fixture did not exercise skipped-row design deferral") end
-local canonical_decisions = {}
-if next(family_resolver.snapshot().provider_metrics or {}) == nil then
-  fail("ProviderMetrics authority emitted no provider records")
-end
-for provider_id, metrics in pairs(family_resolver.snapshot().provider_metrics or {}) do
-  if metrics.record_type ~= "ProviderMetrics" or metrics.provider_id ~= provider_id
-    or type(metrics.provider_version) ~= "string" or type(metrics.family_id) ~= "string"
-    or type(metrics.partition_key) ~= "string" or type(metrics.environment_fingerprint) ~= "string"
-    or type(metrics.metrics.candidate_count.value) ~= "number"
-    or metrics.metrics.candidate_count.measurement_status ~= "COMPLETE"
-    or metrics.metrics.semantic_cluster_count.source ~= "family-operator-partitioner"
-    or type(metrics.metrics.canonical_bytes.value) ~= "number"
-    or (metrics.metrics.provider_phase_time.measurement_status == "COMPLETE"
-      and type(metrics.metrics.provider_phase_time.value) ~= "number")
-    or type(metrics.metrics_fingerprint) ~= "string" then
-    fail("ProviderMetrics did not bind real identifiers, counts, partition, environment, timing, bytes, and provenance")
+compiler_context.with_active(focused_contracts.compilation_context, function()
+  local provider_resolution = production_evidence.provider_resolution or {}
+  local canonical_decisions = {}
+  if next(provider_resolution.provider_metrics or {}) == nil then
+    fail("ProviderMetrics authority emitted no provider records")
   end
-end
-for _, row in ipairs(family_resolver.snapshot().decisions or {}) do
-  if row.rule == "loader-manufacturing" or row.rule == "mining-drill-manufacturing" then
-    canonical_decisions[row.decision_fingerprint] = row
-  end
-end
-local projected_decisions = 0
-for _, row in ipairs((production_context:state_view("diagnostics") or {}).rows or {}) do
-  if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
-    projected_decisions = projected_decisions + 1
-    local canonical = canonical_decisions[row.decision_fingerprint]
-    if not canonical or row.planner_decision_fingerprint ~= canonical.decision_fingerprint
-      or row.risk_fingerprint ~= canonical.risk_fingerprint then
-      fail("capability diagnostics did not project the exact planner decision and risk fingerprints")
+  for provider_id, metrics in pairs(provider_resolution.provider_metrics or {}) do
+    if metrics.record_type ~= "ProviderMetrics" or metrics.provider_id ~= provider_id
+      or type(metrics.provider_version) ~= "string" or type(metrics.family_id) ~= "string"
+      or type(metrics.partition_key) ~= "string" or type(metrics.environment_fingerprint) ~= "string"
+      or type(metrics.metrics.candidate_count.value) ~= "number"
+      or metrics.metrics.candidate_count.measurement_status ~= "COMPLETE"
+      or metrics.metrics.semantic_cluster_count.source ~= "family-operator-partitioner"
+      or type(metrics.metrics.canonical_bytes.value) ~= "number"
+      or (metrics.metrics.provider_phase_time.measurement_status == "COMPLETE"
+        and type(metrics.metrics.provider_phase_time.value) ~= "number")
+      or type(metrics.metrics_fingerprint) ~= "string" then
+      fail("ProviderMetrics did not bind real identifiers, counts, partition, environment, timing, bytes, and provenance")
     end
   end
-end
-local canonical_decision_count = 0
-for _ in pairs(canonical_decisions) do canonical_decision_count = canonical_decision_count + 1 end
-if projected_decisions ~= canonical_decision_count then
-  fail("capability diagnostics omitted or duplicated canonical provider decisions")
-end
+  for _, row in ipairs(provider_resolution.decisions or {}) do
+    if row.rule == "loader-manufacturing" or row.rule == "mining-drill-manufacturing" then
+      canonical_decisions[row.decision_fingerprint] = row
+    end
+  end
+  local projected_decisions = 0
+  for _, row in ipairs(production_evidence.provider_decision_diagnostics or {}) do
+    if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
+      projected_decisions = projected_decisions + 1
+      local canonical = canonical_decisions[row.decision_fingerprint]
+      if not canonical or row.planner_decision_fingerprint ~= canonical.decision_fingerprint
+        or row.risk_fingerprint ~= canonical.risk_fingerprint then
+        fail("capability diagnostics did not project the exact planner decision and risk fingerprints")
+      end
+    end
+  end
+  local canonical_decision_count = 0
+  for _ in pairs(canonical_decisions) do canonical_decision_count = canonical_decision_count + 1 end
+  if projected_decisions ~= canonical_decision_count then
+    fail("capability diagnostics omitted or duplicated canonical provider decisions")
+  end
+end)
 local first_context = compiler_context.new()
+expect_error("CompilerContext no implicit active instance", "before CompilerContext activation", function()
+  compiler_context.current()
+end)
 first_context:set_state("fixture-derived-state", {value = 1})
 first_context:set_state("fixture-epoch-state", {value = 1})
 local _, epoch = first_context:replace_epoch("fixture-epoch-state", {value = 2}, 1)
@@ -1261,28 +1397,44 @@ expect_error("CompilerContext frozen state", "state is frozen", function()
   first_context:replace_epoch("fixture-epoch-state", {value = 4}, 2)
 end)
 first_context:record_artifact("fixture-artifact", {value = 2})
-science_packs.all_lab_inputs()
-science_packs.pack_production_status("automation-science-pack")
-science_packs.technology_is_enabled_and_reachable("automation")
-science_packs.mod_progression_packs_for({"automation-science-pack"})
-for _, key in ipairs({
-  "lab_input_index", "science_pack_recipe_status", "science_pack_production",
-  "technology_researchability_index", "mod_progression_cache"
-}) do
-  if not first_context:has_state(key) then fail("science/progression cache was not context-owned: " .. key) end
-end
-if not first_context:has_service("science.pack_production_status")
-  or not first_context:has_service("science.technology_researchability_reason") then
-  fail("science dependency callbacks were not CompilerContext-owned services")
-end
-expect_error("CompilerContext duplicate service", "registered more than once", function()
-  first_context:set_service("science.pack_production_status", function() return "invalid" end)
-end)
-first_context:freeze_services()
-expect_error("CompilerContext frozen services", "services are frozen", function()
-  first_context:set_service("fixture.late-service", function() return true end)
+compiler_context.with_active(first_context, function()
+  science_packs.all_lab_inputs()
+  science_packs.pack_production_status("automation-science-pack")
+  science_packs.technology_is_enabled_and_reachable("automation")
+  science_packs.mod_progression_packs_for({"automation-science-pack"})
+  for _, key in ipairs({
+    "lab_input_index", "science_pack_recipe_status", "science_pack_production",
+    "technology_researchability_index", "mod_progression_cache"
+  }) do
+    if not first_context:has_state(key) then fail("science/progression cache was not context-owned: " .. key) end
+  end
+  if not first_context:has_service("science.pack_production_status")
+    or not first_context:has_service("science.technology_researchability_reason") then
+    fail("science dependency callbacks were not CompilerContext-owned services")
+  end
+  expect_error("CompilerContext duplicate service", "registered more than once", function()
+    first_context:set_service("science.pack_production_status", function() return "invalid" end)
+  end)
+  first_context:freeze_services()
+  expect_error("CompilerContext frozen services", "services are frozen", function()
+    first_context:set_service("fixture.late-service", function() return true end)
+  end)
 end)
 local second_context = compiler_context.new()
+compiler_context.with_active(first_context, function()
+  if not compiler_context.is_active(first_context) then fail("CompilerContext A was not active") end
+  compiler_context.with_active(second_context, function()
+    if not compiler_context.is_active(second_context) then fail("nested CompilerContext B was not active") end
+  end)
+  if not compiler_context.is_active(first_context) then fail("nested CompilerContext did not restore A") end
+  expect_error("nested CompilerContext error", "nested-context-fixture", function()
+    compiler_context.with_active(second_context, function() error("nested-context-fixture") end)
+  end)
+  if not compiler_context.is_active(first_context) then fail("failed nested CompilerContext did not restore A") end
+end)
+if compiler_context.is_active(first_context) or compiler_context.is_active(second_context) then
+  fail("CompilerContext A/B/A scope did not restore the empty outer activation")
+end
 if second_context:has_state("fixture-derived-state")
   or second_context:artifact("fixture-artifact") ~= nil then
   fail("CompilerContext instances leaked derived state or artifacts")
@@ -1293,16 +1445,17 @@ for _, key in ipairs({
 }) do
   if second_context:has_state(key) then fail("science/progression cache crossed CompilerContext boundary: " .. key) end
 end
-compiler_context.activate(first_context)
-local telemetry_before_snapshot = fingerprint.of(first_context:state_snapshot("compiler_telemetry"))
-local first_snapshot = first_context:snapshot()
-if telemetry_before_snapshot ~= fingerprint.of(first_context:state_snapshot("compiler_telemetry")) then
-  fail("CompilerContext snapshot mutated live telemetry state")
-end
+local first_snapshot
+compiler_context.with_active(first_context, function()
+  local telemetry_before_snapshot = fingerprint.of(first_context:state_snapshot("compiler_telemetry"))
+  first_snapshot = first_context:snapshot()
+  if telemetry_before_snapshot ~= fingerprint.of(first_context:state_snapshot("compiler_telemetry")) then
+    fail("CompilerContext snapshot mutated live telemetry state")
+  end
+end)
 first_snapshot.state["fixture-derived-state"].value = 99
 first_snapshot.artifacts["fixture-artifact"].value = 99
 if first_context:state_view("fixture-derived-state").value ~= 1
   or first_context:artifact("fixture-artifact").value ~= 2 then
   fail("CompilerContext snapshot did not isolate owned state")
 end
-compiler_context.activate(production_context)

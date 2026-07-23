@@ -60,12 +60,15 @@
         ".mir/technology-lifecycle.json",
         ".mir/module-dependencies.json",
         ".mir/technology-effect-targets.json",
+        ".mir/technology-hard-gates.json",
+        ".mir/technology-quality-profiles.json",
         ".mir/compiler-schema-authority.json",
         "fixtures/assert-compiler-contracts/**",
         "scripts/Test-MIRCompiler.ps1",
         "scripts/Test-MIRModuleDependencies.ps1",
         "scripts/Test-MIRCompilerContractCoverage.ps1",
         "scripts/Test-MIRCompilerSchemaDrift.ps1"
+        ,"scripts/Update-MIRCompilerAuthorities.ps1"
       ]
     },
     {

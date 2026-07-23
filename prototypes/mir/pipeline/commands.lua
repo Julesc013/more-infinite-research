@@ -79,7 +79,7 @@ local commands = {
   ["emit-base-extensions"] = {
     kind = "emission",
     requires_features = {},
-    implementation = "prototypes/mir/emit/base_extensions.lua",
+    implementation = "prototypes/mir/planner/base_continuations.lua + prototypes/mir/emit/base_continuation_executor.lua",
     apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").apply_base_extensions(context) end
   },
   ["apply-competing-base-extensions"] = {
@@ -126,7 +126,7 @@ local commands = {
     kind = "report",
     requires_features = {},
     implementation = "prototypes/mir/planner/compiler.lua",
-    apply = function() require("prototypes.mir.planner.compiler").emit() end
+    apply = function() require("prototypes.mir.report.compiler_diagnostics").emit() end
   },
   ["emit-compatibility-planner"] = {
     kind = "report",
@@ -195,30 +195,31 @@ end
 
 function M.run(id, context)
   if not context then error("MIR pipeline command requires a compiler context.", 2) end
-  compiler_context.activate(context)
-  local command = commands[id]
-  if not command then error("Unknown MIR pipeline command " .. tostring(id) .. ".", 2) end
-  for _, dependency in ipairs(command.dependencies) do
-    if not context:command_status(dependency) then
-      error("MIR pipeline command " .. id .. " ran before dependency " .. dependency .. ".", 2)
+  return compiler_context.with_active(context, function()
+    local command = commands[id]
+    if not command then error("Unknown MIR pipeline command " .. tostring(id) .. ".", 2) end
+    for _, dependency in ipairs(command.dependencies) do
+      if not context:command_status(dependency) then
+        error("MIR pipeline command " .. id .. " ran before dependency " .. dependency .. ".", 2)
+      end
     end
-  end
-  if not supported(command) then context:mark_command(id, "skipped"); return false end
-  telemetry.start_phase("pipeline:" .. id)
-  local summary_phase = id == "assert-technology-safety" and "postconditions" or nil
-  if summary_phase then telemetry.start_phase(summary_phase) end
-  local ok, result = pcall(command.apply, context)
-  if summary_phase then telemetry.finish_phase(summary_phase) end
-  telemetry.finish_phase("pipeline:" .. id)
-  if not ok then error(result, 2) end
-  context:mark_command(id, "applied")
-  return true
+    if not supported(command) then context:mark_command(id, "skipped"); return false end
+    telemetry.start_phase("pipeline:" .. id)
+    local summary_phase = id == "assert-technology-safety" and "postconditions" or nil
+    if summary_phase then telemetry.start_phase(summary_phase) end
+    local ok, result = pcall(command.apply, context)
+    if summary_phase then telemetry.finish_phase(summary_phase) end
+    telemetry.finish_phase("pipeline:" .. id)
+    if not ok then error(result, 2) end
+    context:mark_command(id, "applied")
+    return true
+  end)
 end
 
 function M.run_all(options)
   options = options or {}
   local context = compiler_context.new()
-  local ok, result = pcall(function()
+  local ok, result = pcall(compiler_context.with_active, context, function()
     for _, id in ipairs(M.order()) do M.run(id, context) end
   end)
   if not ok then

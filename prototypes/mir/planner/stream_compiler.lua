@@ -62,7 +62,12 @@ local function proof_gates(action, failed_gates)
         {failure.evidence}
       )
     elseif action == "skip" then
-      out[gate_name] = gate_contract.not_applicable("generation-plan", {"decision:non-materializing-row"})
+      out[gate_name] = gate_contract.not_applicable(
+        "generation-plan",
+        "candidate-action-is-materializing",
+        fingerprint.of({action = action, gate = gate_name}),
+        {"decision:non-materializing-row"}
+      )
     elseif contract.initial == "pending" then
       out[gate_name] = gate_contract.pending(contract.evaluator)
     else
@@ -377,9 +382,7 @@ local function plan_stream(key, raw_spec)
     })
 end
 
-local function compile(context, return_view)
-  context = context or compiler_context.current()
-  compiler_context.activate(context)
+local function compile_active(context, return_view)
   science_packs.ensure_services(context)
   local cached = context:state_view("generation_plan")
   if cached then return return_view and cached or deepcopy(cached) end
@@ -435,6 +438,11 @@ local function compile(context, return_view)
   -- the one canonical schema-3 catalog after sanitation and graph decisions.
   context:set_state("generation_plan", artifact)
   return return_view and artifact or deepcopy(artifact)
+end
+
+local function compile(context, return_view)
+  context = context or compiler_context.current()
+  return compiler_context.with_active(context, compile_active, context, return_view)
 end
 
 function M.compile(context)

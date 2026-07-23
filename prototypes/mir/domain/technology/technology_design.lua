@@ -762,6 +762,8 @@ function M.as_diagnostic_alternative(design, reason)
   for gate_name in pairs(design.gates or {}) do
     result.gates[gate_name] = gate_contract.not_applicable(
       "candidate-catalog:diagnostic-alternative",
+      "alternative-materializes-prototype",
+      fingerprint.of({candidate_id = design.candidate_id, gate = gate_name, action = "diagnose"}),
       {"candidate-catalog:safe-diagnostic-alternative"}
     )
   end

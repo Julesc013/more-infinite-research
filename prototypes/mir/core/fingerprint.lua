@@ -10,38 +10,46 @@ local function is_array(value)
   return count == maximum
 end
 
-local function encode(value, seen)
+local function encode(value, seen, path)
   local kind = type(value)
   if kind == "nil" then return "null" end
   if kind == "boolean" then return value and "true" or "false" end
   if kind == "number" then return string.format("%.17g", value) end
   if kind == "string" then return string.format("%q", value) end
-  if kind ~= "table" then error("Cannot fingerprint value of type " .. kind, 3) end
-  if seen[value] then error("Cannot fingerprint cyclic table", 3) end
-  seen[value] = true
+  if kind ~= "table" then error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3) end
+  if seen[value] then error("Cannot fingerprint cyclic table at " .. path .. " (first seen at " .. seen[value] .. ")", 3) end
+  seen[value] = path
 
   local out = {}
   if is_array(value) then
-    for index = 1, #value do out[index] = encode(value[index], seen) end
+    for index = 1, #value do out[index] = encode(value[index], seen, path .. "[" .. index .. "]") end
     seen[value] = nil
     return "[" .. table.concat(out, ",") .. "]"
   end
 
   local keys = {}
   for key, _ in pairs(value) do
-    if type(key) ~= "string" then error("Fingerprint map keys must be strings", 3) end
-    table.insert(keys, key)
+    local key_kind = type(key)
+    if key_kind == "string" then
+      table.insert(keys, {key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key})
+    elseif key_kind == "number" then
+      local encoded = string.format("%.17g", key)
+      table.insert(keys, {key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"})
+    else
+      error("Fingerprint map keys must be strings or numbers at " .. path
+        .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 3)
+    end
   end
-  table.sort(keys)
-  for _, key in ipairs(keys) do
-    table.insert(out, string.format("%q", key) .. ":" .. encode(value[key], seen))
+  table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
+  for _, row in ipairs(keys) do
+    table.insert(out, row.encoded .. ":" .. encode(value[row.key], seen, path .. row.path))
   end
   seen[value] = nil
   return "{" .. table.concat(out, ",") .. "}"
 end
 
 function M.canonical(value)
-  return encode(value, {})
+  return encode(value, {}, "$")
 end
 
 function M.of(value)

@@ -1,6 +1,45 @@
 schema: 1
 
 docs:
+  - path: docs/releases/current-candidate.md
+    title: "Current Development Candidate"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-current-candidate-view
+  - path: docs/reference/generated/technology-quality-and-promotion.md
+    title: "Technology Quality And Promotion Inventory"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-quality-promotion-view
+  - path: docs/reference/generated/README.md
+    title: "Generated Reference Views"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/generated/compiler-schema-registry.md
+    title: "Compiler Schema Registry"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-compiler-schema-view
+  - path: docs/reference/schemas/compiler-boundary.md
+    title: "Compiler Boundary Schemas"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-boundary-schemas
   - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
     title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
     status: current
@@ -114,6 +153,62 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/adr/0020-compilation-snapshot-boundary.md
+    title: "ADR 0020: Compilation Snapshot Boundary"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [compilation-snapshot-boundary]
+  - path: docs/adr/0021-hard-gate-not-applicable-proof.md
+    title: "ADR 0021: Hard Gate And Not-Applicable Proof"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [technology-hard-gate-authority]
+  - path: docs/adr/0022-unified-technology-catalog.md
+    title: "ADR 0022: Unified Technology Catalog"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [unified-technology-catalog]
+  - path: docs/adr/0023-transformation-operations-and-mutation-journal.md
+    title: "ADR 0023: Transformation Operations And Mutation Journal"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [transformation-operation-authority]
+  - path: docs/adr/0024-declarative-compiler-extension.md
+    title: "ADR 0024: Declarative Compiler Extension"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [declarative-compiler-extension]
+  - path: docs/adr/0025-safety-quality-promotion-separation.md
+    title: "ADR 0025: Safety, Quality, And Promotion Separation"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [compiler-result-dispositions]
+  - path: docs/adr/0026-runtime-and-qualification-environments.md
+    title: "ADR 0026: Runtime And Qualification Environments"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [compiler-environment-identities]
+  - path: docs/adr/0027-compiler-schema-compatibility.md
+    title: "ADR 0027: Compiler Schema Compatibility"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: [compiler-schema-compatibility]
     superseded_by: docs/releases/3.2.0-release-readiness-report.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded

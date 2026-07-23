@@ -3,6 +3,7 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
+local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 
 local M = {}
 local Plan = {}
@@ -14,18 +15,7 @@ local ACTIONS = {
   skip = true
 }
 
-local REQUIRED_GATES = {
-  "target_supported",
-  "effect_valid",
-  "owner_conflict_free",
-  "science_compatible",
-  "lab_compatible",
-  "prerequisites_acyclic",
-  "loop_safe",
-  "progression_safe",
-  "migration_safe",
-  "output_identity_safe"
-}
+local REQUIRED_GATES = hard_gate_authority.order()
 
 local function effect_identity(effect)
   return effect_contracts.identity(effect)
@@ -66,6 +56,7 @@ local function validate_row(row, options)
     error("GenerationPlan row has unsupported action: " .. tostring(row.action), 3)
   end
   required(row, "gates")
+  hard_gate_authority.assert_total(row.gates)
   for _, gate in ipairs(REQUIRED_GATES) do
     validate_gate(row, gate)
   end

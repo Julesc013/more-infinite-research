@@ -159,7 +159,7 @@ try {
   & (Join-Path $RepoRoot "scripts\New-MIRTechnologyQualityAssessment.ps1") `
     -CatalogPath $catalogPath -CandidateId $after.candidate_id `
     -ProfilePath (Join-Path $RepoRoot ".mir\technology-quality-profiles.json") `
-    -ProfileId "technology-candidate-default-v1" `
+    -ProfileId "existing-stream-attachment-v1" `
     -MetricsPath $qualityMetricsPath -OutputPath $assessmentPath
   $assessment = Get-Content -Raw -LiteralPath $assessmentPath | ConvertFrom-Json
   if ($assessment.status -ne "PASS" -or $assessment.design_fingerprint -ne $catalogSelection.design_fingerprint `

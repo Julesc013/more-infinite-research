@@ -1,52 +1,20 @@
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local metadata = require("prototypes.mir.domain.effects.metadata")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local generated = require("prototypes.mir.domain.effects.generated_target_contracts")
 
 local M = {}
 
-local contracts = {
-  ["change-recipe-productivity"] = {
-    identity_fields = {"type", "recipe"},
-    targets = {{field = "recipe", prototype_type = "recipe", required = true}}
-  },
-  ["unlock-recipe"] = {
-    identity_fields = {"type", "recipe"},
-    targets = {{field = "recipe", prototype_type = "recipe", required = true}}
-  },
-  ["unlock-space-location"] = {
-    identity_fields = {"type", "space_location"},
-    targets = {{field = "space_location", resolver = "space-location", required = true}}
-  },
-  ["give-item"] = {
-    identity_fields = {"type", "item", "quality"},
-    targets = {
-      {field = "item", resolver = "item", required = true},
-      {field = "quality", prototype_type = "quality", required = false, default = "normal"}
-    }
-  },
-  ["ammo-damage"] = {
-    identity_fields = {"type", "ammo_category"},
-    targets = {{field = "ammo_category", prototype_type = "ammo-category", required = true}}
-  },
-  ["gun-speed"] = {
-    identity_fields = {"type", "ammo_category"},
-    targets = {{field = "ammo_category", prototype_type = "ammo-category", required = true}}
-  },
-  ["unlock-quality"] = {
-    identity_fields = {"type", "quality"},
-    targets = {{field = "quality", prototype_type = "quality", required = true}}
-  },
-  ["turret-attack"] = {
-    identity_fields = {"type", "turret_id"},
-    targets = {{field = "turret_id", resolver = "entity", required = true}}
-  }
-}
+local contracts = generated.contracts
 
-local function target_exists(target, name)
-  if target.resolver == "item" then return lookup.item_prototype(name) ~= nil end
-  if target.resolver == "entity" then return lookup.entity_prototype(name) ~= nil end
-  if target.resolver == "space-location" then return lookup.space_location_prototype(name) ~= nil end
-  return data_raw.prototype(target.prototype_type, name) ~= nil
+local function contains(values, name)
+  for _, value in ipairs(values or {}) do if value == name then return true end end
+  return false
+end
+
+local function target_exists(target, name, inventory)
+  local values = target.resolver and (inventory.resolvers or {})[target.resolver]
+    or inventory[target.prototype_type]
+  return contains(values, name)
 end
 
 local function target_kind(target)
@@ -103,19 +71,22 @@ function M.targets(effect)
   return out
 end
 
-function M.target_status(effect)
+function M.target_status(effect, inventory)
   if type(effect) ~= "table" then
     return false, "effect_not_table", nil
   end
   local contract = contracts[effect.type]
   if not contract then return true, nil, nil end
+  if type(inventory) ~= "table" then
+    error("Effect target validation requires an explicit target inventory.", 2)
+  end
   for _, target in ipairs(contract.targets or {}) do
     local value = target_value(effect, target)
     if value == nil and target.required ~= true then
       -- Optional targets without defaults are absent by design.
     elseif type(value) ~= "string" or value == "" then
       return false, "missing_" .. target.field, value, target.field
-    elseif not target_exists(target, value) then
+    elseif not target_exists(target, value, inventory) then
       return false, "missing_" .. target_kind(target) .. "_target", value, target.field
     end
   end
@@ -123,33 +94,7 @@ function M.target_status(effect)
 end
 
 function M.snapshot()
-  local out = {}
-  for effect_type, contract in pairs(contracts) do
-    out[effect_type] = {
-      identity_fields = contract.identity_fields,
-      targets = contract.targets
-    }
-  end
-  return out
-end
-
-function M.target_inventory()
-  local prototype_types = {}
-  for _, contract in pairs(contracts) do
-    for _, target in ipairs(contract.targets or {}) do
-      if target.prototype_type then prototype_types[target.prototype_type] = true end
-    end
-  end
-  for _, type_name in ipairs(lookup.item_types()) do prototype_types[type_name] = true end
-  for _, type_name in ipairs(lookup.entity_types()) do prototype_types[type_name] = true end
-  local inventory = {}
-  for type_name, _ in pairs(prototype_types) do
-    local names = {}
-    for name, _ in pairs(data_raw.prototypes(type_name)) do table.insert(names, name) end
-    table.sort(names)
-    inventory[type_name] = names
-  end
-  return inventory
+  return deepcopy(generated)
 end
 
 return M

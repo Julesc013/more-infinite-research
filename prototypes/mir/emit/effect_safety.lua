@@ -6,14 +6,21 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local effect_safety_policy = require("prototypes.mir.domain.technology.effect_safety_policy")
 local technology_effects = require("prototypes.mir.integrity.technology_effects")
+local target_inventory_adapter = require("prototypes.mir.platform.factorio.effect_target_inventory")
 
 local S = {}
+local function inventory() return target_inventory_adapter.capture() end
+local function observe_pruned(context, effect, target, owner)
+  telemetry.count("effects_pruned", 1)
+  telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type)
+    .. ":" .. tostring(target) .. ":" .. tostring(owner or "unknown"))
+end
 
 S.assert_effect_allowed = technology_effects.assert_effect_allowed
 S.assert_effects_allowed = technology_effects.assert_effects_allowed
 
 local function assert_effect_target_exists(effect, technology_name)
-  local valid, reason, target = effect_contracts.target_status(effect)
+  local valid, reason, target = effect_contracts.target_status(effect, inventory())
   if valid then return end
   error("Technology "
     .. tostring(technology_name)
@@ -40,7 +47,10 @@ local function log_pruned_effect(technology_name, effect, reason, target, owner)
     .. tostring(reason))
 end
 
-S.sanitize_effects = technology_effects.sanitize_effects
+function S.sanitize_effects(effects, context, owner, target_inventory)
+  return technology_effects.sanitize_effects(
+    effects, context, owner, target_inventory or inventory(), observe_pruned)
+end
 
 function S.prune_missing_recipe_effects(technology, technology_name)
   local effects = technology and technology.effects or {}
@@ -107,7 +117,7 @@ function S.sanitize_all_technology_effects(options)
     external_technology_count = 0,
     emptied_technology_count = 0,
     technologies = {},
-    sanitized_target_inventory_fingerprint = fingerprint.of(effect_contracts.target_inventory())
+    sanitized_target_inventory_fingerprint = fingerprint.of(inventory())
   }
   local names = {}
   for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end

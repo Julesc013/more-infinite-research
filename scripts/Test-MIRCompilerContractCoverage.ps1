@@ -8,8 +8,20 @@ if ([int]$targetProfile.schema -ne 1 -or [string]$targetProfile.factorio_target 
     [string]$targetProfile.factorio_api_version -ne "2.1.11") {
   throw "Technology-effect target profile is not bound to the governed Factorio 2.1.11 API."
 }
-$effectContracts = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\integrity\effect_contracts.lua")
+$effectRuntime = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\integrity\effect_contracts.lua")
+$effectContracts = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\effects\generated_target_contracts.lua")
 $technologyDesign = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\technology\technology_design.lua")
+& (Join-Path $RepoRoot "scripts\Update-MIRCompilerAuthorities.ps1") -RepoRoot $RepoRoot -Check
+$hardGateProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$manifest.technology_hard_gate_profile)) | ConvertFrom-Json
+$hardGateRuntime = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\technology\generated_hard_gate_authority.lua")
+if ([int]$hardGateProfile.schema -ne 1 -or [string]::IsNullOrWhiteSpace([string]$hardGateProfile.authority)) {
+  throw "Technology hard-gate authority is invalid."
+}
+foreach ($gate in @($hardGateProfile.gates)) {
+  if (-not $hardGateRuntime.Contains('id = "' + [string]$gate.id + '"')) {
+    throw "Generated hard-gate authority omits: $($gate.id)"
+  }
+}
 $modifierTypes = @($targetProfile.target_bearing_modifiers | ForEach-Object { [string]$_.type })
 if (@($modifierTypes | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
   throw "Technology-effect target profile contains duplicate modifier contracts."
@@ -27,7 +39,7 @@ foreach ($modifier in @($targetProfile.target_bearing_modifiers)) {
   }
   foreach ($target in @($modifier.targets)) {
     $escapedField = [regex]::Escape([string]$target.field)
-    $targetMatch = [regex]::Match($contractBody, '\{field\s*=\s*"' + $escapedField + '"(?<body>[^}]*)\}')
+    $targetMatch = [regex]::Match($contractBody, '(?s)\{(?<body>[^{}]*field\s*=\s*"' + $escapedField + '"[^{}]*)\}')
     if (-not $targetMatch.Success) {
       throw "MIR effect contract omits $($modifier.type).$($target.field)."
     }
@@ -49,7 +61,7 @@ foreach ($modifier in @($targetProfile.target_bearing_modifiers)) {
     }
   }
 }
-if (-not $effectContracts.Contains("function M.targets(effect)")) {
+if (-not $effectRuntime.Contains("function M.targets(effect)")) {
   throw "MIR effect contracts do not expose the shared target projection."
 }
 if (-not $technologyDesign.Contains("effect_contracts.targets(effect)")) {

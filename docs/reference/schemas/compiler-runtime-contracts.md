@@ -12,50 +12,59 @@ superseded_by: []
 
 # Compiler Runtime Contracts
 
-MIR C8 gives compilation four explicit, fingerprinted records. They replace implicit tables and inferred process state at the compiler boundary.
+MIR uses explicit, fingerprinted records at capture, compilation, application, and qualification boundaries. Candidate identity is deliberately absent from these contracts; the current candidate is generated from `.mir/releases.json`.
 
-## Contract chain
-
-```text
-Factorio adapters
-  -> EnvironmentIdentity schema 1
-  -> CompilerInput schema 1
-  -> pure CompilationPlan finalization
-  -> TechnologyCatalog schema 3
-  -> CompilerResult schema 1
-  -> compiler orchestrator
-  -> emission and exact artifact publication
-```
-
-`CompilerInput` is an immutable snapshot of the requested streams, source fingerprints, configuration, and exact environment. `CompilerResult` is an immutable snapshot of accepted operations, rejected operations, the canonical catalog, and the linked GenerationPlan, CompilationPlan, qualification, input, and result fingerprints. Callers receive defensive copies; mutating a caller-owned input after construction cannot alter either contract.
-
-`EnvironmentIdentity` binds the Factorio target line, target-profile fingerprint, sorted exact loaded-mod ID/version closure, fixture profile when applicable, and configuration fingerprint. Environment equality is fingerprint equality, not a best-effort comparison of selected mod names.
-
-`ProviderMetrics` schema 1 is the authority for provider measurements. Every record binds provider ID/version, family ID, semantic partition, exact environment, candidate dispositions, cluster counts, unlock-depth range, ownership conflicts, cross-version status, phase time, canonical bytes, witnesses, and per-metric provenance. A measurement is `COMPLETE` only when every required metric is measured. Missing measurements remain `INCOMPLETE`; they are never replaced with zero.
-
-## Canonical catalog timing
-
-The schema-3 `TechnologyCatalog` becomes canonical only after sanitation and graph qualification. It preserves accepted and rejected `TechnologyDesign` alternatives, resolves every hard gate to a total authoritative state, and binds exact GenerationPlan and CompilationPlan fingerprints. The GenerationPlan and CompilationPlan must be exact projections of its selected alternatives.
-
-`Export-MIRTechnologyCatalog.ps1` validates and copies this exact artifact byte-for-byte. It cannot rebuild catalog semantics from PowerShell.
-
-## Ownership boundaries
-
-- `pipeline/compiler_orchestrator.lua` owns sequencing and context state.
-- `planner/compilation_plan.lua` is a pure finalizer and imports no emitter.
-- `integrity/technology_effects.lua` is the planner-safe effect validation service.
-- only emission modules mutate prototypes or publish `mod-data`.
-- `.mir/module-dependencies.json` is the exact schema-2 cross-layer matrix; no dependency exception is permitted.
-
-Provider ambiguity fails closed as `REVIEW_REQUIRED`. The compiler retains the evidence and rejects attachment; it does not crash and does not guess. Researchability indexing is iterative, so deeply nested or very wide prerequisite graphs do not depend on the Lua call stack.
-
-## Quality interpretation
-
-`TechnologyQualityAssessment` schema 2 requires an exact governed `ProfileId`, metric provenance, and completeness. Status severity is monotonic:
+## Implemented data flow
 
 ```text
-PASS < REVIEW_REQUIRED < FAIL
+Factorio capture and proposal adapters
+  -> CompilationSnapshot schema 1
+  -> PolicySnapshot schema 1
+  -> RuntimeEnvironmentIdentity schema 2
+  -> CompilerInput schema 2
+  -> sanitation + graph-qualified TechnologyCatalog schema 3
+  -> compiler.compile(CompilationSnapshot, PolicySnapshot)
+  -> TransformationPlan schema 1
+  -> shared technology operation executor
+  -> MutationJournal schema 1
+  -> CompilerResult schema 2
+
+external release harness
+  -> QualificationEnvironmentIdentity schema 1
 ```
 
-Adding evidence may complete an assessment, but adding a failure cannot improve its status. An incomplete assessment is always `REVIEW_REQUIRED` and cannot satisfy promotion admission.
+The capture adapter owns all reads of `data.raw`, startup settings, loaded mods, target APIs, recipe/index services, and active provider discovery. It freezes normalized prototype surfaces, relationship and recipe facts, graph input, target inventory, provider claims, stream proposals, base-continuation proposals, and their derived fingerprints in `CompilationSnapshot`.
 
+`PolicySnapshot` freezes effective settings, compatibility and stream policy, promotion authority, total hard-gate authority, effect contracts, quality profiles, transformation policy, and weapon-overlap mode. `CompilerInput` binds those two snapshots to the exact runtime environment and input-sanitation fingerprint.
+
+`planner/compiler.lua` accepts only `CompilationSnapshot` and `PolicySnapshot`. It does not read Factorio globals, settings, loaded mods, clocks, logging, telemetry, or `CompilerContext`. It validates every proposal's exact total gate vector, rejects or retains review-required alternatives, validates provider-claim identity, and returns a qualified-only `TransformationPlan` made of common create/patch/delete operation envelopes.
+
+The current pipeline retains a compatibility finalization pass before the pure compiler to normalize legacy stream proposals, perform sanitation, and prove the combined graph. That pass does not emit prototypes. The pure compiler consumes the resulting qualification snapshot and is the sole source of executable technology operations. This compatibility seam is explicit in the runtime data flow and may be narrowed without changing the snapshot, plan, operation, or journal contracts.
+
+## Runtime and qualification identity
+
+`RuntimeEnvironmentIdentity` binds the Factorio target, target-profile fingerprint, exact sorted loaded-mod ID/version closure, effective startup settings, imported profile, active compatibility policy, and promotion authority. Runtime equality is exact fingerprint equality.
+
+`QualificationEnvironmentIdentity` belongs to the external release harness. It binds runner, workflow, executable, base data, plan, verifier, trust policy, and evidence scope. It cannot substitute for runtime identity, and runtime identity cannot claim release trust.
+
+## Catalog, result, and mutation truth
+
+The schema-3 `TechnologyCatalog` becomes final only after sanitation and graph proof. It preserves accepted and rejected stream and base-continuation designs with exact qualifications and total hard gates. Final selection accepts only `qualified` alternatives; a proposal is never silently upgraded to a pass.
+
+`CompilerResult` schema 2 reports independent dimensions for execution, safety, review, promotion, and release admission. Its projections include accepted, rejected, review-required, provider-claim, base-continuation, quality, promotion, and sanitation classes, with an exact count and fingerprint for each class. The scalar status is derived from those dimensions and cannot conceal a blocker.
+
+Every materializing stream, base continuation, and native-owner patch becomes a `TransformationOperation`. Operations bind subject, action, precondition, expected output, authority, payload, and evidence fingerprints. The shared technology executor records exact before/after state in `MutationJournal`; duplicate operation IDs and undeclared mutations fail closed.
+
+## Context isolation
+
+`CompilerContext` schema 4 is an explicit lifetime boundary. `new()` does not activate a context. `with_active()` scopes activation and restores the previous context after normal return or error, including nested A/B/A execution. Effective-settings import state and competing-policy preparation are context-owned; no run-derived module cache may survive into another compilation.
+
+## Quality and promotion
+
+Safety, quality, review, promotion, execution, and release admission are separate decisions. Seven schema-2 quality profiles cover existing-stream attachment, native-owner patching, base continuation, new machine manufacturing, new lab manufacturing, exact overhaul material, and experimental process families. Their thresholds and required evidence differ by risk.
+
+A missing quality measurement is `INCOMPLETE` and therefore `REVIEW_REQUIRED`; it is never interpreted as zero. Provider semantic metrics and observational time/memory measurements retain separate provenance. Promotion requires an exact passing assessment, design and claim fingerprints, members/exclusions, ecosystem and settings identity, effect/cost/progression evidence, human approval, applicability envelope, migration decision, upgrade evidence, and promotion fingerprint.
+
+## Compatibility policy
+
+`.mir/compiler-schema-authority.json` defines readable, writable, and compatibility-projection versions. Unknown schema versions fail closed. Schema-1 `CompilerInput`, `CompilerResult`, and runtime-environment views are explicit projections only; they cannot overwrite schema-2 authority.

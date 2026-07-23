@@ -3,6 +3,7 @@ local generation_plan = require("prototypes.mir.planner.generation_plan")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 
@@ -51,6 +52,8 @@ local function non_materializing_gates(identity)
   for _, name in ipairs(names) do
     out[name] = gate_contract.not_applicable(
       "effect-ownership",
+      "candidate-retains-materializing-effect",
+      fingerprint.of({effect_identity = identity, gate = name}),
       {"effect-ownership:" .. tostring(identity)}
     )
   end

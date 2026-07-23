@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local provider_claim = require("prototypes.mir.providers.pipeline.provider_claim")
 
 local M = {}
 
@@ -47,11 +48,13 @@ function M.build(rule, stream, candidate, classification, pack_decision, change,
     risk_review_flags = deepcopy((risk_fact and risk_fact.review_flags) or {}),
     risk_disposition = classification.risk_disposition
   }
+  provider_claim.bind(row)
   row.decision_fingerprint = decision_fingerprint(row)
   return row
 end
 
 function M.refresh_fingerprint(row)
+  row.claim_fingerprint = provider_claim.fingerprint(row)
   row.decision_fingerprint = decision_fingerprint(row)
   return row
 end

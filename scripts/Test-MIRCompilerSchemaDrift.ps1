@@ -34,6 +34,21 @@ foreach ($manifestProperty in @($streamManifest.streams.PSObject.Properties)) {
 $scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
 if ($scenarioManifest.schema -ne 3) { throw "Runtime scenario manifest schema drifted from 3." }
 $contractCoverage = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
+$compilerSchemaAuthority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-schema-authority.json") | ConvertFrom-Json
+if ([int]$compilerSchemaAuthority.schema -ne 1 -or
+    [string]$compilerSchemaAuthority.unknown_schema_policy -ne "fail-closed" -or
+    [string]$compilerSchemaAuthority.downgrade_policy -ne "explicit-projection-only") {
+  throw "Compiler schema compatibility authority is invalid."
+}
+foreach ($entry in @{
+  CompilationSnapshot=1; PolicySnapshot=1; CompilerInput=2; CompilerResult=2;
+  RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1;
+  TransformationOperation=1; TransformationPlan=1; MutationJournal=1
+}.GetEnumerator()) {
+  if ([int]$compilerSchemaAuthority.records.($entry.Key).current -ne [int]$entry.Value) {
+    throw "Compiler schema authority drifted for $($entry.Key)."
+  }
+}
 $technologyDesignText = Read-MIRText "prototypes\mir\domain\technology\technology_design.lua"
 $technologyDesignDoc = Read-MIRText "docs\reference\schemas\technology-design.md"
 $publicArtifactsText = Read-MIRText "prototypes\mir\report\public_compiler_artifacts.lua"
@@ -91,6 +106,12 @@ Assert-MIRText "prototypes\mir\compatibility\packs\schema.lua" "CompatibilityPac
 Assert-MIRText "prototypes\mir\domain\technology\technology_design.lua" "TechnologyDesign schema 2 record is required"
 Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
 Assert-MIRText "prototypes\mir\planner\compilation_plan.lua" "schema = 2"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInput schema 2 record is required"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 2 record is required"
+Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "function M.compatibility_projection"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "function M.compatibility_projection"
+Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\emit\mod_data.lua" "more-infinite-research.compiler-evidence"
 Assert-MIRText "prototypes\mir\settings\effect_contracts.lua" 'require("prototypes.mir.domain.effects.metadata")'
 
@@ -105,6 +126,15 @@ foreach ($row in @(
   "| TechnologyDesign | 2 |",
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
+  "| CompilationSnapshot | 1 |",
+  "| PolicySnapshot | 1 |",
+  "| CompilerInput | 2 |",
+  "| CompilerResult | 2 |",
+  "| RuntimeEnvironmentIdentity | 2 |",
+  "| QualificationEnvironmentIdentity | 1 |",
+  "| TransformationOperation | 1 |",
+  "| TransformationPlan | 1 |",
+  "| MutationJournal | 1 |",
   "| CompilerEvidence | 2 |",
   "| Public compiler artifact projections | 1 |",
   "| RecipeFactV2 | 2 |",
@@ -123,6 +153,7 @@ foreach ($docCheck in @(
   @{Path="docs\reference\schemas\compiler-evidence.md"; Needle='`CompilerEvidence` schema 2'},
   @{Path="docs\reference\schemas\recipe-fact-v2.md"; Needle="schema-2"},
   @{Path="docs\reference\schemas\scenario-manifest.md"; Needle="schema 3"}
+  @{Path="docs\reference\schemas\compiler-boundary.md"; Needle='`CompilerResult` | 2'}
 )) {
   Assert-MIRText $docCheck.Path $docCheck.Needle
 }

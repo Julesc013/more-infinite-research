@@ -11,8 +11,8 @@ local STATUSES = {
   superseded = true
 }
 
-local function evidence_fingerprint(evaluator, evidence)
-  return fingerprint.of({evaluator = evaluator, evidence = evidence or {}})
+local function evidence_fingerprint(evaluator, evidence, applicability)
+  return fingerprint.of({evaluator = evaluator, evidence = evidence or {}, applicability = applicability})
 end
 
 function M.pending(evaluator)
@@ -24,12 +24,25 @@ function M.pending(evaluator)
   }
 end
 
-function M.not_applicable(evaluator, evidence)
+function M.not_applicable(evaluator, applicability_predicate, input_fingerprint, evidence)
+  if type(evaluator) ~= "string" or evaluator == ""
+    or type(applicability_predicate) ~= "string" or applicability_predicate == ""
+    or type(input_fingerprint) ~= "string" or input_fingerprint == "" then
+    error("Not-applicable technology gate requires evaluator, predicate, and input fingerprint.", 2)
+  end
+  local copied = deepcopy(evidence or {})
+  local applicability = {
+    predicate = applicability_predicate,
+    input_fingerprint = input_fingerprint,
+    result = false
+  }
   return {
     passed = true,
     status = "not-applicable",
     evaluator = evaluator,
-    evidence = deepcopy(evidence or {})
+    evidence = copied,
+    applicability = applicability,
+    evidence_fingerprint = evidence_fingerprint(evaluator, copied, applicability)
   }
 end
 
@@ -40,7 +53,7 @@ function M.passed(evaluator, evidence)
     status = "passed",
     evaluator = evaluator,
     evidence = copied,
-    evidence_fingerprint = evidence_fingerprint(evaluator, copied)
+    evidence_fingerprint = evidence_fingerprint(evaluator, copied, nil)
   }
 end
 
@@ -52,7 +65,7 @@ function M.failed(evaluator, reason, evidence)
     evaluator = evaluator,
     reason = reason,
     evidence = copied,
-    evidence_fingerprint = evidence_fingerprint(evaluator, copied)
+    evidence_fingerprint = evidence_fingerprint(evaluator, copied, nil)
   }
 end
 
@@ -75,11 +88,18 @@ function M.validate(record)
     or type(record.passed) ~= "boolean" or type(record.evidence) ~= "table" then
     error("Technology gate must be a valid lifecycle record.", 2)
   end
-  if record.status == "passed" or record.status == "failed" then
+  if record.status == "passed" or record.status == "failed" or record.status == "not-applicable" then
     if type(record.evaluator) ~= "string" or record.evaluator == "" then
       error("Authoritative technology gate requires an evaluator.", 2)
     end
-    if record.evidence_fingerprint ~= evidence_fingerprint(record.evaluator, record.evidence) then
+    local applicability = record.status == "not-applicable" and record.applicability or nil
+    if record.status == "not-applicable" and (type(applicability) ~= "table"
+      or type(applicability.predicate) ~= "string" or applicability.predicate == ""
+      or type(applicability.input_fingerprint) ~= "string" or applicability.input_fingerprint == ""
+      or applicability.result ~= false) then
+      error("Not-applicable technology gate requires a false applicability proof.", 2)
+    end
+    if record.evidence_fingerprint ~= evidence_fingerprint(record.evaluator, record.evidence, applicability) then
       error("Authoritative technology gate evidence fingerprint is invalid.", 2)
     end
   elseif record.evidence_fingerprint ~= nil then
@@ -109,8 +129,9 @@ function M.schema_authority()
   return {
     schema = 1,
     statuses = {"not-applicable", "pending", "passed", "failed", "superseded"},
-    authoritative_statuses = {"passed", "failed"},
-    evidence_fingerprint = "sha256(evaluator+evidence)"
+    authoritative_statuses = {"not-applicable", "passed", "failed"},
+    evidence_fingerprint = "sha256(evaluator+evidence+applicability)",
+    not_applicable_requires = {"evaluator", "predicate", "input_fingerprint", "false-result", "evidence"}
   }
 end
 

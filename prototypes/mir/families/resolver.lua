@@ -13,6 +13,7 @@ local provider_pack_policy = require("prototypes.mir.providers.pipeline.pack_pol
 local provider_hazard_policy = require("prototypes.mir.providers.pipeline.hazard_policy")
 local provider_owner_arbitration = require("prototypes.mir.providers.pipeline.owner_arbitration")
 local provider_decision = require("prototypes.mir.providers.pipeline.decision")
+local provider_claim = require("prototypes.mir.providers.pipeline.provider_claim")
 local provider_budget = require("prototypes.mir.providers.pipeline.budget")
 local provider_metrics = require("prototypes.mir.providers.provider_metrics")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
@@ -136,36 +137,27 @@ local function build()
   for recipe_name in pairs(attachment_claims) do table.insert(claimed_recipes, recipe_name) end
   table.sort(claimed_recipes)
   for _, recipe_name in ipairs(claimed_recipes) do
-    local claims, streams = attachment_claims[recipe_name], {}
-    for _, claim in ipairs(claims) do streams[claim.target_stream] = true end
-    local stream_names = {}
-    for stream_name in pairs(streams) do table.insert(stream_names, stream_name) end
-    table.sort(stream_names)
-    if #stream_names > 1 then
+    local claims = attachment_claims[recipe_name]
+    local arbitration = provider_claim.arbitrate(claims)
+    if arbitration.status ~= "PASS" then
+      local streams = {}
+      for _, claim in ipairs(claims) do streams[claim.target_stream] = true end
+      local stream_names = {}
+      for stream_name in pairs(streams) do table.insert(stream_names, stream_name) end
+      table.sort(stream_names)
       for _, claim in ipairs(claims) do
         claim.final_state = "review-required"
         claim.decision = "review-required"
-        claim.blocker = "ambiguous_family_attachment"
+        claim.blocker = arbitration.code
         claim.risk_disposition = "REVIEW_REQUIRED"
-        claim.ambiguity = {code = "ambiguous_family_attachment", candidate_streams = deepcopy(stream_names)}
+        claim.ambiguity = {code = arbitration.code, candidate_streams = deepcopy(stream_names)}
         provider_decision.refresh_fingerprint(claim)
         telemetry.count("provider_review_required", 1)
       end
     else
-      table.sort(claims, function(left, right)
-        if left.provider_id ~= right.provider_id then return left.provider_id < right.provider_id end
-        return left.decision_fingerprint < right.decision_fingerprint
-      end)
-      local claim = claims[1]
-      attachments[claim.target_stream] = attachments[claim.target_stream] or {}
-      table.insert(attachments[claim.target_stream], {
-        recipe = recipe_name,
-        change = claim.change,
-        rule = claim.rule,
-        provider_id = claim.provider_id,
-        risk_fingerprint = claim.risk_fingerprint,
-        decision_fingerprint = claim.decision_fingerprint
-      })
+      local attachment = arbitration.attachment
+      attachments[attachment.target_stream] = attachments[attachment.target_stream] or {}
+      table.insert(attachments[attachment.target_stream], attachment)
     end
   end
 

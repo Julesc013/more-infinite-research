@@ -1,6 +1,7 @@
 {
   "schema": 1,
   "technology_effect_target_profile": ".mir/technology-effect-targets.json",
+  "technology_hard_gate_profile": ".mir/technology-hard-gates.json",
   "generation_plan_gates": [
     "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
     "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
@@ -12,7 +13,7 @@
     "prerequisite_model", "cost_model", "presentation_model", "ownership_policy", "grouping"
   ],
   "generation_gate_statuses": ["not-applicable", "pending", "passed", "failed", "superseded"],
-  "authoritative_gate_material": ["evaluator", "evidence", "evidence_fingerprint"],
+  "authoritative_gate_material": ["evaluator", "evidence", "evidence_fingerprint", "applicability.predicate", "applicability.input_fingerprint"],
   "family_operator_safety": ["data-only", "registered-only", "fail-closed", "no-prototype-mutation"],
   "compatibility_pack_fields": [
     "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
@@ -86,7 +87,19 @@
     "fixture-only", "local-user", "external-mod-author", "mir-reviewed", "protected-release"
   ],
   "reviewed_mode_trust_classes": ["mir-reviewed", "protected-release"],
-  "compiler_context_schema": 3,
+  "compiler_context_schema": 4,
+  "compiler_boundary_schemas": {
+    "CompilationSnapshot": 1,
+    "PolicySnapshot": 1,
+    "CompilerInput": 2,
+    "CompilerResult": 2,
+    "RuntimeEnvironmentIdentity": 2,
+    "QualificationEnvironmentIdentity": 1,
+    "TransformationOperation": 1,
+    "TransformationPlan": 1,
+    "MutationJournal": 1
+  },
+  "compiler_result_dimensions": ["execution", "safety", "review", "promotion", "release"],
   "public_compiler_artifact_schema": 1,
   "public_compiler_artifact_kinds": [
     "mir-generation-plan-public", "mir-coverage-public", "mir-compiler-evidence-public"
@@ -102,7 +115,8 @@
     "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
     "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",
     "technology-qualifications", "generation-plan", "compilation-plan", "technology-graph-parity",
-    "compiler-input", "compiler-result", "provider-metrics", "environment-identity",
+    "compiler-input", "compiler-result", "compilation-snapshot", "qualification-snapshot", "policy-snapshot",
+    "pure-compilation", "transformation-plan", "mutation-journal", "provider-metrics", "environment-identity",
     "generated-technology-registry", "productivity-family-adoption",
     "coverage-report", "compiler-telemetry", "diagnostics", "context-services", "state-epochs"
   ],

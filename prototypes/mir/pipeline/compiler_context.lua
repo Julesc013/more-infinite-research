@@ -6,9 +6,16 @@ local Context = {}
 Context.__index = Context
 local active = nil
 
+local function assert_context(context, level)
+  if getmetatable(context) ~= Context then
+    error("MIR compiler context activation requires a CompilerContext.", level or 2)
+  end
+  return context
+end
+
 function M.new()
-  local context = setmetatable({
-    schema = 3,
+  return setmetatable({
+    schema = 4,
     command_state = {},
     artifacts = {},
     state = {},
@@ -17,16 +24,31 @@ function M.new()
     services = {},
     services_frozen = false
   }, Context)
-  active = context
-  return context
 end
 
 function M.activate(context)
-  if getmetatable(context) ~= Context then
-    error("MIR compiler context activation requires a CompilerContext.", 2)
-  end
-  active = context
+  active = assert_context(context, 2)
   return context
+end
+
+function M.with_active(context, callback, ...)
+  assert_context(context, 2)
+  if type(callback) ~= "function" then
+    error("MIR scoped compiler activation requires a callback.", 2)
+  end
+  local previous = active
+  local arguments = {n = select("#", ...), ...}
+  active = context
+  local results = {pcall(function()
+    return callback(table.unpack(arguments, 1, arguments.n))
+  end)}
+  active = previous
+  if not results[1] then error(results[2], 2) end
+  return table.unpack(results, 2, #results)
+end
+
+function M.is_active(context)
+  return active == context
 end
 
 function M.current()

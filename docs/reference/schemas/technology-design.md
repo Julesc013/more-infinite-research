@@ -49,7 +49,7 @@ The design-maturity state machine is `proposed` to `experimental` to `automation
 
 ## Hard-gate lifecycle
 
-Every hard gate is an explicit record with one of `not-applicable`, `pending`, `passed`, `failed`, or `superseded`. A `pending` gate yields a proposal, not a false pass or terminal rejection. `passed` and `failed` gates are authoritative only when they bind an evaluator identity, sorted evidence, and the canonical evidence fingerprint. `superseded` preserves the prior and replacement identities so provisional planner evidence cannot be confused with final graph or output evidence.
+Every hard gate is an explicit record with one of `not-applicable`, `pending`, `passed`, `failed`, or `superseded`. A `pending` gate yields a proposal, not a false pass or terminal rejection. `passed` and `failed` gates are authoritative only when they bind an evaluator identity, sorted evidence, and the canonical evidence fingerprint. `not-applicable` is equally authoritative and additionally binds the named applicability predicate, exact input fingerprint, and false predicate result. Missing gates and unevidenced N/A results are schema errors. `superseded` preserves the prior and replacement identities so provisional planner evidence cannot be confused with final graph or output evidence.
 
 `SafetyQualification` is the hard-gate aggregate. `DesignAssessment` evaluates quality independently. `PromotionAuthorization` records separately governed trust and evidence. None can be inferred from another.
 
