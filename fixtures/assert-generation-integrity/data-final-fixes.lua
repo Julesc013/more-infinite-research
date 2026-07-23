@@ -11,9 +11,8 @@ local stream_descriptor = require("__more-infinite-research__.prototypes.mir.dom
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
-local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 
@@ -37,7 +36,8 @@ local function assert_no_blocked_pickup_effects()
 end
 
 local function assert_generation_plan_v3()
-  local plan = stream_compiler.latest_artifact()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+  local plan = prototype and prototype.data
   if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
     fail("missing accepted GenerationPlan schema 3 artifact")
   end
@@ -61,9 +61,10 @@ local function assert_generation_plan_v3()
 end
 
 local function assert_compiler_telemetry()
-  local telemetry = compilation_plan.snapshot().telemetry
-  if not telemetry or telemetry.schema ~= 1 or telemetry.witness_limit ~= 64 then
-    fail("compiler telemetry schema or witness limit changed")
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
+  local evidence = prototype and prototype.data
+  if not evidence or type(evidence.counts) ~= "table" or type(evidence.phases) ~= "table" then
+    fail("public compiler telemetry evidence is missing")
   end
   for _, counter in ipairs({
     "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
@@ -72,14 +73,28 @@ local function assert_compiler_telemetry()
     "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
     "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
     "context_snapshot_bytes", "technology_closure_cache_entries", "technology_closure_cached_nodes",
-    "sanitation_scanned_technologies", "sanitation_scanned_effects"
+    "sanitation_scanned_technologies", "sanitation_scanned_effects", "recipe_risk_facts",
+    "recipe_hard_risk_count", "recipe_review_risk_count", "provider_candidates",
+    "provider_cardinality_review_required", "provider_review_required", "family_members",
+    "stream_rows", "technology_catalog_candidates", "technology_catalog_alternatives",
+    "technology_catalog_canonical_bytes", "technology_catalog_public_bytes",
+    "technology_catalog_internal_bytes", "compiler_evidence_public_bytes",
+    "technology_graph_parity_rows", "snapshot_prototype_bytes", "snapshot_deep_copies",
+    "snapshot_canonicalization_passes", "snapshot_construction_milliseconds",
+    "snapshot_peak_memory_bytes", "input_snapshot_bytes", "qualification_snapshot_bytes",
+    "snapshot_reused_domains", "snapshot_copied_domains",
+    "qualification_snapshot_construction_milliseconds", "qualification_peak_memory_bytes",
+    "compiler_total_milliseconds", "public_artifact_total_bytes"
   }) do
-    if type(telemetry.counters[counter]) ~= "number" then
+    if type(evidence.counts[counter]) ~= "number" then
       fail("compiler telemetry counter is missing: " .. counter)
     end
   end
-  for _, phase in ipairs({"snapshot", "graph", "planning", "postconditions"}) do
-    local value = telemetry.phases[phase]
+  for _, phase in ipairs({
+    "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
+    "graph", "planning", "postconditions"
+  }) do
+    local value = evidence.phases[phase]
     if type(value) ~= "table" or type(value.runs) ~= "number" or value.runs < 1
       or type(value.seconds) ~= "number" then
       fail("compiler telemetry phase is missing or incomplete: " .. phase)
@@ -92,11 +107,11 @@ local function assert_compiler_evidence()
   local evidence = prototype and prototype.data
   local internal_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
   local internal = internal_prototype and internal_prototype.data
-  local plan = compilation_plan.snapshot()
   if not evidence or evidence.schema ~= 1 or evidence.kind ~= "mir-compiler-evidence-public"
-    or evidence.semantic_fingerprint ~= plan.semantic_fingerprint
-    or evidence.compilation_fingerprint ~= plan.compilation_fingerprint
-    or evidence.qualification_fingerprint ~= plan.qualification_fingerprint
+    or not internal or internal.schema ~= 2
+    or evidence.semantic_fingerprint ~= internal.semantic_fingerprint
+    or evidence.compilation_fingerprint ~= internal.compilation_fingerprint
+    or evidence.qualification_fingerprint ~= internal.qualification_fingerprint
     or type(evidence.telemetry_fingerprint) ~= "string"
     or type(evidence.run_fingerprint) ~= "string"
     or type(evidence.input_sanitation_fingerprint) ~= "string"
@@ -105,7 +120,6 @@ local function assert_compiler_evidence()
     or evidence.target_inventory_unchanged ~= true
     or not evidence.input_sanitation or evidence.input_sanitation.pass ~= "input"
     or not evidence.output_sanitation or evidence.output_sanitation.pass ~= "output"
-    or not internal or internal.schema ~= 2
     or not internal.input_sanitation_ledger or internal.input_sanitation_ledger.pass ~= "input"
     or not internal.output_sanitation_ledger or internal.output_sanitation_ledger.pass ~= "output"
     or internal.input_sanitation_ledger.sanitized_target_inventory_fingerprint
@@ -271,7 +285,7 @@ local function assert_recipe_fact_contracts()
   end
 end
 
-assert_recipe_fact_contracts()
+compiler_context.with_active(pipeline_commands.new_context(), assert_recipe_fact_contracts)
 
 local function assert_pipeline_command_contracts()
   local catalog = pipeline_commands.snapshot()

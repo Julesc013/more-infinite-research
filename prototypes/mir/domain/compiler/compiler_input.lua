@@ -8,9 +8,15 @@ local M = {}
 local SCHEMA = 2
 
 local function material(record)
-  local out = deepcopy(record)
-  out.input_fingerprint = nil
-  return out
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    source_fingerprints = record.source_fingerprints,
+    compilation_snapshot_fingerprint = record.compilation_snapshot_fingerprint,
+    policy_fingerprint = record.policy_fingerprint,
+    runtime_environment_fingerprint = record.runtime_environment_fingerprint,
+    input_sanitation_fingerprint = record.input_sanitation_fingerprint
+  }
 end
 
 function M.validate(record)
@@ -43,16 +49,21 @@ function M.validate(record)
 end
 
 function M.new(values)
-  local record = deepcopy(values or {})
-  record.schema = SCHEMA
-  record.record_type = "CompilerInput"
-  record.source_fingerprints = record.source_fingerprints or {}
+  values = values or {}
+  local record = {
+    schema = SCHEMA,
+    record_type = "CompilerInput",
+    source_fingerprints = values.source_fingerprints or {},
+    compilation_snapshot = values.compilation_snapshot,
+    policy_snapshot = values.policy_snapshot,
+    runtime_environment = values.runtime_environment,
+    input_sanitation_fingerprint = values.input_sanitation_fingerprint or fingerprint.of({})
+  }
   record.compilation_snapshot_fingerprint = record.compilation_snapshot
     and record.compilation_snapshot.snapshot_fingerprint
   record.policy_fingerprint = record.policy_snapshot and record.policy_snapshot.policy_fingerprint
   record.runtime_environment_fingerprint = record.runtime_environment
     and record.runtime_environment.environment_fingerprint
-  record.input_sanitation_fingerprint = record.input_sanitation_fingerprint or fingerprint.of({})
   record.input_fingerprint = fingerprint.of(material(record))
   M.validate(record)
   return record
@@ -80,7 +91,9 @@ end
 
 function M.snapshot(record)
   M.validate(record)
-  return deepcopy(record)
+  local out = deepcopy(record)
+  out.compilation_snapshot = compilation_snapshot.snapshot(record.compilation_snapshot)
+  return out
 end
 
 return M

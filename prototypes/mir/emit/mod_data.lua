@@ -65,7 +65,17 @@ function M.emit_technology_catalog(artifact)
   return emit({
     type = "mod-data",
     name = "more-infinite-research-technology-catalog",
-    data_type = "more-infinite-research.technology-catalog-v3",
+    data_type = "more-infinite-research.technology-catalog-public",
+    data = artifact
+  })
+end
+
+function M.emit_internal_technology_catalog(artifact)
+  if not artifact then return end
+  return emit({
+    type = "mod-data",
+    name = "more-infinite-research-technology-catalog-internal",
+    data_type = "more-infinite-research.technology-catalog-v3-internal",
     data = artifact
   })
 end

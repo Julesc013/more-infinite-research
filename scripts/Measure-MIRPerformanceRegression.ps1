@@ -650,6 +650,19 @@ foreach ($surface in @("diagnostics-off", "diagnostics-on")) {
     counters = $counters
   }
 }
+$counterBudgetFailures = @()
+foreach ($measurement in $volumeMeasurements) {
+  foreach ($bound in @($budgets.compiler_counter_bounds)) {
+    $counter = [string]$bound.counter
+    $property = $measurement.counters.PSObject.Properties[$counter]
+    if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
+      $counterBudgetFailures += "$($measurement.surface):$counter"
+    }
+  }
+}
+if ($counterBudgetFailures.Count -gt 0) {
+  throw "Compiler artifact-volume budgets failed: $($counterBudgetFailures -join ', ')."
+}
 
 $closureRows = @($allClosureRows | Sort-Object -Unique)
 $thirdPartyClosureSha = Get-MIRStringSha256 -Value ($closureRows -join "`n")

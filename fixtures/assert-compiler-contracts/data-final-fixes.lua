@@ -51,7 +51,9 @@ local c9_contracts = {
   provider_claim = require("__more-infinite-research__.prototypes.mir.providers.pipeline.provider_claim"),
   transformation_operation = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_operation"),
   transformation_plan = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_plan"),
-  mutation_journal = require("__more-infinite-research__.prototypes.mir.domain.compiler.mutation_journal")
+  mutation_journal = require("__more-infinite-research__.prototypes.mir.domain.compiler.mutation_journal"),
+  execution_mode = require("__more-infinite-research__.prototypes.mir.domain.compiler.execution_mode"),
+  public_artifacts = require("__more-infinite-research__.prototypes.mir.report.public_compiler_artifacts")
 }
 
 local function fail(message)
@@ -1110,6 +1112,10 @@ end
 
 local command_positions = {}
 for index, id in ipairs(pipeline_commands.order()) do command_positions[id] = index end
+if pipeline_commands.new_context({execution_mode = "STRICT_CI"}):execution_mode() ~= "STRICT_CI"
+  or pipeline_commands.new_context({execution_mode = "RELEASE"}):execution_mode() ~= "RELEASE" then
+  fail("pipeline entry point did not forward explicit validation and release execution modes")
+end
 if not (command_positions["compatibility-repairs"] < command_positions["sanitize-input-technology-effects"]
   and command_positions["sanitize-input-technology-effects"] < command_positions["module-permissions"]
   and command_positions["assert-technology-safety"] < command_positions["emit-compatibility-diagnostics"]
@@ -1131,16 +1137,20 @@ do
   end
 end
 
-do
+;(function()
+  local empty_fact_domains = {
+    recipes = {}, technologies = {}, items = {}, entities = {}, labs = {}, science_packs = {}
+  }
   local exact_compilation_snapshot = c9_contracts.compilation_snapshot.new({
-    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
-    effect_target_inventory = {}, stream_inputs = {}, base_continuation_inputs = {},
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, provider_inputs = {}, stream_inputs = {}, base_continuation_inputs = {},
     source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
   })
   local exact_policy_snapshot = c9_contracts.policy_snapshot.new({
     effective_settings = {}, compatibility_policy = {}, stream_policy = {}, promotion_authority = {},
     hard_gate_authority = c9_contracts.hard_gate_authority.snapshot(), effect_contract_authority = effect_contracts.snapshot(),
-    quality_profiles = {}, transformation_policy = {}, weapon_overlap_mode = "off"
+    quality_profiles = {}, transformation_policy = {}, weapon_overlap_mode = "off",
+    execution_mode = "SAFE", review_policy = {}
   })
   local exact_runtime_environment = c9_contracts.runtime_environment.new({
     factorio_line = "2.1", target_profile_fingerprint = "TARGET", loaded_mod_closure = {base = "2.1.11"}
@@ -1168,14 +1178,14 @@ do
     rejected_candidates = {}
   })
   c9_contracts.compiler_result.validate(exact_result)
-  if exact_input.schema ~= 2 or exact_result.schema ~= 2
+  if exact_input.schema ~= 2 or exact_result.schema ~= 3 or exact_result.result_phase ~= "planned"
     or exact_result.dimensions.safety ~= "QUALIFIED" then
-    fail("CompilerInput/CompilerResult schema 2 authority is incomplete")
+    fail("CompilerInput schema 2 / CompilerResult schema 3 authority is incomplete")
   end
 
   local pure_snapshot = c9_contracts.compilation_snapshot.new({
-    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
-    effect_target_inventory = {}, stream_inputs = {rows = {design_row}}, base_continuation_inputs = {},
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, provider_inputs = {}, stream_inputs = {rows = {design_row}}, base_continuation_inputs = {},
     source_fingerprints = {fixtures = "PURE-COMPILER"}
   })
   local pure_result = c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot)
@@ -1204,15 +1214,130 @@ do
   local operation = c9_contracts.transformation_operation.new({
     operation_id = "technology/create/compiler-contract", phase = "technology-materialization",
     action = "create", subject = {type = "technology", id = "compiler-contract"},
+    expected_before_snapshot = {}, expected_after_projection = {technology = "compiler-contract"},
+    allowed_delta = {engine_default_fields = true},
     authority_fingerprint = exact_policy_snapshot.policy_fingerprint,
+    qualification_fingerprint = "QUALIFICATION",
+    source = {candidate_id = "compiler-contract", alternative_id = "create:compiler-contract"},
     payload = {technology = "compiler-contract"}, evidence = {fixture = true}
   })
   local operation_plan = c9_contracts.transformation_plan.new({phase = "fixture",
+    execution_mode = "SAFE",
     compilation_snapshot_fingerprint = pure_snapshot.snapshot_fingerprint,
     policy_fingerprint = exact_policy_snapshot.policy_fingerprint, operations = {operation}})
-  local journal = c9_contracts.mutation_journal.new(operation_plan.plan_fingerprint)
+  local journal = c9_contracts.mutation_journal.new(operation_plan)
+  journal:assert_before(operation, {})
   journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
-  if #journal:snapshot().entries ~= 1 then fail("MutationJournal did not bind its exact operation") end
+  local finalized_journal = journal:finalize()
+  if #finalized_journal.entries ~= 1 or finalized_journal.complete ~= true then
+    fail("MutationJournal did not bind and finalize its exact operation")
+  end
+
+  local final_evidence = {
+    journal_fingerprint = finalized_journal.journal_fingerprint,
+    executed_operation_count = 1, skipped_operation_count = 0, failed_operation_count = 0,
+    missing_operation_count = 0, duplicate_operation_count = 0,
+    undeclared_operation_count = 0, out_of_plan_operation_count = 0,
+    realized_output_fingerprint = "REALIZED", output_parity_fingerprint = "OUTPUT",
+    graph_parity_fingerprint = "GRAPH", sanitation_parity_fingerprint = "SANITATION",
+    output_parity_passed = true, graph_parity_passed = true, sanitation_parity_passed = true
+  }
+  local applied_result = c9_contracts.compiler_result.finalize(exact_result, final_evidence)
+  if applied_result.result_phase ~= "final" or applied_result.dimensions.execution ~= "APPLIED"
+    or applied_result.planned_result_fingerprint ~= exact_result.result_fingerprint then
+    fail("successful execution did not produce an immutable final APPLIED CompilerResult")
+  end
+  local failed_evidence = deepcopy(final_evidence)
+  failed_evidence.output_parity_passed = false
+  local failed_result = c9_contracts.compiler_result.finalize(exact_result, failed_evidence)
+  if failed_result.dimensions.execution ~= "FAILED" or failed_result.dimensions.safety ~= "FAILED" then
+    fail("failed parity did not produce a bounded final FAILED CompilerResult")
+  end
+  local skipped_evidence = deepcopy(final_evidence)
+  skipped_evidence.executed_operation_count = 0
+  skipped_evidence.skipped_operation_count = 1
+  local skipped_result = c9_contracts.compiler_result.finalize(exact_result, skipped_evidence)
+  if skipped_result.dimensions.execution ~= "FAILED"
+    or skipped_result.execution_evidence.planned_operation_count ~= 1 then
+    fail("skipped mandatory operation did not fail exact CompilerResult plan cardinality")
+  end
+
+  local missing_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("missing transformation operation", "MutationJournal is incomplete", function()
+    missing_journal:finalize()
+  end)
+  local precondition_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("transformation precondition tamper", "precondition-mismatch", function()
+    precondition_journal:assert_before(operation, {tampered = true})
+  end)
+  local postcondition_journal = c9_contracts.mutation_journal.new(operation_plan)
+  postcondition_journal:assert_before(operation, {})
+  expect_error("transformation postcondition tamper", "postcondition-mismatch", function()
+    postcondition_journal:record(operation, {}, {technology = "tampered"}, "applied")
+  end)
+  local duplicate_journal = c9_contracts.mutation_journal.new(operation_plan)
+  duplicate_journal:assert_before(operation, {})
+  duplicate_journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  expect_error("duplicate transformation operation", "more than once", function()
+    duplicate_journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  end)
+  local undeclared_operation = c9_contracts.transformation_operation.new({
+    operation_id = "technology/create/undeclared", phase = "technology-materialization",
+    action = "create", subject = {type = "technology", id = "undeclared"},
+    expected_before_snapshot = {}, expected_after_projection = {technology = "undeclared"},
+    allowed_delta = {}, authority_fingerprint = exact_policy_snapshot.policy_fingerprint,
+    qualification_fingerprint = "QUALIFICATION",
+    source = {candidate_id = "undeclared", alternative_id = "create:undeclared"},
+    payload = {technology = "undeclared"}, evidence = {fixture = true}
+  })
+  local undeclared_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("undeclared transformation operation", "undeclared operation", function()
+    undeclared_journal:assert_operation(undeclared_operation)
+  end)
+  local out_of_plan_operation = deepcopy(operation)
+  out_of_plan_operation.allowed_delta = {tampered = true}
+  out_of_plan_operation = c9_contracts.transformation_operation.new(out_of_plan_operation)
+  local out_of_plan_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("out-of-plan transformation operation", "differs from its bound plan", function()
+    out_of_plan_journal:assert_operation(out_of_plan_operation)
+  end)
+
+  local qualified_snapshot = c9_contracts.compilation_snapshot.qualify(pure_snapshot, {
+    stream_inputs = {rows = {design_row}}, base_continuation_inputs = {}
+  })
+  if qualified_snapshot.base_snapshot_fingerprint ~= pure_snapshot.snapshot_fingerprint
+    or qualified_snapshot.fact_domains ~= pure_snapshot.fact_domains
+    or qualified_snapshot.relationship_indexes ~= pure_snapshot.relationship_indexes
+    or qualified_snapshot.metrics.reused_domain_count < 10
+    or qualified_snapshot.metrics.deep_copy_count ~= 0 then
+    fail("qualification snapshot did not structurally share unchanged normalized domains")
+  end
+
+  local review_snapshot = c9_contracts.compilation_snapshot.new({
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, stream_inputs = {}, base_continuation_inputs = {},
+    provider_inputs = {decisions = {{
+      provider_id = "fixture-provider", provider_version = "1", prototype_type = "recipe",
+      prototype_name = "ambiguous", target_stream = "fixture-stream", final_state = "review-required",
+      claim_fingerprint = "CLAIM", decision_fingerprint = "DECISION", risk_disposition = "REVIEW_REQUIRED"
+    }}}, source_fingerprints = {fixtures = "REVIEW-MODES"}
+  })
+  local review_result = c9_contracts.compiler.compile(review_snapshot, exact_policy_snapshot)
+  if review_result.status ~= "REVIEW_REQUIRED" or #review_result.transformation_plan.operations ~= 0
+    or c9_contracts.execution_mode.review_is_fatal("SAFE", {})
+    or c9_contracts.execution_mode.review_is_fatal("PREVIEW", {})
+    or not c9_contracts.execution_mode.review_is_fatal("STRICT_CI", {})
+    or not c9_contracts.execution_mode.review_is_fatal("RELEASE", {}) then
+    fail("provider review safe/preview and strict/release execution-mode policy is inconsistent")
+  end
+
+  local isolated_policy_result = c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot)
+  local ambient_policy = deepcopy(exact_policy_snapshot)
+  ambient_policy.weapon_overlap_mode = "always"
+  if isolated_policy_result.compilation_fingerprint
+    ~= c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot).compilation_fingerprint then
+    fail("captured PolicySnapshot compilation changed after unrelated live-policy mutation")
+  end
 
   local function claim(provider_id, change)
     local row = {
@@ -1236,7 +1361,7 @@ do
     or conflicting_claims.code ~= "conflicting_same_stream_claim" then
     fail("different same-stream provider claims did not fail closed")
   end
-end
+end)()
 
 do
   local deep = {}
@@ -1293,9 +1418,11 @@ compiler_context.with_active(focused_contracts.compilation_context, function()
     fail("RecipeRiskFact canonicalization depends on prototype insertion order")
   end
 end)
-local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
+local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog-internal"]
 local production_catalog = production_catalog_prototype and production_catalog_prototype.data
 local production_qualifications = production_catalog and production_catalog.qualifications
+local public_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
+local public_catalog = public_catalog_prototype and public_catalog_prototype.data
 local production_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
 local production_plan = production_plan_prototype and production_plan_prototype.data
 local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
@@ -1313,6 +1440,28 @@ if not production_catalog or production_catalog.schema ~= 3 or production_catalo
   or #production_catalog.current_selections ~= #production_plan.rows
   or #production_catalog.alternative_qualifications < #production_plan.rows then
   fail("CompilerContext does not own the technology candidate and qualification catalogs")
+end
+if not public_catalog or public_catalog.schema ~= 1
+  or public_catalog.kind ~= "mir-technology-catalog-public"
+  or type(public_catalog.catalog_fingerprint) ~= "string"
+  or type(public_catalog.counts) ~= "table"
+  or type(public_catalog.selected) ~= "table"
+  or type(public_catalog.reason_histogram) ~= "table"
+  or type(public_catalog.provider_summary) ~= "table"
+  or type(public_catalog.samples) ~= "table"
+  or type(public_catalog.truncation) ~= "table"
+  or public_catalog.candidates ~= nil or public_catalog.qualifications ~= nil then
+  fail("normal TechnologyCatalog publication leaked full designs or qualifications")
+end
+if not production_evidence.compiler_result
+  or production_evidence.compiler_result.schema ~= 3
+  or production_evidence.compiler_result.result_phase ~= "final"
+  or production_evidence.compiler_result.dimensions.execution ~= "APPLIED"
+  or not production_evidence.mutation_journal
+  or production_evidence.mutation_journal.complete ~= true
+  or production_evidence.mutation_journal.missing_operation_count ~= 0
+  or production_evidence.mutation_journal.undeclared_operation_count ~= 0 then
+  fail("compiler evidence lacks final APPLIED result and complete plan-bound journal")
 end
 local public_rows = {}
 for _, row in ipairs(public_plan.rows or {}) do public_rows[row.stream_id] = row end
@@ -1432,6 +1581,13 @@ compiler_context.with_active(first_context, function()
   end)
   if not compiler_context.is_active(first_context) then fail("failed nested CompilerContext did not restore A") end
 end)
+local packed_returns = table.pack(compiler_context.with_active(first_context, function()
+  return "first", nil, "third", nil
+end))
+if packed_returns.n ~= 4 or packed_returns[1] ~= "first"
+  or packed_returns[2] ~= nil or packed_returns[3] ~= "third" or packed_returns[4] ~= nil then
+  fail("CompilerContext scoped activation did not preserve nil-position multiple returns")
+end
 if compiler_context.is_active(first_context) or compiler_context.is_active(second_context) then
   fail("CompilerContext A/B/A scope did not restore the empty outer activation")
 end

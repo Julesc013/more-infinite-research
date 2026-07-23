@@ -19,6 +19,12 @@
       "tags": []
     },
     {
+      "pattern": ".mir/public-artifact-budgets.json",
+      "groups": ["base-load", "local-mod-library"],
+      "scenarios": ["compiler-contracts", "package-zip-base", "package-zip-space-age"],
+      "tags": []
+    },
+    {
       "pattern": "scripts/Test-MIRAssurance.ps1",
       "groups": [],
       "scenarios": [],

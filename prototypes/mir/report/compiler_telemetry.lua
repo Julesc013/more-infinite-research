@@ -40,7 +40,23 @@ local REQUIRED_COUNTERS = {
   "technology_catalog_candidates",
   "technology_catalog_alternatives",
   "technology_catalog_canonical_bytes",
-  "technology_graph_parity_rows"
+  "technology_catalog_public_bytes",
+  "technology_catalog_internal_bytes",
+  "compiler_evidence_public_bytes",
+  "technology_graph_parity_rows",
+  "snapshot_prototype_bytes",
+  "snapshot_deep_copies",
+  "snapshot_canonicalization_passes",
+  "snapshot_construction_milliseconds",
+  "snapshot_peak_memory_bytes",
+  "input_snapshot_bytes",
+  "qualification_snapshot_bytes",
+  "snapshot_reused_domains",
+  "snapshot_copied_domains",
+  "qualification_snapshot_construction_milliseconds",
+  "qualification_peak_memory_bytes",
+  "compiler_total_milliseconds",
+  "public_artifact_total_bytes"
 }
 local REQUIRED_PHASES = {
   "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",

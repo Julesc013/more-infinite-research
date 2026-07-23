@@ -37,7 +37,7 @@
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {

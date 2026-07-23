@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
 ---
@@ -35,15 +35,15 @@ This table names one machine authority, validator, and reference contract for ea
 | TechnologyCatalog | 3 | `prototypes/mir/planner/technology_catalog.lua` and `technology_selection_policy.lua` | exact GenerationPlan/CompilationPlan projection and compiler-contract fixture | canonical post-graph alternative inventory and current selection |
 | GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
 | CompilationPlan | 2 | `prototypes/mir/planner/compilation_plan.lua` | global operation finalization and output parity | governed stream and base-extension emission |
-| CompilationSnapshot | 1 | `prototypes/mir/domain/compiler/compilation_snapshot.lua` | compiler-contract replay and tamper tests | immutable normalized compiler state input |
+| CompilationSnapshot | 2 | `prototypes/mir/domain/compiler/compilation_snapshot.lua` | compiler-contract replay, sharing, and tamper tests | normalized fact domains with Merkle fingerprints and compact qualification deltas |
 | PolicySnapshot | 1 | `prototypes/mir/domain/compiler/policy_snapshot.lua` | compiler-contract replay and authority tests | immutable settings, policy, gate, quality, and promotion input |
 | CompilerInput | 2 | `prototypes/mir/domain/compiler/compiler_input.lua` | compiler-contract fixture | exact snapshot, policy, sanitation, and runtime-environment request |
-| CompilerResult | 2 | `prototypes/mir/domain/compiler/compiler_result.lua` | compiler-contract fixture | multidimensional execution, safety, review, promotion, and release result |
+| CompilerResult | 3 | `prototypes/mir/domain/compiler/compiler_result.lua` | compiler-contract fixture | immutable planned result plus final journal, parity, and multidimensional dispositions |
 | RuntimeEnvironmentIdentity | 2 | `prototypes/mir/domain/environment_identity.lua` and Factorio adapter | compiler-contract fixture | exact target, mod closure, settings, policy, and promotion identity |
 | QualificationEnvironmentIdentity | 1 | `prototypes/mir/domain/qualification_environment_identity.lua` | assurance seal and schema tests | candidate, binary, runner, verifier, plan, test-set, and trust identity |
-| TransformationOperation | 1 | `prototypes/mir/domain/compiler/transformation_operation.lua` | compiler-contract and mutation journal tests | common create/patch/delete envelope |
-| TransformationPlan | 1 | `prototypes/mir/domain/compiler/transformation_plan.lua` | pure compiler replay tests | canonically ordered qualified mutation plan |
-| MutationJournal | 1 | `prototypes/mir/domain/compiler/mutation_journal.lua` | executor and compiler-contract tests | before/after evidence for every applied transformation |
+| TransformationOperation | 2 | `prototypes/mir/domain/compiler/transformation_operation.lua` | compiler-contract and mutation journal tests | exact source-bound create/patch envelope with realized pre/post projections |
+| TransformationPlan | 2 | `prototypes/mir/domain/compiler/transformation_plan.lua` | pure compiler replay tests | canonically ordered mandatory plan bound to execution mode |
+| MutationJournal | 2 | `prototypes/mir/domain/compiler/mutation_journal.lua` | executor and compiler-contract tests | plan membership, before/after evidence, violations, and completeness |
 | Compiler orchestration | 1 | `prototypes/mir/pipeline/compiler_orchestrator.lua` | architecture gate and compiler-contract fixture | compile/apply/assert/publish sequencing and context ownership |
 | Shared technology graph | 1 | `prototypes/mir/graph/` | planner/emitter parity and compiler-contract fixtures | virtual and realized graph qualification |
 | CompilerContext | 4 | `prototypes/mir/pipeline/compiler_context.lua` | architecture and A/B/A nested-context fixtures | scoped activation, run-owned services, state epochs, caches, and artifacts |

@@ -2,8 +2,6 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local technology_effects = require("prototypes.mir.integrity.technology_effects")
-local effective_settings = require("prototypes.mir.settings.effective")
-local target_line = require("prototypes.mir.platform.factorio.target_line")
 local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
@@ -43,7 +41,10 @@ end
 local function default_compiler_input(stream_artifact, base_plan, sanitation_ledger)
   local policy = policy_snapshot_adapter.capture()
   local snapshot = compilation_snapshot_contract.new({
-    prototype_surfaces = {}, relationship_indexes = {}, recipe_facts = {}, graph_input = {},
+    fact_domains = {
+      recipes = {}, technologies = {}, items = {}, entities = {}, labs = {}, science_packs = {}
+    },
+    relationship_indexes = {}, owner_index = {}, graph_input = {},
     effect_target_inventory = effect_target_inventory.capture(),
     provider_inputs = {},
     stream_inputs = {plan = stream_artifact}, base_continuation_inputs = {operations = base_plan or {}},
@@ -363,9 +364,8 @@ normalized_base_operation = function(operation)
   return out
 end
 
-local function apply_weapon_overlap_policy(operation, stream_operations, stream_rows)
+local function apply_weapon_overlap_policy(operation, stream_operations, stream_rows, mode)
   if operation.key ~= "weapon-shooting-speed" then return operation end
-  local mode = effective_settings.get("mir-adjust-vanilla-weapon-speed-techs") or target_line.weapon_overlap_default()
   if mode == "off" then
     operation.planned_policy = "weapon-speed-overlap-retained"
     return operation
@@ -553,6 +553,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     stream_artifact = deepcopy(stream_plan)
   end
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
+  local exact_input = compiler_inputs and compiler_inputs.compiler_input
+    or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
+  compiler_input.validate(exact_input)
   local stream_effect_integrity
   local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
     or effect_target_inventory.capture()
@@ -565,7 +568,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
   local finalized_base = {}
   for _, operation in ipairs(normalized_base) do
-    local normalized = apply_weapon_overlap_policy(operation, stream_operations, stream_artifact.rows)
+    local normalized = apply_weapon_overlap_policy(
+      operation, stream_operations, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
     normalized = normalized_base_operation(normalized)
     table.insert(finalized_base, normalized)
     table.insert(operations, copy_operation_without_design(normalized))
@@ -600,9 +604,6 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
-  local exact_input = compiler_inputs and compiler_inputs.compiler_input
-    or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
-  compiler_input.validate(exact_input)
   local artifact = {
     schema = 2,
     compiler_input = compiler_input.snapshot(exact_input),

@@ -5,7 +5,7 @@ applies_to: "3.2.0-dev"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
 ---
@@ -20,8 +20,8 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 | Recipe risk | `RecipeRiskFact` in `index/recipe_risk_facts.lua` | FamilyRule evaluation, ProviderDecision, packs, GenerationPlan, diagnostics | none | identical risk fingerprint at every boundary; hard risk cannot be overridden |
 | Family selection | explicit provider pipeline ending in schema-3 `ProviderDecision` | stream compiler and capability diagnostic adapters | none | immutable discovery, normalization, classification, pack, hazard, owner, decision, and budget stages; no second discovery pass |
 | Provider expansion | registered `CompilerProvider`, schema-1 `ProviderMetrics`, and scoped budget policy | family resolver and quality assessment | none | exact environment, partition, dispositions, depth, conflicts, time, bytes, witnesses, provenance, and completeness |
-| Compilation lifetime | schema-3 `CompilerContext` | every run-derived cache, service, and artifact | context state only | context-owned frozen services, explicit state epochs, pure snapshots, and no cross-context state |
-| Compiler boundary | immutable schema-1 `CompilerInput`, `CompilerResult`, and `EnvironmentIdentity` | pure CompilationPlan finalizer and orchestrator | none | defensive snapshots plus exact input, result, environment, plan, and qualification fingerprints |
+| Compilation lifetime | schema-4 `CompilerContext` | every run-derived cache, service, and artifact | context state only | scoped packed activation, context-owned frozen services, explicit state epochs, compact public snapshots, and no cross-context state |
+| Compiler boundary | normalized schema-2 `CompilationSnapshot`, schema-1 `PolicySnapshot`, schema-2 `CompilerInput`, schema-3 `CompilerResult`, and schema-2 runtime identity | pure compiler, compatibility finalizer, and orchestrator | none | structurally shared fact domains plus exact input, planned/final result, environment, plan, journal, and qualification fingerprints |
 | Technology alternatives | canonical post-graph schema-3 `TechnologyCatalog` plus deterministic selection policy | GenerationPlan, CompilationPlan, preview, review dossier, assessment | none | rejected designs and total gates survive; both plans are exact projections |
 | Hard safety | `SafetyQualification` and evidence-bearing gate records | catalog selection and CompilationPlan | none | pending is proposal; passed/failed bind evaluator and evidence; provisional gates are superseded explicitly |
 | Quality | `DesignAssessment` and schema-2 `TechnologyQualityAssessment` | review and promotion admission | none | mandatory profile, per-metric provenance, monotonic status, and incomplete is review-required |
@@ -30,8 +30,8 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 | Planning | GenerationPlan schema 3 and pure CompilationPlan schema 2 | orchestrator, emitters, and validators | none | complete gates, exact design projection, deterministic fingerprints, and zero planner-to-emit imports |
 | Graph safety | shared `graph/` kernel with planner and emitter adapters | CompilationPlan and final assertion | none | virtual and realized snapshots share SCC, condensation, researchability, diff, and proof semantics plus exact fingerprints |
 | Presentation | `presentation/icon_builder.lua` | planning, diagnostics, and emitter facade | none | presentation construction has no dependency on mutation modules |
-| Emission | `emit/technology_design_adapter.lua`, stream executor, and bounded transactions | Factorio prototype table | generated technology creation and authorized patch-existing operations only | output validator matches exact planned projections |
-| Reporting | public artifact projector and diagnostics sink | mod-data, log, offline tooling | none | compact public artifacts; detailed internal artifacts only in diagnostics or preview mode |
+| Emission | exact schema-2 TransformationPlan, plan-bound MutationJournal, `emit/technology_design_adapter.lua`, and the shared technology-operation executor | Factorio prototype table | generated technology creation and authorized patch-existing operations only | every mandatory operation proves exact before/after state; missing, duplicate, undeclared, failed, or out-of-plan work fails closed |
+| Reporting | governed public-artifact budgets, public artifact projector, diagnostics sink, and offline dossier/export tooling | mod-data, log, validation, reviewer tooling | none | compact bounded public artifacts; detailed internal artifacts only in diagnostics or preview mode; byte overflow fails publication |
 
 ## Non-duplication rules
 

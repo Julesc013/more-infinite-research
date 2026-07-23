@@ -218,7 +218,7 @@ end
 
 function M.run_all(options)
   options = options or {}
-  local context = compiler_context.new()
+  local context = compiler_context.new({execution_mode = options.execution_mode})
   local ok, result = pcall(compiler_context.with_active, context, function()
     for _, id in ipairs(M.order()) do M.run(id, context) end
   end)
@@ -230,8 +230,8 @@ function M.run_all(options)
   return context:snapshot()
 end
 
-function M.new_context()
-  return compiler_context.new()
+function M.new_context(options)
+  return compiler_context.new(options)
 end
 
 function M.order()

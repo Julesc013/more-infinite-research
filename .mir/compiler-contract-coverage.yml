@@ -2,6 +2,7 @@
   "schema": 1,
   "technology_effect_target_profile": ".mir/technology-effect-targets.json",
   "technology_hard_gate_profile": ".mir/technology-hard-gates.json",
+  "public_artifact_budget_profile": ".mir/public-artifact-budgets.json",
   "generation_plan_gates": [
     "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
     "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
@@ -89,23 +90,25 @@
   "reviewed_mode_trust_classes": ["mir-reviewed", "protected-release"],
   "compiler_context_schema": 4,
   "compiler_boundary_schemas": {
-    "CompilationSnapshot": 1,
+    "CompilationSnapshot": 2,
     "PolicySnapshot": 1,
     "CompilerInput": 2,
-    "CompilerResult": 2,
+    "CompilerResult": 3,
     "RuntimeEnvironmentIdentity": 2,
     "QualificationEnvironmentIdentity": 1,
-    "TransformationOperation": 1,
-    "TransformationPlan": 1,
-    "MutationJournal": 1
+    "TransformationOperation": 2,
+    "TransformationPlan": 2,
+    "MutationJournal": 2
   },
+  "compiler_execution_modes": ["SAFE", "PREVIEW", "REVIEWED", "STRICT_CI", "RELEASE"],
   "compiler_result_dimensions": ["execution", "safety", "review", "promotion", "release"],
   "public_compiler_artifact_schema": 1,
   "public_compiler_artifact_kinds": [
-    "mir-generation-plan-public", "mir-coverage-public", "mir-compiler-evidence-public"
+    "mir-generation-plan-public", "mir-technology-catalog-public", "mir-coverage-public", "mir-compiler-evidence-public"
   ],
   "public_compiler_mod_data_types": [
     "more-infinite-research.generation-plan-public",
+    "more-infinite-research.technology-catalog-public",
     "more-infinite-research.coverage-public",
     "more-infinite-research.compiler-evidence-public"
   ],

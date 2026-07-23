@@ -70,8 +70,35 @@ if (-not $technologyDesign.Contains("effect_contracts.targets(effect)")) {
 if ($technologyDesign.Contains('"turret_id", "fluid", "item"')) {
   throw "TechnologyDesign still carries a parallel effect-target field scanner."
 }
-foreach ($field in @("generation_plan_gates", "actions", "family_strategies", "compatibility_pack_fields", "automatic_actions", "automatic_generation_controls", "automatic_creation_maturities", "automatic_policy_presets", "compiler_provider_fields", "diagnostic_code_namespaces", "legacy_automatic_modes", "mutation_sentinels")) {
+foreach ($field in @("generation_plan_gates", "actions", "family_strategies", "compatibility_pack_fields", "automatic_actions", "automatic_generation_controls", "automatic_creation_maturities", "automatic_policy_presets", "compiler_provider_fields", "compiler_execution_modes", "diagnostic_code_namespaces", "legacy_automatic_modes", "mutation_sentinels")) {
   if (@($manifest.$field).Count -eq 0) { throw "Compiler contract coverage omits $field." }
+}
+$executionModes = @("SAFE", "PREVIEW", "REVIEWED", "STRICT_CI", "RELEASE")
+if (($executionModes -join "|") -ne (@($manifest.compiler_execution_modes) -join "|")) {
+  throw "Compiler execution modes are incomplete or out of order."
+}
+$executionModeContract = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\compiler\execution_mode.lua")
+foreach ($mode in $executionModes) {
+  if (-not $executionModeContract.Contains($mode)) { throw "Execution-mode contract is missing: $mode" }
+}
+$budgetProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$manifest.public_artifact_budget_profile)) | ConvertFrom-Json
+$budgetContract = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\compiler\public_artifact_budget.lua")
+$publicProjector = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\public_compiler_artifacts.lua")
+$coveragePublisher = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\coverage.lua")
+if ([int]$budgetProfile.schema -ne 1 -or [int]$budgetProfile.sample_limit -le 0) {
+  throw "Public compiler artifact budget profile is invalid."
+}
+foreach ($artifact in @($budgetProfile.artifacts)) {
+  if ([string]::IsNullOrWhiteSpace([string]$artifact.kind) -or [long]$artifact.max_canonical_bytes -le 0) {
+    throw "Public compiler artifact budget row is invalid."
+  }
+  if (-not $budgetContract.Contains('["' + [string]$artifact.kind + '"] = ' + [string]$artifact.max_canonical_bytes)) {
+    throw "Runtime public artifact budget differs from governed policy: $($artifact.kind)"
+  }
+}
+if (-not $publicProjector.Contains('artifact_budget.limit(artifact and artifact.kind)') -or
+    -not $coveragePublisher.Contains('public_artifacts.assert_byte_budget(public)')) {
+  throw "One or more public compiler artifacts bypass the hard canonical-byte budget."
 }
 $expectedActions = @("disabled", "preview", "apply")
 if (@(Compare-Object $expectedActions @($manifest.automatic_actions)).Count -ne 0) { throw "Automatic action contract coverage is incomplete." }

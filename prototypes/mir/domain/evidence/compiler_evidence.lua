@@ -24,6 +24,8 @@ function M.build(input)
     }),
     compiler_input_fingerprint = input.compiler_input_fingerprint,
     compiler_result_fingerprint = input.compiler_result_fingerprint,
+    compiler_result = deepcopy(input.compiler_result),
+    mutation_journal = deepcopy(input.mutation_journal),
     technology_catalog_fingerprint = input.technology_catalog_fingerprint,
     technology_graph_parity = deepcopy(input.technology_graph_parity),
     provider_resolution = deepcopy(input.provider_resolution or {}),

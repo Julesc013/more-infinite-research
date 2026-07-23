@@ -416,6 +416,7 @@ if ($LASTEXITCODE -ne 0) {
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'commands.run_all({return_snapshot = false})'
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/pipeline/commands.lua")) -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -523,7 +524,7 @@ foreach ($pureCompilerNeedle in @(
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
 foreach ($contextNeedle in @(
   "schema = 4",
-  "function M.activate(context)",
+  "local function activate(context)",
   "function M.with_active(context, callback, ...)",
   "function M.is_active(context)",
   "function M.current()",
@@ -538,9 +539,12 @@ foreach ($contextNeedle in @(
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_context.lua" -Text $compilerContextText -Needle $contextNeedle
 }
-$newContextBody = [regex]::Match($compilerContextText, '(?s)function M\.new\(\)(?<body>.*?)\r?\nend').Groups['body'].Value
+$newContextBody = [regex]::Match($compilerContextText, '(?s)function M\.new\(options\)(?<body>.*?)\r?\nend').Groups['body'].Value
 if ($newContextBody -match 'active\s*=') {
   throw "CompilerContext.new must not implicitly activate the new context."
+}
+if ($compilerContextText -match 'function\s+M\.activate\(') {
+  throw "CompilerContext must not expose unscoped activation."
 }
 foreach ($contextOwnedModule in @(
   "prototypes/mir/index/recipe_facts.lua",
@@ -597,7 +601,12 @@ if ($baseExtensionsText -match 'require\("prototypes\.mir\.emit\.') {
   throw "Base continuation planning imports an emission module."
 }
 $technologyOperationExecutor = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_operation_executor.lua"
-foreach ($executorNeedle in @("function M.create(", "function M.patch(", "function M.apply_stream_row(", "function M.apply_base_continuation(")) {
+foreach ($executorNeedle in @(
+  "function M.apply_plan(plan, journal, options)",
+  "plan_contract.validate(plan)",
+  "journal:assert_before(operation, before)",
+  'journal:record(operation, before, after, "applied"'
+)) {
   Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
 }
 $effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
@@ -629,7 +638,9 @@ foreach ($publicArtifactNeedle in @(
   "more-infinite-research-generation-plan-internal",
   "more-infinite-research-coverage-report-internal",
   "more-infinite-research-compiler-evidence-internal",
+  "more-infinite-research-technology-catalog-internal",
   "more-infinite-research.generation-plan-public",
+  "more-infinite-research.technology-catalog-public",
   "more-infinite-research.coverage-public",
   "more-infinite-research.compiler-evidence-public"
 )) {
@@ -637,7 +648,10 @@ foreach ($publicArtifactNeedle in @(
 }
 
 $publicArtifactsText = Read-MIRFile -RelativePath "prototypes/mir/report/public_compiler_artifacts.lua"
-foreach ($projection in @("function M.generation_plan(artifact)", "function M.coverage(artifact)", "function M.compiler_evidence(input)")) {
+foreach ($projection in @(
+  "function M.generation_plan(artifact)", "function M.technology_catalog(catalog, provider_resolution)",
+  "function M.coverage(artifact)", "function M.compiler_evidence(input)", "function M.assert_byte_budget(artifact)"
+)) {
   Assert-MIRContains -RelativePath "prototypes/mir/report/public_compiler_artifacts.lua" -Text $publicArtifactsText -Needle $projection
 }
 
@@ -659,7 +673,7 @@ if ($technologyCatalogText -match 'data\.raw|data:extend|generated_registry|mod_
 
 $streamExecutorText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_executor.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.technology_operation_executor")'
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle "function M.apply(artifact, journal, transformations_by_stream)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle "function M.apply(artifact, transformation_plan, journal)"
 
 $integrityContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.identity(effect)"

@@ -32,7 +32,7 @@
     "graph->capabilities","graph->core","graph->domain","graph->platform","graph->report",
     "index->compatibility","index->core","index->domain","index->integrity","index->pipeline","index->platform","index->report",
     "integrity->core","integrity->domain",
-    "pipeline->compatibility","pipeline->core","pipeline->domain","pipeline->emit","pipeline->families","pipeline->graph","pipeline->index","pipeline->integrity","pipeline->planner","pipeline->platform","pipeline->policy","pipeline->report","pipeline->settings","pipeline->streams",
+    "pipeline->capabilities","pipeline->compatibility","pipeline->core","pipeline->domain","pipeline->emit","pipeline->families","pipeline->graph","pipeline->index","pipeline->integrity","pipeline->planner","pipeline->platform","pipeline->policy","pipeline->report","pipeline->settings","pipeline->streams",
     "planner->capabilities","planner->compatibility","planner->core","planner->domain","planner->families","planner->graph","planner->index","planner->integrity","planner->pipeline","planner->platform","planner->policy","planner->presentation","planner->providers","planner->report","planner->settings","planner->streams",
     "platform->core","platform->domain",
     "policy->capabilities","policy->compatibility","policy->core","policy->domain","policy->index","policy->pipeline","policy->planner","policy->platform","policy->report","policy->settings","policy->streams",

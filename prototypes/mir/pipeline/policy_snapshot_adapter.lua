@@ -26,6 +26,12 @@ function M.capture(context)
       technology_patch_authority = "emit/technology_operation_executor.lua",
       mutation_journal_required = true
     },
+    execution_mode = context and context:execution_mode() or "SAFE",
+    review_policy = {
+      allow_unbudgeted_review = false,
+      allow_release_review = false,
+      fail_reviewed_mode = false
+    },
     weapon_overlap_mode = effective_settings.get("mir-adjust-vanilla-weapon-speed-techs", context)
       or target_line.weapon_overlap_default()
   })

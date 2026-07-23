@@ -22,7 +22,7 @@ measurement_policy:
   - Paired evidence preserves maximum-observed artifact-volume counters and per-run telemetry fingerprints for diagnostics-off and diagnostics-on candidate runs.
   - A non-shipped symmetric probe times equivalent recipe snapshot planning final graph assertion and postcondition boundaries in both exact archives without changing either package.
   - Compiler phase lanes use measured diagnostics-off probe rows while artifact volume uses the candidate public CompilerEvidence telemetry from diagnostics-off and diagnostics-on rows.
-  - C6 measures canonical recipe risk, provider discovery and qualification, shadow-catalog construction, and emitted/planned graph parity as bounded compiler stages.
+  - C10 measures normalized input snapshot construction qualified snapshot deltas total compilation peak memory structural sharing and aggregate public artifact bytes in addition to canonical recipe risk provider discovery qualification catalog construction and emitted/planned graph parity.
   - Provider expansion is fail-closed before emission and the governed cardinality counters expose review-required overflow instead of hiding it in total load time.
   - Sub-100-millisecond phase lanes retain the 20 percent relative ceiling but use characterized absolute allowances of 0.10 seconds for snapshot and 0.05 seconds for postconditions; graph and planning retain 0.01 seconds.
 
@@ -79,7 +79,23 @@ compiler_telemetry:
     - technology_catalog_candidates
     - technology_catalog_alternatives
     - technology_catalog_canonical_bytes
+    - technology_catalog_public_bytes
+    - technology_catalog_internal_bytes
+    - compiler_evidence_public_bytes
     - technology_graph_parity_rows
+    - snapshot_prototype_bytes
+    - snapshot_deep_copies
+    - snapshot_canonicalization_passes
+    - snapshot_construction_milliseconds
+    - snapshot_peak_memory_bytes
+    - input_snapshot_bytes
+    - qualification_snapshot_bytes
+    - snapshot_reused_domains
+    - snapshot_copied_domains
+    - qualification_snapshot_construction_milliseconds
+    - qualification_peak_memory_bytes
+    - compiler_total_milliseconds
+    - public_artifact_total_bytes
   required_phases:
     - snapshot
     - recipe_risk_facts

@@ -186,6 +186,15 @@ function Test-MIRRuntimePerformanceEvidence {
   $budgetPath = Join-Path $RepoRoot ".mir\performance-budgets.json"
   $budgetManifest = Get-Content -Raw -LiteralPath $budgetPath | ConvertFrom-Json
   if ([int]$budgetManifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
+  foreach ($measurement in $volumeMeasurements) {
+    foreach ($bound in @($budgetManifest.compiler_counter_bounds)) {
+      $counter = [string]$bound.counter
+      $property = $measurement.counters.PSObject.Properties[$counter]
+      if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
+        throw "Artifact-volume measurement '$($measurement.surface)' exceeds or omits compiler budget '$counter'."
+      }
+    }
+  }
   $expectedLanes = @($budgetManifest.regression_lanes)
   $actualLanes = @($evidence.lanes)
   $actualIds = @($actualLanes | ForEach-Object { [string]$_.id })

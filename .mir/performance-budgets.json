@@ -10,7 +10,23 @@
   "compiler_counter_bounds": [
     { "id": "provider-candidates", "counter": "provider_candidates", "maximum": 4096 },
     { "id": "provider-review-required", "counter": "provider_review_required", "maximum": 512 },
-    { "id": "catalog-alternatives", "counter": "technology_catalog_alternatives", "maximum": 512 }
+    { "id": "catalog-alternatives", "counter": "technology_catalog_alternatives", "maximum": 512 },
+    { "id": "snapshot-prototype-bytes", "counter": "snapshot_prototype_bytes", "maximum": 67108864 },
+    { "id": "snapshot-deep-copies", "counter": "snapshot_deep_copies", "maximum": 16 },
+    { "id": "snapshot-canonicalization-passes", "counter": "snapshot_canonicalization_passes", "maximum": 128 },
+    { "id": "initial-snapshot-milliseconds", "counter": "snapshot_construction_milliseconds", "maximum": 5000 },
+    { "id": "qualification-snapshot-milliseconds", "counter": "qualification_snapshot_construction_milliseconds", "maximum": 1000 },
+    { "id": "compiler-total-milliseconds", "counter": "compiler_total_milliseconds", "maximum": 20000 },
+    { "id": "snapshot-peak-memory", "counter": "snapshot_peak_memory_bytes", "maximum": 2147483647 },
+    { "id": "qualification-peak-memory", "counter": "qualification_peak_memory_bytes", "maximum": 2147483647 },
+    { "id": "input-snapshot-bytes", "counter": "input_snapshot_bytes", "maximum": 4194304 },
+    { "id": "qualification-snapshot-bytes", "counter": "qualification_snapshot_bytes", "maximum": 4194304 },
+    { "id": "snapshot-copied-domains", "counter": "snapshot_copied_domains", "maximum": 16 },
+    { "id": "generation-plan-public-bytes", "counter": "generation_plan_public_bytes", "maximum": 524288 },
+    { "id": "technology-catalog-public-bytes", "counter": "technology_catalog_public_bytes", "maximum": 131072 },
+    { "id": "coverage-public-bytes", "counter": "coverage_public_bytes", "maximum": 131072 },
+    { "id": "compiler-evidence-public-bytes", "counter": "compiler_evidence_public_bytes", "maximum": 131072 },
+    { "id": "public-artifact-total-bytes", "counter": "public_artifact_total_bytes", "maximum": 917504 }
   ],
   "regression_lanes": [
     { "id": "base.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },

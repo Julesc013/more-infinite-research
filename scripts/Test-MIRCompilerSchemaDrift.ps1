@@ -41,9 +41,9 @@ if ([int]$compilerSchemaAuthority.schema -ne 1 -or
   throw "Compiler schema compatibility authority is invalid."
 }
 foreach ($entry in @{
-  CompilationSnapshot=1; PolicySnapshot=1; CompilerInput=2; CompilerResult=2;
+  CompilationSnapshot=2; PolicySnapshot=1; CompilerInput=2; CompilerResult=3;
   RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1;
-  TransformationOperation=1; TransformationPlan=1; MutationJournal=1
+  TransformationOperation=2; TransformationPlan=2; MutationJournal=2
 }.GetEnumerator()) {
   if ([int]$compilerSchemaAuthority.records.($entry.Key).current -ne [int]$entry.Value) {
     throw "Compiler schema authority drifted for $($entry.Key)."
@@ -107,7 +107,7 @@ Assert-MIRText "prototypes\mir\domain\technology\technology_design.lua" "Technol
 Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
 Assert-MIRText "prototypes\mir\planner\compilation_plan.lua" "schema = 2"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInput schema 2 record is required"
-Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 2 record is required"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 3 planned or final record is required"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "function M.compatibility_projection"
@@ -126,15 +126,15 @@ foreach ($row in @(
   "| TechnologyDesign | 2 |",
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
-  "| CompilationSnapshot | 1 |",
+  "| CompilationSnapshot | 2 |",
   "| PolicySnapshot | 1 |",
   "| CompilerInput | 2 |",
-  "| CompilerResult | 2 |",
+  "| CompilerResult | 3 |",
   "| RuntimeEnvironmentIdentity | 2 |",
   "| QualificationEnvironmentIdentity | 1 |",
-  "| TransformationOperation | 1 |",
-  "| TransformationPlan | 1 |",
-  "| MutationJournal | 1 |",
+  "| TransformationOperation | 2 |",
+  "| TransformationPlan | 2 |",
+  "| MutationJournal | 2 |",
   "| CompilerEvidence | 2 |",
   "| Public compiler artifact projections | 1 |",
   "| RecipeFactV2 | 2 |",
@@ -153,7 +153,7 @@ foreach ($docCheck in @(
   @{Path="docs\reference\schemas\compiler-evidence.md"; Needle='`CompilerEvidence` schema 2'},
   @{Path="docs\reference\schemas\recipe-fact-v2.md"; Needle="schema-2"},
   @{Path="docs\reference\schemas\scenario-manifest.md"; Needle="schema 3"}
-  @{Path="docs\reference\schemas\compiler-boundary.md"; Needle='`CompilerResult` | 2'}
+  @{Path="docs\reference\schemas\compiler-boundary.md"; Needle='`CompilerResult` | 3'}
 )) {
   Assert-MIRText $docCheck.Path $docCheck.Needle
 }

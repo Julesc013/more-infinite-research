@@ -232,7 +232,7 @@ function M.publish(context, options)
   local artifact = context:state_snapshot("coverage_report")
     or M.build(context, {include_rows = include_internal})
   local public = public_artifacts.coverage(artifact)
-  telemetry.count("coverage_public_bytes", #fingerprint.canonical(public))
+  telemetry.count("coverage_public_bytes", public_artifacts.assert_byte_budget(public))
   mod_data.emit_coverage(public)
   if include_internal then
     telemetry.count("coverage_internal_bytes", #fingerprint.canonical(artifact))

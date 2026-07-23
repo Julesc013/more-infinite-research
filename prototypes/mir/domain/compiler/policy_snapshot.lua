@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 
 local M = {}
 local SCHEMA = 1
@@ -24,6 +25,10 @@ function M.validate(record)
   if type(record.weapon_overlap_mode) ~= "string" or record.weapon_overlap_mode == "" then
     error("PolicySnapshot weapon overlap mode is required.", 2)
   end
+  if execution_mode.normalize(record.execution_mode) ~= record.execution_mode
+    or type(record.review_policy) ~= "table" then
+    error("PolicySnapshot execution mode and review policy are required.", 2)
+  end
   if record.settings_fingerprint ~= fingerprint.of(record.effective_settings)
     or record.compatibility_policy_fingerprint ~= fingerprint.of(record.compatibility_policy)
     or record.promotion_authority_fingerprint ~= fingerprint.of(record.promotion_authority)
@@ -44,6 +49,12 @@ function M.new(values)
   record.record_type = "PolicySnapshot"
   for _, field in ipairs(REQUIRED_TABLES) do record[field] = record[field] or {} end
   record.weapon_overlap_mode = record.weapon_overlap_mode or "reject-overlap"
+  record.execution_mode = execution_mode.normalize(record.execution_mode)
+  record.review_policy = record.review_policy or {
+    allow_unbudgeted_review = false,
+    allow_release_review = false,
+    fail_reviewed_mode = false
+  }
   record.settings_fingerprint = fingerprint.of(record.effective_settings)
   record.compatibility_policy_fingerprint = fingerprint.of(record.compatibility_policy)
   record.promotion_authority_fingerprint = fingerprint.of(record.promotion_authority)

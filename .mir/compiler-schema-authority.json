@@ -2,15 +2,15 @@
   "schema": 1,
   "authority": "mir-compiler-schema-compatibility-v1",
   "records": {
-    "CompilationSnapshot": {"current": 1, "readable": [1], "writable": [1]},
+    "CompilationSnapshot": {"current": 2, "readable": [2], "writable": [2]},
     "PolicySnapshot": {"current": 1, "readable": [1], "writable": [1]},
     "CompilerInput": {"current": 2, "readable": [2], "writable": [2], "compatibility_projection": 1},
-    "CompilerResult": {"current": 2, "readable": [2], "writable": [2], "compatibility_projection": 1},
+    "CompilerResult": {"current": 3, "readable": [3], "writable": [3], "compatibility_projection": 2},
     "RuntimeEnvironmentIdentity": {"current": 2, "readable": [2], "writable": [2], "compatibility_projection": 1},
     "QualificationEnvironmentIdentity": {"current": 1, "readable": [1], "writable": [1]},
-    "TransformationOperation": {"current": 1, "readable": [1], "writable": [1]},
-    "TransformationPlan": {"current": 1, "readable": [1], "writable": [1]},
-    "MutationJournal": {"current": 1, "readable": [1], "writable": [1]}
+    "TransformationOperation": {"current": 2, "readable": [2], "writable": [2]},
+    "TransformationPlan": {"current": 2, "readable": [2], "writable": [2]},
+    "MutationJournal": {"current": 2, "readable": [2], "writable": [2]}
   },
   "unknown_field_policy": "ignore-on-read-preserve-only-in-authoritative-version",
   "unknown_schema_policy": "fail-closed",

@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
 ---
@@ -56,6 +56,14 @@ Validate and copy the exact compiler-produced catalog artifact without reconstru
 ```powershell
 .\scripts\Export-MIRTechnologyCatalog.ps1 -CatalogPath out\technology-catalog.compiler.json -OutputPath out\technology-catalog.json
 ```
+
+For PREVIEW or diagnostics-enabled runs, export the exact full catalog beside deterministic JSON and Markdown reviewer summaries. Supplying internal compiler evidence adds provider/ecosystem decisions and observed public-artifact budget status:
+
+```powershell
+.\scripts\Export-MIRCompilerPreview.ps1 -CatalogPath out\technology-catalog.compiler.json -EvidencePath out\compiler-evidence.internal.json -OutputDirectory out\compiler-preview
+```
+
+The summary calls out selected alternatives, ambiguous or review-required cases, rejected designs and reasons, ecosystem-dependent provider decisions, public artifact limits, and provider budget reviews. It is reviewer evidence, not mutation or promotion authority.
 
 Evaluate the selected alternative against a governed profile, produce a deterministic review dossier, and enforce promotion admission:
 

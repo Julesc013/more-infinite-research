@@ -6,6 +6,7 @@ local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local operation_contract = require("prototypes.mir.domain.compiler.transformation_operation")
 local transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 
@@ -24,14 +25,29 @@ end
 local function stream_operation(row, policy)
   local action = row.action == "adopt" and "patch" or "create"
   local subject_id = row.action == "adopt" and row.adoption.owner or row.technology_name
+  local design = row.technology_design
+  technology_design.validate(design)
+  local expected_before = row.action == "adopt" and deepcopy(row.adoption.input_snapshot)
+    or {presence = "absent", prototype_type = "technology", id = tostring(subject_id)}
+  local expected_after = row.action == "adopt" and deepcopy(row.adoption.expected_snapshot)
+    or technology_design.prototype_projection(design, {validated = true})
+  if action == "create" then expected_after.type = "technology" end
   return operation_contract.new({
     operation_id = "technology/" .. action .. "/" .. tostring(subject_id),
     phase = "technology-materialization",
     action = action,
     subject = {type = "technology", id = tostring(subject_id)},
-    precondition_fingerprint = row.action == "adopt" and row.adoption.input_fingerprint
-      or fingerprint.of({absent = subject_id}),
+    expected_before_snapshot = expected_before,
+    expected_after_projection = expected_after,
+    allowed_delta = action == "create"
+      and {engine_default_fields = true}
+      or {configured_fields = deepcopy(row.adoption.configured_fields or {})},
     authority_fingerprint = policy.policy_fingerprint,
+    qualification_fingerprint = design.qualification_fingerprint,
+    source = {
+      candidate_id = design.candidate_id or tostring(row.stream_key),
+      alternative_id = action .. ":" .. tostring(subject_id)
+    },
     payload = {
       kind = "stream",
       stream_key = row.stream_key,
@@ -44,13 +60,26 @@ local function stream_operation(row, policy)
 end
 
 local function base_operation(operation, policy)
+  local design = operation.technology_design
+  technology_design.validate(design)
+  local expected_after = technology_design.prototype_projection(design, {validated = true})
+  expected_after.type = "technology"
   return operation_contract.new({
     operation_id = "technology/create/" .. tostring(operation.technology_name),
     phase = "technology-materialization",
     action = "create",
     subject = {type = "technology", id = tostring(operation.technology_name)},
-    precondition_fingerprint = fingerprint.of({absent = operation.technology_name}),
+    expected_before_snapshot = {
+      presence = "absent", prototype_type = "technology", id = tostring(operation.technology_name)
+    },
+    expected_after_projection = expected_after,
+    allowed_delta = {engine_default_fields = true},
     authority_fingerprint = policy.policy_fingerprint,
+    qualification_fingerprint = design.qualification_fingerprint,
+    source = {
+      candidate_id = design.candidate_id or ("base-continuation/" .. tostring(operation.key)),
+      alternative_id = "create:" .. tostring(operation.technology_name)
+    },
     payload = {
       kind = "base-continuation",
       key = operation.key,
@@ -126,8 +155,10 @@ function M.compile(snapshot, policy)
   end)
   local plan = transformation_plan.new({
     phase = "qualified-only",
+    execution_mode = policy.execution_mode,
     compilation_snapshot_fingerprint = snapshot.snapshot_fingerprint,
     policy_fingerprint = policy.policy_fingerprint,
+    execution_mode = policy.execution_mode,
     operations = operations
   })
   local result = {

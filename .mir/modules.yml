@@ -147,6 +147,8 @@ modules:
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/compiler/compiler_input.lua
     - prototypes/mir/domain/compiler/compiler_result.lua
+    - prototypes/mir/domain/compiler/execution_mode.lua
+    - prototypes/mir/domain/compiler/public_artifact_budget.lua
     - prototypes/mir/domain/compiler/compilation_snapshot.lua
     - prototypes/mir/domain/compiler/policy_snapshot.lua
     - prototypes/mir/domain/compiler/transformation_operation.lua
@@ -321,9 +323,12 @@ mutation_commands:
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
-    - CompilationSnapshot schema 1 and PolicySnapshot schema 1 are the only inputs to the pure planner compiler API
+    - CompilationSnapshot schema 2 and PolicySnapshot schema 1 are the only inputs to the pure planner compiler API
     - RuntimeEnvironmentIdentity and QualificationEnvironmentIdentity bind runtime behavior and assurance machinery separately
-    - every technology create or patch is a TransformationOperation in one TransformationPlan and produces one MutationJournal entry
+    - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
+    - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
+    - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence
+    - normal loads publish only bounded public catalog projections; full catalogs require preview diagnostics validation or offline export
     - output validation compares numeric effects graph presentation save identity and generated-registry projections
     - input technology sanitation runs after compatibility repairs and before every index or planning pass and records content-addressed original retained removed and sanitized effects
     - final technology safety reruns target-aware sanitation before reporting and output validation as a defensive postcondition
@@ -605,6 +610,8 @@ validation_tooling:
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
+    compiler_preview_export: scripts/Export-MIRCompilerPreview.ps1
+    compiler_preview_export_gate: scripts/Test-MIRCompilerPreviewExport.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
     technology_governance_source: .mir/technology-governance.json
     technology_governance_generator: scripts/Update-MIRTechnologyGovernance.ps1

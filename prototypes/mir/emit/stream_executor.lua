@@ -10,7 +10,7 @@ local function assert_artifact(artifact)
   end
 end
 
-function M.apply(artifact, journal, transformations_by_stream)
+function M.apply(artifact, transformation_plan, journal)
   assert_artifact(artifact)
   for _, row in ipairs(artifact.rows) do
     for _, conflict in ipairs((row.effect_ownership and row.effect_ownership.lost) or {}) do
@@ -29,19 +29,21 @@ function M.apply(artifact, journal, transformations_by_stream)
       if not row.technology_design then
         error("Stream executor requires TechnologyDesign schema 2 for " .. tostring(row.stream_key) .. ".", 2)
       end
-      local technology = technology_operation_executor.apply_stream_row(
-        row, journal, transformations_by_stream and transformations_by_stream[row.stream_key])
-      if D.enabled() and not row.direct_effects then
-        log("[more-infinite-research] Registered technology " .. technology.name)
-      end
-    elseif row.action == "adopt" then
-      technology_operation_executor.apply_stream_row(
-        row, journal, transformations_by_stream and transformations_by_stream[row.stream_key])
     elseif row.reason ~= "disabled" then
       log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
     end
     D.stream(row.diagnostics)
   end
+  local realized = technology_operation_executor.apply_plan(
+    transformation_plan, journal, {kind = "stream"})
+  if D.enabled() then
+    for _, row in ipairs(realized) do
+      if row.result and row.result.name then
+        log("[more-infinite-research] Registered technology " .. row.result.name)
+      end
+    end
+  end
+  return realized
 end
 
 return M

@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 
 local M = {}
 local Context = {}
@@ -13,9 +14,11 @@ local function assert_context(context, level)
   return context
 end
 
-function M.new()
+function M.new(options)
+  options = options or {}
   return setmetatable({
     schema = 4,
+    compiler_execution_mode = execution_mode.normalize(options.execution_mode),
     command_state = {},
     artifacts = {},
     state = {},
@@ -26,7 +29,7 @@ function M.new()
   }, Context)
 end
 
-function M.activate(context)
+local function activate(context)
   active = assert_context(context, 2)
   return context
 end
@@ -37,14 +40,14 @@ function M.with_active(context, callback, ...)
     error("MIR scoped compiler activation requires a callback.", 2)
   end
   local previous = active
-  local arguments = {n = select("#", ...), ...}
-  active = context
-  local results = {pcall(function()
+  local arguments = table.pack(...)
+  activate(context)
+  local results = table.pack(xpcall(function()
     return callback(table.unpack(arguments, 1, arguments.n))
-  end)}
+  end, debug.traceback))
   active = previous
   if not results[1] then error(results[2], 2) end
-  return table.unpack(results, 2, #results)
+  return table.unpack(results, 2, results.n)
 end
 
 function M.is_active(context)
@@ -56,6 +59,10 @@ function M.current()
   -- explicitly; legacy platform facades use this active-run bridge only.
   if not active then error("MIR compiler state was requested before CompilerContext activation.", 2) end
   return active
+end
+
+function Context:execution_mode()
+  return self.compiler_execution_mode
 end
 
 function Context:set_service(name, implementation)
@@ -176,6 +183,7 @@ end
 function Context:snapshot()
   local payload = {
     schema = self.schema,
+    compiler_execution_mode = self.compiler_execution_mode,
     command_state = deepcopy(self.command_state),
     artifacts = deepcopy(self.artifacts),
     state = deepcopy(self.state),

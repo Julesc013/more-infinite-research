@@ -1,8 +1,24 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local artifact_budget = require("prototypes.mir.domain.compiler.public_artifact_budget")
 
 local M = {}
+local SAMPLE_LIMIT = artifact_budget.sample_limit()
+
+local function append_sample(out, value)
+  if #out < SAMPLE_LIMIT then table.insert(out, value) end
+end
+
+function M.assert_byte_budget(artifact)
+  local budget = artifact_budget.limit(artifact and artifact.kind)
+  local bytes = #fingerprint.canonical(artifact)
+  if bytes > budget then
+    error("MIR public artifact exceeds its hard byte budget: " .. artifact.kind
+      .. " bytes=" .. bytes .. " budget=" .. budget, 2)
+  end
+  return bytes, budget
+end
 
 local function sorted_effect_identities(effects)
   local identities = {}
@@ -83,6 +99,85 @@ function M.coverage(artifact)
   return public
 end
 
+function M.technology_catalog(catalog, provider_resolution)
+  if type(catalog) ~= "table" or catalog.schema ~= 3
+    or type(catalog.catalog_fingerprint) ~= "string" then
+    error("TechnologyCatalog public projection requires the final schema-3 catalog.", 2)
+  end
+  local selected, samples = {}, {rejected = {}, review_required = {}}
+  local reason_histogram = {}
+  local alternative_count, rejected_count, review_count = 0, 0, 0
+  for _, selection in ipairs(catalog.current_selections or {}) do
+    table.insert(selected, {
+      candidate_id = selection.candidate_id,
+      alternative_id = selection.alternative_id,
+      action = selection.action,
+      design_fingerprint = selection.design_fingerprint,
+      qualification_fingerprint = selection.qualification_fingerprint
+    })
+  end
+  for _, candidate in ipairs(catalog.candidates or {}) do
+    alternative_count = alternative_count + #(candidate.alternatives or {})
+  end
+  for _, qualification in ipairs(catalog.qualifications or {}) do
+    local decision = qualification.qualification_decision or qualification.decision
+    local reasons = qualification.rejection_reasons or qualification.reasons or {}
+    if decision == "rejected" then
+      rejected_count = rejected_count + 1
+      append_sample(samples.rejected, {
+        candidate_id = qualification.candidate_id,
+        design_fingerprint = qualification.design_fingerprint,
+        reasons = deepcopy(reasons)
+      })
+    elseif decision == "proposal" or decision == "review-required" then
+      review_count = review_count + 1
+      append_sample(samples.review_required, {
+        candidate_id = qualification.candidate_id,
+        design_fingerprint = qualification.design_fingerprint,
+        reasons = deepcopy(reasons)
+      })
+    end
+    for _, reason in ipairs(reasons) do
+      reason_histogram[tostring(reason)] = (reason_histogram[tostring(reason)] or 0) + 1
+    end
+  end
+  local provider_decisions = (provider_resolution or {}).decisions or {}
+  local provider_summary = {decision_count = #provider_decisions, review_required_count = 0, providers = {}}
+  local provider_ids = {}
+  for _, decision in ipairs(provider_decisions) do
+    if decision.final_state == "review-required" or decision.risk_disposition == "REVIEW_REQUIRED" then
+      provider_summary.review_required_count = provider_summary.review_required_count + 1
+    end
+    if decision.provider_id then provider_ids[decision.provider_id] = true end
+  end
+  for provider_id in pairs(provider_ids) do table.insert(provider_summary.providers, provider_id) end
+  table.sort(provider_summary.providers)
+  local public = {
+    schema = 1,
+    kind = "mir-technology-catalog-public",
+    technology_catalog_schema = catalog.schema,
+    catalog_fingerprint = catalog.catalog_fingerprint,
+    counts = {
+      candidates = #(catalog.candidates or {}),
+      alternatives = alternative_count,
+      selected = #selected,
+      rejected = rejected_count,
+      review_required = review_count
+    },
+    selected = selected,
+    reason_histogram = reason_histogram,
+    provider_summary = provider_summary,
+    samples = samples,
+    truncation = {
+      sample_limit = SAMPLE_LIMIT,
+      rejected = rejected_count > #samples.rejected,
+      review_required = review_count > #samples.review_required
+    }
+  }
+  public.public_fingerprint = fingerprint.of(public)
+  return public
+end
+
 local function sanitation_summary(ledger)
   ledger = ledger or {}
   return {
@@ -129,7 +224,28 @@ function M.compiler_evidence(input)
     output_sanitation_fingerprint = fingerprint.of(input.output_sanitation_ledger or {}),
     target_inventory_unchanged = type(input_summary.sanitized_target_inventory_fingerprint) == "string"
       and input_summary.sanitized_target_inventory_fingerprint
-        == output_summary.sanitized_target_inventory_fingerprint
+        == output_summary.sanitized_target_inventory_fingerprint,
+    compiler_result = input.compiler_result and {
+      schema = input.compiler_result.schema,
+      result_phase = input.compiler_result.result_phase,
+      result_fingerprint = input.compiler_result.result_fingerprint,
+      planned_result_fingerprint = input.compiler_result.planned_result_fingerprint,
+      status = input.compiler_result.status,
+      dimensions = deepcopy(input.compiler_result.dimensions),
+      execution_evidence = deepcopy(input.compiler_result.execution_evidence)
+    } or nil,
+    mutation_journal = input.mutation_journal and {
+      schema = input.mutation_journal.schema,
+      plan_fingerprint = input.mutation_journal.plan_fingerprint,
+      journal_fingerprint = input.mutation_journal.journal_fingerprint,
+      required_operation_count = input.mutation_journal.required_operation_count,
+      terminal_counts = deepcopy(input.mutation_journal.terminal_counts),
+      missing_operation_count = input.mutation_journal.missing_operation_count,
+      duplicate_operation_count = input.mutation_journal.duplicate_operation_count,
+      undeclared_operation_count = input.mutation_journal.undeclared_operation_count,
+      out_of_plan_operation_count = input.mutation_journal.out_of_plan_operation_count,
+      complete = input.mutation_journal.complete
+    } or nil
   }
   public.evidence_fingerprint = fingerprint.of(public)
   return public

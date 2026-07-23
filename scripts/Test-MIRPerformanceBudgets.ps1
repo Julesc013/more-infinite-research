@@ -85,7 +85,12 @@ $requiredTelemetryCounters = @(
   "recipe_hard_risk_count", "recipe_review_risk_count", "provider_candidates",
   "provider_cardinality_review_required", "provider_review_required", "family_members", "stream_rows",
   "technology_catalog_candidates", "technology_catalog_alternatives", "technology_catalog_canonical_bytes",
-  "technology_graph_parity_rows"
+  "technology_catalog_public_bytes", "technology_catalog_internal_bytes", "compiler_evidence_public_bytes",
+  "technology_graph_parity_rows", "snapshot_prototype_bytes", "snapshot_deep_copies",
+  "snapshot_canonicalization_passes", "snapshot_construction_milliseconds", "snapshot_peak_memory_bytes",
+  "input_snapshot_bytes", "qualification_snapshot_bytes", "snapshot_reused_domains", "snapshot_copied_domains",
+  "qualification_snapshot_construction_milliseconds", "qualification_peak_memory_bytes",
+  "compiler_total_milliseconds", "public_artifact_total_bytes"
 )
 $requiredTelemetryPhases = @(
   "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler", "graph", "planning", "postconditions"
@@ -93,6 +98,16 @@ $requiredTelemetryPhases = @(
 foreach ($name in @($requiredTelemetryCounters + $requiredTelemetryPhases)) {
   if ($performancePolicy -notmatch "(?m)^\s*-\s+$([regex]::Escape($name))\s*$") {
     throw "Performance policy is missing required telemetry name '$name'."
+  }
+}
+$requiredCounterBudgetIds = @(
+  "initial-snapshot-milliseconds", "qualification-snapshot-milliseconds", "compiler-total-milliseconds",
+  "snapshot-peak-memory", "qualification-peak-memory", "input-snapshot-bytes",
+  "qualification-snapshot-bytes", "public-artifact-total-bytes"
+)
+foreach ($id in $requiredCounterBudgetIds) {
+  if (@($compilerCounterBounds | Where-Object id -eq $id).Count -ne 1) {
+    throw "Compiler performance counter budget is missing: $id"
   }
 }
 $telemetrySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\compiler_telemetry.lua")

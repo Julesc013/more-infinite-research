@@ -16,14 +16,14 @@ superseded_by: []
 
 | Record | Current | Readable | Writable | Compatibility projection |
 | --- | ---: | --- | --- | ---: |
-| `CompilationSnapshot` | 1 | 1 | 1 | none |
+| `CompilationSnapshot` | 2 | 2 | 2 | none |
 | `CompilerInput` | 2 | 2 | 2 | 1 |
-| `CompilerResult` | 2 | 2 | 2 | 1 |
-| `MutationJournal` | 1 | 1 | 1 | none |
+| `CompilerResult` | 3 | 3 | 3 | 2 |
+| `MutationJournal` | 2 | 2 | 2 | none |
 | `PolicySnapshot` | 1 | 1 | 1 | none |
 | `QualificationEnvironmentIdentity` | 1 | 1 | 1 | none |
 | `RuntimeEnvironmentIdentity` | 2 | 2 | 2 | 1 |
-| `TransformationOperation` | 1 | 1 | 1 | none |
-| `TransformationPlan` | 1 | 1 | 1 | none |
+| `TransformationOperation` | 2 | 2 | 2 | none |
+| `TransformationPlan` | 2 | 2 | 2 | none |
 
 Unknown schema versions fail closed. Downgrades exist only through explicit compatibility projections.

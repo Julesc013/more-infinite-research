@@ -777,6 +777,18 @@ fixtures:
       - not-applicable-gate-tamper-rejection
       - qualified-only-final-transformation-plan
       - transformation-operation-plan-and-mutation-journal
+      - provider-review-safe-mode
+      - provider-review-strict-mode
+      - missing-transformation-operation
+      - transformation-precondition-tamper
+      - transformation-postcondition-tamper
+      - journal-completeness-missing-duplicate-undeclared-and-out-of-plan
+      - compiler-result-applied
+      - compiler-result-failed
+      - context-nil-multireturn
+      - catalog-public-projection
+      - snapshot-structural-sharing
+      - policy-snapshot-isolation
       - identical-provider-claim-collapse-with-provenance
       - conflicting-same-stream-provider-claim-review-required
       - compiler-context-new-does-not-activate

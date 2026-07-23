@@ -63,12 +63,25 @@
         ".mir/technology-hard-gates.json",
         ".mir/technology-quality-profiles.json",
         ".mir/compiler-schema-authority.json",
+        ".mir/public-artifact-budgets.json",
         "fixtures/assert-compiler-contracts/**",
         "scripts/Test-MIRCompiler.ps1",
         "scripts/Test-MIRModuleDependencies.ps1",
         "scripts/Test-MIRCompilerContractCoverage.ps1",
         "scripts/Test-MIRCompilerSchemaDrift.ps1"
         ,"scripts/Update-MIRCompilerAuthorities.ps1"
+      ]
+    },
+    {
+      "id": "static.compiler-preview",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./scripts/Test-MIRCompilerPreviewExport.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/public-artifact-budgets.json",
+        "scripts/Export-MIRCompilerPreview.ps1",
+        "scripts/Test-MIRCompilerPreviewExport.ps1"
       ]
     },
     {
