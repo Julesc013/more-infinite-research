@@ -24,37 +24,37 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C7",
+      "candidate_id": "C8",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 958994,
-      "archive_entries": 256,
-      "package_source_commit": "b532e91a227cc4b17526edbb1388c7836e0a6dbe",
-      "package_source_tree": "28c79804f1543961628ccd722931e31305c6d78f",
-      "package_source_sha256": "D687ADB304B6A907BB7604085E0C71788E69CDAF6A256F0D4A2269F8382AA7D7",
+      "archive_bytes": 969200,
+      "archive_entries": 264,
+      "package_source_commit": "4b73ed41e0761eb5d81cddf538ad89712b301054",
+      "package_source_tree": "e8364ead3aba4a1385f7667d4c8be8598fd0ba7f",
+      "package_source_sha256": "8AF5A69147DBBEA863B552E14F4FF710CFCE68E4F2C332D1FCA601DAA0001CF1",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "28c79804f1543961628ccd722931e31305c6d78f",
-        "file_count": 256
+        "source_tree": "e8364ead3aba4a1385f7667d4c8be8598fd0ba7f",
+        "file_count": 264
       },
-      "archive_sha256": "1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B",
-      "package_content_sha256": "D687ADB304B6A907BB7604085E0C71788E69CDAF6A256F0D4A2269F8382AA7D7",
+      "archive_sha256": "5D161E3C05B4223BE87F6C52A2AF65994228CD2626C33BF4B14003FE6A74BFD5",
+      "package_content_sha256": "8AF5A69147DBBEA863B552E14F4FF710CFCE68E4F2C332D1FCA601DAA0001CF1",
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
       "status": "awaiting-fresh-candidate-qualification",
       "supersedes_candidate": {
-        "candidate_id": "C6",
-        "archive_bytes": 942170,
-        "archive_entries": 231,
-        "archive_sha256": "CDAA5A6ECB190C81C3DD9069A27D639C670EB0A6DAF56103871920A361CCF3E8",
-        "package_content_sha256": "7A0BCB4E1C1DCFE77CDCEEC33CB5B3F03E38E821E05527BA8FE78A0CC50D2B91",
-        "package_source_commit": "ecb8b0545d3cef1badf1b46a9b4c2170cf0aceee",
-        "package_source_tree": "420b4315861214fd4275a62106cbaef834e5ff02",
-        "package_source_sha256": "7A0BCB4E1C1DCFE77CDCEEC33CB5B3F03E38E821E05527BA8FE78A0CC50D2B91",
-        "reason": "fixed-point compiler architecture changed package-visible Lua after the bounded C6 hardening candidate"
+        "candidate_id": "C7",
+        "archive_bytes": 958994,
+        "archive_entries": 256,
+        "archive_sha256": "1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B",
+        "package_content_sha256": "D687ADB304B6A907BB7604085E0C71788E69CDAF6A256F0D4A2269F8382AA7D7",
+        "package_source_commit": "b532e91a227cc4b17526edbb1388c7836e0a6dbe",
+        "package_source_tree": "28c79804f1543961628ccd722931e31305c6d78f",
+        "package_source_sha256": "D687ADB304B6A907BB7604085E0C71788E69CDAF6A256F0D4A2269F8382AA7D7",
+        "reason": "governed compiler-platform contracts changed packaged Lua and README after the C7 fixed-point candidate"
       }
     },
     "factorio-2.0": {

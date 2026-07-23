@@ -42,6 +42,7 @@ function Test-MIRAllowedDeltaPath {
 
   foreach ($root in $AllowedChangeRoots) {
     $normalized = ([string]$root).Replace("\", "/").TrimStart("/")
+    if ($Path.Equals($normalized, [System.StringComparison]::Ordinal)) { return $true }
     if (-not $normalized.EndsWith("/")) { $normalized += "/" }
     if ($Path.StartsWith($normalized, [System.StringComparison]::Ordinal)) { return $true }
   }
