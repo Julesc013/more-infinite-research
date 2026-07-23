@@ -4,33 +4,12 @@ local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local effect_safety_policy = require("prototypes.mir.domain.technology.effect_safety_policy")
 
 local S = {}
 
-local blocked_effect_types = {
-  ["character-item-pickup-distance"] = "item pickup reach can vacuum nearby belt items into player inventories and cause severe lag",
-  ["character-loot-pickup-distance"] = "loot pickup reach can vacuum nearby belt items into player inventories and cause severe lag"
-}
-
-function S.assert_effect_allowed(effect, context)
-  local effect_type = effect and effect.type
-  local reason = blocked_effect_types[effect_type]
-  if reason then
-    error("MIR safety guard blocked unsafe technology effect "
-      .. effect_type
-      .. " in "
-      .. tostring(context or "unknown technology")
-      .. ": "
-      .. reason
-      .. ".")
-  end
-end
-
-function S.assert_effects_allowed(effects, context)
-  for _, effect in ipairs(effects or {}) do
-    S.assert_effect_allowed(effect, context)
-  end
-end
+S.assert_effect_allowed = effect_safety_policy.assert_effect_allowed
+S.assert_effects_allowed = effect_safety_policy.assert_effects_allowed
 
 local function assert_effect_target_exists(effect, technology_name)
   local valid, reason, target = effect_contracts.target_status(effect)

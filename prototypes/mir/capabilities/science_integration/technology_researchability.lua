@@ -4,93 +4,24 @@ local pack_registry = require("prototypes.mir.capabilities.science_integration.p
 local recipe_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local researchability_index = require("prototypes.mir.graph.researchability_index")
 
 local M = {}
-local pack_production_status = nil
 
-local function technology_reachability_cache()
-  return compiler_context.current():state_view("technology_researchability", function() return {} end)
+local function pack_production_status(...)
+  local service = compiler_context.current():service("science.pack_production_status")
+  if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
+  return service(...)
 end
 
-local function prerequisite_order_cache()
-  return compiler_context.current():state_view("prerequisite_order_cache", function() return {} end)
-end
-
-function M.configure(dependencies)
-  pack_production_status = assert(dependencies.pack_production_status, "technology researchability requires pack production status")
-end
-
-local function sorted_prerequisites(technology)
-  local out = {}
-  for _, prerequisite in ipairs((technology and technology.prerequisites) or {}) do
-    table.insert(out, prerequisite)
-  end
-  table.sort(out)
-  return out
-end
-
-local function prerequisite_order(root_name)
-  local cache = prerequisite_order_cache()
-  local cached = cache[root_name]
-  if cached then return cached.order, cached.failure end
-
-  local visited, visiting, order = {}, {}, {}
-  local stack = {{name = root_name, entered = false}}
-  local failure = nil
-  while #stack > 0 and not failure do
-    local frame = stack[#stack]
-    if visited[frame.name] then
-      table.remove(stack)
-    elseif not frame.entered then
-      local technology = data_raw.technology(frame.name)
-      if not technology then
-        failure = "missing-prerequisite-" .. tostring(frame.name)
-      elseif technology.enabled == false then
-        failure = "disabled-prerequisite-" .. tostring(frame.name)
-      elseif visiting[frame.name] then
-        failure = "technology-cycle-" .. tostring(frame.name)
-      else
-        frame.entered = true
-        frame.prerequisites = sorted_prerequisites(technology)
-        frame.next_index = 1
-        visiting[frame.name] = true
-      end
-    else
-      local prerequisite = frame.prerequisites[frame.next_index]
-      if prerequisite then
-        frame.next_index = frame.next_index + 1
-        if visiting[prerequisite] then
-          failure = "technology-cycle-" .. tostring(prerequisite)
-        elseif not visited[prerequisite] then
-          table.insert(stack, {name = prerequisite, entered = false})
-        end
-      else
-        visiting[frame.name] = nil
-        visited[frame.name] = true
-        table.insert(order, frame.name)
-        table.remove(stack)
-      end
-    end
-  end
-
-  cache[root_name] = {order = order, failure = failure}
-  telemetry.observe_max("technology_prerequisite_closure_max", #order)
-  telemetry.count("technology_closure_cache_entries", 1)
-  telemetry.count("technology_closure_cached_nodes", #order)
-  return order, failure
+local function graph_index()
+  return compiler_context.current():state_view("technology_researchability_index", researchability_index.build)
 end
 
 local function enabled_and_reachable(tech_name)
-  local cache = technology_reachability_cache()
-  if cache[tech_name] ~= nil then return cache[tech_name] end
   local technology = data_raw.technology(tech_name)
-  if not technology or technology.enabled == false then
-    cache[tech_name] = false
-    return false
-  end
-  local _, failure = prerequisite_order(tech_name)
-  cache[tech_name] = failure == nil
-  return cache[tech_name]
+  if not technology or technology.enabled == false then return false end
+  return not graph_index().structural_failures[tech_name]
 end
 
 local function research_mechanism_reason(technology, context)
@@ -121,7 +52,6 @@ local function research_mechanism_reason(technology, context)
 end
 
 local function reason(tech_name, context)
-  if not pack_production_status then error("MIR technology researchability dependencies were not configured.", 2) end
   context = context or {}
   local technology = data_raw.technology(tech_name)
   if not technology then return "missing" end
@@ -131,13 +61,17 @@ local function reason(tech_name, context)
   if visiting_technologies[tech_name] then return "technology-cycle" end
   visiting_technologies[tech_name] = true
 
-  local order, failure = prerequisite_order(tech_name)
+  local index = graph_index()
+  local failure = index.structural_failures[tech_name]
   if failure then
     visiting_technologies[tech_name] = nil
     return "unreachable-prerequisite"
   end
 
-  for _, candidate_name in ipairs(order) do
+  local candidates = researchability_index.reachable_names(index, tech_name)
+  telemetry.observe_max("technology_prerequisite_closure_max", #candidates)
+  telemetry.count("technology_graph_index_queries", 1)
+  for _, candidate_name in ipairs(candidates) do
     local candidate = data_raw.technology(candidate_name)
     local rejection = research_mechanism_reason(candidate, {
       visiting_packs = context.visiting_packs,

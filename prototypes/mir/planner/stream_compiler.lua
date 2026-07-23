@@ -4,7 +4,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
 local costs = require("prototypes.mir.planner.costs")
-local icon_builder = require("prototypes.mir.emit.icon_builder")
+local icon_builder = require("prototypes.mir.presentation.icon_builder")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
@@ -33,40 +33,40 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 local technology_catalog = require("prototypes.mir.planner.technology_catalog")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local technology_selection_policy = require("prototypes.mir.planner.technology_selection_policy")
 
 local M = {}
 
 local GATE_EVIDENCE = {
-  target_supported = "target-profile:positive-feature-contract",
-  effect_valid = "effect-safety:validated-effect-set",
-  owner_conflict_free = "owner-policy:no-blocking-owner",
-  science_compatible = "science-selector:resolved-ingredients",
-  lab_compatible = "lab-compatibility:accepted-ingredient-set",
-  prerequisites_acyclic = "prerequisite-planner:acyclic-graph",
-  loop_safe = "recipe-policy:fail-closed-risk-filter",
-  progression_safe = "science-reachability:researchable-path",
-  migration_safe = "stream-manifest:stable-identity",
-  output_identity_safe = "stream-spec:unique-output-identity"
+  target_supported = {evaluator = "target-profile", evidence = "positive-feature-contract", initial = "passed"},
+  effect_valid = {evaluator = "effect-contracts", initial = "pending"},
+  owner_conflict_free = {evaluator = "owner-policy", evidence = "no-blocking-owner", initial = "passed"},
+  science_compatible = {evaluator = "science-selector", evidence = "resolved-ingredients", initial = "passed"},
+  lab_compatible = {evaluator = "lab-compatibility", evidence = "accepted-ingredient-set", initial = "passed"},
+  prerequisites_acyclic = {evaluator = "technology-graph", initial = "pending"},
+  loop_safe = {evaluator = "recipe-risk-facts", evidence = "fail-closed-risk-filter", initial = "passed"},
+  progression_safe = {evaluator = "technology-graph", initial = "pending"},
+  migration_safe = {evaluator = "stream-manifest", evidence = "stable-identity", initial = "passed"},
+  output_identity_safe = {evaluator = "generation-plan", initial = "pending"}
 }
-
-local function gate(status, evidence, reason)
-  return {
-    passed = status ~= "failed",
-    status = status,
-    evidence = evidence and {evidence} or {},
-    reason = reason
-  }
-end
 
 local function proof_gates(action, failed_gates)
   local out = {}
-  for gate_name, evidence in pairs(GATE_EVIDENCE) do
+  for gate_name, contract in pairs(GATE_EVIDENCE) do
     if failed_gates and failed_gates[gate_name] then
-      out[gate_name] = gate("failed", failed_gates[gate_name].evidence, failed_gates[gate_name].reason)
+      local failure = failed_gates[gate_name]
+      out[gate_name] = gate_contract.failed(
+        failure.evaluator or contract.evaluator,
+        failure.reason,
+        {failure.evidence}
+      )
     elseif action == "skip" then
-      out[gate_name] = gate("not-applicable", "decision:non-materializing-row")
+      out[gate_name] = gate_contract.not_applicable("generation-plan", {"decision:non-materializing-row"})
+    elseif contract.initial == "pending" then
+      out[gate_name] = gate_contract.pending(contract.evaluator)
     else
-      out[gate_name] = gate("passed", evidence)
+      out[gate_name] = gate_contract.passed(contract.evaluator, {contract.evidence})
     end
   end
   return out
@@ -380,6 +380,7 @@ end
 local function compile(context, return_view)
   context = context or compiler_context.current()
   compiler_context.activate(context)
+  science_packs.ensure_services(context)
   local cached = context:state_view("generation_plan")
   if cached then return return_view and cached or deepcopy(cached) end
   telemetry.start_phase("stream_compiler")
@@ -410,14 +411,13 @@ local function compile(context, return_view)
     table.insert(rows, plan_stream(key, streams[key]))
   end
   rows = effect_ownership.resolve(rows, {defer_design_refresh = true})
-  local catalog
-  if diagnostics.enabled() then
-    catalog = technology_catalog.from_preselection_rows(
-      rows,
-      plan.source_fingerprints,
-      {trusted_designs = true}
-    )
-  end
+  local catalog = technology_catalog.from_preselection_rows(
+    rows,
+    plan.source_fingerprints,
+    {trusted_designs = true}
+  )
+  catalog = technology_catalog.bind_selections(catalog, rows)
+  technology_selection_policy.assert_generation_projection(catalog.current_selections, rows)
   for _, row in ipairs(rows) do
     if row.action ~= "skip" then
       row.technology_design = technology_design.from_generation_row(row)
@@ -426,15 +426,16 @@ local function compile(context, return_view)
   end
   local finalized = plan:finalize()
   local artifact = finalized:artifact_view()
-  if catalog then catalog = technology_catalog.bind_selections(catalog, artifact.rows) end
+  catalog = technology_catalog.bind_selections(catalog, artifact.rows)
+  technology_selection_policy.assert_generation_projection(catalog.current_selections, artifact.rows)
   telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
-  if catalog then
-    telemetry.count("technology_catalog_candidates", #catalog.candidates)
-    telemetry.count("technology_catalog_alternatives", #catalog.alternative_qualifications)
-    telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(catalog))
-    context:set_state("technology_candidate_catalog", catalog)
-    context:set_state("technology_qualifications", catalog.qualifications)
+  telemetry.count("technology_catalog_candidates", #catalog.candidates)
+  telemetry.count("technology_catalog_alternatives", #catalog.alternative_qualifications)
+  telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(catalog))
+  context:set_state("technology_candidate_catalog", catalog)
+  context:set_state("technology_qualifications", catalog.qualifications)
+  if diagnostics.enabled() then
     context:record_artifact("technology_candidate_catalog", catalog)
   end
   context:set_state("generation_plan", artifact)
@@ -452,7 +453,11 @@ end
 function M.accept(plan, context)
   context = context or compiler_context.current()
   local artifact = type(plan.artifact) == "function" and plan:artifact() or deepcopy(plan)
-  context:set_state("generation_plan", artifact)
+  if context:has_state("generation_plan") then
+    context:replace_epoch("generation_plan", artifact, context:state_epoch("generation_plan"))
+  else
+    context:set_state("generation_plan", artifact)
+  end
 end
 
 function M.latest_artifact(context)
@@ -462,7 +467,12 @@ end
 
 function M.accept_artifact(artifact, context, options)
   context = context or compiler_context.current()
-  context:set_state("generation_plan", options and options.trusted and artifact or deepcopy(artifact))
+  local accepted = options and options.trusted and artifact or deepcopy(artifact)
+  if context:has_state("generation_plan") then
+    context:replace_epoch("generation_plan", accepted, context:state_epoch("generation_plan"))
+  else
+    context:set_state("generation_plan", accepted)
+  end
 end
 
 function M.assert_output(context)

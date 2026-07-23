@@ -44,6 +44,7 @@
       "inputs": [
         "prototypes/**",
         ".mir/modules.yml",
+        ".mir/module-dependencies.json",
         "scripts/Test-MIRArchitecture.ps1"
       ]
     },
@@ -56,10 +57,13 @@
       "inputs": [
         "prototypes/mir/**",
         ".mir/compiler-contract-coverage.yml",
+        ".mir/technology-lifecycle.json",
+        ".mir/module-dependencies.json",
         ".mir/technology-effect-targets.json",
         ".mir/compiler-schema-authority.json",
         "fixtures/assert-compiler-contracts/**",
         "scripts/Test-MIRCompiler.ps1",
+        "scripts/Test-MIRModuleDependencies.ps1",
         "scripts/Test-MIRCompilerContractCoverage.ps1",
         "scripts/Test-MIRCompilerSchemaDrift.ps1"
       ]

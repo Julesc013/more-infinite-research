@@ -490,11 +490,15 @@ Assert-MIRContains `
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
 foreach ($contextNeedle in @(
-  "schema = 2",
+  "schema = 3",
   "function M.activate(context)",
   "function M.current()",
+  "function Context:set_service(name, implementation)",
+  "function Context:freeze_services()",
   "function Context:state_view(name, factory)",
   "function Context:set_state(name, value)",
+  "function Context:replace_epoch(name, value, expected_epoch)",
+  "function Context:freeze_state(name)",
   "function Context:state_snapshot(name)",
   "function Context:state_key_count()"
 )) {
@@ -551,7 +555,14 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/base_extensions.lua" -Text
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "science.pack_production_status(pack_name)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "graph_qualification.validate_operations(plan.operations, {actual = true})"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "expected.graph_fingerprint, actual.graph_fingerprint"
+
+$presentationText = Read-MIRFile -RelativePath "prototypes/mir/presentation/icon_builder.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/presentation/icon_builder.lua" -Text $presentationText -Needle "function I.icons_for_stream(stream)"
+if ($streamCompilerText -match 'prototypes\.mir\.emit\.icon_builder') {
+  throw "Stream planning must consume the presentation layer, not an emit-layer icon helper."
+}
 
 $modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
@@ -613,8 +624,14 @@ Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $f
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "operator_dsl.validate(rule.operators)"
 $familyResolverText = Read-MIRFile -RelativePath "prototypes/mir/families/resolver.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText -Needle "operator_dsl.candidate_items"
-Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText -Needle "operator_dsl.eligibility"
+foreach ($stage in @("discovery", "normalization", "classification", "pack_policy", "hazard_policy", "owner_arbitration", "decision", "budget")) {
+  Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText `
+    -Needle ('require("prototypes.mir.providers.pipeline.' + $stage + '")')
+}
+$providerDiscoveryText = Read-MIRFile -RelativePath "prototypes/mir/providers/pipeline/discovery.lua"
+$providerClassificationText = Read-MIRFile -RelativePath "prototypes/mir/providers/pipeline/classification.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/providers/pipeline/discovery.lua" -Text $providerDiscoveryText -Needle "operator_dsl.candidate_items"
+Assert-MIRContains -RelativePath "prototypes/mir/providers/pipeline/classification.lua" -Text $providerClassificationText -Needle "operator_dsl.eligibility"
 foreach ($legacyResolverBranch in @("rule.effects.strategy", "rule.tier.strategy", "rule.selector.output_item")) {
   if ($familyResolverText.Contains($legacyResolverBranch)) {
     throw "Family resolver still dispatches a legacy strategy branch: $legacyResolverBranch"

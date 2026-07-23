@@ -4,6 +4,7 @@ local target_profiles = require("prototypes.mir.platform.factorio.target_profile
 local precedence = require("prototypes.mir.compatibility.packs.precedence")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local promotion_registry = require("prototypes.mir.domain.technology.promotion_registry")
 
 local M = {}
 local PROTOTYPE_NAME = "more-infinite-research-compatibility-pack"
@@ -124,7 +125,14 @@ function M.authorizes_family_stream(stream_key, family, active_packs)
         and (family == nil or row.family == nil or row.family == family) then
         local out = deepcopy(row)
         out.pack = pack.id
-        return out
+        local verified = promotion_registry.resolve_reference(out)
+        if verified then
+          out.promotion_verified = true
+          out.registry_fingerprint = verified.registry_fingerprint
+          out.trust_class = verified.trust_class
+          out.provider_version = verified.provider_version
+          return out
+        end
       end
     end
   end

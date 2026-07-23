@@ -1,15 +1,19 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
-local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local relationships = require("prototypes.mir.index.relationships")
 local rule_registry = require("prototypes.mir.families.registry")
 local policy_authority = require("prototypes.mir.compatibility.policy_authority")
-local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local competing_productivity = require("prototypes.mir.policy.competing_productivity")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local operator_dsl = require("prototypes.mir.families.operator_dsl")
-local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local provider_discovery = require("prototypes.mir.providers.pipeline.discovery")
+local provider_normalization = require("prototypes.mir.providers.pipeline.normalization")
+local provider_classification = require("prototypes.mir.providers.pipeline.classification")
+local provider_pack_policy = require("prototypes.mir.providers.pipeline.pack_policy")
+local provider_hazard_policy = require("prototypes.mir.providers.pipeline.hazard_policy")
+local provider_owner_arbitration = require("prototypes.mir.providers.pipeline.owner_arbitration")
+local provider_decision = require("prototypes.mir.providers.pipeline.decision")
+local provider_budget = require("prototypes.mir.providers.pipeline.budget")
 
 local M = {}
 
@@ -33,114 +37,12 @@ local HARD_BLOCKERS = {
   existing_recipe_productivity_owner = true
 }
 
-local function decision_fingerprint(row)
-  local material = {}
-  for field, value in pairs(row) do
-    if field ~= "decision_fingerprint" then material[field] = value end
-  end
-  return fingerprint.of(material)
-end
-
-local function count_state(rows, state)
-  local count = 0
-  for _, row in ipairs(rows or {}) do if row.final_state == state then count = count + 1 end end
-  return count
-end
-
 local function apply_cardinality_guard(rows, limits, candidate_count)
-  limits = limits or {}
-  local attached = count_state(rows, "attach")
-  local review_required = count_state(rows, "review-required")
-  local reasons = {}
-  if candidate_count > (limits.maximum_candidates or math.huge) then
-    table.insert(reasons, "provider_candidate_cardinality_exceeded")
-  end
-  if attached > (limits.maximum_attachments or math.huge) then
-    table.insert(reasons, "provider_attachment_cardinality_exceeded")
-  end
-  if review_required > (limits.maximum_review_required or math.huge) then
-    table.insert(reasons, "provider_review_cardinality_exceeded")
-  end
-  local status = #reasons > 0 and "REVIEW_REQUIRED" or "PASS"
-  local cardinality = {
-    candidate_count = candidate_count,
-    attachment_count = attached,
-    review_required_count = review_required,
-    limits = deepcopy(limits),
-    status = status,
-    reasons = reasons
-  }
-  cardinality.cardinality_fingerprint = fingerprint.of(cardinality)
-  if status == "REVIEW_REQUIRED" then
-    for _, row in ipairs(rows) do
-      if row.final_state ~= "diagnose" or not HARD_BLOCKERS[row.blocker] then
-        row.final_state = "review-required"
-        row.decision = "review-required"
-        row.blocker = reasons[1]
-        row.risk_disposition = "REVIEW_REQUIRED"
-      end
-      row.cardinality = deepcopy(cardinality)
-      row.decision_fingerprint = decision_fingerprint(row)
-    end
-  else
-    for _, row in ipairs(rows) do
-      row.cardinality = deepcopy(cardinality)
-      row.decision_fingerprint = decision_fingerprint(row)
-    end
-  end
-  return cardinality
-end
-
-local function infer_seed_item(seed, fact)
-  if seed.item then return seed.item end
-  local names, seen = {}, {}
-  for _, result in ipairs((fact and fact.results) or {}) do
-    if result.type == "item" and result.name and not seen[result.name] then
-      seen[result.name] = true
-      table.insert(names, result.name)
-    end
-  end
-  if #names == 1 then return names[1] end
-  return nil
+  return provider_budget.apply(rows, limits or {}, candidate_count or #rows, {}, HARD_BLOCKERS)
 end
 
 local function candidates_for_rule(rule, indexes, seeds)
-  local by_key = {}
-  local stream = operator_dsl.grouping_stream(rule.operators)
-  for _, item_name in ipairs(operator_dsl.candidate_items(rule.operators, indexes)) do
-    for _, recipe_name in ipairs(indexes.recipes_by_output[item_name] or {}) do
-      by_key[recipe_name .. "\0" .. item_name] = {
-        recipe = recipe_name,
-        item = item_name,
-        source = "structural"
-      }
-    end
-  end
-  for _, seed in ipairs(seeds or {}) do
-    if seed.family == rule.id and seed.stream == stream then
-      local fact = recipe_facts.view(seed.recipe)
-      local item_name = infer_seed_item(seed, fact)
-      if not item_name then
-        error("CompatibilityPack candidate seed requires an exact item for ambiguous recipe " .. seed.recipe, 2)
-      end
-      by_key[seed.recipe .. "\0" .. item_name] = {
-        recipe = seed.recipe,
-        item = item_name,
-        source = "compatibility-pack-seed",
-        pack = seed.pack,
-        evidence = deepcopy(seed.evidence),
-        change = seed.change,
-        tier = seed.tier
-      }
-    end
-  end
-  local out = {}
-  for _, candidate in pairs(by_key) do table.insert(out, candidate) end
-  table.sort(out, function(a, b)
-    if a.recipe ~= b.recipe then return a.recipe < b.recipe end
-    return a.item < b.item
-  end)
-  return out
+  return provider_discovery.candidates(rule, indexes, seeds)
 end
 
 local function build()
@@ -168,75 +70,34 @@ local function build()
     local candidates = candidates_for_rule(rule, indexes, seeds)
     local rule_decisions = {}
     telemetry.count("provider_candidates", #candidates)
-    for _, candidate in ipairs(candidates) do
-        local item_name, recipe_name = candidate.item, candidate.recipe
-        local fact = recipe_facts.view(recipe_name)
-        local risk_fact = recipe_risk_facts.view(recipe_name)
-        local risk_disposition, risk_blocker = recipe_risk_facts.primary_disposition(risk_fact)
-        local eligible, blocker = operator_dsl.eligibility(rule.operators, fact, item_name, risk_fact)
-        if risk_disposition ~= "PASS" then blocker = risk_blocker; eligible = false end
-        local pack_decision = policy_authority.resolve_candidate({
-          recipe = recipe_name,
-          item = item_name,
-          family = rule.id,
-          stream = target_stream,
-          blocker = blocker
-        })
-        if pack_decision.action == "attach" and risk_disposition ~= "HARD_REJECTED"
-          and (blocker == nil or policy_authority.blocker_is_reviewable(blocker)) then
-          eligible, blocker = true, nil
-          if risk_disposition == "REVIEW_REQUIRED" then risk_disposition = "EXACT_REVIEWED" end
-        elseif pack_decision.action == "diagnose" then
-          eligible, blocker = false, pack_decision.reason or blocker
-        end
-        if risk_disposition == "HARD_REJECTED" then eligible, blocker = false, risk_blocker end
-        if blocker and HARD_BLOCKERS[blocker] then eligible = false end
-        local external_owners = productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
-          ignore_owner = competing_productivity.ignores_existing_owner,
-          snapshot_phase = "input"
-        })
-        if #external_owners > 0 then eligible, blocker = false, "existing_recipe_productivity_owner" end
+    for _, raw_candidate in ipairs(candidates) do
+      local candidate = provider_normalization.candidate(raw_candidate, rule)
+      local classified = provider_classification.evaluate(rule, candidate)
+      local pack_decision = provider_pack_policy.resolve(rule, target_stream, candidate, classified.blocker)
+      local resolved = provider_hazard_policy.resolve(
+        classified, pack_decision, HARD_BLOCKERS, policy_authority.blocker_is_reviewable)
+      classified.eligible = resolved.eligible
+      classified.blocker = resolved.blocker
+      classified.risk_disposition = resolved.risk_disposition
+      local owner_blocker = provider_owner_arbitration.blocker(candidate.recipe)
+      if owner_blocker then classified.eligible, classified.blocker = false, owner_blocker end
 
-        local change = operator_dsl.effect_change(rule.operators, candidate, indexes)
-        if tonumber(pack_decision.change) then change = tonumber(pack_decision.change) end
-
-        local decision = operator_dsl.grouping_action(rule.operators)
-        if not eligible then
-          decision = risk_disposition == "REVIEW_REQUIRED" and "review-required" or "diagnose"
-        end
-        local decision_row = {
-          schema = 3,
-          provider_id = rule.provider_id,
-          rule = rule.id,
-          source_key = "recipe:" .. recipe_name,
-          prototype_type = "recipe",
-          prototype_name = recipe_name,
-          capability = rule.capability,
-          candidate_family = rule.family,
-          recipe = recipe_name,
-          item = item_name,
-          target_stream = target_stream,
-          final_state = decision,
-          decision = decision,
-          blocker = blocker or rule.blocker,
-          change = change,
-          policy_scope = "automatic-productivity",
-          identity_seed = rule.provider_id .. "\0" .. recipe_name .. "\0" .. item_name,
-          diagnostic_provenance = {provider = rule.provider_id, evidence = deepcopy(rule.required_evidence)},
-          target_support = deepcopy(rule.targets),
-          emission = {adapter = "generation-plan-family-rule", mutates_prototypes = false},
-          candidate_source = candidate.source,
-          compatibility_pack = candidate.pack or pack_decision.pack,
-          evidence = candidate.evidence or pack_decision.evidence
-        }
-        decision_row.risk_fingerprint = risk_fact and risk_fact.risk_fingerprint or "missing"
-        decision_row.risk_hard_flags = deepcopy((risk_fact and risk_fact.hard_flags) or {"recipe_fact_missing"})
-        decision_row.risk_review_flags = deepcopy((risk_fact and risk_fact.review_flags) or {})
-        decision_row.risk_disposition = risk_disposition
-        table.insert(rule_decisions, decision_row)
+      local change = operator_dsl.effect_change(rule.operators, candidate, indexes)
+      if tonumber(pack_decision.change) then change = tonumber(pack_decision.change) end
+      local action = operator_dsl.grouping_action(rule.operators)
+      if not classified.eligible then
+        action = classified.risk_disposition == "REVIEW_REQUIRED" and "review-required" or "diagnose"
+      end
+      table.insert(rule_decisions, provider_decision.build(
+        rule, target_stream, candidate, classified, pack_decision, change, action))
     end
 
-    local cardinality = apply_cardinality_guard(rule_decisions, rule.cardinality, #candidates)
+    local cardinality = provider_budget.apply(rule_decisions, rule.cardinality, #candidates, {
+      provider_id = rule.provider_id,
+      family = rule.id,
+      partition = "single",
+      profile = "active-target"
+    }, HARD_BLOCKERS)
     provider_cardinality[rule.provider_id] = cardinality
     if cardinality.status == "REVIEW_REQUIRED" then telemetry.count("provider_cardinality_review_required", 1) end
     for _, decision_row in ipairs(rule_decisions) do

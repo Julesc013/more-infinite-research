@@ -19,6 +19,13 @@ local native_owner_cost_model = require("__more-infinite-research__.prototypes.m
 local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
 local technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate")
 local technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification")
+local c7_contracts = {
+  gate = require("__more-infinite-research__.prototypes.mir.domain.technology.gate"),
+  safety = require("__more-infinite-research__.prototypes.mir.domain.technology.safety_qualification"),
+  assessment = require("__more-infinite-research__.prototypes.mir.domain.technology.design_assessment"),
+  promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_authorization"),
+  registry = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_registry")
+}
 local technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval")
 local applicability_envelope = require("__more-infinite-research__.prototypes.mir.domain.technology.applicability_envelope")
 local technology_promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_promotion")
@@ -65,7 +72,7 @@ end
 
 local function skip_row(stream_key, manifest_id)
   local function proof(evidence)
-    return {passed = true, status = "not-applicable", evidence = {evidence}}
+    return c7_contracts.gate.not_applicable("compiler-contract-fixture", {evidence})
   end
   return {
     schema = 3,
@@ -137,7 +144,9 @@ if denied or denied_reason ~= "reviewed_compatibility_data_required" then
   fail("reviewed-data generation gate did not fail closed")
 end
 local experimental, experimental_reason, experimental_code = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true}), true, "experimental")
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = true, trust_class = "mir-reviewed"
+  }, "experimental")
 if experimental or experimental_reason ~= "automatic_family_not_reviewed"
   or experimental_code ~= diagnostic_codes.get("automatic_family_not_reviewed") then
   fail("experimental family was accepted by the reviewed-data creation lane")
@@ -147,8 +156,15 @@ expect_error("unknown automatic family creation maturity", "Unknown automatic fa
     automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "unknown")
 end)
 local approved = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true}), true, "reviewed")
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = true, trust_class = "mir-reviewed"
+  }, "reviewed")
 if not approved then fail("reviewed-data generation gate rejected named authorization") end
+local untrusted = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = false, trust_class = "external-mod-author"
+  }, "reviewed")
+if untrusted then fail("reviewed-data generation accepted an externally self-asserted trust class") end
 local generic = automatic_compiler_contract.generation_decision(
   automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "experimental")
 if not generic then fail("registered family module generation was not independently configurable") end
@@ -205,14 +221,17 @@ for index, provider in ipairs(providers.providers) do
 end
 
 local cardinality_rows, cardinality = family_resolver.apply_cardinality_guard({
-  {final_state = "attach", decision = "attach", blocker = nil},
-  {final_state = "attach", decision = "attach", blocker = nil},
-  {final_state = "diagnose", decision = "diagnose", blocker = "recycling_loop"}
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "new-unreviewed"},
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "new-unreviewed"},
+  {final_state = "diagnose", decision = "diagnose", blocker = "recycling_loop", promotion_class = "new-unreviewed"},
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "exact-reviewed"}
 }, {maximum_candidates = 2, maximum_attachments = 2, maximum_review_required = 2}, 3)
 if cardinality.status ~= "REVIEW_REQUIRED"
   or cardinality_rows[1].decision ~= "review-required"
   or cardinality_rows[2].decision ~= "review-required"
   or cardinality_rows[3].decision ~= "diagnose"
+  or cardinality_rows[4].decision ~= "attach"
+  or cardinality.retained_reviewed_or_promoted_count ~= 1
   or type(cardinality_rows[1].decision_fingerprint) ~= "string" then
   fail("provider cardinality overflow did not stop expansion before emission while preserving hard rejection")
 end
@@ -312,7 +331,16 @@ operational_pack.aliases = {['aliased-item'] = {family = "assembler", change = 0
 operational_pack.family_hints = {{recipe = "hinted-recipe", family = "assembler", change = 0.04}}
 operational_pack.science_roles = {{stream = "research_auto_assembling_machine", pack = "automation-science-pack", role = "include"}}
 operational_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "hidden_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
-operational_pack.family_authorizations = {{family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", action = "generate", evidence = {"assert-compiler-contracts"}, claim_boundary = "fixture-only"}}
+operational_pack.family_authorizations = {{
+  family = "assembling-machine-manufacturing",
+  stream = "research_auto_assembling_machine",
+  action = "generate",
+  evidence = {"assert-compiler-contracts"},
+  claim_boundary = "fixture-only",
+  promotion_authorization_id = "mir.reviewed.compiler-contract-fixture-v1",
+  trust_class = "mir-reviewed",
+  provider_version = "family-rule-v3"
+}}
 operational_pack.candidate_seeds = {{recipe = "seeded-recipe", item = "seeded-item", family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", change = 0.02, evidence = {"assert-compiler-contracts"}}}
 local active_operational = {pack_schema.validate(operational_pack)}
 local excluded = pack_registry.resolve_candidate({recipe = "blocked-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
@@ -405,7 +433,9 @@ local function emitted_row(stream_key, technology_name, recipe_name)
   }
   row.source = "fixed-stream"
   row.spec = {manifest_id = stream_key, migration_policy = "stable"}
-  for _, proof in pairs(row.gates) do proof.status = "passed" end
+  for gate_name in pairs(row.gates) do
+    row.gates[gate_name] = c7_contracts.gate.passed("compiler-contract:" .. gate_name, {"fixture:" .. gate_name})
+  end
   row.technology_design = technology_design.from_generation_row(row)
   return row
 end
@@ -461,7 +491,8 @@ if normalized_design.semantic_fingerprint
   fail("TechnologyDesign semantic fingerprint is not deterministic")
 end
 local qualification_row = deepcopy(design_row)
-qualification_row.gates.effect_valid.evidence = {"fixture:qualification-refresh"}
+qualification_row.gates.effect_valid = c7_contracts.gate.passed(
+  "compiler-contract:effect-valid", {"fixture:qualification-refresh"})
 local refreshed_qualification_design = technology_design.with_qualification(
   normalized_design,
   qualification_row,
@@ -481,6 +512,34 @@ expect_error("TechnologyDesign qualification identity", "changed design identity
 end)
 local candidate = technology_candidate.from_design(normalized_design, design_row)
 local qualification = technology_qualification.from_design(normalized_design, design_row)
+do
+  local pending_row = deepcopy(design_row)
+  pending_row.gates.progression_safe = c7_contracts.gate.pending("compiler-contract:pending-progression")
+  pending_row.technology_design = technology_design.from_generation_row(pending_row)
+  local pending_qualification = c7_contracts.safety.from_design(
+    pending_row.technology_design, pending_row, nil, {validated = true})
+  if pending_qualification.decision ~= "proposal"
+    or #pending_qualification.unresolved_gates ~= 1
+    or pending_qualification.unresolved_gates[1] ~= "progression_safe" then
+    fail("pending hard gate was represented as a false pass or terminal rejection")
+  end
+  local failed_gate = c7_contracts.gate.failed("compiler-contract:graph", "fixture-cycle", {"cycle:a-b"})
+  local superseded_gate = c7_contracts.gate.supersede(
+    c7_contracts.gate.pending("compiler-contract:provisional"), "compiler-contract:graph", failed_gate)
+  c7_contracts.gate.validate(superseded_gate)
+  expect_error("tampered gate evidence", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(failed_gate)
+    tampered.evidence = {"cycle:tampered"}
+    c7_contracts.gate.validate(tampered)
+  end)
+  local diagnostic_design = technology_design.as_diagnostic_alternative(normalized_design, "fixture-diagnostic")
+  if diagnostic_design.materialization.kind ~= "diagnose"
+    or diagnostic_design.design.ownership.value.action ~= "diagnose"
+    or diagnostic_design.maturity.runtime_action ~= "diagnose"
+    or diagnostic_design.context.runtime_action ~= nil then
+    fail("TechnologyDesign diagnostic conversion wrote runtime action to the wrong object or violated invariants")
+  end
+end
 local lifecycle_catalog = technology_catalog.from_generation_rows({design_row}, {fixture = "lifecycle"})
 technology_catalog.validate(lifecycle_catalog)
 local trusted_lifecycle_catalog = technology_catalog.from_generation_rows(
@@ -504,6 +563,45 @@ if candidate.candidate_id ~= normalized_design.candidate_id
   or #lifecycle_catalog.alternative_qualifications ~= 2
   or #lifecycle_catalog.current_selections ~= 1 then
   fail("technology candidate catalog and qualification records are inconsistent")
+end
+do
+  local second_design_row = emitted_row("technology-design-contract-b", "technology-design-contract-tech-b")
+  local ordered_catalog = technology_catalog.from_generation_rows(
+    {design_row, second_design_row}, {fixture = "catalog-order"})
+  local reversed_catalog = technology_catalog.from_generation_rows(
+    {second_design_row, design_row}, {fixture = "catalog-order"})
+  if ordered_catalog.catalog_fingerprint ~= reversed_catalog.catalog_fingerprint
+    or ordered_catalog.selection_fingerprint ~= reversed_catalog.selection_fingerprint then
+    fail("TechnologyCatalog selection depends on candidate discovery order")
+  end
+  local assessment = c7_contracts.assessment.new({
+    candidate_id = candidate.candidate_id,
+    design_fingerprint = normalized_design.design_fingerprint,
+    qualification_fingerprint = qualification.qualification_fingerprint,
+    profile_id = "compiler-contract-profile",
+    status = "PASS",
+    evidence_sha256 = {"ASSESSMENT-EVIDENCE"}
+  })
+  local promotion_record = c7_contracts.promotion.new({
+    authorization_id = "promotion-authorization/compiler-contract/1",
+    candidate_id = candidate.candidate_id,
+    design_fingerprint = normalized_design.design_fingerprint,
+    safety_qualification_fingerprint = qualification.qualification_fingerprint,
+    provider_id = "mir.fixture-provider",
+    provider_version = "1",
+    quality_policy_version = "1",
+    trust_class = "mir-reviewed",
+    applicability_envelope = {factorio_line = "2.1", fixture = "compiler-contracts"},
+    profile_fingerprints = {"PROFILE"},
+    quality_assessment_fingerprints = {assessment.assessment_fingerprint},
+    upgrade_evidence_sha256 = {"UPGRADE"},
+    performance_evidence_sha256 = {"PERFORMANCE"},
+    human_review = {decision = "approved", reviewer = "fixture-reviewer"}
+  })
+  if not c7_contracts.promotion.is_reviewed_trust(promotion_record)
+    or c7_contracts.registry.snapshot().trust_authority ~= "mir-owned-source" then
+    fail("promotion authorization did not keep design quality and trust as explicit independent contracts")
+  end
 end
 local approval_envelope = applicability_envelope.new({
   envelope_id = "compiler-contract-fixture-v1",
@@ -983,9 +1081,13 @@ expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function()
 
 local production_context = compiler_context.current()
 local production_graph_parity = production_context:artifact("technology_graph_parity")
-if not production_graph_parity or production_graph_parity.schema ~= 1
+if not production_graph_parity or production_graph_parity.schema ~= 2
   or production_graph_parity.valid ~= true
   or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
+  or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
+  or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
+  or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
+  or type(production_graph_parity.proof_fingerprint) ~= "string"
   or type(production_graph_parity.parity_fingerprint) ~= "string" then
   fail("emitted and planned technology graphs do not have exact parity evidence")
 end
@@ -1066,6 +1168,18 @@ if projected_decisions ~= canonical_decision_count then
 end
 local first_context = compiler_context.new()
 first_context:set_state("fixture-derived-state", {value = 1})
+first_context:set_state("fixture-epoch-state", {value = 1})
+local _, epoch = first_context:replace_epoch("fixture-epoch-state", {value = 2}, 1)
+if epoch ~= 2 or first_context:state_view("fixture-epoch-state").value ~= 2 then
+  fail("CompilerContext explicit state epoch replacement is inconsistent")
+end
+expect_error("CompilerContext stale epoch", "epoch mismatch", function()
+  first_context:replace_epoch("fixture-epoch-state", {value = 3}, 1)
+end)
+first_context:freeze_state("fixture-epoch-state")
+expect_error("CompilerContext frozen state", "state is frozen", function()
+  first_context:replace_epoch("fixture-epoch-state", {value = 4}, 2)
+end)
 first_context:record_artifact("fixture-artifact", {value = 2})
 science_packs.all_lab_inputs()
 science_packs.pack_production_status("automation-science-pack")
@@ -1073,10 +1187,21 @@ science_packs.technology_is_enabled_and_reachable("automation")
 science_packs.mod_progression_packs_for({"automation-science-pack"})
 for _, key in ipairs({
   "lab_input_index", "science_pack_recipe_status", "science_pack_production",
-  "technology_researchability", "prerequisite_order_cache", "mod_progression_cache"
+  "technology_researchability_index", "mod_progression_cache"
 }) do
   if not first_context:has_state(key) then fail("science/progression cache was not context-owned: " .. key) end
 end
+if not first_context:has_service("science.pack_production_status")
+  or not first_context:has_service("science.technology_researchability_reason") then
+  fail("science dependency callbacks were not CompilerContext-owned services")
+end
+expect_error("CompilerContext duplicate service", "registered more than once", function()
+  first_context:set_service("science.pack_production_status", function() return "invalid" end)
+end)
+first_context:freeze_services()
+expect_error("CompilerContext frozen services", "services are frozen", function()
+  first_context:set_service("fixture.late-service", function() return true end)
+end)
 local second_context = compiler_context.new()
 if second_context:has_state("fixture-derived-state")
   or second_context:artifact("fixture-artifact") ~= nil then
@@ -1084,12 +1209,16 @@ if second_context:has_state("fixture-derived-state")
 end
 for _, key in ipairs({
   "lab_input_index", "science_pack_recipe_status", "science_pack_production",
-  "technology_researchability", "prerequisite_order_cache", "mod_progression_cache"
+  "technology_researchability_index", "mod_progression_cache"
 }) do
   if second_context:has_state(key) then fail("science/progression cache crossed CompilerContext boundary: " .. key) end
 end
 compiler_context.activate(first_context)
+local telemetry_before_snapshot = fingerprint.of(first_context:state_snapshot("compiler_telemetry"))
 local first_snapshot = first_context:snapshot()
+if telemetry_before_snapshot ~= fingerprint.of(first_context:state_snapshot("compiler_telemetry")) then
+  fail("CompilerContext snapshot mutated live telemetry state")
+end
 first_snapshot.state["fixture-derived-state"].value = 99
 first_snapshot.artifacts["fixture-artifact"].value = 99
 if first_context:state_view("fixture-derived-state").value ~= 1

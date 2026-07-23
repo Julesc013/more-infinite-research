@@ -48,7 +48,10 @@ data:extend({
         stream = "research_auto_assembling_machine",
         action = "generate",
         evidence = {"upgrade-matrix-automatic-family"},
-        claim_boundary = "fixture-only"
+        claim_boundary = "fixture-only",
+        promotion_authorization_id = "mir.reviewed.upgrade-automatic-family-v1",
+        trust_class = "mir-reviewed",
+        provider_version = "family-rule-v3"
       }},
       candidate_seeds = {{
         recipe = "mir-upgrade-auto-assembler-recipe",

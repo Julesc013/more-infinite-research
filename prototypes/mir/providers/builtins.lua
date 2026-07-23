@@ -17,7 +17,12 @@ local COMMON_DENY_RISKS = {
 local COMMON_CARDINALITY = {
   maximum_candidates = 256,
   maximum_attachments = 128,
-  maximum_review_required = 64
+  maximum_review_required = 64,
+  maximum_new_attachments = 128,
+  maximum_growth_percent = 400,
+  maximum_progression_span = 1,
+  maximum_semantic_clusters = 256,
+  maximum_unreviewed = 128
 }
 
 local function structural_rule(provider_id, row)

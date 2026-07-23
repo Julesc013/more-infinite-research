@@ -691,12 +691,20 @@ fixtures:
       - contributing-rejection-reasons
       - bounded-rejection-cause-graph
       - technology-design-schema-2-normalization
+      - technology-design-closed-enum-and-cross-field-invariants
       - technology-design-field-provenance-and-locks
       - technology-design-cross-field-invariants
       - technology-design-executable-locks
       - technology-design-typed-subjects
       - technology-candidate-schema-1-normalization
       - technology-qualification-schema-1-hard-gates
+      - pending-hard-gate-produces-proposal
+      - failed-hard-gate-produces-rejection
+      - superseded-gate-history
+      - authoritative-gate-evidence-fingerprint
+      - diagnostic-materialization-runtime-invariant
+      - independent-safety-quality-and-promotion-records
+      - mir-owned-reviewed-promotion-trust
       - technology-design-qualification-refresh-parity
       - technology-design-qualification-refresh-identity-rejection
       - partial-effect-sanitation-technology-design-rebuild
@@ -731,13 +739,26 @@ fixtures:
       - provider-diagnostic-planner-decision-fingerprint-parity
       - no-duplicate-loader-or-mining-discovery
       - technology-catalog-schema-2-preselection
+      - technology-catalog-always-built
+      - deterministic-order-independent-catalog-selection
+      - generation-plan-catalog-projection
       - every-catalog-alternative-independently-qualified
       - rejected-catalog-alternative-cannot-be-selected
       - emitted-planned-technology-graph-parity
+      - shared-virtual-actual-graph-semantic-parity
+      - graph-snapshot-component-condensation-and-proof-fingerprints
       - science-and-progression-cache-context-isolation
       - duplicate-provider-id-rejection
       - provider-snapshot-copy-isolation
+      - provider-pipeline-stage-isolation
+      - reviewed-attachment-preserving-cardinality-budget
+      - new-unreviewed-only-cardinality-suppression
       - compiler-context-state-and-artifact-isolation
+      - compiler-context-schema-3-service-isolation
+      - compiler-context-service-freeze
+      - compiler-context-state-epoch-replacement
+      - compiler-context-state-freeze
+      - compiler-context-observationally-pure-snapshot
       - planning-only-provider-emission-adapters
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion

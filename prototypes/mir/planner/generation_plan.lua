@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 local Plan = {}
@@ -41,17 +42,8 @@ end
 
 local function validate_gate(row, gate_name)
   local gate = row.gates[gate_name]
-  if type(gate) ~= "table" or type(gate.passed) ~= "boolean"
-    or type(gate.status) ~= "string" or type(gate.evidence) ~= "table" then
-    error("GenerationPlan row gate must be an evidence record: " .. gate_name, 3)
-  end
-  if gate.status ~= "passed" and gate.status ~= "failed" and gate.status ~= "not-applicable" then
-    error("GenerationPlan row gate has unsupported status: " .. gate_name, 3)
-  end
-  if gate.status == "failed" and gate.passed then
-    error("GenerationPlan failed gate cannot pass: " .. gate_name, 3)
-  end
-  if row.action ~= "skip" and not gate.passed then
+  gate_contract.validate(gate)
+  if row.action ~= "skip" and gate.status == "failed" then
     error("GenerationPlan materializing row failed gate " .. gate_name .. ": " .. row.stream_key, 3)
   end
 end

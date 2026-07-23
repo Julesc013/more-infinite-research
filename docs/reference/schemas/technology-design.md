@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -17,6 +17,8 @@ superseded_by: []
 The required design dimensions are `identity`, `effects`, `progression`, `cost`, `presentation`, `ownership`, and `runtime_contracts`. Every dimension and leaf provenance record declares `present`, `value`, `source`, `evidence_class`, `lock_state`, `locked`, and `lock_policy`. `locked` remains a compatibility boolean and is true only when `lock_state` is `all`; the authoritative states are `none`, `partial`, and `all`.
 
 `materialization.kind` is `create`, `patch-existing`, `continuation`, or `diagnose`. It is part of design identity. The common emitter accepts only `create` and `continuation`; patch operations require a transaction that verifies their input and output fingerprints.
+
+Materialization, maturity, validation-evidence, identity, runtime-action, and public-claim values are closed enums. Cross-field validation is fail-closed: `diagnose` designs cannot declare an emitting runtime action, creating designs cannot claim an existing owner, patch designs must bind their transaction target and input/output identities, and an emitted or adopted design cannot remain proposal-only. Validation writes diagnostics to the design being validated; it never repairs or mutates the caller's context object.
 
 Leaf records remain authoritative. A dimension is `partial` when only some leaves are locked, such as a released technology ID with an adaptive candidate ID or reviewed localized text with fallback-derived icons. `adaptive-within-envelope` fields require a machine-readable envelope. `TechnologyDesign.diff`, `TechnologyDesign.assert_locks`, and `TechnologyDesign.merge` enforce locked paths and adaptive envelopes during policy composition.
 
@@ -44,6 +46,12 @@ The canonical projections are `graph_projection`, `prototype_projection`, `prese
 Identity stability is not inferred from a non-empty proposed technology name. It is one of `unassigned`, `provisional`, `reserved`, `stable-unreleased`, `released`, or `retired`, and it must match `identity_authority.state`. Existing fixed streams use their legacy stream-manifest authority. The two predeclared 3.1 automatic-family identities explicitly declare `identity_state = released`; a future procedural candidate defaults to `provisional` until a promotion authority says otherwise.
 
 The design-maturity state machine is `proposed` to `experimental` to `automation-qualified` to `human-reviewed` to `promoted` to `released-canonical`. Validation evidence is independently `none`, `fixture`, `exact-mod`, `exact-ecosystem`, `upgrade-qualified`, or `interactive-qualified`. Passing a safety gate never promotes identity, validation, design, applicability, runtime action, or a public claim.
+
+## Hard-gate lifecycle
+
+Every hard gate is an explicit record with one of `not-applicable`, `pending`, `passed`, `failed`, or `superseded`. A `pending` gate yields a proposal, not a false pass or terminal rejection. `passed` and `failed` gates are authoritative only when they bind an evaluator identity, sorted evidence, and the canonical evidence fingerprint. `superseded` preserves the prior and replacement identities so provisional planner evidence cannot be confused with final graph or output evidence.
+
+`SafetyQualification` is the hard-gate aggregate. `DesignAssessment` evaluates quality independently. `PromotionAuthorization` records separately governed trust and evidence. None can be inferred from another.
 
 ## GenerationPlan boundary
 

@@ -1,6 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
-local effect_safety = require("prototypes.mir.emit.effect_safety")
-local icon_builder = require("prototypes.mir.emit.icon_builder")
+local effect_safety = require("prototypes.mir.domain.technology.effect_safety_policy")
+local icon_builder = require("prototypes.mir.presentation.icon_builder")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 

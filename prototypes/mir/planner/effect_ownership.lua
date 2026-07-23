@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 
@@ -48,11 +49,10 @@ local function non_materializing_gates(identity)
   }
   local out = {}
   for _, name in ipairs(names) do
-    out[name] = {
-      passed = true,
-      status = "not-applicable",
-      evidence = {"effect-ownership:" .. tostring(identity)}
-    }
+    out[name] = gate_contract.not_applicable(
+      "effect-ownership",
+      {"effect-ownership:" .. tostring(identity)}
+    )
   end
   return out
 end

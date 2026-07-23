@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 
@@ -56,8 +57,25 @@ local SCHEMA = {
     "members-match-subject-projection",
     "dimension-values-match-leaf-provenance",
     "dimension-lock-state-matches-leaf-locks",
-    "fingerprints-match-canonical-material"
+    "fingerprints-match-canonical-material",
+    "materialization-runtime-action-compatible",
+    "materialization-ownership-action-compatible",
+    "authoritative-gates-carry-evaluator-evidence"
   }
+}
+
+local MATERIALIZATION_RUNTIME_ACTIONS = {
+  create = {emit = true, preview = true, diagnose = true},
+  ["patch-existing"] = {adopt = true, ["patch-existing"] = true, diagnose = true},
+  continuation = {continuation = true, diagnose = true},
+  diagnose = {diagnose = true}
+}
+
+local MATERIALIZATION_OWNERSHIP_ACTIONS = {
+  create = {emit = true, diagnose = true},
+  ["patch-existing"] = {adopt = true, ["patch-existing"] = true, diagnose = true},
+  continuation = {emit = true, continuation = true, diagnose = true},
+  diagnose = {diagnose = true}
 }
 
 local DIMENSION_PATHS = {
@@ -377,6 +395,14 @@ function M.schema_authority()
   return deepcopy(SCHEMA)
 end
 
+local function reject_unknown_fields(record, allowed, label)
+  for key in pairs(record or {}) do
+    if not allowed[key] then
+      error("TechnologyDesign " .. label .. " contains unknown field: " .. tostring(key), 3)
+    end
+  end
+end
+
 local function validate(design, verify_fingerprints)
   if type(design) ~= "table" or design.schema ~= SCHEMA.schema then
     error("TechnologyDesign schema 2 record is required.", 2)
@@ -394,6 +420,15 @@ local function validate(design, verify_fingerprints)
     or not MATERIALIZATION_KINDS[design.materialization.kind] then
     error("TechnologyDesign materialization is invalid.", 2)
   end
+  local materialization_fields = {
+    create = {kind = true},
+    ["patch-existing"] = {
+      kind = true, target = true, operation = true, configured_fields = true, expected_snapshot = true
+    },
+    continuation = {kind = true, base_technology = true, chain_key = true},
+    diagnose = {kind = true}
+  }
+  reject_unknown_fields(design.materialization, materialization_fields[design.materialization.kind], "materialization")
   if design.materialization.kind == "patch-existing" and
     (type(design.materialization.target) ~= "string" or design.materialization.target == ""
       or type(design.materialization.operation) ~= "string" or design.materialization.operation == ""
@@ -448,6 +483,7 @@ local function validate(design, verify_fingerprints)
     end
   end
   if type(design.maturity) ~= "table" then error("TechnologyDesign maturity is required.", 2) end
+  reject_unknown_fields(design.maturity, MATURITY_ENUMS, "maturity")
   for axis, allowed in pairs(MATURITY_ENUMS) do
     if not allowed[design.maturity[axis]] then
       error("TechnologyDesign maturity axis is invalid: " .. axis, 2)
@@ -456,6 +492,10 @@ local function validate(design, verify_fingerprints)
   if type(design.gates) ~= "table" or type(design.context) ~= "table"
     or type(design.identity_authority) ~= "table" then
     error("TechnologyDesign qualification context is invalid.", 2)
+  end
+  for gate_name, gate in pairs(design.gates) do
+    if type(gate_name) ~= "string" then error("TechnologyDesign gate name is invalid.", 2) end
+    gate_contract.validate(gate)
   end
   local identity = design.design.identity.value
   if design.technology_id ~= identity.technology_name
@@ -466,6 +506,17 @@ local function validate(design, verify_fingerprints)
   end
   if identity.identity_state == "released" and (not design.technology_id or design.technology_id == "") then
     error("TechnologyDesign released identity lacks a technology_id.", 2)
+  end
+  local materialization_kind = design.materialization.kind
+  local ownership_action = design.design.ownership.value.action
+  local runtime_action = design.maturity.runtime_action
+  if not MATERIALIZATION_RUNTIME_ACTIONS[materialization_kind][runtime_action] then
+    error("TechnologyDesign materialization/runtime action mismatch: "
+      .. materialization_kind .. "/" .. tostring(runtime_action), 2)
+  end
+  if not MATERIALIZATION_OWNERSHIP_ACTIONS[materialization_kind][ownership_action] then
+    error("TechnologyDesign materialization/ownership action mismatch: "
+      .. materialization_kind .. "/" .. tostring(ownership_action), 2)
   end
   local expected_values = expected_dimension_values(design)
   for _, name in ipairs(SCHEMA.dimensions) do
@@ -566,6 +617,7 @@ function M.from_generation_row(row)
   materialization = materialization or {
     kind = row.action == "skip" and "diagnose" or "create"
   }
+  local ownership_action = materialization.kind == "diagnose" and "diagnose" or row.action
   local runtime_action = materialization.kind == "continuation" and "continuation"
     or materialization.kind == "patch-existing" and "patch-existing"
     or row.action == "skip" and "diagnose" or row.action
@@ -623,7 +675,7 @@ function M.from_generation_row(row)
   record("presentation.level", presentation.level, source, evidence_class, fixed)
   record("presentation.enabled", presentation.enabled, source, evidence_class, fixed)
   record("presentation.hidden", presentation.hidden, source, evidence_class, fixed)
-  record("ownership.action", row.action, source, evidence_class, fixed)
+  record("ownership.action", ownership_action, source, evidence_class, fixed)
   record("ownership.migration_policy", row.spec and row.spec.migration_policy, source, evidence_class, fixed)
   record("runtime_contracts.upgrade", fields.upgrade ~= false, source, evidence_class, fixed)
 
@@ -635,7 +687,7 @@ function M.from_generation_row(row)
     manifest_id = row.manifest_id
   }
   local ownership_value = {
-    action = row.action,
+    action = ownership_action,
     owner = adoption.owner,
     migration_policy = row.spec and row.spec.migration_policy
   }
@@ -705,7 +757,14 @@ function M.as_diagnostic_alternative(design, reason)
   result.materialization = {kind = "diagnose"}
   result.design.ownership.value.action = "diagnose"
   result.provenance.fields["ownership.action"].value = "diagnose"
-  result.context.runtime_action = "diagnose"
+  result.maturity.runtime_action = "diagnose"
+  result.gates = {}
+  for gate_name in pairs(design.gates or {}) do
+    result.gates[gate_name] = gate_contract.not_applicable(
+      "candidate-catalog:diagnostic-alternative",
+      {"candidate-catalog:safe-diagnostic-alternative"}
+    )
+  end
   result.context.action_reason = reason or "safe-diagnostic-alternative"
   M.refresh_fingerprints(result)
   M.validate(result)

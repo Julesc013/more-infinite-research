@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "layers": [
+    {"name": "domain", "prefix": "prototypes/mir/domain/"},
+    {"name": "graph", "prefix": "prototypes/mir/graph/"},
+    {"name": "planner", "prefix": "prototypes/mir/planner/"},
+    {"name": "presentation", "prefix": "prototypes/mir/presentation/"},
+    {"name": "emit", "prefix": "prototypes/mir/emit/"},
+    {"name": "providers", "prefix": "prototypes/mir/providers/"},
+    {"name": "compatibility", "prefix": "prototypes/mir/compatibility/"},
+    {"name": "pipeline", "prefix": "prototypes/mir/pipeline/"},
+    {"name": "platform", "prefix": "prototypes/mir/platform/"},
+    {"name": "core", "prefix": "prototypes/mir/core/"}
+  ],
+  "forbidden_edges": [
+    {"from": "domain", "to": "emit"},
+    {"from": "graph", "to": "emit"},
+    {"from": "planner", "to": "emit"}
+  ],
+  "exceptions": [
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/base_extensions.lua",
+      "reason": "bounded legacy orchestration bridge pending base-extension planner extraction"
+    },
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/stream_executor.lua",
+      "reason": "bounded legacy orchestration bridge invoked only by pipeline commands"
+    },
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/effect_safety.lua",
+      "reason": "bounded legacy integrity bridge; pure blocked-effect policy is already domain-owned"
+    },
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/mod_data.lua",
+      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
+    },
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
+    },
+    {
+      "source": "prototypes/mir/planner/compilation_plan.lua",
+      "target": "prototypes/mir/emit/compiler_evidence_adapter.lua",
+      "reason": "bounded legacy publication bridge invoked only by pipeline commands"
+    }
+  ],
+  "overlay_policy": {
+    "path": "prototypes/mir/compatibility/overlays",
+    "forbidden_tokens": ["data.raw", "data:extend", "data_raw."]
+  },
+  "cycle_exceptions": [
+    {
+      "members": [
+        "prototypes/mir/settings/catalog.lua",
+        "prototypes/mir/settings/effective.lua",
+        "prototypes/mir/settings/pipeline_extent.lua",
+        "prototypes/mir/settings/profile_codec.lua"
+      ],
+      "reason": "existing lazy settings facade cycle; frozen baseline blocks new members or new cycles"
+    }
+  ],
+  "command_authority": "prototypes/mir/pipeline/commands.lua"
+}

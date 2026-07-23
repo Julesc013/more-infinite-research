@@ -1,12 +1,14 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local pack_production_status = nil
 
-function M.configure(dependencies)
-  pack_production_status = assert(dependencies.pack_production_status, "lab compatibility requires pack production status")
+local function pack_production_status(...)
+  local service = compiler_context.current():service("science.pack_production_status")
+  if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
+  return service(...)
 end
 
 function M.ingredient_name(ingredient)
@@ -54,7 +56,6 @@ function M.valid_research_ingredients(ingredients)
 end
 
 function M.best_lab_compatible_ingredients(ingredients, context)
-  if not pack_production_status then error("MIR lab compatibility dependencies were not configured.", 2) end
   if policy() == "engine-default" then
     local unchanged = deepcopy(ingredients or {})
     local reachable = #unchanged > 0

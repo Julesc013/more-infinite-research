@@ -14,6 +14,8 @@ local compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evide
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local safety_qualification = require("prototypes.mir.domain.technology.safety_qualification")
 
 local M = {}
 local normalized_base_operation
@@ -64,26 +66,23 @@ local function sanitize_stream_artifact(stream_artifact)
         if #kept == 0 then
           row.action = "skip"
           row.reason = "no_valid_effect_targets"
-          row.gates.effect_valid = {
-            passed = false,
-            status = "failed",
-            evidence = {"effect-contracts:all-targets-missing"},
-            reason = "no_valid_effect_targets"
-          }
+          row.gates.effect_valid = gate_contract.failed(
+            "effect-contracts",
+            "no_valid_effect_targets",
+            {"effect-contracts:all-targets-missing"}
+          )
           skipped_count = skipped_count + 1
         else
-          row.gates.effect_valid = {
-            passed = true,
-            status = "passed",
-            evidence = {"effect-contracts:sanitized", "effect-contracts:remaining=" .. tostring(#kept)}
-          }
+          row.gates.effect_valid = gate_contract.passed(
+            "effect-contracts",
+            {"effect-contracts:sanitized", "effect-contracts:remaining=" .. tostring(#kept)}
+          )
         end
       else
-        row.gates.effect_valid = {
-          passed = true,
-          status = "passed",
-          evidence = {"effect-contracts:all-targets-exist"}
-        }
+        row.gates.effect_valid = gate_contract.passed(
+          "effect-contracts",
+          {"effect-contracts:all-targets-exist"}
+        )
       end
       -- Rebuild only when sanitation changed prototype semantics, ensuring the
       -- preliminary graph and final operation both consume the retained set.
@@ -144,15 +143,28 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
           row.diagnostics.status = "skipped"
           row.diagnostics.reason = rejection.code
         end
-        row.gates.prerequisites_acyclic = deepcopy(rejection)
-        row.gates.progression_safe = deepcopy(rejection)
+        row.gates.prerequisites_acyclic = gate_contract.failed(
+          "technology-graph",
+          rejection.code,
+          rejection.evidence
+        )
+        row.gates.progression_safe = gate_contract.failed(
+          "technology-graph",
+          rejection.code,
+          rejection.evidence
+        )
       else
-        row.gates.prerequisites_acyclic = graph_summary.proofs[row.technology_name] or {
-          passed = false,
-          status = "failed",
-          evidence = {"technology-graph:missing-proof"},
-          reason = "missing_graph_proof"
-        }
+        local proof = graph_summary.proofs[row.technology_name]
+        row.gates.prerequisites_acyclic = proof and deepcopy(proof) or gate_contract.failed(
+          "technology-graph",
+          "missing_graph_proof",
+          {"technology-graph:missing-proof"}
+        )
+        row.gates.progression_safe = deepcopy(row.gates.prerequisites_acyclic)
+        row.gates.output_identity_safe = gate_contract.passed(
+          "generation-plan",
+          {"generation-plan:unique-output-identity"}
+        )
         row.technology_design = technology_design.with_qualification(
           row.technology_design,
           row,
@@ -160,11 +172,22 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
         )
       end
     elseif row.action == "adopt" then
-      row.gates.prerequisites_acyclic = {
-        passed = true,
-        status = "not-applicable",
-        evidence = {"decision:non-materializing-row"}
-      }
+      row.gates.effect_valid = gate_contract.passed(
+        "native-owner-binding",
+        {"native-owner-binding:expected-output-validated"}
+      )
+      row.gates.prerequisites_acyclic = gate_contract.not_applicable(
+        "technology-graph",
+        {"native-owner-binding:prerequisites-unchanged"}
+      )
+      row.gates.progression_safe = gate_contract.not_applicable(
+        "technology-graph",
+        {"native-owner-binding:progression-unchanged"}
+      )
+      row.gates.output_identity_safe = gate_contract.passed(
+        "generation-plan",
+        {"generation-plan:unique-owner-identity"}
+      )
       row.technology_design = technology_design.with_qualification(
         row.technology_design,
         row,
@@ -202,6 +225,12 @@ local function materialized_stream_operations(artifact, options)
         error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
       end
       local design = row.technology_design
+      local qualification = safety_qualification.from_design(design, row, nil, {validated = true})
+      if qualification.decision ~= "qualified"
+        and not (options.virtual_projection and qualification.decision == "proposal") then
+        error("CompilationPlan cannot emit a design without complete structural safety qualification: "
+          .. tostring(row.stream_key), 2)
+      end
       table.insert(out, {
         schema = 2,
         operation = "emit_stream",
@@ -213,6 +242,12 @@ local function materialized_stream_operations(artifact, options)
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
+      local qualification = safety_qualification.from_design(row.technology_design, row, nil, {validated = true})
+      if qualification.decision ~= "qualified"
+        and not (options.virtual_projection and qualification.decision == "proposal") then
+        error("CompilationPlan cannot patch an owner without complete structural safety qualification: "
+          .. tostring(row.stream_key), 2)
+      end
       table.insert(out, {
         schema = 2,
         operation = "native_owner_binding",
@@ -432,7 +467,10 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
   local stream_effect_integrity
   stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact)
-  local operations = materialized_stream_operations(stream_artifact, {include_design = false})
+  -- This projection is input to the authoritative graph evaluator, not an
+  -- emission authorization. Pending graph gates remain explicit proposals.
+  local operations = materialized_stream_operations(
+    stream_artifact, {include_design = false, virtual_projection = true})
   local stream_operations = deepcopy(operations)
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan)
   local finalized_base = {}

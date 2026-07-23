@@ -6,7 +6,12 @@ local pack_registry = require("prototypes.mir.capabilities.science_integration.p
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local prereq_tech_for_science_pack = nil
+
+local function prereq_tech_for_science_pack(...)
+  local service = compiler_context.current():service("science.prereq_tech_for_science_pack")
+  if not service then error("MIR science prerequisite service is not registered in CompilerContext.", 2) end
+  return service(...)
+end
 
 local function mod_progression_cache()
   return compiler_context.current():state_view("mod_progression_cache", function() return {} end)
@@ -99,13 +104,6 @@ local EXTENSION_PACKS = {
   }
 }
 
-function M.configure(dependencies)
-  prereq_tech_for_science_pack = assert(
-    dependencies.prereq_tech_for_science_pack,
-    "science selection policy requires pack prerequisite lookup"
-  )
-end
-
 local function selected_pack_cache_key(selected_packs)
   local names = {}
   for _, pack in ipairs(selected_packs or {}) do
@@ -143,7 +141,6 @@ function M.official_progression_packs_for(selected_packs)
 end
 
 function M.mod_progression_packs_for(selected_packs)
-  if not prereq_tech_for_science_pack then error("MIR science selection dependencies were not configured.", 2) end
   local key = selected_pack_cache_key(selected_packs)
   local cache = mod_progression_cache()
   if cache[key] then return deepcopy(cache[key]) end

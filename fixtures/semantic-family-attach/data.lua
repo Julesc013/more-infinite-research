@@ -134,7 +134,10 @@ table.insert(prototypes, {
         stream = "research_auto_assembling_machine",
         action = "generate",
         evidence = {"semantic-family-attach"},
-        claim_boundary = "fixture-only"
+        claim_boundary = "fixture-only",
+        promotion_authorization_id = "mir.reviewed.semantic-family-fixture-v1",
+        trust_class = "mir-reviewed",
+        provider_version = "family-rule-v3"
       }},
       candidate_seeds = {{
         recipe = "pack-only-recipe",

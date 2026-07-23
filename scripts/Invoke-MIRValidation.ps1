@@ -426,9 +426,9 @@ Invoke-RepoCheck "default-off scripted streams remain guarded" {
 }
 
 Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
-  $safetyPath = Join-Path $repo "prototypes\mir\emit\effect_safety.lua"
+  $safetyPath = Join-Path $repo "prototypes\mir\domain\technology\effect_safety_policy.lua"
   if (-not (Test-Path -LiteralPath $safetyPath)) {
-    throw "Missing technology effect safety guard: prototypes/mir/emit/effect_safety.lua"
+    throw "Missing technology effect safety policy: prototypes/mir/domain/technology/effect_safety_policy.lua"
   }
 
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
@@ -458,8 +458,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "output"})' },
     @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'for _, target in ipairs(contract.targets or {}) do' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_qualification.validate_operations(plan.operations, {actual = true})' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'expected.graph_fingerprint, actual.graph_fingerprint' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 
@@ -469,7 +469,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     }
   }
 
-  $safetyRelative = "prototypes/mir/emit/effect_safety.lua"
+  $safetyRelative = "prototypes/mir/domain/technology/effect_safety_policy.lua"
   $prototypeLuaFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes") -Recurse -File -Filter "*.lua"
   foreach ($file in $prototypeLuaFiles) {
     $relative = Get-RepoRelativePath $file.FullName
@@ -678,7 +678,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua")
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\platform\factorio\prototype_lookup.lua")
-  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\icon_builder.lua")
+  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\presentation\icon_builder.lua")
   $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
@@ -853,17 +853,17 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technology_effects = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "worker-robots-battery-6", type = "worker-robot-battery", modifier = 0.70, max_level = "infinite"' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'mir-use-installed-space-age-icons' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'mir-use-installed-space-age-icons' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
     @{ File = "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
     @{ File = "prototypes\mir\platform\factorio\prototype_lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'required_fluids' },
@@ -881,7 +881,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'MAX_PIPELINE_EXTENT = 4294967295' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incineration$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incinerate$"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },

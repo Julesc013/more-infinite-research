@@ -11,6 +11,8 @@
     "selectors", "normalizers", "partitioner", "tier_resolver", "effect_model", "science_model",
     "prerequisite_model", "cost_model", "presentation_model", "ownership_policy", "grouping"
   ],
+  "generation_gate_statuses": ["not-applicable", "pending", "passed", "failed", "superseded"],
+  "authoritative_gate_material": ["evaluator", "evidence", "evidence_fingerprint"],
   "family_operator_safety": ["data-only", "registered-only", "fail-closed", "no-prototype-mutation"],
   "compatibility_pack_fields": [
     "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
@@ -36,6 +38,9 @@
   "technology_lifecycle_schemas": {
     "TechnologyCandidate": 1,
     "TechnologyQualification": 1,
+    "SafetyQualification": 1,
+    "DesignAssessment": 1,
+    "PromotionAuthorization": 1,
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
@@ -77,7 +82,11 @@
   "mutation_sentinels": [
     "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority", "native-owner-patch-design-authority"
   ],
-  "compiler_context_schema": 2,
+  "promotion_trust_classes": [
+    "fixture-only", "local-user", "external-mod-author", "mir-reviewed", "protected-release"
+  ],
+  "reviewed_mode_trust_classes": ["mir-reviewed", "protected-release"],
+  "compiler_context_schema": 3,
   "public_compiler_artifact_schema": 1,
   "public_compiler_artifact_kinds": [
     "mir-generation-plan-public", "mir-coverage-public", "mir-compiler-evidence-public"
@@ -89,12 +98,12 @@
   ],
   "context_owned_state": [
     "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
-    "technology-researchability-cache", "prerequisite-order-cache", "pack-production-reachability-cache",
+    "technology-researchability-index", "pack-production-reachability-cache",
     "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
     "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",
     "technology-qualifications", "generation-plan", "compilation-plan", "technology-graph-parity",
     "generated-technology-registry", "productivity-family-adoption",
-    "coverage-report", "compiler-telemetry", "diagnostics"
+    "coverage-report", "compiler-telemetry", "diagnostics", "context-services", "state-epochs"
   ],
   "positive_negative_required": true,
   "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"

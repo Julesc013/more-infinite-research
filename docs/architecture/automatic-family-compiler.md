@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -18,7 +18,7 @@ MIR 3.1.5 defines `CompilerProvider` schema 1 as the extension boundary above Fa
 
 Providers cannot mutate prototypes. Their adapter produces planner input; FamilyRule resolution produces declarative candidate and attachment records; GenerationPlan and CompilationPlan arbitrate ownership and validate identities; emission alone materializes technologies. Duplicate provider IDs, behavioral descriptors, registry-order drift, direct mutation claims, and provider/family identity mismatches fail before planning.
 
-The semantic stages are discovery, normalization, identity, capability classification, policy, planning, graph construction, validation, emission, runtime registration, and diagnostics/evidence. Runtime registration is absent unless a provider explicitly uses a separately governed handler. Candidate records retain the provider ID, source key and prototype identity, family, final state, capabilities, recipe/item target, policy scope, stable identity seed, diagnostic provenance, target support, and emission ownership.
+The provider stages are explicit immutable transforms: discovery, normalization, classification, pack policy, hazard policy, owner arbitration, decision, and budget. Runtime registration is absent unless a provider explicitly uses a separately governed handler. Candidate records retain the provider ID and version, source key and prototype identity, family, final state, capabilities, recipe/item target, policy scope, promotion class, stable identity seed, diagnostic provenance, target support, and emission ownership.
 
 MIR 3.0.5 is the published immutable behavior baseline. MIR 3.1.0 turns its fixed declarative stream compiler into a plan-first semantic family compiler on `dev`. Earlier 3.1.0 candidate artifacts and tags are superseded development evidence, not published release authority.
 
@@ -29,6 +29,7 @@ final prototype state
 -> RecipeFactV2 and shared indexes
 -> data-only FamilyRule registry
 -> capability candidates and decisions
+-> canonical TechnologyCatalog and deterministic selection
 -> pure GenerationPlan schema 3
 -> globally finalized CompilationPlan schema 2
 -> emission
@@ -42,6 +43,8 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 
 `DecisionRecordV2` keeps typed evidence classes instead of treating a formatted confidence string as authority. Confidence ranks review evidence; hard safety gates remain independent pass/fail records and cannot be averaged into an emission decision.
 
+Cardinality policy is scoped by provider, family, partition, and profile. It measures absolute candidates, attachments, review rows, new candidates, unreviewed candidates, retained-baseline growth, progression span, and semantic clusters. Overflow can suppress only `new-unreviewed` proposals. Exact-reviewed attachments remain eligible, and hard-safety blockers remain visible diagnostics rather than disappearing to make a count pass.
+
 ## Compatibility And Identity Boundary
 
 - Preserve all 70 released stream and technology IDs.
@@ -50,7 +53,7 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 - Ambiguous, risky, loop-forming, hidden, or externally owned candidates remain proposal-only or diagnostic-only.
 - Compatibility packs contain selectors, policy, expected decisions, and claim metadata. They do not read `data.raw` or mutate prototypes. Hard safety facts are never data-overridable.
 - The schema-2 automatic compiler policy separates action (`disabled`, `preview`, or `apply`) from research creation and reviewed-data requirements. The policy names no mods, recipes, technologies, or Factorio versions.
-- Every generatable family declares a creation maturity. Reviewed mode accepts only reviewed families with active exact-version, fixture-backed authorization; experimental families remain available only through the explicit broad opt-in lane.
+- Every generatable family declares a creation maturity. Reviewed mode requires an exact MIR-owned `PromotionAuthorization` reference whose pack, family, provider, provider version, trust class, and evidence all match. Only `mir-reviewed` and `protected-release` authorize reviewed creation; external self-assertion cannot.
 - A reviewed candidate seed may add one exact recipe to an existing FamilyRule and stable stream; every hard gate still applies.
 - Fixture-only profiles belong to fixture data, not the production profile registry.
 

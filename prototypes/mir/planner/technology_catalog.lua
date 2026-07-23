@@ -3,6 +3,8 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local technology_candidate = require("prototypes.mir.domain.technology.technology_candidate")
 local technology_qualification = require("prototypes.mir.domain.technology.technology_qualification")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local selection_policy = require("prototypes.mir.planner.technology_selection_policy")
 
 local M = {}
 local SCHEMA = 2
@@ -22,11 +24,10 @@ local function safe_diagnostic_row(row)
   copy.reason = nil
   copy.gates = {}
   for gate_name in pairs(row.gates or {}) do
-    copy.gates[gate_name] = {
-      passed = true,
-      status = "not-applicable",
-      evidence = {"candidate-catalog:safe-diagnostic-alternative"}
-    }
+    copy.gates[gate_name] = gate_contract.not_applicable(
+      "candidate-catalog:diagnostic-alternative",
+      {"candidate-catalog:safe-diagnostic-alternative"}
+    )
   end
   return copy
 end
@@ -123,7 +124,7 @@ function M.from_preselection_rows(rows, context_material, options)
     current_selections = {},
     context_fingerprint = fingerprint.of(context_material or {}),
     mutation_authority = false,
-    selection_authority = "generation-plan-shadow"
+    selection_authority = "deterministic-policy-v1"
   }
   catalog.candidate_catalog_fingerprint = fingerprint.of(candidates)
   catalog.qualification_catalog_fingerprint = fingerprint.of(qualifications)
@@ -137,34 +138,7 @@ end
 function M.bind_selections(catalog, rows)
   M.validate(catalog)
   local result = deepcopy(catalog)
-  local candidates_by_key = {}
-  for _, candidate in ipairs(result.candidates) do candidates_by_key[candidate.selection_key] = candidate end
-  local selections = {}
-  for _, row in ipairs(rows or {}) do
-    local candidate = candidates_by_key[selection_key(row)]
-    if not candidate then error("TechnologyCatalog selection has no candidate: " .. selection_key(row), 2) end
-    local wanted = (row.action == "emit" or row.action == "adopt") and row.action or "diagnose"
-    local selected
-    for _, alternative in ipairs(candidate.alternatives) do
-      if alternative.action == wanted then selected = alternative break end
-    end
-    if not selected then
-      error("TechnologyCatalog selected action does not exist: " .. candidate.candidate_id .. "/" .. wanted, 2)
-    end
-    if selected.qualification_decision ~= "qualified" then
-      error("TechnologyCatalog cannot select a rejected alternative: " .. candidate.candidate_id, 2)
-    end
-    table.insert(selections, {
-      selection_key = candidate.selection_key,
-      candidate_id = candidate.candidate_id,
-      alternative_id = selected.alternative_id,
-      action = selected.action,
-      reason = row.reason,
-      design_fingerprint = selected.design_fingerprint,
-      qualification_fingerprint = selected.qualification_fingerprint
-    })
-  end
-  table.sort(selections, function(left, right) return left.candidate_id < right.candidate_id end)
+  local selections = selection_policy.select(result, rows)
   result.current_selections = selections
   result.selection_fingerprint = fingerprint.of(selections)
   result.catalog_fingerprint = fingerprint.of(catalog_material(result))
@@ -180,8 +154,8 @@ function M.validate(catalog)
   if type(catalog) ~= "table" or catalog.schema ~= SCHEMA
     or type(catalog.candidates) ~= "table" or type(catalog.qualifications) ~= "table"
     or type(catalog.alternative_qualifications) ~= "table" or type(catalog.current_selections) ~= "table"
-    or catalog.mutation_authority ~= false or catalog.selection_authority ~= "generation-plan-shadow" then
-    error("TechnologyCatalog schema 2 shadow artifact is required.", 2)
+    or catalog.mutation_authority ~= false or catalog.selection_authority ~= "deterministic-policy-v1" then
+    error("TechnologyCatalog schema 2 canonical preselection inventory is required.", 2)
   end
   local alternatives, qualifications = {}, {}
   for _, qualification in ipairs(catalog.qualifications) do
@@ -212,7 +186,8 @@ function M.validate(catalog)
   end
   for _, selection in ipairs(catalog.current_selections) do
     local alternative = alternatives[selection.candidate_id .. "/" .. selection.alternative_id]
-    if not alternative or alternative.qualification_decision ~= "qualified"
+    if not alternative or (alternative.qualification_decision ~= "qualified"
+        and alternative.qualification_decision ~= "proposal")
       or alternative.action ~= selection.action
       or alternative.design_fingerprint ~= selection.design_fingerprint
       or alternative.qualification_fingerprint ~= selection.qualification_fingerprint then

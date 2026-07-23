@@ -4,23 +4,18 @@ local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local technology_researchability_reason = nil
+
+local function technology_researchability_reason(...)
+  local service = compiler_context.current():service("science.technology_researchability_reason")
+  if not service then error("MIR technology-researchability service is not registered in CompilerContext.", 2) end
+  return service(...)
+end
 
 local function science_pack_resolution_cache()
   return compiler_context.current():state_view("science_pack_production", function() return {} end)
 end
 
-function M.configure(dependencies)
-  technology_researchability_reason = assert(
-    dependencies.technology_researchability_reason,
-    "pack production reachability requires technology researchability"
-  )
-end
-
 function M.pack_production_status(pack_name, visiting_packs)
-  if not technology_researchability_reason then
-    error("MIR pack production reachability dependencies were not configured.", 2)
-  end
   local cache = science_pack_resolution_cache()
   local cached = cache[pack_name]
   if cached then return cached.status, cached.prerequisite end

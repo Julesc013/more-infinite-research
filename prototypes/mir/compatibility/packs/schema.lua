@@ -153,6 +153,11 @@ local function validate_family_authorizations(pack)
     if type(row.claim_boundary) ~= "string" or row.claim_boundary == "" then
       fail(pack, "family authorization requires a claim boundary")
     end
+    if type(row.promotion_authorization_id) ~= "string" or row.promotion_authorization_id == ""
+      or type(row.trust_class) ~= "string" or row.trust_class == ""
+      or type(row.provider_version) ~= "string" or row.provider_version == "" then
+      fail(pack, "family authorization requires a promotion id, trust class, and provider version")
+    end
     if not has_exact_applicable_version(pack) then
       fail(pack, "family authorization requires an exact applicable mod version")
     end

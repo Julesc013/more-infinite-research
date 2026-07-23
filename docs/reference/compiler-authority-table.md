@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -21,10 +21,18 @@ This table names one machine authority, validator, and reference contract for ea
 | Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `scripts/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
 | CompilerProvider | 1 | `prototypes/mir/providers/contract.lua` | `prototypes/mir/providers/registry.lua` and compiler-contract fixture | normalized FamilyRule provider adapter |
+| Provider pipeline and budget | 1 | `prototypes/mir/providers/pipeline/` | compiler-contract and scale fixtures | schema-3 ProviderDecision projection |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
 | TechnologyDesign | 2 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator, semantic schema-drift checks, and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
+| Technology hard gate | 1 | `prototypes/mir/domain/technology/gate.lua` | TechnologyDesign, SafetyQualification, and compiler-contract fixture | evidence-bearing planner and verifier decisions |
+| SafetyQualification | 1 | `prototypes/mir/domain/technology/safety_qualification.lua` | TechnologyCatalog and compiler-contract fixture | deterministic selection eligibility |
+| DesignAssessment | 1 | `prototypes/mir/domain/technology/design_assessment.lua` | lifecycle and compiler-contract fixtures | design review independent from safety |
+| PromotionAuthorization | 1 | `prototypes/mir/domain/technology/promotion_authorization.lua` and `promotion_registry.lua` | CompatibilityPack registry and compiler-contract fixture | reviewed automatic creation trust |
+| TechnologyCatalog | 2 | `prototypes/mir/planner/technology_catalog.lua` and `technology_selection_policy.lua` | GenerationPlan projection and compiler-contract fixture | canonical alternative inventory and current selection |
 | GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
 | CompilationPlan | 2 | `prototypes/mir/planner/compilation_plan.lua` | global operation finalization and output parity | governed stream and base-extension emission |
+| Shared technology graph | 1 | `prototypes/mir/graph/` | planner/emitter parity and compiler-contract fixtures | virtual and realized graph qualification |
+| CompilerContext | 3 | `prototypes/mir/pipeline/compiler_context.lua` | architecture and compiler-contract fixtures | run-owned services, state epochs, caches, and artifacts |
 | CompilerEvidence | 2 | `prototypes/mir/domain/evidence/compiler_evidence.lua` | postcondition publication, transport adapters, and content fingerprints | assurance evidence and sanitation review |
 | Public compiler artifact projections | 1 | `prototypes/mir/report/public_compiler_artifacts.lua` | architecture gate and compiler-contract fixtures | normal-load `mod-data` publication |
 | RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |

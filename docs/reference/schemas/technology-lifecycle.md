@@ -20,16 +20,21 @@ MIR uses one governed record chain for fixed and procedural technology work. `.m
 | --- | --- |
 | `TechnologyCandidate` schema 1 | Describes a semantic capability and typed subjects discovered by providers or the compatibility-preserving stream planner without choosing a released identity. |
 | `TechnologyDesign` schema 2 | Describes one materialization alternative and its complete prototype projection. |
-| `TechnologyQualification` schema 1 | Evaluates one design in one exact context, preserving hard gates, quality metrics, primary rejection, contributing rejections, and validation evidence. |
+| `TechnologyQualification` schema 1 | Compatibility name for the schema-1 hard-safety qualification contract. |
+| `SafetyQualification` schema 1 | Evaluates one design in one exact context and returns `qualified`, `proposal`, or `rejected` from explicit hard-gate states. |
+| `DesignAssessment` schema 1 | Records design-quality evaluation independently from hard safety and promotion trust. |
+| `PromotionAuthorization` schema 1 | Binds a named authorization, exact subject, trust class, provider version, and evidence without changing safety or quality. |
 | `TechnologyQualityAssessment` schema 1 | Applies one governed quality profile to an exact candidate, design, qualification, metric set, and evidence set without granting promotion authority. |
 | `TechnologyApproval` schema 1 | Records an approved, quarantined, or demoted maintainer decision with applicability, exact selected alternative, field locks, adaptive envelopes, evidence, reviewer, and time. |
 | `TechnologyApplicabilityEnvelope` schema 1 | Binds approved scope to exact Factorio lines, features, mods, finite structural predicates, positive and negative examples, and a maximum count of newly matched subjects. |
 | `TechnologyPromotion` schema 1 | Advances an identity through one permitted transition and binds an approval plus exact design fingerprint. |
 | `TechnologyMigration` schema 1 | Governs released identity changes and their save behavior. |
-| `TechnologyCatalog` schema 2 | Collects every applicable materializing and safe diagnostic alternative with its exact qualification before recording the current planner selection. It has no mutation or selection authority. |
+| `TechnologyCatalog` schema 2 | Canonically inventories every applicable materializing and safe diagnostic alternative with its exact qualification, then records deterministic current selections. It has no mutation or publication authority. |
 | `TechnologyPromotionAdmission` schema 1 | Fails closed over the exact catalog alternative, passing quality assessment, approval, applicability envelope, evidence, identity edge, migration policy, and field locks. |
 
-When diagnostics or preview mode requests lifecycle detail, the compiler materializes a context-owned schema-2 shadow catalog before current action selection is bound. The final GenerationPlan remains the selection authority. Every selectable alternative has an exact qualification, rejected alternatives cannot be selected, and the catalog cannot publish or mutate a prototype.
+Every compilation materializes the context-owned schema-2 catalog before the GenerationPlan is finalized. The catalog's pure selection policy sorts independent alternatives, excludes rejections, and records one current selection per candidate. The GenerationPlan must be an exact projection of those selections. Diagnostics control only whether detailed internal projections are published; they do not control whether the canonical catalog exists. The catalog cannot publish or mutate a prototype.
+
+Reviewed automatic generation is not authorized by an external pack's self-description. A pack must reference an exact authorization in MIR's source-owned promotion registry, and the pack ID, family ID, provider ID, provider version, trust class, and authorization ID must all match. Only `mir-reviewed` and `protected-release` satisfy reviewed mode; `fixture-only`, `local-user`, and `external-mod-author` remain non-promoting evidence classes.
 
 ## Identity transitions
 
