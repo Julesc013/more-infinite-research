@@ -35,6 +35,14 @@ function M.candidates(rule, indexes, seeds)
       if not item_name then
         item_name = "<review-required>"
       end
+      local ambiguity
+      if #item_candidates ~= 1 then
+        ambiguity = {
+          code = "ambiguous_candidate_seed",
+          candidate_items = item_candidates,
+          evidence = {"compatibility-pack-seed:exact-item-required"}
+        }
+      end
       by_key[seed.recipe .. "\0" .. item_name] = {
         recipe = seed.recipe,
         item = item_name,
@@ -43,11 +51,7 @@ function M.candidates(rule, indexes, seeds)
         evidence = deepcopy(seed.evidence),
         change = seed.change,
         tier = seed.tier,
-        ambiguity = #item_candidates == 1 and nil or {
-          code = "ambiguous_candidate_seed",
-          candidate_items = item_candidates,
-          evidence = {"compatibility-pack-seed:exact-item-required"}
-        }
+        ambiguity = ambiguity
       }
     end
   end

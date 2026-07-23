@@ -122,6 +122,12 @@ table.insert(prototypes, {
       applicability = {mods = {{id = "mir-fixture-semantic-family-attach", version = "= 0.1.0"}}},
       aliases = {},
       exact = {includes = {
+        {recipe = "assemble-alpha", family = "logistics-manufacturing", stream = "research_belts", change = 0.01},
+        {recipe = "assemble-beta", family = "mining-drill-manufacturing", stream = "research_mining_drill", change = 0.05},
+        {recipe = "assemble-gamma", family = "furnace-manufacturing", stream = "research_furnace", change = 0.02},
+        {recipe = "assemble-delta", family = "power-storage-and-generation", stream = "research_electric_energy", change = 0.02},
+        {recipe = "assemble-epsilon", family = "inserter-manufacturing", stream = "research_inserters", change = 0.01},
+        {recipe = "assemble-eta", family = "module-manufacturing", stream = "research_modules", change = 0.01},
         {recipe = "pack-hard-productivity-false", family = "assembling-machine-manufacturing"},
         {recipe = "pack-hard-recycling", family = "assembling-machine-manufacturing"}
       }, excludes = {}},

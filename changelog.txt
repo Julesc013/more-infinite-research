@@ -34,6 +34,7 @@ Version: 3.2.0
     - Preserved unrelated force recipe state during MIR configuration changes without globally reapplying technology effects.
     - Replaced recursive researchability traversal and prevented fatal safety assertions from suppressing diagnostic flushing.
     - Corrected four stable stream manifest policies to match native-owner binding for their Space Age families.
+    - Preserved exact singleton CompatibilityPack candidate seeds instead of incorrectly classifying every seed as ambiguous.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.9

@@ -2,6 +2,7 @@ local deepcopy = require("__more-infinite-research__.prototypes.mir.core.deepcop
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local family_registry = require("__more-infinite-research__.prototypes.mir.families.registry")
 local provider_registry = require("__more-infinite-research__.prototypes.mir.providers.registry")
+local provider_discovery = require("__more-infinite-research__.prototypes.mir.providers.pipeline.discovery")
 local diagnostic_codes = require("__more-infinite-research__.prototypes.mir.domain.diagnostics.codes")
 local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibility.packs.schema")
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
@@ -378,6 +379,37 @@ local authorization = pack_registry.authorizes_family_stream("research_auto_asse
 if not authorization or authorization.pack ~= "pack-operational" then fail("exact-pack family authorization was not resolved") end
 local seeds = pack_registry.candidate_seeds(active_operational)
 if #seeds ~= 1 or seeds[1].recipe ~= "seeded-recipe" then fail("CompatibilityPack candidate seed was not resolved") end
+local seeded_rule
+for _, rule in ipairs(family_registry.snapshot().rules) do
+  if rule.id == "assembling-machine-manufacturing" then seeded_rule = rule; break end
+end
+if not seeded_rule then fail("assembling-machine family rule is missing") end
+local exact_seed_candidates, ambiguous_seed_candidates
+compiler_context.with_active(compiler_context.new(), function()
+  local indexes = relationships.view()
+  exact_seed_candidates = provider_discovery.candidates(seeded_rule, indexes, seeds)
+  ambiguous_seed_candidates = provider_discovery.candidates(seeded_rule, indexes, {{
+    recipe = "missing-seeded-recipe",
+    family = "assembling-machine-manufacturing",
+    stream = "research_auto_assembling_machine",
+    change = 0.02
+  }})
+end)
+local exact_seed_candidate
+for _, row in ipairs(exact_seed_candidates) do
+  if row.recipe == "seeded-recipe" then exact_seed_candidate = row; break end
+end
+if not exact_seed_candidate or exact_seed_candidate.item ~= "seeded-item" or exact_seed_candidate.ambiguity ~= nil then
+  fail("exact singleton CompatibilityPack candidate seed was marked ambiguous")
+end
+local ambiguous_seed_candidate
+for _, row in ipairs(ambiguous_seed_candidates) do
+  if row.recipe == "missing-seeded-recipe" then ambiguous_seed_candidate = row; break end
+end
+if not ambiguous_seed_candidate or not ambiguous_seed_candidate.ambiguity
+  or ambiguous_seed_candidate.ambiguity.code ~= "ambiguous_candidate_seed" then
+  fail("candidate seed without one exact item did not remain review-required")
+end
 local roles = pack_registry.science_roles_for_stream("research_auto_assembling_machine", active_operational)
 if #roles ~= 1 or roles[1].pack ~= "automation-science-pack" then fail("CompatibilityPack science role was not consumed") end
 expect_error("CompatibilityPack transport identity", "transport key must match pack id", function()

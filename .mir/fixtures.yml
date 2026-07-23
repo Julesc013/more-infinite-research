@@ -759,6 +759,7 @@ fixtures:
       - provider-metrics-real-disposition-depth-time-byte-and-witness-measurements
       - incomplete-quality-measurement-never-passes
       - monotone-quality-severity
+      - exact-singleton-candidate-seed-not-ambiguous
       - ambiguous-provider-seed-review-required-without-crash
       - cross-family-attachment-ambiguity-review-required-without-crash
       - reviewed-attachment-preserving-cardinality-budget
