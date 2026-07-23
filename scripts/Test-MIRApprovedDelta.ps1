@@ -205,13 +205,13 @@ if (($actualScenarios -join "`n") -ne (($expectedScenarios | Sort-Object) -join 
   throw "Approved-delta scenario coverage differs from the governed seven-scenario matrix."
 }
 $expectedScenarioRows = @{
-  "approved-delta-automatic-family-controls" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
-  "approved-delta-base" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
-  "approved-delta-base-continuations" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
-  "approved-delta-compat-atan" = @{ baseline = 52; current = 53; differences = 28; technology_differences = 1 }
-  "approved-delta-compat-space-age-galore" = @{ baseline = 70; current = 71; differences = 27; technology_differences = 1 }
-  "approved-delta-native-owner-adoption" = @{ baseline = 70; current = 71; differences = 29; technology_differences = 3 }
-  "approved-delta-space-age" = @{ baseline = 70; current = 71; differences = 27; technology_differences = 1 }
+  "approved-delta-automatic-family-controls" = @{ baseline = 52; current = 53; differences = 30; technology_differences = 1 }
+  "approved-delta-base" = @{ baseline = 52; current = 53; differences = 30; technology_differences = 1 }
+  "approved-delta-base-continuations" = @{ baseline = 52; current = 53; differences = 30; technology_differences = 1 }
+  "approved-delta-compat-atan" = @{ baseline = 52; current = 53; differences = 30; technology_differences = 1 }
+  "approved-delta-compat-space-age-galore" = @{ baseline = 70; current = 71; differences = 29; technology_differences = 1 }
+  "approved-delta-native-owner-adoption" = @{ baseline = 70; current = 71; differences = 31; technology_differences = 3 }
+  "approved-delta-space-age" = @{ baseline = 70; current = 71; differences = 29; technology_differences = 1 }
 }
 foreach ($scenario in @($artifact.scenario_evidence)) {
   if ([string]::IsNullOrWhiteSpace([string]$scenario.baseline_fingerprint) -or
