@@ -332,7 +332,7 @@ mutation_commands:
     - aggregate snapshot catalog operation plan and compilation fingerprints bind exact stored component fingerprints instead of embedding and recanonicalizing complete trusted records
     - planning stage row copies preserve immutable gate record identity while copying only the mutable gate map
     - each compiler-owned TechnologyDesign copies external values once then shares those exact immutable values across dimension subject member and leaf-provenance views; imported designs remain independently deep-verified
-    - TechnologyDesign qualification identities bind an exact immutable design base gate vector and context under technology-design-qualification-components/v2; private weak caches reuse only exact trusted base provenance while copied or imported records recompute every component
+    - TechnologyDesign qualification identities bind exact component fingerprints under technology-design-qualification-components/v1; private weak caches reuse only exact trusted immutable tables while copied or imported records recompute every component
     - catalog candidates share the exact trusted semantic identity and typed subjects from their TechnologyDesign and diagnostic alternatives reuse unchanged subject and prototype fingerprints while recomputing changed design and qualification identities
     - TechnologyDesign and SafetyQualification fingerprints bind each immutable gate through its exact status evaluator pass state and evidence fingerprint rather than serializing the complete evidence tree again
     - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records

@@ -6,9 +6,11 @@ local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 local authority = trusted_record.new("TechnologyDesign")
-local qualification_base_fingerprints = setmetatable({}, {__mode = "k"})
+local component_fingerprints = setmetatable({}, {__mode = "k"})
+local gate_authority_fingerprints = setmetatable({}, {__mode = "k"})
+local provenance_fingerprints = setmetatable({}, {__mode = "k"})
 local gate_vector_fingerprints = setmetatable({}, {__mode = "k"})
-local QUALIFICATION_IDENTITY_SCHEME = "technology-design-qualification-components/v2"
+local QUALIFICATION_IDENTITY_SCHEME = "technology-design-qualification-components/v1"
 
 local SCHEMA = {
   schema = 2,
@@ -323,34 +325,53 @@ local function prototype_projection_unvalidated(design)
   }
 end
 
+local function component_fingerprint(value, options)
+  if options.reuse and type(value) == "table" and component_fingerprints[value] then
+    return component_fingerprints[value]
+  end
+  local result = fingerprint.of(value)
+  if options.register and type(value) == "table" then component_fingerprints[value] = result end
+  return result
+end
+
+local function gate_authority_fingerprint(gate, options)
+  if options.reuse and gate_authority_fingerprints[gate] then
+    return gate_authority_fingerprints[gate]
+  end
+  local result = fingerprint.of(gate_contract.authority_projection(gate))
+  if options.register then gate_authority_fingerprints[gate] = result end
+  return result
+end
+
 local function gate_vector_fingerprint(gates, options)
   if options.reuse and gate_vector_fingerprints[gates] then
     return gate_vector_fingerprints[gates]
   end
   local identities = {}
   for gate_name, gate in pairs(gates or {}) do
-    identities[gate_name] = gate_contract.authority_projection(gate)
+    identities[gate_name] = gate_authority_fingerprint(gate, options)
   end
   local result = fingerprint.of(identities)
   if options.register then gate_vector_fingerprints[gates] = result end
   return result
 end
 
-local function qualification_base_fingerprint(design, options)
-  local cache_key = design.provenance
-  if options.reuse and qualification_base_fingerprints[cache_key] then
-    return qualification_base_fingerprints[cache_key]
+local function provenance_fingerprint(provenance, options)
+  if options.reuse and provenance_fingerprints[provenance] then
+    return provenance_fingerprints[provenance]
+  end
+  local fields = {}
+  for path, record in pairs(provenance.fields or {}) do
+    fields[path] = component_fingerprint(record, options)
   end
   local result = fingerprint.of({
-    schema = design.schema,
-    subject_fingerprint = design.subject_fingerprint,
-    design_fingerprint = design.design_fingerprint,
-    prototype_fingerprint = design.prototype_fingerprint,
-    identity_authority = design.identity_authority,
-    provenance = design.provenance,
-    maturity = design.maturity
+    source = provenance.source,
+    provider_ids_fingerprint = component_fingerprint(provenance.provider_ids, options),
+    family_ids_fingerprint = component_fingerprint(provenance.family_ids, options),
+    evidence_class = provenance.evidence_class,
+    field_fingerprints = fields
   })
-  if options.register then qualification_base_fingerprints[cache_key] = result end
+  if options.register then provenance_fingerprints[provenance] = result end
   return result
 end
 
@@ -358,9 +379,15 @@ local function qualification_material(design, options)
   options = options or {}
   return {
     identity_scheme = QUALIFICATION_IDENTITY_SCHEME,
-    qualification_base_fingerprint = qualification_base_fingerprint(design, options),
+    schema = design.schema,
+    subject_fingerprint = design.subject_fingerprint,
+    design_fingerprint = design.design_fingerprint,
+    prototype_fingerprint = design.prototype_fingerprint,
+    identity_authority_fingerprint = component_fingerprint(design.identity_authority, options),
     gate_vector_fingerprint = gate_vector_fingerprint(design.gates, options),
-    context_fingerprint = fingerprint.of(design.context)
+    provenance_fingerprint = provenance_fingerprint(design.provenance, options),
+    maturity_fingerprint = component_fingerprint(design.maturity, options),
+    context_fingerprint = component_fingerprint(design.context, options)
   }
 end
 
