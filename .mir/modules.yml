@@ -383,6 +383,7 @@ mutation_commands:
     - approved structural applicability is a fingerprinted data-only envelope with exact mods positive examples negative examples and bounded new matches
     - family providers flow through explicit discovery normalization classification pack-policy hazard-policy owner-arbitration decision and budget stages
     - ProviderMetrics binds provider version family partition exact environment measured dispositions unlock depth timing bytes witnesses and per-metric provenance
+    - family resolution builds one context-owned stream query index from the exact canonical decision set and excludes that derived cache from provider snapshots and identities
     - provider budgets suppress only new-unreviewed proposals and preserve exact-reviewed attachments and hard-blocker diagnostics
     - compatibility policy authority is the only planning facade that composes overlays active packs claims and policy fingerprints
     - planner modules have zero imports of emit modules; pipeline compiler orchestration owns all planning-to-emission sequencing
@@ -586,6 +587,7 @@ compiler_context:
     - active-compatibility-packs
     - compatibility-policy-authority
     - family-resolution
+    - family-resolution-query-index
     - generation-plan
     - compilation-plan
     - generated-technology-registry

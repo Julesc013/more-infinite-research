@@ -208,62 +208,101 @@ local function build()
   return context:set_state("family_resolution", canonical)
 end
 
+local function query_index()
+  local context = compiler_context.current()
+  local cached = context:state_view("family_resolution_query_index")
+  if cached then return cached end
+  local resolution = build()
+  local streams = {}
+  local function stream(key)
+    local row = streams[key]
+    if row then return row end
+    row = {
+      provider_ids = {},
+      family_ids = {},
+      decisions = {},
+      decision_fingerprints = {},
+      risk_fingerprints = {}
+    }
+    streams[key] = row
+    return row
+  end
+
+  for stream_key, attachments in pairs(resolution.attachments or {}) do
+    local row, seen = stream(stream_key), {}
+    for _, attachment in ipairs(attachments) do
+      if not seen[attachment.provider_id] then
+        seen[attachment.provider_id] = true
+        row.provider_ids[#row.provider_ids + 1] = attachment.provider_id
+      end
+    end
+  end
+  for _, decision in ipairs(resolution.decisions or {}) do
+    local row = stream(decision.target_stream)
+    row.decisions[#row.decisions + 1] = decision
+    row.decision_fingerprints[#row.decision_fingerprints + 1] = decision.decision_fingerprint
+    row._family_seen = row._family_seen or {}
+    if decision.candidate_family and not row._family_seen[decision.candidate_family] then
+      row._family_seen[decision.candidate_family] = true
+      row.family_ids[#row.family_ids + 1] = decision.candidate_family
+    end
+    row._risk_seen = row._risk_seen or {}
+    if not row._risk_seen[decision.risk_fingerprint] then
+      row._risk_seen[decision.risk_fingerprint] = true
+      row.risk_fingerprints[#row.risk_fingerprints + 1] = decision.risk_fingerprint
+    end
+  end
+  for _, row in pairs(streams) do
+    table.sort(row.provider_ids)
+    table.sort(row.family_ids)
+    table.sort(row.decision_fingerprints)
+    table.sort(row.risk_fingerprints)
+    row._family_seen = nil
+    row._risk_seen = nil
+  end
+  return context:set_state("family_resolution_query_index", {
+    schema = 1,
+    streams = streams
+  })
+end
+
+local function scalar_array(values)
+  local out = {}
+  for index, value in ipairs(values or {}) do out[index] = value end
+  return out
+end
+
 function M.attachments_for_stream(stream_key)
   return deepcopy(build().attachments[stream_key] or {})
 end
 
 function M.provider_ids_for_stream(stream_key)
-  local ids, seen = {}, {}
-  for _, attachment in ipairs(build().attachments[stream_key] or {}) do
-    if not seen[attachment.provider_id] then
-      seen[attachment.provider_id] = true
-      table.insert(ids, attachment.provider_id)
-    end
-  end
-  table.sort(ids)
-  return ids
+  local row = query_index().streams[stream_key]
+  return scalar_array(row and row.provider_ids)
 end
 
 function M.family_ids_for_stream(stream_key)
-  local ids, seen = {}, {}
-  for _, decision in ipairs(build().decisions or {}) do
-    if decision.target_stream == stream_key and decision.candidate_family
-      and not seen[decision.candidate_family] then
-      seen[decision.candidate_family] = true
-      table.insert(ids, decision.candidate_family)
-    end
-  end
-  table.sort(ids)
-  return ids
+  local row = query_index().streams[stream_key]
+  return scalar_array(row and row.family_ids)
 end
 
 function M.decisions_for_stream(stream_key)
-  local out = {}
-  for _, decision in ipairs(build().decisions or {}) do
-    if decision.target_stream == stream_key then table.insert(out, deepcopy(decision)) end
-  end
-  return out
+  local row = query_index().streams[stream_key]
+  return deepcopy((row and row.decisions) or {})
 end
 
 function M.decision_fingerprints_for_stream(stream_key)
-  local out = {}
-  for _, decision in ipairs(build().decisions or {}) do
-    if decision.target_stream == stream_key then table.insert(out, decision.decision_fingerprint) end
-  end
-  table.sort(out)
-  return out
+  local row = query_index().streams[stream_key]
+  return scalar_array(row and row.decision_fingerprints)
 end
 
 function M.risk_fingerprints_for_stream(stream_key)
-  local seen, out = {}, {}
-  for _, decision in ipairs(build().decisions or {}) do
-    if decision.target_stream == stream_key and not seen[decision.risk_fingerprint] then
-      seen[decision.risk_fingerprint] = true
-      table.insert(out, decision.risk_fingerprint)
-    end
-  end
-  table.sort(out)
-  return out
+  local row = query_index().streams[stream_key]
+  return scalar_array(row and row.risk_fingerprints)
+end
+
+function M.decision_set_fingerprint()
+  return build().decision_set_fingerprint
 end
 
 function M.apply_cardinality_guard(rows, limits, candidate_count)

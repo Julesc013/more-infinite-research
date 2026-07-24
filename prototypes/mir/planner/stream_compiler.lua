@@ -404,7 +404,7 @@ local function compile_active(context, return_view)
       compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),
       native_owners = fingerprint.of(native_owner_inputs),
-      provider_decisions = family_resolver.snapshot().decision_set_fingerprint
+      provider_decisions = family_resolver.decision_set_fingerprint()
     }
   })
   local rows = {}

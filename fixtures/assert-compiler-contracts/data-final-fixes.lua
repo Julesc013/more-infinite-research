@@ -1675,6 +1675,29 @@ if not production_graph_parity or production_graph_parity.schema ~= 2
   fail("emitted and planned technology graphs do not have exact parity evidence")
 end
 compiler_context.with_active(focused_contracts.compilation_context, function()
+  local family_resolution = family_resolver.snapshot()
+  if family_resolver.decision_set_fingerprint() ~= family_resolution.decision_set_fingerprint then
+    fail("family-resolution scalar identity differs from its canonical snapshot")
+  end
+  local decisions_by_stream = {}
+  for _, decision in ipairs(family_resolution.decisions or {}) do
+    decisions_by_stream[decision.target_stream] = decisions_by_stream[decision.target_stream] or {}
+    table.insert(decisions_by_stream[decision.target_stream], decision)
+  end
+  for stream_key, expected in pairs(decisions_by_stream) do
+    local actual = family_resolver.decisions_for_stream(stream_key)
+    if fingerprint.of(actual) ~= fingerprint.of(expected) then
+      fail("family-resolution query index changed decision ordering for " .. stream_key)
+    end
+    local isolated = family_resolver.decision_fingerprints_for_stream(stream_key)
+    if #isolated > 0 then
+      local original = isolated[1]
+      isolated[1] = "mutated-query-result"
+      if family_resolver.decision_fingerprints_for_stream(stream_key)[1] ~= original then
+        fail("family-resolution query index exposed mutable scalar state for " .. stream_key)
+      end
+    end
+  end
   local relationship_view = relationships.view("output")
   if relationship_view ~= relationships.view("output")
     or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
