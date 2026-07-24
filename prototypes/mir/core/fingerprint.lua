@@ -3,6 +3,8 @@ local ONE_MIB = 1024 * 1024
 local MAXIMUM_QUOTED_KEY_CACHE_ENTRIES = 1024
 local quoted_key_cache = {}
 local quoted_key_cache_entries = 0
+local encode
+local diagnose
 local metrics = {
   canonical_calls = 0,
   canonical_bytes = 0,
@@ -11,7 +13,7 @@ local metrics = {
   maximum_canonical_bytes = 0
 }
 
-local function map_keys(value, path)
+local function map_keys(value, path, diagnostic, root)
   local keys = {}
   for key in pairs(value) do
     local key_kind = type(key)
@@ -25,6 +27,7 @@ local function map_keys(value, path)
         key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"
       }
     else
+      if not diagnostic then return diagnose(root) end
       error("Fingerprint map keys must be strings or numbers at " .. path
         .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 4)
     end
@@ -52,52 +55,58 @@ local function quoted_key(key)
   return encoded
 end
 
-local function table_shape(value, path)
+local function table_shape(value, path, diagnostic, root)
   local first_key = next(value)
   if first_key == nil then return true end
   if type(first_key) == "string" then
     local keys = string_map_keys(value)
     if keys then return false, keys, true end
-    return false, map_keys(value, path)
+    return false, map_keys(value, path, diagnostic, root)
   end
   if type(first_key) ~= "number" or first_key < 1 or first_key % 1 ~= 0 then
-    return false, map_keys(value, path)
+    return false, map_keys(value, path, diagnostic, root)
   end
   local count, maximum = 0, 0
   for key in pairs(value) do
     if type(key) ~= "number" or key < 1 or key % 1 ~= 0 then
-      return false, map_keys(value, path)
+      return false, map_keys(value, path, diagnostic, root)
     end
     count = count + 1
     if key > maximum then maximum = key end
   end
   if count == maximum then return true end
-  return false, map_keys(value, path)
+  return false, map_keys(value, path, diagnostic, root)
 end
 
-local function encode(value, seen, path)
+encode = function(value, seen, path, diagnostic, root)
   local kind = type(value)
   if kind == "nil" then return "null" end
   if kind == "boolean" then return value and "true" or "false" end
   if kind == "number" then return string.format("%.17g", value) end
   if kind == "string" then return string.format("%q", value) end
-  if kind ~= "table" then error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3) end
-  if seen[value] then error("Cannot fingerprint cyclic table at " .. path .. " (first seen at " .. seen[value] .. ")", 3) end
-  seen[value] = path
+  if kind ~= "table" then
+    if not diagnostic then return diagnose(root) end
+    error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
+  end
+  if seen[value] then
+    if not diagnostic then return diagnose(root) end
+    error("Cannot fingerprint cyclic table at " .. path .. " (first seen at " .. seen[value] .. ")", 3)
+  end
+  seen[value] = diagnostic and path or true
 
   local out = {}
-  local array, keys, string_keys = table_shape(value, path)
+  local array, keys, string_keys = table_shape(value, path, diagnostic, root)
   if array then
     for index = 1, #value do
       local child = value[index]
       local child_kind = type(child)
       local child_path = path
-      if child_kind == "table"
+      if diagnostic and (child_kind == "table"
         or (child_kind ~= "nil" and child_kind ~= "boolean"
-          and child_kind ~= "number" and child_kind ~= "string") then
+          and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "[" .. index .. "]"
       end
-      out[index] = encode(child, seen, child_path)
+      out[index] = encode(child, seen, child_path, diagnostic, root)
     end
     seen[value] = nil
     return "[" .. table.concat(out, ",") .. "]"
@@ -109,12 +118,12 @@ local function encode(value, seen, path)
       local child = value[key]
       local child_kind = type(child)
       local child_path = path
-      if child_kind == "table"
+      if diagnostic and (child_kind == "table"
         or (child_kind ~= "nil" and child_kind ~= "boolean"
-          and child_kind ~= "number" and child_kind ~= "string") then
+          and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "." .. key
       end
-      out[#out + 1] = quoted_key(key) .. ":" .. encode(child, seen, child_path)
+      out[#out + 1] = quoted_key(key) .. ":" .. encode(child, seen, child_path, diagnostic, root)
     end
     seen[value] = nil
     return "{" .. table.concat(out, ",") .. "}"
@@ -125,19 +134,24 @@ local function encode(value, seen, path)
     local child = value[row.key]
     local child_kind = type(child)
     local child_path = path
-    if child_kind == "table"
+    if diagnostic and (child_kind == "table"
       or (child_kind ~= "nil" and child_kind ~= "boolean"
-        and child_kind ~= "number" and child_kind ~= "string") then
+        and child_kind ~= "number" and child_kind ~= "string")) then
       child_path = path .. row.path
     end
-    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path)
+    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path, diagnostic, root)
   end
   seen[value] = nil
   return "{" .. table.concat(out, ",") .. "}"
 end
 
+diagnose = function(root)
+  encode(root, {}, "$", true, root)
+  error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
+end
+
 function M.canonical(value)
-  local text = encode(value, {}, "$")
+  local text = encode(value, {}, "$", false, value)
   local bytes = #text
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes
