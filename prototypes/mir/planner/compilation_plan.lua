@@ -61,18 +61,19 @@ local function default_compiler_input(stream_artifact, base_plan, sanitation_led
   })
 end
 
-local function copy_row_with_design_view(source_row)
+local function shallow_copy(source)
+  local out = {}
+  for key, value in pairs(source or {}) do out[key] = value end
+  return out
+end
+
+local function derive_stream_row(source_row)
   local row = {}
   for key, value in pairs(source_row) do
-    if key == "technology_design" then
-      row[key] = value
-    elseif key == "gates" then
-      row.gates = {}
-      for gate_name, gate in pairs(value or {}) do row.gates[gate_name] = gate end
-    else
-      row[key] = deepcopy(value)
-    end
+    row[key] = value
   end
+  row.gates = shallow_copy(source_row.gates)
+  if source_row.fields then row.fields = shallow_copy(source_row.fields) end
   return row
 end
 
@@ -125,7 +126,7 @@ end
 local function sanitize_stream_artifact(stream_artifact, target_inventory)
   local rows, removed_count, skipped_count = {}, 0, 0
   for _, source_row in ipairs(stream_artifact.rows or {}) do
-    local row = copy_row_with_design_view(source_row)
+    local row = derive_stream_row(source_row)
     if row.action == "emit" then
       local kept, removed = technology_effects.sanitize_effects(
         row.fields.effects,
@@ -221,10 +222,10 @@ local function sanitize_base_operations(base_plan, target_inventory)
 end
 
 local function apply_graph_decisions(stream_artifact, graph_summary)
-  local rows = {}
-  for _, source_row in ipairs(stream_artifact.rows or {}) do
-    table.insert(rows, copy_row_with_design_view(source_row))
-  end
+  -- Sanitation already produced a transient row projection with independently
+  -- owned top-level, gate, and fields tables. Complete immutable child values
+  -- may remain shared while graph decisions mutate that projection in place.
+  local rows = stream_artifact.rows or {}
   for _, row in ipairs(rows) do
     if row.action == "emit" then
       local rejection = graph_summary.rejected[row.technology_name]
@@ -233,6 +234,7 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
         row.reason = rejection.code
         row.graph_integrity = deepcopy(rejection)
         if row.diagnostics then
+          row.diagnostics = shallow_copy(row.diagnostics)
           row.diagnostics.status = "skipped"
           row.diagnostics.reason = rejection.code
         end

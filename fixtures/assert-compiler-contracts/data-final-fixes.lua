@@ -1026,8 +1026,9 @@ if not partial_sanitation_operation
   or not partial_sanitation_design
   or #partial_sanitation_design.design.effects.value ~= 1
   or partial_sanitation_design.design.effects.value[1].recipe ~= "iron-gear-wheel"
-  or partial_sanitation_plan.validation_summary.effect_integrity.streams.removed_effect_count ~= 1 then
-  fail("CompilationPlan partial effect sanitation did not rebuild TechnologyDesign from retained effects")
+  or partial_sanitation_plan.validation_summary.effect_integrity.streams.removed_effect_count ~= 1
+  or #partial_sanitation_source:artifact().rows[1].fields.effects ~= 2 then
+  fail("CompilationPlan sanitation did not preserve source isolation and rebuild retained effects")
 end
 
 local missing_prerequisite_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {{
