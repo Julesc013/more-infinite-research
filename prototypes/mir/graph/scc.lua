@@ -9,16 +9,19 @@ local function sorted_keys(values)
   return out
 end
 
-function M.analyze(adjacency, sorted_names)
+function M.analyze(adjacency, sorted_names, sorted_reverse)
   local names = sorted_names or sorted_keys(adjacency)
-  local reverse = {}
-  for _, name in ipairs(names) do reverse[name] = {} end
-  for owner, edges in pairs(adjacency or {}) do
-    for _, target in ipairs(edges or {}) do
-      if adjacency[target] then table.insert(reverse[target], owner) end
+  local reverse = sorted_reverse
+  if not reverse then
+    reverse = {}
+    for _, name in ipairs(names) do reverse[name] = {} end
+    for owner, edges in pairs(adjacency or {}) do
+      for _, target in ipairs(edges or {}) do
+        if adjacency[target] then table.insert(reverse[target], owner) end
+      end
     end
+    for _, edges in pairs(reverse) do table.sort(edges) end
   end
-  for _, edges in pairs(reverse) do table.sort(edges) end
 
   local visited, order = {}, {}
   for _, root in ipairs(names) do

@@ -267,7 +267,7 @@ function M.validate_operations(operations, options)
     end
   end
 
-  local scc_result = scc_kernel.analyze(adjacency, names)
+  local scc_result = scc_kernel.analyze(adjacency, names, reverse)
   local components = {}
   for _, component in ipairs(scc_result.components) do table.insert(components, component.nodes) end
   local condensed = condensation.build(adjacency, scc_result.assignment)

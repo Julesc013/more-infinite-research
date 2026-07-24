@@ -15,27 +15,46 @@ local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or ingredient
 end
 
+local function node_from_prototype(name, technology, prerequisites)
+  local ingredients = {}
+  for _, ingredient in ipairs(((technology or {}).unit or {}).ingredients or {}) do
+    table.insert(ingredients, ingredient_name(ingredient))
+  end
+  table.sort(ingredients)
+  return {
+    name = name,
+    enabled = technology.enabled ~= false,
+    prerequisites = prerequisites or sorted(technology.prerequisites),
+    research_trigger = technology.research_trigger ~= nil,
+    science_packs = ingredients,
+    has_research_count = technology.unit ~= nil
+      and (technology.unit.count ~= nil or technology.unit.count_formula ~= nil)
+  }
+end
+
+local function same_array(left, right)
+  if type(left) ~= "table" or type(right) ~= "table" or #left ~= #right then return false end
+  for index = 1, #left do if left[index] ~= right[index] then return false end end
+  return true
+end
+
+local function same_node(left, right)
+  return type(left) == "table" and type(right) == "table"
+    and left.name == right.name
+    and left.enabled == right.enabled
+    and left.research_trigger == right.research_trigger
+    and left.has_research_count == right.has_research_count
+    and same_array(left.prerequisites or {}, right.prerequisites or {})
+    and same_array(left.science_packs or {}, right.science_packs or {})
+end
+
 function M.new(technologies, options)
   options = options or {}
   local nodes = {}
   local technology_view = {}
   local function append(name, technology)
-    local ingredients = {}
-    for _, ingredient in ipairs(((technology or {}).unit or {}).ingredients or {}) do
-      table.insert(ingredients, ingredient_name(ingredient))
-    end
-    table.sort(ingredients)
-    local node = {
-      name = name,
-      enabled = technology.enabled ~= false,
-      prerequisites = options.prerequisites_by_name
-        and options.prerequisites_by_name[name]
-        or sorted(technology.prerequisites),
-      research_trigger = technology.research_trigger ~= nil,
-      science_packs = ingredients,
-      has_research_count = technology.unit ~= nil
-        and (technology.unit.count ~= nil or technology.unit.count_formula ~= nil)
-    }
+    local node = node_from_prototype(name, technology,
+      options.prerequisites_by_name and options.prerequisites_by_name[name] or nil)
     table.insert(nodes, node)
     technology_view[name] = node
   end
@@ -49,6 +68,26 @@ function M.new(technologies, options)
   snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
   technology_views[snapshot] = technology_view
   return snapshot
+end
+
+-- Prove a live prototype registry has the exact normalized node projection of
+-- a trusted snapshot without allocating and canonicalizing a second snapshot.
+-- A mismatch returns false so the caller can build the complete actual
+-- snapshot on the exceptional diagnostic path.
+function M.matches_prototypes(snapshot, technologies)
+  if type(snapshot) ~= "table" or snapshot.schema ~= 1 or type(technologies) ~= "table" then
+    return false
+  end
+  local count = 0
+  for _ in pairs(technologies) do count = count + 1 end
+  if count ~= #(snapshot.nodes or {}) then return false end
+  for _, expected in ipairs(snapshot.nodes or {}) do
+    local technology = technologies[expected.name]
+    if not technology or not same_node(expected, node_from_prototype(expected.name, technology)) then
+      return false
+    end
+  end
+  return true
 end
 
 function M.technology_view(snapshot)
@@ -66,12 +105,6 @@ function M.technology_map(snapshot)
   return out
 end
 
-local function same_array(left, right)
-  if type(left) ~= "table" or type(right) ~= "table" or #left ~= #right then return false end
-  for index = 1, #left do if left[index] ~= right[index] then return false end end
-  return true
-end
-
 function M.same(left, right)
   if type(left) ~= "table" or type(right) ~= "table"
     or left.schema ~= right.schema or #(left.nodes or {}) ~= #(right.nodes or {}) then
@@ -79,13 +112,7 @@ function M.same(left, right)
   end
   for index, expected in ipairs(left.nodes or {}) do
     local actual = right.nodes[index]
-    if type(actual) ~= "table"
-      or expected.name ~= actual.name
-      or expected.enabled ~= actual.enabled
-      or expected.research_trigger ~= actual.research_trigger
-      or expected.has_research_count ~= actual.has_research_count
-      or not same_array(expected.prerequisites or {}, actual.prerequisites or {})
-      or not same_array(expected.science_packs or {}, actual.science_packs or {}) then
+    if not same_node(expected, actual) then
       return false
     end
   end

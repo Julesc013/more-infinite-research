@@ -659,7 +659,8 @@ foreach ($gateConsumer in @("prototypes/mir/planner/generation_plan.lua", "proto
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'graph_snapshot.new(data_raw.prototypes("technology"))'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies)'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'actual_snapshot = graph_snapshot.new(actual_technologies)'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "graph_diff.compare(expected.graph_snapshot, actual_snapshot)"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "expected.graph_fingerprint, actual_snapshot.graph_fingerprint"
 $graphDiffText = Read-MIRFile -RelativePath "prototypes/mir/graph/diff.lua"

@@ -1127,10 +1127,27 @@ do
   })
   local view = graph_snapshot.technology_view(snapshot)
   local owned = graph_snapshot.technology_map(snapshot)
+  local exact_prototypes = {
+    ["mir-graph-view-contract"] = {
+      enabled = true,
+      prerequisites = {"automation"},
+      unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
+    }
+  }
   if view ~= graph_snapshot.technology_view(snapshot)
     or view["mir-graph-view-contract"].prerequisites ~= shared_prerequisites
-    or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"] then
+    or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"]
+    or not graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
     fail("graph snapshot did not preserve stable internal views and owned public maps")
+  end
+  exact_prototypes["mir-graph-view-contract"].unit.ingredients = {{"logistic-science-pack", 1}}
+  if graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
+    fail("graph snapshot live-prototype parity accepted altered science ingredients")
+  end
+  exact_prototypes["mir-graph-view-contract"].unit.ingredients = {{"automation-science-pack", 1}}
+  exact_prototypes["mir-unexpected-graph-node"] = {enabled = true}
+  if graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
+    fail("graph snapshot live-prototype parity accepted an unexpected node")
   end
   owned["mir-graph-view-contract"].prerequisites[1] = "tampered"
   if view["mir-graph-view-contract"].prerequisites[1] ~= "automation" then

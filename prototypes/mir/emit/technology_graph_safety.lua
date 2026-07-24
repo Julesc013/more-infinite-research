@@ -98,7 +98,18 @@ function M.assert_registered_technologies(plan)
   -- graph from the Factorio prototype registry and prove exact node equality;
   -- equal graph input
   -- necessarily retains the qualified SCC, condensation, and proof results.
-  local actual_snapshot = graph_snapshot.new(data_raw.prototypes("technology"))
+  local actual_technologies = data_raw.prototypes("technology")
+  local actual_snapshot
+  if graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies) then
+    -- The normalized live projection is byte-for-byte equal to the already
+    -- qualified snapshot. Reuse its exact authority and avoid a redundant
+    -- full-graph canonicalization on the successful release path.
+    actual_snapshot = expected.graph_snapshot
+  else
+    -- Preserve complete independently fingerprinted diagnostics whenever the
+    -- live graph differs. The fast path never converts a mismatch into trust.
+    actual_snapshot = graph_snapshot.new(actual_technologies)
+  end
   local difference = graph_diff.compare(expected.graph_snapshot, actual_snapshot)
   if not difference.equal then
     error("MIR realized technology graph snapshot differs from its qualified virtual snapshot: "
