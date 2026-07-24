@@ -15,7 +15,6 @@ local function material(record)
     execution_mode = record.execution_mode,
     compilation_snapshot_fingerprint = record.compilation_snapshot_fingerprint,
     policy_fingerprint = record.policy_fingerprint,
-    operations = record.operations,
     operation_counts = record.operation_counts,
     operation_fingerprints = record.operation_fingerprints
   }

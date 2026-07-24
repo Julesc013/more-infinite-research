@@ -93,8 +93,8 @@ end
 local function preselection_material(catalog)
   return {
     schema = catalog.schema,
-    candidates = catalog.candidates,
-    qualifications = catalog.qualifications,
+    candidate_catalog_fingerprint = catalog.candidate_catalog_fingerprint,
+    qualification_catalog_fingerprint = catalog.qualification_catalog_fingerprint,
     alternative_qualifications = catalog.alternative_qualifications,
     context_fingerprint = catalog.context_fingerprint,
     mutation_authority = catalog.mutation_authority,
@@ -104,6 +104,44 @@ local function preselection_material(catalog)
     compilation_plan_fingerprint = catalog.compilation_plan_fingerprint,
     base_candidates = catalog.base_candidates
   }
+end
+
+local function candidate_catalog_material(candidates)
+  local out = {}
+  for _, candidate in ipairs(candidates or {}) do
+    local alternatives = {}
+    for _, alternative in ipairs(candidate.alternatives or {}) do
+      table.insert(alternatives, {
+        alternative_id = alternative.alternative_id,
+        action = alternative.action,
+        disposition = alternative.disposition,
+        design_fingerprint = alternative.design_fingerprint,
+        prototype_fingerprint = alternative.prototype_fingerprint,
+        qualification_fingerprint = alternative.qualification_fingerprint,
+        qualification_decision = alternative.qualification_decision
+      })
+    end
+    table.insert(out, {
+      candidate_id = candidate.candidate_id,
+      candidate_fingerprint = candidate.candidate_fingerprint,
+      selection_key = candidate.selection_key,
+      alternatives = alternatives
+    })
+  end
+  return out
+end
+
+local function qualification_catalog_material(qualifications)
+  local out = {}
+  for _, qualification in ipairs(qualifications or {}) do
+    table.insert(out, {
+      candidate_id = qualification.candidate_id,
+      design_fingerprint = qualification.design_fingerprint,
+      qualification_fingerprint = qualification.qualification_fingerprint,
+      decision = qualification.decision
+    })
+  end
+  return out
 end
 
 local function catalog_material(catalog)
@@ -188,8 +226,8 @@ function M.from_preselection_rows(rows, context_material, options)
     compilation_plan_fingerprint = options.compilation_plan_fingerprint or "pending",
     base_candidates = deepcopy(options.base_candidates or {})
   }
-  catalog.candidate_catalog_fingerprint = fingerprint.of(candidates)
-  catalog.qualification_catalog_fingerprint = fingerprint.of(qualifications)
+  catalog.candidate_catalog_fingerprint = fingerprint.of(candidate_catalog_material(candidates))
+  catalog.qualification_catalog_fingerprint = fingerprint.of(qualification_catalog_material(qualifications))
   catalog.preselection_catalog_fingerprint = fingerprint.of(preselection_material(catalog))
   catalog.selection_fingerprint = fingerprint.of(catalog.current_selections)
   catalog.catalog_fingerprint = fingerprint.of(catalog_material(catalog))
@@ -314,8 +352,8 @@ local function verify(catalog, options)
     end
   end
   if options.verify_fingerprints ~= false then
-    if catalog.candidate_catalog_fingerprint ~= fingerprint.of(catalog.candidates)
-      or catalog.qualification_catalog_fingerprint ~= fingerprint.of(catalog.qualifications)
+    if catalog.candidate_catalog_fingerprint ~= fingerprint.of(candidate_catalog_material(catalog.candidates))
+      or catalog.qualification_catalog_fingerprint ~= fingerprint.of(qualification_catalog_material(catalog.qualifications))
       or catalog.preselection_catalog_fingerprint ~= fingerprint.of(preselection_material(catalog))
       or catalog.selection_fingerprint ~= fingerprint.of(catalog.current_selections)
       or catalog.catalog_fingerprint ~= fingerprint.of(catalog_material(catalog)) then
@@ -344,6 +382,19 @@ end
 
 function M.is_trusted(catalog)
   return authority.is_trusted(catalog)
+end
+
+function M.authority_projection(catalog)
+  if M.is_trusted(catalog) then M.assert_trusted(catalog) else M.verify_untrusted(catalog) end
+  return {
+    schema = catalog.schema,
+    phase = catalog.phase,
+    candidate_catalog_fingerprint = catalog.candidate_catalog_fingerprint,
+    qualification_catalog_fingerprint = catalog.qualification_catalog_fingerprint,
+    preselection_catalog_fingerprint = catalog.preselection_catalog_fingerprint,
+    selection_fingerprint = catalog.selection_fingerprint,
+    catalog_fingerprint = catalog.catalog_fingerprint
+  }
 end
 
 function M.snapshot(catalog)

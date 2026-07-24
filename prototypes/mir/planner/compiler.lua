@@ -10,6 +10,50 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 
 local M = {}
 
+local function gate_identity_map(gates)
+  local out = {}
+  for name, gate in pairs(gates or {}) do
+    out[name] = {
+      status = gate.status,
+      passed = gate.passed,
+      evaluator = gate.evaluator,
+      evidence_fingerprint = gate.evidence_fingerprint
+    }
+  end
+  return out
+end
+
+local function input_identity(row)
+  local design = row.technology_design or {}
+  return {
+    schema = row.schema,
+    stream_key = row.stream_key,
+    key = row.key,
+    manifest_id = row.manifest_id,
+    action = row.action,
+    reason = row.reason,
+    technology_name = row.technology_name,
+    candidate_id = design.candidate_id,
+    design_fingerprint = design.design_fingerprint,
+    prototype_fingerprint = design.prototype_fingerprint,
+    qualification_fingerprint = design.qualification_fingerprint,
+    gates = gate_identity_map(row.gates or design.gates)
+  }
+end
+
+local function compilation_material(result)
+  return {
+    schema = result.schema,
+    record_type = result.record_type,
+    compilation_snapshot_fingerprint = result.compilation_snapshot_fingerprint,
+    policy_fingerprint = result.policy_fingerprint,
+    transformation_plan_fingerprint = result.transformation_plan.plan_fingerprint,
+    provider_claims = result.provider_claims,
+    dispositions = result.dispositions,
+    status = result.status
+  }
+end
+
 local function gate_disposition(row)
   hard_gate_authority.assert_total(row.gates)
   local unresolved, failed = {}, {}
@@ -128,7 +172,7 @@ function M.compile(snapshot, policy)
   for _, row in ipairs(stream_plan.rows or {}) do
     local unresolved, failed = gate_disposition(row)
     local record = {candidate = tostring(row.stream_key), action = row.action,
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(row)}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(input_identity(row))}
     if #failed > 0 or (row.action ~= "emit" and row.action ~= "adopt") then
       table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then
@@ -142,7 +186,7 @@ function M.compile(snapshot, policy)
     local gates = operation.gates or (operation.technology_design or {}).gates
     local unresolved, failed = gate_disposition({gates = gates})
     local record = {candidate = "base-continuation/" .. tostring(operation.key), action = "create",
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(operation)}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(input_identity(operation))}
     if #failed > 0 then table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then table.insert(dispositions.review_required, record)
     else table.insert(dispositions.accepted, record); table.insert(operations, base_operation(operation, policy)) end
@@ -174,7 +218,7 @@ function M.compile(snapshot, policy)
     dispositions = dispositions,
     status = #dispositions.review_required > 0 and "REVIEW_REQUIRED" or "PASS"
   }
-  result.compilation_fingerprint = fingerprint.of(result)
+  result.compilation_fingerprint = fingerprint.of(compilation_material(result))
   return result
 end
 

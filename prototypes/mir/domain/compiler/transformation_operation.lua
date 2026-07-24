@@ -7,10 +7,45 @@ local SCHEMA = 2
 local ACTIONS = {create = true, patch = true}
 local authority = trusted_record.new("TransformationOperation")
 
+local function design_identity(design)
+  if type(design) ~= "table" then return design end
+  return {
+    schema = design.schema,
+    candidate_id = design.candidate_id,
+    technology_id = design.technology_id,
+    subject_fingerprint = design.subject_fingerprint,
+    design_fingerprint = design.design_fingerprint,
+    prototype_fingerprint = design.prototype_fingerprint,
+    qualification_fingerprint = design.qualification_fingerprint,
+    semantic_fingerprint = design.semantic_fingerprint
+  }
+end
+
+local function gate_identities(gates)
+  local out = {}
+  for name, gate in pairs(gates or {}) do
+    out[name] = {
+      status = gate.status,
+      passed = gate.passed,
+      evaluator = gate.evaluator,
+      evidence_fingerprint = gate.evidence_fingerprint
+    }
+  end
+  return out
+end
+
 local function material(record)
   local out = {}
   for key, value in pairs(record) do
-    if key ~= "operation_fingerprint" then out[key] = value end
+    if key ~= "operation_fingerprint" and key ~= "payload" and key ~= "evidence" then out[key] = value end
+  end
+  out.payload = {}
+  for key, value in pairs(record.payload or {}) do
+    out.payload[key] = key == "technology_design" and design_identity(value) or value
+  end
+  out.evidence = {}
+  for key, value in pairs(record.evidence or {}) do
+    out.evidence[key] = key == "gates" and gate_identities(value) or value
   end
   return out
 end

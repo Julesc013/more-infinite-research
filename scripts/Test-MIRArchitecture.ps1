@@ -682,6 +682,8 @@ Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "technology_qualification.from_design"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle 'local SCHEMA = 3'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "function M.finalize(rows, context_material, compilation_operations, options)"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "candidate_catalog_fingerprint = catalog.candidate_catalog_fingerprint"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "function M.authority_projection(catalog)"
 if ($technologyCatalogText -match 'data\.raw|data:extend|generated_registry|mod_data') {
   throw "Technology candidate catalog must remain a non-publishing planning artifact."
 }
@@ -714,6 +716,16 @@ foreach ($stage in @("discovery", "normalization", "classification", "pack_polic
   Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText `
     -Needle ('require("prototypes.mir.providers.pipeline.' + $stage + '")')
 }
+
+$transformationOperationText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/transformation_operation.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/transformation_operation.lua" -Text $transformationOperationText -Needle "local function design_identity(design)"
+$transformationPlanText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/transformation_plan.lua"
+if ($transformationPlanText -match '(?m)^\s*operations\s*=\s*record\.operations') {
+  throw "TransformationPlan authority fingerprint must bind operation fingerprints rather than recanonicalizing complete operations."
+}
+$compilationSnapshotText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/compilation_snapshot.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/compilation_snapshot.lua" -Text $compilationSnapshotText -Needle "local function stream_input_material(inputs)"
+Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/compilation_snapshot.lua" -Text $compilationSnapshotText -Needle "local function base_input_material(inputs)"
 $providerDiscoveryText = Read-MIRFile -RelativePath "prototypes/mir/providers/pipeline/discovery.lua"
 $providerClassificationText = Read-MIRFile -RelativePath "prototypes/mir/providers/pipeline/classification.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/providers/pipeline/discovery.lua" -Text $providerDiscoveryText -Needle "operator_dsl.candidate_items"

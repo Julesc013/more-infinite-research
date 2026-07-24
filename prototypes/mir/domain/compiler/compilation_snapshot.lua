@@ -38,6 +38,46 @@ local function sorted_copy(values)
   return out
 end
 
+local function gate_identity_map(gates)
+  local out = {}
+  for name, gate in pairs(gates or {}) do
+    out[name] = {
+      status = gate.status,
+      passed = gate.passed,
+      evaluator = gate.evaluator,
+      evidence_fingerprint = gate.evidence_fingerprint
+    }
+  end
+  return out
+end
+
+local function stream_input_material(inputs)
+  local plan = (inputs or {}).plan or inputs or {}
+  if type(plan.plan_fingerprint) == "string" then
+    return {schema = plan.schema, plan_fingerprint = plan.plan_fingerprint}
+  end
+  return inputs or {}
+end
+
+local function base_input_material(inputs)
+  local operations = (inputs or {}).operations or inputs or {}
+  local out = {}
+  for _, operation in ipairs(operations) do
+    local design = operation.technology_design or {}
+    table.insert(out, {
+      key = operation.key,
+      manifest_id = operation.manifest_id,
+      technology_name = operation.technology_name,
+      candidate_id = design.candidate_id,
+      design_fingerprint = design.design_fingerprint,
+      prototype_fingerprint = design.prototype_fingerprint,
+      qualification_fingerprint = design.qualification_fingerprint,
+      gates = gate_identity_map(operation.gates or design.gates)
+    })
+  end
+  return out
+end
+
 function M.validate(record, options)
   options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA
@@ -70,8 +110,8 @@ function M.validate(record, options)
       or record.graph_input_fingerprint ~= fingerprint.of(record.graph_input)
       or record.effect_target_inventory_fingerprint ~= fingerprint.of(record.effect_target_inventory)
       or record.provider_input_fingerprint ~= fingerprint.of(record.provider_inputs)
-      or record.stream_input_fingerprint ~= fingerprint.of(record.stream_inputs)
-      or record.base_continuation_input_fingerprint ~= fingerprint.of(record.base_continuation_inputs) then
+      or record.stream_input_fingerprint ~= fingerprint.of(stream_input_material(record.stream_inputs))
+      or record.base_continuation_input_fingerprint ~= fingerprint.of(base_input_material(record.base_continuation_inputs)) then
       error("CompilationSnapshot deep domain fingerprint is invalid.", 2)
     end
   end
@@ -118,8 +158,10 @@ function M.new(values)
   record.effect_target_inventory_fingerprint = values.effect_target_inventory_fingerprint
     or fingerprint.of(record.effect_target_inventory)
   record.provider_input_fingerprint = values.provider_input_fingerprint or fingerprint.of(record.provider_inputs)
-  record.stream_input_fingerprint = fingerprint.of(record.stream_inputs)
-  record.base_continuation_input_fingerprint = fingerprint.of(record.base_continuation_inputs)
+  record.stream_input_fingerprint = values.stream_input_fingerprint
+    or fingerprint.of(stream_input_material(record.stream_inputs))
+  record.base_continuation_input_fingerprint = values.base_continuation_input_fingerprint
+    or fingerprint.of(base_input_material(record.base_continuation_inputs))
   canonicalization_passes = canonicalization_passes + 2
     + (values.relationship_fingerprint and 0 or 1)
     + (values.owner_index_fingerprint and 0 or 1)

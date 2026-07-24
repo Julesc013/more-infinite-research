@@ -43,6 +43,7 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 - All science, progression, provider, catalog, diagnostic, telemetry, services, and state epochs belong to the active CompilerContext.
 - A copied or decoded record is untrusted even when all of its public fields match a trusted record. It must pass `verify_untrusted`; a public `validated` flag cannot confer authority.
 - Trusted assertions never canonicalize complete records. Normal compilation performs no full catalog snapshot or full TechnologyDesign copy, and governed work-volume counters make regressions visible independently of wall-clock noise.
+- Aggregate snapshot, catalog, transformation-operation, transformation-plan, and pure-compilation identities are Merkle-style projections over exact stored component fingerprints. They do not embed complete trusted designs or qualifications a second time.
 - `.mir/module-dependencies.json` and `Test-MIRModuleDependencies.ps1` enforce the exhaustive cross-layer matrix, reject every planner-to-emitter import, and permit no exception.
 
 ## Candidate boundary

@@ -687,7 +687,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   artifact.technology_catalog_fingerprint = artifact.technology_catalog.catalog_fingerprint
   telemetry.count("technology_catalog_candidates", #artifact.technology_catalog.candidates)
   telemetry.count("technology_catalog_alternatives", #artifact.technology_catalog.alternative_qualifications)
-  telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(artifact.technology_catalog))
+  telemetry.count("technology_catalog_canonical_bytes",
+    #fingerprint.canonical(technology_catalog.authority_projection(artifact.technology_catalog)))
   artifact.qualification_fingerprint = fingerprint.of(qualification_material(artifact))
   artifact.semantic_fingerprint = artifact.qualification_fingerprint
   artifact.fingerprint = artifact.compilation_fingerprint
