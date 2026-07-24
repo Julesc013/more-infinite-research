@@ -8,49 +8,43 @@ local metrics = {
   maximum_canonical_bytes = 0
 }
 
-local function map_key_row(key, path)
-  local key_kind = type(key)
-  if key_kind == "string" then
-    return {key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key}
+local function map_keys(value, path)
+  local keys = {}
+  for key in pairs(value) do
+    local key_kind = type(key)
+    if key_kind == "string" then
+      keys[#keys + 1] = {
+        key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key
+      }
+    elseif key_kind == "number" then
+      local encoded = string.format("%.17g", key)
+      keys[#keys + 1] = {
+        key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"
+      }
+    else
+      error("Fingerprint map keys must be strings or numbers at " .. path
+        .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 4)
+    end
   end
-  if key_kind == "number" then
-    local encoded = string.format("%.17g", key)
-    return {key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"}
-  end
-  error("Fingerprint map keys must be strings or numbers at " .. path
-    .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 4)
+  return keys
 end
 
 local function table_shape(value, path)
+  local first_key = next(value)
+  if first_key == nil then return true end
+  if type(first_key) ~= "number" or first_key < 1 or first_key % 1 ~= 0 then
+    return false, map_keys(value, path)
+  end
   local count, maximum = 0, 0
-  local possible_array = true
-  local pending_numeric_keys = {}
-  local map_keys
   for key in pairs(value) do
+    if type(key) ~= "number" or key < 1 or key % 1 ~= 0 then
+      return false, map_keys(value, path)
+    end
     count = count + 1
-    if possible_array and type(key) == "number" and key >= 1 and key % 1 == 0 then
-      pending_numeric_keys[#pending_numeric_keys + 1] = key
-      if key > maximum then maximum = key end
-    else
-      if possible_array then
-        possible_array = false
-        map_keys = {}
-        for _, numeric_key in ipairs(pending_numeric_keys) do
-          map_keys[#map_keys + 1] = map_key_row(numeric_key, path)
-        end
-        pending_numeric_keys = nil
-      end
-      map_keys[#map_keys + 1] = map_key_row(key, path)
-    end
+    if key > maximum then maximum = key end
   end
-  if possible_array and count == maximum then return true end
-  if possible_array then
-    map_keys = {}
-    for _, numeric_key in ipairs(pending_numeric_keys) do
-      map_keys[#map_keys + 1] = map_key_row(numeric_key, path)
-    end
-  end
-  return false, map_keys
+  if count == maximum then return true end
+  return false, map_keys(value, path)
 end
 
 local function encode(value, seen, path)
