@@ -78,7 +78,7 @@ local function table_shape(value, path, diagnostic, root)
   return false, map_keys(value, path, diagnostic, root)
 end
 
-encode = function(value, seen, path, diagnostic, root)
+encode = function(value, seen, path, diagnostic, root, completed)
   local kind = type(value)
   if kind == "nil" then return "null" end
   if kind == "boolean" then return value and "true" or "false" end
@@ -88,6 +88,7 @@ encode = function(value, seen, path, diagnostic, root)
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
   end
+  if completed and completed[value] then return completed[value] end
   if seen[value] then
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint cyclic table at " .. path .. " (first seen at " .. seen[value] .. ")", 3)
@@ -106,10 +107,12 @@ encode = function(value, seen, path, diagnostic, root)
           and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "[" .. index .. "]"
       end
-      out[index] = encode(child, seen, child_path, diagnostic, root)
+      out[index] = encode(child, seen, child_path, diagnostic, root, completed)
     end
     seen[value] = nil
-    return "[" .. table.concat(out, ",") .. "]"
+    local result = "[" .. table.concat(out, ",") .. "]"
+    if completed then completed[value] = result end
+    return result
   end
 
   if string_keys then
@@ -123,10 +126,12 @@ encode = function(value, seen, path, diagnostic, root)
           and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "." .. key
       end
-      out[#out + 1] = quoted_string(key) .. ":" .. encode(child, seen, child_path, diagnostic, root)
+      out[#out + 1] = quoted_string(key) .. ":" .. encode(child, seen, child_path, diagnostic, root, completed)
     end
     seen[value] = nil
-    return "{" .. table.concat(out, ",") .. "}"
+    local result = "{" .. table.concat(out, ",") .. "}"
+    if completed then completed[value] = result end
+    return result
   end
 
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
@@ -139,19 +144,33 @@ encode = function(value, seen, path, diagnostic, root)
         and child_kind ~= "number" and child_kind ~= "string")) then
       child_path = path .. row.path
     end
-    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path, diagnostic, root)
+    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path, diagnostic, root, completed)
   end
   seen[value] = nil
-  return "{" .. table.concat(out, ",") .. "}"
+  local result = "{" .. table.concat(out, ",") .. "}"
+  if completed then completed[value] = result end
+  return result
 end
 
 diagnose = function(root)
-  encode(root, {}, "$", true, root)
+  encode(root, {}, "$", true, root, nil)
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
 function M.canonical(value)
-  local text = encode(value, {}, "$", false, value)
+  local text = encode(value, {}, "$", false, value, nil)
+  local bytes = #text
+  metrics.canonical_calls = metrics.canonical_calls + 1
+  metrics.canonical_bytes = metrics.canonical_bytes + bytes
+  metrics.maximum_canonical_bytes = math.max(metrics.maximum_canonical_bytes, bytes)
+  if bytes > ONE_MIB then
+    metrics.serializations_over_one_mib = metrics.serializations_over_one_mib + 1
+  end
+  return text
+end
+
+function M.canonical_shared(value)
+  local text = encode(value, {}, "$", false, value, {})
   local bytes = #text
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes
@@ -213,6 +232,11 @@ function M.of(value)
   metrics.fingerprint_calls = metrics.fingerprint_calls + 1
   local text = M.canonical(value)
   return hash_canonical(text)
+end
+
+function M.of_shared(value)
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
+  return hash_canonical(M.canonical_shared(value))
 end
 
 function M.of_canonical(text)
