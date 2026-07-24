@@ -90,6 +90,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Pass all five exact C14 upgrade archetypes, all nine targeted ecosystem repair smokes, the representative BZ plus Space Age scenario, and the seven-scenario 221-row approved delta.
 - [x] Retire the obsolete Krastorio Spaced Out sanitation prune expectation after the exact current closure passed with zero external repairs, then pass the paired closure smoke.
 - [x] Run all 72 governed C14-Q3 paired performance invocations and fix ordered telemetry-map evaluation so all 38 real counter-bound checks are evaluated correctly.
+- [x] Make hosted validation represent an all-reuse plan with one explicit no-op matrix row while retaining the aggregate evidence gate as the only pass authority.
 - [ ] Resolve C14's paired 3.1.9 performance-regression failure without weakening the declared gate.
 - [ ] Run all final-candidate-bound automated work from the immutable C14 package source and current qualification contract.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.

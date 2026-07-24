@@ -37,7 +37,16 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
-          $matrix = @{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress
+          $work = @($plan.work)
+          if ($work.Count -eq 0) {
+            $work = @([ordered]@{
+              test_id = "reuse-only"
+              safe_test_id = "reuse-only"
+              fingerprint = "reuse-only"
+              no_op = $true
+            })
+          }
+          $matrix = @{ include = $work } | ConvertTo-Json -Depth 10 -Compress
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@v4
         with:
@@ -57,13 +66,16 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
       - uses: actions/download-artifact@v4
+        if: ${{ matrix.no_op != true }}
         with:
           name: mir-verification-plan
           path: out
       - name: Restore persistent evidence ledger
+        if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
         with:
           path: artifacts/assurance/evidence
@@ -72,10 +84,15 @@ jobs:
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
       - name: Reuse, adopt, or run exact test instance
+        if: ${{ matrix.no_op != true }}
         shell: pwsh
         run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+      - name: Confirm reuse-only plan needs no worker
+        if: ${{ matrix.no_op == true }}
+        shell: pwsh
+        run: Write-Host "All required fingerprints were adopted from trusted reusable evidence."
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && matrix.no_op != true }}
         with:
           name: mir-evidence-${{ matrix.safe_test_id }}
           path: artifacts/assurance/evidence

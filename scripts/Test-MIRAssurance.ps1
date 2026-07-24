@@ -242,4 +242,19 @@ if ($workflow -match 'dist/\*\.zip' -or
   throw "Full assurance workflow must transfer the exact candidate, keep workers ledger-free, and restore the shared ledger only at the gate."
 }
 
+$validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
+foreach ($requiredWorkflowSnippet in @(
+  '$work = @($plan.work)',
+  'if ($work.Count -eq 0)',
+  'test_id = "reuse-only"',
+  'no_op = $true',
+  '${{ matrix.no_op != true }}',
+  '${{ matrix.no_op == true }}',
+  '${{ always() && matrix.no_op != true }}'
+)) {
+  if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
+    throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
+  }
+}
+
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."
