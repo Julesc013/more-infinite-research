@@ -8,6 +8,7 @@ local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_
 local M = {}
 local Plan = {}
 Plan.__index = Plan
+local trusted_artifacts = setmetatable({}, {__mode = "k"})
 
 local ACTIONS = {
   adopt = true,
@@ -307,13 +308,33 @@ end
 
 function Plan:artifact_view()
   if not self.finalized then error("GenerationPlan must be finalized before artifact view", 2) end
-  return {
+  local artifact = {
     schema = 3,
     plan_fingerprint = self.plan_fingerprint,
     source_fingerprints = self.source_fingerprints,
     rows = self.rows,
     validation_summary = self.validation_summary
   }
+  trusted_artifacts[artifact] = {
+    plan_fingerprint = self.plan_fingerprint,
+    source_fingerprints = self.source_fingerprints,
+    rows = self.rows,
+    validation_summary = self.validation_summary
+  }
+  return artifact
+end
+
+function M.assert_trusted_artifact(artifact)
+  local authority = trusted_artifacts[artifact]
+  if not authority
+    or artifact.schema ~= 3
+    or artifact.plan_fingerprint ~= authority.plan_fingerprint
+    or artifact.source_fingerprints ~= authority.source_fingerprints
+    or artifact.rows ~= authority.rows
+    or artifact.validation_summary ~= authority.validation_summary then
+    error("GenerationPlan artifact is not the exact trusted finalized view", 2)
+  end
+  return artifact
 end
 
 function M.effect_identity(effect)

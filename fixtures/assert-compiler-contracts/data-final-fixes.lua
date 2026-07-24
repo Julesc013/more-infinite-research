@@ -500,6 +500,20 @@ for seed = 1, 8 do
   end
 end
 if plan_a:snapshot()[1].stream_key ~= "a-stream" then fail("GenerationPlan rows are not stably sorted") end
+do
+  local trusted_plan_artifact = plan_a:artifact_view()
+  if generation_plan.assert_trusted_artifact(trusted_plan_artifact) ~= trusted_plan_artifact then
+    fail("GenerationPlan private artifact authority changed the exact finalized view")
+  end
+  local copied_plan_artifact = deepcopy(trusted_plan_artifact)
+  expect_error("copied GenerationPlan trusted artifact", "not the exact trusted finalized view", function()
+    generation_plan.assert_trusted_artifact(copied_plan_artifact)
+  end)
+  trusted_plan_artifact.plan_fingerprint = "tampered-plan-fingerprint"
+  expect_error("tampered GenerationPlan trusted artifact", "not the exact trusted finalized view", function()
+    generation_plan.assert_trusted_artifact(trusted_plan_artifact)
+  end)
+end
 local duplicate_plan = generation_plan.new()
 duplicate_plan:add(skip_row("same", "id-a"))
 duplicate_plan:add(skip_row("same", "id-b"))

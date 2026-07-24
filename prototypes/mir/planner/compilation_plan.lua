@@ -582,16 +582,18 @@ end
 
 function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_artifact
+  local trusted_stream_artifact = false
   local planned_base_candidates = deepcopy((compiler_inputs and compiler_inputs.base_candidates) or {})
   if type(stream_plan.artifact) == "function" then
     stream_artifact = stream_plan:artifact()
   elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
-    stream_artifact = stream_plan
+    stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
+    trusted_stream_artifact = true
   else
     stream_artifact = deepcopy(stream_plan)
   end
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
-  admit_stream_artifact(stream_artifact)
+  if not trusted_stream_artifact then admit_stream_artifact(stream_artifact) end
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
