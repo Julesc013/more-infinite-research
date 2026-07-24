@@ -342,6 +342,9 @@ mutation_commands:
     - MutationJournal finalization builds terminal state once and binds complete entry snapshots through their ordered immutable entry fingerprints
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
+    - CompilationSnapshot PolicySnapshot RuntimeEnvironmentIdentity and CompilerInput use private validation-once authorities; trusted internal consumers assert stored identities while copied or imported values receive complete component and aggregate verification
+    - CompilationSnapshot hashes its already canonicalized captured fact domains without serializing them a second time and qualified snapshots reuse only exact trusted component fingerprints
+    - internal CompilationPlan state shares the exact trusted CompilerInput rather than deep-copying immutable snapshot and policy trees
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
     - realized graph postconditions capture and structurally compare the exact graph snapshot then reuse SCC condensation and proof results already qualified for that identical graph
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry

@@ -68,14 +68,24 @@ function M.canonical(value)
   return text
 end
 
-function M.of(value)
-  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
-  local text = M.canonical(value)
+local function hash_canonical(text)
   local hash = 2166136261
   for index = 1, #text do
     hash = (hash * 65599 + string.byte(text, index)) % 4294967291
   end
   return "mir32-" .. string.format("%08x", hash)
+end
+
+function M.of(value)
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
+  local text = M.canonical(value)
+  return hash_canonical(text)
+end
+
+function M.of_canonical(text)
+  if type(text) ~= "string" then error("Canonical fingerprint text is required.", 2) end
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
+  return hash_canonical(text)
 end
 
 function M.metrics()

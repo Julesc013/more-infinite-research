@@ -594,7 +594,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   admit_stream_artifact(stream_artifact)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
-  compiler_input.validate(exact_input)
+  if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
+  else compiler_input.verify_untrusted(exact_input) end
   local stream_effect_integrity
   local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
     or effect_target_inventory.capture()
@@ -645,7 +646,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
   local artifact = {
     schema = 2,
-    compiler_input = compiler_input.snapshot(exact_input),
+    compiler_input = exact_input,
     source_fingerprints = source_fingerprints,
     input_sanitation_ledger = deepcopy((compiler_inputs or {}).input_sanitation_ledger),
     operations = operations,

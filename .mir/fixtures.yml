@@ -787,6 +787,12 @@ fixtures:
       - compiler-context-state-freeze
       - compiler-context-observationally-pure-snapshot
       - immutable-compiler-input-and-result-contracts
+      - immutable-boundary-private-trust-registration
+      - canonical-text-fingerprint-parity
+      - compilation-snapshot-untrusted-tamper-rejection
+      - policy-snapshot-untrusted-tamper-rejection
+      - runtime-environment-untrusted-tamper-rejection
+      - compiler-input-untrusted-tamper-rejection
       - compiler-result-private-trust-registration
       - compiler-result-untrusted-tamper-rejection
       - compiler-result-trusted-identity-tamper-rejection

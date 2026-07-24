@@ -91,7 +91,9 @@ local function assert_compiler_telemetry()
     "catalog_snapshot_count", "full_record_copy_count", "technology_design_full_copies",
     "gate_deep_verifications", "technology_design_deep_verifications",
     "safety_qualification_deep_verifications", "technology_candidate_deep_verifications",
-    "technology_catalog_deep_verifications", "transformation_operation_deep_verifications",
+    "technology_catalog_deep_verifications", "compilation_snapshot_deep_verifications",
+    "policy_snapshot_deep_verifications", "compiler_input_deep_verifications",
+    "runtime_environment_deep_verifications", "transformation_operation_deep_verifications",
     "transformation_plan_deep_verifications"
   }) do
     if type(evidence.counts[counter]) ~= "number" then
@@ -120,6 +122,10 @@ local function assert_compiler_telemetry()
     technology_design_deep_verifications = 0,
     safety_qualification_deep_verifications = 0,
     technology_catalog_deep_verifications = 0,
+    compilation_snapshot_deep_verifications = 0,
+    policy_snapshot_deep_verifications = 0,
+    compiler_input_deep_verifications = 0,
+    runtime_environment_deep_verifications = 0,
     transformation_operation_deep_verifications = 0,
     transformation_plan_deep_verifications = 0,
     trusted_rejected_assertions = 0,

@@ -1,7 +1,9 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 
 local M = {}
+local authority = trusted_record.new("RuntimeEnvironmentIdentity")
 local SCHEMA = 2
 local REQUIRED_FINGERPRINTS = {
   "target_profile_fingerprint", "startup_settings_fingerprint", "imported_profile_fingerprint",
@@ -9,8 +11,10 @@ local REQUIRED_FINGERPRINTS = {
 }
 
 local function material(record)
-  local out = deepcopy(record)
-  out.environment_fingerprint = nil
+  local out = {}
+  for key, value in pairs(record or {}) do
+    if key ~= "environment_fingerprint" then out[key] = value end
+  end
   return out
 end
 
@@ -30,7 +34,26 @@ local function normalized_mods(values)
   return rows
 end
 
-function M.validate(record)
+local function trust_identity(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    factorio_line = record.factorio_line,
+    target_profile_fingerprint = record.target_profile_fingerprint,
+    environment_fingerprint = record.environment_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(record, registered)
+  return record.schema == registered.schema
+    and record.record_type == registered.record_type
+    and record.factorio_line == registered.factorio_line
+    and record.target_profile_fingerprint == registered.target_profile_fingerprint
+    and record.environment_fingerprint == registered.environment_fingerprint
+end
+
+local function verify(record, options)
+  options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA
     or record.record_type ~= "RuntimeEnvironmentIdentity"
     or type(record.factorio_line) ~= "string" or record.factorio_line == ""
@@ -51,11 +74,29 @@ function M.validate(record)
     end
     seen[loaded_mod.id], previous = true, loaded_mod.id
   end
-  if record.mod_closure_fingerprint ~= fingerprint.of(record.loaded_mod_closure)
-    or record.environment_fingerprint ~= fingerprint.of(material(record)) then
+  if options.verify_fingerprints ~= false
+    and (record.mod_closure_fingerprint ~= fingerprint.of(record.loaded_mod_closure)
+      or record.environment_fingerprint ~= fingerprint.of(material(record))) then
     error("RuntimeEnvironmentIdentity fingerprint is invalid.", 2)
   end
   return true
+end
+
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, verify, trust_identity(record or {}))
+  return true
+end
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, trust_identity_unchanged)
+end
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
 end
 
 function M.new(values)
@@ -74,12 +115,12 @@ function M.new(values)
   }
   record.mod_closure_fingerprint = fingerprint.of(record.loaded_mod_closure)
   record.environment_fingerprint = fingerprint.of(material(record))
-  M.validate(record)
-  return record
+  verify(record, {verify_fingerprints = false})
+  return authority.register(record, trust_identity(record))
 end
 
 function M.compatibility_projection(record)
-  M.validate(record)
+  if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
   local out = {
     schema = 1,
     record_type = "EnvironmentIdentity",

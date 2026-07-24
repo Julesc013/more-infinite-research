@@ -1,7 +1,9 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 
 local M = {}
+local authority = trusted_record.new("CompilationSnapshot")
 local SCHEMA = 2
 
 local REQUIRED_DOMAINS = {
@@ -78,7 +80,23 @@ local function base_input_material(inputs)
   return out
 end
 
-function M.validate(record, options)
+local function trust_identity(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    base_snapshot_fingerprint = record.base_snapshot_fingerprint,
+    snapshot_fingerprint = record.snapshot_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(record, registered)
+  return record.schema == registered.schema
+    and record.record_type == registered.record_type
+    and record.base_snapshot_fingerprint == registered.base_snapshot_fingerprint
+    and record.snapshot_fingerprint == registered.snapshot_fingerprint
+end
+
+local function verify(record, options)
   options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA
     or record.record_type ~= "CompilationSnapshot"
@@ -115,14 +133,34 @@ function M.validate(record, options)
       error("CompilationSnapshot deep domain fingerprint is invalid.", 2)
     end
   end
-  if record.snapshot_fingerprint ~= fingerprint.of(top_material(record)) then
+  if options.verify_fingerprint ~= false
+    and record.snapshot_fingerprint ~= fingerprint.of(top_material(record)) then
     error("CompilationSnapshot Merkle fingerprint is invalid.", 2)
   end
   return true
 end
 
-function M.new(values)
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, function(value) verify(value, {deep = true}) end,
+    trust_identity(record or {}))
+  return true
+end
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, trust_identity_unchanged)
+end
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
+end
+
+function M.new(values, options)
   values = values or {}
+  options = options or {}
   local domains = values.fact_domains or values.prototype_surfaces or {}
   local record = {
     schema = SCHEMA,
@@ -148,8 +186,7 @@ function M.new(values)
       local canonical = fingerprint.canonical(record.fact_domains[domain])
       captured_bytes = captured_bytes + #canonical
       canonicalization_passes = canonicalization_passes + 1
-      record.domain_fingerprints[domain] = fingerprint.of(record.fact_domains[domain])
-      canonicalization_passes = canonicalization_passes + 1
+      record.domain_fingerprints[domain] = fingerprint.of_canonical(canonical)
     end
   end
   record.relationship_fingerprint = values.relationship_fingerprint or fingerprint.of(record.relationship_indexes)
@@ -176,12 +213,24 @@ function M.new(values)
   record.metrics.reused_domain_count = #record.structural_sharing.reused_domains
   record.metrics.copied_domain_count = #record.structural_sharing.copied_domains
   record.snapshot_fingerprint = fingerprint.of(top_material(record))
-  M.validate(record)
-  return record
+  local supplied_domain_fingerprints = values.domain_fingerprints and next(values.domain_fingerprints) ~= nil
+  local supplied_component_fingerprints = supplied_domain_fingerprints
+    or values.relationship_fingerprint ~= nil
+    or values.owner_index_fingerprint ~= nil
+    or values.graph_input_fingerprint ~= nil
+    or values.effect_target_inventory_fingerprint ~= nil
+    or values.provider_input_fingerprint ~= nil
+    or values.stream_input_fingerprint ~= nil
+    or values.base_continuation_input_fingerprint ~= nil
+  verify(record, {
+    deep = supplied_component_fingerprints and not options.trusted_components,
+    verify_fingerprint = false
+  })
+  return authority.register(record, trust_identity(record))
 end
 
 function M.qualify(base, values)
-  M.validate(base)
+  if M.is_trusted(base) then M.assert_trusted(base) else M.verify_untrusted(base) end
   values = values or {}
   return M.new({
     base_snapshot_fingerprint = base.snapshot_fingerprint,
@@ -209,11 +258,12 @@ function M.qualify(base, values)
       deep_copy_count = 0,
       qualification_delta = true
     }
-  })
+  }, {trusted_components = true})
 end
 
 function M.snapshot(record, options)
-  M.validate(record)
+  if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
+  authority.count_snapshot()
   if not (options and options.full) then
     return deepcopy({
       schema = record.schema,
@@ -233,7 +283,7 @@ function M.snapshot(record, options)
       snapshot_fingerprint = record.snapshot_fingerprint
     })
   end
-  M.validate(record, {deep = true})
+  authority.count_full_copy()
   return deepcopy(record)
 end
 

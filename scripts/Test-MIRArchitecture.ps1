@@ -515,8 +515,8 @@ foreach ($forbiddenPureCompilerToken in @("data.raw", "settings.", "mods", "os.c
 }
 foreach ($pureCompilerNeedle in @(
   'function M.compile(snapshot, policy)',
-  'compilation_snapshot.validate(snapshot)',
-  'policy_snapshot.validate(policy)',
+  'if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)',
+  'if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)',
   'transformation_plan.new('
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle
@@ -629,6 +629,23 @@ foreach ($compilerResultNeedle in @(
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/compiler_result.lua" -Text $compilerResultText -Needle $compilerResultNeedle
 }
+foreach ($trustedBoundary in @(
+  @{Path="prototypes/mir/domain/compiler/compilation_snapshot.lua"; Kind="CompilationSnapshot"},
+  @{Path="prototypes/mir/domain/compiler/policy_snapshot.lua"; Kind="PolicySnapshot"},
+  @{Path="prototypes/mir/domain/environment_identity.lua"; Kind="RuntimeEnvironmentIdentity"},
+  @{Path="prototypes/mir/domain/compiler/compiler_input.lua"; Kind="CompilerInput"}
+)) {
+  $trustedBoundaryText = Read-MIRFile -RelativePath $trustedBoundary.Path
+  foreach ($needle in @(
+    ('local authority = trusted_record.new("' + $trustedBoundary.Kind + '")'),
+    "function M.verify_untrusted(record)",
+    "function M.assert_trusted(record)"
+  )) {
+    Assert-MIRContains -RelativePath $trustedBoundary.Path -Text $trustedBoundaryText -Needle $needle
+  }
+}
+$fingerprintText = Read-MIRFile -RelativePath "prototypes/mir/core/fingerprint.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/core/fingerprint.lua" -Text $fingerprintText -Needle "function M.of_canonical(text)"
 $effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 if ($effectContractsText -match 'platform\.factorio|data_raw|\bsettings\b|\bmods\b') {
   throw "Pure effect contracts retain Factorio platform or ambient state access."

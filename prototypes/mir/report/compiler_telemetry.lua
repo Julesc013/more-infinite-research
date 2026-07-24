@@ -75,6 +75,10 @@ local REQUIRED_COUNTERS = {
   "safety_qualification_deep_verifications",
   "technology_candidate_deep_verifications",
   "technology_catalog_deep_verifications",
+  "compilation_snapshot_deep_verifications",
+  "policy_snapshot_deep_verifications",
+  "compiler_input_deep_verifications",
+  "runtime_environment_deep_verifications",
   "transformation_operation_deep_verifications",
   "transformation_plan_deep_verifications"
 }

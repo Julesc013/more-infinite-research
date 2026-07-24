@@ -138,8 +138,10 @@ local function base_operation(operation, policy)
 end
 
 function M.compile(snapshot, policy)
-  compilation_snapshot.validate(snapshot)
-  policy_snapshot.validate(policy)
+  if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)
+  else compilation_snapshot.verify_untrusted(snapshot) end
+  if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)
+  else policy_snapshot.verify_untrusted(policy) end
   local stream_plan = snapshot.stream_inputs.plan or snapshot.stream_inputs
   local base_plan = snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs
   local operations, dispositions = {}, {accepted = {}, rejected = {}, review_required = {}}

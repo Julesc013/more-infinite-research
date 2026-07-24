@@ -67,6 +67,10 @@ local function record_work_volume()
     safety_qualification_deep_verifications = ((trust_metrics.SafetyQualification or {}).untrusted_verifications or 0),
     technology_candidate_deep_verifications = ((trust_metrics.TechnologyCandidate or {}).untrusted_verifications or 0),
     technology_catalog_deep_verifications = ((trust_metrics.TechnologyCatalog or {}).untrusted_verifications or 0),
+    compilation_snapshot_deep_verifications = ((trust_metrics.CompilationSnapshot or {}).untrusted_verifications or 0),
+    policy_snapshot_deep_verifications = ((trust_metrics.PolicySnapshot or {}).untrusted_verifications or 0),
+    compiler_input_deep_verifications = ((trust_metrics.CompilerInput or {}).untrusted_verifications or 0),
+    runtime_environment_deep_verifications = ((trust_metrics.RuntimeEnvironmentIdentity or {}).untrusted_verifications or 0),
     transformation_operation_deep_verifications = ((trust_metrics.TransformationOperation or {}).untrusted_verifications or 0),
     transformation_plan_deep_verifications = ((trust_metrics.TransformationPlan or {}).untrusted_verifications or 0)
   }) do telemetry.observe_max(counter, value) end

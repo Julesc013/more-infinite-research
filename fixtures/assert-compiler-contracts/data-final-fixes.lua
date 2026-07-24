@@ -1231,6 +1231,38 @@ end
     input_sanitation_fingerprint = "SANITATION",
     source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
   })
+  if not c9_contracts.compilation_snapshot.is_trusted(exact_compilation_snapshot)
+    or not c9_contracts.policy_snapshot.is_trusted(exact_policy_snapshot)
+    or not c9_contracts.runtime_environment.is_trusted(exact_runtime_environment)
+    or not c9_contracts.compiler_input.is_trusted(exact_input) then
+    fail("immutable compiler boundary constructors did not register private trust")
+  end
+  do
+    local canonical = fingerprint.canonical({exact = {"canonical", 1, true}})
+    if fingerprint.of_canonical(canonical) ~= fingerprint.of({exact = {"canonical", 1, true}}) then
+      fail("fingerprint of precomputed canonical text changed exact identity")
+    end
+    local tampered_snapshot = deepcopy(exact_compilation_snapshot)
+    tampered_snapshot.fact_domains.recipes.injected = {name = "tampered"}
+    expect_error("untrusted CompilationSnapshot tamper", "fact-domain fingerprint differs", function()
+      c9_contracts.compilation_snapshot.verify_untrusted(tampered_snapshot)
+    end)
+    local tampered_policy = deepcopy(exact_policy_snapshot)
+    tampered_policy.effective_settings.injected = true
+    expect_error("untrusted PolicySnapshot tamper", "authority fingerprint is invalid", function()
+      c9_contracts.policy_snapshot.verify_untrusted(tampered_policy)
+    end)
+    local tampered_environment = deepcopy(exact_runtime_environment)
+    table.insert(tampered_environment.loaded_mod_closure, {id = "tampered", version = "1.0.0"})
+    expect_error("untrusted RuntimeEnvironmentIdentity tamper", "fingerprint is invalid", function()
+      c9_contracts.runtime_environment.verify_untrusted(tampered_environment)
+    end)
+    local tampered_input = deepcopy(exact_input)
+    tampered_input.source_fingerprints.fixtures = "TAMPERED"
+    expect_error("untrusted CompilerInput tamper", "CompilerInput fingerprint is invalid", function()
+      c9_contracts.compiler_input.verify_untrusted(tampered_input)
+    end)
+  end
   local input_snapshot = c9_contracts.compiler_input.snapshot(exact_input)
   input_snapshot.source_fingerprints.fixtures = "MUTATED"
   if exact_input.source_fingerprints.fixtures ~= "COMPILER-CONTRACTS" then
@@ -1288,6 +1320,8 @@ end
   expect_error("pure compiler missing hard gate", "missing", function()
     local tampered_snapshot = deepcopy(pure_snapshot)
     tampered_snapshot.stream_inputs.rows[1].gates.output_identity_safe = nil
+    tampered_snapshot.stream_input_fingerprint = nil
+    tampered_snapshot.snapshot_fingerprint = nil
     tampered_snapshot = c9_contracts.compilation_snapshot.new(tampered_snapshot)
     c9_contracts.compiler.compile(tampered_snapshot, exact_policy_snapshot)
   end)
