@@ -683,6 +683,31 @@ function Invoke-MIRAssuranceSelfTest {
     $Context.reuse_enabled = $originalReuseEnabled
   }
 
+  $planPolicyContext = $Context.PSObject.Copy()
+  $planPolicyContext.reuse_enabled = $true
+  $planPolicyContext.rerun_tests = @()
+  Sync-MIRAssuranceContextFromPlan -Context $planPolicyContext -Plan ([pscustomobject][ordered]@{
+    reuse_enabled=$false
+    rerun_tests=@()
+  })
+  $planNoReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $planPolicyContext -TestId $selfTestId
+  if ($planPolicyContext.reuse_enabled -or
+      $planNoReuseDecision.disposition -ne "RUN" -or
+      $planNoReuseDecision.reason -ne "reuse-disabled") {
+    throw "A loaded no-reuse plan did not control executor evidence reuse."
+  }
+  Sync-MIRAssuranceContextFromPlan -Context $planPolicyContext -Plan ([pscustomobject][ordered]@{
+    reuse_enabled=$true
+    rerun_tests=@($selfTestId)
+  })
+  $planRerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $planPolicyContext -TestId $selfTestId
+  if (-not $planPolicyContext.reuse_enabled -or
+      @($planPolicyContext.rerun_tests).Count -ne 1 -or
+      $planRerunDecision.disposition -ne "RUN" -or
+      $planRerunDecision.reason -ne "explicit-rerun") {
+    throw "A loaded explicit-rerun plan did not control executor evidence reuse."
+  }
+
   $freshnessProducer = Get-MIRAssuranceProducer
   $freshnessGeneratedAt = (Get-Date).ToUniversalTime().ToString("o")
   $freshnessTest = [pscustomobject][ordered]@{

@@ -54,7 +54,7 @@
         "package_source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
         "package_source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
         "package_source_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
-        "reason": "C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden optional load-order dependencies and a positive multi-science scenario contract"
+        "reason": "C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden ordering metadata and a positive multi-science scenario contract"
       }
     },
     "factorio-2.0": {

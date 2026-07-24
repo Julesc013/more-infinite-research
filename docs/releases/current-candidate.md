@@ -42,6 +42,6 @@ superseded_by: []
 | Archive bytes | `1000633` |
 | Archive entries | `286` |
 | Archive SHA-256 | `34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782` |
-| Reason | C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden optional load-order dependencies and a positive multi-science scenario contract |
+| Reason | C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden ordering metadata and a positive multi-science scenario contract |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

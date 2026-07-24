@@ -1015,10 +1015,21 @@ function Get-MIRAssurancePlanFromOption {
     $path = Resolve-MIRAssurancePath -Path $planOption
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Verification plan not found: $path" }
     $plan = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
-    return Assert-MIRAssurancePlan -Plan $plan -Context $Context
+    $validatedPlan = Assert-MIRAssurancePlan -Plan $plan -Context $Context
+    Sync-MIRAssuranceContextFromPlan -Context $Context -Plan $validatedPlan
+    return $validatedPlan
   }
   if ($RequirePlan) { throw "This command requires --plan <verification-plan.json>." }
   return Get-MIRAssurancePlan -Context $Context
+}
+
+function Sync-MIRAssuranceContextFromPlan {
+  param(
+    [Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)]$Plan
+  )
+  $Context.reuse_enabled = [bool]$Plan.reuse_enabled
+  $Context.rerun_tests = @($Plan.rerun_tests | ForEach-Object { [string]$_ })
 }
 
 function Get-MIRAssurancePlannedTest {
