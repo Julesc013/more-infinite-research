@@ -76,6 +76,7 @@ modules:
     - prototypes/mir/core/table.lua
     - prototypes/mir/core/fingerprint.lua
     - prototypes/mir/core/trusted_record.lua
+    - prototypes/mir/core/structural_equal.lua
   stage:
     - prototypes/mir/stage/settings.lua
     - prototypes/mir/stage/data.lua
@@ -336,6 +337,7 @@ mutation_commands:
     - output sanitation and generated effect assertions share the same freshly captured target inventory
     - CompilerContext owns the immutable input effect target inventory as a non-public service and output validation proves exact current name-set parity before reuse
     - sanitation copies and reconstructs an effect vector only after an in-place validation pass finds an invalid target
+    - output projection equality uses direct cycle-safe structural comparison and computes diagnostic fingerprints only after a mismatch
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints

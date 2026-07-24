@@ -4,6 +4,7 @@ local generated_registry = require("prototypes.mir.domain.facts.generated_techno
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local structural_equal = require("prototypes.mir.core.structural_equal")
 
 local M = {}
 local NUMERIC_TOLERANCE = 0.000000001
@@ -87,9 +88,9 @@ local function assert_equal(context, field, expected, actual)
 end
 
 local function assert_structural(context, field, expected, actual)
-  local expected_fingerprint = fingerprint.of({value = expected})
-  local actual_fingerprint = fingerprint.of({value = actual})
-  if expected_fingerprint ~= actual_fingerprint then
+  if not structural_equal.same(expected, actual) then
+    local expected_fingerprint = fingerprint.of({value = expected})
+    local actual_fingerprint = fingerprint.of({value = actual})
     fail(context, field .. " differs expected=" .. expected_fingerprint .. " actual=" .. actual_fingerprint)
   end
 end
