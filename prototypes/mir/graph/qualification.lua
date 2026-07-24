@@ -62,7 +62,8 @@ local function build_graph(operations, options)
   end
 
   local adjacency, reverse, edge_count, effect_count = {}, {}, 0, 0
-  for _, name in ipairs(sorted_keys(technologies)) do
+  local names = sorted_keys(technologies)
+  for _, name in ipairs(names) do
     adjacency[name] = sorted_prerequisites(technologies[name])
     reverse[name] = reverse[name] or {}
     effect_count = effect_count + #((technologies[name] and technologies[name].effects) or {})
@@ -73,7 +74,8 @@ local function build_graph(operations, options)
     end
   end
   for _, values in pairs(reverse) do table.sort(values) end
-  return technologies, planned, adjacency, reverse, edge_count, effect_count, graph_snapshot.new(technologies)
+  return technologies, planned, names, adjacency, reverse, edge_count, effect_count,
+    graph_snapshot.new(technologies, {prerequisites_by_name = adjacency})
 end
 
 local function component_is_cycle(component, adjacency)
@@ -245,7 +247,8 @@ end
 
 function M.validate_operations(operations, options)
   telemetry.start_phase("graph")
-  local technologies, planned, adjacency, reverse, edge_count, effect_count, snapshot = build_graph(operations, options)
+  local technologies, planned, names, adjacency, reverse, edge_count, effect_count, snapshot =
+    build_graph(operations, options)
   local rejection_reasons = {}
   for owner, prerequisites in pairs(adjacency) do
     for _, prerequisite in ipairs(prerequisites) do
@@ -265,7 +268,6 @@ function M.validate_operations(operations, options)
     end
   end
 
-  local names = sorted_keys(technologies)
   local scc_result = scc_kernel.analyze(adjacency)
   local components = {}
   for _, component in ipairs(scc_result.components) do table.insert(components, component.nodes) end

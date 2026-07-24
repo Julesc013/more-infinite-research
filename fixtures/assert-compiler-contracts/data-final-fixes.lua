@@ -1114,16 +1114,20 @@ do
 end
 do
   local graph_snapshot = require("__more-infinite-research__.prototypes.mir.graph.snapshot")
+  local shared_prerequisites = {"automation"}
   local snapshot = graph_snapshot.new({
     ["mir-graph-view-contract"] = {
       enabled = true,
       prerequisites = {"automation"},
       unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
     }
+  }, {
+    prerequisites_by_name = {['mir-graph-view-contract'] = shared_prerequisites}
   })
   local view = graph_snapshot.technology_view(snapshot)
   local owned = graph_snapshot.technology_map(snapshot)
   if view ~= graph_snapshot.technology_view(snapshot)
+    or view["mir-graph-view-contract"].prerequisites ~= shared_prerequisites
     or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"] then
     fail("graph snapshot did not preserve stable internal views and owned public maps")
   end
