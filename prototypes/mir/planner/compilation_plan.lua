@@ -18,6 +18,7 @@ local effect_target_inventory = require("prototypes.mir.platform.factorio.effect
 
 local M = {}
 local normalized_base_operation
+local REQUIRED_GATES = hard_gate_authority.order()
 
 local function default_base_gates(operation)
   local input_fingerprint = fingerprint.of({key = operation.key, technology_name = operation.technology_name})
@@ -347,11 +348,26 @@ local function materialized_stream_operations(artifact, options)
         error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
       end
       local design = row.technology_design
-      local qualification = safety_qualification.from_design(design, row, nil, {validated = true})
-      if qualification.decision ~= "qualified"
-        and not (options.virtual_projection and qualification.decision == "proposal") then
-        error("CompilationPlan cannot emit a design without complete structural safety qualification: "
-          .. tostring(row.stream_key), 2)
+      if options.virtual_projection then
+        -- Graph input is an ephemeral projection of an already finalized
+        -- GenerationPlan. Admit its trusted children and allow only pending
+        -- graph gates without constructing a discarded qualification record.
+        technology_design.assert_trusted(design)
+        hard_gate_authority.assert_total(row.gates)
+        for _, gate_name in ipairs(REQUIRED_GATES) do
+          local gate = row.gates[gate_name]
+          gate_contract.assert_trusted(gate)
+          if gate.status == "failed" then
+            error("CompilationPlan virtual graph projection contains failed gate: "
+              .. tostring(row.stream_key) .. "/" .. gate_name, 2)
+          end
+        end
+      else
+        local qualification = safety_qualification.from_design(design, row, nil, {validated = true})
+        if qualification.decision ~= "qualified" then
+          error("CompilationPlan cannot emit a design without complete structural safety qualification: "
+            .. tostring(row.stream_key), 2)
+        end
       end
       table.insert(out, {
         schema = 2,
@@ -364,11 +380,24 @@ local function materialized_stream_operations(artifact, options)
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
-      local qualification = safety_qualification.from_design(row.technology_design, row, nil, {validated = true})
-      if qualification.decision ~= "qualified"
-        and not (options.virtual_projection and qualification.decision == "proposal") then
-        error("CompilationPlan cannot patch an owner without complete structural safety qualification: "
-          .. tostring(row.stream_key), 2)
+      if options.virtual_projection then
+        technology_design.assert_trusted(row.technology_design)
+        hard_gate_authority.assert_total(row.gates)
+        for _, gate_name in ipairs(REQUIRED_GATES) do
+          local gate = row.gates[gate_name]
+          gate_contract.assert_trusted(gate)
+          if gate.status == "failed" then
+            error("CompilationPlan virtual owner projection contains failed gate: "
+              .. tostring(row.stream_key) .. "/" .. gate_name, 2)
+          end
+        end
+      else
+        local qualification = safety_qualification.from_design(
+          row.technology_design, row, nil, {validated = true})
+        if qualification.decision ~= "qualified" then
+          error("CompilationPlan cannot patch an owner without complete structural safety qualification: "
+            .. tostring(row.stream_key), 2)
+        end
       end
       table.insert(out, {
         schema = 2,
