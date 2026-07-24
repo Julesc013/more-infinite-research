@@ -148,7 +148,7 @@ function M.from_design(design, row, _, options)
     contributing_rejections = contributing,
     validation_evidence = design.maturity.validation_evidence
   }
-  record.qualification_fingerprint = fingerprint.of(material(record))
+  record.qualification_fingerprint = fingerprint.of_immutable(material(record))
   verify(record, {trusted_children = true, verify_fingerprint = false})
   return authority.register(record, trust_identity(record))
 end

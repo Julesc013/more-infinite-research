@@ -612,10 +612,10 @@ function M.is_trusted(design)
 end
 
 function M.refresh_fingerprints(design)
-  design.subject_fingerprint = fingerprint.of(subject_material(design))
-  design.design_fingerprint = fingerprint.of(design_material(design))
-  design.prototype_fingerprint = fingerprint.of(prototype_projection_unvalidated(design))
-  design.qualification_fingerprint = fingerprint.of(qualification_material(design))
+  design.subject_fingerprint = fingerprint.of_immutable(subject_material(design))
+  design.design_fingerprint = fingerprint.of_immutable(design_material(design))
+  design.prototype_fingerprint = fingerprint.of_immutable(prototype_projection_unvalidated(design))
+  design.qualification_fingerprint = fingerprint.of_immutable(qualification_material(design))
   design.semantic_fingerprint = design.qualification_fingerprint
   return design
 end
@@ -657,7 +657,7 @@ function M.with_qualification(design, row, options)
   result.gates = trusted_gate_map(row.gates)
   result.context.action_reason = row.reason
   result.context.target_profile_fingerprint = row.target_profile_fingerprint
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.qualification_fingerprint = fingerprint.of_immutable(qualification_material(result))
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end
