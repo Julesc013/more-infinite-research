@@ -105,12 +105,12 @@ local commands = {
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
     apply = function(context)
-      local ledger = require("prototypes.mir.emit.effect_safety")
+      local ledger, target_inventory = require("prototypes.mir.emit.effect_safety")
         .sanitize_all_technology_effects({pass = "output"})
       require("prototypes.mir.emit.effect_safety").assert_target_inventory_unchanged(
         context:artifact("input_sanitation_ledger"), ledger)
       context:record_artifact("output_sanitation_ledger", ledger)
-      require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
+      require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects(target_inventory)
       local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
         .assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))
       context:record_artifact("technology_graph_parity", graph_parity)

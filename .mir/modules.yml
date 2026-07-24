@@ -333,6 +333,7 @@ mutation_commands:
     - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records
     - each complete effect-safety pass captures one immutable target inventory and shares it across every technology and effect check
     - effect target membership indexes are private weak-key caches derived from immutable inventory values and never enter fingerprints or public artifacts
+    - output sanitation and generated effect assertions share the same freshly captured target inventory
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints

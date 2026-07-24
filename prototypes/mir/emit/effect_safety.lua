@@ -94,7 +94,7 @@ function S.sanitize_registered_technology_effects()
     end
   end
 
-  return summary
+  return summary, target_inventory
 end
 
 local function owner_record(name)
@@ -171,8 +171,8 @@ function S.register_generated_technology(name)
   generated_registry.register(name)
 end
 
-function S.assert_registered_technology_effects()
-  local target_inventory = inventory()
+function S.assert_registered_technology_effects(target_inventory)
+  target_inventory = target_inventory or inventory()
   for _, name in ipairs(generated_registry.sorted_names()) do
     local tech = data_raw.technology(name)
     if tech then
