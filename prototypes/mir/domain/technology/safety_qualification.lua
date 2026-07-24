@@ -20,10 +20,12 @@ local function binding_matches(entry, row)
   return true
 end
 
-local function material(record)
-  local gate_identities = {}
-  for gate_name, gate in pairs(record.hard_gates or {}) do
-    gate_identities[gate_name] = gate_contract.authority_projection(gate)
+local function material(record, trusted_gate_identities)
+  local gate_identities = trusted_gate_identities or {}
+  if not trusted_gate_identities then
+    for gate_name, gate in pairs(record.hard_gates or {}) do
+      gate_identities[gate_name] = gate_contract.authority_projection(gate)
+    end
   end
   return {
     schema = record.schema,
@@ -85,8 +87,10 @@ local function verify(record, options)
     error("SafetyQualification decision material is invalid.", 2)
   end
   hard_gate_authority.assert_total(record.hard_gates)
-  for _, gate in pairs(record.hard_gates) do
-    if options.trusted_children then gate_contract.assert_trusted(gate) else gate_contract.verify_untrusted(gate) end
+  if not options.trusted_children_verified then
+    for _, gate in pairs(record.hard_gates) do
+      if options.trusted_children then gate_contract.assert_trusted(gate) else gate_contract.verify_untrusted(gate) end
+    end
   end
   if record.primary_rejection ~= nil and type(record.primary_rejection) ~= "table" then
     error("SafetyQualification primary rejection is invalid.", 2)
@@ -136,6 +140,7 @@ function M.from_design(design, row, _, options)
   local contributing = {}
   local unresolved = {}
   local hard_gates = {}
+  local gate_identities = {}
   for _, gate_name in ipairs(GATE_ORDER) do
     local gate = row.gates and row.gates[gate_name]
     if gate == nil then
@@ -144,6 +149,7 @@ function M.from_design(design, row, _, options)
     if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
     else gate_contract.verify_untrusted(gate) end
     hard_gates[gate_name] = gate
+    gate_identities[gate_name] = gate_contract.trusted_authority_projection_view(gate)
     if gate.status == "failed" then
       table.insert(contributing, {gate = gate_name, reason = gate.reason, evidence = deepcopy(gate.evidence)})
     elseif gate.status == "pending" or gate.status == "superseded" then
@@ -171,8 +177,12 @@ function M.from_design(design, row, _, options)
     contributing_rejections = contributing,
     validation_evidence = design.maturity.validation_evidence
   }
-  record.qualification_fingerprint = fingerprint.of(material(record))
-  verify(record, {trusted_children = true, verify_fingerprint = false})
+  record.qualification_fingerprint = fingerprint.of(material(record, gate_identities))
+  verify(record, {
+    trusted_children = true,
+    trusted_children_verified = true,
+    verify_fingerprint = false
+  })
   authority.register(record, trust_identity(record))
   cached = cached or {}
   cached[#cached + 1] = {

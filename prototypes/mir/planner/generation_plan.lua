@@ -184,7 +184,9 @@ end
 
 function Plan:add_owned_derived(row)
   if self.finalized then error("GenerationPlan is already finalized", 2) end
-  validate_row(row, {design_derived = true})
+  -- This path receives a compiler-owned row and finalizes immediately. Keep
+  -- the exact reference, then perform the complete row and cross-row checks
+  -- once in finalize() rather than once here and again in finalize().
   table.insert(self.rows, row)
 end
 

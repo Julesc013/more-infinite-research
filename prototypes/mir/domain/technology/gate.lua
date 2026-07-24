@@ -169,6 +169,13 @@ function M.authority_projection(record)
   return identity(record)
 end
 
+-- Internal constructors use this only after the exact gate instance has
+-- crossed its private trust boundary. The returned scalar projection grants
+-- no trust and cannot authorize an unregistered record.
+function M.trusted_authority_projection_view(record)
+  return identity(record)
+end
+
 function M.schema_authority()
   return {
     schema = 1,

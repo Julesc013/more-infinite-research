@@ -320,10 +320,12 @@ local function prototype_projection_unvalidated(design)
   }
 end
 
-local function qualification_material(design)
+local function qualification_material(design, gates_validated)
   local gate_identities = {}
   for gate_name, gate in pairs(design.gates or {}) do
-    gate_identities[gate_name] = gate_contract.authority_projection(gate)
+    gate_identities[gate_name] = gates_validated
+      and gate_contract.trusted_authority_projection_view(gate)
+      or gate_contract.authority_projection(gate)
   end
   return {
     schema = design.schema,
@@ -543,7 +545,9 @@ local function validate(design, verify_fingerprints, options)
   end
   for gate_name, gate in pairs(design.gates) do
     if type(gate_name) ~= "string" then error("TechnologyDesign gate name is invalid.", 2) end
-    if options.trusted_children then
+    if options.trusted_children_verified then
+      -- The owned constructor already asserted this exact gate instance.
+    elseif options.trusted_children then
       gate_contract.assert_trusted(gate)
     else
       gate_contract.verify_untrusted(gate)
@@ -615,11 +619,13 @@ function M.is_trusted(design)
   return authority.is_trusted(design)
 end
 
-function M.refresh_fingerprints(design)
+function M.refresh_fingerprints(design, options)
+  options = options or {}
   design.subject_fingerprint = fingerprint.of(subject_material(design))
   design.design_fingerprint = fingerprint.of(design_material(design))
   design.prototype_fingerprint = fingerprint.of(prototype_projection_unvalidated(design))
-  design.qualification_fingerprint = fingerprint.of(qualification_material(design))
+  design.qualification_fingerprint = fingerprint.of(
+    qualification_material(design, options.trusted_gates == true))
   design.semantic_fingerprint = design.qualification_fingerprint
   return design
 end
@@ -661,7 +667,7 @@ function M.with_qualification(design, row, options)
   result.gates = trusted_gate_map(row.gates)
   result.context.action_reason = row.reason
   result.context.target_profile_fingerprint = row.target_profile_fingerprint
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.qualification_fingerprint = fingerprint.of(qualification_material(result, true))
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end
@@ -826,8 +832,8 @@ function M.from_generation_row(row)
   }
   -- Construction owns every field in this new record. Prove the structural
   -- and cross-field invariants once, then compute the fingerprints once.
-  validate(result, false, {trusted_children = true})
-  M.refresh_fingerprints(result)
+  validate(result, false, {trusted_children = true, trusted_children_verified = true})
+  M.refresh_fingerprints(result, {trusted_gates = true})
   return trust(result)
 end
 
@@ -923,7 +929,7 @@ function M.as_diagnostic_alternative(design, reason, options)
   result.subject_fingerprint = design.subject_fingerprint
   result.prototype_fingerprint = design.prototype_fingerprint
   result.design_fingerprint = fingerprint.of(design_material(result))
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.qualification_fingerprint = fingerprint.of(qualification_material(result, true))
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end

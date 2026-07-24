@@ -38,7 +38,9 @@ local function gate_disposition(row)
     if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
     else gate_contract.verify_untrusted(gate) end
     if gate.status == "failed" then table.insert(failed, gate_name) end
-    if not gate_contract.is_authoritatively_resolved(gate) then table.insert(unresolved, gate_name) end
+    if gate.status ~= "passed" and gate.status ~= "failed" and gate.status ~= "not-applicable" then
+      table.insert(unresolved, gate_name)
+    end
   end
   return unresolved, failed
 end
