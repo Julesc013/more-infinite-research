@@ -1691,6 +1691,16 @@ expect_error("CompilerContext frozen state", "state is frozen", function()
   first_context:replace_epoch("fixture-epoch-state", {value = 4}, 2)
 end)
 first_context:record_artifact("fixture-artifact", {value = 2})
+first_context:record_immutable_artifact("fixture-immutable-artifact", {value = 3}, {
+  assert_trusted = function(value)
+    if type(value) ~= "table" or value.value ~= 3 then
+      error("fixture immutable artifact was not trusted")
+    end
+  end
+})
+expect_error("CompilerContext immutable artifact authority", "requires its private trust authority", function()
+  first_context:record_immutable_artifact("fixture-untrusted-artifact", {}, {})
+end)
 compiler_context.with_active(first_context, function()
   science_packs.all_lab_inputs()
   science_packs.pack_production_status("automation-science-pack")
@@ -1756,7 +1766,9 @@ compiler_context.with_active(first_context, function()
 end)
 first_snapshot.state["fixture-derived-state"].value = 99
 first_snapshot.artifacts["fixture-artifact"].value = 99
+first_snapshot.artifacts["fixture-immutable-artifact"].value = 99
 if first_context:state_view("fixture-derived-state").value ~= 1
-  or first_context:artifact("fixture-artifact").value ~= 2 then
+  or first_context:artifact("fixture-artifact").value ~= 2
+  or first_context:artifact("fixture-immutable-artifact").value ~= 3 then
   fail("CompilerContext snapshot did not isolate owned state")
 end

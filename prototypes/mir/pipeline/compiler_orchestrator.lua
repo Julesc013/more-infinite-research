@@ -23,6 +23,7 @@ local mutation_journal = require("prototypes.mir.domain.compiler.mutation_journa
 local family_resolver = require("prototypes.mir.families.resolver")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local compiler_result_contract = require("prototypes.mir.domain.compiler.compiler_result")
+local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
 
 local M = {}
 
@@ -152,7 +153,8 @@ local function compile_active(context)
   context:set_state("technology_candidate_catalog", latest.technology_catalog)
   context:set_state("technology_qualifications", latest.technology_catalog.qualifications)
   context:set_state("compiler_result", latest.compiler_result)
-  context:record_artifact("technology_candidate_catalog", latest.technology_catalog)
+  context:record_immutable_artifact(
+    "technology_candidate_catalog", latest.technology_catalog, technology_catalog_contract)
   stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
   record_work_volume()
   telemetry.finish_phase("planning")

@@ -108,6 +108,22 @@ function Context:record_artifact(name, value)
   self.artifacts[name] = deepcopy(value)
 end
 
+-- Compiler-owned immutable records may be shared between state and the
+-- internal artifact index after their private authority has accepted them.
+-- The context never exposes this reference: artifact() and snapshot() retain
+-- the defensive-copy boundary used by adapters, reports, and fixtures.
+function Context:record_immutable_artifact(name, value, authority)
+  if self.artifacts[name] ~= nil then
+    error("MIR compiler context artifact was recorded more than once: " .. tostring(name), 2)
+  end
+  if type(authority) ~= "table" or type(authority.assert_trusted) ~= "function" then
+    error("MIR immutable compiler artifact requires its private trust authority: "
+      .. tostring(name), 2)
+  end
+  authority.assert_trusted(value)
+  self.artifacts[name] = value
+end
+
 function Context:artifact(name)
   return deepcopy(self.artifacts[name])
 end
