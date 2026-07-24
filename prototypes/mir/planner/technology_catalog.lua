@@ -21,10 +21,7 @@ local function selection_key(row)
 end
 
 local function safe_diagnostic_row(row)
-  local copy = deepcopy(row)
-  copy.action = "diagnose"
-  copy.reason = nil
-  copy.gates = {}
+  local copy = {action = "diagnose", gates = {}}
   for gate_name in pairs(row.gates or {}) do
     copy.gates[gate_name] = gate_contract.not_applicable(
       "candidate-catalog:diagnostic-alternative",
@@ -37,7 +34,9 @@ local function safe_diagnostic_row(row)
 end
 
 local function final_qualification_row(row)
-  local copy = deepcopy(row)
+  local copy = {}
+  for key, value in pairs(row) do copy[key] = value end
+  copy.gates = deepcopy(row.gates or {})
   if copy.action ~= "emit" and copy.action ~= "adopt" then
     copy.gates = copy.gates or {}
     for gate_name, gate in pairs(copy.gates) do
@@ -99,7 +98,11 @@ function M.from_preselection_rows(rows, context_material, options)
     if options.phase == "final" then row = final_qualification_row(row) end
     local primary_design = row.technology_design or technology_design.from_generation_row(row)
     if not options.trusted_designs then technology_design.validate(primary_design) end
-    local diagnostic_design = technology_design.as_diagnostic_alternative(primary_design, row.reason)
+    local diagnostic_design = technology_design.as_diagnostic_alternative(
+      primary_design,
+      row.reason,
+      {validated = options.trusted_designs == true}
+    )
     local diagnostic_row = safe_diagnostic_row(row)
     local designs = {}
     if row.action == "emit" or row.action == "adopt" then

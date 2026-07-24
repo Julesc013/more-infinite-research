@@ -23,6 +23,7 @@ Version: 3.2.0
     - Added steel plate productivity: base games receive one MIR chain, while Space Age keeps and extends its native owner.
     - Preserved every MIR 3.1.9 technology while moving design and lifecycle handling behind common contracts.
     - Removed redundant transient technology-catalog materialization while retaining one fully validated authoritative final catalog.
+    - Reduced final catalog construction cost with trusted copy-on-write diagnostic designs and gate-only qualification snapshots.
     - Generated the packaged effective stream-default table directly from the canonical Lua defaults.
     - Raised the Factorio, Recycler, and Space Age dependency floor to 2.1.11, the oldest fully qualified patch.
 

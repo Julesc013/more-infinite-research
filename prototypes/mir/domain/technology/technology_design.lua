@@ -751,12 +751,27 @@ function M.from_generation_row(row)
   return result
 end
 
-function M.as_diagnostic_alternative(design, reason)
-  M.validate(design)
-  local result = deepcopy(design)
+function M.as_diagnostic_alternative(design, reason, options)
+  options = options or {}
+  if not options.validated then M.validate(design) end
+
+  -- Diagnostic alternatives are derived from a compiler-owned immutable
+  -- TechnologyDesign. Copy only the branches whose values change; the catalog
+  -- takes its own defensive snapshot before exposing the alternative.
+  local result = {}
+  for key, value in pairs(design) do result[key] = value end
   result.materialization = {kind = "diagnose"}
+  result.design = {}
+  for key, value in pairs(design.design) do result.design[key] = value end
+  result.design.ownership = deepcopy(design.design.ownership)
   result.design.ownership.value.action = "diagnose"
+  result.provenance = {}
+  for key, value in pairs(design.provenance) do result.provenance[key] = value end
+  result.provenance.fields = {}
+  for key, value in pairs(design.provenance.fields) do result.provenance.fields[key] = value end
+  result.provenance.fields["ownership.action"] = deepcopy(design.provenance.fields["ownership.action"])
   result.provenance.fields["ownership.action"].value = "diagnose"
+  result.maturity = deepcopy(design.maturity)
   result.maturity.runtime_action = "diagnose"
   result.gates = {}
   for gate_name in pairs(design.gates or {}) do
@@ -767,9 +782,10 @@ function M.as_diagnostic_alternative(design, reason)
       {"candidate-catalog:safe-diagnostic-alternative"}
     )
   end
+  result.context = deepcopy(design.context)
   result.context.action_reason = reason or "safe-diagnostic-alternative"
+  validate(result, false)
   M.refresh_fingerprints(result)
-  M.validate(result)
   return result
 end
 
