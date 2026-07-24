@@ -20,6 +20,62 @@ local function entry_material(entry)
   return out
 end
 
+local function journal_fingerprint_material(snapshot)
+  local entries = {}
+  for index, entry in ipairs(snapshot.entries or {}) do
+    entries[index] = {
+      operation_id = entry.operation_id,
+      operation_fingerprint = entry.operation_fingerprint,
+      status = entry.status,
+      failure_code = entry.failure_code,
+      before_fingerprint = entry.before_fingerprint,
+      after_fingerprint = entry.after_fingerprint,
+      entry_fingerprint = entry.entry_fingerprint
+    }
+  end
+  return {
+    schema = snapshot.schema,
+    record_type = snapshot.record_type,
+    plan_fingerprint = snapshot.plan_fingerprint,
+    required_operation_count = snapshot.required_operation_count,
+    entries = entries,
+    terminal_counts = snapshot.terminal_counts,
+    missing_operations = snapshot.missing_operations,
+    missing_operation_count = snapshot.missing_operation_count,
+    duplicate_operation_count = snapshot.duplicate_operation_count,
+    undeclared_operation_count = snapshot.undeclared_operation_count,
+    out_of_plan_operation_count = snapshot.out_of_plan_operation_count,
+    violations = snapshot.violations,
+    finalized = snapshot.finalized,
+    complete = snapshot.complete
+  }
+end
+
+local function build_snapshot(journal)
+  table.sort(journal.entries, function(left, right) return left.operation_id < right.operation_id end)
+  local missing = {}
+  for operation_id in pairs(journal.planned_operation_fingerprints) do
+    if not journal.recorded[operation_id] then table.insert(missing, operation_id) end
+  end
+  table.sort(missing)
+  for _, values in pairs(journal.violations) do table.sort(values) end
+  return {
+    schema = journal.schema,
+    record_type = journal.record_type,
+    plan_fingerprint = journal.plan_fingerprint,
+    required_operation_count = journal.required_operation_count,
+    entries = journal.entries,
+    terminal_counts = terminal_counts(journal.entries),
+    missing_operations = missing,
+    missing_operation_count = #missing,
+    duplicate_operation_count = #journal.violations.duplicate,
+    undeclared_operation_count = #journal.violations.undeclared,
+    out_of_plan_operation_count = #journal.violations.out_of_plan,
+    violations = journal.violations,
+    finalized = journal.finalized
+  }
+end
+
 function M.new(plan)
   if plan_contract.is_trusted(plan) then plan_contract.assert_trusted(plan)
   else plan_contract.verify_untrusted(plan) end
@@ -102,35 +158,15 @@ end
 
 function Journal:snapshot()
   if self.final_snapshot then return deepcopy(self.final_snapshot) end
-  table.sort(self.entries, function(left, right) return left.operation_id < right.operation_id end)
-  local missing = {}
-  for operation_id in pairs(self.planned_operation_fingerprints) do
-    if not self.recorded[operation_id] then table.insert(missing, operation_id) end
-  end
-  table.sort(missing)
-  for _, values in pairs(self.violations) do table.sort(values) end
-  local out = {
-    schema = self.schema,
-    record_type = self.record_type,
-    plan_fingerprint = self.plan_fingerprint,
-    required_operation_count = self.required_operation_count,
-    entries = self.entries,
-    terminal_counts = terminal_counts(self.entries),
-    missing_operations = missing,
-    missing_operation_count = #missing,
-    duplicate_operation_count = #self.violations.duplicate,
-    undeclared_operation_count = #self.violations.undeclared,
-    out_of_plan_operation_count = #self.violations.out_of_plan,
-    violations = self.violations,
-    finalized = self.finalized
-  }
-  out.journal_fingerprint = fingerprint.of(out)
+  local out = build_snapshot(self)
+  out.journal_fingerprint = fingerprint.of(journal_fingerprint_material(out))
   return deepcopy(out)
 end
 
 function Journal:finalize(options)
   options = options or {}
-  local preview = self:snapshot()
+  if self.final_snapshot then return deepcopy(self.final_snapshot) end
+  local preview = build_snapshot(self)
   local complete = preview.missing_operation_count == 0
     and preview.duplicate_operation_count == 0
     and preview.undeclared_operation_count == 0
@@ -138,13 +174,9 @@ function Journal:finalize(options)
     and preview.terminal_counts.failed == 0
     and #preview.entries == self.required_operation_count
   self.finalized = true
-  local result = self:snapshot()
+  local result = build_snapshot(self)
   result.complete = complete
-  result.journal_fingerprint = fingerprint.of((function()
-    local material = deepcopy(result)
-    material.journal_fingerprint = nil
-    return material
-  end)())
+  result.journal_fingerprint = fingerprint.of(journal_fingerprint_material(result))
   self.final_snapshot = deepcopy(result)
   if not complete and options.allow_failed ~= true then
     error("MutationJournal is incomplete or failed: missing=" .. result.missing_operation_count
@@ -153,7 +185,7 @@ function Journal:finalize(options)
       .. " out-of-plan=" .. result.out_of_plan_operation_count
       .. " failed=" .. result.terminal_counts.failed, 2)
   end
-  return result
+  return deepcopy(result)
 end
 
 return M
