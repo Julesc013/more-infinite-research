@@ -142,7 +142,7 @@ $packageSourceCommit = [string]$releaseAuthority.package_source_commit
 if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$' -or
     [string]$artifact.current.source_commit -ne $packageSourceCommit -or
     [string]$artifact.current.package_source_commit -ne $packageSourceCommit) {
-  throw "Approved-delta current side does not bind the canonical C11 package-source commit."
+  throw "Approved-delta current side does not bind the active release candidate's canonical package-source commit."
 }
 $qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
 if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$') {

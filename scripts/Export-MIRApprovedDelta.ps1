@@ -602,7 +602,7 @@ $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.j
 $releaseAuthority = $releaseLedger.development."factorio-2.1"
 $packageSourceCommit = [string]$releaseAuthority.package_source_commit
 if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
-  throw "Approved-delta export requires the canonical C11 package-source commit."
+  throw "Approved-delta export requires the active release candidate's canonical package-source commit."
 }
 & git -C $repo merge-base --is-ancestor $packageSourceCommit $currentSourceCommit
 if ($LASTEXITCODE -ne 0) {
@@ -655,7 +655,7 @@ if ($currentContract.package_content_sha256 -ne (Get-MIRPackageSourceFingerprint
 if ([string]$releaseAuthority.archive_sha256 -ne $currentContract.archive_sha256 -or
     [string]$releaseAuthority.package_content_sha256 -ne $currentContract.package_content_sha256 -or
     [string]$releaseAuthority.package_source_sha256 -ne $currentContract.package_content_sha256) {
-  throw "Approved-delta current package does not match the canonical C11 release authority."
+  throw "Approved-delta current package does not match the active release candidate authority."
 }
 $rawDifferences = [Collections.Generic.List[object]]::new()
 Add-ValueDifferences -Results $rawDifferences -Path "package" -Before $baselineContract -After $currentContract
