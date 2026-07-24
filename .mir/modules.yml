@@ -347,7 +347,7 @@ mutation_commands:
     - CompilationSnapshot PolicySnapshot RuntimeEnvironmentIdentity and CompilerInput use private validation-once authorities; trusted internal consumers assert stored identities while copied or imported values receive complete component and aggregate verification
     - CompilationSnapshot hashes its already canonicalized captured fact domains without serializing them a second time and qualified snapshots reuse only exact trusted component fingerprints
     - the MIR32 canonical hash consumes bytes in identity-preserving sixteen-byte reads with an eight-byte tail while retaining the exact per-byte recurrence and modulus
-    - canonical encoding avoids allocation for arrays, captures ordinary string-key maps in one traversal with direct raw-key sorting and a bounded quoted-key cache, and preserves the existing typed-key ordering and byte encoding
+    - canonical encoding avoids allocation for arrays, captures ordinary string-key maps in one traversal with direct raw-key sorting, reuses at most 4096 quoted string tokens, and preserves the existing typed-key ordering and byte encoding
     - canonical diagnostic paths are constructed in a second traversal only for malformed or cyclic input; valid compilation retains identical bytes without allocating path strings
     - SafetyQualification is reused only for the exact trusted TechnologyDesign row action stream and gate-instance vector; legitimate derived gate vectors construct distinct records
     - TechnologyDesign prototype fingerprinting reads immutable projection values directly while public prototype projections retain one defensive deep copy

@@ -1,8 +1,8 @@
 local M = {}
 local ONE_MIB = 1024 * 1024
-local MAXIMUM_QUOTED_KEY_CACHE_ENTRIES = 1024
-local quoted_key_cache = {}
-local quoted_key_cache_entries = 0
+local MAXIMUM_QUOTED_STRING_CACHE_ENTRIES = 4096
+local quoted_string_cache = {}
+local quoted_string_cache_entries = 0
 local encode
 local diagnose
 local metrics = {
@@ -44,13 +44,13 @@ local function string_map_keys(value)
   return keys
 end
 
-local function quoted_key(key)
-  local encoded = quoted_key_cache[key]
+local function quoted_string(value)
+  local encoded = quoted_string_cache[value]
   if encoded then return encoded end
-  encoded = string.format("%q", key)
-  if quoted_key_cache_entries < MAXIMUM_QUOTED_KEY_CACHE_ENTRIES then
-    quoted_key_cache[key] = encoded
-    quoted_key_cache_entries = quoted_key_cache_entries + 1
+  encoded = string.format("%q", value)
+  if quoted_string_cache_entries < MAXIMUM_QUOTED_STRING_CACHE_ENTRIES then
+    quoted_string_cache[value] = encoded
+    quoted_string_cache_entries = quoted_string_cache_entries + 1
   end
   return encoded
 end
@@ -83,7 +83,7 @@ encode = function(value, seen, path, diagnostic, root)
   if kind == "nil" then return "null" end
   if kind == "boolean" then return value and "true" or "false" end
   if kind == "number" then return string.format("%.17g", value) end
-  if kind == "string" then return string.format("%q", value) end
+  if kind == "string" then return quoted_string(value) end
   if kind ~= "table" then
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
@@ -123,7 +123,7 @@ encode = function(value, seen, path, diagnostic, root)
           and child_kind ~= "number" and child_kind ~= "string")) then
         child_path = path .. "." .. key
       end
-      out[#out + 1] = quoted_key(key) .. ":" .. encode(child, seen, child_path, diagnostic, root)
+      out[#out + 1] = quoted_string(key) .. ":" .. encode(child, seen, child_path, diagnostic, root)
     end
     seen[value] = nil
     return "{" .. table.concat(out, ",") .. "}"
