@@ -19,6 +19,14 @@ local effect_target_inventory = require("prototypes.mir.platform.factorio.effect
 local M = {}
 local normalized_base_operation
 local REQUIRED_GATES = hard_gate_authority.order()
+local shared_planning_gates = {}
+
+local function shared_planning_gate(key, evaluator, evidence)
+  if not shared_planning_gates[key] then
+    shared_planning_gates[key] = gate_contract.passed(evaluator, evidence)
+  end
+  return shared_planning_gates[key]
+end
 
 local function default_base_gates(operation)
   local input_fingerprint = fingerprint.of({key = operation.key, technology_name = operation.technology_name})
@@ -155,10 +163,10 @@ local function sanitize_stream_artifact(stream_artifact, target_inventory)
           )
         end
       else
-        row.gates.effect_valid = gate_contract.passed(
+        row.gates.effect_valid = shared_planning_gate(
+          "all-effect-targets-exist",
           "effect-contracts",
-          {"effect-contracts:all-targets-exist"}
-        )
+          {"effect-contracts:all-targets-exist"})
       end
       -- Rebuild only when sanitation changed prototype semantics, ensuring the
       -- preliminary graph and final operation both consume the retained set.
@@ -258,10 +266,10 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
           {"technology-graph:missing-proof"}
         )
         row.gates.progression_safe = row.gates.prerequisites_acyclic
-        row.gates.output_identity_safe = gate_contract.passed(
+        row.gates.output_identity_safe = shared_planning_gate(
+          "unique-output-identity",
           "generation-plan",
-          {"generation-plan:unique-output-identity"}
-        )
+          {"generation-plan:unique-output-identity"})
         row.technology_design = technology_design.with_qualification(
           row.technology_design,
           row,

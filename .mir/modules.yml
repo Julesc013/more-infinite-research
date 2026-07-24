@@ -330,6 +330,7 @@ mutation_commands:
     - decoded external records are deeply verified once before a module-private weak-key authority admits them to the compiler trust domain
     - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
     - owned design qualification and GenerationPlan construction validate each exact gate and row once before finalization while untrusted imported records retain complete verification
+    - byte-identical source default non-materializing sanitation and output-identity gates share exact trusted instances and per-row decisions replace map entries without mutating gates
     - CompilationPlan sanitation owns copy-on-write row gate and fields tables and graph proof mutates only that transient projection while preserving source GenerationPlan isolation
     - ephemeral pre-graph operations admit finalized designs and total trusted gates without constructing discarded SafetyQualification records while final operations still require exact qualification
     - pre-graph operations share read-only trusted prototype values and a shallow operation vector while final materialization owns complete prototype projections

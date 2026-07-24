@@ -35,6 +35,8 @@ local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
+local shared_materializing_gates = {}
+local shared_skip_gates = {}
 
 local GATE_EVIDENCE = {
   target_supported = {evaluator = "target-profile", evidence = "positive-feature-contract", initial = "passed"},
@@ -49,6 +51,24 @@ local GATE_EVIDENCE = {
   output_identity_safe = {evaluator = "generation-plan", initial = "pending"}
 }
 
+local function shared_default_gate(action, gate_name, contract)
+  local cache = action == "skip" and shared_skip_gates or shared_materializing_gates
+  if cache[gate_name] then return cache[gate_name] end
+  if action == "skip" then
+    cache[gate_name] = gate_contract.not_applicable(
+      "generation-plan",
+      "candidate-action-is-materializing",
+      fingerprint.of({action = action, gate = gate_name}),
+      {"decision:non-materializing-row"}
+    )
+  elseif contract.initial == "pending" then
+    cache[gate_name] = gate_contract.pending(contract.evaluator)
+  else
+    cache[gate_name] = gate_contract.passed(contract.evaluator, {contract.evidence})
+  end
+  return cache[gate_name]
+end
+
 local function proof_gates(action, failed_gates)
   local out = {}
   for gate_name, contract in pairs(GATE_EVIDENCE) do
@@ -59,17 +79,8 @@ local function proof_gates(action, failed_gates)
         failure.reason,
         {failure.evidence}
       )
-    elseif action == "skip" then
-      out[gate_name] = gate_contract.not_applicable(
-        "generation-plan",
-        "candidate-action-is-materializing",
-        fingerprint.of({action = action, gate = gate_name}),
-        {"decision:non-materializing-row"}
-      )
-    elseif contract.initial == "pending" then
-      out[gate_name] = gate_contract.pending(contract.evaluator)
     else
-      out[gate_name] = gate_contract.passed(contract.evaluator, {contract.evidence})
+      out[gate_name] = shared_default_gate(action, gate_name, contract)
     end
   end
   return out
