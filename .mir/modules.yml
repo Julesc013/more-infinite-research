@@ -331,6 +331,7 @@ mutation_commands:
     - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
     - aggregate snapshot catalog operation plan and compilation fingerprints bind exact stored component fingerprints instead of embedding and recanonicalizing complete trusted records
     - planning stage row copies preserve immutable gate record identity while copying only the mutable gate map
+    - each compiler-owned TechnologyDesign copies external values once then shares those exact immutable values across dimension subject member and leaf-provenance views; imported designs remain independently deep-verified
     - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records
     - each complete effect-safety pass captures one immutable target inventory and shares it across every technology and effect check
     - effect target membership indexes are private weak-key caches derived from immutable inventory values and never enter fingerprints or public artifacts

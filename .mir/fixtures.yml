@@ -706,6 +706,7 @@ fixtures:
       - contributing-rejection-reasons
       - bounded-rejection-cause-graph
       - technology-design-schema-2-normalization
+      - technology-design-owned-value-structural-sharing
       - technology-design-closed-enum-and-cross-field-invariants
       - technology-design-field-provenance-and-locks
       - technology-design-cross-field-invariants

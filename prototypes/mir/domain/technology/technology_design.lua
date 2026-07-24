@@ -149,21 +149,21 @@ local function same(left, right, seen)
   return true
 end
 
-local function leaf(value, source, evidence_class, locked, lock_policy, envelope)
+local function leaf(value, source, evidence_class, locked, lock_policy, envelope, share_owned)
   local lock_state = locked and "all" or "none"
   return {
     present = value ~= nil,
-    value = deepcopy(value),
+    value = share_owned and value or deepcopy(value),
     source = source,
     evidence_class = evidence_class,
     lock_state = lock_state,
     locked = lock_state == "all",
     lock_policy = lock_policy or (locked and "locked" or "adaptive"),
-    envelope = deepcopy(envelope)
+    envelope = share_owned and envelope or deepcopy(envelope)
   }
 end
 
-local function dimension(value, source, evidence_class, paths, fields)
+local function dimension(value, source, evidence_class, paths, fields, share_owned)
   local locked_count = 0
   for _, path in ipairs(paths) do
     if fields[path].lock_state == "all" then locked_count = locked_count + 1 end
@@ -171,7 +171,7 @@ local function dimension(value, source, evidence_class, paths, fields)
   local lock_state = locked_count == 0 and "none" or locked_count == #paths and "all" or "partial"
   return {
     present = true,
-    value = deepcopy(value),
+    value = share_owned and value or deepcopy(value),
     source = source,
     evidence_class = evidence_class,
     lock_state = lock_state,
@@ -223,12 +223,12 @@ local function subjects_for(row, effects, progression)
   }
 end
 
-local function members_from_subjects(subjects)
+local function members_from_subjects(subjects, share_owned)
   return {
-    recipes = deepcopy(subjects.recipes),
-    items = deepcopy(subjects.items),
-    fluids = deepcopy(subjects.fluids),
-    entities = deepcopy(subjects.entities)
+    recipes = share_owned and subjects.recipes or deepcopy(subjects.recipes),
+    items = share_owned and subjects.items or deepcopy(subjects.items),
+    fluids = share_owned and subjects.fluids or deepcopy(subjects.fluids),
+    entities = share_owned and subjects.entities or deepcopy(subjects.entities)
   }
 end
 
@@ -668,7 +668,8 @@ function M.from_generation_row(row)
   local fields = row.fields or {}
   local adoption = row.adoption or {}
   local expected = adoption.expected_snapshot or {}
-  local effects = row.action == "adopt" and ((expected.effects) or adoption.effects or {}) or (fields.effects or {})
+  local effects = deepcopy(
+    row.action == "adopt" and ((expected.effects) or adoption.effects or {}) or (fields.effects or {}))
   local technology_id = row.technology_name or adoption.owner
   local capability = capability_for(row, effects)
   local candidate_id = "mir-candidate/" .. capability .. "/" .. tostring(row.stream_key)
@@ -723,10 +724,10 @@ function M.from_generation_row(row)
     hidden = fields.hidden
   }
   local subjects = subjects_for(row, effects, progression)
-  local members = members_from_subjects(subjects)
+  local members = members_from_subjects(subjects, true)
   local field_provenance = {}
   local function record(path, value, record_source, record_evidence, locked, lock_policy, envelope)
-    field_provenance[path] = leaf(value, record_source, record_evidence, locked, lock_policy, envelope)
+    field_provenance[path] = leaf(value, record_source, record_evidence, locked, lock_policy, envelope, true)
   end
   record("identity.technology_id", technology_id, identity_authority, "manifest", identity_locked)
   record("identity.candidate_id", candidate_id, source, evidence_class, false)
@@ -784,13 +785,13 @@ function M.from_generation_row(row)
     subjects = subjects,
     members = members,
     design = {
-      identity = dimension(identity_value, source, evidence_class, DIMENSION_PATHS.identity, field_provenance),
-      effects = dimension(effects, source, evidence_class, DIMENSION_PATHS.effects, field_provenance),
-      progression = dimension(progression, "planner:progression", "planner", DIMENSION_PATHS.progression, field_provenance),
-      cost = dimension(cost, "planner:cost", "planner", DIMENSION_PATHS.cost, field_provenance),
-      presentation = dimension(presentation, source, evidence_class, DIMENSION_PATHS.presentation, field_provenance),
-      ownership = dimension(ownership_value, source, evidence_class, DIMENSION_PATHS.ownership, field_provenance),
-      runtime_contracts = dimension(runtime_value, source, evidence_class, DIMENSION_PATHS.runtime_contracts, field_provenance)
+      identity = dimension(identity_value, source, evidence_class, DIMENSION_PATHS.identity, field_provenance, true),
+      effects = dimension(effects, source, evidence_class, DIMENSION_PATHS.effects, field_provenance, true),
+      progression = dimension(progression, "planner:progression", "planner", DIMENSION_PATHS.progression, field_provenance, true),
+      cost = dimension(cost, "planner:cost", "planner", DIMENSION_PATHS.cost, field_provenance, true),
+      presentation = dimension(presentation, source, evidence_class, DIMENSION_PATHS.presentation, field_provenance, true),
+      ownership = dimension(ownership_value, source, evidence_class, DIMENSION_PATHS.ownership, field_provenance, true),
+      runtime_contracts = dimension(runtime_value, source, evidence_class, DIMENSION_PATHS.runtime_contracts, field_provenance, true)
     },
     gates = trusted_gate_map(row.gates),
     provenance = {

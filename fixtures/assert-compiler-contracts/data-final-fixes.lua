@@ -513,6 +513,20 @@ if normalized_design.schema ~= 2
 then
   fail("TechnologyDesign did not preserve normalized fixed-stream semantics and independent field locks")
 end
+if not rawequal(normalized_design.design.effects.value, normalized_design.provenance.fields.effects.value)
+  or not rawequal(normalized_design.design.progression.value.prerequisites,
+    normalized_design.provenance.fields["progression.prerequisites"].value)
+  or not rawequal(normalized_design.subjects, normalized_design.provenance.fields.subjects.value)
+  or not rawequal(normalized_design.members, normalized_design.provenance.fields.members.value)
+  or not rawequal(normalized_design.members.recipes, normalized_design.subjects.recipes)
+  or rawequal(normalized_design.design.effects.value, design_row.fields.effects) then
+  fail("TechnologyDesign did not copy external values once and share exact owned immutable values")
+end
+local normalized_design_copy = deepcopy(normalized_design)
+technology_design.verify_untrusted(normalized_design_copy)
+if normalized_design_copy.qualification_fingerprint ~= normalized_design.qualification_fingerprint then
+  fail("TechnologyDesign structural sharing changed serialized qualification identity")
+end
 local stale_design_row = emitted_row("stale-design-contract", "stale-design-contract-tech", "iron-gear-wheel")
 stale_design_row.fields.effects[1].change = 0.2
 expect_error("emitted row TechnologyDesign authority", "legacy projection differs", function()
