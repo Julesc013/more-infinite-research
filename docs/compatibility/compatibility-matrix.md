@@ -98,7 +98,7 @@ The machine-readable support-lane ledger lives at `fixtures/compat-matrix/suppor
 | Omni/Angel/Bob Space Age Compat | Future campaign | Suite-aware load and ownership matrix | MIR + Omni/Angel/Bob Space Age Compat matrix | New `ideamods_mix` signal; treat as suite compatibility, not a single stream feature. |
 | Space Exploration | Future campaign | Diagnostics plus guarded recipe families only | Dedicated SE matrix | Start only after the requested proof and coexistence ladder is stable; respect SE productivity restrictions and avoid space-rule mutation. |
 | Krastorio 2 + Space Exploration | Future campaign | Combination matrix | MIR + K2 + SE matrix | Do not collapse into the standalone K2 claim. |
-| Krastorio 2 Spaced Out / Space Age | Future campaign | Separate Space Age-oriented matrix | MIR + K2SO + Space Age matrix | Separate from classic K2 and K2 + SE. |
+| Krastorio 2 Spaced Out / Space Age | Partial support in the 3.2.0 candidate | Load after K2SO final science/lab rewrites and retain representative multi-pack generated science | Exact MIR + K2SO + enhancement + Space Age scenario | Proves the named science-progression behavior, not full-pack support; separate from classic K2 and K2 + SE. |
 | Bob's, Angel's, Pyanodons, or larger suite combinations | Future campaign | Campaign after focused proof profiles and K2/AAI lessons | Explicit suite matrix | Avoid broad suite promises without tested profiles. |
 
 Before a future campaign moves from planned to supported, add:

@@ -967,6 +967,35 @@ function Invoke-MIRScenarioLoad {
 
   $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
+  $expectedPlan = Get-MIRObjectProperty -Object $Scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+  $requiredStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "required_stream_science" -Default ([pscustomobject]@{})
+  $scienceAssertions = @(
+    foreach ($requiredStream in @($requiredStreamScience.PSObject.Properties)) {
+      $streamName = [string]$requiredStream.Name
+      $requiredPacks = @($requiredStream.Value | ForEach-Object { [string]$_ })
+      $streamRows = @($result.audit_rows | Where-Object {
+        [string]$_.kind -eq "stream" -and
+        [string]$_.key -eq $streamName -and
+        [string]$_.status -eq "generated"
+      })
+      $observedPacks = @(
+        $streamRows |
+          ForEach-Object { @([string]$_.science -split ",") } |
+          Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+          Sort-Object -Unique
+      )
+      $missingPacks = @($requiredPacks | Where-Object { $_ -notin $observedPacks })
+      [pscustomobject]@{
+        stream = $streamName
+        required_packs = $requiredPacks
+        observed_packs = $observedPacks
+        matching_generated_rows = $streamRows.Count
+        missing_packs = $missingPacks
+        passed = ($streamRows.Count -gt 0 -and $missingPacks.Count -eq 0)
+      }
+    }
+  )
+  $scienceContractPassed = @($scienceAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -981,12 +1010,14 @@ function Invoke-MIRScenarioLoad {
     duration_seconds = [double]$result.duration_seconds
     skipped = $false
     skip_reason = ""
-    passed = $result.passed
+    passed = ($result.passed -and $scienceContractPassed)
     save = $result.save
     stdout = $result.stdout
     stderr = $result.stderr
     audit_rows = @($result.audit_rows)
     sanitation_rows = @($result.sanitation_rows)
+    science_contract_passed = $scienceContractPassed
+    science_assertions = $scienceAssertions
   }
 }
 

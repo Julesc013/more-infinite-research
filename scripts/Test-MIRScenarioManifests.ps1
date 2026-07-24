@@ -61,6 +61,18 @@ foreach ($relativePath in $manifestPaths) {
     foreach ($planProperty in @("mode", "required_result", "maximum_dependency_failures")) {
       $null = Assert-MIRProperty -Object $expectedPlan -Name $planProperty -Context "$context expected_plan"
     }
+    if ($expectedPlan.PSObject.Properties.Name -contains "required_stream_science") {
+      $requiredStreamScience = $expectedPlan.required_stream_science
+      foreach ($streamProperty in @($requiredStreamScience.PSObject.Properties)) {
+        if ([string]::IsNullOrWhiteSpace([string]$streamProperty.Name)) {
+          throw "$context expected_plan.required_stream_science contains an empty stream name."
+        }
+        $requiredPacks = @($streamProperty.Value)
+        if ($requiredPacks.Count -eq 0 -or @($requiredPacks | Where-Object { [string]::IsNullOrWhiteSpace([string]$_) }).Count -gt 0) {
+          throw "$context expected_plan.required_stream_science.$($streamProperty.Name) must name at least one non-empty science pack."
+        }
+      }
+    }
 
     $timeout = [int](Assert-MIRProperty -Object $scenario -Name "timeout_seconds" -Context $context)
     if ($timeout -lt 1 -or $timeout -gt 3600) { throw "$context timeout_seconds must be between 1 and 3600." }

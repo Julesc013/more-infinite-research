@@ -110,6 +110,7 @@ local_campaign_manifest:
     - expected_plan
     - timeout_seconds
     - claim_level
+    - required_stream_science
   sanitation_budget:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1

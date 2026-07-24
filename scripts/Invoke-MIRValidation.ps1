@@ -241,6 +241,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       "(?) elevated-rails",
       "? recycler >= 2.1.11",
       "(?) quality",
+      "(?) Krastorio2",
+      "(?) Krastorio2-spaced-out",
       "(?) space-exploration",
       "? space-age >= 2.1.11"
     )
@@ -258,7 +260,10 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     if ($deps | Where-Object { $_ -match "^\?\s+space-exploration(\s|$)" }) {
       throw "Space Exploration must be a hidden optional dependency so its final recipe removals run before MIR without advertising broad support."
     }
-    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality|space-exploration)\s+>=" })
+    if ($deps | Where-Object { $_ -match "^\?\s+(Krastorio2|Krastorio2-spaced-out)(\s|$)" }) {
+      throw "Krastorio load-order contracts must be hidden optional dependencies so final science and lab rewrites run before MIR without advertising broad support."
+    }
+    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality|Krastorio2|Krastorio2-spaced-out|space-exploration)\s+>=" })
     if ($hiddenVersionFloors.Count -gt 0) {
       throw "Hidden optional dependency version floors should not gate graceful degradation: $($hiddenVersionFloors -join ', ')"
     }

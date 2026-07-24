@@ -29,6 +29,7 @@ Version: 3.2.0
 
   Bugfixes:
 
+    - Ordered MIR after Krastorio 2 and K2SO final science/lab rewrites so generated research no longer collapses to red science.
     - Ordered MIR after Space Exploration so its final Krastorio recipe removals happen before productivity compilation.
     - Pruned impossible known recipe targets from generated and external technology effects before final safety assertions.
     - Added regressions for removed K2/SE recipes, dangling unlock effects, and retained valid effects.
