@@ -104,6 +104,13 @@ local function owner_record(name)
   return "external", "<unknown>", false
 end
 
+local function all_effect_targets_exist(effects, target_inventory)
+  for _, effect in ipairs(effects or {}) do
+    if not effect_contracts.target_status(effect, target_inventory) then return false end
+  end
+  return true
+end
+
 function S.sanitize_all_technology_effects(options)
   options = options or {}
   local target_inventory = options.target_inventory or inventory()
@@ -126,13 +133,15 @@ function S.sanitize_all_technology_effects(options)
   for _, name in ipairs(names) do
     local technology = data_raw.technology(name)
     local owner, owning_mod, owning_mod_known = owner_record(name)
-    local original_effects = deepcopy((technology and technology.effects) or {})
+    local live_effects = (technology and technology.effects) or {}
+    local original_effects = live_effects
     local original_effect_count = #original_effects
     summary.scanned_technology_count = summary.scanned_technology_count + 1
     summary.scanned_effect_count = summary.scanned_effect_count + original_effect_count
-    local kept, removed, retained_effect_order, retained_effect_identities = S.sanitize_effects(
-      original_effects, name, owner, target_inventory)
-    if #removed > 0 then
+    if not all_effect_targets_exist(live_effects, target_inventory) then
+      original_effects = deepcopy(live_effects)
+      local kept, removed, retained_effect_order, retained_effect_identities = S.sanitize_effects(
+        original_effects, name, owner, target_inventory)
       technology.effects = kept
       summary.pruned_effect_count = summary.pruned_effect_count + #removed
       summary.affected_technology_count = summary.affected_technology_count + 1
