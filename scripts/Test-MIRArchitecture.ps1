@@ -620,6 +620,15 @@ foreach ($trustedRecordNeedle in @(
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/core/trusted_record.lua" -Text $trustedRecordText -Needle $trustedRecordNeedle
 }
+$compilerResultText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/compiler_result.lua"
+foreach ($compilerResultNeedle in @(
+  'local authority = trusted_record.new("CompilerResult")',
+  "function M.verify_untrusted(record)",
+  "function M.assert_trusted(record)",
+  "if M.is_trusted(planned) then M.assert_trusted(planned) else M.verify_untrusted(planned) end"
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/compiler_result.lua" -Text $compilerResultText -Needle $compilerResultNeedle
+}
 $effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 if ($effectContractsText -match 'platform\.factorio|data_raw|\bsettings\b|\bmods\b') {
   throw "Pure effect contracts retain Factorio platform or ambient state access."

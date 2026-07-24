@@ -786,6 +786,10 @@ fixtures:
       - compiler-context-state-freeze
       - compiler-context-observationally-pure-snapshot
       - immutable-compiler-input-and-result-contracts
+      - compiler-result-private-trust-registration
+      - compiler-result-untrusted-tamper-rejection
+      - compiler-result-trusted-identity-tamper-rejection
+      - compiler-result-serialized-final-tamper-rejection
       - compilation-snapshot-and-policy-snapshot-fingerprints
       - pure-compiler-deterministic-replay
       - pure-compiler-missing-hard-gate-rejection

@@ -1233,6 +1233,28 @@ end
     rejected_candidates = {}
   })
   c9_contracts.compiler_result.validate(exact_result)
+  if not c9_contracts.compiler_result.is_trusted(exact_result) then
+    fail("CompilerResult deep verification did not register private trust")
+  end
+  local tampered_result = deepcopy(exact_result)
+  tampered_result.operation_fingerprints[1] = "TAMPERED"
+  expect_error("untrusted CompilerResult tamper", "fingerprint is invalid", function()
+    c9_contracts.compiler_result.validate(tampered_result)
+  end)
+  local identity_tampered_result = c9_contracts.compiler_result.new({
+    input_fingerprint = exact_input.input_fingerprint,
+    technology_catalog_fingerprint = "CATALOG",
+    generation_plan_fingerprint = "PLAN",
+    compilation_plan_fingerprint = "COMPILATION",
+    qualification_fingerprint = "QUALIFICATION",
+    operation_fingerprints = {"OPERATION"},
+    accepted_candidates = {},
+    rejected_candidates = {}
+  })
+  identity_tampered_result.status = "FAIL"
+  expect_error("trusted CompilerResult identity tamper", "Trusted CompilerResult record is required", function()
+    c9_contracts.compiler_result.assert_trusted(identity_tampered_result)
+  end)
   if exact_input.schema ~= 2 or exact_result.schema ~= 3 or exact_result.result_phase ~= "planned"
     or exact_result.dimensions.safety ~= "QUALIFIED" then
     fail("CompilerInput schema 2 / CompilerResult schema 3 authority is incomplete")
@@ -1302,6 +1324,11 @@ end
     or applied_result.planned_result_fingerprint ~= exact_result.result_fingerprint then
     fail("successful execution did not produce an immutable final APPLIED CompilerResult")
   end
+  local serialized_result_tamper = deepcopy(applied_result)
+  serialized_result_tamper.operation_fingerprints[1] = "TAMPERED"
+  expect_error("serialized final CompilerResult tamper", "fingerprint is invalid", function()
+    c9_contracts.compiler_result.verify_untrusted(serialized_result_tamper)
+  end)
   local failed_evidence = deepcopy(final_evidence)
   failed_evidence.output_parity_passed = false
   local failed_result = c9_contracts.compiler_result.finalize(exact_result, failed_evidence)

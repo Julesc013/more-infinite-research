@@ -1,7 +1,9 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 
 local M = {}
+local authority = trusted_record.new("CompilerResult")
 local SCHEMA = 3
 
 local DIMENSION_VALUES = {
@@ -23,9 +25,41 @@ local FINAL_EVIDENCE_FIELDS = {
 }
 
 local function material(record)
-  local out = deepcopy(record)
-  out.result_fingerprint = nil
+  local out = {}
+  for key, value in pairs(record or {}) do
+    if key ~= "result_fingerprint" then out[key] = value end
+  end
   return out
+end
+
+local function trust_identity(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    result_phase = record.result_phase,
+    input_fingerprint = record.input_fingerprint,
+    compilation_plan_fingerprint = record.compilation_plan_fingerprint,
+    qualification_fingerprint = record.qualification_fingerprint,
+    planned_result_fingerprint = record.planned_result_fingerprint,
+    result_fingerprint = record.result_fingerprint,
+    status = record.status
+  }
+end
+
+local function trust_identity_unchanged(record, registered)
+  return record.schema == registered.schema
+    and record.record_type == registered.record_type
+    and record.result_phase == registered.result_phase
+    and record.input_fingerprint == registered.input_fingerprint
+    and record.compilation_plan_fingerprint == registered.compilation_plan_fingerprint
+    and record.qualification_fingerprint == registered.qualification_fingerprint
+    and record.planned_result_fingerprint == registered.planned_result_fingerprint
+    and record.result_fingerprint == registered.result_fingerprint
+    and record.status == registered.status
+end
+
+local function trust(record)
+  return authority.register(record, trust_identity(record))
 end
 
 local function derived_status(dimensions)
@@ -40,7 +74,8 @@ local function derived_status(dimensions)
   return "PASS"
 end
 
-function M.validate(record)
+local function verify(record, options)
+  options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA or record.record_type ~= "CompilerResult"
     or (record.result_phase ~= "planned" and record.result_phase ~= "final") then
     error("CompilerResult schema 3 planned or final record is required.", 2)
@@ -64,8 +99,11 @@ function M.validate(record)
   end
   for _, class in ipairs(PROJECTION_CLASSES) do
     if type(record[class]) ~= "table" then error("CompilerResult projection is required: " .. class, 2) end
-    if record.disposition_counts[class] ~= #record[class]
-      or record.disposition_fingerprints[class] ~= fingerprint.of(record[class]) then
+    if record.disposition_counts[class] ~= #record[class] then
+      error("CompilerResult disposition summary differs: " .. class, 2)
+    end
+    if options.verify_fingerprints ~= false
+      and record.disposition_fingerprints[class] ~= fingerprint.of(record[class]) then
       error("CompilerResult disposition summary differs: " .. class, 2)
     end
   end
@@ -99,10 +137,28 @@ function M.validate(record)
   if record.status ~= derived_status(record.dimensions) then
     error("CompilerResult scalar status differs from its dimensions.", 2)
   end
-  if record.result_fingerprint ~= fingerprint.of(material(record)) then
+  if options.verify_fingerprints ~= false
+    and record.result_fingerprint ~= fingerprint.of(material(record)) then
     error("CompilerResult fingerprint is invalid.", 2)
   end
   return true
+end
+
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, verify, trust_identity(record or {}))
+  return true
+end
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, trust_identity_unchanged)
+end
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
 end
 
 function M.new(values)
@@ -130,12 +186,12 @@ function M.new(values)
   end
   record.status = derived_status(record.dimensions)
   record.result_fingerprint = fingerprint.of(material(record))
-  M.validate(record)
-  return record
+  verify(record, {verify_fingerprints = false})
+  return trust(record)
 end
 
 function M.finalize(planned, evidence)
-  M.validate(planned)
+  if M.is_trusted(planned) then M.assert_trusted(planned) else M.verify_untrusted(planned) end
   if planned.result_phase ~= "planned" then error("CompilerResult finalizer requires a planned result.", 2) end
   evidence = deepcopy(evidence or {})
   evidence.planned_operation_count = #planned.operation_fingerprints
@@ -162,8 +218,8 @@ function M.finalize(planned, evidence)
   record.status = derived_status(record.dimensions)
   record.result_fingerprint = nil
   record.result_fingerprint = fingerprint.of(material(record))
-  M.validate(record)
-  return record
+  verify(record, {verify_fingerprints = false})
+  return trust(record)
 end
 
 function M.schema_authority()
@@ -177,7 +233,7 @@ function M.schema_authority()
 end
 
 function M.compatibility_projection(record)
-  M.validate(record)
+  if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
   local out = {
     schema = 2,
     record_type = "CompilerResult",
@@ -200,7 +256,9 @@ function M.compatibility_projection(record)
 end
 
 function M.snapshot(record)
-  M.validate(record)
+  if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
+  authority.count_snapshot()
+  authority.count_full_copy()
   return deepcopy(record)
 end
 

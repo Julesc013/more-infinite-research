@@ -345,7 +345,7 @@ mutation_commands:
     - realized graph postconditions capture and structurally compare the exact graph snapshot then reuse SCC condensation and proof results already qualified for that identical graph
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
-    - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence
+    - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence and uses private validation-once authority so owned planning finalization and publication never rehash its complete disposition collections
     - normal loads publish only bounded public catalog projections; full catalogs require preview diagnostics validation or offline export
     - output validation compares numeric effects graph presentation save identity and generated-registry projections
     - input technology sanitation runs after compatibility repairs and before every index or planning pass and records content-addressed original retained removed and sanitized effects
