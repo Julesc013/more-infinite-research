@@ -1080,6 +1080,38 @@ if not continuation_operation or not continuation_operation.technology_design
   or continuation_operation.technology_design.identity_authority.source ~= "base-continuation-manifest" then
   fail("base continuation did not use TechnologyDesign and continuation manifest authority")
 end
+(function()
+  local shared_graph_proof_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
+    {
+      operation = "emit_base_extension",
+      key = "shared-proof-a",
+      technology_name = "mir-shared-graph-proof-a",
+      technology = {
+        name = "mir-shared-graph-proof-a", effects = {{type = "nothing"}}, prerequisites = {"automation"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "shared-proof-b",
+      technology_name = "mir-shared-graph-proof-b",
+      technology = {
+        name = "mir-shared-graph-proof-b", effects = {{type = "nothing"}}, prerequisites = {"automation"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    }
+  })
+  local shared_graph_proofs = shared_graph_proof_plan.validation_summary.technology_graph.proofs
+  if not shared_graph_proofs["mir-shared-graph-proof-a"]
+    or not rawequal(
+      shared_graph_proofs["mir-shared-graph-proof-a"],
+      shared_graph_proofs["mir-shared-graph-proof-b"]
+    ) then
+    fail("equivalent accepted graph proofs were not represented by one trusted immutable record")
+  }
+end)()
 expect_error("presentation output parity", "localized name differs", function()
   output_validator.assert_technology_shape(
     {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Expected"}},

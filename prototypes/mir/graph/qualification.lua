@@ -329,6 +329,7 @@ function M.validate_operations(operations, options)
     for _, reason in ipairs(bucket.local_reasons) do table.insert(local_origins, deepcopy(reason)) end
     cause_graph.nodes[name] = {local_origins = local_origins, unsafe_prerequisites = deepcopy(bucket.cause_links)}
   end
+  local accepted_graph_proof
   for name, _ in pairs(planned) do
     local reason_bucket = rejection_reasons[name]
     if reason_bucket then
@@ -347,14 +348,17 @@ function M.validate_operations(operations, options)
         cause_links = cause_summary.cause_links
       }
     else
-      proofs[name] = gate_contract.passed(
-        "technology-graph",
-        {
-          "technology-graph:scc-validated",
-          "technology-graph:nodes=" .. tostring(#names),
-          "technology-graph:edges=" .. tostring(edge_count)
-        }
-      )
+      if not accepted_graph_proof then
+        accepted_graph_proof = gate_contract.passed(
+          "technology-graph",
+          {
+            "technology-graph:scc-validated",
+            "technology-graph:nodes=" .. tostring(#names),
+            "technology-graph:edges=" .. tostring(edge_count)
+          }
+        )
+      end
+      proofs[name] = accepted_graph_proof
     end
   end
   telemetry.count("technologies", #names)

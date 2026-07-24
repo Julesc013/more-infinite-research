@@ -357,6 +357,7 @@ mutation_commands:
     - compiler-owned immutable records may share one exact reference between context state and the internal artifact index only after their module-private trust authority accepts them; all artifact reads and complete context snapshots remain defensive copies
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
     - realized graph postconditions capture and structurally compare the exact graph snapshot then reuse SCC condensation and proof results already qualified for that identical graph
+    - each graph qualification shares one exact trusted passing proof across accepted planned technologies while retaining distinct rejection causality
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence and uses private validation-once authority so owned planning finalization and publication never rehash its complete disposition collections
