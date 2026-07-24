@@ -6,6 +6,11 @@ local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 local authority = trusted_record.new("TechnologyDesign")
+local component_fingerprints = setmetatable({}, {__mode = "k"})
+local gate_authority_fingerprints = setmetatable({}, {__mode = "k"})
+local provenance_fingerprints = setmetatable({}, {__mode = "k"})
+local gate_vector_fingerprints = setmetatable({}, {__mode = "k"})
+local QUALIFICATION_IDENTITY_SCHEME = "technology-design-qualification-components/v1"
 
 local SCHEMA = {
   schema = 2,
@@ -320,22 +325,74 @@ local function prototype_projection_unvalidated(design)
   }
 end
 
-local function qualification_material(design)
-  local gate_identities = {}
-  for gate_name, gate in pairs(design.gates or {}) do
-    gate_identities[gate_name] = gate_contract.authority_projection(gate)
+local function component_fingerprint(value, options)
+  if options.reuse and type(value) == "table" and component_fingerprints[value] then
+    return component_fingerprints[value]
   end
+  local result = fingerprint.of(value)
+  if options.register and type(value) == "table" then component_fingerprints[value] = result end
+  return result
+end
+
+local function gate_authority_fingerprint(gate, options)
+  if options.reuse and gate_authority_fingerprints[gate] then
+    return gate_authority_fingerprints[gate]
+  end
+  local result = fingerprint.of(gate_contract.authority_projection(gate))
+  if options.register then gate_authority_fingerprints[gate] = result end
+  return result
+end
+
+local function gate_vector_fingerprint(gates, options)
+  if options.reuse and gate_vector_fingerprints[gates] then
+    return gate_vector_fingerprints[gates]
+  end
+  local identities = {}
+  for gate_name, gate in pairs(gates or {}) do
+    identities[gate_name] = gate_authority_fingerprint(gate, options)
+  end
+  local result = fingerprint.of(identities)
+  if options.register then gate_vector_fingerprints[gates] = result end
+  return result
+end
+
+local function provenance_fingerprint(provenance, options)
+  if options.reuse and provenance_fingerprints[provenance] then
+    return provenance_fingerprints[provenance]
+  end
+  local fields = {}
+  for path, record in pairs(provenance.fields or {}) do
+    fields[path] = component_fingerprint(record, options)
+  end
+  local result = fingerprint.of({
+    source = provenance.source,
+    provider_ids_fingerprint = component_fingerprint(provenance.provider_ids, options),
+    family_ids_fingerprint = component_fingerprint(provenance.family_ids, options),
+    evidence_class = provenance.evidence_class,
+    field_fingerprints = fields
+  })
+  if options.register then provenance_fingerprints[provenance] = result end
+  return result
+end
+
+local function qualification_material(design, options)
+  options = options or {}
   return {
+    identity_scheme = QUALIFICATION_IDENTITY_SCHEME,
     schema = design.schema,
     subject_fingerprint = design.subject_fingerprint,
     design_fingerprint = design.design_fingerprint,
     prototype_fingerprint = design.prototype_fingerprint,
-    identity_authority = design.identity_authority,
-    gates = gate_identities,
-    provenance = design.provenance,
-    maturity = design.maturity,
-    context = design.context
+    identity_authority_fingerprint = component_fingerprint(design.identity_authority, options),
+    gate_vector_fingerprint = gate_vector_fingerprint(design.gates, options),
+    provenance_fingerprint = provenance_fingerprint(design.provenance, options),
+    maturity_fingerprint = component_fingerprint(design.maturity, options),
+    context_fingerprint = component_fingerprint(design.context, options)
   }
+end
+
+local function qualification_fingerprint(design, options)
+  return fingerprint.of(qualification_material(design, options))
 end
 
 local function validate_string_array(values, label)
@@ -589,7 +646,7 @@ local function validate(design, verify_fingerprints, options)
       or design.prototype_fingerprint ~= expected_prototype then
       error("TechnologyDesign semantic identity fingerprints differ: " .. design.candidate_id, 2)
     end
-    local expected_qualification = fingerprint.of(qualification_material(design))
+    local expected_qualification = qualification_fingerprint(design)
     if design.qualification_fingerprint ~= expected_qualification
       or design.semantic_fingerprint ~= expected_qualification then
       error("TechnologyDesign qualification fingerprint differs: " .. design.candidate_id, 2)
@@ -619,7 +676,17 @@ function M.refresh_fingerprints(design)
   design.subject_fingerprint = fingerprint.of(subject_material(design))
   design.design_fingerprint = fingerprint.of(design_material(design))
   design.prototype_fingerprint = fingerprint.of(prototype_projection_unvalidated(design))
-  design.qualification_fingerprint = fingerprint.of(qualification_material(design))
+  design.qualification_fingerprint = qualification_fingerprint(design)
+  design.semantic_fingerprint = design.qualification_fingerprint
+  return design
+end
+
+local function refresh_owned_fingerprints(design)
+  design.subject_fingerprint = fingerprint.of(subject_material(design))
+  design.design_fingerprint = fingerprint.of(design_material(design))
+  design.prototype_fingerprint = fingerprint.of(prototype_projection_unvalidated(design))
+  design.qualification_fingerprint = qualification_fingerprint(
+    design, {register = true})
   design.semantic_fingerprint = design.qualification_fingerprint
   return design
 end
@@ -661,7 +728,8 @@ function M.with_qualification(design, row, options)
   result.gates = trusted_gate_map(row.gates)
   result.context.action_reason = row.reason
   result.context.target_profile_fingerprint = row.target_profile_fingerprint
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.qualification_fingerprint = qualification_fingerprint(
+    result, {reuse = true, register = true})
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end
@@ -827,7 +895,7 @@ function M.from_generation_row(row)
   -- Construction owns every field in this new record. Prove the structural
   -- and cross-field invariants once, then compute the fingerprints once.
   validate(result, false, {trusted_children = true})
-  M.refresh_fingerprints(result)
+  refresh_owned_fingerprints(result)
   return trust(result)
 end
 
@@ -923,7 +991,8 @@ function M.as_diagnostic_alternative(design, reason, options)
   result.subject_fingerprint = design.subject_fingerprint
   result.prototype_fingerprint = design.prototype_fingerprint
   result.design_fingerprint = fingerprint.of(design_material(result))
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.qualification_fingerprint = qualification_fingerprint(
+    result, {reuse = true, register = true})
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end

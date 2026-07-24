@@ -572,6 +572,14 @@ technology_design.verify_untrusted(normalized_design_copy)
 if normalized_design_copy.qualification_fingerprint ~= normalized_design.qualification_fingerprint then
   fail("TechnologyDesign structural sharing changed serialized qualification identity")
 end
+do
+  local tampered = deepcopy(normalized_design)
+  tampered.provenance.source = "fixture:tampered-provenance"
+  expect_error("TechnologyDesign component-bound qualification provenance",
+    "qualification fingerprint differs", function()
+      technology_design.verify_untrusted(tampered)
+    end)
+end
 local stale_design_row = emitted_row("stale-design-contract", "stale-design-contract-tech", "iron-gear-wheel")
 stale_design_row.fields.effects[1].change = 0.2
 expect_error("emitted row TechnologyDesign authority", "legacy projection differs", function()
