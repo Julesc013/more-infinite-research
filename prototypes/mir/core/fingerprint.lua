@@ -8,14 +8,49 @@ local metrics = {
   maximum_canonical_bytes = 0
 }
 
-local function is_array(value)
-  local count, maximum = 0, 0
-  for key, _ in pairs(value) do
-    if type(key) ~= "number" or key < 1 or key % 1 ~= 0 then return false end
-    count = count + 1
-    if key > maximum then maximum = key end
+local function map_key_row(key, path)
+  local key_kind = type(key)
+  if key_kind == "string" then
+    return {key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key}
   end
-  return count == maximum
+  if key_kind == "number" then
+    local encoded = string.format("%.17g", key)
+    return {key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"}
+  end
+  error("Fingerprint map keys must be strings or numbers at " .. path
+    .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 4)
+end
+
+local function table_shape(value, path)
+  local count, maximum = 0, 0
+  local possible_array = true
+  local pending_numeric_keys = {}
+  local map_keys
+  for key in pairs(value) do
+    count = count + 1
+    if possible_array and type(key) == "number" and key >= 1 and key % 1 == 0 then
+      pending_numeric_keys[#pending_numeric_keys + 1] = key
+      if key > maximum then maximum = key end
+    else
+      if possible_array then
+        possible_array = false
+        map_keys = {}
+        for _, numeric_key in ipairs(pending_numeric_keys) do
+          map_keys[#map_keys + 1] = map_key_row(numeric_key, path)
+        end
+        pending_numeric_keys = nil
+      end
+      map_keys[#map_keys + 1] = map_key_row(key, path)
+    end
+  end
+  if possible_array and count == maximum then return true end
+  if possible_array then
+    map_keys = {}
+    for _, numeric_key in ipairs(pending_numeric_keys) do
+      map_keys[#map_keys + 1] = map_key_row(numeric_key, path)
+    end
+  end
+  return false, map_keys
 end
 
 local function encode(value, seen, path)
@@ -29,25 +64,13 @@ local function encode(value, seen, path)
   seen[value] = path
 
   local out = {}
-  if is_array(value) then
+  local array, keys = table_shape(value, path)
+  if array then
     for index = 1, #value do out[index] = encode(value[index], seen, path .. "[" .. index .. "]") end
     seen[value] = nil
     return "[" .. table.concat(out, ",") .. "]"
   end
 
-  local keys = {}
-  for key, _ in pairs(value) do
-    local key_kind = type(key)
-    if key_kind == "string" then
-      table.insert(keys, {key = key, sort_key = "s:" .. key, encoded = string.format("%q", key), path = "." .. key})
-    elseif key_kind == "number" then
-      local encoded = string.format("%.17g", key)
-      table.insert(keys, {key = key, sort_key = "n:" .. encoded, encoded = "[" .. encoded .. "]", path = "[" .. encoded .. "]"})
-    else
-      error("Fingerprint map keys must be strings or numbers at " .. path
-        .. " (found " .. key_kind .. " key " .. tostring(key) .. ")", 3)
-    end
-  end
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
   for _, row in ipairs(keys) do
     table.insert(out, row.encoded .. ":" .. encode(value[row.key], seen, path .. row.path))

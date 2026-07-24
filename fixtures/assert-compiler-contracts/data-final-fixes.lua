@@ -79,7 +79,23 @@ end
       fail("MIR32 eight-byte hash reads changed the scalar recurrence")
     end
   end
-end)()
+end)();
+
+(function()
+  local canonical_cases = {
+    {value = {}, expected = "[]"},
+    {value = {beta = 2, alpha = 1}, expected = "{\"alpha\":1,\"beta\":2}"},
+    {value = {[2] = "two", [4] = "four"}, expected = "{[2]:\"two\",[4]:\"four\"}"},
+    {value = {"a", "b", "c"}, expected = "[\"a\",\"b\",\"c\"]"},
+    {value = {map = {z = false, a = true}, value = "line\nquote\""},
+      expected = "{\"map\":{\"a\":true,\"z\":false},\"value\":\"line\\\nquote\\\"\"}"}
+  }
+  for _, row in ipairs(canonical_cases) do
+    if fingerprint.canonical(row.value) ~= row.expected then
+      fail("single-pass canonical table traversal changed encoded bytes")
+    end
+  end
+end)();
 
 local function expect_error(label, expected, callback)
   local ok, message = pcall(callback)
