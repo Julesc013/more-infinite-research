@@ -43,6 +43,8 @@ The canonical projections are `graph_projection`, `prototype_projection`, `prese
 
 Prototype fingerprinting reads the exact compiler-owned immutable projection without copying it. The public `prototype_projection` API returns one defensive deep copy of the same material; changing that returned value cannot mutate the trusted design or its stored identity.
 
+A diagnostic alternative is a controlled derivation inside the trusted compiler domain. It shares unchanged subjects, members, identity authority, and design dimensions, and validates its new diagnostic materialization, ownership action, maturity, context, and complete N/A gate vector before registration. A copied or imported alternative does not inherit trust and must pass every schema and fingerprint invariant.
+
 ## Identity authority and maturity
 
 Identity stability is not inferred from a non-empty proposed technology name. It is one of `unassigned`, `provisional`, `reserved`, `stable-unreleased`, `released`, or `retired`, and it must match `identity_authority.state`. Existing fixed streams use their legacy stream-manifest authority. The two predeclared 3.1 automatic-family identities explicitly declare `identity_state = released`; a future procedural candidate defaults to `provisional` until a promotion authority says otherwise.

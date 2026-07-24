@@ -831,6 +831,58 @@ function M.from_generation_row(row)
   return trust(result)
 end
 
+local function assert_diagnostic_derivation(source, result)
+  M.assert_trusted(source)
+  if result.schema ~= source.schema
+    or result.candidate_id ~= source.candidate_id
+    or result.technology_id ~= source.technology_id
+    or result.materialization.kind ~= "diagnose"
+    or not rawequal(result.semantic_identity, source.semantic_identity)
+    or not rawequal(result.subjects, source.subjects)
+    or not rawequal(result.members, source.members)
+    or not rawequal(result.identity_authority, source.identity_authority) then
+    error("TechnologyDesign controlled diagnostic identity derivation is invalid.", 3)
+  end
+  for key in pairs(result.materialization) do
+    if key ~= "kind" then
+      error("TechnologyDesign controlled diagnostic materialization contains an unknown field.", 3)
+    end
+  end
+  for _, name in ipairs(SCHEMA.dimensions) do
+    if name ~= "ownership" and not rawequal(result.design[name], source.design[name]) then
+      error("TechnologyDesign controlled diagnostic changed immutable dimension: " .. name, 3)
+    end
+  end
+  validate_field_record(result.design.ownership, "design.ownership")
+  validate_field_record(result.provenance.fields["ownership.action"],
+    "provenance.fields.ownership.action")
+  if result.design.ownership.value.action ~= "diagnose"
+    or result.provenance.fields["ownership.action"].value ~= "diagnose"
+    or result.maturity.runtime_action ~= "diagnose"
+    or not MATERIALIZATION_RUNTIME_ACTIONS.diagnose[result.maturity.runtime_action]
+    or not MATERIALIZATION_OWNERSHIP_ACTIONS.diagnose[result.design.ownership.value.action] then
+    error("TechnologyDesign controlled diagnostic action derivation is invalid.", 3)
+  end
+  for axis, allowed in pairs(MATURITY_ENUMS) do
+    if not allowed[result.maturity[axis]] then
+      error("TechnologyDesign controlled diagnostic maturity is invalid: " .. axis, 3)
+    end
+  end
+  local source_gate_count, result_gate_count = 0, 0
+  for _ in pairs(source.gates) do source_gate_count = source_gate_count + 1 end
+  for gate_name, gate in pairs(result.gates) do
+    result_gate_count = result_gate_count + 1
+    if source.gates[gate_name] == nil or gate.status ~= "not-applicable" then
+      error("TechnologyDesign controlled diagnostic gate derivation is invalid: " .. tostring(gate_name), 3)
+    end
+    gate_contract.assert_trusted(gate)
+  end
+  if result_gate_count ~= source_gate_count then
+    error("TechnologyDesign controlled diagnostic gate vector is incomplete.", 3)
+  end
+  return true
+end
+
 function M.as_diagnostic_alternative(design, reason, options)
   options = options or {}
   if options.validated then M.assert_trusted(design) else M.verify_untrusted(design) end
@@ -864,7 +916,7 @@ function M.as_diagnostic_alternative(design, reason, options)
   end
   result.context = deepcopy(design.context)
   result.context.action_reason = reason or "safe-diagnostic-alternative"
-  validate(result, false, {trusted_children = true})
+  assert_diagnostic_derivation(design, result)
   -- Diagnostic materialization does not change subjects or the projected
   -- technology. Preserve those exact identities and compute only the design
   -- and qualification identities whose authority material changed.
