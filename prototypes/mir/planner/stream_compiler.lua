@@ -30,11 +30,9 @@ local native_owner_contract = require("prototypes.mir.domain.native_owner.contra
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
-local technology_catalog = require("prototypes.mir.planner.technology_catalog")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
-local technology_selection_policy = require("prototypes.mir.planner.technology_selection_policy")
 
 local M = {}
 
@@ -414,28 +412,14 @@ local function compile_active(context, return_view)
     table.insert(rows, plan_stream(key, streams[key]))
   end
   rows = effect_ownership.resolve(rows, {defer_design_refresh = true})
-  local catalog = technology_catalog.from_preselection_rows(
-    rows,
-    plan.source_fingerprints,
-    {trusted_designs = true}
-  )
-  catalog = technology_catalog.bind_selections(catalog, rows)
-  technology_selection_policy.assert_generation_projection(catalog.current_selections, rows)
   for _, row in ipairs(rows) do
     row.technology_design = technology_design.from_generation_row(row)
     plan:add_owned_derived(row)
   end
   local finalized = plan:finalize()
   local artifact = finalized:artifact_view()
-  catalog = technology_catalog.bind_selections(catalog, artifact.rows)
-  technology_selection_policy.assert_generation_projection(catalog.current_selections, artifact.rows)
   telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
-  telemetry.count("technology_catalog_candidates", #catalog.candidates)
-  telemetry.count("technology_catalog_alternatives", #catalog.alternative_qualifications)
-  telemetry.count("technology_catalog_canonical_bytes", #fingerprint.canonical(catalog))
-  -- The preselection catalog is deliberately transient. CompilationPlan owns
-  -- the one canonical schema-3 catalog after sanitation and graph decisions.
   context:set_state("generation_plan", artifact)
   return return_view and artifact or deepcopy(artifact)
 end

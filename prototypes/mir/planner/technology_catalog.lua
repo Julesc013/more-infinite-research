@@ -166,26 +166,30 @@ function M.from_preselection_rows(rows, context_material, options)
   catalog.preselection_catalog_fingerprint = fingerprint.of(preselection_material(catalog))
   catalog.selection_fingerprint = fingerprint.of(catalog.current_selections)
   catalog.catalog_fingerprint = fingerprint.of(catalog_material(catalog))
-  M.validate(catalog)
+  if not options.defer_validation then M.validate(catalog) end
   return catalog
 end
 
-function M.bind_selections(catalog, rows)
-  M.validate(catalog)
-  local result = deepcopy(catalog)
+function M.bind_selections(catalog, rows, options)
+  options = options or {}
+  if not options.trusted_owned then M.validate(catalog) end
+  local result = options.trusted_owned and catalog or deepcopy(catalog)
   local selections = selection_policy.select(result, rows)
   result.current_selections = selections
   result.selection_fingerprint = fingerprint.of(selections)
   result.catalog_fingerprint = fingerprint.of(catalog_material(result))
-  M.validate(result)
+  if not options.defer_validation then M.validate(result) end
   return result
 end
 
 function M.finalize(rows, context_material, compilation_operations, options)
   options = options or {}
-  options.phase = "final"
-  local catalog = M.from_preselection_rows(rows, context_material, options)
-  catalog = M.bind_selections(catalog, rows)
+  local build_options = {}
+  for key, value in pairs(options) do build_options[key] = value end
+  build_options.phase = "final"
+  build_options.defer_validation = true
+  local catalog = M.from_preselection_rows(rows, context_material, build_options)
+  catalog = M.bind_selections(catalog, rows, {trusted_owned = true, defer_validation = true})
   selection_policy.assert_generation_projection(catalog.current_selections, rows)
   selection_policy.assert_compilation_projection(catalog.current_selections, rows, compilation_operations or {})
   M.validate(catalog)
