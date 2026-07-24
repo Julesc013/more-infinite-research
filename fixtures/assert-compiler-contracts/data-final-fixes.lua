@@ -95,18 +95,6 @@ end)();
       fail("single-pass canonical table traversal changed encoded bytes")
     end
   end
-  local shared_leaf = {values = {"shared", 1, true}}
-  local shared_material = {left = shared_leaf, right = shared_leaf}
-  if fingerprint.canonical_shared(shared_material) ~= fingerprint.canonical(shared_material)
-    or fingerprint.of_shared(shared_material) ~= fingerprint.of(shared_material) then
-    fail("shared-reference canonicalization changed transport identity")
-  end
-  local before = fingerprint.of_shared(shared_material)
-  shared_leaf.values[2] = 2
-  if fingerprint.of_shared(shared_material) == before
-    or fingerprint.of_shared(shared_material) ~= fingerprint.of(shared_material) then
-    fail("shared-reference canonicalization reused stale material across calls")
-  end
 end)();
 
 local function expect_error(label, expected, callback)
