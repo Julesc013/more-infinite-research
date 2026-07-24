@@ -68,3 +68,23 @@ function Get-MIRPerformanceSettingsFingerprint {
   )
   return Get-MIRStringSha256 -Value ($rows -join "`n")
 }
+
+function Get-MIRPerformanceCounterValue {
+  param(
+    [Parameter(Mandatory)]$Counters,
+    [Parameter(Mandatory)][string]$Name
+  )
+
+  if ($Counters -is [Collections.IDictionary]) {
+    if (-not $Counters.Contains($Name)) {
+      return [pscustomobject]@{found=$false; value=[long]0}
+    }
+    return [pscustomobject]@{found=$true; value=[long]$Counters[$Name]}
+  }
+
+  $property = $Counters.PSObject.Properties[$Name]
+  if ($null -eq $property) {
+    return [pscustomobject]@{found=$false; value=[long]0}
+  }
+  return [pscustomobject]@{found=$true; value=[long]$property.Value}
+}

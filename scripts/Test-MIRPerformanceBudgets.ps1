@@ -166,10 +166,20 @@ foreach ($requiredPath in @(
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-foreach ($snippet in @("schema = 3", "artifact_volume", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
+foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
   if ($producerSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
+}
+$performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
+. $performanceCampaignHelpers
+$orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
+$jsonCounter = Get-MIRPerformanceCounterValue -Counters ('{"bounded":12}' | ConvertFrom-Json) -Name "bounded"
+$missingCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "missing"
+if (-not [bool]$orderedCounter.found -or [long]$orderedCounter.value -ne 12 -or
+    -not [bool]$jsonCounter.found -or [long]$jsonCounter.value -ne 12 -or
+    [bool]$missingCounter.found) {
+  throw "Performance counter lookup must support ordered producer maps, parsed evidence objects, and missing counters."
 }
 if ($producerSource -notmatch '\$PackageLabel\s+-eq\s+"candidate"\s+-and\s+\[string\]\$scenarios\[0\]\.result\s+-ne\s+"passed"') {
   throw "Performance campaign must apply current sanitation claim gates to the candidate without imposing them on the sealed baseline."

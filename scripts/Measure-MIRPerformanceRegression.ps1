@@ -654,25 +654,27 @@ $counterBudgetFailures = @()
 foreach ($measurement in $volumeMeasurements) {
   foreach ($bound in @($budgets.compiler_counter_bounds)) {
     $counter = [string]$bound.counter
-    $property = $measurement.counters.PSObject.Properties[$counter]
-    if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
+    $counterValue = Get-MIRPerformanceCounterValue -Counters $measurement.counters -Name $counter
+    if (-not [bool]$counterValue.found -or [long]$counterValue.value -gt [long]$bound.maximum) {
       $counterBudgetFailures += "$($measurement.surface):$counter"
     }
   }
-}
-if ($counterBudgetFailures.Count -gt 0) {
-  throw "Compiler artifact-volume budgets failed: $($counterBudgetFailures -join ', ')."
 }
 
 $closureRows = @($allClosureRows | Sort-Object -Unique)
 $thirdPartyClosureSha = Get-MIRStringSha256 -Value ($closureRows -join "`n")
 $failedLanes = @($laneResults | Where-Object status -ne "passed")
-$raw.status = if ($failedLanes.Count -eq 0) { "passed" } else { "failed" }
+$raw.status = if ($failedLanes.Count -eq 0 -and $counterBudgetFailures.Count -eq 0) { "passed" } else { "failed" }
 $raw.lanes = $laneResults
+$raw.artifact_volume = $volumeMeasurements
+$raw.counter_budget_failures = @($counterBudgetFailures)
 $raw.third_party_closure_sha256 = $thirdPartyClosureSha
 $raw.completed_at = (Get-Date).ToUniversalTime().ToString("o")
 $raw | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $rawPath -Encoding UTF8
 
+if ($counterBudgetFailures.Count -gt 0) {
+  throw "Compiler artifact-volume budgets failed: $($counterBudgetFailures -join ', '). Raw result: $rawPath"
+}
 if ($failedLanes.Count -gt 0) {
   throw "Performance campaign failed lanes: $(@($failedLanes.id) -join ', '). Raw result: $rawPath"
 }
