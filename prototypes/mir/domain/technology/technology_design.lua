@@ -837,8 +837,8 @@ function M.from_generation_row(row)
   return trust(result)
 end
 
-local function assert_diagnostic_derivation(source, result)
-  M.assert_trusted(source)
+local function assert_diagnostic_derivation(source, result, options)
+  if not (options and options.source_trusted_verified) then M.assert_trusted(source) end
   if result.schema ~= source.schema
     or result.candidate_id ~= source.candidate_id
     or result.technology_id ~= source.technology_id
@@ -891,7 +891,9 @@ end
 
 function M.as_diagnostic_alternative(design, reason, options)
   options = options or {}
-  if options.validated then M.assert_trusted(design) else M.verify_untrusted(design) end
+  if not options.source_trusted_verified then
+    if options.validated then M.assert_trusted(design) else M.verify_untrusted(design) end
+  end
 
   -- Diagnostic alternatives are derived from a compiler-owned immutable
   -- TechnologyDesign. Copy only the branches whose values change; the catalog
@@ -922,7 +924,7 @@ function M.as_diagnostic_alternative(design, reason, options)
   end
   result.context = deepcopy(design.context)
   result.context.action_reason = reason or "safe-diagnostic-alternative"
-  assert_diagnostic_derivation(design, result)
+  assert_diagnostic_derivation(design, result, options)
   -- Diagnostic materialization does not change subjects or the projected
   -- technology. Preserve those exact identities and compute only the design
   -- and qualification identities whose authority material changed.

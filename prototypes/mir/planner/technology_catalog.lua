@@ -24,7 +24,6 @@ local function selection_key(row)
 end
 
 local function safe_diagnostic_row(diagnostic_design)
-  technology_design.assert_trusted(diagnostic_design)
   return {action = "diagnose", gates = diagnostic_design.gates}
 end
 
@@ -50,8 +49,6 @@ local function final_qualification_row(row)
 end
 
 local function alternative_record(design, qualification, action, disposition)
-  technology_design.assert_trusted(design)
-  safety_qualification.assert_trusted(qualification)
   return {
     alternative_id = alternative_id(design, action),
     action = action,
@@ -156,7 +153,10 @@ function M.from_preselection_rows(rows, context_material, options)
     local diagnostic_design = technology_design.as_diagnostic_alternative(
       primary_design,
       row.reason,
-      {validated = options.trusted_designs == true}
+      {
+        validated = options.trusted_designs == true,
+        source_trusted_verified = options.trusted_designs == true
+      }
     )
     local diagnostic_row = safe_diagnostic_row(diagnostic_design)
     local designs = {}
@@ -167,7 +167,10 @@ function M.from_preselection_rows(rows, context_material, options)
     end
     table.insert(designs, {design = diagnostic_design, row = diagnostic_row, action = "diagnose", disposition = "safe-diagnostic"})
 
-    local candidate = technology_candidate.from_design(primary_design, row, {validated = true})
+    local candidate = technology_candidate.from_design(primary_design, row, {
+      validated = true,
+      trusted_design_verified = true
+    })
     if by_id[candidate.candidate_id] then
       error("TechnologyCandidate identity has contradictory preselection rows: " .. candidate.candidate_id, 2)
     end
@@ -181,7 +184,12 @@ function M.from_preselection_rows(rows, context_material, options)
         entry.design,
         entry.row,
         {status = "UNMEASURED"},
-        {validated = true}
+        {
+          validated = true,
+          trusted_design_verified = true,
+          trusted_gates_verified = options.children_admitted == true,
+          trusted_cached_verified = options.children_admitted == true
+        }
       )
       local alternative = alternative_record(entry.design, qualification, entry.action, entry.disposition)
       table.insert(candidate.alternatives, alternative)
@@ -254,6 +262,7 @@ function M.finalize(rows, context_material, compilation_operations, options)
   for key, value in pairs(options) do build_options[key] = value end
   build_options.phase = "final"
   build_options.defer_validation = true
+  build_options.children_admitted = true
   local catalog = M.from_preselection_rows(rows, context_material, build_options)
   catalog = M.bind_selections(catalog, rows, {trusted_owned = true, defer_validation = true})
   selection_policy.assert_generation_projection(catalog.current_selections, rows)

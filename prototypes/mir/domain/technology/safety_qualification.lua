@@ -124,8 +124,11 @@ function M.is_trusted(record)
 end
 
 function M.from_design(design, row, _, options)
-  if options and options.validated then technology_design.assert_trusted(design)
-  else technology_design.verify_untrusted(design) end
+  options = options or {}
+  if not options.trusted_design_verified then
+    if options.validated then technology_design.assert_trusted(design)
+    else technology_design.verify_untrusted(design) end
+  end
   row = row or {}
   if type(row.gates) ~= "table" then
     error("SafetyQualification row requires the exact TechnologyDesign gate set.", 2)
@@ -133,7 +136,7 @@ function M.from_design(design, row, _, options)
   local cached = qualifications_by_design[design]
   for _, entry in ipairs(cached or {}) do
     if binding_matches(entry, row) then
-      M.assert_trusted(entry.qualification)
+      if not options.trusted_cached_verified then M.assert_trusted(entry.qualification) end
       return entry.qualification
     end
   end
@@ -146,8 +149,10 @@ function M.from_design(design, row, _, options)
     if gate == nil then
       error("SafetyQualification candidate is missing required hard gate: " .. gate_name, 2)
     end
-    if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
-    else gate_contract.verify_untrusted(gate) end
+    if not options.trusted_gates_verified then
+      if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
+      else gate_contract.verify_untrusted(gate) end
+    end
     hard_gates[gate_name] = gate
     gate_identities[gate_name] = gate_contract.trusted_authority_projection_view(gate)
     if gate.status == "failed" then

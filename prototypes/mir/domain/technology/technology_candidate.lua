@@ -112,8 +112,10 @@ function M.is_trusted(candidate)
 end
 
 function M.from_design(design, row, options)
-  if options and options.validated then technology_design.assert_trusted(design)
-  else technology_design.verify_untrusted(design) end
+  if not (options and options.trusted_design_verified) then
+    if options and options.validated then technology_design.assert_trusted(design)
+    else technology_design.verify_untrusted(design) end
+  end
   row = row or {}
   local provider_ids = sorted_unique(row.provider_ids or {})
   local family_ids = sorted_unique(row.family_ids or {})
