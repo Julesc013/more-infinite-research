@@ -1,4 +1,12 @@
 local M = {}
+local ONE_MIB = 1024 * 1024
+local metrics = {
+  canonical_calls = 0,
+  canonical_bytes = 0,
+  fingerprint_calls = 0,
+  serializations_over_one_mib = 0,
+  maximum_canonical_bytes = 0
+}
 
 local function is_array(value)
   local count, maximum = 0, 0
@@ -49,16 +57,39 @@ local function encode(value, seen, path)
 end
 
 function M.canonical(value)
-  return encode(value, {}, "$")
+  local text = encode(value, {}, "$")
+  local bytes = #text
+  metrics.canonical_calls = metrics.canonical_calls + 1
+  metrics.canonical_bytes = metrics.canonical_bytes + bytes
+  metrics.maximum_canonical_bytes = math.max(metrics.maximum_canonical_bytes, bytes)
+  if bytes > ONE_MIB then
+    metrics.serializations_over_one_mib = metrics.serializations_over_one_mib + 1
+  end
+  return text
 end
 
 function M.of(value)
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
   local text = M.canonical(value)
   local hash = 2166136261
   for index = 1, #text do
     hash = (hash * 65599 + string.byte(text, index)) % 4294967291
   end
   return "mir32-" .. string.format("%08x", hash)
+end
+
+function M.metrics()
+  return {
+    canonical_calls = metrics.canonical_calls,
+    canonical_bytes = metrics.canonical_bytes,
+    fingerprint_calls = metrics.fingerprint_calls,
+    serializations_over_one_mib = metrics.serializations_over_one_mib,
+    maximum_canonical_bytes = metrics.maximum_canonical_bytes
+  }
+end
+
+function M.reset_metrics()
+  for key in pairs(metrics) do metrics[key] = 0 end
 end
 
 return M

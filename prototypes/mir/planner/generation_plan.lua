@@ -32,7 +32,8 @@ end
 
 local function validate_gate(row, gate_name)
   local gate = row.gates[gate_name]
-  gate_contract.validate(gate)
+  if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
+  else gate_contract.verify_untrusted(gate) end
   if row.action ~= "skip" and gate.status == "failed" then
     error("GenerationPlan materializing row failed gate " .. gate_name .. ": " .. row.stream_key, 3)
   end
@@ -64,8 +65,10 @@ local function validate_row(row, options)
     required(row, "technology_name")
     required(row, "technology_design")
     if options.design_derived then
-      if type(row.technology_design) ~= "table" or row.technology_design.schema ~= 2 then
-        error("GenerationPlan derived row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 3)
+      if technology_design.is_trusted(row.technology_design) then
+        technology_design.assert_trusted(row.technology_design)
+      else
+        technology_design.verify_untrusted(row.technology_design)
       end
     else
       technology_design.assert_generation_row(row)
@@ -96,8 +99,10 @@ local function validate_row(row, options)
       error("GenerationPlan native-owner output fingerprint differs: " .. row.stream_key, 3)
     end
     if options.design_derived then
-      if type(row.technology_design) ~= "table" or row.technology_design.schema ~= 2 then
-        error("GenerationPlan derived row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 3)
+      if technology_design.is_trusted(row.technology_design) then
+        technology_design.assert_trusted(row.technology_design)
+      else
+        technology_design.verify_untrusted(row.technology_design)
       end
     else
       technology_design.assert_generation_row(row)

@@ -84,10 +84,54 @@ local function assert_compiler_telemetry()
     "snapshot_peak_memory_bytes", "input_snapshot_bytes", "qualification_snapshot_bytes",
     "snapshot_reused_domains", "snapshot_copied_domains",
     "qualification_snapshot_construction_milliseconds", "qualification_peak_memory_bytes",
-    "compiler_total_milliseconds", "public_artifact_total_bytes"
+    "compiler_total_milliseconds", "public_artifact_total_bytes", "fingerprint_calls",
+    "canonicalization_calls", "canonical_bytes_total", "canonical_serializations_over_one_mib",
+    "maximum_canonical_bytes", "trusted_record_registrations", "trusted_untrusted_verifications",
+    "trusted_assertions", "trusted_rejected_assertions", "trusted_assertion_canonicalizations",
+    "catalog_snapshot_count", "full_record_copy_count", "technology_design_full_copies",
+    "gate_deep_verifications", "technology_design_deep_verifications",
+    "safety_qualification_deep_verifications", "technology_candidate_deep_verifications",
+    "technology_catalog_deep_verifications", "transformation_operation_deep_verifications",
+    "transformation_plan_deep_verifications"
   }) do
     if type(evidence.counts[counter]) ~= "number" then
       fail("compiler telemetry counter is missing: " .. counter)
+    end
+  end
+  log("[mir-fixture] work-volume"
+    .. " fingerprint_calls=" .. tostring(evidence.counts.fingerprint_calls)
+    .. " canonicalization_calls=" .. tostring(evidence.counts.canonicalization_calls)
+    .. " canonical_bytes_total=" .. tostring(evidence.counts.canonical_bytes_total)
+    .. " serializations_over_one_mib=" .. tostring(evidence.counts.canonical_serializations_over_one_mib)
+    .. " gate_deep_verifications=" .. tostring(evidence.counts.gate_deep_verifications)
+    .. " design_deep_verifications=" .. tostring(evidence.counts.technology_design_deep_verifications)
+    .. " qualification_deep_verifications=" .. tostring(evidence.counts.safety_qualification_deep_verifications)
+    .. " catalog_deep_verifications=" .. tostring(evidence.counts.technology_catalog_deep_verifications)
+    .. " trusted_assertions=" .. tostring(evidence.counts.trusted_assertions)
+    .. " rejected_assertions=" .. tostring(evidence.counts.trusted_rejected_assertions)
+    .. " catalog_snapshots=" .. tostring(evidence.counts.catalog_snapshot_count)
+    .. " full_record_copies=" .. tostring(evidence.counts.full_record_copy_count))
+  for counter, maximum in pairs({
+    fingerprint_calls = 15000,
+    canonicalization_calls = 16000,
+    canonical_bytes_total = 50000000,
+    canonical_serializations_over_one_mib = 12,
+    gate_deep_verifications = 2500,
+    technology_design_deep_verifications = 0,
+    safety_qualification_deep_verifications = 0,
+    technology_catalog_deep_verifications = 0,
+    transformation_operation_deep_verifications = 0,
+    transformation_plan_deep_verifications = 0,
+    trusted_rejected_assertions = 0,
+    trusted_assertion_canonicalizations = 0,
+    catalog_snapshot_count = 0,
+    full_record_copy_count = 0,
+    technology_design_full_copies = 0
+  }) do
+    if evidence.counts[counter] > maximum then
+      fail("compiler work-volume regression exceeded " .. counter
+        .. " maximum=" .. tostring(maximum)
+        .. " actual=" .. tostring(evidence.counts[counter]))
     end
   end
   for _, phase in ipairs({

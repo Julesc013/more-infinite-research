@@ -1,10 +1,12 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 
 local M = {}
+local authority = trusted_record.new("SafetyQualification")
 local SCHEMA = 1
 local GATE_ORDER = hard_gate_authority.order()
 local DECISIONS = {qualified = true, proposal = true, rejected = true, quarantined = true}
@@ -34,7 +36,28 @@ function M.schema_authority()
   }
 end
 
-function M.validate(record)
+local function trust_identity(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    candidate_id = record.candidate_id,
+    design_fingerprint = record.design_fingerprint,
+    qualification_fingerprint = record.qualification_fingerprint,
+    decision = record.decision
+  }
+end
+
+local function trust_identity_unchanged(record, registered)
+  return record.schema == registered.schema
+    and record.record_type == registered.record_type
+    and record.candidate_id == registered.candidate_id
+    and record.design_fingerprint == registered.design_fingerprint
+    and record.qualification_fingerprint == registered.qualification_fingerprint
+    and record.decision == registered.decision
+end
+
+local function verify(record, options)
+  options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA or record.record_type ~= "SafetyQualification" then
     error("SafetyQualification schema 1 record is required.", 2)
   end
@@ -49,7 +72,9 @@ function M.validate(record)
     error("SafetyQualification decision material is invalid.", 2)
   end
   hard_gate_authority.assert_total(record.hard_gates)
-  for _, gate in pairs(record.hard_gates) do gate_contract.validate(gate) end
+  for _, gate in pairs(record.hard_gates) do
+    if options.trusted_children then gate_contract.assert_trusted(gate) else gate_contract.verify_untrusted(gate) end
+  end
   if record.primary_rejection ~= nil and type(record.primary_rejection) ~= "table" then
     error("SafetyQualification primary rejection is invalid.", 2)
   end
@@ -59,8 +84,30 @@ function M.validate(record)
   return true
 end
 
+
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, verify, trust_identity(record or {}))
+  return true
+end
+
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, trust_identity_unchanged)
+end
+
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
+end
+
 function M.from_design(design, row, _, options)
-  if not (options and options.validated) then technology_design.validate(design) end
+  if options and options.validated then technology_design.assert_trusted(design)
+  else technology_design.verify_untrusted(design) end
   row = row or {}
   local contributing = {}
   local unresolved = {}
@@ -70,8 +117,9 @@ function M.from_design(design, row, _, options)
     if gate == nil then
       error("SafetyQualification candidate is missing required hard gate: " .. gate_name, 2)
     end
-    gate_contract.validate(gate)
-    hard_gates[gate_name] = deepcopy(gate)
+    if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
+    else gate_contract.verify_untrusted(gate) end
+    hard_gates[gate_name] = gate
     if gate.status == "failed" then
       table.insert(contributing, {gate = gate_name, reason = gate.reason, evidence = deepcopy(gate.evidence)})
     elseif gate.status == "pending" or gate.status == "superseded" then
@@ -100,8 +148,8 @@ function M.from_design(design, row, _, options)
     validation_evidence = design.maturity.validation_evidence
   }
   record.qualification_fingerprint = fingerprint.of(material(record))
-  M.validate(record)
-  return record
+  verify(record, {trusted_children = true})
+  return authority.register(record, trust_identity(record))
 end
 
 return M

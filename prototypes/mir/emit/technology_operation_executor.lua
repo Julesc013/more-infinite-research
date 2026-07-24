@@ -27,7 +27,7 @@ end
 local function apply_operation(operation)
   local payload = operation.payload
   local design = payload.technology_design
-  technology_design.validate(design)
+  technology_design.assert_trusted(design)
   if operation.action == "create" then
     return technology_design_adapter.emit(design, {
       kind = payload.kind == "base-continuation" and "base_extension" or "stream",
@@ -42,7 +42,8 @@ end
 
 function M.apply_plan(plan, journal, options)
   options = options or {}
-  plan_contract.validate(plan)
+  if plan_contract.is_trusted(plan) then plan_contract.assert_trusted(plan)
+  else plan_contract.verify_untrusted(plan) end
   if type(journal) ~= "table" or journal.plan_fingerprint ~= plan.plan_fingerprint then
     error("Technology operation executor requires the exact plan-bound MutationJournal.", 2)
   end

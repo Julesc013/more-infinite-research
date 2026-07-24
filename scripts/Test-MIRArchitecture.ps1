@@ -603,11 +603,21 @@ if ($baseExtensionsText -match 'require\("prototypes\.mir\.emit\.') {
 $technologyOperationExecutor = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_operation_executor.lua"
 foreach ($executorNeedle in @(
   "function M.apply_plan(plan, journal, options)",
-  "plan_contract.validate(plan)",
+  "plan_contract.assert_trusted(plan)",
   "journal:assert_before(operation, before)",
   'journal:record(operation, before, after, "applied"'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
+}
+
+$trustedRecordText = Read-MIRFile -RelativePath "prototypes/mir/core/trusted_record.lua"
+foreach ($trustedRecordNeedle in @(
+  'setmetatable({}, {__mode = "k"})',
+  "function authority.verify_untrusted(record, verifier, identity)",
+  "function authority.assert_trusted(record, identity_check)",
+  "function M.reset_metrics()"
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/core/trusted_record.lua" -Text $trustedRecordText -Needle $trustedRecordNeedle
 }
 $effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 if ($effectContractsText -match 'platform\.factorio|data_raw|\bsettings\b|\bmods\b') {

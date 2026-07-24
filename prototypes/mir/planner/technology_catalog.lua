@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 local technology_candidate = require("prototypes.mir.domain.technology.technology_candidate")
 local technology_qualification = require("prototypes.mir.domain.technology.technology_qualification")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
@@ -10,6 +11,7 @@ local selection_policy = require("prototypes.mir.planner.technology_selection_po
 local M = {}
 local SCHEMA = 3
 local PHASES = {preselection = true, final = true}
+local authority = trusted_record.new("TechnologyCatalog")
 
 local function alternative_id(design, action)
   local target = design.materialization.target or design.technology_id or design.candidate_id
@@ -36,7 +38,8 @@ end
 local function final_qualification_row(row)
   local copy = {}
   for key, value in pairs(row) do copy[key] = value end
-  copy.gates = deepcopy(row.gates or {})
+  copy.gates = {}
+  for gate_name, gate in pairs(row.gates or {}) do copy.gates[gate_name] = gate end
   if copy.action ~= "emit" and copy.action ~= "adopt" then
     copy.gates = copy.gates or {}
     for gate_name, gate in pairs(copy.gates) do
@@ -54,17 +57,37 @@ local function final_qualification_row(row)
 end
 
 local function alternative_record(design, qualification, action, disposition)
+  technology_design.assert_trusted(design)
+  safety_qualification.assert_trusted(qualification)
   return {
     alternative_id = alternative_id(design, action),
     action = action,
     disposition = disposition,
-    materialization = deepcopy(design.materialization),
-    technology_design = deepcopy(design),
+    materialization = design.materialization,
+    technology_design = design,
     design_fingerprint = design.design_fingerprint,
     prototype_fingerprint = design.prototype_fingerprint,
     qualification_fingerprint = qualification.qualification_fingerprint,
     qualification_decision = qualification.decision
   }
+end
+
+local function trust_identity(catalog)
+  return {
+    schema = catalog.schema,
+    phase = catalog.phase,
+    preselection_catalog_fingerprint = catalog.preselection_catalog_fingerprint,
+    selection_fingerprint = catalog.selection_fingerprint,
+    catalog_fingerprint = catalog.catalog_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(catalog, registered)
+  return catalog.schema == registered.schema
+    and catalog.phase == registered.phase
+    and catalog.preselection_catalog_fingerprint == registered.preselection_catalog_fingerprint
+    and catalog.selection_fingerprint == registered.selection_fingerprint
+    and catalog.catalog_fingerprint == registered.catalog_fingerprint
 end
 
 local function preselection_material(catalog)
@@ -97,7 +120,8 @@ function M.from_preselection_rows(rows, context_material, options)
   for _, row in ipairs(rows or {}) do
     if options.phase == "final" then row = final_qualification_row(row) end
     local primary_design = row.technology_design or technology_design.from_generation_row(row)
-    if not options.trusted_designs then technology_design.validate(primary_design) end
+    if options.trusted_designs then technology_design.assert_trusted(primary_design)
+    else technology_design.verify_untrusted(primary_design) end
     local diagnostic_design = technology_design.as_diagnostic_alternative(
       primary_design,
       row.reason,
@@ -169,19 +193,27 @@ function M.from_preselection_rows(rows, context_material, options)
   catalog.preselection_catalog_fingerprint = fingerprint.of(preselection_material(catalog))
   catalog.selection_fingerprint = fingerprint.of(catalog.current_selections)
   catalog.catalog_fingerprint = fingerprint.of(catalog_material(catalog))
-  if not options.defer_validation then M.validate(catalog) end
+  if not options.defer_validation then
+    M.assert_owned(catalog)
+    authority.register(catalog, trust_identity(catalog))
+  end
   return catalog
 end
 
 function M.bind_selections(catalog, rows, options)
   options = options or {}
-  if not options.trusted_owned then M.validate(catalog) end
+  if not options.trusted_owned then M.verify_untrusted(catalog) end
+  if not options.trusted_owned then authority.count_full_copy() end
   local result = options.trusted_owned and catalog or deepcopy(catalog)
   local selections = selection_policy.select(result, rows)
   result.current_selections = selections
   result.selection_fingerprint = fingerprint.of(selections)
   result.catalog_fingerprint = fingerprint.of(catalog_material(result))
-  if not options.defer_validation then M.validate(result) end
+  if not options.defer_validation then
+    if options.trusted_owned then M.assert_owned(result)
+    else M.verify_untrusted(result) end
+    authority.register(result, trust_identity(result))
+  end
   return result
 end
 
@@ -195,15 +227,23 @@ function M.finalize(rows, context_material, compilation_operations, options)
   catalog = M.bind_selections(catalog, rows, {trusted_owned = true, defer_validation = true})
   selection_policy.assert_generation_projection(catalog.current_selections, rows)
   selection_policy.assert_compilation_projection(catalog.current_selections, rows, compilation_operations or {})
-  M.validate(catalog)
-  return catalog
+  M.assert_owned(catalog)
+  return authority.register(catalog, trust_identity(catalog))
 end
 
 function M.from_generation_rows(rows, context_material, options)
-  return M.bind_selections(M.from_preselection_rows(rows, context_material, options), rows)
+  local build_options = {}
+  for key, value in pairs(options or {}) do build_options[key] = value end
+  build_options.defer_validation = true
+  return M.bind_selections(
+    M.from_preselection_rows(rows, context_material, build_options),
+    rows,
+    {trusted_owned = true}
+  )
 end
 
-function M.validate(catalog)
+local function verify(catalog, options)
+  options = options or {}
   if type(catalog) ~= "table" or catalog.schema ~= SCHEMA
     or type(catalog.candidates) ~= "table" or type(catalog.qualifications) ~= "table"
     or type(catalog.alternative_qualifications) ~= "table" or type(catalog.current_selections) ~= "table"
@@ -218,11 +258,13 @@ function M.validate(catalog)
   end
   local alternatives, qualifications = {}, {}
   for _, qualification in ipairs(catalog.qualifications) do
-    technology_qualification.validate(qualification)
+    if options.trusted_children then technology_qualification.assert_trusted(qualification)
+    else technology_qualification.verify_untrusted(qualification) end
     qualifications[qualification.qualification_fingerprint] = qualification
   end
   for _, candidate in ipairs(catalog.candidates) do
-    technology_candidate.validate(candidate)
+    if options.trusted_children then technology_candidate.assert_trusted(candidate)
+    else technology_candidate.verify_untrusted(candidate) end
     if type(candidate.selection_key) ~= "string" or type(candidate.alternatives) ~= "table" then
       error("TechnologyCatalog candidate alternatives are invalid.", 2)
     end
@@ -236,6 +278,8 @@ function M.validate(catalog)
         or alternative.technology_design.design_fingerprint ~= alternative.design_fingerprint then
         error("TechnologyCatalog alternative lacks its exact preserved TechnologyDesign: " .. key, 2)
       end
+      if options.trusted_children then technology_design.assert_trusted(alternative.technology_design)
+      else technology_design.verify_untrusted(alternative.technology_design) end
       alternatives[key] = alternative
     end
   end
@@ -269,18 +313,43 @@ function M.validate(catalog)
       error("TechnologyCatalog current selection is invalid or rejected.", 2)
     end
   end
-  if catalog.candidate_catalog_fingerprint ~= fingerprint.of(catalog.candidates)
-    or catalog.qualification_catalog_fingerprint ~= fingerprint.of(catalog.qualifications)
-    or catalog.preselection_catalog_fingerprint ~= fingerprint.of(preselection_material(catalog))
-    or catalog.selection_fingerprint ~= fingerprint.of(catalog.current_selections)
-    or catalog.catalog_fingerprint ~= fingerprint.of(catalog_material(catalog)) then
-    error("TechnologyCatalog schema 3 fingerprints are invalid.", 2)
+  if options.verify_fingerprints ~= false then
+    if catalog.candidate_catalog_fingerprint ~= fingerprint.of(catalog.candidates)
+      or catalog.qualification_catalog_fingerprint ~= fingerprint.of(catalog.qualifications)
+      or catalog.preselection_catalog_fingerprint ~= fingerprint.of(preselection_material(catalog))
+      or catalog.selection_fingerprint ~= fingerprint.of(catalog.current_selections)
+      or catalog.catalog_fingerprint ~= fingerprint.of(catalog_material(catalog)) then
+      error("TechnologyCatalog schema 3 fingerprints are invalid.", 2)
+    end
   end
   return true
 end
 
+function M.verify_untrusted(catalog)
+  authority.verify_untrusted(catalog, verify, trust_identity(catalog or {}))
+  return true
+end
+
+function M.validate(catalog)
+  return M.verify_untrusted(catalog)
+end
+
+function M.assert_owned(catalog)
+  return verify(catalog, {trusted_children = true, verify_fingerprints = false})
+end
+
+function M.assert_trusted(catalog)
+  return authority.assert_trusted(catalog, trust_identity_unchanged)
+end
+
+function M.is_trusted(catalog)
+  return authority.is_trusted(catalog)
+end
+
 function M.snapshot(catalog)
-  M.validate(catalog)
+  if M.is_trusted(catalog) then M.assert_trusted(catalog) else M.verify_untrusted(catalog) end
+  authority.count_snapshot()
+  authority.count_full_copy()
   return deepcopy(catalog)
 end
 

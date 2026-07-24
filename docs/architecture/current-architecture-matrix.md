@@ -22,6 +22,7 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 | Provider expansion | registered `CompilerProvider`, schema-1 `ProviderMetrics`, and scoped budget policy | family resolver and quality assessment | none | exact environment, partition, dispositions, depth, conflicts, time, bytes, witnesses, provenance, and completeness |
 | Compilation lifetime | schema-4 `CompilerContext` | every run-derived cache, service, and artifact | context state only | scoped packed activation, context-owned frozen services, explicit state epochs, compact public snapshots, and no cross-context state |
 | Compiler boundary | normalized schema-2 `CompilationSnapshot`, schema-1 `PolicySnapshot`, schema-2 `CompilerInput`, schema-3 `CompilerResult`, and schema-2 runtime identity | pure compiler, compatibility finalizer, and orchestrator | none | structurally shared fact domains plus exact input, planned/final result, environment, plan, journal, and qualification fingerprints |
+| Internal record trust | module-private weak-key authorities in `core/trusted_record.lua` | gates, designs, qualifications, candidates, catalogs, transformation operations, and transformation plans | constructors and explicit import verifiers only | untrusted records receive one complete schema/cross-field/fingerprint verification; compiler-owned immutable records use cheap identity assertions; snapshots and final output remain defensive deep-verification boundaries |
 | Technology alternatives | canonical post-graph schema-3 `TechnologyCatalog` plus deterministic selection policy | GenerationPlan, CompilationPlan, preview, review dossier, assessment | none | rejected designs and total gates survive; both plans are exact projections |
 | Hard safety | `SafetyQualification` and evidence-bearing gate records | catalog selection and CompilationPlan | none | pending is proposal; passed/failed bind evaluator and evidence; provisional gates are superseded explicitly |
 | Quality | `DesignAssessment` and schema-2 `TechnologyQualityAssessment` | review and promotion admission | none | mandatory profile, per-metric provenance, monotonic status, and incomplete is review-required |
@@ -40,6 +41,8 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 - The schema-3 candidate catalog is finalized after sanitation and graph proof as the canonical inventory. It cannot emit, patch, register, or promote a technology; the orchestrator publishes its exact artifact.
 - Final graph validation reports actual emitted/planned parity. It does not expose placeholder cycle collections.
 - All science, progression, provider, catalog, diagnostic, telemetry, services, and state epochs belong to the active CompilerContext.
+- A copied or decoded record is untrusted even when all of its public fields match a trusted record. It must pass `verify_untrusted`; a public `validated` flag cannot confer authority.
+- Trusted assertions never canonicalize complete records. Normal compilation performs no full catalog snapshot or full TechnologyDesign copy, and governed work-volume counters make regressions visible independently of wall-clock noise.
 - `.mir/module-dependencies.json` and `Test-MIRModuleDependencies.ps1` enforce the exhaustive cross-layer matrix, reject every planner-to-emitter import, and permit no exception.
 
 ## Candidate boundary

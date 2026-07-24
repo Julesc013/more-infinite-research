@@ -15,7 +15,8 @@ local function gate_disposition(row)
   local unresolved, failed = {}, {}
   for _, gate_name in ipairs(hard_gate_authority.order()) do
     local gate = row.gates[gate_name]
-    gate_contract.validate(gate)
+    if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
+    else gate_contract.verify_untrusted(gate) end
     if gate.status == "failed" then table.insert(failed, gate_name) end
     if not gate_contract.is_authoritatively_resolved(gate) then table.insert(unresolved, gate_name) end
   end
@@ -26,7 +27,8 @@ local function stream_operation(row, policy)
   local action = row.action == "adopt" and "patch" or "create"
   local subject_id = row.action == "adopt" and row.adoption.owner or row.technology_name
   local design = row.technology_design
-  technology_design.validate(design)
+  if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
+  else technology_design.verify_untrusted(design) end
   local expected_before = row.action == "adopt" and deepcopy(row.adoption.input_snapshot)
     or {presence = "absent", prototype_type = "technology", id = tostring(subject_id)}
   local expected_after = row.action == "adopt" and deepcopy(row.adoption.expected_snapshot)
@@ -52,16 +54,17 @@ local function stream_operation(row, policy)
       kind = "stream",
       stream_key = row.stream_key,
       manifest_id = row.manifest_id,
-      technology_design = deepcopy(row.technology_design),
+      technology_design = design,
       adoption = deepcopy(row.adoption)
     },
-    evidence = {gates = deepcopy(row.gates)}
+    evidence = {gates = row.gates}
   })
 end
 
 local function base_operation(operation, policy)
   local design = operation.technology_design
-  technology_design.validate(design)
+  if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
+  else technology_design.verify_untrusted(design) end
   local expected_after = technology_design.prototype_projection(design, {validated = true})
   expected_after.type = "technology"
   return operation_contract.new({
@@ -84,9 +87,9 @@ local function base_operation(operation, policy)
       kind = "base-continuation",
       key = operation.key,
       manifest_id = operation.manifest_id,
-      technology_design = deepcopy(operation.technology_design)
+      technology_design = design
     },
-    evidence = {gates = deepcopy(operation.gates or (operation.technology_design or {}).gates or {})}
+    evidence = {gates = operation.gates or design.gates or {}}
   })
 end
 
@@ -172,7 +175,7 @@ function M.compile(snapshot, policy)
     status = #dispositions.review_required > 0 and "REVIEW_REQUIRED" or "PASS"
   }
   result.compilation_fingerprint = fingerprint.of(result)
-  return deepcopy(result)
+  return result
 end
 
 return M

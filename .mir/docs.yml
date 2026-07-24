@@ -458,6 +458,7 @@ docs:
       - current-compiler-architecture
       - canonical-recipe-risk-and-provider-decisions
       - technology-candidate-promotion-lifecycle
+      - trusted-immutable-compiler-records
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

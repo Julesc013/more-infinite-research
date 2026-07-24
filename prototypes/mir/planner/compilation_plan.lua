@@ -77,6 +77,33 @@ local function copy_operation_without_design(source_operation)
   return operation
 end
 
+local function copy_operation_with_design_view(source_operation)
+  local operation = {}
+  for key, value in pairs(source_operation) do
+    if key == "technology_design" or key == "gates" then operation[key] = value
+    else operation[key] = deepcopy(value) end
+  end
+  return operation
+end
+
+local function admit_stream_artifact(stream_artifact)
+  for _, row in ipairs(stream_artifact.rows or {}) do
+    hard_gate_authority.assert_total(row.gates)
+    for _, gate in pairs(row.gates) do
+      if gate_contract.is_trusted(gate) then gate_contract.assert_trusted(gate)
+      else gate_contract.verify_untrusted(gate) end
+    end
+    if row.technology_design then
+      if technology_design.is_trusted(row.technology_design) then
+        technology_design.assert_trusted(row.technology_design)
+      else
+        technology_design.verify_untrusted(row.technology_design)
+      end
+    end
+  end
+  return stream_artifact
+end
+
 local function rebuild_stream_artifact(stream_artifact, rows, rebuild_design_by_index)
   local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
   for index, row in ipairs(rows) do
@@ -172,8 +199,8 @@ local function sanitize_base_operations(base_plan, target_inventory)
         key = operation.key,
         action = "reject",
         reason = "no_valid_effect_targets",
-        gates = deepcopy(operation.gates),
-        technology_design = deepcopy(operation.technology_design),
+        gates = operation.gates,
+        technology_design = operation.technology_design,
         candidate_fingerprint = fingerprint.of({key = operation.key, reason = "no_valid_effect_targets",
           gates = operation.gates})
       })
@@ -215,12 +242,12 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
         row.technology_design = technology_design.from_generation_row(row)
       else
         local proof = graph_summary.proofs[row.technology_name]
-        row.gates.prerequisites_acyclic = proof and deepcopy(proof) or gate_contract.failed(
+        row.gates.prerequisites_acyclic = proof or gate_contract.failed(
           "technology-graph",
           "missing_graph_proof",
           {"technology-graph:missing-proof"}
         )
-        row.gates.progression_safe = deepcopy(row.gates.prerequisites_acyclic)
+        row.gates.progression_safe = row.gates.prerequisites_acyclic
         row.gates.output_identity_safe = gate_contract.passed(
           "generation-plan",
           {"generation-plan:unique-output-identity"}
@@ -265,12 +292,14 @@ end
 local function apply_base_graph_decisions(base_operations, graph_summary)
   local accepted, rejected = {}, {}
   for _, operation in ipairs(base_operations or {}) do
-    local updated = deepcopy(operation)
+    local updated = copy_operation_with_design_view(operation)
+    updated.gates = {}
+    for gate_name, gate in pairs(operation.gates or {}) do updated.gates[gate_name] = gate end
     local rejection = graph_summary.rejected[operation.technology_name]
     if rejection then
       updated.gates.prerequisites_acyclic = gate_contract.failed(
         "technology-graph", rejection.code, deepcopy(rejection.evidence))
-      updated.gates.progression_safe = deepcopy(updated.gates.prerequisites_acyclic)
+      updated.gates.progression_safe = updated.gates.prerequisites_acyclic
       updated.technology_design = technology_design.from_base_extension_operation(updated)
       table.insert(rejected, {
         candidate_id = "base-continuation/" .. tostring(operation.key),
@@ -281,16 +310,16 @@ local function apply_base_graph_decisions(base_operations, graph_summary)
         reason = rejection.code,
         code = rejection.code,
         evidence = deepcopy(rejection.evidence),
-        gates = deepcopy(updated.gates),
-        technology_design = deepcopy(updated.technology_design),
+        gates = updated.gates,
+        technology_design = updated.technology_design,
         candidate_fingerprint = fingerprint.of({key = operation.key, reason = rejection.code,
           gates = updated.gates})
       })
     else
       local proof = graph_summary.proofs[operation.technology_name]
-      updated.gates.prerequisites_acyclic = proof and deepcopy(proof) or gate_contract.failed(
+      updated.gates.prerequisites_acyclic = proof or gate_contract.failed(
         "technology-graph", "missing_graph_proof", {"technology-graph:missing-proof"})
-      updated.gates.progression_safe = deepcopy(updated.gates.prerequisites_acyclic)
+      updated.gates.progression_safe = updated.gates.prerequisites_acyclic
       updated.technology_design = technology_design.from_base_extension_operation(updated)
       updated.technology = technology_design.prototype_projection(updated.technology_design, {validated = true})
       updated.technology.type = "technology"
@@ -321,7 +350,7 @@ local function materialized_stream_operations(artifact, options)
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.technology_name,
-        technology_design = options.include_design == false and nil or deepcopy(design),
+        technology_design = options.include_design == false and nil or design,
         technology = technology_design.prototype_shape(design, {validated = true}),
         registry = {kind = "stream", key = row.stream_key}
       })
@@ -339,7 +368,7 @@ local function materialized_stream_operations(artifact, options)
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.adoption.owner,
-        technology_design = options.include_design == false and nil or deepcopy(row.technology_design),
+        technology_design = options.include_design == false and nil or row.technology_design,
         effects = deepcopy(row.adoption.effects),
         configured_fields = deepcopy(row.adoption.configured_fields),
         input_fingerprint = row.adoption.input_fingerprint,
@@ -352,7 +381,9 @@ local function materialized_stream_operations(artifact, options)
 end
 
 normalized_base_operation = function(operation)
-  local out = deepcopy(operation)
+  local out = copy_operation_with_design_view(operation)
+  out.gates = {}
+  for gate_name, gate in pairs(operation.gates or {}) do out.gates[gate_name] = gate end
   out.schema = 2
   out.manifest_id = out.manifest_id or ("base-extension:" .. tostring(out.key) .. ":" .. tostring(out.technology_name))
   out.registry = {kind = "base_extension", key = out.key}
@@ -553,6 +584,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     stream_artifact = deepcopy(stream_plan)
   end
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
+  admit_stream_artifact(stream_artifact)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   compiler_input.validate(exact_input)
@@ -582,7 +614,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   normalized_base, graph_rejected_base = apply_base_graph_decisions(normalized_base, graph_summary)
   operations = materialized_stream_operations(stream_artifact)
   for _, operation in ipairs(normalized_base) do
-    table.insert(operations, deepcopy(operation))
+    table.insert(operations, copy_operation_with_design_view(operation))
   end
   table.sort(operations, function(a, b)
     if a.technology_name ~= b.technology_name then return a.technology_name < b.technology_name end
@@ -632,8 +664,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       action = "create",
       technology_name = operation.technology_name,
       design_fingerprint = operation.technology_design.design_fingerprint,
-      technology_design = deepcopy(operation.technology_design),
-      gates = deepcopy(operation.gates),
+      technology_design = operation.technology_design,
+      gates = operation.gates,
       candidate_fingerprint = fingerprint.of({key = operation.key, technology_name = operation.technology_name,
         design_fingerprint = operation.technology_design.design_fingerprint, gates = operation.gates})
     }

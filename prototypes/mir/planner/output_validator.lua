@@ -138,9 +138,8 @@ function M.assert_compilation_artifact(artifact, options)
       if not operation.technology_design then
         fail(operation.technology_name, "TechnologyDesign is missing")
       end
-      if not options.designs_validated then
-        technology_design.validate(operation.technology_design)
-      end
+      if options.designs_validated then technology_design.assert_trusted(operation.technology_design)
+      else technology_design.verify_untrusted(operation.technology_design) end
       local expected = technology_design.prototype_projection(operation.technology_design, {validated = true})
       M.assert_technology_shape(expected, operation.technology,
         operation.technology_name .. " planned TechnologyDesign projection")
@@ -152,9 +151,8 @@ function M.assert_compilation_artifact(artifact, options)
       if not operation.technology_design then
         fail(operation.technology_name, "patch-existing TechnologyDesign is missing")
       end
-      if not options.designs_validated then
-        technology_design.validate(operation.technology_design)
-      end
+      if options.designs_validated then technology_design.assert_trusted(operation.technology_design)
+      else technology_design.verify_untrusted(operation.technology_design) end
       local design_projection = technology_design.prototype_projection(operation.technology_design, {validated = true})
       if operation.technology_design.materialization.kind ~= "patch-existing"
         or operation.technology_design.materialization.target ~= operation.technology_name then

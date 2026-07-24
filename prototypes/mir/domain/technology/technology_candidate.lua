@@ -1,9 +1,11 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 local SCHEMA = 1
+local authority = trusted_record.new("TechnologyCandidate")
 
 local function sorted_unique(values)
   local seen, out = {}, {}
@@ -38,7 +40,21 @@ function M.schema_authority()
   }
 end
 
-function M.validate(candidate)
+local function trust_identity(candidate)
+  return {
+    schema = candidate.schema,
+    candidate_id = candidate.candidate_id,
+    candidate_fingerprint = candidate.candidate_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(candidate, registered)
+  return candidate.schema == registered.schema
+    and candidate.candidate_id == registered.candidate_id
+    and candidate.candidate_fingerprint == registered.candidate_fingerprint
+end
+
+local function verify(candidate)
   if type(candidate) ~= "table" or candidate.schema ~= SCHEMA then
     error("TechnologyCandidate schema 1 record is required.", 2)
   end
@@ -76,8 +92,26 @@ function M.validate(candidate)
   return true
 end
 
+function M.verify_untrusted(candidate)
+  authority.verify_untrusted(candidate, verify, trust_identity(candidate or {}))
+  return true
+end
+
+function M.validate(candidate)
+  return M.verify_untrusted(candidate)
+end
+
+function M.assert_trusted(candidate)
+  return authority.assert_trusted(candidate, trust_identity_unchanged)
+end
+
+function M.is_trusted(candidate)
+  return authority.is_trusted(candidate)
+end
+
 function M.from_design(design, row, options)
-  if not (options and options.validated) then technology_design.validate(design) end
+  if options and options.validated then technology_design.assert_trusted(design)
+  else technology_design.verify_untrusted(design) end
   row = row or {}
   local provider_ids = sorted_unique(row.provider_ids or {})
   local family_ids = sorted_unique(row.family_ids or {})
@@ -108,8 +142,8 @@ function M.from_design(design, row, options)
     }
   }
   candidate.candidate_fingerprint = fingerprint.of(candidate_material(candidate))
-  M.validate(candidate)
-  return candidate
+  verify(candidate)
+  return authority.register(candidate, trust_identity(candidate))
 end
 
 return M

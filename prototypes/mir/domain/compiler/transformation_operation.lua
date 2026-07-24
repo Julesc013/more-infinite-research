@@ -1,17 +1,40 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 
 local M = {}
 local SCHEMA = 2
 local ACTIONS = {create = true, patch = true}
+local authority = trusted_record.new("TransformationOperation")
 
 local function material(record)
-  local out = deepcopy(record)
-  out.operation_fingerprint = nil
+  local out = {}
+  for key, value in pairs(record) do
+    if key ~= "operation_fingerprint" then out[key] = value end
+  end
   return out
 end
 
-function M.validate(record)
+local function trust_identity(record)
+  return {
+    schema = record.schema,
+    operation_id = record.operation_id,
+    expected_before_fingerprint = record.expected_before_fingerprint,
+    expected_after_fingerprint = record.expected_after_fingerprint,
+    operation_fingerprint = record.operation_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(record, registered)
+  return record.schema == registered.schema
+    and record.operation_id == registered.operation_id
+    and record.expected_before_fingerprint == registered.expected_before_fingerprint
+    and record.expected_after_fingerprint == registered.expected_after_fingerprint
+    and record.operation_fingerprint == registered.operation_fingerprint
+end
+
+local function verify(record, options)
+  options = options or {}
   if type(record) ~= "table" or record.schema ~= SCHEMA or record.record_type ~= "TransformationOperation"
     or not ACTIONS[record.action] or type(record.operation_id) ~= "string" or record.operation_id == ""
     or type(record.phase) ~= "string" or record.phase == ""
@@ -35,16 +58,47 @@ function M.validate(record)
     or type(record.source.alternative_id) ~= "string" or record.source.alternative_id == "" then
     error("TransformationOperation exact source candidate and alternative are required.", 2)
   end
-  if record.expected_before_fingerprint ~= fingerprint.of(record.expected_before_snapshot)
-    or record.expected_after_fingerprint ~= fingerprint.of(record.expected_after_projection)
-    or record.operation_fingerprint ~= fingerprint.of(material(record)) then
-    error("TransformationOperation fingerprint is invalid.", 2)
+  if options.verify_fingerprints ~= false then
+    if record.expected_before_fingerprint ~= fingerprint.of(record.expected_before_snapshot)
+      or record.expected_after_fingerprint ~= fingerprint.of(record.expected_after_projection)
+      or record.operation_fingerprint ~= fingerprint.of(material(record)) then
+      error("TransformationOperation fingerprint is invalid.", 2)
+    end
   end
   return true
 end
 
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, verify, trust_identity(record or {}))
+  return true
+end
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, trust_identity_unchanged)
+end
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
+end
+
 function M.new(values)
-  local record = deepcopy(values or {})
+  values = values or {}
+  local record = {}
+  for key, value in pairs(values) do
+    if key ~= "payload" and key ~= "evidence" then record[key] = deepcopy(value) end
+  end
+  record.payload = {}
+  for key, value in pairs(values.payload or {}) do
+    record.payload[key] = key == "technology_design" and value or deepcopy(value)
+  end
+  record.evidence = {}
+  for key, value in pairs(values.evidence or {}) do
+    record.evidence[key] = key == "gates" and value or deepcopy(value)
+  end
   record.schema = SCHEMA
   record.record_type = "TransformationOperation"
   record.evidence = record.evidence or {}
@@ -54,8 +108,8 @@ function M.new(values)
   record.expected_before_fingerprint = fingerprint.of(record.expected_before_snapshot)
   record.expected_after_fingerprint = fingerprint.of(record.expected_after_projection)
   record.operation_fingerprint = fingerprint.of(material(record))
-  M.validate(record)
-  return record
+  verify(record, {verify_fingerprints = false})
+  return authority.register(record, trust_identity(record))
 end
 
 return M

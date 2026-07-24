@@ -47,7 +47,7 @@ function M.apply(plan, design)
   if not design then
     error("Native-owner binding transaction requires TechnologyDesign schema 2.", 2)
   end
-  technology_design.validate(design)
+  technology_design.assert_trusted(design)
   local projected = technology_design.prototype_projection(design, {validated = true})
   if design.materialization.kind ~= "patch-existing"
     or design.materialization.target ~= plan.owner

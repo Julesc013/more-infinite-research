@@ -56,7 +56,27 @@ local REQUIRED_COUNTERS = {
   "qualification_snapshot_construction_milliseconds",
   "qualification_peak_memory_bytes",
   "compiler_total_milliseconds",
-  "public_artifact_total_bytes"
+  "public_artifact_total_bytes",
+  "fingerprint_calls",
+  "canonicalization_calls",
+  "canonical_bytes_total",
+  "canonical_serializations_over_one_mib",
+  "maximum_canonical_bytes",
+  "trusted_record_registrations",
+  "trusted_untrusted_verifications",
+  "trusted_assertions",
+  "trusted_rejected_assertions",
+  "trusted_assertion_canonicalizations",
+  "catalog_snapshot_count",
+  "full_record_copy_count",
+  "technology_design_full_copies",
+  "gate_deep_verifications",
+  "technology_design_deep_verifications",
+  "safety_qualification_deep_verifications",
+  "technology_candidate_deep_verifications",
+  "technology_catalog_deep_verifications",
+  "transformation_operation_deep_verifications",
+  "transformation_plan_deep_verifications"
 }
 local REQUIRED_PHASES = {
   "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",

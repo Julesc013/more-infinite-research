@@ -583,6 +583,14 @@ do
     tampered.evidence = {"cycle:tampered"}
     c7_contracts.gate.validate(tampered)
   end)
+  expect_error("copied gate is not trusted", "Trusted TechnologyGate record is required", function()
+    c7_contracts.gate.assert_trusted(deepcopy(failed_gate))
+  end)
+  expect_error("deep verification detects serialized design tampering", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(normalized_design)
+    tampered.gates.effect_valid.evidence = {"compiler-contract:tampered-design-gate"}
+    technology_design.verify_untrusted(tampered)
+  end)
   local diagnostic_design = technology_design.as_diagnostic_alternative(normalized_design, "fixture-diagnostic")
   if diagnostic_design.materialization.kind ~= "diagnose"
     or diagnostic_design.design.ownership.value.action ~= "diagnose"

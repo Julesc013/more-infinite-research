@@ -75,6 +75,7 @@ modules:
     - prototypes/mir/core/deepcopy.lua
     - prototypes/mir/core/table.lua
     - prototypes/mir/core/fingerprint.lua
+    - prototypes/mir/core/trusted_record.lua
   stage:
     - prototypes/mir/stage/settings.lua
     - prototypes/mir/stage/data.lua
@@ -325,6 +326,8 @@ mutation_commands:
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
     - CompilationSnapshot schema 2 and PolicySnapshot schema 1 are the only inputs to the pure planner compiler API
     - RuntimeEnvironmentIdentity and QualificationEnvironmentIdentity bind runtime behavior and assurance machinery separately
+    - decoded external records are deeply verified once before a module-private weak-key authority admits them to the compiler trust domain
+    - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence

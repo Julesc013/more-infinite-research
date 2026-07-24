@@ -1,9 +1,11 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
+local authority = trusted_record.new("TechnologyDesign")
 
 local SCHEMA = {
   schema = 2,
@@ -130,8 +132,21 @@ local function sorted_records(values)
   return out
 end
 
-local function same(left, right)
-  return fingerprint.of({value = left}) == fingerprint.of({value = right})
+local function same(left, right, seen)
+  if rawequal(left, right) then return true end
+  if type(left) ~= type(right) then return false end
+  if type(left) ~= "table" then return false end
+  seen = seen or {}
+  seen[left] = seen[left] or {}
+  if seen[left][right] then return true end
+  seen[left][right] = true
+  for key, value in pairs(left) do
+    if not same(value, right[key], seen) then return false end
+  end
+  for key in pairs(right) do
+    if left[key] == nil then return false end
+  end
+  return true
 end
 
 local function leaf(value, source, evidence_class, locked, lock_policy, envelope)
@@ -391,6 +406,34 @@ local function expected_dimension_values(design)
   }
 end
 
+local function trust_identity(design)
+  return {
+    schema = design.schema,
+    candidate_id = design.candidate_id,
+    technology_id = design.technology_id,
+    subject_fingerprint = design.subject_fingerprint,
+    design_fingerprint = design.design_fingerprint,
+    prototype_fingerprint = design.prototype_fingerprint,
+    qualification_fingerprint = design.qualification_fingerprint,
+    semantic_fingerprint = design.semantic_fingerprint
+  }
+end
+
+local function trust_identity_unchanged(design, registered)
+  return design.schema == registered.schema
+    and design.candidate_id == registered.candidate_id
+    and design.technology_id == registered.technology_id
+    and design.subject_fingerprint == registered.subject_fingerprint
+    and design.design_fingerprint == registered.design_fingerprint
+    and design.prototype_fingerprint == registered.prototype_fingerprint
+    and design.qualification_fingerprint == registered.qualification_fingerprint
+    and design.semantic_fingerprint == registered.semantic_fingerprint
+end
+
+local function trust(design)
+  return authority.register(design, trust_identity(design))
+end
+
 function M.schema_authority()
   return deepcopy(SCHEMA)
 end
@@ -403,7 +446,8 @@ local function reject_unknown_fields(record, allowed, label)
   end
 end
 
-local function validate(design, verify_fingerprints)
+local function validate(design, verify_fingerprints, options)
+  options = options or {}
   if type(design) ~= "table" or design.schema ~= SCHEMA.schema then
     error("TechnologyDesign schema 2 record is required.", 2)
   end
@@ -495,7 +539,11 @@ local function validate(design, verify_fingerprints)
   end
   for gate_name, gate in pairs(design.gates) do
     if type(gate_name) ~= "string" then error("TechnologyDesign gate name is invalid.", 2) end
-    gate_contract.validate(gate)
+    if options.trusted_children then
+      gate_contract.assert_trusted(gate)
+    else
+      gate_contract.verify_untrusted(gate)
+    end
   end
   local identity = design.design.identity.value
   if design.technology_id ~= identity.technology_name
@@ -546,8 +594,21 @@ local function validate(design, verify_fingerprints)
   return true
 end
 
+function M.verify_untrusted(design)
+  authority.verify_untrusted(design, function(record) validate(record, true) end, trust_identity(design or {}))
+  return true
+end
+
 function M.validate(design)
-  return validate(design, true)
+  return M.verify_untrusted(design)
+end
+
+function M.assert_trusted(design)
+  return authority.assert_trusted(design, trust_identity_unchanged)
+end
+
+function M.is_trusted(design)
+  return authority.is_trusted(design)
 end
 
 function M.refresh_fingerprints(design)
@@ -559,8 +620,21 @@ function M.refresh_fingerprints(design)
   return design
 end
 
+local function trusted_gate_map(gates)
+  local result = {}
+  for gate_name, gate in pairs(gates or {}) do
+    if gate_contract.is_trusted(gate) then
+      gate_contract.assert_trusted(gate)
+    else
+      gate_contract.verify_untrusted(gate)
+    end
+    result[gate_name] = gate
+  end
+  return result
+end
+
 function M.with_qualification(design, row, options)
-  if not (options and options.validated) then M.validate(design) end
+  if options and options.validated then M.assert_trusted(design) else M.verify_untrusted(design) end
   if type(row) ~= "table" or type(row.gates) ~= "table" then
     error("TechnologyDesign qualification update requires a GenerationPlan row.", 2)
   end
@@ -577,14 +651,15 @@ function M.with_qualification(design, row, options)
     for key, value in pairs(design) do result[key] = value end
     result.context = deepcopy(design.context)
   else
+    authority.count_full_copy()
     result = deepcopy(design)
   end
-  result.gates = deepcopy(row.gates)
+  result.gates = trusted_gate_map(row.gates)
   result.context.action_reason = row.reason
   result.context.target_profile_fingerprint = row.target_profile_fingerprint
   result.qualification_fingerprint = fingerprint.of(qualification_material(result))
   result.semantic_fingerprint = result.qualification_fingerprint
-  return result
+  return trust(result)
 end
 
 function M.from_generation_row(row)
@@ -717,7 +792,7 @@ function M.from_generation_row(row)
       ownership = dimension(ownership_value, source, evidence_class, DIMENSION_PATHS.ownership, field_provenance),
       runtime_contracts = dimension(runtime_value, source, evidence_class, DIMENSION_PATHS.runtime_contracts, field_provenance)
     },
-    gates = deepcopy(row.gates or {}),
+    gates = trusted_gate_map(row.gates),
     provenance = {
       source = row.source,
       provider_ids = deepcopy(row.provider_ids or {}),
@@ -746,14 +821,14 @@ function M.from_generation_row(row)
   }
   -- Construction owns every field in this new record. Prove the structural
   -- and cross-field invariants once, then compute the fingerprints once.
-  validate(result, false)
+  validate(result, false, {trusted_children = true})
   M.refresh_fingerprints(result)
-  return result
+  return trust(result)
 end
 
 function M.as_diagnostic_alternative(design, reason, options)
   options = options or {}
-  if not options.validated then M.validate(design) end
+  if options.validated then M.assert_trusted(design) else M.verify_untrusted(design) end
 
   -- Diagnostic alternatives are derived from a compiler-owned immutable
   -- TechnologyDesign. Copy only the branches whose values change; the catalog
@@ -784,9 +859,9 @@ function M.as_diagnostic_alternative(design, reason, options)
   end
   result.context = deepcopy(design.context)
   result.context.action_reason = reason or "safe-diagnostic-alternative"
-  validate(result, false)
+  validate(result, false, {trusted_children = true})
   M.refresh_fingerprints(result)
-  return result
+  return trust(result)
 end
 
 function M.from_base_extension_operation(operation)
@@ -838,7 +913,7 @@ function M.from_base_extension_operation(operation)
 end
 
 function M.graph_projection(design)
-  M.validate(design)
+  if M.is_trusted(design) then M.assert_trusted(design) else M.verify_untrusted(design) end
   return deepcopy({
     name = design.design.identity.value.technology_name,
     prerequisites = design.design.progression.value.prerequisites
@@ -846,12 +921,14 @@ function M.graph_projection(design)
 end
 
 function M.prototype_projection(design, options)
-  if not (options and options.validated) then M.validate(design) end
+  if options and options.validated then M.assert_trusted(design)
+  elseif M.is_trusted(design) then M.assert_trusted(design)
+  else M.verify_untrusted(design) end
   return deepcopy(prototype_projection_unvalidated(design))
 end
 
 function M.presentation_projection(design)
-  M.validate(design)
+  if M.is_trusted(design) then M.assert_trusted(design) else M.verify_untrusted(design) end
   local identity = design.design.identity.value
   local presentation = design.design.presentation.value
   return deepcopy({
@@ -869,7 +946,7 @@ function M.presentation_projection(design)
 end
 
 function M.save_identity_projection(design)
-  M.validate(design)
+  if M.is_trusted(design) then M.assert_trusted(design) else M.verify_untrusted(design) end
   local identity = design.design.identity.value
   local ownership = design.design.ownership.value
   return deepcopy({
@@ -885,8 +962,8 @@ function M.prototype_shape(design, options)
 end
 
 function M.diff(before, after)
-  M.validate(before)
-  M.validate(after)
+  if M.is_trusted(before) then M.assert_trusted(before) else M.verify_untrusted(before) end
+  if M.is_trusted(after) then M.assert_trusted(after) else M.verify_untrusted(after) end
   local paths, seen = {}, {}
   for _, path in ipairs(SCHEMA.required_paths) do
     table.insert(paths, path)
@@ -948,8 +1025,8 @@ function M.assert_locks(before, after, authorization)
 end
 
 function M.merge(base, overlay, authority)
-  M.validate(base)
-  M.validate(overlay)
+  if M.is_trusted(base) then M.assert_trusted(base) else M.verify_untrusted(base) end
+  if M.is_trusted(overlay) then M.assert_trusted(overlay) else M.verify_untrusted(overlay) end
   M.assert_locks(base, overlay, authority)
   return deepcopy(overlay)
 end
@@ -959,7 +1036,8 @@ function M.assert_generation_row(row)
   if not row.technology_design then
     error("GenerationPlan materializing row requires TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
   end
-  M.validate(row.technology_design)
+  if M.is_trusted(row.technology_design) then M.assert_trusted(row.technology_design)
+  else M.verify_untrusted(row.technology_design) end
   local design = row.technology_design
   -- The full validation above already recomputes and verifies the prototype
   -- fingerprint. Re-entering prototype_projection() would validate the same

@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 local compilation_plan = require("prototypes.mir.planner.compilation_plan")
 local stream_compiler = require("prototypes.mir.planner.stream_compiler")
 local base_continuations = require("prototypes.mir.planner.base_continuations")
@@ -31,6 +32,44 @@ end
 
 local function memory_bytes()
   return collectgarbage and collectgarbage("count") * 1024 or 0
+end
+
+local function record_work_volume()
+  local fingerprint_metrics = fingerprint.metrics()
+  for counter, value in pairs({
+    fingerprint_calls = fingerprint_metrics.fingerprint_calls,
+    canonicalization_calls = fingerprint_metrics.canonical_calls,
+    canonical_bytes_total = fingerprint_metrics.canonical_bytes,
+    canonical_serializations_over_one_mib = fingerprint_metrics.serializations_over_one_mib,
+    maximum_canonical_bytes = fingerprint_metrics.maximum_canonical_bytes
+  }) do telemetry.observe_max(counter, value) end
+
+  local trust_metrics = trusted_record.metrics()
+  local registrations, untrusted, assertions, rejected, full_copies = 0, 0, 0, 0, 0
+  for _, values in pairs(trust_metrics) do
+    registrations = registrations + (values.registrations or 0)
+    untrusted = untrusted + (values.untrusted_verifications or 0)
+    assertions = assertions + (values.trusted_assertions or 0)
+    rejected = rejected + (values.rejected_assertions or 0)
+    full_copies = full_copies + (values.full_copies or 0)
+  end
+  for counter, value in pairs({
+    trusted_record_registrations = registrations,
+    trusted_untrusted_verifications = untrusted,
+    trusted_assertions = assertions,
+    trusted_rejected_assertions = rejected,
+    trusted_assertion_canonicalizations = 0,
+    catalog_snapshot_count = ((trust_metrics.TechnologyCatalog or {}).explicit_snapshots or 0),
+    full_record_copy_count = full_copies,
+    technology_design_full_copies = ((trust_metrics.TechnologyDesign or {}).full_copies or 0),
+    gate_deep_verifications = ((trust_metrics.TechnologyGate or {}).untrusted_verifications or 0),
+    technology_design_deep_verifications = ((trust_metrics.TechnologyDesign or {}).untrusted_verifications or 0),
+    safety_qualification_deep_verifications = ((trust_metrics.SafetyQualification or {}).untrusted_verifications or 0),
+    technology_candidate_deep_verifications = ((trust_metrics.TechnologyCandidate or {}).untrusted_verifications or 0),
+    technology_catalog_deep_verifications = ((trust_metrics.TechnologyCatalog or {}).untrusted_verifications or 0),
+    transformation_operation_deep_verifications = ((trust_metrics.TransformationOperation or {}).untrusted_verifications or 0),
+    transformation_plan_deep_verifications = ((trust_metrics.TransformationPlan or {}).untrusted_verifications or 0)
+  }) do telemetry.observe_max(counter, value) end
 end
 
 local function compile_active(context)
@@ -111,6 +150,7 @@ local function compile_active(context)
   context:set_state("compiler_result", latest.compiler_result)
   context:record_artifact("technology_candidate_catalog", latest.technology_catalog)
   stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
+  record_work_volume()
   telemetry.finish_phase("planning")
   telemetry.observe_max("compiler_total_milliseconds", math.max(0, now() - compile_started) * 1000)
   return latest
@@ -292,6 +332,7 @@ function M.publish(context)
   telemetry.observe_max("context_state_keys", context:state_key_count())
   local public_evidence
   for _ = 1, 4 do
+    record_work_volume()
     evidence_input.telemetry = telemetry.snapshot()
     public_evidence = public_artifacts.compiler_evidence(evidence_input)
     local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)
@@ -303,6 +344,7 @@ function M.publish(context)
       + (counters.coverage_public_bytes or 0)
       + evidence_bytes)
   end
+  record_work_volume()
   evidence_input.telemetry = telemetry.snapshot()
   public_evidence = public_artifacts.compiler_evidence(evidence_input)
   public_artifacts.assert_byte_budget(public_evidence)

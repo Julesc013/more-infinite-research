@@ -6,7 +6,7 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 local M = {}
 
 function M.emit(design, registration)
-  technology_design.validate(design)
+  technology_design.assert_trusted(design)
   local kind = design.materialization.kind
   if kind ~= "create" and kind ~= "continuation" then
     error("TechnologyDesign emitter cannot materialize kind " .. tostring(kind) .. ".", 2)

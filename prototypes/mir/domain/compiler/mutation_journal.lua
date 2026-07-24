@@ -21,7 +21,8 @@ local function entry_material(entry)
 end
 
 function M.new(plan)
-  plan_contract.validate(plan)
+  if plan_contract.is_trusted(plan) then plan_contract.assert_trusted(plan)
+  else plan_contract.verify_untrusted(plan) end
   return setmetatable({
     schema = SCHEMA,
     record_type = "MutationJournal",
@@ -37,7 +38,8 @@ end
 
 function Journal:assert_operation(operation)
   if self.finalized then error("MutationJournal is finalized.", 2) end
-  operation_contract.validate(operation)
+  if operation_contract.is_trusted(operation) then operation_contract.assert_trusted(operation)
+  else operation_contract.verify_untrusted(operation) end
   local planned = self.planned_operation_fingerprints[operation.operation_id]
   if not planned then
     table.insert(self.violations.undeclared, operation.operation_id)

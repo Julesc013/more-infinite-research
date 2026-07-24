@@ -1,7 +1,9 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local trusted_record = require("prototypes.mir.core.trusted_record")
 
 local M = {}
+local authority = trusted_record.new("TechnologyGate")
 
 local STATUSES = {
   ["not-applicable"] = true,
@@ -15,13 +17,33 @@ local function evidence_fingerprint(evaluator, evidence, applicability)
   return fingerprint.of({evaluator = evaluator, evidence = evidence or {}, applicability = applicability})
 end
 
-function M.pending(evaluator)
+local function identity(record)
   return {
+    status = record.status,
+    passed = record.passed,
+    evaluator = record.evaluator,
+    evidence_fingerprint = record.evidence_fingerprint
+  }
+end
+
+local function identity_unchanged(record, registered)
+  return record.status == registered.status
+    and record.passed == registered.passed
+    and record.evaluator == registered.evaluator
+    and record.evidence_fingerprint == registered.evidence_fingerprint
+end
+
+local function trust(record)
+  return authority.register(record, identity(record))
+end
+
+function M.pending(evaluator)
+  return trust({
     passed = false,
     status = "pending",
     evaluator = evaluator,
     evidence = {}
-  }
+  })
 end
 
 function M.not_applicable(evaluator, applicability_predicate, input_fingerprint, evidence)
@@ -36,42 +58,42 @@ function M.not_applicable(evaluator, applicability_predicate, input_fingerprint,
     input_fingerprint = input_fingerprint,
     result = false
   }
-  return {
+  return trust({
     passed = true,
     status = "not-applicable",
     evaluator = evaluator,
     evidence = copied,
     applicability = applicability,
     evidence_fingerprint = evidence_fingerprint(evaluator, copied, applicability)
-  }
+  })
 end
 
 function M.passed(evaluator, evidence)
   local copied = deepcopy(evidence or {})
-  return {
+  return trust({
     passed = true,
     status = "passed",
     evaluator = evaluator,
     evidence = copied,
     evidence_fingerprint = evidence_fingerprint(evaluator, copied, nil)
-  }
+  })
 end
 
 function M.failed(evaluator, reason, evidence)
   local copied = deepcopy(evidence or {})
-  return {
+  return trust({
     passed = false,
     status = "failed",
     evaluator = evaluator,
     reason = reason,
     evidence = copied,
     evidence_fingerprint = evidence_fingerprint(evaluator, copied, nil)
-  }
+  })
 end
 
 function M.supersede(previous, evaluator, replacement)
-  M.validate(previous)
-  M.validate(replacement)
+  M.assert_trusted(previous)
+  M.assert_trusted(replacement)
   local result = deepcopy(previous)
   result.passed = false
   result.status = "superseded"
@@ -80,10 +102,10 @@ function M.supersede(previous, evaluator, replacement)
     status = replacement.status,
     evidence_fingerprint = replacement.evidence_fingerprint
   }
-  return result
+  return trust(result)
 end
 
-function M.validate(record)
+local function verify(record)
   if type(record) ~= "table" or not STATUSES[record.status]
     or type(record.passed) ~= "boolean" or type(record.evidence) ~= "table" then
     error("Technology gate must be a valid lifecycle record.", 2)
@@ -120,8 +142,25 @@ function M.validate(record)
   return true
 end
 
+function M.verify_untrusted(record)
+  authority.verify_untrusted(record, verify, identity(record or {}))
+  return true
+end
+
+function M.validate(record)
+  return M.verify_untrusted(record)
+end
+
+function M.assert_trusted(record)
+  return authority.assert_trusted(record, identity_unchanged)
+end
+
+function M.is_trusted(record)
+  return authority.is_trusted(record)
+end
+
 function M.is_authoritatively_resolved(record)
-  M.validate(record)
+  M.assert_trusted(record)
   return record.status == "passed" or record.status == "failed" or record.status == "not-applicable"
 end
 
