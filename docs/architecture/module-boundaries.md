@@ -671,6 +671,8 @@ CompilationPlan sanitation and graph stages copy mutable row envelopes and gate 
 
 Effect-ownership resolution follows the same rule: it copies the mutable row envelope, effect collections, and gate map, but retains each exact immutable gate value. Ownership resolution may replace a whole gate map when it turns an emptied row into a non-materializing diagnostic; it never mutates an existing trusted gate.
 
+An effect-safety pass captures the recipe, item, fluid, and technology target inventory exactly once and shares that immutable snapshot with every sanitation and generated-effect assertion in the pass. The input and output passes still capture independently and compare their exact inventory fingerprints, but no technology or individual effect rebuilds the global inventory during one pass.
+
 Diagnostic catalog alternatives similarly qualify against the exact trusted gate set already constructed with the immutable diagnostic design; the catalog does not construct a second equivalent gate tree. Owned aggregate constructors calculate their authority fingerprint once and register the result after structural and trusted-child checks, while every untrusted import still recomputes that fingerprint. The graph kernel uses an exact length-prefixed node identity for singleton strongly connected components and retains canonical fingerprints for multi-node components, preserving deterministic collision-free component authority without hashing every isolated node.
 
 ## Compiler boundary closure

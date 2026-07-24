@@ -19,8 +19,8 @@ end
 S.assert_effect_allowed = technology_effects.assert_effect_allowed
 S.assert_effects_allowed = technology_effects.assert_effects_allowed
 
-local function assert_effect_target_exists(effect, technology_name)
-  local valid, reason, target = effect_contracts.target_status(effect, inventory())
+local function assert_effect_target_exists(effect, technology_name, target_inventory)
+  local valid, reason, target = effect_contracts.target_status(effect, target_inventory or inventory())
   if valid then return end
   error("Technology "
     .. tostring(technology_name)
@@ -106,6 +106,7 @@ end
 
 function S.sanitize_all_technology_effects(options)
   options = options or {}
+  local target_inventory = inventory()
   local summary = {
     schema = 1,
     pass = options.pass or "unspecified",
@@ -117,7 +118,7 @@ function S.sanitize_all_technology_effects(options)
     external_technology_count = 0,
     emptied_technology_count = 0,
     technologies = {},
-    sanitized_target_inventory_fingerprint = fingerprint.of(inventory())
+    sanitized_target_inventory_fingerprint = fingerprint.of(target_inventory)
   }
   local names = {}
   for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end
@@ -130,7 +131,7 @@ function S.sanitize_all_technology_effects(options)
     summary.scanned_technology_count = summary.scanned_technology_count + 1
     summary.scanned_effect_count = summary.scanned_effect_count + original_effect_count
     local kept, removed, retained_effect_order, retained_effect_identities = S.sanitize_effects(
-      original_effects, name, owner)
+      original_effects, name, owner, target_inventory)
     if #removed > 0 then
       technology.effects = kept
       summary.pruned_effect_count = summary.pruned_effect_count + #removed
@@ -171,12 +172,13 @@ function S.register_generated_technology(name)
 end
 
 function S.assert_registered_technology_effects()
+  local target_inventory = inventory()
   for _, name in ipairs(generated_registry.sorted_names()) do
     local tech = data_raw.technology(name)
     if tech then
       S.assert_effects_allowed(tech.effects, name)
       for _, effect in ipairs(tech.effects or {}) do
-        assert_effect_target_exists(effect, name)
+        assert_effect_target_exists(effect, name, target_inventory)
       end
     end
   end
