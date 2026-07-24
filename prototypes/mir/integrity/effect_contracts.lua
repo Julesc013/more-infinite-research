@@ -5,16 +5,29 @@ local generated = require("prototypes.mir.domain.effects.generated_target_contra
 local M = {}
 
 local contracts = generated.contracts
+local inventory_indexes = setmetatable({}, {__mode = "k"})
 
-local function contains(values, name)
-  for _, value in ipairs(values or {}) do if value == name then return true end end
-  return false
+local function contains(inventory, category, values, name)
+  local indexes = inventory_indexes[inventory]
+  if not indexes then
+    indexes = {}
+    inventory_indexes[inventory] = indexes
+  end
+  local index = indexes[category]
+  if not index then
+    index = {}
+    for _, value in ipairs(values or {}) do index[value] = true end
+    indexes[category] = index
+  end
+  return index[name] == true
 end
 
 local function target_exists(target, name, inventory)
   local values = target.resolver and (inventory.resolvers or {})[target.resolver]
     or inventory[target.prototype_type]
-  return contains(values, name)
+  local category = target.resolver and ("resolver:" .. target.resolver)
+    or ("prototype:" .. tostring(target.prototype_type))
+  return contains(inventory, category, values, name)
 end
 
 local function target_kind(target)

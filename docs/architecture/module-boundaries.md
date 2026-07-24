@@ -673,6 +673,8 @@ Effect-ownership resolution follows the same rule: it copies the mutable row env
 
 An effect-safety pass captures the recipe, item, fluid, and technology target inventory exactly once and shares that immutable snapshot with every sanitation and generated-effect assertion in the pass. The input and output passes still capture independently and compare their exact inventory fingerprints, but no technology or individual effect rebuilds the global inventory during one pass.
 
+Effect-contract membership queries derive lookup sets lazily in a module-private weak-key cache keyed by the immutable inventory table. These lookup indexes are acceleration state only: they are not written into the inventory, do not alter its canonical fingerprint or public evidence, and are reclaimed with the inventory. Repeated target checks therefore remain exact without scanning a sorted prototype-name array for every effect.
+
 Diagnostic catalog alternatives similarly qualify against the exact trusted gate set already constructed with the immutable diagnostic design; the catalog does not construct a second equivalent gate tree. Owned aggregate constructors calculate their authority fingerprint once and register the result after structural and trusted-child checks, while every untrusted import still recomputes that fingerprint. The graph kernel uses an exact length-prefixed node identity for singleton strongly connected components and retains canonical fingerprints for multi-node components, preserving deterministic collision-free component authority without hashing every isolated node.
 
 ## Compiler boundary closure
