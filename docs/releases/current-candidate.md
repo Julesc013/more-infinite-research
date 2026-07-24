@@ -19,16 +19,16 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C13` |
+| Candidate | `C14` |
 | Branch | `dev` |
-| Package source commit | `a49f230cbb792d6b807eab88d218a33feb774bd2` |
-| Package source tree | `a3199523d41c808c9f4e7ad51af75a22cd844ce2` |
-| Package source SHA-256 | `04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620` |
+| Package source commit | `b8e0481830844659bc373c736e9e8245ec45653b` |
+| Package source tree | `7eaba157f6428124d1b19b44c5ae40be152c4260` |
+| Package source SHA-256 | `373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1000637` |
+| Archive bytes | `1000633` |
 | Archive entries | `286` |
-| Archive SHA-256 | `28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837` |
-| Package content SHA-256 | `04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620` |
+| Archive SHA-256 | `34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782` |
+| Package content SHA-256 | `373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37` |
 | Qualification | `not-release-qualified` |
 | Publication | `unreleased` |
 | Status | `awaiting-fresh-candidate-qualification` |
@@ -37,11 +37,11 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C12` |
-| Package source commit | `829f71566349dd9e8920292014855844e1abc861` |
-| Archive bytes | `1000368` |
+| Candidate | `C13` |
+| Package source commit | `a49f230cbb792d6b807eab88d218a33feb774bd2` |
+| Archive bytes | `1000637` |
 | Archive entries | `286` |
-| Archive SHA-256 | `1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC` |
-| Reason | Exact C12 measurement confirmed a release-blocking final catalog construction cost; C13 adds bounded trusted copy-on-write construction without changing technology identities or selection semantics |
+| Archive SHA-256 | `28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837` |
+| Reason | C13 full static qualification found one packaged changelog entry at 133 characters against the enforced 132-character contract; C14 shortens that wording without changing runtime code, technology identities, or selection semantics |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

@@ -391,13 +391,23 @@ docs:
     checkpoint_candidate_sha256: 1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC
   - path: docs/releases/3.2.0-c13-bounded-catalog-construction.md
     title: "MIR 3.2.0 C13 Bounded Catalog Construction"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c14-static-contract-remediation.md
+    checkpoint_source_commit: a49f230cbb792d6b807eab88d218a33feb774bd2
+    checkpoint_candidate_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
+  - path: docs/releases/3.2.0-c14-static-contract-remediation.md
+    title: "MIR 3.2.0 C14 Static Contract Remediation"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c13-compiler-platform
-      - mir-3.2.0-c13-candidate-identity
+      - mir-3.2.0-c14-compiler-platform
+      - mir-3.2.0-c14-candidate-identity
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

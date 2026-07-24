@@ -300,35 +300,35 @@ waves:
     branch: dev
     target_factorio: "2.1"
     source_anchor: mir_3_1_9
-    candidate_id: C13
+    candidate_id: C14
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: development-candidate
-    archive_bytes: 1000637
-    archive_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
-    package_content_sha256: 04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620
-    package_source_sha256: 04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620
-    package_source_commit: a49f230cbb792d6b807eab88d218a33feb774bd2
-    superseded_candidate_id: C12
-    superseded_candidate_sha256: 1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC
+    archive_bytes: 1000633
+    archive_sha256: 34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782
+    package_content_sha256: 373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37
+    package_source_sha256: 373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37
+    package_source_commit: b8e0481830844659bc373c736e9e8245ec45653b
+    superseded_candidate_id: C13
+    superseded_candidate_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
     assurance_policy: mir-verification-v4
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c13
+    exact_approved_delta_gate: pending-exact-c14
     superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c13
+    exact_upgrade_gate: pending-exact-c14
     locale_gate: passed-source-unchanged-50-locales-21250-values
-    locale_runtime_gate: pending-exact-c13
+    locale_runtime_gate: pending-exact-c14
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-    runtime_performance_gate: blocked-clean-c13-probe-exceeds-paired-regression-policy
+    runtime_performance_gate: pending-fresh-c14-paired-campaign-after-c13-regression-block
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
     protected_release_gate: pending
-    interactive_gate: pending-exact-c13
+    interactive_gate: pending-exact-c14
     assurance_seal: pending
-    release_gate: awaiting-c13-performance-remediation-requalification-manual-and-protected-qualification
+    release_gate: awaiting-c14-requalification-performance-manual-and-protected-qualification
     publication_status: unreleased
-    status: c13-built-performance-blocked-awaiting-candidate-bound-requalification
+    status: c14-built-after-static-changelog-remediation-awaiting-candidate-bound-requalification
 
   mir_2_4_0:
     version: "2.4.0"

@@ -24,37 +24,37 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C13",
+      "candidate_id": "C14",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 1000637,
+      "archive_bytes": 1000633,
       "archive_entries": 286,
-      "package_source_commit": "a49f230cbb792d6b807eab88d218a33feb774bd2",
-      "package_source_tree": "a3199523d41c808c9f4e7ad51af75a22cd844ce2",
-      "package_source_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
+      "package_source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
+      "package_source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
+      "package_source_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "a3199523d41c808c9f4e7ad51af75a22cd844ce2",
+        "source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
         "file_count": 286
       },
-      "archive_sha256": "28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837",
-      "package_content_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
+      "archive_sha256": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
+      "package_content_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
       "status": "awaiting-fresh-candidate-qualification",
       "supersedes_candidate": {
-        "candidate_id": "C12",
-        "archive_bytes": 1000368,
+        "candidate_id": "C13",
+        "archive_bytes": 1000637,
         "archive_entries": 286,
-        "archive_sha256": "1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC",
-        "package_content_sha256": "D27D8ECA3535A82E68AF16C2873491F0B7D5132DAE274D80B09B0118B4A76FF5",
-        "package_source_commit": "829f71566349dd9e8920292014855844e1abc861",
-        "package_source_tree": "7a05b9c73161b2b9c6e9e65a67108ebc0be4f4c0",
-        "package_source_sha256": "D27D8ECA3535A82E68AF16C2873491F0B7D5132DAE274D80B09B0118B4A76FF5",
-        "reason": "Exact C12 measurement confirmed a release-blocking final catalog construction cost; C13 adds bounded trusted copy-on-write construction without changing technology identities or selection semantics"
+        "archive_sha256": "28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837",
+        "package_content_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
+        "package_source_commit": "a49f230cbb792d6b807eab88d218a33feb774bd2",
+        "package_source_tree": "a3199523d41c808c9f4e7ad51af75a22cd844ce2",
+        "package_source_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
+        "reason": "C13 full static qualification found one packaged changelog entry at 133 characters against the enforced 132-character contract; C14 shortens that wording without changing runtime code, technology identities, or selection semantics"
       }
     },
     "factorio-2.0": {
