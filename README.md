@@ -244,7 +244,7 @@ Spoilage preservation remains disabled by default. Agricultural growth speed is 
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Enabled by default as a special Space Age technology. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when no effect-proven infinite `research-productivity` or `laboratory-productivity-4` lab-productivity owner is present, so existing native lab-productivity owners keep their chain. Uses Military science pack technology art as the base-game icon. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses the unloading bay unlock technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
+| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Enabled by default as a deliberately expensive late-game sink; disable it if the extra landing-pad capacity is not wanted. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon and electromagnetic science when available. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon and electromagnetic science when available. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
@@ -252,7 +252,7 @@ Spoilage preservation remains disabled by default. Agricultural growth speed is 
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
-| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Disabled by default. Uses the character mining speed pickaxe icon and available late-game science packs. |
+| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Enabled by default. Uses the character mining speed pickaxe icon and available late-game science packs. |
 | `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus`; `character-logistic-trash-slots` | `+1` inventory slot and `+1` logistic trash slot per level | Growth factor default `1.10`. |
 | `research_robot_battery` | Worker robot battery | `worker-robot-battery` | `+10%` per level | Growth factor default `1.2`. Skips when Better Bot Battery-style `worker-robots-battery-6` exists as an infinite native `worker-robot-battery` owner with its expected value. |
 
@@ -286,7 +286,7 @@ Conservative setup:
 
 - Generated productivity streams stay enabled where their recipes and labs are valid.
 - Disable MIR vanilla-chain continuations you do not want to extend.
-- Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
+- Disable Cargo landing pad count if you do not want its deliberately expensive extra Space Age logistics capacity.
 - Keep Spoilage preservation disabled; disable Agricultural growth speed if you do not want its newly planted crop adjustment.
 - Use science pack policy `configured`.
 
@@ -357,24 +357,30 @@ Every generated stream receives:
 | `ips-max-level-<stream-key>` | int, min `0` | stream/defaults/shared | `0` means infinite; positive values cap the stream. |
 | `ips-research-time-<stream-key>` | int, min `0` | stream/defaults/shared | Seconds per research unit. `0` uses the configured default for that stream. |
 
-Per-stream default exceptions:
+Per-stream effective defaults and exceptions:
+
+<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->
+This effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
 
 | Stream | Enabled | Base cost | Growth | Time | Max |
-| --- | --- | --- | --- | --- | --- |
+| --- | --- | ---: | ---: | ---: | --- |
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
 | `research_spoilage_preservation` | No | `50000` | `1.5` | `120` | Infinite |
-| `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
-| `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
-| `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
+| `research_agricultural_growth_speed` | Yes | `40000` | `1.5` | `90` | Infinite |
+| `research_inventory_capacity` | Yes | `8000` | `1.10` | `60` | Infinite |
+| `research_robot_battery` | Yes | `8000` | `1.2` | `60` | Infinite |
+| `research_breeding` | Yes | `8000` | `2` | `60` | Infinite |
 | `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
-| `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
+| `research_cargo_landing_pad_count` | Yes | `1000000` | `10` | `240` | Infinite |
 | `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |
-| `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
-| `research_character_reach` | No | shared | shared | shared | Infinite |
-| `research_rocket_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_cannon_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_flamethrower_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_electric_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
+| `research_ash_separation` | Yes | `8000` | `2` | `90` | Infinite |
+| `research_science_pack_productivity` | Yes | `8000` | `2` | `120` | Infinite |
+| `research_character_reach` | Yes | `8000` | `2` | `60` | Infinite |
+| `research_rocket_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_cannon_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_flamethrower_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_electric_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+<!-- END GENERATED MIR STREAM DEFAULTS -->
 
 ### Base-Extension Settings
 
