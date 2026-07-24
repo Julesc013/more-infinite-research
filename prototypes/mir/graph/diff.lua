@@ -8,6 +8,7 @@ function M.compare(expected, actual)
     expected_graph_fingerprint = expected.graph_fingerprint,
     actual_graph_fingerprint = actual.graph_fingerprint,
     equal = expected.graph_fingerprint == actual.graph_fingerprint
+      and require("prototypes.mir.graph.snapshot").same(expected, actual)
   }
   result.diff_fingerprint = fingerprint.of(result)
   return result

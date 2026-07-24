@@ -336,6 +336,7 @@ mutation_commands:
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
+    - realized graph postconditions capture and structurally compare the exact graph snapshot then reuse SCC condensation and proof results already qualified for that identical graph
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence

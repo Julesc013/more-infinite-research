@@ -2,7 +2,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local graph_diff = require("prototypes.mir.graph.diff")
-local graph_qualification = require("prototypes.mir.graph.qualification")
+local graph_snapshot = require("prototypes.mir.graph.snapshot")
 local scc_kernel = require("prototypes.mir.graph.scc")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
@@ -84,22 +84,26 @@ local function assert_equal(label, expected, actual)
   end
 end
 
+local function same_names(left, right)
+  if #left ~= #right then return false end
+  for index = 1, #left do if left[index] ~= right[index] then return false end end
+  return true
+end
+
 function M.assert_registered_technologies(plan)
   local expected = plan and plan.validation_summary and plan.validation_summary.technology_graph
   if not expected then error("MIR CompilationPlan lacks virtual technology-graph qualification evidence.", 2) end
 
-  local actual = graph_qualification.validate_operations(plan.operations, {actual = true})
-  local difference = graph_diff.compare(expected.graph_snapshot, actual.graph_snapshot)
+  -- The virtual graph has already been fully qualified. Capture the realized
+  -- graph from data.raw and prove exact node equality; equal graph input
+  -- necessarily retains the qualified SCC, condensation, and proof results.
+  local actual_snapshot = graph_snapshot.new(data_raw.prototypes("technology"))
+  local difference = graph_diff.compare(expected.graph_snapshot, actual_snapshot)
   if not difference.equal then
     error("MIR realized technology graph snapshot differs from its qualified virtual snapshot: "
       .. difference.diff_fingerprint .. ".", 2)
   end
-  assert_equal("graph fingerprint", expected.graph_fingerprint, actual.graph_fingerprint)
-  assert_equal("component assignments", expected.component_assignment_fingerprint,
-    actual.component_assignment_fingerprint)
-  assert_equal("condensation topology", expected.condensation_topology_fingerprint,
-    actual.condensation_topology_fingerprint)
-  assert_equal("graph proof", expected.proof_fingerprint, actual.proof_fingerprint)
+  assert_equal("graph fingerprint", expected.graph_fingerprint, actual_snapshot.graph_fingerprint)
 
   local registered = generated_registry.sorted_names()
   local planned = planned_technologies(plan)
@@ -113,9 +117,10 @@ function M.assert_registered_technologies(plan)
     if not operation then error("MIR emitted technology is absent from CompilationPlan: " .. name .. ".", 2) end
     local expected_prerequisites = sorted_prerequisites(operation.technology)
     local actual_prerequisites = sorted_prerequisites(technology)
-    assert_equal("prerequisites for " .. name, fingerprint.of(expected_prerequisites),
-      fingerprint.of(actual_prerequisites))
-    local proof = actual.proofs[name]
+    if not same_names(expected_prerequisites, actual_prerequisites) then
+      error("MIR realized technology prerequisites differ for " .. name .. ".", 2)
+    end
+    local proof = expected.proofs[name]
     if not proof or proof.status ~= "passed" then
       error("MIR emitted technology lacks a realized passing graph proof: " .. name .. ".", 2)
     end
@@ -124,7 +129,7 @@ function M.assert_registered_technologies(plan)
       prerequisites = actual_prerequisites,
       prerequisite_fingerprint = fingerprint.of(actual_prerequisites),
       enabled = true,
-      component_id = actual.component_assignments[name],
+      component_id = expected.component_assignments[name],
       planner_proof = "passed",
       realized_proof = proof.status
     })
@@ -142,12 +147,12 @@ function M.assert_registered_technologies(plan)
       for _ in pairs(planned) do count = count + 1 end
       return count
     end)(),
-    checked_node_count = actual.node_count,
+    checked_node_count = #(actual_snapshot.nodes or {}),
     expected_graph_fingerprint = expected.graph_fingerprint,
-    actual_graph_fingerprint = actual.graph_fingerprint,
-    component_assignment_fingerprint = actual.component_assignment_fingerprint,
-    condensation_topology_fingerprint = actual.condensation_topology_fingerprint,
-    proof_fingerprint = actual.proof_fingerprint,
+    actual_graph_fingerprint = actual_snapshot.graph_fingerprint,
+    component_assignment_fingerprint = expected.component_assignment_fingerprint,
+    condensation_topology_fingerprint = expected.condensation_topology_fingerprint,
+    proof_fingerprint = expected.proof_fingerprint,
     graph_diff_fingerprint = difference.diff_fingerprint,
     technologies = parity
   }

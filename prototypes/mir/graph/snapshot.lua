@@ -44,4 +44,30 @@ function M.technology_map(snapshot)
   return out
 end
 
+local function same_array(left, right)
+  if type(left) ~= "table" or type(right) ~= "table" or #left ~= #right then return false end
+  for index = 1, #left do if left[index] ~= right[index] then return false end end
+  return true
+end
+
+function M.same(left, right)
+  if type(left) ~= "table" or type(right) ~= "table"
+    or left.schema ~= right.schema or #(left.nodes or {}) ~= #(right.nodes or {}) then
+    return false
+  end
+  for index, expected in ipairs(left.nodes or {}) do
+    local actual = right.nodes[index]
+    if type(actual) ~= "table"
+      or expected.name ~= actual.name
+      or expected.enabled ~= actual.enabled
+      or expected.research_trigger ~= actual.research_trigger
+      or expected.has_research_count ~= actual.has_research_count
+      or not same_array(expected.prerequisites or {}, actual.prerequisites or {})
+      or not same_array(expected.science_packs or {}, actual.science_packs or {}) then
+      return false
+    end
+  end
+  return true
+end
+
 return M
