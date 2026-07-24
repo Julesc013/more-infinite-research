@@ -78,6 +78,19 @@ end
     if fingerprint.of_canonical(canonical) ~= scalar_hash(canonical) then
       fail("MIR32 eight-byte hash reads changed the scalar recurrence")
     end
+    local split = math.max(1, math.floor(#canonical / 3))
+    local segments = {
+      string.sub(canonical, 1, split),
+      string.sub(canonical, split + 1, split * 2),
+      string.sub(canonical, split * 2 + 1),
+      "",
+      string.sub(canonical, 1, split),
+      string.sub(canonical, split + 1)
+    }
+    if fingerprint.of_canonical_segments(segments)
+      ~= scalar_hash(table.concat(segments)) then
+      fail("MIR32 segmented composition changed the scalar recurrence")
+    end
   end
 end)();
 
@@ -1127,9 +1140,20 @@ do
     or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"] then
     fail("graph snapshot did not preserve stable internal views and owned public maps")
   end
+  if snapshot.graph_fingerprint ~= fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes}) then
+    fail("segmented graph snapshot fingerprint differs from the canonical graph identity")
+  end
   owned["mir-graph-view-contract"].prerequisites[1] = "tampered"
   if view["mir-graph-view-contract"].prerequisites[1] ~= "automation" then
     fail("graph snapshot owned map mutation escaped into the internal read-only view")
+  end
+  local condensation = require("__more-infinite-research__.prototypes.mir.graph.condensation")
+  local condensed = condensation.build(
+    {a = {"b"}, b = {}},
+    {a = "mir-scc-singleton:1:a", b = "mir-scc-singleton:1:b"}
+  )
+  if condensed.topology_fingerprint ~= fingerprint.of(condensed.edges) then
+    fail("segmented graph condensation fingerprint differs from the canonical topology identity")
   end
 end
 expect_error("presentation output parity", "localized name differs", function()

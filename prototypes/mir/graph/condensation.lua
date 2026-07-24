@@ -2,6 +2,28 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 
+local function quote(value, cache)
+  local encoded = cache[value]
+  if encoded then return encoded end
+  encoded = string.format("%q", value)
+  cache[value] = encoded
+  return encoded
+end
+
+local function canonical_segments(edges)
+  local segments, cache = {"["}, {}
+  for index, edge in ipairs(edges) do
+    if index > 1 then segments[#segments + 1] = "," end
+    segments[#segments + 1] = '{"from":'
+    segments[#segments + 1] = quote(edge.from, cache)
+    segments[#segments + 1] = ',"to":'
+    segments[#segments + 1] = quote(edge.to, cache)
+    segments[#segments + 1] = "}"
+  end
+  segments[#segments + 1] = "]"
+  return segments
+end
+
 function M.build(adjacency, assignment)
   local seen, edges = {}, {}
   for owner, targets in pairs(adjacency or {}) do
@@ -18,7 +40,11 @@ function M.build(adjacency, assignment)
     if left.from ~= right.from then return left.from < right.from end
     return left.to < right.to
   end)
-  return {schema = 1, edges = edges, topology_fingerprint = fingerprint.of(edges)}
+  return {
+    schema = 1,
+    edges = edges,
+    topology_fingerprint = fingerprint.of_canonical_segments(canonical_segments(edges))
+  }
 end
 
 return M

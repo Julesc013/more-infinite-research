@@ -15,6 +15,45 @@ local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or ingredient
 end
 
+local function quote(value, cache)
+  local encoded = cache[value]
+  if encoded then return encoded end
+  encoded = string.format("%q", value)
+  cache[value] = encoded
+  return encoded
+end
+
+local function append_string_array(segments, values, cache)
+  segments[#segments + 1] = "["
+  for index, value in ipairs(values or {}) do
+    if index > 1 then segments[#segments + 1] = "," end
+    segments[#segments + 1] = quote(value, cache)
+  end
+  segments[#segments + 1] = "]"
+end
+
+local function canonical_segments(nodes)
+  local segments, cache = {'{"nodes":['}, {}
+  for index, node in ipairs(nodes) do
+    if index > 1 then segments[#segments + 1] = "," end
+    segments[#segments + 1] = node.enabled
+      and '{"enabled":true,"has_research_count":'
+      or '{"enabled":false,"has_research_count":'
+    segments[#segments + 1] = node.has_research_count and "true" or "false"
+    segments[#segments + 1] = ',"name":'
+    segments[#segments + 1] = quote(node.name, cache)
+    segments[#segments + 1] = ',"prerequisites":'
+    append_string_array(segments, node.prerequisites, cache)
+    segments[#segments + 1] = node.research_trigger
+      and ',"research_trigger":true,"science_packs":'
+      or ',"research_trigger":false,"science_packs":'
+    append_string_array(segments, node.science_packs, cache)
+    segments[#segments + 1] = "}"
+  end
+  segments[#segments + 1] = '],"schema":1}'
+  return segments
+end
+
 function M.new(technologies)
   local nodes = {}
   local technology_view = {}
@@ -38,7 +77,7 @@ function M.new(technologies)
   end
   table.sort(nodes, function(left, right) return left.name < right.name end)
   local snapshot = {schema = 1, nodes = nodes}
-  snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
+  snapshot.graph_fingerprint = fingerprint.of_canonical_segments(canonical_segments(snapshot.nodes))
   technology_views[snapshot] = technology_view
   return snapshot
 end
