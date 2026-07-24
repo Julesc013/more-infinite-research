@@ -53,6 +53,6 @@
     {"version":"3.1.2","path":"dist/more-infinite-research_3.1.2.zip","bytes":388046,"sha256":"D5BFA665DAF813718E4B6E948497FEC885B6A58F11E0C1FB6E1177807D9525F5","kind":"tagged","source_ref":"3.1.2"},
     {"version":"3.1.5","path":"dist/more-infinite-research_3.1.5.zip","bytes":399761,"sha256":"8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50","kind":"tagged","source_ref":"3.1.5"},
     {"version":"3.1.9","path":"dist/more-infinite-research_3.1.9.zip","bytes":406097,"sha256":"D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD","kind":"tagged","source_ref":"3.1.9"},
-    {"version":"3.2.0","path":"dist/more-infinite-research_3.2.0.zip","bytes":1000145,"sha256":"3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED","kind":"development-candidate","source_ref":"dc4b1e12695dc915666b04caddbabce570942a74"}
+    {"version":"3.2.0","path":"dist/more-infinite-research_3.2.0.zip","bytes":1000637,"sha256":"28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837","kind":"development-candidate","source_ref":"a49f230cbb792d6b807eab88d218a33feb774bd2"}
   ]
 }

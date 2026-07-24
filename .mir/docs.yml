@@ -371,13 +371,33 @@ docs:
     checkpoint_candidate_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
   - path: docs/releases/3.2.0-c11-candidate-seed-correction.md
     title: "MIR 3.2.0 C11 Candidate Seed Correction"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c12-optimization-and-default-authority.md
+    checkpoint_source_commit: dc4b1e12695dc915666b04caddbabce570942a74
+    checkpoint_candidate_sha256: 3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED
+  - path: docs/releases/3.2.0-c12-optimization-and-default-authority.md
+    title: "MIR 3.2.0 C12 Optimization And Default Authority"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c13-bounded-catalog-construction.md
+    checkpoint_source_commit: 829f71566349dd9e8920292014855844e1abc861
+    checkpoint_candidate_sha256: 1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC
+  - path: docs/releases/3.2.0-c13-bounded-catalog-construction.md
+    title: "MIR 3.2.0 C13 Bounded Catalog Construction"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c11-compiler-platform
-      - mir-3.2.0-c11-candidate-identity
+      - mir-3.2.0-c13-compiler-platform
+      - mir-3.2.0-c13-candidate-identity
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

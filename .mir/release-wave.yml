@@ -300,35 +300,35 @@ waves:
     branch: dev
     target_factorio: "2.1"
     source_anchor: mir_3_1_9
-    candidate_id: C11
+    candidate_id: C13
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: development-candidate
-    archive_bytes: 1000145
-    archive_sha256: 3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED
-    package_content_sha256: A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA
-    package_source_sha256: A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA
-    package_source_commit: dc4b1e12695dc915666b04caddbabce570942a74
-    superseded_candidate_id: C10
-    superseded_candidate_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
+    archive_bytes: 1000637
+    archive_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
+    package_content_sha256: 04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620
+    package_source_sha256: 04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620
+    package_source_commit: a49f230cbb792d6b807eab88d218a33feb774bd2
+    superseded_candidate_id: C12
+    superseded_candidate_sha256: 1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC
     assurance_policy: mir-verification-v4
-    superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
+    superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c11
+    exact_approved_delta_gate: pending-exact-c13
     superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c11
+    exact_upgrade_gate: pending-exact-c13
     locale_gate: passed-source-unchanged-50-locales-21250-values
-    locale_runtime_gate: pending-exact-c11
+    locale_runtime_gate: pending-exact-c13
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-    runtime_performance_gate: pending-exact-c11
+    runtime_performance_gate: blocked-clean-c13-probe-exceeds-paired-regression-policy
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
     protected_release_gate: pending
-    interactive_gate: pending-exact-c11
+    interactive_gate: pending-exact-c13
     assurance_seal: pending
-    release_gate: awaiting-c11-requalification-manual-and-protected-qualification
+    release_gate: awaiting-c13-performance-remediation-requalification-manual-and-protected-qualification
     publication_status: unreleased
-    status: c11-built-awaiting-candidate-bound-requalification
+    status: c13-built-performance-blocked-awaiting-candidate-bound-requalification
 
   mir_2_4_0:
     version: "2.4.0"

@@ -5,7 +5,7 @@ applies_to: "3.2.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-22
+last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
 ---
@@ -17,6 +17,8 @@ MIR 3.2.0 is a release-engineering overhaul built from the MIR 3.1.9 line plus t
 The release keeps the public setting IDs, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9. The explicit capability guard leaves Factorio 2.1 mod-data emission enabled but changes packaged data-stage source, so the 3.2.0 candidate requires fresh gameplay qualification rather than borrowing the 3.1.9 matrix. Version-only and package-only changes in later candidates still receive fresh deterministic-build, exact-ZIP load, and upgrade proof; gameplay scenarios are reused only when their declared effective domains are byte-identical.
 
 No additional automatic recipe-family generation is enabled by default in 3.2.0. The release retains every established generated technology, adds one explicitly reviewed steel plate productivity stream, and moves candidate design, lifecycle, target integrity, and final emission behind common compiler contracts. Base games receive `recipe-prod-research_steel-1`; Space Age keeps vanilla `steel-plate-productivity` as the single owner for steel smelting and casting. These foundations improve safety and explainability without turning on a broader procedural technology set.
+
+The final compiler path eliminates a discarded transient technology-catalog construction, uses copy-on-write branches for compiler-owned diagnostic designs, resolves final qualification from gate-only snapshots, and performs one complete validation on the authoritative post-selection catalog. These are construction-cost optimizations, not a relaxation of catalog validation or a technology-set change. Packaged stream-default documentation is source-generated from `prototypes/mir/settings/defaults.lua`; agricultural growth speed, cargo landing-pad count, and character reach remain enabled as they were in the canonical code and the sealed 3.1.9 package.
 
 The final candidate requires Factorio 2.1.11 or newer. MIR did not retain the earlier 2.1.8 dependency floor without exact final-candidate base and Space Age qualification. The shipped stable stream manifest also records native-owner binding for low-density structures, plastic, processing units, and rocket fuel, matching the compiler policy and repository stream authority.
 

@@ -19,16 +19,16 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C11` |
+| Candidate | `C13` |
 | Branch | `dev` |
-| Package source commit | `dc4b1e12695dc915666b04caddbabce570942a74` |
-| Package source tree | `68e37991bf360ba437101f042835ca7dfc14bc4f` |
-| Package source SHA-256 | `A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA` |
+| Package source commit | `a49f230cbb792d6b807eab88d218a33feb774bd2` |
+| Package source tree | `a3199523d41c808c9f4e7ad51af75a22cd844ce2` |
+| Package source SHA-256 | `04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1000145` |
+| Archive bytes | `1000637` |
 | Archive entries | `286` |
-| Archive SHA-256 | `3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED` |
-| Package content SHA-256 | `A25F2978289D3BB761F513FB7CD4EBDAB25E2C7320BA91A2FCD74969E9E005BA` |
+| Archive SHA-256 | `28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837` |
+| Package content SHA-256 | `04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620` |
 | Qualification | `not-release-qualified` |
 | Publication | `unreleased` |
 | Status | `awaiting-fresh-candidate-qualification` |
@@ -37,11 +37,11 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C10` |
-| Package source commit | `6f9297bae1aee2e018ae7298e0661e99aa591028` |
-| Archive bytes | `1000085` |
+| Candidate | `C12` |
+| Package source commit | `829f71566349dd9e8920292014855844e1abc861` |
+| Archive bytes | `1000368` |
 | Archive entries | `286` |
-| Archive SHA-256 | `C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695` |
-| Reason | fresh C10 full qualification exposed incorrect ambiguity classification for an exact singleton CompatibilityPack candidate seed; C11 changes only the compiler discovery fix and its shipped changelog entry |
+| Archive SHA-256 | `1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC` |
+| Reason | Exact C12 measurement confirmed a release-blocking final catalog construction cost; C13 adds bounded trusted copy-on-write construction without changing technology identities or selection semantics |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.
