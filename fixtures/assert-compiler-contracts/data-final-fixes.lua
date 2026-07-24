@@ -549,6 +549,10 @@ if normalized_design.schema ~= 2
 then
   fail("TechnologyDesign did not preserve normalized fixed-stream semantics and independent field locks")
 end
+normalized_shape.effects[1].recipe = "fixture-mutated-projection"
+if normalized_design.design.effects.value[1].recipe ~= "iron-gear-wheel" then
+  fail("TechnologyDesign public prototype projection mutated trusted design state")
+end
 if not rawequal(normalized_design.design.effects.value, normalized_design.provenance.fields.effects.value)
   or not rawequal(normalized_design.design.progression.value.prerequisites,
     normalized_design.provenance.fields["progression.prerequisites"].value)

@@ -289,7 +289,7 @@ end
 
 local function prototype_projection_unvalidated(design)
   if design.materialization.kind == "patch-existing" then
-    return deepcopy(design.materialization.expected_snapshot)
+    return design.materialization.expected_snapshot
   end
   local identity = design.design.identity.value
   local progression = design.design.progression.value
@@ -298,15 +298,15 @@ local function prototype_projection_unvalidated(design)
   local runtime_contracts = design.design.runtime_contracts.value
   return {
     name = identity.technology_name,
-    localised_name = deepcopy(presentation.localised_name),
-    localised_description = deepcopy(presentation.localised_description),
+    localised_name = presentation.localised_name,
+    localised_description = presentation.localised_description,
     icon = presentation.icon,
     icon_size = presentation.icon_size,
-    icons = deepcopy(presentation.icons),
-    effects = deepcopy(design.design.effects.value),
-    prerequisites = deepcopy(progression.prerequisites),
+    icons = presentation.icons,
+    effects = design.design.effects.value,
+    prerequisites = progression.prerequisites,
     unit = {
-      ingredients = deepcopy(progression.science),
+      ingredients = progression.science,
       count_formula = cost.count_formula,
       count = cost.count,
       time = cost.research_time

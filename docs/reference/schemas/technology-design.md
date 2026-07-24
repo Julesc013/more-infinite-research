@@ -41,6 +41,8 @@ Schema-2 records carry four distinct identities:
 
 The canonical projections are `graph_projection`, `prototype_projection`, `presentation_projection`, and `save_identity_projection`. Output parity compares the full prototype projection, including localized name, localized description, single-icon or layered-icon fields, order, level, declared enabled and hidden state, and upgrade behavior.
 
+Prototype fingerprinting reads the exact compiler-owned immutable projection without copying it. The public `prototype_projection` API returns one defensive deep copy of the same material; changing that returned value cannot mutate the trusted design or its stored identity.
+
 ## Identity authority and maturity
 
 Identity stability is not inferred from a non-empty proposed technology name. It is one of `unassigned`, `provisional`, `reserved`, `stable-unreleased`, `released`, or `retired`, and it must match `identity_authority.state`. Existing fixed streams use their legacy stream-manifest authority. The two predeclared 3.1 automatic-family identities explicitly declare `identity_state = released`; a future procedural candidate defaults to `provisional` until a promotion authority says otherwise.
