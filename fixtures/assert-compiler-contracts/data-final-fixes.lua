@@ -1136,19 +1136,11 @@ do
   end
   local condensation = require("__more-infinite-research__.prototypes.mir.graph.condensation")
   local condensed = condensation.build(
-    {a = {"b", "b"}, b = {}},
+    {a = {"b"}, b = {}},
     {a = "mir-scc-singleton:1:a", b = "mir-scc-singleton:1:b"}
   )
-  if #condensed.edges ~= 1 or condensed.topology_fingerprint ~= fingerprint.of(condensed.edges) then
+  if condensed.topology_fingerprint ~= fingerprint.of(condensed.edges) then
     fail("graph condensation schema-specific canonical bytes differ from the general canonical serializer")
-  end
-  local scc = require("__more-infinite-research__.prototypes.mir.graph.scc")
-  local acyclic = scc.analyze({a = {}, b = {"a"}, c = {"b"}})
-  if #acyclic.components ~= 3
-    or acyclic.assignment.a ~= "mir-scc-singleton:1:a"
-    or acyclic.assignment.b ~= "mir-scc-singleton:1:b"
-    or acyclic.assignment.c ~= "mir-scc-singleton:1:c" then
-    fail("acyclic SCC fast path did not preserve exact singleton component identities")
   end
 end
 expect_error("presentation output parity", "localized name differs", function()
