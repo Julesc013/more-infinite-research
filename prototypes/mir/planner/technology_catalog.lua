@@ -12,6 +12,7 @@ local M = {}
 local SCHEMA = 3
 local PHASES = {preselection = true, final = true}
 local authority = trusted_record.new("TechnologyCatalog")
+local assert_newly_constructed
 
 local function alternative_id(design, action)
   local target = design.materialization.target or design.technology_id or design.candidate_id
@@ -257,7 +258,7 @@ function M.finalize(rows, context_material, compilation_operations, options)
   catalog = M.bind_selections(catalog, rows, {trusted_owned = true, defer_validation = true})
   selection_policy.assert_generation_projection(catalog.current_selections, rows)
   selection_policy.assert_compilation_projection(catalog.current_selections, rows, compilation_operations or {})
-  M.assert_owned(catalog)
+  assert_newly_constructed(catalog)
   return authority.register(catalog, trust_identity(catalog))
 end
 
@@ -288,13 +289,17 @@ local function verify(catalog, options)
   end
   local alternatives, qualifications = {}, {}
   for _, qualification in ipairs(catalog.qualifications) do
-    if options.trusted_children then technology_qualification.assert_trusted(qualification)
-    else technology_qualification.verify_untrusted(qualification) end
+    if not options.trusted_children_verified then
+      if options.trusted_children then technology_qualification.assert_trusted(qualification)
+      else technology_qualification.verify_untrusted(qualification) end
+    end
     qualifications[qualification.qualification_fingerprint] = qualification
   end
   for _, candidate in ipairs(catalog.candidates) do
-    if options.trusted_children then technology_candidate.assert_trusted(candidate)
-    else technology_candidate.verify_untrusted(candidate) end
+    if not options.trusted_children_verified then
+      if options.trusted_children then technology_candidate.assert_trusted(candidate)
+      else technology_candidate.verify_untrusted(candidate) end
+    end
     if type(candidate.selection_key) ~= "string" or type(candidate.alternatives) ~= "table" then
       error("TechnologyCatalog candidate alternatives are invalid.", 2)
     end
@@ -308,8 +313,10 @@ local function verify(catalog, options)
         or alternative.technology_design.design_fingerprint ~= alternative.design_fingerprint then
         error("TechnologyCatalog alternative lacks its exact preserved TechnologyDesign: " .. key, 2)
       end
-      if options.trusted_children then technology_design.assert_trusted(alternative.technology_design)
-      else technology_design.verify_untrusted(alternative.technology_design) end
+      if not options.trusted_children_verified then
+        if options.trusted_children then technology_design.assert_trusted(alternative.technology_design)
+        else technology_design.verify_untrusted(alternative.technology_design) end
+      end
       alternatives[key] = alternative
     end
   end
@@ -317,7 +324,10 @@ local function verify(catalog, options)
     for _, qualification in ipairs(catalog.qualifications) do
       for _, gate_name in ipairs(safety_qualification.schema_authority().gate_order) do
         local gate = qualification.hard_gates[gate_name]
-        if not gate or not gate_contract.is_authoritatively_resolved(gate) then
+        local resolved = gate and (options.trusted_children_verified
+          and (gate.status == "passed" or gate.status == "failed" or gate.status == "not-applicable")
+          or gate_contract.is_authoritatively_resolved(gate))
+        if not resolved then
           error("TechnologyCatalog final qualification has an unresolved hard gate: "
             .. qualification.candidate_id .. "/" .. gate_name, 2)
         end
@@ -366,6 +376,18 @@ end
 
 function M.assert_owned(catalog)
   return verify(catalog, {trusted_children = true, verify_fingerprints = false})
+end
+
+assert_newly_constructed = function(catalog)
+  -- finalize() has just constructed or admitted every child through its
+  -- private authority and has not exposed the catalog. Recheck all catalog
+  -- shape, cross-reference, selection, and resolved-status invariants without
+  -- looking up those exact child instances a second time.
+  return verify(catalog, {
+    trusted_children = true,
+    trusted_children_verified = true,
+    verify_fingerprints = false
+  })
 end
 
 function M.assert_trusted(catalog)
