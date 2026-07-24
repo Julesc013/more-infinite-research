@@ -60,14 +60,32 @@ local function encode(value, seen, path)
   local out = {}
   local array, keys = table_shape(value, path)
   if array then
-    for index = 1, #value do out[index] = encode(value[index], seen, path .. "[" .. index .. "]") end
+    for index = 1, #value do
+      local child = value[index]
+      local child_kind = type(child)
+      local child_path = path
+      if child_kind == "table"
+        or (child_kind ~= "nil" and child_kind ~= "boolean"
+          and child_kind ~= "number" and child_kind ~= "string") then
+        child_path = path .. "[" .. index .. "]"
+      end
+      out[index] = encode(child, seen, child_path)
+    end
     seen[value] = nil
     return "[" .. table.concat(out, ",") .. "]"
   end
 
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
   for _, row in ipairs(keys) do
-    table.insert(out, row.encoded .. ":" .. encode(value[row.key], seen, path .. row.path))
+    local child = value[row.key]
+    local child_kind = type(child)
+    local child_path = path
+    if child_kind == "table"
+      or (child_kind ~= "nil" and child_kind ~= "boolean"
+        and child_kind ~= "number" and child_kind ~= "string") then
+      child_path = path .. row.path
+    end
+    out[#out + 1] = row.encoded .. ":" .. encode(child, seen, child_path)
   end
   seen[value] = nil
   return "{" .. table.concat(out, ",") .. "}"
