@@ -9,8 +9,8 @@ local function sorted_keys(values)
   return out
 end
 
-function M.analyze(adjacency)
-  local names = sorted_keys(adjacency)
+function M.analyze(adjacency, sorted_names)
+  local names = sorted_names or sorted_keys(adjacency)
   local reverse = {}
   for _, name in ipairs(names) do reverse[name] = {} end
   for owner, edges in pairs(adjacency or {}) do

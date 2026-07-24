@@ -1122,7 +1122,8 @@ do
       unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
     }
   }, {
-    prerequisites_by_name = {['mir-graph-view-contract'] = shared_prerequisites}
+    prerequisites_by_name = {['mir-graph-view-contract'] = shared_prerequisites},
+    sorted_names = {"mir-graph-view-contract"}
   })
   local view = graph_snapshot.technology_view(snapshot)
   local owned = graph_snapshot.technology_map(snapshot)

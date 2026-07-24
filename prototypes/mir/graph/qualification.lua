@@ -73,9 +73,8 @@ local function build_graph(operations, options)
       table.insert(reverse[prerequisite], name)
     end
   end
-  for _, values in pairs(reverse) do table.sort(values) end
   return technologies, planned, names, adjacency, reverse, edge_count, effect_count,
-    graph_snapshot.new(technologies, {prerequisites_by_name = adjacency})
+    graph_snapshot.new(technologies, {prerequisites_by_name = adjacency, sorted_names = names})
 end
 
 local function component_is_cycle(component, adjacency)
@@ -268,7 +267,7 @@ function M.validate_operations(operations, options)
     end
   end
 
-  local scc_result = scc_kernel.analyze(adjacency)
+  local scc_result = scc_kernel.analyze(adjacency, names)
   local components = {}
   for _, component in ipairs(scc_result.components) do table.insert(components, component.nodes) end
   local condensed = condensation.build(adjacency, scc_result.assignment)

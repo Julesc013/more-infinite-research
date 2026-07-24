@@ -19,7 +19,7 @@ function M.new(technologies, options)
   options = options or {}
   local nodes = {}
   local technology_view = {}
-  for name, technology in pairs(technologies or {}) do
+  local function append(name, technology)
     local ingredients = {}
     for _, ingredient in ipairs(((technology or {}).unit or {}).ingredients or {}) do
       table.insert(ingredients, ingredient_name(ingredient))
@@ -39,7 +39,12 @@ function M.new(technologies, options)
     table.insert(nodes, node)
     technology_view[name] = node
   end
-  table.sort(nodes, function(left, right) return left.name < right.name end)
+  if options.sorted_names then
+    for _, name in ipairs(options.sorted_names) do append(name, technologies[name]) end
+  else
+    for name, technology in pairs(technologies or {}) do append(name, technology) end
+    table.sort(nodes, function(left, right) return left.name < right.name end)
+  end
   local snapshot = {schema = 1, nodes = nodes}
   snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
   technology_views[snapshot] = technology_view
