@@ -9,15 +9,15 @@
   },
   "current": {
     "version": "3.2.0",
-    "source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
-    "package_source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
-    "archive_sha256": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
-    "package_content_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37"
+    "source_commit": "c3a56e88fa15da7c12db3b0d11c3d4e732935746",
+    "package_source_commit": "c3a56e88fa15da7c12db3b0d11c3d4e732935746",
+    "archive_sha256": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
+    "package_content_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
     "script": "scripts/Export-MIRApprovedDelta.ps1",
-    "qualification_source_commit": "8db66ee56887c1b99655e37c189fcda7abcdbc71",
+    "qualification_source_commit": "34c864577f59076907924d8465354f1bbebba207",
     "producer_sha256": "2E04B07BB5618C9C9C5B88668669C0F52CBCBCCDC3FCC40D37DE728FCAA572AA",
     "factorio_binary_version": "2.1.11.86962",
     "scenarios": [
@@ -99,7 +99,7 @@
     {
       "field": "package.archive_sha256",
       "before": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
-      "after": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
+      "after": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -112,7 +112,7 @@
     {
       "field": "package.package_content_sha256",
       "before": "1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229",
-      "after": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
+      "after": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
