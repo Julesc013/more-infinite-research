@@ -348,11 +348,12 @@ local function materialized_stream_operations(artifact, options)
         error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
       end
       local design = row.technology_design
+      local virtual_technology
       if options.virtual_projection then
         -- Graph input is an ephemeral projection of an already finalized
         -- GenerationPlan. Admit its trusted children and allow only pending
         -- graph gates without constructing a discarded qualification record.
-        technology_design.assert_trusted(design)
+        virtual_technology = technology_design.trusted_prototype_projection_view(design)
         hard_gate_authority.assert_total(row.gates)
         for _, gate_name in ipairs(REQUIRED_GATES) do
           local gate = row.gates[gate_name]
@@ -376,7 +377,8 @@ local function materialized_stream_operations(artifact, options)
         manifest_id = row.manifest_id,
         technology_name = row.technology_name,
         technology_design = options.include_design == false and nil or design,
-        technology = technology_design.prototype_shape(design, {validated = true}),
+        technology = virtual_technology
+          or technology_design.prototype_shape(design, {validated = true}),
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
@@ -637,7 +639,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   -- emission authorization. Pending graph gates remain explicit proposals.
   local operations = materialized_stream_operations(
     stream_artifact, {include_design = false, virtual_projection = true})
-  local stream_operations = deepcopy(operations)
+  local stream_operations = {}
+  for index, operation in ipairs(operations) do stream_operations[index] = operation end
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
   local finalized_base = {}
   for _, operation in ipairs(normalized_base) do

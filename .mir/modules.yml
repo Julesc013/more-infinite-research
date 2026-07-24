@@ -332,6 +332,7 @@ mutation_commands:
     - owned design qualification and GenerationPlan construction validate each exact gate and row once before finalization while untrusted imported records retain complete verification
     - CompilationPlan sanitation owns copy-on-write row gate and fields tables and graph proof mutates only that transient projection while preserving source GenerationPlan isolation
     - ephemeral pre-graph operations admit finalized designs and total trusted gates without constructing discarded SafetyQualification records while final operations still require exact qualification
+    - pre-graph operations share read-only trusted prototype values and a shallow operation vector while final materialization owns complete prototype projections
     - aggregate snapshot catalog operation plan and compilation fingerprints bind exact stored component fingerprints instead of embedding and recanonicalizing complete trusted records
     - planning stage row copies preserve immutable gate record identity while copying only the mutable gate map
     - each compiler-owned TechnologyDesign copies external values once then shares those exact immutable values across dimension subject member and leaf-provenance views; imported designs remain independently deep-verified
