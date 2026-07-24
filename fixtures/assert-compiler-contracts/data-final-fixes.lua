@@ -319,6 +319,10 @@ if provider_registry.snapshot().providers[1].family == "mutated" then
 end
 
 local rules = family_registry.snapshot()
+if family_registry.view() ~= family_registry.view()
+  or fingerprint.of(family_registry.view()) ~= fingerprint.of(rules) then
+  fail("FamilyRule read-only view changed its validated source-owned catalog")
+end
 local reversed = {schema = 2, rules = {}}
 for index = #rules.rules, 1, -1 do table.insert(reversed.rules, rules.rules[index]) end
 local normalized = family_registry.validate(reversed)

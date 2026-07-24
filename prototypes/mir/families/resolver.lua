@@ -55,7 +55,7 @@ local function build()
   local canonical = context:state_view("family_resolution")
   if canonical then return canonical end
   local indexes = relationships.view()
-  local rules = rule_registry.snapshot().rules
+  local rules = rule_registry.view().rules
   local seeds = policy_authority.candidate_seeds()
   local attachments, decisions, provider_cardinality, metrics_by_provider = {}, {}, {}, {}
   local attachment_claims, rules_by_provider, phase_seconds = {}, {}, {}

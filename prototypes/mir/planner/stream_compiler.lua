@@ -385,7 +385,7 @@ local function compile_active(context, return_view)
   local cached = context:state_view("generation_plan")
   if cached then return return_view and cached or deepcopy(cached) end
   telemetry.start_phase("stream_compiler")
-  local streams = C.snapshot()
+  local streams = C.view()
   local native_owner_inputs = {}
   for key, spec in pairs(streams) do
     local binding = spec.native_owner_binding
@@ -399,7 +399,7 @@ local function compile_active(context, return_view)
     source_fingerprints = {
       facts = recipe_facts.fingerprint(),
       risks = recipe_risk_facts.fingerprint(),
-      rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
+      rules = fingerprint.of({streams = streams, families = family_registry.view()}),
       providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),

@@ -121,4 +121,10 @@ function M.snapshot()
   return deepcopy(build())
 end
 
+-- Family rules are validated once from source-owned data. Provider planning
+-- may share this exact immutable catalog; external ownership uses snapshot().
+function M.view()
+  return build()
+end
+
 return M
