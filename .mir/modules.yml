@@ -330,6 +330,7 @@ mutation_commands:
     - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
     - aggregate snapshot catalog operation plan and compilation fingerprints bind exact stored component fingerprints instead of embedding and recanonicalizing complete trusted records
     - planning stage row copies preserve immutable gate record identity while copying only the mutable gate map
+    - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints

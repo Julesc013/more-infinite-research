@@ -669,6 +669,8 @@ Aggregate identities are component-fingerprint projections. `CompilationSnapshot
 
 CompilationPlan sanitation and graph stages copy mutable row envelopes and gate maps but retain the exact trusted immutable gate records until a gate is deliberately superseded. Copying an entire gate record would discard private trust and force redundant evidence revalidation; replacing one gate still creates a new fingerprinted record through the gate constructor.
 
+Effect-ownership resolution follows the same rule: it copies the mutable row envelope, effect collections, and gate map, but retains each exact immutable gate value. Ownership resolution may replace a whole gate map when it turns an emptied row into a non-materializing diagnostic; it never mutates an existing trusted gate.
+
 Diagnostic catalog alternatives similarly qualify against the exact trusted gate set already constructed with the immutable diagnostic design; the catalog does not construct a second equivalent gate tree. Owned aggregate constructors calculate their authority fingerprint once and register the result after structural and trusted-child checks, while every untrusted import still recomputes that fingerprint. The graph kernel uses an exact length-prefixed node identity for singleton strongly connected components and retains canonical fingerprints for multi-node components, preserving deterministic collision-free component authority without hashing every isolated node.
 
 ## Compiler boundary closure

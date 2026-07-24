@@ -7,6 +7,23 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 
+local function copy_rows_preserving_gates(raw_rows)
+  local rows = {}
+  for index, source in ipairs(raw_rows or {}) do
+    local row = {}
+    for key, value in pairs(source) do
+      if key == "gates" then
+        row.gates = {}
+        for gate_name, gate in pairs(value or {}) do row.gates[gate_name] = gate end
+      else
+        row[key] = deepcopy(value)
+      end
+    end
+    rows[index] = row
+  end
+  return rows
+end
+
 local function effects_for(row)
   if row.action == "emit" then return row.fields and row.fields.effects or {} end
   if row.action == "adopt" then return row.adoption and row.adoption.effects or {} end
@@ -77,7 +94,7 @@ end
 
 function M.resolve(raw_rows, options)
   options = options or {}
-  local rows = deepcopy(raw_rows or {})
+  local rows = copy_rows_preserving_gates(raw_rows)
   local claims_by_identity = {}
   local materializing_counts = {}
 
