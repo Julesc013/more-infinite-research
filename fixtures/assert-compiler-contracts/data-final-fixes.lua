@@ -593,6 +593,13 @@ do
     fail("pending hard gate was represented as a false pass or terminal rejection")
   end
   local failed_gate = c7_contracts.gate.failed("compiler-contract:graph", "fixture-cycle", {"cycle:a-b"})
+  local failed_gate_authority = c7_contracts.gate.authority_projection(failed_gate)
+  if failed_gate_authority.status ~= failed_gate.status
+    or failed_gate_authority.evaluator ~= failed_gate.evaluator
+    or failed_gate_authority.evidence_fingerprint ~= failed_gate.evidence_fingerprint
+    or failed_gate_authority.evidence ~= nil then
+    fail("TechnologyGate authority projection did not bind exact evidence identity compactly")
+  end
   local superseded_gate = c7_contracts.gate.supersede(
     c7_contracts.gate.pending("compiler-contract:provisional"), "compiler-contract:graph", failed_gate)
   c7_contracts.gate.validate(superseded_gate)

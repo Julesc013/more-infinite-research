@@ -12,13 +12,17 @@ local GATE_ORDER = hard_gate_authority.order()
 local DECISIONS = {qualified = true, proposal = true, rejected = true, quarantined = true}
 
 local function material(record)
+  local gate_identities = {}
+  for gate_name, gate in pairs(record.hard_gates or {}) do
+    gate_identities[gate_name] = gate_contract.authority_projection(gate)
+  end
   return {
     schema = record.schema,
     record_type = record.record_type,
     candidate_id = record.candidate_id,
     design_fingerprint = record.design_fingerprint,
     context_fingerprint = record.context_fingerprint,
-    hard_gates = record.hard_gates,
+    hard_gates = gate_identities,
     decision = record.decision,
     unresolved_gates = record.unresolved_gates,
     primary_rejection = record.primary_rejection,

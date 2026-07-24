@@ -646,6 +646,8 @@ foreach ($trustedBoundary in @(
 }
 $fingerprintText = Read-MIRFile -RelativePath "prototypes/mir/core/fingerprint.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/core/fingerprint.lua" -Text $fingerprintText -Needle "function M.of_canonical(text)"
+$technologyGateText = Read-MIRFile -RelativePath "prototypes/mir/domain/technology/gate.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/domain/technology/gate.lua" -Text $technologyGateText -Needle "function M.authority_projection(record)"
 $effectContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
 if ($effectContractsText -match 'platform\.factorio|data_raw|\bsettings\b|\bmods\b') {
   throw "Pure effect contracts retain Factorio platform or ambient state access."

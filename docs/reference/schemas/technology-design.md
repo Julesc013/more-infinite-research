@@ -35,7 +35,7 @@ Schema-2 records carry four distinct identities:
 | `subject_fingerprint` | Semantic capability, family, partition, and typed subjects. |
 | `design_fingerprint` | Identity, effects, progression, cost, presentation, ownership, and runtime design values. |
 | `prototype_fingerprint` | Canonical normalized Factorio technology projection. |
-| `qualification_fingerprint` | Subject, design, and prototype identities plus exact context, gates, provenance, maturity, locks, and evidence. |
+| `qualification_fingerprint` | Subject, design, and prototype identities plus exact context, gate authority identities, provenance, maturity, locks, and evidence. Each gate authority identity binds its complete evaluator evidence and applicability through `evidence_fingerprint`; the qualification does not serialize that evidence tree again. |
 
 `semantic_fingerprint` remains a compatibility alias for `qualification_fingerprint`; it is not a pure design identity.
 

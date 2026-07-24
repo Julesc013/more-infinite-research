@@ -321,13 +321,17 @@ local function prototype_projection_unvalidated(design)
 end
 
 local function qualification_material(design)
+  local gate_identities = {}
+  for gate_name, gate in pairs(design.gates or {}) do
+    gate_identities[gate_name] = gate_contract.authority_projection(gate)
+  end
   return {
     schema = design.schema,
     subject_fingerprint = design.subject_fingerprint,
     design_fingerprint = design.design_fingerprint,
     prototype_fingerprint = design.prototype_fingerprint,
     identity_authority = design.identity_authority,
-    gates = design.gates,
+    gates = gate_identities,
     provenance = design.provenance,
     maturity = design.maturity,
     context = design.context

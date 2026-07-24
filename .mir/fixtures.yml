@@ -720,6 +720,7 @@ fixtures:
       - failed-hard-gate-produces-rejection
       - superseded-gate-history
       - authoritative-gate-evidence-fingerprint
+      - compact-gate-authority-projection
       - diagnostic-materialization-runtime-invariant
       - independent-safety-quality-and-promotion-records
       - mir-owned-reviewed-promotion-trust

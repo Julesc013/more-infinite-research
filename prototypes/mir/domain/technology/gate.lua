@@ -164,6 +164,11 @@ function M.is_authoritatively_resolved(record)
   return record.status == "passed" or record.status == "failed" or record.status == "not-applicable"
 end
 
+function M.authority_projection(record)
+  if M.is_trusted(record) then M.assert_trusted(record) else M.verify_untrusted(record) end
+  return identity(record)
+end
+
 function M.schema_authority()
   return {
     schema = 1,
