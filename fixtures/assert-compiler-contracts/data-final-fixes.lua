@@ -577,6 +577,10 @@ expect_error("TechnologyDesign qualification identity", "changed design identity
 end)
 local candidate = focused_contracts.technology_candidate.from_design(normalized_design, design_row)
 local qualification = focused_contracts.technology_qualification.from_design(normalized_design, design_row)
+if not rawequal(candidate.semantic_identity, normalized_design.semantic_identity)
+  or not rawequal(candidate.subjects, normalized_design.subjects) then
+  fail("TechnologyCandidate did not share exact trusted design identity and subjects")
+end
 do
   local pending_row = deepcopy(design_row)
   pending_row.gates.progression_safe = c7_contracts.gate.pending("compiler-contract:pending-progression")
@@ -609,7 +613,11 @@ do
   if diagnostic_design.materialization.kind ~= "diagnose"
     or diagnostic_design.design.ownership.value.action ~= "diagnose"
     or diagnostic_design.maturity.runtime_action ~= "diagnose"
-    or diagnostic_design.context.runtime_action ~= nil then
+    or diagnostic_design.context.runtime_action ~= nil
+    or diagnostic_design.subject_fingerprint ~= normalized_design.subject_fingerprint
+    or diagnostic_design.prototype_fingerprint ~= normalized_design.prototype_fingerprint
+    or diagnostic_design.design_fingerprint == normalized_design.design_fingerprint
+    or diagnostic_design.qualification_fingerprint == normalized_design.qualification_fingerprint then
     fail("TechnologyDesign diagnostic conversion wrote runtime action to the wrong object or violated invariants")
   end
 end

@@ -120,8 +120,8 @@ function M.from_design(design, row, options)
   local candidate = {
     schema = SCHEMA,
     candidate_id = design.candidate_id,
-    semantic_identity = deepcopy(design.semantic_identity),
-    subjects = deepcopy(design.subjects),
+    semantic_identity = design.semantic_identity,
+    subjects = design.subjects,
     discovery = {
       provider_ids = provider_ids,
       family_ids = family_ids,

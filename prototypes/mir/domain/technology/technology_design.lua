@@ -861,7 +861,14 @@ function M.as_diagnostic_alternative(design, reason, options)
   result.context = deepcopy(design.context)
   result.context.action_reason = reason or "safe-diagnostic-alternative"
   validate(result, false, {trusted_children = true})
-  M.refresh_fingerprints(result)
+  -- Diagnostic materialization does not change subjects or the projected
+  -- technology. Preserve those exact identities and compute only the design
+  -- and qualification identities whose authority material changed.
+  result.subject_fingerprint = design.subject_fingerprint
+  result.prototype_fingerprint = design.prototype_fingerprint
+  result.design_fingerprint = fingerprint.of(design_material(result))
+  result.qualification_fingerprint = fingerprint.of(qualification_material(result))
+  result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end
 
