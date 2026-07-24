@@ -84,7 +84,7 @@ local function compile_active(context)
   telemetry.start_phase("planning")
   local stream_plan = stream_compiler.compile_view(context)
   local base_plan, base_candidates = base_continuations.plan_all()
-  local provider_inputs = family_resolver.snapshot()
+  local provider_inputs = family_resolver.view()
   local policy_snapshot = policy_snapshot_adapter.capture(context)
   local input_snapshot = compilation_snapshot_adapter.capture({
     stream_inputs = {plan = stream_plan},
@@ -98,17 +98,18 @@ local function compile_active(context)
   })
   local input_sources = deepcopy(stream_plan.source_fingerprints)
   input_sources.base_extension_plan = fingerprint.of(base_plan)
+  local input_sanitation_ledger = context:artifact_view("input_sanitation_ledger") or {}
   local input = compiler_input.new({
     source_fingerprints = input_sources,
     compilation_snapshot = input_snapshot,
     policy_snapshot = policy_snapshot,
     runtime_environment = environment,
-    input_sanitation_fingerprint = fingerprint.of(context:artifact("input_sanitation_ledger") or {})
+    input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
   })
   latest = compilation_plan.finalize(stream_plan, base_plan, {
     compiler_input = input,
     base_candidates = base_candidates,
-    input_sanitation_ledger = context:artifact("input_sanitation_ledger"),
+    input_sanitation_ledger = input_sanitation_ledger,
     stream_plan_trusted = true,
     effect_target_inventory = effect_target_inventory.capture()
   })

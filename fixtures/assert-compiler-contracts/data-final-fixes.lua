@@ -1676,6 +1676,11 @@ if not production_graph_parity or production_graph_parity.schema ~= 2
 end
 compiler_context.with_active(focused_contracts.compilation_context, function()
   local family_resolution = family_resolver.snapshot()
+  local family_resolution_view = family_resolver.view()
+  if family_resolution_view ~= family_resolver.view()
+    or fingerprint.of(family_resolution_view) ~= fingerprint.of(family_resolution) then
+    fail("family-resolution read-only view changed its context-owned canonical authority")
+  end
   if family_resolver.decision_set_fingerprint() ~= family_resolution.decision_set_fingerprint then
     fail("family-resolution scalar identity differs from its canonical snapshot")
   end
@@ -1844,6 +1849,17 @@ expect_error("CompilerContext frozen state", "state is frozen", function()
   first_context:replace_epoch("fixture-epoch-state", {value = 4}, 2)
 end)
 first_context:record_artifact("fixture-artifact", {value = 2})
+if first_context:artifact_view("fixture-artifact")
+  ~= first_context:artifact_view("fixture-artifact") then
+  fail("CompilerContext artifact view did not preserve the active context-owned identity")
+end
+do
+  local artifact_copy = first_context:artifact("fixture-artifact")
+  artifact_copy.value = 3
+  if first_context:artifact_view("fixture-artifact").value ~= 2 then
+    fail("CompilerContext public artifact copy mutated the context-owned planning view")
+  end
+end
 first_context:record_immutable_artifact("fixture-immutable-artifact", {value = 3}, {
   assert_trusted = function(value)
     if type(value) ~= "table" or value.value ~= 3 then

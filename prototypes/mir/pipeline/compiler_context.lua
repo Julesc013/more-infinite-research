@@ -110,8 +110,9 @@ end
 
 -- Compiler-owned immutable records may be shared between state and the
 -- internal artifact index after their private authority has accepted them.
--- The context never exposes this reference: artifact() and snapshot() retain
--- the defensive-copy boundary used by adapters, reports, and fixtures.
+-- The context exposes this reference only through the explicitly read-only
+-- artifact_view() planning surface. artifact() and snapshot() retain the
+-- defensive-copy boundary used by adapters, reports, and fixtures.
 function Context:record_immutable_artifact(name, value, authority)
   if self.artifacts[name] ~= nil then
     error("MIR compiler context artifact was recorded more than once: " .. tostring(name), 2)
@@ -126,6 +127,13 @@ end
 
 function Context:artifact(name)
   return deepcopy(self.artifacts[name])
+end
+
+-- Planning modules may share the context-owned artifact instance while the
+-- active compiler scope remains open. Callers must treat this as read-only;
+-- artifact() remains the defensive-copy boundary for exports and fixtures.
+function Context:artifact_view(name)
+  return self.artifacts[name]
 end
 
 -- Context state is the owner for all mutable, data-derived compiler state.

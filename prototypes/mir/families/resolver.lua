@@ -314,6 +314,10 @@ function M.snapshot()
   return deepcopy(build())
 end
 
+function M.view()
+  return build()
+end
+
 function M.metrics_for_provider(provider_id)
   return deepcopy(build().provider_metrics[provider_id])
 end
