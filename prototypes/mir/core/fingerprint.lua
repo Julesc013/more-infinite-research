@@ -1,5 +1,8 @@
 local M = {}
 local ONE_MIB = 1024 * 1024
+local MAXIMUM_QUOTED_KEY_CACHE_ENTRIES = 1024
+local quoted_key_cache = {}
+local quoted_key_cache_entries = 0
 local metrics = {
   canonical_calls = 0,
   canonical_bytes = 0,
@@ -29,9 +32,34 @@ local function map_keys(value, path)
   return keys
 end
 
+local function string_map_keys(value)
+  local keys = {}
+  for key in pairs(value) do
+    if type(key) ~= "string" then return nil end
+    keys[#keys + 1] = key
+  end
+  return keys
+end
+
+local function quoted_key(key)
+  local encoded = quoted_key_cache[key]
+  if encoded then return encoded end
+  encoded = string.format("%q", key)
+  if quoted_key_cache_entries < MAXIMUM_QUOTED_KEY_CACHE_ENTRIES then
+    quoted_key_cache[key] = encoded
+    quoted_key_cache_entries = quoted_key_cache_entries + 1
+  end
+  return encoded
+end
+
 local function table_shape(value, path)
   local first_key = next(value)
   if first_key == nil then return true end
+  if type(first_key) == "string" then
+    local keys = string_map_keys(value)
+    if keys then return false, keys, true end
+    return false, map_keys(value, path)
+  end
   if type(first_key) ~= "number" or first_key < 1 or first_key % 1 ~= 0 then
     return false, map_keys(value, path)
   end
@@ -58,7 +86,7 @@ local function encode(value, seen, path)
   seen[value] = path
 
   local out = {}
-  local array, keys = table_shape(value, path)
+  local array, keys, string_keys = table_shape(value, path)
   if array then
     for index = 1, #value do
       local child = value[index]
@@ -73,6 +101,23 @@ local function encode(value, seen, path)
     end
     seen[value] = nil
     return "[" .. table.concat(out, ",") .. "]"
+  end
+
+  if string_keys then
+    table.sort(keys)
+    for _, key in ipairs(keys) do
+      local child = value[key]
+      local child_kind = type(child)
+      local child_path = path
+      if child_kind == "table"
+        or (child_kind ~= "nil" and child_kind ~= "boolean"
+          and child_kind ~= "number" and child_kind ~= "string") then
+        child_path = path .. "." .. key
+      end
+      out[#out + 1] = quoted_key(key) .. ":" .. encode(child, seen, child_path)
+    end
+    seen[value] = nil
+    return "{" .. table.concat(out, ",") .. "}"
   end
 
   table.sort(keys, function(left, right) return left.sort_key < right.sort_key end)
