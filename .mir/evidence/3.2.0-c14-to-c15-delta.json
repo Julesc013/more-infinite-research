@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "record_type": "MIRCandidateArchiveDelta",
+  "status": "PASS",
+  "baseline": {
+    "candidate_id": "C14",
+    "archive_bytes": 1000633,
+    "archive_entries": 286,
+    "archive_sha256": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
+    "candidate_content_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37"
+  },
+  "candidate": {
+    "candidate_id": "C15",
+    "archive_bytes": 1000692,
+    "archive_entries": 286,
+    "archive_sha256": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
+    "candidate_content_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242"
+  },
+  "policy": {
+    "allowed_change_roots": [
+      "info.json",
+      "changelog.txt"
+    ],
+    "removals_allowed": false,
+    "unchanged_entries_omitted": true
+  },
+  "summary": {
+    "added": 0,
+    "changed": 2,
+    "removed": 0,
+    "unchanged": 284,
+    "unexpected": 0
+  },
+  "changes": [
+    {
+      "path": "changelog.txt",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "changelog.txt",
+        "bytes": 71210,
+        "content_sha256": "9B9625C02864BCD454C874AE7480E5EE57C824C75384FBD64183801B722F4CEA"
+      },
+      "candidate": {
+        "path": "changelog.txt",
+        "bytes": 71340,
+        "content_sha256": "6168B763D012D0AF3152D7F3AB3A10C8658683D2F30CA2389CCAED9982419435"
+      }
+    },
+    {
+      "path": "info.json",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "info.json",
+        "bytes": 484,
+        "content_sha256": "33FF1A597D9A91ABEAB0A340E154BEC0159B21E0ABBCFF508ADA57BE493BBC97"
+      },
+      "candidate": {
+        "path": "info.json",
+        "bytes": 539,
+        "content_sha256": "F854CD23D65A77DA4DF4129A8C8F24C44D864EAA778F6A6DC9017D902942D7D0"
+      }
+    }
+  ]
+}

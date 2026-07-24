@@ -293,7 +293,7 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
-      candidate_id: C14
+      candidate_id: C15
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
@@ -302,28 +302,28 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 1000633
-      archive_sha256: 34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782
-      package_content_sha256: 373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37
-      package_source_sha256: 373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37
-      package_source_commit: b8e0481830844659bc373c736e9e8245ec45653b
-      superseded_candidate_id: C13
-      superseded_candidate_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
+      archive_bytes: 1000692
+      archive_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
+      package_content_sha256: E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242
+      package_source_sha256: E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242
+      package_source_commit: c3a56e88fa15da7c12db3b0d11c3d4e732935746
+      superseded_candidate_id: C14
+      superseded_candidate_sha256: 34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782
       superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
       superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: pending-exact-c14
+      approved_delta_gate: pending-exact-c15
       superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: pending-exact-c14
+      upgrade_gate: pending-exact-c15
       locale_gate: passed-source-unchanged-50-locales-21250-values
-      locale_runtime_gate: pending-exact-c14
-      fast_static_gate: pending-exact-c14
+      locale_runtime_gate: pending-exact-c15
+      fast_static_gate: pending-exact-c15
       superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-      runtime_performance_gate: pending-fresh-c14-paired-campaign-after-c13-regression-block
-      manual_attestation_gate: pending-exact-c14
+      runtime_performance_gate: pending-fresh-c15-paired-campaign-after-c13-regression-block
+      manual_attestation_gate: pending-exact-c15
       minimum_factorio_gate: passed-floor-raised-to-2.1.11
       release_gate: awaiting-c13-performance-remediation-requalification-manual-and-protected-qualification
       publication_status: unreleased
-      status: c13-built-performance-blocked-awaiting-candidate-bound-requalification
+      status: c15-built-after-k2so-science-progression-remediation-awaiting-candidate-bound-requalification
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

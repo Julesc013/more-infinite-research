@@ -24,37 +24,37 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C14",
+      "candidate_id": "C15",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 1000633,
+      "archive_bytes": 1000692,
       "archive_entries": 286,
-      "package_source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
-      "package_source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
-      "package_source_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
+      "package_source_commit": "c3a56e88fa15da7c12db3b0d11c3d4e732935746",
+      "package_source_tree": "de885bb52a10a6ee44517a8efda84be629019c28",
+      "package_source_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
+        "source_tree": "de885bb52a10a6ee44517a8efda84be629019c28",
         "file_count": 286
       },
-      "archive_sha256": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
-      "package_content_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
+      "archive_sha256": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
+      "package_content_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
       "status": "awaiting-fresh-candidate-qualification",
       "supersedes_candidate": {
-        "candidate_id": "C13",
-        "archive_bytes": 1000637,
+        "candidate_id": "C14",
+        "archive_bytes": 1000633,
         "archive_entries": 286,
-        "archive_sha256": "28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837",
-        "package_content_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
-        "package_source_commit": "a49f230cbb792d6b807eab88d218a33feb774bd2",
-        "package_source_tree": "a3199523d41c808c9f4e7ad51af75a22cd844ce2",
-        "package_source_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620",
-        "reason": "C13 full static qualification found one packaged changelog entry at 133 characters against the enforced 132-character contract; C14 shortens that wording without changing runtime code, technology identities, or selection semantics"
+        "archive_sha256": "34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782",
+        "package_content_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
+        "package_source_commit": "b8e0481830844659bc373c736e9e8245ec45653b",
+        "package_source_tree": "7eaba157f6428124d1b19b44c5ae40be152c4260",
+        "package_source_sha256": "373D884F761A88D15F737D95A2D8E038F699673937D85192AC0DEA00662F9D37",
+        "reason": "C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden optional load-order dependencies and a positive multi-science scenario contract"
       }
     },
     "factorio-2.0": {

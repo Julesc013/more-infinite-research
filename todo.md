@@ -86,13 +86,14 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Remove C11's redundant transient TechnologyCatalog construction, generate packaged defaults from canonical Lua, and freeze C12 without widening the technology set.
 - [x] Profile C12's final catalog construction, apply bounded trusted copy-on-write construction, and freeze exact C13 without changing technology identities or selections.
 - [x] Replace C13 with exact C14 after full static qualification found one packaged changelog line above the enforced 132-character limit.
+- [x] Replace C14 with exact C15 after the K2SO science-progression playtest defect and freeze its exact package identity.
 - [x] Make full-plan execution fail closed on preflight exceptions, incomplete result sets, and unexpected result rows; retain the first run as 124/124 directly dispatched development passes rather than misreporting 129/129.
 - [x] Pass all five exact C14 upgrade archetypes, all nine targeted ecosystem repair smokes, the representative BZ plus Space Age scenario, and the seven-scenario 221-row approved delta.
 - [x] Retire the obsolete Krastorio Spaced Out sanitation prune expectation after the exact current closure passed with zero external repairs, then pass the paired closure smoke.
 - [x] Run all 72 governed C14-Q3 paired performance invocations and fix ordered telemetry-map evaluation so all 38 real counter-bound checks are evaluated correctly.
 - [x] Make hosted validation represent an all-reuse plan with one explicit no-op matrix row while retaining the aggregate evidence gate as the only pass authority.
-- [ ] Resolve C14's paired 3.1.9 performance-regression failure without weakening the declared gate.
-- [ ] Run all final-candidate-bound automated work from the immutable C14 package source and current qualification contract.
+- [ ] Resolve C15's inherited paired 3.1.9 performance-regression failure without weakening the declared gate.
+- [ ] Run all final-candidate-bound automated work from the immutable C15 package source and current qualification contract.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.

@@ -401,13 +401,33 @@ docs:
     checkpoint_candidate_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
   - path: docs/releases/3.2.0-c14-static-contract-remediation.md
     title: "MIR 3.2.0 C14 Static Contract Remediation"
+    status: historical-checkpoint
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c15-k2so-science-progression.md
+    checkpoint_source_commit: b8e0481830844659bc373c736e9e8245ec45653b
+    checkpoint_candidate_sha256: 34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782
+  - path: docs/releases/3.2.0-c15-k2so-science-progression.md
+    title: "MIR 3.2.0 C15 K2SO Science Progression"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c14-compiler-platform
-      - mir-3.2.0-c14-candidate-identity
+      - mir-3.2.0-c15-compiler-platform
+      - mir-3.2.0-c15-candidate-identity
+      - mir-3.2.0-k2so-science-progression
+  - path: docs/releases/3.2.0-c15-playtest-guide.md
+    title: "MIR 3.2.0 C15 In-Game Playtest Guide"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-c15-in-game-playtest-order
+      - mir-3.2.0-c15-gameplay-tuning-intake
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

@@ -551,19 +551,19 @@ function Invoke-MIRAssuranceSelfTest {
       -PackageSourceCommit ([string]$authority.package_source_commit) `
       -ContentCommit $qualificationCommit `
       -Material $authority.package_source_material
-    if ([string]$authority.candidate_id -ne "C14" -or
+    if ([string]$authority.candidate_id -ne "C15" -or
         [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [int]$packageMaterial.file_count -ne 286 -or
         -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
-      throw "C14 package-source and qualification-source authority self-test failed."
+      throw "C15 package-source and qualification-source authority self-test failed."
     }
     $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
     if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
         [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
         [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256 -or
         (Get-MIRAssurancePackageSourceHash) -ne [string]$authority.package_source_sha256) {
-      throw "C14 candidate, normalized content, and current package-source identities do not match release authority."
+      throw "C15 candidate, normalized content, and current package-source identities do not match release authority."
     }
     $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
     if ([string]$tamperedMaterial.hash_algorithm -eq "git-commit-normalized-package-v1") {
