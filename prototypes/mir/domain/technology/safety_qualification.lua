@@ -10,6 +10,15 @@ local authority = trusted_record.new("SafetyQualification")
 local SCHEMA = 1
 local GATE_ORDER = hard_gate_authority.order()
 local DECISIONS = {qualified = true, proposal = true, rejected = true, quarantined = true}
+local qualifications_by_design = setmetatable({}, {__mode = "k"})
+
+local function binding_matches(entry, row)
+  if entry.action ~= row.action or entry.stream_key ~= row.stream_key then return false end
+  for _, gate_name in ipairs(GATE_ORDER) do
+    if entry.gates[gate_name] ~= row.gates[gate_name] then return false end
+  end
+  return true
+end
 
 local function material(record)
   local gate_identities = {}
@@ -114,6 +123,16 @@ function M.from_design(design, row, _, options)
   if options and options.validated then technology_design.assert_trusted(design)
   else technology_design.verify_untrusted(design) end
   row = row or {}
+  if type(row.gates) ~= "table" then
+    error("SafetyQualification row requires the exact TechnologyDesign gate set.", 2)
+  end
+  local cached = qualifications_by_design[design]
+  for _, entry in ipairs(cached or {}) do
+    if binding_matches(entry, row) then
+      M.assert_trusted(entry.qualification)
+      return entry.qualification
+    end
+  end
   local contributing = {}
   local unresolved = {}
   local hard_gates = {}
@@ -154,7 +173,16 @@ function M.from_design(design, row, _, options)
   }
   record.qualification_fingerprint = fingerprint.of(material(record))
   verify(record, {trusted_children = true, verify_fingerprint = false})
-  return authority.register(record, trust_identity(record))
+  authority.register(record, trust_identity(record))
+  cached = cached or {}
+  cached[#cached + 1] = {
+    action = row.action,
+    stream_key = row.stream_key,
+    gates = hard_gates,
+    qualification = record
+  }
+  qualifications_by_design[design] = cached
+  return record
 end
 
 return M

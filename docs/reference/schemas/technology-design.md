@@ -53,6 +53,8 @@ Every hard gate is an explicit record with one of `not-applicable`, `pending`, `
 
 `SafetyQualification` is the hard-gate aggregate. `DesignAssessment` evaluates quality independently. `PromotionAuthorization` records separately governed trust and evidence. None can be inferred from another.
 
+Internal planning constructs one `SafetyQualification` for an exact tuple of trusted `TechnologyDesign`, row action, stream identity, and complete gate-instance vector. Operation validation and catalog assembly may share that immutable record only while the tuple remains exact. A legitimate derived vector constructs a distinct record; imported or copied inputs receive full verification and cannot claim the reuse path.
+
 ## GenerationPlan boundary
 
 Every schema-3 `emit` or `adopt` row must carry one validated schema-2 `TechnologyDesign`. The compatibility `fields` record is checked against the IR and cannot disagree with it. Compilation planning, stream emission, adoption transactions, and output validation consume canonical projections from the IR.

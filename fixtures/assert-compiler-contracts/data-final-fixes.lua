@@ -613,6 +613,17 @@ expect_error("TechnologyDesign qualification identity", "changed design identity
 end)
 local candidate = focused_contracts.technology_candidate.from_design(normalized_design, design_row)
 local qualification = focused_contracts.technology_qualification.from_design(normalized_design, design_row)
+if focused_contracts.technology_qualification.from_design(normalized_design, design_row) ~= qualification then
+  fail("SafetyQualification did not reuse the exact trusted TechnologyDesign qualification")
+end
+do
+  local mismatched = deepcopy(design_row)
+  mismatched.gates.effect_valid = c7_contracts.gate.passed("compiler-contract:mismatch", {"fixture:mismatch"})
+  local distinct = focused_contracts.technology_qualification.from_design(normalized_design, mismatched)
+  if distinct == qualification or distinct.qualification_fingerprint == qualification.qualification_fingerprint then
+    fail("SafetyQualification reused a record across different exact gate vectors")
+  end
+end
 if not rawequal(candidate.semantic_identity, normalized_design.semantic_identity)
   or not rawequal(candidate.subjects, normalized_design.subjects) then
   fail("TechnologyCandidate did not share exact trusted design identity and subjects")
