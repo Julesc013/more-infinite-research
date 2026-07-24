@@ -692,6 +692,7 @@ fixtures:
       - sanitation-retained-effect-order-ledger
       - sanitation-content-fingerprints
       - post-sanitation-target-prototype-invariant
+      - output-target-inventory-name-set-tamper-rejection
       - missing-unlock-quality-target-pruned
       - valid-unlock-quality-target-retained
       - missing-turret-entity-target-pruned

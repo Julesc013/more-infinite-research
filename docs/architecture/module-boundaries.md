@@ -675,7 +675,9 @@ An effect-safety pass captures the recipe, item, fluid, and technology target in
 
 Effect-contract membership queries derive lookup sets lazily in a module-private weak-key cache keyed by the immutable inventory table. These lookup indexes are acceleration state only: they are not written into the inventory, do not alter its canonical fingerprint or public evidence, and are reclaimed with the inventory. Repeated target checks therefore remain exact without scanning a sorted prototype-name array for every effect.
 
-Output sanitation returns its freshly captured target inventory to the enclosing safety command. The subsequent generated-effect assertion uses that exact same value, so both checks bind one output-state capture and one inventory fingerprint rather than reconstructing the global target set twice.
+Output sanitation and the subsequent generated-effect assertion receive the same context-owned inventory after current-set parity succeeds, so both checks bind one input inventory fingerprint rather than reconstructing the sorted global target set.
+
+`CompilerContext` owns the immutable input effect-target inventory as a non-public service. Before output sanitation reuses it, the target adapter enumerates every current governed prototype and resolver union without sorting, rejecting any added or removed name and any count mismatch. The unchanged exact name sets preserve the input inventory fingerprint; the service value itself is excluded from public context artifacts, which expose only the service name.
 
 The realized graph postcondition captures a fresh graph snapshot from `data.raw` and requires both its graph fingerprint and every ordered node field to equal the previously qualified virtual snapshot. Exact snapshot equality makes the earlier SCC assignments, condensation topology, and per-technology researchability proofs valid for the realized graph, so the postcondition reuses those immutable results instead of performing a second full graph qualification. Generated-technology presence, enabled state, prerequisite arrays, plan membership, and proof status remain checked independently.
 

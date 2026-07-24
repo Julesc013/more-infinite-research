@@ -19,8 +19,9 @@ local commands = {
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
     apply = function(context)
-      local ledger = require("prototypes.mir.emit.effect_safety")
+      local ledger, target_inventory = require("prototypes.mir.emit.effect_safety")
         .sanitize_all_technology_effects({pass = "input"})
+      context:set_service("effect_target_inventory", target_inventory)
       context:record_artifact("input_sanitation_ledger", ledger)
     end
   },
@@ -105,12 +106,17 @@ local commands = {
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
     apply = function(context)
-      local ledger, target_inventory = require("prototypes.mir.emit.effect_safety")
-        .sanitize_all_technology_effects({pass = "output"})
+      local effect_safety = require("prototypes.mir.emit.effect_safety")
+      local target_inventory = context:service("effect_target_inventory")
+      effect_safety.assert_current_target_inventory(target_inventory)
+      local ledger = effect_safety.sanitize_all_technology_effects({
+        pass = "output",
+        target_inventory = target_inventory
+      })
       require("prototypes.mir.emit.effect_safety").assert_target_inventory_unchanged(
         context:artifact("input_sanitation_ledger"), ledger)
       context:record_artifact("output_sanitation_ledger", ledger)
-      require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects(target_inventory)
+      effect_safety.assert_registered_technology_effects(target_inventory)
       local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
         .assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))
       context:record_artifact("technology_graph_parity", graph_parity)

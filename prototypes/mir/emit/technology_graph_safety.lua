@@ -95,7 +95,8 @@ function M.assert_registered_technologies(plan)
   if not expected then error("MIR CompilationPlan lacks virtual technology-graph qualification evidence.", 2) end
 
   -- The virtual graph has already been fully qualified. Capture the realized
-  -- graph from data.raw and prove exact node equality; equal graph input
+  -- graph from the Factorio prototype registry and prove exact node equality;
+  -- equal graph input
   -- necessarily retains the qualified SCC, condensation, and proof results.
   local actual_snapshot = graph_snapshot.new(data_raw.prototypes("technology"))
   local difference = graph_diff.compare(expected.graph_snapshot, actual_snapshot)

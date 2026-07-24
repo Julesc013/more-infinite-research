@@ -1150,6 +1150,21 @@ if default_quality_identity ~= normal_quality_identity or normal_quality_identit
   fail("give-item identities do not bind the effective quality target")
 end
 
+(function()
+  local target_inventory = require("__more-infinite-research__.prototypes.mir.platform.factorio.effect_target_inventory")
+  local raw = require("__more-infinite-research__.prototypes.mir.platform.factorio.data_raw")
+  local captured = target_inventory.capture()
+  target_inventory.assert_unchanged(captured)
+  local sentinel = "mir-fixture-target-inventory-sentinel"
+  raw.prototypes("recipe")[sentinel] = {type = "recipe", name = sentinel}
+  local ok, message = pcall(target_inventory.assert_unchanged, captured)
+  raw.prototypes("recipe")[sentinel] = nil
+  if ok or not tostring(message):find("target prototype inventory changed", 1, true) then
+    fail("effect target inventory accepted a post-sanitation recipe addition")
+  end
+  target_inventory.assert_unchanged(captured)
+end)()
+
 local command_positions = {}
 for index, id in ipairs(pipeline_commands.order()) do command_positions[id] = index end
 if pipeline_commands.new_context({execution_mode = "STRICT_CI"}):execution_mode() ~= "STRICT_CI"

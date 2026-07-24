@@ -94,7 +94,7 @@ function S.sanitize_registered_technology_effects()
     end
   end
 
-  return summary, target_inventory
+  return summary
 end
 
 local function owner_record(name)
@@ -106,7 +106,7 @@ end
 
 function S.sanitize_all_technology_effects(options)
   options = options or {}
-  local target_inventory = inventory()
+  local target_inventory = options.target_inventory or inventory()
   local summary = {
     schema = 1,
     pass = options.pass or "unspecified",
@@ -155,7 +155,11 @@ function S.sanitize_all_technology_effects(options)
   end
   telemetry.count("sanitation_scanned_technologies", summary.scanned_technology_count)
   telemetry.count("sanitation_scanned_effects", summary.scanned_effect_count)
-  return summary
+  return summary, target_inventory
+end
+
+function S.assert_current_target_inventory(expected)
+  return target_inventory_adapter.assert_unchanged(expected)
 end
 
 function S.assert_target_inventory_unchanged(input_ledger, output_ledger)

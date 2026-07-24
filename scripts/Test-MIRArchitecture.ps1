@@ -440,8 +440,9 @@ foreach ($needle in @(
   'require("prototypes.mir.compatibility.planner").emit()',
   'require("prototypes.mir.pipeline.compiler_orchestrator").assert_output(context)',
   '.sanitize_all_technology_effects({pass = "input"})',
-  '.sanitize_all_technology_effects({pass = "output"})',
-  'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
+  'effect_safety.assert_current_target_inventory(target_inventory)',
+  'target_inventory = target_inventory',
+  'effect_safety.assert_registered_technology_effects(target_inventory)',
   '.assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))',
   'context:record_artifact("technology_graph_parity", graph_parity)',
   'require("prototypes.mir.pipeline.compiler_orchestrator").publish(context)',
@@ -630,8 +631,11 @@ foreach ($gateConsumer in @("prototypes/mir/planner/generation_plan.lua", "proto
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "graph_qualification.validate_operations(plan.operations, {actual = true})"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "expected.graph_fingerprint, actual.graph_fingerprint"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'graph_snapshot.new(data_raw.prototypes("technology"))'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "graph_diff.compare(expected.graph_snapshot, actual_snapshot)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "expected.graph_fingerprint, actual_snapshot.graph_fingerprint"
+$graphDiffText = Read-MIRFile -RelativePath "prototypes/mir/graph/diff.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/graph/diff.lua" -Text $graphDiffText -Needle '.same(expected, actual)'
 
 $presentationText = Read-MIRFile -RelativePath "prototypes/mir/presentation/icon_builder.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/presentation/icon_builder.lua" -Text $presentationText -Needle "function I.icons_for_stream(stream)"
