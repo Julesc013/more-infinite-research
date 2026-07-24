@@ -169,6 +169,27 @@ local function hash_canonical(text)
   -- Preserve the exact MIR32 recurrence while amortizing the Lua-to-C call
   -- used to read canonical bytes. The modulus remains applied after every
   -- byte, so this is identity-compatible with the scalar implementation.
+  while index + 15 <= length do
+    local b1, b2, b3, b4, b5, b6, b7, b8,
+      b9, b10, b11, b12, b13, b14, b15, b16 = string.byte(text, index, index + 15)
+    hash = (hash * 65599 + b1) % 4294967291
+    hash = (hash * 65599 + b2) % 4294967291
+    hash = (hash * 65599 + b3) % 4294967291
+    hash = (hash * 65599 + b4) % 4294967291
+    hash = (hash * 65599 + b5) % 4294967291
+    hash = (hash * 65599 + b6) % 4294967291
+    hash = (hash * 65599 + b7) % 4294967291
+    hash = (hash * 65599 + b8) % 4294967291
+    hash = (hash * 65599 + b9) % 4294967291
+    hash = (hash * 65599 + b10) % 4294967291
+    hash = (hash * 65599 + b11) % 4294967291
+    hash = (hash * 65599 + b12) % 4294967291
+    hash = (hash * 65599 + b13) % 4294967291
+    hash = (hash * 65599 + b14) % 4294967291
+    hash = (hash * 65599 + b15) % 4294967291
+    hash = (hash * 65599 + b16) % 4294967291
+    index = index + 16
+  end
   while index + 7 <= length do
     local b1, b2, b3, b4, b5, b6, b7, b8 = string.byte(text, index, index + 7)
     hash = (hash * 65599 + b1) % 4294967291
