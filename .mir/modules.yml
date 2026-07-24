@@ -329,6 +329,10 @@ mutation_commands:
     - decoded external records are deeply verified once before a module-private weak-key authority admits them to the compiler trust domain
     - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
     - aggregate snapshot catalog operation plan and compilation fingerprints bind exact stored component fingerprints instead of embedding and recanonicalizing complete trusted records
+    - planning stage row copies preserve immutable gate record identity while copying only the mutable gate map
+    - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
+    - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
+    - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence

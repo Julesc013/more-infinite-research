@@ -64,7 +64,14 @@ end
 local function copy_row_with_design_view(source_row)
   local row = {}
   for key, value in pairs(source_row) do
-    row[key] = key == "technology_design" and value or deepcopy(value)
+    if key == "technology_design" then
+      row[key] = value
+    elseif key == "gates" then
+      row.gates = {}
+      for gate_name, gate in pairs(value or {}) do row.gates[gate_name] = gate end
+    else
+      row[key] = deepcopy(value)
+    end
   end
   return row
 end

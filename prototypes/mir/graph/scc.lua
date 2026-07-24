@@ -58,7 +58,12 @@ function M.analyze(adjacency)
         end
       end
       table.sort(component)
-      local id = fingerprint.of(component)
+      -- Singleton SCCs are their own exact identity. Avoid canonicalizing and
+      -- hashing the overwhelmingly common one-node component while retaining
+      -- an unambiguous length-prefixed namespace.
+      local id = #component == 1
+        and ("mir-scc-singleton:" .. tostring(#component[1]) .. ":" .. component[1])
+        or fingerprint.of(component)
       table.insert(components, {component_id = id, nodes = component})
       for _, name in ipairs(component) do assignment[name] = id end
     end

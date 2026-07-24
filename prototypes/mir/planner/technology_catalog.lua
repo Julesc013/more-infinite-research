@@ -22,17 +22,9 @@ local function selection_key(row)
   return tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)
 end
 
-local function safe_diagnostic_row(row)
-  local copy = {action = "diagnose", gates = {}}
-  for gate_name in pairs(row.gates or {}) do
-    copy.gates[gate_name] = gate_contract.not_applicable(
-      "candidate-catalog:diagnostic-alternative",
-      "alternative-materializes-prototype",
-      fingerprint.of({selection_key = selection_key(row), gate = gate_name, action = "diagnose"}),
-      {"candidate-catalog:safe-diagnostic-alternative"}
-    )
-  end
-  return copy
+local function safe_diagnostic_row(diagnostic_design)
+  technology_design.assert_trusted(diagnostic_design)
+  return {action = "diagnose", gates = diagnostic_design.gates}
 end
 
 local function final_qualification_row(row)
@@ -165,7 +157,7 @@ function M.from_preselection_rows(rows, context_material, options)
       row.reason,
       {validated = options.trusted_designs == true}
     )
-    local diagnostic_row = safe_diagnostic_row(row)
+    local diagnostic_row = safe_diagnostic_row(diagnostic_design)
     local designs = {}
     if row.action == "emit" or row.action == "adopt" then
       table.insert(designs, {design = primary_design, row = row, action = row.action, disposition = "materialize"})

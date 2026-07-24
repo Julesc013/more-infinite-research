@@ -78,7 +78,8 @@ local function verify(record, options)
   if record.primary_rejection ~= nil and type(record.primary_rejection) ~= "table" then
     error("SafetyQualification primary rejection is invalid.", 2)
   end
-  if record.qualification_fingerprint ~= fingerprint.of(material(record)) then
+  if options.verify_fingerprint ~= false
+    and record.qualification_fingerprint ~= fingerprint.of(material(record)) then
     error("SafetyQualification fingerprint is invalid.", 2)
   end
   return true
@@ -148,7 +149,7 @@ function M.from_design(design, row, _, options)
     validation_evidence = design.maturity.validation_evidence
   }
   record.qualification_fingerprint = fingerprint.of(material(record))
-  verify(record, {trusted_children = true})
+  verify(record, {trusted_children = true, verify_fingerprint = false})
   return authority.register(record, trust_identity(record))
 end
 

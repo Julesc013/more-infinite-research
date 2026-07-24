@@ -54,7 +54,8 @@ local function trust_identity_unchanged(candidate, registered)
     and candidate.candidate_fingerprint == registered.candidate_fingerprint
 end
 
-local function verify(candidate)
+local function verify(candidate, options)
+  options = options or {}
   if type(candidate) ~= "table" or candidate.schema ~= SCHEMA then
     error("TechnologyCandidate schema 1 record is required.", 2)
   end
@@ -86,7 +87,8 @@ local function verify(candidate)
     or type(discovery.feature_signature) ~= "string" or discovery.feature_signature == "" then
     error("TechnologyCandidate discovery record is invalid.", 2)
   end
-  if candidate.candidate_fingerprint ~= fingerprint.of(candidate_material(candidate)) then
+  if options.verify_fingerprint ~= false
+    and candidate.candidate_fingerprint ~= fingerprint.of(candidate_material(candidate)) then
     error("TechnologyCandidate fingerprint is invalid.", 2)
   end
   return true
@@ -142,7 +144,7 @@ function M.from_design(design, row, options)
     }
   }
   candidate.candidate_fingerprint = fingerprint.of(candidate_material(candidate))
-  verify(candidate)
+  verify(candidate, {verify_fingerprint = false})
   return authority.register(candidate, trust_identity(candidate))
 end
 
