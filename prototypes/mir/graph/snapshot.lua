@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
+local technology_views = setmetatable({}, {__mode = "k"})
 
 local function sorted(values)
   local out = {}
@@ -16,13 +17,14 @@ end
 
 function M.new(technologies)
   local nodes = {}
+  local technology_view = {}
   for name, technology in pairs(technologies or {}) do
     local ingredients = {}
     for _, ingredient in ipairs(((technology or {}).unit or {}).ingredients or {}) do
       table.insert(ingredients, ingredient_name(ingredient))
     end
     table.sort(ingredients)
-    table.insert(nodes, {
+    local node = {
       name = name,
       enabled = technology.enabled ~= false,
       prerequisites = sorted(technology.prerequisites),
@@ -30,17 +32,29 @@ function M.new(technologies)
       science_packs = ingredients,
       has_research_count = technology.unit ~= nil
         and (technology.unit.count ~= nil or technology.unit.count_formula ~= nil)
-    })
+    }
+    table.insert(nodes, node)
+    technology_view[name] = node
   end
   table.sort(nodes, function(left, right) return left.name < right.name end)
   local snapshot = {schema = 1, nodes = nodes}
   snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
+  technology_views[snapshot] = technology_view
   return snapshot
+end
+
+function M.technology_view(snapshot)
+  local view = technology_views[snapshot]
+  if view then return view end
+  view = {}
+  for _, node in ipairs(snapshot.nodes or {}) do view[node.name] = node end
+  technology_views[snapshot] = view
+  return view
 end
 
 function M.technology_map(snapshot)
   local out = {}
-  for _, node in ipairs(snapshot.nodes or {}) do out[node.name] = deepcopy(node) end
+  for name, node in pairs(M.technology_view(snapshot)) do out[name] = deepcopy(node) end
   return out
 end
 

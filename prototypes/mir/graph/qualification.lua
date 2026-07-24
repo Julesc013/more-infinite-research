@@ -309,7 +309,7 @@ function M.validate_operations(operations, options)
   end
 
   local proofs, research_rejections = {}, {}
-  local nodes = graph_snapshot.technology_map(snapshot)
+  local nodes = graph_snapshot.technology_view(snapshot)
   local research_services = {
     valid_research_ingredients = science.valid_research_ingredients,
     pack_production_status = science.pack_production_status

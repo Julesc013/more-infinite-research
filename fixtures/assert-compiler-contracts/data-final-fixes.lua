@@ -1080,7 +1080,7 @@ if not continuation_operation or not continuation_operation.technology_design
   or continuation_operation.technology_design.identity_authority.source ~= "base-continuation-manifest" then
   fail("base continuation did not use TechnologyDesign and continuation manifest authority")
 end
-(function()
+do
   local shared_graph_proof_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
     {
       operation = "emit_base_extension",
@@ -1110,8 +1110,28 @@ end
       shared_graph_proofs["mir-shared-graph-proof-b"]
     ) then
     fail("equivalent accepted graph proofs were not represented by one trusted immutable record")
-  }
-end)()
+  end
+end
+do
+  local graph_snapshot = require("__more-infinite-research__.prototypes.mir.graph.snapshot")
+  local snapshot = graph_snapshot.new({
+    ["mir-graph-view-contract"] = {
+      enabled = true,
+      prerequisites = {"automation"},
+      unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
+    }
+  })
+  local view = graph_snapshot.technology_view(snapshot)
+  local owned = graph_snapshot.technology_map(snapshot)
+  if view ~= graph_snapshot.technology_view(snapshot)
+    or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"] then
+    fail("graph snapshot did not preserve stable internal views and owned public maps")
+  end
+  owned["mir-graph-view-contract"].prerequisites[1] = "tampered"
+  if view["mir-graph-view-contract"].prerequisites[1] ~= "automation" then
+    fail("graph snapshot owned map mutation escaped into the internal read-only view")
+  end
+end
 expect_error("presentation output parity", "localized name differs", function()
   output_validator.assert_technology_shape(
     {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Expected"}},
