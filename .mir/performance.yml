@@ -16,6 +16,7 @@ measurement_policy:
   - Load-only overhaul observations do not create compatibility support claims.
   - Source-instrumented coverage measurements do not create archive compatibility claims.
   - The split 100000-scale campaigns cover recipes technologies effects graph edges a 25000-node SCC and randomized insertion order without conflating independent stress domains.
+  - Runtime scenario timeout_seconds is a process-kill safety ceiling, not a performance pass budget. The graph scenarios use 900-second process timeouts; only the canonical synthetic-scale-graph lane is compared with the separate 600-second large-synthetic-graph acceptance budget, while the randomized-order lane proves determinism and must finish before its process timeout.
   - Factorio runtime materializes 60000 technologies below the engine hard limit of 65535 while the same compiler graph implementation validates 100000 in-memory planned technologies.
   - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
   - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.

@@ -339,6 +339,7 @@ mutation_commands:
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
     - the schema-3 TechnologyCatalog is finalized once after sanitation and graph proof, preserves rejected designs, publishes as one exact artifact, and has no mutation authority
+    - stream compilation produces source rows only; CompilationPlan is the sole TechnologyCatalog construction and finalization owner and no transient catalog is discarded
     - the TechnologyCatalog includes accepted and rejected base continuation candidates under the same hard-gate authority
     - every GenerationPlan is an exact projection of the catalog selection policy
     - SafetyQualification DesignAssessment and PromotionAuthorization are independent fingerprinted decisions

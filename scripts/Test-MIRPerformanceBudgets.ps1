@@ -131,6 +131,18 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.0" -or
     [string]$campaign.factorio_line -ne "2.1" -or [string]$campaign.factorio_version -ne "2.1.11") {
   throw "Performance campaign authority must be the schema-2 MIR 3.2.0 Factorio 2.1.11 campaign."
 }
+$releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
+$releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
+$activeCandidate = $releaseLedger.development.'factorio-2.1'
+if ($null -eq $activeCandidate -or
+    [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+    [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+    [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+    [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+    [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+    [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+  throw "Performance campaign candidate authority differs from the active Factorio 2.1 release candidate."
+}
 if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
     [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
     [string]$campaign.run_policy.order -ne "paired-balanced") {

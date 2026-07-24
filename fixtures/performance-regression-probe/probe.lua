@@ -19,13 +19,17 @@ function M.measure(phase, callback, ...)
   local current = sequence
   log("[MIR_PERFORMANCE_PHASE] start " .. phase .. " " .. tostring(current))
   local started = now()
-  local result = callback(...)
+  local arguments = table.pack(...)
+  local results = table.pack(xpcall(function()
+    return callback(table.unpack(arguments, 1, arguments.n))
+  end, debug.traceback))
   local elapsed = math.max(0, now() - started)
   log("[MIR_PERFORMANCE_PHASE] end " .. phase .. " " .. tostring(current))
   local row = M.phases[phase]
   row.runs = row.runs + 1
   row.seconds = row.seconds + elapsed
-  return result
+  if not results[1] then error(results[2], 2) end
+  return table.unpack(results, 2, results.n)
 end
 
 return M

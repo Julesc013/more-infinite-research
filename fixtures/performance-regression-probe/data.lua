@@ -1,6 +1,15 @@
 local probe = require("probe")
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
-local compilation_plan = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator")
+local mir_version = mods and mods["more-infinite-research"] or nil
+local compilation_module
+if mir_version == "3.1.9" then
+  compilation_module = "__more-infinite-research__.prototypes.mir.planner.compilation_plan"
+elseif mir_version == "3.2.0" then
+  compilation_module = "__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator"
+else
+  error("performance probe does not govern MIR version " .. tostring(mir_version))
+end
+local compilation_plan = require(compilation_module)
 local graph_safety = require("__more-infinite-research__.prototypes.mir.emit.technology_graph_safety")
 local commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 

@@ -658,7 +658,12 @@ foreach ($projection in @(
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.technology_catalog")'
+Assert-MIRNoPatternInLuaFile `
+  -RelativePath "prototypes/mir/planner/stream_compiler.lua" `
+  -Pattern 'prototypes\.mir\.planner\.technology_catalog' `
+  -Message "Stream compilation must produce source rows without constructing a discarded transient TechnologyCatalog."
+Assert-MIRContains -RelativePath "prototypes/mir/planner/compilation_plan.lua" -Text $compilationPlanText -Needle 'require("prototypes.mir.planner.technology_catalog")'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/compilation_plan.lua" -Text $compilationPlanText -Needle "artifact.technology_catalog = technology_catalog.finalize("
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile(context)"
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua" -Text $compilerOrchestratorText -Needle 'context:set_state("technology_candidate_catalog"'
 

@@ -93,8 +93,15 @@
       "inputs": [
         "settings*.lua",
         "prototypes/mir/settings/**",
+        "prototypes/streams/**",
         ".mir/settings.yml",
-        "locale/**"
+        "locale/**",
+        "README.md",
+        "docs/user/settings.md",
+        "docs/reference/settings.md",
+        "docs/maintainer/settings-governance.md",
+        "scripts/Update-MIRREADMEStreamDefaults.ps1",
+        "scripts/Test-MIRSettingsVisibility.ps1"
       ]
     },
     {

@@ -104,6 +104,10 @@ The technology graph semantics no longer belong separately to planner and emitte
 
 Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua`; `emit/icon_builder.lua` is a compatibility facade. Pure blocked-effect policy lives in `domain/technology/effect_safety_policy.lua`, while the emit facade owns mutation. `.mir/module-dependencies.json` and `scripts/Test-MIRModuleDependencies.ps1` enforce forbidden planner-to-emitter imports, overlay mutation boundaries, command authority, and an exact bounded baseline for the few remaining legacy cycles.
 
+### Technology Catalog Construction Ownership
+
+`prototypes/mir/planner/stream_compiler.lua` produces source rows and the finalized GenerationPlan only. It must not construct a transient TechnologyCatalog. `prototypes/mir/planner/compilation_plan.lua` is the sole TechnologyCatalog construction and finalization owner after the complete operation set is known, and its final catalog receives the full schema validation before publication.
+
 ## Three Workspaces
 
 Use three clear workspaces:
