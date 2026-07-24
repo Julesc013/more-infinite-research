@@ -150,8 +150,7 @@ diagnose = function(root)
   error("Fingerprint diagnostic traversal did not reproduce invalid input.", 3)
 end
 
-function M.canonical(value)
-  local text = encode(value, {}, "$", false, value)
+local function record_canonical(text)
   local bytes = #text
   metrics.canonical_calls = metrics.canonical_calls + 1
   metrics.canonical_bytes = metrics.canonical_bytes + bytes
@@ -159,6 +158,11 @@ function M.canonical(value)
   if bytes > ONE_MIB then
     metrics.serializations_over_one_mib = metrics.serializations_over_one_mib + 1
   end
+end
+
+function M.canonical(value)
+  local text = encode(value, {}, "$", false, value)
+  record_canonical(text)
   return text
 end
 
@@ -217,6 +221,13 @@ end
 
 function M.of_canonical(text)
   if type(text) ~= "string" then error("Canonical fingerprint text is required.", 2) end
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
+  return hash_canonical(text)
+end
+
+function M.of_prebuilt_canonical(text)
+  if type(text) ~= "string" then error("Prebuilt canonical fingerprint text is required.", 2) end
+  record_canonical(text)
   metrics.fingerprint_calls = metrics.fingerprint_calls + 1
   return hash_canonical(text)
 end

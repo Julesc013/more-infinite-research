@@ -359,6 +359,7 @@ mutation_commands:
     - realized graph postconditions capture and structurally compare the exact graph snapshot then reuse SCC condensation and proof results already qualified for that identical graph
     - each graph qualification shares one exact trusted passing proof across accepted planned technologies while retaining distinct rejection causality
     - graph researchability consumes a snapshot-owned stable node view and externally owned graph maps remain defensive copies
+    - fixed graph snapshot and condensation schemas build byte-identical canonical text directly and record that work through the fingerprint authority
     - every technology create or patch is a schema-2 TransformationOperation in one schema-2 TransformationPlan and produces one plan-bound schema-2 MutationJournal entry
     - SAFE and PREVIEW retain review-required candidates without aborting startup while REVIEWED STRICT_CI and RELEASE apply their exact captured review policy
     - CompilerResult schema 3 separates immutable planned material from final APPLIED or FAILED execution evidence and uses private validation-once authority so owned planning finalization and publication never rehash its complete disposition collections
