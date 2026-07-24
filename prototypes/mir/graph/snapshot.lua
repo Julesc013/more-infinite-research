@@ -54,7 +54,8 @@ local function canonical_snapshot(nodes)
   return table.concat(out)
 end
 
-function M.new(technologies)
+function M.new(technologies, options)
+  options = options or {}
   local nodes = {}
   local technology_view = {}
   for name, technology in pairs(technologies or {}) do
@@ -66,7 +67,9 @@ function M.new(technologies)
     local node = {
       name = name,
       enabled = technology.enabled ~= false,
-      prerequisites = sorted(technology.prerequisites),
+      prerequisites = options.prerequisites_by_name
+        and options.prerequisites_by_name[name]
+        or sorted(technology.prerequisites),
       research_trigger = technology.research_trigger ~= nil,
       science_packs = ingredients,
       has_research_count = technology.unit ~= nil

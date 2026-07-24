@@ -31,8 +31,12 @@ function M.build(adjacency, assignment)
     for _, target in ipairs(targets or {}) do
       local to = assignment[target]
       if from and to and from ~= to then
-        local key = from .. "\0" .. to
-        if not seen[key] then seen[key] = true; table.insert(edges, {from = from, to = to}) end
+        local from_seen = seen[from]
+        if not from_seen then from_seen = {}; seen[from] = from_seen end
+        if not from_seen[to] then
+          from_seen[to] = true
+          table.insert(edges, {from = from, to = to})
+        end
       end
     end
   end

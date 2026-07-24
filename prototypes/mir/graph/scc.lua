@@ -18,7 +18,35 @@ function M.analyze(adjacency)
       if adjacency[target] then table.insert(reverse[target], owner) end
     end
   end
-  for _, edges in pairs(reverse) do table.sort(edges) end
+  local remaining_dependencies, queue, queue_head, processed = {}, {}, 1, 0
+  for _, name in ipairs(names) do
+    local count = 0
+    for _, target in ipairs(adjacency[name] or {}) do
+      if adjacency[target] then count = count + 1 end
+    end
+    remaining_dependencies[name] = count
+    if count == 0 then queue[#queue + 1] = name end
+  end
+  while queue_head <= #queue do
+    local name = queue[queue_head]
+    queue_head = queue_head + 1
+    processed = processed + 1
+    for _, dependent in ipairs(reverse[name] or {}) do
+      local remaining = remaining_dependencies[dependent] - 1
+      remaining_dependencies[dependent] = remaining
+      if remaining == 0 then queue[#queue + 1] = dependent end
+    end
+  end
+  if processed == #names then
+    local components, assignment = {}, {}
+    for _, name in ipairs(names) do
+      local id = "mir-scc-singleton:" .. tostring(#name) .. ":" .. name
+      components[#components + 1] = {component_id = id, nodes = {name}}
+      assignment[name] = id
+    end
+    table.sort(components, function(left, right) return left.component_id < right.component_id end)
+    return {schema = 1, components = components, assignment = assignment}
+  end
 
   local visited, order = {}, {}
   for _, root in ipairs(names) do

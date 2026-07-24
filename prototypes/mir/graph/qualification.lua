@@ -73,7 +73,9 @@ local function build_graph(operations, options)
     end
   end
   for _, values in pairs(reverse) do table.sort(values) end
-  return technologies, planned, adjacency, reverse, edge_count, effect_count, graph_snapshot.new(technologies)
+  return technologies, planned, adjacency, reverse, edge_count, effect_count, graph_snapshot.new(technologies, {
+    prerequisites_by_name = adjacency
+  })
 end
 
 local function component_is_cycle(component, adjacency)
