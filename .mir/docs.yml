@@ -428,6 +428,16 @@ docs:
     source_of_truth_for:
       - mir-3.2.0-c15-in-game-playtest-order
       - mir-3.2.0-c15-gameplay-tuning-intake
+  - path: docs/releases/3.2.0-and-2.5.0-tonight-runbook.md
+    title: "MIR 3.2.0 and 2.5.0 Release-Night Runbook"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-release-night-decision-flow
+      - mir-2.5.0-post-freeze-backport-order
+      - mir-release-night-storage-discipline
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current
