@@ -875,6 +875,46 @@ function Invoke-MIRAssuranceSelfTest {
   } catch { $emptyPlanRejected = $true }
   if (-not $emptyPlanRejected) { throw "Empty verification plan was accepted." }
 
+  $completeCounts = Get-MIRAssuranceResultCounts -Results @(
+    [pscustomobject]@{status="passed"; disposition="RUN"},
+    [pscustomobject]@{status="passed"; disposition="REUSE"}
+  ) -ExpectedTotal 2
+  if ($completeCounts.failed -ne 0 -or $completeCounts.incomplete -ne 0 -or
+      $completeCounts.unexpected -ne 0 -or $completeCounts.total -ne $completeCounts.expected) {
+    throw "Complete assurance result cardinality was not accepted."
+  }
+  $incompleteCounts = Get-MIRAssuranceResultCounts -Results @(
+    [pscustomobject]@{status="passed"; disposition="RUN"}
+  ) -ExpectedTotal 2
+  if ($incompleteCounts.failed -ne 0 -or $incompleteCounts.incomplete -ne 1 -or
+      $incompleteCounts.total -eq $incompleteCounts.expected) {
+    throw "Incomplete assurance result cardinality was not rejected."
+  }
+  $preflightFailure = [pscustomobject]@{status="failed"; disposition="RUN"}
+  $failedCounts = Get-MIRAssuranceResultCounts -Results @($preflightFailure) -ExpectedTotal 2
+  if ($failedCounts.failed -ne 1 -or $failedCounts.incomplete -ne 1) {
+    throw "Assurance preflight failure was not retained as failed and incomplete."
+  }
+  $preflightKey = Get-MIRAssuranceTextHash -Text ("preflight-" + [guid]::NewGuid().ToString("N"))
+  $preflightTest = [pscustomobject][ordered]@{
+    id="self-test.preflight-failure"
+    requires_factorio=$true
+    fingerprint=[pscustomobject][ordered]@{
+      input_key=$preflightKey
+      fingerprint_sha256=$preflightKey
+    }
+  }
+  $preflightPlanResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($preflightTest)}) `
+    -Context ([pscustomobject][ordered]@{factorio=""}))
+  if ($preflightPlanResults.Count -ne 1 -or
+      [string]$preflightPlanResults[0].schema -ne "mir-plan-execution-error-v1" -or
+      [string]$preflightPlanResults[0].status -ne "failed" -or
+      [string]$preflightPlanResults[0].test_id -ne [string]$preflightTest.id -or
+      [string]$preflightPlanResults[0].message -notmatch "requires --factorio") {
+    throw "Assurance plan execution discarded a preflight failure."
+  }
+
   $truncatedPlanRejected = $false
   $truncatedPlan = [pscustomobject][ordered]@{
     schema=4

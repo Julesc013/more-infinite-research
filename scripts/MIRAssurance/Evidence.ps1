@@ -1255,10 +1255,28 @@ function Invoke-MIRAssurancePlan {
     try {
       $results += Invoke-MIRAssuranceTest -Test $test -Plan $Plan -Context $Context
     } catch {
+      $capturedFailure = $false
       $paths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
       if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) {
         $blocked = Read-MIRAssuranceEvidencePointer -Path $paths.blocked
-        if ($null -ne $blocked) { $results += $blocked }
+        if ($null -ne $blocked) {
+          $results += $blocked
+          $capturedFailure = $true
+        }
+      }
+      if (-not $capturedFailure) {
+        $results += [pscustomobject][ordered]@{
+          schema="mir-plan-execution-error-v1"
+          test_id=[string]$test.id
+          status="failed"
+          conclusion="failed"
+          disposition="RUN"
+          input_key=[string]$test.fingerprint.input_key
+          fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
+          exit_code=1
+          message=$_.Exception.Message
+          completed_at=(Get-Date).ToUniversalTime().ToString("o")
+        }
       }
       break
     }
@@ -1407,12 +1425,20 @@ function Invoke-MIRAssuranceBuild {
 }
 
 function Get-MIRAssuranceResultCounts {
-  param([Parameter(Mandatory)][AllowEmptyCollection()]$Results)
+  param(
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Results,
+    [int]$ExpectedTotal = -1
+  )
+  $total = @($Results).Count
+  $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
   return [ordered]@{
-    total=@($Results).Count
+    expected=$expected
+    total=$total
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     failed=@($Results | Where-Object { [string]$_.status -ne "passed" }).Count
+    incomplete=[Math]::Max(0, $expected - $total)
+    unexpected=[Math]::Max(0, $total - $expected)
   }
 }
 

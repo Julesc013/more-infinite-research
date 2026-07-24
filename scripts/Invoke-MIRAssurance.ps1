@@ -121,8 +121,8 @@ switch ($command) {
   "verify" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
     $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context
-    $counts = Get-MIRAssuranceResultCounts -Results $results
-    $status = if ($counts.failed -eq 0) { "passed" } else { "failed" }
+    $counts = Get-MIRAssuranceResultCounts -Results $results -ExpectedTotal @($plan.tests).Count
+    $status = if ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
     $summary = [ordered]@{
       schema=2
       status=$status
@@ -146,8 +146,8 @@ switch ($command) {
     if (-not (Get-MIRAssuranceOption -Name "--profile")) { $script:Args += @("--profile", $profile) }
     $plan = Get-MIRAssurancePlan -Context $context
     $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context
-    $counts = Get-MIRAssuranceResultCounts -Results $results
-    $status = if ($counts.failed -eq 0) { "passed" } else { "failed" }
+    $counts = Get-MIRAssuranceResultCounts -Results $results -ExpectedTotal @($plan.tests).Count
+    $status = if ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
     $summary = [ordered]@{
       schema=2
       status=$status
