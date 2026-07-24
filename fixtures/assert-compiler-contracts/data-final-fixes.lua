@@ -61,6 +61,26 @@ local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
 end
 
+(function()
+  local function scalar_hash(text)
+    local hash = 2166136261
+    for index = 1, #text do
+      hash = (hash * 65599 + string.byte(text, index)) % 4294967291
+    end
+    return "mir32-" .. string.format("%08x", hash)
+  end
+  for _, value in ipairs({
+    "mir32-scalar-equivalence",
+    {schema = 2, values = {1, true, false, "quoted\nvalue"}},
+    {nested = {map = {alpha = 1, beta = 2}, array = {"a", "b", "c"}}}
+  }) do
+    local canonical = fingerprint.canonical(value)
+    if fingerprint.of_canonical(canonical) ~= scalar_hash(canonical) then
+      fail("MIR32 eight-byte hash reads changed the scalar recurrence")
+    end
+  end
+end)()
+
 local function expect_error(label, expected, callback)
   local ok, message = pcall(callback)
   if ok then fail(label .. " did not fail") end

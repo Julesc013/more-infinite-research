@@ -346,6 +346,7 @@ mutation_commands:
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - CompilationSnapshot PolicySnapshot RuntimeEnvironmentIdentity and CompilerInput use private validation-once authorities; trusted internal consumers assert stored identities while copied or imported values receive complete component and aggregate verification
     - CompilationSnapshot hashes its already canonicalized captured fact domains without serializing them a second time and qualified snapshots reuse only exact trusted component fingerprints
+    - the MIR32 canonical hash consumes bytes in identity-preserving eight-byte reads while retaining the exact per-byte recurrence and modulus
     - internal CompilationPlan state shares the exact trusted CompilerInput rather than deep-copying immutable snapshot and policy trees
     - compiler-owned immutable records may share one exact reference between context state and the internal artifact index only after their module-private trust authority accepts them; all artifact reads and complete context snapshots remain defensive copies
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
