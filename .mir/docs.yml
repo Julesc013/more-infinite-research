@@ -438,6 +438,16 @@ docs:
       - mir-3.2.0-release-night-decision-flow
       - mir-2.5.0-post-freeze-backport-order
       - mir-release-night-storage-discipline
+  - path: docs/releases/3.2.0-c15-local-qualification-report.md
+    title: "MIR 3.2.0 C15 Local Qualification Report"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-c15-local-qualification
+      - mir-3.2.0-c15-performance-blocker
+      - mir-3.2.0-c15-performance-root-cause
   - path: docs/architecture/current-architecture-matrix.md
     title: "Current MIR Compiler Architecture Matrix"
     status: current

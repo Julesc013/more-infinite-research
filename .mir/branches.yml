@@ -318,10 +318,11 @@ release_artifacts:
       locale_runtime_gate: pending-exact-c15
       fast_static_gate: pending-exact-c15
       superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-      runtime_performance_gate: pending-fresh-c15-paired-campaign-after-c13-regression-block
+      runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
+      runtime_performance_gate: failed-exact-c15-eight-of-ten-lanes-after-72-factorio-runs
       manual_attestation_gate: pending-exact-c15
       minimum_factorio_gate: passed-floor-raised-to-2.1.11
-      release_gate: awaiting-c13-performance-remediation-requalification-manual-and-protected-qualification
+      release_gate: blocked-exact-c15-performance-manual-and-protected-qualification
       publication_status: unreleased
       status: c15-built-after-k2so-science-progression-remediation-awaiting-candidate-bound-requalification
     mir_2_5_0:

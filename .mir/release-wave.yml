@@ -321,12 +321,13 @@ waves:
     locale_gate: passed-source-unchanged-50-locales-21250-values
     locale_runtime_gate: pending-exact-c15
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
-    runtime_performance_gate: pending-fresh-c15-paired-campaign-after-c13-regression-block
+    runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
+    runtime_performance_gate: failed-exact-c15-eight-of-ten-lanes-after-72-factorio-runs
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
     protected_release_gate: pending
     interactive_gate: pending-exact-c15
     assurance_seal: pending
-    release_gate: awaiting-c15-requalification-performance-manual-and-protected-qualification
+    release_gate: blocked-exact-c15-performance-manual-and-protected-qualification
     publication_status: unreleased
     status: c15-built-after-k2so-science-progression-remediation-awaiting-candidate-bound-requalification
 
