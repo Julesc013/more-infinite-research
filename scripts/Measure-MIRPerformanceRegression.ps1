@@ -283,11 +283,12 @@ function Get-MIRCampaignClosureRows {
     [Parameter(Mandatory)][ValidateSet("baseline", "candidate")][string]$PackageLabel
   )
   $scenarios = @($CampaignEvidence.scenarios)
-  if ($scenarios.Count -ne 1 -or [string]$scenarios[0].process_result -ne "passed" -or
-      [bool]$scenarios[0].timed_out -or [int]$scenarios[0].dependency_failure_count -ne 0) {
-    throw "Compatibility performance run did not produce one passing scenario for $LaneId."
+  if ($scenarios.Count -ne 1 -or [bool]$scenarios[0].timed_out -or
+      [int]$scenarios[0].exit_code -ne 0 -or [int]$scenarios[0].dependency_failure_count -ne 0) {
+    throw "Compatibility performance run did not produce one successful Factorio process for $LaneId."
   }
-  if ($PackageLabel -eq "candidate" -and [string]$scenarios[0].result -ne "passed") {
+  if ($PackageLabel -eq "candidate" -and
+      ([string]$scenarios[0].process_result -ne "passed" -or [string]$scenarios[0].result -ne "passed")) {
     throw "Candidate compatibility performance run did not satisfy its governed claim gate for $LaneId."
   }
   return @(
@@ -323,7 +324,7 @@ function Invoke-MIRCompatPerformanceRun {
     RunLoadTests = $true
     RunManualScenarios = $true
     Offline = $true
-    FailFast = $true
+    FailFast = ($PackageLabel -eq "candidate")
     LinkMode = "Hardlink"
     ScenarioNames = @([string]$Lane.scenario)
     ManualScenariosPath = $script:ManualScenariosPath
@@ -353,6 +354,8 @@ function Invoke-MIRCompatPerformanceRun {
     harness_seconds = [Math]::Round($harnessTimer.Elapsed.TotalSeconds, 6)
     closure_rows = $closureRows
     official_mods = @($campaignEvidence.scenarios[0].official_mods)
+    process_result = [string]$campaignEvidence.scenarios[0].process_result
+    claim_result = [string]$campaignEvidence.scenarios[0].result
     probe = $null
   }
 }
@@ -388,6 +391,10 @@ function Invoke-MIRCampaignLaneRun {
   }
   if ($null -ne $result.probe) {
     $capsule.probe = $result.probe
+  }
+  if (-not [string]::IsNullOrWhiteSpace([string]$result.process_result)) {
+    $capsule.process_result = [string]$result.process_result
+    $capsule.claim_result = [string]$result.claim_result
   }
   $capsule | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $runRoot "run.json") -Encoding UTF8
   Write-Host ("[performance] lane={0} phase={1} index={2} package={3} seconds={4:N3} passed" -f $Lane.id, $Phase, $Index, $PackageLabel, $result.seconds)

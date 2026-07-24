@@ -181,8 +181,13 @@ if (-not [bool]$orderedCounter.found -or [long]$orderedCounter.value -ne 12 -or
     [bool]$missingCounter.found) {
   throw "Performance counter lookup must support ordered producer maps, parsed evidence objects, and missing counters."
 }
-if ($producerSource -notmatch '\$PackageLabel\s+-eq\s+"candidate"\s+-and\s+\[string\]\$scenarios\[0\]\.result\s+-ne\s+"passed"') {
-  throw "Performance campaign must apply current sanitation claim gates to the candidate without imposing them on the sealed baseline."
+if ($producerSource -notmatch 'FailFast\s*=\s*\(\$PackageLabel\s+-eq\s+"candidate"\)' -or
+    $producerSource -notmatch '\$PackageLabel\s+-eq\s+"candidate"[\s\S]{0,200}process_result[\s\S]{0,200}result') {
+  throw "Performance campaign must enforce process and claim gates on the candidate without imposing current behavioral claims on the sealed baseline."
+}
+if ($producerSource -notmatch '\[int\]\$scenarios\[0\]\.exit_code\s+-ne\s+0' -or
+    $producerSource -notmatch '\[int\]\$scenarios\[0\]\.dependency_failure_count\s+-ne\s+0') {
+  throw "Performance campaign must still require successful Factorio execution and an exact dependency closure for both packages."
 }
 $campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1")
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
@@ -194,6 +199,11 @@ $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_second
 if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
     $durationProjectionCount -lt 2) {
   throw "Compatibility performance lanes require authoritative Factorio process duration in load and campaign evidence."
+}
+if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed' -or
+    $compatAuditSource -notmatch '\$processResult\s*=\s*if\s*\(\$result\.process_passed\s+-eq\s+\$true\)' -or
+    $compatAuditSource -notmatch '\$claimGateResult\s*=\s*if\s*\(\$processResult\s+-eq\s+"passed"\s+-and\s+\$result\.passed\s+-eq\s+\$true') {
+  throw "Compatibility evidence must distinguish successful Factorio execution from the package-specific behavioral claim gate."
 }
 
 if ($ValidateManifestOnly) {

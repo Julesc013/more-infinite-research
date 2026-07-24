@@ -944,6 +944,7 @@ function Invoke-MIRScenarioLoad {
       duration_seconds = 0.0
       skipped = $true
       skip_reason = "dependency_resolution_failure"
+      process_passed = $false
       passed = $false
       save = ""
       stdout = ""
@@ -1010,6 +1011,7 @@ function Invoke-MIRScenarioLoad {
     duration_seconds = [double]$result.duration_seconds
     skipped = $false
     skip_reason = ""
+    process_passed = [bool]$result.passed
     passed = ($result.passed -and $scienceContractPassed)
     save = $result.save
     stdout = $result.stdout
@@ -1406,7 +1408,7 @@ if ($RunLoadTests) {
       $observedIdentities = @($observedPrunes | ForEach-Object { "$($_.technology)|$($_.effect_type)|$($_.target)" } | Sort-Object -Unique)
       $missingExpectedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '<=' | ForEach-Object InputObject)
       $unreviewedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '=>' | ForEach-Object InputObject)
-      $processResult = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+      $processResult = if ($result.process_passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
       $sanitationResult = if ($processResult -eq "skipped") {
         "skipped"
       } elseif ($missingExpectedPrunes.Count -eq 0 -and $unreviewedPrunes.Count -le $maximumUnreviewedPrunes) {
@@ -1414,7 +1416,7 @@ if ($RunLoadTests) {
       } else {
         "REVIEW_REQUIRED"
       }
-      $claimGateResult = if ($processResult -eq "passed" -and
+      $claimGateResult = if ($processResult -eq "passed" -and $result.passed -eq $true -and
           $dependencyFailureCount -le $maximumDependencyFailures -and
           $sanitationResult -eq "passed") {
         "passed"
