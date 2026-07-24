@@ -352,6 +352,7 @@ mutation_commands:
     - SafetyQualification is reused only for the exact trusted TechnologyDesign row action stream and gate-instance vector; legitimate derived gate vectors construct distinct records
     - TechnologyDesign prototype fingerprinting reads immutable projection values directly while public prototype projections retain one defensive deep copy
     - controlled diagnostic TechnologyDesign derivation asserts its exact changed branches and shared immutable branches instead of repeating full source-design validation
+    - pure compiler dispositions reuse the exact TechnologyDesign qualification fingerprint and TransformationOperation copies a trusted prototype projection exactly once
     - internal CompilationPlan state shares the exact trusted CompilerInput rather than deep-copying immutable snapshot and policy trees
     - compiler-owned immutable records may share one exact reference between context state and the internal artifact index only after their module-private trust authority accepts them; all artifact reads and complete context snapshots remain defensive copies
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints

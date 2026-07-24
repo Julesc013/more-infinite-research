@@ -553,6 +553,11 @@ normalized_shape.effects[1].recipe = "fixture-mutated-projection"
 if normalized_design.design.effects.value[1].recipe ~= "iron-gear-wheel" then
   fail("TechnologyDesign public prototype projection mutated trusted design state")
 end
+if not rawequal(
+    technology_design.trusted_prototype_projection_view(normalized_design).effects,
+    normalized_design.design.effects.value) then
+  fail("TechnologyDesign trusted prototype projection did not share its exact owned values")
+end
 if not rawequal(normalized_design.design.effects.value, normalized_design.provenance.fields.effects.value)
   or not rawequal(normalized_design.design.progression.value.prerequisites,
     normalized_design.provenance.fields["progression.prerequisites"].value)

@@ -991,6 +991,14 @@ function M.prototype_projection(design, options)
   return deepcopy(prototype_projection_unvalidated(design))
 end
 
+-- Internal planner boundary. The returned top-level projection is new, but
+-- nested values remain owned by the trusted design and must be treated as
+-- read-only until the receiving immutable record performs its one copy.
+function M.trusted_prototype_projection_view(design)
+  M.assert_trusted(design)
+  return prototype_projection_unvalidated(design)
+end
+
 function M.presentation_projection(design)
   if M.is_trusted(design) then M.assert_trusted(design) else M.verify_untrusted(design) end
   local identity = design.design.identity.value

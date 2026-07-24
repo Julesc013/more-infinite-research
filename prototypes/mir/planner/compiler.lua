@@ -10,35 +10,11 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 
 local M = {}
 
-local function gate_identity_map(gates)
-  local out = {}
-  for name, gate in pairs(gates or {}) do
-    out[name] = {
-      status = gate.status,
-      passed = gate.passed,
-      evaluator = gate.evaluator,
-      evidence_fingerprint = gate.evidence_fingerprint
-    }
-  end
-  return out
-end
-
 local function input_identity(row)
-  local design = row.technology_design or {}
-  return {
-    schema = row.schema,
-    stream_key = row.stream_key,
-    key = row.key,
-    manifest_id = row.manifest_id,
-    action = row.action,
-    reason = row.reason,
-    technology_name = row.technology_name,
-    candidate_id = design.candidate_id,
-    design_fingerprint = design.design_fingerprint,
-    prototype_fingerprint = design.prototype_fingerprint,
-    qualification_fingerprint = design.qualification_fingerprint,
-    gates = gate_identity_map(row.gates or design.gates)
-  }
+  local design = row.technology_design
+  if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
+  else technology_design.verify_untrusted(design) end
+  return design.qualification_fingerprint
 end
 
 local function compilation_material(result)
@@ -76,7 +52,7 @@ local function stream_operation(row, policy)
   local expected_before = row.action == "adopt" and deepcopy(row.adoption.input_snapshot)
     or {presence = "absent", prototype_type = "technology", id = tostring(subject_id)}
   local expected_after = row.action == "adopt" and deepcopy(row.adoption.expected_snapshot)
-    or technology_design.prototype_projection(design, {validated = true})
+    or technology_design.trusted_prototype_projection_view(design)
   if action == "create" then expected_after.type = "technology" end
   return operation_contract.new({
     operation_id = "technology/" .. action .. "/" .. tostring(subject_id),
@@ -109,7 +85,7 @@ local function base_operation(operation, policy)
   local design = operation.technology_design
   if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
   else technology_design.verify_untrusted(design) end
-  local expected_after = technology_design.prototype_projection(design, {validated = true})
+  local expected_after = technology_design.trusted_prototype_projection_view(design)
   expected_after.type = "technology"
   return operation_contract.new({
     operation_id = "technology/create/" .. tostring(operation.technology_name),
@@ -174,7 +150,7 @@ function M.compile(snapshot, policy)
   for _, row in ipairs(stream_plan.rows or {}) do
     local unresolved, failed = gate_disposition(row)
     local record = {candidate = tostring(row.stream_key), action = row.action,
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(input_identity(row))}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = input_identity(row)}
     if #failed > 0 or (row.action ~= "emit" and row.action ~= "adopt") then
       table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then
@@ -188,7 +164,7 @@ function M.compile(snapshot, policy)
     local gates = operation.gates or (operation.technology_design or {}).gates
     local unresolved, failed = gate_disposition({gates = gates})
     local record = {candidate = "base-continuation/" .. tostring(operation.key), action = "create",
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = fingerprint.of(input_identity(operation))}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = input_identity(operation)}
     if #failed > 0 then table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then table.insert(dispositions.review_required, record)
     else table.insert(dispositions.accepted, record); table.insert(operations, base_operation(operation, policy)) end
