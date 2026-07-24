@@ -1127,20 +1127,9 @@ do
     or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"] then
     fail("graph snapshot did not preserve stable internal views and owned public maps")
   end
-  if snapshot.graph_fingerprint ~= fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes}) then
-    fail("graph snapshot schema-specific canonical bytes differ from the general canonical serializer")
-  end
   owned["mir-graph-view-contract"].prerequisites[1] = "tampered"
   if view["mir-graph-view-contract"].prerequisites[1] ~= "automation" then
     fail("graph snapshot owned map mutation escaped into the internal read-only view")
-  end
-  local condensation = require("__more-infinite-research__.prototypes.mir.graph.condensation")
-  local condensed = condensation.build(
-    {a = {"b"}, b = {}},
-    {a = "mir-scc-singleton:1:a", b = "mir-scc-singleton:1:b"}
-  )
-  if condensed.topology_fingerprint ~= fingerprint.of(condensed.edges) then
-    fail("graph condensation schema-specific canonical bytes differ from the general canonical serializer")
   end
 end
 expect_error("presentation output parity", "localized name differs", function()

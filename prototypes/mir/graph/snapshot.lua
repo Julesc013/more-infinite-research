@@ -15,45 +15,6 @@ local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or ingredient
 end
 
-local function quote(value, cache)
-  local encoded = cache[value]
-  if encoded then return encoded end
-  encoded = string.format("%q", value)
-  cache[value] = encoded
-  return encoded
-end
-
-local function append_string_array(out, values, cache)
-  out[#out + 1] = "["
-  for index, value in ipairs(values or {}) do
-    if index > 1 then out[#out + 1] = "," end
-    out[#out + 1] = quote(value, cache)
-  end
-  out[#out + 1] = "]"
-end
-
-local function canonical_snapshot(nodes)
-  local out, cache = {'{"nodes":['}, {}
-  for index, node in ipairs(nodes) do
-    if index > 1 then out[#out + 1] = "," end
-    out[#out + 1] = '{"enabled":'
-    out[#out + 1] = node.enabled and "true" or "false"
-    out[#out + 1] = ',"has_research_count":'
-    out[#out + 1] = node.has_research_count and "true" or "false"
-    out[#out + 1] = ',"name":'
-    out[#out + 1] = quote(node.name, cache)
-    out[#out + 1] = ',"prerequisites":'
-    append_string_array(out, node.prerequisites, cache)
-    out[#out + 1] = ',"research_trigger":'
-    out[#out + 1] = node.research_trigger and "true" or "false"
-    out[#out + 1] = ',"science_packs":'
-    append_string_array(out, node.science_packs, cache)
-    out[#out + 1] = "}"
-  end
-  out[#out + 1] = '],"schema":1}'
-  return table.concat(out)
-end
-
 function M.new(technologies)
   local nodes = {}
   local technology_view = {}
@@ -77,7 +38,7 @@ function M.new(technologies)
   end
   table.sort(nodes, function(left, right) return left.name < right.name end)
   local snapshot = {schema = 1, nodes = nodes}
-  snapshot.graph_fingerprint = fingerprint.of_prebuilt_canonical(canonical_snapshot(snapshot.nodes))
+  snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
   technology_views[snapshot] = technology_view
   return snapshot
 end
