@@ -32,6 +32,9 @@ if summary.technology_scan_count ~= 1 then fail("technology coverage scan count 
 
 local evidence_prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-compiler-evidence"]
 local evidence = evidence_prototype and evidence_prototype.data
+local internal_evidence_prototype = data.raw["mod-data"]
+  and data.raw["mod-data"]["more-infinite-research-compiler-evidence-internal"]
+local internal_evidence = internal_evidence_prototype and internal_evidence_prototype.data
 local telemetry = evidence and {counters = evidence.counts, phases = evidence.phases}
 if not telemetry or telemetry.counters.technologies < 60000
   or telemetry.counters.effects < 60000
@@ -44,6 +47,12 @@ end
 if not generation_plan or not generation_plan.data or type(generation_plan.data.plan_fingerprint) ~= "string" then
   fail("generation plan fingerprint is missing")
 end
+if not internal_evidence or not internal_evidence.compiler_result
+  or type(internal_evidence.compiler_result.operation_fingerprints) ~= "table" then
+  fail("compiler operation fingerprints are missing")
+end
+local compiler_output_fingerprint = fingerprint.of(
+  internal_evidence.compiler_result.operation_fingerprints)
 
 local STRESS_TOTAL = 100000
 local STRESS_LARGE_SCC = 25000
@@ -123,5 +132,5 @@ local stress_fingerprint = fingerprint.of({
 })
 log("[mir-fixture] synthetic-graph fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
-  .. " compilation=" .. tostring(evidence.semantic_fingerprint)
+  .. " compilation=" .. tostring(compiler_output_fingerprint)
   .. " in_memory=" .. tostring(stress_fingerprint))
