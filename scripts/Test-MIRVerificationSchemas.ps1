@@ -10,11 +10,11 @@ $contracts = [ordered]@{
   "result.schema.json" = @("schema", "test_id", "status", "exit_code", "assertions", "artifacts")
   "capsule.schema.json" = @("schema", "test_id", "status", "fingerprint_sha256", "producer", "result", "result_digest")
   "bundle.schema.json" = @("schema", "policy_id", "status", "plan_material_sha256", "capsule_set_sha256", "bundle_sha256")
-  "seal.schema.json" = @("schema", "state", "mir_version", "target", "candidate_sha256", "plan_material_sha256", "capsule_set_sha256", "seal_sha256")
-  "runtime-performance-evidence.schema.json" = @("schema", "kind", "status", "candidate", "baseline", "factorio", "comparability", "run_policy", "run_order", "lanes")
+  "seal.schema.json" = @("schema", "state", "mir_version", "target", "candidate_id", "package_source_commit", "package_source_sha256", "package_source_material", "qualification_source_commit", "qualification_source_tree", "candidate_sha256", "plan_material_sha256", "capsule_set_sha256", "seal_sha256")
+  "runtime-performance-evidence.schema.json" = @("schema", "kind", "status", "candidate", "baseline", "factorio", "comparability", "run_policy", "run_order", "lanes", "artifact_volume")
   "manual-release-attestation.schema.json" = @("schema", "kind", "candidate_sha256", "candidate_content_sha256", "source_commit", "checklist_version", "items", "status", "attestation_sha256")
+  "playtest-report.schema.json" = @("schema", "kind", "created_at", "candidate", "factorio", "environment", "observation", "compiler", "attachments")
   "upgrade-matrix.schema.json" = @("schema", "kind", "status", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows")
-  "upgrade-proof.schema.json" = @("schema", "status", "package_source_commit", "evidence_commit", "factorio_binary_version", "factorio_binary_sha256", "from", "to", "assertions", "create_log", "create_log_sha256", "load_log", "load_log_sha256")
 }
 
 foreach ($entry in $contracts.GetEnumerator()) {

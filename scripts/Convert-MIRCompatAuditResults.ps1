@@ -198,7 +198,7 @@ foreach ($result in $loadResults) {
       -Mod $primaryMod `
       -Reason "audit_rows_empty" `
       -Evidence $stdoutPath `
-      -LikelyRemediation "Confirm the copied MIR diagnostics patch was applied and the Factorio log was captured."
+      -LikelyRemediation "Confirm the diagnostics settings override mod was enabled and the Factorio log was captured."
   }
 
   foreach ($row in $auditRows) {

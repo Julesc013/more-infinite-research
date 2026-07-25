@@ -13,10 +13,11 @@
     "comparability",
     "run_policy",
     "run_order",
-    "lanes"
+    "lanes",
+    "artifact_volume"
   ],
   "properties": {
-    "schema": { "const": 2 },
+    "schema": { "const": 3 },
     "kind": { "const": "mir-runtime-performance-regression" },
     "status": { "const": "passed" },
     "candidate": { "$ref": "#/$defs/candidate" },
@@ -33,7 +34,8 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/lane" }
-    }
+    },
+    "artifact_volume": { "$ref": "#/$defs/artifactVolume" }
   },
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
@@ -112,6 +114,40 @@
         "absolute_delta_seconds": { "type": "number" },
         "percentage_delta": { "type": ["number", "null"] },
         "status": { "const": "passed" }
+      },
+      "additionalProperties": false
+    },
+    "artifactVolume": {
+      "type": "object",
+      "required": ["telemetry_schema", "aggregation", "measurements"],
+      "properties": {
+        "telemetry_schema": { "const": 1 },
+        "aggregation": { "const": "maximum-observed" },
+        "measurements": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/artifactVolumeMeasurement" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifactVolumeMeasurement": {
+      "type": "object",
+      "required": ["surface", "measured_runs", "telemetry_fingerprints", "counters"],
+      "properties": {
+        "surface": { "enum": ["diagnostics-off", "diagnostics-on"] },
+        "measured_runs": { "type": "integer", "minimum": 5 },
+        "telemetry_fingerprints": {
+          "type": "array",
+          "minItems": 5,
+          "items": { "$ref": "#/$defs/sha256" }
+        },
+        "counters": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
       },
       "additionalProperties": false
     }

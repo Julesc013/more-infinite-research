@@ -6,7 +6,7 @@
   "description": "Asserts that finalized recipe removals cannot leave dangling MIR productivity effects.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.0.77",
     "space-exploration",
     "more-infinite-research"
   ]

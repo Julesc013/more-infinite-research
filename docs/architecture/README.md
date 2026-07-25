@@ -5,13 +5,15 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
 # Architecture
 
 More Infinite Research is organized around a compatibility-first data-stage pipeline.
+
+Use the [current compiler architecture matrix](current-architecture-matrix.md) for the active fact, decision, lifecycle, graph, emission, and evidence authorities. Historical checkpoint reports do not override that matrix.
 
 ## Data Stage Flow
 
@@ -114,12 +116,12 @@ MIR 3 does not keep a broad `prototypes/util.lua` facade. Domain logic lives in 
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
 - `prototypes/mir/emit/technology_replacement.lua`: graph-safe transactional replacement with prerequisite rewiring; unreferenced removal is an explicit separate operation.
-- `prototypes/mir/policy/max_level.lua`: post-emission max-level setting enforcement for generated stream technologies.
-- `prototypes/mir/policy/weapon_speed.lua`: coverage-aware rocket/cannon category cleanup from generated general weapon-speed continuations.
+- `prototypes/mir/policy/max_level.lua`: pure post-emission max-level command planning for generated stream technologies; `pipeline/mutations/max_level.lua` owns assignment.
+- `prototypes/mir/policy/weapon_speed.lua`: pure coverage-aware rocket/cannon cleanup planning; `pipeline/mutations/weapon_speed.lua` owns effect assignment.
 - `prototypes/mir/policy/native_effect_coverage.lua`: exact reachable infinite native-effect ownership shared by direct-stream adoption and weapon overlap policy.
 - `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
-- `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus adoption-signature payload construction.
-- `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
+- `prototypes/mir/policy/productivity_family_adoption.lua`: pure planning of safe residual-recipe adoption into configured existing productivity families; `emit/transactions/productivity_family_adoption.lua` owns effect mutation and adoption evidence.
+- `prototypes/mir/policy/competing_productivity.lua`: pure profile-driven replacement planning for known fully covered competing infinite recipe-productivity technologies; `pipeline/mutations/competing_productivity.lua` executes the transaction.
 - `prototypes/mir/emit/effect_safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 - `prototypes/mir/emit/mod_data.lua`: emits MIR mod-data prototypes through the Factorio platform adapter.
 
@@ -155,7 +157,7 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 
 Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
 
-Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag. The same final pass verifies that every registered `change-recipe-productivity` effect still names an existing recipe when MIR finishes. Later dependent mods can still mutate prototypes, so classifier policy and dependent final-fixes fixtures must cover evidenced late-removal cases.
+Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag. The final pass prunes registered `change-recipe-productivity` effects whose recipe target no longer exists, logs the affected technology and recipe, and then asserts every remaining effect. This is a defense against mutations visible before MIR finishes. An evidenced mod that removes recipes in its own `data-final-fixes.lua` must also receive a hidden optional ordering edge so MIR plans against the finalized recipe set; the Space Exploration plus Krastorio copper-cable removal fixture is the reference case.
 
 `mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 
@@ -215,7 +217,7 @@ New mod support should add policy and fixtures first. New behavior classes shoul
 
 The `3.0.0` line promotes this kernel into the public compatibility compiler architecture. Use `docs/architecture/compatibility-compiler-charter.md` as the source of truth for the 3.0 charter, invariants, module boundaries, non-goals, release ladder, and acceptance gates. Use `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance. Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository shape: thin Factorio root files, the `prototypes/mir/` compiler namespace, Factorio adapters under `platform/`, no old shim directories on the main 3.x line, and the development-only workspace boundary.
 
-Development after the immutable 3.1.0 release is governed by `docs/architecture/automatic-family-compiler.md`. It adds a pure whole-plan boundary, consolidated semantic facts, data-only family rules, and attach-only automatic coverage before any new generated technology identity is considered.
+Unreleased MIR 3.1.0 automatic-compiler development is governed by `docs/architecture/automatic-family-compiler.md` from the published 3.0.5 baseline. It adds a pure whole-plan boundary, consolidated semantic facts, data-only family rules, and attach-only automatic coverage before any new generated technology identity is considered.
 
 ## Diagnostics
 

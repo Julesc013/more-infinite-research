@@ -27,7 +27,7 @@ branches:
       - validation
 
   legacy:
-    purpose: frozen Factorio 2.0 line at released MIR 2.4.5
+    purpose: frozen Factorio 2.0 line at released MIR 2.4.9
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -41,7 +41,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    purpose: bounded MIR 2.4.9 Factorio 2.0 stability candidate; MIR 2.5 compiler backport remains planned
+    purpose: maintained Factorio 2.0 MIR 2.5.0 semantic companion and verification-overhaul backport branch
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport
@@ -293,48 +293,60 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
+      candidate_id: C16
       assurance_policy: mir-verification-v4
-      assurance_evidence_schema: 3
+      assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
       verification_domains: validation/domains.yml
       verification_profile: validation/profiles/factorio-2.1.json
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
-      release_gate: implementation-and-qualification-pending
+      archive: dist/more-infinite-research_3.2.0.zip
+      archive_bytes: 1014593
+      archive_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
+      package_content_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
+      package_source_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
+      package_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
+      superseded_candidate_id: C15
+      superseded_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
+      superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
+      superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
+      approved_delta_gate: pending-exact-c16
+      superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+      upgrade_gate: pending-exact-c16
+      locale_gate: passed-source-unchanged-50-locales-21250-values
+      locale_runtime_gate: pending-exact-c16
+      fast_static_gate: passed-c16-focused-contracts
+      superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+      superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
+      focused_c16_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
+      c15_to_c16_semantic_parity_evidence: .mir/evidence/3.2.0-c15-to-c16-semantic-parity.json
+      runtime_performance_gate: passed-exact-c16-focused-formal-10-of-10-full-plan-refresh-pending
+      manual_attestation_gate: pending-exact-c16
+      minimum_factorio_gate: passed-floor-raised-to-2.1.11
+      release_gate: blocked-exact-c16-full-no-reuse-manual-and-protected-qualification
       publication_status: unreleased
-      status: development-candidate
-    mir_2_4_9:
-      version: "2.4.9"
+      status: c16-automated-playtest-candidate-focused-performance-and-semantic-parity-passed
+    mir_2_5_0:
+      version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_2_4_5
-      portable_fix_source_commit: ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7
-      localization_source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
-      package_source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
-      artifact: dist/more-infinite-research_2.4.9.zip
-      archive_bytes: 893263
-      sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
-      package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
+      source_anchor: mir_3_2_0
       prior_candidate:
-        source_anchor: mir_3_2_0
-        source_commit: fb606d296c933e2597c165c0c03e13afb12878f1
+        source_anchor: mir_3_1_2
+        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
         artifact: dist/more-infinite-research_2.5.0.zip
-        sha256: 9FDF0F9E81A2DCD0F5EE6DA30BEF399D80470E3CC0C6E678FC19AE07433369AF
+        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+        history_document: docs/archive/superseded/2.5.0-precanonical-candidate.md
         status: superseded-unpublished-candidate
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
-      prior_release: dist/more-infinite-research_2.4.5.zip
-      approved_delta: approved-delta/2.4.5-to-2.4.9.json
-      approved_delta_gate: passed-local-exact-candidate
-      upgrade_gate: passed-local-factorio-2.0.77
-      locale_gate: passed-local-50-locales-21250-values
-      ecosystem_gate: passed-local-representative-and-exact-fixtures
-      local_automated_gate: passed-106-machine-verifiable-tests-manual-pending
-      runtime_performance_gate: passed-local-exact-candidate
-      release_gate: manual-and-protected-qualification-pending
+      prior_release: dist/more-infinite-research_2.4.9.zip
+      release_gate: target-backport-and-qualification-pending
       publication_status: unreleased
-      status: release-candidate-awaiting-manual-and-protected-qualification
+      status: development-candidate
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -369,6 +381,31 @@ release_artifacts:
       manual_gate: accepted-for-publication
       publication_status: published
       tag: "2.4.5"
+      status: published-frozen
+    mir_2_4_9:
+      version: "2.4.9"
+      branch: legacy
+      development_branch: tmp/2.0
+      target_factorio: "2.0"
+      package_source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
+      release_evidence_commit: 26a18e2ac17171bdd75b2c1a75875b14fc71d0b4
+      tag_commit: 7ebe93029695bbf809a15a14c6540530738a9e62
+      artifact: dist/more-infinite-research_2.4.9.zip
+      sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
+      package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
+      size_bytes: 893263
+      entries: 209
+      forbidden_entries: 0
+      approved_delta_evidence: approved-delta/2.4.5-to-2.4.9.json
+      automated_qualification: .mir/evidence/2.4.9-local-automated-qualification.json
+      runtime_performance_evidence: .mir/evidence/2.4.9-performance-regression.json
+      automated_gate: passed-106-machine-verifiable-92-runtime
+      manual_gate: not-recorded-before-maintainer-publication
+      protected_gate: not-run-before-maintainer-publication
+      release_gate: maintainer-published-with-recorded-assurance-exceptions
+      publication_status: published
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.9
+      tag: "2.4.9"
       status: published-frozen
     mir_2_3_0:
       version: "2.3.0"

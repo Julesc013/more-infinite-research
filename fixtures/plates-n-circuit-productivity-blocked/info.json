@@ -6,7 +6,7 @@
   "description": "Validation fixture with a known combined plate productivity technology and a second external owner that blocks one recipe.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
-    "? space-age"
+    "base >= 2.0.77",
+    "? space-age >= 2.0.77"
   ]
 }

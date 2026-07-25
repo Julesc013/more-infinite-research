@@ -2,7 +2,6 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$BudgetsPath = ".mir\performance-budgets.json",
   [string]$PerformancePolicyPath = ".mir\performance.yml",
-  [string]$CampaignPath = ".mir\performance-campaign.json",
   [string]$ValidationSummaryPath = "",
   [string]$MediumPackSummaryPath = "",
   [string]$LargePackSummaryPath = "",
@@ -20,13 +19,27 @@ function Resolve-MIRPerformancePath {
 
 $resolvedBudgetsPath = Resolve-MIRPerformancePath -Path $BudgetsPath
 $resolvedPerformancePolicyPath = Resolve-MIRPerformancePath -Path $PerformancePolicyPath
-$resolvedCampaignPath = Resolve-MIRPerformancePath -Path $CampaignPath
 $manifest = Get-Content -Raw -LiteralPath $resolvedBudgetsPath | ConvertFrom-Json
 if ($manifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
 $budgets = @($manifest.budgets)
 if ($budgets.Count -eq 0) { throw "Performance budget manifest contains no budgets." }
 $regressionLanes = @($manifest.regression_lanes)
 if ($regressionLanes.Count -eq 0) { throw "Performance budget manifest contains no regression lanes." }
+$compilerStageBudgets = @($manifest.compiler_stage_budgets)
+$compilerCounterBounds = @($manifest.compiler_counter_bounds)
+if (($compilerStageBudgets.id -join ",") -ne "recipe-risk-facts,provider-discovery,stream-compiler") {
+  throw "Performance budget manifest omits the governed C6 compiler stages."
+}
+foreach ($budget in $compilerStageBudgets) {
+  if ([string]::IsNullOrWhiteSpace([string]$budget.phase) -or [double]$budget.max_seconds -le 0) {
+    throw "Compiler stage performance budget is invalid: $($budget.id)"
+  }
+}
+foreach ($bound in $compilerCounterBounds) {
+  if ([string]::IsNullOrWhiteSpace([string]$bound.counter) -or [int]$bound.maximum -le 0) {
+    throw "Compiler counter bound is invalid: $($bound.id)"
+  }
+}
 
 $requiredIds = @(
   "base", "space-age", "scoped-caps-off", "scoped-caps-on", "diagnostics-off",
@@ -50,66 +63,171 @@ foreach ($lane in $regressionLanes) {
   }
 }
 
-$campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
-if ([int]$campaign.schema -ne 1 -or [string]$campaign.release -ne "2.4.9" -or
-    [string]$campaign.factorio_line -ne "2.0" -or [string]$campaign.factorio_version -ne "2.0.77") {
-  throw "Paired performance campaign authority is not the governed MIR 2.4.9 Factorio 2.0.77 campaign."
+$campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
+$campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
+$info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$info.version `
+    -or [string]$campaign.factorio_line -ne [string]$info.factorio_version `
+    -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line)) {
+  throw "Performance campaign authority must match the active MIR and Factorio target in info.json."
 }
-$campaignLanes = @($campaign.lanes)
-if ((@($regressionLanes.id | Sort-Object) -join "`n") -ne (@($campaignLanes.id | Sort-Object) -join "`n")) {
-  throw "Paired performance campaign does not contain the exact governed regression lane set."
-}
-$expectedCampaignLanes = @{
-  "base.factorio-total" = @("exact-package-load", "base-default")
-  "space-age.factorio-total" = @("exact-package-load", "space-age-default")
-  "medium-ecosystem.factorio-total" = @("compat-audit", "local-2-0-bz-suite")
-  "large-ecosystem.factorio-total" = @("compat-audit", "local-2-0-performance-large")
-  "diagnostics-off.factorio-total" = @("exact-package-load", "base-diagnostics-off")
-  "diagnostics-on.factorio-total" = @("exact-package-load", "base-diagnostics-on")
-}
-foreach ($laneId in $expectedCampaignLanes.Keys) {
-  $row = @($campaignLanes | Where-Object id -eq $laneId)
-  if ($row.Count -ne 1 -or [string]$row[0].runner -ne $expectedCampaignLanes[$laneId][0] -or
-      [string]$row[0].scenario -ne $expectedCampaignLanes[$laneId][1]) {
-    throw "Paired performance campaign lane authority drifted: $laneId"
-  }
-}
-if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
-    [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
-    [string]$campaign.run_policy.order -ne "paired-balanced") {
-  throw "Paired performance campaign run policy is below the governed minimum."
-}
-if ([string]$campaign.baseline.archive_sha256 -ne "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8") {
-  throw "Paired performance campaign does not bind the published MIR 2.4.5 baseline archive."
-}
-$collector = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-if ($collector -match 'Get-MIRCampaignObjectMap' -or
-    $collector -notmatch 'Get-MIRPerformanceSettingsFingerprint' -or
-    $collector -notmatch 'Get-MIRPerformanceHarnessFingerprint' -or
-    $collector -notmatch '\$campaignEvidence\.scenarios\[0\]\.duration_seconds') {
-  throw "Paired performance collection is not bound to the shared settings and scoped-harness fingerprint authority."
-}
-$factorioRunner = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
-$compatAudit = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
-if ($factorioRunner -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
-    $compatAudit -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\[double\]\$result\.duration_seconds') {
-  throw "Compatibility performance lanes do not propagate the isolated Factorio process duration."
-}
-
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(
-  'release: 2.4.9',
-  'factorio_line: "2.0"',
-  'qualified_baseline: "2.4.5"',
-  'maximum_regression_percent: 20'
+  "release: $([string]$campaign.release)",
+  "qualified_baseline: `"$([string]$campaign.baseline.version)`"",
+  'maximum_regression_percent: 20',
+  'witness_node_limit: 64'
 )) {
   if ($performancePolicy -notmatch [regex]::Escape($requiredPolicySnippet)) {
     throw "Performance policy is missing '$requiredPolicySnippet'."
   }
 }
+$requiredTelemetryCounters = @(
+  "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
+  "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
+  "rejected_operations", "diagnostic_rows", "generation_plan_rows", "generation_plan_public_bytes",
+  "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
+  "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
+  "context_snapshot_bytes", "technology_closure_cache_entries", "technology_closure_cached_nodes",
+  "sanitation_scanned_technologies", "sanitation_scanned_effects", "recipe_risk_facts",
+  "recipe_hard_risk_count", "recipe_review_risk_count", "provider_candidates",
+  "provider_cardinality_review_required", "provider_review_required", "family_members", "stream_rows",
+  "technology_catalog_candidates", "technology_catalog_alternatives", "technology_catalog_canonical_bytes",
+  "technology_catalog_public_bytes", "technology_catalog_internal_bytes", "compiler_evidence_public_bytes",
+  "technology_graph_parity_rows", "snapshot_prototype_bytes", "snapshot_deep_copies",
+  "snapshot_canonicalization_passes", "snapshot_construction_milliseconds", "snapshot_peak_memory_bytes",
+  "input_snapshot_bytes", "qualification_snapshot_bytes", "snapshot_reused_domains", "snapshot_copied_domains",
+  "qualification_snapshot_construction_milliseconds", "qualification_peak_memory_bytes",
+  "compiler_total_milliseconds", "public_artifact_total_bytes", "fingerprint_calls",
+  "canonicalization_calls", "canonical_bytes_total", "canonical_serializations_over_one_mib",
+  "maximum_canonical_bytes", "trusted_record_registrations", "trusted_untrusted_verifications",
+  "trusted_assertions", "trusted_rejected_assertions", "trusted_assertion_canonicalizations",
+  "catalog_snapshot_count", "full_record_copy_count", "technology_design_full_copies",
+  "gate_deep_verifications", "technology_design_deep_verifications",
+  "safety_qualification_deep_verifications", "technology_candidate_deep_verifications",
+  "technology_catalog_deep_verifications", "compilation_snapshot_deep_verifications",
+  "policy_snapshot_deep_verifications", "compiler_input_deep_verifications",
+  "runtime_environment_deep_verifications", "transformation_operation_deep_verifications",
+  "transformation_plan_deep_verifications"
+)
+$requiredTelemetryPhases = @(
+  "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler", "graph", "planning", "postconditions"
+)
+foreach ($name in @($requiredTelemetryCounters + $requiredTelemetryPhases)) {
+  if ($performancePolicy -notmatch "(?m)^\s*-\s+$([regex]::Escape($name))\s*$") {
+    throw "Performance policy is missing required telemetry name '$name'."
+  }
+}
+$requiredCounterBudgetIds = @(
+  "initial-snapshot-milliseconds", "qualification-snapshot-milliseconds", "compiler-total-milliseconds",
+  "snapshot-peak-memory", "qualification-peak-memory", "input-snapshot-bytes",
+  "qualification-snapshot-bytes", "public-artifact-total-bytes"
+)
+foreach ($id in $requiredCounterBudgetIds) {
+  if (@($compilerCounterBounds | Where-Object id -eq $id).Count -ne 1) {
+    throw "Compiler performance counter budget is missing: $id"
+  }
+}
+$telemetrySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\compiler_telemetry.lua")
+foreach ($name in $requiredTelemetryCounters) {
+  if ($telemetrySource -notmatch ('"' + [regex]::Escape($name) + '"')) {
+    throw "Compiler telemetry does not initialize required counter '$name'."
+  }
+}
+foreach ($name in $requiredTelemetryPhases) {
+  if ($telemetrySource -notmatch ('"' + [regex]::Escape($name) + '"')) {
+    throw "Compiler telemetry does not initialize required phase '$name'."
+  }
+}
+if ($telemetrySource -notmatch 'WITNESS_LIMIT\s*=\s*64') {
+  throw "Compiler telemetry witness limit differs from the governed performance policy."
+}
+
+$releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
+$releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
+$targetKey = "factorio-$([string]$campaign.factorio_line)"
+$activeCandidate = $releaseLedger.development.PSObject.Properties[$targetKey].Value
+if ($null -eq $activeCandidate -or
+    [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+    [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+    [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+    [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+    [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+    [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+  throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
+}
+if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
+    [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
+    [string]$campaign.run_policy.order -ne "paired-balanced") {
+  throw "Performance campaign authority does not declare the governed paired run policy."
+}
+$campaignLaneIds = @($campaign.lanes.id + $campaign.phase_lanes.id | Sort-Object)
+$budgetLaneIds = @($regressionLanes.id | Sort-Object)
+if (($campaignLaneIds -join "`n") -ne ($budgetLaneIds -join "`n")) {
+  throw "Performance campaign and regression budget lane sets differ."
+}
+foreach ($requiredPath in @(
+  "fixtures\performance-regression-probe\info.json",
+  "fixtures\performance-regression-probe\probe.lua",
+  "fixtures\performance-regression-probe\data.lua",
+  "fixtures\performance-regression-probe\data-final-fixes.lua",
+  "scripts\Invoke-MIRPerformanceQualification.ps1",
+  "scripts\Measure-MIRPerformanceRegression.ps1",
+  "scripts\validation\PerformanceCampaign.ps1"
+)) {
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $requiredPath) -PathType Leaf)) {
+    throw "Performance campaign producer authority is absent: $requiredPath"
+  }
+}
+$qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
+foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion")) {
+  if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
+    throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
+  }
+}
+$producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
+foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
+  if ($producerSource -notmatch [regex]::Escape($snippet)) {
+    throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
+  }
+}
+$performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
+. $performanceCampaignHelpers
+$orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
+$jsonCounter = Get-MIRPerformanceCounterValue -Counters ('{"bounded":12}' | ConvertFrom-Json) -Name "bounded"
+$missingCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "missing"
+if (-not [bool]$orderedCounter.found -or [long]$orderedCounter.value -ne 12 -or
+    -not [bool]$jsonCounter.found -or [long]$jsonCounter.value -ne 12 -or
+    [bool]$missingCounter.found) {
+  throw "Performance counter lookup must support ordered producer maps, parsed evidence objects, and missing counters."
+}
+if ($producerSource -notmatch 'FailFast\s*=\s*\(\$PackageLabel\s+-eq\s+"candidate"\)' -or
+    $producerSource -notmatch '\$PackageLabel\s+-eq\s+"candidate"[\s\S]{0,200}process_result[\s\S]{0,200}result') {
+  throw "Performance campaign must enforce process and claim gates on the candidate without imposing current behavioral claims on the sealed baseline."
+}
+if ($producerSource -notmatch '\[int\]\$scenarios\[0\]\.exit_code\s+-ne\s+0' -or
+    $producerSource -notmatch '\[int\]\$scenarios\[0\]\.dependency_failure_count\s+-ne\s+0') {
+  throw "Performance campaign must still require successful Factorio execution and an exact dependency closure for both packages."
+}
+$campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1")
+if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
+  throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
+}
+$compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+$compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+$durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
+if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
+    $durationProjectionCount -lt 2) {
+  throw "Compatibility performance lanes require authoritative Factorio process duration in load and campaign evidence."
+}
+if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed' -or
+    $compatAuditSource -notmatch '\$processResult\s*=\s*if\s*\(\$result\.process_passed\s+-eq\s+\$true\)' -or
+    $compatAuditSource -notmatch '\$claimGateResult\s*=\s*if\s*\(\$processResult\s+-eq\s+"passed"\s+-and\s+\$result\.passed\s+-eq\s+\$true') {
+  throw "Compatibility evidence must distinguish successful Factorio execution from the package-specific behavioral claim gate."
+}
 
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR 2.4.9 performance manifest declares $($budgets.Count) absolute budgets and $($regressionLanes.Count) exact paired Factorio 2.0 lanes."
+  Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
   exit 0
 }
 
@@ -170,12 +288,12 @@ $evidence = [ordered]@{
   validation_run_id = [string]$validation.run_id
   validation_source = $ValidationSummaryPath
   medium_pack = [ordered]@{
-    scenario = "local-2-1-bz-suite-space-age"
+    scenario = [string](@($campaign.lanes | Where-Object id -eq "medium-ecosystem.factorio-total")[0].scenario)
     third_party_mods = 6
     source = $MediumPackSummaryPath
   }
   large_pack = [ordered]@{
-    scenario = "local-2-1-krastorio-spaced-out"
+    scenario = [string](@($campaign.lanes | Where-Object id -eq "large-ecosystem.factorio-total")[0].scenario)
     third_party_mods = 8
     audit_rows = 2654
     compatibility_claim = "load-observation-only"

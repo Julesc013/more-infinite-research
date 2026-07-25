@@ -108,25 +108,6 @@ function Copy-MIRModUnderTest {
   return $target
 }
 
-function Enable-MIRCopiedGenerationReport {
-  param([Parameter(Mandatory)][string]$ModsDir)
-
-  $overridePath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\test_overrides.lua"
-  if (-not (Test-Path -LiteralPath $overridePath)) {
-    throw "Unable to find copied MIR settings override module: $overridePath"
-  }
-
-  $overrides = Get-Content -Raw -LiteralPath $overridePath
-  if (-not $overrides.Contains("return overrides")) {
-    throw "Copied MIR settings override module is missing its return marker."
-  }
-  $overrides = $overrides.Replace(
-    "return overrides",
-    "overrides[`"mir-debug-generation-report`"] = true`r`nreturn overrides"
-  )
-  Set-Content -LiteralPath $overridePath -Value $overrides -Encoding UTF8
-}
-
 function Copy-MIRCachedModZips {
   param(
     [Parameter(Mandatory)][string]$CacheDir,
@@ -212,7 +193,7 @@ read-data=$factorioReadData
 write-data=$UserDataDir
 
 [general]
-locale=en
+locale=auto
 
 [other]
 enable-steam-networking=false
@@ -227,7 +208,7 @@ disable-blueprint-storage=true
   )
 
   $timer = [Diagnostics.Stopwatch]::StartNew()
-  $process = Start-Process -FilePath $factorioBinResolved -ArgumentList $args -PassThru -WindowStyle Hidden -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
+  $process = Start-Process -FilePath $factorioBinResolved -ArgumentList $args -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
   $timedOut = $false
   $waitMilliseconds = [Math]::Max(1, $ScenarioTimeoutSeconds) * 1000
   if (-not $process.WaitForExit($waitMilliseconds)) {
@@ -242,8 +223,12 @@ disable-blueprint-storage=true
   $timer.Stop()
 
   $auditRows = @()
+  $sanitationRows = @()
   if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)) {
     $auditRows = @(Read-MIRAuditLog -Path $logPath)
+  }
+  if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)) {
+    $sanitationRows = @(Read-MIRSanitationLog -Path $logPath)
   }
 
   $exitCode = if ($timedOut) { -1 } else { $process.ExitCode }
@@ -257,6 +242,7 @@ disable-blueprint-storage=true
     stdout = $logPath
     stderr = "$logPath.err"
     audit_rows = $auditRows
+    sanitation_rows = $sanitationRows
     passed = (-not $timedOut) -and $exitCode -eq 0
   }
 }

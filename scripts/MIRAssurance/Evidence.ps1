@@ -20,7 +20,6 @@ function Get-MIRAssurancePatternFingerprint {
   $script:MIRAssurancePatternFingerprintCache[$cacheKey] = $fingerprint
   return $fingerprint
 }
-
 function Get-MIRAssuranceInputFingerprint {
   param(
     [Parameter(Mandatory)][string]$InputName,
@@ -32,6 +31,30 @@ function Get-MIRAssuranceInputFingerprint {
     "candidate" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.candidate -MissingLabel "candidate" }
     "factorio" { return Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath $Context.factorio }
     "factorio-installation" { return Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath $Context.factorio }
+    "museum-installations" {
+      Import-Module (Join-Path $repo "scripts\Museum\MuseumCompiler.psm1") -Force
+      $museumCatalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
+      $installations = @(
+        foreach ($museumTarget in @($museumCatalog.targets)) {
+          $installation = Resolve-MIRMuseumInstallation -Target $museumTarget -RepoRoot $repo
+          $validation = Test-MIRMuseumExactInstallation -Catalog $museumCatalog -Target $museumTarget -Installation $installation
+          if (-not $validation.passed) { throw ($validation.errors -join "`n") }
+          [ordered]@{
+            target=[string]$museumTarget.factorio
+            installation_id=[string]$museumTarget.installation_id
+            binary_sha256=[string]$validation.binary_sha256
+            base_file_count=[int]$validation.base_file_count
+            base_data_bytes=[long]$validation.base_data_bytes
+            base_data_sha256=[string]$validation.base_data_sha256
+          }
+        }
+      )
+      return [ordered]@{
+        kind="museum-installations"
+        installations=$installations
+        sha256=(Get-MIRAssuranceJsonHash -Value $installations)
+      }
+    }
     "prior-release" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.prior_release -MissingLabel "prior-release" }
     "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)
@@ -40,6 +63,53 @@ function Get-MIRAssuranceInputFingerprint {
     "repository" {
       $files = @(Get-MIRAssuranceRepositoryFiles)
       return [ordered]@{ kind="repository"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
+    }
+    "release-history" {
+      $rootTree = (& git -C $repo write-tree).Trim()
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($rootTree)) {
+        throw "Unable to materialize the staged repository tree for release-history fingerprinting."
+      }
+      $targetLinesTree = (& git -C $repo rev-parse "$rootTree`:.mir/target-lines" 2>$null).Trim()
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($targetLinesTree)) {
+        $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+        if ([string]$info.factorio_version -ne "2.0") {
+          throw "Unable to resolve the staged .mir/target-lines tree for release-history fingerprinting."
+        }
+        $backportPaths = @(
+          ".mir/backport-source-lock.json",
+          ".mir/releases.json",
+          ".mir/distributions.json"
+        )
+        $backportRows = @(
+          foreach ($path in $backportPaths) {
+            $object = (& git -C $repo rev-parse "$rootTree`:$path" 2>$null).Trim()
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($object)) {
+              throw "Unable to resolve staged Factorio 2.0 release authority: $path"
+            }
+            "$path`t$object"
+          }
+        )
+        $targetLinesTree = "factorio-2.0:" + (Get-MIRAssuranceJsonHash -Value $backportRows)
+      }
+      $inventoryPatterns = if ($targetLinesTree.StartsWith("factorio-2.0:")) {
+        @(
+          ".mir/distributions.json",
+          "dist/more-infinite-research_2.4.9.zip",
+          "dist/more-infinite-research_2.5.0.zip"
+        )
+      }
+      else { @(".mir/distributions.json", "dist/**") }
+      $inventory = Get-MIRAssurancePatternFingerprint -Patterns $inventoryPatterns
+      $material = [ordered]@{
+        target_lines_tree=$targetLinesTree
+        inventory=$inventory
+      }
+      return [ordered]@{
+        kind="release-history"
+        target_lines_tree=$targetLinesTree
+        inventory=$inventory
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
     }
     "test-catalog" { return [ordered]@{ kind="manifest"; path="validation/tests.yml"; sha256=(Get-MIRAssuranceSha256 -Path $catalogPath) } }
     "target-profile" {
@@ -96,7 +166,8 @@ function Get-MIRAssuranceInputFingerprint {
         "fixtures/$fixture/**",
         "fixtures/upgrade-modset-source/**",
         "scripts/Test-MIRUpgrade.ps1",
-        "verification/schema/upgrade-proof.schema.json"
+        "scripts/Test-MIRUpgradeMatrix.ps1",
+        "verification/schema/upgrade-matrix.schema.json"
       )
     }
     "candidate-seal" {
@@ -130,7 +201,6 @@ function Get-MIRAssuranceInputFingerprint {
     }
   }
 }
-
 function Get-MIRAssuranceTestFingerprint {
   param(
     [Parameter(Mandatory)]$Test,
@@ -178,7 +248,6 @@ function Get-MIRAssuranceTestFingerprint {
     input_key=$fingerprintHash
   }
 }
-
 function Get-MIRAssuranceEvidencePaths {
   param([Parameter(Mandatory)][string]$TestId, [Parameter(Mandatory)][string]$InputKey)
   $safeId = $TestId -replace '[^A-Za-z0-9._-]', '_'
@@ -234,6 +303,24 @@ function Get-MIRAssuranceProducer {
     verifier_sha256=(Get-MIRAssuranceRunnerHash)
     policy_sha256=(Get-MIRAssuranceSha256 -Path $trustPath)
   }
+}
+
+function Get-MIRAssuranceHostIdentity {
+  if (-not [string]::IsNullOrWhiteSpace([string]$env:MIR_HOST_IDENTITY)) {
+    return [string]$env:MIR_HOST_IDENTITY
+  }
+  $machine = [Environment]::MachineName
+  if (-not [string]::IsNullOrWhiteSpace([string]$env:RUNNER_NAME)) {
+    return "github:$([string]$env:RUNNER_NAME)@$machine"
+  }
+  return "host:$machine"
+}
+
+function Get-MIRAssuranceProcessStartedAt {
+  param([int]$ProcessId = $PID)
+  $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+  if ($null -eq $process) { return "" }
+  return ([DateTimeOffset]$process.StartTime.ToUniversalTime()).ToString("o")
 }
 
 function Get-MIRAssuranceEvidenceProducer {
@@ -471,32 +558,81 @@ function Get-MIRAssuranceRunningEvidence {
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Fingerprint.test_id -InputKey $Fingerprint.input_key
   if (-not (Test-Path -LiteralPath $paths.running -PathType Leaf)) { return $null }
   try { $running = Get-Content -Raw -LiteralPath $paths.running | ConvertFrom-Json }
-  catch { return $null }
-  if ([string]$running.test_id -ne [string]$Fingerprint.test_id -or [string]$running.input_key -ne [string]$Fingerprint.input_key) { return $null }
+  catch {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
+  if ([int]$running.schema -ne 2 -or
+      [string]$running.test_id -ne [string]$Fingerprint.test_id -or
+      [string]$running.input_key -ne [string]$Fingerprint.input_key -or
+      [string]$running.fingerprint_sha256 -ne [string]$Fingerprint.fingerprint_sha256) {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
   if ($null -ne $Context -and -not (Test-MIRAssuranceTrustedProducer -Producer $running.producer -Context $Context)) {
     Remove-Item -LiteralPath $paths.running -Force
     return $null
   }
   try { $expires = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.expires_at }
-  catch { return $null }
+  catch {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
   if ($expires -le [DateTimeOffset]::UtcNow) {
     Remove-Item -LiteralPath $paths.running -Force
     return $null
   }
-  if ([string]$running.producer.workflow -eq "local" -and [int]$running.process_id -gt 0) {
-    $process = Get-Process -Id ([int]$running.process_id) -ErrorAction SilentlyContinue
-    $startedAtValid = $true
-    try { $startedAt = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.started_at }
-    catch {
-      $startedAt = [DateTimeOffset]::MinValue
-      $startedAtValid = $false
+
+  $hostIdentity = [string]$running.host_identity
+  if ([string]::IsNullOrWhiteSpace($hostIdentity)) {
+    Remove-Item -LiteralPath $paths.running -Force
+    return $null
+  }
+  switch ([string]$running.lease_scope) {
+    "process" {
+      if ($hostIdentity -ne (Get-MIRAssuranceHostIdentity) -or [int]$running.process_id -le 0) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      try { $expectedProcessStart = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.process_started_at }
+      catch {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $process = Get-Process -Id ([int]$running.process_id) -ErrorAction SilentlyContinue
+      if ($null -eq $process) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $actualProcessStart = [DateTimeOffset]$process.StartTime.ToUniversalTime()
+      if ($actualProcessStart.UtcTicks -ne $expectedProcessStart.UtcTicks) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
     }
-    $processIsOwner = [int]$running.process_id -eq $PID -or (
-      $null -ne $process -and (
-        -not $startedAtValid -or $process.StartTime.ToUniversalTime() -le $startedAt.UtcDateTime.AddSeconds(5)
-      )
-    )
-    if (-not $processIsOwner) {
+    "ci-job" {
+      $runId = [string]$running.workflow_run_id
+      $runAttempt = [string]$running.workflow_run_attempt
+      $job = [string]$running.workflow_job
+      if ([string]::IsNullOrWhiteSpace($runId) -or
+          [string]::IsNullOrWhiteSpace($runAttempt) -or
+          [string]::IsNullOrWhiteSpace($job) -or
+          $runId -ne [string]$running.producer.run_id -or
+          $runAttempt -ne [string]$running.producer.run_attempt -or
+          $job -ne [string]$running.producer.job) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+      $currentProducer = Get-MIRAssuranceProducer
+      $sameJob = $runId -eq [string]$currentProducer.run_id -and
+        $runAttempt -eq [string]$currentProducer.run_attempt -and
+        $job -eq [string]$currentProducer.job
+      if ($sameJob -and $hostIdentity -ne (Get-MIRAssuranceHostIdentity)) {
+        Remove-Item -LiteralPath $paths.running -Force
+        return $null
+      }
+    }
+    default {
       Remove-Item -LiteralPath $paths.running -Force
       return $null
     }
@@ -539,16 +675,24 @@ function Write-MIRAssuranceRunningEvidence {
   New-Item -ItemType Directory -Force -Path $paths.root | Out-Null
   $ttl = [int]$Context.verification_profile.running_evidence_ttl_minutes
   if ($ttl -le 0) { $ttl = 360 }
+  $producer = Get-MIRAssuranceProducer
+  $leaseScope = if ($env:GITHUB_ACTIONS) { "ci-job" } else { "process" }
   $running = [ordered]@{
-    schema=1
+    schema=2
     test_id=[string]$Fingerprint.test_id
     input_key=[string]$Fingerprint.input_key
     fingerprint_sha256=[string]$Fingerprint.fingerprint_sha256
     target=[string]$Fingerprint.target
-    producer=(Get-MIRAssuranceProducer)
+    producer=$producer
+    lease_scope=$leaseScope
+    host_identity=(Get-MIRAssuranceHostIdentity)
+    process_id=$PID
+    process_started_at=(Get-MIRAssuranceProcessStartedAt)
+    workflow_run_id=[string]$producer.run_id
+    workflow_run_attempt=[string]$producer.run_attempt
+    workflow_job=[string]$producer.job
     started_at=[DateTimeOffset]::UtcNow.ToString("o")
     expires_at=[DateTimeOffset]::UtcNow.AddMinutes($ttl).ToString("o")
-    process_id=$PID
   }
   Write-MIRAssuranceAtomicJson -Value $running -Path $paths.running
   return $running
@@ -613,7 +757,6 @@ function Resolve-MIRAssuranceCommandText {
     "<upgrade-to>"=[string]$Context.verification_profile.upgrade.to_version
     "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
     "<source-commit>"=[string]$Plan.source_commit
-    "<package-source-commit>"=[string]$Plan.package_source_commit
     "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
   }
   $resolved = $Command
@@ -750,7 +893,6 @@ function Get-MIRAssurancePlanMaterial {
     profile=[string]$Plan.profile
     baseline=[string]$Plan.baseline
     source_commit=[string]$Plan.source_commit
-    package_source_commit=[string]$Plan.package_source_commit
     source_tree=[string]$Plan.source_tree
     candidate_descriptor_sha256=[string]$Plan.candidate_descriptor.descriptor_sha256
     package_source_sha256=[string]$Plan.package_source_sha256
@@ -896,10 +1038,21 @@ function Get-MIRAssurancePlanFromOption {
     $path = Resolve-MIRAssurancePath -Path $planOption
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Verification plan not found: $path" }
     $plan = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
-    return Assert-MIRAssurancePlan -Plan $plan -Context $Context
+    $validatedPlan = Assert-MIRAssurancePlan -Plan $plan -Context $Context
+    Sync-MIRAssuranceContextFromPlan -Context $Context -Plan $validatedPlan
+    return $validatedPlan
   }
   if ($RequirePlan) { throw "This command requires --plan <verification-plan.json>." }
   return Get-MIRAssurancePlan -Context $Context
+}
+
+function Sync-MIRAssuranceContextFromPlan {
+  param(
+    [Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)]$Plan
+  )
+  $Context.reuse_enabled = [bool]$Plan.reuse_enabled
+  $Context.rerun_tests = @($Plan.rerun_tests | ForEach-Object { [string]$_ })
 }
 
 function Get-MIRAssurancePlannedTest {
@@ -1136,10 +1289,28 @@ function Invoke-MIRAssurancePlan {
     try {
       $results += Invoke-MIRAssuranceTest -Test $test -Plan $Plan -Context $Context
     } catch {
+      $capturedFailure = $false
       $paths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
       if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) {
         $blocked = Read-MIRAssuranceEvidencePointer -Path $paths.blocked
-        if ($null -ne $blocked) { $results += $blocked }
+        if ($null -ne $blocked) {
+          $results += $blocked
+          $capturedFailure = $true
+        }
+      }
+      if (-not $capturedFailure) {
+        $results += [pscustomobject][ordered]@{
+          schema="mir-plan-execution-error-v1"
+          test_id=[string]$test.id
+          status="failed"
+          conclusion="failed"
+          disposition="RUN"
+          input_key=[string]$test.fingerprint.input_key
+          fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
+          exit_code=1
+          message=$_.Exception.Message
+          completed_at=(Get-Date).ToUniversalTime().ToString("o")
+        }
       }
       break
     }
@@ -1228,11 +1399,10 @@ function Invoke-MIRAssuranceGate {
 
 function Get-MIRAssuranceBuildFingerprint {
   param([Parameter(Mandatory)]$Context)
-  $packageFiles = @(Get-MIRAssurancePackageFiles)
   $material = [ordered]@{
     schema=$buildReceiptSchema
     target=[string]$Context.target
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths $packageFiles)
+    package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "scripts\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "scripts\validation\PackageIdentity.ps1"))
     info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "info.json"))
@@ -1289,11 +1459,19 @@ function Invoke-MIRAssuranceBuild {
 }
 
 function Get-MIRAssuranceResultCounts {
-  param([Parameter(Mandatory)][AllowEmptyCollection()]$Results)
+  param(
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Results,
+    [int]$ExpectedTotal = -1
+  )
+  $total = @($Results).Count
+  $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
   return [ordered]@{
-    total=@($Results).Count
+    expected=$expected
+    total=$total
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     failed=@($Results | Where-Object { [string]$_.status -ne "passed" }).Count
+    incomplete=[Math]::Max(0, $expected - $total)
+    unexpected=[Math]::Max(0, $total - $expected)
   }
 }

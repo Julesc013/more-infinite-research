@@ -157,8 +157,8 @@
     {
       "key": "technology-name.more-infinite-research.research_steel",
       "source_sha256": "6DC96AF07713E679BA4799525BE809A6868A04A65348B730E002088E5788CCFE",
-      "translation": "Παραγωγικότητα χάλυβα",
-      "provenance": "preexisting"
+      "translation": "Παραγωγικότητα βέργας ατσαλιού",
+      "provenance": "maintainer-override"
     },
     {
       "key": "technology-name.more-infinite-research.research_engine",

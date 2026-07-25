@@ -5,5 +5,5 @@
   "author": "MIR Tests",
   "description": "Test fixture that creates ATAN Ash-style ash separation and ash sink recipes.",
   "factorio_version": "2.0",
-  "dependencies": ["base >= 2.0"]
+  "dependencies": ["base >= 2.0.77"]
 }

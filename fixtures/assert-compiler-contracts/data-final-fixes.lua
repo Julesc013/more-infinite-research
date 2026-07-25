@@ -2,6 +2,7 @@ local deepcopy = require("__more-infinite-research__.prototypes.mir.core.deepcop
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local family_registry = require("__more-infinite-research__.prototypes.mir.families.registry")
 local provider_registry = require("__more-infinite-research__.prototypes.mir.providers.registry")
+local provider_discovery = require("__more-infinite-research__.prototypes.mir.providers.pipeline.discovery")
 local diagnostic_codes = require("__more-infinite-research__.prototypes.mir.domain.diagnostics.codes")
 local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibility.packs.schema")
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
@@ -10,32 +11,91 @@ local generation_plan = require("__more-infinite-research__.prototypes.mir.plann
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
+local effect_safety = require("__more-infinite-research__.prototypes.mir.emit.effect_safety")
 local effect_contracts = require("__more-infinite-research__.prototypes.mir.integrity.effect_contracts")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
+local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
+local c7_contracts = {
+  gate = require("__more-infinite-research__.prototypes.mir.domain.technology.gate"),
+  safety = require("__more-infinite-research__.prototypes.mir.domain.technology.safety_qualification"),
+  assessment = require("__more-infinite-research__.prototypes.mir.domain.technology.design_assessment"),
+  promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_authorization"),
+  registry = require("__more-infinite-research__.prototypes.mir.domain.technology.promotion_registry")
+}
+local applicability_envelope = require("__more-infinite-research__.prototypes.mir.domain.technology.applicability_envelope")
+local technology_promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_promotion")
+local focused_contracts = {
+  family_operator_dsl = require("__more-infinite-research__.prototypes.mir.families.operator_dsl"),
+  compatibility_policy = require("__more-infinite-research__.prototypes.mir.compatibility.policy_authority"),
+  technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate"),
+  technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification"),
+  technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval"),
+  technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
+}
+local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
+local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
+local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
+local relationships = require("__more-infinite-research__.prototypes.mir.index.relationships")
+local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
+local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
+local science_packs = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
+local c9_contracts = {
+  compiler_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input"),
+  compiler_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result"),
+  compilation_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.compilation_snapshot"),
+  policy_snapshot = require("__more-infinite-research__.prototypes.mir.domain.compiler.policy_snapshot"),
+  runtime_environment = require("__more-infinite-research__.prototypes.mir.domain.environment_identity"),
+  compiler = require("__more-infinite-research__.prototypes.mir.planner.compiler"),
+  hard_gate_authority = require("__more-infinite-research__.prototypes.mir.domain.technology.hard_gate_authority"),
+  provider_claim = require("__more-infinite-research__.prototypes.mir.providers.pipeline.provider_claim"),
+  transformation_operation = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_operation"),
+  transformation_plan = require("__more-infinite-research__.prototypes.mir.domain.compiler.transformation_plan"),
+  mutation_journal = require("__more-infinite-research__.prototypes.mir.domain.compiler.mutation_journal"),
+  execution_mode = require("__more-infinite-research__.prototypes.mir.domain.compiler.execution_mode"),
+  public_artifacts = require("__more-infinite-research__.prototypes.mir.report.public_compiler_artifacts")
+}
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
 end
 
-local function expect_effect_target(label, effect, expected)
-  local valid = effect_contracts.target_status(effect)
-  if valid ~= expected then fail(label) end
-end
-expect_effect_target("unlock-quality positive target", {type = "unlock-quality", quality = "normal"}, true)
-expect_effect_target("unlock-quality negative target", {type = "unlock-quality", quality = "mir-missing-quality"}, false)
-expect_effect_target("unlock-space-location planet target", {type = "unlock-space-location", space_location = "nauvis"}, true)
-expect_effect_target("unlock-space-location missing target", {
-  type = "unlock-space-location", space_location = "mir-missing-space-location"
-}, false)
-expect_effect_target("turret-attack positive target", {type = "turret-attack", turret_id = "gun-turret"}, true)
-expect_effect_target("turret-attack negative target", {type = "turret-attack", turret_id = "mir-missing-turret"}, false)
-expect_effect_target("give-item optional normal quality", {type = "give-item", item = "iron-plate"}, true)
-expect_effect_target("give-item negative quality", {type = "give-item", item = "iron-plate", quality = "mir-missing-quality"}, false)
-if effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "normal"})
-    == effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "uncommon"}) then
-  fail("give-item quality identity")
-end
+(function()
+  local function scalar_hash(text)
+    local hash = 2166136261
+    for index = 1, #text do
+      hash = (hash * 65599 + string.byte(text, index)) % 4294967291
+    end
+    return "mir32-" .. string.format("%08x", hash)
+  end
+  for _, value in ipairs({
+    "mir32-scalar-equivalence",
+    {schema = 2, values = {1, true, false, "quoted\nvalue"}},
+    {nested = {map = {alpha = 1, beta = 2}, array = {"a", "b", "c"}}}
+  }) do
+    local canonical = fingerprint.canonical(value)
+    if fingerprint.of_canonical(canonical) ~= scalar_hash(canonical) then
+      fail("MIR32 eight-byte hash reads changed the scalar recurrence")
+    end
+  end
+end)();
+
+(function()
+  local canonical_cases = {
+    {value = {}, expected = "[]"},
+    {value = {beta = 2, alpha = 1}, expected = "{\"alpha\":1,\"beta\":2}"},
+    {value = {[2] = "two", [4] = "four"}, expected = "{[2]:\"two\",[4]:\"four\"}"},
+    {value = {"a", "b", "c"}, expected = "[\"a\",\"b\",\"c\"]"},
+    {value = {map = {z = false, a = true}, value = "line\nquote\""},
+      expected = "{\"map\":{\"a\":true,\"z\":false},\"value\":\"line\\\nquote\\\"\"}"}
+  }
+  for _, row in ipairs(canonical_cases) do
+    if fingerprint.canonical(row.value) ~= row.expected then
+      fail("single-pass canonical table traversal changed encoded bytes")
+    end
+  end
+end)();
 
 local function expect_error(label, expected, callback)
   local ok, message = pcall(callback)
@@ -66,7 +126,9 @@ end
 
 local function skip_row(stream_key, manifest_id)
   local function proof(evidence)
-    return {passed = true, status = "not-applicable", evidence = {evidence}}
+    return c7_contracts.gate.not_applicable(
+      "compiler-contract-fixture", "fixture-row-materializes",
+      fingerprint.of({stream_key = stream_key, evidence = evidence}), {evidence})
   end
   return {
     schema = 3,
@@ -138,7 +200,9 @@ if denied or denied_reason ~= "reviewed_compatibility_data_required" then
   fail("reviewed-data generation gate did not fail closed")
 end
 local experimental, experimental_reason, experimental_code = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true}), true, "experimental")
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = true, trust_class = "mir-reviewed"
+  }, "experimental")
 if experimental or experimental_reason ~= "automatic_family_not_reviewed"
   or experimental_code ~= diagnostic_codes.get("automatic_family_not_reviewed") then
   fail("experimental family was accepted by the reviewed-data creation lane")
@@ -148,8 +212,15 @@ expect_error("unknown automatic family creation maturity", "Unknown automatic fa
     automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "unknown")
 end)
 local approved = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true}), true, "reviewed")
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = true, trust_class = "mir-reviewed"
+  }, "reviewed")
 if not approved then fail("reviewed-data generation gate rejected named authorization") end
+local untrusted = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), {
+    promotion_verified = false, trust_class = "external-mod-author"
+  }, "reviewed")
+if untrusted then fail("reviewed-data generation accepted an externally self-asserted trust class") end
 local generic = automatic_compiler_contract.generation_decision(
   automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "experimental")
 if not generic then fail("registered family module generation was not independently configurable") end
@@ -199,9 +270,26 @@ for index, provider in ipairs(providers.providers) do
   if provider.family_rule.provider_id ~= provider.id
     or provider.emission_adapter.mutates_prototypes ~= false
     or provider.runtime_handler.required ~= false
+    or type(provider.default_policy.cardinality) ~= "table"
   then
     fail("CompilerProvider contract metadata is incomplete: " .. provider.id)
   end
+end
+
+local cardinality_rows, cardinality = family_resolver.apply_cardinality_guard({
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "new-unreviewed"},
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "new-unreviewed"},
+  {final_state = "diagnose", decision = "diagnose", blocker = "recycling_loop", promotion_class = "new-unreviewed"},
+  {final_state = "attach", decision = "attach", blocker = nil, promotion_class = "exact-reviewed"}
+}, {maximum_candidates = 2, maximum_attachments = 2, maximum_review_required = 2}, 3)
+if cardinality.status ~= "REVIEW_REQUIRED"
+  or cardinality_rows[1].decision ~= "review-required"
+  or cardinality_rows[2].decision ~= "review-required"
+  or cardinality_rows[3].decision ~= "diagnose"
+  or cardinality_rows[4].decision ~= "attach"
+  or cardinality.retained_reviewed_or_promoted_count ~= 1
+  or type(cardinality_rows[1].decision_fingerprint) ~= "string" then
+  fail("provider cardinality overflow did not stop expansion before emission while preserving hard rejection")
 end
 local reversed_providers = {schema = 1, providers = {}}
 for index = #providers.providers, 1, -1 do table.insert(reversed_providers.providers, providers.providers[index]) end
@@ -231,6 +319,10 @@ if provider_registry.snapshot().providers[1].family == "mutated" then
 end
 
 local rules = family_registry.snapshot()
+if family_registry.view() ~= family_registry.view()
+  or fingerprint.of(family_registry.view()) ~= fingerprint.of(rules) then
+  fail("FamilyRule read-only view changed its validated source-owned catalog")
+end
 local reversed = {schema = 2, rules = {}}
 for index = #rules.rules, 1, -1 do table.insert(reversed.rules, rules.rules[index]) end
 local normalized = family_registry.validate(reversed)
@@ -247,6 +339,17 @@ expect_error("incomplete FamilyRule safety requirements", "hard evidence require
 local behavioral_rule = deepcopy(rules)
 behavioral_rule.rules[1].callback = function() end
 expect_error("behavioral FamilyRule", "FamilyRule must be data-only", function() family_registry.validate(behavioral_rule) end)
+local operator_schema = focused_contracts.family_operator_dsl.schema_authority()
+if operator_schema.schema ~= 1
+  or #operator_schema.operators.selectors < 6
+  or rules.rules[1].operators.effect_model.operator == nil then
+  fail("family operator DSL authority or provider composition is incomplete")
+end
+local unknown_operator_rule = deepcopy(rules)
+unknown_operator_rule.rules[1].operators.selectors[1].operator = "recipe.opaque-machine-learning"
+expect_error("unknown family operator", "unsupported selectors operator", function()
+  family_registry.validate(unknown_operator_rule)
+end)
 
 local base_pack = valid_pack("pack-a", "2.1", "test-mod", "= 1.0.0")
 pack_schema.validate(base_pack)
@@ -288,7 +391,16 @@ operational_pack.aliases = {['aliased-item'] = {family = "assembler", change = 0
 operational_pack.family_hints = {{recipe = "hinted-recipe", family = "assembler", change = 0.04}}
 operational_pack.science_roles = {{stream = "research_auto_assembling_machine", pack = "automation-science-pack", role = "include"}}
 operational_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "hidden_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
-operational_pack.family_authorizations = {{family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", action = "generate", evidence = {"assert-compiler-contracts"}, claim_boundary = "fixture-only"}}
+operational_pack.family_authorizations = {{
+  family = "assembling-machine-manufacturing",
+  stream = "research_auto_assembling_machine",
+  action = "generate",
+  evidence = {"assert-compiler-contracts"},
+  claim_boundary = "fixture-only",
+  promotion_authorization_id = "mir.reviewed.compiler-contract-fixture-v1",
+  trust_class = "mir-reviewed",
+  provider_version = "family-rule-v3"
+}}
 operational_pack.candidate_seeds = {{recipe = "seeded-recipe", item = "seeded-item", family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", change = 0.02, evidence = {"assert-compiler-contracts"}}}
 local active_operational = {pack_schema.validate(operational_pack)}
 local excluded = pack_registry.resolve_candidate({recipe = "blocked-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
@@ -307,6 +419,37 @@ local authorization = pack_registry.authorizes_family_stream("research_auto_asse
 if not authorization or authorization.pack ~= "pack-operational" then fail("exact-pack family authorization was not resolved") end
 local seeds = pack_registry.candidate_seeds(active_operational)
 if #seeds ~= 1 or seeds[1].recipe ~= "seeded-recipe" then fail("CompatibilityPack candidate seed was not resolved") end
+local seeded_rule
+for _, rule in ipairs(family_registry.snapshot().rules) do
+  if rule.id == "assembling-machine-manufacturing" then seeded_rule = rule; break end
+end
+if not seeded_rule then fail("assembling-machine family rule is missing") end
+local exact_seed_candidates, ambiguous_seed_candidates
+compiler_context.with_active(compiler_context.new(), function()
+  local indexes = relationships.view()
+  exact_seed_candidates = provider_discovery.candidates(seeded_rule, indexes, seeds)
+  ambiguous_seed_candidates = provider_discovery.candidates(seeded_rule, indexes, {{
+    recipe = "missing-seeded-recipe",
+    family = "assembling-machine-manufacturing",
+    stream = "research_auto_assembling_machine",
+    change = 0.02
+  }})
+end)
+local exact_seed_candidate
+for _, row in ipairs(exact_seed_candidates) do
+  if row.recipe == "seeded-recipe" then exact_seed_candidate = row; break end
+end
+if not exact_seed_candidate or exact_seed_candidate.item ~= "seeded-item" or exact_seed_candidate.ambiguity ~= nil then
+  fail("exact singleton CompatibilityPack candidate seed was marked ambiguous")
+end
+local ambiguous_seed_candidate
+for _, row in ipairs(ambiguous_seed_candidates) do
+  if row.recipe == "missing-seeded-recipe" then ambiguous_seed_candidate = row; break end
+end
+if not ambiguous_seed_candidate or not ambiguous_seed_candidate.ambiguity
+  or ambiguous_seed_candidate.ambiguity.code ~= "ambiguous_candidate_seed" then
+  fail("candidate seed without one exact item did not remain review-required")
+end
 local roles = pack_registry.science_roles_for_stream("research_auto_assembling_machine", active_operational)
 if #roles ~= 1 or roles[1].pack ~= "automation-science-pack" then fail("CompatibilityPack science role was not consumed") end
 expect_error("CompatibilityPack transport identity", "transport key must match pack id", function()
@@ -361,23 +504,353 @@ for seed = 1, 8 do
   end
 end
 if plan_a:snapshot()[1].stream_key ~= "a-stream" then fail("GenerationPlan rows are not stably sorted") end
+do
+  local trusted_plan_artifact = plan_a:artifact_view()
+  if generation_plan.assert_trusted_artifact(trusted_plan_artifact) ~= trusted_plan_artifact then
+    fail("GenerationPlan private artifact authority changed the exact finalized view")
+  end
+  local copied_plan_artifact = deepcopy(trusted_plan_artifact)
+  expect_error("copied GenerationPlan trusted artifact", "not the exact trusted finalized view", function()
+    generation_plan.assert_trusted_artifact(copied_plan_artifact)
+  end)
+  trusted_plan_artifact.plan_fingerprint = "tampered-plan-fingerprint"
+  expect_error("tampered GenerationPlan trusted artifact", "not the exact trusted finalized view", function()
+    generation_plan.assert_trusted_artifact(trusted_plan_artifact)
+  end)
+end
 local duplicate_plan = generation_plan.new()
 duplicate_plan:add(skip_row("same", "id-a"))
 duplicate_plan:add(skip_row("same", "id-b"))
 expect_error("duplicate GenerationPlan stream id", "duplicate stream key", function() duplicate_plan:finalize() end)
 
-local function emitted_row(stream_key, technology_name)
+local function emitted_row(stream_key, technology_name, recipe_name)
   local row = skip_row(stream_key, stream_key)
   row.action = "emit"
   row.technology_name = technology_name
   row.fields = {
-    effects = {{type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1}},
+    effects = {{
+      type = "change-recipe-productivity",
+      recipe = recipe_name or "iron-gear-wheel",
+      change = 0.1
+    }},
     ingredients = {{"automation-science-pack", 1}}, prerequisites = {},
     count_formula = "100", research_time = 30, max_level = "infinite"
   }
-  for _, proof in pairs(row.gates) do proof.status = "passed" end
+  row.source = "fixed-stream"
+  row.spec = {manifest_id = stream_key, migration_policy = "stable"}
+  for gate_name in pairs(row.gates) do
+    row.gates[gate_name] = c7_contracts.gate.passed("compiler-contract:" .. gate_name, {"fixture:" .. gate_name})
+  end
+  row.technology_design = technology_design.from_generation_row(row)
   return row
 end
+
+local design_row = emitted_row("technology-design-contract", "technology-design-contract-tech")
+design_row.source = "fixed-stream"
+design_row.spec = {manifest_id = "technology-design-contract", migration_policy = "stable"}
+local normalized_design = technology_design.from_generation_row(design_row)
+local normalized_shape = technology_design.prototype_shape(normalized_design)
+if normalized_design.schema ~= 2
+  or normalized_design.candidate_id ~= "mir-candidate/recipe-productivity/technology-design-contract"
+  or normalized_design.technology_id ~= "technology-design-contract-tech"
+  or normalized_design.design.identity.lock_state ~= "partial"
+  or normalized_design.design.progression.locked ~= false
+  or normalized_design.provenance.fields["identity.technology_id"].locked ~= true
+  or normalized_design.provenance.fields["presentation.icons"].locked ~= false
+  or normalized_shape.effects[1].recipe ~= "iron-gear-wheel"
+  or normalized_shape.unit.count_formula ~= "100"
+  or normalized_design.maturity.identity_stability ~= "released"
+  or type(normalized_design.subject_fingerprint) ~= "string"
+  or type(normalized_design.design_fingerprint) ~= "string"
+  or type(normalized_design.prototype_fingerprint) ~= "string"
+  or type(normalized_design.qualification_fingerprint) ~= "string"
+then
+  fail("TechnologyDesign did not preserve normalized fixed-stream semantics and independent field locks")
+end
+normalized_shape.effects[1].recipe = "fixture-mutated-projection"
+if normalized_design.design.effects.value[1].recipe ~= "iron-gear-wheel" then
+  fail("TechnologyDesign public prototype projection mutated trusted design state")
+end
+if not rawequal(
+    technology_design.trusted_prototype_projection_view(normalized_design).effects,
+    normalized_design.design.effects.value) then
+  fail("TechnologyDesign trusted prototype projection did not share its exact owned values")
+end
+if not rawequal(normalized_design.design.effects.value, normalized_design.provenance.fields.effects.value)
+  or not rawequal(normalized_design.design.progression.value.prerequisites,
+    normalized_design.provenance.fields["progression.prerequisites"].value)
+  or not rawequal(normalized_design.subjects, normalized_design.provenance.fields.subjects.value)
+  or not rawequal(normalized_design.members, normalized_design.provenance.fields.members.value)
+  or not rawequal(normalized_design.members.recipes, normalized_design.subjects.recipes)
+  or rawequal(normalized_design.design.effects.value, design_row.fields.effects) then
+  fail("TechnologyDesign did not copy external values once and share exact owned immutable values")
+end
+local normalized_design_copy = deepcopy(normalized_design)
+technology_design.verify_untrusted(normalized_design_copy)
+if normalized_design_copy.qualification_fingerprint ~= normalized_design.qualification_fingerprint then
+  fail("TechnologyDesign structural sharing changed serialized qualification identity")
+end
+local stale_design_row = emitted_row("stale-design-contract", "stale-design-contract-tech", "iron-gear-wheel")
+stale_design_row.fields.effects[1].change = 0.2
+expect_error("emitted row TechnologyDesign authority", "legacy projection differs", function()
+  generation_plan.new():add(stale_design_row)
+end)
+local unlocked_overlay = deepcopy(normalized_design)
+unlocked_overlay.design.progression.value.prerequisites = {"automation"}
+unlocked_overlay.provenance.fields["progression.prerequisites"].value = {"automation"}
+technology_design.refresh_fingerprints(unlocked_overlay)
+technology_design.merge(normalized_design, unlocked_overlay, {})
+local locked_overlay = deepcopy(normalized_design)
+locked_overlay.design.presentation.value.localised_name = {"", "Unauthorized rename"}
+locked_overlay.provenance.fields["presentation.localised_name"].value = {"", "Unauthorized rename"}
+locked_overlay.provenance.fields["presentation.localised_name"].present = true
+technology_design.refresh_fingerprints(locked_overlay)
+expect_error("TechnologyDesign locked field mutation", "locked field changed without authorization", function()
+  technology_design.merge(normalized_design, locked_overlay, {})
+end)
+local malformed_design = deepcopy(normalized_design)
+malformed_design.provenance.fields["identity.candidate_id"].value = "contradictory-candidate"
+technology_design.refresh_fingerprints(malformed_design)
+expect_error("TechnologyDesign cross-field invariant", "dimension differs from leaf provenance", function()
+  technology_design.validate(malformed_design)
+end)
+if normalized_design.semantic_fingerprint
+  ~= technology_design.from_generation_row(design_row).semantic_fingerprint then
+  fail("TechnologyDesign semantic fingerprint is not deterministic")
+end
+local qualification_row = deepcopy(design_row)
+qualification_row.gates.effect_valid = c7_contracts.gate.passed(
+  "compiler-contract:effect-valid", {"fixture:qualification-refresh"})
+local refreshed_qualification_design = technology_design.with_qualification(
+  normalized_design,
+  qualification_row,
+  {validated = true, share_immutable = true}
+)
+local rebuilt_qualification_design = technology_design.from_generation_row(qualification_row)
+if fingerprint.of(refreshed_qualification_design) ~= fingerprint.of(rebuilt_qualification_design) then
+  fail("TechnologyDesign qualification-only refresh differs from a complete rebuild")
+end
+if normalized_design.gates.effect_valid.evidence[1] == "fixture:qualification-refresh" then
+  fail("TechnologyDesign qualification-only refresh mutated its source design")
+end
+local mismatched_qualification_row = deepcopy(qualification_row)
+mismatched_qualification_row.technology_name = "mismatched-technology-design"
+expect_error("TechnologyDesign qualification identity", "changed design identity", function()
+  technology_design.with_qualification(normalized_design, mismatched_qualification_row)
+end)
+local candidate = focused_contracts.technology_candidate.from_design(normalized_design, design_row)
+local qualification = focused_contracts.technology_qualification.from_design(normalized_design, design_row)
+if focused_contracts.technology_qualification.from_design(normalized_design, design_row) ~= qualification then
+  fail("SafetyQualification did not reuse the exact trusted TechnologyDesign qualification")
+end
+do
+  local mismatched = deepcopy(design_row)
+  mismatched.gates.effect_valid = c7_contracts.gate.passed("compiler-contract:mismatch", {"fixture:mismatch"})
+  local distinct = focused_contracts.technology_qualification.from_design(normalized_design, mismatched)
+  if distinct == qualification or distinct.qualification_fingerprint == qualification.qualification_fingerprint then
+    fail("SafetyQualification reused a record across different exact gate vectors")
+  end
+end
+if not rawequal(candidate.semantic_identity, normalized_design.semantic_identity)
+  or not rawequal(candidate.subjects, normalized_design.subjects) then
+  fail("TechnologyCandidate did not share exact trusted design identity and subjects")
+end
+do
+  local pending_row = deepcopy(design_row)
+  pending_row.gates.progression_safe = c7_contracts.gate.pending("compiler-contract:pending-progression")
+  pending_row.technology_design = technology_design.from_generation_row(pending_row)
+  local pending_qualification = c7_contracts.safety.from_design(
+    pending_row.technology_design, pending_row, nil, {validated = true})
+  if pending_qualification.decision ~= "proposal"
+    or #pending_qualification.unresolved_gates ~= 1
+    or pending_qualification.unresolved_gates[1] ~= "progression_safe" then
+    fail("pending hard gate was represented as a false pass or terminal rejection")
+  end
+  local failed_gate = c7_contracts.gate.failed("compiler-contract:graph", "fixture-cycle", {"cycle:a-b"})
+  local failed_gate_authority = c7_contracts.gate.authority_projection(failed_gate)
+  if failed_gate_authority.status ~= failed_gate.status
+    or failed_gate_authority.evaluator ~= failed_gate.evaluator
+    or failed_gate_authority.evidence_fingerprint ~= failed_gate.evidence_fingerprint
+    or failed_gate_authority.evidence ~= nil then
+    fail("TechnologyGate authority projection did not bind exact evidence identity compactly")
+  end
+  local superseded_gate = c7_contracts.gate.supersede(
+    c7_contracts.gate.pending("compiler-contract:provisional"), "compiler-contract:graph", failed_gate)
+  c7_contracts.gate.validate(superseded_gate)
+  expect_error("tampered gate evidence", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(failed_gate)
+    tampered.evidence = {"cycle:tampered"}
+    c7_contracts.gate.validate(tampered)
+  end)
+  expect_error("copied gate is not trusted", "Trusted TechnologyGate record is required", function()
+    c7_contracts.gate.assert_trusted(deepcopy(failed_gate))
+  end)
+  expect_error("deep verification detects serialized design tampering", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(normalized_design)
+    tampered.gates.effect_valid.evidence = {"compiler-contract:tampered-design-gate"}
+    technology_design.verify_untrusted(tampered)
+  end)
+  local diagnostic_design = technology_design.as_diagnostic_alternative(normalized_design, "fixture-diagnostic")
+  if diagnostic_design.materialization.kind ~= "diagnose"
+    or diagnostic_design.design.ownership.value.action ~= "diagnose"
+    or diagnostic_design.maturity.runtime_action ~= "diagnose"
+    or diagnostic_design.context.runtime_action ~= nil
+    or diagnostic_design.subject_fingerprint ~= normalized_design.subject_fingerprint
+    or diagnostic_design.prototype_fingerprint ~= normalized_design.prototype_fingerprint
+    or diagnostic_design.design_fingerprint == normalized_design.design_fingerprint
+    or diagnostic_design.qualification_fingerprint == normalized_design.qualification_fingerprint then
+    fail("TechnologyDesign diagnostic conversion wrote runtime action to the wrong object or violated invariants")
+  end
+end
+local lifecycle_catalog = technology_catalog.from_generation_rows({design_row}, {fixture = "lifecycle"})
+technology_catalog.validate(lifecycle_catalog)
+local trusted_lifecycle_catalog = technology_catalog.from_generation_rows(
+  {design_row},
+  {fixture = "lifecycle"},
+  {trusted_designs = true}
+)
+technology_catalog.validate(trusted_lifecycle_catalog)
+if fingerprint.of(lifecycle_catalog) ~= fingerprint.of(trusted_lifecycle_catalog) then
+  fail("trusted technology catalog construction differs from the defensive path")
+end
+if candidate.candidate_id ~= normalized_design.candidate_id
+  or candidate.semantic_identity.capability ~= "recipe-productivity"
+  or qualification.decision ~= "qualified"
+  or qualification.design_fingerprint ~= normalized_design.design_fingerprint
+  or lifecycle_catalog.schema ~= 3
+  or lifecycle_catalog.mutation_authority ~= false
+  or #lifecycle_catalog.candidates ~= 1
+  or #lifecycle_catalog.candidates[1].alternatives ~= 2
+  or #lifecycle_catalog.qualifications ~= 2
+  or #lifecycle_catalog.alternative_qualifications ~= 2
+  or #lifecycle_catalog.current_selections ~= 1 then
+  fail("technology candidate catalog and qualification records are inconsistent")
+end
+do
+  local second_design_row = emitted_row("technology-design-contract-b", "technology-design-contract-tech-b")
+  local ordered_catalog = technology_catalog.from_generation_rows(
+    {design_row, second_design_row}, {fixture = "catalog-order"})
+  local reversed_catalog = technology_catalog.from_generation_rows(
+    {second_design_row, design_row}, {fixture = "catalog-order"})
+  if ordered_catalog.catalog_fingerprint ~= reversed_catalog.catalog_fingerprint
+    or ordered_catalog.selection_fingerprint ~= reversed_catalog.selection_fingerprint then
+    fail("TechnologyCatalog selection depends on candidate discovery order")
+  end
+  local assessment = c7_contracts.assessment.new({
+    candidate_id = candidate.candidate_id,
+    design_fingerprint = normalized_design.design_fingerprint,
+    qualification_fingerprint = qualification.qualification_fingerprint,
+    profile_id = "compiler-contract-profile",
+    status = "PASS",
+    evidence_sha256 = {"ASSESSMENT-EVIDENCE"}
+  })
+  if assessment.schema ~= 2 or assessment.measurement_status ~= "INCOMPLETE"
+    or assessment.status ~= "REVIEW_REQUIRED" then
+    fail("incomplete quality evidence was represented as a passing measurement")
+  end
+  local promotion_record = c7_contracts.promotion.new({
+    authorization_id = "promotion-authorization/compiler-contract/1",
+    candidate_id = candidate.candidate_id,
+    design_fingerprint = normalized_design.design_fingerprint,
+    safety_qualification_fingerprint = qualification.qualification_fingerprint,
+    provider_id = "mir.fixture-provider",
+    provider_version = "1",
+    quality_policy_version = "1",
+    trust_class = "mir-reviewed",
+    applicability_envelope = {factorio_line = "2.1", fixture = "compiler-contracts"},
+    profile_fingerprints = {"PROFILE"},
+    quality_assessment_fingerprints = {assessment.assessment_fingerprint},
+    upgrade_evidence_sha256 = {"UPGRADE"},
+    performance_evidence_sha256 = {"PERFORMANCE"},
+    human_review = {decision = "approved", reviewer = "fixture-reviewer"}
+  })
+  if not c7_contracts.promotion.is_reviewed_trust(promotion_record)
+    or c7_contracts.registry.snapshot().trust_authority ~= "mir-owned-source" then
+    fail("promotion authorization did not keep design quality and trust as explicit independent contracts")
+  end
+end
+local approval_envelope = applicability_envelope.new({
+  envelope_id = "compiler-contract-fixture-v1",
+  factorio_lines = {"2.1"},
+  required_features = {"recipe-productivity"},
+  required_mods = {{id = "base"}},
+  structural_predicates = {
+    {predicate = "recipe.visible"},
+    {predicate = "recipe.productivity-eligible"}
+  },
+  positive_examples = {"compiler-contract-positive"},
+  negative_examples = {"compiler-contract-negative"},
+  maximum_new_matches = 0
+})
+local envelope_matches = applicability_envelope.matches(approval_envelope, {
+  factorio_line = "2.1",
+  features = {["recipe-productivity"] = true},
+  active_mods = {base = true},
+  predicates = {["recipe.visible"] = true, ["recipe.productivity-eligible"] = true},
+  new_matches = 0
+})
+if not envelope_matches then fail("technology applicability envelope rejected its reviewed context") end
+local expansion_matches, expansion_reason = applicability_envelope.matches(approval_envelope, {
+  factorio_line = "2.1",
+  features = {["recipe-productivity"] = true},
+  active_mods = {base = true},
+  predicates = {["recipe.visible"] = true, ["recipe.productivity-eligible"] = true},
+  new_matches = 1
+})
+if expansion_matches or expansion_reason ~= "new-matches" then
+  fail("technology applicability envelope did not fail closed on an unreviewed match")
+end
+local policy_snapshot
+compiler_context.with_active(compiler_context.new(), function()
+  policy_snapshot = focused_contracts.compatibility_policy.snapshot()
+end)
+if policy_snapshot.schema ~= 1 or type(policy_snapshot.policy_fingerprint) ~= "string"
+  or type(policy_snapshot.active_packs) ~= "table" or type(policy_snapshot.claims) ~= "table" then
+  fail("context-owned compatibility policy authority is incomplete")
+end
+local approval = focused_contracts.technology_approval.new({
+  approval_id = "approval/compiler-contract/1",
+  decision = "approved",
+  candidate_selector = {candidate_id = candidate.candidate_id},
+  applicability = {exact_mods = {"base"}, structural_envelope = approval_envelope},
+  selected_alternative = lifecycle_catalog.candidates[1].alternatives[1].alternative_id,
+  approved_design_fingerprint = normalized_design.design_fingerprint,
+  qualification_fingerprint = qualification.qualification_fingerprint,
+  locked_fields = {"identity.technology_id", "presentation.localised_name"},
+  adaptive_envelopes = {},
+  required_evidence = {"positive-fixture", "negative-fixture"},
+  reviewer = "fixture-reviewer",
+  decided_at = "2026-07-18T00:00:00Z"
+})
+local promotion = technology_promotion.new({
+  promotion_id = "promotion/compiler-contract/1",
+  technology_id = normalized_design.technology_id,
+  candidate_id = candidate.candidate_id,
+  approval_id = approval.approval_id,
+  approved_design_fingerprint = normalized_design.design_fingerprint,
+  prior_identity_state = "reserved",
+  identity_state = "stable-unreleased",
+  migration_policy = "stable",
+  introduced_in = "3.2.0",
+  evidence = {qualification.qualification_fingerprint}
+})
+local migration = focused_contracts.technology_migration.new({
+  migration_id = "migration/compiler-contract/1",
+  from_technology_id = "old-fixture-technology",
+  to_technology_id = normalized_design.technology_id,
+  strategy = "retain-hidden-alias",
+  save_behavior = "preserve researched state through an alias migration",
+  approval_id = approval.approval_id,
+  evidence = {promotion.promotion_fingerprint}
+})
+if type(approval.approval_fingerprint) ~= "string"
+  or type(promotion.promotion_fingerprint) ~= "string"
+  or type(migration.migration_fingerprint) ~= "string" then
+  fail("technology lifecycle records are not independently fingerprinted")
+end
+expect_error("TechnologyPromotion state regression", "transition is not permitted", function()
+  technology_promotion.assert_transition("released", "reserved")
+end)
 
 local function native_owner_row(stream_key, owner, recipe)
   local row = emitted_row(stream_key, "unused")
@@ -406,6 +879,7 @@ local function native_owner_row(stream_key, owner, recipe)
     input_fingerprint = fingerprint.of(input),
     output_fingerprint = fingerprint.of(expected)
   }
+  row.technology_design = technology_design.from_generation_row(row)
   return row
 end
 local duplicate_effect_plan = generation_plan.new()
@@ -438,7 +912,7 @@ end
 
 local malformed_single_stream = emitted_row("malformed-single-stream", "malformed-single-stream-tech")
 table.insert(malformed_single_stream.fields.effects, {
-  type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1
+  type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.1
 })
 local malformed_rows = effect_ownership.resolve({malformed_single_stream})
 local malformed_plan = generation_plan.new()
@@ -455,7 +929,25 @@ if partial_rows[2].action ~= "emit" or #partial_rows[2].fields.effects ~= 1
   fail("effect ownership removed a losing stream instead of retaining its unique effects")
 end
 
-local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "shared-recipe")
+local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "iron-gear-wheel")
+if adoption.technology_design.materialization.kind ~= "patch-existing"
+  or adoption.technology_design.materialization.target ~= adoption.adoption.owner
+  or adoption.technology_design.prototype_fingerprint ~= adoption.adoption.output_fingerprint
+  or adoption.technology_design.context.patch_input_fingerprint ~= adoption.adoption.input_fingerprint then
+  fail("native-owner adoption did not bind a patch-existing TechnologyDesign")
+end
+local mismatched_patch_design = deepcopy(adoption)
+mismatched_patch_design.technology_design.materialization.target = "wrong-owner"
+technology_design.refresh_fingerprints(mismatched_patch_design.technology_design)
+expect_error("native-owner patch design parity", "projection differs from TechnologyDesign", function()
+  technology_design.assert_generation_row(mismatched_patch_design)
+end)
+local mismatched_patch_input = deepcopy(adoption)
+mismatched_patch_input.technology_design.context.patch_input_fingerprint = "tampered-input"
+technology_design.refresh_fingerprints(mismatched_patch_input.technology_design)
+expect_error("native-owner patch input authority", "projection differs from TechnologyDesign", function()
+  technology_design.assert_generation_row(mismatched_patch_input)
+end)
 local adoption_rows = effect_ownership.resolve({emitted_row("research_emitted", "effect-tech-emitted"), adoption})
 if adoption_rows[1].stream_key ~= "research_adopted" or adoption_rows[1].action ~= "adopt"
   or adoption_rows[2].action ~= "skip" then
@@ -496,25 +988,73 @@ if rejected_unrecognized or rejected_reason ~= "unrecognized_cost_formula" then
   fail("unsafe unrecognized cost formula override did not fail closed")
 end
 
+focused_contracts.compilation_context = compiler_context.new()
+focused_contracts.finalize_compilation = function(...)
+  return compiler_context.with_active(
+    focused_contracts.compilation_context, compilation_plan.finalize, ...)
+end
+
 local collision_plan = generation_plan.new()
 collision_plan:add(emitted_row("collision-stream", "collision-tech"))
 collision_plan:finalize()
 expect_error("CompilationPlan cross collision", "technology-name collision", function()
-  compilation_plan.finalize(collision_plan, {{
+  focused_contracts.finalize_compilation(collision_plan, {{
     operation = "emit_base_extension",
     key = "collision-base",
     technology_name = "collision-tech",
     technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
 end)
-expect_error("CompilationPlan missing prerequisite sentinel", "prerequisite target is missing", function()
-  compilation_plan.finalize(generation_plan.new():finalize(), {{
+
+local partial_sanitation_row = emitted_row(
+  "partial-effect-sanitation-stream",
+  "partial-effect-sanitation-tech",
+  "iron-gear-wheel"
+)
+table.insert(partial_sanitation_row.fields.effects, {
+  type = "change-recipe-productivity",
+  recipe = "definitely-missing-partial-sanitation-recipe",
+  change = 0.1
+})
+partial_sanitation_row.technology_design = technology_design.from_generation_row(partial_sanitation_row)
+local partial_sanitation_source = generation_plan.new()
+partial_sanitation_source:add(partial_sanitation_row)
+partial_sanitation_source:finalize()
+local partial_sanitation_plan = focused_contracts.finalize_compilation(partial_sanitation_source, {})
+local partial_sanitation_operation = partial_sanitation_plan.operations[1]
+local partial_sanitation_design = partial_sanitation_operation
+  and partial_sanitation_operation.technology_design
+if not partial_sanitation_operation
+  or #partial_sanitation_operation.technology.effects ~= 1
+  or partial_sanitation_operation.technology.effects[1].recipe ~= "iron-gear-wheel"
+  or not partial_sanitation_design
+  or #partial_sanitation_design.design.effects.value ~= 1
+  or partial_sanitation_design.design.effects.value[1].recipe ~= "iron-gear-wheel"
+  or partial_sanitation_plan.validation_summary.effect_integrity.streams.removed_effect_count ~= 1
+  or #partial_sanitation_source:artifact().rows[1].fields.effects ~= 2 then
+  fail("CompilationPlan sanitation did not preserve source isolation and rebuild retained effects")
+end
+
+local missing_prerequisite_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {{
     operation = "emit_base_extension",
     key = "missing-prerequisite",
     technology_name = "missing-prerequisite-tech",
     technology = {name = "missing-prerequisite-tech", effects = {}, prerequisites = {"definitely-missing-technology"}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
-end)
+if #missing_prerequisite_plan.operations ~= 0
+  or missing_prerequisite_plan.validation_summary.technology_graph.rejected["missing-prerequisite-tech"].code
+    ~= "prerequisite_missing" then
+  fail("CompilationPlan did not withhold and classify a missing-prerequisite operation")
+end
+local missing_rejection = missing_prerequisite_plan.validation_summary.technology_graph
+  .rejected["missing-prerequisite-tech"]
+local saw_research_mechanism = false
+for _, reason in ipairs(missing_rejection.contributing or {}) do
+  if reason.code == "research_mechanism_missing" then saw_research_mechanism = true end
+end
+if missing_rejection.primary.code ~= "prerequisite_missing" or not saw_research_mechanism then
+  fail("semantic rejection priority did not preserve the subordinate research mechanism reason")
+end
 
 expect_error("output effect numeric parity", "numeric effect value differs", function()
   output_validator.assert_effects(
@@ -532,7 +1072,891 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
+local continuation_design_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {{
+  operation = "emit_base_extension",
+  key = "compiler-contract-continuation",
+  manifest_id = "base-continuation/compiler-contract-continuation",
+  base_technology_name = "automation",
+  technology_name = "mir-compiler-contract-continuation",
+  technology = {
+    type = "technology",
+    name = "mir-compiler-contract-continuation",
+    localised_name = {"", "Compiler contract continuation"},
+    icon = "__base__/graphics/technology/automation.png",
+    icon_size = 256,
+    effects = {{type = "nothing"}},
+    prerequisites = {"automation"},
+    unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+    max_level = "infinite",
+    upgrade = true
+  }
+}})
+local continuation_operation = continuation_design_plan.operations[1]
+if not continuation_operation or not continuation_operation.technology_design
+  or continuation_operation.technology_design.materialization.kind ~= "continuation"
+  or continuation_operation.technology_design.design.presentation.value.icon
+    ~= "__base__/graphics/technology/automation.png"
+  or continuation_operation.technology_design.identity_authority.source ~= "base-continuation-manifest" then
+  fail("base continuation did not use TechnologyDesign and continuation manifest authority")
+end
+do
+  local shared_graph_proof_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
+    {
+      operation = "emit_base_extension",
+      key = "shared-proof-a",
+      technology_name = "mir-shared-graph-proof-a",
+      technology = {
+        name = "mir-shared-graph-proof-a", effects = {{type = "nothing"}}, prerequisites = {"automation"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "shared-proof-b",
+      technology_name = "mir-shared-graph-proof-b",
+      technology = {
+        name = "mir-shared-graph-proof-b", effects = {{type = "nothing"}}, prerequisites = {"automation"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    }
+  })
+  local shared_graph_proofs = shared_graph_proof_plan.validation_summary.technology_graph.proofs
+  if not shared_graph_proofs["mir-shared-graph-proof-a"]
+    or not rawequal(
+      shared_graph_proofs["mir-shared-graph-proof-a"],
+      shared_graph_proofs["mir-shared-graph-proof-b"]
+    ) then
+    fail("equivalent accepted graph proofs were not represented by one trusted immutable record")
+  end
+end
+do
+  local graph_snapshot = require("__more-infinite-research__.prototypes.mir.graph.snapshot")
+  local shared_prerequisites = {"automation"}
+  local snapshot = graph_snapshot.new({
+    ["mir-graph-view-contract"] = {
+      enabled = true,
+      prerequisites = {"automation"},
+      unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
+    }
+  }, {
+    prerequisites_by_name = {['mir-graph-view-contract'] = shared_prerequisites},
+    sorted_names = {"mir-graph-view-contract"}
+  })
+  local view = graph_snapshot.technology_view(snapshot)
+  local owned = graph_snapshot.technology_map(snapshot)
+  local exact_prototypes = {
+    ["mir-graph-view-contract"] = {
+      enabled = true,
+      prerequisites = {"automation"},
+      unit = {ingredients = {{"automation-science-pack", 1}}, count = 1}
+    }
+  }
+  if view ~= graph_snapshot.technology_view(snapshot)
+    or view["mir-graph-view-contract"].prerequisites ~= shared_prerequisites
+    or owned["mir-graph-view-contract"] == view["mir-graph-view-contract"]
+    or not graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
+    fail("graph snapshot did not preserve stable internal views and owned public maps")
+  end
+  exact_prototypes["mir-graph-view-contract"].unit.ingredients = {{"logistic-science-pack", 1}}
+  if graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
+    fail("graph snapshot live-prototype parity accepted altered science ingredients")
+  end
+  exact_prototypes["mir-graph-view-contract"].unit.ingredients = {{"automation-science-pack", 1}}
+  exact_prototypes["mir-unexpected-graph-node"] = {enabled = true}
+  if graph_snapshot.matches_prototypes(snapshot, exact_prototypes) then
+    fail("graph snapshot live-prototype parity accepted an unexpected node")
+  end
+  owned["mir-graph-view-contract"].prerequisites[1] = "tampered"
+  if view["mir-graph-view-contract"].prerequisites[1] ~= "automation" then
+    fail("graph snapshot owned map mutation escaped into the internal read-only view")
+  end
+end
+expect_error("presentation output parity", "localized name differs", function()
+  output_validator.assert_technology_shape(
+    {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Expected"}},
+    {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Actual"}},
+    "presentation-parity-test"
+  )
+end)
+local cyclic_plan = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
+    {
+      operation = "emit_base_extension",
+      key = "cycle-a",
+      technology_name = "mir-planned-cycle-a",
+      technology = {
+        name = "mir-planned-cycle-a",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-c"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "cycle-b",
+      technology_name = "mir-planned-cycle-b",
+      technology = {
+        name = "mir-planned-cycle-b",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-a"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "cycle-c",
+      technology_name = "mir-planned-cycle-c",
+      technology = {
+        name = "mir-planned-cycle-c",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-b"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    }
+  })
+if #cyclic_plan.operations ~= 0
+  or cyclic_plan.validation_summary.technology_graph.rejected_planned_technology_count ~= 3
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-a"].code
+    ~= "prerequisite_mir_cycle"
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-b"].code
+    ~= "prerequisite_mir_cycle"
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-c"].code
+    ~= "prerequisite_mir_cycle" then
+  fail("CompilationPlan did not withhold and classify the planned prerequisite SCC")
+end
+local component = cyclic_plan.validation_summary.technology_graph.cyclic_components[1]
+local witness = component and component.actual_cycle_witness or {}
+local actual_edges = {
+  ["mir-planned-cycle-a\0mir-planned-cycle-c"] = true,
+  ["mir-planned-cycle-c\0mir-planned-cycle-b"] = true,
+  ["mir-planned-cycle-b\0mir-planned-cycle-a"] = true
+}
+if not component or type(component.component_member_id) ~= "string"
+  or type(component.component_topology_fingerprint) ~= "string" or component.internal_edge_count ~= 3
+  or #component.member_sample ~= 3
+  or #witness ~= 4 then
+  fail("technology SCC did not publish bounded component identity and actual cycle evidence")
+end
+for index = 1, #witness - 1 do
+  if not actual_edges[witness[index] .. "\0" .. witness[index + 1]] then
+    fail("technology SCC witness contains a nonexistent prerequisite edge")
+  end
+end
+
+local semantic_plan_a = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {})
+local semantic_plan_b = focused_contracts.finalize_compilation(generation_plan.new():finalize(), {})
+if semantic_plan_a.semantic_fingerprint ~= semantic_plan_b.semantic_fingerprint
+  or semantic_plan_a.fingerprint ~= semantic_plan_a.compilation_fingerprint
+  or semantic_plan_a.semantic_fingerprint ~= semantic_plan_a.qualification_fingerprint then
+  fail("CompilationPlan semantic fingerprint depends on operational telemetry")
+end
+if semantic_plan_a.telemetry_fingerprint == semantic_plan_b.telemetry_fingerprint then
+  fail("CompilationPlan did not separate changing run telemetry evidence")
+end
+
+local dangling_effect_candidate = {
+  effects = {
+    {type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.01},
+    {type = "change-recipe-productivity", recipe = "mir-fixture-definitely-missing-recipe", change = 0.01}
+  }
+}
+local dangling_effect_result = compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.prune_missing_recipe_effects,
+  dangling_effect_candidate,
+  "compiler-contract-dangling-effect")
+if dangling_effect_result.pruned_effect_count ~= 1
+  or dangling_effect_result.remaining_effect_count ~= 1
+  or dangling_effect_candidate.effects[1].recipe ~= "iron-gear-wheel"
+then
+  fail("final effect safety did not prune only the missing recipe-productivity target")
+end
+compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.assert_effects_allowed,
+  dangling_effect_candidate.effects,
+  "compiler-contract-dangling-effect")
+
+local generic_effect_candidate = {
+  effects = {
+    {type = "unlock-recipe", recipe = "iron-gear-wheel"},
+    {type = "unlock-recipe", recipe = "mir-fixture-definitely-missing-recipe"},
+    {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
+    {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1},
+    {type = "unlock-space-location", space_location = "nauvis"},
+    {type = "unlock-space-location", space_location = "mir-fixture-definitely-missing-space-location"},
+    {type = "unlock-quality", quality = "normal"},
+    {type = "unlock-quality", quality = "mir-fixture-definitely-missing-quality"},
+    {type = "turret-attack", turret_id = "gun-turret", modifier = 0.1},
+    {type = "turret-attack", turret_id = "mir-fixture-definitely-missing-entity", modifier = 0.1},
+    {type = "give-item", item = "iron-plate", count = 1},
+    {type = "give-item", item = "iron-plate", quality = "mir-fixture-definitely-missing-quality", count = 1}
+  }
+}
+local kept_generic, removed_generic, retained_effect_order, retained_effect_identities = compiler_context.with_active(
+  focused_contracts.compilation_context,
+  effect_safety.sanitize_effects,
+  generic_effect_candidate.effects,
+  "compiler-contract-generic-effects",
+  "external")
+if #kept_generic ~= 5 or #removed_generic ~= 7
+  or removed_generic[1].original_effect_index ~= 2
+  or removed_generic[2].original_effect_index ~= 4
+  or removed_generic[3].original_effect_index ~= 5
+  or removed_generic[4].original_effect_index ~= 6
+  or removed_generic[5].original_effect_index ~= 8
+  or removed_generic[6].original_effect_index ~= 10
+  or removed_generic[7].original_effect_index ~= 12
+  or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
+  or #retained_effect_identities ~= 5
+  or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3
+  or retained_effect_order[3] ~= 7 or retained_effect_order[4] ~= 9
+  or retained_effect_order[5] ~= 11 then
+  fail("generic effect contracts did not retain valid targets and prune missing targets"
+    .. ": kept=" .. tostring(#kept_generic)
+    .. " removed=" .. tostring(#removed_generic)
+    .. " retained-order=" .. table.concat(retained_effect_order, ","))
+end
+local default_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate"})
+local normal_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "normal"})
+local epic_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "epic"})
+if default_quality_identity ~= normal_quality_identity or normal_quality_identity == epic_quality_identity then
+  fail("give-item identities do not bind the effective quality target")
+end
+
+(function()
+  local target_inventory = require("__more-infinite-research__.prototypes.mir.platform.factorio.effect_target_inventory")
+  local raw = require("__more-infinite-research__.prototypes.mir.platform.factorio.data_raw")
+  local captured = target_inventory.capture()
+  target_inventory.assert_unchanged(captured)
+  local sentinel = "mir-fixture-target-inventory-sentinel"
+  raw.prototypes("recipe")[sentinel] = {type = "recipe", name = sentinel}
+  local ok, message = pcall(target_inventory.assert_unchanged, captured)
+  raw.prototypes("recipe")[sentinel] = nil
+  if ok or not tostring(message):find("target prototype inventory changed", 1, true) then
+    fail("effect target inventory accepted a post-sanitation recipe addition")
+  end
+  target_inventory.assert_unchanged(captured)
+end)()
+
+local command_positions = {}
+for index, id in ipairs(pipeline_commands.order()) do command_positions[id] = index end
+if pipeline_commands.new_context({execution_mode = "STRICT_CI"}):execution_mode() ~= "STRICT_CI"
+  or pipeline_commands.new_context({execution_mode = "RELEASE"}):execution_mode() ~= "RELEASE" then
+  fail("pipeline entry point did not forward explicit validation and release execution modes")
+end
+if not (command_positions["compatibility-repairs"] < command_positions["sanitize-input-technology-effects"]
+  and command_positions["sanitize-input-technology-effects"] < command_positions["module-permissions"]
+  and command_positions["assert-technology-safety"] < command_positions["emit-compatibility-diagnostics"]
+  and command_positions["assert-technology-safety"] < command_positions["assert-plan-output"]) then
+  fail("pipeline does not sanitize finalized input before indexes or output before reports and parity checks")
+end
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
+do
+  if fingerprint.of({[10] = "ten", [2] = "two", label = "mixed"})
+    ~= fingerprint.of({label = "mixed", [2] = "two", [10] = "ten"}) then
+    fail("sparse numeric map fingerprint is iteration-order dependent")
+  end
+  if fingerprint.of({[10] = "ten", [2] = "two", label = "mixed"})
+    == fingerprint.of({[2] = "two", [10] = "different", label = "mixed"}) then
+    fail("sparse numeric map fingerprint does not bind numeric-keyed values")
+  end
+end
+
+;(function()
+  local empty_fact_domains = {
+    recipes = {}, technologies = {}, items = {}, entities = {}, labs = {}, science_packs = {}
+  }
+  local exact_compilation_snapshot = c9_contracts.compilation_snapshot.new({
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, provider_inputs = {}, stream_inputs = {}, base_continuation_inputs = {},
+    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
+  })
+  local exact_policy_snapshot = c9_contracts.policy_snapshot.new({
+    effective_settings = {}, compatibility_policy = {}, stream_policy = {}, promotion_authority = {},
+    hard_gate_authority = c9_contracts.hard_gate_authority.snapshot(), effect_contract_authority = effect_contracts.snapshot(),
+    quality_profiles = {}, transformation_policy = {}, weapon_overlap_mode = "off",
+    execution_mode = "SAFE", review_policy = {}
+  })
+  local exact_runtime_environment = c9_contracts.runtime_environment.new({
+    factorio_line = "2.1", target_profile_fingerprint = "TARGET", loaded_mod_closure = {base = "2.1.11"}
+  })
+  local exact_input = c9_contracts.compiler_input.new({
+    compilation_snapshot = exact_compilation_snapshot,
+    policy_snapshot = exact_policy_snapshot,
+    runtime_environment = exact_runtime_environment,
+    input_sanitation_fingerprint = "SANITATION",
+    source_fingerprints = {fixtures = "COMPILER-CONTRACTS"}
+  })
+  if not c9_contracts.compilation_snapshot.is_trusted(exact_compilation_snapshot)
+    or not c9_contracts.policy_snapshot.is_trusted(exact_policy_snapshot)
+    or not c9_contracts.runtime_environment.is_trusted(exact_runtime_environment)
+    or not c9_contracts.compiler_input.is_trusted(exact_input) then
+    fail("immutable compiler boundary constructors did not register private trust")
+  end
+  do
+    local canonical = fingerprint.canonical({exact = {"canonical", 1, true}})
+    if fingerprint.of_canonical(canonical) ~= fingerprint.of({exact = {"canonical", 1, true}}) then
+      fail("fingerprint of precomputed canonical text changed exact identity")
+    end
+    local tampered_snapshot = deepcopy(exact_compilation_snapshot)
+    tampered_snapshot.fact_domains.recipes.injected = {name = "tampered"}
+    expect_error("untrusted CompilationSnapshot tamper", "fact-domain fingerprint differs", function()
+      c9_contracts.compilation_snapshot.verify_untrusted(tampered_snapshot)
+    end)
+    local tampered_policy = deepcopy(exact_policy_snapshot)
+    tampered_policy.effective_settings.injected = true
+    expect_error("untrusted PolicySnapshot tamper", "authority fingerprint is invalid", function()
+      c9_contracts.policy_snapshot.verify_untrusted(tampered_policy)
+    end)
+    local tampered_environment = deepcopy(exact_runtime_environment)
+    table.insert(tampered_environment.loaded_mod_closure, {id = "tampered", version = "1.0.0"})
+    expect_error("untrusted RuntimeEnvironmentIdentity tamper", "fingerprint is invalid", function()
+      c9_contracts.runtime_environment.verify_untrusted(tampered_environment)
+    end)
+    local tampered_input = deepcopy(exact_input)
+    tampered_input.source_fingerprints.fixtures = "TAMPERED"
+    expect_error("untrusted CompilerInput tamper", "CompilerInput fingerprint is invalid", function()
+      c9_contracts.compiler_input.verify_untrusted(tampered_input)
+    end)
+  end
+  local input_snapshot = c9_contracts.compiler_input.snapshot(exact_input)
+  input_snapshot.source_fingerprints.fixtures = "MUTATED"
+  if exact_input.source_fingerprints.fixtures ~= "COMPILER-CONTRACTS" then
+    fail("CompilerInput snapshot mutated its immutable source contract")
+  end
+  local exact_result = c9_contracts.compiler_result.new({
+    input_fingerprint = exact_input.input_fingerprint,
+    technology_catalog_fingerprint = "CATALOG",
+    generation_plan_fingerprint = "PLAN",
+    compilation_plan_fingerprint = "COMPILATION",
+    qualification_fingerprint = "QUALIFICATION",
+    operation_fingerprints = {"OPERATION"},
+    accepted_candidates = {},
+    rejected_candidates = {}
+  })
+  c9_contracts.compiler_result.validate(exact_result)
+  if not c9_contracts.compiler_result.is_trusted(exact_result) then
+    fail("CompilerResult deep verification did not register private trust")
+  end
+  local tampered_result = deepcopy(exact_result)
+  tampered_result.operation_fingerprints[1] = "TAMPERED"
+  expect_error("untrusted CompilerResult tamper", "fingerprint is invalid", function()
+    c9_contracts.compiler_result.validate(tampered_result)
+  end)
+  local identity_tampered_result = c9_contracts.compiler_result.new({
+    input_fingerprint = exact_input.input_fingerprint,
+    technology_catalog_fingerprint = "CATALOG",
+    generation_plan_fingerprint = "PLAN",
+    compilation_plan_fingerprint = "COMPILATION",
+    qualification_fingerprint = "QUALIFICATION",
+    operation_fingerprints = {"OPERATION"},
+    accepted_candidates = {},
+    rejected_candidates = {}
+  })
+  identity_tampered_result.status = "FAIL"
+  expect_error("trusted CompilerResult identity tamper", "Trusted CompilerResult record is required", function()
+    c9_contracts.compiler_result.assert_trusted(identity_tampered_result)
+  end)
+  if exact_input.schema ~= 2 or exact_result.schema ~= 3 or exact_result.result_phase ~= "planned"
+    or exact_result.dimensions.safety ~= "QUALIFIED" then
+    fail("CompilerInput schema 2 / CompilerResult schema 3 authority is incomplete")
+  end
+
+  local pure_snapshot = c9_contracts.compilation_snapshot.new({
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, provider_inputs = {}, stream_inputs = {rows = {design_row}}, base_continuation_inputs = {},
+    source_fingerprints = {fixtures = "PURE-COMPILER"}
+  })
+  local pure_result = c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot)
+  local pure_replay = c9_contracts.compiler.compile(deepcopy(pure_snapshot), deepcopy(exact_policy_snapshot))
+  if pure_result.status ~= "PASS" or #pure_result.transformation_plan.operations ~= 1
+    or pure_result.compilation_fingerprint ~= pure_replay.compilation_fingerprint then
+    fail("pure compiler replay did not produce one deterministic qualified operation")
+  end
+  expect_error("pure compiler missing hard gate", "missing", function()
+    local tampered_snapshot = deepcopy(pure_snapshot)
+    tampered_snapshot.stream_inputs.rows[1].gates.output_identity_safe = nil
+    tampered_snapshot.stream_input_fingerprint = nil
+    tampered_snapshot.snapshot_fingerprint = nil
+    tampered_snapshot = c9_contracts.compilation_snapshot.new(tampered_snapshot)
+    c9_contracts.compiler.compile(tampered_snapshot, exact_policy_snapshot)
+  end)
+  expect_error("N/A gate missing applicability proof", "requires evaluator, predicate", function()
+    c7_contracts.gate.not_applicable("compiler-contract-fixture", nil, nil, {"invalid"})
+  end)
+  local valid_na = c7_contracts.gate.not_applicable(
+    "compiler-contract-fixture", "fixture-applicability", "FIXTURE-INPUT", {"not-applicable"})
+  expect_error("tampered N/A input fingerprint", "evidence fingerprint is invalid", function()
+    local tampered = deepcopy(valid_na)
+    tampered.applicability.input_fingerprint = "TAMPERED"
+    c7_contracts.gate.validate(tampered)
+  end)
+
+  local operation = c9_contracts.transformation_operation.new({
+    operation_id = "technology/create/compiler-contract", phase = "technology-materialization",
+    action = "create", subject = {type = "technology", id = "compiler-contract"},
+    expected_before_snapshot = {}, expected_after_projection = {technology = "compiler-contract"},
+    allowed_delta = {engine_default_fields = true},
+    authority_fingerprint = exact_policy_snapshot.policy_fingerprint,
+    qualification_fingerprint = "QUALIFICATION",
+    source = {candidate_id = "compiler-contract", alternative_id = "create:compiler-contract"},
+    payload = {technology = "compiler-contract"}, evidence = {fixture = true}
+  })
+  local operation_plan = c9_contracts.transformation_plan.new({phase = "fixture",
+    execution_mode = "SAFE",
+    compilation_snapshot_fingerprint = pure_snapshot.snapshot_fingerprint,
+    policy_fingerprint = exact_policy_snapshot.policy_fingerprint, operations = {operation}})
+  local journal = c9_contracts.mutation_journal.new(operation_plan)
+  journal:assert_before(operation, {})
+  journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  local finalized_journal = journal:finalize()
+  if #finalized_journal.entries ~= 1 or finalized_journal.complete ~= true then
+    fail("MutationJournal did not bind and finalize its exact operation")
+  end
+
+  local final_evidence = {
+    journal_fingerprint = finalized_journal.journal_fingerprint,
+    executed_operation_count = 1, skipped_operation_count = 0, failed_operation_count = 0,
+    missing_operation_count = 0, duplicate_operation_count = 0,
+    undeclared_operation_count = 0, out_of_plan_operation_count = 0,
+    realized_output_fingerprint = "REALIZED", output_parity_fingerprint = "OUTPUT",
+    graph_parity_fingerprint = "GRAPH", sanitation_parity_fingerprint = "SANITATION",
+    output_parity_passed = true, graph_parity_passed = true, sanitation_parity_passed = true
+  }
+  local applied_result = c9_contracts.compiler_result.finalize(exact_result, final_evidence)
+  if applied_result.result_phase ~= "final" or applied_result.dimensions.execution ~= "APPLIED"
+    or applied_result.planned_result_fingerprint ~= exact_result.result_fingerprint then
+    fail("successful execution did not produce an immutable final APPLIED CompilerResult")
+  end
+  local serialized_result_tamper = deepcopy(applied_result)
+  serialized_result_tamper.operation_fingerprints[1] = "TAMPERED"
+  expect_error("serialized final CompilerResult tamper", "fingerprint is invalid", function()
+    c9_contracts.compiler_result.verify_untrusted(serialized_result_tamper)
+  end)
+  local failed_evidence = deepcopy(final_evidence)
+  failed_evidence.output_parity_passed = false
+  local failed_result = c9_contracts.compiler_result.finalize(exact_result, failed_evidence)
+  if failed_result.dimensions.execution ~= "FAILED" or failed_result.dimensions.safety ~= "FAILED" then
+    fail("failed parity did not produce a bounded final FAILED CompilerResult")
+  end
+  local skipped_evidence = deepcopy(final_evidence)
+  skipped_evidence.executed_operation_count = 0
+  skipped_evidence.skipped_operation_count = 1
+  local skipped_result = c9_contracts.compiler_result.finalize(exact_result, skipped_evidence)
+  if skipped_result.dimensions.execution ~= "FAILED"
+    or skipped_result.execution_evidence.planned_operation_count ~= 1 then
+    fail("skipped mandatory operation did not fail exact CompilerResult plan cardinality")
+  end
+
+  local missing_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("missing transformation operation", "MutationJournal is incomplete", function()
+    missing_journal:finalize()
+  end)
+  local precondition_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("transformation precondition tamper", "precondition-mismatch", function()
+    precondition_journal:assert_before(operation, {tampered = true})
+  end)
+  local postcondition_journal = c9_contracts.mutation_journal.new(operation_plan)
+  postcondition_journal:assert_before(operation, {})
+  expect_error("transformation postcondition tamper", "postcondition-mismatch", function()
+    postcondition_journal:record(operation, {}, {technology = "tampered"}, "applied")
+  end)
+  local duplicate_journal = c9_contracts.mutation_journal.new(operation_plan)
+  duplicate_journal:assert_before(operation, {})
+  duplicate_journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  expect_error("duplicate transformation operation", "more than once", function()
+    duplicate_journal:record(operation, {}, {technology = "compiler-contract"}, "applied")
+  end)
+  local undeclared_operation = c9_contracts.transformation_operation.new({
+    operation_id = "technology/create/undeclared", phase = "technology-materialization",
+    action = "create", subject = {type = "technology", id = "undeclared"},
+    expected_before_snapshot = {}, expected_after_projection = {technology = "undeclared"},
+    allowed_delta = {}, authority_fingerprint = exact_policy_snapshot.policy_fingerprint,
+    qualification_fingerprint = "QUALIFICATION",
+    source = {candidate_id = "undeclared", alternative_id = "create:undeclared"},
+    payload = {technology = "undeclared"}, evidence = {fixture = true}
+  })
+  local undeclared_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("undeclared transformation operation", "undeclared operation", function()
+    undeclared_journal:assert_operation(undeclared_operation)
+  end)
+  local out_of_plan_operation = deepcopy(operation)
+  out_of_plan_operation.allowed_delta = {tampered = true}
+  out_of_plan_operation = c9_contracts.transformation_operation.new(out_of_plan_operation)
+  local out_of_plan_journal = c9_contracts.mutation_journal.new(operation_plan)
+  expect_error("out-of-plan transformation operation", "differs from its bound plan", function()
+    out_of_plan_journal:assert_operation(out_of_plan_operation)
+  end)
+
+  local qualified_snapshot = c9_contracts.compilation_snapshot.qualify(pure_snapshot, {
+    stream_inputs = {rows = {design_row}}, base_continuation_inputs = {}
+  })
+  if qualified_snapshot.base_snapshot_fingerprint ~= pure_snapshot.snapshot_fingerprint
+    or qualified_snapshot.fact_domains ~= pure_snapshot.fact_domains
+    or qualified_snapshot.relationship_indexes ~= pure_snapshot.relationship_indexes
+    or qualified_snapshot.metrics.reused_domain_count < 10
+    or qualified_snapshot.metrics.deep_copy_count ~= 0 then
+    fail("qualification snapshot did not structurally share unchanged normalized domains")
+  end
+
+  local review_snapshot = c9_contracts.compilation_snapshot.new({
+    fact_domains = empty_fact_domains, relationship_indexes = {}, owner_index = {}, graph_input = {},
+    effect_target_inventory = {}, stream_inputs = {}, base_continuation_inputs = {},
+    provider_inputs = {decisions = {{
+      provider_id = "fixture-provider", provider_version = "1", prototype_type = "recipe",
+      prototype_name = "ambiguous", target_stream = "fixture-stream", final_state = "review-required",
+      claim_fingerprint = "CLAIM", decision_fingerprint = "DECISION", risk_disposition = "REVIEW_REQUIRED"
+    }}}, source_fingerprints = {fixtures = "REVIEW-MODES"}
+  })
+  local review_result = c9_contracts.compiler.compile(review_snapshot, exact_policy_snapshot)
+  if review_result.status ~= "REVIEW_REQUIRED" or #review_result.transformation_plan.operations ~= 0
+    or c9_contracts.execution_mode.review_is_fatal("SAFE", {})
+    or c9_contracts.execution_mode.review_is_fatal("PREVIEW", {})
+    or not c9_contracts.execution_mode.review_is_fatal("STRICT_CI", {})
+    or not c9_contracts.execution_mode.review_is_fatal("RELEASE", {}) then
+    fail("provider review safe/preview and strict/release execution-mode policy is inconsistent")
+  end
+
+  local isolated_policy_result = c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot)
+  local ambient_policy = deepcopy(exact_policy_snapshot)
+  ambient_policy.weapon_overlap_mode = "always"
+  if isolated_policy_result.compilation_fingerprint
+    ~= c9_contracts.compiler.compile(pure_snapshot, exact_policy_snapshot).compilation_fingerprint then
+    fail("captured PolicySnapshot compilation changed after unrelated live-policy mutation")
+  end
+
+  local function claim(provider_id, change)
+    local row = {
+      provider_id = provider_id, rule = "fixture-rule", prototype_type = "recipe",
+      prototype_name = "iron-gear-wheel", recipe = "iron-gear-wheel", item = "iron-gear-wheel",
+      target_stream = "fixture-stream", candidate_family = "fixture-family", partition_key = "fixture",
+      change = change, final_state = "attach", policy_scope = "automatic-productivity",
+      promotion_class = "exact-reviewed", compatibility_pack = "fixture-pack", target_support = {"2.1"},
+      evidence = {fixture = "provider-claim"}, risk_fingerprint = "RISK", risk_hard_flags = {},
+      risk_review_flags = {}, risk_disposition = "PASS", decision_fingerprint = provider_id
+    }
+    return c9_contracts.provider_claim.bind(row)
+  end
+  local duplicate_claims = c9_contracts.provider_claim.arbitrate({claim("provider-b", 0.01), claim("provider-a", 0.01)})
+  if duplicate_claims.status ~= "PASS" or #duplicate_claims.attachment.provider_ids ~= 2
+    or duplicate_claims.attachment.provider_ids[1] ~= "provider-a" then
+    fail("identical provider claims did not collapse deterministically with preserved identities")
+  end
+  local conflicting_claims = c9_contracts.provider_claim.arbitrate({claim("provider-a", 0.01), claim("provider-b", 0.02)})
+  if conflicting_claims.status ~= "REVIEW_REQUIRED"
+    or conflicting_claims.code ~= "conflicting_same_stream_claim" then
+    fail("different same-stream provider claims did not fail closed")
+  end
+end)()
+
+do
+  local deep = {}
+  for index = 1, 5000 do
+    deep["deep-" .. index] = {prerequisites = index == 1 and {} or {"deep-" .. (index - 1)}}
+  end
+  local deep_index = require("__more-infinite-research__.prototypes.mir.graph.researchability_index").build_from(deep)
+  if deep_index.schema ~= 2 or deep_index.max_unlock_depth ~= 4999
+    or deep_index.structural_failures["deep-5000"] ~= false then
+    fail("iterative researchability did not resolve a 5000-node chain")
+  end
+  local wide, prerequisites = {}, {}
+  for index = 1, 2000 do
+    local name = "wide-leaf-" .. index
+    wide[name] = {prerequisites = {}}
+    table.insert(prerequisites, name)
+  end
+  wide["wide-root"] = {prerequisites = prerequisites}
+  local wide_index = require("__more-infinite-research__.prototypes.mir.graph.researchability_index").build_from(wide)
+  if wide_index.unlock_depths["wide-root"] ~= 1 or wide_index.node_count ~= 2001 then
+    fail("iterative researchability did not resolve a wide prerequisite fan-in")
+  end
+end
+
+local production_evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
+local production_evidence = production_evidence_prototype and production_evidence_prototype.data
+local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
+if not production_graph_parity or production_graph_parity.schema ~= 2
+  or production_graph_parity.valid ~= true
+  or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
+  or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
+  or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
+  or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
+  or type(production_graph_parity.proof_fingerprint) ~= "string"
+  or type(production_graph_parity.parity_fingerprint) ~= "string" then
+  fail("emitted and planned technology graphs do not have exact parity evidence")
+end
+compiler_context.with_active(focused_contracts.compilation_context, function()
+  local family_resolution = family_resolver.snapshot()
+  local family_resolution_view = family_resolver.view()
+  if family_resolution_view ~= family_resolver.view()
+    or fingerprint.of(family_resolution_view) ~= fingerprint.of(family_resolution) then
+    fail("family-resolution read-only view changed its context-owned canonical authority")
+  end
+  if family_resolver.decision_set_fingerprint() ~= family_resolution.decision_set_fingerprint then
+    fail("family-resolution scalar identity differs from its canonical snapshot")
+  end
+  local decisions_by_stream = {}
+  for _, decision in ipairs(family_resolution.decisions or {}) do
+    decisions_by_stream[decision.target_stream] = decisions_by_stream[decision.target_stream] or {}
+    table.insert(decisions_by_stream[decision.target_stream], decision)
+  end
+  for stream_key, expected in pairs(decisions_by_stream) do
+    local actual = family_resolver.decisions_for_stream(stream_key)
+    if fingerprint.of(actual) ~= fingerprint.of(expected) then
+      fail("family-resolution query index changed decision ordering for " .. stream_key)
+    end
+    local isolated = family_resolver.decision_fingerprints_for_stream(stream_key)
+    if #isolated > 0 then
+      local original = isolated[1]
+      isolated[1] = "mutated-query-result"
+      if family_resolver.decision_fingerprints_for_stream(stream_key)[1] ~= original then
+        fail("family-resolution query index exposed mutable scalar state for " .. stream_key)
+      end
+    end
+  end
+  local relationship_view = relationships.view("output")
+  if relationship_view ~= relationships.view("output")
+    or fingerprint.of(relationship_view) ~= fingerprint.of(relationships.snapshot("output")) then
+    fail("relationship index view is not stable or snapshot-equivalent")
+  end
+  local recipe_view = recipe_facts.view("iron-plate")
+  if recipe_view and recipe_view ~= recipe_facts.view("iron-plate") then
+    fail("recipe fact view is not stable within one CompilerContext")
+  end
+  local risk_source = recipe_facts.index_view()
+  local permuted_risk_source = {schema = risk_source.schema, facts = risk_source.facts, names = {}}
+  for index = #risk_source.names, 1, -1 do table.insert(permuted_risk_source.names, risk_source.names[index]) end
+  local canonical_risks = recipe_risk_facts.index_facts(risk_source, relationships.view("input"))
+  local permuted_risks = recipe_risk_facts.index_facts(permuted_risk_source, relationships.view("input"))
+  if canonical_risks.risk_index_fingerprint ~= permuted_risks.risk_index_fingerprint then
+    fail("RecipeRiskFact canonicalization depends on prototype insertion order")
+  end
+end)
+local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog-internal"]
+local production_catalog = production_catalog_prototype and production_catalog_prototype.data
+local production_qualifications = production_catalog and production_catalog.qualifications
+local public_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog"]
+local public_catalog = public_catalog_prototype and public_catalog_prototype.data
+local production_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+local production_plan = production_plan_prototype and production_plan_prototype.data
+local public_plan_prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+local public_plan = public_plan_prototype and public_plan_prototype.data
+if not production_catalog or production_catalog.schema ~= 3 or production_catalog.phase ~= "final"
+  or production_catalog.mutation_authority ~= false
+  or not production_qualifications
+  or not production_plan or not public_plan
+  or not production_evidence
+  or type(production_evidence.compiler_input_fingerprint) ~= "string"
+  or type(production_evidence.compiler_result_fingerprint) ~= "string"
+  or production_evidence.technology_catalog_fingerprint ~= production_catalog.catalog_fingerprint
+  or #production_catalog.candidates == 0
+  or #production_catalog.qualifications ~= #production_qualifications
+  or #production_catalog.current_selections ~= #production_plan.rows
+  or #production_catalog.alternative_qualifications < #production_plan.rows then
+  fail("CompilerContext does not own the technology candidate and qualification catalogs")
+end
+if not public_catalog or public_catalog.schema ~= 1
+  or public_catalog.kind ~= "mir-technology-catalog-public"
+  or type(public_catalog.catalog_fingerprint) ~= "string"
+  or type(public_catalog.counts) ~= "table"
+  or type(public_catalog.selected) ~= "table"
+  or type(public_catalog.reason_histogram) ~= "table"
+  or type(public_catalog.provider_summary) ~= "table"
+  or type(public_catalog.samples) ~= "table"
+  or type(public_catalog.truncation) ~= "table"
+  or public_catalog.candidates ~= nil or public_catalog.qualifications ~= nil then
+  fail("normal TechnologyCatalog publication leaked full designs or qualifications")
+end
+if not production_evidence.compiler_result
+  or production_evidence.compiler_result.schema ~= 3
+  or production_evidence.compiler_result.result_phase ~= "final"
+  or production_evidence.compiler_result.dimensions.execution ~= "APPLIED"
+  or not production_evidence.mutation_journal
+  or production_evidence.mutation_journal.complete ~= true
+  or production_evidence.mutation_journal.missing_operation_count ~= 0
+  or production_evidence.mutation_journal.undeclared_operation_count ~= 0 then
+  fail("compiler evidence lacks final APPLIED result and complete plan-bound journal")
+end
+local public_rows = {}
+for _, row in ipairs(public_plan.rows or {}) do public_rows[row.stream_id] = row end
+local skipped_design_count = 0
+for _, row in ipairs(production_plan.rows or {}) do
+  local public_row = public_rows[row.stream_key]
+  if not public_row or type(public_row.decision_fingerprint) ~= "string" then
+    fail("public GenerationPlan row lacks a decision fingerprint")
+  end
+  if row.action == "skip" then
+    skipped_design_count = skipped_design_count + 1
+    if row.technology_design == nil
+      or type(row.technology_design.design_fingerprint) ~= "string"
+      or public_row.subject_fingerprint ~= row.technology_design.subject_fingerprint
+      or public_row.qualification_fingerprint ~= row.technology_design.qualification_fingerprint then
+      fail("skipped GenerationPlan row did not preserve and project its exact TechnologyDesign fingerprints")
+    end
+  elseif not row.technology_design
+    or type(public_row.subject_fingerprint) ~= "string"
+    or type(public_row.qualification_fingerprint) ~= "string" then
+    fail("materializing GenerationPlan row lacks its public design fingerprints")
+  end
+end
+if skipped_design_count == 0 then fail("compiler-contract fixture did not exercise skipped-row design deferral") end
+compiler_context.with_active(focused_contracts.compilation_context, function()
+  local provider_resolution = production_evidence.provider_resolution or {}
+  local canonical_decisions = {}
+  if next(provider_resolution.provider_metrics or {}) == nil then
+    fail("ProviderMetrics authority emitted no provider records")
+  end
+  for provider_id, metrics in pairs(provider_resolution.provider_metrics or {}) do
+    if metrics.record_type ~= "ProviderMetrics" or metrics.provider_id ~= provider_id
+      or type(metrics.provider_version) ~= "string" or type(metrics.family_id) ~= "string"
+      or type(metrics.partition_key) ~= "string" or type(metrics.environment_fingerprint) ~= "string"
+      or type(metrics.metrics.candidate_count.value) ~= "number"
+      or metrics.metrics.candidate_count.measurement_status ~= "COMPLETE"
+      or metrics.metrics.semantic_cluster_count.source ~= "family-operator-partitioner"
+      or type(metrics.metrics.canonical_bytes.value) ~= "number"
+      or (metrics.metrics.provider_phase_time.measurement_status == "COMPLETE"
+        and type(metrics.metrics.provider_phase_time.value) ~= "number")
+      or type(metrics.metrics_fingerprint) ~= "string" then
+      fail("ProviderMetrics did not bind real identifiers, counts, partition, environment, timing, bytes, and provenance")
+    end
+  end
+  for _, row in ipairs(provider_resolution.decisions or {}) do
+    if row.rule == "loader-manufacturing" or row.rule == "mining-drill-manufacturing" then
+      canonical_decisions[row.decision_fingerprint] = row
+    end
+  end
+  local projected_decisions = 0
+  for _, row in ipairs(production_evidence.provider_decision_diagnostics or {}) do
+    if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
+      projected_decisions = projected_decisions + 1
+      local canonical = canonical_decisions[row.decision_fingerprint]
+      if not canonical or row.planner_decision_fingerprint ~= canonical.decision_fingerprint
+        or row.risk_fingerprint ~= canonical.risk_fingerprint then
+        fail("capability diagnostics did not project the exact planner decision and risk fingerprints")
+      end
+    end
+  end
+  local canonical_decision_count = 0
+  for _ in pairs(canonical_decisions) do canonical_decision_count = canonical_decision_count + 1 end
+  if projected_decisions ~= canonical_decision_count then
+    fail("capability diagnostics omitted or duplicated canonical provider decisions")
+  end
+end)
+local first_context = compiler_context.new()
+expect_error("CompilerContext no implicit active instance", "before CompilerContext activation", function()
+  compiler_context.current()
+end)
+first_context:set_state("fixture-derived-state", {value = 1})
+first_context:set_state("fixture-epoch-state", {value = 1})
+local _, epoch = first_context:replace_epoch("fixture-epoch-state", {value = 2}, 1)
+if epoch ~= 2 or first_context:state_view("fixture-epoch-state").value ~= 2 then
+  fail("CompilerContext explicit state epoch replacement is inconsistent")
+end
+expect_error("CompilerContext stale epoch", "epoch mismatch", function()
+  first_context:replace_epoch("fixture-epoch-state", {value = 3}, 1)
+end)
+first_context:freeze_state("fixture-epoch-state")
+expect_error("CompilerContext frozen state", "state is frozen", function()
+  first_context:replace_epoch("fixture-epoch-state", {value = 4}, 2)
+end)
+first_context:record_artifact("fixture-artifact", {value = 2})
+if first_context:artifact_view("fixture-artifact")
+  ~= first_context:artifact_view("fixture-artifact") then
+  fail("CompilerContext artifact view did not preserve the active context-owned identity")
+end
+do
+  local artifact_copy = first_context:artifact("fixture-artifact")
+  artifact_copy.value = 3
+  if first_context:artifact_view("fixture-artifact").value ~= 2 then
+    fail("CompilerContext public artifact copy mutated the context-owned planning view")
+  end
+end
+first_context:record_immutable_artifact("fixture-immutable-artifact", {value = 3}, {
+  assert_trusted = function(value)
+    if type(value) ~= "table" or value.value ~= 3 then
+      error("fixture immutable artifact was not trusted")
+    end
+  end
+})
+expect_error("CompilerContext immutable artifact authority", "requires its private trust authority", function()
+  first_context:record_immutable_artifact("fixture-untrusted-artifact", {}, {})
+end)
+compiler_context.with_active(first_context, function()
+  science_packs.all_lab_inputs()
+  science_packs.pack_production_status("automation-science-pack")
+  science_packs.technology_is_enabled_and_reachable("automation")
+  science_packs.mod_progression_packs_for({"automation-science-pack"})
+  for _, key in ipairs({
+    "lab_input_index", "science_pack_recipe_status", "science_pack_production",
+    "technology_researchability_index", "mod_progression_cache"
+  }) do
+    if not first_context:has_state(key) then fail("science/progression cache was not context-owned: " .. key) end
+  end
+  if not first_context:has_service("science.pack_production_status")
+    or not first_context:has_service("science.technology_researchability_reason") then
+    fail("science dependency callbacks were not CompilerContext-owned services")
+  end
+  expect_error("CompilerContext duplicate service", "registered more than once", function()
+    first_context:set_service("science.pack_production_status", function() return "invalid" end)
+  end)
+  first_context:freeze_services()
+  expect_error("CompilerContext frozen services", "services are frozen", function()
+    first_context:set_service("fixture.late-service", function() return true end)
+  end)
+end)
+local second_context = compiler_context.new()
+compiler_context.with_active(first_context, function()
+  if not compiler_context.is_active(first_context) then fail("CompilerContext A was not active") end
+  compiler_context.with_active(second_context, function()
+    if not compiler_context.is_active(second_context) then fail("nested CompilerContext B was not active") end
+  end)
+  if not compiler_context.is_active(first_context) then fail("nested CompilerContext did not restore A") end
+  expect_error("nested CompilerContext error", "nested-context-fixture", function()
+    compiler_context.with_active(second_context, function() error("nested-context-fixture") end)
+  end)
+  if not compiler_context.is_active(first_context) then fail("failed nested CompilerContext did not restore A") end
+end)
+local packed_returns = table.pack(compiler_context.with_active(first_context, function()
+  return "first", nil, "third", nil
+end))
+if packed_returns.n ~= 4 or packed_returns[1] ~= "first"
+  or packed_returns[2] ~= nil or packed_returns[3] ~= "third" or packed_returns[4] ~= nil then
+  fail("CompilerContext scoped activation did not preserve nil-position multiple returns")
+end
+if compiler_context.is_active(first_context) or compiler_context.is_active(second_context) then
+  fail("CompilerContext A/B/A scope did not restore the empty outer activation")
+end
+if second_context:has_state("fixture-derived-state")
+  or second_context:artifact("fixture-artifact") ~= nil then
+  fail("CompilerContext instances leaked derived state or artifacts")
+end
+for _, key in ipairs({
+  "lab_input_index", "science_pack_recipe_status", "science_pack_production",
+  "technology_researchability_index", "mod_progression_cache"
+}) do
+  if second_context:has_state(key) then fail("science/progression cache crossed CompilerContext boundary: " .. key) end
+end
+local first_snapshot
+compiler_context.with_active(first_context, function()
+  local telemetry_before_snapshot = fingerprint.of(first_context:state_snapshot("compiler_telemetry"))
+  first_snapshot = first_context:snapshot()
+  if telemetry_before_snapshot ~= fingerprint.of(first_context:state_snapshot("compiler_telemetry")) then
+    fail("CompilerContext snapshot mutated live telemetry state")
+  end
+end)
+first_snapshot.state["fixture-derived-state"].value = 99
+first_snapshot.artifacts["fixture-artifact"].value = 99
+first_snapshot.artifacts["fixture-immutable-artifact"].value = 99
+if first_context:state_view("fixture-derived-state").value ~= 1
+  or first_context:artifact("fixture-artifact").value ~= 2
+  or first_context:artifact("fixture-immutable-artifact").value ~= 3 then
+  fail("CompilerContext snapshot did not isolate owned state")
+end

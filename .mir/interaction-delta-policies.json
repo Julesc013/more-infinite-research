@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "mir-narrow-interaction-delta-policies",
+  "policies": [
+    {
+      "policy_id": "space-age-x-big-mining-drill-v1",
+      "capsules": ["big-mining-drill", "space-age"],
+      "shared_footprints": [
+        "prototype_targets:entity:big-mining-drill",
+        "recipe_output_families:mining-drill-manufacturing",
+        "technology_effect_owners:recipe-productivity:mining-drill-manufacturing"
+      ],
+      "delta_actions": ["reuse-structural-family-attachment", "assert-single-effect-owner"],
+      "fixtures": ["fixtures/big-mining-drill", "fixtures/assert-big-mining-drill-productivity"],
+      "scenario": "combination-space-age-big-mining-drill",
+      "copies_full_capsule_policy": false
+    },
+    {
+      "policy_id": "space-age-x-space-age-galore-v1",
+      "capsules": ["space-age", "space-age-galore"],
+      "shared_footprints": [
+        "prototype_targets:recipe:carbon",
+        "prototype_targets:recipe:sulfur",
+        "recipe_output_families:carbon",
+        "recipe_output_families:sulfur",
+        "science_lab_families:space-age-labs",
+        "surface_planet_gates:vulcanus",
+        "technology_effect_owners:recipe-productivity:carbon",
+        "technology_effect_owners:recipe-productivity:sulfur",
+        "technology_prerequisite_components:space-science-progression"
+      ],
+      "delta_actions": ["deterministic-cross-stream-effect-arbitration", "assert-single-effect-owner"],
+      "fixtures": ["fixtures/space-age-galore-overlap"],
+      "scenario": "space-age-galore-effect-ownership",
+      "copies_full_capsule_policy": false
+    }
+  ]
+}

@@ -57,6 +57,8 @@ $policyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
 $contractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
 $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
 $manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
+$continuationManifestPath = Join-Path $repo "prototypes\mir\streams\generated_continuation_manifest.json"
+$baseDefaultsPath = Join-Path $repo "prototypes\mir\settings\defaults.lua"
 $productivityStreamsPath = Join-Path $repo "prototypes\streams\productivity.lua"
 $directEffectStreamsPath = Join-Path $repo "prototypes\streams\direct-effects.lua"
 $claimsPath = Join-Path $repo "fixtures\compat-matrix\claims.json"
@@ -72,6 +74,8 @@ $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
 $productivityStreamsText = Get-Content -Raw -LiteralPath $productivityStreamsPath
 $directEffectStreamsText = Get-Content -Raw -LiteralPath $directEffectStreamsPath
 $manifest = Read-MIRJson -Path $manifestPath
+$continuationManifest = Read-MIRJson -Path $continuationManifestPath
+$baseDefaultsText = Get-Content -Raw -LiteralPath $baseDefaultsPath
 $claims = Read-MIRJson -Path $claimsPath
 $supportLanes = Read-MIRJson -Path $supportLanePath
 $compatibilityManifestText = Get-Content -Raw -LiteralPath $compatibilityManifestPath
@@ -111,6 +115,29 @@ foreach ($streamProperty in @($streams.PSObject.Properties)) {
   if (@(ConvertTo-MIRArray (Get-MIRProperty -Object $stream -Name "targets")).Count -eq 0) {
     throw "Generated stream manifest row $id must list targets."
   }
+}
+
+if ([int](Get-MIRProperty -Object $continuationManifest -Name "schema" -Default 0) -ne 1) {
+  throw "Generated continuation manifest must use schema 1."
+}
+$continuations = Get-MIRProperty -Object $continuationManifest -Name "continuations"
+foreach ($continuationProperty in @($continuations.PSObject.Properties)) {
+  $id = [string]$continuationProperty.Name
+  $continuation = $continuationProperty.Value
+  foreach ($field in @("chain_key", "identity_pattern", "identity_state", "introduced_in", "migration_policy", "stable")) {
+    if ($null -eq (Get-MIRProperty -Object $continuation -Name $field)) {
+      throw "Generated continuation manifest row $id missing required field: $field"
+    }
+  }
+  if ((-not [bool](Get-MIRProperty -Object $continuation -Name "stable")) -or
+    ([string](Get-MIRProperty -Object $continuation -Name "identity_state") -ne "released") -or
+    ([string](Get-MIRProperty -Object $continuation -Name "migration_policy") -ne "stable")) {
+    throw "Generated continuation manifest row $id lacks released stable identity authority."
+  }
+  $chainKey = [string](Get-MIRProperty -Object $continuation -Name "chain_key")
+  Assert-MIRTextContains -Text $baseDefaultsText -Snippet ('["' + $chainKey + '"]') -Context "base continuation defaults"
+  Assert-MIRTextContains -Text $baseDefaultsText -Snippet ('manifest_id = "' + $id + '"') -Context "base continuation defaults"
+  Assert-MIRTextContains -Text $streamsManifestText -Snippet ("    ${id}:") -Context ".mir continuation manifest"
 }
 
 if ([int](Get-MIRProperty -Object $claims -Name "schema" -Default 0) -ne 1) {
@@ -165,8 +192,10 @@ foreach ($streamKey in $sourceStreamKeys) {
   }
 }
 
+$streamRecordsBlock = [regex]::Match($streamsManifestText, "(?ms)^streams:\s*\r?\n\s{2}records:\s*\r?\n(?<body>.*)$")
+if (-not $streamRecordsBlock.Success) { throw ".mir/streams.yml must declare streams.records." }
 $mirStreamIds = @(
-  [regex]::Matches($streamsManifestText, "(?m)^\s{4}([A-Za-z0-9._-]+):\s*$") |
+  [regex]::Matches($streamRecordsBlock.Groups["body"].Value, "(?m)^\s{4}([A-Za-z0-9._-]+):\s*$") |
     ForEach-Object { $_.Groups[1].Value }
 )
 foreach ($streamId in $mirStreamIds) {

@@ -6,7 +6,7 @@
   "description": "Validates deterministic science unlock inference and generated technology graph reachability.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.0.77",
     "more-infinite-research"
   ]
 }

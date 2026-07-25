@@ -1,4 +1,5 @@
 $script:MIRAssuranceDomainManifestCache = @{}
+$script:MIRAssuranceFixturePathIndex = $null
 
 function Get-MIRAssuranceVerificationProfilePath {
   param([Parameter(Mandatory)][string]$Target)
@@ -82,7 +83,7 @@ function Get-MIRAssuranceDomainManifest {
     $item = Get-Item -LiteralPath $Context.candidate
     "$($item.FullName)|$($item.Length)|$($item.LastWriteTimeUtc.Ticks)"
   } else {
-    "source|$(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))"
+    "source|$(Get-MIRAssurancePackageSourceHash)"
   }
   if ($script:MIRAssuranceDomainManifestCache.ContainsKey($candidateIdentity)) {
     return $script:MIRAssuranceDomainManifestCache[$candidateIdentity]
@@ -97,7 +98,7 @@ function Get-MIRAssuranceDomainManifest {
     state=if ($candidateExists) { "present" } else { "source-fallback" }
     path=if ($candidateExists) { Get-MIRAssuranceRepoRelativePath -Path $Context.candidate } else { "" }
     sha256=if ($candidateExists) { Get-MIRAssuranceSha256 -Path $Context.candidate } else { "" }
-    content_sha256=if ($candidateExists) { Get-MIRAssuranceZipContentHash -Path $Context.candidate } else { Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles) }
+    content_sha256=if ($candidateExists) { Get-MIRAssuranceZipContentHash -Path $Context.candidate } else { Get-MIRAssurancePackageSourceHash }
   }
 
   if ($candidateExists) {
@@ -215,11 +216,47 @@ function Get-MIRAssuranceScenarioRecordFingerprint {
   }
 }
 
+function Get-MIRAssuranceFixturePathByModId {
+  param([Parameter(Mandatory)][string]$ModId)
+
+  if ($null -eq $script:MIRAssuranceFixturePathIndex) {
+    $index = @{}
+    $fixtureRoot = Join-Path $repo "fixtures"
+    foreach ($infoFile in @(Get-ChildItem -LiteralPath $fixtureRoot -Filter "info.json" -File -Recurse | Sort-Object FullName)) {
+      try {
+        $info = Get-Content -Raw -LiteralPath $infoFile.FullName | ConvertFrom-Json
+      } catch {
+        throw "Fixture metadata is not valid JSON: $($infoFile.FullName)"
+      }
+      $fixtureModId = [string]$info.name
+      if ([string]::IsNullOrWhiteSpace($fixtureModId)) {
+        throw "Fixture metadata is missing its mod name: $($infoFile.FullName)"
+      }
+      $relativePath = Get-MIRAssuranceRepoRelativePath -Path $infoFile.Directory.FullName
+      if (-not $index.ContainsKey($fixtureModId)) {
+        $index[$fixtureModId] = @()
+      }
+      $index[$fixtureModId] = @($index[$fixtureModId]) + $relativePath
+    }
+    $script:MIRAssuranceFixturePathIndex = $index
+  }
+
+  if (-not $script:MIRAssuranceFixturePathIndex.ContainsKey($ModId)) {
+    throw "Scenario fixture mod ID '$ModId' does not resolve to a repository-owned fixture directory."
+  }
+  $matches = @($script:MIRAssuranceFixturePathIndex[$ModId] | Sort-Object -Unique)
+  if ($matches.Count -ne 1) {
+    throw "Scenario fixture mod ID '$ModId' is ambiguous across repository fixture directories: $($matches -join ', ')."
+  }
+  return [string]$matches[0]
+}
+
 function Get-MIRAssuranceScenarioFixtureFingerprint {
   param([Parameter(Mandatory)]$Test)
   $patterns = @(".mir/fixtures.yml")
   foreach ($fixture in @($Test.scenario.fixtures)) {
-    $patterns += "fixtures/$([string]$fixture)/**"
+    $fixturePath = Get-MIRAssuranceFixturePathByModId -ModId ([string]$fixture)
+    $patterns += "$fixturePath/**"
   }
   if ([string]$Test.scenario.group -eq "local-mod-library") {
     $patterns += @(

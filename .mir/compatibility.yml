@@ -11,6 +11,61 @@ compatibility_packs:
   registry: prototypes/mir/compatibility/packs/registry.lua
   external_transport: more-infinite-research-compatibility-pack
   fixture_only_profiles_allowed_in_production_registry: false
+  applicability:
+    any_field: mods_any
+    all_field: mods_all
+    none_field: mods_none
+    legacy_any_field: mods
+    version_constraints: comma-separated-comparators
+  production_consumers:
+    - exact-includes-excludes
+    - aliases
+    - family-hints
+    - science-roles
+    - owner-claims
+    - reviewed-risk-overrides
+    - exact-family-generation-authorizations
+    - exact-candidate-seeds
+    - deterministic-precedence
+  hard_safety:
+    compatibility_pack_overridable: false
+    reviewable_signals_require_exact_recipe_version_and_fixture: true
+  exact_pack:
+    unrelated_active_pack_enables_generation: false
+    authorization_query: compatibility_packs.authorizes_family_stream
+    baseline: safe-attachment
+
+generated_policy_authority:
+  schema: 1
+  implementation: prototypes/mir/compatibility/policy_authority.lua
+  context_state: compatibility_policy_authority
+  sources:
+    - prototypes/mir/compatibility/overlay_loader.lua
+    - prototypes/mir/compatibility/packs/registry.lua
+    - prototypes/mir/compatibility/claim_registry.lua
+  reviewed_corpus: .mir/technology-review-corpus.json
+  planning_consumers:
+    - prototypes/mir/families/resolver.lua
+    - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/capabilities/science_integration/science_selector.lua
+    - prototypes/mir/compatibility/profiles.lua
+  rules:
+    - only this facade composes overlays active packs claims and their policy fingerprint
+    - hard prototype safety remains non-overridable
+    - public claims remain separately governed and evidence-bound
+
+mod_interactions:
+  policy: .mir/mod-interaction-policy.json
+  support_capsules: .mir/compatibility-capsules.json
+  generated_graph: .mir/mod-interaction-graph.json
+  narrow_delta_policies: .mir/interaction-delta-policies.json
+  campaigns: .mir/combination-campaigns.json
+  generator: scripts/New-MIRModInteractionGraph.ps1
+  validator: scripts/Test-MIRModInteractions.ps1
+  rules:
+    - single-mod qualification never proves a combination
+    - independent pairs require composition smoke evidence
+    - overlapping pairs require a narrow pair delta and targeted campaign evidence
 
 technology_prerequisite_cycle_repairs:
   - id: muluna-astroponics-space-science-cycle
@@ -24,8 +79,28 @@ technology_prerequisite_cycle_repairs:
     claim_level: diagnostic-only
     public_scope: bounded startup-cycle interoperability repair only
 
+load_order_requirements:
+  - id: space-exploration-finalized-recipe-set
+    mod: space-exploration
+    dependency: "(?) space-exploration"
+    reason: Space Exploration removes recipes during data-final-fixes, so MIR must compile after those removals
+    fixture: fixtures/space-exploration-recipe-removal
+    assertion_fixture: fixtures/assert-final-recipe-effect-integrity
+    reproduced_recipe: kr-copper-cable-from-copper-ore
+    integrity_contract: target-aware-generated-and-external-technology-effect-sanitation
+    claim_level: diagnostic-only
+    public_scope: startup integrity only; no broad Space Exploration support claim
+
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1
+  sanitation_budget:
+    authority: .mir/sanitation-budgets.json
+    policy: mir-ecosystem-sanitation-budget-v1
+    scopes:
+      manifest_scenarios: campaigns
+      release_targeted_repair_smokes: local_mod_zips
+    maximum_unreviewed_external_prunes: 0
+    mismatch_disposition: REVIEW_REQUIRED
   exact_mir_archive_sha256_required: true
   exact_mir_source_commit_required: true
   dependency_lock_sha256_required: true
@@ -34,8 +109,37 @@ campaigns:
   resolved_archive_sha256_required: true
   result_and_claim_level_required: true
   mega_smash_qualifies_individual_ecosystems: false
-  current_load_evidence:
-    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
+  pre_renumber_load_characterization:
+    - .mir/evidence/pre-3.1-renumber-bz-bob-load-campaign-summary.json
+    - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
+    - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
+  final_3_1_0_load_evidence:
+    available_ecosystems: .mir/evidence/3.1.0-rc5-ecosystem-campaign.json
+    status: 9-passed-load-claims-including-planet-cluster
+    current_archive_status: passed
+    source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
+    archive_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
+    dependency_lock_sha256: 225E28FB37626A52AC224B5A1275B01AC7C2101C3A806984208646B00E143AC4
+    missing_dependency_closures:
+      - angels
+      - space-exploration
+      - pyanodon
+    missing_dependency_evidence: .mir/evidence/3.1.0-rc4-missing-overhaul-closures.json
+  development_3_2_0_qualification:
+    summary: .mir/evidence/3.2.0-ecosystem-qualification-summary.json
+    status: superseded-development-qualification
+    source_commit: 565e68398315762af653daf2ed6c1d40b93a4136
+    archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
+    passed_load_claims: 7
+    campaign_evidence:
+      - .mir/evidence/3.2.0-ecosystem-qualification/available-closures/campaign-evidence.json
+      - .mir/evidence/3.2.0-ecosystem-qualification/krastorio-spaced-out/campaign-evidence.json
+      - .mir/evidence/3.2.0-ecosystem-qualification/pymodpack/campaign-evidence.json
+    blocked_missing_dependency_closures:
+      - pyanodon
+      - space-exploration
+    replacement_candidate_status: unqualified
+    claim_boundary: exact-archive-load-claims-only-not-release-qualification
 
 claims:
   allowed_levels:
@@ -46,6 +150,10 @@ claims:
     - partial-support
     - full-family-support
     - full-pack-support
+  dimensions:
+    maturity: [unverified, observed, load-checked, fixture-qualified, release-qualified]
+    behavior: [diagnostic, coexistence, generated, repaired]
+    scope: [single-observation, named-behavior, partial-family, family, pack]
 
 targets:
   docs_root: docs/compatibility/targets
@@ -54,6 +162,9 @@ targets:
       mod: atan-air-scrubbing
       doc: docs/compatibility/targets/atan-air-scrubbing.md
       claim_level: full-family-support
+      maturity: fixture-qualified
+      behavior: generated
+      scope: family
       public_claim: clean-filter crafting productivity only
       fixtures:
         - fixtures/air-scrubbing
@@ -71,6 +182,9 @@ targets:
       mod: atan-ash
       doc: docs/compatibility/targets/atan-ash.md
       claim_level: full-family-support
+      maturity: fixture-qualified
+      behavior: generated
+      scope: family
       public_claim: ash separation productivity only
       fixtures:
         - fixtures/atan-ash
@@ -90,6 +204,9 @@ targets:
       mod: atan-nuclear-science
       doc: docs/compatibility/targets/atan-nuclear-science.md
       claim_level: partial-support
+      maturity: fixture-qualified
+      behavior: generated
+      scope: partial-family
       public_claim: science-pack recipe productivity only
       fixtures:
         - fixtures/atan-nuclear-science
@@ -105,6 +222,9 @@ targets:
       mod: aai-loaders
       doc: docs/compatibility/targets/aai-loaders.md
       claim_level: partial-support
+      maturity: fixture-qualified
+      behavior: generated
+      scope: partial-family
       public_claim: loader crafting productivity only
       fixtures:
         - fixtures/aai-loaders
@@ -120,6 +240,9 @@ targets:
       mod: big-mining-drill
       doc: docs/compatibility/targets/big-mining-drill.md
       claim_level: partial-support
+      maturity: fixture-qualified
+      behavior: generated
+      scope: partial-family
       public_claim: mining drill recipe productivity only
       fixtures:
         - fixtures/big-mining-drill
@@ -133,6 +256,9 @@ targets:
       mod: modules-t4
       doc: docs/compatibility/targets/modules-t4.md
       claim_level: partial-support
+      maturity: load-checked
+      behavior: generated
+      scope: partial-family
       public_claim: module recipe productivity by final prototype tier
       fixtures:
         - fixtures/assert-prototype-limits
@@ -148,6 +274,9 @@ targets:
       mod: finite_prod_techs
       doc: docs/compatibility/targets/finite-prod-techs.md
       claim_level: cooperates
+      maturity: load-checked
+      behavior: coexistence
+      scope: named-behavior
       public_claim: load-after finite productivity cap post-processing
       named_load_checks:
         - finite_prod_techs_0.1.1 source archive on Factorio 2.1.9
@@ -159,6 +288,9 @@ targets:
       mod: FluidMustFlow
       doc: docs/compatibility/targets/fluid-must-flow.md
       claim_level: diagnostic-only
+      maturity: load-checked
+      behavior: diagnostic
+      scope: named-behavior
       public_claim: pipeline coexistence only
       named_load_checks:
         - release-targeted local repair check
@@ -171,6 +303,9 @@ targets:
       mod: robot_attrition
       doc: docs/compatibility/targets/robot-attrition.md
       claim_level: diagnostic-only
+      maturity: load-checked
+      behavior: coexistence
+      scope: named-behavior
       public_claim: runtime balance coexistence only
       named_load_checks:
         - release-targeted local repair check
@@ -184,6 +319,9 @@ targets:
       mod: jetpack
       doc: docs/compatibility/targets/jetpack.md
       claim_level: diagnostic-only
+      maturity: load-checked
+      behavior: coexistence
+      scope: named-behavior
       public_claim: equipment content coexistence only
       named_load_checks:
         - release-targeted local repair check
@@ -197,6 +335,9 @@ targets:
       mod: equipment-gantry
       doc: docs/compatibility/targets/equipment-gantry.md
       claim_level: diagnostic-only
+      maturity: load-checked
+      behavior: coexistence
+      scope: named-behavior
       public_claim: equipment-grid automation coexistence only
       named_load_checks:
         - release-targeted local repair check
@@ -210,6 +351,9 @@ targets:
       mod: aai-containers
       doc: docs/compatibility/targets/aai-containers.md
       claim_level: diagnostic-only
+      maturity: load-checked
+      behavior: coexistence
+      scope: named-behavior
       public_claim: storage content coexistence only
       named_load_checks:
         - release-targeted local repair check
@@ -222,6 +366,9 @@ targets:
       mod: aai-industry
       doc: docs/compatibility/targets/aai-industry.md
       claim_level: observed
+      maturity: observed
+      behavior: diagnostic
+      scope: single-observation
       public_claim: mini-overhaul tuning profile
       named_load_checks:
         - release-targeted local repair check
@@ -229,19 +376,8 @@ targets:
       diagnostic_only:
         - broad-aai-suite-support
 
-load_order_requirements:
-  - id: space-exploration-finalized-recipe-set
-    mod: space-exploration
-    dependency: "(?) space-exploration"
-    reason: Space Exploration removes recipes during data-final-fixes, so MIR must compile after those removals
-    fixture: fixtures/space-exploration-recipe-removal
-    assertion_fixture: fixtures/assert-final-recipe-effect-integrity
-    reproduced_recipe: kr-copper-cable-from-copper-ore
-    integrity_contract: target-aware-generated-and-external-technology-effect-sanitation
-    claim_level: diagnostic-only
-    public_scope: startup integrity only; no broad Space Exploration support claim
-
 rules:
+  - every target declares compatibility maturity behavior and scope independently
   - every public compatibility claim has a compatibility page
   - every generated stream in a claim exists in the stream manifest
   - full-family support requires fixture evidence

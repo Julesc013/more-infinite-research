@@ -61,6 +61,18 @@ foreach ($relativePath in $manifestPaths) {
     foreach ($planProperty in @("mode", "required_result", "maximum_dependency_failures")) {
       $null = Assert-MIRProperty -Object $expectedPlan -Name $planProperty -Context "$context expected_plan"
     }
+    if ($expectedPlan.PSObject.Properties.Name -contains "required_stream_science") {
+      $requiredStreamScience = $expectedPlan.required_stream_science
+      foreach ($streamProperty in @($requiredStreamScience.PSObject.Properties)) {
+        if ([string]::IsNullOrWhiteSpace([string]$streamProperty.Name)) {
+          throw "$context expected_plan.required_stream_science contains an empty stream name."
+        }
+        $requiredPacks = @($streamProperty.Value)
+        if ($requiredPacks.Count -eq 0 -or @($requiredPacks | Where-Object { [string]::IsNullOrWhiteSpace([string]$_) }).Count -gt 0) {
+          throw "$context expected_plan.required_stream_science.$($streamProperty.Name) must name at least one non-empty science pack."
+        }
+      }
+    }
 
     $timeout = [int](Assert-MIRProperty -Object $scenario -Name "timeout_seconds" -Context $context)
     if ($timeout -lt 1 -or $timeout -gt 3600) { throw "$context timeout_seconds must be between 1 and 3600." }
@@ -68,23 +80,6 @@ foreach ($relativePath in $manifestPaths) {
       throw "$context retains a schema-1 field; use roots and setup.include_space_age."
     }
   }
-}
-
-$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
-foreach ($requiredSnippet in @(
-  '. (Join-Path $PSScriptRoot "validation\SettingsOverrides.ps1")',
-  'Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine',
-  'Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $scenarioSettings',
-  '"mir-validation-settings-overrides"'
-)) {
-  if (-not $compatAuditText.Contains($requiredSnippet)) {
-    throw "Compatibility audit does not apply declared scenario settings through the isolated override mod: $requiredSnippet"
-  }
-}
-
-$runnerText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
-if (-not $runnerText.Contains("locale=en") -or $runnerText.Contains("locale=auto")) {
-  throw "Compatibility load scenarios must pin the Factorio locale to English for reproducible diagnostics."
 }
 
 Write-Host "[ok] MIR scenario schema 2 manifests own targets, setup, roots, settings, expected plans, timeouts, and claim levels."

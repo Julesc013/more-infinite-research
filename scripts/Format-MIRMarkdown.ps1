@@ -138,7 +138,12 @@ if ($Paths.Count -eq 0) {
     Get-ChildItem -LiteralPath (Join-Path $repo "docs") -Recurse -File -Filter "*.md" |
       ForEach-Object { [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") }
   )
-  $Paths = @($trackedMarkdown + $docsMarkdown | Sort-Object -Unique)
+  $Paths = @(
+    $trackedMarkdown + $docsMarkdown |
+      Where-Object { $_ -notmatch '^\.mir/target-lines/' } |
+      Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) -PathType Leaf } |
+      Sort-Object -Unique
+  )
 }
 
 $changed = [System.Collections.Generic.List[string]]::new()

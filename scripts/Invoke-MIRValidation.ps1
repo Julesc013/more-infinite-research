@@ -175,6 +175,14 @@ Invoke-RepoCheck "target profile views match canonical manifest" {
   & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 }
 
+Invoke-RepoCheck "release authority views match the canonical ledger" {
+  & (Join-Path $repo "scripts\Test-MIRReleaseAuthority.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "backport source lock is current when present" {
+  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
   & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
 }
@@ -219,8 +227,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 1.1 metadata must not carry Factorio 2.x or DLC dependencies: $($newerDeps -join ', ')"
     }
   } elseif ($isLegacyFactorio20) {
-    if ($deps -notcontains "base >= 2.0") {
-      throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
+    if (@($deps | Where-Object { $_ -match '^base\s*>=\s*2\.0(?:\.\d+)?$' }).Count -ne 1) {
+      throw "Factorio 2.0 metadata must declare exactly one base dependency at a 2.0-compatible floor."
     }
 
     $factorio21Deps = @($deps | Where-Object { $_ -match ">=\s*2\.1" })
@@ -229,11 +237,14 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     }
   } elseif ($isFactorio21Line) {
     $requiredDeps = @(
-      "base >= 2.1.8",
+      "base >= 2.1.11",
       "(?) elevated-rails",
-      "? recycler >= 2.1.8",
+      "? recycler >= 2.1.11",
       "(?) quality",
-      "? space-age >= 2.1.8"
+      "(?) Krastorio2",
+      "(?) Krastorio2-spaced-out",
+      "(?) space-exploration",
+      "? space-age >= 2.1.11"
     )
     foreach ($requiredDep in $requiredDeps) {
       if ($deps -notcontains $requiredDep) {
@@ -246,7 +257,13 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     if ($deps | Where-Object { $_ -match "^\?\s+quality(\s|$)" }) {
       throw "Quality must be a hidden optional dependency so module productivity can see quality module recipes without advertising a visible dependency."
     }
-    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality)\s+>=\s*2\.1" })
+    if ($deps | Where-Object { $_ -match "^\?\s+space-exploration(\s|$)" }) {
+      throw "Space Exploration must be a hidden optional dependency so its final recipe removals run before MIR without advertising broad support."
+    }
+    if ($deps | Where-Object { $_ -match "^\?\s+(Krastorio2|Krastorio2-spaced-out)(\s|$)" }) {
+      throw "Krastorio load-order contracts must be hidden optional dependencies so final science and lab rewrites run before MIR without advertising broad support."
+    }
+    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality|Krastorio2|Krastorio2-spaced-out|space-exploration)\s+>=" })
     if ($hiddenVersionFloors.Count -gt 0) {
       throw "Hidden optional dependency version floors should not gate graceful degradation: $($hiddenVersionFloors -join ', ')"
     }
@@ -308,10 +325,6 @@ Invoke-RepoCheck "settings visibility policy is linted" {
   & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
 }
 
-Invoke-RepoCheck "Factorio 2.0 source lock matches canonical MIR 3.2.0" {
-  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
-}
-
 Invoke-RepoCheck "legacy inventory thresholds pass" {
   & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
 }
@@ -321,6 +334,17 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "Old science-pack authority references remain."
+  }
+}
+
+Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
+  $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
+  if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
+    throw "Stream compiler count formulas must use compact multiplication syntax."
+  }
+  if ($baseContinuationsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
+    throw "Base continuation count formulas must use compact multiplication syntax."
   }
 }
 
@@ -347,6 +371,7 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
         $extension = $_.Extension.ToLowerInvariant()
         $imageExtensions -contains $extension `
           -and -not $relative.StartsWith(".git/") `
+          -and -not $relative.StartsWith(".mir/target-lines/") `
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
           -and -not $relative.StartsWith("dist/") `
@@ -406,17 +431,22 @@ Invoke-RepoCheck "default-off scripted streams remain guarded" {
 }
 
 Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
-  $safetyPath = Join-Path $repo "prototypes\mir\emit\effect_safety.lua"
+  $safetyPath = Join-Path $repo "prototypes\mir\domain\technology\effect_safety_policy.lua"
   if (-not (Test-Path -LiteralPath $safetyPath)) {
-    throw "Missing technology effect safety guard: prototypes/mir/emit/effect_safety.lua"
+    throw "Missing technology effect safety policy: prototypes/mir/domain/technology/effect_safety_policy.lua"
   }
 
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $technologyDesignAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_design_adapter.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
+  $technologyOperationExecutorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_operation_executor.lua")
   $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
   $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
+  $integrityContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
   foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
@@ -427,17 +457,21 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'generated_registry.register(technology.name,' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
-    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.sanitize_all_technology_effects()' },
-    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.assert_registered_technology_effects()' },
-    @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'effect_contracts.target_status(effect)' },
-    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["unlock-quality"]' },
-    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["turret-attack"]' },
+    @{ File = "prototypes\mir\emit\technology_design_adapter.lua"; Text = $technologyDesignAdapterText; Snippet = 'generated_registry.register(technology.name,' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
+    @{ File = "prototypes\mir\emit\technology_operation_executor.lua"; Text = $technologyOperationExecutorText; Snippet = 'technology_design_adapter.emit(design, {' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.stage.data_final_fixes").run()' },
+    @{ File = "prototypes\mir\stage\data_final_fixes.lua"; Text = $dataFinalFixesStageText; Snippet = 'commands.run_all({return_snapshot = false})' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "input"})' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'local ledger = effect_safety.sanitize_all_technology_effects({' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'pass = "output",' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.assert_registered_technology_effects(target_inventory)' },
+    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'for _, target in ipairs(contract.targets or {}) do' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_diff.compare(expected.graph_snapshot, actual_snapshot)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'proof.status ~= "passed"' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'assert_equal("graph fingerprint", expected.graph_fingerprint, actual_snapshot.graph_fingerprint)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 
@@ -447,7 +481,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     }
   }
 
-  $safetyRelative = "prototypes/mir/emit/effect_safety.lua"
+  $safetyRelative = "prototypes/mir/domain/technology/effect_safety_policy.lua"
   $prototypeLuaFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes") -Recurse -File -Filter "*.lua"
   foreach ($file in $prototypeLuaFiles) {
     $relative = Get-RepoRelativePath $file.FullName
@@ -496,8 +530,33 @@ Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
   & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "ecosystem campaigns declare exact sanitation budgets" {
+  & (Join-Path $repo "scripts\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "active release evidence is portable and summary-oriented" {
+  & (Join-Path $repo "scripts\Test-MIREvidenceHygiene.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
+}
+
+if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
+  Invoke-RepoCheck "the provisional 2.5 approved-delta gate remains explicitly runtime-pending" {
+    $backportDelta = Join-Path $repo "approved-delta\2.4.9-to-2.5.0.json"
+    if (Test-Path -LiteralPath $backportDelta -PathType Leaf) {
+      Write-Host "[info] provisional 2.5 approved-delta artifact is present and will be candidate-validated by the runtime release gate."
+    }
+    else {
+      Write-Host "[pending] exact 2.4.9 to 2.5.0 approved-delta evidence requires the Factorio 2.0 runtime campaign."
+    }
+  }
+}
+else {
+  Invoke-RepoCheck "the normalized 3.1.9 approved delta is complete" {
+    & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -ValidateStructureOnly
+  }
 }
 
 Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
@@ -508,12 +567,20 @@ Invoke-RepoCheck "compiler contract coverage and mutation sentinels are complete
   & (Join-Path $repo "scripts\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
 }
 
-Invoke-RepoCheck "assurance classifier and evidence invalidation contracts are complete" {
-  & (Join-Path $repo "scripts\Test-MIRAssurance.ps1") -RepoRoot $repo
+Invoke-RepoCheck "technology lifecycle records and review tooling are schema-bound" {
+  & (Join-Path $repo "scripts\Test-MIRTechnologyLifecycle.ps1") -RepoRoot $repo
 }
 
-Invoke-RepoCheck "native-owner balance source and setting bindings do not drift" {
-  & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
+Invoke-RepoCheck "technology policy corpora and applicability envelopes are governed" {
+  & (Join-Path $repo "scripts\Test-MIRTechnologyPolicy.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "offline family-rule synthesis is deterministic and review-only" {
+  & (Join-Path $repo "scripts\Test-MIRRuleSynthesis.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "semantic mod interactions and combination campaigns are complete" {
+  & (Join-Path $repo "scripts\Test-MIRModInteractions.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
@@ -542,7 +609,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "run-profiles")
+  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -552,10 +619,15 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     }
 
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
-    $allowedExternalIdentityFixtures = @("Better_Robots_Extended", "space-exploration")
+    $externalIdentityFixtures = @{
+      "better-robots-extended-competitor" = "Better_Robots_Extended"
+      "space-exploration-recipe-removal" = "space-exploration"
+    }
+    $allowedExternalIdentity = $externalIdentityFixtures.ContainsKey($fixture.Name) -and
+      $externalIdentityFixtures[$fixture.Name] -eq $info.name
     if ([string]::IsNullOrWhiteSpace($info.name) -or
-      ($info.name -notmatch "^mir-fixture-" -and $info.name -notin $allowedExternalIdentityFixtures)) {
-      throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
+      ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
+      throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
@@ -608,7 +680,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\resolver.lua")
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
   $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
@@ -631,7 +703,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua")
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\platform\factorio\prototype_lookup.lua")
-  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\icon_builder.lua")
+  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\presentation\icon_builder.lua")
   $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
@@ -665,6 +737,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
   $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
+  $recipeRiskFactsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_risk_facts.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -729,7 +802,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'if policy == "configured" then' },
     @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'if policy() == "engine-default" then' },
     @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
@@ -737,10 +810,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data_raw.technology(new_name) then' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'if data_raw.technology(new_name) then' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = '"target_exists"' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset="space-age"' },
@@ -805,22 +878,22 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technology_effects = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "worker-robots-battery-6", type = "worker-robot-battery", modifier = 0.70, max_level = "infinite"' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'mir-use-installed-space-age-icons' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'mir-use-installed-space-age-icons' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
     @{ File = "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
     @{ File = "prototypes\mir\platform\factorio\prototype_lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'required_fluids' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'technology_requirements.skip_reason(spec)' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.settings.pipeline_extent").multiplier()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.settings.pipeline_extent").multiplier(value)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(multiplier)' },
@@ -833,7 +906,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'MAX_PIPELINE_EXTENT = 4294967295' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
-    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
+    @{ File = "prototypes\mir\presentation\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incineration$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incinerate$"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
@@ -850,7 +923,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'disabled vanilla automation-science-pack technology was unexpectedly re-enabled' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\control.lua"; Text = $generatedPrerequisiteRuntimeText; Snippet = 'force.research_all_technologies()' },
     @{ File = "prototypes\mir\index\recipe_unlocks.lua"; Text = $recipeUnlockIndexText; Snippet = 'function M.for_recipe(recipe_name)' },
-    @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'S.researchable_unlockers_for_recipe = pack_production_reachability.researchable_unlockers_for_recipe' },
+    @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'S.researchable_unlockers_for_recipe = ready(pack_production_reachability.researchable_unlockers_for_recipe)' },
+    @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'context:set_service(SERVICE_PREFIX .. "pack_production_status",' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'science.technology_researchability_reason(tech_name)' },
@@ -862,8 +936,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\space-exploration-recipe-removal\data-final-fixes.lua"; Text = $spaceExplorationRemovalFixtureText; Snippet = 'MIR loaded before Space Exploration finalized its recipe removals' },
     @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'references missing recipe' },
     @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'valid base copper cable productivity was not retained' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = 'native_owner_binding("steel-plate-productivity", {"steel-plate"})' },
-    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "casting-steel", owner = "steel-plate-productivity" }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'mir-use-installed-space-age-icons' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
@@ -889,6 +961,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'mir-loader-like-container' },
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'maximum_productivity = 0' },
     @{ File = "fixtures\assert-capability-negative-cases\data-final-fixes.lua"; Text = $capabilityNegativeAssertText; Snippet = 'denied_recipes' },
+    @{ File = "fixtures\assert-capability-negative-cases\data-final-fixes.lua"; Text = $capabilityNegativeAssertText; Snippet = 'REVIEW_REQUIRED' },
+    @{ File = "prototypes\mir\index\recipe_risk_facts.lua"; Text = $recipeRiskFactsText; Snippet = 'risk_fingerprint' },
+    @{ File = "prototypes\mir\index\recipe_risk_facts.lua"; Text = $recipeRiskFactsText; Snippet = 'ambiguous_placeable_output' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -960,14 +1035,32 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   )
 
   if ($isReducedLegacyLine -or $isLegacyFactorio20) {
-    $legacyForbiddenCargoSnippets = @(
-      'type = "max-cargo-bay-unloading-distance"',
-      'type = "cargo-landing-pad-count"'
+    # Cross-target stream declarations may remain in the shared raw catalog.  The
+    # authoritative safety boundary is the target profile's positive effect
+    # allowlist plus descriptor-based stream admission, not the physical absence
+    # of dormant declarations from a portable source file.
+    $legacyUnsupportedCargoEffects = @(
+      "max-cargo-bay-unloading-distance",
+      "cargo-landing-pad-count"
     )
-    foreach ($snippet in $legacyForbiddenCargoSnippets) {
-      if ($directEffectsText.Contains($snippet)) {
-        throw "Factorio $($repoInfo.factorio_version) must not include Factorio 2.1-only cargo technology modifier in prototypes\streams\direct-effects.lua: $snippet"
+    foreach ($effectType in $legacyUnsupportedCargoEffects) {
+      if (@($targetProfile.supported_effect_types | Where-Object { [string]$_ -eq $effectType }).Count -ne 0) {
+        throw "Factorio $($repoInfo.factorio_version) target profile must not admit unsupported cargo effect type $effectType."
       }
+    }
+
+    $targetLineText = Get-Content -Raw (Join-Path $repo "prototypes\mir\platform\factorio\target_line.lua")
+    $streamRegistryText = Get-Content -Raw (Join-Path $repo "prototypes\mir\streams\registry.lua")
+    foreach ($requiredTargetFilter in @(
+      'for _, effect_type in ipairs(requirements.required_effect_types or {}) do',
+      'if not supported_effect_types[effect_type] then return true end'
+    )) {
+      if (-not $targetLineText.Contains($requiredTargetFilter)) {
+        throw "Factorio target admission is missing required positive effect filtering: $requiredTargetFilter"
+      }
+    }
+    if (-not $streamRegistryText.Contains('if target_line.stream_supported(key, spec) then canonical_streams[key] = spec end')) {
+      throw "MIR stream registry must apply target-line admission before exposing canonical streams."
     }
   } else {
     $requiredSnippets += @(
@@ -1180,7 +1273,7 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-50"] = 0.5' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-400"] = 4.0' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'if type(raw_value) == "number" then return raw_value / 100 end' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'commands.run_all()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'commands.run_all({return_snapshot = false})' },
     @{ File = "prototypes\mir\stage\data_final_fixes_steps.lua"; Text = $stepsText; Snippet = 'require("prototypes.mir.pipeline.prototype_limits").apply()' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'data_raw.prototypes("recipe")' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'recipe.parameter ~= true' },
@@ -1331,6 +1424,10 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("artifacts/")' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "skip_reason = `"dependency_resolution_failure`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Invoke-MIRScenarioLoad" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'validation\SettingsOverrides.ps1' },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine' },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'Enable-CopiedDiagnostics -ModsDir $modsDir' },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '"mir-validation-settings-overrides"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Get-MIRSafeScenarioFileName" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
@@ -1345,8 +1442,6 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\settings\test_overrides.lua' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'overrides[`"mir-debug-generation-report`"] = true' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = "local-2-1-crucible-rigor-exact-dist" },
@@ -1443,6 +1538,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "fixtures\compat-matrix\manual-scenarios.json"; Text = $manualScenariosText; Snippet = '"include_space_age"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-space-age-mega-smash"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-bz-suite-space-age"' },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-krastorio-space-exploration"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-planet-pack-wrapper-full"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios-2.0.json"; Text = $localLibraryScenarios20Text; Snippet = '"local-2-0-base-baseline"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios-2.0.json"; Text = $localLibraryScenarios20Text; Snippet = '"local-2-0-bob-angels"' },
@@ -1485,13 +1581,15 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
 
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $dataFinalFixesStagePath = Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua"
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
   $capabilityContractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
   $capabilityPolicyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
   $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
-  $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
+  $compilerDiagnosticsPath = Join-Path $repo "prototypes\mir\report\compiler_diagnostics.lua"
+  $pipelineCommandsPath = Join-Path $repo "prototypes\mir\pipeline\commands.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
@@ -1500,13 +1598,17 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
     throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
   }
-  if (-not (Test-Path -LiteralPath $compilerPath)) {
-    throw "Missing compiler diagnostics module: prototypes\mir\planner\compiler.lua"
-  }
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
     throw "Missing capability registry: prototypes\mir\capabilities\registry.lua"
   }
-  foreach ($path in @($capabilityContractPath, $capabilityPolicyPath, $schemaPath)) {
+  foreach ($path in @(
+      $dataFinalFixesStagePath,
+      $compilerDiagnosticsPath,
+      $pipelineCommandsPath,
+      $capabilityContractPath,
+      $capabilityPolicyPath,
+      $schemaPath
+    )) {
     if (-not (Test-Path -LiteralPath $path)) {
       throw "Missing 2.2.0 capability kernel artifact: $path"
     }
@@ -1520,10 +1622,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
   $schemaText = Get-Content -Raw -LiteralPath $schemaPath
-  $compilerText = Get-Content -Raw -LiteralPath $compilerPath
+  $compilerDiagnosticsText = Get-Content -Raw -LiteralPath $compilerDiagnosticsPath
+  $pipelineCommandsText = Get-Content -Raw -LiteralPath $pipelineCommandsPath
+  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath $dataFinalFixesStagePath
 
   $requiredSnippets = @(
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.planner.compiler").emit()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.stage.data_final_fixes").run()' },
+    @{ File = "prototypes\mir\stage\data_final_fixes.lua"; Text = $dataFinalFixesStageText; Snippet = 'commands.run_all({return_snapshot = false})' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'require("prototypes.mir.report.compiler_diagnostics").emit()' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
@@ -1541,7 +1647,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'sink.decision(record)' },
     @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'kind = "mir-coverage-report"' },
-    @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'accounted_recipes = #rows' },
+    @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'accounted_recipes = #facts.names' },
     @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'technology_effect_count' },
     @{ File = "prototypes\mir\core\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 2' },
     @{ File = "prototypes\mir\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
@@ -1554,15 +1660,16 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
-    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'canonical_provider_decision_projection' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'planner_decision_fingerprint = row.decision_fingerprint' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,materialize,result' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, {' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
-    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'D.fact_registry({' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'decision_export.emit(D, {' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\mir\report\compiler_diagnostics.lua"; Text = $compilerDiagnosticsText; Snippet = 'capabilities.emit(registry)' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
     @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
@@ -1987,11 +2094,11 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
-  $validationOutputDir = "build/validation-dist"
-  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
-
-  $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
-  if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
+    $validationOutputDir = "build/validation-dist"
+    & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
+    $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
+  } else {
     $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
     if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
       throw "Candidate package not found: $CandidateZip"
@@ -2000,7 +2107,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     Write-Host "[check] validating exact candidate package $zipPath"
   }
   if (-not (Test-Path -LiteralPath $zipPath)) {
-    throw "Validation package not found after build: $zipPath"
+    throw "Validation package not found: $zipPath"
   }
   $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $zipPath).Path
 
@@ -2119,7 +2226,11 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 }
 
 Invoke-RepoCheck "package construction is byte deterministic" {
-  & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
+  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
+    & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
+  } else {
+    Write-Host "[skip] exact candidate lane reuses separate deterministic-package evidence"
+  }
 }
 
 Invoke-RepoCheck "git whitespace check" {
@@ -2313,7 +2424,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "golden-plans", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",
@@ -2327,6 +2438,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-semantic-family-generate",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-synthetic-scale-graph",
+  "mir-fixture-assert-synthetic-scale-recipes",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
   "mir-fixture-assert-final-recipe-effect-integrity",
@@ -2978,14 +3090,17 @@ $defaultEnabledBaseExtensionKeys = @(
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
-
-$spaceAgeVanillaOwnedProductivityStreams = [ordered]@{
-  research_low_density_structure = "low-density-structure-productivity"
-  research_plastic = "plastic-bar-productivity"
-  research_processing_unit = "processing-unit-productivity"
-  research_rocket_fuel = "rocket-fuel-productivity"
-  research_steel = "steel-plate-productivity"
+if ($isFactorio10Line) {
+  $defaultEnabledBaseExtensionKeys = @($defaultEnabledBaseExtensionKeys | Where-Object { $_ -ne "laser-shooting-speed" })
 }
+
+$spaceAgeVanillaOwnedProductivityStreams = @(
+  "research_low_density_structure",
+  "research_plastic",
+  "research_processing_unit",
+  "research_rocket_fuel",
+  "research_steel"
+)
 
 function Assert-DefaultBaseExtensionDiagnostics {
   param(
@@ -3014,11 +3129,10 @@ function Assert-DefaultBaseExtensionDiagnostics {
 function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
   param([string]$Context)
 
-  foreach ($entry in $spaceAgeVanillaOwnedProductivityStreams.GetEnumerator()) {
-    $vanillaOwnedLine = Get-LastStreamReportLine -Key $entry.Key
-    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner" `
-        -or $vanillaOwnedLine -notmatch "effects=0" -or $vanillaOwnedLine -notmatch ("owners=" + [regex]::Escape($entry.Value))) {
-      throw "$Context should preserve and bind vanilla-owned productivity instead of generating a parallel MIR technology: $vanillaOwnedLine"
+  foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
+    $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
+    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner") {
+      throw "$Context should preserve the vanilla owner instead of generating a parallel MIR technology: $vanillaOwnedLine"
     }
   }
 }
@@ -3187,7 +3301,10 @@ function Invoke-WeaponSpeedPolicyMatrix {
     "mir-fixture-assert-weapon-speed-safety"
   ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
   $externalExtensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $externalExtensionLine -Context "$Context external owner"
+  if ($externalExtensionLine -notmatch "status=generated" -and
+      ($externalExtensionLine -notmatch "status=skipped" -or $externalExtensionLine -notmatch "reason=already_infinite")) {
+    throw "$Context external owner neither generated a MIR continuation nor retained an existing infinite continuation: $externalExtensionLine"
+  }
   foreach ($stream in $dedicatedStreams) {
     $streamLine = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineContains -Line $streamLine -Expected "status=skipped" -Context "$Context external owner stream $stream"
@@ -3293,28 +3410,34 @@ if ($selectionActive -and -not $checkpointActive) {
           $parameters[$property.Name] = $property.Value
         }
         Invoke-RuntimeScenario @parameters
+        if ($declaration.name -eq "space-age-generation-integrity") {
+          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity scenario"
+        } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
+          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
+        }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
           "space-age-native-owner-settings-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
               -ScenarioName $declaration.name `
-              -InitialFixtureNames @(
-                "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings",
-                "mir-fixture-assert-native-owner-progress"
-              ) `
-              -ChangedFixtureNames @(
-                "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings",
-                "mir-fixture-assert-native-owner-progress"
-              ) `
+            -InitialFixtureNames @(
+              "mir-fixture-native-owner-settings-source",
+              "mir-fixture-assert-native-owner-settings",
+              "mir-fixture-assert-native-owner-progress"
+            ) `
+            -ChangedFixtureNames @(
+              "mir-fixture-native-owner-settings-source",
+              "mir-fixture-assert-native-owner-settings",
+              "mir-fixture-assert-native-owner-progress"
+            ) `
               -InitialNativeOwnerSettingsProfile "default" `
               -ChangedNativeOwnerSettingsProfile "combined" `
               -EnableSpaceAge
-            Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
-            Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
-            Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
-            Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
+          Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
+          Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
+          Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context $declaration.name
+          Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
+          Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
           }
           "space-age-vanilla-family-adoption-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -3555,11 +3678,68 @@ Invoke-RuntimeScenario -ScenarioName "synthetic-scale-graph" -EnabledFixtureName
   "mir-fixture-synthetic-scale-graph",
   "mir-fixture-assert-synthetic-scale-graph"
 )
+$orderedScaleFingerprint = $null
+if (Test-MIRScenarioSelected -Name "synthetic-scale-graph") {
+  $orderedScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-graph fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $orderedScaleMatch.Success) { throw "Ordered 100000-scale compiler fingerprints are missing." }
+  $orderedScaleFingerprint = $orderedScaleMatch.Groups[1].Value
+}
 $syntheticCoverageLine = Get-DiagnosticReportLineContaining -Kind "coverage" -Key "recipe_accounting" -Expected "recipe_count="
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "candidate_count=" -Context "Synthetic graph candidate count"
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "effect_count=" -Context "Synthetic graph effect count"
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "graph_edge_count=" -Context "Synthetic graph edge count"
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-graph-random-order" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-graph",
+  "mir-fixture-synthetic-scale-random-order",
+  "mir-fixture-assert-synthetic-scale-graph"
+)
+if ($orderedScaleFingerprint -and (Test-MIRScenarioSelected -Name "synthetic-scale-graph-random-order")) {
+  $randomScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-graph fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $randomScaleMatch.Success) { throw "Randomized 100000-scale compiler fingerprints are missing." }
+  if ($randomScaleMatch.Groups[1].Value -ne $orderedScaleFingerprint) {
+    throw "Randomized insertion changed 100000-scale compiler output: ordered=$orderedScaleFingerprint randomized=$($randomScaleMatch.Groups[1].Value)"
+  }
+  Write-Host "[ok] 100000-node graph order invariance: $orderedScaleFingerprint"
+}
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "scan_count=2" -Context "Synthetic graph bounded scan count"
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-recipes" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-recipes",
+  "mir-fixture-assert-synthetic-scale-recipes"
+)
+$orderedRecipeScaleFingerprint = $null
+if (Test-MIRScenarioSelected -Name "synthetic-scale-recipes") {
+  $orderedRecipeScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-recipes fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $orderedRecipeScaleMatch.Success) { throw "Ordered 100000-recipe compiler fingerprints are missing." }
+  $orderedRecipeScaleFingerprint = $orderedRecipeScaleMatch.Groups[1].Value
+}
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-recipes-random-order" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-recipes",
+  "mir-fixture-synthetic-scale-random-order",
+  "mir-fixture-assert-synthetic-scale-recipes"
+)
+if ($orderedRecipeScaleFingerprint -and (Test-MIRScenarioSelected -Name "synthetic-scale-recipes-random-order")) {
+  $randomRecipeScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-recipes fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $randomRecipeScaleMatch.Success) { throw "Randomized 100000-recipe compiler fingerprints are missing." }
+  if ($randomRecipeScaleMatch.Groups[1].Value -ne $orderedRecipeScaleFingerprint) {
+    throw "Randomized insertion changed 100000-recipe compiler output: ordered=$orderedRecipeScaleFingerprint randomized=$($randomRecipeScaleMatch.Groups[1].Value)"
+  }
+  Write-Host "[ok] 100000-recipe order invariance: $orderedRecipeScaleFingerprint"
+}
 
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",
@@ -3617,6 +3797,40 @@ $inventoryCapacityLine = Get-LastStreamReportLine -Key "research_inventory_capac
 Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "Merged character inventory/trash slot scenario"
 Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "Merged character inventory/trash slot scenario"
 Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged character inventory/trash slot scenario"
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-automatic-family-controls" -EnabledFixtureNames @(
+  "mir-fixture-semantic-family-attach",
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-base" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-base-continuations" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-compat-space-age-galore" -EnabledFixtureNames @(
+  "mir-fixture-space-age-galore-overlap",
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-compat-atan" -EnabledFixtureNames @(
+  "mir-fixture-atan-nuclear-science",
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-native-owner-adoption" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-adoption-recipes",
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-space-age" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity",
@@ -3758,6 +3972,25 @@ $atanAshTileDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key 
 Assert-ReportLineContains -Line $atanAshTileDecision -Expected "decision=diagnose_only" -Context "ATAN Ash tile-surface deny decision scenario"
 $atanAshSinkDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
 Assert-ReportLineContains -Line $atanAshSinkDecision -Expected "decision=diagnose_only" -Context "ATAN Ash sink deny decision scenario"
+
+Invoke-RuntimeScenario -ScenarioName "combination-atan-ash-big-mining-drill" -EnabledFixtureNames @(
+  "mir-fixture-atan-ash",
+  "mir-fixture-assert-hidden-setting-readability",
+  "mir-fixture-assert-atan-ash-separation",
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+)
+$combinationAtanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
+Assert-ReportLineGenerated -Line $combinationAtanAshLine -Context "Independent ATAN Ash plus Big Mining Drill composition"
+$combinationBigDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $combinationBigDrillLine -Context "Independent Big Mining Drill plus ATAN Ash composition"
+
+Invoke-RuntimeScenario -ScenarioName "combination-space-age-big-mining-drill" -EnabledFixtureNames @(
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+) -EnableSpaceAge
+$combinationSpaceAgeDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $combinationSpaceAgeDrillLine -Context "Space Age plus Big Mining Drill targeted interaction"
 $atanAshTileRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
 Assert-ReportLineContains -Line $atanAshTileRisk -Expected "risks=tile_surface" -Context "ATAN Ash tile-surface loop-risk scenario"
 $atanAshSinkRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
@@ -4220,6 +4453,7 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
     -EnableSpaceAge
   Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"

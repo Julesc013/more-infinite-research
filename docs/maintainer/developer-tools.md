@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
 ---
@@ -27,6 +27,8 @@ Use `scripts/mir.ps1` first:
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 audit top25 --space-age
+.\scripts\mir.ps1 storage audit --all-worktrees
+.\scripts\mir.ps1 storage clean --all-worktrees --apply
 .\scripts\mir.ps1 report latest
 .\scripts\mir.ps1 report missing-deps --run <path>
 .\scripts\mir.ps1 report observations --run <path>
@@ -48,6 +50,8 @@ Common overrides:
 ```
 
 `mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+
+`storage audit` reports protected, recent, and cleanup-eligible artifact roots without deleting anything. `storage clean` is also a preview unless `--apply` is explicit. See [local artifact retention and storage](artifact-retention.md) for the protected storage classes, seven-day default, immediate post-run cleanup, hardlink accounting, and deletion safeguards.
 
 `release docs-only` and `release docs-refresh` are aliases for the fast post-gate documentation path. Use them only after the current release candidate has already passed the full release gate and the remaining edits are docs, release notes, changelog text, or the release archive. The command rebuilds the package, runs static/package validation, checks whitespace, and rejects non-doc/package changes so code, prototype, script, fixture, or locale edits still require the full release gate.
 
@@ -123,6 +127,22 @@ scripts/Convert-MIRCompatAuditResults.ps1
 scripts/New-MIRCompatProfileStub.ps1
 scripts/Test-MIRPolicyLints.ps1
 scripts/Compare-MIRPlannerReports.ps1
+scripts/Export-MIRPlannerSnapshot.ps1
+scripts/Compare-MIRPlannerSnapshots.ps1
+scripts/Minimize-MIRPlannerSnapshot.ps1
+scripts/New-MIRCompatibilityPack.ps1
+```
+
+`Export-MIRPlannerSnapshot.ps1` converts one or more MIR audit logs into a deterministic target/source/archive-bound JSON snapshot with separate plan and coverage rows. `Compare-MIRPlannerSnapshots.ps1` reports added, removed, and changed plan identities and can require different target profiles for a target-plan diff. `Minimize-MIRPlannerSnapshot.ps1` extracts the rows tied to named recipes, streams, rules, capabilities, or subjects for a focused fixture packet. `New-MIRCompatibilityPack.ps1` creates a non-public, review-required schema-2 pack scaffold and refuses to overwrite an existing file. Static validation runs `Test-MIRPlannerTools.ps1` against all five workflows.
+
+`Invoke-MIRValidation.ps1` builds MIR once and uses that exact ZIP for every runtime scenario. Schema-3 scenario records own fixtures, settings, source mode, timeouts, tags, isolation, and assertion contracts. Use `-List`, `-Scenario`, `-Group`, or `-Tag` for focused work; `-Tier smoke` for the mandatory smoke set; and `-ChangedSince <commit> -Tier impacted` for `.mir/test-impact.yml` selection plus the exact-package baseline. `-MaxParallel 2` or `4` runs selected runtime scenarios in isolated write-data directories with longest-duration-first scheduling while result rows remain name ordered. Full release runs remain complete and do not reuse outcomes.
+
+Example target-plan workflow:
+
+```powershell
+.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.1.log -TargetProfile 2.1 -OutputPath .\plan-2.1.json
+.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.0.log -TargetProfile 2.0 -OutputPath .\plan-2.0.json
+.\scripts\Compare-MIRPlannerSnapshots.ps1 -Before .\plan-2.1.json -After .\plan-2.0.json -RequireDifferentTargets
 ```
 
 Private helpers:

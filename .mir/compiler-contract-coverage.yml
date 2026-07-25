@@ -1,12 +1,21 @@
 {
   "schema": 1,
   "technology_effect_target_profile": ".mir/technology-effect-targets.json",
+  "technology_hard_gate_profile": ".mir/technology-hard-gates.json",
+  "public_artifact_budget_profile": ".mir/public-artifact-budgets.json",
   "generation_plan_gates": [
     "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
     "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
   ],
   "actions": ["emit", "adopt", "skip", "emit_base_extension"],
   "family_strategies": ["attach-existing", "tier-table", "fixed"],
+  "family_operator_categories": [
+    "selectors", "normalizers", "partitioner", "tier_resolver", "effect_model", "science_model",
+    "prerequisite_model", "cost_model", "presentation_model", "ownership_policy", "grouping"
+  ],
+  "generation_gate_statuses": ["not-applicable", "pending", "passed", "failed", "superseded"],
+  "authoritative_gate_material": ["evaluator", "evidence", "evidence_fingerprint", "applicability.predicate", "applicability.input_fingerprint"],
+  "family_operator_safety": ["data-only", "registered-only", "fail-closed", "no-prototype-mutation"],
   "compatibility_pack_fields": [
     "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
     "science_roles", "owner_claims", "risk_overrides", "family_authorizations", "candidate_seeds", "evidence", "claim"
@@ -14,6 +23,56 @@
   "automatic_actions": ["disabled", "preview", "apply"],
   "automatic_generation_controls": ["create_research", "require_reviewed_data"],
   "automatic_creation_maturities": ["experimental", "reviewed"],
+  "technology_design_dimensions": [
+    "identity", "effects", "progression", "cost", "presentation", "ownership", "runtime_contracts"
+  ],
+  "technology_design_schema": 2,
+  "technology_design_subject_categories": [
+    "recipes", "products", "items", "fluids", "entities", "technologies", "effect_targets",
+    "science_packs", "surfaces"
+  ],
+  "technology_design_fingerprints": [
+    "subject_fingerprint", "design_fingerprint", "prototype_fingerprint", "qualification_fingerprint"
+  ],
+  "technology_design_lock_states": ["none", "partial", "all"],
+  "technology_design_lock_policies": ["adaptive", "locked", "field-specific", "adaptive-within-envelope"],
+  "technology_design_materialization_kinds": ["create", "patch-existing", "continuation", "diagnose"],
+  "technology_lifecycle_schemas": {
+    "TechnologyCandidate": 1,
+    "TechnologyQualification": 1,
+    "SafetyQualification": 1,
+    "DesignAssessment": 1,
+    "PromotionAuthorization": 1,
+    "TechnologyApproval": 1,
+    "TechnologyPromotion": 1,
+    "TechnologyMigration": 1,
+    "TechnologyCatalog": 3,
+    "TechnologyQualityAssessment": 2,
+    "TechnologyPromotionAdmission": 1,
+    "TechnologyApplicabilityEnvelope": 1
+  },
+  "technology_applicability_predicates": [
+    "family.semantic-signature", "output.deterministic-single-item", "output.place-result-family",
+    "recipe.productivity-eligible", "recipe.visible", "risk.none"
+  ],
+  "technology_approval_decisions": ["approved", "quarantined", "demoted"],
+  "technology_identity_transitions": [
+    "unassigned->provisional", "provisional->reserved", "reserved->stable-unreleased",
+    "stable-unreleased->released", "released->retired"
+  ],
+  "technology_design_maturity_axes": [
+    "safety", "discovery_evidence", "design_maturity", "validation_evidence",
+    "applicability_scope", "identity_stability", "runtime_action", "public_claim"
+  ],
+  "technology_design_leaf_provenance": [
+    "identity.technology_id", "identity.candidate_id", "identity.identity_state", "subjects", "members", "effects",
+    "progression.prerequisites", "progression.science", "cost.count_formula", "cost.research_time",
+    "cost.count", "cost.max_level", "presentation.localised_name", "presentation.localised_description",
+    "presentation.icon", "presentation.icon_size", "presentation.icons", "presentation.order", "presentation.level",
+    "presentation.enabled", "presentation.hidden",
+    "ownership.action", "ownership.migration_policy",
+    "runtime_contracts.upgrade"
+  ],
   "automatic_policy_presets": ["conservative", "safe", "expansive", "custom"],
   "compiler_provider_fields": [
     "id", "source_kinds", "discovery", "positive_capabilities", "family", "normalization",
@@ -23,7 +82,46 @@
   "diagnostic_code_namespaces": ["MIR-AUTO", "MIR-PROVIDER"],
   "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
   "mutation_sentinels": [
-    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority", "native-owner-patch-design-authority"
+  ],
+  "promotion_trust_classes": [
+    "fixture-only", "local-user", "external-mod-author", "mir-reviewed", "protected-release"
+  ],
+  "reviewed_mode_trust_classes": ["mir-reviewed", "protected-release"],
+  "compiler_context_schema": 4,
+  "compiler_boundary_schemas": {
+    "CompilationSnapshot": 2,
+    "PolicySnapshot": 1,
+    "CompilerInput": 2,
+    "CompilerResult": 3,
+    "RuntimeEnvironmentIdentity": 2,
+    "QualificationEnvironmentIdentity": 1,
+    "TransformationOperation": 2,
+    "TransformationPlan": 2,
+    "MutationJournal": 2
+  },
+  "compiler_execution_modes": ["SAFE", "PREVIEW", "REVIEWED", "STRICT_CI", "RELEASE"],
+  "compiler_result_dimensions": ["execution", "safety", "review", "promotion", "release"],
+  "public_compiler_artifact_schema": 1,
+  "public_compiler_artifact_kinds": [
+    "mir-generation-plan-public", "mir-technology-catalog-public", "mir-coverage-public", "mir-compiler-evidence-public"
+  ],
+  "public_compiler_mod_data_types": [
+    "more-infinite-research.generation-plan-public",
+    "more-infinite-research.technology-catalog-public",
+    "more-infinite-research.coverage-public",
+    "more-infinite-research.compiler-evidence-public"
+  ],
+  "context_owned_state": [
+    "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
+    "technology-researchability-index", "pack-production-reachability-cache",
+    "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
+    "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",
+    "technology-qualifications", "generation-plan", "compilation-plan", "technology-graph-parity",
+    "compiler-input", "compiler-result", "compilation-snapshot", "qualification-snapshot", "policy-snapshot",
+    "pure-compilation", "transformation-plan", "mutation-journal", "provider-metrics", "environment-identity",
+    "generated-technology-registry", "productivity-family-adoption",
+    "coverage-report", "compiler-telemetry", "diagnostics", "context-services", "state-epochs"
   ],
   "positive_negative_required": true,
   "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"

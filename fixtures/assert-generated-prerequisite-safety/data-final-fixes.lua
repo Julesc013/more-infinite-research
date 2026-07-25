@@ -1,4 +1,5 @@
 local science = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 
 local function fail(message)
   error("MIR generated prerequisite safety validation failed: " .. message)
@@ -17,6 +18,10 @@ if data.raw.recipe["automation-science-pack"].enabled ~= true then
   fail("initially available automation-science-pack recipe was unexpectedly disabled.")
 end
 
+-- MIR's production CompilerContext is intentionally closed before dependent
+-- mods enter data-final-fixes. Exercise the public science facade in a fresh,
+-- fixture-owned context instead of reopening or depending on compiler state.
+compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), function()
 local initial_status, initial_prerequisite = science.pack_production_status("mir-fixture-initial-science-pack")
 if initial_status ~= "initial" or initial_prerequisite ~= nil then
   fail("already-enabled fixture science should have no inferred prerequisite.")
@@ -106,3 +111,4 @@ end
 if generated_count == 0 then fail("no generated stream technologies were found.") end
 if fixture_pack_user_count == 0 then fail("the all-science scenario did not exercise the fixture science pack.") end
 if unreachable_pack_user_count ~= 0 then fail("generated streams retained unreachable fixture science packs.") end
+end)

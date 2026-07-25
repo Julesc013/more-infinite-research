@@ -1,43 +1,15 @@
 schema: 1
 
 release:
-  version: "2.4.9"
+  version: "2.5.0"
   branch: tmp/2.0
   factorio_version: "2.0"
-  baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
-  baseline_tag: "2.4.5"
-  portable_fix_source_version: "3.2.0"
-  portable_fix_source_commit: ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7
-  baseline_package_source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
-  source_lock: .mir/backport-source-lock.json
-  objective: bounded-correctness-and-contract-modernization
-  public_contract_change: patch-compatible
+  baseline_commit: 7ebe93029695bbf809a15a14c6540530738a9e62
+  baseline_tag: "2.4.9"
+  objective: target-port-behavioral-subset
+  public_contract_change: minor-compatible
 
 superseded_candidates:
-  - source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
-    artifact: dist/more-infinite-research_2.4.1.zip
-    sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
-    package_content_sha256: 9370E0C2EF7EACA54D3095119FF3ADF5EA51A7DAE1D46F30D6D2F5EFD1A4AC97
-    size_bytes: 406237
-    entries: 167
-    forbidden_entries: 0
-    assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-    reason: maintainer-directed release renumber from qualified 2.4.1 to 2.4.5 before publication
-    status: superseded-qualified-unreleased-candidate
-  - source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
-    artifact: dist/more-infinite-research_2.4.1.zip
-    sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
-    package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
-    reason: incomplete six-scenario startup hotfix omitted final 3.1.9 native-owner and assurance parity
-    status: superseded-unreleased-candidate
-  - source_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
-    historical_artifact_identity: dist/more-infinite-research_2.5.0.zip
-    sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-    size_bytes: 387662
-    entries: 160
-    forbidden_entries: 0
-    reason: maintainer selected 2.4.0 as the first public final-3.1.5 Factorio 2.0 companion release
-    status: superseded-unpublished-candidate
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
     artifact: dist/more-infinite-research_3.0.5.zip
     sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
@@ -119,19 +91,78 @@ superseded_candidates:
     reason: expected scenario manifest still used a raw checkout-line-ending-dependent hash
     status: superseded-unpublished-candidate
 
+  - source_commit: 37985c7b4fe59ccd01645d1662b5fdd607661d23
+    artifact: dist/more-infinite-research_3.1.0.zip
+    sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
+    size_bytes: 474992
+    entries: 154
+    forbidden_entries: 0
+    reason: RC6 compiler correctness closure changed package-visible source and invalidated RC5 evidence
+    status: superseded-unpublished-candidate
+
+  - source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    artifact: dist/more-infinite-research_3.1.0.zip
+    sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
+    size_bytes: 383525
+    entries: 157
+    forbidden_entries: 0
+    reason: RC8 exposed a cross-stream duplicate recipe effect during Space Age Galore startup
+    status: superseded-unpublished-candidate
+
+  - source_commit: bbc6b499ac3c2218fb9c1abdd8a4cf57e1fdd3db
+    artifact: dist/more-infinite-research_3.1.5.zip
+    sha256: 493F6EE2303FF087AB76D983DAFF872F10EC28D04FC816A13434C188613C59EA
+    size_bytes: 392530
+    entries: 162
+    forbidden_entries: 0
+    reason: final provider contract, exact 3.1.2 upgrade proof, and clearer automatic-recipe-support UI changed package-visible source
+    status: superseded-unpublished-candidate
+
+  - source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
+    artifact: dist/more-infinite-research_3.1.5.zip
+    sha256: EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E
+    size_bytes: 399065
+    entries: 166
+    forbidden_entries: 0
+    reason: final UI normalization and experimental family creation maturity changed package-visible source
+    status: superseded-unpublished-candidate
+
+  - source_commit: f870c929dcf1442716ed7554f09ef8cdb5a6f7e0
+    artifact: dist/more-infinite-research_3.1.5.zip
+    sha256: 3DDDFB2C899E57B9BB9962F67F3902B4B3D7663110A2B2306F0A09A6CCF35A3C
+    size_bytes: 399512
+    entries: 166
+    forbidden_entries: 0
+    reason: final settings availability policy changed package-visible source
+    status: superseded-unpublished-candidate
+
+  - source_commit: f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f
+    artifact: dist/more-infinite-research_3.1.9.zip
+    sha256: DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B
+    size_bytes: 406023
+    entries: 167
+    forbidden_entries: 0
+    reason: exact disabled vanilla science technology regression changed package documentation and validation evidence
+    status: superseded-unpublished-candidate
+
+  - source_commit: e19b54fc7daddabcba5c5a6ab6c9bd82d8fe09ba
+    evidence_commit: 3479204bc1c2bb3239338fde227c67af277d375f
+    candidate_id: C4
+    artifact: dist/more-infinite-research_3.2.0.zip
+    sha256: C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B
+    package_content_sha256: 8AC13777AB19D56DDF99BE32A407328E017E2B759DF53182BC400D5A41C61ADE
+    size_bytes: 935164
+    entries: 229
+    forbidden_entries: 0
+    reason: Factorio 2.1.11 dependency floor and stable stream-manifest policy corrections required new package bytes
+    status: superseded-locally-qualified-candidate
+
 candidate:
-  artifact: dist/more-infinite-research_2.4.9.zip
-  source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
-  archive_bytes: 893263
-  sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
-  package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
-  automated_gate: passed-local-machine-verifiable
-  local_automated_gate: passed-static-runtime-upgrade
-  runtime_performance_gate: passed-local-exact-candidate
-  protected_automated_gate: pending
+  artifact: dist/more-infinite-research_3.2.0.zip
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  approved_delta: approved-delta/2.4.5-to-2.4.9.json
-  status: awaiting-manual-and-protected-qualification
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation
@@ -294,19 +325,11 @@ behaviors:
     impact: prototype-limits
     evidence: prototype-limits
     status: complete
-  BP-020:
-    source: dev@79df29b50ea9b855b8665d6c9a3d8295806acde0
-    behavior: disabled Automation science technology does not become a generated prerequisite when its recipe is initially available
-    class: B-missing-exact-regression
-    decision: retain-existing-reachability-fix-and-backport-exact-fixture
-    impact: validation-and-release-documentation
-    evidence: disabled-automation-science-regression
-    status: complete
 
 release_gates:
   - static-validation
-  - factorio-2.0-base-runtime
-  - factorio-2.0-space-age-runtime
+  - factorio-2.1-base-runtime
+  - factorio-2.1-space-age-runtime
   - generated-prerequisite-safety
   - weapon-overlap-policy-matrix
   - settings-profile-codec

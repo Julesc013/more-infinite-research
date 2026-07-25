@@ -6,8 +6,8 @@
   "description": "Validation fixture that asserts deterministic MIR settings profile encoding, compact export behavior, and strict import validation.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
-    "? space-age",
+    "base >= 2.0.77",
+    "? space-age >= 2.0.77",
     "more-infinite-research"
   ]
 }

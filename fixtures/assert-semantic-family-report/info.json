@@ -1,13 +1,9 @@
 {
   "name": "mir-fixture-assert-semantic-family-report",
   "version": "0.1.0",
-  "title": "MIR Fixture - Assert Automatic Compiler Preview",
+  "title": "MIR Fixture - Assert Automatic Compiler Report",
   "author": "Julesc013",
-  "description": "Asserts preview mode records candidates without automatic attachment or generation.",
+  "description": "Asserts report mode records candidates without automatic attachment or generation.",
   "factorio_version": "2.0",
-  "dependencies": [
-    "base >= 2.0",
-    "more-infinite-research",
-    "mir-fixture-semantic-family-attach"
-  ]
+  "dependencies": ["base >= 2.0.77", "more-infinite-research", "mir-fixture-semantic-family-attach"]
 }

@@ -1,14 +1,44 @@
 {
   "schema": 2,
-  "release": "2.4.9",
-  "factorio_line": "2.0",
+  "release": "3.2.0",
+  "factorio_line": "2.1",
+  "compiler_stage_budgets": [
+    { "id": "recipe-risk-facts", "phase": "recipe_risk_facts", "max_seconds": 0.5 },
+    { "id": "provider-discovery", "phase": "provider_discovery", "max_seconds": 0.5 },
+    { "id": "stream-compiler", "phase": "stream_compiler", "max_seconds": 0.5 }
+  ],
+  "compiler_counter_bounds": [
+    { "id": "provider-candidates", "counter": "provider_candidates", "maximum": 4096 },
+    { "id": "provider-review-required", "counter": "provider_review_required", "maximum": 512 },
+    { "id": "catalog-alternatives", "counter": "technology_catalog_alternatives", "maximum": 512 },
+    { "id": "snapshot-prototype-bytes", "counter": "snapshot_prototype_bytes", "maximum": 67108864 },
+    { "id": "snapshot-deep-copies", "counter": "snapshot_deep_copies", "maximum": 16 },
+    { "id": "snapshot-canonicalization-passes", "counter": "snapshot_canonicalization_passes", "maximum": 128 },
+    { "id": "initial-snapshot-milliseconds", "counter": "snapshot_construction_milliseconds", "maximum": 5000 },
+    { "id": "qualification-snapshot-milliseconds", "counter": "qualification_snapshot_construction_milliseconds", "maximum": 1000 },
+    { "id": "compiler-total-milliseconds", "counter": "compiler_total_milliseconds", "maximum": 20000 },
+    { "id": "snapshot-peak-memory", "counter": "snapshot_peak_memory_bytes", "maximum": 2147483647 },
+    { "id": "qualification-peak-memory", "counter": "qualification_peak_memory_bytes", "maximum": 2147483647 },
+    { "id": "input-snapshot-bytes", "counter": "input_snapshot_bytes", "maximum": 4194304 },
+    { "id": "qualification-snapshot-bytes", "counter": "qualification_snapshot_bytes", "maximum": 4194304 },
+    { "id": "snapshot-copied-domains", "counter": "snapshot_copied_domains", "maximum": 16 },
+    { "id": "generation-plan-public-bytes", "counter": "generation_plan_public_bytes", "maximum": 524288 },
+    { "id": "technology-catalog-public-bytes", "counter": "technology_catalog_public_bytes", "maximum": 131072 },
+    { "id": "coverage-public-bytes", "counter": "coverage_public_bytes", "maximum": 131072 },
+    { "id": "compiler-evidence-public-bytes", "counter": "compiler_evidence_public_bytes", "maximum": 131072 },
+    { "id": "public-artifact-total-bytes", "counter": "public_artifact_total_bytes", "maximum": 917504 }
+  ],
   "regression_lanes": [
     { "id": "base.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
     { "id": "space-age.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.15, "max_candidate_seconds": 18.0 },
     { "id": "medium-ecosystem.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.25, "max_candidate_seconds": 90.0 },
     { "id": "large-ecosystem.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.25, "max_candidate_seconds": 90.0 },
     { "id": "diagnostics-off.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 7.0 },
-    { "id": "diagnostics-on.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 }
+    { "id": "diagnostics-on.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
+    { "id": "compiler.snapshot", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10 },
+    { "id": "compiler.graph", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.planning", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.postconditions", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.05 }
   ],
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
@@ -17,8 +47,8 @@
     { "id": "scoped-caps-on", "source": "validation_scenario", "key": "prototype-limit-overrides-base", "max_seconds": 8.0 },
     { "id": "diagnostics-off", "source": "validation_scenario", "key": "package-zip-base", "max_seconds": 7.0 },
     { "id": "diagnostics-on", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
-    { "id": "medium-pack", "source": "medium_pack_step", "key": "local-2-0-bz-suite", "max_seconds": 90.0 },
-    { "id": "large-pack", "source": "large_pack_step", "key": "local-2-0-performance-large", "max_seconds": 90.0 },
+    { "id": "medium-pack", "source": "medium_pack_step", "key": "representative-local-scenario", "max_seconds": 90.0 },
+    { "id": "large-pack", "source": "large_pack_step", "key": "LocalLibraryScenarios", "max_seconds": 90.0 },
     { "id": "large-synthetic-graph", "source": "validation_scenario", "key": "synthetic-scale-graph", "max_seconds": 600.0 },
     { "id": "large-synthetic-recipes", "source": "validation_scenario", "key": "synthetic-scale-recipes", "max_seconds": 600.0 },
     { "id": "full-matrix", "source": "validation_total", "key": "all", "max_seconds": 3000.0 }

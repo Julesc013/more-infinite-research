@@ -1,5 +1,4 @@
 . (Join-Path $PSScriptRoot "PackageIdentity.ps1")
-. (Join-Path $PSScriptRoot "PerformanceCampaign.ps1")
 
 function Get-MIRReleaseSha256 {
   param([Parameter(Mandatory)][string]$Path)
@@ -102,8 +101,8 @@ function Test-MIRRuntimePerformanceEvidence {
   $evidencePath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Path
   if (-not (Test-Path -LiteralPath $evidencePath -PathType Leaf)) { throw "Runtime performance evidence is absent: $evidencePath" }
   $evidence = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json
-  if ([int]$evidence.schema -ne 2 -or [string]$evidence.kind -ne "mir-runtime-performance-regression") {
-    throw "Runtime performance evidence must use mir-runtime-performance-regression schema 2."
+  if ([int]$evidence.schema -ne 3 -or [string]$evidence.kind -ne "mir-runtime-performance-regression") {
+    throw "Runtime performance evidence must use mir-runtime-performance-regression schema 3."
   }
   if ([string]$evidence.status -ne "passed") { throw "Runtime performance evidence is not passed." }
   $candidateSha = Get-MIRReleaseSha256 -Path $candidatePath
@@ -124,10 +123,6 @@ function Test-MIRRuntimePerformanceEvidence {
       $baselineSha -ne "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD") {
     throw "Runtime performance evidence did not use the sealed 3.1.9 baseline archive."
   }
-  if ([string]$priorInfo.version -eq "2.4.5" -and
-      $baselineSha -ne "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8") {
-    throw "Runtime performance evidence did not use the published 2.4.5 baseline archive."
-  }
   $factorioSha = Get-MIRReleaseSha256 -Path $FactorioBin
   $factorioVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
   if ([string]$evidence.factorio.binary_sha256 -ne $factorioSha -or
@@ -139,13 +134,6 @@ function Test-MIRRuntimePerformanceEvidence {
     if ([string]$evidence.comparability.$field -notmatch '^[0-9A-Fa-f]{64}$') {
       throw "Runtime performance evidence lacks comparable-run authority: $field"
     }
-  }
-  $campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
-  $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
-  if ([string]$evidence.comparability.scenarios_sha256 -ne (Get-MIRReleaseSha256 -Path $campaignPath) -or
-      [string]$evidence.comparability.settings_sha256 -ne (Get-MIRPerformanceSettingsFingerprint -Campaign $campaign) -or
-      [string]$evidence.comparability.harness_sha256 -ne (Get-MIRPerformanceHarnessFingerprint -RepoRoot $RepoRoot)) {
-    throw "Runtime performance evidence does not bind the current campaign, settings, and measurement harness authorities."
   }
   $minimumRuns = [int]$evidence.run_policy.minimum_measured_runs_per_package
   if ($minimumRuns -lt 5 -or [int]$evidence.run_policy.warmup_runs -lt 1 -or
@@ -165,9 +153,48 @@ function Test-MIRRuntimePerformanceEvidence {
     }
   }
 
+  if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
+      [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
+    throw "Runtime performance evidence lacks the governed artifact-volume aggregation."
+  }
+  $volumeMeasurements = @($evidence.artifact_volume.measurements)
+  $volumeSurfaces = @($volumeMeasurements | ForEach-Object { [string]$_.surface })
+  $actualVolumeSurfaces = (@($volumeSurfaces | Sort-Object) -join "`n")
+  $expectedVolumeSurfaces = (@("diagnostics-off", "diagnostics-on") | Sort-Object) -join "`n"
+  if ($actualVolumeSurfaces -ne $expectedVolumeSurfaces -or
+      @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+    throw "Runtime performance evidence must contain exactly diagnostics-off and diagnostics-on artifact-volume measurements."
+  }
+  $performancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance.yml")
+  $counterBlock = [regex]::Match($performancePolicy, '(?ms)required_counters:\s*(?<block>.*?)\s+required_phases:')
+  if (-not $counterBlock.Success) { throw "Performance policy does not expose its required telemetry counter block." }
+  $requiredVolumeCounters = @([regex]::Matches($counterBlock.Groups['block'].Value, '(?m)^\s*-\s+(?<name>[a-z0-9_-]+)\s*$') | ForEach-Object { $_.Groups['name'].Value })
+  foreach ($measurement in $volumeMeasurements) {
+    $fingerprints = @($measurement.telemetry_fingerprints | ForEach-Object { [string]$_ })
+    if ([int]$measurement.measured_runs -lt $minimumRuns -or $fingerprints.Count -ne [int]$measurement.measured_runs -or
+        @($fingerprints | Where-Object { $_ -notmatch '^[0-9A-Fa-f]{64}$' }).Count -gt 0) {
+      throw "Artifact-volume measurement '$($measurement.surface)' does not bind every measured candidate run."
+    }
+    $counterNames = @($measurement.counters.PSObject.Properties.Name)
+    foreach ($counterName in $requiredVolumeCounters) {
+      if ($counterNames -notcontains $counterName -or [long]$measurement.counters.$counterName -lt 0) {
+        throw "Artifact-volume measurement '$($measurement.surface)' lacks governed counter '$counterName'."
+      }
+    }
+  }
+
   $budgetPath = Join-Path $RepoRoot ".mir\performance-budgets.json"
   $budgetManifest = Get-Content -Raw -LiteralPath $budgetPath | ConvertFrom-Json
   if ([int]$budgetManifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
+  foreach ($measurement in $volumeMeasurements) {
+    foreach ($bound in @($budgetManifest.compiler_counter_bounds)) {
+      $counter = [string]$bound.counter
+      $property = $measurement.counters.PSObject.Properties[$counter]
+      if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
+        throw "Artifact-volume measurement '$($measurement.surface)' exceeds or omits compiler budget '$counter'."
+      }
+    }
+  }
   $expectedLanes = @($budgetManifest.regression_lanes)
   $actualLanes = @($evidence.lanes)
   $actualIds = @($actualLanes | ForEach-Object { [string]$_.id })

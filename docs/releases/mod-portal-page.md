@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-22
 supersedes: []
 superseded_by: []
 ---
@@ -33,7 +33,7 @@ It is built for players who want more *long-term scaling for late-game megabases
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`. Space Age is optional.
 
 *Recipe productivity researches are infinite, but each recipe's Factorio `maximum_productivity` cap still applies. MIR leaves the engine's +300% recipe default unchanged unless you explicitly select another value under startup settings > Limits. Explicit productivity caps do not rewrite recycling-category recipes; recycler returns have their own separate control. The separate non-zero power floor is also off by default.*
 
@@ -78,9 +78,8 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 
 | Technology | Effect per level | Default | Unique notes |
 | --- | --- | --- | --- |
-| Copper plate productivity | `+10%` productivity for copper plate recipes | On | Skips hidden, recycling, and scrap-input recovery recipes. |
-| Iron plate productivity | `+10%` productivity for iron plate recipes | On | Skips hidden, recycling, and scrap-input recovery recipes. |
-| Steel productivity | `+10%` productivity for steel plate recipes | On, native-owned in Space Age | Skips scrap-input recovery recipes. Space Age's vanilla technology owns `steel-plate` and `casting-steel`. |
+| Copper plate productivity | `+10%` productivity for copper plate recipes | On | Skips hidden and recycling recipes. |
+| Iron plate productivity | `+10%` productivity for iron plate recipes | On | Skips hidden and recycling recipes. |
 | Iron gear wheel productivity | `+10%` productivity for iron gear wheel recipes | On | Avoids scrap-input recipes. |
 | Iron stick productivity | `+10%` productivity for iron stick recipes | On | Avoids scrap-input recipes. |
 | Copper cable productivity | `+10%` productivity for copper cable recipes | On | Avoids scrap-input recipes. |
@@ -206,8 +205,6 @@ This helps it work with:
 - Plates n Circuit Productivity, with replacement limited to exact known infinite technologies that MIR can fully replace with matching recipe productivity values and no other blocking owner.
 
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
-
-MIR loads after Space Exploration's finalized recipe removals and validates every final recipe-targeting technology effect. This prevents removed Krastorio recipe names from causing startup failure; it is not a claim of broad Space Exploration support.
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility. MIR 3 public claims are deliberately narrow: a page may claim a named recipe family, a diagnostic observation, or coexistence behavior, but not full overhaul support unless that claim is explicitly recorded.
 

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "scope": "factorio-2.0-active-release-line",
+  "distribution_count": 2,
+  "distributions": [
+    {
+      "version": "2.4.9",
+      "path": "dist/more-infinite-research_2.4.9.zip",
+      "bytes": 893263,
+      "sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+      "kind": "tagged-baseline",
+      "source_ref": "7ebe93029695bbf809a15a14c6540530738a9e62"
+    },
+    {
+      "version": "2.5.0",
+      "path": "dist/more-infinite-research_2.5.0.zip",
+      "bytes": 1014729,
+      "sha256": "7B1B66038349EC6E61A10436652518434B1BD3CBCFB73FEC4A1C7DCB8C575DD4",
+      "kind": "automated-playtest-candidate",
+      "source_ref": "7ea1eeb6b042d21a2d06301f392b12979876d4dd"
+    }
+  ]
+}

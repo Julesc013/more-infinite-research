@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -28,6 +28,16 @@ Run the local reproducibility gate with:
 
 It builds two independent archives, requires identical SHA-256 values, and verifies canonical entry order and timestamps. Before release, repeat the comparison from a second clean worktree or CI checkout to prove checkout-independent identity.
 
+Measure and review package composition with:
+
+```powershell
+.\scripts\Measure-MIRPackageComposition.ps1 `
+  -Explanation "Reviewed package growth explanation" `
+  -RequireReviewedExplanation
+```
+
+The schema-1 report records archive identity, compressed and uncompressed totals by package category, the largest entries, and exact added, removed, and changed paths relative to 3.1.9. Growth over the configured thresholds, a new category, or an unclassified path requires a written explanation. This is a review gate, not an arbitrary small package-size cap; the ordinary package gate remains authoritative for forbidden repository-only paths.
+
 ## Published Archives
 
 Files in `dist/` are upload artifacts for specific versions. Once a version has been published, its archive is immutable repository evidence.
@@ -37,7 +47,7 @@ Do not refresh these archives during later architecture or backport work:
 - `dist/more-infinite-research_2.2.0.zip`;
 - `dist/more-infinite-research_1.9.2.zip` on `legacy` after upload.
 
-The current canonical line is released MIR `3.1.5`; its maintained Factorio 2.0 port is the unreleased `2.4.0` candidate. Build or refresh `dist/<mod>_<version>.zip` only for the unpublished target version being qualified.
+The current development line targets `3.1.0`; its next maintained Factorio 2.0 port is `2.4.0`. Build or refresh `dist/<mod>_<version>.zip` only for the unpublished target version being released.
 
 For regression or architecture work before the version bump, prefer validation archives under `build/validation-dist/` and restore any accidental published archive rebuilds before committing.
 

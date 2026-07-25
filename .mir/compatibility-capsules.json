@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "mir-compatibility-support-capsules",
+  "capsules": [
+    {
+      "id": "atan-ash",
+      "exact_mods": ["atan-ash"],
+      "evidence": ["fixtures/atan-ash", "fixtures/assert-atan-ash-separation"],
+      "footprints": {
+        "recipe_output_families": ["ash-separation"],
+        "technology_effect_owners": ["recipe-productivity:ash-separation"],
+        "technology_prerequisite_components": ["chemical-science-progression"],
+        "science_lab_families": [],
+        "surface_planet_gates": [],
+        "prototype_targets": ["recipe:atan-ash-seperation"],
+        "data_final_fixes_replacements": []
+      }
+    },
+    {
+      "id": "big-mining-drill",
+      "exact_mods": ["big-mining-drill"],
+      "evidence": ["fixtures/big-mining-drill", "fixtures/assert-big-mining-drill-productivity"],
+      "footprints": {
+        "recipe_output_families": ["mining-drill-manufacturing"],
+        "technology_effect_owners": ["recipe-productivity:mining-drill-manufacturing"],
+        "technology_prerequisite_components": ["production-science-progression"],
+        "science_lab_families": [],
+        "surface_planet_gates": [],
+        "prototype_targets": ["entity:big-mining-drill", "recipe:big-mining-drill"],
+        "data_final_fixes_replacements": []
+      }
+    },
+    {
+      "id": "space-age",
+      "exact_mods": ["space-age"],
+      "evidence": ["approved-delta/3.1.9-to-3.2.0.json"],
+      "footprints": {
+        "recipe_output_families": ["carbon", "mining-drill-manufacturing", "sulfur"],
+        "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:mining-drill-manufacturing", "recipe-productivity:sulfur"],
+        "technology_prerequisite_components": ["space-science-progression"],
+        "science_lab_families": ["space-age-labs"],
+        "surface_planet_gates": ["aquilo", "fulgora", "gleba", "space-platform", "vulcanus"],
+        "prototype_targets": ["entity:big-mining-drill", "recipe:carbon", "recipe:sulfur"],
+        "data_final_fixes_replacements": []
+      }
+    },
+    {
+      "id": "space-age-galore",
+      "exact_mods": ["space-age", "space-age-galore"],
+      "evidence": ["fixtures/space-age-galore-overlap", "approved-delta/3.1.9-to-3.2.0.json"],
+      "footprints": {
+        "recipe_output_families": ["carbon", "sulfur"],
+        "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:sulfur"],
+        "technology_prerequisite_components": ["space-science-progression"],
+        "science_lab_families": ["space-age-labs"],
+        "surface_planet_gates": ["vulcanus"],
+        "prototype_targets": ["recipe:carbon", "recipe:sulfur", "recipe:vgal-coal-crushing"],
+        "data_final_fixes_replacements": []
+      }
+    }
+  ]
+}

@@ -106,6 +106,8 @@ $validationRunnerText = Read-MIRText -RelativePath "scripts/Invoke-MIRValidation
 $userSettingsDocText = Read-MIRText -RelativePath "docs/user/settings.md"
 $referenceSettingsDocText = Read-MIRText -RelativePath "docs/reference/settings.md"
 $settingsGovernanceDocText = Read-MIRText -RelativePath "docs/maintainer/settings-governance.md"
+$readmeText = Read-MIRText -RelativePath "README.md"
+$readmeDefaultsGeneratorText = Read-MIRText -RelativePath "scripts/Update-MIRREADMEStreamDefaults.ps1"
 $defaultsText = Read-MIRText -RelativePath "prototypes/mir/settings/defaults.lua"
 $productivityText = Read-MIRText -RelativePath "prototypes/streams/productivity.lua"
 $directEffectsText = Read-MIRText -RelativePath "prototypes/streams/direct-effects.lua"
@@ -117,6 +119,8 @@ $streamKeys = @(
   Get-RegexValues -Text $directEffectsText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
 ) | Sort-Object -Unique
 $baseExtensionKeys = Get-RegexValues -Text $catalogText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
+
+& (Join-Path $repo "scripts\Update-MIRREADMEStreamDefaults.ps1") -RepoRoot $repo -Check
 
 if ($streamKeys.Count -lt 60) {
   throw "Expected to discover at least 60 generated stream settings, found $($streamKeys.Count)."
@@ -185,7 +189,7 @@ Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text 
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.codec = "canonical-json-deflate-base64"'
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local function sorted_keys(value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "function M.current_profile(options)"
-Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name)"
+Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name, context)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "settings_catalog.validate_value(name, imported)"
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-import-check"'
@@ -291,6 +295,12 @@ Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSetti
 Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "Unknown setting IDs, wrong value types, invalid enum values, and out-of-range"
 Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $settingsGovernanceDocText -Needle "Portable Profiles"
 Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $settingsGovernanceDocText -Needle "runtime commands may export or validate profiles"
+Assert-Contains -RelativePath "scripts/Update-MIRREADMEStreamDefaults.ps1" -Text $readmeDefaultsGeneratorText -Needle 'prototypes\mir\settings\defaults.lua'
+Assert-Contains -RelativePath "README.md" -Text $readmeText -Needle '<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->'
+Assert-Contains -RelativePath "README.md" -Text $readmeText -Needle 'Enabled by default as a deliberately expensive late-game sink'
+Assert-Contains -RelativePath "README.md" -Text $readmeText -Needle '| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Enabled by default.'
+Assert-NoPattern -RelativePath "README.md" -Text $readmeText -Pattern 'research_cargo_landing_pad_count[^\r\n]*Disabled by default'
+Assert-NoPattern -RelativePath "README.md" -Text $readmeText -Pattern 'research_character_reach[^\r\n]*Disabled by default'
 
 Assert-NoPattern -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Pattern "\bdata\.raw\b|data:extend|settings\.startup"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Pattern "forced_value"

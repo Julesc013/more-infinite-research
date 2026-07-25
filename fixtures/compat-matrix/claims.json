@@ -4,6 +4,9 @@
     {
       "mod": "atan-air-scrubbing",
       "claim_level": "full family support: clean-filter crafting only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "family",
       "capabilities": {
         "recipe-productivity": "generated",
         "loop-risk": "diagnostic-only"
@@ -23,6 +26,9 @@
     {
       "mod": "aai-loaders",
       "claim_level": "loader crafting productivity only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "partial-family",
       "capabilities": {
         "logistics-loader-manufacturing": "generated-through-existing-stream",
         "native-belt-stack-size": "observed"
@@ -40,6 +46,9 @@
     {
       "mod": "atan-ash",
       "claim_level": "ash separation productivity only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "family",
       "capabilities": {
         "recipe-productivity": "generated",
         "tile-surface": "diagnostic-only",
@@ -63,6 +72,9 @@
     {
       "mod": "big-mining-drill",
       "claim_level": "mining drill recipe productivity only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "partial-family",
       "capabilities": {
         "mining-drill-manufacturing": "generated-through-existing-stream",
         "native-mining-yield-productivity": "observed"
@@ -80,6 +92,9 @@
     {
       "mod": "atan-nuclear-science",
       "claim_level": "science-pack recipe productivity only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "partial-family",
       "capabilities": {
         "science-pack-integration": "generated-through-existing-stream",
         "lab-compatibility": "validated",
@@ -100,6 +115,9 @@
     {
       "mod": "modules-t4",
       "claim_level": "module recipe productivity by final prototype tier",
+      "maturity": "load-checked",
+      "behavior": "generated",
+      "scope": "partial-family",
       "capabilities": {
         "recipe-productivity": "generated-through-existing-stream",
         "dynamic-module-effect-research": "not-owned"
@@ -119,6 +137,9 @@
     {
       "mod": "finite_prod_techs",
       "claim_level": "load-after finite productivity cap cooperation",
+      "maturity": "load-checked",
+      "behavior": "coexistence",
+      "scope": "named-behavior",
       "capabilities": {
         "finite-productivity-post-processing": "external-owner",
         "finite-level-formula": "not-owned"
@@ -137,6 +158,9 @@
     {
       "mod": "FluidMustFlow",
       "claim_level": "pipeline coexistence only",
+      "maturity": "load-checked",
+      "behavior": "diagnostic",
+      "scope": "named-behavior",
       "capabilities": {
         "pipeline-extent": "coexistence-check",
         "recipe-productivity": "diagnostic-only"
@@ -153,6 +177,9 @@
     {
       "mod": "robot_attrition",
       "claim_level": "runtime balance coexistence only",
+      "maturity": "load-checked",
+      "behavior": "coexistence",
+      "scope": "named-behavior",
       "capabilities": {
         "rule-surface": "coexistence-check",
         "runtime-productivity": "not-owned"
@@ -169,6 +196,9 @@
     {
       "mod": "jetpack",
       "claim_level": "equipment content coexistence only",
+      "maturity": "load-checked",
+      "behavior": "coexistence",
+      "scope": "named-behavior",
       "capabilities": {
         "equipment-content": "coexistence-check",
         "runtime-movement": "not-owned"
@@ -185,6 +215,9 @@
     {
       "mod": "equipment-gantry",
       "claim_level": "equipment-grid automation coexistence only",
+      "maturity": "load-checked",
+      "behavior": "coexistence",
+      "scope": "named-behavior",
       "capabilities": {
         "equipment-grid-automation": "coexistence-check",
         "recipe-productivity": "diagnostic-only"
@@ -201,6 +234,9 @@
     {
       "mod": "aai-containers",
       "claim_level": "storage content coexistence only",
+      "maturity": "load-checked",
+      "behavior": "coexistence",
+      "scope": "named-behavior",
       "capabilities": {
         "storage-content": "coexistence-check",
         "recipe-productivity": "diagnostic-only"
@@ -217,6 +253,9 @@
     {
       "mod": "aai-industry",
       "claim_level": "mini-overhaul tuning profile",
+      "maturity": "observed",
+      "behavior": "diagnostic",
+      "scope": "single-observation",
       "capabilities": {
         "recipe-classification": "coexistence-check",
         "science-lab": "coexistence-check",

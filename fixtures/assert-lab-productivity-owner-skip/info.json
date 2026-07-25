@@ -6,7 +6,7 @@
   "description": "Validation fixture that asserts MIR skips lab productivity when laboratory-productivity-4 has the expected native effect.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.0.77",
     "more-infinite-research",
     "mir-fixture-lab-productivity-owner"
   ]

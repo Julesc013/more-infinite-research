@@ -1,5 +1,3 @@
-. (Join-Path $PSScriptRoot "..\validation\PackageIdentity.ps1")
-
 function Get-MIRAssuranceOption {
   param([string]$Name, [string]$Default = "")
   for ($i = 0; $i -lt $script:Args.Count; $i++) {
@@ -7,7 +5,6 @@ function Get-MIRAssuranceOption {
   }
   return $Default
 }
-
 function Get-MIRAssuranceOptionValues {
   param([string]$Name)
   $values = @()
@@ -19,12 +16,10 @@ function Get-MIRAssuranceOptionValues {
   }
   return @($values)
 }
-
 function Test-MIRAssuranceSwitch {
   param([string]$Name)
   return $script:Args -contains $Name
 }
-
 function Get-MIRAssuranceSha256 {
   param([Parameter(Mandatory)][string]$Path)
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -92,22 +87,6 @@ function Get-MIRAssuranceRepositoryFiles {
   return @($script:MIRAssuranceRepositoryFilesCache)
 }
 
-function Get-MIRAssuranceEvidenceFiles {
-  # Evidence is deliberately excluded from the general repository and harness
-  # inventories to prevent self-invalidating fingerprints. Explicit evidence
-  # inputs must still resolve to their tracked or newly authored files.
-  $files = @(& git -C $repo ls-files -- .mir/evidence)
-  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate tracked release evidence files." }
-  $files += @(& git -C $repo ls-files --others --exclude-standard -- .mir/evidence)
-  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate untracked release evidence files." }
-  return @(
-    $files |
-      ForEach-Object { ([string]$_).Replace("\", "/") } |
-      Where-Object { $_ -like ".mir/evidence/*" } |
-      Sort-Object -Unique
-  )
-}
-
 function Test-MIRAssurancePathPattern {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Pattern)
   $normalizedPath = $Path.Replace("\", "/")
@@ -118,16 +97,10 @@ function Test-MIRAssurancePathPattern {
 function Resolve-MIRAssurancePatternFiles {
   param([Parameter(Mandatory)][string[]]$Patterns)
   $allFiles = @(Get-MIRAssuranceRepositoryFiles)
-  $evidenceFiles = $null
   $matches = @()
   foreach ($patternValue in @($Patterns)) {
     $pattern = ([string]$patternValue).Replace("\", "/")
-    $candidateFiles = $allFiles
-    if ($pattern -like ".mir/evidence/*") {
-      if ($null -eq $evidenceFiles) { $evidenceFiles = @(Get-MIRAssuranceEvidenceFiles) }
-      $candidateFiles = $evidenceFiles
-    }
-    foreach ($file in $candidateFiles) {
+    foreach ($file in $allFiles) {
       if (Test-MIRAssurancePathPattern -Path $file -Pattern $pattern) { $matches += $file }
     }
     $direct = if ([IO.Path]::IsPathRooted($pattern)) { $pattern } else { Join-Path $repo $pattern }
@@ -305,25 +278,6 @@ function Get-MIRAssuranceCandidateDescriptor {
   return $descriptor
 }
 
-function Get-MIRAssurancePackageSourceCommit {
-  $head = (& git -C $repo rev-parse HEAD).Trim()
-  $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
-  if (-not (Test-Path -LiteralPath $sourceLockPath -PathType Leaf)) { return $head }
-  $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
-  $candidateCommit = [string]$sourceLock.candidate_package_source_commit
-  if ($candidateCommit -notmatch '^[0-9a-f]{40}$') { return $head }
-  & git -C $repo merge-base --is-ancestor $candidateCommit HEAD
-  if ($LASTEXITCODE -ne 0) { throw "Candidate package-source commit is not an ancestor of HEAD: $candidateCommit" }
-  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
-  $roots = @(Get-MIRPackageSourceRoots)
-  & git -C $repo diff --quiet $candidateCommit HEAD -- @roots
-  if ($LASTEXITCODE -ne 0) { throw "Package-visible source changed after the locked candidate package-source commit." }
-  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
-    throw "Package-visible source is dirty relative to the locked candidate package-source commit."
-  }
-  return $candidateCommit
-}
-
 function Get-MIRAssurancePackageFiles {
   . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
   return @(Get-MIRPackageSourceFiles -RepoRoot $repo | ForEach-Object { ([string]$_).Replace("\", "/") })
@@ -354,7 +308,13 @@ function Get-MIRAssuranceHarnessFiles {
 
 function Get-MIRAssuranceZipContentHash {
   param([Parameter(Mandatory)][string]$Path)
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
   return Get-MIRZipContentFingerprint -Path $Path
+}
+
+function Get-MIRAssurancePackageSourceHash {
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  return Get-MIRPackageSourceFingerprint -RepoRoot $repo
 }
 
 function Resolve-MIRAssurancePath {
@@ -601,9 +561,8 @@ function Get-MIRAssurancePlan {
     rerun_tests=@($Context.rerun_tests)
     source_commit=(& git -C $repo rev-parse HEAD).Trim()
     source_tree=(& git -C $repo rev-parse "HEAD^{tree}").Trim()
-    package_source_commit=(Get-MIRAssurancePackageSourceCommit)
     candidate_descriptor=(Get-MIRAssuranceCandidateDescriptor -Context $Context)
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
+    package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
     verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))

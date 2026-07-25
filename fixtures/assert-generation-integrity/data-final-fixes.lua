@@ -11,9 +11,10 @@ local stream_descriptor = require("__more-infinite-research__.prototypes.mir.dom
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
-local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
+local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -35,8 +36,8 @@ local function assert_no_blocked_pickup_effects()
 end
 
 local function assert_generation_plan_v3()
-  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
-  local plan = (prototype and prototype.data) or stream_compiler.latest_artifact()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+  local plan = prototype and prototype.data
   if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
     fail("missing accepted GenerationPlan schema 3 artifact")
   end
@@ -56,6 +57,125 @@ local function assert_generation_plan_v3()
         fail("GenerationPlan row is missing evidence gate " .. gate)
       end
     end
+  end
+end
+
+local function assert_compiler_telemetry()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
+  local evidence = prototype and prototype.data
+  if not evidence or type(evidence.counts) ~= "table" or type(evidence.phases) ~= "table" then
+    fail("public compiler telemetry evidence is missing")
+  end
+  for _, counter in ipairs({
+    "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
+    "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
+    "rejected_operations", "diagnostic_rows", "generation_plan_rows", "generation_plan_public_bytes",
+    "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
+    "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
+    "context_snapshot_bytes", "technology_closure_cache_entries", "technology_closure_cached_nodes",
+    "sanitation_scanned_technologies", "sanitation_scanned_effects", "recipe_risk_facts",
+    "recipe_hard_risk_count", "recipe_review_risk_count", "provider_candidates",
+    "provider_cardinality_review_required", "provider_review_required", "family_members",
+    "stream_rows", "technology_catalog_candidates", "technology_catalog_alternatives",
+    "technology_catalog_canonical_bytes", "technology_catalog_public_bytes",
+    "technology_catalog_internal_bytes", "compiler_evidence_public_bytes",
+    "technology_graph_parity_rows", "snapshot_prototype_bytes", "snapshot_deep_copies",
+    "snapshot_canonicalization_passes", "snapshot_construction_milliseconds",
+    "snapshot_peak_memory_bytes", "input_snapshot_bytes", "qualification_snapshot_bytes",
+    "snapshot_reused_domains", "snapshot_copied_domains",
+    "qualification_snapshot_construction_milliseconds", "qualification_peak_memory_bytes",
+    "compiler_total_milliseconds", "public_artifact_total_bytes", "fingerprint_calls",
+    "canonicalization_calls", "canonical_bytes_total", "canonical_serializations_over_one_mib",
+    "maximum_canonical_bytes", "trusted_record_registrations", "trusted_untrusted_verifications",
+    "trusted_assertions", "trusted_rejected_assertions", "trusted_assertion_canonicalizations",
+    "catalog_snapshot_count", "full_record_copy_count", "technology_design_full_copies",
+    "gate_deep_verifications", "technology_design_deep_verifications",
+    "safety_qualification_deep_verifications", "technology_candidate_deep_verifications",
+    "technology_catalog_deep_verifications", "compilation_snapshot_deep_verifications",
+    "policy_snapshot_deep_verifications", "compiler_input_deep_verifications",
+    "runtime_environment_deep_verifications", "transformation_operation_deep_verifications",
+    "transformation_plan_deep_verifications"
+  }) do
+    if type(evidence.counts[counter]) ~= "number" then
+      fail("compiler telemetry counter is missing: " .. counter)
+    end
+  end
+  log("[mir-fixture] work-volume"
+    .. " fingerprint_calls=" .. tostring(evidence.counts.fingerprint_calls)
+    .. " canonicalization_calls=" .. tostring(evidence.counts.canonicalization_calls)
+    .. " canonical_bytes_total=" .. tostring(evidence.counts.canonical_bytes_total)
+    .. " serializations_over_one_mib=" .. tostring(evidence.counts.canonical_serializations_over_one_mib)
+    .. " gate_deep_verifications=" .. tostring(evidence.counts.gate_deep_verifications)
+    .. " design_deep_verifications=" .. tostring(evidence.counts.technology_design_deep_verifications)
+    .. " qualification_deep_verifications=" .. tostring(evidence.counts.safety_qualification_deep_verifications)
+    .. " catalog_deep_verifications=" .. tostring(evidence.counts.technology_catalog_deep_verifications)
+    .. " trusted_assertions=" .. tostring(evidence.counts.trusted_assertions)
+    .. " rejected_assertions=" .. tostring(evidence.counts.trusted_rejected_assertions)
+    .. " catalog_snapshots=" .. tostring(evidence.counts.catalog_snapshot_count)
+    .. " full_record_copies=" .. tostring(evidence.counts.full_record_copy_count))
+  for counter, maximum in pairs({
+    fingerprint_calls = 15000,
+    canonicalization_calls = 16000,
+    canonical_bytes_total = 50000000,
+    canonical_serializations_over_one_mib = 12,
+    gate_deep_verifications = 2500,
+    technology_design_deep_verifications = 0,
+    safety_qualification_deep_verifications = 0,
+    technology_catalog_deep_verifications = 0,
+    compilation_snapshot_deep_verifications = 0,
+    policy_snapshot_deep_verifications = 0,
+    compiler_input_deep_verifications = 0,
+    runtime_environment_deep_verifications = 0,
+    transformation_operation_deep_verifications = 0,
+    transformation_plan_deep_verifications = 0,
+    trusted_rejected_assertions = 0,
+    trusted_assertion_canonicalizations = 0,
+    catalog_snapshot_count = 0,
+    full_record_copy_count = 0,
+    technology_design_full_copies = 0
+  }) do
+    if evidence.counts[counter] > maximum then
+      fail("compiler work-volume regression exceeded " .. counter
+        .. " maximum=" .. tostring(maximum)
+        .. " actual=" .. tostring(evidence.counts[counter]))
+    end
+  end
+  for _, phase in ipairs({
+    "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
+    "graph", "planning", "postconditions"
+  }) do
+    local value = evidence.phases[phase]
+    if type(value) ~= "table" or type(value.runs) ~= "number" or value.runs < 1
+      or type(value.seconds) ~= "number" then
+      fail("compiler telemetry phase is missing or incomplete: " .. phase)
+    end
+  end
+end
+
+local function assert_compiler_evidence()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
+  local evidence = prototype and prototype.data
+  local internal_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
+  local internal = internal_prototype and internal_prototype.data
+  if not evidence or evidence.schema ~= 1 or evidence.kind ~= "mir-compiler-evidence-public"
+    or not internal or internal.schema ~= 2
+    or evidence.semantic_fingerprint ~= internal.semantic_fingerprint
+    or evidence.compilation_fingerprint ~= internal.compilation_fingerprint
+    or evidence.qualification_fingerprint ~= internal.qualification_fingerprint
+    or type(evidence.telemetry_fingerprint) ~= "string"
+    or type(evidence.run_fingerprint) ~= "string"
+    or type(evidence.input_sanitation_fingerprint) ~= "string"
+    or type(evidence.output_sanitation_fingerprint) ~= "string"
+    or type(evidence.evidence_fingerprint) ~= "string"
+    or evidence.target_inventory_unchanged ~= true
+    or not evidence.input_sanitation or evidence.input_sanitation.pass ~= "input"
+    or not evidence.output_sanitation or evidence.output_sanitation.pass ~= "output"
+    or not internal.input_sanitation_ledger or internal.input_sanitation_ledger.pass ~= "input"
+    or not internal.output_sanitation_ledger or internal.output_sanitation_ledger.pass ~= "output"
+    or internal.input_sanitation_ledger.sanitized_target_inventory_fingerprint
+      ~= internal.output_sanitation_ledger.sanitized_target_inventory_fingerprint
+  then
+    fail("compact compiler evidence or debug sanitation ledgers are missing")
   end
 end
 
@@ -179,14 +299,56 @@ local function assert_recipe_fact_contracts()
   if canonical_recipe_facts.scan_count() ~= 1 then
     fail("large synthetic recipe queries triggered a repeated full recipe scan")
   end
+
+  local default_policy = canonical_recipe_facts.get("mir-fixture-default-productivity-policy")
+  if not default_policy or default_policy.declared_allow_productivity ~= nil
+    or default_policy.effective_allow_productivity ~= false then
+    fail("omitted allow_productivity did not resolve to the Factorio 2.1 false default")
+  end
+
+  local complete_shape = canonical_recipe_facts.get("mir-fixture-complete-product-shape")
+  local product = complete_shape and complete_shape.variants[1] and complete_shape.variants[1].results[1]
+  if not product or product.independent_probability ~= 0.5 or product.extra_count_fraction ~= 0.25
+    or product.percent_spoiled ~= 0.1 or product.always_fresh ~= true
+    or product.reset_freshness_on_craft ~= true or product.quality_min ~= "normal"
+    or product.quality_max ~= "normal" or product.quality_change ~= 0
+    or product.affected_by_quality ~= false then
+    fail("RecipeFactV2 did not preserve the complete Factorio 2.1 product shape")
+  end
+
+  local inherited = recipe_semantics.resolve(
+    {allow_productivity = true, maximum_productivity = 2.5},
+    {allow_quality = false},
+    target_profile
+  )
+  if inherited.effective_allow_productivity ~= true or inherited.effective_allow_quality ~= false
+    or inherited.effective_maximum_productivity ~= 2.5 then
+    fail("recipe variant policy did not inherit root declarations")
+  end
+
+  local probability_fields = {}
+  for _, field in ipairs(target_profile.prototype_shapes.product_probability_fields or {}) do
+    probability_fields[field] = true
+  end
+  for _, field in ipairs({"independent_probability", "shared_probability", "extra_count_fraction", "quality_min", "quality_max"}) do
+    if not probability_fields[field] then fail("target profile omits product field " .. field) end
+  end
 end
 
-assert_recipe_fact_contracts()
+compiler_context.with_active(pipeline_commands.new_context(), assert_recipe_fact_contracts)
 
 local function assert_pipeline_command_contracts()
   local catalog = pipeline_commands.snapshot()
   local count = 0
-  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true, report = true}
+  local allowed_kinds = {
+    sanitation = true,
+    mutation = true,
+    emission = true,
+    plan = true,
+    assertion = true,
+    report = true,
+    publication = true
+  }
   for id, command in pairs(catalog) do
     count = count + 1
     if command.id ~= id or not allowed_kinds[command.kind] then
@@ -197,7 +359,7 @@ local function assert_pipeline_command_contracts()
       fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
-  if count ~= 20 then fail("expected 20 governed pipeline commands, got " .. tostring(count)) end
+  if count ~= 21 then fail("expected 21 governed pipeline commands, got " .. tostring(count)) end
 end
 
 assert_pipeline_command_contracts()
@@ -322,6 +484,8 @@ local base_extension_defaults = {
 
 assert_no_blocked_pickup_effects()
 assert_generation_plan_v3()
+assert_compiler_telemetry()
+assert_compiler_evidence()
 assert_decision_record_v2()
 assert_setting_target_ownership()
 
@@ -631,6 +795,13 @@ if techs["recipe-prod-research_processing_unit-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
   end
 end
+if techs["recipe-prod-research_steel-1"] then
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_steel-1", "__space-age__/graphics/technology/steel-plate-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")
+  end
+end
 if techs["research-productivity"] then
   assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
 elseif use_installed_space_age_icons then
@@ -658,13 +829,6 @@ if techs["recipe-prod-research_rocket_fuel-1"] then
     assert_tech_uses_icon_path("recipe-prod-research_rocket_fuel-1", "__space-age__/graphics/technology/rocket-fuel-productivity.png")
   else
     assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")
-  end
-end
-if techs["recipe-prod-research_steel-1"] then
-  if use_installed_space_age_icons then
-    assert_tech_uses_icon_path("recipe-prod-research_steel-1", "__space-age__/graphics/technology/steel-plate-productivity.png")
-  else
-    assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")
   end
 end
 if use_installed_space_age_icons then
@@ -805,8 +969,6 @@ if is_space_age then
   end
 
   for _, expectation in ipairs({
-    { recipe = "steel-plate", owner = "steel-plate-productivity" },
-    { recipe = "casting-steel", owner = "steel-plate-productivity" },
     { recipe = "processing-unit", owner = "processing-unit-productivity" },
     { recipe = "low-density-structure", owner = "low-density-structure-productivity" },
     { recipe = "casting-low-density-structure", owner = "low-density-structure-productivity" },
@@ -814,7 +976,9 @@ if is_space_age then
     { recipe = "bioplastic", owner = "plastic-bar-productivity" },
     { recipe = "rocket-fuel", owner = "rocket-fuel-productivity" },
     { recipe = "rocket-fuel-from-jelly", owner = "rocket-fuel-productivity" },
-    { recipe = "ammonia-rocket-fuel", owner = "rocket-fuel-productivity" }
+    { recipe = "ammonia-rocket-fuel", owner = "rocket-fuel-productivity" },
+    { recipe = "steel-plate", owner = "steel-plate-productivity" },
+    { recipe = "casting-steel", owner = "steel-plate-productivity" }
   }) do
     assert_recipe_owner(expectation.recipe, expectation.owner)
   end
@@ -858,11 +1022,11 @@ if is_space_age then
   end
 else
   for _, expectation in ipairs({
-    { recipe = "steel-plate", owner = "recipe-prod-research_steel-1" },
     { recipe = "processing-unit", owner = "recipe-prod-research_processing_unit-1" },
     { recipe = "low-density-structure", owner = "recipe-prod-research_low_density_structure-1" },
     { recipe = "plastic-bar", owner = "recipe-prod-research_plastic-1" },
-    { recipe = "rocket-fuel", owner = "recipe-prod-research_rocket_fuel-1" }
+    { recipe = "rocket-fuel", owner = "recipe-prod-research_rocket_fuel-1" },
+    { recipe = "steel-plate", owner = "recipe-prod-research_steel-1" }
   }) do
     assert_recipe_owner(expectation.recipe, expectation.owner)
   end

@@ -5,7 +5,9 @@ function Get-MIRPerformanceHarnessFiles {
   $authorities = @(
     ".mir/performance-budgets.json",
     ".mir/performance-campaign.json",
-    "fixtures/compat-matrix/local-library-scenarios-2.0.json",
+    ".mir/sanitation-budgets.json",
+    "fixtures/compat-matrix/local-library-scenarios.json",
+    "fixtures/performance-regression-probe",
     "scripts/Invoke-MIRCompatAudit.ps1",
     "scripts/Measure-MIRPerformanceRegression.ps1",
     "scripts/MIRCompatAudit",
@@ -65,4 +67,24 @@ function Get-MIRPerformanceSettingsFingerprint {
     }
   )
   return Get-MIRStringSha256 -Value ($rows -join "`n")
+}
+
+function Get-MIRPerformanceCounterValue {
+  param(
+    [Parameter(Mandatory)]$Counters,
+    [Parameter(Mandatory)][string]$Name
+  )
+
+  if ($Counters -is [Collections.IDictionary]) {
+    if (-not $Counters.Contains($Name)) {
+      return [pscustomobject]@{found=$false; value=[long]0}
+    }
+    return [pscustomobject]@{found=$true; value=[long]$Counters[$Name]}
+  }
+
+  $property = $Counters.PSObject.Properties[$Name]
+  if ($null -eq $property) {
+    return [pscustomobject]@{found=$false; value=[long]0}
+  }
+  return [pscustomobject]@{found=$true; value=[long]$property.Value}
 }

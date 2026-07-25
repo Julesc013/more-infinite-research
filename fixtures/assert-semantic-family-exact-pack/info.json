@@ -6,7 +6,7 @@
   "description": "Asserts reviewed-data mode does not promote experimental family technologies.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.0.77",
     "more-infinite-research",
     "mir-fixture-semantic-family-attach"
   ]

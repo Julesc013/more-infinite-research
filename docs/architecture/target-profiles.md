@@ -34,13 +34,12 @@ Every profile is now a `TargetProfileV2` record and declares:
 - feature switches;
 - positive recipe, science-pack, probability, formula, quality, and surface-condition shapes;
 - available emitter families, asset policy, and expected stream count;
-- positive supported mod namespaces and technology effect types on maintained modern lines;
-- temporary unsupported-stream/effect/settings cuts only on historical reduced profiles awaiting refresh;
+- positive supported mod namespaces and technology effect types on every declared line;
 - required validation groups.
 
 `target_line.lua` converts the selected profile into the stable adapter API used by settings, planning, emission, stage orchestration, and runtime state. Target profiles classify capabilities; they do not create or mutate prototypes.
 
-For Factorio 2.1 and 2.0, stream descriptors declare required features, mods, prototypes, technologies, and effect types. The selected profile must positively admit every required feature, mod namespace, and effect type. These profiles are not allowed to carry the older `unsupported_streams`, `unsupported_required_mods`, or `unsupported_effect_types` denylists. Historical reduced profiles retain that transitional shape until their independent refresh and binary-proof waves.
+For every target, stream descriptors declare required features, mods, prototypes, technologies, and effect types. The selected profile must positively admit every required feature, mod namespace, and effect type. No profile may carry the older `unsupported_streams`, `unsupported_required_mods`, `unsupported_effect_types`, or `omitted_global_settings` denylists. Reduced profiles use empty positive allowlists and disabled features to fail closed; this is a contract shape, not a binary support claim.
 
 The same positive declaration rule applies to generated settings, pipeline commands, runtime event handlers, and governed fixtures. An empty `requires_features` array is an explicit portable declaration, not missing metadata. Architecture lint fails when a handler or fixture omits its declaration. Cross-target fixtures obtain science-pack prototype kind and stream-count expectations from TargetProfileV2 rather than branching on Factorio version or hard-coding modern values.
 

@@ -1,6 +1,160 @@
 . (Join-Path $PSScriptRoot "Hashing.ps1")
 . (Join-Path (Split-Path -Parent $PSScriptRoot) "validation\ReleaseAttestations.ps1")
 
+function Get-MIRAssuranceCandidateArchiveIdentity {
+  param([Parameter(Mandatory)][string]$Path)
+
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Candidate does not exist: $Path" }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    $entryCount = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith("/") }).Count
+  } finally {
+    $archive.Dispose()
+  }
+  return [pscustomobject]@{
+    bytes = (Get-Item -LiteralPath $Path).Length
+    entries = $entryCount
+    sha256 = Get-MIRAssuranceSha256 -Path $Path
+    content_sha256 = Get-MIRAssuranceZipContentHash -Path $Path
+  }
+}
+
+function Get-MIRAssuranceReleaseCandidateAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  $ledgerPath = Join-Path $repo ".mir\releases.json"
+  $ledger = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json
+  if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne "canonical-release-ledger") {
+    throw "Canonical release ledger is invalid."
+  }
+  $targetKey = "factorio-$($Context.target)"
+  $property = $ledger.development.PSObject.Properties[$targetKey]
+  if ($null -eq $property) { throw "Canonical release ledger has no development authority for $targetKey." }
+  $authority = $property.Value
+  if ([string]$authority.mir_version -ne [string]$Context.info.version) {
+    throw "Release authority version does not match the candidate version."
+  }
+  if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$') {
+    throw "Release authority candidate_id is invalid."
+  }
+  if ([string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$') {
+    throw "Release authority package_source_commit must be a full lowercase Git commit."
+  }
+  foreach ($field in @("package_source_sha256", "archive_sha256", "package_content_sha256")) {
+    if ([string]$authority.$field -notmatch '^[0-9A-F]{64}$') {
+      throw "Release authority $field must be an uppercase SHA-256 digest."
+    }
+  }
+  $material = $authority.package_source_material
+  $materialAlgorithm = [string]$material.hash_algorithm
+  $legacyMaterial = $materialAlgorithm -eq "git-index-with-captured-worktree-v1" -and
+    [string]$material.source_parent_commit -match '^[0-9a-f]{40}$' -and
+    @($material.changed_files).Count -gt 0
+  $cleanMaterial = $materialAlgorithm -eq "git-commit-normalized-package-v1" -and
+    [string]$material.source_tree -match '^[0-9a-f]{40}$' -and
+    [int]$material.file_count -gt 0
+  if ([int]$material.schema -ne 1 -or (-not $legacyMaterial -and -not $cleanMaterial)) {
+    throw "Release authority package_source_material is invalid."
+  }
+  if ([long]$authority.archive_bytes -le 0) { throw "Release authority archive_bytes must be positive." }
+  $null = Resolve-MIRAssuranceCommit -Commit ([string]$authority.package_source_commit)
+  return $authority
+}
+
+function Get-MIRAssuranceCommitCandidateIdentity {
+  param([Parameter(Mandatory)][string]$Commit)
+
+  $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
+  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-seal-source-" + [guid]::NewGuid().ToString("N"))
+  $sourceRoot = Join-Path $temporaryRoot "source"
+  $sourceArchive = Join-Path $temporaryRoot "source.zip"
+  try {
+    New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
+    . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+    $archivePaths = @(
+      @(Get-MIRPackageSourceRoots)
+      "scripts/Build-MIRPackage.ps1"
+      "scripts/validation/PackageIdentity.ps1"
+    )
+    & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @archivePaths 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
+    Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
+    $powerShell = (Get-Process -Id $PID).Path
+    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot "scripts\Build-MIRPackage.ps1") -OutputDir "authority-dist" | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Deterministic package reconstruction failed for $resolvedCommit." }
+    $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRoot "info.json") | ConvertFrom-Json
+    $candidate = Join-Path $sourceRoot "authority-dist\$($info.name)_$($info.version).zip"
+    $identity = Get-MIRAssuranceCandidateArchiveIdentity -Path $candidate
+    return [pscustomobject]@{
+      commit = $resolvedCommit
+      bytes = [long]$identity.bytes
+      entries = [int]$identity.entries
+      sha256 = [string]$identity.sha256
+      content_sha256 = [string]$identity.content_sha256
+    }
+  } finally {
+    if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
+      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+    }
+  }
+}
+
+function Get-MIRAssuranceSealSourceAuthority {
+  param(
+    [Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)][string]$QualificationCommit
+  )
+
+  $qualification = Resolve-MIRAssuranceCommit -Commit $QualificationCommit
+  $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+  $packageCommit = Resolve-MIRAssuranceCommit -Commit ([string]$authority.package_source_commit)
+  & git -C $repo merge-base --is-ancestor $packageCommit $qualification
+  if ($LASTEXITCODE -ne 0) { throw "Package-source commit is not an ancestor of the qualification commit." }
+  if (-not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $qualification)) {
+    throw "Package-visible paths changed between package source and qualification."
+  }
+  $packageMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $packageCommit -Material $authority.package_source_material
+  $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $qualification -Material $authority.package_source_material
+  if ([string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256) {
+    throw "Package-source commit does not reproduce the canonical package-source identity."
+  }
+  if ([string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256) {
+    throw "Qualification commit does not preserve the canonical package-source identity."
+  }
+  $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
+  if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
+      [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
+      [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256) {
+    throw "Candidate archive does not match canonical release authority."
+  }
+  $packageBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $packageCommit
+  $qualificationBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $qualification
+  foreach ($build in @($packageBuild, $qualificationBuild)) {
+    if ([long]$build.bytes -ne [long]$candidateIdentity.bytes -or
+        [int]$build.entries -ne [int]$candidateIdentity.entries -or
+        [string]$build.sha256 -ne [string]$candidateIdentity.sha256 -or
+        [string]$build.content_sha256 -ne [string]$candidateIdentity.content_sha256) {
+      throw "Commit $($build.commit) does not reproduce the exact candidate archive and content identities."
+    }
+  }
+  $qualificationTree = @(& git -C $repo rev-parse "$qualification^{tree}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $qualificationTree.Count -ne 1) {
+    throw "Unable to resolve the qualification source tree."
+  }
+  return [pscustomobject]@{
+    candidate = $authority
+    package_source_commit = $packageCommit
+    package_source_sha256 = [string]$authority.package_source_sha256
+    package_source_material = $authority.package_source_material
+    qualification_source_commit = $qualification
+    qualification_source_tree = [string]$qualificationTree[0]
+    candidate_identity = $candidateIdentity
+    package_source_build = $packageBuild
+    qualification_source_build = $qualificationBuild
+  }
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -24,32 +178,35 @@ function Invoke-MIRAssuranceSeal {
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   $nonGeneratedStatus = @($status | Where-Object {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }
-    $path -notlike "artifacts/assurance/*" -and $path -notlike "out/*"
+    $path -notlike "artifacts/assurance/*" -and
+      $path -notlike "out/*" -and
+      $path -notlike "approved-delta/*" -and
+      $path -notlike ".mir/evidence/*"
   })
   if ($nonGeneratedStatus.Count -ne 0) {
     throw "Refusing to seal a dirty source tree. Commit the exact candidate source first."
   }
   if ([string]$plan.source_commit -ne $commit) { throw "Verification plan source commit is not the current source commit." }
-  $packageSourceCommit = Get-MIRAssurancePackageSourceCommit
-  if ([string]$plan.package_source_commit -ne $packageSourceCommit) {
-    throw "Verification plan package-source commit is not the locked candidate package source."
-  }
   if ([string]$plan.candidate_descriptor_sha256 -ne [string](Get-MIRAssuranceCandidateDescriptor -Context $Context).descriptor_sha256) {
     throw "Verification plan candidate descriptor is not the current candidate."
+  }
+  $sourceAuthority = Get-MIRAssuranceSealSourceAuthority -Context $Context -QualificationCommit $commit
+  if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
+    throw "Verification plan source tree is not the qualification source tree."
   }
   $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
-    -ExpectedSourceCommit $packageSourceCommit `
+    -ExpectedSourceCommit $commit `
     -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
     -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $manualReview = Test-MIRManualReleaseAttestation `
     -RepoRoot $repo `
     -Candidate $Context.candidate `
     -FactorioBin $Context.factorio `
-    -ExpectedSourceCommit $packageSourceCommit `
+    -ExpectedSourceCommit $commit `
     -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
   $canonicalDevAnchor = $commit
@@ -76,16 +233,20 @@ function Invoke-MIRAssuranceSeal {
     target=$Context.target
     canonical_dev_anchor=$canonicalDevAnchor
     branch=$branch
-    source_commit=$commit
-    package_source_commit=$packageSourceCommit
-    source_tree=[string]$plan.source_tree
+    candidate_id=[string]$sourceAuthority.candidate.candidate_id
+    package_source_commit=[string]$sourceAuthority.package_source_commit
+    package_source_sha256=[string]$sourceAuthority.package_source_sha256
+    package_source_material=$sourceAuthority.package_source_material
+    qualification_source_commit=[string]$sourceAuthority.qualification_source_commit
+    qualification_source_tree=[string]$sourceAuthority.qualification_source_tree
+    source_commit=[string]$sourceAuthority.qualification_source_commit
+    source_tree=[string]$sourceAuthority.qualification_source_tree
     source_clean=($nonGeneratedStatus.Count -eq 0)
     candidate=(Get-MIRAssuranceRepoRelativePath -Path $Context.candidate)
-    candidate_sha256=(Get-MIRAssuranceSha256 -Path $Context.candidate)
-    candidate_content_sha256=(Get-MIRAssuranceZipContentHash -Path $Context.candidate)
+    candidate_sha256=[string]$sourceAuthority.candidate_identity.sha256
+    candidate_content_sha256=[string]$sourceAuthority.candidate_identity.content_sha256
     candidate_descriptor_sha256=[string]$plan.candidate_descriptor_sha256
     candidate_domain_manifest_sha256=[string]$domainManifest.manifest_sha256
-    package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
     target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $targetsPath)
     verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
     domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
@@ -129,11 +290,20 @@ function Invoke-MIRAssuranceCheckSeal {
   $checks = [ordered]@{
     seal_digest=$false
     candidate_exists=(Test-Path -LiteralPath $candidate -PathType Leaf)
+    candidate_id=$false
+    candidate_authority=$false
     candidate_sha256=$false
     candidate_content_sha256=$false
     candidate_descriptor_sha256=$false
     candidate_domain_manifest_sha256=$false
-    package_source_sha256=$false
+    source_aliases=$false
+    package_source_is_ancestor=$false
+    package_source_identity=$false
+    qualification_package_source_identity=$false
+    package_roots_unchanged=$false
+    package_roots_unchanged_to_head=$false
+    package_source_candidate=$false
+    qualification_source_candidate=$false
     target_profile_sha256=$false
     verification_profile_sha256=$false
     domain_policy_sha256=$false
@@ -141,10 +311,11 @@ function Invoke-MIRAssuranceCheckSeal {
     validation_harness_sha256=$false
     trust_policy_sha256=$false
     source_is_ancestor=$false
-    package_source_is_ancestor=$false
-    package_source_unchanged=$false
     source_tree=$false
+    qualification_source_is_ancestor=$false
+    qualification_source_tree=$false
     verification_plan_sha256=$false
+    verification_plan_source=$false
     plan_material_sha256=$false
     required_test_set_sha256=$false
     evidence_bundle_sha256=$false
@@ -160,15 +331,60 @@ function Invoke-MIRAssuranceCheckSeal {
   $sealMaterial = ConvertTo-MIRAssuranceOrderedMap -Object $seal
   $sealMaterial.Remove("seal_sha256")
   $checks.seal_digest=((Get-MIRAssuranceJsonHash -Value $sealMaterial) -eq [string]$seal.seal_sha256)
+  $candidateIdentity = $null
   if ($checks.candidate_exists) {
-    $checks.candidate_sha256=((Get-MIRAssuranceSha256 -Path $candidate) -eq [string]$seal.candidate_sha256)
-    $checks.candidate_content_sha256=((Get-MIRAssuranceZipContentHash -Path $candidate) -eq [string]$seal.candidate_content_sha256)
+    $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $candidate
+    $checks.candidate_sha256=([string]$candidateIdentity.sha256 -eq [string]$seal.candidate_sha256)
+    $checks.candidate_content_sha256=([string]$candidateIdentity.content_sha256 -eq [string]$seal.candidate_content_sha256)
     $sealContext = $Context.PSObject.Copy()
     $sealContext.candidate = $candidate
     $checks.candidate_domain_manifest_sha256=([string](Get-MIRAssuranceDomainManifest -Context $sealContext -RequireCandidate).manifest_sha256 -eq [string]$seal.candidate_domain_manifest_sha256)
     $checks.candidate_descriptor_sha256=([string](Get-MIRAssuranceCandidateDescriptor -Context $sealContext).descriptor_sha256 -eq [string]$seal.candidate_descriptor_sha256)
+    try {
+      $candidateAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $sealContext
+      $checks.candidate_id=([string]$candidateAuthority.candidate_id -eq [string]$seal.candidate_id)
+      $checks.candidate_authority=(
+        [string]$candidateAuthority.package_source_commit -eq [string]$seal.package_source_commit -and
+        [string]$candidateAuthority.package_source_sha256 -eq [string]$seal.package_source_sha256 -and
+        (Get-MIRAssuranceJsonHash -Value $candidateAuthority.package_source_material) -eq (Get-MIRAssuranceJsonHash -Value $seal.package_source_material) -and
+        [long]$candidateAuthority.archive_bytes -eq [long]$candidateIdentity.bytes -and
+        [string]$candidateAuthority.archive_sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$candidateAuthority.package_content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+    } catch {}
   }
-  $checks.package_source_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles)) -eq [string]$seal.package_source_sha256)
+  $checks.source_aliases=(
+    [string]$seal.source_commit -eq [string]$seal.qualification_source_commit -and
+    [string]$seal.source_tree -eq [string]$seal.qualification_source_tree
+  )
+  try {
+    $packageCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.package_source_commit)
+    $qualificationCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.qualification_source_commit)
+    & git -C $repo merge-base --is-ancestor $packageCommit $qualificationCommit
+    $checks.package_source_is_ancestor=($LASTEXITCODE -eq 0)
+    $checks.package_roots_unchanged=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $qualificationCommit)
+    $checks.package_roots_unchanged_to_head=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit HEAD)
+    $packageMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $packageCommit -Material $seal.package_source_material
+    $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $qualificationCommit -Material $seal.package_source_material
+    $checks.package_source_identity=([string]$packageMaterial.sha256 -eq [string]$seal.package_source_sha256)
+    $checks.qualification_package_source_identity=([string]$qualificationMaterial.sha256 -eq [string]$seal.package_source_sha256)
+    if ($null -ne $candidateIdentity) {
+      $packageBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $packageCommit
+      $qualificationBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $qualificationCommit
+      $checks.package_source_candidate=(
+        [long]$packageBuild.bytes -eq [long]$candidateIdentity.bytes -and
+        [int]$packageBuild.entries -eq [int]$candidateIdentity.entries -and
+        [string]$packageBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$packageBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+      $checks.qualification_source_candidate=(
+        [long]$qualificationBuild.bytes -eq [long]$candidateIdentity.bytes -and
+        [int]$qualificationBuild.entries -eq [int]$candidateIdentity.entries -and
+        [string]$qualificationBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$qualificationBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+    }
+  } catch {}
   $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $targetsPath) -eq [string]$seal.target_profile_sha256)
   $checks.verification_profile_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
   $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
@@ -177,19 +393,24 @@ function Invoke-MIRAssuranceCheckSeal {
   $checks.trust_policy_sha256=((Get-MIRAssuranceSha256 -Path $trustPath) -eq [string]$seal.trust_policy_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
-  & git -C $repo merge-base --is-ancestor ([string]$seal.package_source_commit) ([string]$seal.source_commit)
-  $checks.package_source_is_ancestor=($LASTEXITCODE -eq 0)
-  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
-  $packageRoots = @(Get-MIRPackageSourceRoots)
-  & git -C $repo diff --quiet ([string]$seal.package_source_commit) ([string]$seal.source_commit) -- @packageRoots
-  $checks.package_source_unchanged=($LASTEXITCODE -eq 0)
   $sourceTree = @(& git -C $repo rev-parse "$([string]$seal.source_commit)^{tree}" 2>$null)
   $checks.source_tree=($LASTEXITCODE -eq 0 -and [string]$sourceTree[0] -eq [string]$seal.source_tree)
+  & git -C $repo merge-base --is-ancestor ([string]$seal.qualification_source_commit) HEAD
+  $checks.qualification_source_is_ancestor=($LASTEXITCODE -eq 0)
+  $qualificationTree = @(& git -C $repo rev-parse "$([string]$seal.qualification_source_commit)^{tree}" 2>$null)
+  $checks.qualification_source_tree=(
+    $LASTEXITCODE -eq 0 -and
+    [string]$qualificationTree[0] -eq [string]$seal.qualification_source_tree
+  )
   if (Test-Path -LiteralPath $planPath -PathType Leaf) {
     $checks.verification_plan_sha256=((Get-MIRAssuranceSha256 -Path $planPath) -eq [string]$seal.verification_plan_sha256)
     if ($checks.verification_plan_sha256) {
       try {
         $plan = Get-Content -Raw -LiteralPath $planPath | ConvertFrom-Json
+        $checks.verification_plan_source=(
+          [string]$plan.source_commit -eq [string]$seal.qualification_source_commit -and
+          [string]$plan.source_tree -eq [string]$seal.qualification_source_tree
+        )
         $checks.plan_material_sha256=([string]$plan.plan_material_sha256 -eq [string]$seal.plan_material_sha256)
         $checks.required_test_set_sha256=([string]$plan.required_test_set_sha256 -eq [string]$seal.required_test_set_sha256)
       } catch {}
@@ -225,7 +446,7 @@ function Invoke-MIRAssuranceCheckSeal {
           [string]$performance.status -eq "passed" -and
           [string]$performance.candidate.archive_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$performance.candidate.package_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$performance.candidate.source_commit -eq [string]$seal.package_source_commit
+          [string]$performance.candidate.source_commit -eq [string]$seal.source_commit
         )
       } catch {}
     }
@@ -243,7 +464,7 @@ function Invoke-MIRAssuranceCheckSeal {
           [string]$manualReview.status -eq "passed" -and
           [string]$manualReview.candidate_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$manualReview.candidate_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$manualReview.source_commit -eq [string]$seal.package_source_commit -and
+          [string]$manualReview.source_commit -eq [string]$seal.source_commit -and
           [string]$manualReview.attestation_sha256 -eq $manualSelfHash
         )
       } catch {}
@@ -276,6 +497,32 @@ function Invoke-MIRAssuranceSelfTest {
     if ($actual.classes -notcontains $case.class) { throw "Classifier self-test failed for $($case.path)." }
   }
 
+  $fixtureFingerprint = Get-MIRAssuranceScenarioFixtureFingerprint -Test ([pscustomobject]@{
+    id = "scenario/2.1/compiler-contracts"
+    scenario = [pscustomobject]@{
+      group = "local-mod-library"
+      fixtures = @("mir-fixture-assert-compiler-contracts")
+    }
+  })
+  if (@($fixtureFingerprint.patterns) -notcontains "fixtures/assert-compiler-contracts/**") {
+    throw "Scenario fixture fingerprint did not resolve the fixture mod ID to its repository directory."
+  }
+  if (@($fixtureFingerprint.patterns) -contains "fixtures/mir-fixture-assert-compiler-contracts/**") {
+    throw "Scenario fixture fingerprint incorrectly treated a fixture mod ID as a repository directory."
+  }
+  if ([int]$fixtureFingerprint.file_count -lt 3) {
+    throw "Scenario fixture fingerprint did not capture the compiler-contract fixture source files."
+  }
+  $unknownFixtureRejected = $false
+  try {
+    $null = Get-MIRAssuranceFixturePathByModId -ModId "mir-fixture-does-not-exist"
+  } catch {
+    $unknownFixtureRejected = $true
+  }
+  if (-not $unknownFixtureRejected) {
+    throw "Unknown scenario fixture mod ID was accepted by the evidence fingerprint resolver."
+  }
+
   $baseMaterial = [ordered]@{test="a"; candidate="a"; binary="a"; harness="a"; settings="a"}
   $base = Get-MIRAssuranceJsonHash -Value $baseMaterial
   foreach ($field in @("candidate", "binary", "harness", "settings")) {
@@ -291,6 +538,49 @@ function Invoke-MIRAssuranceSelfTest {
   })
   if ((Get-MIRAssuranceJsonHash -Value $dependencyA) -ne (Get-MIRAssuranceJsonHash -Value $dependencyB)) {
     throw "Version-only metadata unexpectedly invalidated the dependency contract."
+  }
+
+  if ([string]$Context.target -eq "2.1" -and [string]$Context.info.version -eq "3.2.0") {
+    $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+    $packageMaterial = Get-MIRAssurancePackageAuthorityHash `
+      -PackageSourceCommit ([string]$authority.package_source_commit) `
+      -ContentCommit ([string]$authority.package_source_commit) `
+      -Material $authority.package_source_material
+    $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash `
+      -PackageSourceCommit ([string]$authority.package_source_commit) `
+      -ContentCommit $qualificationCommit `
+      -Material $authority.package_source_material
+    if ([string]$authority.candidate_id -ne "C16" -or
+        [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
+        [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
+        [int]$packageMaterial.file_count -ne 288 -or
+        -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
+      throw "C16 package-source and qualification-source authority self-test failed."
+    }
+    $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
+    if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
+        [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
+        [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256 -or
+        (Get-MIRAssurancePackageSourceHash) -ne [string]$authority.package_source_sha256) {
+      throw "C16 candidate, normalized content, and current package-source identities do not match release authority."
+    }
+    $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
+    if ([string]$tamperedMaterial.hash_algorithm -eq "git-commit-normalized-package-v1") {
+      $tamperedMaterial.source_tree = "0" * 40
+    } else {
+      $tamperedMaterial.changed_files[0].captured_worktree_sha256 = "0" * 64
+    }
+    $tamperedRejected = $false
+    try {
+      $null = Get-MIRAssurancePackageAuthorityHash `
+        -PackageSourceCommit ([string]$authority.package_source_commit) `
+        -ContentCommit $qualificationCommit `
+        -Material $tamperedMaterial
+    } catch { $tamperedRejected = $true }
+    if (-not $tamperedRejected) {
+      throw "Tampered package-source material was not rejected."
+    }
   }
 
   $selfTestId = "self-test.synthetic"
@@ -393,6 +683,31 @@ function Invoke-MIRAssuranceSelfTest {
     $Context.reuse_enabled = $originalReuseEnabled
   }
 
+  $planPolicyContext = $Context.PSObject.Copy()
+  $planPolicyContext.reuse_enabled = $true
+  $planPolicyContext.rerun_tests = @()
+  Sync-MIRAssuranceContextFromPlan -Context $planPolicyContext -Plan ([pscustomobject][ordered]@{
+    reuse_enabled=$false
+    rerun_tests=@()
+  })
+  $planNoReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $planPolicyContext -TestId $selfTestId
+  if ($planPolicyContext.reuse_enabled -or
+      $planNoReuseDecision.disposition -ne "RUN" -or
+      $planNoReuseDecision.reason -ne "reuse-disabled") {
+    throw "A loaded no-reuse plan did not control executor evidence reuse."
+  }
+  Sync-MIRAssuranceContextFromPlan -Context $planPolicyContext -Plan ([pscustomobject][ordered]@{
+    reuse_enabled=$true
+    rerun_tests=@($selfTestId)
+  })
+  $planRerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $planPolicyContext -TestId $selfTestId
+  if (-not $planPolicyContext.reuse_enabled -or
+      @($planPolicyContext.rerun_tests).Count -ne 1 -or
+      $planRerunDecision.disposition -ne "RUN" -or
+      $planRerunDecision.reason -ne "explicit-rerun") {
+    throw "A loaded explicit-rerun plan did not control executor evidence reuse."
+  }
+
   $freshnessProducer = Get-MIRAssuranceProducer
   $freshnessGeneratedAt = (Get-Date).ToUniversalTime().ToString("o")
   $freshnessTest = [pscustomobject][ordered]@{
@@ -440,31 +755,143 @@ function Invoke-MIRAssuranceSelfTest {
   }
   Remove-Item -LiteralPath $resolvedSelfTestRoot -Recurse -Force
 
-  $runningKey = Get-MIRAssuranceTextHash -Text ([guid]::NewGuid().ToString("N"))
-  $runningFingerprint = [ordered]@{
-    schema=$evidenceSchema
-    test_id="self-test.running"
-    target=[string]$Context.target
-    input_key=$runningKey
-    fingerprint_sha256=$runningKey
-    definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition")
-  }
-  $running = Write-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context
-  if ($null -eq (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
-    throw "Matching live worker evidence was not adoptable."
-  }
-  $running.process_id = [int]::MaxValue
-  $runningPaths = Get-MIRAssuranceEvidencePaths -TestId $runningFingerprint.test_id -InputKey $runningFingerprint.input_key
-  [IO.File]::WriteAllText($runningPaths.running, (($running | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
-  if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
-    throw "Dead local worker evidence was incorrectly adoptable."
-  }
-  if (Test-Path -LiteralPath $runningPaths.root) {
-    $resolvedRunningRoot = [IO.Path]::GetFullPath($runningPaths.root)
-    if (-not $resolvedRunningRoot.StartsWith($resolvedEvidenceRoot, [StringComparison]::OrdinalIgnoreCase)) {
-      throw "Refusing to remove running self-test evidence outside the evidence root."
+  $newRunningCase = {
+    param([Parameter(Mandatory)][string]$Label)
+    $key = Get-MIRAssuranceTextHash -Text "$Label-$([guid]::NewGuid().ToString('N'))"
+    $caseFingerprint = [ordered]@{
+      schema=$evidenceSchema
+      test_id="self-test.running.$Label"
+      target=[string]$Context.target
+      input_key=$key
+      fingerprint_sha256=$key
+      definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition-$Label")
     }
-    Remove-Item -LiteralPath $resolvedRunningRoot -Recurse -Force
+    $marker = Write-MIRAssuranceRunningEvidence -Fingerprint $caseFingerprint -Context $Context
+    return [pscustomobject]@{
+      fingerprint=$caseFingerprint
+      marker=$marker
+      paths=(Get-MIRAssuranceEvidencePaths -TestId $caseFingerprint.test_id -InputKey $caseFingerprint.input_key)
+    }
+  }
+  $writeRunningCase = {
+    param([Parameter(Mandatory)]$Case)
+    Write-MIRAssuranceAtomicJson -Value $Case.marker -Path $Case.paths.running
+  }
+  $assertRemovedAndRun = {
+    param([Parameter(Mandatory)]$Case, [Parameter(Mandatory)][string]$Message)
+    $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $Case.fingerprint -Context $Context -TestId $Case.fingerprint.test_id
+    if ($decision.disposition -ne "RUN" -or (Test-Path -LiteralPath $Case.paths.running -PathType Leaf)) {
+      throw $Message
+    }
+  }
+
+  # 1. A same-host process lease waits while the exact process incarnation is alive.
+  $liveProcess = & $newRunningCase "live-process"
+  $liveProcess.marker.lease_scope = "process"
+  $liveProcess.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $liveProcess.marker.process_id = $PID
+  $liveProcess.marker.process_started_at = Get-MIRAssuranceProcessStartedAt
+  & $writeRunningCase $liveProcess
+  $liveDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $liveProcess.fingerprint -Context $Context -TestId $liveProcess.fingerprint.test_id
+  if ($liveDecision.disposition -ne "WAIT") { throw "Same-host live process evidence was not adoptable." }
+
+  # 2. A missing process invalidates its same-host lease.
+  $deadProcess = & $newRunningCase "dead-process"
+  $deadProcess.marker.lease_scope = "process"
+  $deadProcess.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $deadProcess.marker.process_id = [int]::MaxValue
+  & $writeRunningCase $deadProcess
+  & $assertRemovedAndRun $deadProcess "Dead same-host process evidence was incorrectly adoptable."
+
+  # 3. A reused PID cannot adopt a lease created by a different process incarnation.
+  $reusedPid = & $newRunningCase "reused-pid"
+  $reusedPid.marker.lease_scope = "process"
+  $reusedPid.marker.host_identity = Get-MIRAssuranceHostIdentity
+  $reusedPid.marker.process_id = $PID
+  $reusedPid.marker.process_started_at = [DateTimeOffset]::UtcNow.AddDays(-1).ToString("o")
+  & $writeRunningCase $reusedPid
+  & $assertRemovedAndRun $reusedPid "A reused PID with a different process start time was incorrectly adoptable."
+
+  # 4. A trusted, unexpired marker from another CI job is adopted without inspecting its remote PID.
+  $remoteJob = & $newRunningCase "remote-job"
+  $remoteRunId = "remote-$([guid]::NewGuid().ToString('N'))"
+  $remoteJob.marker.lease_scope = "ci-job"
+  $remoteJob.marker.host_identity = "remote-host-$([guid]::NewGuid().ToString('N'))"
+  $remoteJob.marker.process_id = [int]::MaxValue
+  $remoteJob.marker.workflow_run_id = $remoteRunId
+  $remoteJob.marker.workflow_run_attempt = "1"
+  $remoteJob.marker.workflow_job = "remote-worker"
+  $remoteJob.marker.producer.run_id = $remoteRunId
+  $remoteJob.marker.producer.run_attempt = "1"
+  $remoteJob.marker.producer.job = "remote-worker"
+  & $writeRunningCase $remoteJob
+  $remoteDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $remoteJob.fingerprint -Context $Context -TestId $remoteJob.fingerprint.test_id
+  if ($remoteDecision.disposition -ne "WAIT") { throw "Trusted unexpired remote-job evidence was not adoptable." }
+
+  # 5. An expired remote-job marker is removed and scheduled again.
+  $expiredRemote = & $newRunningCase "expired-remote"
+  $expiredRunId = "remote-$([guid]::NewGuid().ToString('N'))"
+  $expiredRemote.marker.lease_scope = "ci-job"
+  $expiredRemote.marker.host_identity = "expired-remote-host"
+  $expiredRemote.marker.workflow_run_id = $expiredRunId
+  $expiredRemote.marker.workflow_run_attempt = "1"
+  $expiredRemote.marker.workflow_job = "expired-worker"
+  $expiredRemote.marker.producer.run_id = $expiredRunId
+  $expiredRemote.marker.producer.run_attempt = "1"
+  $expiredRemote.marker.producer.job = "expired-worker"
+  $expiredRemote.marker.expires_at = [DateTimeOffset]::UtcNow.AddMinutes(-1).ToString("o")
+  & $writeRunningCase $expiredRemote
+  & $assertRemovedAndRun $expiredRemote "Expired remote-job evidence was incorrectly adoptable."
+
+  # 6. A marker from another trust class is rejected even when its lease is unexpired.
+  $untrustedLease = & $newRunningCase "untrusted-producer"
+  $untrustedLease.marker.producer.trust_class = "different-trust-class"
+  & $writeRunningCase $untrustedLease
+  & $assertRemovedAndRun $untrustedLease "Running evidence from a different trust class was incorrectly adoptable."
+
+  # 7. An explicit rerun bypasses an otherwise valid marker.
+  $explicitRerun = & $newRunningCase "explicit-rerun"
+  $originalRerunTests = @($Context.rerun_tests)
+  try {
+    $Context.rerun_tests = @($explicitRerun.fingerprint.test_id)
+    $rerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $explicitRerun.fingerprint -Context $Context -TestId $explicitRerun.fingerprint.test_id
+    if ($rerunDecision.disposition -ne "RUN" -or $rerunDecision.reason -ne "explicit-rerun") {
+      throw "Explicit rerun did not bypass running evidence."
+    }
+  } finally {
+    $Context.rerun_tests = $originalRerunTests
+  }
+
+  # 8. Reuse-disabled execution bypasses an otherwise valid marker.
+  $reuseDisabled = & $newRunningCase "reuse-disabled"
+  $originalReuseEnabled = [bool]$Context.reuse_enabled
+  try {
+    $Context.reuse_enabled = $false
+    $noReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $reuseDisabled.fingerprint -Context $Context -TestId $reuseDisabled.fingerprint.test_id
+    if ($noReuseDecision.disposition -ne "RUN" -or $noReuseDecision.reason -ne "reuse-disabled") {
+      throw "Reuse-disabled execution did not bypass running evidence."
+    }
+  } finally {
+    $Context.reuse_enabled = $originalReuseEnabled
+  }
+
+  foreach ($runningCase in @(
+    $liveProcess,
+    $deadProcess,
+    $reusedPid,
+    $remoteJob,
+    $expiredRemote,
+    $untrustedLease,
+    $explicitRerun,
+    $reuseDisabled
+  )) {
+    if (Test-Path -LiteralPath $runningCase.paths.root) {
+      $resolvedRunningRoot = [IO.Path]::GetFullPath($runningCase.paths.root)
+      if (-not $resolvedRunningRoot.StartsWith($resolvedEvidenceRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to remove running self-test evidence outside the evidence root."
+      }
+      Remove-Item -LiteralPath $resolvedRunningRoot -Recurse -Force
+    }
   }
 
   $emptyPlanRejected = $false
@@ -472,6 +899,46 @@ function Invoke-MIRAssuranceSelfTest {
     $null = Complete-MIRAssurancePlan -Plan ([ordered]@{tests=@()}) -Context $Context
   } catch { $emptyPlanRejected = $true }
   if (-not $emptyPlanRejected) { throw "Empty verification plan was accepted." }
+
+  $completeCounts = Get-MIRAssuranceResultCounts -Results @(
+    [pscustomobject]@{status="passed"; disposition="RUN"},
+    [pscustomobject]@{status="passed"; disposition="REUSE"}
+  ) -ExpectedTotal 2
+  if ($completeCounts.failed -ne 0 -or $completeCounts.incomplete -ne 0 -or
+      $completeCounts.unexpected -ne 0 -or $completeCounts.total -ne $completeCounts.expected) {
+    throw "Complete assurance result cardinality was not accepted."
+  }
+  $incompleteCounts = Get-MIRAssuranceResultCounts -Results @(
+    [pscustomobject]@{status="passed"; disposition="RUN"}
+  ) -ExpectedTotal 2
+  if ($incompleteCounts.failed -ne 0 -or $incompleteCounts.incomplete -ne 1 -or
+      $incompleteCounts.total -eq $incompleteCounts.expected) {
+    throw "Incomplete assurance result cardinality was not rejected."
+  }
+  $preflightFailure = [pscustomobject]@{status="failed"; disposition="RUN"}
+  $failedCounts = Get-MIRAssuranceResultCounts -Results @($preflightFailure) -ExpectedTotal 2
+  if ($failedCounts.failed -ne 1 -or $failedCounts.incomplete -ne 1) {
+    throw "Assurance preflight failure was not retained as failed and incomplete."
+  }
+  $preflightKey = Get-MIRAssuranceTextHash -Text ("preflight-" + [guid]::NewGuid().ToString("N"))
+  $preflightTest = [pscustomobject][ordered]@{
+    id="self-test.preflight-failure"
+    requires_factorio=$true
+    fingerprint=[pscustomobject][ordered]@{
+      input_key=$preflightKey
+      fingerprint_sha256=$preflightKey
+    }
+  }
+  $preflightPlanResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($preflightTest)}) `
+    -Context ([pscustomobject][ordered]@{factorio=""}))
+  if ($preflightPlanResults.Count -ne 1 -or
+      [string]$preflightPlanResults[0].schema -ne "mir-plan-execution-error-v1" -or
+      [string]$preflightPlanResults[0].status -ne "failed" -or
+      [string]$preflightPlanResults[0].test_id -ne [string]$preflightTest.id -or
+      [string]$preflightPlanResults[0].message -notmatch "requires --factorio") {
+    throw "Assurance plan execution discarded a preflight failure."
+  }
 
   $truncatedPlanRejected = $false
   $truncatedPlan = [pscustomobject][ordered]@{
@@ -492,5 +959,5 @@ function Invoke-MIRAssuranceSelfTest {
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
 
-  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, trust, freshness binding, blocking, and version-only reuse tests passed."
+  Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
 }

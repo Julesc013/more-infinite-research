@@ -6,6 +6,6 @@
   "description": "Validation fixture that creates an external infinite laboratory productivity owner.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0"
+    "base >= 2.0.77"
   ]
 }

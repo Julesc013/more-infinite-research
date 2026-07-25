@@ -6,7 +6,7 @@
   "description": "Validation fixture that mirrors the competing Plates n Circuit Productivity technologies.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
-    "? space-age"
+    "base >= 2.0.77",
+    "? space-age >= 2.0.77"
   ]
 }

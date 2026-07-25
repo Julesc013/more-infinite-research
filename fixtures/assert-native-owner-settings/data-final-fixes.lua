@@ -66,9 +66,7 @@ for _, stream in ipairs(streams) do
 
   local unrecognized = stream.key == "research_processing_unit"
     and owner.unit.count_formula == "1000 + 100 * L"
-  local base_changed = base ~= 8000
-  local growth_changed = growth ~= 2
-  local cost_changed = base_changed or growth_changed
+  local cost_changed = base ~= 8000 or growth ~= 2
   local time_changed = research_time ~= 60 and research_time > 0
   local max_changed = max_level ~= 0
   local effect_changed = effect_percent ~= 10

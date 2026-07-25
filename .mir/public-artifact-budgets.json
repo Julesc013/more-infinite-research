@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "sample_limit": 16,
+  "artifacts": [
+    {"kind": "mir-generation-plan-public", "max_canonical_bytes": 524288},
+    {"kind": "mir-technology-catalog-public", "max_canonical_bytes": 131072},
+    {"kind": "mir-coverage-public", "max_canonical_bytes": 131072},
+    {"kind": "mir-compiler-evidence-public", "max_canonical_bytes": 131072}
+  ]
+}

@@ -23,6 +23,10 @@ script.on_init(function()
     technology_level = tech.level,
     research_progress = force.research_progress
   }
+  if not remote.interfaces["mir-native-owner-reset-safety"] then
+    fail("reset-safety source interface is absent during initialization")
+  end
+  remote.call("mir-native-owner-reset-safety", "seal_initial_inventory")
   log("[mir-fixture] native-owner progress source proof complete")
 end)
 
@@ -41,5 +45,27 @@ script.on_configuration_changed(function()
     fail("native-owner research progress was " .. tostring(force.research_progress)
       .. ", expected " .. tostring(state.research_progress))
   end
+  if not remote.interfaces["mir-native-owner-reset-safety"] then
+    fail("reset-safety source interface is absent")
+  end
+  local reset_snapshot = remote.call("mir-native-owner-reset-safety", "configuration_snapshot")
+  local player = game.get_player(1)
+  local token_count = player and player.get_item_count("mir-reset-safety-token") or 0
+  local reset_recipe = force.recipes["mir-reset-safety-recipe"]
+  if not reset_snapshot.configuration_change_seen then
+    fail("reset-safety source did not observe configuration change before MIR")
+  end
+  if reset_snapshot.player_inventory_available
+    and reset_snapshot.token_count_before_mir ~= reset_snapshot.initial_token_count then
+    fail("external give-item inventory changed before MIR configuration handling")
+  end
+  if reset_snapshot.player_inventory_available and token_count ~= reset_snapshot.token_count_before_mir then
+    fail("MIR duplicated an external give-item effect during configuration change")
+  end
+  if reset_snapshot.recipe_enabled_after_override ~= false or not reset_recipe or reset_recipe.enabled ~= false then
+    fail("MIR lost another mod's configuration-change recipe state")
+  end
+  log("[mir-fixture] native-owner force-state preservation proof complete"
+    .. " player_inventory_asserted=" .. tostring(reset_snapshot.player_inventory_available))
   log("[mir-fixture] native-owner progress configuration-change proof complete")
 end)

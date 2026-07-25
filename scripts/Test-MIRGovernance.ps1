@@ -8,7 +8,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $docsRoot = Join-Path $repo "docs"
 $mirRoot = Join-Path $repo ".mir"
 
-$allowedStatuses = @("current", "draft", "deprecated", "archived")
+$allowedStatuses = @("current", "draft", "historical-checkpoint", "deprecated", "archived")
 $allowedDocTypes = @("tutorial", "how-to", "reference", "explanation", "adr", "release-plan", "archive")
 $allowedAudiences = @("player", "modpack-author", "maintainer", "developer", "release-manager")
 $forbiddenDocNames = @("notes.md", "misc.md", "old.md", "new.md", "ideas.md", "dump.md")
@@ -142,6 +142,14 @@ $targetManifest = Get-Content -Raw -LiteralPath $targetManifestPath | ConvertFro
 if ($targetManifest.schema -ne 2 -or -not $targetManifest.profiles) {
   throw ".mir/targets.json must use schema 2 and define profiles."
 }
+$releaseLedgerPath = Join-Path $repo ".mir\releases.json"
+if (-not (Test-Path -LiteralPath $releaseLedgerPath -PathType Leaf)) {
+  throw "Missing canonical release ledger: .mir/releases.json"
+}
+$releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
+if ($releaseLedger.schema -ne 1 -or [string]$releaseLedger.authority -ne "canonical-release-ledger") {
+  throw ".mir/releases.json must use canonical release-ledger schema 1."
+}
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
   throw ".mir/targets.json has no profile for current Factorio $($repoInfo.factorio_version)."
@@ -205,6 +213,14 @@ foreach ($docPath in $docFiles) {
     $supersededBy = Get-MIRFrontmatterString -Fields $frontmatter -Name "superseded_by" -RelativePath $docPath
     if ($supersededBy -eq "[]") {
       throw "$docPath is archived but superseded_by is empty."
+    }
+  }
+  if ($status -eq "historical-checkpoint") {
+    $supersededBy = Get-MIRFrontmatterString -Fields $frontmatter -Name "superseded_by" -RelativePath $docPath
+    $sourceCommit = Get-MIRFrontmatterString -Fields $frontmatter -Name "checkpoint_source_commit" -RelativePath $docPath
+    $candidateSha = Get-MIRFrontmatterString -Fields $frontmatter -Name "checkpoint_candidate_sha256" -RelativePath $docPath
+    if ($supersededBy -eq "[]" -or [string]::IsNullOrWhiteSpace($sourceCommit) -or [string]::IsNullOrWhiteSpace($candidateSha)) {
+      throw "$docPath historical checkpoint lacks replacement or source/candidate metadata."
     }
   }
 
@@ -299,7 +315,6 @@ if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_versi
 if ([string]$releaseFields.objective -notin @(
   "behavioral-superset-implementation-subset",
   "target-port-behavioral-subset",
-  "canonical-3.1.9-derived-factorio-2.0-projection",
   "bounded-correctness-and-contract-modernization",
   "plan-first-automatic-family-compiler"
 )) {

@@ -6,7 +6,7 @@
   "description": "Validation fixture that asserts Space Age cargo logistics technologies use the intended effects, science packs, prerequisites, and costs.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0",
+    "base >= 2.0.77",
     "space-age",
     "more-infinite-research"
   ]

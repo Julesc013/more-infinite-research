@@ -9,10 +9,11 @@ if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
 if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }
 
 $config = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\assurance.json") | ConvertFrom-Json
+$impact = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\test-impact.yml") | ConvertFrom-Json
 $catalog = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests.yml") | ConvertFrom-Json
 $domains = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\domains.yml") | ConvertFrom-Json
 $trust = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\trust.json") | ConvertFrom-Json
-if ([int]$config.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
+if ([int]$config.schema -ne 1 -or [int]$impact.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
   throw "Unsupported assurance manifest schema."
 }
 
@@ -20,12 +21,138 @@ $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
 
+$releaseHistoryClassificationCases = [ordered]@{
+  ".mir/portable-return.yml" = "release-governance"
+  ".mir/target-lines/index.json" = "release-evidence"
+  ".mir/target-lines/2.4.9/info.json" = "release-evidence"
+  ".mir/evidence/2.4.9/publication.json" = "release-evidence"
+  "approved-delta/2.4.5-to-2.4.9.json" = "release-evidence"
+  "dist/more-infinite-research_2.4.9.zip" = "release-evidence"
+}
+foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
+  $matchedClasses = @(
+    $config.classes | Where-Object {
+      $class = $_
+      @($class.patterns | Where-Object { [string]$case.Key -match [string]$_ }).Count -gt 0
+    } | ForEach-Object { [string]$_.id }
+  )
+  if ($matchedClasses -notcontains [string]$case.Value) {
+    throw "Release-history assurance classification is missing '$($case.Value)' for '$($case.Key)'."
+  }
+  if (@($matchedClasses | Where-Object { $_ -in @("runtime-or-migration", "settings", "compiler-data-stage", "balance", "metadata-dependencies", "test-harness") }).Count -gt 0) {
+    throw "Release-history path '$($case.Key)' incorrectly selects a runtime-impact assurance class: $($matchedClasses -join ', ')."
+  }
+}
+
+$assuranceToolingClassificationCases = @(
+  ".mir/assurance.json",
+  ".mir/test-impact.yml",
+  "scripts/Invoke-MIRAssurance.ps1",
+  "scripts/MIRAssurance/Evidence.ps1",
+  "scripts/Test-MIRAssurance.ps1",
+  "scripts/Test-MIRReleaseAuthority.ps1",
+  "validation/tests.yml"
+)
+foreach ($path in $assuranceToolingClassificationCases) {
+  $matchedClasses = @(
+    $config.classes | Where-Object {
+      $class = $_
+      @($class.patterns | Where-Object { $path -match [string]$_ }).Count -gt 0
+    } | ForEach-Object { [string]$_.id }
+  )
+  if ($matchedClasses -notcontains "assurance-tooling" -or $matchedClasses -contains "test-harness") {
+    throw "Static assurance path '$path' must select assurance-tooling without selecting the Factorio test harness: $($matchedClasses -join ', ')."
+  }
+}
+
+$autoSealClasses = @($config.classes | Where-Object { @($_.tests) -contains "seal.verify" } | ForEach-Object { [string]$_.id })
+if ($autoSealClasses.Count -ne 0) {
+  throw "seal.verify must be reserved for explicit promotion checks, not auto-selected by change classes: $($autoSealClasses -join ', ')."
+}
+if (@($config.profiles.'promotion-check').Count -ne 1 -or [string]$config.profiles.'promotion-check'[0] -ne "seal.verify") {
+  throw "The promotion-check profile must contain exactly seal.verify."
+}
+
+$releaseHistoryTest = @($catalog.tests | Where-Object { [string]$_.id -eq "static.release-history" })
+if ($releaseHistoryTest.Count -ne 1 -or
+    [string]$releaseHistoryTest[0].command -ne "./scripts/Test-MIRPublishedSnapshotIntegrity.ps1 -Index" -or
+    @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
+  throw "static.release-history must bind the staged release-history fingerprint and run indexed snapshot integrity."
+}
+foreach ($profileName in @("fast", "full", "backport")) {
+  if (@($config.profiles.$profileName) -notcontains "static.release-history") {
+    throw "The $profileName assurance profile must include static.release-history."
+  }
+}
+
+foreach ($requiredStaticRoutingPath in @(
+  ".mir/assurance.json",
+  ".mir/test-impact.yml",
+  "scripts/Test-MIRAssurance.ps1",
+  "scripts/Test-MIRReleaseAuthority.ps1"
+)) {
+  $matchingRules = @($impact.paths | Where-Object { [string]$_.pattern -eq $requiredStaticRoutingPath })
+  if ($matchingRules.Count -ne 1) {
+    throw "Static assurance routing path '$requiredStaticRoutingPath' must have exactly one explicit impact rule."
+  }
+  if (@($matchingRules[0].groups).Count -ne 0 -or @($matchingRules[0].scenarios).Count -ne 0 -or @($matchingRules[0].tags).Count -ne 0) {
+    throw "Static assurance routing path '$requiredStaticRoutingPath' must not select unrelated runtime impact."
+  }
+}
+
 foreach ($required in @(
   "tooling.self-test", "static.full", "performance.static", "runtime.full", "runtime.upgrade",
-  "runtime.exact-zip", "runtime.ecosystem", "release.approved-delta",
+  "static.release-history", "runtime.exact-zip", "runtime.ecosystem", "release.approved-delta",
   "runtime.performance-regression", "manual.release-review", "seal.verify"
 )) {
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
+}
+
+$portableMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "static.museum" })
+$exactMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.museum-exact" })
+if ($portableMuseumTest.Count -ne 1 -or
+    [bool]$portableMuseumTest[0].requires_factorio -or
+    [string]$portableMuseumTest[0].command -ne "./scripts/Test-MIRMuseumCompiler.ps1" -or
+    @($portableMuseumTest[0].inputs) -notcontains "fixtures/museum/synthetic-installation/**") {
+  throw "static.museum must remain portable and bind the repository-owned synthetic installation fixture."
+}
+if ($exactMuseumTest.Count -ne 1 -or
+    [string]$exactMuseumTest[0].kind -ne "runtime" -or
+    [string]$exactMuseumTest[0].command -ne "./scripts/Test-MIRMuseumExact.ps1" -or
+    @($exactMuseumTest[0].inputs) -notcontains "museum-installations") {
+  throw "runtime.museum-exact must be a separately fingerprinted exact-installation runtime test."
+}
+if (@($config.profiles.'museum-exact').Count -ne 2 -or
+    @($config.profiles.'museum-exact') -notcontains "static.museum" -or
+    @($config.profiles.'museum-exact') -notcontains "runtime.museum-exact") {
+  throw "The museum-exact profile must contain only portable museum validation and exact target runtime execution."
+}
+foreach ($modernProfile in @("fast", "full", "backport")) {
+  if (@($config.profiles.$modernProfile) -contains "runtime.museum-exact") {
+    throw "runtime.museum-exact must not block the modern $modernProfile profile."
+  }
+}
+$museumCatalogText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\museum-targets.json")
+if ($museumCatalogText -match '"(binary|base_data)"\s*:' -or $museumCatalogText -match '(?i)[A-Z]:[/\\]') {
+  throw "Tracked museum target policy contains a workstation-specific installation path."
+}
+
+$ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
+if ($ecosystemTest.Count -ne 1 -or
+    [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
+    [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
+    [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
+  throw "runtime.ecosystem must execute the exact candidate ZIP and must not rebuild distribution bytes."
+}
+
+$performanceTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.performance-regression" })
+if ($performanceTest.Count -ne 1 -or
+    [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
+    [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
+    @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
+  throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
 }
 
 foreach ($target in @("2.0", "2.1")) {
@@ -41,6 +168,12 @@ foreach ($requiredSealField in @(
   "mir_version",
   "target",
   "canonical_dev_anchor",
+  "candidate_id",
+  "package_source_commit",
+  "package_source_sha256",
+  "package_source_material",
+  "qualification_source_commit",
+  "qualification_source_tree",
   "candidate_descriptor_sha256",
   "plan_material_sha256",
   "required_test_set_sha256",
@@ -60,28 +193,26 @@ foreach ($requiredSealField in @(
 if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
   throw "Candidate sealing still accepts an arbitrary evidence summary."
 }
+foreach ($requiredSourceCheck in @(
+  "package_source_is_ancestor",
+  "package_source_identity",
+  "qualification_package_source_identity",
+  "package_roots_unchanged",
+  "package_source_candidate",
+  "qualification_source_candidate"
+)) {
+  if ($releaseAssurance -notmatch [regex]::Escape($requiredSourceCheck)) {
+    throw "Candidate seal verification omits source-authority check: $requiredSourceCheck"
+  }
+}
+$publishedSnapshotIntegrity = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Test-MIRPublishedSnapshotIntegrity.ps1")
+if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
+  $publishedSnapshotIntegrity -match 'Measure-Object -Property Length -Sum') {
+  throw "Published snapshot byte counts must come from canonical Git blobs, not checkout line endings."
+}
 
 $coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
 . $coreScript
-. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
-$script:repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$evidencePatternProbe = Join-Path $RepoRoot ".mir\evidence\.assurance-pattern-probe-$([guid]::NewGuid().ToString('N')).json"
-try {
-  [IO.File]::WriteAllText($evidencePatternProbe, "{}`n", [Text.UTF8Encoding]::new($false))
-  $resolvedEvidenceProbe = @(Resolve-MIRAssurancePatternFiles -Patterns @(".mir/evidence/.assurance-pattern-probe-*.json"))
-  if ($resolvedEvidenceProbe.Count -ne 1 -or
-      $resolvedEvidenceProbe[0] -ne (Get-MIRAssuranceRepoRelativePath -Path $evidencePatternProbe)) {
-    throw "Explicit release-evidence wildcard inputs do not bind their files."
-  }
-} finally {
-  if (Test-Path -LiteralPath $evidencePatternProbe) { Remove-Item -LiteralPath $evidencePatternProbe -Force }
-}
-$packageInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
-$candidatePath = Join-Path $RepoRoot "dist\$($packageInfo.name)_$($packageInfo.version).zip"
-if ((Test-Path -LiteralPath $candidatePath -PathType Leaf) -and
-    (Get-MIRAssuranceZipContentHash -Path $candidatePath) -ne (Get-MIRZipContentFingerprint -Path $candidatePath)) {
-  throw "Assurance and package validation disagree on the candidate content fingerprint."
-}
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
   New-Item -ItemType Directory -Force -Path (Join-Path $externalTreeRoot "data") | Out-Null
@@ -119,6 +250,21 @@ if ($workflow -match 'dist/\*\.zip' -or
     ([regex]::Matches($workflow, 'actions/cache/restore@v4')).Count -ne 1 -or
     -not $workflow.Contains('${{ needs.plan.outputs.candidate_path }}')) {
   throw "Full assurance workflow must transfer the exact candidate, keep workers ledger-free, and restore the shared ledger only at the gate."
+}
+
+$validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
+foreach ($requiredWorkflowSnippet in @(
+  '$work = @($plan.work)',
+  'if ($work.Count -eq 0)',
+  'test_id = "reuse-only"',
+  'no_op = $true',
+  '${{ matrix.no_op != true }}',
+  '${{ matrix.no_op == true }}',
+  '${{ always() && matrix.no_op != true }}'
+)) {
+  if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
+    throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
+  }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

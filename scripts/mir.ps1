@@ -27,6 +27,11 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
+  .\scripts\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
+  .\scripts\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
+  .\scripts\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
+  .\scripts\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
   .\scripts\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
   .\scripts\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
   .\scripts\mir.ps1 report latest
@@ -40,11 +45,13 @@ Usage:
 Common overrides:
   --factorio <path>   Factorio binary path
   --factorio-line <2.0|2.1>
+  --candidate <path>  Exact MIR candidate ZIP for candidate-bound runtime work
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
   --link-mode <mode>  Copy, Hardlink, or Symlink local zips into scenario mod dirs
   --skip-strict-gate  Reuse an already completed strict gate in a composed assurance run
+  --skip-clean-git-status  Leave source authority to the composed assurance and sealing gates
 "@
 }
 
@@ -85,6 +92,7 @@ function New-MIRProfileOverrides {
   $factorio = Get-MIRArgValue -Items $Items -Name "--factorio"
   $factorioLine = Get-MIRArgValue -Items $Items -Name "--factorio-line"
   $mods = Get-MIRArgValue -Items $Items -Name "--mods"
+  $candidate = Get-MIRArgValue -Items $Items -Name "--candidate"
   $output = Get-MIRArgValue -Items $Items -Name "--output"
   $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
   $linkMode = Get-MIRArgValue -Items $Items -Name "--link-mode"
@@ -101,6 +109,9 @@ function New-MIRProfileOverrides {
     $overrides.local_mod_zip_dirs = @($mods)
     $overrides.local_mod_library_dirs = @($mods)
   }
+  if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+    $overrides.candidate_zip = $candidate
+  }
   if (-not [string]::IsNullOrWhiteSpace($output)) {
     $overrides.output_root = $output
   }
@@ -116,6 +127,12 @@ function New-MIRProfileOverrides {
   }
   if (Test-MIRArgSwitch -Items $Items -Name "--skip-strict-gate") {
     $overrides.skip_strict_gate = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-build") {
+    $overrides.skip_build = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-clean-git-status") {
+    $overrides.skip_clean_git_status = $true
   }
 
   return $overrides
@@ -204,6 +221,7 @@ function Invoke-MIRRunProfile {
       $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $candidateZip = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "candidate_zip"
       $repairSmokeModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "repair_smoke_mod_names"
       $representativeScenarioName = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "representative_scenario_name"
       $manualScenariosPath = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "manual_scenarios_path"
@@ -213,6 +231,7 @@ function Invoke-MIRRunProfile {
       if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
+      if ($candidateZip) { $params.CandidateZip = [string]$candidateZip }
       if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
       if ($representativeScenarioName) { $params.RepresentativeScenarioName = [string]$representativeScenarioName }
       if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
@@ -223,6 +242,7 @@ function Invoke-MIRRunProfile {
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_repair_smokes") { $params.SkipRepairSmokes = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_representative_scenario") { $params.SkipRepresentativeScenario = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_build") { $params.SkipBuild = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_clean_git_status") { $params.SkipCleanGitStatus = $true }
       & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
     }
     "overnight-local" {
@@ -392,6 +412,50 @@ switch ($area) {
     if ($verb -ne "check") { throw "Unknown manifests command: $verb" }
     & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ManifestsOnly
   }
+  "technology" {
+    $catalog = Get-MIRArgValue -Items $Args -Name "--catalog"
+    $candidateId = Get-MIRArgValue -Items $Args -Name "--candidate"
+    $output = Get-MIRArgValue -Items $Args -Name "--output"
+    if ([string]::IsNullOrWhiteSpace($catalog) -or [string]::IsNullOrWhiteSpace($output)) {
+      throw "technology commands require --catalog and --output."
+    }
+    switch ($verb) {
+      "quality-assessment" {
+        $profilePath = Get-MIRArgValue -Items $Args -Name "--profile"
+        if ([string]::IsNullOrWhiteSpace($candidateId) -or [string]::IsNullOrWhiteSpace($profilePath)) {
+          throw "technology quality-assessment requires --candidate and --profile."
+        }
+        $params = @{CatalogPath=$catalog; CandidateId=$candidateId; ProfilePath=$profilePath; OutputPath=$output}
+        $metrics = Get-MIRArgValue -Items $Args -Name "--metrics"
+        if ($metrics) { $params.MetricsPath = $metrics }
+        & (Join-Path $scriptRoot "New-MIRTechnologyQualityAssessment.ps1") @params
+      }
+      "review-dossier" {
+        if ([string]::IsNullOrWhiteSpace($candidateId)) { throw "technology review-dossier requires --candidate." }
+        $params = @{CatalogPath=$catalog; CandidateId=$candidateId; OutputPath=$output}
+        $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"
+        if ($assessment) { $params.AssessmentPath = $assessment }
+        & (Join-Path $scriptRoot "New-MIRTechnologyReviewDossier.ps1") @params
+      }
+      "promotion-gate" {
+        $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"
+        $approval = Get-MIRArgValue -Items $Args -Name "--approval"
+        $promotion = Get-MIRArgValue -Items $Args -Name "--promotion"
+        $profilePath = Get-MIRArgValue -Items $Args -Name "--profile"
+        foreach ($value in @($assessment, $approval, $promotion, $profilePath)) {
+          if ([string]::IsNullOrWhiteSpace($value)) { throw "technology promotion-gate requires --assessment, --approval, --promotion, and --profile." }
+        }
+        $params = @{
+          CatalogPath=$catalog; AssessmentPath=$assessment; ApprovalPath=$approval
+          PromotionPath=$promotion; ProfilePath=$profilePath; OutputPath=$output
+        }
+        $migration = Get-MIRArgValue -Items $Args -Name "--migration"
+        if ($migration) { $params.MigrationPath = $migration }
+        & (Join-Path $scriptRoot "Test-MIRTechnologyPromotionAdmission.ps1") @params
+      }
+      default { throw "Unknown technology command: $verb" }
+    }
+  }
   "release" {
     switch ($verb) {
       "gate" {
@@ -429,6 +493,21 @@ switch ($area) {
   "package" {
     if ($verb -ne "build") { throw "Unknown package command: $verb" }
     & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+  }
+  "storage" {
+    if ($verb -notin @("audit", "clean")) { throw "Unknown storage command: $verb" }
+    $olderThanText = Get-MIRArgValue -Items $Args -Name "--older-than-days" -Default "7"
+    [int]$olderThanDays = 0
+    if (-not [int]::TryParse($olderThanText, [ref]$olderThanDays) -or $olderThanDays -lt 0) {
+      throw "--older-than-days must be a non-negative integer."
+    }
+    $params = @{
+      RepoRoot = $repo.Path
+      OlderThanDays = $olderThanDays
+      AllWorktrees = (Test-MIRArgSwitch -Items $Args -Name "--all-worktrees")
+    }
+    if ($verb -eq "clean" -and (Test-MIRArgSwitch -Items $Args -Name "--apply")) { $params.Apply = $true }
+    & (Join-Path $scriptRoot "Remove-MIRStaleArtifacts.ps1") @params
   }
   "report" {
     switch ($verb) {

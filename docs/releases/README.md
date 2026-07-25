@@ -14,13 +14,14 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 2.4.9 is the active bounded Factorio 2.0 stability candidate on `tmp/2.0`. It starts from published MIR 2.4.5, carries only declared capability, effect-integrity, reset-safety, and release-boundary fixes, and requires fresh exact-package qualification. MIR 2.5.0 remains the planned broader compiler and verification backport after this release.
+MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is the persistent content-addressed verification architecture documented in [the 3.2.0 verification overhaul](3.2.0-verification-overhaul.md); no publication is claimed until the exact candidate completes the aggregate gate and remaining human review.
 
-- [2.4.9 stability backport](2.4.9-stability-backport.md)
-- [2.4.9 release notes](notes/release-notes-2.4.9.md)
-- [2.5.0 verification backport](2.5.0-verification-backport.md)
-- [2.5.0 release notes](notes/release-notes-2.5.0.md)
+MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
+MIR 2.5.0 `2.5-P2` is the provisional Factorio 2.0 projection of C16. It is an automated playtest candidate with manual review, protected qualification, sealing, branch promotion, tagging, and publication still pending.
+
+- [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
+- [3.2.0 release notes](notes/release-notes-3.2.0.md)
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
 - [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)
@@ -37,17 +38,39 @@ MIR 2.4.9 is the active bounded Factorio 2.0 stability candidate on `tmp/2.0`. I
 - [3.0.5 release notes](notes/release-notes-3.0.5.md)
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [2.3.5 backport plan](2.3.5-backport-plan.md)
-- [2.4.5 release checklist](2.4.5-checklist.md)
-- [2.4.5 release notes](notes/release-notes-2.4.5.md)
-- [2.4.5 validation summary](2.4.5-validation-summary.md)
 - [Backport wave dashboard](backport-wave-dashboard.md)
 - [3.1.0 plan](3.1.0-plan.md)
 - [3.1.0 release checklist](3.1.0-checklist.md)
 - [3.1.0 release notes](notes/release-notes-3.1.0.md)
+- [3.1.1 release notes](notes/release-notes-3.1.1.md)
+- [3.1.2 release notes](notes/release-notes-3.1.2.md)
+- [3.1.5 candidate notes](notes/release-notes-3.1.5.md)
+- [3.1.5 validation summary](3.1.5-validation-summary.md)
+- [3.1.9 release notes](notes/release-notes-3.1.9.md)
+- [3.1.9 migration guide](3.1.9-migration-guide.md)
+- [3.1.9 release checklist](3.1.9-checklist.md)
+- [3.1.9 validation summary](3.1.9-validation-summary.md)
+- [2.4.9 stability backport](2.4.9-stability-backport.md)
+- [2.4.9 release notes](notes/release-notes-2.4.9.md)
+- [2.5.0 provisional C16 backport](2.5.0-provisional-c16-backport.md)
+- [2.5.0 playtest guide](2.5.0-playtest-guide.md)
+- [2.5.0 verification backport contract](2.5.0-verification-backport.md)
+- [2.5.0 provisional release notes](notes/release-notes-2.5.0.md)
+- [0.x Factorio version metadata correction](0.x-factorio-version-metadata-correction.md)
+- [0.12.0 release notes](notes/release-notes-0.12.0.md)
+- [0.11.0 release notes](notes/release-notes-0.11.0.md)
+- [0.10.0 release notes](notes/release-notes-0.10.0.md)
+- [0.9.0 release notes](notes/release-notes-0.9.0.md)
+- [0.8.0 release notes](notes/release-notes-0.8.0.md)
+- [0.7.0 release notes](notes/release-notes-0.7.0.md)
+- [0.6.0 release notes](notes/release-notes-0.6.0.md)
+- [3.1.9 and 2.4.5 post-release synthesis](3.1.9-post-2.4.5-ring-synthesis.md)
+- [0.17 through 0.6 lower-wave synthesis](lower-wave-0.17-to-0.6-synthesis.md)
+- [Published lines development copy pack](lower-wave-development-copy-pack.md)
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
-- [3.2.0 development summary](3.2.0-development-summary.md)
+- [3.1.0 automatic compiler development summary](3.1.0-automatic-compiler-development-summary.md)
 - [1.6.0 Factorio 0.16 plan](1.6.0-plan.md)
 - [1.5.0 Factorio 0.15 plan](1.5.0-plan.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)

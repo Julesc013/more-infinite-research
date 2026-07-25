@@ -14,7 +14,7 @@ superseded_by: []
 
 ## Predeclared Automatic Family IDs
 
-MIR 2.4.0 predeclares `mir-auto-prod-manufacturing-assembling-machine-1` and `mir-auto-prod-manufacturing-lab-1`. These IDs derive from stable semantic family names, never from mod or recipe names. Both remain experimental: they are absent in the default attachment-only policy and in reviewed-data creation mode. The explicit broad opt-in policy may emit them after whole-plan validation. Predeclaration stabilizes identity; it does not assert that balance, grouping, or progression is accepted.
+MIR 3.1.0 predeclares `mir-auto-prod-manufacturing-assembling-machine-1` and `mir-auto-prod-manufacturing-lab-1`. These IDs derive from stable semantic family names, never from mod or recipe names. Both are experimental in 3.1.5: they remain absent in the default attachment-only policy and in reviewed-data creation mode. The explicit broad opt-in policy may emit them after whole-plan validation. Predeclaration stabilizes identity; it does not assert that balance, grouping, or progression is accepted.
 
 Generated recipe-productivity technologies use stable names:
 
@@ -30,6 +30,6 @@ Generated base-technology continuations use the vanilla technology chain name an
 
 Released generated IDs are save-facing API. Renames, removals, or stream target changes require migration review and release notes.
 
-The machine-readable generated stream record remains `prototypes/mir/streams/generated_stream_manifest.json`, routed through `.mir/streams.yml`.
+The machine-readable generated stream record remains `prototypes/mir/streams/generated_stream_manifest.json`. Base-chain identities are governed separately by `prototypes/mir/streams/generated_continuation_manifest.json`; each stable row binds a chain key, released identity pattern, and migration policy. Both records are routed through `.mir/streams.yml`.
 
 Every stream key in the current legacy stream tables must have a manifest row. Most rows use the emitted `recipe-prod-<stream-key>-1` technology name as the manifest key. Compatibility policy streams may use a clearer stable `mir-prod-*` manifest key, but they still record the emitted Factorio technology name in `generated_technology`.

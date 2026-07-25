@@ -1,81 +1,131 @@
+[CmdletBinding()]
 param([string]$RepoRoot = "")
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 $lockPath = Join-Path $RepoRoot ".mir\backport-source-lock.json"
+if (-not (Test-Path -LiteralPath $lockPath -PathType Leaf)) {
+  Write-Host "[skip] MIR backport source lock is not present on this branch."
+  return
+}
+
+function Assert-MIRCommit {
+  param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Commit)
+  if ($Commit -notmatch '^[0-9a-f]{40}$') { throw "$Name must be a full Git commit SHA." }
+  & git -C $RepoRoot cat-file -e "$Commit`^{commit}"
+  if ($LASTEXITCODE -ne 0) { throw "$Name is unavailable: $Commit" }
+}
+
+function Assert-MIRAncestor {
+  param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Commit)
+  & git -C $RepoRoot merge-base --is-ancestor $Commit HEAD
+  if ($LASTEXITCODE -ne 0) { throw "$Name is not an ancestor of the current qualification source: $Commit" }
+}
+
+function Get-MIRZipFileCount {
+  param([Parameter(Mandatory)][string]$Path)
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
+  try { return @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
+  finally { $zip.Dispose() }
+}
+
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
+if ([int]$lock.schema -ne 3 -or [int]$lock.projection_schema -ne 2) {
+  throw "Unsupported MIR backport source-lock schema."
+}
+foreach ($field in @("candidate_id", "mir_version", "target", "target_profile_sha256", "release_notes", "playtest_guide")) {
+  if ([string]::IsNullOrWhiteSpace([string]$lock.$field)) { throw "Backport source lock is missing $field." }
+}
+foreach ($section in @("baseline", "portable_source", "projection", "candidate", "upgrade_contract", "qualification")) {
+  if ($null -eq $lock.$section) { throw "Backport source lock is missing $section." }
+}
 
-if ([int]$lock.schema -ne 2 -or [int]$lock.projection_schema -ne 2 -or
-    [string]$lock.backport_kind -ne "legacy-stability-patch") {
-  throw "Unsupported MIR legacy stability source-lock schema."
+$baselineCommit = [string]$lock.baseline.commit
+$portableCommit = [string]$lock.portable_source.commit
+$projectionCommit = [string]$lock.projection.package_source_commit
+Assert-MIRCommit -Name "baseline.commit" -Commit $baselineCommit
+Assert-MIRCommit -Name "portable_source.commit" -Commit $portableCommit
+Assert-MIRCommit -Name "projection.package_source_commit" -Commit $projectionCommit
+Assert-MIRAncestor -Name "Published 2.4.9 baseline" -Commit $baselineCommit
+Assert-MIRAncestor -Name "2.5 package-source projection" -Commit $projectionCommit
+
+$baselineRef = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.baseline.reference)).Trim()
+if ($LASTEXITCODE -ne 0 -or $baselineRef -ne $baselineCommit) {
+  throw "Baseline reference $($lock.baseline.reference) does not resolve to the locked commit."
 }
-if ([string]$lock.baseline_version -ne "2.4.5" -or [string]$lock.target -ne "2.0" -or
-    [string]$lock.mir_version -ne "2.4.9") {
-  throw "The source lock must bind MIR 2.4.9 for Factorio 2.0 to the published MIR 2.4.5 baseline."
+$projectionTree = (& git -C $RepoRoot show -s --format=%T $projectionCommit).Trim()
+if ($LASTEXITCODE -ne 0 -or $projectionTree -ne [string]$lock.projection.package_source_tree) {
+  throw "The locked 2.5 package-source tree does not match its commit."
 }
 
-foreach ($field in @("baseline_release_commit", "baseline_package_source_commit", "portable_fix_source_commit")) {
-  $commit = [string]$lock.$field
-  & git -C $RepoRoot cat-file -e "$commit`^{commit}"
-  if ($LASTEXITCODE -ne 0) { throw "Backport authority commit is unavailable: $field=$commit" }
+. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $RepoRoot "scripts\validation\TargetProfiles.ps1")
+$roots = @(Get-MIRPackageSourceRoots)
+& git -C $RepoRoot diff --quiet $projectionCommit HEAD -- @roots
+if ($LASTEXITCODE -ne 0) { throw "Qualification commits changed package roots after the locked projection commit." }
+if (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot) { throw "Package roots are dirty; the projection cannot be verified." }
+
+$adaptedExpected = @($lock.projection.adapted_package_paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+$adaptedActual = @(
+  & git -C $RepoRoot diff --name-only $portableCommit $projectionCommit -- @roots |
+    ForEach-Object { ([string]$_).Replace("\", "/") } |
+    Sort-Object -Unique
+)
+if ($LASTEXITCODE -ne 0) { throw "Unable to compare the portable source with the target projection." }
+$adaptedDelta = @(Compare-Object $adaptedExpected $adaptedActual)
+if ($adaptedDelta.Count -gt 0) {
+  throw "The C16-to-2.5 package delta is not the exact declared adapter set."
 }
+
+$sourceHash = Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
+if ($sourceHash -ne [string]$lock.projection.package_source_sha256) {
+  throw "The projected package source hash drifted: $sourceHash"
+}
+$profile = Get-MIRTargetProfile -RepoRoot $RepoRoot -FactorioVersion ([string]$lock.target)
+$profileHash = Get-MIRTargetProfileFingerprint -Profile $profile
+if ($profileHash -ne [string]$lock.target_profile_sha256) { throw "Target profile fingerprint drifted: $profileHash" }
+& (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
+if ($LASTEXITCODE -ne 0) { throw "Generated target-profile Lua is stale." }
+
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
 if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
   throw "Source-lock target identity disagrees with info.json."
 }
-$targetHash = (Get-FileHash -LiteralPath (Join-Path $RepoRoot ".mir\targets.json") -Algorithm SHA256).Hash
-if ($targetHash -ne [string]$lock.target_profile_sha256) {
-  throw "Target profile hash drifted from the Factorio 2.0 source lock."
+
+$archivePath = Join-Path $RepoRoot ([string]$lock.candidate.archive)
+if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) { throw "Candidate archive is missing: $archivePath" }
+$archiveItem = Get-Item -LiteralPath $archivePath
+$archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
+$contentHash = Get-MIRZipContentFingerprint -Path $archivePath
+$entryCount = Get-MIRZipFileCount -Path $archivePath
+if ($archiveHash -ne [string]$lock.candidate.archive_sha256 `
+    -or $contentHash -ne [string]$lock.candidate.content_sha256 `
+    -or $archiveItem.Length -ne [long]$lock.candidate.bytes `
+    -or $entryCount -ne [int]$lock.candidate.entries) {
+  throw "Candidate archive identity disagrees with the backport source lock."
 }
 
-. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
-$roots = @(Get-MIRPackageSourceRoots)
-$baseline = [string]$lock.baseline_package_source_commit
-$baselineRows = @()
-foreach ($line in @(& git -C $RepoRoot ls-tree -r $baseline -- @roots)) {
-  if ($line -match '^\d+\s+blob\s+([0-9a-f]+)\t(.+)$') {
-    $baselineRows += "$($Matches[2])`t$($Matches[1])"
+if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.4.9" `
+    -or [string]$lock.upgrade_contract.oldest_maintained_optional -ne "2.4.5") {
+  throw "The 2.5 upgrade contract must require 2.4.9 and retain 2.4.5 as the optional oldest-maintained row."
+}
+if ([string]$lock.qualification.manual_review -ne "pending" `
+    -or [string]$lock.qualification.protected_qualification -ne "pending" `
+    -or [string]$lock.qualification.publication -ne "unreleased") {
+  throw "The provisional 2.5 candidate must remain unreviewed, unsealed, and unreleased."
+}
+
+foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.playtest_guide)) {
+  $docPath = Join-Path $RepoRoot $docRelative
+  if (-not (Test-Path -LiteralPath $docPath -PathType Leaf)) { throw "Backport authority document is missing: $docRelative" }
+  $docText = Get-Content -Raw -LiteralPath $docPath
+  foreach ($identity in @($baselineCommit, $portableCommit, $projectionCommit, [string]$lock.candidate.archive_sha256)) {
+    if (-not $docText.Contains($identity)) { throw "$docRelative does not cite required identity $identity" }
   }
 }
-if ($LASTEXITCODE -ne 0 -or $baselineRows.Count -eq 0) {
-  throw "Unable to fingerprint the published MIR 2.4.5 package source."
-}
-$baselineHash = Get-MIRStringSha256 -Value (($baselineRows | Sort-Object) -join "`n")
-if ($baselineHash -ne [string]$lock.baseline_package_source_sha256) {
-  throw "Published MIR 2.4.5 package-source fingerprint disagrees with the source lock."
-}
 
-$changed = @(& git -C $RepoRoot diff --name-only $baseline -- @roots)
-if ($LASTEXITCODE -ne 0) { throw "Unable to compare the stability patch with MIR 2.4.5." }
-$untracked = @(& git -C $RepoRoot ls-files --others --exclude-standard -- @roots)
-$changed = @(($changed + $untracked) | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
-$declared = @($lock.adapted_package_paths.PSObject.Properties.Name | Sort-Object -Unique)
-$undeclared = @($changed | Where-Object { $declared -notcontains $_ })
-$stale = @($declared | Where-Object { $changed -notcontains $_ })
-if ($undeclared.Count -gt 0) {
-  throw "Package files differ from MIR 2.4.5 without a declared 2.4.9 backport reason: $($undeclared -join ', ')"
-}
-if ($stale.Count -gt 0) {
-  throw "Declared 2.4.9 package paths no longer differ from MIR 2.4.5: $($stale -join ', ')"
-}
-
-$directEffects = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\streams\direct-effects.lua")
-foreach ($unsupported in @("cargo-landing-pad-count", "max-cargo-bay-unloading-distance")) {
-  if ($directEffects -match [regex]::Escape($unsupported)) {
-    throw "Factorio 2.1-only technology modifier leaked into the 2.0 backport: $unsupported"
-  }
-}
-$targetProfileText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\platform\factorio\target_profiles.lua")
-if ($targetProfileText -notmatch '(?s)\["2\.0"\].*?mod_data\s*=\s*false') {
-  throw "Factorio 2.0 target profile must explicitly disable mod-data prototypes."
-}
-$modDataEmitterText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\emit\mod_data.lua")
-if (-not $modDataEmitterText.Contains("target_line.mod_data_supported()")) {
-  throw "The mod-data emitter is not guarded by the target capability."
-}
-$adoptionText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\runtime\productivity_family_adoption.lua")
-if ($adoptionText.Contains("reset_technology_effects")) {
-  throw "The 2.4.9 stability patch must not perform a global technology-effect reset."
-}
-
-Write-Host "[ok] MIR 2.4.9 is a bounded Factorio 2.0 stability patch over published MIR 2.4.5 with $($changed.Count) declared package paths."
+Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C16."
+Write-Host "[ok] Baseline: $baselineCommit; portable source: $portableCommit; projection: $projectionCommit."
+Write-Host "[ok] Adapted package paths: $($adaptedActual -join ', ')."

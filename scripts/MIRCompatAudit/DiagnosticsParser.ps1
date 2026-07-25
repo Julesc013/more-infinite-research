@@ -82,3 +82,32 @@ function Read-MIRAuditLog {
   }
   return $rows
 }
+
+function ConvertFrom-MIRSanitationLine {
+  param([AllowEmptyString()][string]$Line)
+
+  if ([string]::IsNullOrWhiteSpace($Line)) { return $null }
+  $match = [regex]::Match(
+    $Line,
+    '\[MIR\] pruned dangling technology effect from (?<technology>[^:]+): owner=(?<owner>\S+) type=(?<effect_type>\S+) target=(?<target>\S*) reason=(?<reason>\S+)'
+  )
+  if (-not $match.Success) { return $null }
+  return [pscustomobject][ordered]@{
+    technology = $match.Groups["technology"].Value
+    owner = $match.Groups["owner"].Value
+    effect_type = $match.Groups["effect_type"].Value
+    target = $match.Groups["target"].Value
+    reason = $match.Groups["reason"].Value
+  }
+}
+
+function Read-MIRSanitationLog {
+  param([Parameter(Mandatory)][string]$Path)
+
+  $rows = @()
+  foreach ($line in Get-Content -LiteralPath $Path) {
+    $row = ConvertFrom-MIRSanitationLine -Line $line
+    if ($row) { $rows += $row }
+  }
+  return $rows
+}

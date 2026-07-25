@@ -42,9 +42,17 @@ verification_manifests:
     targets:
       - factorio-2.0
       - factorio-2.1
+  trust:
+    path: validation/trust.json
+    schema: 1
+    owns:
+      - evidence-trust-classes
+      - release-producer-policy
+      - same-class-reuse
   evidence:
-    schema: 3
+    schema: 4
     root: artifacts/assurance/evidence
+    schemas: verification/schema
     dispositions:
       - REUSE
       - WAIT
@@ -56,21 +64,83 @@ compiler_contract_coverage:
   schema: 1
   validator: scripts/Test-MIRCompilerContractCoverage.ps1
 
+offline_rule_synthesis:
+  authority: .mir/rule-synthesis.json
+  corpus: .mir/technology-review-corpus.json
+  snapshots: .mir/technology-review-snapshots.json
+  synthesizer: scripts/Invoke-MIRRuleSynthesis.ps1
+  validator: scripts/Test-MIRRuleSynthesis.ps1
+  validates:
+    - all-positive-coverage
+    - all-negative-rejection
+    - mandatory-hard-predicate-retention
+    - minimized-new-unreviewed-matches
+    - deterministic-review-required-output
+    - no-production-mutation-authority
+
+mod_interaction_campaigns:
+  policy: .mir/mod-interaction-policy.json
+  graph: .mir/mod-interaction-graph.json
+  campaigns: .mir/combination-campaigns.json
+  validator: scripts/Test-MIRModInteractions.ps1
+  runtime_scenarios:
+    - combination-atan-ash-big-mining-drill
+    - combination-space-age-big-mining-drill
+    - space-age-galore-effect-ownership
+  validates:
+    - semantic-footprint-intersection
+    - independent-composition-smoke-routing
+    - overlapping-targeted-campaign-routing
+    - narrow-pair-delta-policy
+    - zero-uncovered-overlapping-pairs
+
+local_campaign_manifest:
+  path: fixtures/compat-matrix/local-library-scenarios.json
+  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
+  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
+  schema: 2
+  validator: scripts/Test-MIRScenarioManifests.ps1
+  record_owns:
+    - targets
+    - kind
+    - group
+    - setup
+    - roots
+    - settings
+    - expected_plan
+    - timeout_seconds
+    - claim_level
+    - required_stream_science
+  sanitation_budget:
+    path: .mir/sanitation-budgets.json
+    policy: mir-ecosystem-sanitation-budget-v1
+    validator: scripts/Test-MIRSanitationBudgets.ps1
+    scopes:
+      manifest_scenarios: campaigns
+      release_targeted_repair_smokes: local_mod_zips
+    unknown_repair_disposition: REVIEW_REQUIRED
+  independent_aai_scenarios:
+    - local-2-1-aai-loaders
+    - local-2-1-aai-industry
+    - local-2-1-aai-loaders-industry
+    - local-2-1-aai-representative-extensions
+
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
-    baseline: immutable-3.0.5
+    baseline: published-3.0.5
     expected_count: 70
-    validator: scripts/Test-MIRGoldenPlans.ps1
-  release_2_4_9_technology_ids:
-    path: fixtures/golden-plans/release-2.4.9-technology-ids.json
-    release: "2.4.9"
-    expected_count: 1
     validator: scripts/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
-    release: "3.2.0"
+    release: "3.1.0"
     expected_count: 2
+    validator: scripts/Test-MIRGoldenPlans.ps1
+  release_3_2_technology_ids:
+    path: fixtures/golden-plans/3.2.0-technology-ids.json
+    release: "3.2.0"
+    identity_state: stable-unreleased
+    expected_count: 1
     validator: scripts/Test-MIRGoldenPlans.ps1
 
 fixture_roots:
@@ -89,6 +159,25 @@ real_mod_gates:
     status: required
 
 fixtures:
+  museum-synthetic-installation:
+    requires_features: []
+    path: fixtures/museum/synthetic-installation
+    shipped: false
+    validates:
+      - portable-museum-renderer-determinism
+      - museum-installation-schema
+      - binary-and-base-data-fingerprint-rejection
+      - base-evidence-and-icon-contracts
+
+  performance-regression-probe:
+    requires_features: []
+    path: fixtures/performance-regression-probe
+    shipped: false
+    validates:
+      - exact-archive-paired-phase-timing
+      - diagnostics-artifact-volume-export
+      - baseline-candidate-symmetric-instrumentation
+
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/space-exploration-recipe-removal
@@ -103,24 +192,6 @@ fixtures:
       - final-dangling-effect-pruning-contract
       - external-dangling-unlock-recipe-effect-pruned
       - external-valid-unlock-recipe-effect-retained
-
-  compiler-contracts:
-    requires_features: [recipe_productivity]
-    assertion_path: fixtures/assert-compiler-contracts
-    validates:
-      - invalid-family-rule-rejection
-      - invalid-compatibility-pack-rejection
-      - stable-rule-and-pack-sorting
-      - deterministic-rule-precedence
-      - equal-precedence-conflict-rejection
-      - compatibility-pack-target-and-applicability-filtering
-      - stable-generation-plan-identities
-      - evidence-bearing-generation-plan-gates
-      - deterministic-cross-stream-effect-arbitration
-      - compilation-plan-cross-collision
-      - final-plan-output-owner-parity
-      - insertion-order-independent-plan-fingerprints
-      - cyclic-fingerprint-rejection
 
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
@@ -151,6 +222,8 @@ fixtures:
       - decomposed-science-authority-parity
       - stable-science-rejection-reason-codes
       - shared-pack-production-reachability-cache
+      - isolated-context-science-facade-validation
+      - closed-compiler-context-assertion-safety
 
   external-technology-cycle:
     requires_features: []
@@ -225,11 +298,16 @@ fixtures:
       - positive-stream-target-requirements
       - canonical-recipe-fact-single-scan
       - canonical-recipe-fact-copy-isolation
+      - effective-recipe-property-defaults
+      - root-variant-recipe-property-inheritance
+      - complete-factorio-2-1-product-normalization
+      - target-declared-product-probability-fields
       - governed-pipeline-command-catalog
       - pipeline-command-positive-target-requirements
       - large-synthetic-recipe-index
       - repeated-full-recipe-scan-rejection
       - non-aliased-capability-lifecycle-stages
+      - complete-bounded-compiler-telemetry
 
   scripted-runtime-lifecycle:
     requires_features: [scripted_techs]
@@ -254,50 +332,94 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
-  upgrade-2-3-5-to-2-4-0:
+  upgrade-3-0-5-to-3-1-5:
     requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-2-3-5-to-2-4-0
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-5
     validates:
-      - exact-2-3-5-source-archive
+      - exact-3-0-5-source-archive
       - non-default-startup-setting-retention
       - scripted-technology-level-retention
       - runtime-state-effect-retention
-      - exact-2-4-0-candidate-normal-mod-directory-load
+      - exact-3-1-5-candidate-normal-mod-directory-load
 
-  upgrade-2-4-0-to-2-4-1:
-    requires_features: [productivity_family_adoption]
-    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-4-5
+  upgrade-3-0-5-to-3-1-9:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-9
     validates:
-      - exact-2-4-0-source-archive
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
+
+  upgrade-3-0-5-to-3-1-0-automatic-compiler:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-0-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-2-to-3-1-5-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-5-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-2-to-3-1-9-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-9-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-5-to-3-1-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-5-to-3-1-9
+    validates:
+      - exact-3-1-5-source-archive
       - native-owner-setting-retention
       - native-owner-technology-level-retention
-      - native-owner-current-research-selection-retention
-      - native-owner-fractional-progress-retention
-      - legacy-independent-cost-model-to-paired-cost-model-migration
-      - exact-2-4-1-candidate-normal-mod-directory-load
+      - native-owner-research-progress-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
 
-  upgrade-2-4-5-to-2-4-9:
-    requires_features: [productivity_family_adoption]
-    assertion_path: fixtures/assert-upgrade-2-4-5-to-2-4-9
-    companion_paths: [fixtures/upgrade-reset-probe]
+  upgrade-3-1-9-to-3-2-0:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-0
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
     validates:
-      - exact-2-4-5-source-archive
+      - exact-3-1-9-source-archive
+      - base-default-profile-retention
       - native-owner-setting-retention
       - native-owner-technology-level-retention
-      - native-owner-current-research-selection-retention
-      - native-owner-fractional-progress-retention
-      - external-give-item-technology-researched-before-upgrade
-      - post-factorio-reconciliation-custom-recipe-state-preserved-by-mir
-      - post-factorio-reconciliation-custom-force-effect-preserved-by-mir
-      - valid-planet-space-location-target-retained
-      - missing-space-location-target-pruned
-      - missing-unlock-quality-target-pruned
-      - valid-unlock-quality-target-retained
-      - missing-turret-entity-target-pruned
-      - valid-turret-entity-target-retained
-      - missing-give-item-quality-target-pruned
-      - give-item-quality-aware-effect-identity
-      - exact-2-4-9-candidate-normal-mod-directory-load
+      - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-0-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
@@ -339,7 +461,9 @@ fixtures:
       - unsafe-unrecognized-formula-override-rejection
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
-      - configuration-change-signature-reset
+      - configuration-change-signature-without-global-effect-reset
+      - external-give-item-connected-player-manual-review-surface
+      - other-mod-configuration-change-recipe-state-preserved
       - configuration-change-current-research-progress-retention
       - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
@@ -367,6 +491,7 @@ fixtures:
     requires_features: []
     path: fixtures/better-robots-extended-competitor
     assertion_path: fixtures/assert-base-competitor-transaction
+    external_mod_identity: Better_Robots_Extended
     validates:
       - base-competitor-rollback
       - technology-prerequisite-rewire
@@ -407,6 +532,9 @@ fixtures:
       - external-owner-suppresses-dedicated-streams-when-preferred
       - dedicated-weapon-prerequisites
       - scaled-weapon-overlap
+      - finalized-artifact-generated-identity-projection
+      - isolated-context-weapon-policy-replay
+      - closed-compiler-context-assertion-safety
 
   air-scrubbing:
     requires_features: [recipe_productivity]
@@ -458,6 +586,18 @@ fixtures:
       - mining-drill-recipe-candidates
       - native-mining-owner-observation
 
+  capability-negative-cases:
+    requires_features: [recipe_productivity]
+    path: fixtures/capability-negative-cases
+    assertion_path: fixtures/assert-capability-negative-cases
+    validates:
+      - canonical-recipe-risk-hard-flags
+      - canonical-recipe-risk-review-flags
+      - plausible-placeable-output-negative-cases
+      - hard-risk-cannot-be-overridden
+      - review-risk-requires-exact-pack-or-review
+      - planner-risk-fingerprint-parity
+
   omega-drill:
     requires_features: [recipe_productivity]
     path: fixtures/omega-drill
@@ -482,11 +622,42 @@ fixtures:
       - compatibility-pack-production-integration
       - reviewed-candidate-seeding
 
+  approved-delta-3.1.9-to-3.2.0:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/3.1.9-to-3.2.0.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+    validates:
+      - base-normalized-technology-parity
+      - space-age-normalized-technology-parity
+      - automatic-family-control-parity
+      - native-owner-adoption-parity
+      - base-continuation-parity
+      - atan-compatibility-parity
+      - space-age-galore-effect-ownership-parity
+      - generated-registry-identity-parity
+      - finalized-generation-plan-registry-projection
+      - finalized-compiler-evidence-base-continuation-projection
+      - closed-compiler-context-export-safety
+      - exact-3.1.9-legacy-registry-projection
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
+      - bounded-public-technology-catalog-transition
+      - explicit-internal-technology-catalog-transition
+      - startup-setting-value-parity
+      - runtime-namespace-parity
+      - migration-contract-parity
+      - governed-mod-data-schema-delta
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts
     validates:
       - invalid-family-rule-rejection
+      - unknown-family-operator-rejection
+      - data-only-family-operator-composition
       - invalid-compatibility-pack-rejection
       - stable-rule-and-pack-sorting
       - deterministic-rule-precedence
@@ -509,8 +680,65 @@ fixtures:
       - compilation-plan-cross-collision
       - output-effect-value-parity
       - base-extension-output-parity
+      - base-continuation-technology-design-authority
+      - native-owner-patch-existing-technology-design-authority
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
+      - telemetry-independent-semantic-compilation-fingerprint
+      - separate-compilation-run-telemetry-fingerprint
+      - split-subject-design-prototype-qualification-fingerprints
+      - content-addressed-compiler-evidence-publication
+      - pre-index-and-post-emission-sanitation-order
+      - sanitation-retained-effect-order-ledger
+      - sanitation-content-fingerprints
+      - post-sanitation-target-prototype-invariant
+      - output-target-inventory-name-set-tamper-rejection
+      - missing-unlock-quality-target-pruned
+      - valid-unlock-quality-target-retained
+      - missing-turret-entity-target-pruned
+      - valid-turret-entity-target-retained
+      - missing-give-item-quality-target-pruned
+      - give-item-quality-aware-effect-identity
+      - exhaustive-factorio-2.1.11-target-bearing-modifier-contracts
+      - actual-scc-cycle-edge-witness
+      - scc-member-and-topology-identities
+      - explicit-semantic-rejection-priority
+      - contributing-rejection-reasons
+      - bounded-rejection-cause-graph
+      - technology-design-schema-2-normalization
+      - technology-design-owned-value-structural-sharing
+      - technology-candidate-trusted-subject-sharing
+      - diagnostic-design-unchanged-identity-reuse
+      - technology-design-closed-enum-and-cross-field-invariants
+      - technology-design-field-provenance-and-locks
+      - technology-design-cross-field-invariants
+      - technology-design-executable-locks
+      - technology-design-typed-subjects
+      - technology-candidate-schema-1-normalization
+      - technology-qualification-schema-1-hard-gates
+      - pending-hard-gate-produces-proposal
+      - failed-hard-gate-produces-rejection
+      - superseded-gate-history
+      - authoritative-gate-evidence-fingerprint
+      - compact-gate-authority-projection
+      - diagnostic-materialization-runtime-invariant
+      - independent-safety-quality-and-promotion-records
+      - mir-owned-reviewed-promotion-trust
+      - technology-design-qualification-refresh-parity
+      - technology-design-qualification-refresh-identity-rejection
+      - partial-effect-sanitation-technology-design-rebuild
+      - context-owned-candidate-and-qualification-catalogs
+      - report-mode-explicit-candidate-catalog-request
+      - skipped-row-technology-design-report-mode-synthesis
+      - public-generation-plan-decision-fingerprints
+      - technology-approval-exact-design-binding
+      - machine-readable-technology-applicability-envelope
+      - positive-negative-applicability-examples
+      - context-owned-compatibility-policy-authority
+      - technology-promotion-state-transition-enforcement
+      - technology-migration-strategy-enforcement
+      - emitted-row-technology-design-authority
+      - full-technology-presentation-parity
       - cyclic-fingerprint-rejection
       - automatic-control-schema-2-defaults
       - automatic-action-disabled-preview-apply
@@ -524,12 +752,95 @@ fixtures:
       - registered-family-generation-remains-extensible
       - data-only-compiler-provider-contract
       - stable-provider-order-and-fingerprint
+      - canonical-recipe-risk-permutation-invariance
+      - provider-cardinality-overflow-review-required
+      - hard-risk-preserved-during-cardinality-overflow
+      - provider-diagnostic-planner-decision-fingerprint-parity
+      - no-duplicate-loader-or-mining-discovery
+      - technology-catalog-schema-3-final-post-sanitation-post-graph
+      - technology-catalog-always-built
+      - rejected-technology-design-preservation
+      - exact-technology-catalog-publication
+      - deterministic-order-independent-catalog-selection
+      - generation-plan-catalog-projection
+      - compilation-plan-catalog-projection
+      - every-catalog-alternative-independently-qualified
+      - total-authoritatively-resolved-final-hard-gate-vector
+      - rejected-catalog-alternative-cannot-be-selected
+      - emitted-planned-technology-graph-parity
+      - shared-virtual-actual-graph-semantic-parity
+      - graph-snapshot-component-condensation-and-proof-fingerprints
+      - science-and-progression-cache-context-isolation
       - duplicate-provider-id-rejection
       - provider-snapshot-copy-isolation
+      - provider-pipeline-stage-isolation
+      - provider-metrics-identifiers-partitions-environment-and-provenance
+      - provider-metrics-real-disposition-depth-time-byte-and-witness-measurements
+      - incomplete-quality-measurement-never-passes
+      - monotone-quality-severity
+      - exact-singleton-candidate-seed-not-ambiguous
+      - ambiguous-provider-seed-review-required-without-crash
+      - cross-family-attachment-ambiguity-review-required-without-crash
+      - reviewed-attachment-preserving-cardinality-budget
+      - new-unreviewed-only-cardinality-suppression
+      - compiler-context-state-and-artifact-isolation
+      - compiler-context-schema-4-service-isolation
+      - compiler-context-service-freeze
+      - compiler-context-state-epoch-replacement
+      - compiler-context-state-freeze
+      - compiler-context-observationally-pure-snapshot
+      - immutable-compiler-input-and-result-contracts
+      - immutable-boundary-private-trust-registration
+      - canonical-text-fingerprint-parity
+      - compilation-snapshot-untrusted-tamper-rejection
+      - policy-snapshot-untrusted-tamper-rejection
+      - runtime-environment-untrusted-tamper-rejection
+      - compiler-input-untrusted-tamper-rejection
+      - compiler-result-private-trust-registration
+      - compiler-result-untrusted-tamper-rejection
+      - compiler-result-trusted-identity-tamper-rejection
+      - compiler-result-serialized-final-tamper-rejection
+      - compilation-snapshot-and-policy-snapshot-fingerprints
+      - pure-compiler-deterministic-replay
+      - pure-compiler-missing-hard-gate-rejection
+      - not-applicable-gate-predicate-and-input-proof
+      - not-applicable-gate-tamper-rejection
+      - qualified-only-final-transformation-plan
+      - transformation-operation-plan-and-mutation-journal
+      - provider-review-safe-mode
+      - provider-review-strict-mode
+      - missing-transformation-operation
+      - transformation-precondition-tamper
+      - transformation-postcondition-tamper
+      - journal-completeness-missing-duplicate-undeclared-and-out-of-plan
+      - compiler-result-applied
+      - compiler-result-failed
+      - context-nil-multireturn
+      - catalog-public-projection
+      - snapshot-structural-sharing
+      - policy-snapshot-isolation
+      - identical-provider-claim-collapse-with-provenance
+      - conflicting-same-stream-provider-claim-review-required
+      - compiler-context-new-does-not-activate
+      - compiler-context-a-b-a-nested-restoration
+      - compiler-context-error-restoration
+      - base-continuation-accepted-and-rejected-catalog-inventory
+      - iterative-deep-researchability-chain
+      - iterative-wide-researchability-fan-in
       - planning-only-provider-emission-adapters
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion
       - stable-automatic-and-provider-diagnostic-codes
+
+  space-age-galore-effect-ownership:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-age-galore-overlap
+    validates:
+      - vgal-coal-crushing-multi-output-shape
+      - carbon-and-sulfur-cross-stream-claim
+      - exactly-one-materialized-effect-owner
+      - stable-owner-selection
+      - no-settings-reset-required
 
   semantic-family-generate:
     requires_features: [recipe_productivity]
@@ -542,6 +853,8 @@ fixtures:
       - predeclared-settings-stage-mode
       - full-recipe-coverage-accounting
       - coverage-artifact-fingerprint
+      - scenario-scoped-reviewed-exact-candidate-seeds
+      - shared-unreviewed-provider-budget-remains-fail-closed
 
   semantic-family-modes:
     requires_features: [recipe_productivity]
@@ -555,17 +868,47 @@ fixtures:
       - independent-creation-and-review-controls
       - reviewed-data-rejects-experimental-family-authorization
       - reviewed-data-safe-attachment-baseline
+      - published-artifact-assertions-without-ambient-compiler-context
       - unrelated-pack-family-remains-disabled
 
   synthetic-scale-graph:
     requires_features: [recipe_productivity]
     path: fixtures/synthetic-scale-graph
+    randomized_order_selector: fixtures/synthetic-scale-random-order
     assertion_path: fixtures/assert-synthetic-scale-graph
     validates:
-      - 1000-explicit-recipes
-      - 1000-explicit-technologies
-      - 10000-explicit-technology-effects
+      - 1000-structural-family-candidate-recipes
+      - 60000-materialized-technologies-below-factorio-65535-engine-limit
+      - 60000-materialized-technology-effects
+      - 60000-materialized-technology-graph-edges
+      - published-compiler-telemetry-with-isolated-stress-context
+      - shallow-acyclic-factorio-engine-graph
+      - 100000-in-memory-compiler-technologies
+      - 100000-in-memory-compiler-effects
+      - 100000-in-memory-compiler-graph-edges
+      - 25000-node-in-memory-strongly-connected-component
+      - 1000-small-in-memory-strongly-connected-components
+      - deterministic-randomized-insertion-order
+      - bounded-64-node-scc-diagnostics
+      - 900-second-portable-graph-stress-budget
       - high-family-candidate-fanout
       - single-recipe-fact-scan
       - single-technology-coverage-scan
       - complete-recipe-accounting
+
+  synthetic-scale-recipes:
+    requires_features: [recipe_productivity]
+    path: fixtures/synthetic-scale-recipes
+    randomized_order_selector: fixtures/synthetic-scale-random-order
+    assertion_path: fixtures/assert-synthetic-scale-recipes
+    validates:
+      - 1000-materialized-structural-family-candidate-recipes
+      - 100000-in-memory-canonical-recipe-facts
+      - 1000-structural-family-candidates
+      - deterministic-randomized-insertion-order
+      - published-compiler-telemetry-with-isolated-stress-context
+      - high-family-candidate-fanout
+      - single-recipe-fact-scan
+      - single-technology-coverage-scan
+      - complete-recipe-accounting
+      - chunked-full-index-fingerprint

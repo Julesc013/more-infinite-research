@@ -1,6 +1,7 @@
 schema: 1
 
 canonical_machine_record: prototypes/mir/streams/generated_stream_manifest.json
+canonical_continuation_machine_record: prototypes/mir/streams/generated_continuation_manifest.json
 stream_docs_root: docs/reference/schemas
 generated_id_doc: docs/reference/generated-id-reference.md
 
@@ -17,19 +18,59 @@ rules:
   - release notes mention generated stream changes
   - stream docs describe contracts, not release-specific plans
   - legacy stream-table rows may use stream:<stream_key> targets until exact capability targets are materialized
+  - recipe-productivity effects target finalized recipes; evidenced late recipe removers must run before MIR planning and emission
+
+continuations:
+  records:
+    base-continuation/braking-force:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/braking-force
+      chain_key: braking-force
+      identity_pattern: braking-force-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/inserter-capacity-bonus:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/inserter-capacity-bonus
+      chain_key: inserter-capacity-bonus
+      identity_pattern: inserter-capacity-bonus-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/laser-shooting-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/laser-shooting-speed
+      chain_key: laser-shooting-speed
+      identity_pattern: laser-shooting-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/research-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/research-speed
+      chain_key: research-speed
+      identity_pattern: research-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/weapon-shooting-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/weapon-shooting-speed
+      chain_key: weapon-shooting-speed
+      identity_pattern: weapon-shooting-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/worker-robots-storage:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/worker-robots-storage
+      chain_key: worker-robots-storage
+      identity_pattern: worker-robots-storage-{next-level}
+      identity_state: released
+      migration_policy: stable
 
 streams:
   records:
     mir-auto-prod-manufacturing-assembling-machine-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-auto-prod-manufacturing-assembling-machine-1
-      introduced_in: "3.2.0"
+      introduced_in: "3.1.0"
       source: family-rule:assembling-machine-manufacturing
       capability: recipe-productivity
       family: manufacturing_assembling_machine
       policy: automatic.experimental-family-generation
       creation_maturity: experimental
+      identity_state: released
       settings_visibility: hidden-until-reviewed
-      science_contract: explicit-automation-logistic-chemical-production
       generated_technology: mir-auto-prod-manufacturing-assembling-machine-1
       stream_key: research_auto_assembling_machine
       migration_policy: stable
@@ -41,14 +82,14 @@ streams:
           - fixtures/assert-semantic-family-generate
     mir-auto-prod-manufacturing-lab-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-auto-prod-manufacturing-lab-1
-      introduced_in: "3.2.0"
+      introduced_in: "3.1.0"
       source: family-rule:lab-manufacturing
       capability: recipe-productivity
       family: manufacturing_lab
       policy: automatic.experimental-family-generation
       creation_maturity: experimental
+      identity_state: released
       settings_visibility: hidden-until-reviewed
-      science_contract: explicit-automation-logistic-chemical-production
       generated_technology: mir-auto-prod-manufacturing-lab-1
       stream_key: research_auto_lab
       migration_policy: stable
@@ -743,22 +784,6 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
-    recipe-prod-research_steel-1:
-      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_steel-1
-      introduced_in: "2.4.9"
-      source: legacy_stream_table:productivity
-      capability: recipe-productivity
-      family: steel
-      policy: legacy.recipe-productivity-stream
-      generated_technology: recipe-prod-research_steel-1
-      stream_key: research_steel
-      migration_policy: stable
-      targets:
-        - stream:research_steel
-      evidence:
-        fixtures:
-          - fixtures/assert-generation-integrity
-
     recipe-prod-research_lab_productivity-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lab_productivity-1
       introduced_in: "pre-2.2.0"
@@ -1087,6 +1112,25 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_steel-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_steel-1
+      introduced_in: "3.2.0"
+      source: stream_table:productivity
+      capability: recipe-productivity
+      family: steel
+      policy: native-owner-binding-or-generated-stream
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_steel-1
+      stream_key: research_steel
+      migration_policy: stable
+      targets:
+        - stream:research_steel
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
+          - fixtures/assert-vanilla-family-adoption
 
     recipe-prod-research_sulfur-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_sulfur-1

@@ -42,6 +42,7 @@ param(
   [switch]$FailFast,
   [Alias("ManualScenarios")]
   [string]$ManualScenariosPath = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\manual-scenarios.json"),
+  [string]$SanitationBudgetPath = (Join-Path $PSScriptRoot "..\.mir\sanitation-budgets.json"),
   [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\known-exclusions.json")
 )
 
@@ -54,6 +55,12 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
 . (Join-Path $PSScriptRoot "validation\SettingsOverrides.ps1")
+
+$resolvedSanitationBudgetPath = (Resolve-Path -LiteralPath $SanitationBudgetPath).Path
+$sanitationPolicy = Get-Content -Raw -LiteralPath $resolvedSanitationBudgetPath | ConvertFrom-Json
+if ([int]$sanitationPolicy.schema -ne 1 -or [string]$sanitationPolicy.policy -ne "mir-ecosystem-sanitation-budget-v1") {
+  throw "Compatibility audit requires mir-ecosystem-sanitation-budget-v1 schema 1."
+}
 
 $resolvedModUnderTestZip = ""
 if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
@@ -934,14 +941,16 @@ function Invoke-MIRScenarioLoad {
       exit_code = $null
       timed_out = $false
       timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
-      duration_seconds = 0
+      duration_seconds = 0.0
       skipped = $true
       skip_reason = "dependency_resolution_failure"
+      process_passed = $false
       passed = $false
       save = ""
       stdout = ""
       stderr = ""
       audit_rows = @()
+      sanitation_rows = @()
     }
     return
   }
@@ -949,17 +958,8 @@ function Invoke-MIRScenarioLoad {
   $userData = New-MIRCompatUserDataDir -Root $runRoot
   $modsDir = Join-Path $userData "mods"
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
-  if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) {
-    Enable-MIRCopiedGenerationReport -ModsDir $modsDir
-  }
-
   Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine
-  $scenarioSettings = @{}
-  $settingsObject = Get-MIRObjectProperty -Object $Scenario -Name "settings" -Default ([pscustomobject]@{})
-  foreach ($property in @($settingsObject.PSObject.Properties)) {
-    $scenarioSettings[[string]$property.Name] = $property.Value
-  }
-  Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $scenarioSettings
+  Enable-CopiedDiagnostics -ModsDir $modsDir
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
@@ -968,6 +968,35 @@ function Invoke-MIRScenarioLoad {
 
   $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
+  $expectedPlan = Get-MIRObjectProperty -Object $Scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+  $requiredStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "required_stream_science" -Default ([pscustomobject]@{})
+  $scienceAssertions = @(
+    foreach ($requiredStream in @($requiredStreamScience.PSObject.Properties)) {
+      $streamName = [string]$requiredStream.Name
+      $requiredPacks = @($requiredStream.Value | ForEach-Object { [string]$_ })
+      $streamRows = @($result.audit_rows | Where-Object {
+        [string]$_.kind -eq "stream" -and
+        [string]$_.key -eq $streamName -and
+        [string]$_.status -eq "generated"
+      })
+      $observedPacks = @(
+        $streamRows |
+          ForEach-Object { @([string]$_.science -split ",") } |
+          Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+          Sort-Object -Unique
+      )
+      $missingPacks = @($requiredPacks | Where-Object { $_ -notin $observedPacks })
+      [pscustomobject]@{
+        stream = $streamName
+        required_packs = $requiredPacks
+        observed_packs = $observedPacks
+        matching_generated_rows = $streamRows.Count
+        missing_packs = $missingPacks
+        passed = ($streamRows.Count -gt 0 -and $missingPacks.Count -eq 0)
+      }
+    }
+  )
+  $scienceContractPassed = @($scienceAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -979,14 +1008,18 @@ function Invoke-MIRScenarioLoad {
     exit_code = $result.exit_code
     timed_out = $result.timed_out
     timeout_seconds = $result.timeout_seconds
-    duration_seconds = $result.duration_seconds
+    duration_seconds = [double]$result.duration_seconds
     skipped = $false
     skip_reason = ""
-    passed = $result.passed
+    process_passed = [bool]$result.passed
+    passed = ($result.passed -and $scienceContractPassed)
     save = $result.save
     stdout = $result.stdout
     stderr = $result.stderr
     audit_rows = @($result.audit_rows)
+    sanitation_rows = @($result.sanitation_rows)
+    science_contract_passed = $scienceContractPassed
+    science_assertions = $scienceAssertions
   }
 }
 
@@ -1326,6 +1359,7 @@ if ($RunLoadTests) {
     $officialMods = @($scenario.official_mods) -join ","
     $dependencyFailureCount = @($scenario.dependency_failures).Count
     Write-Host ("[compat-audit] load {0}/{1} starting scenario={2} type={3} roots={4} resolved={5} official={6} dependency_failures={7}" -f $displayIndex, $scenarioList.Count, $scenario.name, $scenario.type, $rootMods, $resolvedCount, $officialMods, $dependencyFailureCount)
+    $scenarioStarted = Get-Date
     $result = Invoke-MIRScenarioLoad -Scenario $scenario
     $results += $result
     $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
@@ -1333,7 +1367,7 @@ if ($RunLoadTests) {
     if ($manualResults.Count -gt 0) {
       $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
     }
-    $scenarioSeconds = [math]::Round([double]$result.duration_seconds, 2)
+    $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
     Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
     if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
   }
@@ -1352,8 +1386,39 @@ if ($RunLoadTests) {
       $dependencyFailureCount = @($scenario.dependency_failures).Count
       $expectedPlan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
       $maximumDependencyFailures = [int](Get-MIRObjectProperty -Object $expectedPlan -Name "maximum_dependency_failures" -Default 0)
-      $processResult = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
-      $claimGateResult = if ($processResult -eq "passed" -and $dependencyFailureCount -le $maximumDependencyFailures) {
+      $budgetScope = if ([string]$scenario.type -eq "local_zip") { "local_mod_zips" } else { "campaigns" }
+      $budgetKey = if ($budgetScope -eq "local_mod_zips") {
+        "local-$FactorioLine-$($scenario.name)"
+      } else {
+        [string]$scenario.name
+      }
+      $budgetScopeProperty = $sanitationPolicy.PSObject.Properties[$budgetScope]
+      if ($null -eq $budgetScopeProperty) {
+        throw "Sanitation policy has no '$budgetScope' budget scope for scenario $($scenario.name)."
+      }
+      $budgetProperty = $budgetScopeProperty.Value.PSObject.Properties[$budgetKey]
+      if ($null -eq $budgetProperty) {
+        throw "Scenario $($scenario.name) has no governed sanitation budget '$budgetKey' in scope '$budgetScope'."
+      }
+      $sanitationBudget = $budgetProperty.Value
+      $expectedPrunes = @($sanitationBudget.expected_external_prunes)
+      $maximumUnreviewedPrunes = [int]$sanitationBudget.maximum_unreviewed_external_prunes
+      $observedPrunes = @($result.sanitation_rows | Where-Object { [string]$_.owner -eq "external" })
+      $expectedIdentities = @($expectedPrunes | ForEach-Object { "$($_.technology)|$($_.effect_type)|$($_.target)" } | Sort-Object -Unique)
+      $observedIdentities = @($observedPrunes | ForEach-Object { "$($_.technology)|$($_.effect_type)|$($_.target)" } | Sort-Object -Unique)
+      $missingExpectedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '<=' | ForEach-Object InputObject)
+      $unreviewedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '=>' | ForEach-Object InputObject)
+      $processResult = if ($result.process_passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+      $sanitationResult = if ($processResult -eq "skipped") {
+        "skipped"
+      } elseif ($missingExpectedPrunes.Count -eq 0 -and $unreviewedPrunes.Count -le $maximumUnreviewedPrunes) {
+        "passed"
+      } else {
+        "REVIEW_REQUIRED"
+      }
+      $claimGateResult = if ($processResult -eq "passed" -and $result.passed -eq $true -and
+          $dependencyFailureCount -le $maximumDependencyFailures -and
+          $sanitationResult -eq "passed") {
         "passed"
       } elseif ($processResult -eq "skipped") {
         "skipped"
@@ -1386,9 +1451,19 @@ if ($RunLoadTests) {
         exit_code = $result.exit_code
         timed_out = [bool]$result.timed_out
         timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
-        duration_seconds = [Math]::Round([double]$result.duration_seconds, 6)
+        duration_seconds = [double]$result.duration_seconds
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
+        sanitation_budget = [ordered]@{
+          scope = $budgetScope
+          key = $budgetKey
+          expected_external_prunes = $expectedPrunes
+          maximum_unreviewed_external_prunes = $maximumUnreviewedPrunes
+        }
+        observed_external_prunes = $observedPrunes
+        missing_expected_prunes = $missingExpectedPrunes
+        unreviewed_external_prunes = $unreviewedPrunes
+        sanitation_result = $sanitationResult
         source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
         claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
       }
@@ -1399,16 +1474,25 @@ if ($RunLoadTests) {
     kind = "mir-modpack-campaign-evidence"
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     factorio_line = $FactorioLine
-    factorio_binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+    factorio_binary = [ordered]@{
+      name = Split-Path -Leaf (Resolve-Path -LiteralPath $FactorioBin).Path
+      version = (Get-Item -LiteralPath (Resolve-Path -LiteralPath $FactorioBin).Path).VersionInfo.FileVersion
+      sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Resolve-Path -LiteralPath $FactorioBin).Path).Hash
+    }
     mir_archive = [ordered]@{
-      path = $resolvedModUnderTestZip
+      path = if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) { "working-tree" } else { Split-Path -Leaf $resolvedModUnderTestZip }
       sha256 = $lock.mod_under_test_sha256
       source_commit = $ModUnderTestSourceCommit
       source_commit_binding = if ([string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit)) { "unbound" } else { "declared" }
     }
     dependency_lock = [ordered]@{
-      path = $lockPath
+      path = Split-Path -Leaf $lockPath
       sha256 = $lockSha256
+    }
+    sanitation_budget = [ordered]@{
+      policy = [string]$sanitationPolicy.policy
+      path = ".mir/sanitation-budgets.json"
+      sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedSanitationBudgetPath).Hash
     }
     scenarios = $campaignScenarios
   }
