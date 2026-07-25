@@ -144,6 +144,7 @@ local function row_fingerprint_material(row)
     target_profile_fingerprint = row.target_profile_fingerprint,
     provider_ids = row.provider_ids,
     family_ids = row.family_ids,
+    technology_risk = row.technology_risk,
     gates = row.gates,
     diagnostics = row.diagnostics,
     effect_ownership = row.effect_ownership,

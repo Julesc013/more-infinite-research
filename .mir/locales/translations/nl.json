@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Experimenteel en standaard uitgeschakeld in v2.1.0. Dit is een globaal/kaartbreed scripteffect. Bestaand bederfbaar stapelgedrag wordt pas geclaimd nadat het handmatig is gevalideerd.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Risicovolle technologie. Standaard ingeschakeld. Het globale/kaartbrede scripteffect kan de timing van bederf veranderen; bestaande bederfelijke stapels kunnen de huidige deadlines behouden totdat ze opnieuw worden opgebouwd of opnieuw gevalideerd. Schakel het uit voordat u een opslagbestand laadt als het behouden van de bestaande bederftijd van cruciaal belang is.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Standaard uitgeschakeld. Extra capaciteit van de inserter kan circuitgestuurde inserters kapot maken en motoroptimalisaties verminderen.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Risicovolle technologie. Standaard ingeschakeld. Extra capaciteit van de invoegmachine verandert het aantal handmatige stapels, kan circuitgestuurde aannames en blauwdrukken van de invoegmachine doorbreken en kan engine-optimalisaties verminderen. Schakel het uit voordat u een opslagbestand laadt als het exacte invoeggedrag ongewijzigd moet blijven.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Risicovolle technologie. Standaard ingeschakeld. Onderzoek ernaar kan bestaand fabrieks- of blauwdrukgedrag veranderen. Controleer de technologiespecifieke effecten en schakel deze uit voordat u een opslagbestand laadt, als het exacte gedrag ongewijzigd moet blijven.",
       "provenance": "machine-assisted"
     },
     {

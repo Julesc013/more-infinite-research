@@ -414,7 +414,7 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
   }
 }
 
-Invoke-RepoCheck "default-off scripted streams remain guarded" {
+Invoke-RepoCheck "scripted technology defaults and risks remain explicit" {
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
   if ($isReducedLegacyLine) {
     if ($defaultsText -match "research_(spoilage_preservation|agricultural_growth_speed)\s*=") {
@@ -422,8 +422,12 @@ Invoke-RepoCheck "default-off scripted streams remain guarded" {
     }
     return
   }
-  if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false") {
-    throw "Spoilage preservation must remain disabled by default until manual save validation supports stronger release claims."
+  if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*true") {
+    throw "Spoilage preservation must be enabled by default."
+  }
+  $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  if ($directEffectsText -notmatch '(?s)research_spoilage_preservation\s*=\s*\{.*?technology_risk\s*=\s*\{.*?class\s*=\s*"factory-disruptive"') {
+    throw "Spoilage preservation must retain its explicit factory-disruptive classification independently of its default."
   }
   if ($defaultsText -notmatch "(?s)research_agricultural_growth_speed\s*=\s*\{.*?enabled\s*=\s*true") {
     throw "Agricultural growth speed should be enabled by default as a promoted special technology."
@@ -758,7 +762,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.visibility_for_stream(stream, settings_context)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.apply(setting, group and group.ui_visibility)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function group_attention_rank(group)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'if group.settings_priority == "top" then return "050" end' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local risk_rank = technology_risk.settings_rank(group.technology_risk)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'if risk_rank then return risk_rank end' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_priority = "top"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_catalog.stream_setting_specs(key, stream)' },
@@ -1012,10 +1017,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prefer-this-mod-for-competing-techs=[font=default-bold][color=green]Main:[/color][/font] Prefer MIR for duplicate infinite research' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-adjust-vanilla-weapon-speed-techs=[font=default-bold][color=cyan]Compatibility:[/color][/font] Rocket/cannon speed cleanup' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-debug-generation-report=[font=default-bold][color=yellow]Diagnostics:[/color][/font] Generated and skipped technologies' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.1.0.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Risky technology. Enabled by default.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-agriculture-growth=Applies to newly planted agricultural tower crops.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default. Extra inserter capacity can break circuit-controlled inserters and reduce engine optimizations.' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-spoilage' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Risky technology. Enabled by default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-risk-factory-disruptive=Risky technology. Enabled by default.' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'mod-setting-description.mir-note-experimental-spoilage' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-agriculture-growth' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-inserter-capacity' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
@@ -1198,11 +1204,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
-  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*false') {
-    throw "Inserter capacity bonus must remain disabled by default."
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*true') {
+    throw "Inserter capacity bonus must be enabled by default."
   }
-  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?settings_priority\s*=\s*"top"') {
-    throw "Inserter capacity bonus must stay in the top default-off settings bucket."
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?technology_risk\s*=\s*\{.*?class\s*=\s*"factory-disruptive"') {
+    throw "Inserter capacity bonus must stay in the factory-disruptive settings bucket independently of its default."
   }
 }
 
@@ -3056,6 +3062,7 @@ $defaultEnabledBaseExtensionKeys = @(
   "braking-force",
   "research-speed",
   "worker-robots-storage",
+  "inserter-capacity-bonus",
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
@@ -3072,27 +3079,15 @@ $spaceAgeVanillaOwnedProductivityStreams = @(
 )
 
 function Assert-DefaultBaseExtensionDiagnostics {
-  param(
-    [string]$Context,
-    [switch]$InserterCapacityEnabled
-  )
+  param([string]$Context)
 
   $expectedGenerated = @($defaultEnabledBaseExtensionKeys)
-  if ($InserterCapacityEnabled) {
-    $expectedGenerated += "inserter-capacity-bonus"
-  }
 
   foreach ($key in $expectedGenerated) {
     $line = Get-LastExtensionReportLine -Key $key
     Assert-ReportLineGenerated -Line $line -Context "$Context base extension $key"
   }
 
-  if (-not $InserterCapacityEnabled) {
-    $inserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
-    if ($inserterLine -notmatch "status=skipped" -or $inserterLine -notmatch "disabled") {
-      throw "$Context expected disabled inserter-capacity-bonus extension to skip cleanly: $inserterLine"
-    }
-  }
 }
 
 function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
@@ -4080,7 +4075,7 @@ Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled
   "inserter-capacity-bonus"
 )
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity with inserter enabled scenario"
-Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity with inserter enabled scenario" -InserterCapacityEnabled
+Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity with inserter enabled scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-installed-space-age-icon-assets" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
@@ -4211,11 +4206,11 @@ if ([bool]$targetProfile.features.scripted_techs -and [bool]$targetProfile.suppo
     -EnableSpaceAge
   $disabledSpoilageLine = Get-LastStreamReportLine -Key "research_spoilage_preservation"
   if ($disabledSpoilageLine -notmatch "status=skipped" -or $disabledSpoilageLine -notmatch "disabled") {
-    throw "Default-disabled scripted spoilage stream should skip when its checkbox is off: $disabledSpoilageLine"
+    throw "Explicitly disabled scripted spoilage stream should skip when its checkbox is off: $disabledSpoilageLine"
   }
   $defaultAgriculturalLine = Get-LastStreamReportLine -Key "research_agricultural_growth_speed"
   Assert-ReportLineGenerated -Line $defaultAgriculturalLine -Context "Default-enabled scripted agricultural runtime scenario"
-  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Default-disabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Explicitly disabled scripted spoilage runtime scenario"
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Default-enabled scripted agricultural runtime scenario"
 
   Invoke-RuntimeConfigurationChangeScenario `
@@ -4465,7 +4460,7 @@ Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity-inserter-en
   "inserter-capacity-bonus"
 ) -EnableSpaceAge
 Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
-Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity with inserter enabled scenario" -InserterCapacityEnabled
+Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity with inserter enabled scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
 $spaceAgeSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"

@@ -106,6 +106,8 @@ Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua
 
 ### Technology Catalog Construction Ownership
 
+`prototypes/mir/domain/technology/technology_risk.lua` is the shared technology-risk authority for startup-setting order, compiler classification, and automatic localized tooltip warnings. Its risk class and reason remain independent of the enable default: a risky technology can default on without falling out of the first attention bucket or losing its warning.
+
 `prototypes/mir/planner/stream_compiler.lua` produces source rows and the finalized GenerationPlan only. It must not construct a transient TechnologyCatalog. `prototypes/mir/planner/compilation_plan.lua` is the sole TechnologyCatalog construction and finalization owner after the complete operation set is known, and its final catalog receives the full schema validation before publication.
 
 ## Three Workspaces

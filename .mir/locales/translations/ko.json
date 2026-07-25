@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "실험적이며 v2.1.0에서는 기본적으로 비활성화되어 있습니다. 이는 글로벌/맵 전체의 스크립트 효과입니다. 기존의 손상될 수 있는 스택 동작은 수동으로 검증될 때까지 주장되지 않습니다.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "위험한 기술. 기본적으로 활성화되어 있습니다. 글로벌/맵 전체의 스크립트 효과는 부패 시기를 변경할 수 있습니다. 기존의 손상되기 쉬운 스택은 재구축되거나 재검증될 때까지 현재 기한을 유지할 수 있습니다. 기존 손상 타이밍을 유지하는 것이 중요한 경우 저장을 로드하기 전에 비활성화하십시오.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "기본적으로 비활성화되어 있습니다. 추가 삽입기 용량은 회로 제어 삽입기를 손상시키고 엔진 최적화를 감소시킬 수 있습니다.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "위험한 기술. 기본적으로 활성화되어 있습니다. 추가 삽입기 용량은 핸드 스택 수를 변경하고, 회로 제어 삽입기 가정 및 청사진을 깨뜨릴 수 있으며, 엔진 최적화를 줄일 수 있습니다. 정확한 삽입기 동작을 변경하지 않고 유지해야 하는 경우 저장을 로드하기 전에 비활성화하십시오.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "위험한 기술. 기본적으로 활성화되어 있습니다. 이를 연구하면 기존 공장이나 청사진 동작을 변경할 수 있습니다. 정확한 동작을 변경하지 않고 유지해야 하는 경우 저장을 로드하기 전에 기술별 효과를 검토하고 비활성화하십시오.",
       "provenance": "machine-assisted"
     },
     {

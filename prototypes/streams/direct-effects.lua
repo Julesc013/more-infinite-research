@@ -8,6 +8,13 @@ end
 
 return {
   research_spoilage_preservation = {
+    technology_risk = {
+      class = "factory-disruptive",
+      reason = "existing-spoilable-stack-deadlines",
+      tooltip_note = {
+        "mod-setting-description.mir-note-experimental-spoilage"
+      }
+    },
     effect_per_level = {
       field = "runtime_multiplier_delta",
       unit = "percent",

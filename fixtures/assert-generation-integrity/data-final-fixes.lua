@@ -477,7 +477,7 @@ local base_extension_defaults = {
   ["braking-force"] = true,
   ["research-speed"] = true,
   ["worker-robots-storage"] = true,
-  ["inserter-capacity-bonus"] = false,
+  ["inserter-capacity-bonus"] = true,
   ["weapon-shooting-speed"] = true,
   ["laser-shooting-speed"] = true
 }

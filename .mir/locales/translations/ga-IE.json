@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Turgnamhach agus díchumasaithe de réir réamhshocraithe in v2.1.0. Is éifeacht scriptithe dhomhanda/leathanaigh é seo. Ní éilítear iompar stoic inmhillte atá ann cheana féin go dtí go ndéanfar é a bhailíochtú de láimh.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Teicneolaíocht rioscúil. Cumasaithe de réir réamhshocraithe. Is féidir le héifeacht scriptithe domhanda/léarscáileanna uainiú millte a athrú; féadfaidh stoic inmhillte atá ann cheana na spriocdhátaí reatha a choinneáil go dtí go ndéanfar iad a atógáil nó a athbhailíochtú. Díchumasaigh é sula luchtaítear sábhálann tú má tá sé ríthábhachtach an t-am millte atá ann cheana a chaomhnú.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Díchumasaithe de réir réamhshocraithe. Is féidir le hacmhainn bhreise ionsaitheoirí ionsaitheoirí ciorcaid-rialaithe a bhriseadh agus leas iomlán a bhaint as innill a laghdú.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Teicneolaíocht rioscúil. Cumasaithe de réir réamhshocraithe. Athraíonn cumas ionsáiteora breise comhaireamh cruachta láimhe, féadann sé boinn tuisceana agus gormchlónna ionsáiteora ciorcaid-rialaithe a bhriseadh, agus féadann sé leas iomlán a bhaint as innill a laghdú. Díchumasaigh é sula lódálann tú sábhálann más rud é nach mór an t-iompraíocht ionsáiteora gan athrú.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Teicneolaíocht risky. Cumasaithe de réir réamhshocraithe. Is féidir iompar monarchan nó treoirphlean a athrú trí thaighde a dhéanamh air. Déan athbhreithniú ar na héifeachtaí a bhaineann go sonrach le teicneolaíocht agus díchumasaigh é sula lódáiltear sábhálann tú más gá fanacht gan athrú.",
       "provenance": "machine-assisted"
     },
     {

@@ -29,7 +29,7 @@ Settings are compatibility surface. Treat a released setting ID like a public co
 - Preserve portable profile import/export compatibility by keeping `mir-settings-profile-import` registered.
 - Exclude `mir-settings-profile-import` from exported profiles.
 - Treat a profile import as an effective data-stage override, not a runtime mutation of Factorio startup settings.
-- Order technology settings in three attention buckets: default-off or experimental rows first, enabled special/unusual rows second, and ordinary enabled rows last. Sort alphabetically inside each bucket.
+- Order technology settings in four attention buckets: explicitly risk-classified rows first, other default-off or experimental rows second, enabled special/unusual rows third, and ordinary enabled rows last. Sort alphabetically inside each bucket. Default enablement must not erase a risk classification; the shared risk policy also appends a localized warning to the enable-setting and emitted technology tooltips unless that locale key is already present.
 - Keep prototype limit settings startup-only, defaulting to `engine-default`, and document every non-default value as an explicit global prototype override.
 - Keep energy-use limits, pollution limits, and zero-power prototype rewrites as separate controls. The zero-power rewrite must remain default off.
 - Keep positive speed caps and negative speed floors as separate controls.

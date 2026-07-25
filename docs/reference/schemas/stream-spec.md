@@ -36,8 +36,11 @@ Before planning produces a `StreamSpec`, every raw declaration is normalized int
 | `kind` | `recipe-productivity` or `direct-effect`. |
 | `effect` | Typed field, unit, display multiplier, canonical anchor, integer policy, and runtime-delta policy. |
 | `targets` | Positive feature requirements plus required mods, prototypes, technologies, and effect types. |
+| `technology_risk` | Optional schema-1 classification for a technology whose researched effect may disrupt existing factories, blueprints, or save behavior. This is independent of default enablement. |
 
 The canonical registry is private. Consumers use `snapshot()` or `get()` and receive deep copies. Duplicate raw IDs, overlay attempts to create unknown declarations, and overlay attempts to inject canonical descriptors are errors. Numeric defaults use the largest compatible positive declared anchor, making them invariant under array ordering while preserving the 3.0.5 primary-tier values.
+
+`technology_risk` contains a governed `class`, stable `reason`, localized tooltip note, and settings attention rank. `factory-disruptive` technologies remain in the first generated-technology settings bucket even when their enable checkbox defaults on. The settings builder and compiler consume the same classification: the former orders and warns, while the latter carries the classification into the generation record and appends the warning to the emitted technology description. A missing technology-specific note falls back to the class warning, and a description that already embeds the selected locale key is not decorated twice. Risk classification must never be inferred from an enable checkbox.
 
 ## Transition Adapter
 

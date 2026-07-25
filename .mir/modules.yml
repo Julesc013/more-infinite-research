@@ -168,6 +168,7 @@ modules:
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
     - prototypes/mir/domain/technology/technology_candidate.lua
+    - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
     - prototypes/mir/domain/technology/gate.lua

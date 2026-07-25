@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Experimental e desabilitado por padrão na v2.1.0. Este é um efeito de script global/em todo o mapa. O comportamento existente da pilha estragada não é reivindicado até ser validado manualmente.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Tecnologia arriscada. Habilitado por padrão. Seu efeito de script global/em todo o mapa pode alterar o tempo de deterioração; as pilhas estragáveis ​​existentes podem manter os prazos atuais até serem reconstruídas ou revalidadas. Desative-o antes de carregar um jogo salvo se preservar o tempo de deterioração existente for crítico.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Desativado por padrão. A capacidade extra do insersor pode interromper os insersores controlados por circuito e reduzir as otimizações do motor.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Tecnologia arriscada. Habilitado por padrão. A capacidade extra do insersor altera as contagens de pilhas manuais, pode quebrar suposições e projetos do insersor controlado por circuito e pode reduzir as otimizações do mecanismo. Desative-o antes de carregar um salvamento se o comportamento exato do insersor precisar permanecer inalterado.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Tecnologia arriscada. Habilitado por padrão. Pesquisá-lo pode mudar o comportamento existente da fábrica ou do projeto. Revise os efeitos específicos da tecnologia e desative-os antes de carregar um jogo salvo se o comportamento exato precisar permanecer inalterado.",
       "provenance": "machine-assisted"
     },
     {

@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local effect_metadata = require("prototypes.mir.domain.effects.metadata")
+local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
 
 local M = {}
 
@@ -200,6 +201,7 @@ function M.normalize(key, raw_spec)
   end
 
   local spec = deepcopy(raw_spec)
+  spec.technology_risk = technology_risk.normalize(spec.technology_risk, "stream " .. key)
   local automatic_family = spec.automatic_family
   if spec.ui_visibility == nil
       and type(automatic_family) == "table"
@@ -235,6 +237,7 @@ function M.normalize(key, raw_spec)
     kind = kind,
     effect = effect,
     targets = target_requirements(spec, kind, effect),
+    technology_risk = deepcopy(spec.technology_risk),
     ui = {
       sort_name = settings_sort_names[key] or (key:gsub("^research_", ""):gsub("_", " "))
     }

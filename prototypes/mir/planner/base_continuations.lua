@@ -19,6 +19,7 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
+local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
 
 local M = {}
 
@@ -492,7 +493,9 @@ local function plan_chain(key)
   local new = base_extension_builder.continuation(base_tech, {
     name = new_name,
     localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key},
-    localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key},
+    localised_description = technology_risk.append_tooltip(
+      spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key},
+      spec.technology_risk),
     prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites),
     effects = {},
     unit = {},
@@ -576,6 +579,7 @@ local function plan_chain(key)
     base_technology_name = chain_key .. "-" .. base_level,
     technology_name = new.name,
     technology = new,
+    technology_risk = technology_risk.classification(spec.technology_risk),
     diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status),
     gates = accepted_gate_vector(key, new.name)
   }
@@ -601,9 +605,11 @@ function M.plan_all()
         key = key,
         action = "create",
         technology_name = operation.technology_name,
+        technology_risk = deepcopy(operation.technology_risk),
         design_fingerprint = operation.technology_design.design_fingerprint,
         gates = deepcopy(operation.gates),
         candidate_fingerprint = fingerprint.of({key = key, technology_name = operation.technology_name,
+          technology_risk = operation.technology_risk,
           design_fingerprint = operation.technology_design.design_fingerprint})
       })
     elseif rejected then

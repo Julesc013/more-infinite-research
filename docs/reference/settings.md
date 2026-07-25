@@ -93,15 +93,16 @@ Global startup settings use visible section prefixes and stable `a-*` order rang
 
 The visible prefixes may use Factorio rich text for color and bold emphasis, but the plain section words remain part of the label. Do not add fake divider settings for 3.0.0.
 
-Visible generated technology settings use three `b-*` buckets:
+Visible generated technology settings use four `b-*` buckets:
 
-- `b-000`: disabled-by-default or experimental rows;
+- `b-000`: explicitly risk-classified technology rows, whether enabled or disabled by default;
+- `b-025`: other disabled-by-default or experimental rows;
 - `b-050`: enabled special, unusual, balance-sensitive, or vanilla-continuation rows;
 - `b-100`: ordinary enabled rows.
 
 Unreviewed automatic-family tuning groups are hidden before ordering, so they do not look enabled merely because their preserved internal setting value authorizes broad experimental testing.
 
-Breeding productivity, agricultural growth speed, cargo bay unloading distance, cargo landing pad count, and character reach are enabled by default but remain in the special bucket. Inserter capacity bonus remains disabled by default and therefore stays in the first bucket.
+Spoilage preservation and inserter capacity bonus are enabled by default but retain schema-1 `factory-disruptive` classifications and therefore stay in `b-000`. Their localized warning is appended automatically to the enable-setting and technology tooltips, with duplicate locale keys suppressed. Breeding productivity, agricultural growth speed, cargo bay unloading distance, cargo landing pad count, and character reach remain enabled in the special bucket. Risk class, default enablement, and settings priority are separate policy fields.
 
 ## Prototype Limit Settings
 

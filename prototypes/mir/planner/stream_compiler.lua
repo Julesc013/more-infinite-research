@@ -33,6 +33,7 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
+local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
 
 local M = {}
 local shared_materializing_gates = {}
@@ -105,12 +106,17 @@ local function lname(key, spec)
 end
 
 local function ldesc(spec)
-  if spec.localised_description then return spec.localised_description end
-  if spec.description_locale_key then return { spec.description_locale_key } end
-  if spec.direct_effects then
-    return {"technology-description.more-infinite-research.direct_effect"}
+  local description
+  if spec.localised_description then
+    description = spec.localised_description
+  elseif spec.description_locale_key then
+    description = { spec.description_locale_key }
+  elseif spec.direct_effects then
+    description = {"technology-description.more-infinite-research.direct_effect"}
+  else
+    description = {"technology-description.more-infinite-research.recipe_productivity"}
   end
-  return {"technology-description.more-infinite-research.recipe_productivity"}
+  return technology_risk.append_tooltip(description, spec.technology_risk)
 end
 
 local function append_unique_item(items, seen, item_name)
@@ -184,6 +190,7 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     family_ids = family_resolver.family_ids_for_stream(key),
     provider_decision_fingerprints = family_resolver.decision_fingerprints_for_stream(key),
     risk_fingerprints = family_resolver.risk_fingerprints_for_stream(key),
+    technology_risk = technology_risk.classification(spec.technology_risk),
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, extra.failed_gates)
