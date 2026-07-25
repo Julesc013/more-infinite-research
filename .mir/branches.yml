@@ -325,7 +325,7 @@ release_artifacts:
       superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
       runtime_performance_gate: pending-exact-c20
       manual_attestation_gate: pending-exact-c20
-      minimum_factorio_gate: passed-floor-raised-to-2.1.11
+      minimum_factorio_gate: declared-2.1.8-api-reviewed-exact-runtime-pending
       superseded_c18_hosted_branch_policy_gate: passed-run-30155405708
       superseded_c18_hosted_mir_gate: passed-run-30155405710
       maintainer_release_decision: fast-stage-then-long-validation-before-tag

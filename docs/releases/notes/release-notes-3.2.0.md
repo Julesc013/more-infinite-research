@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 3.2.0 Release Notes
 
-MIR 3.2.0 is a major compiler, compatibility, and technology expansion for Factorio 2.1.11 and newer.
+MIR 3.2.0 is a major compiler, compatibility, and technology expansion for Factorio 2.1.8 and newer. Release qualification uses newer Factorio 2.1 builds.
 
 ## New technologies
 

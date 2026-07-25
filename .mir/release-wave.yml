@@ -329,7 +329,7 @@ waves:
     runtime_performance_gate: pending-exact-c20
     ecosystem_gate: pending-exact-c20
     automated_gate: pending-exact-c20
-    minimum_factorio_gate: passed-floor-raised-to-2.1.11
+    minimum_factorio_gate: declared-2.1.8-api-reviewed-exact-runtime-pending
     protected_release_gate: pending
     interactive_gate: pending-exact-c20
     assurance_seal: pending

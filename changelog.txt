@@ -33,7 +33,7 @@ Date: 2026-07-25
     - Added default-on +10% Nutrients productivity for exact forward Space Age nutrient recipes.
     - Added default-on +10% Capture bot rocket productivity for its exact Space Age recipe.
     - Proved pentapod egg remains in Breeding productivity with a seed-safe +10% effect.
-    - Raised the Factorio, Recycler, and Space Age dependency floor to 2.1.11, the oldest fully qualified patch.
+    - Supports Factorio, Recycler, and Space Age 2.1.8 or newer; release qualification continues on newer 2.1 builds.
 
   Bugfixes:
 
