@@ -1316,7 +1316,8 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -1347,7 +1348,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -1378,7 +1380,8 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -1409,7 +1412,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -1440,7 +1444,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -4483,7 +4488,8 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -4514,7 +4520,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -4545,7 +4552,8 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -4576,7 +4584,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",
@@ -4607,7 +4616,8 @@
         "group": "automatic-compiler",
         "surface": "base",
         "required_features": [
-          "recipe_productivity"
+          "recipe_productivity",
+          "productivity_family_adoption"
         ],
         "fixtures": [
           "mir-fixture-semantic-family-attach",

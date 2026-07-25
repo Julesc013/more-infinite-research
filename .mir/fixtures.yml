@@ -607,7 +607,7 @@ fixtures:
       - effect-count
 
   semantic-family-attach:
-    requires_features: [recipe_productivity]
+    requires_features: [recipe_productivity, productivity_family_adoption]
     path: fixtures/semantic-family-attach
     assertion_path: fixtures/assert-semantic-family-attach
     validates:
@@ -843,7 +843,7 @@ fixtures:
       - no-settings-reset-required
 
   semantic-family-generate:
-    requires_features: [recipe_productivity]
+    requires_features: [recipe_productivity, productivity_family_adoption]
     path: fixtures/semantic-family-attach
     assertion_path: fixtures/assert-semantic-family-generate
     validates:
@@ -857,7 +857,7 @@ fixtures:
       - shared-unreviewed-provider-budget-remains-fail-closed
 
   semantic-family-modes:
-    requires_features: [recipe_productivity]
+    requires_features: [recipe_productivity, productivity_family_adoption]
     path: fixtures/semantic-family-attach
     assertion_paths:
       - fixtures/assert-semantic-family-off
