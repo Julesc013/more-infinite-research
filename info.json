@@ -10,8 +10,6 @@
     "(?) elevated-rails",
     "? recycler >= 2.0.77",
     "(?) quality",
-    "(?) Krastorio2",
-    "(?) Krastorio2-spaced-out",
     "(?) space-exploration",
     "? space-age >= 2.0.77"
   ]
