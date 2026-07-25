@@ -10,7 +10,7 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the provisional `2.5.0` compiler backport.
 
-MIR `2.5.0` projects the MIR 3.2 compiler through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, `mod-data` and productivity-family adoption are disabled, Factorio 2.1-only modifiers are omitted, and every runtime and compatibility claim is requalified on the 2.0 binary and mod line.
+MIR `2.5.0` projects the MIR 3.2 compiler through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, Factorio 2.0.77 retains its proven `mod-data` and productivity-family adoption support, Factorio 2.1-only modifiers are omitted, and every runtime and compatibility claim is requalified on the 2.0 binary and mod line.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
