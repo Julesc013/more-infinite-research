@@ -1,5 +1,5 @@
 local profile_codec = require("prototypes.mir.settings.profile_codec")
-local effective_settings = require("prototypes.mir.settings.effective")
+local startup_settings = require("prototypes.mir.runtime.startup_settings")
 
 local M = {}
 M.requires_features = {"settings_profiles"}
@@ -82,7 +82,7 @@ end
 local function export_profile(command)
   local options = export_options(command.parameter)
   local profile = profile_codec.current_profile({
-    value_resolver = effective_settings.get,
+    value_resolver = startup_settings.get,
     metadata = export_metadata(command),
     compact = options.compact
   })
@@ -140,7 +140,7 @@ function M.register()
     export_string = function(options)
       if type(options) ~= "table" then options = {} end
       local profile = profile_codec.current_profile({
-        value_resolver = effective_settings.get,
+        value_resolver = startup_settings.get,
         compact = options.compact == true,
         metadata = {
           mir_version = script.active_mods["more-infinite-research"],

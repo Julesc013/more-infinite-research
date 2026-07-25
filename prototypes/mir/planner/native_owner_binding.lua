@@ -6,6 +6,7 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local cost_model = require("prototypes.mir.domain.native_owner.cost_model")
 local contract = require("prototypes.mir.domain.native_owner.contract")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -119,23 +120,12 @@ local function build_plan(key, spec, owner, binding, buckets)
 
   local input = contract.snapshot(owner)
   local expected = deepcopy(input)
-  local legacy_output_unit = deepcopy(input.unit)
   local configured = {}
 
   if configured_cost.changed then
     expected.unit.count = configured_cost.count
     expected.unit.count_formula = configured_cost.count_formula
     configured.cost_model = true
-
-    -- MIR 2.4.0 applied base and growth overrides independently. Keep the
-    -- exact former unit model in the 2.4.5 binding artifact so an in-progress
-    -- native-owner research can be restored while upgrading to paired costs.
-    local legacy_cost = assert(cost_model.configure(model, {
-      base = base.changed and base.value or nil,
-      growth = growth.changed and growth.value or nil
-    }))
-    legacy_output_unit.count = legacy_cost.count
-    legacy_output_unit.count_formula = legacy_cost.count_formula
   end
   if research_time.changed and research_time.value > 0 then
     expected.unit.time = research_time.value
@@ -187,7 +177,6 @@ local function build_plan(key, spec, owner, binding, buckets)
     end)(),
     input_snapshot = input,
     expected_snapshot = expected,
-    legacy_output_unit = legacy_output_unit,
     input_fingerprint = contract.fingerprint(input),
     output_fingerprint = contract.fingerprint(expected)
   }
@@ -196,6 +185,9 @@ end
 function M.plan(key, spec, buckets)
   local binding = spec and spec.native_owner_binding
   if not binding then return buckets, {}, {}, nil, nil end
+  if not target_line.feature_enabled("productivity_family_adoption") then
+    return buckets, {}, {}, nil, nil, "productivity_family_adoption_unsupported"
+  end
   if not binding.effect_scope or binding.effect_scope.type ~= "change-recipe-productivity"
       or type(binding.effect_scope.products) ~= "table" or #binding.effect_scope.products == 0 then
     error("Native-owner binding is missing a recipe-productivity effect scope for " .. tostring(key), 2)

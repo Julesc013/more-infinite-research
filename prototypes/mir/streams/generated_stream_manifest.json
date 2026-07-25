@@ -9,6 +9,7 @@
       "policy": "automatic.experimental-family-generation",
       "creation_maturity": "experimental",
       "stable": true,
+      "identity_state": "released",
       "generated_technology": "mir-auto-prod-manufacturing-assembling-machine-1",
       "stream_key": "research_auto_assembling_machine",
       "migration_policy": "stable",
@@ -22,6 +23,7 @@
       "policy": "automatic.experimental-family-generation",
       "creation_maturity": "experimental",
       "stable": true,
+      "identity_state": "released",
       "generated_technology": "mir-auto-prod-manufacturing-lab-1",
       "stream_key": "research_auto_lab",
       "migration_policy": "stable",
@@ -619,20 +621,6 @@
         "stream:research_iron_sticks"
       ]
     },
-    "recipe-prod-research_steel-1": {
-      "introduced_in": "2.4.9",
-      "source": "legacy_stream_table:productivity",
-      "capability": "recipe-productivity",
-      "family": "steel",
-      "policy": "legacy.recipe-productivity-stream",
-      "stable": true,
-      "generated_technology": "recipe-prod-research_steel-1",
-      "stream_key": "research_steel",
-      "migration_policy": "stable",
-      "targets": [
-        "stream:research_steel"
-      ]
-    },
     "recipe-prod-research_lab_productivity-1": {
       "introduced_in": "pre-2.2.0",
       "source": "legacy_stream_table:direct-effects",
@@ -680,7 +668,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "low_density_structure",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "native-owner-binding-or-generated-stream",
       "stable": true,
       "generated_technology": "recipe-prod-research_low_density_structure-1",
       "stream_key": "research_low_density_structure",
@@ -781,7 +769,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "plastic",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "native-owner-binding-or-generated-stream",
       "stable": true,
       "generated_technology": "recipe-prod-research_plastic-1",
       "stream_key": "research_plastic",
@@ -795,7 +783,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "processing_unit",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "native-owner-binding-or-generated-stream",
       "stable": true,
       "generated_technology": "recipe-prod-research_processing_unit-1",
       "stream_key": "research_processing_unit",
@@ -851,7 +839,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "rocket_fuel",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "native-owner-binding-or-generated-stream",
       "stable": true,
       "generated_technology": "recipe-prod-research_rocket_fuel-1",
       "stream_key": "research_rocket_fuel",
@@ -914,6 +902,21 @@
       "migration_policy": "stable",
       "targets": [
         "stream:research_spoilage_preservation"
+      ]
+    },
+    "recipe-prod-research_steel-1": {
+      "introduced_in": "3.2.0",
+      "source": "stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "steel",
+      "policy": "native-owner-binding-or-generated-stream",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_steel-1",
+      "stream_key": "research_steel",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_steel"
       ]
     },
     "recipe-prod-research_sulfur-1": {

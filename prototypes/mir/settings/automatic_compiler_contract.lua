@@ -214,7 +214,11 @@ function M.generation_decision(policy, reviewed_authorization, creation_maturity
   if policy.require_reviewed_data and creation_maturity ~= "reviewed" then
     return false, "automatic_family_not_reviewed", diagnostic_codes.get("automatic_family_not_reviewed")
   end
-  if policy.require_reviewed_data and not reviewed_authorization then
+  local reviewed_trust = reviewed_authorization
+    and reviewed_authorization.promotion_verified == true
+    and (reviewed_authorization.trust_class == "mir-reviewed"
+      or reviewed_authorization.trust_class == "protected-release")
+  if policy.require_reviewed_data and not reviewed_trust then
     return false, "reviewed_compatibility_data_required", diagnostic_codes.get("reviewed_compatibility_data_required")
   end
   local reason = policy.require_reviewed_data and "reviewed_compatibility_data_authorized" or "registered_family_module_authorized"

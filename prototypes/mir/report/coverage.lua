@@ -8,9 +8,11 @@ local mod_data = require("prototypes.mir.emit.mod_data")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local adoption = require("prototypes.mir.emit.transactions.productivity_family_adoption")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
-local latest = nil
 
 local CATEGORIES = {
   "auto_attached",
@@ -120,8 +122,11 @@ local function classify(recipe_name, fact, owners, attached, decisions, adopted)
   return "unclassified", "no_family_candidate_or_owner"
 end
 
-function M.build()
-  local facts = recipe_facts.snapshot()
+function M.build(context, options)
+  context = context or compiler_context.current()
+  options = options or {}
+  local include_rows = options.include_rows ~= false
+  local facts = recipe_facts.index_view()
   local owners_by_recipe, prototype_counts = owner_index()
   local attached, decisions, candidate_count = family_indexes()
   local adopted = adopted_index()
@@ -141,15 +146,17 @@ function M.build()
     if #owners > 1 then duplicate = duplicate + 1 end
     local category, reason = classify(recipe_name, fact, owners, attached, decisions, adopted)
     counts[category] = counts[category] + 1
-    table.insert(rows, {
-      schema = 1,
-      recipe = recipe_name,
-      category = category,
-      reason = reason,
-      visible = not fact.hidden,
-      productivity_eligible = not skip_category and target_line.feature_enabled("recipe_productivity"),
-      owners = deepcopy(owners)
-    })
+    if include_rows then
+      table.insert(rows, {
+        schema = 1,
+        recipe = recipe_name,
+        category = category,
+        reason = reason,
+        visible = not fact.hidden,
+        productivity_eligible = not skip_category and target_line.feature_enabled("recipe_productivity"),
+        owners = deepcopy(owners)
+      })
+    end
   end
 
   for recipe_name, _ in pairs(owners_by_recipe) do
@@ -160,7 +167,7 @@ function M.build()
     total_recipes = #facts.names,
     visible_recipes = visible,
     productivity_eligible_recipes = eligible,
-    accounted_recipes = #rows,
+    accounted_recipes = #facts.names,
     category_counts = counts,
     dangling_effects = dangling,
     duplicate_owners = duplicate,
@@ -178,13 +185,13 @@ function M.build()
     rows = rows
   }
   artifact.fingerprint = fingerprint.of(artifact)
-  latest = artifact
+  telemetry.count("coverage_rows", #rows)
+  context:set_state("coverage_report", artifact)
   return deepcopy(artifact)
 end
 
-function M.emit()
-  local artifact = M.build()
-  mod_data.emit_coverage(artifact)
+function M.emit(context)
+  local artifact = M.build(context)
   diagnostics.coverage({
     key = "recipe_accounting",
     status = "diagnostic",
@@ -218,8 +225,25 @@ function M.emit()
   return artifact
 end
 
-function M.latest_artifact()
-  return latest and deepcopy(latest) or nil
+function M.publish(context, options)
+  context = context or compiler_context.current()
+  options = options or {}
+  local include_internal = options.include_internal == true
+  local artifact = context:state_snapshot("coverage_report")
+    or M.build(context, {include_rows = include_internal})
+  local public = public_artifacts.coverage(artifact)
+  telemetry.count("coverage_public_bytes", public_artifacts.assert_byte_budget(public))
+  mod_data.emit_coverage(public)
+  if include_internal then
+    telemetry.count("coverage_internal_bytes", #fingerprint.canonical(artifact))
+    mod_data.emit_internal_coverage(artifact)
+  end
+  return true
+end
+
+function M.latest_artifact(context)
+  context = context or compiler_context.current()
+  return context:state_snapshot("coverage_report")
 end
 
 return M

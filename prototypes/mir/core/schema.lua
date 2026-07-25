@@ -13,6 +13,23 @@ S.decision_record = 2
 S.generated_stream_manifest = 1
 S.compatibility_claims = 1
 S.generation_plan = 3
+S.compilation_snapshot = 1
+S.policy_snapshot = 1
+S.compiler_input = 2
+S.compiler_result = 2
+S.runtime_environment_identity = 2
+S.qualification_environment_identity = 1
+S.transformation_operation = 1
+S.transformation_plan = 1
+S.mutation_journal = 1
+S.technology_candidate = 1
+S.technology_qualification = 1
+S.technology_approval = 1
+S.technology_promotion = 1
+S.technology_migration = 1
+S.technology_catalog = 3
+S.technology_quality_assessment = 2
+S.technology_promotion_admission = 1
 S.target_profile = 2
 
 function S.with_schema(kind, row)

@@ -59,6 +59,32 @@ function M.validate(provider)
   if provider.family_rule.family ~= provider.family then
     error("CompilerProvider family_rule family mismatch: " .. provider.id, 2)
   end
+  local cardinality = provider.default_policy.cardinality
+  if type(cardinality) ~= "table" then
+    error("CompilerProvider cardinality policy is required: " .. provider.id, 2)
+  end
+  for _, field in ipairs({
+    "maximum_candidates", "maximum_attachments", "maximum_review_required",
+    "maximum_new_attachments", "maximum_growth_percent", "maximum_progression_span",
+    "maximum_semantic_clusters", "maximum_unreviewed"
+  }) do
+    local value = cardinality[field]
+    if type(value) ~= "number" or value < 0 or value % 1 ~= 0 then
+      error("CompilerProvider cardinality field is invalid: " .. provider.id .. ":" .. field, 2)
+    end
+  end
+  if type(provider.family_rule.cardinality) ~= "table" then
+    error("CompilerProvider FamilyRule cardinality policy is missing: " .. provider.id, 2)
+  end
+  for _, field in ipairs({
+    "maximum_candidates", "maximum_attachments", "maximum_review_required",
+    "maximum_new_attachments", "maximum_growth_percent", "maximum_progression_span",
+    "maximum_semantic_clusters", "maximum_unreviewed"
+  }) do
+    if provider.family_rule.cardinality[field] ~= cardinality[field] then
+      error("CompilerProvider and FamilyRule cardinality policies differ: " .. provider.id .. ":" .. field, 2)
+    end
+  end
   return deepcopy(provider)
 end
 

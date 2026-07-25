@@ -1,5 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
@@ -13,11 +15,14 @@ local commands = {
     end
   },
   ["sanitize-input-technology-effects"] = {
-    kind = "mutation",
+    kind = "sanitation",
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
-    apply = function()
-      require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()
+    apply = function(context)
+      local ledger, target_inventory = require("prototypes.mir.emit.effect_safety")
+        .sanitize_all_technology_effects({pass = "input"})
+      context:set_service("effect_target_inventory", target_inventory)
+      context:record_artifact("input_sanitation_ledger", ledger)
     end
   },
   ["module-permissions"] = {
@@ -37,7 +42,8 @@ local commands = {
     requires_features = {"pipeline_extent"},
     implementation = "prototypes/mir/pipeline/extent.lua",
     apply = function()
-      local multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier()
+      local value = require("prototypes.mir.settings.effective").get("mir-pipeline-extent-multiplier")
+      local multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier(value)
       if multiplier ~= 1 then require("prototypes.mir.pipeline.extent").apply(multiplier) end
     end
   },
@@ -56,14 +62,14 @@ local commands = {
   ["compile-generation-plan"] = {
     kind = "plan",
     requires_features = {},
-    implementation = "prototypes/mir/planner/compilation_plan.lua",
-    apply = function() require("prototypes.mir.planner.compilation_plan").compile() end
+    implementation = "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").compile(context) end
   },
   ["emit-streams"] = {
     kind = "emission",
     requires_features = {},
-    implementation = "prototypes/mir/planner/stream_compiler.lua",
-    apply = function() require("prototypes.mir.planner.compilation_plan").apply_streams() end
+    implementation = "prototypes/mir/emit/stream_executor.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").apply_streams(context) end
   },
   ["apply-competing-productivity"] = {
     kind = "mutation",
@@ -74,8 +80,8 @@ local commands = {
   ["emit-base-extensions"] = {
     kind = "emission",
     requires_features = {},
-    implementation = "prototypes/mir/emit/base_extensions.lua",
-    apply = function() require("prototypes.mir.planner.compilation_plan").apply_base_extensions() end
+    implementation = "prototypes/mir/planner/base_continuations.lua + prototypes/mir/emit/base_continuation_executor.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").apply_base_extensions(context) end
   },
   ["apply-competing-base-extensions"] = {
     kind = "mutation",
@@ -99,15 +105,21 @@ local commands = {
     kind = "assertion",
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
-    apply = function()
+    apply = function(context)
       local effect_safety = require("prototypes.mir.emit.effect_safety")
-      -- Reconcile against the finalized prototype set as a last line of defence.
-      -- Optional dependencies normally put MIR after known late removers such as
-      -- Space Exploration, but this also protects effects added between MIR's
-      -- input sanitation pass and its final assertions.
-      effect_safety.sanitize_all_technology_effects()
-      effect_safety.assert_registered_technology_effects()
-      require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()
+      local target_inventory = context:service("effect_target_inventory")
+      effect_safety.assert_current_target_inventory(target_inventory)
+      local ledger = effect_safety.sanitize_all_technology_effects({
+        pass = "output",
+        target_inventory = target_inventory
+      })
+      require("prototypes.mir.emit.effect_safety").assert_target_inventory_unchanged(
+        context:artifact("input_sanitation_ledger"), ledger)
+      context:record_artifact("output_sanitation_ledger", ledger)
+      effect_safety.assert_registered_technology_effects(target_inventory)
+      local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
+        .assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))
+      context:record_artifact("technology_graph_parity", graph_parity)
     end
   },
   ["emit-compatibility-diagnostics"] = {
@@ -120,7 +132,7 @@ local commands = {
     kind = "report",
     requires_features = {},
     implementation = "prototypes/mir/planner/compiler.lua",
-    apply = function() require("prototypes.mir.planner.compiler").emit() end
+    apply = function() require("prototypes.mir.report.compiler_diagnostics").emit() end
   },
   ["emit-compatibility-planner"] = {
     kind = "report",
@@ -132,7 +144,13 @@ local commands = {
     kind = "assertion",
     requires_features = {},
     implementation = "prototypes/mir/planner/output_validator.lua",
-    apply = function() require("prototypes.mir.planner.compilation_plan").assert_output() end
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").assert_output(context) end
+  },
+  ["publish-compiler-artifacts"] = {
+    kind = "publication",
+    requires_features = {},
+    implementation = "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").publish(context) end
   },
   ["flush-diagnostics"] = {
     kind = "report",
@@ -157,12 +175,13 @@ local ORDERING = {
   ["apply-competing-base-extensions"] = {phase = 60, dependencies = {"emit-base-extensions"}},
   ["weapon-speed-adjustments"] = {phase = 70, dependencies = {"apply-competing-base-extensions"}},
   ["max-level-control"] = {phase = 70, dependencies = {"weapon-speed-adjustments"}},
-  ["emit-compatibility-diagnostics"] = {phase = 80, dependencies = {"max-level-control"}},
+  ["assert-technology-safety"] = {phase = 75, dependencies = {"max-level-control"}},
+  ["emit-compatibility-diagnostics"] = {phase = 80, dependencies = {"assert-technology-safety"}},
   ["emit-compiler-reports"] = {phase = 80, dependencies = {"emit-compatibility-diagnostics"}},
   ["emit-compatibility-planner"] = {phase = 80, dependencies = {"emit-compiler-reports"}},
   ["assert-plan-output"] = {phase = 90, dependencies = {"emit-compatibility-planner"}},
-  ["assert-technology-safety"] = {phase = 90, dependencies = {"assert-plan-output"}},
-  ["flush-diagnostics"] = {phase = 100, dependencies = {"assert-technology-safety"}}
+  ["publish-compiler-artifacts"] = {phase = 95, dependencies = {"assert-plan-output"}},
+  ["flush-diagnostics"] = {phase = 100, dependencies = {"publish-compiler-artifacts"}}
 }
 
 
@@ -173,8 +192,6 @@ for id, command in pairs(commands) do
   command.dependencies = ordering.dependencies
 end
 
-local completed = {}
-
 local function supported(command)
   for _, feature in ipairs(command.requires_features) do
     if not target_line.feature_enabled(feature) then return false end
@@ -182,22 +199,45 @@ local function supported(command)
   return true
 end
 
-function M.run(id)
-  local command = commands[id]
-  if not command then error("Unknown MIR pipeline command " .. tostring(id) .. ".", 2) end
-  for _, dependency in ipairs(command.dependencies) do
-    if not completed[dependency] then
-      error("MIR pipeline command " .. id .. " ran before dependency " .. dependency .. ".", 2)
+function M.run(id, context)
+  if not context then error("MIR pipeline command requires a compiler context.", 2) end
+  return compiler_context.with_active(context, function()
+    local command = commands[id]
+    if not command then error("Unknown MIR pipeline command " .. tostring(id) .. ".", 2) end
+    for _, dependency in ipairs(command.dependencies) do
+      if not context:command_status(dependency) then
+        error("MIR pipeline command " .. id .. " ran before dependency " .. dependency .. ".", 2)
+      end
     end
-  end
-  if not supported(command) then completed[id] = "skipped"; return false end
-  command.apply()
-  completed[id] = "applied"
-  return true
+    if not supported(command) then context:mark_command(id, "skipped"); return false end
+    telemetry.start_phase("pipeline:" .. id)
+    local summary_phase = id == "assert-technology-safety" and "postconditions" or nil
+    if summary_phase then telemetry.start_phase(summary_phase) end
+    local ok, result = pcall(command.apply, context)
+    if summary_phase then telemetry.finish_phase(summary_phase) end
+    telemetry.finish_phase("pipeline:" .. id)
+    if not ok then error(result, 2) end
+    context:mark_command(id, "applied")
+    return true
+  end)
 end
 
-function M.run_all()
-  for _, id in ipairs(M.order()) do M.run(id) end
+function M.run_all(options)
+  options = options or {}
+  local context = compiler_context.new({execution_mode = options.execution_mode})
+  local ok, result = pcall(compiler_context.with_active, context, function()
+    for _, id in ipairs(M.order()) do M.run(id, context) end
+  end)
+  if not ok then
+    pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)
+    error(result, 2)
+  end
+  if options.return_snapshot == false then return context end
+  return context:snapshot()
+end
+
+function M.new_context(options)
+  return compiler_context.new(options)
 end
 
 function M.order()

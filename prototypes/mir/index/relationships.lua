@@ -2,18 +2,10 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local canonical = {}
-
-local ENTITY_TYPES = {
-  "accumulator", "ammo-turret", "assembling-machine", "beacon", "boiler",
-  "burner-generator", "container", "electric-energy-interface", "electric-pole",
-  "furnace", "generator", "inserter", "lab", "loader", "loader-1x1",
-  "logistic-container", "mining-drill", "pipe", "pipe-to-ground", "pump",
-  "radar", "reactor", "rocket-silo", "roboport", "solar-panel", "splitter",
-  "storage-tank", "transport-belt", "underground-belt"
-}
 
 local function append(index, key, value)
   if key == nil or value == nil then return end
@@ -34,19 +26,16 @@ local function sort_index(index)
 end
 
 local function effect_identity(effect)
-  local parts = {}
-  for _, field in ipairs({"type", "recipe", "ammo_category", "turret_id", "fluid", "item"}) do
-    if effect[field] ~= nil then table.insert(parts, field .. "=" .. tostring(effect[field])) end
-  end
-  return table.concat(parts, ";")
+  return effect_contracts.identity(effect)
 end
 
 local function build(phase)
   phase = phase or "input"
   if phase ~= "input" and phase ~= "output" then error("Unknown relationship snapshot phase: " .. tostring(phase), 2) end
+  local canonical = compiler_context.current():state_view("relationship_indexes", function() return {} end)
   if canonical[phase] then return canonical[phase] end
 
-  local recipe_index = recipe_facts.snapshot()
+  local recipe_index = recipe_facts.index_view()
   local out = {
     schema = 2,
     phase = phase,
@@ -83,17 +72,15 @@ local function build(phase)
     end
   end)
 
-  for _, prototype_type in ipairs(ENTITY_TYPES) do
-    for name, entity in pairs(data_raw.prototypes(prototype_type)) do
-      append(out.entities_by_type, prototype_type, name)
-      out.entity_type_by_name[name] = prototype_type
-      append(out.entities_by_subgroup, entity.subgroup, name)
-      if entity.next_upgrade then out.next_upgrade[name] = entity.next_upgrade end
-      if entity.surface_conditions then
-        out.surface_conditions.entities[name] = deepcopy(entity.surface_conditions)
-      end
+  lookup.each_entity_prototype(function(name, entity, prototype_type)
+    append(out.entities_by_type, prototype_type, name)
+    out.entity_type_by_name[name] = prototype_type
+    append(out.entities_by_subgroup, entity.subgroup, name)
+    if entity.next_upgrade then out.next_upgrade[name] = entity.next_upgrade end
+    if entity.surface_conditions then
+      out.surface_conditions.entities[name] = deepcopy(entity.surface_conditions)
     end
-  end
+  end)
 
   for recipe_name, fact in pairs(recipe_index.facts) do
     if fact.surface_conditions then
@@ -135,6 +122,12 @@ end
 
 function M.snapshot(phase)
   return deepcopy(build(phase))
+end
+
+-- Internal compiler consumers share the context-owned immutable index. Public
+-- exports and callers that need ownership must continue to use snapshot().
+function M.view(phase)
+  return build(phase)
 end
 
 function M.entity_type(name)

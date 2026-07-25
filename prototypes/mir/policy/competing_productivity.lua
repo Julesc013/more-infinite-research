@@ -11,10 +11,13 @@ local science_packs = require("prototypes.mir.capabilities.science_integration.s
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local technology_requirements = require("prototypes.mir.planner.technology_requirements")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
-local prepared_removable_techs = nil
+local function prepared(context)
+  return (context or compiler_context.current()):state_view("competing_productivity_preparation")
+end
 
 local function same_change(a, b)
   local left = tonumber(a)
@@ -118,7 +121,9 @@ local function replacement_names_for_effects(effects)
 end
 
 function M.prepare()
-  prepared_removable_techs = {}
+  local context = compiler_context.current()
+  local removable = {}
+  context:set_once("competing_productivity_preparation", removable)
   if not prefer_this_mod_for_competing_techs() then return end
   if not known_competing_mod_active() then return end
 
@@ -147,7 +152,7 @@ function M.prepare()
         end
       end
       if removable then
-        prepared_removable_techs[name] = true
+        removable[name] = true
         log("[more-infinite-research] Prepared competing recipe productivity technology for MIR replacement: " .. name)
       end
     end
@@ -155,14 +160,15 @@ function M.prepare()
 end
 
 function M.ignores_existing_owner(tech_name)
-  return prepared_removable_techs and prepared_removable_techs[tech_name] == true
+  local removable = prepared()
+  return removable and removable[tech_name] == true
 end
 
 function M.replacement_plan()
   if not prefer_this_mod_for_competing_techs() then return {} end
   if not known_competing_mod_active() then return {} end
 
-  local candidates = prepared_removable_techs or {}
+  local candidates = prepared() or {}
   local names, plan = {}, {}
   for name, _ in pairs(candidates) do table.insert(names, name) end
   table.sort(names)

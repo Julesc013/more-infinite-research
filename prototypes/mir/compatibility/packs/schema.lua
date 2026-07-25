@@ -16,6 +16,11 @@ local CLAIM_LEVELS = {
 local REVIEWABLE_RISKS = {
   hidden_recipe = true,
   name_based_recovery_or_voiding_heuristic = true,
+  cleaning_or_recovery_loop = true,
+  voiding_or_destruction = true,
+  matter_or_transmutation = true,
+  barrel_or_container_return = true,
+  multi_output_resource_loop = true,
   family_ambiguity = true,
   tier_ambiguity = true,
   soft_science_role_refinement = true,
@@ -147,6 +152,11 @@ local function validate_family_authorizations(pack)
     end
     if type(row.claim_boundary) ~= "string" or row.claim_boundary == "" then
       fail(pack, "family authorization requires a claim boundary")
+    end
+    if type(row.promotion_authorization_id) ~= "string" or row.promotion_authorization_id == ""
+      or type(row.trust_class) ~= "string" or row.trust_class == ""
+      or type(row.provider_version) ~= "string" or row.provider_version == "" then
+      fail(pack, "family authorization requires a promotion id, trust class, and provider version")
     end
     if not has_exact_applicable_version(pack) then
       fail(pack, "family authorization requires an exact applicable mod version")

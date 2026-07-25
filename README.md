@@ -6,9 +6,11 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the provisional `2.5.0` compiler backport.
+
+MIR `2.5.0` projects the MIR 3.2 compiler through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, `mod-data` and productivity-family adoption are disabled, Factorio 2.1-only modifiers are omitted, and every runtime and compatibility claim is requalified on the 2.0 binary and mod line.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
@@ -31,6 +33,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
+- **Conservative 3.2 scope:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
 
 Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 
@@ -75,18 +78,33 @@ See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and val
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
-1. **Startup-only prototype extensions** such as the opt-in pipeline extent multiplier.
-2. **Exact-version compatibility schema repairs** for known upstream loader-schema breaks such as ATAN `2.1` recipe fields.
-3. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
-4. **Generated stream technology creation.**
-5. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
-6. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
-7. **Base technology infinite extensions.**
-8. **Optional weapon shooting speed overlap adjustment.**
-9. **Max-level enforcement.**
-10. **Compiler diagnostics and compatibility planner reporting.**
-11. **Generated-technology effect safety validation.**
-12. **Optional diagnostics report flush.**
+<!-- BEGIN GENERATED MIR PIPELINE -->
+This table is generated from `prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+
+| Phase | Command | Kind | Implementation | Depends on |
+| ---: | --- | --- | --- | --- |
+| 10 | `compatibility-repairs` | mutation | `prototypes/mir/compatibility/repairs/registry.lua` | none |
+| 15 | `sanitize-input-technology-effects` | sanitation | `prototypes/mir/emit/effect_safety.lua` | `compatibility-repairs` |
+| 20 | `module-permissions` | mutation | `prototypes/mir/pipeline/module_permissions.lua` | `sanitize-input-technology-effects` |
+| 20 | `prototype-limits` | mutation | `prototypes/mir/pipeline/prototype_limits.lua` | `compatibility-repairs`, `module-permissions` |
+| 20 | `pipeline-extent` | mutation | `prototypes/mir/pipeline/extent.lua` | `compatibility-repairs`, `prototype-limits` |
+| 30 | `prepare-competing-productivity` | plan | `prototypes/mir/policy/competing_productivity.lua` | `pipeline-extent` |
+| 30 | `prepare-competing-base-extensions` | plan | `prototypes/mir/policy/competing_base_extensions.lua` | `prepare-competing-productivity` |
+| 35 | `compile-generation-plan` | plan | `prototypes/mir/pipeline/compiler_orchestrator.lua` | `prepare-competing-base-extensions` |
+| 40 | `emit-streams` | emission | `prototypes/mir/emit/stream_executor.lua` | `compile-generation-plan` |
+| 50 | `apply-competing-productivity` | mutation | `prototypes/mir/pipeline/mutations/competing_productivity.lua` | `emit-streams` |
+| 50 | `emit-base-extensions` | emission | `prototypes/mir/planner/base_continuations.lua + prototypes/mir/emit/base_continuation_executor.lua` | `apply-competing-productivity` |
+| 60 | `apply-competing-base-extensions` | mutation | `prototypes/mir/pipeline/mutations/competing_base_extensions.lua` | `emit-base-extensions` |
+| 70 | `weapon-speed-adjustments` | mutation | `prototypes/mir/pipeline/mutations/weapon_speed.lua` | `apply-competing-base-extensions` |
+| 70 | `max-level-control` | mutation | `prototypes/mir/pipeline/mutations/max_level.lua` | `weapon-speed-adjustments` |
+| 75 | `assert-technology-safety` | assertion | `prototypes/mir/emit/effect_safety.lua` | `max-level-control` |
+| 80 | `emit-compatibility-diagnostics` | report | `prototypes/mir/compatibility/diagnostics/registry.lua` | `assert-technology-safety` |
+| 80 | `emit-compiler-reports` | report | `prototypes/mir/planner/compiler.lua` | `emit-compatibility-diagnostics` |
+| 80 | `emit-compatibility-planner` | report | `prototypes/mir/compatibility/planner.lua` | `emit-compiler-reports` |
+| 90 | `assert-plan-output` | assertion | `prototypes/mir/planner/output_validator.lua` | `emit-compatibility-planner` |
+| 95 | `publish-compiler-artifacts` | publication | `prototypes/mir/pipeline/compiler_orchestrator.lua` | `assert-plan-output` |
+| 100 | `flush-diagnostics` | report | `prototypes/mir/report/diagnostics_sink.lua` | `publish-compiler-artifacts` |
+<!-- END GENERATED MIR PIPELINE -->
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -113,8 +131,6 @@ where `L` is the research level.
 | Research unit time | `60` seconds |
 
 **Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
-
-When Space Age or another mod already owns a recognized infinite productivity technology, MIR keeps the same stream settings instead of hiding them. Default values preserve the final external owner exactly; disabling the stream leaves it untouched. Changing either cost base or growth applies both displayed values as one cost model, and changing startup costs preserves the currently researched owner, its level, and fractional progress. Explicit cost changes are rejected for unknown formulas instead of guessing, while safe MIR generation remains the fallback when no eligible owner exists.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -161,9 +177,9 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 | Stream key | Player-facing research | Targets | Per-level productivity | Notes |
 | --- | --- | --- | --- | --- |
-| `research_copper` | Copper plate productivity | `copper-plate` | `+10%` | Excludes hidden, recycling, and scrap-input recovery recipes. |
-| `research_iron` | Iron plate productivity | `iron-plate` | `+10%` | Excludes hidden, recycling, and scrap-input recovery recipes. |
-| `research_steel` | Steel productivity | recipes producing `steel-plate` | `+10%` | Excludes scrap-input recovery recipes. In Space Age, `steel-plate` and `casting-steel` remain owned by vanilla `steel-plate-productivity`; additional safe steel outputs are adopted there. |
+| `research_copper` | Copper plate productivity | `copper-plate` | `+10%` | Excludes hidden and recycling recipes. |
+| `research_iron` | Iron plate productivity | `iron-plate` | `+10%` | Excludes hidden and recycling recipes. |
+| `research_steel` | Steel plate productivity | `steel-plate` | `+10%` | Generates a MIR owner for base-game steel smelting. With Space Age, vanilla `steel-plate-productivity` remains the sole owner for `steel-plate`, `casting-steel`, and safely adopted productivity-allowed steel recipes. |
 | `research_gears` | Iron gear wheel productivity | `iron-gear-wheel` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_iron_sticks` | Iron stick productivity | `iron-stick` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |
@@ -230,7 +246,7 @@ Spoilage preservation remains disabled by default. Agricultural growth speed is 
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Enabled by default as a special Space Age technology. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when no effect-proven infinite `research-productivity` or `laboratory-productivity-4` lab-productivity owner is present, so existing native lab-productivity owners keep their chain. Uses Military science pack technology art as the base-game icon. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses the unloading bay unlock technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
+| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Enabled by default as a deliberately expensive late-game sink; disable it if the extra landing-pad capacity is not wanted. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon and electromagnetic science when available. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon and electromagnetic science when available. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
@@ -238,7 +254,7 @@ Spoilage preservation remains disabled by default. Agricultural growth speed is 
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
-| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Disabled by default. Uses the character mining speed pickaxe icon and available late-game science packs. |
+| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Enabled by default. Uses the character mining speed pickaxe icon and available late-game science packs. |
 | `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus`; `character-logistic-trash-slots` | `+1` inventory slot and `+1` logistic trash slot per level | Growth factor default `1.10`. |
 | `research_robot_battery` | Worker robot battery | `worker-robot-battery` | `+10%` per level | Growth factor default `1.2`. Skips when Better Bot Battery-style `worker-robots-battery-6` exists as an infinite native `worker-robot-battery` owner with its expected value. |
 
@@ -272,7 +288,7 @@ Conservative setup:
 
 - Generated productivity streams stay enabled where their recipes and labs are valid.
 - Disable MIR vanilla-chain continuations you do not want to extend.
-- Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
+- Disable Cargo landing pad count if you do not want its deliberately expensive extra Space Age logistics capacity.
 - Keep Spoilage preservation disabled; disable Agricultural growth speed if you do not want its newly planted crop adjustment.
 - Use science pack policy `configured`.
 
@@ -343,24 +359,30 @@ Every generated stream receives:
 | `ips-max-level-<stream-key>` | int, min `0` | stream/defaults/shared | `0` means infinite; positive values cap the stream. |
 | `ips-research-time-<stream-key>` | int, min `0` | stream/defaults/shared | Seconds per research unit. `0` uses the configured default for that stream. |
 
-Per-stream default exceptions:
+Per-stream effective defaults and exceptions:
+
+<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->
+This effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
 
 | Stream | Enabled | Base cost | Growth | Time | Max |
-| --- | --- | --- | --- | --- | --- |
+| --- | --- | ---: | ---: | ---: | --- |
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
 | `research_spoilage_preservation` | No | `50000` | `1.5` | `120` | Infinite |
-| `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
-| `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
-| `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
+| `research_agricultural_growth_speed` | Yes | `40000` | `1.5` | `90` | Infinite |
+| `research_inventory_capacity` | Yes | `8000` | `1.10` | `60` | Infinite |
+| `research_robot_battery` | Yes | `8000` | `1.2` | `60` | Infinite |
+| `research_breeding` | Yes | `8000` | `2` | `60` | Infinite |
 | `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
-| `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
+| `research_cargo_landing_pad_count` | Yes | `1000000` | `10` | `240` | Infinite |
 | `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |
-| `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
-| `research_character_reach` | No | shared | shared | shared | Infinite |
-| `research_rocket_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_cannon_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_flamethrower_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
-| `research_electric_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
+| `research_ash_separation` | Yes | `8000` | `2` | `90` | Infinite |
+| `research_science_pack_productivity` | Yes | `8000` | `2` | `120` | Infinite |
+| `research_character_reach` | Yes | `8000` | `2` | `60` | Infinite |
+| `research_rocket_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_cannon_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_flamethrower_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+| `research_electric_shooting_speed` | Yes | `60` | `1.5` | `60` | Infinite |
+<!-- END GENERATED MIR STREAM DEFAULTS -->
 
 ### Base-Extension Settings
 
@@ -417,8 +439,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Unknown overhauls:** broad support is opportunistic, not a guarantee.
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
 - **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology. For configured vanilla Space Age productivity families, residual productivity-allowed recipes can be adopted into the existing vanilla infinite technology instead of generating a parallel MIR technology.
-- **Space Exploration recipe removal:** MIR loads after Space Exploration's finalized recipe set and removes any remaining technology effects that target recipes deleted during final fixes. This is a bounded startup-integrity guarantee, not a broad Space Exploration support claim.
-- **Existing saves:** MIR records productivity-family adoption changes but does not perform a force-wide technology-effect reset. Factorio remains responsible for configuration-change reconciliation, avoiding duplicate `give-item` rewards and loss of unrelated custom force state.
+- **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR resets technology effects once so already-researched vanilla family technologies apply the new recipe effects.
 - **Stable IDs:** generated stream prototype IDs are intentionally kept stable unless a tested migration is provided.
 - **Scripted agriculture scope:** the current implementation applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a later manual test/spike item to avoid broad scans.
 
@@ -447,7 +468,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/mir/planner/stream_compiler.lua` | Owns the generated stream loop. |
 | `prototypes/mir/emit/base_extensions.lua` | Extends finite vanilla technology chains. |
 | `prototypes/mir/emit/effect_safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
-| `prototypes/mir/emit/mod_data.lua` | Emits MIR mod-data prototypes used by runtime state reconciliation. |
+| `prototypes/mir/emit/mod_data.lua` | Emits compact public compiler artifacts on normal loads and separately named full internal artifacts in debug/report modes. |
 | `prototypes/mir/policy/weapon_speed.lua` | Removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation only under the configured coverage policy. |
 | `prototypes/mir/policy/native_effect_coverage.lua` | Identifies exact, enabled, reachable infinite native-effect owners for ownership and overlap decisions. |
 | `prototypes/mir/policy/max_level.lua` | Applies stream max levels after generation. |
@@ -669,11 +690,10 @@ The validation script checks:
 - **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/releases/2.4.0-roadmap.md`:** published Factorio 2.0 port scope, target cuts, and sequencing.
-- **`docs/releases/2.4.9-stability-backport.md`:** active Factorio 2.0 stability-patch scope, qualification gates, and release boundary.
-- **`docs/releases/notes/release-notes-2.4.9.md`:** current player-facing Factorio 2.0 stability changes.
-- **`docs/releases/2.5.0-verification-backport.md`:** planned Factorio 2.0 compiler and verification backport after the 2.4.9 release.
-- **`docs/releases/2.4.5-validation-summary.md`:** immutable prior-release identity and validation evidence.
+- **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
+- **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
+- **`docs/releases/notes/release-notes-3.0.5.md`:** current player-facing compatibility changes.
+- **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.

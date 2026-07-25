@@ -2,6 +2,9 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local structural_equal = require("prototypes.mir.core.structural_equal")
 
 local M = {}
 local NUMERIC_TOLERANCE = 0.000000001
@@ -84,8 +87,17 @@ local function assert_equal(context, field, expected, actual)
   end
 end
 
+local function assert_structural(context, field, expected, actual)
+  if not structural_equal.same(expected, actual) then
+    local expected_fingerprint = fingerprint.of({value = expected})
+    local actual_fingerprint = fingerprint.of({value = actual})
+    fail(context, field .. " differs expected=" .. expected_fingerprint .. " actual=" .. actual_fingerprint)
+  end
+end
+
 function M.assert_technology_shape(expected, actual, context)
   if not actual then fail(context, "technology is missing") end
+  if expected.name ~= nil then assert_equal(context, "name", expected.name, actual.name) end
   M.assert_effects(expected.effects, actual.effects, context, true)
   assert_equal(context, "prerequisites", normalized_names(expected.prerequisites), normalized_names(actual.prerequisites))
   local expected_unit, actual_unit = expected.unit or {}, actual.unit or {}
@@ -96,6 +108,13 @@ function M.assert_technology_shape(expected, actual, context)
     fail(context, "research time differs expected=" .. tostring(expected_unit.time) .. " actual=" .. tostring(actual_unit.time))
   end
   assert_equal(context, "max level", expected.max_level, actual.max_level)
+  assert_structural(context, "localized name", expected.localised_name, actual.localised_name)
+  assert_structural(context, "localized description", expected.localised_description, actual.localised_description)
+  assert_equal(context, "icon", expected.icon, actual.icon)
+  assert_equal(context, "icon size", expected.icon_size, actual.icon_size)
+  assert_structural(context, "icons", expected.icons, actual.icons)
+  assert_equal(context, "order", expected.order, actual.order)
+  assert_equal(context, "level", expected.level, actual.level)
   for _, field in ipairs({"enabled", "hidden", "upgrade"}) do
     if expected[field] ~= nil then assert_equal(context, field, expected[field], actual[field]) end
   end
@@ -110,17 +129,38 @@ local function assert_registry(operation)
   assert_equal(operation.technology_name, "registry key", expected.key, actual.key)
 end
 
-function M.assert_compilation_artifact(artifact)
+function M.assert_compilation_artifact(artifact, options)
   if not artifact or artifact.schema ~= 2 then error("CompilationPlan schema 2 artifact is required", 2) end
+  options = options or {}
   local checked = 0
   for _, operation in ipairs(artifact.operations or {}) do
     local technology = data_raw.technology(operation.technology_name)
     if operation.operation == "emit_stream" or operation.operation == "emit_base_extension" then
-      M.assert_technology_shape(operation.technology, technology, operation.technology_name)
+      if not operation.technology_design then
+        fail(operation.technology_name, "TechnologyDesign is missing")
+      end
+      if options.designs_validated then technology_design.assert_trusted(operation.technology_design)
+      else technology_design.verify_untrusted(operation.technology_design) end
+      local expected = technology_design.prototype_projection(operation.technology_design, {validated = true})
+      M.assert_technology_shape(expected, operation.technology,
+        operation.technology_name .. " planned TechnologyDesign projection")
+      M.assert_technology_shape(expected, technology, operation.technology_name)
       assert_registry(operation)
       checked = checked + 1
     elseif operation.operation == "native_owner_binding" then
       if not technology then fail(operation.technology_name, "adoption owner is missing") end
+      if not operation.technology_design then
+        fail(operation.technology_name, "patch-existing TechnologyDesign is missing")
+      end
+      if options.designs_validated then technology_design.assert_trusted(operation.technology_design)
+      else technology_design.verify_untrusted(operation.technology_design) end
+      local design_projection = technology_design.prototype_projection(operation.technology_design, {validated = true})
+      if operation.technology_design.materialization.kind ~= "patch-existing"
+        or operation.technology_design.materialization.target ~= operation.technology_name then
+        fail(operation.technology_name, "patch-existing TechnologyDesign target differs")
+      end
+      assert_equal(operation.technology_name, "TechnologyDesign patch fingerprint",
+        operation.output_fingerprint, native_owner_contract.fingerprint(design_projection))
       local actual_snapshot = native_owner_contract.snapshot(technology)
       local actual_fingerprint = native_owner_contract.fingerprint(actual_snapshot)
       assert_equal(operation.technology_name, "native-owner output fingerprint", operation.output_fingerprint, actual_fingerprint)
@@ -139,21 +179,18 @@ function M.assert_artifact(artifact)
   local operations = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
+      technology_design.assert_generation_row(row)
       table.insert(operations, {
         operation = "emit_stream",
         technology_name = row.technology_name,
-        technology = {
-          effects = row.fields.effects,
-          prerequisites = row.fields.prerequisites,
-          unit = {ingredients = row.fields.ingredients, count_formula = row.fields.count_formula, time = row.fields.research_time},
-          max_level = row.fields.max_level,
-          upgrade = true
-        }
+        technology = technology_design.prototype_projection(row.technology_design, {validated = true})
       })
     elseif row.action == "adopt" then
+      technology_design.assert_generation_row(row)
       table.insert(operations, {
         operation = "native_owner_binding",
         technology_name = row.adoption.owner,
+        technology_design = row.technology_design,
         output_fingerprint = row.adoption.output_fingerprint,
         expected_snapshot = row.adoption.expected_snapshot
       })

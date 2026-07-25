@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "continuations": {
+    "base-continuation/braking-force": {
+      "chain_key": "braking-force",
+      "identity_pattern": "braking-force-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    },
+    "base-continuation/inserter-capacity-bonus": {
+      "chain_key": "inserter-capacity-bonus",
+      "identity_pattern": "inserter-capacity-bonus-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    },
+    "base-continuation/laser-shooting-speed": {
+      "chain_key": "laser-shooting-speed",
+      "identity_pattern": "laser-shooting-speed-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    },
+    "base-continuation/research-speed": {
+      "chain_key": "research-speed",
+      "identity_pattern": "research-speed-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    },
+    "base-continuation/weapon-shooting-speed": {
+      "chain_key": "weapon-shooting-speed",
+      "identity_pattern": "weapon-shooting-speed-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    },
+    "base-continuation/worker-robots-storage": {
+      "chain_key": "worker-robots-storage",
+      "identity_pattern": "worker-robots-storage-{next-level}",
+      "identity_state": "released",
+      "introduced_in": "pre-2.2.0",
+      "migration_policy": "stable",
+      "stable": true
+    }
+  }
+}

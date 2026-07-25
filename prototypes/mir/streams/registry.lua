@@ -23,6 +23,13 @@ function M.snapshot()
   return deepcopy(canonical_streams)
 end
 
+-- Internal planning boundary for source-owned normalized stream policy.
+-- Callers must treat the returned catalog as immutable; snapshot() and get()
+-- remain the defensive-copy surfaces for independently owned values.
+function M.view()
+  return canonical_streams
+end
+
 function M.get(key)
   local spec = canonical_streams[key]
   return spec and deepcopy(spec) or nil

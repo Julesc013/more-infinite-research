@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local raw = require("prototypes.mir.families.rules")
+local operator_dsl = require("prototypes.mir.families.operator_dsl")
 
 local M = {}
 local canonical = nil
@@ -17,6 +18,8 @@ local REQUIRED_RISKS = {
   "recycling_loop",
   "catalyst_or_self_return",
   "non_deterministic_output",
+  "voiding_or_destruction",
+  "matter_or_transmutation",
   "hidden_internal"
 }
 
@@ -77,6 +80,15 @@ local function validate(source)
     if type(rule.effects) ~= "table" or type(rule.effects.default) ~= "number" then
       error("FamilyRule effect policy is required: " .. rule.id, 2)
     end
+    if type(rule.cardinality) ~= "table" then
+      error("FamilyRule cardinality policy is required: " .. rule.id, 2)
+    end
+    for _, field in ipairs({"maximum_candidates", "maximum_attachments", "maximum_review_required"}) do
+      local value = rule.cardinality[field]
+      if type(value) ~= "number" or value < 0 or value % 1 ~= 0 then
+        error("FamilyRule cardinality field is invalid: " .. rule.id .. ":" .. field, 2)
+      end
+    end
     if type(rule.ownership) ~= "table" or rule.ownership.strategy ~= "prefer-existing-exact-owner" then
       error("FamilyRule exact-owner policy is required: " .. rule.id, 2)
     end
@@ -86,6 +98,7 @@ local function validate(source)
     if type(rule.support_claim) ~= "table" or rule.support_claim.public ~= false then
       error("FamilyRule support claim boundary is required: " .. rule.id, 2)
     end
+    operator_dsl.validate(rule.operators)
     ids[rule.id] = true
     table.insert(rules, deepcopy(rule))
   end
@@ -106,6 +119,12 @@ end
 
 function M.snapshot()
   return deepcopy(build())
+end
+
+-- Family rules are validated once from source-owned data. Provider planning
+-- may share this exact immutable catalog; external ownership uses snapshot().
+function M.view()
+  return build()
 end
 
 return M

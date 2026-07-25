@@ -2,10 +2,10 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local canonical = nil
-local build_scan_count = 0
 local SCHEMA = 2
 
 local function name_of(entry)
@@ -256,12 +256,10 @@ local function source_class(recipe, categories, is_hidden)
   return "ordinary"
 end
 
-local function build()
-  if canonical then return canonical end
-  build_scan_count = build_scan_count + 1
+local function build_index(recipe_prototypes)
   local facts = {}
   local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
-  for recipe_name, recipe in pairs(data_raw.prototypes("recipe")) do
+  for recipe_name, recipe in pairs(recipe_prototypes or {}) do
     local semantics = recipe_semantics.resolve(recipe, recipe, target_profiles.current())
     local normalized_variants = variant_facts(recipe)
     local all_variants_allow_productivity = #normalized_variants > 0
@@ -314,7 +312,7 @@ local function build()
   for _, index in pairs({by_output, by_productive_output, by_ingredient, by_category}) do
     for _, recipe_names in pairs(index) do table.sort(recipe_names) end
   end
-  canonical = {
+  local canonical = {
     schema = SCHEMA,
     facts = facts,
     names = names,
@@ -326,9 +324,67 @@ local function build()
   return canonical
 end
 
+local function build()
+  local context = compiler_context.current()
+  local cached = context:state_view("recipe_index")
+  if cached then return cached end
+  telemetry.start_phase("snapshot")
+  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
+  metrics.scan_count = metrics.scan_count + 1
+  local canonical = build_index(data_raw.prototypes("recipe"))
+  telemetry.count("recipe_index_scans", 1)
+  telemetry.count("recipes", #canonical.names)
+  telemetry.finish_phase("snapshot")
+  return context:set_state("recipe_index", canonical)
+end
+
+-- Builds the same canonical index from an explicit prototype map.
+-- Offline review and scale tooling use this without mutating the prototype registry
+-- or the active CompilerContext.
+function M.index_prototypes(recipe_prototypes)
+  if type(recipe_prototypes) ~= "table" then
+    error("recipe_facts.index_prototypes expects a recipe prototype map", 2)
+  end
+  return build_index(recipe_prototypes)
+end
+
 function M.get(recipe_name)
   local fact = build().facts[recipe_name]
+  if fact then telemetry.count("recipe_fact_copies", 1) end
   return fact and deepcopy(fact) or nil
+end
+
+-- Internal compiler views avoid repeated deep copies during one immutable
+-- data-final-fixes planning pass. Callers must treat returned tables as
+-- read-only.
+function M.view(recipe_name)
+  return build().facts[recipe_name]
+end
+
+function M.index_view()
+  return build()
+end
+
+function M.for_each(callback)
+  if type(callback) ~= "function" then error("recipe_facts.for_each expects a callback", 2) end
+  local index = build()
+  for _, recipe_name in ipairs(index.names) do callback(recipe_name, index.facts[recipe_name]) end
+end
+
+function M.summary()
+  local index = build()
+  return {schema = index.schema, recipe_count = #index.names}
+end
+
+function M.fingerprint()
+  local context = compiler_context.current()
+  return context:state_view("recipe_index_fingerprint", function()
+    return require("prototypes.mir.core.fingerprint").of(build())
+  end)
+end
+
+function M.recipes_by_output_view(name)
+  return build().by_output[name] or {}
 end
 
 function M.all_names()
@@ -371,12 +427,14 @@ function M.recipes_by_category(name)
 end
 
 function M.snapshot()
-  return deepcopy(build())
+  local index = build()
+  telemetry.count("recipe_fact_copies", #index.names)
+  return deepcopy(index)
 end
 
 function M.scan_count()
   build()
-  return build_scan_count
+  return compiler_context.current():state_view("recipe_index_metrics").scan_count
 end
 
 return M

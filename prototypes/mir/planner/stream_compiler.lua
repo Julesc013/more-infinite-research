@@ -3,19 +3,16 @@ local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
-local adoption_transaction = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local costs = require("prototypes.mir.planner.costs")
-local icon_builder = require("prototypes.mir.emit.icon_builder")
+local icon_builder = require("prototypes.mir.presentation.icon_builder")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
-local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
-local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
@@ -24,47 +21,66 @@ local family_registry = require("prototypes.mir.families.registry")
 local provider_registry = require("prototypes.mir.providers.registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
-local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
+local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local diagnostics = require("prototypes.mir.report.diagnostics_sink")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
-local latest_plan = nil
+local shared_materializing_gates = {}
+local shared_skip_gates = {}
 
 local GATE_EVIDENCE = {
-  target_supported = "target-profile:positive-feature-contract",
-  effect_valid = "effect-safety:validated-effect-set",
-  owner_conflict_free = "owner-policy:no-blocking-owner",
-  science_compatible = "science-selector:resolved-ingredients",
-  lab_compatible = "lab-compatibility:accepted-ingredient-set",
-  prerequisites_acyclic = "prerequisite-planner:acyclic-graph",
-  loop_safe = "recipe-policy:fail-closed-risk-filter",
-  progression_safe = "science-reachability:researchable-path",
-  migration_safe = "stream-manifest:stable-identity",
-  output_identity_safe = "stream-spec:unique-output-identity"
+  target_supported = {evaluator = "target-profile", evidence = "positive-feature-contract", initial = "passed"},
+  effect_valid = {evaluator = "effect-contracts", initial = "pending"},
+  owner_conflict_free = {evaluator = "owner-policy", evidence = "no-blocking-owner", initial = "passed"},
+  science_compatible = {evaluator = "science-selector", evidence = "resolved-ingredients", initial = "passed"},
+  lab_compatible = {evaluator = "lab-compatibility", evidence = "accepted-ingredient-set", initial = "passed"},
+  prerequisites_acyclic = {evaluator = "technology-graph", initial = "pending"},
+  loop_safe = {evaluator = "recipe-risk-facts", evidence = "fail-closed-risk-filter", initial = "passed"},
+  progression_safe = {evaluator = "technology-graph", initial = "pending"},
+  migration_safe = {evaluator = "stream-manifest", evidence = "stable-identity", initial = "passed"},
+  output_identity_safe = {evaluator = "generation-plan", initial = "pending"}
 }
 
-local function gate(status, evidence, reason)
-  return {
-    passed = status ~= "failed",
-    status = status,
-    evidence = evidence and {evidence} or {},
-    reason = reason
-  }
+local function shared_default_gate(action, gate_name, contract)
+  local cache = action == "skip" and shared_skip_gates or shared_materializing_gates
+  if cache[gate_name] then return cache[gate_name] end
+  if action == "skip" then
+    cache[gate_name] = gate_contract.not_applicable(
+      "generation-plan",
+      "candidate-action-is-materializing",
+      fingerprint.of({action = action, gate = gate_name}),
+      {"decision:non-materializing-row"}
+    )
+  elseif contract.initial == "pending" then
+    cache[gate_name] = gate_contract.pending(contract.evaluator)
+  else
+    cache[gate_name] = gate_contract.passed(contract.evaluator, {contract.evidence})
+  end
+  return cache[gate_name]
 end
 
 local function proof_gates(action, failed_gates)
   local out = {}
-  for gate_name, evidence in pairs(GATE_EVIDENCE) do
+  for gate_name, contract in pairs(GATE_EVIDENCE) do
     if failed_gates and failed_gates[gate_name] then
-      out[gate_name] = gate("failed", failed_gates[gate_name].evidence, failed_gates[gate_name].reason)
-    elseif action == "skip" then
-      out[gate_name] = gate("not-applicable", "decision:non-materializing-row")
+      local failure = failed_gates[gate_name]
+      out[gate_name] = gate_contract.failed(
+        failure.evaluator or contract.evaluator,
+        failure.reason,
+        {failure.evidence}
+      )
     else
-      out[gate_name] = gate("passed", evidence)
+      out[gate_name] = shared_default_gate(action, gate_name, contract)
     end
   end
   return out
@@ -95,10 +111,6 @@ local function ldesc(spec)
     return {"technology-description.more-infinite-research.direct_effect"}
   end
   return {"technology-description.more-infinite-research.recipe_productivity"}
-end
-
-local function emit_stream_technology(key, spec, fields)
-  return stream_emitter.emit(key, spec, fields)
 end
 
 local function append_unique_item(items, seen, item_name)
@@ -169,6 +181,9 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     reason = reason,
     source = spec.automatic_family and "family-rule" or "fixed-stream",
     provider_ids = family_resolver.provider_ids_for_stream(key),
+    family_ids = family_resolver.family_ids_for_stream(key),
+    provider_decision_fingerprints = family_resolver.decision_fingerprints_for_stream(key),
+    risk_fingerprints = family_resolver.risk_fingerprints_for_stream(key),
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, extra.failed_gates)
@@ -222,7 +237,7 @@ end
 
 local function plan_stream(key, raw_spec)
   if raw_spec.automatic_family then
-    local authorization = compatibility_packs.authorizes_family_stream(key)
+    local authorization = compatibility_policy.authorizes_family_stream(key)
     local maturity = type(raw_spec.automatic_family) == "table"
       and raw_spec.automatic_family.creation_maturity
       or "reviewed"
@@ -248,7 +263,7 @@ local function plan_stream(key, raw_spec)
   local base_cost = costs.base_cost_for(key, spec)
   local growth_factor = costs.growth_factor_for(key, spec)
   local max_level = costs.max_level_for(key, spec)
-  local count_formula = tostring(base_cost) .. " * " .. tostring(growth_factor) .. "^(L-1)"
+  local count_formula = tostring(base_cost) .. "*" .. tostring(growth_factor) .. "^(L-1)"
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
@@ -376,8 +391,12 @@ local function plan_stream(key, raw_spec)
     })
 end
 
-function M.compile()
-  local streams = C.snapshot()
+local function compile_active(context, return_view)
+  science_packs.ensure_services(context)
+  local cached = context:state_view("generation_plan")
+  if cached then return return_view and cached or deepcopy(cached) end
+  telemetry.start_phase("stream_compiler")
+  local streams = C.view()
   local native_owner_inputs = {}
   for key, spec in pairs(streams) do
     local binding = spec.native_owner_binding
@@ -389,74 +408,73 @@ function M.compile()
   end
   local plan = generation_plan.new({
     source_fingerprints = {
-      facts = fingerprint.of(recipe_facts.snapshot()),
-      rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
+      facts = recipe_facts.fingerprint(),
+      risks = recipe_risk_facts.fingerprint(),
+      rules = fingerprint.of({streams = streams, families = family_registry.view()}),
       providers = provider_registry.fingerprint(),
-      compatibility_packs = fingerprint.of(compatibility_packs.snapshot()),
+      compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),
-      native_owners = fingerprint.of(native_owner_inputs)
+      native_owners = fingerprint.of(native_owner_inputs),
+      provider_decisions = family_resolver.decision_set_fingerprint()
     }
   })
   local rows = {}
   for _, key in ipairs(table_utils.sorted_keys(streams)) do
     table.insert(rows, plan_stream(key, streams[key]))
   end
-  rows = effect_ownership.resolve(rows)
+  rows = effect_ownership.resolve(rows, {defer_design_refresh = true})
   for _, row in ipairs(rows) do
-    plan:add(row)
+    row.technology_design = technology_design.from_generation_row(row)
+    plan:add_owned_derived(row)
   end
-  return plan:finalize()
+  local finalized = plan:finalize()
+  local artifact = finalized:artifact_view()
+  telemetry.count("stream_rows", #artifact.rows)
+  telemetry.finish_phase("stream_compiler")
+  context:set_state("generation_plan", artifact)
+  return return_view and artifact or deepcopy(artifact)
 end
 
-function M.apply(plan)
-  for _, row in ipairs(plan:snapshot()) do
-    for _, conflict in ipairs((row.effect_ownership and row.effect_ownership.lost) or {}) do
-      D.recipe_owner({
-        recipe = conflict.recipe,
-        action = "planned-owner-won",
-        owners = conflict.winner_owner,
-        owner_actions = conflict.winner_stream,
-        warning_class = conflict.reason
-      })
-    end
-    if row.action == "emit" then
-      if row.direct_effects then
-        native_modifiers.record_overlaps(row.stream_key, row.overlap_effects)
-      end
-      local technology = emit_stream_technology(row.stream_key, row.spec, row.fields)
-      if D.enabled() and not row.direct_effects then
-        log("[more-infinite-research] Registered technology " .. technology.name)
-      end
-    elseif row.action == "adopt" then
-      adoption_transaction.apply(row.adoption)
-    elseif row.reason ~= "disabled" then
-      log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
-    end
-    D.stream(row.diagnostics)
-  end
+local function compile(context, return_view)
+  context = context or compiler_context.current()
+  return compiler_context.with_active(context, compile_active, context, return_view)
+end
 
-  if target_line.feature_enabled("recipe_productivity") then
-    adoption_transaction.emit_mod_data()
+function M.compile(context)
+  return compile(context, false)
+end
+
+function M.compile_view(context)
+  return compile(context, true)
+end
+
+function M.accept(plan, context)
+  context = context or compiler_context.current()
+  local artifact = type(plan.artifact) == "function" and plan:artifact() or deepcopy(plan)
+  if context:has_state("generation_plan") then
+    context:replace_epoch("generation_plan", artifact, context:state_epoch("generation_plan"))
+  else
+    context:set_state("generation_plan", artifact)
   end
 end
 
-function M.run()
-  local plan = M.compile()
-  M.accept(plan)
-  M.apply(plan)
-  return plan
+function M.latest_artifact(context)
+  context = context or compiler_context.current()
+  return context:state_snapshot("generation_plan")
 end
 
-function M.accept(plan)
-  latest_plan = plan
+function M.accept_artifact(artifact, context, options)
+  context = context or compiler_context.current()
+  local accepted = options and options.trusted and artifact or deepcopy(artifact)
+  if context:has_state("generation_plan") then
+    context:replace_epoch("generation_plan", accepted, context:state_epoch("generation_plan"))
+  else
+    context:set_state("generation_plan", accepted)
+  end
 end
 
-function M.latest_artifact()
-  return latest_plan and latest_plan:artifact() or nil
-end
-
-function M.assert_output()
-  return require("prototypes.mir.planner.output_validator").assert_artifact(M.latest_artifact())
+function M.assert_output(context)
+  return require("prototypes.mir.planner.output_validator").assert_artifact(M.latest_artifact(context))
 end
 
 return M

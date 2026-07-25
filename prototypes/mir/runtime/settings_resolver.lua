@@ -1,10 +1,10 @@
 local defaults = require("prototypes.mir.settings.defaults")
-local effective_settings = require("prototypes.mir.settings.effective")
+local startup_settings = require("prototypes.mir.runtime.startup_settings")
 
 local R = {}
 
 local function startup_setting(name)
-  return effective_settings.get(name)
+  return startup_settings.get(name)
 end
 
 local function stream_default_enabled(key)

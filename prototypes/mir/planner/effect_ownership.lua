@@ -1,8 +1,28 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
+
+local function copy_rows_preserving_gates(raw_rows)
+  local rows = {}
+  for index, source in ipairs(raw_rows or {}) do
+    local row = {}
+    for key, value in pairs(source) do
+      if key == "gates" then
+        row.gates = {}
+        for gate_name, gate in pairs(value or {}) do row.gates[gate_name] = gate end
+      else
+        row[key] = deepcopy(value)
+      end
+    end
+    rows[index] = row
+  end
+  return rows
+end
 
 local function effects_for(row)
   if row.action == "emit" then return row.fields and row.fields.effects or {} end
@@ -47,11 +67,12 @@ local function non_materializing_gates(identity)
   }
   local out = {}
   for _, name in ipairs(names) do
-    out[name] = {
-      passed = true,
-      status = "not-applicable",
-      evidence = {"effect-ownership:" .. tostring(identity)}
-    }
+    out[name] = gate_contract.not_applicable(
+      "effect-ownership",
+      "candidate-retains-materializing-effect",
+      fingerprint.of({effect_identity = identity, gate = name}),
+      {"effect-ownership:" .. tostring(identity)}
+    )
   end
   return out
 end
@@ -71,8 +92,9 @@ local function convert_empty_row_to_skip(row, first_identity)
   row.diagnostics.effects = "0"
 end
 
-function M.resolve(raw_rows)
-  local rows = deepcopy(raw_rows or {})
+function M.resolve(raw_rows, options)
+  options = options or {}
+  local rows = copy_rows_preserving_gates(raw_rows)
   local claims_by_identity = {}
   local materializing_counts = {}
 
@@ -149,6 +171,11 @@ function M.resolve(raw_rows)
     if a.action ~= b.action then return a.action < b.action end
     return tostring(a.manifest_id) < tostring(b.manifest_id)
   end)
+  if not options.defer_design_refresh then
+    for _, row in ipairs(rows) do
+      if row.action == "emit" then row.technology_design = technology_design.from_generation_row(row) end
+    end
+  end
   return rows, {conflict_count = conflict_count}
 end
 
