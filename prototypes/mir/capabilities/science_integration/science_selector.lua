@@ -21,6 +21,8 @@ local STREAM_EXTRA_PACKS = {
   research_electric_energy = {"electromagnetic-science-pack"},
 
   research_breeding = {"agricultural-science-pack", "cryogenic-science-pack"},
+  research_nutrients = {"agricultural-science-pack", "cryogenic-science-pack"},
+  research_capture_robot_rockets = {"military-science-pack", "agricultural-science-pack"},
   research_plastic = {"agricultural-science-pack"},
   research_rocket_fuel = {"agricultural-science-pack"},
   research_thruster_fuel_productivity = {"space-science-pack", "agricultural-science-pack"},

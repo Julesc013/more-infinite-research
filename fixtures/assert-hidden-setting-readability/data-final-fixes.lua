@@ -13,6 +13,14 @@ local function assert_startup_setting_readable(name)
   end
 end
 
+local function assert_stream_enabled(stream_key)
+  local name = string.format("ips-enable-%s", stream_key)
+  assert_startup_setting_readable(name)
+  if settings.startup[name].value ~= true then
+    fail(stream_key .. " must be enabled by default.")
+  end
+end
+
 for _, name in ipairs({
   "mir-automatic-productivity-action",
   "mir-automatic-create-research",
@@ -20,6 +28,13 @@ for _, name in ipairs({
   "mir-automatic-compiler-mode"
 }) do
   assert_startup_setting_readable(name)
+end
+
+for _, stream_key in ipairs({
+  "research_capture_robot_rockets",
+  "research_nutrients"
+}) do
+  assert_stream_enabled(stream_key)
 end
 
 local governed_stream_keys = {
@@ -38,6 +53,7 @@ local governed_stream_keys = {
   "research_breeding",
   "research_bullets",
   "research_cannon_shooting_speed",
+  "research_capture_robot_rockets",
   "research_carbon",
   "research_carbon_fiber",
   "research_cargo_bay_unloading_distance",
@@ -75,6 +91,7 @@ local governed_stream_keys = {
   "research_mining_drill",
   "research_modules",
   "research_molten_metals",
+  "research_nutrients",
   "research_oil_cracking_productivity",
   "research_oil_processing_productivity",
   "research_plastic",
@@ -151,10 +168,12 @@ if not (mods and mods["space-age"]) then
     "recipe-prod-research_thruster_fuel_productivity-1",
     "recipe-prod-research_thruster_oxidizer_productivity-1",
     "recipe-prod-research_breeding-1",
+    "recipe-prod-research_capture_robot_rockets-1",
     "recipe-prod-research_agricultural_growth_speed-1",
     "recipe-prod-research_cargo_bay_unloading_distance-1",
     "recipe-prod-research_cargo_landing_pad_count-1",
-    "recipe-prod-research_spoilage_preservation-1"
+    "recipe-prod-research_spoilage_preservation-1",
+    "recipe-prod-research_nutrients-1"
   }) do
     if techs[tech_name] then
       fail("base-only setting fixture expected " .. tech_name .. " to remain ungenerateable.")

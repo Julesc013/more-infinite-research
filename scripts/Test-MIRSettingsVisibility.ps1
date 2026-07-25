@@ -273,6 +273,9 @@ Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-f
 if (-not $isReducedLegacyLine) {
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_tungsten"'
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_breeding"'
+  Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_capture_robot_rockets"'
+  Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_nutrients"'
+  Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle "assert_stream_enabled_by_default"
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_agricultural_growth_speed"'
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_cargo_landing_pad_count"'
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_air_scrubbing_clean_filter"'

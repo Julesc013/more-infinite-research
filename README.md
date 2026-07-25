@@ -82,7 +82,8 @@ This table is generated from `prototypes/mir/pipeline/commands.lua`; run `./scri
 | Phase | Command | Kind | Implementation | Depends on |
 | ---: | --- | --- | --- | --- |
 | 10 | `compatibility-repairs` | mutation | `prototypes/mir/compatibility/repairs/registry.lua` | none |
-| 15 | `sanitize-input-technology-effects` | sanitation | `prototypes/mir/emit/effect_safety.lua` | `compatibility-repairs` |
+| 12 | `recipe-productivity-permissions` | mutation | `prototypes/mir/pipeline/recipe_productivity_permissions.lua` | `compatibility-repairs` |
+| 15 | `sanitize-input-technology-effects` | sanitation | `prototypes/mir/emit/effect_safety.lua` | `recipe-productivity-permissions` |
 | 20 | `module-permissions` | mutation | `prototypes/mir/pipeline/module_permissions.lua` | `sanitize-input-technology-effects` |
 | 20 | `prototype-limits` | mutation | `prototypes/mir/pipeline/prototype_limits.lua` | `compatibility-repairs`, `module-permissions` |
 | 20 | `pipeline-extent` | mutation | `prototypes/mir/pipeline/extent.lua` | `compatibility-repairs`, `prototype-limits` |
@@ -212,10 +213,12 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_ice` | Ice productivity | oxide asteroid crushing, advanced oxide asteroid crushing, and compatible ice-output recipes | `+10%` | Generates when matching visible recipes exist; adds space science when available. |
 | `research_bioflux` | Bioflux productivity | `bioflux` | `+10%` | Generates when matching visible recipes exist; adds agricultural science when available. |
 | `research_bacteria_cultivation` | Bacteria cultivation productivity | iron bacteria cultivation; copper bacteria cultivation | `+10%` | Uses bacteria cultivation technology art. Adds agricultural and cryogenic science when available. Excluded from Breeding productivity so it has a dedicated owner. |
-| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding, except dedicated bacteria cultivation recipes | `+10%` | Adds agricultural and cryogenic science when available. Category-only biochamber matching is intentionally avoided. |
+| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding, except dedicated bacteria cultivation recipes | `+10%` | Adds agricultural and cryogenic science when available. Pentapod egg's seed input remains excluded from productivity by Space Age. Category-only biochamber matching is intentionally avoided. |
+| `research_nutrients` | Nutrients productivity | exact `nutrients-from-yumako-mash`, `nutrients-from-bioflux`, and `nutrients-from-biter-egg` recipes | `+10%` | Default on with Space Age. Deliberately excludes spoilage recovery, fish, ash sinks, and broad third-party nutrient matches. Adds agricultural and cryogenic science when available. |
+| `research_capture_robot_rockets` | Capture bot rocket productivity | exact `capture-robot-rocket` recipe | `+10%` | Default on with Space Age. Grants exact recipe productivity permission before planning and adds military and agricultural science when available. |
 | `research_grenades` | Grenade productivity | `grenade`; `cluster-grenade` | `+10%`; `+5%` | Adds military and space science when available. |
 | `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Uses the gate technology art. Adds military and space science when available. |
-| `research_landfill` | Landfill productivity | `landfill`; `foundation` | `+10%`; `+5%` | Uses landfill technology art. Adds metallurgic and space science when available; excludes scrap inputs. |
+| `research_landfill` | Landfill productivity | `landfill`; `foundation`; `ice-platform`; `space-platform-foundation` | `+10%`; `+5%`; `+2%`; `+1%` | Uses landfill technology art. Grants exact Space Age platform recipe productivity permission before planning. Adds metallurgic and space science when available; excludes scrap inputs. |
 | `research_artificial_soil` | Artificial soil productivity | artificial yumako/jellynut soil and compatible artificial soil patterns; overgrowth yumako/jellynut soil and compatible overgrowth soil patterns | `+10%`; `+5%` | Uses artificial soil technology art. Adds agricultural and space science when available. |
 | `research_molten_metals` | Molten metals productivity | molten iron/copper from lava; iron/copper ore melting | `+10%`; `+5%` | Uses foundry technology art. Adds metallurgic science when available; excludes scrap inputs. |
 | `research_rails` | Rail productivity | `rail`; Elevated Rails `rail-support`; Elevated Rails `rail-ramp` when present | `+10%`; `+5%`; `+2%` | Rail matching is strict so rail-like unrelated outputs are not caught. Prefers Elevated Rails technology art when available, with the rail item as fallback. |

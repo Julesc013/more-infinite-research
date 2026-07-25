@@ -28,6 +28,10 @@ Version: 3.2.0
     - Enabled every established technology toggle by default, including spoilage preservation and inserter capacity bonus.
     - Kept factory-disruptive technology classification independent of default enablement.
     - Sorted risky technologies first and appended automatic localized tooltip warnings.
+    - Added +2% ice-platform and +1% space-platform-foundation productivity to Landfill productivity.
+    - Added default-on +10% Nutrients productivity for exact forward Space Age nutrient recipes.
+    - Added default-on +10% Capture bot rocket productivity for its exact Space Age recipe.
+    - Proved pentapod egg remains in Breeding productivity with a seed-safe +10% effect.
     - Raised the Factorio, Recycler, and Space Age dependency floor to 2.1.11, the oldest fully qualified patch.
 
   Bugfixes:
