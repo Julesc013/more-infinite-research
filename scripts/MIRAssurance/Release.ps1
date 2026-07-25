@@ -551,19 +551,22 @@ function Invoke-MIRAssuranceSelfTest {
       -PackageSourceCommit ([string]$authority.package_source_commit) `
       -ContentCommit $qualificationCommit `
       -Material $authority.package_source_material
-    if ([string]$authority.candidate_id -ne "C18" -or
+    $expectedPackageFileCount = [int]$authority.package_source_material.file_count
+    if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$' -or
         [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
-        [int]$packageMaterial.file_count -ne 290 -or
+        [int]$packageMaterial.file_count -ne $expectedPackageFileCount -or
+        [int]$qualificationMaterial.file_count -ne $expectedPackageFileCount -or
         -not (Test-MIRAssurancePackageRootsEqual -ReferenceCommit ([string]$authority.package_source_commit) -DifferenceCommit $qualificationCommit)) {
-      throw "C18 package-source and qualification-source authority self-test failed."
+      throw "Current package-source and qualification-source authority self-test failed."
     }
     $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $Context.candidate
     if ([long]$candidateIdentity.bytes -ne [long]$authority.archive_bytes -or
+        [int]$candidateIdentity.entries -ne [int]$authority.archive_entries -or
         [string]$candidateIdentity.sha256 -ne [string]$authority.archive_sha256 -or
         [string]$candidateIdentity.content_sha256 -ne [string]$authority.package_content_sha256 -or
         (Get-MIRAssurancePackageSourceHash) -ne [string]$authority.package_source_sha256) {
-      throw "C18 candidate, normalized content, and current package-source identities do not match release authority."
+      throw "Current candidate, normalized content, and package-source identities do not match release authority."
     }
     $tamperedMaterial = ($authority.package_source_material | ConvertTo-Json -Depth 20) | ConvertFrom-Json
     if ([string]$tamperedMaterial.hash_algorithm -eq "git-commit-normalized-package-v1") {

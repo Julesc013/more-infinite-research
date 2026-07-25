@@ -3101,6 +3101,21 @@ function Assert-DefaultBaseExtensionDiagnostics {
 
 }
 
+function ConvertTo-MIRScenarioParameterValue {
+  param($Value)
+  if ($Value -is [pscustomobject]) {
+    $table = @{}
+    foreach ($property in $Value.PSObject.Properties) {
+      $table[$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
+    }
+    return $table
+  }
+  if ($Value -is [System.Collections.IList] -and $Value -isnot [string]) {
+    return @($Value | ForEach-Object { ConvertTo-MIRScenarioParameterValue -Value $_ })
+  }
+  return $Value
+}
+
 function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
   param([string]$Context)
 
@@ -3307,7 +3322,9 @@ if ($selectionActive -and -not $checkpointActive) {
           EnabledFixtureNames = @($declaration.fixtures)
           EnableSpaceAge = ($declaration.surface -eq "space-age")
         }
-        foreach ($property in $declaration.settings.PSObject.Properties) { $parameters[$property.Name] = $property.Value }
+        foreach ($property in $declaration.settings.PSObject.Properties) {
+          $parameters[$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
+        }
         $scenarioState = Initialize-RuntimeScenario @parameters
         $scenarioRoot = Split-Path -Parent $scenarioState.SavePath
         $workerData = Join-Path $scenarioRoot "userdata"
@@ -3382,7 +3399,7 @@ if ($selectionActive -and -not $checkpointActive) {
           EnableSpaceAge = ($declaration.surface -eq "space-age")
         }
         foreach ($property in $declaration.settings.PSObject.Properties) {
-          $parameters[$property.Name] = $property.Value
+          $parameters[$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
         }
         Invoke-RuntimeScenario @parameters
         if ($declaration.name -eq "space-age-generation-integrity") {

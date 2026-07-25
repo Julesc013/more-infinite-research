@@ -481,7 +481,7 @@ docs:
     checkpoint_candidate_sha256: C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E
   - path: docs/releases/3.2.0-c19-release-candidate.md
     title: "MIR 3.2.0 C19 Release Candidate"
-    status: current
+    status: historical-checkpoint
     audience: release-manager
     doc_type: how-to
     owner: mir-maintainers
@@ -491,6 +491,19 @@ docs:
       - mir-3.2.0-c19-in-game-playtest-order
       - mir-3.2.0-c18-candidate-scope
       - mir-3.2.0-c18-in-game-playtest-order
+    superseded_by: docs/releases/3.2.0-c20-release-candidate.md
+    checkpoint_source_commit: 62c084dcd6fb5650ac67abcaa50a08ced218b87c
+    checkpoint_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
+  - path: docs/releases/3.2.0-c20-release-candidate.md
+    title: "MIR 3.2.0 C20 Release Candidate"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-c20-candidate-scope
+      - mir-3.2.0-c20-release-artifact
+      - mir-3.2.0-c20-in-game-playtest-order
       - mir-3.2.0-space-age-productivity-membership
       - mir-3.2.0-risk-classification-and-warning-contract
   - path: docs/releases/3.2.0-c15-local-qualification-report.md

@@ -1690,6 +1690,9 @@ if not production_graph_parity or production_graph_parity.schema ~= 2
   or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
   or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
   or type(production_graph_parity.proof_fingerprint) ~= "string"
+  or type(production_graph_parity.replacement_journal_fingerprint) ~= "string"
+  or type(production_graph_parity.replacement_count) ~= "number"
+  or type(production_graph_parity.replacement_graph_requalified) ~= "boolean"
   or type(production_graph_parity.parity_fingerprint) ~= "string" then
   fail("emitted and planned technology graphs do not have exact parity evidence")
 end

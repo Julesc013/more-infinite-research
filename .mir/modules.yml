@@ -363,7 +363,7 @@ mutation_commands:
     - internal CompilationPlan state shares the exact trusted CompilerInput rather than deep-copying immutable snapshot and policy trees
     - compiler-owned immutable records may share one exact reference between context state and the internal artifact index only after their module-private trust authority accepts them; all artifact reads and complete context snapshots remain defensive copies
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
-    - realized graph postconditions compare the live normalized prototype projection field by field against the trusted graph snapshot and reuse its exact authority only after equality while mismatches materialize an independently fingerprinted actual snapshot
+    - realized graph postconditions compare the live normalized prototype projection field by field against the trusted graph snapshot and reuse its exact authority only after equality while declared competitor replacements require an exact frozen mutation journal projection and fresh realized-graph qualification
     - each graph qualification shares one exact trusted passing proof across accepted planned technologies while retaining distinct rejection causality
     - graph researchability consumes a snapshot-owned stable node view and externally owned graph maps remain defensive copies
     - graph qualification establishes one sorted technology name authority for snapshot SCC and reverse-edge construction and shares its freshly owned sorted prerequisite arrays and reverse edges with the immutable graph pipeline
@@ -616,6 +616,7 @@ compiler_context:
     - provider-metrics
     - environment-identity
     - technology-graph-parity
+    - technology-replacement-journal
     - context-services
     - state-epochs
   immutable_process_catalogs:

@@ -341,8 +341,15 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "Better_Robots_Extended",
+          "mir-fixture-assert-base-competitor-transaction"
+        ],
+        "settings": {
+          "BaseMaxLevelOverrides": {
+            "worker-robots-storage": 3
+          }
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1946,7 +1953,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity",
+          "mir-fixture-assert-plates-n-circuit-productivity"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -2651,7 +2661,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "Better_Robots_Extended",
+          "mir-fixture-assert-base-competitor-transaction"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,

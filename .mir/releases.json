@@ -24,24 +24,24 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C19",
+      "candidate_id": "C20",
       "branch": "main",
       "development_branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 1026920,
+      "archive_bytes": 1029464,
       "archive_entries": 290,
-      "package_source_commit": "62c084dcd6fb5650ac67abcaa50a08ced218b87c",
-      "package_source_tree": "0746dc2bce8c4feac0d0f7d6dbdc8d6ffa105d3d",
-      "package_source_sha256": "4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0",
+      "package_source_commit": "303de261629149af5f50bd210368e61423f1a299",
+      "package_source_tree": "cf60e2adab3c61364b94f192b886845e0c3c0642",
+      "package_source_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "0746dc2bce8c4feac0d0f7d6dbdc8d6ffa105d3d",
+        "source_tree": "cf60e2adab3c61364b94f192b886845e0c3c0642",
         "file_count": 290
       },
-      "archive_sha256": "6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6",
-      "package_content_sha256": "4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0",
+      "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+      "package_content_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
       "archive_class": "main-staged-fast-validated-release-candidate",
       "qualification": "fast-static-deterministic-package-and-release-authority-passed",
       "approved_delta": "pending",
@@ -52,7 +52,7 @@
       "release_decision": {
         "decision": "maintainer-directed-fast-stage-then-long-validation-before-tag",
         "recorded_at": "2026-07-25",
-        "package_delta_from_c18": "packaged-changelog-date-only",
+        "package_delta_from_c19": "journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix",
         "fast_validation": "passed",
         "long_validation": "pending",
         "tag": "pending",
@@ -60,17 +60,17 @@
         "artifact_rule": "publish-the-recorded-zip-without-rebuilding"
       },
       "publication_status": "staged-on-main-awaiting-long-validation-tag-and-publication",
-      "status": "c19-main-staged-fast-validation-passed-long-validation-pending",
+      "status": "c20-main-staged-fast-validation-passed-long-validation-pending",
       "supersedes_candidate": {
-        "candidate_id": "C18",
-        "archive_bytes": 1026915,
+        "candidate_id": "C19",
+        "archive_bytes": 1026920,
         "archive_entries": 290,
-        "archive_sha256": "C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E",
-        "package_content_sha256": "1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5",
-        "package_source_commit": "55a57548316729d89482c96dcecd7c65f26c6103",
-        "package_source_tree": "958aae2feeea0a3f6a3a4c1cffc431985c9537a4",
-        "package_source_sha256": "1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5",
-        "reason": "C19 changes only packaged changelog metadata by adding the final 2026-07-25 release date; gameplay, compiler, locale, dependency, and asset inputs remain identical to C18"
+        "archive_sha256": "6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6",
+        "package_content_sha256": "4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0",
+        "package_source_commit": "62c084dcd6fb5650ac67abcaa50a08ced218b87c",
+        "package_source_tree": "0746dc2bce8c4feac0d0f7d6dbdc8d6ffa105d3d",
+        "package_source_sha256": "4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0",
+        "reason": "C20 replaces C19 after long validation exposed an unqualified post-compile prerequisite rewrite and a shadowed competing-productivity preparation table; C19 remains an immutable rejected candidate"
       }
     },
     "factorio-2.0": {

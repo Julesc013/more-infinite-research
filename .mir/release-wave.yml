@@ -301,45 +301,45 @@ waves:
     development_branch: dev
     target_factorio: "2.1"
     source_anchor: mir_3_1_9
-    candidate_id: C19
+    candidate_id: C20
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: release-staged-fast-validated-candidate
-    archive_bytes: 1026920
-    archive_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
-    package_content_sha256: 4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0
-    package_source_sha256: 4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0
-    package_source_commit: 62c084dcd6fb5650ac67abcaa50a08ced218b87c
-    superseded_candidate_id: C18
-    superseded_candidate_sha256: C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E
+    archive_bytes: 1029464
+    archive_sha256: 35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32
+    package_content_sha256: 26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18
+    package_source_sha256: 26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18
+    package_source_commit: 303de261629149af5f50bd210368e61423f1a299
+    superseded_candidate_id: C19
+    superseded_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
     assurance_policy: mir-verification-v4
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     superseded_c16_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c19
+    exact_approved_delta_gate: pending-exact-c20
     superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c19
+    exact_upgrade_gate: pending-exact-c20
     locale_gate: passed-source-current-50-locales-21300-values
-    locale_runtime_gate: pending-exact-c19
+    locale_runtime_gate: pending-exact-c20
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
     superseded_c16_focused_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
     superseded_c16_full_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
-    runtime_performance_gate: pending-exact-c19
-    ecosystem_gate: pending-exact-c19
-    automated_gate: pending-exact-c19
+    runtime_performance_gate: pending-exact-c20
+    ecosystem_gate: pending-exact-c20
+    automated_gate: pending-exact-c20
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
     protected_release_gate: pending
-    interactive_gate: pending-exact-c19
+    interactive_gate: pending-exact-c20
     assurance_seal: pending
     superseded_c18_hosted_branch_policy_gate: passed-run-30155405708
     superseded_c18_hosted_mir_gate: passed-run-30155405710
     maintainer_release_decision: fast-stage-then-long-validation-before-tag
-    package_delta_from_c18: packaged-changelog-date-only
+    package_delta_from_c19: journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix
     release_gate: blocked-long-validation-before-tag
     publication_status: staged-awaiting-long-validation-tag-and-publication
-    status: c19-main-staged-fast-validation-passed-long-validation-pending
+    status: c20-main-staged-fast-validation-passed-long-validation-pending
 
   mir_2_4_0:
     version: "2.4.0"
