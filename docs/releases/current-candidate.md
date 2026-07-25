@@ -19,29 +19,29 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C18` |
+| Candidate | `C19` |
 | Branch | `main` |
-| Package source commit | `55a57548316729d89482c96dcecd7c65f26c6103` |
-| Package source tree | `958aae2feeea0a3f6a3a4c1cffc431985c9537a4` |
-| Package source SHA-256 | `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5` |
+| Package source commit | `62c084dcd6fb5650ac67abcaa50a08ced218b87c` |
+| Package source tree | `0746dc2bce8c4feac0d0f7d6dbdc8d6ffa105d3d` |
+| Package source SHA-256 | `4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1026915` |
+| Archive bytes | `1026920` |
 | Archive entries | `290` |
-| Archive SHA-256 | `C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E` |
-| Package content SHA-256 | `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5` |
-| Qualification | `quick-static-locale-package-targeted-space-age-runtime-and-hosted-ci-passed` |
-| Publication | `staged-on-main-awaiting-tag-and-publication` |
-| Status | `c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions` |
+| Archive SHA-256 | `6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6` |
+| Package content SHA-256 | `4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0` |
+| Qualification | `fast-static-deterministic-package-and-release-authority-passed` |
+| Publication | `staged-on-main-awaiting-long-validation-tag-and-publication` |
+| Status | `c19-main-staged-fast-validation-passed-long-validation-pending` |
 
 ## Superseded candidate
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C17` |
-| Package source commit | `d301a3a8ba66bb45a24a55e24c51e3779600fd68` |
-| Archive bytes | `1025248` |
-| Archive entries | `289` |
-| Archive SHA-256 | `57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D` |
-| Reason | C17 preserved C16's performance correction and enabled every shipped technology toggle by default; C18 intentionally changes package bytes to add bounded Space Age nutrients and capture bot rocket productivity, extend Landfill productivity to ice and space platforms, and prove pentapod egg coverage in Breeding productivity |
+| Candidate | `C18` |
+| Package source commit | `55a57548316729d89482c96dcecd7c65f26c6103` |
+| Archive bytes | `1026915` |
+| Archive entries | `290` |
+| Archive SHA-256 | `C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E` |
+| Reason | C19 changes only packaged changelog metadata by adding the final 2026-07-25 release date; gameplay, compiler, locale, dependency, and asset inputs remain identical to C18 |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

@@ -15,7 +15,7 @@ Updated: 2026-07-25
 
 ## Current 3.2 Release Roles
 
-Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. Exact MIR `3.2.0` C18 is staged on `main` for tag and publication while `dev` remains its development source. After publication, emergency package corrections use `3.2.1`; otherwise `dev` advances through compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation toward `3.2.5`. MIR `2.5.0` is then derived on `tmp/2.0` from the final stabilized `3.2.5` source, not independently reimplemented from an old `tmp/2.0` state. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
+Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. Exact MIR `3.2.0` C19 is staged on `main` for long validation, tag, and publication while `dev` remains its development source. After publication, emergency package corrections use `3.2.1`; otherwise `dev` advances through compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation toward `3.2.5`. MIR `2.5.0` is then derived on `tmp/2.0` from the final stabilized `3.2.5` source, not independently reimplemented from an old `tmp/2.0` state. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
 
 The locked modern-to-backport sequence is:
 
@@ -88,7 +88,7 @@ Use these branch roles during the transition:
 
 | Branch or worktree | Role | New release line |
 | --- | --- | ---: |
-| `main` | Stable canonical Factorio `2.1` line; exact C18 is staged here for the 3.2.0 tag and publication. | `3.x.x` after `3.0.0` |
+| `main` | Stable canonical Factorio `2.1` line; exact C19 is staged here for 3.2.0 long validation, tag, and publication. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line; advances to 3.2.5 after 3.2.0 publication. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
 | `tmp/2.0` | Maintained Factorio `2.0` semantic companion derived from final portable 3.2.5 source plus explicit 2.0 adapters. | Unreleased `2.5.0` from published `2.4.9`. |

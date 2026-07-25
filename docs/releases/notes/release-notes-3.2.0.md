@@ -14,9 +14,9 @@ superseded_by: []
 
 ## Release artifact
 
-MIR 3.2.0 uses exact C18 package-source commit `55a57548316729d89482c96dcecd7c65f26c6103`. The release archive is `dist/more-infinite-research_3.2.0.zip`: 1,026,915 bytes, 290 entries, and SHA-256 `C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E`. Its normalized package-content and package-source SHA-256 is `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5`. Publish this recorded ZIP without rebuilding it, then verify every downloaded public copy against the archive hash.
+MIR 3.2.0 uses exact C19 package-source commit `62c084dcd6fb5650ac67abcaa50a08ced218b87c`. The release archive is `dist/more-infinite-research_3.2.0.zip`: 1,026,920 bytes, 290 entries, and SHA-256 `6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6`. Its normalized package-content and package-source SHA-256 is `4D5D05A0225D3F2AA322EC418A8975BF48C949B4AC2B053B4956B5EE217641D0`. Publish this recorded ZIP without rebuilding it, then verify every downloaded public copy against the archive hash.
 
-The maintainer selected C18 for `main` staging after deterministic builds, static validation, a targeted exact Space Age runtime, and hosted Branch Policy and MIR validation passed. Full exact-C18 no-reuse, approved-delta, upgrade, ecosystem/performance, schema-2 manual, protected qualification, and seal work was not completed; those omissions are recorded as explicit assurance exceptions rather than passes.
+The maintainer selected C19 for `main` staging after fresh release-authority, documentation, static, composition, and deterministic-package validation. C19 changes only the packaged changelog date from C18. Longer exact-C19 validation is run and recorded separately before tagging; superseded C18 runtime and hosted results are not relabelled as exact C19 evidence.
 
 MIR 3.2.0 is a release-engineering overhaul built from the MIR 3.1.9 line plus the portable target-capability guard accumulated on `dev`. It introduces persistent content-addressed test evidence so unchanged scenarios can reuse exact prior proof while changed package, gameplay, settings, migration, fixture, harness, binary, and dependency inputs rerun the lanes they affect.
 

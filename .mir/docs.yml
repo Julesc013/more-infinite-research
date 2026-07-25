@@ -471,11 +471,24 @@ docs:
     checkpoint_candidate_sha256: 57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D
   - path: docs/releases/3.2.0-c18-space-age-productivity-playtest.md
     title: "MIR 3.2.0 C18 Space Age Productivity Playtest Candidate"
-    status: current
+    status: historical-checkpoint
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c19-release-candidate.md
+    checkpoint_source_commit: 55a57548316729d89482c96dcecd7c65f26c6103
+    checkpoint_candidate_sha256: C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E
+  - path: docs/releases/3.2.0-c19-release-candidate.md
+    title: "MIR 3.2.0 C19 Release Candidate"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
     source_of_truth_for:
+      - mir-3.2.0-c19-candidate-scope
+      - mir-3.2.0-c19-release-artifact
+      - mir-3.2.0-c19-in-game-playtest-order
       - mir-3.2.0-c18-candidate-scope
       - mir-3.2.0-c18-in-game-playtest-order
       - mir-3.2.0-space-age-productivity-membership
