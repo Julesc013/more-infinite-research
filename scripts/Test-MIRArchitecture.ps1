@@ -433,8 +433,8 @@ foreach ($needle in @(
   'require("prototypes.mir.pipeline.compiler_orchestrator").compile(context)',
   'require("prototypes.mir.pipeline.compiler_orchestrator").apply_streams(context)',
   'require("prototypes.mir.pipeline.compiler_orchestrator").apply_base_extensions(context)',
-  'require("prototypes.mir.pipeline.mutations.competing_productivity").apply()',
-  'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply()',
+  'require("prototypes.mir.pipeline.mutations.competing_productivity").apply(context)',
+  'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply(context)',
   'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
   'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
@@ -443,7 +443,8 @@ foreach ($needle in @(
   'effect_safety.assert_current_target_inventory(target_inventory)',
   'target_inventory = target_inventory',
   'effect_safety.assert_registered_technology_effects(target_inventory)',
-  '.assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))',
+  '.assert_registered_technologies(',
+  'require("prototypes.mir.pipeline.compiler_orchestrator").compile(context), replacement_journal)',
   'context:record_artifact("technology_graph_parity", graph_parity)',
   'require("prototypes.mir.pipeline.compiler_orchestrator").publish(context)',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
@@ -663,7 +664,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lu
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies)'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle 'actual_snapshot = graph_snapshot.new(actual_technologies)'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "graph_diff.compare(expected.graph_snapshot, actual_snapshot)"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "expected.graph_fingerprint, actual_snapshot.graph_fingerprint"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "comparison_snapshot.graph_fingerprint, actual_snapshot.graph_fingerprint"
 $graphDiffText = Read-MIRFile -RelativePath "prototypes/mir/graph/diff.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/graph/diff.lua" -Text $graphDiffText -Needle '.same(expected, actual)'
 
