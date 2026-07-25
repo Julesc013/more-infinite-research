@@ -445,6 +445,7 @@ fixtures:
       - cost-growth-override
       - research-time-override
       - finite-max-level-override
+      - target-line-compatible-mir-dependency-floor
       - infinite-max-level-default
       - effect-per-level-override
       - combined-owner-override
