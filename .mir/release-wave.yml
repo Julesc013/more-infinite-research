@@ -410,8 +410,8 @@ waves:
     size_bytes: 1029640
     entries: 290
     archive_class: automated-playtest-candidate
-    release_gate: deterministic-package-passed-focused-runtime-pending
+    release_gate: targeted-15-of-15-passed-full-no-reuse-pending
     manual_review: pending
     protected_qualification: pending
     publication_status: unreleased
-    status: automated-playtest-candidate-c20-projection-focused-validation-pending
+    status: automated-playtest-candidate-c20-projection-targeted-passed

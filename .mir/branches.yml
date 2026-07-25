@@ -380,9 +380,9 @@ release_artifacts:
       package_content_sha256: 6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3
       archive_bytes: 1029640
       archive_entries: 290
-      release_gate: deterministic-package-passed-focused-runtime-pending
+      release_gate: targeted-15-of-15-passed-full-no-reuse-pending
       publication_status: unreleased
-      status: automated-playtest-candidate-c20-projection-focused-validation-pending
+      status: automated-playtest-candidate-c20-projection-targeted-passed
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

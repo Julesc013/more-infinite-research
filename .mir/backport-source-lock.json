@@ -56,8 +56,8 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "pending-exact-p6",
-    "runtime": "pending-exact-p6",
+    "target_static": "passed-exact-p6",
+    "runtime": "targeted-15-of-15-passed-exact-p6",
     "manual_review": "pending",
     "protected_qualification": "pending",
     "publication": "unreleased"
