@@ -629,7 +629,10 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-capability-negative-cases",
+          "mir-fixture-assert-capability-negative-cases"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,

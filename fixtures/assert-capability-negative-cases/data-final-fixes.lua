@@ -34,13 +34,18 @@ local compiler_context = require("__more-infinite-research__.prototypes.mir.pipe
 
 local expected_hard = {
   ["mir-hidden-placeable-machine"] = "hidden_internal",
-  ["mir-parameter-placeable-machine"] = "parameter_recipe",
   ["mir-productivity-disabled-machine"] = "productivity_disabled",
   ["mir-zero-cap-placeable-machine"] = "zero_productivity_cap",
   ["mir-recycling-placeable-machine"] = "recycling_loop",
   ["mir-self-return-placeable-machine"] = "catalyst_or_self_return",
   ["mir-nondeterministic-placeable-machine"] = "non_deterministic_output",
   ["mir-ambiguous-placeable-machine"] = "ambiguous_placeable_output"
+}
+local expected_fact_only = {
+  -- Parameter recipes cannot own concrete results in Factorio 2.1, so this
+  -- prototype proves canonical risk classification without pretending it can
+  -- also be a concrete placeable-output family candidate.
+  ["mir-parameter-placeable-machine"] = "parameter_recipe"
 }
 local expected_review = {
   ["mir-voiding-placeable-machine"] = "voiding_or_destruction",
@@ -66,6 +71,17 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
       or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
       or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose" then
       error("MIR hard RecipeRiskFact was not enforced by the family planner: " .. recipe_name .. "/" .. expected)
+    end
+  end
+  for recipe_name, expected in pairs(expected_fact_only) do
+    local risk = risk_facts.view(recipe_name)
+    local decision = decisions[recipe_name]
+    if not risk or not contains(risk.hard_flags, expected) then
+      error("MIR hard RecipeRiskFact was not classified: " .. recipe_name .. "/" .. expected)
+    end
+    if decision and (decision.risk_fingerprint ~= risk.risk_fingerprint
+      or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose") then
+      error("MIR parameter RecipeRiskFact reached planning without hard rejection: " .. recipe_name)
     end
   end
   for recipe_name, expected in pairs(expected_review) do

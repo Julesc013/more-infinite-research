@@ -128,12 +128,20 @@ local function add_placeable_risk(name, recipe_options, ingredients, results)
   local entity = machine_entity(name)
   if entity then table.insert(prototypes, entity) end
   table.insert(prototypes, item(name, name))
-  table.insert(prototypes, recipe(
+  local recipe_prototype = recipe(
     name,
     ingredients or {{type = "item", name = "iron-plate", amount = 1}},
     results or {{type = "item", name = name, amount = 1}},
     recipe_options
-  ))
+  )
+  -- Factorio 2.1 parameter recipes are templates and cannot own concrete
+  -- ingredients or results. Keep the prototype engine-valid while preserving
+  -- the parameter flag that MIR must classify as a hard risk.
+  if recipe_prototype.parameter == true then
+    recipe_prototype.ingredients = nil
+    recipe_prototype.results = nil
+  end
+  table.insert(prototypes, recipe_prototype)
 end
 
 add_placeable_risk("mir-hidden-placeable-machine", {hidden = true})
@@ -151,7 +159,7 @@ add_placeable_risk(
   "mir-nondeterministic-placeable-machine",
   {},
   nil,
-  {{type = "item", name = "mir-nondeterministic-placeable-machine", amount = 1, probability = 0.5}}
+  {{type = "item", name = "mir-nondeterministic-placeable-machine", amount = 1, independent_probability = 0.5}}
 )
 add_placeable_risk(
   "mir-ambiguous-placeable-machine",

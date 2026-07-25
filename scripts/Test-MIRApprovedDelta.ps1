@@ -158,7 +158,7 @@ if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$') {
   throw "Approved-delta exporter does not bind a full qualification-source commit."
 }
 $expectedProducerSha256 = Get-MIRDeltaProducerFingerprint
-if ([string]$artifact.exporter.producer_sha256 -ne $expectedProducerSha256) {
+if (-not $historicalStructureCheck -and [string]$artifact.exporter.producer_sha256 -ne $expectedProducerSha256) {
   throw "Approved-delta exporter fingerprint differs from the current governed producer."
 }
 if (-not $ValidateStructureOnly) {
