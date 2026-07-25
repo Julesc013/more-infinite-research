@@ -24,9 +24,11 @@ $modern = $ledger.development."factorio-2.1"
 $backport = $ledger.development."factorio-2.0"
 $publishedModern = $ledger.published_baselines."factorio-2.1"
 $publishedBackport = $ledger.published_baselines."factorio-2.0"
-if ([string]$publishedModern.mir_version -ne "3.1.9" -or [string]$publishedModern.tag -ne "3.1.9" -or
+if ([string]$publishedModern.mir_version -ne "3.2.0" -or [string]$publishedModern.tag -ne "3.2.0" -or
+    [string]$publishedModern.tag_commit -ne "c8f3d8248cc89b8636cf1ee485fd8889422c6124" -or
+    [string]$publishedModern.archive_sha256 -ne "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32" -or
     [string]$publishedModern.status -ne "published-frozen") {
-  throw "Canonical Factorio 2.1 published baseline must remain immutable MIR 3.1.9."
+  throw "Canonical Factorio 2.1 published baseline must remain immutable MIR 3.2.0."
 }
 if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBackport.tag -ne "2.4.9" -or
     [string]$publishedBackport.archive -ne "dist/more-infinite-research_2.4.9.zip" -or
@@ -35,26 +37,26 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
 }
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "main" -or
     [string]$modern.development_branch -ne "dev" -or
-    [string]$modern.archive_class -ne "main-staged-fast-validated-release-candidate" -or
-    [string]$modern.qualification -ne "fast-static-deterministic-package-and-release-authority-passed" -or
+    [string]$modern.archive_class -ne "tagged-published-immutable" -or
+    [string]$modern.qualification -ne "maintainer-published-after-fast-validation-with-long-gates-not-recorded" -or
     [string]$modern.approved_delta -ne "pending" -or
     [string]$modern.upgrade_qualification -ne "pending" -or
     [string]$modern.runtime_qualification -ne "pending" -or
     [string]$modern.manual_review -ne "pending" -or
     [string]$modern.protected_qualification -ne "pending" -or
-    [string]$modern.publication_status -ne "staged-on-main-awaiting-long-validation-tag-and-publication" -or
-    [string]$modern.status -ne "c20-main-staged-fast-validation-passed-long-validation-pending") {
-  throw "Canonical modern release must remain exact MIR 3.2.0 C20 staged on main after fast validation with long validation pending."
+    [string]$modern.publication_status -ne "published-github-asset-verified" -or
+    [string]$modern.status -ne "published-frozen") {
+  throw "Canonical modern release must remain exact published MIR 3.2.0 C20 with recorded assurance exceptions."
 }
-if ([string]$modern.release_decision.decision -ne "maintainer-directed-fast-stage-then-long-validation-before-tag" -or
+if ([string]$modern.release_decision.decision -ne "maintainer-published-exact-c20-after-fast-validation" -or
     [string]$modern.release_decision.recorded_at -ne "2026-07-25" -or
     [string]$modern.release_decision.package_delta_from_c19 -ne "journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix" -or
     [string]$modern.release_decision.fast_validation -ne "passed" -or
-    [string]$modern.release_decision.long_validation -ne "pending" -or
-    [string]$modern.release_decision.tag -ne "pending" -or
-    [string]$modern.release_decision.publication -ne "pending" -or
+    [string]$modern.release_decision.long_validation -ne "not-completed-before-publication" -or
+    [string]$modern.release_decision.tag -ne "published-3.2.0-at-c8f3d8248cc89b8636cf1ee485fd8889422c6124" -or
+    [string]$modern.release_decision.publication -ne "github-published-and-asset-digest-verified" -or
     [string]$modern.release_decision.artifact_rule -ne "publish-the-recorded-zip-without-rebuilding") {
-  throw "Canonical C20 staging decision must require fresh long validation before tag and publication."
+  throw "Canonical C20 publication decision and assurance exceptions changed."
 }
 $c20Authority = [ordered]@{
   candidate_id = "C20"
@@ -115,9 +117,9 @@ if ([string]$superseded.candidate_id -ne "C19" -or [long]$superseded.archive_byt
   throw "C20 must retain the complete immutable C19 authority as its superseded candidate."
 }
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
-    [string]$backport.source_anchor -ne "3.2.5-final-source-freeze" -or
-    [string]$backport.status -ne "planned-after-3.2.5-freeze" -or $null -ne $backport.archive) {
-  throw "Canonical Factorio 2.0 backport must remain unbuilt MIR 2.5.0 after the final 3.2.5 source freeze."
+    [string]$backport.source_anchor -ne "3.2.0-final-source-freeze" -or
+    [string]$backport.status -ne "backport-authorized-from-3.2.0" -or $null -ne $backport.archive) {
+  throw "Canonical Factorio 2.0 backport must remain unbuilt MIR 2.5.0 authorized from final 3.2.0 source."
 }
 
 $branches = Read-MIRText ".mir/branches.yml"
@@ -138,7 +140,7 @@ foreach ($required in @(
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*303de261629149af5f50bd210368e61423f1a299\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_2_5_0:\s*$'},
-  @{Path="todo.md"; Text=$todo; Pattern='Exact C20 is staged on `main` for the MIR 3\.2\.0 tag and publication'},
+  @{Path="todo.md"; Text=$todo; Pattern='Exact C20 was tagged and published as MIR 3\.2\.0 from `main`'},
   @{Path="todo.md"; Text=$todo; Pattern='governed C10 compiler contract-closure overhaul from the unqualified C9 foundation'},
   @{Path="todo.md"; Text=$todo; Pattern='exact-singleton candidate-seed ambiguity defect as C11'},
   @{Path="todo.md"; Text=$todo; Pattern='freeze C12 without widening the technology set'},
@@ -171,12 +173,12 @@ foreach ($forbiddenVersion in @("1.9.5", "2.5.0")) {
   }
 }
 $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.0" })
-if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "release-staged-fast-validated-candidate" -or
+if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "tagged" -or
     [string]$candidateRows[0].path -ne [string]$modern.archive -or
     [long]$candidateRows[0].bytes -ne [long]$modern.archive_bytes -or
     [string]$candidateRows[0].sha256 -ne [string]$modern.archive_sha256 -or
-    [string]$candidateRows[0].source_ref -ne [string]$modern.package_source_commit) {
-  throw "The tracked MIR 3.2.0 release-staged distribution must exactly mirror canonical candidate authority."
+    [string]$candidateRows[0].source_ref -ne "3.2.0") {
+  throw "The tracked MIR 3.2.0 tagged distribution must exactly mirror canonical release authority."
 }
 
 Write-Host "[ok] canonical release ledger and branch, wave, distribution, queue, and promotion views agree."

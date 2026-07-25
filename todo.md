@@ -1,22 +1,22 @@
 # M.I.R. TODO
 
-Updated: 2026-07-25
+Updated: 2026-07-26
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
 ## Current Truth
 
-- MIR 3.1.9 is the immutable Factorio 2.1 release; MIR 2.4.9 is the immutable Factorio 2.0 companion.
+- MIR 3.2.0 is the immutable Factorio 2.1 release; MIR 2.4.9 remains the immutable Factorio 2.0 companion until 2.5.0 qualifies.
 - MIR 1.9.4 and 1.8.2 are the immutable Factorio 1.1 and 1.0 releases.
 - MIR 1.7.1 through 1.3.0 are published reduced or finite target projections for Factorio 0.17 through 0.13.
 - MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
 - The modern `dev` root contains every accepted portable code, data, fixture, validation, documentation, determinism, process-lifecycle, and package-governance return from those target lines, including the completed 2.4.9 campaign.
 - Complete immutable source snapshots for published campaign versions remain under `.mir/target-lines/<version>/`, but active validation and assurance fingerprints exclude those archival trees unless the dedicated snapshot-integrity gate is running.
-- The 45 tracked root distribution paths are bound by `.mir/distributions.json`: 44 tagged releases plus the exact MIR 3.2.0 C20 release-staged candidate. The nonexistent 1.9.5 and not-yet-built final 2.5.0 archives are not distribution entries.
+- The 45 tracked root distribution paths are bound by `.mir/distributions.json`: all 45 are tagged releases. The nonexistent 1.9.5 and not-yet-built 2.5.0 archives are not distribution entries.
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
-- Exact C20 is staged on `main` for the MIR 3.2.0 tag and publication after longer validation. After publication, `dev` advances toward MIR 3.2.5; MIR 2.5.0 begins from the 2.4.9 baseline only after the final canonical 3.2.5 source freezes.
-- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. C16 is the exact fully automated checkpoint after C15 correctly failed the governed fixed-cost performance gate. C17 preserves the deliberate risk-default settings change. C18 adds the final Space Age productivity scope. C19 adds the packaged changelog date and remains an immutable rejected candidate after its long run exposed a prerequisite-rewire graph mismatch. C20 is the current main-staged candidate; focused and fast validation pass, while longer exact-C20 validation remains pending before tag.
+- Exact C20 was tagged and published as MIR 3.2.0 from `main`. Its GitHub asset digest matches the immutable recorded ZIP; the longer, manual, protected, and seal gates were not completed before maintainer-directed publication and remain recorded as assurance exceptions rather than passes.
+- `dev` now advances toward MIR 3.2.5. MIR 2.5.0 begins immediately from immutable MIR 2.4.9 and projects the final 3.2.0 semantics through the Factorio 2.0 capability profile; MIR 2.5.5 will later project the frozen portable 3.2.5 delta.
 
 ## Consolidation Gate
 
@@ -103,13 +103,14 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Preserve C19 as rejected evidence after its long validation exposed the post-compile prerequisite-rewire graph mismatch.
 - [x] Create C20 from C19 by journal-verifying competing technology rewires, freshly qualifying the realized graph, and fixing competing-productivity preparation.
 - [x] Run focused replacement, rollback, multi-replacement, Base integrity, static, documentation, composition, and deterministic-package validation for exact C20.
-- [ ] Run the longer exact-C20 validation campaign and record its result in a separate `main` authority commit.
-- [ ] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify every public download against the canonical archive SHA-256.
+- [x] Record that the longer exact-C20 validation campaign was not completed before maintainer-directed publication; do not relabel earlier candidate evidence as exact C20 evidence.
+- [x] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify the GitHub asset digest against the canonical archive SHA-256.
 - [ ] Reserve MIR 3.2.1 for an emergency package-level correction; otherwise return `dev` to the MIR 3.2.5 compiler, compatibility, tuning, and reviewed-promotion campaign.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
-- [ ] Freeze canonical 3.2.5 source before creating the final 2.5.0 backport candidate.
+- [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.0 semantics through explicit Factorio 2.0 capability adapters.
+- [ ] Freeze canonical 3.2.5 source before projecting its portable delta into MIR 2.5.5.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.
 - [ ] Preserve 3.1.9 behavior and stable identities unless a new release plan explicitly authorizes a change.
