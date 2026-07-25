@@ -4,6 +4,6 @@
   "title": "MIR Fixture - Assert Scripted Runtime Lifecycle",
   "author": "MIR maintainers",
   "factorio_version": "2.0",
-  "dependencies": ["base >= 2.0.77", "space-age >= 2.0.77", "more-infinite-research >= 3.1.0"],
+  "dependencies": ["base >= 2.0.77", "space-age >= 2.0.77", "more-infinite-research >= 2.5.0"],
   "description": "Exercises MIR scripted effects across levels, reversal, reset, forces, rebasing, save/load, and restoration."
 }
