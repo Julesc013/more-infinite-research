@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Kísérleti és alapértelmezés szerint le van tiltva a 2.1.0-s verzióban. Ez egy globális/térkép-szintű script-effektus. A meglévő elrontható verem viselkedés nem érvényesíthető a kézi ellenőrzésig.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Kockázatos technológia. Alapértelmezés szerint engedélyezve. Globális/térkép-szintű script-effektusa megváltoztathatja a romlási időzítést; a meglévő elrontható kötegek megtarthatják a jelenlegi határidőket az újjáépítésig vagy újraérvényesítésig. A mentés betöltése előtt tiltsa le, ha a meglévő romlási időzítés megőrzése kritikus fontosságú.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Alapértelmezés szerint le van tiltva. A megnövelt betétkapacitás megszakíthatja az áramkör által vezérelt betéteket, és csökkentheti a motor optimalizálását.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Kockázatos technológia. Alapértelmezés szerint engedélyezve. A beszúró többletkapacitása megváltoztatja a kézi kötegek számát, megtörheti az áramkör által vezérelt beszúró feltevéseket és tervrajzokat, és csökkentheti a motor optimalizálását. A mentés betöltése előtt tiltsa le, ha a beszúró pontos viselkedése változatlan marad.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Kockázatos technológia. Alapértelmezés szerint engedélyezve. Ennek kutatása megváltoztathatja a meglévő gyári vagy tervrajzi viselkedést. Tekintse át a technológia-specifikus hatásokat, és tiltsa le a mentés betöltése előtt, ha a pontos viselkedés nem változik.",
       "provenance": "machine-assisted"
     },
     {

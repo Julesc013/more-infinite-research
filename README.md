@@ -30,7 +30,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
+- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are enabled by default. Spoilage preservation remains explicitly classified as factory-disruptive, stays at the top of the settings list, and warns that existing spoilable stacks may retain their current deadlines; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 - **Conservative 3.2 scope:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
@@ -238,11 +238,11 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-Spoilage preservation remains disabled by default. Agricultural growth speed is enabled by default after event-path coverage, but its bounded first slice applies only to newly planted agricultural tower crops. Stronger existing-save, reversal, disabling, and multi-force claims still require the named manual save matrix.
+Spoilage preservation and agricultural growth speed are enabled by default. Spoilage preservation remains a factory-disruptive risky technology because its global effect can alter factory timing while existing spoilable stacks may retain current deadlines. Its risk classification, first-bucket settings order, and automatic tooltip warning are independent of its enable default. Agricultural growth speed's bounded first slice applies only to newly planted agricultural tower crops. Stronger existing-save, reversal, disabling, and multi-force claims still require the named manual save matrix.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
-| `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age and spoilage; its research cost includes space, agricultural, and cryogenic science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
+| `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Enabled by default but classified as factory-disruptive and automatically warned. Requires Space Age and spoilage; its research cost includes space, agricultural, and cryogenic science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Enabled by default as a special Space Age technology. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when no effect-proven infinite `research-productivity` or `laboratory-productivity-4` lab-productivity owner is present, so existing native lab-productivity owners keep their chain. Uses Military science pack technology art as the base-game icon. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses the unloading bay unlock technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
@@ -281,7 +281,7 @@ Recommended default:
 
 - Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
-- Spoilage preservation stays disabled by default; agricultural growth speed is enabled for newly planted tower crops.
+- Spoilage preservation and agricultural growth speed are enabled by default; spoilage remains risk-classified and both settings and technology tooltips warn about its existing-save behavior.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Conservative setup:
@@ -367,7 +367,7 @@ This effective-default table is generated from `prototypes/mir/settings/defaults
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | ---: | ---: | ---: | --- |
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
-| `research_spoilage_preservation` | No | `50000` | `1.5` | `120` | Infinite |
+| `research_spoilage_preservation` | Yes | `50000` | `1.5` | `120` | Infinite |
 | `research_agricultural_growth_speed` | Yes | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | Yes | `8000` | `1.10` | `60` | Infinite |
 | `research_robot_battery` | Yes | `8000` | `1.2` | `60` | Infinite |

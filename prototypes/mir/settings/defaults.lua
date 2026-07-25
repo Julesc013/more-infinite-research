@@ -10,14 +10,11 @@ local defaults = {
   -- Per-stream overrides. Add, remove, or modify entries as needed.
   streams = {
     research_spoilage_preservation = {
-      enabled = false,
+      enabled = true,
       base_cost = 50000,
       growth_factor = 1.5,
       research_time = 120,
-      max_level = 0,
-      settings_note = {
-        "mod-setting-description.mir-note-experimental-spoilage"
-      }
+      max_level = 0
     },
     research_agricultural_growth_speed = {
       enabled = true,
@@ -162,7 +159,7 @@ local defaults = {
     },
     ["inserter-capacity-bonus"] = {
       manifest_id = "base-continuation/inserter-capacity-bonus",
-      enabled = false,
+      enabled = true,
       settings_priority = "top",
       max_level = 0,
       base_cost = 200,
@@ -170,8 +167,12 @@ local defaults = {
       research_time = 60,
       non_bulk_increment = 2,
       bulk_increment = 4,
-      settings_note = {
-        "mod-setting-description.mir-note-inserter-capacity"
+      technology_risk = {
+        class = "factory-disruptive",
+        reason = "inserter-hand-stack-and-circuit-behavior",
+        tooltip_note = {
+          "mod-setting-description.mir-note-inserter-capacity"
+        }
       },
       science_packs = "inherit",
       add_science_packs = {

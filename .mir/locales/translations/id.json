@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Eksperimental dan dinonaktifkan secara default di v2.1.0. Ini adalah efek skrip global/seluruh peta. Perilaku tumpukan rusak yang ada tidak diklaim hingga divalidasi secara manual.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Teknologi berisiko. Diaktifkan secara default. Efek skrip global/seluruh peta dapat mengubah waktu pembusukan; tumpukan yang sudah rusak dapat mempertahankan tenggat waktu saat ini sampai dibangun kembali atau divalidasi ulang. Nonaktifkan sebelum memuat simpanan jika mempertahankan waktu pembusukan yang ada sangat penting.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Dinonaktifkan secara bawaan. Kapasitas inserter ekstra dapat merusak inserter yang dikontrol sirkuit dan mengurangi optimalisasi mesin.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Teknologi berisiko. Diaktifkan secara default. Kapasitas inserter ekstra mengubah jumlah tumpukan tangan, dapat merusak asumsi dan cetak biru inserter yang dikontrol sirkuit, dan dapat mengurangi optimalisasi mesin. Nonaktifkan sebelum memuat penyimpanan jika perilaku penyisipan yang tepat harus tetap tidak berubah.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Teknologi berisiko. Diaktifkan secara default. Menelitinya dapat mengubah perilaku pabrik atau cetak biru yang ada. Tinjau efek khusus teknologi dan nonaktifkan sebelum memuat penyimpanan jika perilaku sebenarnya tidak boleh diubah.",
       "provenance": "machine-assisted"
     },
     {

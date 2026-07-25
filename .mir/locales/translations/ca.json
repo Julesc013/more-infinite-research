@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Experimental i desactivat per defecte a la v2.1.0. Aquest és un efecte de guió global/de tot el mapa. El comportament de la pila spoilable existent no es reclama fins que no es valida manualment.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Tecnologia de risc. Habilitat per defecte. El seu efecte de guió global/a tot el mapa pot canviar el temps de deteriorament; Les piles en mal estat existents poden mantenir els terminis actuals fins que es reconstrueixin o es revalidin. Desactiveu-lo abans de carregar un desat si és fonamental preservar el temps de deteriorament existent.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Desactivat per defecte. La capacitat d'inserció addicional pot trencar els inseridors controlats per circuits i reduir les optimitzacions del motor.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Tecnologia de risc. Habilitat per defecte. La capacitat addicional de l'inseridor canvia el recompte de la pila manual, pot trencar els supòsits i els plànols d'inserció controlats per circuits i pot reduir les optimitzacions del motor. Desactiveu-lo abans de carregar un desat si el comportament exacte de la inserció no ha de canviar.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Tecnologia de risc. Habilitat per defecte. Investigar-lo pot canviar el comportament de fàbrica o plànol existent. Reviseu els efectes específics de la tecnologia i desactiveu-los abans de carregar un desat si el comportament exacte no ha de canviar.",
       "provenance": "machine-assisted"
     },
     {

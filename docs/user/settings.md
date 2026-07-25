@@ -59,7 +59,7 @@ Leaving the settings at their defaults preserves the final existing technology e
 
 MIR preserves recognized native and MIR exponential formula styles when applying cost changes. If another mod supplies a formula MIR cannot safely interpret, defaults still preserve it, but an explicit base-cost or growth override is rejected and reported rather than approximated. Changes are startup settings and require a restart.
 
-Visible generated technology settings are ordered so default-off rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group when Space Age is active. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
+Visible generated technology settings are ordered by explicit attention policy: factory-disruptive risky rows come first, other default-off rows come next, enabled special rows follow, and ordinary enabled rows come last. Spoilage preservation and inserter capacity bonus are enabled by default but remain in the first bucket because their risk classification is independent of enablement. MIR automatically appends their governed risk warning to the enable-setting tooltip and emitted technology description unless that exact localized warning is already present. Disable either technology before loading a save when preserving existing spoilage timing, inserter hand-stack counts, circuit behavior, or blueprint assumptions matters.
 
 ## Prototype Limit Settings
 

@@ -91,6 +91,7 @@ function Assert-NoPatternInTree {
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
 $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
 $streamDescriptorText = Read-MIRText -RelativePath "prototypes/mir/domain/streams/descriptor.lua"
+$technologyRiskText = Read-MIRText -RelativePath "prototypes/mir/domain/technology/technology_risk.lua"
 $catalogText = Read-MIRText -RelativePath "prototypes/mir/settings/catalog.lua"
 $settingOrderText = Read-MIRText -RelativePath "prototypes/mir/settings/order.lua"
 $prototypeLimitSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/prototype_limits.lua"
@@ -140,7 +141,9 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "runtime_export_writes_script_output_only: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "inactive_official_dlc_technology_settings_are_hidden_but_registered: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "experimental_automatic_family_settings_are_hidden_until_reviewed: true"
-Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_three_attention_buckets: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_four_attention_buckets: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_risk_is_independent_of_default_enablement: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "risky_technology_tooltips_are_decorated_automatically: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "canonical_settings_catalog_required: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "profile_import_validates_catalog_constraints: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "settings_profiles_support_compact_export: true"
@@ -218,7 +221,9 @@ Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catal
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("diagnostics", 10)'
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 10)'
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 40)'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if not group.enabled then return "000" end'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local risk_rank = technology_risk.settings_rank(group.technology_risk)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if risk_rank then return risk_rank end'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if not group.enabled then return "025" end'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if group.settings_priority == "top" then return "050" end'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'return "100"'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'return setting_order.technology(bucket, order_slug(group.sort_name), group.kind, group.key)'
@@ -232,13 +237,18 @@ if (-not $isReducedLegacyLine) {
 }
 Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_character_reach\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
 if (-not $isReducedLegacyLine) {
-  Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false'
+  Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*true'
+  Assert-Matches -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Pattern '(?s)research_spoilage_preservation\s*=\s*\{.*?technology_risk\s*=\s*\{.*?class\s*=\s*"factory-disruptive"'
 } else {
   Assert-NoPattern -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern 'research_spoilage_preservation\s*='
   Assert-NoPattern -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern 'research_agricultural_growth_speed\s*='
   Assert-NoPattern -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern 'research_cargo_(bay_unloading_distance|landing_pad_count)\s*='
 }
-Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*false.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*true.*?technology_risk\s*=\s*\{.*?class\s*=\s*"factory-disruptive"'
+Assert-Contains -RelativePath "prototypes/mir/domain/technology/technology_risk.lua" -Text $technologyRiskText -Needle '["factory-disruptive"]'
+Assert-Contains -RelativePath "prototypes/mir/domain/technology/technology_risk.lua" -Text $technologyRiskText -Needle 'settings_rank = "000"'
+Assert-Contains -RelativePath "prototypes/mir/domain/technology/technology_risk.lua" -Text $technologyRiskText -Needle 'function M.append_tooltip(description, raw)'
+Assert-Contains -RelativePath "prototypes/mir/domain/technology/technology_risk.lua" -Text $technologyRiskText -Needle 'contains_locale_key(base, note[1])'
 
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'

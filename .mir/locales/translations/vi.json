@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Thử nghiệm và bị tắt theo mặc định trong v2.1.0. Đây là hiệu ứng kịch bản toàn cầu/toàn bản đồ. Hành vi ngăn xếp có thể sửa lỗi hiện tại không được xác nhận cho đến khi được xác thực theo cách thủ công.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Công nghệ rủi ro. Được bật theo mặc định. Hiệu ứng kịch bản toàn cầu/toàn bản đồ của nó có thể thay đổi thời gian hư hỏng; các ngăn xếp có thể hư hỏng hiện có có thể giữ nguyên thời hạn hiện tại cho đến khi được xây dựng lại hoặc xác nhận lại. Vô hiệu hóa nó trước khi tải bản lưu nếu việc duy trì thời gian hư hỏng hiện có là rất quan trọng.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Bị tắt theo mặc định. Công suất bộ chèn bổ sung có thể làm hỏng bộ chèn được điều khiển bằng mạch và giảm khả năng tối ưu hóa động cơ.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Công nghệ rủi ro. Được bật theo mặc định. Công suất bộ chèn bổ sung làm thay đổi số lượng ngăn xếp thủ công, có thể phá vỡ các giả định và bản thiết kế của bộ chèn được kiểm soát bằng mạch, đồng thời có thể giảm tối ưu hóa động cơ. Tắt tính năng này trước khi tải bản lưu nếu hành vi của trình chèn chính xác không được thay đổi.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Công nghệ rủi ro. Được bật theo mặc định. Nghiên cứu nó có thể thay đổi hành vi của nhà máy hoặc kế hoạch chi tiết hiện có. Xem lại các hiệu ứng dành riêng cho công nghệ và tắt nó trước khi tải bản lưu nếu hành vi chính xác không được thay đổi.",
       "provenance": "machine-assisted"
     },
     {

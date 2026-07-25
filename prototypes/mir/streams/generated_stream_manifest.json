@@ -900,6 +900,12 @@
       "generated_technology": "recipe-prod-research_spoilage_preservation-1",
       "stream_key": "research_spoilage_preservation",
       "migration_policy": "stable",
+      "technology_risk": {
+        "schema": 1,
+        "class": "factory-disruptive",
+        "reason": "existing-spoilable-stack-deadlines",
+        "tooltip_note": "mod-setting-description.mir-note-experimental-spoilage"
+      },
       "targets": [
         "stream:research_spoilage_preservation"
       ]

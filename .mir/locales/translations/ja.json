@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "実験的で、v2.1.0 ではデフォルトで無効になっています。これはグローバル/マップ全体のスクリプト効果です。既存の破損しやすいスタックの動作は、手動で検証されるまで要求されません。",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "危険なテクノロジー。デフォルトで有効になっています。そのグローバル/マップ全体のスクリプト効果は、腐敗のタイミングを変更する可能性があります。既存の破損しやすいスタックは、再構築または再検証されるまで現在の期限を保持する場合があります。既存の破損タイミングを維持することが重要な場合は、セーブをロードする前にこれを無効にします。",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "デフォルトでは無効になっています。インサーターの容量が増えると、回路制御のインサーターが壊れ、エンジンの最適化が低下する可能性があります。",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "危険なテクノロジー。デフォルトで有効になっています。インサータの容量が増えると、ハンド スタックの数が変化し、回路制御のインサータの想定や設計図が崩れ、エンジンの最適化が低下する可能性があります。正確なインサーターの動作を変更しない必要がある場合は、保存をロードする前に無効にしてください。",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "危険なテクノロジー。デフォルトで有効になっています。これを研究すると、既存のファクトリやブループリントの動作が変わる可能性があります。テクノロジー固有の効果を確認し、正確な動作を変更しない必要がある場合は、保存をロードする前にそれを無効にします。",
       "provenance": "machine-assisted"
     },
     {

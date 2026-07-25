@@ -15,7 +15,13 @@
       "identity_state": "released",
       "introduced_in": "pre-2.2.0",
       "migration_policy": "stable",
-      "stable": true
+      "stable": true,
+      "technology_risk": {
+        "schema": 1,
+        "class": "factory-disruptive",
+        "reason": "inserter-hand-stack-and-circuit-behavior",
+        "tooltip_note": "mod-setting-description.mir-note-inserter-capacity"
+      }
     },
     "base-continuation/laser-shooting-speed": {
       "chain_key": "laser-shooting-speed",

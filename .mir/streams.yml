@@ -34,6 +34,11 @@ continuations:
       identity_pattern: inserter-capacity-bonus-{next-level}
       identity_state: released
       migration_policy: stable
+      technology_risk:
+        schema: 1
+        class: factory-disruptive
+        reason: inserter-hand-stack-and-circuit-behavior
+        tooltip_note: mod-setting-description.mir-note-inserter-capacity
     base-continuation/laser-shooting-speed:
       canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/laser-shooting-speed
       chain_key: laser-shooting-speed
@@ -1107,6 +1112,11 @@ streams:
       generated_technology: recipe-prod-research_spoilage_preservation-1
       stream_key: research_spoilage_preservation
       migration_policy: stable
+      technology_risk:
+        schema: 1
+        class: factory-disruptive
+        reason: existing-spoilable-stack-deadlines
+        tooltip_note: mod-setting-description.mir-note-experimental-spoilage
       targets:
         - stream:research_spoilage_preservation
       evidence:

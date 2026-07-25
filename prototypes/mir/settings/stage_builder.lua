@@ -4,6 +4,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
 local setting_order = require("prototypes.mir.settings.order")
+local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
 
 local settings_data = {}
 local settings_context = settings_adapter.context()
@@ -38,13 +39,14 @@ local function copy_spec(spec)
   return out
 end
 
-local function decorate_stream_setting(spec, tech_locale, order_prefix)
+local function decorate_stream_setting(spec, tech_locale, order_prefix, risk)
   local out = copy_spec(spec)
   out.setting_type = "startup"
   if string.find(out.name, "^ips%-enable%-") then
     out.order = order_prefix .. "-0"
     out.localised_name = {"mod-setting-name.ips-enable-stream", tech_locale}
-    out.localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, nil)
+    out.localised_description = technology_risk.append_tooltip(
+      {"mod-setting-description.ips-enable-stream", tech_locale}, risk)
   elseif string.find(out.name, "^ips%-cost%-base%-") then
     out.order = order_prefix .. "-1"
     out.localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale}
@@ -71,13 +73,14 @@ local function decorate_stream_setting(spec, tech_locale, order_prefix)
   return out
 end
 
-local function decorate_base_setting(spec, tech_locale, order_prefix, settings_note)
+local function decorate_base_setting(spec, tech_locale, order_prefix, settings_note, risk)
   local out = copy_spec(spec)
   out.setting_type = "startup"
   if string.find(out.name, "^mir%-enable%-") then
     out.order = order_prefix .. "-0"
     out.localised_name = {"mod-setting-name.mir-enable-base-tech", tech_locale}
-    out.localised_description = append_note({"mod-setting-description.mir-enable-base-tech", tech_locale}, settings_note)
+    out.localised_description = technology_risk.append_tooltip(
+      append_note({"mod-setting-description.mir-enable-base-tech", tech_locale}, settings_note), risk)
   elseif string.find(out.name, "^mir%-cost%-base%-") then
     out.order = order_prefix .. "-1"
     out.localised_name = {"mod-setting-name.mir-cost-base", tech_locale}
@@ -117,7 +120,9 @@ local function order_slug(value)
 end
 
 local function group_attention_rank(group)
-  if not group.enabled then return "000" end
+  local risk_rank = technology_risk.settings_rank(group.technology_risk)
+  if risk_rank then return risk_rank end
+  if not group.enabled then return "025" end
   if group.settings_priority == "top" then return "050" end
   return "100"
 end
@@ -136,6 +141,7 @@ for key, stream in pairs(streams) do
     stream = stream,
     sort_name = stream.descriptor.ui.sort_name,
     enabled = default_enabled(key, stream),
+    technology_risk = stream.technology_risk,
     settings_priority = lookup_default(key, "settings_priority", stream, nil),
     ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
   })
@@ -152,6 +158,7 @@ for _, spec in ipairs(base_extension_specs) do
     defaults_spec = defaults_spec,
     sort_name = spec.sort_name or spec.key,
     enabled = enabled,
+    technology_risk = defaults_spec.technology_risk,
     settings_priority = spec.settings_priority or defaults_spec.settings_priority
   })
 end
@@ -178,7 +185,7 @@ for _, group in ipairs(technology_setting_groups) do
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
     local settings_note = lookup_default(key, "settings_note", stream, nil)
     for _, spec in ipairs(settings_catalog.stream_setting_specs(key, stream)) do
-      local setting = decorate_stream_setting(spec, tech_locale, order_prefix)
+      local setting = decorate_stream_setting(spec, tech_locale, order_prefix, group.technology_risk)
       setting.localised_description = append_note(setting.localised_description, settings_note)
       add_technology_setting(group, setting)
     end
@@ -188,7 +195,8 @@ for _, group in ipairs(technology_setting_groups) do
     local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key
     local locale = {"technology-name."..locale_key}
     for _, setting_spec in ipairs(settings_catalog.base_extension_setting_specs(spec.key)) do
-      add_technology_setting(group, decorate_base_setting(setting_spec, locale, order_prefix, defaults_spec.settings_note))
+      add_technology_setting(group, decorate_base_setting(
+        setting_spec, locale, order_prefix, defaults_spec.settings_note, group.technology_risk))
     end
   end
 end

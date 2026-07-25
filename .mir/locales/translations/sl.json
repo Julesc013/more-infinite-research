@@ -1032,8 +1032,8 @@
     },
     {
       "key": "mod-setting-description.mir-note-experimental-spoilage",
-      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
-      "translation": "Eksperimentalno in privzeto onemogočeno v v2.1.0. To je globalni skriptni učinek/učinek na zemljevidu. Obstoječe vedenje pokvarljivega sklada ni zahtevano, dokler ni ročno potrjeno.",
+      "source_sha256": "7698F8C8E6D3B811CDF0DF68F3F64CC7CEB2B6C779D6350C94D2D3DABB422776",
+      "translation": "Tvegana tehnologija. Privzeto omogočeno. Njegov globalni/skriptni učinek na zemljevidu lahko spremeni čas kvarjenja; obstoječi skladi, ki jih je mogoče pokvariti, lahko ohranijo trenutne roke, dokler niso ponovno izdelani ali ponovno potrjeni. Onemogočite ga pred nalaganjem shranjevanja, če je ohranjanje obstoječega časa kvarjenja ključnega pomena.",
       "provenance": "machine-assisted"
     },
     {
@@ -1050,8 +1050,14 @@
     },
     {
       "key": "mod-setting-description.mir-note-inserter-capacity",
-      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
-      "translation": "Privzeto onemogočeno. Dodatna zmogljivost vstavljalnika lahko pokvari vstavljalnike, ki jih krmili tokokrog, in zmanjša optimizacijo motorja.",
+      "source_sha256": "19E158B98A868CE1D4B8A3845CCE4F816595D9BDF7393D1D4752087BB5754C66",
+      "translation": "Tvegana tehnologija. Privzeto omogočeno. Dodatna zmogljivost vstavljanja spremeni število ročnih skladov, lahko prekine predpostavke in načrte vstavljalca, ki ga nadzoruje vezje, in lahko zmanjša optimizacijo motorja. Onemogočite ga pred nalaganjem shranjevanja, če mora natančno vedenje vstavljalnika ostati nespremenjeno.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-risk-factory-disruptive",
+      "source_sha256": "BCF66CF8EF161CC3D7E5B74F969D35ACCA0570394077416532BE7B2FB1C7528D",
+      "translation": "Tvegana tehnologija. Privzeto omogočeno. Raziskovanje lahko spremeni obstoječo tovarno ali načrtovanje. Preglejte učinke, specifične za tehnologijo, in jih onemogočite, preden naložite shranjevanje, če mora natančno vedenje ostati nespremenjeno.",
       "provenance": "machine-assisted"
     },
     {

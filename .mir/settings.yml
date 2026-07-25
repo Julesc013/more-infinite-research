@@ -19,7 +19,9 @@ rules:
   technology_settings_sort_by_visibility_then_player_name: true
   inactive_official_dlc_technology_settings_are_hidden_but_registered: true
   experimental_automatic_family_settings_are_hidden_until_reviewed: true
-  technology_settings_use_three_attention_buckets: true
+  technology_settings_use_four_attention_buckets: true
+  technology_risk_is_independent_of_default_enablement: true
+  risky_technology_tooltips_are_decorated_automatically: true
   canonical_settings_catalog_required: true
   profile_import_validates_catalog_constraints: true
   settings_profiles_support_compact_export: true
