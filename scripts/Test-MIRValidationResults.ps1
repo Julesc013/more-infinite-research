@@ -13,6 +13,26 @@ $registry = Import-MIRScenarioRegistry `
 if ($registry.schema -ne 3 -or $registry.records.Count -lt 1) {
   throw "Scenario manifest schema-3 full records did not load."
 }
+$filtered20 = Select-MIRScenarioRegistryForTargetCapabilities `
+  -Registry (Import-MIRScenarioRegistry `
+    -Path (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") `
+    -TargetProfile "2.0") `
+  -TargetProfile ([pscustomobject]@{features=[pscustomobject]@{
+    recipe_productivity=$true
+    productivity_family_adoption=$false
+  }})
+if (@($filtered20.records | Where-Object name -like "semantic-family-*").Count -ne 0) {
+  throw "Factorio 2.0 scenario filtering retained adoption-dependent semantic-family rows."
+}
+$filtered21 = Select-MIRScenarioRegistryForTargetCapabilities `
+  -Registry $registry `
+  -TargetProfile ([pscustomobject]@{features=[pscustomobject]@{
+    recipe_productivity=$true
+    productivity_family_adoption=$true
+  }})
+if (@($filtered21.records | Where-Object name -like "semantic-family-*").Count -ne 5) {
+  throw "Factorio 2.1 scenario filtering removed supported semantic-family rows."
+}
 $semanticDeclaration = Resolve-MIRScenarioDeclaration `
   -Registry $registry `
   -ScenarioName "semantic-family-attach" `

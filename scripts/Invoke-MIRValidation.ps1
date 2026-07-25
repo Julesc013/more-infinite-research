@@ -32,14 +32,15 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "scripts\validation\ScenarioRegistry.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $expectedScenariosPath = Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json"
+$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 if ($List) {
   $listed = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
+  $listed = Select-MIRScenarioRegistryForTargetCapabilities -Registry $listed -TargetProfile $targetProfile
   $listed.records | Select-Object name, kind, group, surface, @{Name="tags";Expression={$_.tags -join ","}} | Format-Table -AutoSize
   return
 }
 if ($Tier -in @("pure", "static")) { $StaticOnly = $true }
 if ($Tier -eq "smoke" -and $Tag -notcontains "smoke") { $Tag += "smoke" }
-$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
 $isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
 $isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
@@ -2340,6 +2341,7 @@ if ($checkpointActive) {
   }
 }
 $scenarioRegistry = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
+$scenarioRegistry = Select-MIRScenarioRegistryForTargetCapabilities -Registry $scenarioRegistry -TargetProfile $targetProfile
 $selectionActive = $Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0
 $scenarioRegistry = Select-MIRScenarioRegistry -Registry $scenarioRegistry -Scenario $Scenario -Group $Group -Tag $Tag
 if ($ScenarioWorker) {

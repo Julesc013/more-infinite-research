@@ -77,6 +77,33 @@ function Get-MIRExpectedScenarioNames {
   @($Registry.records | ForEach-Object { [string]$_.name })
 }
 
+function Select-MIRScenarioRegistryForTargetCapabilities {
+  param(
+    [Parameter(Mandatory)]$Registry,
+    [Parameter(Mandatory)]$TargetProfile
+  )
+
+  if (-not $TargetProfile.features) {
+    throw "Target profile is missing its feature authority."
+  }
+  $records = @($Registry.records | Where-Object {
+    $supported = $true
+    foreach ($feature in @($_.required_features | ForEach-Object { [string]$_ })) {
+      $property = $TargetProfile.features.PSObject.Properties[$feature]
+      if ($null -eq $property) {
+        throw "Scenario '$($_.name)' requires unknown target feature '$feature'."
+      }
+      if ($property.Value -ne $true) { $supported = $false; break }
+    }
+    $supported
+  })
+  [pscustomobject]@{
+    schema = [int]$Registry.schema
+    target_profile = [string]$Registry.target_profile
+    records = $records
+  }
+}
+
 function Resolve-MIRScenarioDeclaration {
   param(
     [Parameter(Mandatory)]$Registry,

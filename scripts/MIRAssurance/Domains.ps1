@@ -318,6 +318,10 @@ function Expand-MIRAssuranceTests {
   )
   . (Join-Path $repo "scripts\validation\ScenarioRegistry.ps1")
   $registry = Import-MIRScenarioRegistry -Path $scenarioRegistryPath -TargetProfile $Context.target
+  $targetManifest = Get-Content -Raw -LiteralPath $targetsPath | ConvertFrom-Json
+  $targetProfile = $targetManifest.profiles.PSObject.Properties[[string]$Context.target].Value
+  if ($null -eq $targetProfile) { throw "No target capability profile exists for Factorio $($Context.target)." }
+  $registry = Select-MIRScenarioRegistryForTargetCapabilities -Registry $registry -TargetProfile $targetProfile
   $expanded = @()
   $seen = @{}
   foreach ($test in @($Tests)) {
