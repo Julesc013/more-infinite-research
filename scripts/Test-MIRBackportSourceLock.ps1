@@ -94,7 +94,7 @@ $adaptedActual = @(
 if ($LASTEXITCODE -ne 0) { throw "Unable to compare the portable source with the target projection." }
 $adaptedDelta = @(Compare-Object $adaptedExpected $adaptedActual)
 if ($adaptedDelta.Count -gt 0) {
-  throw "The C16-to-2.5 package delta is not the exact declared adapter set."
+  throw "The C20-to-2.5 package delta is not the exact declared adapter set."
 }
 
 $sourceHash = Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
@@ -144,6 +144,6 @@ foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.playtest_g
   }
 }
 
-Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C16."
+Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C20."
 Write-Host "[ok] Baseline: $baselineCommit; portable source: $portableCommit; projection: $projectionCommit."
 Write-Host "[ok] Adapted package paths: $($adaptedActual -join ', ')."

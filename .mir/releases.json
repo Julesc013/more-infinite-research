@@ -59,31 +59,31 @@
     },
     "factorio-2.0": {
       "mir_version": "2.5.0",
-      "candidate_id": "2.5-P3",
+      "candidate_id": "2.5-P4",
       "branch": "tmp/2.0",
-      "source_anchor": "C16",
-      "portable_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
+      "source_anchor": "C20",
+      "portable_source_commit": "303de261629149af5f50bd210368e61423f1a299",
       "prior_release": "2.4.9",
       "archive": "dist/more-infinite-research_2.5.0.zip",
-      "archive_bytes": 1014794,
-      "archive_entries": 288,
-      "package_source_commit": "dbb3e9e1519dc6f29326ca13ddb589550c66c2c7",
-      "package_source_tree": "30ca3d60d66745f3fb8d6e7cd13fba52174d100d",
-      "package_source_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
+      "archive_bytes": 1029641,
+      "archive_entries": 290,
+      "package_source_commit": "4a19c26c5abf479cbe4cf48f477eec6e3ab2474d",
+      "package_source_tree": "ab842844a36e30847fd930af0713f6b5ce604a73",
+      "package_source_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "30ca3d60d66745f3fb8d6e7cd13fba52174d100d",
-        "file_count": 288
+        "source_tree": "ab842844a36e30847fd930af0713f6b5ce604a73",
+        "file_count": 290
       },
-      "archive_sha256": "86C6EE163CB393078E7E690C23800117324B40DB21F31BC4764A2797907E91EF",
-      "package_content_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
+      "archive_sha256": "546F82FB58288F492F7B3D21AF4F597B21D4477B18FF9D98A18BE0E5E2D26580",
+      "package_content_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
       "archive_class": "automated-playtest-candidate",
-      "qualification": "focused-upgrade-matrix-passed-full-runtime-pending",
+      "qualification": "deterministic-package-passed-focused-runtime-pending",
       "manual_review": "pending",
       "protected_qualification": "pending",
       "publication_status": "unreleased",
-      "status": "provisional-c16-projection-with-published-2.4.9-capability-restored"
+      "status": "automated-playtest-candidate-c20-projection-focused-validation-pending"
     }
   },
   "views": {

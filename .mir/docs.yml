@@ -2180,14 +2180,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.4.9-release-notes
-  - path: docs/releases/2.5.0-provisional-c16-backport.md
-    title: "MIR 2.5.0 Provisional C16 Backport"
+  - path: docs/releases/2.5.0-provisional-c20-backport.md
+    title: "MIR 2.5.0 Provisional C20 Backport"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-2.5.0-provisional-c16-backport
+      - mir-2.5.0-provisional-c20-backport
       - mir-2.5.0-candidate-identity
   - path: docs/releases/2.5.0-playtest-guide.md
     title: "MIR 2.5.0 Provisional Playtest Guide"

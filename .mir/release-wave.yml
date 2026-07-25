@@ -396,22 +396,22 @@ waves:
 
   mir_2_5_0:
     version: "2.5.0"
-    candidate_id: "2.5-P3"
+    candidate_id: "2.5-P4"
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor: mir_3_2_0
-    portable_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
-    package_source_commit: dbb3e9e1519dc6f29326ca13ddb589550c66c2c7
+    portable_source_commit: 303de261629149af5f50bd210368e61423f1a299
+    package_source_commit: 4a19c26c5abf479cbe4cf48f477eec6e3ab2474d
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_2.5.0.zip
-    sha256: 86C6EE163CB393078E7E690C23800117324B40DB21F31BC4764A2797907E91EF
-    package_content_sha256: A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F
-    size_bytes: 1014794
-    entries: 288
+    sha256: 546F82FB58288F492F7B3D21AF4F597B21D4477B18FF9D98A18BE0E5E2D26580
+    package_content_sha256: 583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75
+    size_bytes: 1029641
+    entries: 290
     archive_class: automated-playtest-candidate
-    release_gate: focused-upgrade-matrix-passed-full-runtime-pending
+    release_gate: deterministic-package-passed-focused-runtime-pending
     manual_review: pending
     protected_qualification: pending
     publication_status: unreleased
-    status: provisional-c16-projection-with-published-2.4.9-capability-restored
+    status: automated-playtest-candidate-c20-projection-focused-validation-pending

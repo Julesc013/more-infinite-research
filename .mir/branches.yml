@@ -372,9 +372,17 @@ release_artifacts:
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      release_gate: target-backport-and-qualification-pending
+      candidate_id: "2.5-P4"
+      portable_source_commit: 303de261629149af5f50bd210368e61423f1a299
+      package_source_commit: 4a19c26c5abf479cbe4cf48f477eec6e3ab2474d
+      archive: dist/more-infinite-research_2.5.0.zip
+      archive_sha256: 546F82FB58288F492F7B3D21AF4F597B21D4477B18FF9D98A18BE0E5E2D26580
+      package_content_sha256: 583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75
+      archive_bytes: 1029641
+      archive_entries: 290
+      release_gate: deterministic-package-passed-focused-runtime-pending
       publication_status: unreleased
-      status: development-candidate
+      status: automated-playtest-candidate-c20-projection-focused-validation-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

@@ -1,10 +1,10 @@
 {
   "schema": 3,
   "projection_schema": 2,
-  "candidate_id": "2.5-P3",
+  "candidate_id": "2.5-P4",
   "mir_version": "2.5.0",
   "target": "2.0",
-  "target_profile_sha256": "D40D736862F09497858C49B7F3534FB922BAB41CAB60E741FA1C1C5BE391C07C",
+  "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
   "baseline": {
     "version": "2.4.9",
     "reference": "2.4.9",
@@ -15,25 +15,25 @@
   },
   "portable_source": {
     "release": "3.2.0",
-    "candidate_id": "C16",
-    "commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
-    "source_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
-    "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D"
+    "candidate_id": "C20",
+    "commit": "303de261629149af5f50bd210368e61423f1a299",
+    "source_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
+    "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32"
   },
   "lineage": {
     "policy": "canonical-tag-projection",
-    "state": "provisional-content-projection",
+    "state": "canonical-tag-descendant",
     "canonical_release_tag": "3.2.0",
-    "canonical_release_tag_status": "pending",
-    "portable_source_commit_is_ancestor": false,
+    "canonical_release_tag_status": "published",
+    "portable_source_commit_is_ancestor": true,
     "prior_target_tag": "2.4.9",
     "final_candidate_requires_canonical_tag_ancestry": true,
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "dbb3e9e1519dc6f29326ca13ddb589550c66c2c7",
-    "package_source_tree": "30ca3d60d66745f3fb8d6e7cd13fba52174d100d",
-    "package_source_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
+    "package_source_commit": "4a19c26c5abf479cbe4cf48f477eec6e3ab2474d",
+    "package_source_tree": "ab842844a36e30847fd930af0713f6b5ce604a73",
+    "package_source_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
@@ -43,10 +43,10 @@
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "86C6EE163CB393078E7E690C23800117324B40DB21F31BC4764A2797907E91EF",
-    "content_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
-    "bytes": 1014794,
-    "entries": 288,
+    "archive_sha256": "546F82FB58288F492F7B3D21AF4F597B21D4477B18FF9D98A18BE0E5E2D26580",
+    "content_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
+    "bytes": 1029641,
+    "entries": 290,
     "forbidden_entries": 0,
     "class": "automated-playtest-candidate"
   },
@@ -55,12 +55,12 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "pending-after-capability-correction",
-    "runtime": "focused-upgrade-matrix-passed-full-pending",
+    "target_static": "pending-exact-p4",
+    "runtime": "pending-exact-p4",
     "manual_review": "pending",
     "protected_qualification": "pending",
     "publication": "unreleased"
   },
-  "release_notes": "docs/releases/2.5.0-provisional-c16-backport.md",
+  "release_notes": "docs/releases/2.5.0-provisional-c20-backport.md",
   "playtest_guide": "docs/releases/2.5.0-playtest-guide.md"
 }
