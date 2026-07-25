@@ -429,6 +429,7 @@ fixtures:
       - scaled-known-productivity-competitor
       - external-recipe-productivity-prefix-owner
       - technology-prerequisite-rewire
+      - cross-target-compatibility-pack-applicability
 
   native-owner-settings:
     requires_features: [recipe_productivity]
