@@ -50,8 +50,8 @@ Version: 2.5.0
     - Corrected four stable stream manifest policies to match native-owner binding for their Space Age families.
     - Preserved exact singleton CompatibilityPack candidate seeds instead of incorrectly classifying every seed as ambiguous.
     - Corrected packaged documentation for the enabled agricultural-growth, cargo-landing-pad-count, and character-reach defaults.
-    - Preserved Factorio 2.0 native productivity-owner configuration and fractional research progress across the 2.4.9 to 2.5.0 upgrade.
-    - Restored the exact Factorio 2.0.77 mod-data and safe productivity-family adoption capability proven by the published 2.4.9 package.
+    - Preserved Factorio 2.0 native-owner settings and fractional research progress across the 2.4.9 upgrade.
+    - Retained Factorio 2.0.77 mod-data and safe productivity-family adoption proven by published 2.4.9.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.9
