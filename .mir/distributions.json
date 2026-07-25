@@ -14,10 +14,10 @@
     {
       "version": "2.5.0",
       "path": "dist/more-infinite-research_2.5.0.zip",
-      "bytes": 1029630,
-      "sha256": "29F1797D4C2B692C7855A558DC1D0CC436011C12D251CCA503BBA7C1A0D2BCF0",
+      "bytes": 1029640,
+      "sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
       "kind": "automated-playtest-candidate",
-      "source_ref": "fe8d046a0c5858f9e94669131ac5fcbf91856669"
+      "source_ref": "f9eb34eae9b767275a17b5e68351343042ef7532"
     }
   ]
 }
