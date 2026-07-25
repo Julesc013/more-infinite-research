@@ -11,7 +11,7 @@ Version: 2.5.0
     - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
     - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
     - Rebuilt the MIR 3.2 compiler architecture through the Factorio 2.0 target-capability profile.
-    - Recalculated package, binary, scenario, fixture, verifier, and evidence identities independently from MIR 3.2.
+    - Revalidated compatibility scenarios independently against Factorio 2.0 and its supported mod ecosystem.
     - Added canonical schema-4 plans, structured test results, immutable attempt capsules, trust classes, and strict JSON schemas.
     - Enforced protected F0 through F4 release layers and made candidate sealing invoke the canonical aggregate gate.
     - Bound mod archives, the Factorio installation, verifier, policy, and producer trust to evidence reuse.
