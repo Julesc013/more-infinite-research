@@ -781,7 +781,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_priority = "top"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_catalog.stream_setting_specs(key, stream)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'decorate_stream_setting(spec, tech_locale, order_prefix)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'decorate_stream_setting(spec, tech_locale, order_prefix, group.technology_risk)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_catalog.base_extension_setting_specs(spec.key)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'ips-effect-per-level' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key' },
