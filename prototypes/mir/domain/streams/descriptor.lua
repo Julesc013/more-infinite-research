@@ -19,6 +19,7 @@ local settings_sort_names = {
   research_breeding = "Breeding productivity",
   research_bullets = "Bullet productivity",
   research_cannon_shooting_speed = "Cannon shooting speed",
+  research_capture_robot_rockets = "Capture bot rocket productivity",
   research_cargo_bay_unloading_distance = "Cargo bay unloading distance",
   research_cargo_landing_pad_count = "Cargo landing pad count",
   research_artificial_soil = "Artificial soil productivity",
@@ -56,6 +57,7 @@ local settings_sort_names = {
   research_mining_drill = "Mining drill productivity",
   research_modules = "Module productivity",
   research_molten_metals = "Molten metals productivity",
+  research_nutrients = "Nutrients productivity",
   research_lubricant_productivity = "Lubricant productivity",
   research_oil_cracking_productivity = "Oil cracking productivity",
   research_oil_processing_productivity = "Oil processing productivity",
@@ -201,6 +203,28 @@ function M.normalize(key, raw_spec)
   end
 
   local spec = deepcopy(raw_spec)
+  if spec.productivity_permission_recipes ~= nil then
+    if type(spec.productivity_permission_recipes) ~= "table" then
+      error("Raw MIR stream " .. key .. " has invalid productivity_permission_recipes.", 2)
+    end
+    local seen_permissions = {}
+    for index, permission in ipairs(spec.productivity_permission_recipes) do
+      if type(permission) ~= "table"
+          or type(permission.name) ~= "string"
+          or permission.name == ""
+          or type(permission.required_mods) ~= "table"
+          or #permission.required_mods == 0 then
+        error("Raw MIR stream " .. key .. " has invalid productivity permission at index "
+          .. tostring(index) .. ".", 2)
+      end
+      if seen_permissions[permission.name] then
+        error("Raw MIR stream " .. key .. " repeats productivity permission "
+          .. permission.name .. ".", 2)
+      end
+      seen_permissions[permission.name] = true
+      permission.required_mods = sorted_unique(permission.required_mods)
+    end
+  end
   spec.technology_risk = technology_risk.normalize(spec.technology_risk, "stream " .. key)
   local automatic_family = spec.automatic_family
   if spec.ui_visibility == nil

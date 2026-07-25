@@ -1269,3 +1269,37 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_capture_robot_rockets-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_capture_robot_rockets-1
+      introduced_in: "3.2.0"
+      source: stream_table:productivity
+      capability: recipe-productivity
+      family: capture_robot_rockets
+      policy: exact-space-age-recipe-productivity-stream
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_capture_robot_rockets-1
+      stream_key: research_capture_robot_rockets
+      migration_policy: stable
+      targets:
+        - stream:research_capture_robot_rockets
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_nutrients-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_nutrients-1
+      introduced_in: "3.2.0"
+      source: stream_table:productivity
+      capability: recipe-productivity
+      family: nutrients
+      policy: exact-space-age-forward-production-stream
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_nutrients-1
+      stream_key: research_nutrients
+      migration_policy: stable
+      targets:
+        - stream:research_nutrients
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity

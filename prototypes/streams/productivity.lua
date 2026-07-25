@@ -390,6 +390,7 @@ return {
     "^copper%-bacteria%-cultivation$"
   } },
   research_breeding = {
+    allow_shared_input_output = true,
     ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
@@ -405,6 +406,61 @@ return {
     },
     icon_tech = "fish-breeding"
   },
+  research_nutrients = {
+    localised_name = {
+      "",
+      {"description.productivity-bonus"},
+      ": ",
+      {"item-name.nutrients"}
+    },
+    ui_visibility = space_age_setting_visibility(),
+    required_mods = {"space-age"},
+    generation_requirements = {
+      require_any_recipe = {
+        "nutrients-from-yumako-mash",
+        "nutrients-from-bioflux",
+        "nutrients-from-biter-egg"
+      }
+    },
+    groups = {
+      {
+        change = 0.10,
+        recipe_patterns = {
+          "^nutrients%-from%-yumako%-mash$",
+          "^nutrients%-from%-bioflux$",
+          "^nutrients%-from%-biter%-egg$"
+        }
+      }
+    },
+    icon_item = "nutrients"
+  },
+  research_capture_robot_rockets = {
+    localised_name = {
+      "",
+      {"description.productivity-bonus"},
+      ": ",
+      {"item-name.capture-robot-rocket"}
+    },
+    ui_visibility = space_age_setting_visibility(),
+    required_mods = {"space-age"},
+    generation_requirements = {
+      require_any_recipe = {"capture-robot-rocket"}
+    },
+    productivity_permission_recipes = {
+      {
+        name = "capture-robot-rocket",
+        required_mods = {"space-age"}
+      }
+    },
+    groups = {
+      {
+        change = 0.10,
+        recipe_patterns = {"^capture%-robot%-rocket$"}
+      }
+    },
+    icon_item = "capture-robot-rocket",
+    icon_tech = "captivity"
+  },
 
   research_grenades = { icon_item="grenade", groups = {
     {change=0.10, items={"grenade"}},
@@ -418,7 +474,18 @@ return {
 
   research_landfill = { icon_tech = "landfill", groups = {
     { change = 0.10, items = { "landfill" } },
-    { change = 0.05, items = { "foundation" } }
+    { change = 0.05, items = { "foundation" } },
+    { change = 0.02, items = { "ice-platform" } },
+    { change = 0.01, items = { "space-platform-foundation" } }
+  }, productivity_permission_recipes = {
+    {
+      name = "ice-platform",
+      required_mods = {"space-age"}
+    },
+    {
+      name = "space-platform-foundation",
+      required_mods = {"space-age"}
+    }
   }, exclude_recipe_patterns = {
     "^atan%-landfill%-from%-ash$",
     "^atan%-foundation%-from%-ash$"

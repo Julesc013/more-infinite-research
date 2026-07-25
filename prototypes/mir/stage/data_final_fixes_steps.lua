@@ -3,6 +3,7 @@ local commands = require("prototypes.mir.pipeline.commands")
 local context = commands.new_context()
 
 function M.apply_compatibility_repairs() commands.run("compatibility-repairs", context) end
+function M.apply_recipe_productivity_permissions() commands.run("recipe-productivity-permissions", context) end
 function M.sanitize_input_technology_effects() commands.run("sanitize-input-technology-effects", context) end
 function M.apply_module_permissions() commands.run("module-permissions", context) end
 function M.apply_prototype_limits() commands.run("prototype-limits", context) end

@@ -950,6 +950,13 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "pentapod-egg", owner = "recipe-prod-research_breeding-1", change = 0.10 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "nutrients-from-bioflux", owner = "recipe-prod-research_nutrients-1", change = 0.10 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "capture-robot-rocket", owner = "recipe-prod-research_capture_robot_rockets-1", change = 0.10 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "ice-platform", owner = "recipe-prod-research_landfill-1", change = 0.02 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "space-platform-foundation", owner = "recipe-prod-research_landfill-1", change = 0.01 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_recipe_not_owned_by("nutrients-from-spoilage", "recipe-prod-research_nutrients-1")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_technology_has_science("recipe-prod-research_nutrients-1"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
@@ -1355,10 +1362,12 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     throw "Effect contracts must not import effective settings; catalog/profile loading would recurse."
   }
 
-  if (-not $stepsText.Contains('["prototype-limits"] = {phase = 20, dependencies = {"compatibility-repairs", "module-permissions"}}') `
+  if (-not $stepsText.Contains('["recipe-productivity-permissions"] = {phase = 12, dependencies = {"compatibility-repairs"}}') `
+      -or -not $stepsText.Contains('["sanitize-input-technology-effects"] = {phase = 15, dependencies = {"recipe-productivity-permissions"}}') `
+      -or -not $stepsText.Contains('["prototype-limits"] = {phase = 20, dependencies = {"compatibility-repairs", "module-permissions"}}') `
       -or -not $stepsText.Contains('["pipeline-extent"] = {phase = 20, dependencies = {"compatibility-repairs", "prototype-limits"}}') `
       -or -not $stepsText.Contains('["prepare-competing-productivity"] = {phase = 30, dependencies = {"pipeline-extent"}}')) {
-    throw "Prototype limit pass must run after compatibility repairs and before pipeline extent, planning, and recipe-cap diagnostics."
+    throw "Recipe permissions and prototype limits must run after compatibility repairs and before fact capture, planning, and recipe-cap diagnostics."
   }
 }
 
@@ -4299,6 +4308,8 @@ Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity 
 $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
+$spaceAgeLandfillLine = Get-LastStreamReportLine -Key "research_landfill"
+Assert-ReportLineContains -Line $spaceAgeLandfillLine -Expected "effects=4" -Context "Space Age landfill and platform productivity scenario"
 $spaceAgeArtificialSoilLine = Get-LastStreamReportLine -Key "research_artificial_soil"
 Assert-ReportLineGenerated -Line $spaceAgeArtificialSoilLine -Context "Space Age artificial soil productivity scenario"
 Assert-ReportScienceContains -Line $spaceAgeArtificialSoilLine -Expected "agricultural-science-pack" -Context "Space Age artificial soil agricultural science scenario"
@@ -4311,6 +4322,16 @@ $spaceAgeBreedingLine = Get-LastStreamReportLine -Key "research_breeding"
 Assert-ReportLineGenerated -Line $spaceAgeBreedingLine -Context "Space Age breeding productivity scenario"
 Assert-ReportScienceContains -Line $spaceAgeBreedingLine -Expected "agricultural-science-pack" -Context "Space Age breeding agricultural science scenario"
 Assert-ReportScienceContains -Line $spaceAgeBreedingLine -Expected "cryogenic-science-pack" -Context "Space Age breeding cryogenic science scenario"
+$spaceAgeNutrientsLine = Get-LastStreamReportLine -Key "research_nutrients"
+Assert-ReportLineGenerated -Line $spaceAgeNutrientsLine -Context "Space Age nutrients productivity scenario"
+Assert-ReportLineContains -Line $spaceAgeNutrientsLine -Expected "effects=3" -Context "Space Age exact forward nutrient recipes scenario"
+Assert-ReportScienceContains -Line $spaceAgeNutrientsLine -Expected "agricultural-science-pack" -Context "Space Age nutrients agricultural science scenario"
+Assert-ReportScienceContains -Line $spaceAgeNutrientsLine -Expected "cryogenic-science-pack" -Context "Space Age nutrients cryogenic science scenario"
+$spaceAgeCaptureRocketLine = Get-LastStreamReportLine -Key "research_capture_robot_rockets"
+Assert-ReportLineGenerated -Line $spaceAgeCaptureRocketLine -Context "Space Age capture bot rocket productivity scenario"
+Assert-ReportLineContains -Line $spaceAgeCaptureRocketLine -Expected "effects=1" -Context "Space Age exact capture bot rocket recipe scenario"
+Assert-ReportScienceContains -Line $spaceAgeCaptureRocketLine -Expected "military-science-pack" -Context "Space Age capture bot rocket military science scenario"
+Assert-ReportScienceContains -Line $spaceAgeCaptureRocketLine -Expected "agricultural-science-pack" -Context "Space Age capture bot rocket agricultural science scenario"
 foreach ($weaponSpeedStream in @("research_rocket_shooting_speed", "research_cannon_shooting_speed")) {
   $weaponSpeedLine = Get-LastStreamReportLine -Key $weaponSpeedStream
   Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Space Age weapon shooting speed stream $weaponSpeedStream"

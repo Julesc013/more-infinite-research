@@ -53,6 +53,13 @@ local function assert_stream_absent(stream_key)
   end
 end
 
+local function assert_stream_enabled_by_default(stream_key)
+  local prototype = setting_prototype(string.format("ips-enable-%s", stream_key))
+  if prototype.default_value ~= true then
+    fail(stream_key .. " must be enabled by default.")
+  end
+end
+
 for _, stream_key in ipairs({
   "research_auto_assembling_machine",
   "research_auto_lab"
@@ -67,12 +74,14 @@ for _, stream_key in ipairs({
   "research_bacteria_cultivation",
   "research_bioflux",
   "research_breeding",
+  "research_capture_robot_rockets",
   "research_carbon",
   "research_carbon_fiber",
   "research_holmium",
   "research_ice",
   "research_lithium",
   "research_molten_metals",
+  "research_nutrients",
   "research_quantum_processor",
   "research_spoilage_preservation",
   "research_supercapacitor",
@@ -94,4 +103,11 @@ for _, stream_key in ipairs({
   else
     assert_stream_hidden(stream_key, not space_age_active)
   end
+end
+
+for _, stream_key in ipairs({
+  "research_capture_robot_rockets",
+  "research_nutrients"
+}) do
+  assert_stream_enabled_by_default(stream_key)
 end

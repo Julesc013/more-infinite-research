@@ -906,6 +906,37 @@ local function assert_required_recipe_owner(recipe_name, expected_owner, expecte
   end
 end
 
+local function assert_recipe_productivity_permission(recipe_name)
+  local recipe = recipes[recipe_name]
+  if not recipe then fail("missing required vanilla recipe " .. recipe_name .. ".") end
+  if recipe.allow_productivity ~= true then
+    fail("recipe " .. recipe_name .. " was not granted its exact productivity permission.")
+  end
+end
+
+local function assert_recipe_not_owned_by(recipe_name, denied_owner)
+  local change = recipe_productivity_change(techs[denied_owner], recipe_name)
+  if change ~= nil then
+    fail("recipe " .. recipe_name .. " must not be owned by " .. denied_owner .. ".")
+  end
+end
+
+local function assert_technology_has_science(technology_name, expected_packs)
+  local technology = techs[technology_name]
+  if not technology or not technology.unit or type(technology.unit.ingredients) ~= "table" then
+    fail("technology " .. technology_name .. " has no research unit ingredients.")
+  end
+  local actual = {}
+  for _, ingredient in ipairs(technology.unit.ingredients) do
+    actual[ingredient.name or ingredient[1]] = true
+  end
+  for _, pack_name in ipairs(expected_packs) do
+    if not actual[pack_name] then
+      fail("technology " .. technology_name .. " is missing science pack " .. pack_name .. ".")
+    end
+  end
+end
+
 local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
   local owner = techs[owner_name]
   if not owner or owner.max_level ~= "infinite" or owner.upgrade ~= true then
@@ -1024,6 +1055,37 @@ if is_space_age then
   }) do
     assert_required_recipe_owner(expectation.recipe, expectation.owner, 0.1)
   end
+
+  for _, expectation in ipairs({
+    { recipe = "pentapod-egg", owner = "recipe-prod-research_breeding-1", change = 0.10 },
+    { recipe = "nutrients-from-yumako-mash", owner = "recipe-prod-research_nutrients-1", change = 0.10 },
+    { recipe = "nutrients-from-bioflux", owner = "recipe-prod-research_nutrients-1", change = 0.10 },
+    { recipe = "nutrients-from-biter-egg", owner = "recipe-prod-research_nutrients-1", change = 0.10 },
+    { recipe = "capture-robot-rocket", owner = "recipe-prod-research_capture_robot_rockets-1", change = 0.10 },
+    { recipe = "ice-platform", owner = "recipe-prod-research_landfill-1", change = 0.02 },
+    { recipe = "space-platform-foundation", owner = "recipe-prod-research_landfill-1", change = 0.01 }
+  }) do
+    assert_required_recipe_owner(expectation.recipe, expectation.owner, expectation.change)
+  end
+
+  for _, recipe_name in ipairs({
+    "capture-robot-rocket",
+    "ice-platform",
+    "space-platform-foundation"
+  }) do
+    assert_recipe_productivity_permission(recipe_name)
+  end
+
+  assert_recipe_not_owned_by("nutrients-from-spoilage", "recipe-prod-research_nutrients-1")
+  assert_recipe_not_owned_by("nutrients-from-fish", "recipe-prod-research_nutrients-1")
+  assert_technology_has_science("recipe-prod-research_nutrients-1", {
+    "agricultural-science-pack",
+    "cryogenic-science-pack"
+  })
+  assert_technology_has_science("recipe-prod-research_capture_robot_rockets-1", {
+    "military-science-pack",
+    "agricultural-science-pack"
+  })
 
   for owner_name, expected_recipes in pairs({
     ["asteroid-productivity"] = {

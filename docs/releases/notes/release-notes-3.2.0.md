@@ -5,7 +5,7 @@ applies_to: "3.2.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 supersedes: []
 superseded_by: []
 ---
@@ -17,6 +17,8 @@ MIR 3.2.0 is a release-engineering overhaul built from the MIR 3.1.9 line plus t
 The release keeps the public setting IDs, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9. The explicit capability guard leaves Factorio 2.1 mod-data emission enabled but changes packaged data-stage source, so the 3.2.0 candidate requires fresh gameplay qualification rather than borrowing the 3.1.9 matrix. Version-only and package-only changes in later candidates still receive fresh deterministic-build, exact-ZIP load, and upgrade proof; gameplay scenarios are reused only when their declared effective domains are byte-identical.
 
 No additional automatic recipe-family generation is enabled by default in 3.2.0. The release retains every established generated technology, adds one explicitly reviewed steel plate productivity stream, and moves candidate design, lifecycle, target integrity, and final emission behind common compiler contracts. Base games receive `recipe-prod-research_steel-1`; Space Age keeps vanilla `steel-plate-productivity` as the single owner for steel smelting and casting. These foundations improve safety and explainability without turning on a broader procedural technology set.
+
+The Space Age stream set also adds default-on Nutrients productivity and Capture bot rocket productivity at `+10%` per level. Nutrients productivity targets only the exact yumako mash, bioflux, and biter egg forward-production recipes; spoilage recovery, fish, ATAN Ash sinks, and broad third-party nutrient matches remain excluded. Breeding productivity now has an exact regression proving pentapod egg coverage while retaining Space Age's productivity-exempt seed egg. Landfill productivity keeps landfill at `+10%` and foundation at `+5%`, and adds exact ice-platform and space-platform-foundation effects at `+2%` and `+1%`. Because those two platform recipes and capture robot rockets are not productivity-enabled upstream, MIR grants permission only to those exact recipes, only while Space Age is active, before immutable recipe facts are captured.
 
 The final compiler path eliminates a discarded transient technology-catalog construction, uses copy-on-write branches for compiler-owned diagnostic designs, resolves final qualification from gate-only snapshots, and performs one complete validation on the authoritative post-selection catalog. These are construction-cost optimizations, not a relaxation of catalog validation. Packaged stream-default documentation is source-generated from `prototypes/mir/settings/defaults.lua`. All established technology toggles now default on, including spoilage preservation and the inserter capacity continuation. Those two remain explicitly `factory-disruptive`, sort in the first settings attention bucket, and receive automatic localized warnings in both their enable-setting and technology tooltips; default enablement does not weaken their classification.
 

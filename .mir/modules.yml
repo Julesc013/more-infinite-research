@@ -126,6 +126,7 @@ modules:
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
+    - prototypes/mir/pipeline/recipe_productivity_permissions.lua
     - prototypes/mir/pipeline/mutations/competing_productivity.lua
     - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
     - prototypes/mir/pipeline/mutations/weapon_speed.lua
@@ -404,6 +405,7 @@ mutation_commands:
     - exact-version compatibility repairs remain separately bounded
   ids:
     - compatibility-repairs
+    - recipe-productivity-permissions
     - sanitize-input-technology-effects
     - module-permissions
     - prototype-limits
@@ -459,6 +461,7 @@ target_layers:
       - families
       - platform
       - settings
+      - streams
     may_mutate_data_raw: true
   domain:
     path: prototypes/mir/domain

@@ -454,6 +454,7 @@ foreach ($needle in @(
 $commandCatalogText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
 foreach ($commandId in @(
   "compatibility-repairs",
+  "recipe-productivity-permissions",
   "sanitize-input-technology-effects",
   "module-permissions",
   "prototype-limits",
