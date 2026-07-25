@@ -34,47 +34,50 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or
-    [string]$modern.qualification -ne "local-full-no-reuse-128-automated-passed-manual-pending" -or
+    [string]$modern.qualification -ne "quick-static-locale-and-package-checks-passed-runtime-pending" -or
+    [string]$modern.approved_delta -ne "pending" -or
+    [string]$modern.upgrade_qualification -ne "pending" -or
+    [string]$modern.runtime_qualification -ne "pending" -or
     [string]$modern.manual_review -ne "pending" -or
     [string]$modern.protected_qualification -ne "pending") {
-  throw "Canonical modern development release must remain MIR 3.2.0 C16 on dev with local automation green and manual/protected qualification pending."
+  throw "Canonical modern development release must remain MIR 3.2.0 C17 on dev with quick checks passed and runtime/manual/protected qualification pending."
 }
-$c16Authority = [ordered]@{
-  candidate_id = "C16"
+$c17Authority = [ordered]@{
+  candidate_id = "C17"
   archive = "dist/more-infinite-research_3.2.0.zip"
-  archive_bytes = 1014593
-  archive_entries = 288
-  package_source_commit = "0448ceb8d3992082718e2df83bd6a42c56955636"
-  package_source_tree = "eb6a5b42676ab65bb95ee7c1422f2191730b1338"
-  package_source_sha256 = "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
-  archive_sha256 = "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D"
-  package_content_sha256 = "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
+  archive_bytes = 1025248
+  archive_entries = 289
+  package_source_commit = "d301a3a8ba66bb45a24a55e24c51e3779600fd68"
+  package_source_tree = "fe75f801ecabce050110bf678ec37fd8628bd5a7"
+  package_source_sha256 = "FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9"
+  archive_sha256 = "57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D"
+  package_content_sha256 = "FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9"
 }
-foreach ($field in $c16Authority.Keys) {
-  if ([string]$modern.$field -ne [string]$c16Authority[$field]) {
-    throw "Canonical C16 authority field '$field' changed. A later candidate is required if candidate bytes change."
+foreach ($field in $c17Authority.Keys) {
+  if ([string]$modern.$field -ne [string]$c17Authority[$field]) {
+    throw "Canonical C17 authority field '$field' changed. A later candidate is required if candidate bytes change."
   }
 }
 if ([int]$modern.package_source_material.schema -ne 1 -or
     [string]$modern.package_source_material.hash_algorithm -ne "git-commit-normalized-package-v1" -or
     [string]$modern.package_source_material.source_tree -ne [string]$modern.package_source_tree -or
-    [int]$modern.package_source_material.file_count -ne 288) {
-  throw "Canonical C16 package-source material descriptor must bind its clean source tree and 288 package files."
+    [int]$modern.package_source_material.file_count -ne 289) {
+  throw "Canonical C17 package-source material descriptor must bind its clean source tree and 289 package files."
 }
 & git -C $repo merge-base --is-ancestor ([string]$modern.package_source_commit) HEAD
-if ($LASTEXITCODE -ne 0) { throw "C16 package-source commit is not an ancestor of release-engineering HEAD." }
+if ($LASTEXITCODE -ne 0) { throw "C17 package-source commit is not an ancestor of release-engineering HEAD." }
 $packageSourceTree = @(& git -C $repo rev-parse "$([string]$modern.package_source_commit)^{tree}")
 if ($LASTEXITCODE -ne 0 -or $packageSourceTree.Count -ne 1 -or [string]$packageSourceTree[0] -ne [string]$modern.package_source_tree) {
-  throw "C16 package-source tree does not match the canonical authority row."
+  throw "C17 package-source tree does not match the canonical authority row."
 }
 . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $packageRoots = @(Get-MIRPackageSourceRoots)
 $changedPackagePaths = @(& git -C $repo diff --name-only ([string]$modern.package_source_commit) HEAD -- @packageRoots)
 if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
-  throw "Package-visible paths changed after immutable C16 package source: $($changedPackagePaths -join ', ')"
+  throw "Package-visible paths changed after immutable C17 package source: $($changedPackagePaths -join ', ')"
 }
 if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$modern.package_source_sha256) {
-  throw "Current package roots do not reproduce the canonical C16 package-source identity."
+  throw "Current package roots do not reproduce the canonical C17 package-source identity."
 }
 $candidatePath = Join-Path $repo ([string]$modern.archive)
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -85,30 +88,17 @@ if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf) -or
     $candidateEntries -ne [int]$modern.archive_entries -or
     (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$modern.archive_sha256 -or
     (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$modern.package_content_sha256) {
-  throw "Canonical C16 archive no longer matches its immutable authority row."
+  throw "Canonical C17 archive no longer matches its immutable authority row."
 }
 $superseded = $modern.supersedes_candidate
-if ([string]$superseded.candidate_id -ne "C15" -or [long]$superseded.archive_bytes -ne 1000692 -or
-    [int]$superseded.archive_entries -ne 286 -or
-    [string]$superseded.archive_sha256 -ne "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA" -or
-    [string]$superseded.package_content_sha256 -ne "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242" -or
-    [string]$superseded.package_source_commit -ne "c3a56e88fa15da7c12db3b0d11c3d4e732935746" -or
-    [string]$superseded.package_source_tree -ne "de885bb52a10a6ee44517a8efda84be629019c28" -or
-    [string]$superseded.package_source_sha256 -ne "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242") {
-  throw "C16 must retain the complete immutable C15 authority as its superseded candidate."
-}
-$delta = Read-MIRText ".mir/evidence/3.2.0-c15-to-c16-delta.json" | ConvertFrom-Json
-if ([int]$delta.schema -ne 1 -or [string]$delta.record_type -ne "MIRCandidateArchiveDelta" -or [string]$delta.status -ne "PASS" -or
-    [string]$delta.baseline.archive_sha256 -ne [string]$superseded.archive_sha256 -or
-    [string]$delta.candidate.archive_sha256 -ne [string]$modern.archive_sha256 -or
-    [int]$delta.summary.added -ne 2 -or [int]$delta.summary.changed -ne 38 -or [int]$delta.summary.removed -ne 0 -or
-    [int]$delta.summary.unchanged -ne 248 -or [int]$delta.summary.unexpected -ne 0) {
-  throw "Tracked C15-to-C16 archive delta does not match the two immutable candidate authorities."
-}
-$deltaPaths = @($delta.changes | ForEach-Object { [string]$_.path } | Sort-Object)
-if (@($deltaPaths | Where-Object { $_ -notlike "prototypes/mir/*" }).Count -ne 0 -or
-    @($delta.changes | Where-Object { -not [bool]$_.allowed -or [string]$_.change -eq "removed" }).Count -ne 0) {
-  throw "C15-to-C16 delta must contain only additive or changed compiler implementation files under prototypes/mir/."
+if ([string]$superseded.candidate_id -ne "C16" -or [long]$superseded.archive_bytes -ne 1014593 -or
+    [int]$superseded.archive_entries -ne 288 -or
+    [string]$superseded.archive_sha256 -ne "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D" -or
+    [string]$superseded.package_content_sha256 -ne "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7" -or
+    [string]$superseded.package_source_commit -ne "0448ceb8d3992082718e2df83bd6a42c56955636" -or
+    [string]$superseded.package_source_tree -ne "eb6a5b42676ab65bb95ee7c1422f2191730b1338" -or
+    [string]$superseded.package_source_sha256 -ne "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7") {
+  throw "C17 must retain the complete immutable C16 authority as its superseded candidate."
 }
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
     [string]$backport.status -ne "planned-after-3.2-freeze" -or $null -ne $backport.archive) {
@@ -122,14 +112,14 @@ $promotion = Read-MIRText ".github/workflows/assurance-promotion.yml"
 foreach ($required in @(
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*dev:\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='MIR 3\.2\.0'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C16\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*0448ceb8d3992082718e2df83bd6a42c56955636\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C17\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*d301a3a8ba66bb45a24a55e24c51e3779600fd68\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='tmp/2\.0'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_3_2_0:\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C16\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*0448ceb8d3992082718e2df83bd6a42c56955636\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C17\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*d301a3a8ba66bb45a24a55e24c51e3779600fd68\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_2_5_0:\s*$'},
   @{Path="todo.md"; Text=$todo; Pattern='MIR 3\.2\.0 verifier hardening'},
   @{Path="todo.md"; Text=$todo; Pattern='governed C10 compiler contract-closure overhaul from the unqualified C9 foundation'},
@@ -139,6 +129,7 @@ foreach ($required in @(
   @{Path="todo.md"; Text=$todo; Pattern='Replace C13 with exact C14 after full static qualification'},
   @{Path="todo.md"; Text=$todo; Pattern='Replace C14 with exact C15 after the K2SO science-progression playtest defect'},
   @{Path="todo.md"; Text=$todo; Pattern='Replace rejected C15 with exact C16 after the fixed-cost compiler performance correction'},
+  @{Path="todo.md"; Text=$todo; Pattern='Create C17 from C16 by enabling every shipped technology toggle by default'},
   @{Path=".github/workflows/assurance-promotion.yml"; Text=$promotion; Pattern='mir-3\.2\.0-factorio-2\.1\.json'}
 )) {
   if ([string]$required.Text -notmatch [string]$required.Pattern) {
@@ -160,7 +151,7 @@ foreach ($forbiddenVersion in @("1.9.5", "2.5.0")) {
   }
 }
 $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.0" })
-if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "automated-playtest-candidate" -or
+if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "quick-checked-playtest-candidate" -or
     [string]$candidateRows[0].path -ne [string]$modern.archive -or
     [long]$candidateRows[0].bytes -ne [long]$modern.archive_bytes -or
     [string]$candidateRows[0].sha256 -ne [string]$modern.archive_sha256 -or

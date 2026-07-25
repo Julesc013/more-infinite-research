@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-24
+Updated: 2026-07-25
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
@@ -16,7 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - MIR 3.2.0 verifier hardening, integrity-kernel work, modularization, optimization, fixtures, tests, and documentation are authorized on `dev`. MIR 2.5.0 begins from the 2.4.9 baseline only after the canonical 3.2.0 source freezes.
-- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. C16 is the exact automated playtest candidate after C15 correctly failed the governed fixed-cost performance gate; C16 is not manually reviewed, protected-qualified, sealed, or published.
+- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. C16 is the exact fully automated checkpoint after C15 correctly failed the governed fixed-cost performance gate. C17 is the current quick-checked playtest candidate after the deliberate risk-default settings change; it is not runtime-qualified, manually reviewed, protected-qualified, sealed, or published.
 
 ## Consolidation Gate
 
@@ -96,7 +96,8 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Pass the focused C16 formal paired performance campaign without changing budgets: all ten runtime and compiler-phase lanes passed, with deterministic work-volume counters enforcing zero trusted-assertion canonicalizations, full catalog snapshots, and full TechnologyDesign copies.
 - [x] Make hosted validation represent an all-reuse plan with one explicit no-op matrix row while retaining the aggregate evidence gate as the only pass authority.
 - [x] Resolve C15's inherited paired 3.1.9 performance-regression failure in C16 without weakening the declared gate.
-- [ ] Run all final-candidate-bound automated work from the immutable C16 package source and current qualification contract.
+- [x] Create C17 from C16 by enabling every shipped technology toggle by default while preserving explicit risk classification, top-of-list ordering, and duplicate-safe localized warnings.
+- [ ] Run all final-candidate-bound automated work from the immutable C17 package source and current qualification contract.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.

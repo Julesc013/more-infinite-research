@@ -5,7 +5,7 @@ applies_to: "3.2.0"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-07-25
 supersedes: []
 superseded_by: []
 ---
@@ -19,29 +19,29 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C16` |
+| Candidate | `C17` |
 | Branch | `dev` |
-| Package source commit | `0448ceb8d3992082718e2df83bd6a42c56955636` |
-| Package source tree | `eb6a5b42676ab65bb95ee7c1422f2191730b1338` |
-| Package source SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
+| Package source commit | `d301a3a8ba66bb45a24a55e24c51e3779600fd68` |
+| Package source tree | `fe75f801ecabce050110bf678ec37fd8628bd5a7` |
+| Package source SHA-256 | `FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1014593` |
-| Archive entries | `288` |
-| Archive SHA-256 | `4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D` |
-| Package content SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
-| Qualification | `local-full-no-reuse-128-automated-passed-manual-pending` |
+| Archive bytes | `1025248` |
+| Archive entries | `289` |
+| Archive SHA-256 | `57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D` |
+| Package content SHA-256 | `FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9` |
+| Qualification | `quick-static-locale-and-package-checks-passed-runtime-pending` |
 | Publication | `unreleased` |
-| Status | `automated-playtest-candidate-local-automation-green-manual-pending` |
+| Status | `quick-checked-playtest-candidate-runtime-and-release-qualification-pending` |
 
 ## Superseded candidate
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C15` |
-| Package source commit | `c3a56e88fa15da7c12db3b0d11c3d4e732935746` |
-| Archive bytes | `1000692` |
-| Archive entries | `286` |
-| Archive SHA-256 | `89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA` |
-| Reason | C15 passed gameplay, package, K2SO, upgrade, and scale checks but failed the governed fixed-cost performance gate; C16 removes redundant trusted-record validation, copying, fingerprinting, and canonicalization while preserving exact seven-scenario semantic output |
+| Candidate | `C16` |
+| Package source commit | `0448ceb8d3992082718e2df83bd6a42c56955636` |
+| Archive bytes | `1014593` |
+| Archive entries | `288` |
+| Archive SHA-256 | `4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D` |
+| Reason | C16 passed all 128 local machine-verifiable no-reuse lanes and remained pending manual and protected qualification; C17 intentionally changes package bytes to enable every shipped technology toggle by default while retaining explicit risk classification, top-of-list ordering, and localized risk warnings |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

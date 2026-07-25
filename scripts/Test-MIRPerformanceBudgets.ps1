@@ -144,13 +144,24 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.0" -or
 $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
 $activeCandidate = $releaseLedger.development.'factorio-2.1'
-if ($null -eq $activeCandidate -or
-    [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
-    [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
-    [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
-    [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
-    [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
-    [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+$campaignBindsActiveCandidate = $null -ne $activeCandidate -and
+  [string]$campaign.candidate.candidate_id -eq [string]$activeCandidate.candidate_id -and
+  [string]$campaign.candidate.version -eq [string]$activeCandidate.mir_version -and
+  [string]$campaign.candidate.package_source_commit -eq [string]$activeCandidate.package_source_commit -and
+  [string]$campaign.candidate.package_source_sha256 -eq [string]$activeCandidate.package_source_sha256 -and
+  [string]$campaign.candidate.archive_sha256 -eq [string]$activeCandidate.archive_sha256 -and
+  [string]$campaign.candidate.package_content_sha256 -eq [string]$activeCandidate.package_content_sha256
+$supersededCandidate = $activeCandidate.supersedes_candidate
+$campaignBindsSupersededCandidate = $ValidateManifestOnly -and
+  [string]$activeCandidate.runtime_qualification -eq "pending" -and
+  $null -ne $supersededCandidate -and
+  [string]$campaign.candidate.candidate_id -eq [string]$supersededCandidate.candidate_id -and
+  [string]$campaign.candidate.version -eq [string]$activeCandidate.mir_version -and
+  [string]$campaign.candidate.package_source_commit -eq [string]$supersededCandidate.package_source_commit -and
+  [string]$campaign.candidate.package_source_sha256 -eq [string]$supersededCandidate.package_source_sha256 -and
+  [string]$campaign.candidate.archive_sha256 -eq [string]$supersededCandidate.archive_sha256 -and
+  [string]$campaign.candidate.package_content_sha256 -eq [string]$supersededCandidate.package_content_sha256
+if (-not $campaignBindsActiveCandidate -and -not $campaignBindsSupersededCandidate) {
   throw "Performance campaign candidate authority differs from the active Factorio 2.1 release candidate."
 }
 if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
@@ -224,7 +235,8 @@ if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed'
 }
 
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
+  $binding = if ($campaignBindsActiveCandidate) { "the active candidate" } else { "the exact superseded candidate while current performance qualification is explicitly pending" }
+  Write-Host "[ok] MIR performance manifests bind $binding and declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
   exit 0
 }
 

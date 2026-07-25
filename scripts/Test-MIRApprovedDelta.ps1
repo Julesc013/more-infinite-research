@@ -138,12 +138,21 @@ if ($artifact.current.version -ne "3.2.0" -or [string]::IsNullOrWhiteSpace([stri
 }
 $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
 $releaseAuthority = $releaseLedger.development."factorio-2.1"
-$packageSourceCommit = [string]$releaseAuthority.package_source_commit
-if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$' -or
-    [string]$artifact.current.source_commit -ne $packageSourceCommit -or
-    [string]$artifact.current.package_source_commit -ne $packageSourceCommit) {
+$activePackageSourceCommit = [string]$releaseAuthority.package_source_commit
+$artifactPackageSourceCommit = [string]$artifact.current.package_source_commit
+$artifactBindsActiveCandidate = $activePackageSourceCommit -match '^[0-9a-f]{40}$' -and
+  [string]$artifact.current.source_commit -eq $activePackageSourceCommit -and
+  $artifactPackageSourceCommit -eq $activePackageSourceCommit
+$historicalStructureCheck = $ValidateStructureOnly -and
+  [string]$releaseAuthority.approved_delta -eq "pending" -and
+  $activePackageSourceCommit -match '^[0-9a-f]{40}$' -and
+  [string]$artifact.current.source_commit -match '^[0-9a-f]{40}$' -and
+  $artifactPackageSourceCommit -match '^[0-9a-f]{40}$' -and
+  $artifactPackageSourceCommit -ne $activePackageSourceCommit
+if (-not $artifactBindsActiveCandidate -and -not $historicalStructureCheck) {
   throw "Approved-delta current side does not bind the active release candidate's canonical package-source commit."
 }
+$packageSourceCommit = $artifactPackageSourceCommit
 $qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
 if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$') {
   throw "Approved-delta exporter does not bind a full qualification-source commit."

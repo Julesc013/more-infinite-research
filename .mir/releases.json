@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-25",
   "published_baselines": {
     "factorio-2.1": {
       "mir_version": "3.1.9",
@@ -24,40 +24,42 @@
   "development": {
     "factorio-2.1": {
       "mir_version": "3.2.0",
-      "candidate_id": "C16",
+      "candidate_id": "C17",
       "branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 1014593,
-      "archive_entries": 288,
-      "package_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
-      "package_source_tree": "eb6a5b42676ab65bb95ee7c1422f2191730b1338",
-      "package_source_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
+      "archive_bytes": 1025248,
+      "archive_entries": 289,
+      "package_source_commit": "d301a3a8ba66bb45a24a55e24c51e3779600fd68",
+      "package_source_tree": "fe75f801ecabce050110bf678ec37fd8628bd5a7",
+      "package_source_sha256": "FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "eb6a5b42676ab65bb95ee7c1422f2191730b1338",
-        "file_count": 288
+        "source_tree": "fe75f801ecabce050110bf678ec37fd8628bd5a7",
+        "file_count": 289
       },
-      "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D",
-      "package_content_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
-      "archive_class": "automated-playtest-candidate",
-      "qualification": "local-full-no-reuse-128-automated-passed-manual-pending",
-      "local_automated_qualification": ".mir/evidence/3.2.0-c16-local-automated-qualification.json",
+      "archive_sha256": "57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D",
+      "package_content_sha256": "FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9",
+      "archive_class": "quick-checked-playtest-candidate",
+      "qualification": "quick-static-locale-and-package-checks-passed-runtime-pending",
+      "approved_delta": "pending",
+      "upgrade_qualification": "pending",
+      "runtime_qualification": "pending",
       "manual_review": "pending",
       "protected_qualification": "pending",
       "publication_status": "unreleased",
-      "status": "automated-playtest-candidate-local-automation-green-manual-pending",
+      "status": "quick-checked-playtest-candidate-runtime-and-release-qualification-pending",
       "supersedes_candidate": {
-        "candidate_id": "C15",
-        "archive_bytes": 1000692,
-        "archive_entries": 286,
-        "archive_sha256": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
-        "package_content_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
-        "package_source_commit": "c3a56e88fa15da7c12db3b0d11c3d4e732935746",
-        "package_source_tree": "de885bb52a10a6ee44517a8efda84be629019c28",
-        "package_source_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
-        "reason": "C15 passed gameplay, package, K2SO, upgrade, and scale checks but failed the governed fixed-cost performance gate; C16 removes redundant trusted-record validation, copying, fingerprinting, and canonicalization while preserving exact seven-scenario semantic output"
+        "candidate_id": "C16",
+        "archive_bytes": 1014593,
+        "archive_entries": 288,
+        "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D",
+        "package_content_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
+        "package_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
+        "package_source_tree": "eb6a5b42676ab65bb95ee7c1422f2191730b1338",
+        "package_source_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
+        "reason": "C16 passed all 128 local machine-verifiable no-reuse lanes and remained pending manual and protected qualification; C17 intentionally changes package bytes to enable every shipped technology toggle by default while retaining explicit risk classification, top-of-list ordering, and localized risk warnings"
       }
     },
     "factorio-2.0": {

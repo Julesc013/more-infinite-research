@@ -293,7 +293,7 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
-      candidate_id: C16
+      candidate_id: C17
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
@@ -302,31 +302,31 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 1014593
-      archive_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
-      package_content_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
-      package_source_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
-      package_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
-      superseded_candidate_id: C15
-      superseded_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
+      archive_bytes: 1025248
+      archive_sha256: 57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D
+      package_content_sha256: FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9
+      package_source_sha256: FF871240BEA124F79C4B83DD2BBEE9D74EB569DC313524A721B42B1A0B5C3FC9
+      package_source_commit: d301a3a8ba66bb45a24a55e24c51e3779600fd68
+      superseded_candidate_id: C16
+      superseded_candidate_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
       superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
-      superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: pending-exact-c16
-      superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: pending-exact-c16
-      locale_gate: passed-source-unchanged-50-locales-21250-values
-      locale_runtime_gate: pending-exact-c16
-      fast_static_gate: passed-c16-focused-contracts
+      superseded_c16_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
+      approved_delta_gate: pending-exact-c17
+      superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+      upgrade_gate: pending-exact-c17
+      locale_gate: passed-source-current-50-locales-21300-values
+      locale_runtime_gate: pending-exact-c17
+      fast_static_gate: passed-c17-quick-contracts
       superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
       superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
-      focused_c16_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
-      c15_to_c16_semantic_parity_evidence: .mir/evidence/3.2.0-c15-to-c16-semantic-parity.json
-      runtime_performance_gate: passed-exact-c16-focused-formal-10-of-10-full-plan-refresh-pending
-      manual_attestation_gate: pending-exact-c16
+      superseded_c16_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+      superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
+      runtime_performance_gate: pending-exact-c17
+      manual_attestation_gate: pending-exact-c17
       minimum_factorio_gate: passed-floor-raised-to-2.1.11
-      release_gate: blocked-exact-c16-full-no-reuse-manual-and-protected-qualification
+      release_gate: blocked-exact-c17-runtime-full-no-reuse-manual-and-protected-qualification
       publication_status: unreleased
-      status: c16-automated-playtest-candidate-focused-performance-and-semantic-parity-passed
+      status: c17-quick-checked-playtest-candidate-runtime-and-release-qualification-pending
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
