@@ -126,7 +126,7 @@ The required workflow is:
 
 Portable fixes discovered during target qualification should land on `dev` and return through the next canonical merge when practical. Urgent shared fixes may be cherry-picked downward with an explicit source-commit record. Target metadata, removed capabilities, lower dependency floors, and old-line release wording never merge upward.
 
-The current `2.5-P4` archive descends from both published `2.4.9` and tag `3.2.0`, projects final C20, and remains an automated playtest candidate until exact target qualification and manual review pass. Its four-path package adapter is recorded in `.mir/backport-source-lock.json`.
+The current `2.5-P5` archive descends from both published `2.4.9` and tag `3.2.0`, projects final C20, and remains an automated playtest candidate until exact target qualification and manual review pass. Its four-path package adapter is recorded in `.mir/backport-source-lock.json`.
 
 `tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
 

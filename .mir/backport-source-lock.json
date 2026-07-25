@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "projection_schema": 2,
-  "candidate_id": "2.5-P4",
+  "candidate_id": "2.5-P5",
   "mir_version": "2.5.0",
   "target": "2.0",
   "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
@@ -31,9 +31,9 @@
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "4a19c26c5abf479cbe4cf48f477eec6e3ab2474d",
-    "package_source_tree": "ab842844a36e30847fd930af0713f6b5ce604a73",
-    "package_source_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
+    "package_source_commit": "fe8d046a0c5858f9e94669131ac5fcbf91856669",
+    "package_source_tree": "cf2670784430237a1e63d62d22ab5b56c8b2f486",
+    "package_source_sha256": "E97671B0B13071CB85960BEF93B398BAF6852D1660DA986E2E3B28F912F388D5",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
@@ -43,9 +43,9 @@
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "546F82FB58288F492F7B3D21AF4F597B21D4477B18FF9D98A18BE0E5E2D26580",
-    "content_sha256": "583C94FBFC604F6F4A7475B9303BE51AC82BF089205D610F9FC190DEC644BF75",
-    "bytes": 1029641,
+    "archive_sha256": "29F1797D4C2B692C7855A558DC1D0CC436011C12D251CCA503BBA7C1A0D2BCF0",
+    "content_sha256": "E97671B0B13071CB85960BEF93B398BAF6852D1660DA986E2E3B28F912F388D5",
+    "bytes": 1029630,
     "entries": 290,
     "forbidden_entries": 0,
     "class": "automated-playtest-candidate"
@@ -55,8 +55,8 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "pending-exact-p4",
-    "runtime": "pending-exact-p4",
+    "target_static": "pending-exact-p5",
+    "runtime": "pending-exact-p5",
     "manual_review": "pending",
     "protected_qualification": "pending",
     "publication": "unreleased"

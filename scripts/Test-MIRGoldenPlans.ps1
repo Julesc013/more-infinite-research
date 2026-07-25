@@ -30,8 +30,11 @@ if ($release320.schema -ne 1 -or $release320.release -ne "3.2.0" `
   throw "3.2.0 technology golden plan has an unsupported schema, release, or identity state."
 }
 $release320Ids = @($release320.technology_ids | ForEach-Object { [string]$_ } | Sort-Object)
-if ($release320Ids.Count -ne 1 -or $release320Ids[0] -ne "recipe-prod-research_steel-1") {
-  throw "3.2.0 technology golden plan must reserve exactly the steel productivity identity."
+if ($release320Ids.Count -ne 3 -or
+    "recipe-prod-research_capture_robot_rockets-1" -notin $release320Ids -or
+    "recipe-prod-research_nutrients-1" -notin $release320Ids -or
+    "recipe-prod-research_steel-1" -notin $release320Ids) {
+  throw "3.2.0 technology golden plan must reserve exactly Steel, Nutrients, and Capture bot rocket productivity."
 }
 $combined = @($expected + $automaticIds + $release320Ids | Sort-Object -Unique)
 if ($actual.Count -ne $combined.Count -or ($actual -join "`n") -ne ($combined -join "`n")) {
