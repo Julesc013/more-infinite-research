@@ -37,6 +37,8 @@ Version: 2.5.0
 
   Bugfixes:
 
+    - Requalified the exact realized technology graph after safe competing-technology replacement and prerequisite rewiring.
+    - Fixed competing productivity preparation when a recognized overhaul owner is eligible for MIR replacement.
     - Ordered MIR after Krastorio 2 and K2SO final science/lab rewrites so generated research no longer collapses to red science.
     - Ordered MIR after Space Exploration so its final Krastorio recipe removals happen before productivity compilation.
     - Pruned impossible known recipe targets from generated and external technology effects before final safety assertions.

@@ -48,6 +48,35 @@ local function same_node(left, right)
     and same_array(left.science_packs or {}, right.science_packs or {})
 end
 
+local function replacement_prerequisites(prerequisites, old_name, replacements)
+  local out, seen = {}, {}
+  for _, name in ipairs(prerequisites or {}) do
+    if name == old_name then
+      for _, replacement in ipairs(replacements or {}) do
+        if not seen[replacement] then
+          seen[replacement] = true
+          table.insert(out, replacement)
+        end
+      end
+    elseif not seen[name] then
+      seen[name] = true
+      table.insert(out, name)
+    end
+  end
+  table.sort(out)
+  return out
+end
+
+local function snapshot_from_nodes(nodes)
+  table.sort(nodes, function(left, right) return left.name < right.name end)
+  local snapshot = {schema = 1, nodes = nodes}
+  snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
+  local view = {}
+  for _, node in ipairs(nodes) do view[node.name] = node end
+  technology_views[snapshot] = view
+  return snapshot
+end
+
 function M.new(technologies, options)
   options = options or {}
   local nodes = {}
@@ -64,10 +93,83 @@ function M.new(technologies, options)
     for name, technology in pairs(technologies or {}) do append(name, technology) end
     table.sort(nodes, function(left, right) return left.name < right.name end)
   end
-  local snapshot = {schema = 1, nodes = nodes}
-  snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
+  local snapshot = snapshot_from_nodes(nodes)
   technology_views[snapshot] = technology_view
   return snapshot
+end
+
+-- Project the exact normalized graph that a validated sequence of technology
+-- replacements is allowed to realize. Every removed node and every dependent
+-- prerequisite rewrite must match the journal's before/after evidence.
+function M.apply_replacement_journal(snapshot, entries)
+  if type(snapshot) ~= "table" or snapshot.schema ~= 1 or type(entries) ~= "table" then
+    error("MIR graph replacement projection requires a schema-1 snapshot and journal entries.", 2)
+  end
+  local by_name = {}
+  for _, node in ipairs(snapshot.nodes or {}) do by_name[node.name] = deepcopy(node) end
+
+  for _, entry in ipairs(entries) do
+    local old_node = by_name[entry.old_technology]
+    if not old_node then
+      error("MIR graph replacement journal removes an absent qualified node: "
+        .. tostring(entry.old_technology) .. ".", 2)
+    end
+    if fingerprint.of(old_node) ~= entry.old_graph_node_fingerprint then
+      error("MIR graph replacement journal old-node authority differs for "
+        .. tostring(entry.old_technology) .. ".", 2)
+    end
+    for _, replacement in ipairs(entry.replacement_technologies or {}) do
+      if not by_name[replacement] then
+        error("MIR graph replacement journal references an absent qualified replacement: "
+          .. tostring(replacement) .. ".", 2)
+      end
+    end
+
+    local expected_dependents = {}
+    for name, node in pairs(by_name) do
+      if name ~= entry.old_technology then
+        for _, prerequisite in ipairs(node.prerequisites or {}) do
+          if prerequisite == entry.old_technology then
+            expected_dependents[name] = node
+            break
+          end
+        end
+      end
+    end
+    local journal_dependents = {}
+    for _, row in ipairs(entry.rewired_dependents or {}) do
+      if journal_dependents[row.technology_name] then
+        error("MIR graph replacement journal repeats dependent " .. row.technology_name .. ".", 2)
+      end
+      journal_dependents[row.technology_name] = row
+    end
+    for name in pairs(expected_dependents) do
+      if not journal_dependents[name] then
+        error("MIR graph replacement journal omits dependent " .. name .. ".", 2)
+      end
+    end
+    for name, row in pairs(journal_dependents) do
+      local node = expected_dependents[name]
+      if not node then
+        error("MIR graph replacement journal declares an unexpected dependent " .. name .. ".", 2)
+      end
+      if not same_array(node.prerequisites or {}, row.before_prerequisites or {}) then
+        error("MIR graph replacement journal before-state differs for dependent " .. name .. ".", 2)
+      end
+      local projected = replacement_prerequisites(
+        row.before_prerequisites, entry.old_technology, entry.replacement_technologies)
+      if not same_array(projected, row.after_prerequisites or {}) then
+        error("MIR graph replacement journal after-state is not the declared exact rewrite for dependent "
+          .. name .. ".", 2)
+      end
+      node.prerequisites = deepcopy(row.after_prerequisites)
+    end
+    by_name[entry.old_technology] = nil
+  end
+
+  local nodes = {}
+  for _, node in pairs(by_name) do table.insert(nodes, node) end
+  return snapshot_from_nodes(nodes)
 end
 
 -- Prove a live prototype registry has the exact normalized node projection of

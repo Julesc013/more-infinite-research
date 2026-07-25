@@ -83,7 +83,7 @@ local commands = {
     kind = "mutation",
     requires_features = {"recipe_productivity"},
     implementation = "prototypes/mir/pipeline/mutations/competing_productivity.lua",
-    apply = function() require("prototypes.mir.pipeline.mutations.competing_productivity").apply() end
+    apply = function(context) require("prototypes.mir.pipeline.mutations.competing_productivity").apply(context) end
   },
   ["emit-base-extensions"] = {
     kind = "emission",
@@ -95,7 +95,7 @@ local commands = {
     kind = "mutation",
     requires_features = {},
     implementation = "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
-    apply = function() require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply() end
+    apply = function(context) require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply(context) end
   },
   ["weapon-speed-adjustments"] = {
     kind = "mutation",
@@ -125,8 +125,12 @@ local commands = {
         context:artifact("input_sanitation_ledger"), ledger)
       context:record_artifact("output_sanitation_ledger", ledger)
       effect_safety.assert_registered_technology_effects(target_inventory)
+      local replacement_journal = context:state_view("technology_replacement_journal")
+      if not replacement_journal then error("MIR technology replacement journal is missing.", 2) end
+      context:freeze_state("technology_replacement_journal")
       local graph_parity = require("prototypes.mir.emit.technology_graph_safety")
-        .assert_registered_technologies(require("prototypes.mir.pipeline.compiler_orchestrator").compile(context))
+        .assert_registered_technologies(
+          require("prototypes.mir.pipeline.compiler_orchestrator").compile(context), replacement_journal)
       context:record_artifact("technology_graph_parity", graph_parity)
     end
   },
