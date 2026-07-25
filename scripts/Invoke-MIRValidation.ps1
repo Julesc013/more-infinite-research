@@ -476,7 +476,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies)' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_diff.compare(expected.graph_snapshot, actual_snapshot)' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'proof.status ~= "passed"' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'assert_equal("graph fingerprint", expected.graph_fingerprint, actual_snapshot.graph_fingerprint)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'assert_equal("graph fingerprint", comparison_snapshot.graph_fingerprint, actual_snapshot.graph_fingerprint)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 
