@@ -292,6 +292,16 @@ if cardinality.status ~= "REVIEW_REQUIRED"
   or type(cardinality_rows[1].decision_fingerprint) ~= "string" then
   fail("provider cardinality overflow did not stop expansion before emission while preserving hard rejection")
 end
+local progression_rows, progression = family_resolver.apply_cardinality_guard({
+  {final_state = "attach", decision = "attach", blocker = nil,
+    promotion_class = "exact-reviewed", unlock_depth = 2},
+  {final_state = "diagnose", decision = "diagnose", blocker = "productivity_disabled",
+    promotion_class = "new-unreviewed", unlock_depth = 100}
+}, {maximum_progression_span = 1}, 2)
+if progression.status ~= "PASS" or progression.progression_span ~= 0
+  or progression_rows[1].decision ~= "attach" or progression_rows[2].decision ~= "diagnose" then
+  fail("provider progression budget included a hard-rejected non-member")
+end
 local reversed_providers = {schema = 1, providers = {}}
 for index = #providers.providers, 1, -1 do table.insert(reversed_providers.providers, providers.providers[index]) end
 local normalized_providers = provider_registry.validate(reversed_providers)
