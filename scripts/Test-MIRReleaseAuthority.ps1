@@ -33,14 +33,34 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
     [string]$publishedBackport.status -ne "published-frozen") {
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
-if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or
-    [string]$modern.qualification -ne "quick-static-locale-package-and-targeted-space-age-runtime-passed" -or
+if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "main" -or
+    [string]$modern.development_branch -ne "dev" -or
+    [string]$modern.archive_class -ne "main-staged-release-candidate" -or
+    [string]$modern.qualification -ne "quick-static-locale-package-targeted-space-age-runtime-and-hosted-ci-passed" -or
     [string]$modern.approved_delta -ne "pending" -or
     [string]$modern.upgrade_qualification -ne "pending" -or
     [string]$modern.runtime_qualification -ne "pending" -or
     [string]$modern.manual_review -ne "pending" -or
-    [string]$modern.protected_qualification -ne "pending") {
-  throw "Canonical modern development release must remain MIR 3.2.0 C18 on dev with quick checks passed and runtime/manual/protected qualification pending."
+    [string]$modern.protected_qualification -ne "pending" -or
+    [string]$modern.publication_status -ne "staged-on-main-awaiting-tag-and-publication" -or
+    [string]$modern.status -ne "c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions") {
+  throw "Canonical modern release must remain exact MIR 3.2.0 C18 staged on main, developed from dev, with passed quick/hosted checks and recorded pending assurance gates."
+}
+if ([string]$modern.hosted_ci.branch_policy.status -ne "passed" -or
+    [string]$modern.hosted_ci.branch_policy.run_id -ne "30155405708" -or
+    [string]$modern.hosted_ci.mir.status -ne "passed" -or
+    [string]$modern.hosted_ci.mir.run_id -ne "30155405710") {
+  throw "Canonical C18 staging authority must retain the exact successful hosted Branch Policy and MIR runs."
+}
+$acceptedExceptions = @($modern.release_decision.accepted_assurance_exceptions)
+if ([string]$modern.release_decision.decision -ne "maintainer-directed-stage-and-release-as-is" -or
+    [string]$modern.release_decision.recorded_at -ne "2026-07-25" -or
+    [string]$modern.release_decision.qualification_authority_commit -ne "3ad7db79029b0043b14611e6234b0c7d1b75c25c" -or
+    [string]$modern.release_decision.tag -ne "pending" -or
+    [string]$modern.release_decision.publication -ne "pending" -or
+    [string]$modern.release_decision.artifact_rule -ne "publish-the-recorded-zip-without-rebuilding" -or
+    $acceptedExceptions.Count -ne 6) {
+  throw "Canonical C18 staging decision and its six accepted assurance exceptions must remain explicit."
 }
 $c18Authority = [ordered]@{
   candidate_id = "C18"
@@ -101,8 +121,9 @@ if ([string]$superseded.candidate_id -ne "C17" -or [long]$superseded.archive_byt
   throw "C18 must retain the complete immutable C17 authority as its superseded candidate."
 }
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
-    [string]$backport.status -ne "planned-after-3.2-freeze" -or $null -ne $backport.archive) {
-  throw "Canonical Factorio 2.0 backport must remain unbuilt MIR 2.5.0 after the 3.2 source freeze."
+    [string]$backport.source_anchor -ne "3.2.5-final-source-freeze" -or
+    [string]$backport.status -ne "planned-after-3.2.5-freeze" -or $null -ne $backport.archive) {
+  throw "Canonical Factorio 2.0 backport must remain unbuilt MIR 2.5.0 after the final 3.2.5 source freeze."
 }
 
 $branches = Read-MIRText ".mir/branches.yml"
@@ -113,15 +134,17 @@ foreach ($required in @(
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*dev:\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='MIR 3\.2\.0'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C18\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*branch:\s*main\s*$.*?^\s*development_branch:\s*dev\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*archive_sha256:\s*C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?m)^\s*package_source_commit:\s*55a57548316729d89482c96dcecd7c65f26c6103\s*$'},
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='tmp/2\.0'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_3_2_0:\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*candidate_id:\s*C18\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?ms)^\s*mir_3_2_0:\s*$.*?^\s*branch:\s*main\s*$.*?^\s*development_branch:\s*dev\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*archive_sha256:\s*C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*package_source_commit:\s*55a57548316729d89482c96dcecd7c65f26c6103\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$releaseWave; Pattern='(?m)^\s*mir_2_5_0:\s*$'},
-  @{Path="todo.md"; Text=$todo; Pattern='MIR 3\.2\.0 verifier hardening'},
+  @{Path="todo.md"; Text=$todo; Pattern='Exact C18 is staged on `main` for the MIR 3\.2\.0 tag and publication'},
   @{Path="todo.md"; Text=$todo; Pattern='governed C10 compiler contract-closure overhaul from the unqualified C9 foundation'},
   @{Path="todo.md"; Text=$todo; Pattern='exact-singleton candidate-seed ambiguity defect as C11'},
   @{Path="todo.md"; Text=$todo; Pattern='freeze C12 without widening the technology set'},
@@ -131,6 +154,7 @@ foreach ($required in @(
   @{Path="todo.md"; Text=$todo; Pattern='Replace rejected C15 with exact C16 after the fixed-cost compiler performance correction'},
   @{Path="todo.md"; Text=$todo; Pattern='Create C17 from C16 by enabling every shipped technology toggle by default'},
   @{Path="todo.md"; Text=$todo; Pattern='Create C18 from C17 with bounded Space Age productivity streams'},
+  @{Path="todo.md"; Text=$todo; Pattern='Stage exact C18 on `main` without rebuilding'},
   @{Path=".github/workflows/assurance-promotion.yml"; Text=$promotion; Pattern='mir-3\.2\.0-factorio-2\.1\.json'}
 )) {
   if ([string]$required.Text -notmatch [string]$required.Pattern) {
@@ -152,12 +176,12 @@ foreach ($forbiddenVersion in @("1.9.5", "2.5.0")) {
   }
 }
 $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.0" })
-if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "quick-checked-playtest-candidate" -or
+if ($candidateRows.Count -ne 1 -or [string]$candidateRows[0].kind -ne "release-staged-candidate" -or
     [string]$candidateRows[0].path -ne [string]$modern.archive -or
     [long]$candidateRows[0].bytes -ne [long]$modern.archive_bytes -or
     [string]$candidateRows[0].sha256 -ne [string]$modern.archive_sha256 -or
     [string]$candidateRows[0].source_ref -ne [string]$modern.package_source_commit) {
-  throw "The tracked MIR 3.2.0 development distribution must exactly mirror canonical candidate authority."
+  throw "The tracked MIR 3.2.0 release-staged distribution must exactly mirror canonical candidate authority."
 }
 
 Write-Host "[ok] canonical release ledger and branch, wave, distribution, queue, and promotion views agree."

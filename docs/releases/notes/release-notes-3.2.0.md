@@ -12,6 +12,12 @@ superseded_by: []
 
 # MIR 3.2.0 Release Notes
 
+## Release artifact
+
+MIR 3.2.0 uses exact C18 package-source commit `55a57548316729d89482c96dcecd7c65f26c6103`. The release archive is `dist/more-infinite-research_3.2.0.zip`: 1,026,915 bytes, 290 entries, and SHA-256 `C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E`. Its normalized package-content and package-source SHA-256 is `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5`. Publish this recorded ZIP without rebuilding it, then verify every downloaded public copy against the archive hash.
+
+The maintainer selected C18 for `main` staging after deterministic builds, static validation, a targeted exact Space Age runtime, and hosted Branch Policy and MIR validation passed. Full exact-C18 no-reuse, approved-delta, upgrade, ecosystem/performance, schema-2 manual, protected qualification, and seal work was not completed; those omissions are recorded as explicit assurance exceptions rather than passes.
+
 MIR 3.2.0 is a release-engineering overhaul built from the MIR 3.1.9 line plus the portable target-capability guard accumulated on `dev`. It introduces persistent content-addressed test evidence so unchanged scenarios can reuse exact prior proof while changed package, gameplay, settings, migration, fixture, harness, binary, and dependency inputs rerun the lanes they affect.
 
 The release keeps the public setting IDs, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9. The explicit capability guard leaves Factorio 2.1 mod-data emission enabled but changes packaged data-stage source, so the 3.2.0 candidate requires fresh gameplay qualification rather than borrowing the 3.1.9 matrix. Version-only and package-only changes in later candidates still receive fresh deterministic-build, exact-ZIP load, and upgrade proof; gameplay scenarios are reused only when their declared effective domains are byte-identical.

@@ -20,7 +20,7 @@ superseded_by: []
 | --- | --- |
 | MIR version | `3.2.0` |
 | Candidate | `C18` |
-| Branch | `dev` |
+| Branch | `main` |
 | Package source commit | `55a57548316729d89482c96dcecd7c65f26c6103` |
 | Package source tree | `958aae2feeea0a3f6a3a4c1cffc431985c9537a4` |
 | Package source SHA-256 | `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5` |
@@ -29,9 +29,9 @@ superseded_by: []
 | Archive entries | `290` |
 | Archive SHA-256 | `C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E` |
 | Package content SHA-256 | `1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5` |
-| Qualification | `quick-static-locale-package-and-targeted-space-age-runtime-passed` |
-| Publication | `unreleased` |
-| Status | `c18-quick-checked-playtest-candidate-full-release-qualification-pending` |
+| Qualification | `quick-static-locale-package-targeted-space-age-runtime-and-hosted-ci-passed` |
+| Publication | `staged-on-main-awaiting-tag-and-publication` |
+| Status | `c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions` |
 
 ## Superseded candidate
 

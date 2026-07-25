@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.9
+    purpose: stable Factorio 2.1 line with exact C18 staged for MIR 3.2.0 tag and publication; MIR 3.1.9 remains the last published tag
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -10,13 +10,14 @@ branches:
       - fixture-correction
       - unpublished-version-package-build
       - validated-release-candidate-promotion
+      - maintainer-directed-release-staging-with-recorded-assurance-exceptions
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes
       - large-architecture-rewrite
 
   dev:
-    purpose: MIR 3.2.0 persistent-verification development and canonical future Factorio 2.1 integration
+    purpose: MIR 3.2.0 release staging followed by MIR 3.2.5 compiler and promotion refinement after publication
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -290,7 +291,8 @@ release_artifacts:
       status: published-frozen
     mir_3_2_0:
       version: "3.2.0"
-      branch: dev
+      branch: main
+      development_branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
       candidate_id: C18
@@ -324,14 +326,24 @@ release_artifacts:
       runtime_performance_gate: pending-exact-c18
       manual_attestation_gate: pending-exact-c18
       minimum_factorio_gate: passed-floor-raised-to-2.1.11
-      release_gate: blocked-exact-c18-runtime-full-no-reuse-manual-and-protected-qualification
-      publication_status: unreleased
-      status: c18-quick-checked-playtest-candidate-full-release-qualification-pending
+      hosted_branch_policy_gate: passed-run-30155405708
+      hosted_mir_gate: passed-run-30155405710
+      maintainer_release_decision: stage-and-release-as-is
+      accepted_assurance_exceptions:
+        - exact-c18-full-no-reuse-plan-not-run
+        - exact-c18-approved-delta-not-rerun
+        - exact-c18-upgrade-matrix-not-rerun
+        - exact-c18-ecosystem-and-performance-campaigns-not-rerun
+        - schema-2-manual-attestation-not-recorded
+        - protected-qualification-and-schema-4-seal-not-created
+      release_gate: maintainer-approved-for-tag-and-publication-with-recorded-assurance-exceptions
+      publication_status: staged-awaiting-tag-and-publication
+      status: c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_2_0
+      source_anchor: mir_3_2_5_final_source
       prior_candidate:
         source_anchor: mir_3_1_2
         source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
@@ -344,9 +356,9 @@ release_artifacts:
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      release_gate: target-backport-and-qualification-pending
+      release_gate: pending-canonical-3.2.5-source-freeze
       publication_status: unreleased
-      status: development-candidate
+      status: planned-after-3.2.5-freeze
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -790,14 +802,15 @@ release_artifacts:
   next_release_targets:
     current_line:
       version: "3.2.0"
-      branch: dev
+      branch: main
+      development_branch: dev
       target_factorio: "2.1"
-      purpose: persistent content-addressed verification overhaul from the published 3.1.9 behavior baseline
+      purpose: exact C18 staged for tag and publication without rebuilding
     factorio_2_0_companion:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      purpose: target-specific verification-overhaul backport from accepted MIR 3.2.0 tooling
+      purpose: target-specific backport from the final stabilized MIR 3.2.5 source
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1
@@ -828,10 +841,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.2.0"
+      version: "3.2.5"
       branch: dev
       target_factorio: "2.1"
-      purpose: persistent evidence ledger, dependency-domain invalidation, scenario workers, and one aggregate gate
+      purpose: post-3.2.0 compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

@@ -5,17 +5,29 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-25
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-20
+Updated: 2026-07-25
 
 ## Current 3.2 Release Roles
 
-Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. MIR `3.2.0` is the active `dev` candidate for persistent content-addressed verification, and MIR `2.5.0` is the subsequent Factorio 2.0 target on `tmp/2.0`. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
+Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. Exact MIR `3.2.0` C18 is staged on `main` for tag and publication while `dev` remains its development source. After publication, emergency package corrections use `3.2.1`; otherwise `dev` advances through compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation toward `3.2.5`. MIR `2.5.0` is then derived on `tmp/2.0` from the final stabilized `3.2.5` source, not independently reimplemented from an old `tmp/2.0` state. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
+
+The locked modern-to-backport sequence is:
+
+```text
+3.2.0 exact release artifact
+→ 3.2.1 only for emergency release correction
+→ 3.2.5 compiler/promotion/compatibility consolidation
+→ freeze final 3.2.5 source
+→ derive and independently qualify 2.5.0 for Factorio 2.0
+```
+
+The 2.5 branch should share the final portable 3.2.5 ancestry where target compatibility permits, then apply explicit Factorio 2.0 capability adapters. It must not merge Factorio 2.1-only metadata or borrow Factorio 2.1 evidence.
 
 MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
@@ -76,10 +88,10 @@ Use these branch roles during the transition:
 
 | Branch or worktree | Role | New release line |
 | --- | --- | ---: |
-| `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
-| `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
+| `main` | Stable canonical Factorio `2.1` line; exact C18 is staged here for the 3.2.0 tag and publication. | `3.x.x` after `3.0.0` |
+| `dev` | Development canonical Factorio `2.1` line; advances to 3.2.5 after 3.2.0 publication. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
-| `tmp/2.0` | Maintained Factorio `2.0` semantic companion and verification-overhaul branch. | Unreleased `2.5.0` from published `2.4.9`. |
+| `tmp/2.0` | Maintained Factorio `2.0` semantic companion derived from final portable 3.2.5 source plus explicit 2.0 adapters. | Unreleased `2.5.0` from published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |

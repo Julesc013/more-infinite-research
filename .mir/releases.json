@@ -25,7 +25,8 @@
     "factorio-2.1": {
       "mir_version": "3.2.0",
       "candidate_id": "C18",
-      "branch": "dev",
+      "branch": "main",
+      "development_branch": "dev",
       "source_anchor": "3.1.9",
       "archive": "dist/more-infinite-research_3.2.0.zip",
       "archive_bytes": 1026915,
@@ -41,15 +42,43 @@
       },
       "archive_sha256": "C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E",
       "package_content_sha256": "1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5",
-      "archive_class": "quick-checked-playtest-candidate",
-      "qualification": "quick-static-locale-package-and-targeted-space-age-runtime-passed",
+      "archive_class": "main-staged-release-candidate",
+      "qualification": "quick-static-locale-package-targeted-space-age-runtime-and-hosted-ci-passed",
       "approved_delta": "pending",
       "upgrade_qualification": "pending",
       "runtime_qualification": "pending",
       "manual_review": "pending",
       "protected_qualification": "pending",
-      "publication_status": "unreleased",
-      "status": "c18-quick-checked-playtest-candidate-full-release-qualification-pending",
+      "hosted_ci": {
+        "branch_policy": {
+          "status": "passed",
+          "run_id": "30155405708",
+          "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/30155405708"
+        },
+        "mir": {
+          "status": "passed",
+          "run_id": "30155405710",
+          "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/30155405710"
+        }
+      },
+      "release_decision": {
+        "decision": "maintainer-directed-stage-and-release-as-is",
+        "recorded_at": "2026-07-25",
+        "qualification_authority_commit": "3ad7db79029b0043b14611e6234b0c7d1b75c25c",
+        "accepted_assurance_exceptions": [
+          "exact-c18-full-no-reuse-plan-not-run",
+          "exact-c18-approved-delta-not-rerun",
+          "exact-c18-upgrade-matrix-not-rerun",
+          "exact-c18-ecosystem-and-performance-campaigns-not-rerun",
+          "schema-2-manual-attestation-not-recorded",
+          "protected-qualification-and-schema-4-seal-not-created"
+        ],
+        "tag": "pending",
+        "publication": "pending",
+        "artifact_rule": "publish-the-recorded-zip-without-rebuilding"
+      },
+      "publication_status": "staged-on-main-awaiting-tag-and-publication",
+      "status": "c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions",
       "supersedes_candidate": {
         "candidate_id": "C17",
         "archive_bytes": 1025248,
@@ -65,13 +94,13 @@
     "factorio-2.0": {
       "mir_version": "2.5.0",
       "branch": "tmp/2.0",
-      "source_anchor": "3.2.0-final-source-freeze",
+      "source_anchor": "3.2.5-final-source-freeze",
       "prior_release": "2.4.9",
       "archive": null,
       "archive_class": "not-built-from-final-source",
       "qualification": "pending-canonical-backport",
       "publication_status": "unreleased",
-      "status": "planned-after-3.2-freeze"
+      "status": "planned-after-3.2.5-freeze"
     }
   },
   "views": {

@@ -297,13 +297,14 @@ waves:
 
   mir_3_2_0:
     version: "3.2.0"
-    branch: dev
+    branch: main
+    development_branch: dev
     target_factorio: "2.1"
     source_anchor: mir_3_1_9
     candidate_id: C18
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
-    archive_class: development-candidate
+    archive_class: release-staged-candidate
     archive_bytes: 1026915
     archive_sha256: C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E
     package_content_sha256: 1CDCBE41F644DB187153165617835FB8008DD69767A9BD6C78B396E8160065F5
@@ -332,9 +333,19 @@ waves:
     protected_release_gate: pending
     interactive_gate: pending-exact-c18
     assurance_seal: pending
-    release_gate: blocked-runtime-full-no-reuse-manual-and-protected-qualification
-    publication_status: unreleased
-    status: c18-quick-checked-playtest-candidate-full-release-qualification-pending
+    hosted_branch_policy_gate: passed-run-30155405708
+    hosted_mir_gate: passed-run-30155405710
+    maintainer_release_decision: stage-and-release-as-is
+    accepted_assurance_exceptions:
+      - exact-c18-full-no-reuse-plan-not-run
+      - exact-c18-approved-delta-not-rerun
+      - exact-c18-upgrade-matrix-not-rerun
+      - exact-c18-ecosystem-and-performance-campaigns-not-rerun
+      - schema-2-manual-attestation-not-recorded
+      - protected-qualification-and-schema-4-seal-not-created
+    release_gate: maintainer-approved-for-tag-and-publication-with-recorded-assurance-exceptions
+    publication_status: staged-awaiting-tag-and-publication
+    status: c18-main-staged-awaiting-tag-and-publication-with-recorded-assurance-exceptions
 
   mir_2_4_0:
     version: "2.4.0"
@@ -401,11 +412,11 @@ waves:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
-    source_anchor: mir_3_2_0
+    source_anchor: mir_3_2_5_final_source
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: null
     archive_class: not-built-from-final-source
-    release_gate: pending-canonical-3.2-source-freeze
+    release_gate: pending-canonical-3.2.5-source-freeze
     publication_status: unreleased
-    status: planned-after-3.2-freeze
+    status: planned-after-3.2.5-freeze
