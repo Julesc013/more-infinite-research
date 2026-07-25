@@ -34,8 +34,10 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or
-    [string]$modern.qualification -ne "focused-automation-passed-full-no-reuse-pending") {
-  throw "Canonical modern development release must remain MIR 3.2.0 C16 on dev with full no-reuse qualification pending."
+    [string]$modern.qualification -ne "local-full-no-reuse-128-automated-passed-manual-pending" -or
+    [string]$modern.manual_review -ne "pending" -or
+    [string]$modern.protected_qualification -ne "pending") {
+  throw "Canonical modern development release must remain MIR 3.2.0 C16 on dev with local automation green and manual/protected qualification pending."
 }
 $c16Authority = [ordered]@{
   candidate_id = "C16"

@@ -29,9 +29,9 @@ superseded_by: []
 | Archive entries | `288` |
 | Archive SHA-256 | `4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D` |
 | Package content SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
-| Qualification | `focused-automation-passed-full-no-reuse-pending` |
+| Qualification | `local-full-no-reuse-128-automated-passed-manual-pending` |
 | Publication | `unreleased` |
-| Status | `focused-performance-and-semantic-parity-passed-awaiting-full-no-reuse` |
+| Status | `automated-playtest-candidate-local-automation-green-manual-pending` |
 
 ## Superseded candidate
 

@@ -315,23 +315,27 @@ waves:
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c16
+    exact_approved_delta_gate: passed-exact-c16-local-no-reuse
     superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c16
+    exact_upgrade_gate: passed-exact-c16-local-no-reuse-five-rows
     locale_gate: passed-source-unchanged-50-locales-21250-values
-    locale_runtime_gate: pending-exact-c16
+    locale_runtime_gate: passed-exact-c16-local-no-reuse
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
     focused_c16_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
+    full_c16_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+    local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
     c15_to_c16_semantic_parity_evidence: .mir/evidence/3.2.0-c15-to-c16-semantic-parity.json
-    runtime_performance_gate: passed-exact-c16-focused-formal-10-of-10-full-plan-refresh-pending
+    runtime_performance_gate: passed-exact-c16-full-no-reuse-10-of-10
+    ecosystem_gate: passed-exact-c16-local-no-reuse
+    automated_gate: passed-128-machine-verifiable-zero-reuse
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
     protected_release_gate: pending
     interactive_gate: pending-exact-c16
     assurance_seal: pending
-    release_gate: blocked-exact-c16-full-no-reuse-manual-and-protected-qualification
+    release_gate: blocked-only-manual-and-protected-qualification
     publication_status: unreleased
-    status: c16-automated-playtest-candidate-focused-performance-and-semantic-parity-passed
+    status: c16-automated-playtest-candidate-local-automation-green-manual-pending
 
   mir_2_4_0:
     version: "2.4.0"
