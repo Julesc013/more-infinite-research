@@ -3133,8 +3133,13 @@ function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
 
   foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
     $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
-    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner") {
-      throw "$Context should preserve the vanilla owner instead of generating a parallel MIR technology: $vanillaOwnedLine"
+    if ([bool]$targetProfile.features.productivity_family_adoption) {
+      if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner") {
+        throw "$Context should adopt and preserve the vanilla owner instead of generating a parallel MIR technology: $vanillaOwnedLine"
+      }
+    } elseif ($vanillaOwnedLine -notmatch "status=skipped" -or
+        $vanillaOwnedLine -notmatch "reason=covered_by_existing_infinite_recipe_productivity") {
+      throw "$Context should preserve the vanilla owner by skipping target-unsupported adoption: $vanillaOwnedLine"
     }
   }
 }
