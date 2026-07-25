@@ -461,13 +461,24 @@ docs:
     checkpoint_candidate_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
   - path: docs/releases/3.2.0-c17-risk-default-playtest.md
     title: "MIR 3.2.0 C17 Risk-Default Playtest Candidate"
+    status: historical-checkpoint
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/3.2.0-c18-space-age-productivity-playtest.md
+    checkpoint_source_commit: d301a3a8ba66bb45a24a55e24c51e3779600fd68
+    checkpoint_candidate_sha256: 57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D
+  - path: docs/releases/3.2.0-c18-space-age-productivity-playtest.md
+    title: "MIR 3.2.0 C18 Space Age Productivity Playtest Candidate"
     status: current
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.0-c17-candidate-scope
-      - mir-3.2.0-c17-in-game-playtest-order
+      - mir-3.2.0-c18-candidate-scope
+      - mir-3.2.0-c18-in-game-playtest-order
+      - mir-3.2.0-space-age-productivity-membership
       - mir-3.2.0-risk-classification-and-warning-contract
   - path: docs/releases/3.2.0-c15-local-qualification-report.md
     title: "MIR 3.2.0 C15 Local Qualification Report"

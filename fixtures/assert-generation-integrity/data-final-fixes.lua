@@ -906,6 +906,39 @@ local function assert_technology_has_science(technology_name, expected_packs)
   end
 end
 
+local function assert_native_follower_robot_continuation()
+  local technology = techs["follower-robot-count-5"]
+  if not technology or technology.max_level ~= "infinite" or technology.upgrade ~= true then
+    fail("vanilla follower-robot-count-5 must remain the native infinite continuation.")
+  end
+  if not technology.unit or technology.unit.count_formula ~= "1000*(L-4)" or technology.unit.time ~= 30 then
+    fail("vanilla follower robot infinite cost contract changed unexpectedly.")
+  end
+  local matching_effects = 0
+  for _, effect in ipairs(technology.effects or {}) do
+    if effect.type == "maximum-following-robots-count" then
+      matching_effects = matching_effects + 1
+      if effect.modifier ~= 25 then
+        fail("vanilla follower robot infinite modifier must remain +25 per level.")
+      end
+    end
+  end
+  if matching_effects ~= 1 then
+    fail("vanilla follower robot infinite continuation must retain one exact count effect.")
+  end
+  assert_technology_has_science("follower-robot-count-5", {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "military-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack"
+  })
+end
+
+assert_native_follower_robot_continuation()
+
 local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
   local owner = techs[owner_name]
   if not owner or owner.max_level ~= "infinite" or owner.upgrade ~= true then

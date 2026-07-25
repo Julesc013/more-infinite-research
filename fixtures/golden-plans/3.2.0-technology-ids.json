@@ -3,6 +3,8 @@
   "release": "3.2.0",
   "identity_state": "stable-unreleased",
   "technology_ids": [
+    "recipe-prod-research_capture_robot_rockets-1",
+    "recipe-prod-research_nutrients-1",
     "recipe-prod-research_steel-1"
   ]
 }

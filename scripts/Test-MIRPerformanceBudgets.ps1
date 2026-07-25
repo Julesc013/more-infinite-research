@@ -161,7 +161,17 @@ $campaignBindsSupersededCandidate = $ValidateManifestOnly -and
   [string]$campaign.candidate.package_source_sha256 -eq [string]$supersededCandidate.package_source_sha256 -and
   [string]$campaign.candidate.archive_sha256 -eq [string]$supersededCandidate.archive_sha256 -and
   [string]$campaign.candidate.package_content_sha256 -eq [string]$supersededCandidate.package_content_sha256
-if (-not $campaignBindsActiveCandidate -and -not $campaignBindsSupersededCandidate) {
+$campaignBindsC16HistoricalCheckpoint = $ValidateManifestOnly -and
+  [string]$activeCandidate.runtime_qualification -eq "pending" -and
+  [string]$campaign.candidate.candidate_id -eq "C16" -and
+  [string]$campaign.candidate.version -eq "3.2.0" -and
+  [string]$campaign.candidate.package_source_commit -eq "0448ceb8d3992082718e2df83bd6a42c56955636" -and
+  [string]$campaign.candidate.package_source_sha256 -eq "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7" -and
+  [string]$campaign.candidate.archive_sha256 -eq "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D" -and
+  [string]$campaign.candidate.package_content_sha256 -eq "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
+if (-not $campaignBindsActiveCandidate -and
+    -not $campaignBindsSupersededCandidate -and
+    -not $campaignBindsC16HistoricalCheckpoint) {
   throw "Performance campaign candidate authority differs from the active Factorio 2.1 release candidate."
 }
 if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
@@ -235,7 +245,13 @@ if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed'
 }
 
 if ($ValidateManifestOnly) {
-  $binding = if ($campaignBindsActiveCandidate) { "the active candidate" } else { "the exact superseded candidate while current performance qualification is explicitly pending" }
+  $binding = if ($campaignBindsActiveCandidate) {
+    "the active candidate"
+  } elseif ($campaignBindsSupersededCandidate) {
+    "the exact superseded candidate while current performance qualification is explicitly pending"
+  } else {
+    "the exact C16 automated checkpoint while current performance qualification is explicitly pending"
+  }
   Write-Host "[ok] MIR performance manifests bind $binding and declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
   exit 0
 }
