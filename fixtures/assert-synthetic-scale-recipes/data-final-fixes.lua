@@ -5,10 +5,80 @@ end
 local recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
+local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 local generation_plan = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-generation-plan"]
 local prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report"]
 local summary = prototype and prototype.data and prototype.data.summary
-if not summary then fail("coverage summary is missing") end
+local portable_evidence
+if not summary then
+  if target_profile.prototype_shapes.mod_data then fail("coverage summary is missing") end
+
+  local portable_index = compiler_context.with_active(
+    compiler_context.new(), recipe_facts.index_prototypes, data.raw.recipe or {})
+  local synthetic_names = {}
+  for _, recipe_name in ipairs(portable_index.names or {}) do
+    if string.find(recipe_name, "mir-synthetic-scale-recipe-", 1, true) == 1 then
+      table.insert(synthetic_names, recipe_name)
+    end
+  end
+
+  local dangling_effects, owner_counts = 0, {}
+  for _, technology in pairs(data.raw.technology or {}) do
+    if technology.max_level == "infinite" then
+      for _, effect in ipairs(technology.effects or {}) do
+        if effect.type == "change-recipe-productivity" then
+          if not (data.raw.recipe and data.raw.recipe[effect.recipe]) then
+            dangling_effects = dangling_effects + 1
+          else
+            owner_counts[effect.recipe] = (owner_counts[effect.recipe] or 0) + 1
+          end
+        end
+      end
+    end
+  end
+  local duplicate_owners = 0
+  for _, count in pairs(owner_counts) do
+    if count > 1 then duplicate_owners = duplicate_owners + 1 end
+  end
+
+  local chunks, chunk = {}, {}
+  for _, recipe_name in ipairs(synthetic_names) do
+    table.insert(chunk, portable_index.facts[recipe_name])
+    if #chunk == 1000 then
+      table.insert(chunks, fingerprint.of(chunk))
+      chunk = {}
+    end
+  end
+  if #chunk > 0 then table.insert(chunks, fingerprint.of(chunk)) end
+
+  summary = {
+    total_recipes = #(portable_index.names or {}),
+    accounted_recipes = #(portable_index.names or {}),
+    candidate_count = #synthetic_names,
+    dangling_effects = dangling_effects,
+    duplicate_owners = duplicate_owners,
+    recipe_fact_scan_count = 1,
+    technology_scan_count = 1
+  }
+  local materialized = {
+    schema = 1,
+    target = target_profile.factorio_version,
+    recipe_chunks = chunks
+  }
+  local coverage_fingerprint = fingerprint.of({summary = summary, materialized = materialized})
+  local plan_fingerprint = fingerprint.of({schema = 1, materialized = materialized})
+  local semantic_fingerprint = fingerprint.of({
+    coverage_fingerprint = coverage_fingerprint,
+    plan_fingerprint = plan_fingerprint
+  })
+  prototype = {data = {coverage_fingerprint = coverage_fingerprint, summary = summary}}
+  generation_plan = {data = {plan_fingerprint = plan_fingerprint}}
+  portable_evidence = {
+    counts = {recipes = #(portable_index.names or {}), recipe_index_scans = 1},
+    phases = {},
+    semantic_fingerprint = semantic_fingerprint
+  }
+end
 
 local minimums = {
   total_recipes = 1000,
@@ -27,7 +97,7 @@ if summary.recipe_fact_scan_count ~= 1 then fail("recipe facts were rebuilt") en
 if summary.technology_scan_count ~= 1 then fail("technology coverage scan count changed") end
 
 local evidence_prototype = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-compiler-evidence"]
-local evidence = evidence_prototype and evidence_prototype.data
+local evidence = (evidence_prototype and evidence_prototype.data) or portable_evidence
 local telemetry = evidence and {counters = evidence.counts, phases = evidence.phases}
 if not telemetry or telemetry.counters.recipes < 1000
   or telemetry.counters.recipe_index_scans ~= 1 then

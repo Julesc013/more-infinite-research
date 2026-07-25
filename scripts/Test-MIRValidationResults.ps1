@@ -77,6 +77,14 @@ $semanticDeclaration = Resolve-MIRScenarioDeclaration `
 if ($semanticDeclaration.group -ne "local-mod-library" -or $semanticDeclaration.surface -ne "base") {
   throw "Semantic family scenario did not retain its declared group and surface."
 }
+$scale20 = @($filtered20.records | Where-Object name -like "synthetic-scale-*")
+$scale21 = @($filtered21.records | Where-Object name -like "synthetic-scale-*")
+if ($scale20.Count -ne 4 -or @($scale20 | Where-Object { @($_.fixtures).Count -lt 2 }).Count -ne 0) {
+  throw "Factorio 2.0 scale scenarios do not all declare their source and assertion fixtures."
+}
+if ($scale21.Count -ne 4 -or @($scale21 | Where-Object { @($_.fixtures).Count -lt 2 }).Count -ne 0) {
+  throw "Factorio 2.1 scale scenarios do not all declare their source and assertion fixtures."
+}
 
 $cases = @(
   @{ Name = "generated-prerequisite-safety"; Kind = "runtime"; SpaceAge = $false; Expected = "science-prerequisites" },

@@ -2537,7 +2537,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-synthetic-scale-graph",
+          "mir-fixture-assert-synthetic-scale-graph"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
