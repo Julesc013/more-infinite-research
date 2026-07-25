@@ -41,6 +41,7 @@ local relationships = require("__more-infinite-research__.prototypes.mir.index.r
 local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
 local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
 local science_packs = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
+local target_line = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_line")
 local c9_contracts = {
   compiler_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input"),
   compiler_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result"),
@@ -1682,16 +1683,42 @@ end
 
 local production_evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
 local production_evidence = production_evidence_prototype and production_evidence_prototype.data
-local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
-if not production_graph_parity or production_graph_parity.schema ~= 2
-  or production_graph_parity.valid ~= true
-  or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
-  or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
-  or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
-  or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
-  or type(production_graph_parity.proof_fingerprint) ~= "string"
-  or type(production_graph_parity.parity_fingerprint) ~= "string" then
-  fail("emitted and planned technology graphs do not have exact parity evidence")
+if target_line.mod_data_supported() then
+  local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
+  if not production_graph_parity or production_graph_parity.schema ~= 2
+    or production_graph_parity.valid ~= true
+    or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
+    or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
+    or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
+    or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
+    or type(production_graph_parity.proof_fingerprint) ~= "string"
+    or type(production_graph_parity.parity_fingerprint) ~= "string" then
+    fail("emitted and planned technology graphs do not have exact parity evidence")
+  end
+else
+  if production_evidence_prototype ~= nil then
+    fail("Factorio 2.0 target emitted unsupported compiler-evidence mod-data")
+  end
+  local generated_count = 0
+  for name, technology in pairs(data.raw.technology or {}) do
+    if name:find("^recipe%-prod%-research_") then
+      generated_count = generated_count + 1
+      for _, prerequisite in ipairs(technology.prerequisites or {}) do
+        if not (data.raw.technology or {})[prerequisite] then
+          fail("Factorio 2.0 generated technology has a dangling prerequisite: " .. name .. " -> " .. prerequisite)
+        end
+      end
+      for _, effect in ipairs(technology.effects or {}) do
+        if effect.type == "change-recipe-productivity" and not (data.raw.recipe or {})[effect.recipe] then
+          fail("Factorio 2.0 generated technology has a dangling recipe-productivity target: "
+            .. name .. " -> " .. tostring(effect.recipe))
+        end
+      end
+    end
+  end
+  if generated_count == 0 then
+    fail("Factorio 2.0 compiler contract fixture observed no generated technologies")
+  end
 end
 compiler_context.with_active(focused_contracts.compilation_context, function()
   local family_resolution = family_resolver.snapshot()
@@ -1740,6 +1767,7 @@ compiler_context.with_active(focused_contracts.compilation_context, function()
     fail("RecipeRiskFact canonicalization depends on prototype insertion order")
   end
 end)
+if target_line.mod_data_supported() then
 local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog-internal"]
 local production_catalog = production_catalog_prototype and production_catalog_prototype.data
 local production_qualifications = production_catalog and production_catalog.qualifications
@@ -1850,6 +1878,20 @@ compiler_context.with_active(focused_contracts.compilation_context, function()
     fail("capability diagnostics omitted or duplicated canonical provider decisions")
   end
 end)
+else
+  for _, prototype_name in ipairs({
+    "more-infinite-research-compiler-evidence-internal",
+    "more-infinite-research-compiler-evidence",
+    "more-infinite-research-technology-catalog-internal",
+    "more-infinite-research-technology-catalog",
+    "more-infinite-research-generation-plan-internal",
+    "more-infinite-research-generation-plan"
+  }) do
+    if (data.raw["mod-data"] or {})[prototype_name] ~= nil then
+      fail("Factorio 2.0 target emitted unsupported MIR mod-data: " .. prototype_name)
+    end
+  end
+end
 local first_context = compiler_context.new()
 expect_error("CompilerContext no implicit active instance", "before CompilerContext activation", function()
   compiler_context.current()
