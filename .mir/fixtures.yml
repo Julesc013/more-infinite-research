@@ -608,6 +608,7 @@ fixtures:
 
   semantic-family-attach:
     requires_features: [recipe_productivity, productivity_family_adoption]
+    targets: ["2.0", "2.1"]
     path: fixtures/semantic-family-attach
     assertion_path: fixtures/assert-semantic-family-attach
     validates:
