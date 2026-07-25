@@ -1,10 +1,10 @@
 {
   "schema": 3,
   "projection_schema": 2,
-  "candidate_id": "2.5-P2",
+  "candidate_id": "2.5-P3",
   "mir_version": "2.5.0",
   "target": "2.0",
-  "target_profile_sha256": "1F2C924D65D26C7D0DB0D23EA9E269AA4826962EE2001154B784823EB31F054E",
+  "target_profile_sha256": "D40D736862F09497858C49B7F3534FB922BAB41CAB60E741FA1C1C5BE391C07C",
   "baseline": {
     "version": "2.4.9",
     "reference": "2.4.9",
@@ -31,9 +31,9 @@
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "7ea1eeb6b042d21a2d06301f392b12979876d4dd",
-    "package_source_tree": "8c58fcdb15cf7ffeec5000d2d90b793fc296305c",
-    "package_source_sha256": "47F44A48712F0025368DFC7B8B67BA4DC10AB792311F7FC5821D8E629D1361C0",
+    "package_source_commit": "dbb3e9e1519dc6f29326ca13ddb589550c66c2c7",
+    "package_source_tree": "30ca3d60d66745f3fb8d6e7cd13fba52174d100d",
+    "package_source_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
@@ -43,9 +43,9 @@
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "7B1B66038349EC6E61A10436652518434B1BD3CBCFB73FEC4A1C7DCB8C575DD4",
-    "content_sha256": "47F44A48712F0025368DFC7B8B67BA4DC10AB792311F7FC5821D8E629D1361C0",
-    "bytes": 1014729,
+    "archive_sha256": "86C6EE163CB393078E7E690C23800117324B40DB21F31BC4764A2797907E91EF",
+    "content_sha256": "A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F",
+    "bytes": 1014794,
     "entries": 288,
     "forbidden_entries": 0,
     "class": "automated-playtest-candidate"
@@ -55,8 +55,8 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "passed",
-    "runtime": "pending",
+    "target_static": "pending-after-capability-correction",
+    "runtime": "focused-upgrade-matrix-passed-full-pending",
     "manual_review": "pending",
     "protected_qualification": "pending",
     "publication": "unreleased"

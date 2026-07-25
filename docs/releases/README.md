@@ -18,7 +18,7 @@ MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is 
 
 MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
-MIR 2.5.0 `2.5-P2` is the provisional Factorio 2.0 projection of C16. It is an automated playtest candidate with manual review, protected qualification, sealing, branch promotion, tagging, and publication still pending.
+MIR 2.5.0 `2.5-P3` is the provisional Factorio 2.0 projection of C16 with the published 2.4.9 ModData/adoption capability restored. It is an automated playtest candidate with manual review, protected qualification, sealing, branch promotion, tagging, and publication still pending.
 
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)

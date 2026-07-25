@@ -396,22 +396,22 @@ waves:
 
   mir_2_5_0:
     version: "2.5.0"
-    candidate_id: "2.5-P2"
+    candidate_id: "2.5-P3"
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor: mir_3_2_0
     portable_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
-    package_source_commit: 7ea1eeb6b042d21a2d06301f392b12979876d4dd
+    package_source_commit: dbb3e9e1519dc6f29326ca13ddb589550c66c2c7
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_2.5.0.zip
-    sha256: 7B1B66038349EC6E61A10436652518434B1BD3CBCFB73FEC4A1C7DCB8C575DD4
-    package_content_sha256: 47F44A48712F0025368DFC7B8B67BA4DC10AB792311F7FC5821D8E629D1361C0
-    size_bytes: 1014729
+    sha256: 86C6EE163CB393078E7E690C23800117324B40DB21F31BC4764A2797907E91EF
+    package_content_sha256: A6A117F2523532974B5C683B6120D4D237CB360EC55DB3BDAAFDE4F20E8CC12F
+    size_bytes: 1014794
     entries: 288
     archive_class: automated-playtest-candidate
-    release_gate: target-static-passed-runtime-pending
+    release_gate: focused-upgrade-matrix-passed-full-runtime-pending
     manual_review: pending
     protected_qualification: pending
     publication_status: unreleased
-    status: provisional-c16-capability-projection
+    status: provisional-c16-projection-with-published-2.4.9-capability-restored

@@ -19,22 +19,22 @@ $filtered20 = Select-MIRScenarioRegistryForTargetCapabilities `
     -TargetProfile "2.0") `
   -TargetProfile ([pscustomobject]@{features=[pscustomobject]@{
     recipe_productivity=$true
-    productivity_family_adoption=$false
+    productivity_family_adoption=$true
   }})
-if (@($filtered20.records | Where-Object name -like "semantic-family-*").Count -ne 0) {
-  throw "Factorio 2.0 scenario filtering retained adoption-dependent semantic-family rows."
+if (@($filtered20.records | Where-Object name -like "semantic-family-*").Count -ne 5) {
+  throw "Factorio 2.0 scenario filtering removed supported semantic-family rows."
 }
-if (@($filtered20.records | Where-Object name -like "space-age-native-owner-settings-*").Count -ne 0) {
-  throw "Factorio 2.0 scenario filtering retained adoption-dependent native-owner settings rows."
+if (@($filtered20.records | Where-Object name -like "space-age-native-owner-settings-*").Count -ne 11) {
+  throw "Factorio 2.0 scenario filtering removed supported native-owner settings rows."
 }
-if (@($filtered20.records | Where-Object name -like "space-age-vanilla-family-*").Count -ne 0) {
-  throw "Factorio 2.0 scenario filtering retained adoption-dependent vanilla-family rows."
+if (@($filtered20.records | Where-Object name -like "space-age-vanilla-family-*").Count -ne 5) {
+  throw "Factorio 2.0 scenario filtering removed supported vanilla-family rows."
 }
-if (@($filtered20.records | Where-Object name -eq "space-age-plates-n-circuit-productivity-compat").Count -ne 0) {
-  throw "Factorio 2.0 scenario filtering retained the adoption-dependent Plates n Circuit positive row."
+if (@($filtered20.records | Where-Object name -eq "space-age-plates-n-circuit-productivity-compat").Count -ne 1) {
+  throw "Factorio 2.0 scenario filtering removed the supported Plates n Circuit positive row."
 }
-if (@($filtered20.records | Where-Object name -like "space-age-plates-n-circuit-productivity-*").Count -ne 3) {
-  throw "Factorio 2.0 scenario filtering removed a fail-closed Plates n Circuit safety row."
+if (@($filtered20.records | Where-Object name -like "space-age-plates-n-circuit-productivity-*").Count -ne 4) {
+  throw "Factorio 2.0 scenario filtering removed a Plates n Circuit compatibility row."
 }
 $filtered21 = Select-MIRScenarioRegistryForTargetCapabilities `
   -Registry $registry `
