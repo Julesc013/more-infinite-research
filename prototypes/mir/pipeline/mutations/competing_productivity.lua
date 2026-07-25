@@ -3,10 +3,14 @@ local replacement = require("prototypes.mir.emit.technology_replacement")
 
 local M = {}
 
-function M.apply()
+function M.apply(context)
+  local journal = context:state_view("technology_replacement_journal", replacement.new_journal)
   for _, command in ipairs(policy.replacement_plan()) do
     if #command.replacements > 0 then
-      local replaced, reason = replacement.replace_technology(command.technology, command.replacements)
+      local replaced, reason = replacement.replace_technology(command.technology, command.replacements, {
+        journal = journal,
+        source = "competing-productivity"
+      })
       if replaced then
         log("[more-infinite-research] Replaced competing recipe productivity technology: "
           .. command.technology .. " -> " .. table.concat(command.replacements, ","))

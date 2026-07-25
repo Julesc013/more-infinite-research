@@ -133,11 +133,11 @@ function M.prepare()
       and known_competing_tech_name(name)
       and tech.max_level == "infinite" then
       local effects = productivity_owners.recipe_productivity_effects_only(tech)
-      local removable = effects ~= nil
+      local is_removable = effects ~= nil
       for _, effect in ipairs(effects or {}) do
         local covered = covered_recipes[effect.recipe]
         if not covered or not same_change(covered.change, effect.change) then
-          removable = false
+          is_removable = false
           break
         end
 
@@ -147,11 +147,11 @@ function M.prepare()
           end
         })
         if #blockers > 0 then
-          removable = false
+          is_removable = false
           break
         end
       end
-      if removable then
+      if is_removable then
         removable[name] = true
         log("[more-infinite-research] Prepared competing recipe productivity technology for MIR replacement: " .. name)
       end

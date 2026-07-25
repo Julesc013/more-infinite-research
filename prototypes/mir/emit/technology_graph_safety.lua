@@ -2,9 +2,11 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local graph_diff = require("prototypes.mir.graph.diff")
+local graph_qualification = require("prototypes.mir.graph.qualification")
 local graph_snapshot = require("prototypes.mir.graph.snapshot")
 local scc_kernel = require("prototypes.mir.graph.scc")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local technology_replacement = require("prototypes.mir.emit.technology_replacement")
 
 local M = {}
 
@@ -90,9 +92,11 @@ local function same_names(left, right)
   return true
 end
 
-function M.assert_registered_technologies(plan)
+function M.assert_registered_technologies(plan, replacement_journal)
   local expected = plan and plan.validation_summary and plan.validation_summary.technology_graph
   if not expected then error("MIR CompilationPlan lacks virtual technology-graph qualification evidence.", 2) end
+  replacement_journal = replacement_journal or technology_replacement.new_journal()
+  local replacement_summary = technology_replacement.validate_journal(replacement_journal)
 
   -- The virtual graph has already been fully qualified. Capture the realized
   -- graph from the Factorio prototype registry and prove exact node equality;
@@ -100,22 +104,52 @@ function M.assert_registered_technologies(plan)
   -- necessarily retains the qualified SCC, condensation, and proof results.
   local actual_technologies = data_raw.prototypes("technology")
   local actual_snapshot
+  local comparison_snapshot = expected.graph_snapshot
+  local realized_authority = expected
+  local graph_requalified = false
   if graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies) then
     -- The normalized live projection is byte-for-byte equal to the already
     -- qualified snapshot. Reuse its exact authority and avoid a redundant
     -- full-graph canonicalization on the successful release path.
     actual_snapshot = expected.graph_snapshot
+    if replacement_summary.entry_count > 0 then
+      error("MIR technology replacement journal contains entries but the realized graph did not change.", 2)
+    end
   else
     -- Preserve complete independently fingerprinted diagnostics whenever the
     -- live graph differs. The fast path never converts a mismatch into trust.
     actual_snapshot = graph_snapshot.new(actual_technologies)
+    if replacement_summary.entry_count == 0 then
+      local unexpected = graph_diff.compare(expected.graph_snapshot, actual_snapshot)
+      error("MIR realized technology graph snapshot differs from its qualified virtual snapshot: "
+        .. unexpected.diff_fingerprint .. ".", 2)
+    end
+    comparison_snapshot = graph_snapshot.apply_replacement_journal(
+      expected.graph_snapshot, replacement_journal.entries)
+    local projected_difference = graph_diff.compare(comparison_snapshot, actual_snapshot)
+    if not projected_difference.equal then
+      error("MIR realized technology graph differs from its exact replacement-journal projection: "
+        .. projected_difference.diff_fingerprint .. ".", 2)
+    end
+    realized_authority = graph_qualification.validate_operations(plan.operations, {actual = true})
+    if realized_authority.rejected_planned_technology_count ~= 0
+      or realized_authority.accepted_planned_technology_count ~= realized_authority.planned_technology_count then
+      error("MIR realized replacement graph failed fresh graph qualification.", 2)
+    end
+    local qualification_difference = graph_diff.compare(
+      realized_authority.graph_snapshot, actual_snapshot)
+    if not qualification_difference.equal then
+      error("MIR realized graph changed during replacement requalification: "
+        .. qualification_difference.diff_fingerprint .. ".", 2)
+    end
+    graph_requalified = true
   end
-  local difference = graph_diff.compare(expected.graph_snapshot, actual_snapshot)
+  local difference = graph_diff.compare(comparison_snapshot, actual_snapshot)
   if not difference.equal then
     error("MIR realized technology graph snapshot differs from its qualified virtual snapshot: "
       .. difference.diff_fingerprint .. ".", 2)
   end
-  assert_equal("graph fingerprint", expected.graph_fingerprint, actual_snapshot.graph_fingerprint)
+  assert_equal("graph fingerprint", comparison_snapshot.graph_fingerprint, actual_snapshot.graph_fingerprint)
 
   local registered = generated_registry.sorted_names()
   local planned = planned_technologies(plan)
@@ -127,12 +161,14 @@ function M.assert_registered_technologies(plan)
     if technology.enabled == false then error("MIR generated technology is disabled: " .. name .. ".", 2) end
     local operation = planned[name]
     if not operation then error("MIR emitted technology is absent from CompilationPlan: " .. name .. ".", 2) end
-    local expected_prerequisites = sorted_prerequisites(operation.technology)
+    local realized_node = graph_snapshot.technology_view(realized_authority.graph_snapshot)[name]
+    if not realized_node then error("MIR realized graph qualification omitted " .. name .. ".", 2) end
+    local expected_prerequisites = realized_node.prerequisites or {}
     local actual_prerequisites = sorted_prerequisites(technology)
     if not same_names(expected_prerequisites, actual_prerequisites) then
       error("MIR realized technology prerequisites differ for " .. name .. ".", 2)
     end
-    local proof = expected.proofs[name]
+    local proof = realized_authority.proofs[name]
     if not proof or proof.status ~= "passed" then
       error("MIR emitted technology lacks a realized passing graph proof: " .. name .. ".", 2)
     end
@@ -141,7 +177,7 @@ function M.assert_registered_technologies(plan)
       prerequisites = actual_prerequisites,
       prerequisite_fingerprint = fingerprint.of(actual_prerequisites),
       enabled = true,
-      component_id = expected.component_assignments[name],
+      component_id = realized_authority.component_assignments[name],
       planner_proof = "passed",
       realized_proof = proof.status
     })
@@ -160,12 +196,16 @@ function M.assert_registered_technologies(plan)
       return count
     end)(),
     checked_node_count = #(actual_snapshot.nodes or {}),
-    expected_graph_fingerprint = expected.graph_fingerprint,
+    planning_graph_fingerprint = expected.graph_fingerprint,
+    expected_graph_fingerprint = comparison_snapshot.graph_fingerprint,
     actual_graph_fingerprint = actual_snapshot.graph_fingerprint,
-    component_assignment_fingerprint = expected.component_assignment_fingerprint,
-    condensation_topology_fingerprint = expected.condensation_topology_fingerprint,
-    proof_fingerprint = expected.proof_fingerprint,
+    component_assignment_fingerprint = realized_authority.component_assignment_fingerprint,
+    condensation_topology_fingerprint = realized_authority.condensation_topology_fingerprint,
+    proof_fingerprint = realized_authority.proof_fingerprint,
     graph_diff_fingerprint = difference.diff_fingerprint,
+    replacement_journal_fingerprint = replacement_summary.journal_fingerprint,
+    replacement_count = replacement_summary.entry_count,
+    replacement_graph_requalified = graph_requalified,
     technologies = parity
   }
   result.parity_fingerprint = fingerprint.of(result)
