@@ -20,6 +20,16 @@
     "source_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
     "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D"
   },
+  "lineage": {
+    "policy": "canonical-tag-projection",
+    "state": "provisional-content-projection",
+    "canonical_release_tag": "3.2.0",
+    "canonical_release_tag_status": "pending",
+    "portable_source_commit_is_ancestor": false,
+    "prior_target_tag": "2.4.9",
+    "final_candidate_requires_canonical_tag_ancestry": true,
+    "next_feature_pair": "3.3.x-to-2.6.x"
+  },
   "projection": {
     "package_source_commit": "7ea1eeb6b042d21a2d06301f392b12979876d4dd",
     "package_source_tree": "8c58fcdb15cf7ffeec5000d2d90b793fc296305c",

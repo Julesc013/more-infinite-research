@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-07-25
 supersedes: []
 superseded_by: []
 ---
@@ -79,7 +79,7 @@ Use these branch roles during the transition:
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
-| `tmp/2.0` | Maintained Factorio `2.0` semantic companion and verification-overhaul branch. | Unreleased `2.5.0` from published `2.4.9`. |
+| `tmp/2.0` | Maintained Factorio `2.0` semantic companion and verification-overhaul branch. | Provisional `2.5.0` projection; final lineage joins released `3.2.0` with published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
@@ -95,6 +95,38 @@ Use these branch roles during the transition:
 | `tmp/0.8` | Working Factorio `0.8` port branch or worktree. | `0.8.x` |
 | `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
 | `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
+
+## Canonical Tag Projection And Shared Ancestry
+
+Each maintained Factorio 2.0 feature line is a target projection of one released canonical Factorio 2.1 feature line. MIR `3.2.x` maps to MIR `2.5.x`; MIR `3.3.x` maps to MIR `2.6.x`. Patch numbers remain target-local because either target can require a patch the other does not.
+
+The final target branch must contain the paired canonical release tag in its Git ancestry. It must also retain the prior target release as the upgrade predecessor. The release ZIPs cannot come from the identical commit because target metadata and capability adapters differ, but the target package-source commit must descend from the canonical tag through a small, explicit adapter layer.
+
+For the first ancestry-normalized Factorio 2.0 line, wait until `3.2.0` is tagged. Then establish a reviewed lineage join that has both `3.2.0` and `2.4.9` as ancestors, prove the pre-adapter package tree is the canonical `3.2.0` tree, and apply only declared Factorio 2.0 adapter paths. Do not use an ancestry-only merge to conceal an unported canonical delta. The backport source lock records the canonical tag, prior target tag, join state, adapter paths, and exact package hashes.
+
+After `2.5.0` is published, future feature-line work becomes an ordinary three-way merge:
+
+```text
+released 3.2.0 ── modern 3.3 work ── released 3.3.0
+       │                                  │
+       └─ 2.0 adapter ── released 2.5.0 ──┴─ merge 3.3.0 ── 2.0 adapter delta ── 2.6.0
+```
+
+Because `3.2.0` is the common ancestor, Git applies the modern `3.3` delta instead of requiring the full compiler to be copied again. Conflicts should concentrate in the declared target adapter: `info.json`, target profiles, unsupported effects or prototype shapes, target release documentation, and target-specific fixtures.
+
+The required workflow is:
+
+1. Freeze, qualify, seal, publish, and tag the canonical `3.x.0` release.
+2. Create or update the paired `tmp/2.0` line so the canonical tag and prior `2.x` release are both ancestors.
+3. Apply the Factorio 2.0 capability projection in explicit adapter commits.
+4. Verify the ancestry relation and exact allowed package-tree delta mechanically.
+5. Build and independently qualify the Factorio 2.0 archive.
+6. Fast-forward `legacy` only after the target candidate passes its own gates.
+7. For the next feature pair, merge the next released canonical tag normally; do not reconstruct the compiler from the old target tree.
+
+Portable fixes discovered during target qualification should land on `dev` and return through the next canonical merge when practical. Urgent shared fixes may be cherry-picked downward with an explicit source-commit record. Target metadata, removed capabilities, lower dependency floors, and old-line release wording never merge upward.
+
+The current `2.5-P2` archive predates the `3.2.0` tag and is therefore an automated playtest candidate only. Its content projection is useful evidence, but it cannot satisfy the final canonical-tag ancestry gate. If gameplay changes produce C17, the final 2.5 source anchor moves to the released C17-based `3.2.0` tag before final target qualification.
 
 `tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
 

@@ -38,8 +38,26 @@ if ([int]$lock.schema -ne 3 -or [int]$lock.projection_schema -ne 2) {
 foreach ($field in @("candidate_id", "mir_version", "target", "target_profile_sha256", "release_notes", "playtest_guide")) {
   if ([string]::IsNullOrWhiteSpace([string]$lock.$field)) { throw "Backport source lock is missing $field." }
 }
-foreach ($section in @("baseline", "portable_source", "projection", "candidate", "upgrade_contract", "qualification")) {
+foreach ($section in @("baseline", "portable_source", "lineage", "projection", "candidate", "upgrade_contract", "qualification")) {
   if ($null -eq $lock.$section) { throw "Backport source lock is missing $section." }
+}
+
+if ([string]$lock.lineage.policy -ne "canonical-tag-projection") {
+  throw "Backport source lock must use canonical-tag-projection lineage policy."
+}
+if ([string]$lock.lineage.state -eq "provisional-content-projection") {
+  if ([string]$lock.lineage.canonical_release_tag_status -ne "pending" -or
+      [bool]$lock.lineage.portable_source_commit_is_ancestor) {
+    throw "Provisional backport lineage must record a pending canonical tag and no ancestry claim."
+  }
+} elseif ([string]$lock.lineage.state -eq "canonical-tag-descendant") {
+  $canonicalTag = [string]$lock.lineage.canonical_release_tag
+  & git -C $RepoRoot rev-parse --verify "$canonicalTag`^{commit}" 2>$null | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw "Canonical backport release tag does not exist: $canonicalTag" }
+  & git -C $RepoRoot merge-base --is-ancestor $canonicalTag ([string]$lock.projection.package_source_commit)
+  if ($LASTEXITCODE -ne 0) { throw "Backport package source is not a descendant of canonical tag $canonicalTag." }
+} else {
+  throw "Unsupported backport lineage state: $($lock.lineage.state)"
 }
 
 $baselineCommit = [string]$lock.baseline.commit

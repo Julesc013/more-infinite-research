@@ -97,6 +97,34 @@ backport_rules:
       - docs-lint
       - no-package-diff
 
+feature_line_lineage:
+  policy: canonical-tag-projection
+  canonical_line: "3.x"
+  rules:
+    - freeze-and-release-the-canonical-3.x-tag-before-final-target-projection
+    - require-each-maintained-2.x-feature-line-to-descend-from-its-paired-3.x-release-tag
+    - retain-the-prior-2.x-release-as-upgrade-baseline-and-second-lineage-parent
+    - keep-target-metadata-and-capability-cuts-in-explicit-adapter-commits
+    - merge-the-next-canonical-3.x-tag-normally-into-the-published-2.x-line
+    - return-portable-fixes-to-dev-without-merging-target-adapters-upward
+    - qualify-and-seal-each-target-archive-independently
+  feature_pairs:
+    - canonical: "3.2.x"
+      factorio_2_0_companion: "2.5.x"
+      canonical_release_tag: "3.2.0"
+      status: canonical-tag-pending-provisional-projection-only
+    - canonical: "3.3.x"
+      factorio_2_0_companion: "2.6.x"
+      canonical_release_tag: "3.3.0"
+      status: planned
+  patch_policy: patch-numbers-are-target-local-and-need-not-advance-in-lockstep
+  final_2_5_0_ancestry_gate:
+    canonical_tag: "3.2.0"
+    prior_target_tag: "2.4.9"
+    required: true
+    current_provisional_candidate_satisfies_gate: false
+    action_after_canonical_release: establish-and-verify-tag-ancestry-before-final-2.5-qualification
+
 release_artifacts:
   published_archives_are_immutable: true
   source_anchors:
