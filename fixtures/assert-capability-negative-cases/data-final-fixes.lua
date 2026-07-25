@@ -30,6 +30,7 @@ end
 
 local risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
 local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 
 local expected_hard = {
   ["mir-hidden-placeable-machine"] = "hidden_internal",
@@ -52,23 +53,28 @@ local function contains(values, expected)
   return false
 end
 
-local decisions = {}
-for _, row in ipairs(family_resolver.snapshot().decisions or {}) do decisions[row.recipe] = row end
-for recipe_name, expected in pairs(expected_hard) do
-  local risk = risk_facts.view(recipe_name)
-  local decision = decisions[recipe_name]
-  if not risk or not contains(risk.hard_flags, expected)
-    or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
-    or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose" then
-    error("MIR hard RecipeRiskFact was not enforced by the family planner: " .. recipe_name .. "/" .. expected)
+-- MIR closes its production CompilerContext before dependent mods run their
+-- data-final-fixes stage. Re-evaluate the immutable risk/decision contract in
+-- a fixture-owned context rather than reaching into closed compiler state.
+compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), function()
+  local decisions = {}
+  for _, row in ipairs(family_resolver.snapshot().decisions or {}) do decisions[row.recipe] = row end
+  for recipe_name, expected in pairs(expected_hard) do
+    local risk = risk_facts.view(recipe_name)
+    local decision = decisions[recipe_name]
+    if not risk or not contains(risk.hard_flags, expected)
+      or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
+      or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose" then
+      error("MIR hard RecipeRiskFact was not enforced by the family planner: " .. recipe_name .. "/" .. expected)
+    end
   end
-end
-for recipe_name, expected in pairs(expected_review) do
-  local risk = risk_facts.view(recipe_name)
-  local decision = decisions[recipe_name]
-  if not risk or not contains(risk.review_flags, expected)
-    or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
-    or decision.risk_disposition ~= "REVIEW_REQUIRED" or decision.decision ~= "review-required" then
-    error("MIR review RecipeRiskFact did not produce REVIEW_REQUIRED: " .. recipe_name .. "/" .. expected)
+  for recipe_name, expected in pairs(expected_review) do
+    local risk = risk_facts.view(recipe_name)
+    local decision = decisions[recipe_name]
+    if not risk or not contains(risk.review_flags, expected)
+      or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
+      or decision.risk_disposition ~= "REVIEW_REQUIRED" or decision.decision ~= "review-required" then
+      error("MIR review RecipeRiskFact did not produce REVIEW_REQUIRED: " .. recipe_name .. "/" .. expected)
+    end
   end
-end
+end)
