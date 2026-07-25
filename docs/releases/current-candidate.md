@@ -19,29 +19,29 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.0` |
-| Candidate | `C15` |
+| Candidate | `C16` |
 | Branch | `dev` |
-| Package source commit | `c3a56e88fa15da7c12db3b0d11c3d4e732935746` |
-| Package source tree | `de885bb52a10a6ee44517a8efda84be629019c28` |
-| Package source SHA-256 | `E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242` |
+| Package source commit | `0448ceb8d3992082718e2df83bd6a42c56955636` |
+| Package source tree | `eb6a5b42676ab65bb95ee7c1422f2191730b1338` |
+| Package source SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
 | Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1000692` |
-| Archive entries | `286` |
-| Archive SHA-256 | `89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA` |
-| Package content SHA-256 | `E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242` |
-| Qualification | `not-release-qualified` |
+| Archive bytes | `1014593` |
+| Archive entries | `288` |
+| Archive SHA-256 | `4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D` |
+| Package content SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
+| Qualification | `focused-automation-passed-full-no-reuse-pending` |
 | Publication | `unreleased` |
-| Status | `awaiting-fresh-candidate-qualification` |
+| Status | `focused-performance-and-semantic-parity-passed-awaiting-full-no-reuse` |
 
 ## Superseded candidate
 
 | Field | Authority |
 | --- | --- |
-| Candidate | `C14` |
-| Package source commit | `b8e0481830844659bc373c736e9e8245ec45653b` |
-| Archive bytes | `1000633` |
+| Candidate | `C15` |
+| Package source commit | `c3a56e88fa15da7c12db3b0d11c3d4e732935746` |
+| Archive bytes | `1000692` |
 | Archive entries | `286` |
-| Archive SHA-256 | `34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782` |
-| Reason | C14 exact K2SO playtest reproduced generated technologies collapsed to automation science because MIR compiled before Krastorio 2 Spaced Out final science and lab rewrites; C15 adds hidden ordering metadata and a positive multi-science scenario contract |
+| Archive SHA-256 | `89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA` |
+| Reason | C15 passed gameplay, package, K2SO, upgrade, and scale checks but failed the governed fixed-cost performance gate; C16 removes redundant trusted-record validation, copying, fingerprinting, and canonicalization while preserving exact seven-scenario semantic output |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

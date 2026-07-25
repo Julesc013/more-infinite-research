@@ -446,6 +446,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
   $integrityContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $dataFinalFixesStageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
   foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
@@ -459,13 +460,18 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\technology_design_adapter.lua"; Text = $technologyDesignAdapterText; Snippet = 'generated_registry.register(technology.name,' },
     @{ File = "prototypes\mir\planner\base_continuations.lua"; Text = $baseContinuationsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\technology_operation_executor.lua"; Text = $technologyOperationExecutorText; Snippet = 'technology_design_adapter.emit(design, {' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.stage.data_final_fixes").run()' },
+    @{ File = "prototypes\mir\stage\data_final_fixes.lua"; Text = $dataFinalFixesStageText; Snippet = 'commands.run_all({return_snapshot = false})' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "input"})' },
-    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "output"})' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'local ledger = effect_safety.sanitize_all_technology_effects({' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'pass = "output",' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.assert_registered_technology_effects(target_inventory)' },
     @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'for _, target in ipairs(contract.targets or {}) do' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_qualification.validate_operations(plan.operations, {actual = true})' },
-    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'expected.graph_fingerprint, actual.graph_fingerprint' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_snapshot.matches_prototypes(expected.graph_snapshot, actual_technologies)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'graph_diff.compare(expected.graph_snapshot, actual_snapshot)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'proof.status ~= "passed"' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'assert_equal("graph fingerprint", expected.graph_fingerprint, actual_snapshot.graph_fingerprint)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 

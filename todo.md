@@ -16,7 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - MIR 3.2.0 verifier hardening, integrity-kernel work, modularization, optimization, fixtures, tests, and documentation are authorized on `dev`. MIR 2.5.0 begins from the 2.4.9 baseline only after the canonical 3.2.0 source freezes.
-- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. The replacement 3.2.0 package is rebuilding and is not release-qualified.
+- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. C16 is the exact automated playtest candidate after C15 correctly failed the governed fixed-cost performance gate; C16 is not manually reviewed, protected-qualified, sealed, or published.
 
 ## Consolidation Gate
 
@@ -92,9 +92,11 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Retire the obsolete Krastorio Spaced Out sanitation prune expectation after the exact current closure passed with zero external repairs, then pass the paired closure smoke.
 - [x] Run all 72 governed C14-Q3 paired performance invocations and fix ordered telemetry-map evaluation so all 38 real counter-bound checks are evaluated correctly.
 - [x] Run all 72 governed C15 paired performance invocations, preserve the exact failed result, and isolate repeated catalog validation and fingerprinting as the fixed small-profile cost.
+- [x] Replace rejected C15 with exact C16 after the fixed-cost compiler performance correction, preserving all technology identities, selections, effects, science, prerequisites, ownership, settings, and sanitation across the seven governed runtime exports.
+- [x] Pass the focused C16 formal paired performance campaign without changing budgets: all ten runtime and compiler-phase lanes passed, with deterministic work-volume counters enforcing zero trusted-assertion canonicalizations, full catalog snapshots, and full TechnologyDesign copies.
 - [x] Make hosted validation represent an all-reuse plan with one explicit no-op matrix row while retaining the aggregate evidence gate as the only pass authority.
-- [ ] Resolve C15's inherited paired 3.1.9 performance-regression failure without weakening the declared gate.
-- [ ] Run all final-candidate-bound automated work from the immutable C15 package source and current qualification contract.
+- [x] Resolve C15's inherited paired 3.1.9 performance-regression failure in C16 without weakening the declared gate.
+- [ ] Run all final-candidate-bound automated work from the immutable C16 package source and current qualification contract.
 - [ ] Complete the exact-final-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.
