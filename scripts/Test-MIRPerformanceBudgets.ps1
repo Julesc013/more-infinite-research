@@ -168,11 +168,18 @@ foreach ($requiredPath in @(
   "fixtures\performance-regression-probe\probe.lua",
   "fixtures\performance-regression-probe\data.lua",
   "fixtures\performance-regression-probe\data-final-fixes.lua",
+  "scripts\Invoke-MIRPerformanceQualification.ps1",
   "scripts\Measure-MIRPerformanceRegression.ps1",
   "scripts\validation\PerformanceCampaign.ps1"
 )) {
   if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $requiredPath) -PathType Leaf)) {
     throw "Performance campaign producer authority is absent: $requiredPath"
+  }
+}
+$qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
+foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion")) {
+  if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
+    throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")

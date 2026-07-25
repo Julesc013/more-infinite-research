@@ -116,21 +116,25 @@ For MIR 3.2.0:
 The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
 
 - `release.approved-delta` checks both archive and package-content hashes plus package source authority;
-- `runtime.performance-regression` checks the paired qualified-baseline campaign in `.mir/evidence/<version>-performance-regression.json`;
+- `runtime.performance-regression` produces a fresh paired qualified-baseline campaign in `.mir/evidence/<version>-performance-regression.json` and immediately checks it;
 - `manual.release-review` checks the package-focused attestation in `.mir/evidence/<version>-manual-review-attestation.json`.
 
 Schema-3 performance evidence must bind the exact prior release, candidate, source commit, Factorio binary, machine, mod closure, settings, scenarios, and harness. It uses at least one warm-up and five balanced measured pairs. Every governed lane must meet the 20 percent median ceiling or its small absolute-noise allowance, and any declared absolute ceiling. It also preserves maximum-observed compiler artifact-volume counters plus the telemetry fingerprint for every measured diagnostics-off and diagnostics-on candidate run, so timing changes can be separated from plan, coverage, context-copy, closure-cache, and sanitation volume.
 
-Create that evidence with the governed producer before rerunning the full plan:
+The full and backport no-reuse plans create and validate that evidence as one capsule. For a focused preflight, run the same composed producer/verifier:
 
 ```powershell
-.\scripts\Measure-MIRPerformanceRegression.ps1 `
+.\scripts\Invoke-MIRPerformanceQualification.ps1 `
   -Candidate artifacts\candidate\more-infinite-research_3.2.0.zip `
   -PriorRelease dist\more-infinite-research_3.1.9.zip `
   -FactorioBin C:\Factorio-2.1.11\bin\x64\factorio.exe `
   -LocalModZipDir C:\Factorio-mods-2.1 `
-  -ExpectedSourceCommit (git rev-parse HEAD)
+  -ExpectedSourceCommit (git rev-parse HEAD) `
+  -ExpectedBaselineVersion 3.1.9 `
+  -ExpectedFactorioVersion 2.1.11
 ```
+
+The generated evidence path is an output, not a verification-plan input. This prevents a no-reuse plan from validating stale evidence or invalidating its own fingerprint while it writes the fresh campaign.
 
 The campaign uses the non-shipped `fixtures/performance-regression-probe` symmetrically for exact-archive diagnostics-off phase timing. The probe does not enter either release ZIP. Medium and large ecosystem lanes remain load observations over their exact resolved closures. Candidate ecosystem rows must also satisfy the current sanitation claim gate. The sealed prior-release baseline must pass its Factorio process, timeout, dependency, and closure checks, but is not required to emit a sanitation ledger introduced by the candidate.
 

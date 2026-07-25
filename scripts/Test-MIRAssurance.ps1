@@ -145,6 +145,16 @@ if ($ecosystemTest.Count -ne 1 -or
   throw "runtime.ecosystem must execute the exact candidate ZIP and must not rebuild distribution bytes."
 }
 
+$performanceTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.performance-regression" })
+if ($performanceTest.Count -ne 1 -or
+    [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
+    [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
+    @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
+  throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
+}
+
 foreach ($target in @("2.0", "2.1")) {
   $profilePath = Join-Path $RepoRoot "validation\profiles\factorio-$target.json"
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
