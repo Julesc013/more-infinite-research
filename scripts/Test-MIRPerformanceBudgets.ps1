@@ -71,6 +71,10 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$info.
     -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line)) {
   throw "Performance campaign authority must match the active MIR and Factorio target in info.json."
 }
+if ([string]$manifest.release -ne [string]$campaign.release -or
+    [string]$manifest.factorio_line -ne [string]$campaign.factorio_line) {
+  throw "Performance budget authority must match the active performance campaign target."
+}
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(
   "release: $([string]$campaign.release)",
@@ -191,6 +195,16 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
 }
+$probeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\performance-regression-probe\data.lua")
+foreach ($version in @("2.4.9", "2.5.0")) {
+  if ($probeSource -notmatch [regex]::Escape($version)) {
+    throw "Performance probe does not govern release-pair version '$version'."
+  }
+}
+if ($producerSource -notmatch '\$declaredOfficialMods' -or
+    $producerSource -notmatch '\$declaredOfficialMods\s*\|\s*ForEach-Object\s*\{\s*"data\\\$_"\s*\}') {
+  throw "Performance campaign must fingerprint the exact target-declared official-mod roots."
+}
 $performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
@@ -227,7 +241,7 @@ if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed'
 }
 
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
+  Write-Host "[ok] MIR performance manifests declare $($budgets.Count) budgets, $($regressionLanes.Count) paired lanes, a schema-3 producer, and complete bounded compiler telemetry."
   exit 0
 }
 

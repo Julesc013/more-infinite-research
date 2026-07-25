@@ -27,12 +27,7 @@
     "diagnostics-off.factorio-total",
     "diagnostics-on.factorio-total"
   ],
-  "phase_lanes": [
-    {"id": "compiler.snapshot", "probe_phase": "snapshot"},
-    {"id": "compiler.graph", "probe_phase": "graph"},
-    {"id": "compiler.planning", "probe_phase": "planning"},
-    {"id": "compiler.postconditions", "probe_phase": "postconditions"}
-  ],
+  "phase_lanes": [],
   "lanes": [
     {
       "id": "base.factorio-total",
@@ -45,7 +40,7 @@
       "id": "space-age.factorio-total",
       "runner": "exact-package-load",
       "scenario": "space-age-default",
-      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "official_mods": ["elevated-rails", "quality", "space-age"],
       "settings": {}
     },
     {

@@ -174,9 +174,11 @@ fixtures:
     path: fixtures/performance-regression-probe
     shipped: false
     validates:
-      - exact-archive-paired-phase-timing
+      - exact-archive-paired-total-load-timing
       - diagnostics-artifact-volume-export
-      - baseline-candidate-symmetric-instrumentation
+      - baseline-candidate-symmetric-load
+      - exact-2.4.9-and-2.5.0-version-guard
+      - target-native-telemetry-with-total-load-fallback
 
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]

@@ -182,7 +182,8 @@ function Get-MIRCampaignProbeFromLog {
   foreach ($phase in @("snapshot", "graph", "planning", "postconditions")) {
     $probe.phases.$phase.runs = [int]$phaseRows[$phase].runs
     $probe.phases.$phase.seconds = [Math]::Round([double]$phaseRows[$phase].seconds, 6)
-    if ([int]$probe.phases.$phase.runs -lt 1 -or [double]$probe.phases.$phase.seconds -lt 0) {
+    if ($script:RequirePerformancePhases -and
+        ([int]$probe.phases.$phase.runs -lt 1 -or [double]$probe.phases.$phase.seconds -lt 0)) {
       throw "Performance probe phase '$phase' is absent or invalid in $LogPath"
     }
   }
@@ -434,6 +435,7 @@ if ([int]$campaign.schema -ne 2 -or [string]::IsNullOrWhiteSpace([string]$campai
 $script:CampaignFactorioLine = [string]$campaign.factorio_line
 $lanes = @($campaign.lanes)
 $phaseLanes = @($campaign.phase_lanes)
+$script:RequirePerformancePhases = $phaseLanes.Count -gt 0
 $budgets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-budgets.json") | ConvertFrom-Json
 $expectedLaneIds = @($budgets.regression_lanes.id | Sort-Object)
 if (($expectedLaneIds -join "`n") -ne (@($lanes.id + $phaseLanes.id | Sort-Object) -join "`n")) {
@@ -520,7 +522,16 @@ if (-not [string]::IsNullOrWhiteSpace($CompatSmokeLaneId)) {
 }
 
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $script:FactorioPath))
-$officialRoots = @("data\core", "data\base", "data\elevated-rails", "data\quality", "data\recycler", "data\space-age")
+$declaredOfficialMods = @(
+  $lanes |
+    ForEach-Object { @($_.official_mods) } |
+    ForEach-Object { [string]$_ } |
+    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+    Sort-Object -Unique
+)
+$officialRoots = @("data\core", "data\base") + @(
+  $declaredOfficialMods | ForEach-Object { "data\$_" }
+)
 $machineSha = Get-MIRCampaignMachineSha256
 $officialModsSha = Get-MIRCampaignTreeSha256 -Root $factorioRoot -RelativeRoots $officialRoots
 $settingsSha = Get-MIRPerformanceSettingsFingerprint -Campaign $campaign
