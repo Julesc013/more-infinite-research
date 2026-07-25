@@ -2057,6 +2057,7 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [
+          "productivity_family_adoption",
           "recipe_productivity"
         ],
         "fixtures": [
@@ -4917,6 +4918,7 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [
+          "productivity_family_adoption",
           "recipe_productivity"
         ],
         "fixtures": [],

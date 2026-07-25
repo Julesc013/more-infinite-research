@@ -30,6 +30,12 @@ if (@($filtered20.records | Where-Object name -like "space-age-native-owner-sett
 if (@($filtered20.records | Where-Object name -like "space-age-vanilla-family-*").Count -ne 0) {
   throw "Factorio 2.0 scenario filtering retained adoption-dependent vanilla-family rows."
 }
+if (@($filtered20.records | Where-Object name -eq "space-age-plates-n-circuit-productivity-compat").Count -ne 0) {
+  throw "Factorio 2.0 scenario filtering retained the adoption-dependent Plates n Circuit positive row."
+}
+if (@($filtered20.records | Where-Object name -like "space-age-plates-n-circuit-productivity-*").Count -ne 3) {
+  throw "Factorio 2.0 scenario filtering removed a fail-closed Plates n Circuit safety row."
+}
 $filtered21 = Select-MIRScenarioRegistryForTargetCapabilities `
   -Registry $registry `
   -TargetProfile ([pscustomobject]@{features=[pscustomobject]@{
@@ -56,6 +62,13 @@ if (@($vanillaFamily21 | Where-Object {
       @($_.required_features) -notcontains "productivity_family_adoption"
     }).Count -ne 0) {
   throw "Vanilla-family adoption rows do not declare the productivity-family adoption capability."
+}
+$platesCircuitPositive21 = @($filtered21.records | Where-Object {
+    $_.name -eq "space-age-plates-n-circuit-productivity-compat"
+  })
+if ($platesCircuitPositive21.Count -ne 1 -or
+    @($platesCircuitPositive21[0].required_features) -notcontains "productivity_family_adoption") {
+  throw "The Factorio 2.1 Plates n Circuit positive row is not adoption-capability-bound."
 }
 $semanticDeclaration = Resolve-MIRScenarioDeclaration `
   -Registry $registry `
