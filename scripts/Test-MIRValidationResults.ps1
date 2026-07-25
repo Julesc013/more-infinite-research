@@ -24,6 +24,9 @@ $filtered20 = Select-MIRScenarioRegistryForTargetCapabilities `
 if (@($filtered20.records | Where-Object name -like "semantic-family-*").Count -ne 0) {
   throw "Factorio 2.0 scenario filtering retained adoption-dependent semantic-family rows."
 }
+if (@($filtered20.records | Where-Object name -like "space-age-native-owner-settings-*").Count -ne 0) {
+  throw "Factorio 2.0 scenario filtering retained adoption-dependent native-owner settings rows."
+}
 $filtered21 = Select-MIRScenarioRegistryForTargetCapabilities `
   -Registry $registry `
   -TargetProfile ([pscustomobject]@{features=[pscustomobject]@{
@@ -32,6 +35,15 @@ $filtered21 = Select-MIRScenarioRegistryForTargetCapabilities `
   }})
 if (@($filtered21.records | Where-Object name -like "semantic-family-*").Count -ne 5) {
   throw "Factorio 2.1 scenario filtering removed supported semantic-family rows."
+}
+$nativeOwnerSettings21 = @($filtered21.records | Where-Object name -like "space-age-native-owner-settings-*")
+if ($nativeOwnerSettings21.Count -ne 11) {
+  throw "Factorio 2.1 scenario filtering removed supported native-owner settings rows."
+}
+if (@($nativeOwnerSettings21 | Where-Object {
+      @($_.required_features) -notcontains "productivity_family_adoption"
+    }).Count -ne 0) {
+  throw "Native-owner settings rows do not declare the productivity-family adoption capability."
 }
 $semanticDeclaration = Resolve-MIRScenarioDeclaration `
   -Registry $registry `
