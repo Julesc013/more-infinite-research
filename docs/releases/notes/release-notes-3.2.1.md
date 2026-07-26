@@ -44,6 +44,12 @@ Install 3.2.1 over 3.2.0 and load the affected save. The corrected technology pr
 
 ## Qualification status
 
-The exact artifact above is recorded and ready for the `3.2.1` tag. Its focused emergency source-contract regression passed. Broader branch and candidate validation is still in progress and is not represented as complete.
+- Exact local no-reuse plan: `129 / 129` passed, `0` reused, `0` failed, and `0` unexpected.
+- Direct patch upgrade: all five `3.2.0 → 3.2.1` save archetypes passed.
+- Runtime coverage: all `108` Factorio scenarios passed on Factorio `2.1.12`.
+- Performance: all `10` governed direct `3.2.0 → 3.2.1` lanes passed.
+- Manual review: the exact C21 package attestation passed.
+- Hosted validation: MIR Validate and Branch Policy passed for the locally qualified source.
+- Remaining release gate: protected no-reuse qualification, schema-4 seal, independent seal check, and branch promotion.
 
-Tag and publish this exact ZIP without rebuilding it.
+Tag and publish the exact ZIP above without rebuilding it after the protected gate passes.

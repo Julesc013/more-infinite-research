@@ -16,7 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - Exact C20 was tagged and published as MIR 3.2.0 from `main`. Its GitHub asset digest matches the immutable recorded ZIP; the longer, manual, protected, and seal gates were not completed before maintainer-directed publication and remain recorded as assurance exceptions rather than passes.
-- MIR 3.2.1 C21 is the exact emergency planet-discovery hotfix on `dev`, already published to the Mod Portal and awaiting full validation, `main` promotion, tag, and GitHub release. MIR 2.5.0 projects the final 3.2.1 semantics through the Factorio 2.0 capability profile; MIR 2.5.5 will later project the frozen portable 3.2.5 delta.
+- MIR 3.2.1 C21 is the exact emergency planet-discovery hotfix on `dev`, already published to the Mod Portal with all 129 local no-reuse rows passed. Protected qualification, `main` promotion, and the `3.2.1` tag remain; MIR 2.5.0 will project final 3.2.2 semantics through the Factorio 2.0 capability profile.
 
 ## Consolidation Gate
 
@@ -106,7 +106,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Record that the longer exact-C20 validation campaign was not completed before maintainer-directed publication; do not relabel earlier candidate evidence as exact C20 evidence.
 - [x] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify the GitHub asset digest against the canonical archive SHA-256.
 - [x] Create exact C21 by resolving `unlock-space-location` across concrete planet prototypes and preserve its deterministic emergency archive.
-- [ ] Complete exact C21 validation, promote the unchanged archive to `main`, and tag `3.2.1` for GitHub release.
+- [ ] Complete exact C21 protected qualification and sealing, promote the unchanged archive to `main`, and tag `3.2.1` for GitHub release (local no-reuse qualification is 129/129 passed).
 - [ ] Reserve MIR 3.2.1 for an emergency package-level correction; otherwise return `dev` to the MIR 3.2.5 compiler, compatibility, tuning, and reviewed-promotion campaign.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.

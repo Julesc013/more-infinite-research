@@ -368,11 +368,15 @@ waves:
     focused_planet_discovery_gate: passed
     package_determinism_gate: passed-exact-bytes
     manual_attestation_gate: maintainer-playtest-approved
-    automated_gate: full-validation-pending
+    local_automated_qualification: .mir/evidence/3.2.1-local-automated-qualification.json
+    local_automated_qualification_sha256: EBC221AFC714141476C48954ADA8945DE363978389477895A68357C3CF7C11A2
+    performance_evidence: .mir/evidence/3.2.1-performance-regression.json
+    performance_evidence_sha256: 5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726
+    automated_gate: passed-local-129-of-129-no-reuse
     protected_release_gate: pending
-    release_gate: tag-ready-after-full-validation
+    release_gate: protected-qualification-and-seal-pending
     publication_status: published-mod-portal-github-pending
-    status: c21-focused-passed-full-validation-pending
+    status: c21-full-local-validation-passed-tag-ready
 
   mir_2_4_0:
     version: "2.4.0"

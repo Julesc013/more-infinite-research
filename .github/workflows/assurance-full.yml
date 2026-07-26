@@ -144,6 +144,16 @@ jobs:
             New-Item -ItemType Directory -Force -Path (Split-Path -Parent $resultDestination) | Out-Null
             Copy-Item -LiteralPath $scenarioResult -Destination $resultDestination
           }
+          if ('${{ matrix.test_id }}' -eq 'runtime.performance-regression') {
+            $version = [string](Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json).version
+            $performanceEvidence = ".mir/evidence/$version-performance-regression.json"
+            if (-not (Test-Path -LiteralPath $performanceEvidence -PathType Leaf)) {
+              throw "Performance worker did not produce its governed evidence file: $performanceEvidence"
+            }
+            $performanceDestination = Join-Path $delta $performanceEvidence
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceDestination) | Out-Null
+            Copy-Item -LiteralPath $performanceEvidence -Destination $performanceDestination
+          }
       - uses: actions/upload-artifact@v4
         if: always() && matrix.test_id != '__none__'
         with:

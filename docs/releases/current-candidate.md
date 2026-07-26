@@ -29,9 +29,9 @@ superseded_by: []
 | Archive entries | `290` |
 | Archive SHA-256 | `4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6` |
 | Package content SHA-256 | `5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188` |
-| Qualification | `focused-emergency-build-passed-full-validation-pending` |
+| Qualification | `full-local-no-reuse-validation-passed` |
 | Publication | `published-mod-portal-github-pending` |
-| Status | `c21-focused-passed-full-validation-pending` |
+| Status | `c21-full-local-validation-passed-tag-ready` |
 
 ## Superseded candidate
 

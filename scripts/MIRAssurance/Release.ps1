@@ -20,6 +20,11 @@ function Get-MIRAssuranceCandidateArchiveIdentity {
   }
 }
 
+function Test-MIRAssuranceReleaseCandidateId {
+  param([Parameter(Mandatory)][string]$CandidateId)
+  return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
+}
+
 function Get-MIRAssuranceReleaseCandidateAuthority {
   param([Parameter(Mandatory)]$Context)
 
@@ -35,7 +40,7 @@ function Get-MIRAssuranceReleaseCandidateAuthority {
   if ([string]$authority.mir_version -ne [string]$Context.info.version) {
     throw "Release authority version does not match the candidate version."
   }
-  if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$') {
+  if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId ([string]$authority.candidate_id))) {
     throw "Release authority candidate_id is invalid."
   }
   if ([string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$') {
@@ -194,12 +199,35 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
     throw "Verification plan source tree is not the qualification source tree."
   }
+  $performanceEvidencePath = Join-Path $repo ".mir\evidence\$($Context.info.version)-performance-regression.json"
+  if (-not (Test-Path -LiteralPath $performanceEvidencePath -PathType Leaf)) {
+    throw "Runtime performance evidence is absent: $performanceEvidencePath"
+  }
+  $performanceRecord = Get-Content -Raw -LiteralPath $performanceEvidencePath | ConvertFrom-Json
+  $performanceSourceCommit = Resolve-MIRAssuranceCommit -Commit ([string]$performanceRecord.candidate.source_commit)
+  & git -C $repo merge-base --is-ancestor $performanceSourceCommit $commit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Runtime performance evidence source is not an ancestor of the qualification source."
+  }
+  if (-not (Test-MIRAssurancePackageRootsEqual `
+      -ReferenceCommit ([string]$sourceAuthority.package_source_commit) `
+      -DifferenceCommit $performanceSourceCommit)) {
+    throw "Runtime performance evidence source does not preserve the candidate package roots."
+  }
+  $performanceSourceBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $performanceSourceCommit
+  if ([long]$performanceSourceBuild.bytes -ne [long]$sourceAuthority.candidate_identity.bytes -or
+      [int]$performanceSourceBuild.entries -ne [int]$sourceAuthority.candidate_identity.entries -or
+      [string]$performanceSourceBuild.sha256 -ne [string]$sourceAuthority.candidate_identity.sha256 -or
+      [string]$performanceSourceBuild.content_sha256 -ne [string]$sourceAuthority.candidate_identity.content_sha256) {
+    throw "Runtime performance evidence source does not reproduce the exact candidate."
+  }
   $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
+    -Path $performanceEvidencePath `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
-    -ExpectedSourceCommit $commit `
+    -ExpectedSourceCommit $performanceSourceCommit `
     -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
     -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $manualReview = Test-MIRManualReleaseAttestation `
@@ -261,6 +289,7 @@ function Invoke-MIRAssuranceSeal {
     evidence_bundle_sha256=(Get-MIRAssuranceSha256 -Path $bundleSnapshotPath)
     evidence_bundle_digest=[string]$bundle.bundle_sha256
     capsule_set_sha256=[string]$bundle.capsule_set_sha256
+    performance_source_commit=$performanceSourceCommit
     performance_evidence=(Get-MIRAssuranceRepoRelativePath -Path $performanceEvidence.path)
     performance_evidence_sha256=[string]$performanceEvidence.sha256
     performance_status=[string]$performanceEvidence.status
@@ -321,6 +350,9 @@ function Invoke-MIRAssuranceCheckSeal {
     evidence_bundle_sha256=$false
     evidence_bundle_digest=$false
     capsule_set_sha256=$false
+    performance_source_is_ancestor=$false
+    performance_package_roots_unchanged=$false
+    performance_source_candidate=$false
     performance_evidence_sha256=$false
     performance_status=$false
     manual_review_attestation_sha256=$false
@@ -360,10 +392,14 @@ function Invoke-MIRAssuranceCheckSeal {
   try {
     $packageCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.package_source_commit)
     $qualificationCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.qualification_source_commit)
+    $performanceCommit = Resolve-MIRAssuranceCommit -Commit ([string]$seal.performance_source_commit)
     & git -C $repo merge-base --is-ancestor $packageCommit $qualificationCommit
     $checks.package_source_is_ancestor=($LASTEXITCODE -eq 0)
+    & git -C $repo merge-base --is-ancestor $performanceCommit $qualificationCommit
+    $checks.performance_source_is_ancestor=($LASTEXITCODE -eq 0)
     $checks.package_roots_unchanged=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $qualificationCommit)
     $checks.package_roots_unchanged_to_head=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit HEAD)
+    $checks.performance_package_roots_unchanged=(Test-MIRAssurancePackageRootsEqual -ReferenceCommit $packageCommit -DifferenceCommit $performanceCommit)
     $packageMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $packageCommit -Material $seal.package_source_material
     $qualificationMaterial = Get-MIRAssurancePackageAuthorityHash -PackageSourceCommit $packageCommit -ContentCommit $qualificationCommit -Material $seal.package_source_material
     $checks.package_source_identity=([string]$packageMaterial.sha256 -eq [string]$seal.package_source_sha256)
@@ -371,6 +407,7 @@ function Invoke-MIRAssuranceCheckSeal {
     if ($null -ne $candidateIdentity) {
       $packageBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $packageCommit
       $qualificationBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $qualificationCommit
+      $performanceBuild = Get-MIRAssuranceCommitCandidateIdentity -Commit $performanceCommit
       $checks.package_source_candidate=(
         [long]$packageBuild.bytes -eq [long]$candidateIdentity.bytes -and
         [int]$packageBuild.entries -eq [int]$candidateIdentity.entries -and
@@ -382,6 +419,12 @@ function Invoke-MIRAssuranceCheckSeal {
         [int]$qualificationBuild.entries -eq [int]$candidateIdentity.entries -and
         [string]$qualificationBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
         [string]$qualificationBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
+      )
+      $checks.performance_source_candidate=(
+        [long]$performanceBuild.bytes -eq [long]$candidateIdentity.bytes -and
+        [int]$performanceBuild.entries -eq [int]$candidateIdentity.entries -and
+        [string]$performanceBuild.sha256 -eq [string]$candidateIdentity.sha256 -and
+        [string]$performanceBuild.content_sha256 -eq [string]$candidateIdentity.content_sha256
       )
     }
   } catch {}
@@ -446,7 +489,7 @@ function Invoke-MIRAssuranceCheckSeal {
           [string]$performance.status -eq "passed" -and
           [string]$performance.candidate.archive_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$performance.candidate.package_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$performance.candidate.source_commit -eq [string]$seal.source_commit
+          [string]$performance.candidate.source_commit -eq [string]$seal.performance_source_commit
         )
       } catch {}
     }
@@ -540,6 +583,17 @@ function Invoke-MIRAssuranceSelfTest {
     throw "Version-only metadata unexpectedly invalidated the dependency contract."
   }
 
+  foreach ($candidateId in @("C1", "C21", "2.5-P1", "2.5-P99", "10.12-P3")) {
+    if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId $candidateId)) {
+      throw "Valid release candidate ID was rejected: $candidateId"
+    }
+  }
+  foreach ($candidateId in @("C0", "C01", "C-1", "2.5-P0", "2.5-P01", "2-P1", "2.5-C1", "candidate")) {
+    if (Test-MIRAssuranceReleaseCandidateId -CandidateId $candidateId) {
+      throw "Invalid release candidate ID was accepted: $candidateId"
+    }
+  }
+
   if ([string]$Context.target -eq "2.1" -and [string]$Context.info.version -eq "3.2.0") {
     $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
     $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
@@ -552,7 +606,7 @@ function Invoke-MIRAssuranceSelfTest {
       -ContentCommit $qualificationCommit `
       -Material $authority.package_source_material
     $expectedPackageFileCount = [int]$authority.package_source_material.file_count
-    if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$' -or
+    if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId ([string]$authority.candidate_id)) -or
         [string]$packageMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [string]$qualificationMaterial.sha256 -ne [string]$authority.package_source_sha256 -or
         [int]$packageMaterial.file_count -ne $expectedPackageFileCount -or

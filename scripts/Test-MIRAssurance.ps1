@@ -184,6 +184,7 @@ foreach ($requiredSealField in @(
   "required_test_set_sha256",
   "evidence_bundle_sha256",
   "capsule_set_sha256",
+  "performance_source_commit",
   "performance_evidence_sha256",
   "performance_status",
   "manual_review_attestation_sha256",
@@ -204,7 +205,10 @@ foreach ($requiredSourceCheck in @(
   "qualification_package_source_identity",
   "package_roots_unchanged",
   "package_source_candidate",
-  "qualification_source_candidate"
+  "qualification_source_candidate",
+  "performance_source_is_ancestor",
+  "performance_package_roots_unchanged",
+  "performance_source_candidate"
 )) {
   if ($releaseAssurance -notmatch [regex]::Escape($requiredSourceCheck)) {
     throw "Candidate seal verification omits source-authority check: $requiredSourceCheck"
@@ -244,6 +248,8 @@ foreach ($requiredWorkflowSnippet in @(
   "--no-reuse --output out/verification-plan.json",
   "out/assurance-inputs",
   "out/worker-delta",
+  'if (''${{ matrix.test_id }}'' -eq ''runtime.performance-regression'')',
+  '.mir/evidence/$version-performance-regression.json',
   "path: artifacts/assurance/evidence",
   "assurance seal"
 )) {
