@@ -144,11 +144,39 @@ jobs:
             New-Item -ItemType Directory -Force -Path (Split-Path -Parent $resultDestination) | Out-Null
             Copy-Item -LiteralPath $scenarioResult -Destination $resultDestination
           }
+          if ('${{ matrix.test_id }}' -eq 'runtime.performance-regression') {
+            $plan = Get-Content -Raw -LiteralPath 'out/verification-plan.json' | ConvertFrom-Json
+            $candidateVersion = [string](Get-Content -Raw -LiteralPath 'info.json' | ConvertFrom-Json).version
+            if ($candidateVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+              throw "Candidate version cannot identify protected performance evidence: $candidateVersion"
+            }
+            $performanceEvidence = ".mir/evidence/$candidateVersion-performance-regression.json"
+            if (-not (Test-Path -LiteralPath $performanceEvidence -PathType Leaf)) {
+              throw "Fresh protected performance evidence is absent: $performanceEvidence"
+            }
+            $performance = Get-Content -Raw -LiteralPath $performanceEvidence | ConvertFrom-Json
+            if ([int]$performance.schema -ne 3 -or
+                [string]$performance.status -ne 'passed' -or
+                [string]$performance.candidate.version -ne $candidateVersion -or
+                [string]$performance.candidate.source_commit -ne [string]$plan.source_commit -or
+                [string]$performance.candidate.archive_sha256 -ne [string]$plan.candidate_descriptor.sha256 -or
+                [string]$performance.candidate.package_content_sha256 -ne [string]$plan.candidate_descriptor.content_sha256) {
+              throw 'Fresh protected performance evidence does not bind the exact worker plan and candidate.'
+            }
+            $performanceDestination = Join-Path $delta $performanceEvidence
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceDestination) | Out-Null
+            $performanceSourceHash = (Get-FileHash -LiteralPath $performanceEvidence -Algorithm SHA256).Hash
+            Copy-Item -LiteralPath $performanceEvidence -Destination $performanceDestination
+            if ((Get-FileHash -LiteralPath $performanceDestination -Algorithm SHA256).Hash -ne $performanceSourceHash) {
+              throw 'Performance evidence copy failed integrity verification.'
+            }
+          }
       - uses: actions/upload-artifact@v4
         if: always() && matrix.test_id != '__none__'
         with:
           name: mir-full-evidence-${{ matrix.safe_test_id }}
           path: out/worker-delta
+          include-hidden-files: true
           if-no-files-found: error
 
   f1:

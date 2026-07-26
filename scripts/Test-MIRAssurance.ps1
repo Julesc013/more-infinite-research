@@ -240,6 +240,13 @@ foreach ($requiredWorkflowSnippet in @(
   "out/assurance-inputs",
   "out/worker-delta",
   "path: artifacts/assurance/evidence",
+  "include-hidden-files: true",
+  'if (''${{ matrix.test_id }}'' -eq ''runtime.performance-regression'')',
+  '$performanceEvidence = ".mir/evidence/$candidateVersion-performance-regression.json"',
+  '[string]$performance.candidate.source_commit -ne [string]$plan.source_commit',
+  '[string]$performance.candidate.archive_sha256 -ne [string]$plan.candidate_descriptor.sha256',
+  '[string]$performance.candidate.package_content_sha256 -ne [string]$plan.candidate_descriptor.content_sha256',
+  'Performance evidence copy failed integrity verification.',
   "assurance seal"
 )) {
   if (-not $workflow.Contains($requiredWorkflowSnippet)) {
