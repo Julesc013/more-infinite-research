@@ -35,7 +35,8 @@ function Get-MIRDeltaProducerFingerprint {
   $rows = @(
     foreach ($relative in $paths) {
       $file = Join-Path $repo $relative
-      "$relative=$((Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash)"
+      $identity = Get-MIRFileContentIdentity -Path $file -RelativePath $relative
+      "$relative=$([string]$identity.Sha256)"
     }
   )
   return Get-MIRStringSha256 -Value ($rows -join "`n")

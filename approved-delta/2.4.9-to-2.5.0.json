@@ -20,7 +20,7 @@
     "fixture": "fixtures/export-approved-delta",
     "script": "scripts/Export-MIRApprovedDelta.ps1",
     "qualification_source_commit": "c1a29b22a6d4b461f06aea0b7145f6e21d5004db",
-    "producer_sha256": "491FC3FF518A4FEE1C00ECD3F4E945248F087ADE05ECABE137F73C10FE4683CC",
+    "producer_sha256": "52FA8210EC041BF4C2A29E466851A3AE062467844423783355D33AD378160673",
     "factorio_binary_version": "2.0.77.84539",
     "scenarios": [
       "approved-delta-automatic-family-controls",

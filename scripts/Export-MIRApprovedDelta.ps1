@@ -55,7 +55,8 @@ function Get-ApprovedDeltaProducerFingerprint {
   $rows = @()
   foreach ($relative in $paths) {
     $path = Join-Path $repo $relative
-    $rows += "$relative=$((Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash)"
+    $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
+    $rows += "$relative=$([string]$identity.Sha256)"
   }
   return Get-TextSha256 -Text ($rows -join "`n")
 }

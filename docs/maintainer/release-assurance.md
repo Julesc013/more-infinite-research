@@ -115,7 +115,7 @@ For MIR 3.2.0:
 
 The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
 
-- `release.approved-delta` checks both archive and package-content hashes plus package source authority;
+- `release.approved-delta` checks both archive and package-content hashes plus package source authority; its producer fingerprint uses canonical LF-normalized text identities so an exact Git tree has one authority on every checkout;
 - `runtime.performance-regression` produces a fresh paired qualified-baseline campaign in `.mir/evidence/<version>-performance-regression.json` and immediately checks it;
 - `manual.release-review` checks the package-focused attestation in `.mir/evidence/<version>-manual-review-attestation.json`.
 
