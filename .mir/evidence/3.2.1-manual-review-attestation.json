@@ -17,7 +17,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -28,7 +28,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -39,7 +39,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -50,7 +50,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -61,7 +61,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -72,7 +72,7 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     },
@@ -83,11 +83,11 @@
       "artifacts": [
         {
           "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
-          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+          "sha256": "F9143F40C607148F06243BAAE27982348C2C6F5EF4BBACACC485B8B5F5CB4FE3"
         }
       ]
     }
   ],
   "status": "passed",
-  "attestation_sha256": "F321C78CB6130BD789CFE272E140BE63989DBB4554EA2C642700B026E366E782"
+  "attestation_sha256": "20CFB6EEDAFA90F499FA6CDE822AF1D6501C1880936EB28734E2BC56A6E00508"
 }
