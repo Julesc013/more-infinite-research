@@ -1,0 +1,136 @@
+name: MIR Emergency Package
+
+on:
+  push:
+    branches:
+      - dev
+      - tmp/2.0
+    paths:
+      - ".github/workflows/emergency-package.yml"
+      - "info.json"
+      - "changelog.txt"
+      - "prototypes/**"
+      - "scripts/Test-MIRSpaceLocationTargetInventory.ps1"
+      - "docs/releases/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mir-emergency-package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[emergency-dist]')
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply emergency release metadata
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
+          $version = [string]$info.version
+          $text = [IO.File]::ReadAllText((Resolve-Path changelog.txt)).Replace("`r`n", "`n").Replace("`r", "`n")
+          $bullet = '    - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.'
+          if (-not $text.Contains($bullet)) {
+            if ($version -eq '3.2.1') {
+              $section = @"
+          ---------------------------------------------------------------------------------------------------
+          Version: 3.2.1
+          Date: 2026-07-26
+
+            Bugfixes:
+
+          $bullet
+
+          "@
+              $text = $section.Replace("          ", "") + $text
+            } elseif ($version -eq '2.5.0') {
+              $needle = "  Bugfixes:`n`n"
+              $index = $text.IndexOf($needle, [StringComparison]::Ordinal)
+              if ($index -lt 0) { throw 'Unable to locate the 2.5.0 Bugfixes section.' }
+              $insertAt = $index + $needle.Length
+              $text = $text.Substring(0, $insertAt) + $bullet + "`n" + $text.Substring($insertAt)
+            } else {
+              throw "Emergency package workflow does not recognize MIR version $version."
+            }
+            [IO.File]::WriteAllText((Resolve-Path changelog.txt), $text, [Text.UTF8Encoding]::new($false))
+          }
+
+      - name: Verify planet target contract
+        shell: pwsh
+        run: ./scripts/Test-MIRSpaceLocationTargetInventory.ps1
+
+      - name: Build twice and require deterministic bytes
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
+          $candidate = "dist/$([string]$info.name)_$([string]$info.version).zip"
+          ./scripts/mir.ps1 package build
+          if ($LASTEXITCODE -ne 0) { throw 'First package build failed.' }
+          $first = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
+          ./scripts/mir.ps1 package build
+          if ($LASTEXITCODE -ne 0) { throw 'Second package build failed.' }
+          $second = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
+          if ($first -ne $second) { throw "Package is not deterministic: $first != $second" }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $candidate))
+          try { $entries = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith('/') }).Count }
+          finally { $archive.Dispose() }
+          . ./scripts/validation/PackageIdentity.ps1
+          $identity = [ordered]@{
+            schema = 1
+            kind = 'mir-emergency-package-identity'
+            version = [string]$info.version
+            factorio_version = [string]$info.factorio_version
+            archive = $candidate.Replace('\\', '/')
+            archive_bytes = (Get-Item -LiteralPath $candidate).Length
+            archive_entries = $entries
+            archive_sha256 = $second
+            package_content_sha256 = Get-MIRZipContentFingerprint -Path $candidate
+            focused_test = 'scripts/Test-MIRSpaceLocationTargetInventory.ps1'
+            status = 'focused-emergency-build-passed-full-release-qualification-pending'
+          }
+          $identityPath = "dist/$([string]$info.name)_$([string]$info.version).identity.json"
+          [IO.File]::WriteAllText(
+            $identityPath,
+            (($identity | ConvertTo-Json -Depth 10) + "`n"),
+            [Text.UTF8Encoding]::new($false)
+          )
+          "candidate=$candidate" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "identity=$identityPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$second" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Commit exact emergency distribution
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git diff --check
+          if ($LASTEXITCODE -ne 0) { throw 'git diff --check failed.' }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- changelog.txt
+          git add -f -- '${{ steps.package.outputs.candidate }}' '${{ steps.package.outputs.identity }}'
+          if (git diff --cached --quiet) {
+            Write-Host 'Emergency distribution is already exact.'
+            exit 0
+          }
+          $version = (Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json).version
+          git commit -m "build($version): commit emergency package [emergency-dist] [skip ci]"
+          git push origin "HEAD:$env:GITHUB_REF_NAME"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-emergency-package-${{ github.sha }}
+          path: |
+            ${{ steps.package.outputs.candidate }}
+            ${{ steps.package.outputs.identity }}
+          if-no-files-found: error
