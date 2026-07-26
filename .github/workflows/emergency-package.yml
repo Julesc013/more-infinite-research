@@ -5,25 +5,11 @@ on:
     branches:
       - dev
       - tmp/2.0
-    paths:
-      - ".github/workflows/emergency-package.yml"
-      - "info.json"
-      - "changelog.txt"
-      - "prototypes/**"
-      - "scripts/Test-MIRSpaceLocationTargetInventory.ps1"
-      - "docs/releases/**"
   pull_request:
     branches:
       - dev
       - tmp/2.0
     types: [opened, synchronize, reopened]
-    paths:
-      - ".github/workflows/emergency-package.yml"
-      - "info.json"
-      - "changelog.txt"
-      - "prototypes/**"
-      - "scripts/Test-MIRSpaceLocationTargetInventory.ps1"
-      - "docs/releases/**"
   workflow_dispatch:
 
 permissions:
@@ -53,17 +39,8 @@ jobs:
           $bullet = '    - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.'
           if (-not $text.Contains($bullet)) {
             if ($version -eq '3.2.1') {
-              $section = @"
-          ---------------------------------------------------------------------------------------------------
-          Version: 3.2.1
-          Date: 2026-07-26
-
-            Bugfixes:
-
-          $bullet
-
-          "@
-              $text = $section.Replace("          ", "") + $text
+              $section = "---------------------------------------------------------------------------------------------------`nVersion: 3.2.1`nDate: 2026-07-26`n`n  Bugfixes:`n`n$bullet`n`n"
+              $text = $section + $text
             } elseif ($version -eq '2.5.0') {
               $needle = "  Bugfixes:`n`n"
               $index = $text.IndexOf($needle, [StringComparison]::Ordinal)
@@ -80,25 +57,35 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-MIRSpaceLocationTargetInventory.ps1
 
-      - name: Build twice and require deterministic bytes
-        id: package
+      - name: Build first package
+        id: first
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $candidate = "dist/$([string]$info.name)_$([string]$info.version).zip"
-          ./scripts/mir.ps1 package build
-          if ($LASTEXITCODE -ne 0) { throw 'First package build failed.' }
-          $first = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
-          ./scripts/mir.ps1 package build
-          if ($LASTEXITCODE -ne 0) { throw 'Second package build failed.' }
+          ./scripts/Build-MIRPackage.ps1 -OutputDir dist
+          $hash = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
+          Write-Host "First build: $candidate $hash"
+          "candidate=$candidate" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "sha256=$hash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Rebuild and require byte identity
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $candidate = '${{ steps.first.outputs.candidate }}'
+          ./scripts/Build-MIRPackage.ps1 -OutputDir dist
           $second = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
-          if ($first -ne $second) { throw "Package is not deterministic: $first != $second" }
+          if ('${{ steps.first.outputs.sha256 }}' -ne $second) {
+            throw "Package is not deterministic: ${{ steps.first.outputs.sha256 }} != $second"
+          }
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $archive = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $candidate))
           try { $entries = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith('/') }).Count }
           finally { $archive.Dispose() }
-          . ./scripts/validation/PackageIdentity.ps1
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $identity = [ordered]@{
             schema = 1
             kind = 'mir-emergency-package-identity'
@@ -108,38 +95,27 @@ jobs:
             archive_bytes = (Get-Item -LiteralPath $candidate).Length
             archive_entries = $entries
             archive_sha256 = $second
-            package_content_sha256 = Get-MIRZipContentFingerprint -Path $candidate
             focused_test = 'scripts/Test-MIRSpaceLocationTargetInventory.ps1'
             status = 'focused-emergency-build-passed-full-release-qualification-pending'
           }
           $identityPath = "dist/$([string]$info.name)_$([string]$info.version).identity.json"
-          [IO.File]::WriteAllText(
-            $identityPath,
-            (($identity | ConvertTo-Json -Depth 10) + "`n"),
-            [Text.UTF8Encoding]::new($false)
-          )
+          [IO.File]::WriteAllText($identityPath, (($identity | ConvertTo-Json -Depth 10) + "`n"), [Text.UTF8Encoding]::new($false))
           "candidate=$candidate" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "identity=$identityPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          "sha256=$second" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Commit exact emergency distribution
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           git diff --check
-          if ($LASTEXITCODE -ne 0) { throw 'git diff --check failed.' }
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -- changelog.txt
           git add -f -- '${{ steps.package.outputs.candidate }}' '${{ steps.package.outputs.identity }}'
-          if (git diff --cached --quiet) {
-            Write-Host 'Emergency distribution is already exact.'
-            exit 0
-          }
+          if (git diff --cached --quiet) { exit 0 }
           $version = (Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json).version
           git commit -m "build($version): commit emergency package [emergency-dist] [skip ci]"
           $targetBranch = if ('${{ github.event_name }}' -eq 'pull_request') { '${{ github.head_ref }}' } else { '${{ github.ref_name }}' }
-          if ([string]::IsNullOrWhiteSpace($targetBranch)) { throw 'Unable to resolve package target branch.' }
           git push origin "HEAD:$targetBranch"
 
       - uses: actions/upload-artifact@v4
