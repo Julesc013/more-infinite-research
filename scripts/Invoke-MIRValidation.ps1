@@ -3121,7 +3121,7 @@ function Assert-DefaultBaseExtensionDiagnostics {
 
 function ConvertTo-MIRScenarioParameterValue {
   param($Value)
-  if ($Value -is [pscustomobject]) {
+  if ($null -ne $Value -and $Value.GetType() -eq [System.Management.Automation.PSCustomObject]) {
     $table = @{}
     foreach ($property in $Value.PSObject.Properties) {
       $table[$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
