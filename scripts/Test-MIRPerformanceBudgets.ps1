@@ -66,7 +66,7 @@ foreach ($lane in $regressionLanes) {
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(
   'release: 3.2.1',
-  'qualified_baseline: "3.1.9"',
+  'qualified_baseline: "3.2.0"',
   'maximum_regression_percent: 20',
   'witness_node_limit: 64'
 )) {
