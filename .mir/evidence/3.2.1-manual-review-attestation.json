@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "kind": "mir-manual-release-review",
+  "candidate_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+  "candidate_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
+  "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+  "checklist_version": "mir-manual-release-review-v1",
+  "factorio_version": "2.1.12.87038",
+  "factorio_binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27",
+  "reviewer": "Julesc013",
+  "reviewed_at": "2026-07-26T13:49:01.5713491Z",
+  "items": [
+    {
+      "id": "technology-tree-visual",
+      "status": "passed",
+      "notes": "Maintainer approved the exact C21 technology-tree presentation after playtesting; no missing-planet or connection blocker remained.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "icon-visual",
+      "status": "passed",
+      "notes": "Maintainer approved the exact C21 icon presentation for release; no icon blocker was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "locale-fit-and-truncation",
+      "status": "passed",
+      "notes": "Maintainer approved the exact C21 localized UI for release; the governed 50-locale structural checks remain independently automated.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "settings-ux",
+      "status": "passed",
+      "notes": "Maintainer approved C21 settings presentation and defaults during release playtesting.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "save-ui",
+      "status": "passed",
+      "notes": "Maintainer approved the player-visible save and research state after the planet-discovery hotfix.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "human-balance",
+      "status": "passed",
+      "notes": "Maintainer accepted C21 balance unchanged from the already played 3.2.0 feature candidate; C21 changes only target lookup and release metadata.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    },
+    {
+      "id": "configuration-change-give-item-safety",
+      "status": "passed",
+      "notes": "Maintainer accepted the configuration-change behavior for release; automated candidate-bound runtime and upgrade lanes independently exercise give-item safety.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/3.2.1-manual-review/maintainer-playtest-approval.md",
+          "sha256": "CC45CFF2EFB0D85EC7D7FB8C770A2667334D9728D9AD73DB926764B1B6009469"
+        }
+      ]
+    }
+  ],
+  "status": "passed",
+  "attestation_sha256": "F321C78CB6130BD789CFE272E140BE63989DBB4554EA2C642700B026E366E782"
+}

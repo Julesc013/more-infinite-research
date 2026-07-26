@@ -734,6 +734,7 @@ function Resolve-MIRAssuranceCommandText {
     "<upgrade-to>"=[string]$Context.verification_profile.upgrade.to_version
     "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
     "<source-commit>"=[string]$Plan.source_commit
+    "<package-source-commit>"=[string]$Plan.package_source_commit
     "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
   }
   $resolved = $Command

@@ -206,7 +206,7 @@ function Invoke-MIRAssuranceSeal {
     -RepoRoot $repo `
     -Candidate $Context.candidate `
     -FactorioBin $Context.factorio `
-    -ExpectedSourceCommit $commit `
+    -ExpectedSourceCommit ([string]$sourceAuthority.package_source_commit) `
     -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
   $canonicalDevAnchor = $commit
@@ -464,7 +464,7 @@ function Invoke-MIRAssuranceCheckSeal {
           [string]$manualReview.status -eq "passed" -and
           [string]$manualReview.candidate_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$manualReview.candidate_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$manualReview.source_commit -eq [string]$seal.source_commit -and
+          [string]$manualReview.source_commit -eq [string]$seal.package_source_commit -and
           [string]$manualReview.attestation_sha256 -eq $manualSelfHash
         )
       } catch {}

@@ -155,6 +155,11 @@ if ($performanceTest.Count -ne 1 -or
   throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
 }
 
+$manualTest = @($catalog.tests | Where-Object { [string]$_.id -eq "manual.release-review" })
+if ($manualTest.Count -ne 1 -or
+    [string]$manualTest[0].command -notmatch '-ExpectedSourceCommit\s+<package-source-commit>') {
+  throw "manual.release-review must bind the immutable package-source commit, not its containing qualification commit."
+}
 foreach ($target in @("2.0", "2.1")) {
   $profilePath = Join-Path $RepoRoot "validation\profiles\factorio-$target.json"
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json

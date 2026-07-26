@@ -548,6 +548,7 @@ function Get-MIRAssurancePlan {
   }
   $expanded = @(Expand-MIRAssuranceTests -Tests $selectedDefinitions -Context $Context -ImpactSelection $impactSelection)
   Write-MIRAssuranceTiming -Label "expanded-tests" -Stopwatch $timing
+  $releaseAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
   $plan = [ordered]@{
     schema=4
     policy_id=[string]$Context.verification_profile.policy_id
@@ -564,6 +565,7 @@ function Get-MIRAssurancePlan {
     rerun_tests=@($Context.rerun_tests)
     source_commit=(& git -C $repo rev-parse HEAD).Trim()
     source_tree=(& git -C $repo rev-parse "HEAD^{tree}").Trim()
+    package_source_commit=[string]$releaseAuthority.package_source_commit
     candidate_descriptor=(Get-MIRAssuranceCandidateDescriptor -Context $Context)
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)

@@ -272,7 +272,7 @@
       "id": "manual.release-review",
       "kind": "manual-evidence",
       "layer": "F4",
-      "command": "./scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -ExpectedFactorioVersion <qualification-factorio-version>",
+      "command": "./scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedFactorioVersion <qualification-factorio-version>",
       "requires_factorio": true,
       "inputs": [
         "candidate",

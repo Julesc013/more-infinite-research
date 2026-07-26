@@ -274,7 +274,11 @@ function Test-MIRManualReleaseAttestation {
       [string]::IsNullOrWhiteSpace([string]$attestation.reviewed_at)) {
     throw "Manual release attestation lacks reviewer identity or review time."
   }
-  $null = [DateTimeOffset]::Parse([string]$attestation.reviewed_at)
+  if ($attestation.reviewed_at -is [DateTime]) {
+    $null = [DateTimeOffset]([DateTime]$attestation.reviewed_at)
+  } else {
+    $null = [DateTimeOffset]::Parse([string]$attestation.reviewed_at, [Globalization.CultureInfo]::InvariantCulture)
+  }
   $expectedItems = @(
     "technology-tree-visual", "icon-visual", "locale-fit-and-truncation",
     "settings-ux", "save-ui", "human-balance", "configuration-change-give-item-safety"
