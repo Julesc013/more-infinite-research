@@ -423,12 +423,174 @@ function Test-ExactTechnologyCatalogContractAddition {
     ($actualFields -join "|") -eq ($expectedFields -join "|")
 }
 
+function Test-ExactBackportSettingDifference {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -match '^scenarios\.[^.]+\.settings\.(?<setting>ips-(?<field>cost-base|cost-growth|effect-per-level|enable|max-level|research-time)-(?<stream>research_capture_robot_rockets|research_nutrients))$') {
+    $expected = @{
+      'cost-base' = @{ type = 'number'; value = 8000 }
+      'cost-growth' = @{ type = 'number'; value = 2 }
+      'effect-per-level' = @{ type = 'number'; value = 10 }
+      'enable' = @{ type = 'boolean'; value = $true }
+      'max-level' = @{ type = 'number'; value = 0 }
+      'research-time' = @{ type = 'number'; value = 60 }
+    }[$Matches.field]
+    return $null -eq $Before -and [string]$After.value_type -eq $expected.type -and
+      $After.current_value -eq $expected.value -and @($After.PSObject.Properties.Name).Count -eq 2
+  }
+  if ($Path -match '^scenarios\.[^.]+\.settings\.(ips-enable-research_spoilage_preservation|mir-enable-inserter-capacity-bonus)\.current_value$') {
+    return $Before -eq $false -and $After -eq $true
+  }
+  return $false
+}
+
+function Test-ExactBackportRegistryAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($null -ne $Before -or $Path -notmatch '^scenarios\.(?<scenario>[^.]+)\.generated_registry\.(?<name>[^.]+)$') { return $false }
+  $expected = @{
+    'inserter-capacity-bonus-8' = @{ kind = 'base_extension'; key = 'inserter-capacity-bonus' }
+    'recipe-prod-research_capture_robot_rockets-1' = @{ kind = 'stream'; key = 'research_capture_robot_rockets' }
+    'recipe-prod-research_nutrients-1' = @{ kind = 'stream'; key = 'research_nutrients' }
+    'recipe-prod-research_spoilage_preservation-1' = @{ kind = 'stream'; key = 'research_spoilage_preservation' }
+  }[$Matches.name]
+  if ($null -eq $expected) { return $false }
+  if ($Matches.name -ne 'inserter-capacity-bonus-8' -and $Matches.scenario -notin @(
+      'approved-delta-compat-space-age-galore', 'approved-delta-native-owner-adoption', 'approved-delta-space-age')) { return $false }
+  return [string]$After.name -eq $Matches.name -and [string]$After.kind -eq $expected.kind -and
+    [string]$After.key -eq $expected.key -and @($After.PSObject.Properties.Name).Count -eq 3
+}
+
+function Test-ExactBackportTechnologyAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($null -ne $Before -or $Path -notmatch '^scenarios\.(?<scenario>[^.]+)\.technologies\.(?<name>[^.]+)$') { return $false }
+  $hash = Get-TextSha256 -Text (Get-CanonicalJson -Value $After)
+  if ($Matches.name -eq 'inserter-capacity-bonus-8') {
+    $expected = if ($Matches.scenario -in @(
+      'approved-delta-compat-space-age-galore', 'approved-delta-native-owner-adoption', 'approved-delta-space-age')) {
+      'B1486F405DED05DD05F8A90FD5CDE0558E570C8691AC58C892E6F1E136F0DBE6'
+    } else {
+      '974F990F706CD1FD7264BB4F19C89CEDFD4431EA388AB11D226B4B22D94F892B'
+    }
+    return $hash -eq $expected
+  }
+  if ($Matches.scenario -notin @(
+      'approved-delta-compat-space-age-galore', 'approved-delta-native-owner-adoption', 'approved-delta-space-age')) { return $false }
+  $expectedHashes = @{
+    'recipe-prod-research_capture_robot_rockets-1' = '3C8275FE50D8CCCF025A7059616EA3690D4AE9EB3D82CE19521D71632939078A'
+    'recipe-prod-research_nutrients-1' = 'A6F74FF94EEA1B3AA4C5E38615E06300566387902B37086E1DEC286D5B77204B'
+    'recipe-prod-research_spoilage_preservation-1' = '8A2DCBA105609A72D7555AD9910AAC10B942C3E5F9288054EB9533AA8E71D6D4'
+  }
+  return $expectedHashes.ContainsKey($Matches.name) -and $hash -eq $expectedHashes[$Matches.name]
+}
+
+function Test-ExactBackportTechnologyIdentityAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -notmatch '^scenarios\.(?<scenario>[^.]+)\.technology_ids$') { return $false }
+  $expected = @('inserter-capacity-bonus-8')
+  if ($Matches.scenario -in @(
+      'approved-delta-compat-space-age-galore', 'approved-delta-native-owner-adoption', 'approved-delta-space-age')) {
+    $expected += @(
+      'recipe-prod-research_capture_robot_rockets-1',
+      'recipe-prod-research_nutrients-1',
+      'recipe-prod-research_spoilage_preservation-1'
+    )
+  }
+  $beforeValues = @($Before | ForEach-Object { [string]$_ })
+  $afterValues = @($After | ForEach-Object { [string]$_ })
+  $added = @($afterValues | Where-Object { $beforeValues -notcontains $_ } | Sort-Object)
+  $removed = @($beforeValues | Where-Object { $afterValues -notcontains $_ })
+  return $removed.Count -eq 0 -and ($added -join '|') -eq (@($expected | Sort-Object) -join '|')
+}
+
+function Test-ExactBackportBreedingExpansion {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.recipe-prod-research_breeding-1\.effects\.(?<field>change|recipe|type)$' -or $null -ne $After) { return $false }
+  return ($Matches.field -eq 'change' -and [double]$Before -eq 0.1) -or
+    ($Matches.field -eq 'recipe' -and [string]$Before -eq 'biter-egg') -or
+    ($Matches.field -eq 'type' -and [string]$Before -eq 'change-recipe-productivity')
+}
+
+function Test-ExactBackportLandfillExpansion {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.recipe-prod-research_landfill-1\.effects$') { return $false }
+  return (Get-TextSha256 -Text (Get-CanonicalJson -Value $Before)) -eq '7AF5B974AC7742708F15D8E1AE01348BCC43B313B83ED0DC1478E4E33403976B' -and
+    (Get-TextSha256 -Text (Get-CanonicalJson -Value $After)) -eq 'D76029747337E24523D9CE9431592BCBB9B093CF06B62ECC537E1F1304DC5A61'
+}
+
+function Test-ExactBackportAdoptionShapeCleanup {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.mod_data_contracts\.more-infinite-research-productivity-family-adoption\.contract_shape\.fields\.bindings\.item_shapes\.fields\.legacy_output_unit$' -or $null -ne $After) { return $false }
+  return (Get-CanonicalJson -Value $Before) -eq '{"kind":"object","fields":{"count_formula":"string","ingredients":{"kind":"table","bounded":true},"time":"number"}}'
+}
+
 function Get-DifferenceDisposition {
   param(
     [Parameter(Mandatory)][string]$Path,
     $Before,
     $After
   )
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportSettingDifference -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 adds exact settings for nutrients and capture-robot-rocket productivity and default-enables the reviewed disruptive continuations."
+      intentional = $true
+      migration_impact = "New settings use reviewed defaults; spoilage preservation and inserter capacity remain classified and tooltip-warned as disruptive."
+      required_evidence = @("settings schema and locale gates", "default-enablement fixtures", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportRegistryAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 registers the exact reviewed inserter, nutrients, capture-robot-rocket, and spoilage identities."
+      intentional = $true
+      migration_impact = "Stable generated identities are added without renaming or removing existing 2.4.9 identities."
+      required_evidence = @("generated identity registry", "2.4.9 upgrade matrix", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportTechnologyAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 adds exact reviewed infinite technologies for inserter capacity and supported Space Age production families."
+      intentional = $true
+      migration_impact = "Existing saves receive stable new infinite technologies under the documented default and risk policy."
+      required_evidence = @("technology contract fixtures", "2.4.9 upgrade matrix", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportTechnologyIdentityAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 extends the normalized technology identity set by only the exact reviewed additions."
+      intentional = $true
+      migration_impact = "No 2.4.9 technology identity is removed or renamed."
+      required_evidence = @("exact identity-set delta", "generated identity registry", "upgrade matrix")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportBreedingExpansion -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 expands breeding productivity from biter eggs to the exact reviewed biter-egg, fish-breeding, and pentapod-egg set."
+      intentional = $true
+      migration_impact = "The existing breeding identity is retained while two supported forward-production effects are added."
+      required_evidence = @("exact Space Age breeding fixture", "effect-target integrity", "approved-delta scenario fingerprints")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportLandfillExpansion -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 adds exact 2% ice-platform and 1% space-platform-foundation effects to landfill/foundation productivity."
+      intentional = $true
+      migration_impact = "The existing landfill and foundation effects remain unchanged and two reviewed Space Age targets are appended."
+      required_evidence = @("landfill/foundation exact-effect fixture", "effect-target integrity", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportAdoptionShapeCleanup -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "2.5 removes the obsolete legacy_output_unit diagnostic field from the target-2.0 adoption contract shape."
+      intentional = $true
+      migration_impact = "Compiler behavior and save identity are unchanged; diagnostic consumers use the canonical target-neutral binding fields."
+      required_evidence = @("compiler contract gate", "target-profile parity", "exact 2.0 runtime delta")
+    }
+  }
   if ($Path -match '^package\.(version|archive_sha256|package_content_sha256|runtime_source_fingerprints|settings_source_fingerprints)') {
     return [ordered]@{
       reason = "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch."
@@ -599,7 +761,19 @@ if ($currentSourceCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGit
   throw "Approved-delta exporter source differs. Expected $ExpectedSourceCommit actual $currentSourceCommit"
 }
 $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
-$releaseAuthority = $releaseLedger.development."factorio-2.1"
+$currentContract = Get-PackageContract -PackagePath $currentPath
+$baselineContract = Get-PackageContract -PackagePath $baselinePath
+if ($baselineContract.factorio_version -ne $currentContract.factorio_version) {
+  throw "Approved-delta packages target different Factorio lines."
+}
+$script:IsFactorio20BackportDelta = $baselineContract.version -eq '2.4.9' -and
+  $currentContract.version -eq '2.5.0' -and $currentContract.factorio_version -eq '2.0'
+$targetAuthorityKey = "factorio-$($currentContract.factorio_version)"
+$releaseAuthority = $releaseLedger.development.$targetAuthorityKey
+$baselineAuthority = $releaseLedger.published_baselines.$targetAuthorityKey
+if ($null -eq $releaseAuthority -or $null -eq $baselineAuthority) {
+  throw "Approved-delta release authority is absent for $targetAuthorityKey."
+}
 $packageSourceCommit = [string]$releaseAuthority.package_source_commit
 if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
   throw "Approved-delta export requires the active release candidate's canonical package-source commit."
@@ -647,8 +821,6 @@ foreach ($line in @(
   }
 }
 
-$baselineContract = Get-PackageContract -PackagePath $baselinePath
-$currentContract = Get-PackageContract -PackagePath $currentPath
 if ($currentContract.package_content_sha256 -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
   throw "Approved-delta current package content does not match ExpectedSourceCommit package source."
 }
@@ -656,6 +828,11 @@ if ([string]$releaseAuthority.archive_sha256 -ne $currentContract.archive_sha256
     [string]$releaseAuthority.package_content_sha256 -ne $currentContract.package_content_sha256 -or
     [string]$releaseAuthority.package_source_sha256 -ne $currentContract.package_content_sha256) {
   throw "Approved-delta current package does not match the active release candidate authority."
+}
+if ([string]$baselineAuthority.mir_version -ne $baselineContract.version -or
+    [string]$baselineAuthority.archive_sha256 -ne $baselineContract.archive_sha256 -or
+    [string]$baselineAuthority.package_content_sha256 -ne $baselineContract.package_content_sha256) {
+  throw "Approved-delta baseline package does not match the published baseline authority."
 }
 $rawDifferences = [Collections.Generic.List[object]]::new()
 Add-ValueDifferences -Results $rawDifferences -Path "package" -Before $baselineContract -After $currentContract
@@ -707,12 +884,14 @@ $output = [pscustomobject][ordered]@{
   kind = "mir-approved-delta"
   baseline = [ordered]@{
     version = $baselineContract.version
-    source_commit = "79df29b50ea9b855b8665d6c9a3d8295806acde0"
+    factorio_version = $baselineContract.factorio_version
+    source_commit = [string]$baselineAuthority.tag_commit
     archive_sha256 = $baselineContract.archive_sha256
     package_content_sha256 = $baselineContract.package_content_sha256
   }
   current = [ordered]@{
     version = $currentContract.version
+    factorio_version = $currentContract.factorio_version
     source_commit = $packageSourceCommit
     package_source_commit = $packageSourceCommit
     archive_sha256 = $currentContract.archive_sha256

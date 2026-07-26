@@ -656,6 +656,27 @@ fixtures:
       - migration-contract-parity
       - governed-mod-data-schema-delta
 
+  approved-delta-2.4.9-to-2.5.0:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/2.4.9-to-2.5.0.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
+    validates:
+      - exact-factorio-2.0.77-seven-scenario-delta
+      - exact-2.4.9-generated-identity-projection
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
+      - inserter-capacity-default-enablement-and-risk-retention
+      - nutrients-productivity-settings-and-technology
+      - capture-robot-rocket-productivity-settings-and-technology
+      - spoilage-preservation-default-enablement-and-risk-retention
+      - breeding-biter-fish-and-pentapod-effect-expansion
+      - landfill-foundation-ice-and-space-platform-effect-expansion
+      - exact-2.0-adoption-contract-shape
+      - zero-unreviewed-normalized-differences
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts

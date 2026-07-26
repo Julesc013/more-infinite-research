@@ -41,12 +41,14 @@ end
 
 local function normalized_technology(technology)
   local unit = technology.unit or {}
+  local count_formula = unit.count_formula
+  if count_formula then count_formula = string.gsub(count_formula, "%s+", "") end
   return {
     name = technology.name,
     effects = normalize(technology.effects or {}),
     prerequisites = normalized_names(technology.prerequisites),
     science_ingredients = normalized_ingredients(unit.ingredients),
-    count_formula = unit.count_formula,
+    count_formula = count_formula,
     count = unit.count,
     research_time = unit.time,
     maximum_level = technology.max_level,
@@ -164,10 +166,32 @@ if finalized_artifacts then
       }
     end
   end
+elseif mods and mods["more-infinite-research"] == "2.4.9" then
+  -- The frozen 2.4.9 registry has already left its mutable construction lifetime
+  -- by data-final-fixes. Reconstruct the exact public identity projection from
+  -- its stable technology-name contract instead of reopening that registry.
+  local base_continuations = {
+    ["braking-force-8"] = "braking-force",
+    ["inserter-capacity-bonus-8"] = "inserter-capacity-bonus",
+    ["laser-shooting-speed-8"] = "laser-shooting-speed",
+    ["research-speed-7"] = "research-speed",
+    ["weapon-shooting-speed-7"] = "weapon-shooting-speed",
+    ["worker-robots-storage-4"] = "worker-robots-storage"
+  }
+  for name, _ in pairs(data.raw.technology or {}) do
+    local stream_key = string.match(name, "^recipe%-prod%-(.+)%-1$")
+    if stream_key then
+      technology_names[name] = true
+      registry_rows[name] = {name = name, kind = "stream", key = stream_key}
+    elseif base_continuations[name] then
+      technology_names[name] = true
+      registry_rows[name] = {name = name, kind = "base_extension", key = base_continuations[name]}
+    end
+  end
 elseif mods and mods["more-infinite-research"] == "3.1.9" then
   -- The frozen 3.1.9 baseline predates finalized compiler artifacts and its
   -- registry is not context-scoped. This exact-version adapter exists only to
-  -- reproduce the sealed baseline side of the governed delta.
+  -- reproduce a published baseline side of the governed delta.
   local legacy_registry = require(
     "__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry"
   )

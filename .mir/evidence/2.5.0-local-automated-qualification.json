@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "mir-local-automated-qualification",
+  "release": "2.5.0",
+  "candidate_id": "2.5-P6",
+  "target": "2.0",
+  "status": "machine-verifiable-passed-manual-and-protected-gates-pending",
+  "release_eligible": false,
+  "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
+  "local_evidence_source_commit": "c1a29b22a6d4b461f06aea0b7145f6e21d5004db",
+  "candidate": {
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_bytes": 1029640,
+    "archive_entries": 290,
+    "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
+    "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3"
+  },
+  "factorio": {
+    "version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "plan": {
+    "artifact": "mir-2.5-p6-backport-plan-r6.json",
+    "artifact_sha256": "F013321AD5F17AA0E47ABD4F04BC621F46254CA26C237D4D092D186C1EE915A6",
+    "plan_material_sha256": "E74C306A1C00A58E52C54EADBB1C62408F644821FB0E462283C3EA35F2B173B7",
+    "required_test_set_sha256": "02572F83031ACFDEDA0350CBA55F92DD56194D11F956AE6AC7048351BCD5B5FD",
+    "candidate_descriptor_sha256": "09803CA2F9119EB1D94E07C74D90C96A6970A03CB8E83F9FFFDEF851AE6A48AE",
+    "validation_harness_sha256": "F53ECA7E5954D99524402A9F133E8ADCDB4B8446C0D29C130E4A6B55EA32B85D",
+    "expected_test_count": 117,
+    "reuse_disabled": true
+  },
+  "aggregate": {
+    "artifact": "mir-2.5-p6-backport-results-r6.json",
+    "artifact_sha256": "3F982DB47E80C96C58226FD1F30D21F579F3C997CA75BBCD262DBEDBE5ABF338",
+    "status": "machine-verifiable-passed-manual-attestation-absent",
+    "executed": 117,
+    "passed": 116,
+    "failed": 1,
+    "reused": 0,
+    "unexpected": 0,
+    "only_failure": "manual.release-review"
+  },
+  "checks": {
+    "static_and_deterministic": {
+      "status": "passed",
+      "candidate_rebuild": "byte-identical",
+      "scenario_count": 101,
+      "passed_scenarios": 101,
+      "failed_scenarios": 0
+    },
+    "exact_upgrade": {
+      "status": "passed",
+      "summary": "artifacts/assurance/2.5.0-upgrade-proof.json",
+      "summary_sha256": "024B13D2061876CFEE8446956AE14BDABB0C1E7D05AB7CE7B88048855AFC9975",
+      "baseline_archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+      "row_count": 5,
+      "assurance_fingerprint_sha256": "E510E22961A6F1C4BDAEC2742277DACE8BF8A7E4EA0FAB1C452B66DDA2B99650",
+      "assurance_result_digest": "BD11682629F81E3A19845919A209114CE9893210BD7A50F717C490DC8255FC5E"
+    },
+    "targeted_ecosystem": {
+      "status": "passed",
+      "scope": "representative-local-scenario-plus-exact-runtime-fixtures",
+      "summary_sha256": "1976529EB04861862A9866852476EEE9E005E8E30AF6A5565375294303BA8A4B",
+      "assurance_fingerprint_sha256": "FCB7FC251BB284A567C3E63E85F0492524189BA19E94362A347E29521808B083",
+      "assurance_result_digest": "46885008954E5104BAAEE203E57ECF18A891063EE2C62C87AC4C6D85C12D0FBA"
+    },
+    "approved_delta": {
+      "status": "passed",
+      "evidence": "approved-delta/2.4.9-to-2.5.0.json",
+      "evidence_sha256": "0A620053780E772DEB3F18B32A5B203C38A1F2D01B7F229DA21EF3B2CB924443",
+      "baseline": "2.4.9",
+      "factorio_version": "2.0.77",
+      "scenario_count": 7,
+      "difference_count": 319,
+      "intentional_count": 319,
+      "unapproved_count": 0
+    },
+    "runtime_performance": {
+      "status": "passed",
+      "evidence": ".mir/evidence/2.5.0-performance-regression.json",
+      "evidence_sha256": "5DA2DECF509B4271225A4FE7A0A6822F2126680336EDA927374B6F308DECF6F5",
+      "measurement_harness_sha256": "2890F94A152CD8037BD927F5CE1D1AFF95094AA4B792551AF4A80AFC2712E4D5",
+      "assurance_fingerprint_sha256": "0589ECC62F606B809B63AFF1006B4598963E8C8E91F99221E92CAA8AEE81B162",
+      "assurance_result_digest": "096C2C556FEC3698F6057DBCCEC84618CD0D547A17EC9D148059EEBDB57FBBB9",
+      "warmup_runs_per_package_per_lane": 1,
+      "measured_runs_per_package_per_lane": 5,
+      "measured_execution_count": 60,
+      "total_execution_count": 72,
+      "lane_count": 6,
+      "failed_lanes": 0
+    },
+    "manual_review": {
+      "status": "missing-required-attestation",
+      "required_path": ".mir/evidence/2.5.0-manual-review-attestation.json",
+      "assurance_test_id": "manual.release-review",
+      "assurance_fingerprint_sha256": "B6410AA221699E1D05ADFAE2EE9C95C6F50D03E3E8F4B13F4433D6B8A1C70802"
+    }
+  },
+  "remaining_release_blockers": [
+    "maintainer-authored schema-2 package review attestation for the exact candidate",
+    "protected full qualification and candidate seal",
+    "promotion to legacy only after the protected gate passes"
+  ]
+}

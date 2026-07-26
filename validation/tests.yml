@@ -230,11 +230,11 @@
       "id": "release.approved-delta",
       "kind": "release-evidence",
       "layer": "F4",
-      "command": "./scripts/Test-MIRApprovedDelta.ps1 -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
+      "command": "./scripts/Test-MIRApprovedDelta.ps1 -Path approved-delta/<upgrade-from>-to-<upgrade-to>.json -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
       "requires_factorio": false,
       "inputs": [
         "candidate",
-        "approved-delta/3.1.9-to-3.2.0.json",
+        "approved-delta/<upgrade-from>-to-<upgrade-to>.json",
         "scripts/Test-MIRApprovedDelta.ps1",
         "scripts/Export-MIRApprovedDelta.ps1",
         "scripts/validation/PackageIdentity.ps1"

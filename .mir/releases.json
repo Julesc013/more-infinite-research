@@ -79,11 +79,14 @@
       "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
       "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
       "archive_class": "automated-playtest-candidate",
-      "qualification": "targeted-15-of-15-passed-full-no-reuse-pending",
+      "qualification": "local-no-reuse-116-machine-verifiable-passed-manual-pending",
+      "automated_qualification": ".mir/evidence/2.5.0-local-automated-qualification.json",
+      "runtime_performance_evidence": ".mir/evidence/2.5.0-performance-regression.json",
+      "approved_delta_evidence": "approved-delta/2.4.9-to-2.5.0.json",
       "manual_review": "pending",
       "protected_qualification": "pending",
       "publication_status": "unreleased",
-      "status": "automated-playtest-candidate-c20-projection-targeted-passed"
+      "status": "automated-playtest-candidate-c20-projection-automated-green-manual-pending"
     }
   },
   "views": {

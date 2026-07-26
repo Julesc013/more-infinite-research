@@ -548,14 +548,9 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
 }
 
 if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
-  Invoke-RepoCheck "the provisional 2.5 approved-delta gate remains explicitly runtime-pending" {
+  Invoke-RepoCheck "the normalized 2.4.9 approved delta is complete" {
     $backportDelta = Join-Path $repo "approved-delta\2.4.9-to-2.5.0.json"
-    if (Test-Path -LiteralPath $backportDelta -PathType Leaf) {
-      Write-Host "[info] provisional 2.5 approved-delta artifact is present and will be candidate-validated by the runtime release gate."
-    }
-    else {
-      Write-Host "[pending] exact 2.4.9 to 2.5.0 approved-delta evidence requires the Factorio 2.0 runtime campaign."
-    }
+    & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -Path $backportDelta -ValidateStructureOnly
   }
 }
 else {

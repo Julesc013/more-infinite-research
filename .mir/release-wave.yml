@@ -410,8 +410,12 @@ waves:
     size_bytes: 1029640
     entries: 290
     archive_class: automated-playtest-candidate
-    release_gate: targeted-15-of-15-passed-full-no-reuse-pending
+    automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
+    runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
+    approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
+    automated_gate: passed-116-machine-verifiable-101-runtime-zero-reuse
+    release_gate: automated-passed-manual-and-protected-pending
     manual_review: pending
     protected_qualification: pending
     publication_status: unreleased
-    status: automated-playtest-candidate-c20-projection-targeted-passed
+    status: automated-playtest-candidate-c20-projection-automated-green-manual-pending
