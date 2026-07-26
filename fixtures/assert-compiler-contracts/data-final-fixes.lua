@@ -1314,19 +1314,18 @@ local kept_generic, removed_generic, retained_effect_order, retained_effect_iden
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
-if #kept_generic ~= 5 or #removed_generic ~= 7
+if #kept_generic ~= 6 or #removed_generic ~= 6
   or removed_generic[1].original_effect_index ~= 2
   or removed_generic[2].original_effect_index ~= 4
-  or removed_generic[3].original_effect_index ~= 5
-  or removed_generic[4].original_effect_index ~= 6
-  or removed_generic[5].original_effect_index ~= 8
-  or removed_generic[6].original_effect_index ~= 10
-  or removed_generic[7].original_effect_index ~= 12
+  or removed_generic[3].original_effect_index ~= 6
+  or removed_generic[4].original_effect_index ~= 8
+  or removed_generic[5].original_effect_index ~= 10
+  or removed_generic[6].original_effect_index ~= 12
   or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
-  or #retained_effect_identities ~= 5
+  or #retained_effect_identities ~= 6
   or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3
-  or retained_effect_order[3] ~= 7 or retained_effect_order[4] ~= 9
-  or retained_effect_order[5] ~= 11 then
+  or retained_effect_order[3] ~= 5 or retained_effect_order[4] ~= 7
+  or retained_effect_order[5] ~= 9 or retained_effect_order[6] ~= 11 then
   fail("generic effect contracts did not retain valid targets and prune missing targets"
     .. ": kept=" .. tostring(#kept_generic)
     .. " removed=" .. tostring(#removed_generic)

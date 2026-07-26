@@ -31,7 +31,7 @@ function M.capture()
   for type_name in pairs(prototype_types) do inventory[type_name] = sorted_names({type_name}) end
   inventory.resolvers.item = sorted_names(lookup.item_types())
   inventory.resolvers.entity = sorted_names(lookup.entity_types())
-  inventory.resolvers["space-location"] = sorted_names({"space-location"})
+  inventory.resolvers["space-location"] = sorted_names({"space-location", "planet"})
   return inventory
 end
 
@@ -60,7 +60,7 @@ function M.assert_unchanged(expected)
   local resolver_types = {
     item = lookup.item_types(),
     entity = lookup.entity_types(),
-    ["space-location"] = {"space-location"}
+    ["space-location"] = {"space-location", "planet"}
   }
   for resolver, type_names in pairs(resolver_types) do
     if not exact_name_set(expected.resolvers[resolver], type_names) then
