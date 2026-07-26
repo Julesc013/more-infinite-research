@@ -22,6 +22,7 @@ MIR 3.2.1 is an emergency Space Age progression hotfix for MIR 3.2.0.
 - Entries: `290`
 - SHA-256: `4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6`
 - Compatibility: Factorio `2.1.8` or newer
+- Final release validation: Factorio `2.1.12` (the supported dependency floor remains `2.1.8`)
 
 ## Fixed
 
