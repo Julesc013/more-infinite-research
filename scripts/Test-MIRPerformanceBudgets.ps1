@@ -65,7 +65,7 @@ foreach ($lane in $regressionLanes) {
 
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(
-  'release: 3.2.0',
+  'release: 3.2.1',
   'qualified_baseline: "3.1.9"',
   'maximum_regression_percent: 20',
   'witness_node_limit: 64'
@@ -137,9 +137,9 @@ if ($telemetrySource -notmatch 'WITNESS_LIMIT\s*=\s*64') {
 
 $campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
 $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
-if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.0" -or
+if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.1" -or
     [string]$campaign.factorio_line -ne "2.1" -or [string]$campaign.factorio_version -ne "2.1.11") {
-  throw "Performance campaign authority must be the schema-2 MIR 3.2.0 Factorio 2.1.11 campaign."
+  throw "Performance campaign authority must be the schema-2 MIR 3.2.1 Factorio 2.1.11 campaign."
 }
 $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json

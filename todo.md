@@ -12,11 +12,11 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
 - The modern `dev` root contains every accepted portable code, data, fixture, validation, documentation, determinism, process-lifecycle, and package-governance return from those target lines, including the completed 2.4.9 campaign.
 - Complete immutable source snapshots for published campaign versions remain under `.mir/target-lines/<version>/`, but active validation and assurance fingerprints exclude those archival trees unless the dedicated snapshot-integrity gate is running.
-- The 45 tracked root distribution paths are bound by `.mir/distributions.json`: all 45 are tagged releases. The nonexistent 1.9.5 and not-yet-built 2.5.0 archives are not distribution entries.
+- The 46 tracked root distribution paths are bound by `.mir/distributions.json`: 45 tagged releases plus the exact MIR 3.2.1 Mod Portal artifact awaiting its GitHub tag. The nonexistent 1.9.5 and not-yet-authorized dev-line 2.5.0 archive are not distribution entries.
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - Exact C20 was tagged and published as MIR 3.2.0 from `main`. Its GitHub asset digest matches the immutable recorded ZIP; the longer, manual, protected, and seal gates were not completed before maintainer-directed publication and remain recorded as assurance exceptions rather than passes.
-- `dev` now advances toward MIR 3.2.5. MIR 2.5.0 begins immediately from immutable MIR 2.4.9 and projects the final 3.2.0 semantics through the Factorio 2.0 capability profile; MIR 2.5.5 will later project the frozen portable 3.2.5 delta.
+- MIR 3.2.1 C21 is the exact emergency planet-discovery hotfix on `dev`, already published to the Mod Portal and awaiting full validation, `main` promotion, tag, and GitHub release. MIR 2.5.0 projects the final 3.2.1 semantics through the Factorio 2.0 capability profile; MIR 2.5.5 will later project the frozen portable 3.2.5 delta.
 
 ## Consolidation Gate
 
@@ -105,11 +105,13 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Run focused replacement, rollback, multi-replacement, Base integrity, static, documentation, composition, and deterministic-package validation for exact C20.
 - [x] Record that the longer exact-C20 validation campaign was not completed before maintainer-directed publication; do not relabel earlier candidate evidence as exact C20 evidence.
 - [x] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify the GitHub asset digest against the canonical archive SHA-256.
+- [x] Create exact C21 by resolving `unlock-space-location` across concrete planet prototypes and preserve its deterministic emergency archive.
+- [ ] Complete exact C21 validation, promote the unchanged archive to `main`, and tag `3.2.1` for GitHub release.
 - [ ] Reserve MIR 3.2.1 for an emergency package-level correction; otherwise return `dev` to the MIR 3.2.5 compiler, compatibility, tuning, and reviewed-promotion campaign.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
-- [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.0 semantics through explicit Factorio 2.0 capability adapters.
+- [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.1 semantics through explicit Factorio 2.0 capability adapters.
 - [ ] Freeze canonical 3.2.5 source before projecting its portable delta into MIR 2.5.5.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.

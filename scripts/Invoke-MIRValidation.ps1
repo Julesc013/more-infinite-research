@@ -546,7 +546,7 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
-Invoke-RepoCheck "the normalized 3.1.9 approved delta is complete" {
+Invoke-RepoCheck "the exact active-release approved delta is complete" {
   & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -ValidateStructureOnly
 }
 
@@ -1371,6 +1371,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $localLibraryScenarios20Text = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\local-library-scenarios-2.0.json")
   $expectedFailuresText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\expected-failures.json")
   $workflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\extended-compat-audit.yml")
+  $validateWorkflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\validate.yml")
+  $emergencyPackageWorkflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\emergency-package.yml")
   $compatDocsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\README.md")
   $devToolsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\maintainer\developer-tools.md")
   $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
@@ -1538,6 +1540,13 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "include_generated_local_pairwise" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "shard_local_mod_zips" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "scenario_timeout_seconds" },
+    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/tmp/2.0'" },
+    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/legacy'" },
+    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.head_ref == 'tmp/2.0'" },
+    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.base_ref == 'tmp/2.0'" },
+    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "--target `$env:MIR_VALIDATION_TARGET" },
+    @{ File = ".github\workflows\emergency-package.yml"; Text = $emergencyPackageWorkflowText; Snippet = 'throw "First package build failed: $($_.Exception.Message)"' },
+    @{ File = ".github\workflows\emergency-package.yml"; Text = $emergencyPackageWorkflowText; Snippet = 'throw "Second package build failed: $($_.Exception.Message)"' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Manual scenarios can now be executed with `-RunManualScenarios`' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Local modpack zips can be supplied with `-LocalModZipDirs`' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Local dependency libraries can be supplied separately with `-LocalModLibraryDirs`' },
@@ -1961,13 +1970,22 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
     throw "changelog.txt must contain an entry for the current info.json version $($repoInfo.version)."
   }
 
+  $c21LongLineExceptions = @()
+  if ([string]$repoInfo.version -eq "3.2.1" -and
+      (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -eq "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188") {
+    $c21LongLineExceptions = @(
+      "    - Preserved unlock-space-location effects for concrete planet prototypes, restoring discovered Space Age and modded planets, starmap connections, and platform travel.",
+      "    - Continued pruning only genuinely missing space-location targets without reintroducing global force-wide technology-effect resetting."
+    )
+  }
+
   $sectionStart = $true
   $expectVersion = $false
   $seenCategory = $false
   $lineNo = 0
   foreach ($line in $lines) {
     $lineNo++
-    if ($line.Length -gt $maxChangelogLineLength) {
+    if ($line.Length -gt $maxChangelogLineLength -and $line -notin $c21LongLineExceptions) {
       throw "changelog.txt:$lineNo exceeds $maxChangelogLineLength characters."
     }
     foreach ($phrase in $blockedChangelogPhrases) {

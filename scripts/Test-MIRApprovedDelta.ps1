@@ -1,6 +1,6 @@
 param(
-  [string]$Path = "approved-delta\3.1.9-to-3.2.0.json",
-  [string]$Candidate = "dist\more-infinite-research_3.2.0.zip",
+  [string]$Path = "approved-delta\3.2.0-to-3.2.1.json",
+  [string]$Candidate = "dist\more-infinite-research_3.2.1.zip",
   [string]$ExpectedSourceCommit = "",
   [switch]$ValidateStructureOnly
 )
@@ -8,6 +8,18 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+$activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
+if ($activeVersion -eq "3.2.1") {
+  $arguments = @{
+    RepoRoot = $repo
+    Path = "approved-delta\3.2.0-to-3.2.1.json"
+    Candidate = $Candidate
+    ExpectedSourceCommit = $ExpectedSourceCommit
+    ValidateStructureOnly = $ValidateStructureOnly
+  }
+  & (Join-Path $repo "scripts\Test-MIRApprovedPatchDelta.ps1") @arguments
+  exit $LASTEXITCODE
+}
 $artifactPath = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
 if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Approved-delta artifact is absent: $artifactPath"

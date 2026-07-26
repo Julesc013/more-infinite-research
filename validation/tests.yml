@@ -234,9 +234,9 @@
       "requires_factorio": false,
       "inputs": [
         "candidate",
-        "approved-delta/3.1.9-to-3.2.0.json",
+        "approved-delta/3.2.0-to-3.2.1.json",
         "scripts/Test-MIRApprovedDelta.ps1",
-        "scripts/Export-MIRApprovedDelta.ps1",
+        "scripts/Test-MIRApprovedPatchDelta.ps1",
         "scripts/validation/PackageIdentity.ps1"
       ]
     },

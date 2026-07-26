@@ -87,11 +87,17 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $candidate = "dist/$([string]$info.name)_$([string]$info.version).zip"
-          ./scripts/mir.ps1 package build
-          if ($LASTEXITCODE -ne 0) { throw 'First package build failed.' }
+          try {
+            & ./scripts/mir.ps1 package build
+          } catch {
+            throw "First package build failed: $($_.Exception.Message)"
+          }
           $first = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
-          ./scripts/mir.ps1 package build
-          if ($LASTEXITCODE -ne 0) { throw 'Second package build failed.' }
+          try {
+            & ./scripts/mir.ps1 package build
+          } catch {
+            throw "Second package build failed: $($_.Exception.Message)"
+          }
           $second = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
           if ($first -ne $second) { throw "Package is not deterministic: $first != $second" }
           Add-Type -AssemblyName System.IO.Compression.FileSystem

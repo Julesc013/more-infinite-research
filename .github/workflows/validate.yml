@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.ref == 'refs/heads/legacy' || github.head_ref == 'tmp/2.0' || github.head_ref == 'legacy' || github.base_ref == 'tmp/2.0' || github.base_ref == 'legacy') && '2.0' || '2.1' }}
+
 jobs:
   plan:
     name: verification-plan
@@ -28,10 +31,10 @@ jobs:
             mir-ledger-${{ runner.os }}-
       - name: Diagnose verifier
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
+        run: ./scripts/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output out/verification-plan.json
+        run: ./scripts/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --output out/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -86,7 +89,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./scripts/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -130,7 +133,7 @@ jobs:
           merge-multiple: true
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+        run: ./scripts/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4

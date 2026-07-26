@@ -14,6 +14,15 @@ superseded_by: []
 
 MIR 3.2.1 is an emergency Space Age progression hotfix for MIR 3.2.0.
 
+## Release artifact
+
+- Package: `dist/more-infinite-research_3.2.1.zip`
+- Package source: `f3f8cabd0f84be674d5cc190343a9b7df5ba65c5`
+- Size: `1,029,716` bytes
+- Entries: `290`
+- SHA-256: `4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6`
+- Compatibility: Factorio `2.1.8` or newer
+
 ## Fixed
 
 - Preserved researched Space Age planets and starmap connections.
@@ -34,4 +43,6 @@ Install 3.2.1 over 3.2.0 and load the affected save. The corrected technology pr
 
 ## Qualification status
 
-The emergency distribution is built deterministically with a focused source-contract regression. Complete candidate-bound runtime and release qualification continues after the emergency package is available.
+The exact artifact above is recorded and ready for the `3.2.1` tag. Its focused emergency source-contract regression passed. Broader branch and candidate validation is still in progress and is not represented as complete.
+
+Tag and publish this exact ZIP without rebuilding it.

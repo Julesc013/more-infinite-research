@@ -345,6 +345,35 @@ waves:
     publication_evidence: .mir/evidence/3.2.0/publication.json
     status: published-frozen
 
+  mir_3_2_1:
+    version: "3.2.1"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    minimum_factorio: "2.1.8"
+    source_anchor: mir_3_2_0
+    candidate_id: C21
+    canonical_ledger: .mir/releases.json
+    archive: dist/more-infinite-research_3.2.1.zip
+    archive_class: mod-portal-published-github-release-candidate
+    archive_bytes: 1029716
+    archive_entries: 290
+    archive_sha256: 4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6
+    package_content_sha256: 5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188
+    package_source_sha256: 5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188
+    package_source_commit: f3f8cabd0f84be674d5cc190343a9b7df5ba65c5
+    package_source_tree: f3ba606fb152fbf07951f8af52da129c819f0672
+    superseded_candidate_id: C20
+    superseded_candidate_sha256: 35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32
+    focused_planet_discovery_gate: passed
+    package_determinism_gate: passed-exact-bytes
+    manual_attestation_gate: maintainer-playtest-approved
+    automated_gate: full-validation-pending
+    protected_release_gate: pending
+    release_gate: tag-ready-after-full-validation
+    publication_status: published-mod-portal-github-pending
+    status: c21-focused-passed-full-validation-pending
+
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy
@@ -410,11 +439,11 @@ waves:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
-    source_anchor: mir_3_2_0_final_source
+    source_anchor: mir_3_2_1_final_source
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: null
     archive_class: not-built-from-final-source
-    release_gate: authorized-backport-from-published-3.2.0
+    release_gate: project-final-3.2.1-hotfix-before-2.5.0-release
     publication_status: unreleased
-    status: backport-authorized-from-3.2.0
+    status: backport-in-progress-from-3.2.1
