@@ -7,6 +7,20 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
 & (Join-Path $RepoRoot "scripts\Test-MIRVerificationSchemas.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }
+. (Join-Path $RepoRoot "scripts\validation\ReleaseAttestations.ps1")
+$timestampText = "2026-07-26T08:45:20.3387899Z"
+$convertedTimestamp = ("{`"timestamp`":`"$timestampText`"}" | ConvertFrom-Json).timestamp
+$expectedTimestamp = [DateTimeOffset]::Parse(
+  $timestampText,
+  [Globalization.CultureInfo]::InvariantCulture,
+  [Globalization.DateTimeStyles]::RoundtripKind
+)
+foreach ($timestampValue in @($timestampText, $convertedTimestamp)) {
+  $parsedTimestamp = ConvertTo-MIRReleaseDateTimeOffset -Value $timestampValue
+  if ($parsedTimestamp.ToUniversalTime().Ticks -ne $expectedTimestamp.ToUniversalTime().Ticks) {
+    throw "Release attestation timestamp parsing is not culture- and conversion-safe."
+  }
+}
 
 $config = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\assurance.json") | ConvertFrom-Json
 $impact = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\test-impact.yml") | ConvertFrom-Json

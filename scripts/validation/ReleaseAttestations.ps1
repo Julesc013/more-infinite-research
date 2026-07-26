@@ -26,6 +26,17 @@ function Resolve-MIRReleasePath {
   return [IO.Path]::GetFullPath((Join-Path $RepoRoot $Path))
 }
 
+function ConvertTo-MIRReleaseDateTimeOffset {
+  param([Parameter(Mandatory)]$Value)
+  if ($Value -is [DateTimeOffset]) { return [DateTimeOffset]$Value }
+  if ($Value -is [DateTime]) { return [DateTimeOffset]::new([DateTime]$Value) }
+  return [DateTimeOffset]::Parse(
+    [string]$Value,
+    [Globalization.CultureInfo]::InvariantCulture,
+    [Globalization.DateTimeStyles]::RoundtripKind
+  )
+}
+
 function Resolve-MIRReleaseCommit {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -370,7 +381,7 @@ function Test-MIRManualReleaseAttestation {
       [string]::IsNullOrWhiteSpace([string]$attestation.reviewed_at)) {
     throw "Manual release attestation lacks reviewer identity or review time."
   }
-  $null = [DateTimeOffset]::Parse([string]$attestation.reviewed_at)
+  $null = ConvertTo-MIRReleaseDateTimeOffset -Value $attestation.reviewed_at
   $expectedItems = @(
     "technology-tree-visual", "icon-visual", "locale-fit-and-truncation",
     "settings-ux", "save-ui", "human-balance", "configuration-change-give-item-safety"
