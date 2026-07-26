@@ -425,9 +425,13 @@ if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) 
 if ($ExpectedSourceCommit -notmatch '^[0-9A-Fa-f]{40}$') { throw "ExpectedSourceCommit must be a full Git commit." }
 
 $campaign = Get-Content -Raw -LiteralPath $campaignFile | ConvertFrom-Json
-if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.0" -or [string]$campaign.factorio_line -ne "2.1") {
-  throw "Performance campaign manifest is not the governed MIR 3.2.0 Factorio 2.1 campaign."
+if ([int]$campaign.schema -ne 2 -or [string]::IsNullOrWhiteSpace([string]$campaign.release) `
+    -or [string]$campaign.factorio_line -notmatch '^\d+\.\d+$' `
+    -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line) `
+    -or [string]$campaign.candidate.version -ne [string]$campaign.release) {
+  throw "Performance campaign manifest does not declare a coherent governed target and candidate."
 }
+
 $lanes = @($campaign.lanes)
 $phaseLanes = @($campaign.phase_lanes)
 $budgets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-budgets.json") | ConvertFrom-Json
