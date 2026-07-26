@@ -4,7 +4,7 @@ local mir_version = mods and mods["more-infinite-research"] or nil
 local compilation_module
 if mir_version == "3.1.9" then
   compilation_module = "__more-infinite-research__.prototypes.mir.planner.compilation_plan"
-elseif mir_version == "3.2.0" then
+elseif mir_version == "3.2.1" then
   compilation_module = "__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator"
 else
   error("performance probe does not govern MIR version " .. tostring(mir_version))

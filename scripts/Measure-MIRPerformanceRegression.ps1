@@ -1,12 +1,12 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$CampaignPath = ".mir\performance-campaign.json",
-  [string]$Candidate = "dist\more-infinite-research_3.2.0.zip",
+  [string]$Candidate = "dist\more-infinite-research_3.2.1.zip",
   [string]$PriorRelease = "dist\more-infinite-research_3.1.9.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [string]$LocalModZipDir = "C:\Projects\Factorio\testmods_2.1",
-  [string]$OutputPath = ".mir\evidence\3.2.0-performance-regression.json",
+  [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
   [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
@@ -463,7 +463,7 @@ $manualScenariosRelative = [string]$campaign.manual_scenarios
 $script:ManualScenariosPath = Resolve-MIRCampaignPath -Path $manualScenariosRelative
 if (-not (Test-Path -LiteralPath $script:ManualScenariosPath -PathType Leaf)) { throw "Manual scenario authority is absent." }
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = "artifacts\performance\3.1.9-to-3.2.0-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+  $ArtifactRoot = "artifacts\performance\3.1.9-to-3.2.1-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
 }
 $script:RunRoot = Resolve-MIRCampaignPath -Path $ArtifactRoot
 New-Item -ItemType Directory -Force -Path $script:RunRoot | Out-Null
