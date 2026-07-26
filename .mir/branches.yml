@@ -383,7 +383,7 @@ release_artifacts:
       automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
       runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
       approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
-      automated_gate: passed-116-machine-verifiable-101-runtime-zero-reuse
+      automated_gate: passed-124-machine-verifiable-108-runtime-zero-reuse
       release_gate: automated-passed-manual-and-protected-pending
       publication_status: unreleased
       status: automated-playtest-candidate-c20-projection-automated-green-manual-pending
