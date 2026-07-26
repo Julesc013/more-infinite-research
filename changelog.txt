@@ -4,6 +4,13 @@ Date: 2026-07-26
 
   Bugfixes:
 
+    - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.
+---------------------------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2026-07-26
+
+  Bugfixes:
+
     - Preserved unlock-space-location effects for concrete planet prototypes, restoring discovered Space Age and modded planets, starmap connections, and platform travel.
     - Continued pruning only genuinely missing space-location targets without reintroducing global force-wide technology-effect resetting.
 
