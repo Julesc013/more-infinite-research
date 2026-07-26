@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "kind": "mir-emergency-package-identity",
+  "version": "3.2.1",
+  "factorio_version": "2.1",
+  "archive": "dist/more-infinite-research_3.2.1.zip",
+  "archive_bytes": 1029659,
+  "archive_entries": 290,
+  "archive_sha256": "A667548DA3E9DB472FC49A68AD63CF063B775447B3246C7AFF12A10A55EAA1CB",
+  "focused_test": "scripts/Test-MIRSpaceLocationTargetInventory.ps1",
+  "status": "focused-emergency-build-passed-full-release-qualification-pending"
+}
