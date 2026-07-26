@@ -446,6 +446,31 @@ fixtures:
       - independent-result-row-per-upgrade-archetype
       - exact-3-2-1-candidate-normal-mod-directory-load
 
+  upgrade-3-2-0-to-3-2-1:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-0-to-3-2-1
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-0-source-archive-for-3-2-1
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-1-candidate-normal-mod-directory-load
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
