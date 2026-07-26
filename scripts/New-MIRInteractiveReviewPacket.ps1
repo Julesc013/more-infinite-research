@@ -164,7 +164,7 @@ $packet = [ordered]@{
   notes = @(
     "This pending packet is preparation, not schema-2 evidence that GUI review passed.",
     "Do not reuse screenshots or saves from another candidate or Factorio binary.",
-    "Complete the final governed attestation only after Factorio 2.1.11 is identity-bound."
+    "Complete the final governed attestation only after Factorio $ExpectedFactorioVersion is identity-bound."
   )
 }
 $packetPath = Join-Path $outputRoot "interactive-review.json"
