@@ -36,6 +36,11 @@ local ITEM_TYPES = {
   "space-platform-starter-pack"
 }
 
+-- PlanetPrototype inherits SpaceLocationPrototype, but Factorio stores concrete
+-- planets in data.raw.planet rather than data.raw["space-location"]. Any
+-- resolver for SpaceLocationID therefore has to inspect both prototype kinds.
+local SPACE_LOCATION_TYPES = {"space-location", "planet"}
+
 function L.item_prototype(name)
   if not name then return nil end
   for _, type_name in ipairs(ITEM_TYPES) do
@@ -52,7 +57,17 @@ end
 
 function L.space_location_prototype(name)
   if not name then return nil end
-  return data_raw.prototype("space-location", name) or data_raw.prototype("planet", name)
+  for _, type_name in ipairs(SPACE_LOCATION_TYPES) do
+    local prototype = data_raw.prototype(type_name, name)
+    if prototype then return prototype end
+  end
+  return nil
+end
+
+function L.space_location_types()
+  local out = {}
+  for _, type_name in ipairs(SPACE_LOCATION_TYPES) do table.insert(out, type_name) end
+  return out
 end
 
 function L.each_item_prototype(callback)
