@@ -41,6 +41,15 @@ foreach ($entry in $contracts.GetEnumerator()) {
   }
 }
 
+$sealSchema = Get-Content -Raw -LiteralPath (Join-Path $schemaRoot 'seal.schema.json') | ConvertFrom-Json
+$candidateIdPattern = [string]$sealSchema.properties.candidate_id.pattern
+foreach ($candidateId in @('C1', 'C16', '2.5-P6', '10.12-P34')) {
+  if ($candidateId -cnotmatch $candidateIdPattern) { throw "Seal schema rejected valid candidate ID: $candidateId" }
+}
+foreach ($candidateId in @('C0', 'C01', 'c16', '2-P1', '2.5P6', '2.5-P0', '2.5-P01', 'P6')) {
+  if ($candidateId -cmatch $candidateIdPattern) { throw "Seal schema accepted invalid candidate ID: $candidateId" }
+}
+
 $assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
 if ($assuranceEntry -notmatch '\$evidenceSchema\s*=\s*4') {
   throw "Assurance evidence schema differs from capsule.schema.json."

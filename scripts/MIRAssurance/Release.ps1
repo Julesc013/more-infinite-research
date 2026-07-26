@@ -20,6 +20,11 @@ function Get-MIRAssuranceCandidateArchiveIdentity {
   }
 }
 
+function Test-MIRAssuranceCandidateId {
+  param([Parameter(Mandatory)][string]$CandidateId)
+  return $CandidateId -cmatch '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
+}
+
 function Get-MIRAssuranceReleaseCandidateAuthority {
   param([Parameter(Mandatory)]$Context)
 
@@ -35,7 +40,7 @@ function Get-MIRAssuranceReleaseCandidateAuthority {
   if ([string]$authority.mir_version -ne [string]$Context.info.version) {
     throw "Release authority version does not match the candidate version."
   }
-  if ([string]$authority.candidate_id -notmatch '^C[1-9][0-9]*$') {
+  if (-not (Test-MIRAssuranceCandidateId -CandidateId ([string]$authority.candidate_id))) {
     throw "Release authority candidate_id is invalid."
   }
   if ([string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$') {
@@ -441,12 +446,18 @@ function Invoke-MIRAssuranceCheckSeal {
     if ($checks.performance_evidence_sha256) {
       try {
         $performance = Get-Content -Raw -LiteralPath $performancePath | ConvertFrom-Json
+        $performanceSource = Assert-MIRReleaseEvidenceSourceAuthority `
+          -RepoRoot $repo `
+          -CandidateInfo (Get-MIRReleasePackageInfo -Path $candidate) `
+          -CandidatePath $candidate `
+          -ExpectedQualificationCommit ([string]$seal.qualification_source_commit) `
+          -RecordedEvidenceCommit ([string]$performance.candidate.source_commit)
         $checks.performance_status=(
           [string]$seal.performance_status -eq "passed" -and
           [string]$performance.status -eq "passed" -and
           [string]$performance.candidate.archive_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$performance.candidate.package_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$performance.candidate.source_commit -eq [string]$seal.source_commit
+          [string]$performanceSource.qualification_source_commit -eq [string]$seal.qualification_source_commit
         )
       } catch {}
     }
@@ -456,6 +467,13 @@ function Invoke-MIRAssuranceCheckSeal {
     if ($checks.manual_review_attestation_sha256) {
       try {
         $manualReview = Get-Content -Raw -LiteralPath $manualReviewPath | ConvertFrom-Json
+        $manualSource = Assert-MIRReleaseEvidenceSourceAuthority `
+          -RepoRoot $repo `
+          -CandidateInfo (Get-MIRReleasePackageInfo -Path $candidate) `
+          -CandidatePath $candidate `
+          -ExpectedQualificationCommit ([string]$seal.qualification_source_commit) `
+          -RecordedEvidenceCommit ([string]$manualReview.source_commit) `
+          -RequirePackageSourceEvidenceCommit
         $manualMaterial = ConvertTo-MIRReleaseOrderedMap -Object $manualReview
         $manualMaterial.Remove("attestation_sha256")
         $manualSelfHash = Get-MIRReleaseTextSha256 -Text ($manualMaterial | ConvertTo-Json -Depth 40 -Compress)
@@ -464,7 +482,7 @@ function Invoke-MIRAssuranceCheckSeal {
           [string]$manualReview.status -eq "passed" -and
           [string]$manualReview.candidate_sha256 -eq [string]$seal.candidate_sha256 -and
           [string]$manualReview.candidate_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
-          [string]$manualReview.source_commit -eq [string]$seal.source_commit -and
+          [string]$manualSource.package_source_commit -eq [string]$seal.package_source_commit -and
           [string]$manualReview.attestation_sha256 -eq $manualSelfHash
         )
       } catch {}
@@ -483,6 +501,16 @@ function Invoke-MIRAssuranceCheckSeal {
 
 function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
+  foreach ($candidateId in @('C1', 'C16', '2.5-P6', '10.12-P34')) {
+    if (-not (Test-MIRAssuranceCandidateId -CandidateId $candidateId)) {
+      throw "Valid release candidate ID was rejected: $candidateId"
+    }
+  }
+  foreach ($candidateId in @('C0', 'C01', 'c16', '2-P1', '2.5P6', '2.5-P0', '2.5-P01', 'P6')) {
+    if (Test-MIRAssuranceCandidateId -CandidateId $candidateId) {
+      throw "Invalid release candidate ID was accepted: $candidateId"
+    }
+  }
   $cases = @(
     @{path="control.lua"; class="runtime-or-migration"},
     @{path="migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
@@ -580,6 +608,40 @@ function Invoke-MIRAssuranceSelfTest {
     } catch { $tamperedRejected = $true }
     if (-not $tamperedRejected) {
       throw "Tampered package-source material was not rejected."
+    }
+  }
+
+  if ([string]$Context.target -eq '2.0' -and [string]$Context.info.version -eq '2.5.0') {
+    $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+    $performance = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\evidence\2.5.0-performance-regression.json') | ConvertFrom-Json
+    if ([string]$authority.candidate_id -ne '2.5-P6') {
+      throw 'P6 target-scoped candidate identity self-test failed.'
+    }
+    $null = Assert-MIRReleaseEvidenceSourceAuthority `
+      -RepoRoot $repo `
+      -CandidateInfo $Context.info `
+      -CandidatePath $Context.candidate `
+      -ExpectedQualificationCommit $qualificationCommit `
+      -RecordedEvidenceCommit ([string]$performance.candidate.source_commit)
+    $null = Assert-MIRReleaseEvidenceSourceAuthority `
+      -RepoRoot $repo `
+      -CandidateInfo $Context.info `
+      -CandidatePath $Context.candidate `
+      -ExpectedQualificationCommit $qualificationCommit `
+      -RecordedEvidenceCommit ([string]$authority.package_source_commit) `
+      -RequirePackageSourceEvidenceCommit
+    $untrustedCommitRejected = $false
+    try {
+      $null = Assert-MIRReleaseEvidenceSourceAuthority `
+        -RepoRoot $repo `
+        -CandidateInfo $Context.info `
+        -CandidatePath $Context.candidate `
+        -ExpectedQualificationCommit $qualificationCommit `
+        -RecordedEvidenceCommit '7ebe93029695bbf809a15a14c6540530738a9e62'
+    } catch { $untrustedCommitRejected = $true }
+    if (-not $untrustedCommitRejected) {
+      throw 'Evidence from outside the P6 package-source lineage was accepted.'
     }
   }
 

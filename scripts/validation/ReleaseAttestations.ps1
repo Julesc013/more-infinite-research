@@ -26,6 +26,91 @@ function Resolve-MIRReleasePath {
   return [IO.Path]::GetFullPath((Join-Path $RepoRoot $Path))
 }
 
+function Resolve-MIRReleaseCommit {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$Label
+  )
+  if ($Commit -notmatch '^[0-9a-fA-F]{40}$') { throw "$Label must be a full Git commit." }
+  $resolved = @(& git -C $RepoRoot rev-parse "$Commit^{commit}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $resolved.Count -ne 1 -or [string]$resolved[0] -notmatch '^[0-9a-f]{40}$') {
+    throw "$Label is unavailable: $Commit"
+  }
+  return ([string]$resolved[0]).Trim().ToLowerInvariant()
+}
+
+function Get-MIRReleaseCandidateAuthority {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$CandidateInfo
+  )
+  $ledgerPath = Join-Path $RepoRoot '.mir\releases.json'
+  $ledger = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json
+  $targetKey = "factorio-$([string]$CandidateInfo.factorio_version)"
+  $property = $ledger.development.PSObject.Properties[$targetKey]
+  if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne 'canonical-release-ledger' -or $null -eq $property) {
+    throw "Canonical release authority is absent for $targetKey."
+  }
+  $authority = $property.Value
+  if ([string]$authority.mir_version -ne [string]$CandidateInfo.version -or
+      [string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$' -or
+      [string]$authority.archive_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [string]$authority.package_content_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw 'Canonical release authority does not describe the candidate package.'
+  }
+  return $authority
+}
+
+function Test-MIRReleasePackageRootsEqual {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$ReferenceCommit,
+    [Parameter(Mandatory)][string]$DifferenceCommit
+  )
+  $roots = @(Get-MIRPackageSourceRoots)
+  & git -C $RepoRoot diff --quiet $ReferenceCommit $DifferenceCommit -- @roots
+  return $LASTEXITCODE -eq 0
+}
+
+function Assert-MIRReleaseEvidenceSourceAuthority {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$CandidateInfo,
+    [Parameter(Mandatory)][string]$CandidatePath,
+    [Parameter(Mandatory)][string]$ExpectedQualificationCommit,
+    [Parameter(Mandatory)][string]$RecordedEvidenceCommit,
+    [switch]$RequirePackageSourceEvidenceCommit
+  )
+  $authority = Get-MIRReleaseCandidateAuthority -RepoRoot $RepoRoot -CandidateInfo $CandidateInfo
+  $packageCommit = Resolve-MIRReleaseCommit -RepoRoot $RepoRoot -Commit ([string]$authority.package_source_commit) -Label 'Package-source commit'
+  $qualificationCommit = Resolve-MIRReleaseCommit -RepoRoot $RepoRoot -Commit $ExpectedQualificationCommit -Label 'Qualification-source commit'
+  $evidenceCommit = Resolve-MIRReleaseCommit -RepoRoot $RepoRoot -Commit $RecordedEvidenceCommit -Label 'Evidence-producing commit'
+  if ($RequirePackageSourceEvidenceCommit -and $evidenceCommit -ne $packageCommit) {
+    throw 'Manual review evidence must bind the immutable package-source commit.'
+  }
+  & git -C $RepoRoot merge-base --is-ancestor $packageCommit $evidenceCommit
+  if ($LASTEXITCODE -ne 0) { throw 'Package-source commit is not an ancestor of the evidence-producing commit.' }
+  & git -C $RepoRoot merge-base --is-ancestor $evidenceCommit $qualificationCommit
+  if ($LASTEXITCODE -ne 0) { throw 'Evidence-producing commit is not an ancestor of the qualification-source commit.' }
+  if (-not (Test-MIRReleasePackageRootsEqual -RepoRoot $RepoRoot -ReferenceCommit $packageCommit -DifferenceCommit $evidenceCommit) -or
+      -not (Test-MIRReleasePackageRootsEqual -RepoRoot $RepoRoot -ReferenceCommit $packageCommit -DifferenceCommit $qualificationCommit)) {
+    throw 'Package-visible roots differ across package, evidence, and qualification source authorities.'
+  }
+  $candidateSha = Get-MIRReleaseSha256 -Path $CandidatePath
+  $candidateContentSha = Get-MIRReleaseArchiveContentSha256 -Path $CandidatePath
+  if ($candidateSha -ne [string]$authority.archive_sha256 -or
+      $candidateContentSha -ne [string]$authority.package_content_sha256 -or
+      (Get-Item -LiteralPath $CandidatePath).Length -ne [long]$authority.archive_bytes) {
+    throw 'Candidate bytes do not match canonical release authority.'
+  }
+  return [pscustomobject][ordered]@{
+    package_source_commit = $packageCommit
+    evidence_source_commit = $evidenceCommit
+    qualification_source_commit = $qualificationCommit
+  }
+}
+
 function Get-MIRReleasePackageInfo {
   param([Parameter(Mandatory)][string]$Path)
   Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -108,10 +193,15 @@ function Test-MIRRuntimePerformanceEvidence {
   $candidateSha = Get-MIRReleaseSha256 -Path $candidatePath
   $candidateContentSha = Get-MIRReleaseArchiveContentSha256 -Path $candidatePath
   if ([string]$evidence.candidate.archive_sha256 -ne $candidateSha -or
-      [string]$evidence.candidate.package_content_sha256 -ne $candidateContentSha -or
-      [string]$evidence.candidate.source_commit -ne $ExpectedSourceCommit) {
-    throw "Runtime performance evidence does not bind the exact candidate and package source authority."
+      [string]$evidence.candidate.package_content_sha256 -ne $candidateContentSha) {
+    throw "Runtime performance evidence does not bind the exact candidate."
   }
+  $null = Assert-MIRReleaseEvidenceSourceAuthority `
+    -RepoRoot $RepoRoot `
+    -CandidateInfo $candidateInfo `
+    -CandidatePath $candidatePath `
+    -ExpectedQualificationCommit $ExpectedSourceCommit `
+    -RecordedEvidenceCommit ([string]$evidence.candidate.source_commit)
   $baselineSha = Get-MIRReleaseSha256 -Path $priorPath
   if ([string]$priorInfo.version -ne $ExpectedBaselineVersion -or
       [string]$evidence.baseline.version -ne $ExpectedBaselineVersion -or
@@ -260,10 +350,16 @@ function Test-MIRManualReleaseAttestation {
     throw "Manual release attestation is not a passing schema-2 package review."
   }
   if ([string]$attestation.candidate_sha256 -ne (Get-MIRReleaseSha256 -Path $candidatePath) -or
-      [string]$attestation.candidate_content_sha256 -ne (Get-MIRReleaseArchiveContentSha256 -Path $candidatePath) -or
-      [string]$attestation.source_commit -ne $ExpectedSourceCommit) {
-    throw "Manual release attestation does not bind the exact candidate and package source authority."
+      [string]$attestation.candidate_content_sha256 -ne (Get-MIRReleaseArchiveContentSha256 -Path $candidatePath)) {
+    throw "Manual release attestation does not bind the exact candidate."
   }
+  $null = Assert-MIRReleaseEvidenceSourceAuthority `
+    -RepoRoot $RepoRoot `
+    -CandidateInfo $candidateInfo `
+    -CandidatePath $candidatePath `
+    -ExpectedQualificationCommit $ExpectedSourceCommit `
+    -RecordedEvidenceCommit ([string]$attestation.source_commit) `
+    -RequirePackageSourceEvidenceCommit
   $factorioVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
   if (-not ([string]$attestation.factorio_version).StartsWith($ExpectedFactorioVersion) -or
       -not ([string]$factorioVersion).StartsWith($ExpectedFactorioVersion) -or
