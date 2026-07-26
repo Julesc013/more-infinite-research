@@ -5,14 +5,14 @@ applies_to: "3.2.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-26
 supersedes: []
 superseded_by: []
 ---
 
 # MIR 3.2.0 Release Notes
 
-MIR 3.2.0 is a major compiler, compatibility, and technology expansion for Factorio 2.1.8 and newer. Release qualification uses newer Factorio 2.1 builds.
+MIR 3.2.0 is a major compiler, compatibility, and technology expansion for Factorio 2.1.11 and newer.
 
 ## New technologies
 
@@ -80,4 +80,4 @@ MIR 3.2.0 is a major compiler, compatibility, and technology expansion for Facto
 - SHA-256: `35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32`
 - Package-source commit: `303de261629149af5f50bd210368e61423f1a299`
 
-Publish the recorded ZIP without rebuilding it, and verify downloaded copies against the SHA-256 above.
+The published GitHub asset matches this recorded ZIP. Do not rebuild or replace it.

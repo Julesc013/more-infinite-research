@@ -1,13 +1,17 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-25",
+  "updated_at": "2026-07-26",
   "published_baselines": {
     "factorio-2.1": {
-      "mir_version": "3.1.9",
+      "mir_version": "3.2.0",
       "branch": "main",
-      "tag": "3.1.9",
-      "archive": "dist/more-infinite-research_3.1.9.zip",
+      "tag": "3.2.0",
+      "tag_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+      "package_source_commit": "303de261629149af5f50bd210368e61423f1a299",
+      "archive": "dist/more-infinite-research_3.2.0.zip",
+      "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+      "package_content_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
       "status": "published-frozen"
     },
     "factorio-2.0": {
@@ -42,25 +46,29 @@
       },
       "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
       "package_content_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
-      "archive_class": "main-staged-fast-validated-release-candidate",
-      "qualification": "fast-static-deterministic-package-and-release-authority-passed",
+      "archive_class": "tagged-published-immutable",
+      "qualification": "maintainer-published-after-fast-validation-with-long-gates-not-recorded",
       "approved_delta": "pending",
       "upgrade_qualification": "pending",
       "runtime_qualification": "pending",
       "manual_review": "pending",
       "protected_qualification": "pending",
       "release_decision": {
-        "decision": "maintainer-directed-fast-stage-then-long-validation-before-tag",
+        "decision": "maintainer-published-exact-c20-after-fast-validation",
         "recorded_at": "2026-07-25",
         "package_delta_from_c19": "journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix",
         "fast_validation": "passed",
-        "long_validation": "pending",
-        "tag": "pending",
-        "publication": "pending",
+        "long_validation": "not-completed-before-publication",
+        "tag": "published-3.2.0-at-c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+        "publication": "github-published-and-asset-digest-verified",
         "artifact_rule": "publish-the-recorded-zip-without-rebuilding"
       },
-      "publication_status": "staged-on-main-awaiting-long-validation-tag-and-publication",
-      "status": "c20-main-staged-fast-validation-passed-long-validation-pending",
+      "tag": "3.2.0",
+      "tag_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+      "release_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+      "publication_evidence": ".mir/evidence/3.2.0/publication.json",
+      "publication_status": "published-github-asset-verified",
+      "status": "published-frozen",
       "supersedes_candidate": {
         "candidate_id": "C19",
         "archive_bytes": 1026920,
@@ -76,13 +84,13 @@
     "factorio-2.0": {
       "mir_version": "2.5.0",
       "branch": "tmp/2.0",
-      "source_anchor": "3.2.5-final-source-freeze",
+      "source_anchor": "3.2.0-final-source-freeze",
       "prior_release": "2.4.9",
       "archive": null,
       "archive_class": "not-built-from-final-source",
       "qualification": "pending-canonical-backport",
       "publication_status": "unreleased",
-      "status": "planned-after-3.2.5-freeze"
+      "status": "backport-authorized-from-3.2.0"
     }
   },
   "views": {

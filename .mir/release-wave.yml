@@ -304,7 +304,7 @@ waves:
     candidate_id: C20
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
-    archive_class: release-staged-fast-validated-candidate
+    archive_class: tagged-published-immutable
     archive_bytes: 1029464
     archive_sha256: 35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32
     package_content_sha256: 26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18
@@ -316,30 +316,34 @@ waves:
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     superseded_c16_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c20
+    exact_approved_delta_gate: not-recorded-exact-c20-before-publication
     superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c20
+    exact_upgrade_gate: not-recorded-exact-c20-before-publication
     locale_gate: passed-source-current-50-locales-21300-values
-    locale_runtime_gate: pending-exact-c20
+    locale_runtime_gate: not-recorded-exact-c20-before-publication
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
     superseded_c16_focused_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
     superseded_c16_full_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
-    runtime_performance_gate: pending-exact-c20
-    ecosystem_gate: pending-exact-c20
-    automated_gate: pending-exact-c20
-    minimum_factorio_gate: declared-2.1.8-api-reviewed-exact-runtime-pending
-    protected_release_gate: pending
-    interactive_gate: pending-exact-c20
-    assurance_seal: pending
+    runtime_performance_gate: not-recorded-exact-c20-before-publication
+    ecosystem_gate: not-recorded-exact-c20-before-publication
+    automated_gate: not-recorded-exact-c20-before-publication
+    minimum_factorio_gate: passed-floor-raised-to-2.1.11
+    protected_release_gate: not-run-before-maintainer-publication
+    interactive_gate: not-recorded-before-maintainer-publication
+    assurance_seal: not-created-before-maintainer-publication
     superseded_c18_hosted_branch_policy_gate: passed-run-30155405708
     superseded_c18_hosted_mir_gate: passed-run-30155405710
-    maintainer_release_decision: fast-stage-then-long-validation-before-tag
+    maintainer_release_decision: published-exact-c20-after-fast-validation
     package_delta_from_c19: journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix
-    release_gate: blocked-long-validation-before-tag
-    publication_status: staged-awaiting-long-validation-tag-and-publication
-    status: c20-main-staged-fast-validation-passed-long-validation-pending
+    release_gate: maintainer-published-with-recorded-assurance-exceptions
+    publication_status: published-github-asset-verified
+    tag: "3.2.0"
+    tag_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+    release_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+    publication_evidence: .mir/evidence/3.2.0/publication.json
+    status: published-frozen
 
   mir_2_4_0:
     version: "2.4.0"
@@ -406,11 +410,11 @@ waves:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
-    source_anchor: mir_3_2_5_final_source
+    source_anchor: mir_3_2_0_final_source
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: null
     archive_class: not-built-from-final-source
-    release_gate: pending-canonical-3.2.5-source-freeze
+    release_gate: authorized-backport-from-published-3.2.0
     publication_status: unreleased
-    status: planned-after-3.2.5-freeze
+    status: backport-authorized-from-3.2.0

@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: stable Factorio 2.1 line with exact C20 staged for MIR 3.2.0 long validation, tag, and publication; MIR 3.1.9 remains the last published tag
+    purpose: frozen Factorio 2.1 stable line at published MIR 3.2.0; accepts only emergency 3.2.1 fixes and non-package corrections
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -17,7 +17,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: MIR 3.2.0 release staging followed by MIR 3.2.5 compiler and promotion refinement after publication
+    purpose: MIR 3.2.5 compiler refinement, ecosystem tuning, reviewed promotions, and compatibility expansion
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -313,31 +313,37 @@ release_artifacts:
       superseded_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
       superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
       superseded_c16_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: pending-exact-c20
+      approved_delta_gate: not-recorded-exact-c20-before-publication
       superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: pending-exact-c20
+      upgrade_gate: not-recorded-exact-c20-before-publication
       locale_gate: passed-source-current-50-locales-21300-values
-      locale_runtime_gate: pending-exact-c20
+      locale_runtime_gate: not-recorded-exact-c20-before-publication
       fast_static_gate: passed-c20-static-and-deterministic-package
       superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
       superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
       superseded_c16_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
       superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
-      runtime_performance_gate: pending-exact-c20
-      manual_attestation_gate: pending-exact-c20
-      minimum_factorio_gate: declared-2.1.8-api-reviewed-exact-runtime-pending
+      runtime_performance_gate: not-recorded-exact-c20-before-publication
+      manual_attestation_gate: not-recorded-before-maintainer-publication
+      minimum_factorio_gate: passed-floor-raised-to-2.1.11
       superseded_c18_hosted_branch_policy_gate: passed-run-30155405708
       superseded_c18_hosted_mir_gate: passed-run-30155405710
-      maintainer_release_decision: fast-stage-then-long-validation-before-tag
+      maintainer_release_decision: published-exact-c20-after-fast-validation
       package_delta_from_c19: journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix
-      release_gate: blocked-long-validation-before-tag
-      publication_status: staged-awaiting-long-validation-tag-and-publication
-      status: c20-main-staged-fast-validation-passed-long-validation-pending
+      protected_release_gate: not-run-before-maintainer-publication
+      assurance_seal: not-created-before-maintainer-publication
+      release_gate: maintainer-published-with-recorded-assurance-exceptions
+      publication_status: published-github-asset-verified
+      tag: "3.2.0"
+      tag_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+      release_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+      publication_evidence: .mir/evidence/3.2.0/publication.json
+      status: published-frozen
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_2_5_final_source
+      source_anchor: mir_3_2_0_final_source
       prior_candidate:
         source_anchor: mir_3_1_2
         source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
@@ -350,9 +356,9 @@ release_artifacts:
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      release_gate: pending-canonical-3.2.5-source-freeze
+      release_gate: authorized-backport-from-published-3.2.0
       publication_status: unreleased
-      status: planned-after-3.2.5-freeze
+      status: backport-authorized-from-3.2.0
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -799,12 +805,12 @@ release_artifacts:
       branch: main
       development_branch: dev
       target_factorio: "2.1"
-      purpose: exact C20 staged after fast validation and awaiting long validation before tag and publication
+      purpose: published frozen MIR 3.2.0 foundation; emergency fixes only
     factorio_2_0_companion:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      purpose: target-specific backport from the final stabilized MIR 3.2.5 source
+      purpose: target-specific Factorio 2.0 backport from published MIR 3.2.0
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1

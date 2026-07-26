@@ -5,7 +5,7 @@ applies_to: "3.2.0"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-25
+last_reviewed: 2026-07-26
 supersedes: []
 superseded_by: []
 ---
@@ -29,9 +29,9 @@ superseded_by: []
 | Archive entries | `290` |
 | Archive SHA-256 | `35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32` |
 | Package content SHA-256 | `26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18` |
-| Qualification | `fast-static-deterministic-package-and-release-authority-passed` |
-| Publication | `staged-on-main-awaiting-long-validation-tag-and-publication` |
-| Status | `c20-main-staged-fast-validation-passed-long-validation-pending` |
+| Qualification | `maintainer-published-after-fast-validation-with-long-gates-not-recorded` |
+| Publication | `published-github-asset-verified` |
+| Status | `published-frozen` |
 
 ## Superseded candidate
 
