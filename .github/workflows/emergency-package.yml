@@ -12,6 +12,18 @@ on:
       - "prototypes/**"
       - "scripts/Test-MIRSpaceLocationTargetInventory.ps1"
       - "docs/releases/**"
+  pull_request:
+    branches:
+      - dev
+      - tmp/2.0
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/emergency-package.yml"
+      - "info.json"
+      - "changelog.txt"
+      - "prototypes/**"
+      - "scripts/Test-MIRSpaceLocationTargetInventory.ps1"
+      - "docs/releases/**"
   workflow_dispatch:
 
 permissions:
@@ -23,11 +35,12 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[emergency-dist]')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || !contains(github.event.head_commit.message, '[emergency-dist]')
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Apply emergency release metadata
@@ -125,7 +138,9 @@ jobs:
           }
           $version = (Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json).version
           git commit -m "build($version): commit emergency package [emergency-dist] [skip ci]"
-          git push origin "HEAD:$env:GITHUB_REF_NAME"
+          $targetBranch = if ('${{ github.event_name }}' -eq 'pull_request') { '${{ github.head_ref }}' } else { '${{ github.ref_name }}' }
+          if ([string]::IsNullOrWhiteSpace($targetBranch)) { throw 'Unable to resolve package target branch.' }
+          git push origin "HEAD:$targetBranch"
 
       - uses: actions/upload-artifact@v4
         with:
