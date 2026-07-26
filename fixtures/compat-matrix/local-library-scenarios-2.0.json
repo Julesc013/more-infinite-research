@@ -110,6 +110,36 @@
       "notes": "Core Bob scenario for legacy recipe-productivity compatibility checks."
     },
     {
+      "name": "local-2-0-aai-suite",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "aai-industry",
+        "aai-loaders",
+        "aai-containers",
+        "aai-programmable-structures",
+        "aai-programmable-vehicles"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Locally complete Factorio 2.0 AAI industry, logistics, structures, and vehicle profile used as the large performance closure."
+    },
+    {
       "name": "local-2-0-angels-core-suite",
       "targets": [
         "2.0"
@@ -172,7 +202,7 @@
       "notes": "Combined Bob and Angel legacy scenario. Dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
     },
     {
-      "name": "local-2-0-krastorio2",
+      "name": "local-2-0-k2so",
       "targets": [
         "2.0"
       ],
@@ -180,12 +210,12 @@
       "group": "compatibility-campaign",
       "setup": {
         "mode": "local-library",
-        "include_space_age": false,
+        "include_space_age": true,
         "offline": true,
         "exact_mir_archive": true
       },
       "roots": [
-        "Krastorio2"
+        "Krastorio2-spaced-out"
       ],
       "settings": {},
       "expected_plan": {
@@ -195,7 +225,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Krastorio 2 legacy scenario without Space Age assumptions."
+      "notes": "Exact Factorio 2.0 Krastorio 2 Spaced Out scenario with its required Space Age closure. Classic Krastorio2 2.1 archives are not eligible evidence for this target."
     },
     {
       "name": "local-2-0-space-exploration",

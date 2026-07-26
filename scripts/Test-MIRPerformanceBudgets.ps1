@@ -205,6 +205,9 @@ if ($producerSource -notmatch '\$declaredOfficialMods' -or
     $producerSource -notmatch '\$declaredOfficialMods\s*\|\s*ForEach-Object\s*\{\s*"data\\\$_"\s*\}') {
   throw "Performance campaign must fingerprint the exact target-declared official-mod roots."
 }
+if ($producerSource -match '\$phaseLanes\.probe_phase') {
+  throw "Performance campaign must not index an empty phase-lane projection through a null property value."
+}
 $performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"

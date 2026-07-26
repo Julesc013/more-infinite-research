@@ -566,7 +566,11 @@ $laneResults = @()
 $allClosureRows = @()
 $phaseSamples = [ordered]@{baseline=[ordered]@{}; candidate=[ordered]@{}}
 foreach ($packageLabel in @("baseline", "candidate")) {
-  foreach ($phase in @($phaseLanes.probe_phase)) { $phaseSamples[$packageLabel][$phase] = @() }
+  foreach ($phaseLane in $phaseLanes) {
+    $phase = [string]$phaseLane.probe_phase
+    if ([string]::IsNullOrWhiteSpace($phase)) { throw "Performance phase lane has no probe phase." }
+    $phaseSamples[$packageLabel][$phase] = @()
+  }
 }
 $volumeSamples = [ordered]@{"diagnostics-off"=@(); "diagnostics-on"=@()}
 foreach ($lane in $lanes) {
@@ -594,7 +598,8 @@ foreach ($lane in $lanes) {
     else { $candidateRuns += [double]$result.seconds }
     if ([string]$lane.id -eq [string]$campaign.phase_source_lane) {
       if ($null -eq $result.probe) { throw "Phase-source run lacks the exact-archive performance probe." }
-      foreach ($phase in @($phaseLanes.probe_phase)) {
+      foreach ($phaseLane in $phaseLanes) {
+        $phase = [string]$phaseLane.probe_phase
         $phaseSamples[$packageLabel][$phase] += [double]$result.probe.phases.$phase.seconds
       }
     }

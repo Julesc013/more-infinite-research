@@ -53,7 +53,7 @@
     {
       "id": "large-ecosystem.factorio-total",
       "runner": "compat-audit",
-      "scenario": "local-2-0-krastorio2",
+      "scenario": "local-2-0-aai-suite",
       "official_mods": [],
       "settings": {}
     },
