@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-24",
+  "updated_at": "2026-07-27",
   "published_baselines": {
     "factorio-2.1": {
       "mir_version": "3.1.9",
@@ -59,34 +59,62 @@
     },
     "factorio-2.0": {
       "mir_version": "2.5.0",
-      "candidate_id": "2.5-P6",
+      "candidate_id": "2.5-P9",
       "branch": "tmp/2.0",
-      "source_anchor": "C20",
-      "portable_source_commit": "303de261629149af5f50bd210368e61423f1a299",
+      "source_anchor": "C22",
+      "portable_source_commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
       "prior_release": "2.4.9",
       "archive": "dist/more-infinite-research_2.5.0.zip",
-      "archive_bytes": 1029640,
+      "archive_bytes": 1029914,
       "archive_entries": 290,
-      "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
-      "package_source_tree": "74f497c6c090f981dee00a79c748231c68ff594b",
-      "package_source_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
+      "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+      "package_source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
+      "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
       "package_source_material": {
         "schema": 1,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "74f497c6c090f981dee00a79c748231c68ff594b",
+        "source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
         "file_count": 290
       },
-      "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
-      "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
+      "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+      "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
       "archive_class": "automated-playtest-candidate",
-      "qualification": "local-no-reuse-124-machine-verifiable-passed-manual-pending",
+      "qualification": "focused-static-and-synthetic-contract-passed-exact-runtime-pending",
       "automated_qualification": ".mir/evidence/2.5.0-local-automated-qualification.json",
       "runtime_performance_evidence": ".mir/evidence/2.5.0-performance-regression.json",
       "approved_delta_evidence": "approved-delta/2.4.9-to-2.5.0.json",
-      "manual_review": "pending",
-      "protected_qualification": "pending",
+      "manual_review": "pending-exact-p9",
+      "protected_qualification": "pending-exact-p9",
       "publication_status": "unreleased",
-      "status": "automated-playtest-candidate-c20-projection-automated-green-manual-pending"
+      "status": "automated-playtest-candidate-c22-projection-focused-static-passed-runtime-and-release-qualification-pending",
+      "portable_delta_ledger": ".mir/backport-portable-delta-3.2.2-to-2.5.0.json",
+      "release_gate": "full-automated-manual-and-protected-pending-exact-p9",
+      "superseded_candidates": [
+        {
+          "candidate_id": "2.5-P8",
+          "archive_sha256": "A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F",
+          "package_content_sha256": "65E8ED27BF06D8428125A170456FDE8A44D30DD8BA182DC7382484BDB0F20540",
+          "package_source_commit": "ee88e54af52294452fb4d94cd9e3eae1a8929d3d",
+          "reason": "Factorio changelog syntax rejected continuation prose",
+          "status": "rejected-before-runtime-qualification"
+        },
+        {
+          "candidate_id": "2.5-P7",
+          "archive_sha256": "569D53D6C528317106D57D7A8C3C5AEE450FA76B213DE629A6459CB0930E4445",
+          "package_content_sha256": "36D1FD63EE37AC2C4242904FF7BA83959E7579B95ED60304E52130E67312D697",
+          "package_source_commit": "21ce5f976ffed77fdba8059b87a7481ee2d69e49",
+          "reason": "packaged changelog exceeded the governed 132-character line limit",
+          "status": "rejected-before-runtime-qualification"
+        },
+        {
+          "candidate_id": "2.5-P6",
+          "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
+          "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
+          "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
+          "evidence_root": ".mir/evidence/superseded/2.5-P6",
+          "status": "superseded-unpublished-by-final-c22-reanchor"
+        }
+      ]
     }
   },
   "views": {

@@ -548,9 +548,19 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
 }
 
 if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
-  Invoke-RepoCheck "the normalized 2.4.9 approved delta is complete" {
+  Invoke-RepoCheck "the normalized 2.4.9 approved delta is complete or explicitly pending" {
     $backportDelta = Join-Path $repo "approved-delta\2.4.9-to-2.5.0.json"
-    & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -Path $backportDelta -ValidateStructureOnly
+    if (Test-Path -LiteralPath $backportDelta -PathType Leaf) {
+      & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -Path $backportDelta -ValidateStructureOnly
+    } else {
+      $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
+      $backportAuthority = $releaseLedger.development."factorio-2.0"
+      if ([string]$backportAuthority.candidate_id -ne "2.5-P9" -or
+          [string]$backportAuthority.release_gate -notmatch "pending") {
+        throw "The active release authority does not permit missing approved-delta evidence."
+      }
+      Write-Host "[pending] exact P9 approved-delta evidence has not yet been generated; the F4 plan remains blocked."
+    }
   }
 }
 else {
@@ -621,6 +631,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
     $externalIdentityFixtures = @{
       "better-robots-extended-competitor" = "Better_Robots_Extended"
+      "pypostprocessing-stale-unlock" = "pypostprocessing"
       "space-exploration-recipe-removal" = "space-exploration"
     }
     $allowedExternalIdentity = $externalIdentityFixtures.ContainsKey($fixture.Name) -and

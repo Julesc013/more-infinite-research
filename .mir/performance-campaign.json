@@ -9,12 +9,12 @@
     "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
   },
   "candidate": {
-    "candidate_id": "2.5-P6",
+    "candidate_id": "2.5-P9",
     "version": "2.5.0",
-    "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
-    "package_source_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
-    "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
-    "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3"
+    "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+    "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2"
   },
   "run_policy": {
     "warmup_runs": 1,
@@ -40,7 +40,11 @@
       "id": "space-age.factorio-total",
       "runner": "exact-package-load",
       "scenario": "space-age-default",
-      "official_mods": ["elevated-rails", "quality", "space-age"],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "space-age"
+      ],
       "settings": {}
     },
     {
@@ -62,14 +66,18 @@
       "runner": "exact-package-load",
       "scenario": "base-diagnostics-off",
       "official_mods": [],
-      "settings": {"mir-debug-generation-report": false}
+      "settings": {
+        "mir-debug-generation-report": false
+      }
     },
     {
       "id": "diagnostics-on.factorio-total",
       "runner": "exact-package-load",
       "scenario": "base-diagnostics-on",
       "official_mods": [],
-      "settings": {"mir-debug-generation-report": true}
+      "settings": {
+        "mir-debug-generation-report": true
+      }
     }
   ]
 }

@@ -15,7 +15,7 @@ Updated: 2026-07-20
 
 ## Current 3.2 Release Roles
 
-Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. MIR `3.2.0` is the active `dev` candidate for persistent content-addressed verification, and MIR `2.5.0` is the subsequent Factorio 2.0 target on `tmp/2.0`. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
+MIR `3.2.1` is the frozen Factorio 2.1 patch candidate awaiting final protected-evidence import, MIR `3.2.2` C22 is the active Py/planet-recovery hotfix on `dev`, and MIR `2.4.9` on `legacy` remains the immutable Factorio 2.0 baseline. MIR `2.5.0` P9 on `tmp/2.0` is the exact target projection of final C22. The verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release.
 
 MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
@@ -79,7 +79,7 @@ Use these branch roles during the transition:
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
-| `tmp/2.0` | Maintained Factorio `2.0` semantic companion and verification-overhaul branch. | Provisional `2.5.0` projection; final lineage joins released `3.2.0` with published `2.4.9`. |
+| `tmp/2.0` | Maintained Factorio `2.0` semantic companion and verification-overhaul branch. | Provisional `2.5.0` P9 semantic projection of final C22, with literal ancestry from published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
@@ -96,39 +96,27 @@ Use these branch roles during the transition:
 | `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
 | `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
 
-## Canonical Tag Projection And Shared Ancestry
+## Canonical Semantic Projection
 
-Each maintained Factorio 2.0 feature line is a target projection of one released canonical Factorio 2.1 feature line. MIR `3.2.x` maps to MIR `2.5.x`; MIR `3.3.x` maps to MIR `2.6.x`. Patch numbers remain target-local because either target can require a patch the other does not.
+Each maintained Factorio 2.0 feature line is a target projection of one frozen canonical Factorio 2.1 feature line. MIR `3.2.x` maps to MIR `2.5.x`; MIR `3.3.x` maps to MIR `2.6.x`. Patch numbers remain target-local.
 
-The final target branch must contain the paired canonical release tag in its Git ancestry. It must also retain the prior target release as the upgrade predecessor. The release ZIPs cannot come from the identical commit because target metadata and capability adapters differ, but the target package-source commit must descend from the canonical tag through a small, explicit adapter layer.
+The prior target release remains the literal Git ancestor and direct upgrade baseline. The paired modern package source is an immutable semantic authority, not a wholesale merge parent. The target source lock compares the modern and target package trees directly, declares every adapted path, and binds a portable-delta ledger that classifies each source change as unchanged, adapted, already present, target-incompatible, version-specific, or requiring independent target proof.
 
-For the first ancestry-normalized Factorio 2.0 line, wait until `3.2.0` is tagged. Then establish a reviewed lineage join that has both `3.2.0` and `2.4.9` as ancestors, prove the pre-adapter package tree is the canonical `3.2.0` tree, and apply only declared Factorio 2.0 adapter paths. Do not use an ancestry-only merge to conceal an unported canonical delta. The backport source lock records the canonical tag, prior target tag, join state, adapter paths, and exact package hashes.
-
-After `2.5.0` is published, future feature-line work becomes an ordinary three-way merge:
-
-```text
-released 3.2.0 ── modern 3.3 work ── released 3.3.0
-       │                                  │
-       └─ 2.0 adapter ── released 2.5.0 ──┴─ merge 3.3.0 ── 2.0 adapter delta ── 2.6.0
-```
-
-Because `3.2.0` is the common ancestor, Git applies the modern `3.3` delta instead of requiring the full compiler to be copied again. Conflicts should concentrate in the declared target adapter: `info.json`, target profiles, unsupported effects or prototype shapes, target release documentation, and target-specific fixtures.
+This avoids both expensive reimplementation and unsafe tree unification. Shared code moves by reviewed commits or mechanical projection; Factorio 2.1 metadata, effects, fixtures, and evidence never enter the 2.0 package merely to manufacture ancestry. No portable change may be omitted silently, and no 2.1 evidence may satisfy a 2.0 gate.
 
 The required workflow is:
 
-1. Freeze, qualify, seal, publish, and tag the canonical `3.x.0` release.
-2. Create or update the paired `tmp/2.0` line so the canonical tag and prior `2.x` release are both ancestors.
-3. Apply the Factorio 2.0 capability projection in explicit adapter commits.
-4. Verify the ancestry relation and exact allowed package-tree delta mechanically.
-5. Build and independently qualify the Factorio 2.0 archive.
-6. Fast-forward `legacy` only after the target candidate passes its own gates.
-7. For the next feature pair, merge the next released canonical tag normally; do not reconstruct the compiler from the old target tree.
+1. Freeze and qualify the canonical `3.x` package source.
+2. Record every relevant canonical change in the target portable-delta ledger.
+3. Retain the prior `2.x` release as target ancestry and upgrade baseline.
+4. Apply only the declared Factorio 2.0 adapters.
+5. Compare package trees and verify the exact adapter set mechanically.
+6. Build and independently qualify the Factorio 2.0 archive.
+7. Fast-forward `legacy` only after target-specific manual, protected, and seal gates pass.
 
-Portable fixes discovered during target qualification should land on `dev` and return through the next canonical merge when practical. Urgent shared fixes may be cherry-picked downward with an explicit source-commit record. Target metadata, removed capabilities, lower dependency floors, and old-line release wording never merge upward.
+Portable fixes found during target qualification return to `dev` when they are genuinely target-neutral. Target metadata, removed capabilities, lower dependency floors, and target release wording never merge upward.
 
-The current `2.5-P6` archive descends from both published `2.4.9` and tag `3.2.0`, projects final C20, and remains an automated playtest candidate until exact target qualification and manual review pass. Its five-path package adapter, including the target-discovered progression-budget correction, is recorded in `.mir/backport-source-lock.json`.
-
-`tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
+The current `2.5-P9` archive binds final C22 package source `7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8`, target package source `f446d89f94ce4b9dc26f04c31c92f9bcffbac70d`, and the seven exact adapted package paths recorded in `.mir/backport-source-lock.json`. The 3.2-only affected-save recovery is explicitly omitted; the Py ordering fix and synthetic fixture are ported and require independent Factorio 2.0 runtime proof. `tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
 
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a Factorio `2.0` port can be validated while `dev` remains available for Factorio `2.1` fixes.
 

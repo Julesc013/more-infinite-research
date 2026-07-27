@@ -1,7 +1,7 @@
 {
-  "schema": 3,
-  "projection_schema": 2,
-  "candidate_id": "2.5-P6",
+  "schema": 4,
+  "projection_schema": 3,
+  "candidate_id": "2.5-P9",
   "mir_version": "2.5.0",
   "target": "2.0",
   "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
@@ -14,39 +14,45 @@
     "content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
   },
   "portable_source": {
-    "release": "3.2.0",
-    "candidate_id": "C20",
-    "commit": "303de261629149af5f50bd210368e61423f1a299",
-    "source_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
-    "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32"
+    "release": "3.2.2",
+    "candidate_id": "C22",
+    "commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
+    "source_sha256": "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4",
+    "archive_sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
+    "tag": "3.2.2",
+    "tag_status": "pending-final-qualification"
   },
   "lineage": {
-    "policy": "canonical-tag-projection",
-    "state": "canonical-tag-descendant",
-    "canonical_release_tag": "3.2.0",
-    "canonical_release_tag_status": "published",
-    "portable_source_commit_is_ancestor": true,
+    "policy": "canonical-semantic-projection",
+    "state": "final-c22-semantic-source-pending-tag",
+    "canonical_release_tag": "3.2.2",
+    "canonical_release_tag_status": "pending",
+    "portable_source_commit_is_ancestor": false,
     "prior_target_tag": "2.4.9",
-    "final_candidate_requires_canonical_tag_ancestry": true,
+    "prior_target_tag_is_ancestor": true,
+    "final_candidate_requires_exact_portable_delta_ledger": true,
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
-    "package_source_tree": "74f497c6c090f981dee00a79c748231c68ff594b",
-    "package_source_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
+    "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+    "package_source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
+    "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
       "info.json",
+      "prototypes/mir/platform/factorio/target_profiles.lua",
       "prototypes/mir/providers/pipeline/budget.lua",
-      "prototypes/mir/platform/factorio/target_profiles.lua"
-    ]
+      "prototypes/mir/runtime/planet_discovery_recovery.lua",
+      "prototypes/mir/runtime/scripted_techs.lua"
+    ],
+    "portable_delta_ledger": ".mir/backport-portable-delta-3.2.2-to-2.5.0.json"
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
-    "content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
-    "bytes": 1029640,
+    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "bytes": 1029914,
     "entries": 290,
     "forbidden_entries": 0,
     "class": "automated-playtest-candidate"
@@ -56,12 +62,36 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "passed-exact-p6",
-    "runtime": "targeted-15-of-15-passed-exact-p6",
-    "manual_review": "pending",
-    "protected_qualification": "pending",
+    "target_static": "passed-focused-p7",
+    "synthetic_py_finalizer": "passed-exact-p9",
+    "runtime": "pending-exact-p9",
+    "manual_review": "pending-exact-p9",
+    "protected_qualification": "pending-exact-p9",
     "publication": "unreleased"
   },
-  "release_notes": "docs/releases/2.5.0-provisional-c20-backport.md",
-  "playtest_guide": "docs/releases/2.5.0-playtest-guide.md"
+  "release_notes": "docs/releases/notes/release-notes-2.5.0.md",
+  "candidate_document": "docs/releases/2.5.0-provisional-c22-backport.md",
+  "playtest_guide": "docs/releases/2.5.0-playtest-guide.md",
+  "superseded_candidates": [
+    {
+      "candidate_id": "2.5-P8",
+      "archive_sha256": "A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F",
+      "package_content_sha256": "65E8ED27BF06D8428125A170456FDE8A44D30DD8BA182DC7382484BDB0F20540",
+      "package_source_commit": "ee88e54af52294452fb4d94cd9e3eae1a8929d3d",
+      "reason": "Factorio changelog syntax rejected continuation prose",
+      "status": "rejected-before-runtime-qualification"
+    },
+    {
+      "candidate_id": "2.5-P7",
+      "package_source_commit": "21ce5f976ffed77fdba8059b87a7481ee2d69e49",
+      "archive_sha256": "569D53D6C528317106D57D7A8C3C5AEE450FA76B213DE629A6459CB0930E4445",
+      "reason": "packaged changelog exceeded the governed 132-character line limit",
+      "status": "rejected-before-runtime-qualification"
+    },
+    {
+      "candidate_id": "2.5-P6",
+      "evidence_root": ".mir/evidence/superseded/2.5-P6",
+      "status": "superseded-unpublished"
+    }
+  ]
 }

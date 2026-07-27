@@ -18,7 +18,7 @@ MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is 
 
 MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
-MIR 2.5.0 `2.5-P6` is the provisional Factorio 2.0 projection of final C20 with the published 2.4.9 ModData/adoption capability retained and hard-rejected recipes excluded from family progression-span measurements. It is an automated playtest candidate with focused and full validation, manual review, protected qualification, sealing, branch promotion, tagging, and publication still pending.
+MIR 2.5.0 `2.5-P9` is the provisional Factorio 2.0 semantic projection of final C22. It retains the published 2.4.9 target capabilities, the concrete planet resolver, and the Py finalizer-ordering correction while excluding the 3.2-only affected-save repair. Focused static and synthetic gates pass; exact runtime, full, manual, protected, sealing, promotion, tagging, and publication gates remain pending.
 
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)
@@ -52,7 +52,7 @@ MIR 2.5.0 `2.5-P6` is the provisional Factorio 2.0 projection of final C20 with 
 - [3.1.9 validation summary](3.1.9-validation-summary.md)
 - [2.4.9 stability backport](2.4.9-stability-backport.md)
 - [2.4.9 release notes](notes/release-notes-2.4.9.md)
-- [2.5.0 provisional C20 backport](2.5.0-provisional-c20-backport.md)
+- [2.5.0 provisional C22 backport](2.5.0-provisional-c22-backport.md)
 - [2.5.0 playtest guide](2.5.0-playtest-guide.md)
 - [2.5.0 verification backport contract](2.5.0-verification-backport.md)
 - [2.5.0 provisional release notes](notes/release-notes-2.5.0.md)

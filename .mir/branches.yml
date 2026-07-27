@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.9
+    purpose: frozen Factorio 2.1 stable line at MIR 3.2.1 pending final protected evidence import and 3.2.2 hotfix promotion
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: MIR 3.2.0 persistent-verification development and canonical future Factorio 2.1 integration
+    purpose: MIR 3.2.2 Py and planet-recovery emergency hotfix qualification; returns to MIR 3.2.5 development after publication
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -98,32 +98,33 @@ backport_rules:
       - no-package-diff
 
 feature_line_lineage:
-  policy: canonical-tag-projection
+  policy: canonical-semantic-projection
   canonical_line: "3.x"
   rules:
     - freeze-and-release-the-canonical-3.x-tag-before-final-target-projection
-    - require-each-maintained-2.x-feature-line-to-descend-from-its-paired-3.x-release-tag
-    - retain-the-prior-2.x-release-as-upgrade-baseline-and-second-lineage-parent
+    - bind-each-maintained-2.x-feature-line-to-its-paired-3.x-package-source-through-an-exact-portable-delta-ledger
+    - retain-the-prior-2.x-release-as-the-literal-upgrade-and-lineage-parent
     - keep-target-metadata-and-capability-cuts-in-explicit-adapter-commits
-    - merge-the-next-canonical-3.x-tag-normally-into-the-published-2.x-line
+    - never-merge-the-2.1-tree-wholesale-into-a-2.0-package-line
     - return-portable-fixes-to-dev-without-merging-target-adapters-upward
     - qualify-and-seal-each-target-archive-independently
   feature_pairs:
     - canonical: "3.2.x"
       factorio_2_0_companion: "2.5.x"
-      canonical_release_tag: "3.2.0"
-      status: canonical-tag-pending-provisional-projection-only
+      canonical_release_tag: "3.2.2"
+      status: c22-tag-pending-p7-semantic-projection-in-progress
     - canonical: "3.3.x"
       factorio_2_0_companion: "2.6.x"
       canonical_release_tag: "3.3.0"
       status: planned
   patch_policy: patch-numbers-are-target-local-and-need-not-advance-in-lockstep
-  final_2_5_0_ancestry_gate:
-    canonical_tag: "3.2.0"
+  final_2_5_0_source_gate:
+    canonical_tag: "3.2.2"
     prior_target_tag: "2.4.9"
-    required: true
+    exact_portable_delta_ledger_required: true
+    prior_target_tag_ancestry_required: true
     current_provisional_candidate_satisfies_gate: false
-    action_after_canonical_release: establish-and-verify-tag-ancestry-before-final-2.5-qualification
+    action_after_canonical_release: verify-final-c22-source-and-exact-target-projection-before-2.5-qualification
 
 release_artifacts:
   published_archives_are_immutable: true
@@ -355,38 +356,67 @@ release_artifacts:
       release_gate: blocked-exact-c16-full-no-reuse-manual-and-protected-qualification
       publication_status: unreleased
       status: c16-automated-playtest-candidate-focused-performance-and-semantic-parity-passed
+    mir_3_2_2:
+      version: "3.2.2"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_2_0
+      candidate_id: C22
+      package_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+      artifact: dist/more-infinite-research_3.2.2.zip
+      sha256: 638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938
+      package_content_sha256: B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4
+      tag: "3.2.2"
+      publication_status: pending
+      status: exact-package-source-pending-final-qualification-and-tag
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_2_0
-      prior_candidate:
-        source_anchor: mir_3_1_2
-        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
-        artifact: dist/more-infinite-research_2.5.0.zip
-        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
-        history_document: docs/archive/superseded/2.5.0-precanonical-candidate.md
-        status: superseded-unpublished-candidate
+      source_anchor: mir_3_2_2
+      superseded_candidates:
+        - candidate_id: "2.5-P8"
+          package_source_commit: ee88e54af52294452fb4d94cd9e3eae1a8929d3d
+          archive_sha256: A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F
+          reason: Factorio changelog syntax rejected continuation prose
+          status: rejected-before-runtime-qualification
+        - candidate_id: "2.5-P7"
+          package_source_commit: 21ce5f976ffed77fdba8059b87a7481ee2d69e49
+          archive_sha256: 569D53D6C528317106D57D7A8C3C5AEE450FA76B213DE629A6459CB0930E4445
+          reason: packaged changelog exceeded the governed 132-character line limit
+          status: rejected-before-runtime-qualification
+        - candidate_id: "2.5-P6"
+          package_source_commit: f9eb34eae9b767275a17b5e68351343042ef7532
+          archive_sha256: 98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE
+          evidence_root: .mir/evidence/superseded/2.5-P6
+          status: superseded-unpublished-by-final-c22-reanchor
+        - source_anchor: mir_3_1_2
+          source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+          archive_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+          history_document: docs/archive/superseded/2.5.0-precanonical-candidate.md
+          status: superseded-unpublished-candidate
       assurance_policy: mir-verification-v4
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      candidate_id: "2.5-P6"
-      portable_source_commit: 303de261629149af5f50bd210368e61423f1a299
-      package_source_commit: f9eb34eae9b767275a17b5e68351343042ef7532
+      candidate_id: "2.5-P9"
+      portable_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+      portable_delta_ledger: .mir/backport-portable-delta-3.2.2-to-2.5.0.json
+      package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
       archive: dist/more-infinite-research_2.5.0.zip
-      archive_sha256: 98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE
-      package_content_sha256: 6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3
-      archive_bytes: 1029640
+      archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
+      package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
+      archive_bytes: 1029914
       archive_entries: 290
       automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
       runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
       approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
-      automated_gate: passed-124-machine-verifiable-108-runtime-zero-reuse
-      release_gate: automated-passed-manual-and-protected-pending
+      automated_gate: focused-static-and-synthetic-passed-exact-p9-runtime-pending
+      release_gate: full-automated-manual-and-protected-pending-exact-p9
+      manual_review: pending-exact-p9
+      protected_qualification: pending-exact-p9
       publication_status: unreleased
-      status: automated-playtest-candidate-c20-projection-automated-green-manual-pending
+      status: automated-playtest-candidate-c22-projection-focused-static-passed-runtime-and-release-qualification-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

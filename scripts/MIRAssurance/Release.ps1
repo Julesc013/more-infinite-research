@@ -451,7 +451,7 @@ function Invoke-MIRAssuranceCheckSeal {
           -CandidateInfo (Get-MIRReleasePackageInfo -Path $candidate) `
           -CandidatePath $candidate `
           -ExpectedQualificationCommit ([string]$seal.qualification_source_commit) `
-          -RecordedEvidenceCommit ([string]$performance.candidate.source_commit)
+          -RecordedEvidenceCommit ([string]$authority.package_source_commit)
         $checks.performance_status=(
           [string]$seal.performance_status -eq "passed" -and
           [string]$performance.status -eq "passed" -and
@@ -614,16 +614,15 @@ function Invoke-MIRAssuranceSelfTest {
   if ([string]$Context.target -eq '2.0' -and [string]$Context.info.version -eq '2.5.0') {
     $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
     $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
-    $performance = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\evidence\2.5.0-performance-regression.json') | ConvertFrom-Json
-    if ([string]$authority.candidate_id -ne '2.5-P6') {
-      throw 'P6 target-scoped candidate identity self-test failed.'
+    if ([string]$authority.candidate_id -ne '2.5-P9') {
+      throw 'P9 target-scoped candidate identity self-test failed.'
     }
     $null = Assert-MIRReleaseEvidenceSourceAuthority `
       -RepoRoot $repo `
       -CandidateInfo $Context.info `
       -CandidatePath $Context.candidate `
       -ExpectedQualificationCommit $qualificationCommit `
-      -RecordedEvidenceCommit ([string]$performance.candidate.source_commit)
+      -RecordedEvidenceCommit ([string]$authority.package_source_commit)
     $null = Assert-MIRReleaseEvidenceSourceAuthority `
       -RepoRoot $repo `
       -CandidateInfo $Context.info `
@@ -641,7 +640,7 @@ function Invoke-MIRAssuranceSelfTest {
         -RecordedEvidenceCommit '7ebe93029695bbf809a15a14c6540530738a9e62'
     } catch { $untrustedCommitRejected = $true }
     if (-not $untrustedCommitRejected) {
-      throw 'Evidence from outside the P6 package-source lineage was accepted.'
+      throw 'Evidence from outside the P9 package-source lineage was accepted.'
     }
   }
 

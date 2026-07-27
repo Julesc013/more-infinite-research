@@ -32,32 +32,27 @@ function Get-MIRZipFileCount {
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
-if ([int]$lock.schema -ne 3 -or [int]$lock.projection_schema -ne 2) {
+if ([int]$lock.schema -ne 4 -or [int]$lock.projection_schema -ne 3) {
   throw "Unsupported MIR backport source-lock schema."
 }
-foreach ($field in @("candidate_id", "mir_version", "target", "target_profile_sha256", "release_notes", "playtest_guide")) {
+foreach ($field in @("candidate_id", "mir_version", "target", "target_profile_sha256", "release_notes", "candidate_document", "playtest_guide")) {
   if ([string]::IsNullOrWhiteSpace([string]$lock.$field)) { throw "Backport source lock is missing $field." }
 }
 foreach ($section in @("baseline", "portable_source", "lineage", "projection", "candidate", "upgrade_contract", "qualification")) {
   if ($null -eq $lock.$section) { throw "Backport source lock is missing $section." }
 }
 
-if ([string]$lock.lineage.policy -ne "canonical-tag-projection") {
-  throw "Backport source lock must use canonical-tag-projection lineage policy."
+if ([string]$lock.lineage.policy -ne "canonical-semantic-projection" -or
+    [string]$lock.lineage.state -ne "final-c22-semantic-source-pending-tag" -or
+    [bool]$lock.lineage.portable_source_commit_is_ancestor -or
+    -not [bool]$lock.lineage.prior_target_tag_is_ancestor -or
+    -not [bool]$lock.lineage.final_candidate_requires_exact_portable_delta_ledger) {
+  throw "Backport source lock must record an honest final-C22 semantic projection with literal 2.4.9 ancestry and no false C22 ancestry claim."
 }
-if ([string]$lock.lineage.state -eq "provisional-content-projection") {
-  if ([string]$lock.lineage.canonical_release_tag_status -ne "pending" -or
-      [bool]$lock.lineage.portable_source_commit_is_ancestor) {
-    throw "Provisional backport lineage must record a pending canonical tag and no ancestry claim."
-  }
-} elseif ([string]$lock.lineage.state -eq "canonical-tag-descendant") {
-  $canonicalTag = [string]$lock.lineage.canonical_release_tag
-  & git -C $RepoRoot rev-parse --verify "$canonicalTag`^{commit}" 2>$null | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw "Canonical backport release tag does not exist: $canonicalTag" }
-  & git -C $RepoRoot merge-base --is-ancestor $canonicalTag ([string]$lock.projection.package_source_commit)
-  if ($LASTEXITCODE -ne 0) { throw "Backport package source is not a descendant of canonical tag $canonicalTag." }
-} else {
-  throw "Unsupported backport lineage state: $($lock.lineage.state)"
+if ([string]$lock.portable_source.release -ne "3.2.2" -or
+    [string]$lock.portable_source.candidate_id -ne "C22" -or
+    [string]$lock.lineage.canonical_release_tag -ne "3.2.2") {
+  throw "The 2.5 source lock must bind final MIR 3.2.2 candidate C22."
 }
 
 $baselineCommit = [string]$lock.baseline.commit
@@ -94,7 +89,35 @@ $adaptedActual = @(
 if ($LASTEXITCODE -ne 0) { throw "Unable to compare the portable source with the target projection." }
 $adaptedDelta = @(Compare-Object $adaptedExpected $adaptedActual)
 if ($adaptedDelta.Count -gt 0) {
-  throw "The C20-to-2.5 package delta is not the exact declared adapter set."
+  throw "The C22-to-2.5 package delta is not the exact declared adapter set."
+}
+$deltaPath = Join-Path $RepoRoot ([string]$lock.projection.portable_delta_ledger)
+if (-not (Test-Path -LiteralPath $deltaPath -PathType Leaf)) { throw "Portable-delta ledger is missing." }
+$delta = Get-Content -Raw -LiteralPath $deltaPath | ConvertFrom-Json
+if ([int]$delta.schema -ne 1 -or [string]$delta.kind -ne "mir-portable-delta-ledger" -or
+    [string]$delta.source.version -ne "3.2.2" -or [string]$delta.source.candidate_id -ne "C22" -or
+    [string]$delta.source.package_source_commit -ne $portableCommit -or
+    [string]$delta.target.version -ne "2.5.0" -or [string]$delta.target.candidate_id -ne "2.5-P9" -or
+    [string]$delta.target.package_source_commit -ne $projectionCommit -or
+    -not [bool]$delta.rules.wholesale_merge_forbidden -or -not [bool]$delta.rules.target_specific_evidence_required -or
+    [bool]$delta.rules.factorio_2_1_evidence_reusable) {
+  throw "Portable-delta ledger identity or target-boundary rules are invalid."
+}
+$expectedDeltaIds = @(
+  "c21-concrete-planet-resolver",
+  "c22-py-finalizer-ordering",
+  "c22-affected-save-planet-recovery",
+  "c22-py-synthetic-fixture",
+  "c22-py-real-closure",
+  "c21-c22-release-assurance",
+  "factorio-2.1-metadata-and-effects"
+) | Sort-Object
+$actualDeltaIds = @($delta.changes.id | Sort-Object -Unique)
+if (($actualDeltaIds -join "|") -ne ($expectedDeltaIds -join "|")) {
+  throw "Portable-delta ledger does not classify every governed C21/C22 backport surface exactly once."
+}
+if ([string](@($delta.changes | Where-Object id -eq "c22-affected-save-planet-recovery")[0].disposition) -ne "omitted-version-specific") {
+  throw "The 3.2-only affected-save repair must remain explicitly omitted from the 2.x package line."
 }
 
 $sourceHash = Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
@@ -129,13 +152,13 @@ if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.4.9" `
     -or [string]$lock.upgrade_contract.oldest_maintained_optional -ne "2.4.5") {
   throw "The 2.5 upgrade contract must require 2.4.9 and retain 2.4.5 as the optional oldest-maintained row."
 }
-if ([string]$lock.qualification.manual_review -ne "pending" `
-    -or [string]$lock.qualification.protected_qualification -ne "pending" `
+if ([string]$lock.qualification.manual_review -ne "pending-exact-p9" `
+    -or [string]$lock.qualification.protected_qualification -ne "pending-exact-p9" `
     -or [string]$lock.qualification.publication -ne "unreleased") {
   throw "The provisional 2.5 candidate must remain unreviewed, unsealed, and unreleased."
 }
 
-foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.playtest_guide)) {
+foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_document, [string]$lock.playtest_guide)) {
   $docPath = Join-Path $RepoRoot $docRelative
   if (-not (Test-Path -LiteralPath $docPath -PathType Leaf)) { throw "Backport authority document is missing: $docRelative" }
   $docText = Get-Content -Raw -LiteralPath $docPath
@@ -144,6 +167,6 @@ foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.playtest_g
   }
 }
 
-Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C20."
+Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C22."
 Write-Host "[ok] Baseline: $baselineCommit; portable source: $portableCommit; projection: $projectionCommit."
 Write-Host "[ok] Adapted package paths: $($adaptedActual -join ', ')."

@@ -38,13 +38,13 @@ if ([string]$info.factorio_version -eq "2.0") {
   if ([string]$info.version -ne "2.5.0" -or [string]$backport.mir_version -ne "2.5.0" -or
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or
       [string]$backport.archive_class -ne "automated-playtest-candidate" -or
-      [string]$backport.manual_review -ne "pending" -or [string]$backport.protected_qualification -ne "pending" -or
+      [string]$backport.manual_review -notlike "pending*" -or [string]$backport.protected_qualification -notlike "pending*" -or
       [string]$backport.publication_status -ne "unreleased" -or
       [string]$backport.status -notmatch '^automated-playtest-candidate-') {
     throw "Factorio 2.0 authority must describe an unreleased automated playtest candidate with manual and protected qualification pending."
   }
-  if ([string]$backport.portable_source_commit -ne "303de261629149af5f50bd210368e61423f1a299") {
-    throw "The 2.5 portable source must bind the exact immutable C20 package-source commit."
+  if ([string]$backport.portable_source_commit -ne "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8") {
+    throw "The 2.5 portable source must bind the exact final C22 package-source commit."
   }
   foreach ($commitField in @("portable_source_commit", "package_source_commit")) {
     $commit = [string]$backport.$commitField
@@ -54,8 +54,12 @@ if ([string]$info.factorio_version -eq "2.0") {
   }
   & git -C $repo merge-base --is-ancestor ([string]$publishedBackport.tag_commit) HEAD
   if ($LASTEXITCODE -ne 0) { throw "The provisional 2.5 line is not descended from immutable 2.4.9." }
-  & git -C $repo merge-base --is-ancestor 3.2.0 HEAD
-  if ($LASTEXITCODE -ne 0) { throw "The provisional 2.5 line is not descended from published tag 3.2.0." }
+  $sourceLock = Read-MIRText ".mir/backport-source-lock.json" | ConvertFrom-Json
+  if ([int]$sourceLock.schema -ne 4 -or [string]$sourceLock.portable_source.commit -ne [string]$backport.portable_source_commit -or
+      [string]$sourceLock.projection.package_source_commit -ne [string]$backport.package_source_commit -or
+      [string]$sourceLock.projection.portable_delta_ledger -ne [string]$backport.portable_delta_ledger) {
+    throw "The 2.5 release ledger and exact C22 portable source lock disagree."
+  }
   & git -C $repo merge-base --is-ancestor ([string]$backport.package_source_commit) HEAD
   if ($LASTEXITCODE -ne 0) { throw "The provisional 2.5 package-source commit is not an ancestor of qualification HEAD." }
 
