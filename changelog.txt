@@ -1,5 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.5.0
+Date: 2026-07-27
 
   Changes:
 
@@ -37,6 +38,7 @@ Version: 2.5.0
 
   Bugfixes:
 
+    - Ordered MIR after Pyanodons Post-processing so final missing recipe unlocks are sanitized after Py rebuilds its technology tree, fixing the casting-mk02 reference to removed casting-gear.
     - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.
     - Requalified the exact realized technology graph after safe competing-technology replacement and prerequisite rewiring.
     - Fixed competing productivity preparation when a recognized overhaul owner is eligible for MIR replacement.
