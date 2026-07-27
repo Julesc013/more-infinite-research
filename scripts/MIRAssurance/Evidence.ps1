@@ -21,6 +21,14 @@ function Get-MIRAssurancePatternFingerprint {
   return $fingerprint
 }
 
+function Resolve-MIRAssuranceManualReviewAttestationPath {
+  param([Parameter(Mandatory)]$Info)
+  $version = [string]$Info.version
+  if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+    throw "Manual-review attestation version must be an exact semantic version: '$version'."
+  }
+  return ".mir/evidence/$version-manual-review-attestation.json"
+}
 function Get-MIRAssuranceInputFingerprint {
   param(
     [Parameter(Mandatory)][string]$InputName,
@@ -57,7 +65,19 @@ function Get-MIRAssuranceInputFingerprint {
       }
     }
     "prior-release" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.prior_release -MissingLabel "prior-release" }
-    "package-source" {
+    "manual-review-attestation" {
+      $relativePath = Resolve-MIRAssuranceManualReviewAttestationPath -Info $Context.info
+      $path = Join-Path $repo $relativePath
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Manual-review attestation is absent: $relativePath"
+      }
+      return [ordered]@{
+        kind="manual-review-attestation"
+        version=[string]$Context.info.version
+        path=$relativePath
+        sha256=(Get-MIRAssuranceSha256 -Path $path)
+      }
+    }    "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)
       return [ordered]@{ kind="package-source"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
     }
