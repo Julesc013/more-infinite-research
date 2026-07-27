@@ -1,13 +1,16 @@
 ---
 title: "MIR 3.2.1 Release Notes"
-status: current
+status: historical-checkpoint
 applies_to: "3.2.1"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
 last_reviewed: 2026-07-26
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/releases/notes/release-notes-3.2.2.md
+checkpoint_source_commit: f3f8cabd0f84be674d5cc190343a9b7df5ba65c5
+checkpoint_candidate_sha256: 4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6
 ---
 
 # MIR 3.2.1

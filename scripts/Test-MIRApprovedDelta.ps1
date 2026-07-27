@@ -1,6 +1,6 @@
 param(
-  [string]$Path = "approved-delta\3.2.0-to-3.2.1.json",
-  [string]$Candidate = "dist\more-infinite-research_3.2.1.zip",
+  [string]$Path = "approved-delta\3.2.1-to-3.2.2.json",
+  [string]$Candidate = "dist\more-infinite-research_3.2.2.zip",
   [string]$ExpectedSourceCommit = "",
   [switch]$ValidateStructureOnly
 )
@@ -9,10 +9,10 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
-if ($activeVersion -eq "3.2.1") {
+if ($activeVersion -eq "3.2.2") {
   $arguments = @{
     RepoRoot = $repo
-    Path = "approved-delta\3.2.0-to-3.2.1.json"
+    Path = "approved-delta\3.2.1-to-3.2.2.json"
     Candidate = $Candidate
     ExpectedSourceCommit = $ExpectedSourceCommit
     ValidateStructureOnly = $ValidateStructureOnly

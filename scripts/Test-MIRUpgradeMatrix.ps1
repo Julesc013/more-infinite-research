@@ -5,8 +5,8 @@ param(
   [Parameter(Mandatory)][string]$ToZip,
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
-  [string]$FixtureName = "assert-upgrade-3-1-9-to-3-2-1",
-  [string]$OutputPath = "artifacts/assurance/3.2.1-upgrade-proof.json"
+  [string]$FixtureName = "assert-upgrade-3-2-1-to-3-2-2",
+  [string]$OutputPath = "artifacts/assurance/3.2.2-upgrade-proof.json"
 )
 
 $ErrorActionPreference = "Stop"

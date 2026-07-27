@@ -15,20 +15,20 @@ Updated: 2026-07-26
 
 ## Current 3.2 Release Roles
 
-Published MIR `3.2.0` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. Emergency package corrections use `3.2.1`; otherwise `dev` advances through compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation toward `3.2.5`. MIR `2.5.0` is now derived on `tmp/2.0` from final MIR `3.2.1` semantics projected through explicit Factorio 2.0 capabilities. MIR `2.5.5` will later project the frozen portable `3.2.5` delta. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
+Published MIR `3.2.1` on the Factorio 2.1 line and MIR `2.4.9` on `legacy` are immutable. The final emergency package correction uses `3.2.2`; otherwise `dev` advances through compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation toward `3.2.5`. MIR `2.5.0` is now derived on `tmp/2.0` from final MIR `3.2.2` semantics projected through explicit Factorio 2.0 capabilities. MIR `2.5.5` will later project the frozen portable `3.2.5` delta. The portable verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release. The 2.4.9 tag snapshot, distribution, approved delta, release notes, and automated evidence are retained on `dev`; Factorio 2.0 metadata and target cuts remain isolated from the modern root.
 
 The locked modern-to-backport sequence is:
 
 ```text
-3.2.1 exact hotfix release artifact
+3.2.2 exact hotfix release artifact
 → derive and independently qualify 2.5.0 for Factorio 2.0
-→ 3.2.1 and 2.5.1 only for emergency release corrections
+→ 3.2.2 and 2.5.1 only for emergency release corrections
 → 3.2.5 compiler/promotion/compatibility consolidation
 → freeze final 3.2.5 source
 → project and independently qualify 2.5.5 for Factorio 2.0
 ```
 
-The 2.5.0 branch starts from immutable 2.4.9 and ports final 3.2.1 semantics through explicit Factorio 2.0 capability adapters. It must not merge Factorio 2.1-only metadata or borrow Factorio 2.1 evidence. Portable 3.2.5 changes are classified when developed so 2.5.5 can consume a frozen, reviewed delta instead of reimplementing it later.
+The 2.5.0 branch starts from immutable 2.4.9 and ports final 3.2.2 semantics through explicit Factorio 2.0 capability adapters. It must not merge Factorio 2.1-only metadata or borrow Factorio 2.1 evidence. Portable 3.2.5 changes are classified when developed so 2.5.5 can consume a frozen, reviewed delta instead of reimplementing it later.
 
 MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
@@ -89,10 +89,10 @@ Use these branch roles during the transition:
 
 | Branch or worktree | Role | New release line |
 | --- | --- | ---: |
-| `main` | Frozen canonical Factorio `2.1` MIR `3.2.0` line; emergency `3.2.1` fixes only. | `3.x.x` after `3.0.0` |
+| `main` | Frozen canonical Factorio `2.1` MIR `3.2.1` line; exact emergency `3.2.2` promotion only. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line for 3.2.5 compiler refinement and reviewed promotion. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
-| `tmp/2.0` | Factorio `2.0` worktree projecting final 3.2.1 semantics for 2.5.0, then frozen 3.2.5 portable deltas for 2.5.5. | Unreleased `2.5.0` from published `2.4.9`. |
+| `tmp/2.0` | Factorio `2.0` worktree projecting final 3.2.2 semantics for 2.5.0, then frozen 3.2.5 portable deltas for 2.5.5. | Unreleased `2.5.0` from published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |

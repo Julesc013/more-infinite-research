@@ -355,7 +355,7 @@ waves:
     candidate_id: C21
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.1.zip
-    archive_class: mod-portal-published-github-release-candidate
+    archive_class: mod-portal-published-github-tag-pending
     archive_bytes: 1029716
     archive_entries: 290
     archive_sha256: 4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6
@@ -363,8 +363,6 @@ waves:
     package_source_sha256: 5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188
     package_source_commit: f3f8cabd0f84be674d5cc190343a9b7df5ba65c5
     package_source_tree: f3ba606fb152fbf07951f8af52da129c819f0672
-    superseded_candidate_id: C20
-    superseded_candidate_sha256: 35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32
     focused_planet_discovery_gate: passed
     package_determinism_gate: passed-exact-bytes
     manual_attestation_gate: maintainer-playtest-approved
@@ -373,11 +371,38 @@ waves:
     performance_evidence: .mir/evidence/3.2.1-performance-regression.json
     performance_evidence_sha256: 5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726
     automated_gate: passed-local-129-of-129-no-reuse
+    protected_release_gate: running-run-30229114461
+    release_gate: protected-qualification-and-seal-running
+    publication_status: published-mod-portal-github-tag-pending
+    status: c21-protected-qualification-running
+  mir_3_2_2:
+    version: "3.2.2"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    minimum_factorio: "2.1.8"
+    source_anchor: mir_3_2_1
+    candidate_id: C22
+    canonical_ledger: .mir/releases.json
+    archive: dist/more-infinite-research_3.2.2.zip
+    archive_class: unreleased-emergency-hotfix-candidate
+    archive_bytes: 1030828
+    archive_entries: 291
+    archive_sha256: 638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938
+    package_content_sha256: B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4
+    package_source_sha256: B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4
+    package_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+    package_source_tree: 789069c794d86fbd734475ae2fc6c3555581b0cb
+    py_finalizer_order_gate: focused-passed
+    affected_planet_recovery_gate: focused-passed
+    package_determinism_gate: passed-exact-bytes
+    approved_delta: approved-delta/3.2.1-to-3.2.2.json
+    automated_gate: pending-full-no-reuse
+    manual_attestation_gate: pending-exact-patch-review
     protected_release_gate: pending
-    release_gate: protected-qualification-and-seal-pending
-    publication_status: published-mod-portal-github-pending
-    status: c21-full-local-validation-passed-tag-ready
-
+    release_gate: full-and-protected-qualification-pending
+    publication_status: unreleased
+    status: c22-focused-passed-full-validation-pending
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy
@@ -443,11 +468,11 @@ waves:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
-    source_anchor: mir_3_2_1_final_source
+    source_anchor: mir_3_2_2_final_source
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: null
     archive_class: not-built-from-final-source
-    release_gate: project-final-3.2.1-hotfix-before-2.5.0-release
+    release_gate: project-final-3.2.2-hotfix-before-2.5.0-release
     publication_status: unreleased
-    status: backport-in-progress-from-3.2.1
+    status: backport-pending-from-3.2.2

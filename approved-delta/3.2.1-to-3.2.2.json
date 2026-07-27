@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "mir-approved-patch-delta",
+  "status": "approved",
+  "baseline": {
+    "version": "3.2.1",
+    "archive": "dist/more-infinite-research_3.2.1.zip",
+    "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188"
+  },
+  "current": {
+    "version": "3.2.2",
+    "archive": "dist/more-infinite-research_3.2.2.zip",
+    "source_commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
+    "package_source_commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
+    "archive_sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
+    "package_content_sha256": "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4"
+  },
+  "allowed_added_paths": [
+    "prototypes/mir/runtime/planet_discovery_recovery.lua"
+  ],
+  "allowed_changed_paths": [
+    "changelog.txt",
+    "info.json",
+    "prototypes/mir/runtime/scripted_techs.lua"
+  ],
+  "reason": "Run MIR after Pyanodons Post-processing and restore only valid researched space locations left locked by MIR 3.2.0 or 3.2.1.",
+  "migration_impact": "A version-gated 3.2.0/3.2.1 to 3.2.2 configuration-change repair unlocks valid researched locations without resetting unrelated technology effects."
+}
