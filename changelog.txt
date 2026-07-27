@@ -4,8 +4,10 @@ Date: 2026-07-27
 
   Bugfixes:
 
-    - Ordered MIR after Pyanodons Post-processing so final missing recipe unlocks are sanitized after Py rebuilds its technology tree, fixing the casting-mk02 reference to removed casting-gear.
-    - Added a narrow one-time upgrade repair that restores valid researched planet discoveries damaged by MIR 3.2.0 or 3.2.1 without resetting unrelated technology effects.
+    - Ordered MIR after Pyanodons Post-processing so sanitation runs against Py's final rebuilt technology tree.
+    - Fixed casting-mk02 referencing the removed casting-gear recipe after Pyanodons finalization.
+    - Restored valid researched planet discoveries damaged by MIR 3.2.0 or 3.2.1.
+    - Kept the upgrade repair narrow; unrelated technology effects are not reset.
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.1
 Date: 2026-07-26
