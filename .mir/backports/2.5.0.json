@@ -21,10 +21,10 @@
     "strategy": "dual-parent-target-projection-v1",
     "first_parent_role": "factorio-2.0-lineage",
     "second_parent_role": "immutable-modern-release",
-    "preintegration_tag": "archive/2.5-pre-3.2.2",
+    "preintegration_tag": "archive/2.5-pre-3.2.2-q1",
     "preintegration_tag_state": "locked",
-    "preintegration_commit": "b58c8995984e185a75176e6c818fe0b6f5b1f0af",
-    "preintegration_tree": "7e58844e8e2970923b3795a2f37bb6b3613a2840",
+    "preintegration_commit": "caeb84d3a8079a2b4157964fbf6ac18517df28b5",
+    "preintegration_tree": "9e1ef1370d54f1f3d2eaf8acaac1bf485e1f27d8",
     "target_package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
     "target_profile": "2.0",
     "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C"
@@ -48,7 +48,7 @@
   ],
   "expected_target": {
     "candidate_id": "2.5-P9",
-    "integration_tree": "7e58844e8e2970923b3795a2f37bb6b3613a2840",
+    "integration_tree": "9e1ef1370d54f1f3d2eaf8acaac1bf485e1f27d8",
     "archive": "dist/more-infinite-research_2.5.0.zip",
     "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
     "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",

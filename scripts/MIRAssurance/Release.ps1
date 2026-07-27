@@ -595,27 +595,29 @@ function Invoke-MIRAssuranceSelfTest {
     $changed[$field] = "b"
     if ((Get-MIRAssuranceJsonHash -Value $changed) -eq $base) { throw "Evidence invalidation self-test failed for $field." }
   }
-  $approvedDeltaC21Profile = [pscustomobject]@{
-    upgrade=[pscustomobject]@{from_version="3.2.0"; to_version="3.2.1"}
+  $activeApprovedDeltaProfile = $Context.verification_profile
+  $activeApprovedDeltaPath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $activeApprovedDeltaProfile
+  $activeApprovedDeltaFrom = [string]$activeApprovedDeltaProfile.upgrade.from_version
+  $activeApprovedDeltaTo = [string]$activeApprovedDeltaProfile.upgrade.to_version
+  $expectedApprovedDeltaPath = "approved-delta/$activeApprovedDeltaFrom-to-$activeApprovedDeltaTo.json"
+  if ($activeApprovedDeltaPath -ne $expectedApprovedDeltaPath) {
+    throw "Approved-delta transition resolver did not select the active release-transition artifact."
   }
-  $approvedDeltaC24Profile = [pscustomobject]@{
-    upgrade=[pscustomobject]@{from_version="3.2.1"; to_version="3.2.2"}
+  $activeApprovedDeltaFile = Join-Path $repo $activeApprovedDeltaPath
+  if (-not (Test-Path -LiteralPath $activeApprovedDeltaFile -PathType Leaf) -or
+      (Get-MIRAssuranceSha256 -Path $activeApprovedDeltaFile) -notmatch '^[A-F0-9]{64}$') {
+    throw "Active approved-delta transition artifact is absent or unreadable: $activeApprovedDeltaPath"
   }
-  $approvedDeltaC21Path = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $approvedDeltaC21Profile
-  $approvedDeltaC24Path = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $approvedDeltaC24Profile
-  if ($approvedDeltaC21Path -ne "approved-delta/3.2.0-to-3.2.1.json" -or
-      $approvedDeltaC24Path -ne "approved-delta/3.2.1-to-3.2.2.json") {
-    throw "Approved-delta transition resolver did not select the exact release-transition artifact."
-  }
-  $approvedDeltaC21Hash = Get-MIRAssuranceSha256 -Path (Join-Path $repo $approvedDeltaC21Path)
-  $approvedDeltaC24Hash = Get-MIRAssuranceSha256 -Path (Join-Path $repo $approvedDeltaC24Path)
-  if ($approvedDeltaC21Hash -eq $approvedDeltaC24Hash) {
-    throw "Approved-delta transition change did not invalidate the effective input fingerprint."
+  $alternateApprovedDeltaPath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile ([pscustomobject]@{
+    upgrade=[pscustomobject]@{from_version="9.9.9"; to_version="9.9.10"}
+  })
+  if ($alternateApprovedDeltaPath -eq $activeApprovedDeltaPath) {
+    throw "Approved-delta transition change did not invalidate the resolved input path."
   }
   $unsafeApprovedDeltaRejected = $false
   try {
     $null = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile ([pscustomobject]@{
-      upgrade=[pscustomobject]@{from_version="../3.2.1"; to_version="3.2.2"}
+      upgrade=[pscustomobject]@{from_version="../9.9.9"; to_version="9.9.10"}
     })
   } catch {
     $unsafeApprovedDeltaRejected = $true
