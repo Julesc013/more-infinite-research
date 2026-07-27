@@ -18,8 +18,9 @@ The exact C21 package was manually reviewed by Julesc013. Those observations may
 - Exact Factorio 2.1.12 Base and Space Age focused loads passed.
 - All six direct 3.2.1-to-3.2.2 upgrade archetypes passed, including affected planet discovery.
 - The synthetic late Py reconstruction fixture passed and retained valid sibling effects in order.
-- The exact Py Alien Life trigger closure remains pending until its missing authenticated Mod Portal archives are available.
-- Paired C21/C24 performance and the definitive full no-reuse campaign are separate release gates.
+- The exact 15-mod Py 3.1 closure passed on Factorio 2.1.12 with `casting-gear` and its dangling unlock absent, all valid effects retained, and zero unexpected sanitation.
+- The focused scripted-runtime disable/restoration configuration-change scenario passed on exact C24.
+- Paired C21/C24 performance passed all governed lanes; the definitive full no-reuse campaign remains a separate release gate.
 
 ## Maintainer confirmation still required
 
