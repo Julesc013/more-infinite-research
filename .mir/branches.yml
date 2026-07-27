@@ -112,7 +112,7 @@ feature_line_lineage:
     - canonical: "3.2.x"
       factorio_2_0_companion: "2.5.x"
       canonical_release_tag: "3.2.2"
-      status: c22-tag-pending-p7-semantic-projection-in-progress
+      status: c24-tag-pending-p9-semantic-projection-static-green-runtime-pending
     - canonical: "3.3.x"
       factorio_2_0_companion: "2.6.x"
       canonical_release_tag: "3.3.0"
@@ -124,7 +124,7 @@ feature_line_lineage:
     exact_portable_delta_ledger_required: true
     prior_target_tag_ancestry_required: true
     current_provisional_candidate_satisfies_gate: false
-    action_after_canonical_release: verify-final-c22-source-and-exact-target-projection-before-2.5-qualification
+    action_after_canonical_release: verify-final-c24-source-and-exact-target-projection-before-2.5-qualification
 
 release_artifacts:
   published_archives_are_immutable: true
@@ -361,11 +361,11 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_2_0
-      candidate_id: C22
-      package_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+      candidate_id: C24
+      package_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
       artifact: dist/more-infinite-research_3.2.2.zip
-      sha256: 638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938
-      package_content_sha256: B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4
+      sha256: 8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8
+      package_content_sha256: 25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F
       tag: "3.2.2"
       publication_status: pending
       status: exact-package-source-pending-final-qualification-and-tag
@@ -389,7 +389,7 @@ release_artifacts:
           package_source_commit: f9eb34eae9b767275a17b5e68351343042ef7532
           archive_sha256: 98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE
           evidence_root: .mir/evidence/superseded/2.5-P6
-          status: superseded-unpublished-by-final-c22-reanchor
+          status: superseded-unpublished-by-final-c24-reanchor
         - source_anchor: mir_3_1_2
           source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
           archive_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
@@ -400,7 +400,7 @@ release_artifacts:
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
       candidate_id: "2.5-P9"
-      portable_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+      portable_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
       portable_delta_ledger: .mir/backport-portable-delta-3.2.2-to-2.5.0.json
       package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
       archive: dist/more-infinite-research_2.5.0.zip
@@ -416,7 +416,7 @@ release_artifacts:
       manual_review: pending-exact-p9
       protected_qualification: pending-exact-p9
       publication_status: unreleased
-      status: automated-playtest-candidate-c22-projection-focused-static-passed-runtime-and-release-qualification-pending
+      status: automated-playtest-candidate-c24-projection-focused-static-passed-runtime-and-release-qualification-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

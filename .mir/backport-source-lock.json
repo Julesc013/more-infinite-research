@@ -15,16 +15,16 @@
   },
   "portable_source": {
     "release": "3.2.2",
-    "candidate_id": "C22",
-    "commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
-    "source_sha256": "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4",
-    "archive_sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
+    "candidate_id": "C24",
+    "commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+    "source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
     "tag": "3.2.2",
     "tag_status": "pending-final-qualification"
   },
   "lineage": {
     "policy": "canonical-semantic-projection",
-    "state": "final-c22-semantic-source-pending-tag",
+    "state": "final-c24-semantic-source-pending-tag",
     "canonical_release_tag": "3.2.2",
     "canonical_release_tag_status": "pending",
     "portable_source_commit_is_ancestor": false,
@@ -70,7 +70,7 @@
     "publication": "unreleased"
   },
   "release_notes": "docs/releases/notes/release-notes-2.5.0.md",
-  "candidate_document": "docs/releases/2.5.0-provisional-c22-backport.md",
+  "candidate_document": "docs/releases/2.5.0-provisional-c24-backport.md",
   "playtest_guide": "docs/releases/2.5.0-playtest-guide.md",
   "superseded_candidates": [
     {

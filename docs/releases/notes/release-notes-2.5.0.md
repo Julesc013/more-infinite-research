@@ -31,7 +31,7 @@ superseded_by: []
 
 - Candidate: `2.5-P9`.
 - Baseline commit: `7ebe93029695bbf809a15a14c6540530738a9e62`.
-- Portable C22 source: `7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8`.
+- Portable C24 source: `29f81addc0eec9b571afd6428c9e3529c4497a1b`.
 - Package source: `f446d89f94ce4b9dc26f04c31c92f9bcffbac70d`.
 - ZIP SHA-256: `30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3`.
 - ZIP size: `1,029,910` bytes; `290` entries.

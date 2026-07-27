@@ -2189,7 +2189,7 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/2.5.0-provisional-c22-backport.md
+    superseded_by: docs/releases/2.5.0-provisional-c24-backport.md
   - path: docs/archive/superseded/2.5.0-p6-playtest-guide.md
     title: "MIR 2.5.0 P6 Playtest Guide"
     status: archived
@@ -2198,14 +2198,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
     superseded_by: docs/releases/2.5.0-playtest-guide.md
-  - path: docs/releases/2.5.0-provisional-c22-backport.md
-    title: "MIR 2.5.0 Provisional C22 Backport"
+  - path: docs/releases/2.5.0-provisional-c24-backport.md
+    title: "MIR 2.5.0 Provisional C24 Backport"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-2.5.0-provisional-c22-backport
+      - mir-2.5.0-provisional-c24-backport
       - mir-2.5.0-candidate-identity
   - path: docs/releases/2.5.0-playtest-guide.md
     title: "MIR 2.5.0 P9 Playtest Guide"

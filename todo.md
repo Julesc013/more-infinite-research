@@ -15,7 +15,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - The 45 tracked root distribution paths are bound by `.mir/distributions.json`: 44 tagged releases plus the MIR 3.2.0 development candidate. The nonexistent 1.9.5 and not-yet-built final 2.5.0 archives are not distribution entries.
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
-- MIR 3.2.1 C21 is awaiting final protected evidence import and tagging; MIR 3.2.2 C22 is the exact Py/planet-recovery hotfix on `dev`; MIR 2.5.0 P9 projects final C22 from the immutable 2.4.9 baseline through an exact portable-delta ledger.
+- MIR 3.2.1 C21 is awaiting final protected evidence import and tagging; MIR 3.2.2 C24 is the exact Py/planet-recovery hotfix on `dev`; MIR 2.5.0 P9 projects final C24 from the immutable 2.4.9 baseline through an exact portable-delta ledger.
 - The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. C16 is the exact automated playtest candidate after C15 correctly failed the governed fixed-cost performance gate; C16 is not manually reviewed, protected-qualified, sealed, or published.
 
 ## Consolidation Gate

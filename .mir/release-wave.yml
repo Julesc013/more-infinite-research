@@ -400,7 +400,7 @@ waves:
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor: mir_3_2_2
-    portable_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+    portable_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
     portable_delta_ledger: .mir/backport-portable-delta-3.2.2-to-2.5.0.json
     package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
     prior_release: dist/more-infinite-research_2.4.9.zip
@@ -419,4 +419,4 @@ waves:
     manual_review: pending-exact-p9
     protected_qualification: pending-exact-p9
     publication_status: unreleased
-    status: automated-playtest-candidate-c22-projection-focused-static-passed-runtime-and-release-qualification-pending
+    status: automated-playtest-candidate-c24-projection-focused-static-passed-runtime-and-release-qualification-pending

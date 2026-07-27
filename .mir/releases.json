@@ -61,8 +61,8 @@
       "mir_version": "2.5.0",
       "candidate_id": "2.5-P9",
       "branch": "tmp/2.0",
-      "source_anchor": "C22",
-      "portable_source_commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
+      "source_anchor": "C24",
+      "portable_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
       "prior_release": "2.4.9",
       "archive": "dist/more-infinite-research_2.5.0.zip",
       "archive_bytes": 1029914,
@@ -86,7 +86,7 @@
       "manual_review": "pending-exact-p9",
       "protected_qualification": "pending-exact-p9",
       "publication_status": "unreleased",
-      "status": "automated-playtest-candidate-c22-projection-focused-static-passed-runtime-and-release-qualification-pending",
+      "status": "automated-playtest-candidate-c24-projection-focused-static-passed-runtime-and-release-qualification-pending",
       "portable_delta_ledger": ".mir/backport-portable-delta-3.2.2-to-2.5.0.json",
       "release_gate": "full-automated-manual-and-protected-pending-exact-p9",
       "superseded_candidates": [
@@ -112,7 +112,7 @@
           "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
           "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
           "evidence_root": ".mir/evidence/superseded/2.5-P6",
-          "status": "superseded-unpublished-by-final-c22-reanchor"
+          "status": "superseded-unpublished-by-final-c24-reanchor"
         }
       ]
     }

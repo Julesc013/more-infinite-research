@@ -43,16 +43,16 @@ foreach ($section in @("baseline", "portable_source", "lineage", "projection", "
 }
 
 if ([string]$lock.lineage.policy -ne "canonical-semantic-projection" -or
-    [string]$lock.lineage.state -ne "final-c22-semantic-source-pending-tag" -or
+    [string]$lock.lineage.state -ne "final-c24-semantic-source-pending-tag" -or
     [bool]$lock.lineage.portable_source_commit_is_ancestor -or
     -not [bool]$lock.lineage.prior_target_tag_is_ancestor -or
     -not [bool]$lock.lineage.final_candidate_requires_exact_portable_delta_ledger) {
-  throw "Backport source lock must record an honest final-C22 semantic projection with literal 2.4.9 ancestry and no false C22 ancestry claim."
+  throw "Backport source lock must record an honest final-C24 semantic projection with literal 2.4.9 ancestry and no false C24 ancestry claim."
 }
 if ([string]$lock.portable_source.release -ne "3.2.2" -or
-    [string]$lock.portable_source.candidate_id -ne "C22" -or
+    [string]$lock.portable_source.candidate_id -ne "C24" -or
     [string]$lock.lineage.canonical_release_tag -ne "3.2.2") {
-  throw "The 2.5 source lock must bind final MIR 3.2.2 candidate C22."
+  throw "The 2.5 source lock must bind final MIR 3.2.2 candidate C24."
 }
 
 $baselineCommit = [string]$lock.baseline.commit
@@ -89,13 +89,13 @@ $adaptedActual = @(
 if ($LASTEXITCODE -ne 0) { throw "Unable to compare the portable source with the target projection." }
 $adaptedDelta = @(Compare-Object $adaptedExpected $adaptedActual)
 if ($adaptedDelta.Count -gt 0) {
-  throw "The C22-to-2.5 package delta is not the exact declared adapter set."
+  throw "The C24-to-2.5 package delta is not the exact declared adapter set."
 }
 $deltaPath = Join-Path $RepoRoot ([string]$lock.projection.portable_delta_ledger)
 if (-not (Test-Path -LiteralPath $deltaPath -PathType Leaf)) { throw "Portable-delta ledger is missing." }
 $delta = Get-Content -Raw -LiteralPath $deltaPath | ConvertFrom-Json
 if ([int]$delta.schema -ne 1 -or [string]$delta.kind -ne "mir-portable-delta-ledger" -or
-    [string]$delta.source.version -ne "3.2.2" -or [string]$delta.source.candidate_id -ne "C22" -or
+    [string]$delta.source.version -ne "3.2.2" -or [string]$delta.source.candidate_id -ne "C24" -or
     [string]$delta.source.package_source_commit -ne $portableCommit -or
     [string]$delta.target.version -ne "2.5.0" -or [string]$delta.target.candidate_id -ne "2.5-P9" -or
     [string]$delta.target.package_source_commit -ne $projectionCommit -or
@@ -105,18 +105,18 @@ if ([int]$delta.schema -ne 1 -or [string]$delta.kind -ne "mir-portable-delta-led
 }
 $expectedDeltaIds = @(
   "c21-concrete-planet-resolver",
-  "c22-py-finalizer-ordering",
-  "c22-affected-save-planet-recovery",
-  "c22-py-synthetic-fixture",
-  "c22-py-real-closure",
-  "c21-c22-release-assurance",
+  "c24-py-finalizer-ordering",
+  "c24-affected-save-planet-recovery",
+  "c24-py-synthetic-fixture",
+  "c24-py-real-closure",
+  "c21-c24-release-assurance",
   "factorio-2.1-metadata-and-effects"
 ) | Sort-Object
 $actualDeltaIds = @($delta.changes.id | Sort-Object -Unique)
 if (($actualDeltaIds -join "|") -ne ($expectedDeltaIds -join "|")) {
-  throw "Portable-delta ledger does not classify every governed C21/C22 backport surface exactly once."
+  throw "Portable-delta ledger does not classify every governed C21/C24 backport surface exactly once."
 }
-if ([string](@($delta.changes | Where-Object id -eq "c22-affected-save-planet-recovery")[0].disposition) -ne "omitted-version-specific") {
+if ([string](@($delta.changes | Where-Object id -eq "c24-affected-save-planet-recovery")[0].disposition) -ne "omitted-version-specific") {
   throw "The 3.2-only affected-save repair must remain explicitly omitted from the 2.x package line."
 }
 
@@ -167,6 +167,6 @@ foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_
   }
 }
 
-Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C22."
+Write-Host "[ok] MIR $($lock.mir_version) $($lock.candidate_id) is an exact Factorio $($lock.target) projection of C24."
 Write-Host "[ok] Baseline: $baselineCommit; portable source: $portableCommit; projection: $projectionCommit."
 Write-Host "[ok] Adapted package paths: $($adaptedActual -join ', ')."
