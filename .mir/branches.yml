@@ -370,10 +370,10 @@ release_artifacts:
       performance_evidence: .mir/evidence/3.2.1-performance-regression.json
       performance_evidence_sha256: 5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726
       automated_gate: passed-local-129-of-129-no-reuse
-      protected_release_gate: running-run-30229114461
-      release_gate: protected-qualification-and-seal-running
+      protected_release_gate: failed-run-30229114461-harness-defects-repaired-rerun-pending
+      release_gate: protected-qualification-and-seal-rerun-pending
       publication_status: published-mod-portal-github-tag-pending
-      status: c21-protected-qualification-running
+      status: c21-protected-qualification-rerun-pending
     mir_3_2_2:
       version: "3.2.2"
       branch: main
@@ -401,12 +401,15 @@ release_artifacts:
       affected_planet_recovery_gate: focused-passed
       package_determinism_gate: passed-exact-bytes
       approved_delta: approved-delta/3.2.1-to-3.2.2.json
+      exact_py_gate: passed-exact-15-mod-closure-zero-prune
+      exact_py_evidence: .mir/evidence/3.2.2-py-exact.json
+      exact_py_evidence_sha256: 32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00
       automated_gate: pending-full-no-reuse
       manual_attestation_gate: pending-exact-patch-review
       protected_release_gate: pending
       release_gate: full-and-protected-qualification-pending
       publication_status: unreleased
-      status: c24-focused-passed-full-validation-pending
+      status: c24-focused-and-exact-py-passed-full-validation-pending
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

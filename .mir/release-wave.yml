@@ -404,12 +404,15 @@ waves:
     performance_evidence: .mir/evidence/3.2.2-performance-regression.json
     performance_evidence_sha256: 9713544E56107CABFAD859C59D1466B9DF908185A7BB37323DC09C829D7A3657
     approved_delta: approved-delta/3.2.1-to-3.2.2.json
+    exact_py_gate: passed-exact-15-mod-closure-zero-prune
+    exact_py_evidence: .mir/evidence/3.2.2-py-exact.json
+    exact_py_evidence_sha256: 32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00
     automated_gate: pending-full-no-reuse
     manual_attestation_gate: pending-exact-patch-review
     protected_release_gate: pending
     release_gate: full-and-protected-qualification-pending
     publication_status: unreleased
-    status: c24-focused-passed-full-validation-pending
+    status: c24-focused-and-exact-py-passed-full-validation-pending
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy

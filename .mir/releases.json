@@ -47,7 +47,9 @@
       "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
       "package_content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
       "archive_class": "unreleased-emergency-hotfix-candidate",
-      "qualification": "focused-hotfix-validation-passed-full-validation-pending",
+      "qualification": "focused-hotfix-and-exact-py-validation-passed-full-validation-pending",
+      "exact_py_evidence": ".mir/evidence/3.2.2-py-exact.json",
+      "exact_py_evidence_sha256": "32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00",
       "performance_evidence": ".mir/evidence/3.2.2-performance-regression.json",
       "performance_evidence_sha256": "9713544E56107CABFAD859C59D1466B9DF908185A7BB37323DC09C829D7A3657",
       "performance_qualification": "passed-exact-paired-3.2.1-to-3.2.2",
@@ -55,7 +57,7 @@
       "minimum_factorio_qualification": ".mir/evidence/3.2.2-factorio-2.1.8-floor-smokes.json",
       "upgrade_qualification": "exact-3.2.1-to-3.2.2-six-archetype-runtime-passed",
       "upgrade_evidence": ".mir/evidence/3.2.2-upgrade-proof.json",
-      "runtime_qualification": "focused-package-loads-passed-full-runtime-pending",
+      "runtime_qualification": "focused-package-loads-and-exact-py-passed-full-runtime-pending",
       "manual_review": "exact-patch-review-pending",
       "protected_qualification": "pending",
       "release_decision": {
@@ -69,7 +71,7 @@
         "artifact_rule": "publish-the-recorded-zip-without-rebuilding"
       },
       "publication_status": "unreleased",
-      "status": "c24-focused-passed-full-validation-pending",
+      "status": "c24-focused-and-exact-py-passed-full-validation-pending",
       "supersedes_candidate": {
         "candidate_id": "C21",
         "archive_bytes": 1029716,

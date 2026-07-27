@@ -58,6 +58,8 @@ $c24 = [ordered]@{
   archive_sha256 = "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
   package_content_sha256 = "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F"
   approved_delta = "bounded-c21-to-c24-hotfix-reviewed"
+  exact_py_evidence = ".mir/evidence/3.2.2-py-exact.json"
+  exact_py_evidence_sha256 = "32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00"
 }
 foreach ($field in $c24.Keys) { Assert-MIRField $modern $field $c24[$field] "Active C24" }
 if ([string]$modern.archive_class -ne "unreleased-emergency-hotfix-candidate" -or
@@ -68,13 +70,21 @@ if ([string]$modern.archive_class -ne "unreleased-emergency-hotfix-candidate" -o
 }
 if ([string]$modern.qualification -notin @(
       "focused-hotfix-validation-passed-full-validation-pending",
+      "focused-hotfix-and-exact-py-validation-passed-full-validation-pending",
       "full-local-no-reuse-validation-passed",
       "protected-no-reuse-validation-passed") -or
     [string]$modern.status -notin @(
       "c24-focused-passed-full-validation-pending",
+      "c24-focused-and-exact-py-passed-full-validation-pending",
       "c24-full-local-validation-passed",
       "c24-protected-validation-passed-tag-ready")) {
   throw "Active C24 qualification status is not an allowed candidate state."
+}
+
+$exactPyPath = Join-Path $repo ([string]$modern.exact_py_evidence)
+if (-not (Test-Path -LiteralPath $exactPyPath -PathType Leaf) -or
+    (Get-FileHash -LiteralPath $exactPyPath -Algorithm SHA256).Hash -ne [string]$modern.exact_py_evidence_sha256) {
+  throw "C24 exact Py evidence is absent or differs from release authority."
 }
 
 & git -C $repo merge-base --is-ancestor ([string]$modern.package_source_commit) HEAD
