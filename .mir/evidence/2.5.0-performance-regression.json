@@ -1,0 +1,431 @@
+{
+  "schema": 3,
+  "kind": "mir-runtime-performance-regression",
+  "status": "passed",
+  "candidate": {
+    "version": "2.5.0",
+    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "source_commit": "b58c8995984e185a75176e6c818fe0b6f5b1f0af"
+  },
+  "baseline": {
+    "version": "2.4.9",
+    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+    "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
+  },
+  "factorio": {
+    "version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "comparability": {
+    "machine_sha256": "D267D3CEF075BA4B8554F9971E4EC41F795AA18D91F85072D59D47348F18D34F",
+    "official_mods_sha256": "B1C2BC7DF3821BC0F6B180B08824C2E1BE2A1602113E28850FD404A7BB3E5308",
+    "third_party_closure_sha256": "E76FA7B84680DD19BC0B68755EF712A7CB7D8A25A31F9EF1678018F0FE5BF552",
+    "settings_sha256": "DF8C6E11428401B7E3EFAE8275D465B8D8BC2691BBA572EE1A554AAC5F5CDB4C",
+    "scenarios_sha256": "1ADE449F3489A912E89A1E3CD502DDF480B0E19974D28EF84152558A23227493",
+    "harness_sha256": "A018D8E2664448F63956BCFE90E7415F328C141C2E6923A9AC4D5D0F0E846A21"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "run_order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          4.633272,
+          4.971311,
+          4.161884,
+          4.300734,
+          4.617558
+        ],
+        "median_seconds": 4.617558,
+        "p90_seconds": 4.971311,
+        "minimum_seconds": 4.161884,
+        "maximum_seconds": 4.971311
+      },
+      "candidate": {
+        "runs_seconds": [
+          4.88399,
+          4.851787,
+          4.874229,
+          4.518189,
+          5.06276
+        ],
+        "median_seconds": 4.874229,
+        "p90_seconds": 5.06276,
+        "minimum_seconds": 4.518189,
+        "maximum_seconds": 5.06276
+      },
+      "absolute_delta_seconds": 0.256671,
+      "percentage_delta": 5.558587,
+      "status": "passed"
+    },
+    {
+      "id": "space-age.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          11.186886,
+          9.498154,
+          9.628236,
+          9.489604,
+          9.362767
+        ],
+        "median_seconds": 9.498154,
+        "p90_seconds": 11.186886,
+        "minimum_seconds": 9.362767,
+        "maximum_seconds": 11.186886
+      },
+      "candidate": {
+        "runs_seconds": [
+          6.543393,
+          6.929801,
+          6.323095,
+          6.051769,
+          6.150518
+        ],
+        "median_seconds": 6.323095,
+        "p90_seconds": 6.929801,
+        "minimum_seconds": 6.051769,
+        "maximum_seconds": 6.929801
+      },
+      "absolute_delta_seconds": -3.175059,
+      "percentage_delta": -33.428169,
+      "status": "passed"
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          7.478047,
+          7.208265,
+          6.479826,
+          8.394235,
+          6.903215
+        ],
+        "median_seconds": 7.208265,
+        "p90_seconds": 8.394235,
+        "minimum_seconds": 6.479826,
+        "maximum_seconds": 8.394235
+      },
+      "candidate": {
+        "runs_seconds": [
+          6.373711,
+          6.158791,
+          6.156056,
+          5.863758,
+          7.239056
+        ],
+        "median_seconds": 6.158791,
+        "p90_seconds": 7.239056,
+        "minimum_seconds": 5.863758,
+        "maximum_seconds": 7.239056
+      },
+      "absolute_delta_seconds": -1.049474,
+      "percentage_delta": -14.559315,
+      "status": "passed"
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          8.054669,
+          6.792393,
+          6.406684,
+          6.744807,
+          6.180309
+        ],
+        "median_seconds": 6.744807,
+        "p90_seconds": 8.054669,
+        "minimum_seconds": 6.180309,
+        "maximum_seconds": 8.054669
+      },
+      "candidate": {
+        "runs_seconds": [
+          7.38683,
+          6.600656,
+          6.924869,
+          6.431041,
+          5.905278
+        ],
+        "median_seconds": 6.600656,
+        "p90_seconds": 7.38683,
+        "minimum_seconds": 5.905278,
+        "maximum_seconds": 7.38683
+      },
+      "absolute_delta_seconds": -0.144151,
+      "percentage_delta": -2.137215,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          3.99991,
+          4.075826,
+          3.929897,
+          3.991249,
+          4.012934
+        ],
+        "median_seconds": 3.99991,
+        "p90_seconds": 4.075826,
+        "minimum_seconds": 3.929897,
+        "maximum_seconds": 4.075826
+      },
+      "candidate": {
+        "runs_seconds": [
+          4.08126,
+          4.360584,
+          4.170507,
+          4.683375,
+          4.21306
+        ],
+        "median_seconds": 4.21306,
+        "p90_seconds": 4.683375,
+        "minimum_seconds": 4.08126,
+        "maximum_seconds": 4.683375
+      },
+      "absolute_delta_seconds": 0.21315,
+      "percentage_delta": 5.32887,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          4.872143,
+          5.083102,
+          4.77649,
+          4.779966,
+          4.851859
+        ],
+        "median_seconds": 4.851859,
+        "p90_seconds": 5.083102,
+        "minimum_seconds": 4.77649,
+        "maximum_seconds": 5.083102
+      },
+      "candidate": {
+        "runs_seconds": [
+          5.222838,
+          5.967944,
+          5.704256,
+          5.17941,
+          5.606864
+        ],
+        "median_seconds": 5.606864,
+        "p90_seconds": 5.967944,
+        "minimum_seconds": 5.17941,
+        "maximum_seconds": 5.967944
+      },
+      "absolute_delta_seconds": 0.755005,
+      "percentage_delta": 15.561149,
+      "status": "passed"
+    }
+  ],
+  "artifact_volume": {
+    "telemetry_schema": 1,
+    "aggregation": "maximum-observed",
+    "measurements": [
+      {
+        "surface": "diagnostics-off",
+        "measured_runs": 5,
+        "telemetry_fingerprints": [
+          "CFB6D73458EA291394A463E2237274FB373E49EEC14A68A10C18EFC92483A28A",
+          "D3CF7AE10ED9A7EEAA60BE8BE4666F4BFE5D154327988B76544E2207D9016DBC",
+          "680FD319EEF9F04C391EC320F1159CD249149CE94AE789474D570BBC158C2322",
+          "668AD8907A41A93721D6CD4708D481A3E6169A3F8EDD4B93A776B5992BC1D473",
+          "72BFB30CD4474D029135DFA868E3C42E221013A71D65002C02E9CFBE7694B8FE"
+        ],
+        "counters": {
+          "accepted_operations": 54,
+          "candidate_operations": 54,
+          "canonical_bytes_total": 7672829,
+          "canonical_serializations_over_one_mib": 0,
+          "canonicalization_calls": 3999,
+          "catalog_snapshot_count": 0,
+          "compilation_snapshot_deep_verifications": 0,
+          "compiler_evidence_public_bytes": 6346,
+          "compiler_input_deep_verifications": 0,
+          "compiler_total_milliseconds": 0,
+          "context_snapshot_bytes": 0,
+          "context_state_keys": 34,
+          "coverage_internal_bytes": 0,
+          "coverage_public_bytes": 651,
+          "coverage_rows": 0,
+          "cyclic_components": 0,
+          "diagnostic_rows": 0,
+          "effects": 450,
+          "family_members": 0,
+          "fingerprint_calls": 3849,
+          "full_record_copy_count": 0,
+          "gate_deep_verifications": 0,
+          "generation_plan_internal_bytes": 0,
+          "generation_plan_public_bytes": 27794,
+          "generation_plan_rows": 73,
+          "graph_components": 250,
+          "graph_edges": 610,
+          "input_snapshot_bytes": 1355,
+          "maximum_canonical_bytes": 323921,
+          "policy_snapshot_deep_verifications": 0,
+          "provider_candidates": 41,
+          "provider_cardinality_review_required": 0,
+          "provider_review_required": 0,
+          "public_artifact_total_bytes": 56348,
+          "qualification_peak_memory_bytes": 132028092,
+          "qualification_snapshot_bytes": 1369,
+          "qualification_snapshot_construction_milliseconds": 0,
+          "recipe_fact_copies": 0,
+          "recipe_hard_risk_count": 177,
+          "recipe_index_scans": 1,
+          "recipe_review_risk_count": 20,
+          "recipe_risk_facts": 217,
+          "recipes": 217,
+          "rejected_operations": 0,
+          "runtime_environment_deep_verifications": 0,
+          "safety_qualification_deep_verifications": 0,
+          "sanitation_scanned_effects": 792,
+          "sanitation_scanned_technologies": 446,
+          "snapshot_canonicalization_passes": 14,
+          "snapshot_construction_milliseconds": 0,
+          "snapshot_copied_domains": 2,
+          "snapshot_deep_copies": 3,
+          "snapshot_peak_memory_bytes": 100853455,
+          "snapshot_prototype_bytes": 527632,
+          "snapshot_reused_domains": 11,
+          "stream_rows": 73,
+          "technologies": 250,
+          "technology_candidate_deep_verifications": 0,
+          "technology_catalog_alternatives": 146,
+          "technology_catalog_candidates": 73,
+          "technology_catalog_canonical_bytes": 262,
+          "technology_catalog_deep_verifications": 0,
+          "technology_catalog_internal_bytes": 0,
+          "technology_catalog_public_bytes": 21557,
+          "technology_closure_cache_entries": 0,
+          "technology_closure_cached_nodes": 0,
+          "technology_design_canonical_bytes": 0,
+          "technology_design_count": 73,
+          "technology_design_deep_verifications": 0,
+          "technology_design_full_copies": 0,
+          "technology_graph_index_queries": 269,
+          "technology_graph_parity_rows": 54,
+          "technology_prerequisite_closure_max": 45,
+          "transformation_operation_deep_verifications": 0,
+          "transformation_plan_deep_verifications": 0,
+          "trusted_assertion_canonicalizations": 0,
+          "trusted_assertions": 6472,
+          "trusted_record_registrations": 1351,
+          "trusted_rejected_assertions": 0,
+          "trusted_untrusted_verifications": 0
+        }
+      },
+      {
+        "surface": "diagnostics-on",
+        "measured_runs": 5,
+        "telemetry_fingerprints": [
+          "604CB6CB82053ED7585EF736C1A4BDEACF8B11372FF71CED1D28B951EE3C0977",
+          "87A534880E08BCF986C248BFDA2B086941F081DBC168A0497090FD55C7AEA2E9",
+          "93690DDB2F685A626C099E60358CFF8F89C8455756C9BCB8867D51F734244B63",
+          "4E3598607E1E199C4439F93DB5BB34095EF7A48DB166D0D6FCD3894CEABFF100",
+          "723D8A1868759FBE38277A97904375721CF993B987CE2091BE47A4352C065298"
+        ],
+        "counters": {
+          "accepted_operations": 54,
+          "candidate_operations": 54,
+          "canonical_bytes_total": 12073563,
+          "canonical_serializations_over_one_mib": 2,
+          "canonicalization_calls": 4075,
+          "catalog_snapshot_count": 0,
+          "compilation_snapshot_deep_verifications": 0,
+          "compiler_evidence_public_bytes": 6372,
+          "compiler_input_deep_verifications": 0,
+          "compiler_total_milliseconds": 0,
+          "context_snapshot_bytes": 0,
+          "context_state_keys": 34,
+          "coverage_internal_bytes": 38949,
+          "coverage_public_bytes": 651,
+          "coverage_rows": 217,
+          "cyclic_components": 0,
+          "diagnostic_rows": 767,
+          "effects": 450,
+          "family_members": 0,
+          "fingerprint_calls": 3849,
+          "full_record_copy_count": 0,
+          "gate_deep_verifications": 0,
+          "generation_plan_internal_bytes": 1114314,
+          "generation_plan_public_bytes": 27794,
+          "generation_plan_rows": 73,
+          "graph_components": 250,
+          "graph_edges": 610,
+          "input_snapshot_bytes": 1356,
+          "maximum_canonical_bytes": 2413552,
+          "policy_snapshot_deep_verifications": 0,
+          "provider_candidates": 41,
+          "provider_cardinality_review_required": 0,
+          "provider_review_required": 0,
+          "public_artifact_total_bytes": 56374,
+          "qualification_peak_memory_bytes": 119384958,
+          "qualification_snapshot_bytes": 1369,
+          "qualification_snapshot_construction_milliseconds": 0,
+          "recipe_fact_copies": 0,
+          "recipe_hard_risk_count": 177,
+          "recipe_index_scans": 1,
+          "recipe_review_risk_count": 20,
+          "recipe_risk_facts": 217,
+          "recipes": 217,
+          "rejected_operations": 0,
+          "runtime_environment_deep_verifications": 0,
+          "safety_qualification_deep_verifications": 0,
+          "sanitation_scanned_effects": 792,
+          "sanitation_scanned_technologies": 446,
+          "snapshot_canonicalization_passes": 14,
+          "snapshot_construction_milliseconds": 0,
+          "snapshot_copied_domains": 2,
+          "snapshot_deep_copies": 3,
+          "snapshot_peak_memory_bytes": 103654338,
+          "snapshot_prototype_bytes": 527632,
+          "snapshot_reused_domains": 11,
+          "stream_rows": 73,
+          "technologies": 250,
+          "technology_candidate_deep_verifications": 0,
+          "technology_catalog_alternatives": 146,
+          "technology_catalog_candidates": 73,
+          "technology_catalog_canonical_bytes": 262,
+          "technology_catalog_deep_verifications": 0,
+          "technology_catalog_internal_bytes": 2413552,
+          "technology_catalog_public_bytes": 21557,
+          "technology_closure_cache_entries": 0,
+          "technology_closure_cached_nodes": 0,
+          "technology_design_canonical_bytes": 795247,
+          "technology_design_count": 73,
+          "technology_design_deep_verifications": 0,
+          "technology_design_full_copies": 0,
+          "technology_graph_index_queries": 269,
+          "technology_graph_parity_rows": 54,
+          "technology_prerequisite_closure_max": 45,
+          "transformation_operation_deep_verifications": 0,
+          "transformation_plan_deep_verifications": 0,
+          "trusted_assertion_canonicalizations": 0,
+          "trusted_assertions": 6472,
+          "trusted_record_registrations": 1351,
+          "trusted_rejected_assertions": 0,
+          "trusted_untrusted_verifications": 0
+        }
+      }
+    ]
+  }
+}

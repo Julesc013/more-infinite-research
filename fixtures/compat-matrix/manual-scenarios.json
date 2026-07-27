@@ -403,7 +403,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact reduced Py 2.0 closure for issue #35: pypostprocessing finalizes before MIR, casting-gear is absent, casting-mk02 retains only valid unlocks, and sanitation matches the reviewed one-row budget."
+      "notes": "Exact reduced Py 2.0 closure for issue #35: pypostprocessing finalizes before MIR, casting-gear remains present, casting-mk02 retains valid ordered unlocks, and sanitation records zero external prunes."
     },    {
       "name": "nullius",
       "targets": [

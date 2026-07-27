@@ -139,9 +139,9 @@ if ($isFactorio20Backport) {
     commit = '7ebe93029695bbf809a15a14c6540530738a9e62'
   }
   $expectedCurrent = [ordered]@{
-    archive = '98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE'
-    content = '6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3'
-    commit = 'f9eb34eae9b767275a17b5e68351343042ef7532'
+    archive = '30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3'
+    content = '02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2'
+    commit = 'f446d89f94ce4b9dc26f04c31c92f9bcffbac70d'
   }
   if ($artifact.baseline.factorio_version -ne '2.0' -or
       [string]$artifact.baseline.archive_sha256 -ne $expectedBaseline.archive -or
@@ -153,7 +153,7 @@ if ($isFactorio20Backport) {
       [string]$artifact.current.package_content_sha256 -ne $expectedCurrent.content -or
       [string]$artifact.current.source_commit -ne $expectedCurrent.commit -or
       [string]$artifact.current.package_source_commit -ne $expectedCurrent.commit) {
-    throw 'Approved-delta current side does not bind the exact P6 2.5.0 package authority.'
+    throw 'Approved-delta current side does not bind the exact P9 2.5.0 package authority.'
   }
   $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\releases.json') | ConvertFrom-Json
   $releaseAuthority = $releaseLedger.development.'factorio-2.0'
@@ -186,12 +186,12 @@ if ($isFactorio20Backport) {
     if ($LASTEXITCODE -ne 0) { throw 'Approved-delta qualification source is not an ancestor of ExpectedSourceCommit.' }
     [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
     & git -C $repo diff --quiet $expectedCurrent.commit $ExpectedSourceCommit -- @packageRoots
-    if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after P6 package-source authority.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after P9 package-source authority.' }
     $candidateSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $candidatePath).Hash
     $candidateContentSha = Get-MIRZipContentFingerprint -Path $candidatePath
     if ($candidateSha -ne $expectedCurrent.archive -or $candidateContentSha -ne $expectedCurrent.content -or
         $candidateContentSha -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
-      throw 'Approved-delta does not bind the exact P6 candidate bytes and package source.'
+      throw 'Approved-delta does not bind the exact P9 candidate bytes and package source.'
     }
   }
 
@@ -200,9 +200,9 @@ if ($isFactorio20Backport) {
     'approved-delta-base' = @{ baseline_fp='7A5FF8482C287D7FFFBF816BC5A2B8280EA04646EEF236C604B98600FDE6E46E'; current_fp='51CBDCAAB4917BF131E1602D637AF33E385EA5713381EBE55A69CFE029D4F4E6'; baseline=53; current=54; differences=39; technology_differences=1 }
     'approved-delta-base-continuations' = @{ baseline_fp='7A5FF8482C287D7FFFBF816BC5A2B8280EA04646EEF236C604B98600FDE6E46E'; current_fp='51CBDCAAB4917BF131E1602D637AF33E385EA5713381EBE55A69CFE029D4F4E6'; baseline=53; current=54; differences=39; technology_differences=1 }
     'approved-delta-compat-atan' = @{ baseline_fp='EB80E8545659B3A6620122EA5C114FA7096AB2E5DF24FC34691549E27FBEC236'; current_fp='335D354355FD20A6100E84DEFDBF81BC1853BFDF018008DB8C606E024F856A9A'; baseline=53; current=54; differences=39; technology_differences=1 }
-    'approved-delta-compat-space-age-galore' = @{ baseline_fp='25120728B97FAFF6BE2A96B9C39F6674EC37D403D486B88CB0C44E4D8A662DE9'; current_fp='AE1B868318B511B0829160C04EDD981785B352DACB1EE61531F0CE550E51699C'; baseline=69; current=73; differences=50; technology_differences=8 }
-    'approved-delta-native-owner-adoption' = @{ baseline_fp='A013B3B7E085BE990C376FD7399AC905057AF925980137F5E2A64B7A07A01805'; current_fp='710381B28B3E2AFD545BFD53C4791265F488E1531FA480BF6AE7CA0283ABFEAE'; baseline=69; current=73; differences=50; technology_differences=8 }
-    'approved-delta-space-age' = @{ baseline_fp='27179CEE0CF70765F84ECD493EB60BD62CABF2D808812DC9B79A94A535D7280B'; current_fp='42527D8533A99642D457D9326E90DB5BE74B72467FF709C139816424790D89B8'; baseline=69; current=73; differences=50; technology_differences=8 }
+    'approved-delta-compat-space-age-galore' = @{ baseline_fp='25120728B97FAFF6BE2A96B9C39F6674EC37D403D486B88CB0C44E4D8A662DE9'; current_fp='A863B46B7DB067980E22A1C94B951DD58BB92367B4D4105FE0527EFF15F4B7A3'; baseline=69; current=73; differences=50; technology_differences=8 }
+    'approved-delta-native-owner-adoption' = @{ baseline_fp='A013B3B7E085BE990C376FD7399AC905057AF925980137F5E2A64B7A07A01805'; current_fp='D83F845C0CEC28898FC3E3E6790DB534FD955E07C857511252F33C255E320EAC'; baseline=69; current=73; differences=50; technology_differences=8 }
+    'approved-delta-space-age' = @{ baseline_fp='27179CEE0CF70765F84ECD493EB60BD62CABF2D808812DC9B79A94A535D7280B'; current_fp='4F35385A125235BDDC87B9821F1AC0115034828E8D0C3653A2ED5B9A53822790'; baseline=69; current=73; differences=50; technology_differences=8 }
   }
   $actualScenarioNames = @($artifact.scenario_evidence.scenario | Sort-Object -Unique)
   if (($actualScenarioNames -join '|') -ne (@($expectedScenarios.Keys | Sort-Object) -join '|')) {
@@ -236,11 +236,11 @@ if ($isFactorio20Backport) {
   }
   $rowsSha = Get-MIRStringSha256 -Value (Get-MIRDeltaCanonicalJson -Value $differences)
   $fieldsSha = Get-MIRStringSha256 -Value (@($differences.field) -join "`n")
-  if ($rowsSha -ne 'B12E7A8AB070B9516A3D92ADD87E130BD80F454BA33F58D52F987BAC2195E083' -or
+  if ($rowsSha -ne '5270E406FE8556B7DE0A76858A178796B7AB6F800FAD6DE4E50B2687DBCEF7AB' -or
       $fieldsSha -ne '3A23372EABED0AD9A49AF806002938AFF9E8882ECAA3C4A25490474EADF91494') {
     throw 'Approved-delta reviewed rows or exact field set drifted.'
   }
-  $binding = if ($ValidateStructureOnly) { 'governed artifact structure' } else { 'the exact P6 candidate' }
+  $binding = if ($ValidateStructureOnly) { 'governed artifact structure' } else { 'the exact P9 candidate' }
   Write-Host "[ok] MIR 2.5 approved delta binds $binding, seven exact Factorio 2.0.77 scenarios, and 319 exact intentional differences with zero unknowns."
   return
 }

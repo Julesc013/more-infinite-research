@@ -16,8 +16,8 @@ superseded_by: []
 
 - Backports the MIR 3.2 compiler platform, deterministic planning, fail-closed integrity checks, settings, localization, and established research streams to Factorio 2.0.
 - Preserves valid concrete planet-discovery effects while pruning genuinely missing location targets.
-- Loads after Pyanodons Post-processing and sanitizes the final Py technology surface, preventing `casting-mk02` from unlocking removed `casting-gear`.
-- Retains valid sibling technology effects in their original order and records the exact reviewed sanitation row.
+- Loads after Pyanodons Post-processing and sanitizes the final Py technology surface when targets are genuinely removed.
+- The exact Py 2.0 closure retains valid `casting-gear` and ordered `casting-mk02` effects with zero external prunes; the synthetic late-removal fixture separately proves stale-unlock cleanup.
 - Keeps Factorio 2.0-specific science, prototype, effect, dependency, and capability behavior; Factorio 2.1-only surfaces remain excluded.
 - Uses 2.4.9 as the mandatory direct upgrade and approved-delta baseline.
 
@@ -34,8 +34,8 @@ superseded_by: []
 - Portable C24 source: `29f81addc0eec9b571afd6428c9e3529c4497a1b`.
 - Package source: `f446d89f94ce4b9dc26f04c31c92f9bcffbac70d`.
 - ZIP SHA-256: `30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3`.
-- ZIP size: `1,029,910` bytes; `290` entries.
+- ZIP size: `1,029,914` bytes; `290` entries.
 
 ## Release status
 
-P9 is an unreleased candidate. Exact Factorio 2.0 runtime, approved delta, upgrade, performance, full no-reuse, manual, protected, seal, and promotion gates remain pending until their candidate-bound evidence is produced.
+P9 is an unreleased candidate. Exact Base and official Space Age ZIP loads, the direct 2.4.9 upgrade matrix, the 319-row approved delta, and all six paired performance lanes pass. Exact Py 2.0 runtime, full no-reuse, manual, protected, seal, and promotion gates remain pending.

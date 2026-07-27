@@ -68,8 +68,9 @@ mod_interactions:
     exact_real_campaign: py-casting-finalizer-repair
     exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
     reproduced_technology: casting-mk02
-    reproduced_missing_recipe: casting-gear
-    integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
+    synthetic_reproduced_missing_recipe: casting-gear
+    exact_real_observed_recipe: casting-gear
+    integrity_contract: exact-real-target-integrity-with-zero-prunes-plus-synthetic-late-removal-repair
     claim_level: diagnostic-only
     public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
 campaigns: .mir/combination-campaigns.json
@@ -113,8 +114,9 @@ load_order_requirements:
     exact_real_campaign: py-casting-finalizer-repair
     exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
     reproduced_technology: casting-mk02
-    reproduced_missing_recipe: casting-gear
-    integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
+    synthetic_reproduced_missing_recipe: casting-gear
+    exact_real_observed_recipe: casting-gear
+    integrity_contract: exact-real-target-integrity-with-zero-prunes-plus-synthetic-late-removal-repair
     claim_level: diagnostic-only
     public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
 campaigns:
