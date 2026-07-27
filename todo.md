@@ -6,7 +6,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 
 ## Current Truth
 
-- MIR 3.2.1 is the tagged and Mod Portal-published Factorio 2.1 baseline; its already-running protected qualification remains to be reconciled without changing the tagged package. MIR 2.4.9 remains the immutable published Factorio 2.0 baseline until 2.5.0 qualifies.
+- MIR 3.2.1 is the tagged and Mod Portal-published Factorio 2.1 baseline. Protected run 30229114461 is retained as an honestly failed historical attempt and does not move or requalify that immutable tag. MIR 2.4.9 remains the immutable published Factorio 2.0 baseline until 2.5.0 qualifies.
 - MIR 1.9.4 and 1.8.2 are the immutable Factorio 1.1 and 1.0 releases.
 - MIR 1.7.1 through 1.3.0 are published reduced or finite target projections for Factorio 0.17 through 0.13.
 - MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
@@ -119,6 +119,8 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Build deterministic P9 from immutable 2.4.9 and final C24 package semantics through the explicit Factorio 2.0 capability adapters; pass focused static, synthetic, exact Base/Space Age, direct upgrade, approved-delta, and paired-performance gates.
 - [ ] After tag `3.2.2` exists, update the immutable source-tag authority, reconstruct P9 twice with target-first/source-second parent order, and advance only `tmp/2.0`.
 - [x] Pass the independent exact 11-mod Py 2.0 closure on Factorio 2.0.77 with the missing recipe and dangling unlock absent and zero unreviewed external sanitation.
+- [x] Advance the P9 qualification-only checkpoint to Q4 without changing package bytes: port the current assurance fixes, isolate the Factorio 2.0 capability fixture context, and omit the engine-invalid parameter-recipe fixture from the 2.0 campaign.
+- [ ] Resolve the strict P9 100,000-technology randomized-insertion comparison: coverage, generation, final graph, and in-memory graph fingerprints are stable, while the compiler qualification fingerprint still differs. Identify and correct the order-sensitive authority input; do not weaken or remove the comparison.
 - [ ] Complete P9 manual review, the definitive no-reuse plan, protected qualification, schema-4 seal, and promotion check.
 - [ ] Fast-forward `legacy`, verify immutable P9 bytes, and push annotated tag `2.5.0`.
 - [x] Lock the P9 target-first/source-second reconstruction manifest and hash every deterministic reconstruction-receipt field independently of its observation timestamp.
