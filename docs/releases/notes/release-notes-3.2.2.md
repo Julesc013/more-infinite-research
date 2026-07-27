@@ -19,7 +19,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 
 - Package: `dist/more-infinite-research_3.2.2.zip`
 - Package source: `29f81addc0eec9b571afd6428c9e3529c4497a1b`
-- Size: `1,030,828` bytes
+- Size: `1,030,817` bytes
 - Entries: `291`
 - SHA-256: `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8`
 - Content SHA-256: `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F`
