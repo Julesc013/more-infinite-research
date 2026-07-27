@@ -108,7 +108,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Create exact C21 by resolving `unlock-space-location` across concrete planet prototypes and preserve its deterministic emergency archive.
 - [x] Reconcile C21 protected run 30229114461 as historical failed evidence without moving the immutable `3.2.1` tag or misrepresenting the absent seal.
 - [x] Pass C24 exact 2.1.8 floor smokes, 2.1.12 Base and Space Age loads, the direct six-row 3.2.1 upgrade, paired performance, deterministic packaging, full static validation, and hosted MIR/Branch Policy.
-- [ ] Pass the exact real Py 2.1 closure with the one reviewed `casting-mk02` sanitation row and zero unknown external prunes.
+- [x] Pass the exact real 15-mod Py 2.1 closure with `casting-gear` and its dangling `casting-mk02` unlock absent, all valid effects retained, and zero external sanitation; retain the synthetic one-row stale-unlock repair proof.
 - [ ] Complete exact C24 differential manual review, one definitive no-reuse plan, protected qualification, schema-4 seal, and promotion check.
 - [ ] Fast-forward `main`, verify immutable C24 bytes, push annotated tag `3.2.2`, and close issue #35 with the exact tested closure and package identity.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.

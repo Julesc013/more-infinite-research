@@ -56,7 +56,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - Synthetic late Py reconstruction and exact sibling-order sanitation: passed.
 - Direct six-row 3.2.1-to-3.2.2 upgrade matrix: passed for Base, Space Age native owners, automatic families, base continuations, mod-set changes, and affected planet discovery.
 - Exact paired 3.2.1-to-3.2.2 performance campaign: passed all ten total-load and compiler-phase lanes without changing the governed budgets.
-- Exact Py Alien Life trigger closure: pending final candidate-bound run.
+- Exact 15-mod Py 3.1 trigger closure: passed on Factorio 2.1.12 with `casting-gear` and its dangling unlock absent, all valid effects retained, and zero unexpected sanitation.
 - Full no-reuse, protected qualification, schema-4 seal, and independent seal check: pending.
 
 Publish only the exact recorded ZIP after every remaining gate passes; do not rebuild it during publication.

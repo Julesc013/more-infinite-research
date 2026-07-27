@@ -20,12 +20,7 @@
       ],
       "maximum_unreviewed_external_prunes": 0
     },
-    "py-casting-finalizer-repair": {
-      "expected_external_prunes": [
-        {"technology": "casting-mk02", "effect_type": "unlock-recipe", "target": "casting-gear"}
-      ],
-      "maximum_unreviewed_external_prunes": 0
-    },
+    "py-casting-finalizer-repair": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "nullius": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "ultracube": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-crucible-rigor-exact-dist": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},

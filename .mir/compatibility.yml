@@ -101,7 +101,7 @@ load_order_requirements:
     exact_real_roots: [pyalienlife, pypetroleumhandling, pypostprocessing, pyrawores]
     reproduced_technology: casting-mk02
     reproduced_missing_recipe: casting-gear
-    integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
+    integrity_contract: synthetic-late-stale-unlock-single-prune-and-exact-current-closure-zero-prune
     claim_level: diagnostic-only
     public_scope: exact startup-integrity correction only; no broad Pyanodons semantic-support claim
 
