@@ -13,6 +13,18 @@ function Get-MIRReleaseTextSha256 {
   finally { $sha.Dispose() }
 }
 
+function Get-MIRReleasePortableArtifactSha256 {
+  param([Parameter(Mandatory)][string]$Path)
+  $textExtensions = @(".csv", ".json", ".log", ".md", ".txt", ".yaml", ".yml")
+  $extension = [IO.Path]::GetExtension($Path).ToLowerInvariant()
+  if ($textExtensions -notcontains $extension) {
+    return Get-MIRReleaseSha256 -Path $Path
+  }
+  $text = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8)
+  $normalized = ($text -replace "`r`n", "`n") -replace "`r", "`n"
+  return Get-MIRReleaseTextSha256 -Text $normalized
+}
+
 function ConvertTo-MIRReleaseOrderedMap {
   param([Parameter(Mandatory)]$Object)
   $map = [ordered]@{}
@@ -299,7 +311,7 @@ function Test-MIRManualReleaseAttestation {
       }
       $artifactPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $relative
       if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
-          [string]$artifact.sha256 -ne (Get-MIRReleaseSha256 -Path $artifactPath)) {
+          [string]$artifact.sha256 -ne (Get-MIRReleasePortableArtifactSha256 -Path $artifactPath)) {
         throw "Manual review artifact is absent or has the wrong hash: $relative"
       }
     }

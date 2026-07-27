@@ -602,6 +602,22 @@ function Invoke-MIRAssuranceSelfTest {
     throw "Approved-delta transition resolver accepted an unsafe version value."
   }
 
+  $manualC21Path = Resolve-MIRAssuranceManualReviewAttestationPath -Info ([pscustomobject]@{version="3.2.1"})
+  $manualC24Path = Resolve-MIRAssuranceManualReviewAttestationPath -Info ([pscustomobject]@{version="3.2.2"})
+  if ($manualC21Path -ne ".mir/evidence/3.2.1-manual-review-attestation.json" -or
+      $manualC24Path -ne ".mir/evidence/3.2.2-manual-review-attestation.json") {
+    throw "Manual-review resolver did not select the exact versioned attestation."
+  }
+  $unsafeManualReviewRejected = $false
+  try {
+    $null = Resolve-MIRAssuranceManualReviewAttestationPath -Info ([pscustomobject]@{version="../3.2.2"})
+  } catch {
+    $unsafeManualReviewRejected = $true
+  }
+  if (-not $unsafeManualReviewRejected) {
+    throw "Manual-review resolver accepted an unsafe version value."
+  }
+
   $dependencyA = Get-MIRAssuranceDependencyContract -Info ([pscustomobject]@{
     name="more-infinite-research"; version="3.1.9"; factorio_version="2.1"; dependencies=@("base >= 2.1.8")
   })
