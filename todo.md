@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-27
+Updated: 2026-07-28
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
@@ -16,7 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - Exact C20 was tagged and published as MIR 3.2.0 from `main`. Its GitHub asset digest matches the immutable recorded ZIP; the longer, manual, protected, and seal gates were not completed before maintainer-directed publication and remain recorded as assurance exceptions rather than passes.
-- MIR 3.2.1 C21 is the exact Mod Portal-published planet-discovery hotfix with all 129 local no-reuse rows passed; protected run 30229114461 completed with three non-package harness failures that are repaired, so an exact rerun remains the seal gate. MIR 3.2.2 C24 is the exact Py finalizer-order and affected-save planet-recovery hotfix candidate. MIR 2.5.0 will project final 3.2.2 semantics through the Factorio 2.0 capability profile.
+- MIR 3.2.1 C21 is the exact tagged and Mod Portal-published planet-discovery hotfix with all 129 local no-reuse rows passed. Protected run 30229114461 is reconciled as historical failed evidence and does not qualify or move the immutable tag. MIR 3.2.2 C24 is the frozen Py finalizer-order and affected-save planet-recovery hotfix candidate: exact 2.1.8 floor smokes, 2.1.12 Base and Space Age loads, the direct six-row upgrade matrix, paired performance, full static validation, and hosted MIR/Branch Policy pass. Exact real Py, manual, full no-reuse, protected, seal, promotion, and tag gates remain. MIR 2.5.0 P9 is the deterministic Factorio 2.0 projection of final C24: exact Base and official Space Age loads, the direct 2.4.9 upgrade matrix, the 319-row approved delta, and all six paired performance lanes pass; final dual-parent reconstruction and independent Py/full/manual/protected release gates remain.
 
 ## Consolidation Gate
 
@@ -106,14 +106,20 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Record that the longer exact-C20 validation campaign was not completed before maintainer-directed publication; do not relabel earlier candidate evidence as exact C20 evidence.
 - [x] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify the GitHub asset digest against the canonical archive SHA-256.
 - [x] Create exact C21 by resolving `unlock-space-location` across concrete planet prototypes and preserve its deterministic emergency archive.
-- [ ] Complete and reconcile exact C21 protected qualification and sealing in run 30229114461, then import the unchanged archive's protected evidence to `main`; tag `3.2.1` already identifies the exact locally qualified package and must not be moved.
-- [ ] Fully qualify, seal, promote, and tag exact C24 as MIR 3.2.2 after exact Py and dual-source planet-recovery evidence passes; then return `dev` to the MIR 3.2.5 campaign.
+- [x] Reconcile C21 protected run 30229114461 as historical failed evidence without moving the immutable `3.2.1` tag or misrepresenting the absent seal.
+- [x] Pass C24 exact 2.1.8 floor smokes, 2.1.12 Base and Space Age loads, the direct six-row 3.2.1 upgrade, paired performance, deterministic packaging, full static validation, and hosted MIR/Branch Policy.
+- [ ] Pass the exact real Py 2.1 closure with the one reviewed `casting-mk02` sanitation row and zero unknown external prunes.
+- [ ] Complete exact C24 differential manual review, one definitive no-reuse plan, protected qualification, schema-4 seal, and promotion check.
+- [ ] Fast-forward `main`, verify immutable C24 bytes, push annotated tag `3.2.2`, and close issue #35 with the exact tested closure and package identity.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
-- [ ] Run the exact Py Alien Life trigger closure and retain only the narrow startup-integrity claim; supply broader full-Py and legacy Space Exploration closures before strengthening compatibility claims.
-- [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.2 semantics through explicit Factorio 2.0 capability adapters.
+- [ ] Retain only the narrow exact-Py startup-integrity claim for C24/P9; broader full-Py and legacy Space Exploration claims require separate complete closures and evidence.
+- [x] Build deterministic P9 from immutable 2.4.9 and final C24 package semantics through the explicit Factorio 2.0 capability adapters; pass focused static, synthetic, exact Base/Space Age, direct upgrade, approved-delta, and paired-performance gates.
+- [ ] After tag `3.2.2` exists, update the immutable source-tag authority, reconstruct P9 twice with target-first/source-second parent order, and advance only `tmp/2.0`.
+- [ ] Pass the independent exact Py 2.0 closure, manual review, definitive no-reuse plan, protected qualification, schema-4 seal, and promotion check.
+- [ ] Fast-forward `legacy`, verify immutable P9 bytes, and push annotated tag `2.5.0`.
 - [x] Lock the P9 target-first/source-second reconstruction manifest and hash every deterministic reconstruction-receipt field independently of its observation timestamp.
-- [ ] Freeze canonical 3.2.5 source before projecting its portable delta into MIR 2.5.5.
+- [ ] Begin the 3.3/2.6 semantic-platform program only after immutable `3.2.2` and `2.5.0` tags exist and their behavioral baselines are frozen.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.
 - [ ] Preserve 3.1.9 behavior and stable identities unless a new release plan explicitly authorizes a change.
