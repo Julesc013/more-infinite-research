@@ -280,7 +280,7 @@ function Invoke-MIRAssuranceSeal {
     domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
     test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
-    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path $trustPath)
+    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
     verification_plan=(Get-MIRAssuranceRepoRelativePath -Path $planSnapshotPath)
     verification_plan_sha256=(Get-MIRAssuranceSha256 -Path $planSnapshotPath)
     plan_material_sha256=[string]$plan.plan_material_sha256
@@ -433,7 +433,7 @@ function Invoke-MIRAssuranceCheckSeal {
   $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
   $checks.test_catalog_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
   $checks.validation_harness_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles)) -eq [string]$seal.validation_harness_sha256)
-  $checks.trust_policy_sha256=((Get-MIRAssuranceSha256 -Path $trustPath) -eq [string]$seal.trust_policy_sha256)
+  $checks.trust_policy_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath)) -eq [string]$seal.trust_policy_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
   $sourceTree = @(& git -C $repo rev-parse "$([string]$seal.source_commit)^{tree}" 2>$null)
@@ -526,6 +526,28 @@ function Invoke-MIRAssuranceCheckSeal {
 
 function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
+
+  $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
+  $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
+  $decoyTrustPath = Join-Path $repo ".mir\target-lines\2.4.9\validation\trust.json"
+  if (-not (Test-Path -LiteralPath $decoyTrustPath -PathType Leaf) -or
+      (Get-MIRAssuranceSha256 -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
+    throw "Trust-path collision self-test requires a distinct target-line policy fixture."
+  }
+  $originalTrustPath = $trustPath
+  try {
+    $trustPath = $decoyTrustPath
+    $collisionProducer = Get-MIRAssuranceProducer
+    $collisionContext = Get-MIRAssuranceContext
+    if ([string]$collisionProducer.policy_sha256 -ne $canonicalTrustSha256 -or
+        (Get-MIRAssuranceJsonHash -Value $collisionContext.trust_policy) -ne
+        (Get-MIRAssuranceJsonHash -Value (Get-Content -Raw -LiteralPath $canonicalTrustPath | ConvertFrom-Json))) {
+      throw "A dynamically scoped trustPath collision changed canonical producer or context authority."
+    }
+  } finally {
+    $trustPath = $originalTrustPath
+  }
+
   $cases = @(
     @{path="control.lua"; class="runtime-or-migration"},
     @{path="migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
