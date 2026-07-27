@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "default_target": "2.1",
+  "default_target": "2.0",
   "verification": {
     "tests": "validation/tests.yml",
     "domains": "validation/domains.yml",
