@@ -156,7 +156,9 @@ $performanceTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.
 if ($performanceTest.Count -ne 1 -or
     [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
     [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
+    [string]$performanceTest[0].command -notmatch '-LocalModZipDir\s+<mods>' -or
     [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    @($performanceTest[0].inputs) -notcontains "mod-closure" -or
     @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
     @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
   throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."

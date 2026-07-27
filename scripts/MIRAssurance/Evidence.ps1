@@ -774,6 +774,7 @@ function Resolve-MIRAssuranceCommandText {
     "<factorio>"=[string]$Context.factorio
     "<candidate>"=[string]$Context.candidate
     "<prior-release>"=[string]$Context.prior_release
+    "<mods>"=[string]$Context.mods
     "<baseline>"=[string]$Plan.baseline
     "<seal>"=[string]$Context.seal
     "<target>"=[string]$Context.target
