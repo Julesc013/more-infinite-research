@@ -529,7 +529,7 @@ function Invoke-MIRAssuranceSelfTest {
 
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
   $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
-  $decoyTrustPath = Join-Path $repo ".mir\target-lines\2.4.9\validation\trust.json"
+  $decoyTrustPath = Join-Path $repo "validation\domains.yml"
   if (-not (Test-Path -LiteralPath $decoyTrustPath -PathType Leaf) -or
       (Get-MIRAssuranceSha256 -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
     throw "Trust-path collision self-test requires a distinct target-line policy fixture."
