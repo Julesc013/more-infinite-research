@@ -43,37 +43,22 @@ jobs:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
-      - name: Apply emergency release metadata
+      - name: Verify emergency release metadata
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $version = [string]$info.version
           $text = [IO.File]::ReadAllText((Resolve-Path changelog.txt)).Replace("`r`n", "`n").Replace("`r", "`n")
-          $bullet = '    - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.'
-          if (-not $text.Contains($bullet)) {
-            if ($version -eq '3.2.1') {
-              $section = @"
-          ---------------------------------------------------------------------------------------------------
-          Version: 3.2.1
-          Date: 2026-07-26
-
-            Bugfixes:
-
-          $bullet
-
-          "@
-              $text = $section.Replace("          ", "") + $text
-            } elseif ($version -eq '2.5.0') {
-              $needle = "  Bugfixes:`n`n"
-              $index = $text.IndexOf($needle, [StringComparison]::Ordinal)
-              if ($index -lt 0) { throw 'Unable to locate the 2.5.0 Bugfixes section.' }
-              $insertAt = $index + $needle.Length
-              $text = $text.Substring(0, $insertAt) + $bullet + "`n" + $text.Substring($insertAt)
-            } else {
-              throw "Emergency package workflow does not recognize MIR version $version."
+          $header = "Version: $version"
+          if (-not $text.Contains($header)) {
+            throw "The package changelog does not contain the active release header $header."
+          }
+          if ($version -in @('3.2.1', '3.2.2', '2.5.0')) {
+            $planetTerms = @('planet', 'space location', 'starmap')
+            if (-not ($planetTerms | Where-Object { $text.Contains($_) })) {
+              throw "The emergency release changelog does not describe the planet-discovery repair for MIR $version."
             }
-            [IO.File]::WriteAllText((Resolve-Path changelog.txt), $text, [Text.UTF8Encoding]::new($false))
           }
 
       - name: Verify planet target contract
