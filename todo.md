@@ -110,6 +110,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Pass C24 exact 2.1.8 floor smokes, 2.1.12 Base and Space Age loads, the direct six-row 3.2.1 upgrade, paired performance, deterministic packaging, full static validation, and hosted MIR/Branch Policy.
 - [x] Pass the exact real 15-mod Py 2.1 closure with `casting-gear` and its dangling `casting-mk02` unlock absent, all valid effects retained, and zero external sanitation; retain the synthetic one-row stale-unlock repair proof.
 - [x] Focused-rerun space-age-scripted-runtime-disable-restoration on exact C24 and retain its portable passing summary.
+- [x] Correct the Big Mining Drill validation harness to distinguish its reviewed explicit stream effect from the automatic provider's fail-closed progression-span review; the exact scenario passes without changing C24 bytes.
 - [ ] Complete exact C24 differential manual review, one definitive no-reuse plan, protected qualification, schema-4 seal, and promotion check.
 - [ ] Fast-forward `main`, verify immutable C24 bytes, push annotated tag `3.2.2`, and close issue #35 with the exact tested closure and package identity.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.

@@ -3919,7 +3919,8 @@ Invoke-RuntimeScenario -ScenarioName "big-mining-drill-productivity" -EnabledFix
 $bigMiningDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
 Assert-ReportLineGenerated -Line $bigMiningDrillLine -Context "Big Mining Drill productivity scenario"
 $bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "big-mining-drill" -Expected "capability=mining-drill-manufacturing"
-Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=attach" -Context "Big Mining Drill capability resolver scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=review-required" -Context "Big Mining Drill automatic-provider safety scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "blockers=provider_progression_span_budget_exceeded" -Context "Big Mining Drill automatic-provider progression budget scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=effect-owner-index,place-result-index,recipe-fact-v2" -Context "Big Mining Drill entity-backed evidence scenario"
 

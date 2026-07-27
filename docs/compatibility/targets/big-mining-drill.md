@@ -19,4 +19,6 @@ Evidence:
 - `mir-fixture-big-mining-drill`
 - `mir-fixture-assert-big-mining-drill-productivity`
 
+The reviewed explicit `research_mining_drill` stream owns this attachment. The generic automatic provider still returns `REVIEW_REQUIRED` when the combined mining-drill family exceeds its progression-span budget; that fail-closed diagnostic does not remove the separately reviewed stream effect.
+
 Non-goal: native mining-yield productivity.
