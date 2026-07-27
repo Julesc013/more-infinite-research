@@ -176,6 +176,30 @@ if ($performanceTest.Count -ne 1 -or
   throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
 }
 
+$manualTest = @($catalog.tests | Where-Object { [string]$_.id -eq "manual.release-review" })
+if ($manualTest.Count -ne 1 -or
+    [string]$manualTest[0].command -notmatch '-ExpectedSourceCommit\s+<package-source-commit>' -or
+    @($manualTest[0].inputs) -notcontains "manual-review-attestation" -or
+    @($manualTest[0].inputs | Where-Object { [string]$_ -match 'manual-review-attestation\.json' }).Count -ne 0) {
+  throw "manual.release-review must bind the package-source commit and dynamically fingerprint the exact versioned attestation."
+}
+. (Join-Path $RepoRoot "scripts\validation\ReleaseAttestations.ps1")
+$portableHashRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-portable-hash-" + [Guid]::NewGuid().ToString("N"))
+$portableLf = Join-Path $portableHashRoot "evidence.md"
+$portableCrLf = Join-Path $portableHashRoot "evidence-crlf.md"
+try {
+  $null = New-Item -ItemType Directory -Path $portableHashRoot
+  [IO.File]::WriteAllText($portableLf, "line one`nline two`n", [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($portableCrLf, "line one`r`nline two`r`n", [Text.UTF8Encoding]::new($false))
+  if ((Get-MIRReleasePortableArtifactSha256 -Path $portableLf) -ne
+      (Get-MIRReleasePortableArtifactSha256 -Path $portableCrLf)) {
+    throw "Portable manual-review text hashes must be invariant across LF and CRLF checkouts."
+  }
+} finally {
+  if (Test-Path -LiteralPath $portableHashRoot) {
+    Remove-Item -LiteralPath $portableHashRoot -Recurse -Force
+  }
+}
 foreach ($target in @("2.0", "2.1")) {
   $profilePath = Join-Path $RepoRoot "validation\profiles\factorio-$target.json"
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json

@@ -1,0 +1,3 @@
+.mir/evidence/**/*.md text eol=lf
+.mir/evidence/**/*.txt text eol=lf
+.mir/evidence/**/*-attestation.json text eol=lf
