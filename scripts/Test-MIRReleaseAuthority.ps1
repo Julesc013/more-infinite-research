@@ -43,57 +43,57 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 baseline must remain immutable MIR 2.4.9."
 }
 
-$c22 = [ordered]@{
+$c24 = [ordered]@{
   mir_version = "3.2.2"
-  candidate_id = "C22"
+  candidate_id = "C24"
   branch = "main"
   development_branch = "dev"
   source_anchor = "3.2.1"
   archive = "dist/more-infinite-research_3.2.2.zip"
-  archive_bytes = 1030828
+  archive_bytes = 1030817
   archive_entries = 291
-  package_source_commit = "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8"
-  package_source_tree = "789069c794d86fbd734475ae2fc6c3555581b0cb"
-  package_source_sha256 = "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4"
-  archive_sha256 = "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938"
-  package_content_sha256 = "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4"
-  approved_delta = "bounded-c21-to-c22-hotfix-reviewed"
+  package_source_commit = "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  package_source_tree = "afe3959e40c868578f3182bea5b4ce725dcfd222"
+  package_source_sha256 = "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F"
+  archive_sha256 = "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
+  package_content_sha256 = "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F"
+  approved_delta = "bounded-c21-to-c24-hotfix-reviewed"
 }
-foreach ($field in $c22.Keys) { Assert-MIRField $modern $field $c22[$field] "Active C22" }
+foreach ($field in $c24.Keys) { Assert-MIRField $modern $field $c24[$field] "Active C24" }
 if ([string]$modern.archive_class -ne "unreleased-emergency-hotfix-candidate" -or
     [string]$modern.publication_status -ne "unreleased" -or
     [string]$modern.manual_review -notin @("exact-patch-review-pending", "maintainer-patch-review-approved") -or
     [string]$modern.protected_qualification -notin @("pending", "passed")) {
-  throw "Active C22 release-state authority is invalid."
+  throw "Active C24 release-state authority is invalid."
 }
 if ([string]$modern.qualification -notin @(
       "focused-hotfix-validation-passed-full-validation-pending",
       "full-local-no-reuse-validation-passed",
       "protected-no-reuse-validation-passed") -or
     [string]$modern.status -notin @(
-      "c22-focused-passed-full-validation-pending",
-      "c22-full-local-validation-passed",
-      "c22-protected-validation-passed-tag-ready")) {
-  throw "Active C22 qualification status is not an allowed candidate state."
+      "c24-focused-passed-full-validation-pending",
+      "c24-full-local-validation-passed",
+      "c24-protected-validation-passed-tag-ready")) {
+  throw "Active C24 qualification status is not an allowed candidate state."
 }
 
 & git -C $repo merge-base --is-ancestor ([string]$modern.package_source_commit) HEAD
-if ($LASTEXITCODE -ne 0) { throw "C22 package source is not an ancestor of release-engineering HEAD." }
+if ($LASTEXITCODE -ne 0) { throw "C24 package source is not an ancestor of release-engineering HEAD." }
 $tree = (& git -C $repo show -s --format=%T ([string]$modern.package_source_commit)).Trim()
 if ($LASTEXITCODE -ne 0 -or $tree -ne [string]$modern.package_source_tree) {
-  throw "C22 package-source tree differs from authority."
+  throw "C24 package-source tree differs from authority."
 }
 $roots = @(Get-MIRPackageSourceRoots)
 $changedRoots = @(& git -C $repo diff --name-only ([string]$modern.package_source_commit) HEAD -- @roots)
 if ($LASTEXITCODE -ne 0 -or $changedRoots.Count -gt 0) {
-  throw "Package-visible paths changed after C22 package source: $($changedRoots -join ', ')"
+  throw "Package-visible paths changed after C24 package source: $($changedRoots -join ', ')"
 }
 if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty." }
 if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$modern.package_source_sha256) {
-  throw "Current package roots do not reproduce canonical C22 content."
+  throw "Current package roots do not reproduce canonical C24 content."
 }
 $candidatePath = Join-Path $repo ([string]$modern.archive)
-if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw "Canonical C22 archive is missing." }
+if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw "Canonical C24 archive is missing." }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [IO.Compression.ZipFile]::OpenRead($candidatePath)
 try { $entryCount = @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
@@ -102,21 +102,21 @@ if ((Get-Item -LiteralPath $candidatePath).Length -ne [long]$modern.archive_byte
     $entryCount -ne [int]$modern.archive_entries -or
     (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$modern.archive_sha256 -or
     (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$modern.package_content_sha256) {
-  throw "Canonical C22 archive no longer matches authority."
+  throw "Canonical C24 archive no longer matches authority."
 }
 
 $superseded = $modern.supersedes_candidate
 foreach ($field in @("archive_sha256", "package_content_sha256", "package_source_commit")) {
-  Assert-MIRField $superseded $field $c21[$field] "C22 superseded C21"
+  Assert-MIRField $superseded $field $c21[$field] "C24 superseded C21"
 }
 if ([string]$superseded.candidate_id -ne "C21" -or [string]$superseded.tag -ne "3.2.1" -or
     [string]$superseded.tag_commit -ne [string]$publishedModern.tag_commit) {
-  throw "C22 superseded-candidate authority does not bind the published C21 tag."
+  throw "C24 superseded-candidate authority does not bind the published C21 tag."
 }
 if ([string]$backport.mir_version -ne "2.5.0" -or [string]$backport.branch -ne "tmp/2.0" -or
     [string]$backport.source_anchor -ne "3.2.2-final-source-freeze" -or
     [string]$backport.status -ne "backport-pending-from-3.2.2" -or $null -ne $backport.archive) {
-  throw "Factorio 2.0 backport must remain pending from final C22 until target authority is committed."
+  throw "Factorio 2.0 backport must remain pending from final C24 until target authority is committed."
 }
 
 $branches = Read-MIRText ".mir/branches.yml"
@@ -124,31 +124,31 @@ $wave = Read-MIRText ".mir/release-wave.yml"
 $todo = Read-MIRText "todo.md"
 $requiredViews = @(
   @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_1:\s*$.*?^\s*candidate_id:\s*C21\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*candidate_id:\s*C22\s*$'},
-  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*archive_sha256:\s*638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*candidate_id:\s*C24\s*$'},
+  @{Path=".mir/branches.yml"; Text=$branches; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*archive_sha256:\s*8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8\s*$'},
   @{Path=".mir/release-wave.yml"; Text=$wave; Pattern='(?ms)^\s*mir_3_2_1:\s*$.*?^\s*candidate_id:\s*C21\s*$'},
-  @{Path=".mir/release-wave.yml"; Text=$wave; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*candidate_id:\s*C22\s*$'},
+  @{Path=".mir/release-wave.yml"; Text=$wave; Pattern='(?ms)^\s*mir_3_2_2:\s*$.*?^\s*candidate_id:\s*C24\s*$'},
   @{Path="todo.md"; Text=$todo; Pattern='MIR 3\.2\.2'}
 )
 foreach ($view in $requiredViews) {
-  if ([string]$view.Text -notmatch [string]$view.Pattern) { throw "$($view.Path) does not mirror canonical C22/C21 authority." }
+  if ([string]$view.Text -notmatch [string]$view.Pattern) { throw "$($view.Path) does not mirror canonical C24/C21 authority." }
 }
 
 $distributionRows = @((Read-MIRJson ".mir/distributions.json").distributions)
 $c21Rows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.1" })
-$c22Rows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.2" })
+$c24Rows = @($distributionRows | Where-Object { [string]$_.version -eq "3.2.2" })
 if ($c21Rows.Count -ne 1 -or [string]$c21Rows[0].path -ne [string]$publishedModern.archive -or
     [string]$c21Rows[0].sha256 -ne [string]$publishedModern.archive_sha256 -or [string]$c21Rows[0].source_ref -ne "3.2.1") {
   throw "Distribution inventory does not retain exact tagged C21."
 }
-if ($c22Rows.Count -ne 1 -or [string]$c22Rows[0].path -ne [string]$modern.archive -or
-    [long]$c22Rows[0].bytes -ne [long]$modern.archive_bytes -or [string]$c22Rows[0].sha256 -ne [string]$modern.archive_sha256 -or
-    [string]$c22Rows[0].kind -ne "unreleased-emergency-hotfix-candidate" -or [string]$c22Rows[0].source_ref -ne "dev") {
-  throw "Distribution inventory does not bind exact unreleased C22."
+if ($c24Rows.Count -ne 1 -or [string]$c24Rows[0].path -ne [string]$modern.archive -or
+    [long]$c24Rows[0].bytes -ne [long]$modern.archive_bytes -or [string]$c24Rows[0].sha256 -ne [string]$modern.archive_sha256 -or
+    [string]$c24Rows[0].kind -ne "unreleased-emergency-hotfix-candidate" -or [string]$c24Rows[0].source_ref -ne "dev") {
+  throw "Distribution inventory does not bind exact unreleased C24."
 }
 foreach ($forbiddenVersion in @("1.9.5", "2.5.0")) {
   if (@($distributionRows | Where-Object { [string]$_.version -eq $forbiddenVersion }).Count -gt 0) {
     throw "Nonexistent or not-yet-authorized version $forbiddenVersion must not appear in the distribution inventory."
   }
 }
-Write-Host "[ok] canonical C21 baseline, active C22, branch/wave views, distribution inventory, and C22-anchored backport agree."
+Write-Host "[ok] canonical C21 baseline, active C24, branch/wave views, distribution inventory, and C24-anchored backport agree."

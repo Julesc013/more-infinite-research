@@ -18,11 +18,11 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 ## Release artifact
 
 - Package: `dist/more-infinite-research_3.2.2.zip`
-- Package source: `7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8`
+- Package source: `29f81addc0eec9b571afd6428c9e3529c4497a1b`
 - Size: `1,030,828` bytes
 - Entries: `291`
-- SHA-256: `638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938`
-- Content SHA-256: `B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4`
+- SHA-256: `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8`
+- Content SHA-256: `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F`
 - Compatibility: Factorio `2.1.8` or newer
 - Release validation: Factorio `2.1.12`
 
@@ -50,7 +50,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 ## Qualification status
 
 - Deterministic package reconstruction: passed twice with identical bytes.
-- Exact C21-to-C22 package delta: one added runtime repair module and three changed packaged files; no removals.
+- Exact C21-to-C24 package delta: one added runtime repair module and three changed packaged files; no removals.
 - Exact ZIP Base and Space Age loads: passed in focused validation.
 - Synthetic late Py reconstruction and exact sibling-order sanitation: passed.
 - Direct six-row 3.2.1-to-3.2.2 upgrade matrix: pending final candidate-bound rerun.

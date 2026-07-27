@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-27T01:02:49Z",
+  "generated_at_utc": "2026-07-27T05:11:15Z",
   "archive": {
-    "path": "C:\\tmp\\mir-322-prep\\dist\\more-infinite-research_3.2.2.zip",
-    "bytes": 1030828,
-    "sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\more-infinite-research_3.2.2.zip",
+    "bytes": 1030817,
+    "sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
     "entry_count": 291
   },
   "roots": [
@@ -41,8 +41,8 @@
     {
       "root": "shell-documentation",
       "entry_count": 4,
-      "uncompressed_bytes": 164787,
-      "compressed_bytes": 45848
+      "uncompressed_bytes": 164793,
+      "compressed_bytes": 45837
     }
   ],
   "top_entries": [
@@ -61,8 +61,8 @@
     {
       "path": "changelog.txt",
       "category": "shell-documentation",
-      "uncompressed_bytes": 73253,
-      "compressed_bytes": 18163
+      "uncompressed_bytes": 73259,
+      "compressed_bytes": 18152
     },
     {
       "path": "locale/sr/more-infinite-research.cfg",
@@ -181,8 +181,8 @@
     "changed": [
       {
         "path": "changelog.txt",
-        "uncompressed_byte_delta": 513,
-        "compressed_byte_delta": 136
+        "uncompressed_byte_delta": 519,
+        "compressed_byte_delta": 125
       },
       {
         "path": "info.json",
@@ -195,30 +195,12 @@
         "compressed_byte_delta": 24
       }
     ],
-    "compressed_byte_delta": 1112
+    "compressed_byte_delta": 1101
   },
   "review": {
     "required": false,
     "reviewed": true,
-    "explanation": "C22 intentionally adds one small version-gated runtime module for researched planet-discovery recovery and updates info.json/changelog.txt for the Py finalizer ordering hotfix; no repository-only roots are packaged.",
-    "triggers": [
-      {
-        "kind": "total-growth",
-        "actual_percent": 0.108,
-        "threshold_percent": 0.0
-      },
-      {
-        "kind": "root-growth",
-        "root": "runtime",
-        "actual_percent": 11.204,
-        "threshold_percent": 0.0
-      },
-      {
-        "kind": "root-growth",
-        "root": "shell-documentation",
-        "actual_percent": 0.328,
-        "threshold_percent": 0.0
-      }
-    ]
+    "explanation": "C24 adds one small version-gated runtime module for researched planet-discovery recovery, orders MIR after Pyanodons Post-processing, and uses valid Factorio changelog bullets; no repository-only roots are packaged.",
+    "triggers": []
   }
 }

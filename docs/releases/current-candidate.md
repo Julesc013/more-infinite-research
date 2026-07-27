@@ -19,19 +19,19 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.2` |
-| Candidate | `C22` |
+| Candidate | `C24` |
 | Branch | `main` |
-| Package source commit | `7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8` |
-| Package source tree | `789069c794d86fbd734475ae2fc6c3555581b0cb` |
-| Package source SHA-256 | `B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4` |
+| Package source commit | `29f81addc0eec9b571afd6428c9e3529c4497a1b` |
+| Package source tree | `afe3959e40c868578f3182bea5b4ce725dcfd222` |
+| Package source SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
 | Archive | `dist/more-infinite-research_3.2.2.zip` |
-| Archive bytes | `1030828` |
+| Archive bytes | `1030817` |
 | Archive entries | `291` |
-| Archive SHA-256 | `638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938` |
-| Package content SHA-256 | `B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4` |
+| Archive SHA-256 | `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8` |
+| Package content SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
 | Qualification | `focused-hotfix-validation-passed-full-validation-pending` |
 | Publication | `unreleased` |
-| Status | `c22-focused-passed-full-validation-pending` |
+| Status | `c24-focused-passed-full-validation-pending` |
 
 ## Superseded candidate
 
@@ -42,6 +42,6 @@ superseded_by: []
 | Archive bytes | `1029716` |
 | Archive entries | `290` |
 | Archive SHA-256 | `4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6` |
-| Reason | C22 adds exact Py finalizer ordering and repairs valid researched planet discoveries left locked by 3.2.0 or 3.2.1. |
+| Reason | C24 adds exact Py finalizer ordering and repairs valid researched planet discoveries left locked by 3.2.0 or 3.2.1. |
 
 Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.

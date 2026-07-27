@@ -160,7 +160,7 @@ superseded_candidates:
 candidate:
   artifact: dist/more-infinite-research_3.2.2.zip
   source_commit: pending
-  package_source_commit: 7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8
+  package_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
   automated_gate: pending-requalification
   manual_gate: accepted-for-publication
   status: requalifying-after-validation-harness-change

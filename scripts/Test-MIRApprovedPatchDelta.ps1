@@ -52,14 +52,14 @@ if ([string]$artifact.baseline.version -ne "3.2.1" -or
 }
 $ledger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
 $current = $ledger.development."factorio-2.1"
-if ([string]$artifact.current.version -ne "3.2.2" -or [string]$current.candidate_id -ne "C22" -or
+if ([string]$artifact.current.version -ne "3.2.2" -or [string]$current.candidate_id -ne "C24" -or
     [string]$artifact.current.source_commit -ne [string]$current.package_source_commit -or
     [string]$artifact.current.package_source_commit -ne [string]$current.package_source_commit -or
     (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$artifact.current.archive_sha256 -or
     (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$artifact.current.package_content_sha256 -or
     [string]$current.archive_sha256 -ne [string]$artifact.current.archive_sha256 -or
     [string]$current.package_content_sha256 -ne [string]$artifact.current.package_content_sha256) {
-  throw "Approved patch current side does not bind exact C22."
+  throw "Approved patch current side does not bind exact C24."
 }
 $baselineEntries = Get-MIRPatchEntries $baselinePath
 $currentEntries = Get-MIRPatchEntries $candidatePath
@@ -70,22 +70,22 @@ $expectedAdded = @($artifact.allowed_added_paths | ForEach-Object { [string]$_ }
 $expectedChanged = @($artifact.allowed_changed_paths | ForEach-Object { [string]$_ } | Sort-Object)
 if ((Compare-Object $expectedAdded $added).Count -ne 0 -or $removed.Count -ne 0 -or
     (Compare-Object $expectedChanged $changed).Count -ne 0) {
-  throw "C22 patch delta escaped its exact four-path boundary. Added=$($added -join ',') Removed=$($removed -join ',') Changed=$($changed -join ',')"
+  throw "C24 patch delta escaped its exact four-path boundary. Added=$($added -join ',') Removed=$($removed -join ',') Changed=$($changed -join ',')"
 }
 if ($added.Count -ne 1 -or $added[0] -ne 'prototypes/mir/runtime/planet_discovery_recovery.lua' -or
     $changed.Count -ne 3 -or $changed -notcontains 'changelog.txt' -or
     $changed -notcontains 'info.json' -or
     $changed -notcontains 'prototypes/mir/runtime/scripted_techs.lua') {
-  throw "C22 patch delta must add only the recovery handler and change exactly metadata, changelog, and handler registration."
+  throw "C24 patch delta must add only the recovery handler and change exactly metadata, changelog, and handler registration."
 }
 if (-not $ValidateStructureOnly) {
   if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) { throw "Exact patch-delta validation requires ExpectedSourceCommit." }
   & git -C $repo merge-base --is-ancestor ([string]$current.package_source_commit) $ExpectedSourceCommit
-  if ($LASTEXITCODE -ne 0) { throw "C22 package source is not an ancestor of qualification source." }
+  if ($LASTEXITCODE -ne 0) { throw "C24 package source is not an ancestor of qualification source." }
   $roots = @(Get-MIRPackageSourceRoots)
   $changes = @(& git -C $repo diff --name-only ([string]$current.package_source_commit) $ExpectedSourceCommit -- @roots)
   if ($LASTEXITCODE -ne 0 -or $changes.Count -gt 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
-    throw "Package-visible source changed after C22 authority: $($changes -join ', ')"
+    throw "Package-visible source changed after C24 authority: $($changes -join ', ')"
   }
 }
 Write-Host "[ok] exact MIR 3.2.1 to 3.2.2 approved four-path hotfix delta."
