@@ -391,6 +391,7 @@
         "exact_mir_archive": true
       },
       "roots": [
+        "pyalienlife",
         "pypetroleumhandling",
         "pypostprocessing",
         "pyrawores"

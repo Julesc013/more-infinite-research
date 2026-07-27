@@ -199,7 +199,7 @@ fixtures:
     assertion_path: fixtures/assert-py-postprocessing-stale-unlock
     external_mod_identity: pypostprocessing
     exact_real_campaign: py-casting-finalizer-repair
-    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    exact_real_roots: [pyalienlife, pypetroleumhandling, pypostprocessing, pyrawores]
     validates:
       - pypostprocessing-final-fixes-runs-before-mir
       - late-casting-mk02-stale-unlock-reconstruction

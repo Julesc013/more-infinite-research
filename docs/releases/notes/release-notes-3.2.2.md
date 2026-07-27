@@ -37,7 +37,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 ## Exact scope
 
 - The Py correction is a generic finalizer-order and missing-target sanitation repair, not a hard-coded mutation of `casting-mk02`.
-- The compatibility claim is limited to startup integrity for the exact tested reduced Py closure; it is not a broad claim that every Py-generated technology is semantically supported.
+- The compatibility claim is limited to startup integrity for the exact tested Py Alien Life trigger closure; it is not a broad claim that every Py-generated technology is semantically supported.
 - The planet repair runs only for upgrades from MIR 3.2.0 or 3.2.1 to MIR 3.2.2.
 - The repair unlocks only valid locations referenced by researched discovery technologies and never performs a force-wide technology-effect reset.
 
@@ -54,7 +54,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - Exact ZIP Base and Space Age loads: passed in focused validation.
 - Synthetic late Py reconstruction and exact sibling-order sanitation: passed.
 - Direct six-row 3.2.1-to-3.2.2 upgrade matrix: pending final candidate-bound rerun.
-- Exact reduced Py runtime closure: pending final candidate-bound run.
+- Exact Py Alien Life trigger closure: pending final candidate-bound run.
 - Full no-reuse, protected qualification, schema-4 seal, and independent seal check: pending.
 
 Publish only the exact recorded ZIP after every remaining gate passes; do not rebuild it during publication.

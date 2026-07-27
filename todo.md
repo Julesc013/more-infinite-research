@@ -110,7 +110,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [ ] Fully qualify, seal, promote, and tag exact C24 as MIR 3.2.2 after exact Py and dual-source planet-recovery evidence passes; then return `dev` to the MIR 3.2.5 campaign.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
-- [ ] Run the acquired exact reduced Pyanodons closure and retain only the narrow startup-integrity claim; supply remaining full Py and legacy Space Exploration closures before strengthening compatibility claims.
+- [ ] Run the exact Py Alien Life trigger closure and retain only the narrow startup-integrity claim; supply broader full-Py and legacy Space Exploration closures before strengthening compatibility claims.
 - [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.2 semantics through explicit Factorio 2.0 capability adapters.
 - [ ] Freeze canonical 3.2.5 source before projecting its portable delta into MIR 2.5.5.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.

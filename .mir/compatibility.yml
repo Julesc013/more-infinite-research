@@ -98,7 +98,7 @@ load_order_requirements:
     fixture: fixtures/pypostprocessing-stale-unlock
     assertion_fixture: fixtures/assert-py-postprocessing-stale-unlock
     exact_real_campaign: py-casting-finalizer-repair
-    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    exact_real_roots: [pyalienlife, pypetroleumhandling, pypostprocessing, pyrawores]
     reproduced_technology: casting-mk02
     reproduced_missing_recipe: casting-gear
     integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
