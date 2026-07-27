@@ -1,6 +1,7 @@
 local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
 local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
+local planet_discovery_recovery = require("prototypes.mir.runtime.planet_discovery_recovery")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local runtime_state = require("prototypes.mir.runtime.state")
 
@@ -10,7 +11,8 @@ M.requires_features = {"scripted_techs", "productivity_family_adoption"}
 local features = {
   spoilage,
   agricultural_growth,
-  productivity_family_adoption
+  productivity_family_adoption,
+  planet_discovery_recovery
 }
 
 for _, feature in ipairs(features) do
