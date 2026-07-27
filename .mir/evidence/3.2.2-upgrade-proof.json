@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "mir-upgrade-matrix",
+  "status": "passed",
+  "generated_at": "2026-07-27T13:13:31.2899073Z",
+  "source_commit": "a64bb6e4d8f310d7cbb98908983a6e54f1685f59",
+  "factorio": {
+    "version": "2.1.12.87038",
+    "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "baseline": {
+    "version": "3.2.1",
+    "archive": "more-infinite-research_3.2.1.zip",
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6"
+  },
+  "candidate": {
+    "version": "3.2.2",
+    "archive": "more-infinite-research_3.2.2.zip",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
+  },
+  "required_archetypes": [
+    "base-default",
+    "space-age-native-owner",
+    "automatic-family-creation",
+    "base-continuations",
+    "mod-set-configuration-change",
+    "affected-planet-discovery"
+  ],
+  "rows": [
+    {
+      "id": "base-default",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-base-default.json",
+      "result_sha256": "CC5C3B63265B9987A24BC3B81F8BF70BA45450BB50D9388ACD482ECF1C0C86C5",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "base-only-mod-set-retained"
+      ]
+    },
+    {
+      "id": "space-age-native-owner",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-space-age-native-owner.json",
+      "result_sha256": "357A74B0ECCE7ADCBA61A0D677A06F8E3E79BD1CA2A0AEDBA4ACABB3F58BFA0D",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "space-age-native-owner-retained"
+      ]
+    },
+    {
+      "id": "automatic-family-creation",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-automatic-family-creation.json",
+      "result_sha256": "BB82ADC0EE9697EB663E9050EBF21FD0A048B7B34C6A9A003015184A309DFC59",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "automatic-generated-family-retained",
+        "automatic-recipe-target-retained"
+      ]
+    },
+    {
+      "id": "base-continuations",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-base-continuations.json",
+      "result_sha256": "2BC94636B2E61ABDBC67100ADBA771130BDC78B3A59C28642850AE8E625FB289",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "base-continuation-retained"
+      ]
+    },
+    {
+      "id": "mod-set-configuration-change",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-mod-set-configuration-change.json",
+      "result_sha256": "EAD65DB2641286844AF81C89CF514AEC5E54D641F901473D604BC7EDD21233DE",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "source-only-mod-removed",
+        "removed-recipe-target-sanitized"
+      ]
+    },
+    {
+      "id": "affected-planet-discovery",
+      "status": "passed",
+      "result": "artifacts/assurance/3.2.2-upgrade-affected-planet-discovery.json",
+      "result_sha256": "07E01C8B3B9405C530F15238816B9593AFCF3BC64B09BADA94D9413B8DB970EC",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "affected-locked-location-reproduced",
+        "planet-discovery-research-retained",
+        "researched-space-location-restored"
+      ]
+    }
+  ]
+}

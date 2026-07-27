@@ -371,10 +371,10 @@ waves:
     performance_evidence: .mir/evidence/3.2.1-performance-regression.json
     performance_evidence_sha256: 5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726
     automated_gate: passed-local-129-of-129-no-reuse
-    protected_release_gate: running-run-30229114461
-    release_gate: protected-qualification-and-seal-running
+    protected_release_gate: failed-run-30229114461-harness-defects-repaired-rerun-pending
+    release_gate: protected-qualification-and-seal-rerun-pending
     publication_status: published-mod-portal-github-tag-pending
-    status: c21-protected-qualification-running
+    status: c21-protected-qualification-rerun-pending
   mir_3_2_2:
     version: "3.2.2"
     branch: main
@@ -396,6 +396,13 @@ waves:
     py_finalizer_order_gate: focused-passed
     affected_planet_recovery_gate: focused-passed
     package_determinism_gate: passed-exact-bytes
+    minimum_factorio_gate: passed-exact-2.1.8-base-and-space-age
+    minimum_factorio_evidence: .mir/evidence/3.2.2-factorio-2.1.8-floor-smokes.json
+    upgrade_gate: passed-exact-six-archetype-3.2.1-to-3.2.2
+    upgrade_evidence: .mir/evidence/3.2.2-upgrade-proof.json
+    performance_gate: passed-exact-paired-3.2.1-to-3.2.2
+    performance_evidence: .mir/evidence/3.2.2-performance-regression.json
+    performance_evidence_sha256: 9713544E56107CABFAD859C59D1466B9DF908185A7BB37323DC09C829D7A3657
     approved_delta: approved-delta/3.2.1-to-3.2.2.json
     automated_gate: pending-full-no-reuse
     manual_attestation_gate: pending-exact-patch-review

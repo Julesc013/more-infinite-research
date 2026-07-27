@@ -5,7 +5,7 @@ applies_to: "3.2.2+ and maintained backports"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-26
+last_reviewed: 2026-07-27
 supersedes: []
 superseded_by: []
 ---
@@ -32,7 +32,7 @@ After the exact `3.2.2` and preintegration archive tags exist, reconstruct the t
   --worktree C:\Projects\Factorio\mir-reconstructed-2.5
 ```
 
-The materializer verifies both tags and the 2.4.9 ancestry, creates a target-first/source-second merge, reapplies the exact reviewed Factorio 2.0 projection tree, checks the target profile and source lock, builds twice, verifies the expected archive and content hashes, and writes a reconstruction receipt.
+The materializer verifies both tags and the 2.4.9 ancestry, creates a target-first/source-second merge, reapplies the exact reviewed Factorio 2.0 projection tree, checks the target profile and source lock, builds twice, verifies the expected archive and content hashes, and writes a reconstruction receipt. The receipt stores `receipt_material_sha256` over every deterministic non-time field; `reconstructed_at` is an observation-only envelope field, so two rehearsals can prove identical reconstruction material without pretending their timestamps match.
 
 Before sealing, delete the disposable reconstruction worktree, rerun the command from the immutable tags, and require the same integration tree and package identities. This branch-loss rehearsal proves that `tmp/2.0` is a workspace rather than unique source authority.
 

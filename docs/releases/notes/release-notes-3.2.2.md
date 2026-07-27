@@ -24,6 +24,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - SHA-256: `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8`
 - Content SHA-256: `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F`
 - Compatibility: Factorio `2.1.8` or newer
+- Minimum-version qualification: exact Factorio `2.1.8` Base and Space Age ZIP loads passed.
 - Release validation: Factorio `2.1.12`
 
 ## Fixed
@@ -53,7 +54,8 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - Exact C21-to-C24 package delta: one added runtime repair module and three changed packaged files; no removals.
 - Exact ZIP Base and Space Age loads: passed in focused validation.
 - Synthetic late Py reconstruction and exact sibling-order sanitation: passed.
-- Direct six-row 3.2.1-to-3.2.2 upgrade matrix: pending final candidate-bound rerun.
+- Direct six-row 3.2.1-to-3.2.2 upgrade matrix: passed for Base, Space Age native owners, automatic families, base continuations, mod-set changes, and affected planet discovery.
+- Exact paired 3.2.1-to-3.2.2 performance campaign: passed all ten total-load and compiler-phase lanes without changing the governed budgets.
 - Exact Py Alien Life trigger closure: pending final candidate-bound run.
 - Full no-reuse, protected qualification, schema-4 seal, and independent seal check: pending.
 

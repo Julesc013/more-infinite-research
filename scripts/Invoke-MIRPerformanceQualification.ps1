@@ -10,7 +10,8 @@ param(
   [string]$OutputPath = "",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
-  [ValidateRange(5, 25)][int]$MeasuredRuns = 5
+  [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
+  [switch]$KeepArtifacts
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,6 +28,22 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$($candidateInfo.version)-performance-regression.json"
 }
 
+$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "artifacts\performance"))
+if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
+  $ArtifactRoot = Join-Path $performanceArtifactsRoot "$($candidateInfo.version)-qualification-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+} elseif (-not [IO.Path]::IsPathRooted($ArtifactRoot)) {
+  $ArtifactRoot = Join-Path $RepoRoot $ArtifactRoot
+}
+$ArtifactRoot = [IO.Path]::GetFullPath($ArtifactRoot)
+$safeArtifactPrefix = $performanceArtifactsRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+  throw "Performance artifacts must stay inside $performanceArtifactsRoot."
+}
+$resolvedOutputPath = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $OutputPath)) }
+if (-not $KeepArtifacts -and $resolvedOutputPath.StartsWith(($ArtifactRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar), [StringComparison]::OrdinalIgnoreCase)) {
+  throw "Compact performance evidence must remain outside the disposable artifact directory."
+}
+
 $measure = @{
   RepoRoot = $RepoRoot
   Candidate = $Candidate
@@ -38,9 +55,7 @@ $measure = @{
   WarmupRuns = $WarmupRuns
   MeasuredRuns = $MeasuredRuns
 }
-if (-not [string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $measure.ArtifactRoot = $ArtifactRoot
-}
+$measure.ArtifactRoot = $ArtifactRoot
 
 & (Join-Path $PSScriptRoot "Measure-MIRPerformanceRegression.ps1") @measure
 if (-not $?) {
@@ -58,6 +73,11 @@ if (-not $?) {
   -ExpectedFactorioVersion $ExpectedFactorioVersion
 if (-not $?) {
   throw "Fresh performance evidence validation failed."
+}
+
+if (-not $KeepArtifacts -and (Test-Path -LiteralPath $ArtifactRoot -PathType Container)) {
+  Remove-Item -LiteralPath $ArtifactRoot -Recurse -Force
+  Write-Host "[cleanup] removed disposable performance artifacts: $ArtifactRoot"
 }
 
 Write-Host "[ok] fresh no-reuse performance qualification passed: $OutputPath"

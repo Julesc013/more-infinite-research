@@ -90,7 +90,7 @@ try {
   if (-not $ReceiptPath) { $ReceiptPath = Join-Path $Worktree "artifacts\backport-reconstruction\2.5.0.json" }
   if (-not [IO.Path]::IsPathRooted($ReceiptPath)) { $ReceiptPath = Join-Path $Worktree $ReceiptPath }
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReceiptPath) | Out-Null
-  $receipt = [ordered]@{
+  $receiptMaterial = [ordered]@{
     schema = 1
     target_release = [string]$manifest.target_release
     target_factorio = [string]$manifest.target_factorio
@@ -105,8 +105,16 @@ try {
     bytes = $zipItem.Length
     entries = $entryCount
     package_path_classification = @($manifest.package_path_classification)
-    reconstructed_at = [DateTime]::UtcNow.ToString("o")
   }
+  $receiptMaterialJson = $receiptMaterial | ConvertTo-Json -Depth 20 -Compress
+  $receiptMaterialBytes = [Text.UTF8Encoding]::new($false).GetBytes($receiptMaterialJson)
+  $receiptMaterialSha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($receiptMaterialBytes))
+  $receipt = [ordered]@{}
+  foreach ($entry in $receiptMaterial.GetEnumerator()) {
+    $receipt[$entry.Key] = $entry.Value
+  }
+  $receipt.receipt_material_sha256 = $receiptMaterialSha256
+  $receipt.reconstructed_at = [DateTime]::UtcNow.ToString("o")
   [IO.File]::WriteAllText($ReceiptPath, ($receipt | ConvertTo-Json -Depth 20), [Text.UTF8Encoding]::new($false))
   Write-Host "[ok] reconstructed MIR $($manifest.target_release) at $mergeCommit"
   Write-Host "[ok] receipt: $ReceiptPath"

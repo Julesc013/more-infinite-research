@@ -16,7 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - Exact C20 was tagged and published as MIR 3.2.0 from `main`. Its GitHub asset digest matches the immutable recorded ZIP; the longer, manual, protected, and seal gates were not completed before maintainer-directed publication and remain recorded as assurance exceptions rather than passes.
-- MIR 3.2.1 C21 is the exact Mod Portal-published planet-discovery hotfix with all 129 local no-reuse rows passed; protected run 30229114461 is the final seal and tag gate. MIR 3.2.2 C24 is the exact Py finalizer-order and affected-save planet-recovery hotfix candidate. MIR 2.5.0 will project final 3.2.2 semantics through the Factorio 2.0 capability profile.
+- MIR 3.2.1 C21 is the exact Mod Portal-published planet-discovery hotfix with all 129 local no-reuse rows passed; protected run 30229114461 completed with three non-package harness failures that are repaired, so an exact rerun remains the seal gate. MIR 3.2.2 C24 is the exact Py finalizer-order and affected-save planet-recovery hotfix candidate. MIR 2.5.0 will project final 3.2.2 semantics through the Factorio 2.0 capability profile.
 
 ## Consolidation Gate
 
@@ -112,6 +112,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
 - [ ] Run the exact Py Alien Life trigger closure and retain only the narrow startup-integrity claim; supply broader full-Py and legacy Space Exploration closures before strengthening compatibility claims.
 - [ ] Build MIR 2.5.0 from the immutable 2.4.9 baseline by projecting final 3.2.2 semantics through explicit Factorio 2.0 capability adapters.
+- [x] Lock the P9 target-first/source-second reconstruction manifest and hash every deterministic reconstruction-receipt field independently of its observation timestamp.
 - [ ] Freeze canonical 3.2.5 source before projecting its portable delta into MIR 2.5.5.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.

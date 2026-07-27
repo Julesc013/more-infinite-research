@@ -50,13 +50,17 @@ foreach ($case in $cases) {
   if ([int]$result.schema -ne 2 -or [string]$result.status -ne "passed" -or [string]$result.archetype -ne [string]$case.id) {
     throw "Upgrade matrix row is not an exact passing schema-2 result: $($case.id)"
   }
+  $assertions = @($result.assertions | ForEach-Object { [string]$_ } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+  if ($assertions.Count -eq 0) {
+    throw "Upgrade matrix row published no named assertions: $($case.id)"
+  }
   $relative = [IO.Path]::GetRelativePath($RepoRoot, (Resolve-Path -LiteralPath $rowOutput).Path).Replace('\', '/')
   $rows += [ordered]@{
     id = [string]$case.id
     status = "passed"
     result = $relative
     result_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $rowOutput).Hash
-    assertions = @($result.assertions)
+    assertions = $assertions
   }
 }
 

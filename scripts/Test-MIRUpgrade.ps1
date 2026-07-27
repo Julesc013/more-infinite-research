@@ -209,6 +209,7 @@ $assertions = if ($Archetype) {
     "automatic-family-creation" { $common + @("automatic-generated-family-retained", "automatic-recipe-target-retained") }
     "base-continuations" { $common + @("base-continuation-retained") }
     "mod-set-configuration-change" { $common + @("source-only-mod-removed", "removed-recipe-target-sanitized") }
+    "affected-planet-discovery" { $common + @("affected-locked-location-reproduced", "planet-discovery-research-retained", "researched-space-location-restored") }
   }
 } elseif ($isLegacyFactorio) {
   @(

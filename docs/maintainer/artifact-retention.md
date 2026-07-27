@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-07-27
 supersedes: []
 superseded_by: []
 ---
@@ -56,7 +56,7 @@ Cleanup is dry-run-first unless `--apply` is present. It considers only immediat
 
 ## Run Finalization
 
-When a run finishes, retain its compact summary, failure packet, or authority-bound evidence in the governed destination, verify that the retained record identifies the exact source, candidate, verifier, and target where applicable, then remove the bulky run directory. Do not retain copied Factorio installations, scenario mod directories, decompressed caches, duplicate candidate archives, or raw performance campaigns merely because they may be useful later.
+When a run finishes, retain its compact summary, failure packet, or authority-bound evidence in the governed destination, verify that the retained record identifies the exact source, candidate, verifier, and target where applicable, then remove the bulky run directory. Do not retain copied Factorio installations, scenario mod directories, decompressed caches, duplicate candidate archives, or raw performance campaigns merely because they may be useful later. `Invoke-MIRPerformanceQualification.ps1` enforces this by keeping raw performance directories on failure and removing them after compact evidence validates successfully; pass `-KeepArtifacts` only for a deliberate diagnostic investigation.
 
 The scenario runners already prefer NTFS hardlinks for local mod ZIPs when the source and staging directory share a volume. Windows and Explorer report each hardlink path in logical directory totals even though the file content occupies physical disk once, so logical artifact size can substantially exceed physical storage use. Keep `testmods_*` as the shared source library and remove stale staging links instead of deleting or duplicating the library.
 
