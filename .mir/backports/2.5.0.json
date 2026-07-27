@@ -22,7 +22,7 @@
     "first_parent_role": "factorio-2.0-lineage",
     "second_parent_role": "immutable-modern-release",
     "preintegration_tag": "archive/2.5-pre-3.2.2",
-    "preintegration_tag_state": "pending",
+    "preintegration_tag_state": "locked",
     "preintegration_commit": "b58c8995984e185a75176e6c818fe0b6f5b1f0af",
     "preintegration_tree": "7e58844e8e2970923b3795a2f37bb6b3613a2840",
     "target_package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
