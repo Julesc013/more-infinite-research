@@ -20,6 +20,18 @@ function Get-MIRAssurancePatternFingerprint {
   $script:MIRAssurancePatternFingerprintCache[$cacheKey] = $fingerprint
   return $fingerprint
 }
+
+function Resolve-MIRAssuranceApprovedDeltaPath {
+  param([Parameter(Mandatory)]$VerificationProfile)
+  $fromVersion = [string]$VerificationProfile.upgrade.from_version
+  $toVersion = [string]$VerificationProfile.upgrade.to_version
+  $versionPattern = '^[0-9]+\.[0-9]+\.[0-9]+$'
+  if ($fromVersion -notmatch $versionPattern -or $toVersion -notmatch $versionPattern) {
+    throw "Approved-delta transition versions must be exact semantic versions: '$fromVersion' -> '$toVersion'."
+  }
+  return "approved-delta/$fromVersion-to-$toVersion.json"
+}
+
 function Get-MIRAssuranceInputFingerprint {
   param(
     [Parameter(Mandatory)][string]$InputName,
@@ -56,6 +68,20 @@ function Get-MIRAssuranceInputFingerprint {
       }
     }
     "prior-release" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.prior_release -MissingLabel "prior-release" }
+    "approved-delta-transition" {
+      $relativePath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
+      $path = Join-Path $repo $relativePath
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Approved-delta transition artifact is absent: $relativePath"
+      }
+      return [ordered]@{
+        kind="approved-delta-transition"
+        from_version=[string]$Context.verification_profile.upgrade.from_version
+        to_version=[string]$Context.verification_profile.upgrade.to_version
+        path=$relativePath
+        sha256=(Get-MIRAssuranceSha256 -Path $path)
+      }
+    }
     "package-source" {
       $files = @(Get-MIRAssurancePackageFiles)
       return [ordered]@{ kind="package-source"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }

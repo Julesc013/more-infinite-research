@@ -480,6 +480,14 @@ docs:
       - canonical-recipe-risk-and-provider-decisions
       - technology-candidate-promotion-lifecycle
       - trusted-immutable-compiler-records
+  - path: docs/architecture/3.3-2.6-semantic-platform-roadmap.md
+    title: "MIR 3.3 And 2.6 Semantic Platform Roadmap"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.3-2.6-semantic-platform-roadmap
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

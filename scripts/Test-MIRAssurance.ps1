@@ -122,6 +122,13 @@ foreach ($required in @(
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
+$approvedDeltaTest = @($catalog.tests | Where-Object { [string]$_.id -eq "release.approved-delta" })
+if ($approvedDeltaTest.Count -ne 1 -or
+    @($approvedDeltaTest[0].inputs) -notcontains "approved-delta-transition" -or
+    @($approvedDeltaTest[0].inputs | Where-Object { [string]$_ -match '^approved-delta/[0-9]' }).Count -ne 0) {
+  throw "release.approved-delta must fingerprint the dynamically resolved release transition, not a version-specific path."
+}
+
 $portableMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "static.museum" })
 $exactMuseumTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.museum-exact" })
 if ($portableMuseumTest.Count -ne 1 -or

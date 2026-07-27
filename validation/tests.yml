@@ -234,7 +234,7 @@
       "requires_factorio": false,
       "inputs": [
         "candidate",
-        "approved-delta/<upgrade-from>-to-<upgrade-to>.json",
+        "approved-delta-transition",
         "scripts/Test-MIRApprovedDelta.ps1",
         "scripts/Export-MIRApprovedDelta.ps1",
         "scripts/validation/PackageIdentity.ps1"

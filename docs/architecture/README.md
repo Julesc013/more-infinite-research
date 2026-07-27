@@ -15,6 +15,8 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 Use the [current compiler architecture matrix](current-architecture-matrix.md) for the active fact, decision, lifecycle, graph, emission, and evidence authorities. Historical checkpoint reports do not override that matrix.
 
+Use the [MIR 3.3 and 2.6 semantic platform roadmap](3.3-2.6-semantic-platform-roadmap.md) for future control-plane, compiler, target-projection, repository, test, and ecosystem work. That roadmap begins only after MIR 3.2.2 and MIR 2.5.0 are frozen; it does not alter the C24 or P9 package boundary.
+
 ## Data Stage Flow
 
 `data.lua` loads only stable shared configuration and utility facades.

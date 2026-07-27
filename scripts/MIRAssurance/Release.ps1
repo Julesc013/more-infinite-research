@@ -558,6 +558,35 @@ function Invoke-MIRAssuranceSelfTest {
     $changed[$field] = "b"
     if ((Get-MIRAssuranceJsonHash -Value $changed) -eq $base) { throw "Evidence invalidation self-test failed for $field." }
   }
+  $approvedDeltaC21Profile = [pscustomobject]@{
+    upgrade=[pscustomobject]@{from_version="3.2.0"; to_version="3.2.1"}
+  }
+  $approvedDeltaC24Profile = [pscustomobject]@{
+    upgrade=[pscustomobject]@{from_version="3.2.1"; to_version="3.2.2"}
+  }
+  $approvedDeltaC21Path = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $approvedDeltaC21Profile
+  $approvedDeltaC24Path = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $approvedDeltaC24Profile
+  if ($approvedDeltaC21Path -ne "approved-delta/3.2.0-to-3.2.1.json" -or
+      $approvedDeltaC24Path -ne "approved-delta/3.2.1-to-3.2.2.json") {
+    throw "Approved-delta transition resolver did not select the exact release-transition artifact."
+  }
+  $approvedDeltaC21Hash = Get-MIRAssuranceSha256 -Path (Join-Path $repo $approvedDeltaC21Path)
+  $approvedDeltaC24Hash = Get-MIRAssuranceSha256 -Path (Join-Path $repo $approvedDeltaC24Path)
+  if ($approvedDeltaC21Hash -eq $approvedDeltaC24Hash) {
+    throw "Approved-delta transition change did not invalidate the effective input fingerprint."
+  }
+  $unsafeApprovedDeltaRejected = $false
+  try {
+    $null = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile ([pscustomobject]@{
+      upgrade=[pscustomobject]@{from_version="../3.2.1"; to_version="3.2.2"}
+    })
+  } catch {
+    $unsafeApprovedDeltaRejected = $true
+  }
+  if (-not $unsafeApprovedDeltaRejected) {
+    throw "Approved-delta transition resolver accepted an unsafe version value."
+  }
+
   $dependencyA = Get-MIRAssuranceDependencyContract -Info ([pscustomobject]@{
     name="more-infinite-research"; version="3.1.9"; factorio_version="2.1"; dependencies=@("base >= 2.1.8")
   })
