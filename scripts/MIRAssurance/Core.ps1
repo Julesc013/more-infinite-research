@@ -324,6 +324,12 @@ function Resolve-MIRAssurancePath {
   return Join-Path $repo $Path
 }
 
+function Get-MIRAssuranceCanonicalTrustPolicyPath {
+  $scriptsRoot = Split-Path -Parent $PSScriptRoot
+  $repositoryRoot = Split-Path -Parent $scriptsRoot
+  return Join-Path $repositoryRoot "validation\trust.json"
+}
+
 function Get-MIRAssuranceContext {
   $config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
@@ -338,7 +344,8 @@ function Get-MIRAssuranceContext {
     $defaultMods = "C:\Projects\Factorio\testmods_$target"
     if (Test-Path -LiteralPath $defaultMods -PathType Container) { $mods = $defaultMods }
   }
-  $trustPolicy = Get-Content -Raw -LiteralPath $trustPath | ConvertFrom-Json
+  $trustPolicyPath = Get-MIRAssuranceCanonicalTrustPolicyPath
+  $trustPolicy = Get-Content -Raw -LiteralPath $trustPolicyPath | ConvertFrom-Json
   if ([int]$trustPolicy.schema -ne 1) { throw "Verification trust policy schema must be 1." }
   $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   return [pscustomobject]@{
@@ -567,7 +574,7 @@ function Get-MIRAssurancePlan {
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
     verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
     domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
-    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path $trustPath)
+    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
     producer=(Get-MIRAssuranceProducer)
   }
   Write-MIRAssuranceTiming -Label "plan-inputs" -Stopwatch $timing

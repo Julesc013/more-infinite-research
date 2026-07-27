@@ -349,7 +349,7 @@ function Get-MIRAssuranceProducer {
     runner_identity=if ($env:MIR_TRUSTED_RUNNER) { [string]$env:MIR_TRUSTED_RUNNER } else { "local" }
     trust_class=$trustClass
     verifier_sha256=(Get-MIRAssuranceRunnerHash)
-    policy_sha256=(Get-MIRAssuranceSha256 -Path $trustPath)
+    policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
   }
 }
 
@@ -407,7 +407,7 @@ function Test-MIRAssuranceTrustedProducer {
   if ($repository -ne $current -and -not ($repository -eq "local" -and $current -eq "local")) { return $false }
   if ([string]$Producer.trust_class -ne [string]$Context.trust_class) { return $false }
   if ([string]$Producer.verifier_sha256 -ne (Get-MIRAssuranceRunnerHash)) { return $false }
-  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path $trustPath)) { return $false }
+  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
   return $true
 }
 
@@ -435,7 +435,7 @@ function Test-MIRAssuranceReleaseProducer {
     if ([string]$Producer.commit -ne $ExpectedCommit) { return $false }
   } elseif ([string]$Producer.commit -ne $ExpectedCommit) { return $false }
   if ([string]$Producer.verifier_sha256 -ne (Get-MIRAssuranceRunnerHash)) { return $false }
-  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path $trustPath)) { return $false }
+  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
   return $true
 }
 
