@@ -1,12 +1,12 @@
 # M.I.R. TODO
 
-Updated: 2026-07-26
+Updated: 2026-07-27
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
 ## Current Truth
 
-- MIR 3.2.0 is the immutable Factorio 2.1 release; MIR 2.4.9 remains the immutable Factorio 2.0 companion until 2.5.0 qualifies.
+- MIR 3.2.1 is the tagged and Mod Portal-published Factorio 2.1 baseline; its already-running protected qualification remains to be reconciled without changing the tagged package. MIR 2.4.9 remains the immutable published Factorio 2.0 baseline until 2.5.0 qualifies.
 - MIR 1.9.4 and 1.8.2 are the immutable Factorio 1.1 and 1.0 releases.
 - MIR 1.7.1 through 1.3.0 are published reduced or finite target projections for Factorio 0.17 through 0.13.
 - MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
@@ -106,7 +106,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Record that the longer exact-C20 validation campaign was not completed before maintainer-directed publication; do not relabel earlier candidate evidence as exact C20 evidence.
 - [x] Tag exact C20 as `3.2.0`, publish the recorded ZIP without rebuilding, and verify the GitHub asset digest against the canonical archive SHA-256.
 - [x] Create exact C21 by resolving `unlock-space-location` across concrete planet prototypes and preserve its deterministic emergency archive.
-- [ ] Complete exact C21 protected qualification and sealing in run 30229114461, promote the unchanged archive to `main`, and tag `3.2.1` (local no-reuse qualification is 129/129 passed).
+- [ ] Complete and reconcile exact C21 protected qualification and sealing in run 30229114461, then import the unchanged archive's protected evidence to `main`; tag `3.2.1` already identifies the exact locally qualified package and must not be moved.
 - [ ] Fully qualify, seal, promote, and tag exact C24 as MIR 3.2.2 after exact Py and dual-source planet-recovery evidence passes; then return `dev` to the MIR 3.2.5 campaign.
 - [ ] Run all candidate-bound automated work required by any later package candidate before its release.
 - [ ] Complete exact-candidate manual and public-presentation review for any later package candidate before its release unless a new maintainer decision explicitly records otherwise.
@@ -116,6 +116,25 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.
 - [ ] Preserve 3.1.9 behavior and stable identities unless a new release plan explicitly authorizes a change.
+
+## MIR 3.3 And 2.6 Platform Backlog
+
+The canonical future architecture and phased acceptance criteria are in docs/architecture/3.3-2.6-semantic-platform-roadmap.md. None of these items may change C24 or P9 package bytes.
+
+- [ ] Freeze exact 3.2.2 and 2.5.0 semantic exports, package trees, observations, performance counters, and evidence volumes as the differential baseline.
+- [ ] Establish canonical FeatureSpec and SettingSpec authorities that generate or validate identities, settings, locale, docs, targets, migrations, test obligations, and backport dispositions.
+- [ ] Split the broad provider interface into composable fact, discovery, normalization, policy, quality, presentation, runtime, migration, diagnostic, and fixture protocols.
+- [ ] Introduce typed policy fragments, field-specific conflict algebra, immutable decision traces, and orthogonal compatibility maturity, scope, and behavior claims.
+- [ ] Route every MIR prototype mutation through governed normalization or technology transformation plans with exact operation IDs, before/after fingerprints, journals, and postconditions.
+- [ ] Replace manual runtime routing with versioned runtime feature specifications, state schemas, lifecycle subscriptions, target requirements, and migrations.
+- [ ] Split compilation_plan.lua, require explicit pure compiler inputs, introduce typed context keys, add validation-only mutation sentinels, and remove forbidden dependency cycles.
+- [ ] Add RecipeFactV3, a bipartite process graph, deterministic process-role classification, and explicit net-flow proofs for complex chemistry, biology, recovery, recycling, catalyst, matter, and correlated-output families.
+- [ ] Modularize the PowerShell control plane behind stable ABIs before extracting the typed cross-platform mirctl kernel and thin platform launchers.
+- [ ] Replace nested suites with an atomic task DAG, reusable observations plus independent evaluations, generated and mutation-tested semantic impact, exact cache explanations, failure-directed reruns, and resource-aware scheduling.
+- [ ] Replace copied release views with immutable per-release and release-transition records, a release state machine, generated documentation, and machine-readable changesets.
+- [ ] Make 2.6.x an executable deterministic projection of immutable 3.3.x source plus the Factorio 2.0 profile and adapters; retain the target-first/source-second merge only as provenance.
+- [ ] Move future raw archives, logs, saves, complete historical source trees, and large evidence bundles out of active Git while retaining compact identities and immutable asset receipts.
+- [ ] Qualify ecosystems in evidence-driven order and promote only reviewed attachments, exact owners, bounded machine/lab families, and exact material families before specialized complex processes.
 
 ## Recurring Gate
 
