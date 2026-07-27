@@ -29,9 +29,9 @@ superseded_by: []
 | Archive entries | `291` |
 | Archive SHA-256 | `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8` |
 | Package content SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
-| Qualification | `focused-hotfix-validation-passed-full-validation-pending` |
+| Qualification | `focused-hotfix-and-exact-py-validation-passed-full-validation-pending` |
 | Publication | `unreleased` |
-| Status | `c24-focused-passed-full-validation-pending` |
+| Status | `c24-focused-and-exact-py-passed-full-validation-pending` |
 
 ## Superseded candidate
 

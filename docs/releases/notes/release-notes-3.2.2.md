@@ -54,6 +54,7 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - Exact C21-to-C24 package delta: one added runtime repair module and three changed packaged files; no removals.
 - Exact ZIP Base and Space Age loads: passed in focused validation.
 - Synthetic late Py reconstruction and exact sibling-order sanitation: passed.
+- Focused scripted-runtime disable/restoration configuration-change scenario: passed on exact C24 and Factorio 2.1.12.
 - Direct six-row 3.2.1-to-3.2.2 upgrade matrix: passed for Base, Space Age native owners, automatic families, base continuations, mod-set changes, and affected planet discovery.
 - Exact paired 3.2.1-to-3.2.2 performance campaign: passed all ten total-load and compiler-phase lanes without changing the governed budgets.
 - Exact 15-mod Py 3.1 trigger closure: passed on Factorio 2.1.12 with `casting-gear` and its dangling unlock absent, all valid effects retained, and zero unexpected sanitation.
