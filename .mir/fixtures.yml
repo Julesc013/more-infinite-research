@@ -195,6 +195,21 @@ fixtures:
       - external-dangling-unlock-recipe-effect-pruned
       - external-valid-unlock-recipe-effect-retained
 
+  py-postprocessing-stale-unlock:
+    requires_features: [recipe_productivity]
+    path: fixtures/pypostprocessing-stale-unlock
+    assertion_path: fixtures/assert-py-postprocessing-stale-unlock
+    external_mod_identity: pypostprocessing
+    exact_real_campaign: py-casting-finalizer-repair
+    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    validates:
+      - pypostprocessing-final-fixes-runs-before-mir
+      - late-casting-mk02-stale-unlock-reconstruction
+      - missing-casting-gear-unlock-pruned
+      - valid-casting-mk02-siblings-retained-in-order
+      - exact-single-reviewed-external-sanitation-row
+      - zero-additional-unreviewed-prunes
+      - final-unlock-recipe-target-integrity
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal

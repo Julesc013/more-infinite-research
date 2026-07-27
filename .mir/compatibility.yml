@@ -59,7 +59,20 @@ mod_interactions:
   support_capsules: .mir/compatibility-capsules.json
   generated_graph: .mir/mod-interaction-graph.json
   narrow_delta_policies: .mir/interaction-delta-policies.json
-  campaigns: .mir/combination-campaigns.json
+    - id: pyanodons-finalized-technology-tree
+    mod: pypostprocessing
+    dependency: "(?) pypostprocessing"
+    reason: Pyanodons Post-processing rebuilds technology unlocks during data-final-fixes, so MIR must sanitize the finalized Py technology tree
+    fixture: fixtures/pypostprocessing-stale-unlock
+    assertion_fixture: fixtures/assert-py-postprocessing-stale-unlock
+    exact_real_campaign: py-casting-finalizer-repair
+    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    reproduced_technology: casting-mk02
+    reproduced_missing_recipe: casting-gear
+    integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
+    claim_level: diagnostic-only
+    public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
+campaigns: .mir/combination-campaigns.json
   generator: scripts/New-MIRModInteractionGraph.ps1
   validator: scripts/Test-MIRModInteractions.ps1
   rules:
@@ -91,6 +104,19 @@ load_order_requirements:
     claim_level: diagnostic-only
     public_scope: startup integrity only; no broad Space Exploration support claim
 
+  - id: pyanodons-finalized-technology-tree
+    mod: pypostprocessing
+    dependency: "(?) pypostprocessing"
+    reason: Pyanodons Post-processing rebuilds technology unlocks during data-final-fixes, so MIR must sanitize the finalized Py technology tree
+    fixture: fixtures/pypostprocessing-stale-unlock
+    assertion_fixture: fixtures/assert-py-postprocessing-stale-unlock
+    exact_real_campaign: py-casting-finalizer-repair
+    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    reproduced_technology: casting-mk02
+    reproduced_missing_recipe: casting-gear
+    integrity_contract: exact-single-reviewed-external-sanitation-row-and-retained-sibling-order
+    claim_level: diagnostic-only
+    public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1
   sanitation_budget:

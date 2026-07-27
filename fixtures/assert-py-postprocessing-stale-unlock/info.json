@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-py-postprocessing-stale-unlock",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Py Postprocessing Stale Unlock",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "pypostprocessing = 0.0.0",
+    "more-infinite-research >= 2.5.0"
+  ]
+}

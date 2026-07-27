@@ -3858,6 +3858,10 @@ Invoke-RuntimeScenario -ScenarioName "external-technology-cycle" -EnabledFixture
   "mir-fixture-external-technology-cycle"
 )
 
+Invoke-RuntimeScenario -ScenarioName "py-postprocessing-stale-unlock" -EnabledFixtureNames @(
+  "pypostprocessing",
+  "mir-fixture-assert-py-postprocessing-stale-unlock"
+)
 Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixtureNames @(
   "mir-fixture-rigor-late-recipe-removal"
 )
