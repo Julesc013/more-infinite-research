@@ -612,6 +612,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
     $externalIdentityFixtures = @{
       "better-robots-extended-competitor" = "Better_Robots_Extended"
+      "pypostprocessing-stale-unlock" = "pypostprocessing"
       "space-exploration-recipe-removal" = "space-exploration"
     }
     $allowedExternalIdentity = $externalIdentityFixtures.ContainsKey($fixture.Name) -and
