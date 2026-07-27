@@ -6,7 +6,7 @@ param(
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
-  [ValidateSet("", "base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")]
+  [ValidateSet("", "base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change", "affected-planet-discovery")]
   [string]$Archetype = "",
   [string[]]$SourceOnlyFixtureNames = @(),
   [string]$OutputPath = ""
@@ -113,7 +113,7 @@ $config = Join-Path $root "config.ini"
 ) | Set-Content -LiteralPath $config -Encoding UTF8
 
 $enableDlc = -not $isLegacyFactorio
-if ($Archetype) { $enableDlc = $Archetype -eq "space-age-native-owner" }
+if ($Archetype) { $enableDlc = $Archetype -in @("space-age-native-owner", "affected-planet-discovery") }
 $sourceOnlyModNames = @()
 foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
   $sourceFixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$sourceFixtureName")

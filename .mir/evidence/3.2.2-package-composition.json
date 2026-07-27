@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "generated_at_utc": "2026-07-27T01:02:49Z",
+  "archive": {
+    "path": "C:\\tmp\\mir-322-prep\\dist\\more-infinite-research_3.2.2.zip",
+    "bytes": 1030828,
+    "sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
+    "entry_count": 291
+  },
+  "roots": [
+    {
+      "root": "assets",
+      "entry_count": 1,
+      "uncompressed_bytes": 90975,
+      "compressed_bytes": 90958
+    },
+    {
+      "root": "locale",
+      "entry_count": 50,
+      "uncompressed_bytes": 2809983,
+      "compressed_bytes": 569259
+    },
+    {
+      "root": "migrations",
+      "entry_count": 2,
+      "uncompressed_bytes": 267,
+      "compressed_bytes": 186
+    },
+    {
+      "root": "prototypes/compiler",
+      "entry_count": 224,
+      "uncompressed_bytes": 1077498,
+      "compressed_bytes": 252989
+    },
+    {
+      "root": "runtime",
+      "entry_count": 10,
+      "uncompressed_bytes": 24845,
+      "compressed_bytes": 7186
+    },
+    {
+      "root": "shell-documentation",
+      "entry_count": 4,
+      "uncompressed_bytes": 164787,
+      "compressed_bytes": 45848
+    }
+  ],
+  "top_entries": [
+    {
+      "path": "thumbnail.png",
+      "category": "assets",
+      "uncompressed_bytes": 90975,
+      "compressed_bytes": 90958
+    },
+    {
+      "path": "README.md",
+      "category": "shell-documentation",
+      "uncompressed_bytes": 74244,
+      "compressed_bytes": 22070
+    },
+    {
+      "path": "changelog.txt",
+      "category": "shell-documentation",
+      "uncompressed_bytes": 73253,
+      "compressed_bytes": 18163
+    },
+    {
+      "path": "locale/sr/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 75905,
+      "compressed_bytes": 13534
+    },
+    {
+      "path": "locale/ru/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 78406,
+      "compressed_bytes": 13509
+    },
+    {
+      "path": "locale/el/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 78130,
+      "compressed_bytes": 13504
+    },
+    {
+      "path": "locale/be/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 73931,
+      "compressed_bytes": 13041
+    },
+    {
+      "path": "locale/uk/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 73104,
+      "compressed_bytes": 12994
+    },
+    {
+      "path": "locale/ka/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 98698,
+      "compressed_bytes": 12958
+    },
+    {
+      "path": "locale/bg/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 77465,
+      "compressed_bytes": 12842
+    },
+    {
+      "path": "locale/th/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 92388,
+      "compressed_bytes": 12591
+    },
+    {
+      "path": "locale/kk/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 71702,
+      "compressed_bytes": 12276
+    },
+    {
+      "path": "locale/ja/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 56808,
+      "compressed_bytes": 12201
+    },
+    {
+      "path": "locale/fa/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 64976,
+      "compressed_bytes": 12040
+    },
+    {
+      "path": "locale/ar/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 63562,
+      "compressed_bytes": 11886
+    },
+    {
+      "path": "locale/hu/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 53514,
+      "compressed_bytes": 11781
+    },
+    {
+      "path": "locale/de/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 53226,
+      "compressed_bytes": 11759
+    },
+    {
+      "path": "locale/sk/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 50055,
+      "compressed_bytes": 11722
+    },
+    {
+      "path": "locale/cs/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 50240,
+      "compressed_bytes": 11589
+    },
+    {
+      "path": "locale/pl/more-infinite-research.cfg",
+      "category": "locale",
+      "uncompressed_bytes": 51441,
+      "compressed_bytes": 11538
+    }
+  ],
+  "delta": {
+    "baseline": {
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\more-infinite-research_3.2.1.zip",
+      "bytes": 1029716,
+      "sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+      "entry_count": 290
+    },
+    "added": [
+      "prototypes/mir/runtime/planet_discovery_recovery.lua"
+    ],
+    "removed": null,
+    "changed": [
+      {
+        "path": "changelog.txt",
+        "uncompressed_byte_delta": 513,
+        "compressed_byte_delta": 136
+      },
+      {
+        "path": "info.json",
+        "uncompressed_byte_delta": 28,
+        "compressed_byte_delta": 14
+      },
+      {
+        "path": "prototypes/mir/runtime/scripted_techs.lua",
+        "uncompressed_byte_delta": 123,
+        "compressed_byte_delta": 24
+      }
+    ],
+    "compressed_byte_delta": 1112
+  },
+  "review": {
+    "required": false,
+    "reviewed": true,
+    "explanation": "C22 intentionally adds one small version-gated runtime module for researched planet-discovery recovery and updates info.json/changelog.txt for the Py finalizer ordering hotfix; no repository-only roots are packaged.",
+    "triggers": [
+      {
+        "kind": "total-growth",
+        "actual_percent": 0.108,
+        "threshold_percent": 0.0
+      },
+      {
+        "kind": "root-growth",
+        "root": "runtime",
+        "actual_percent": 11.204,
+        "threshold_percent": 0.0
+      },
+      {
+        "kind": "root-growth",
+        "root": "shell-documentation",
+        "actual_percent": 0.328,
+        "threshold_percent": 0.0
+      }
+    ]
+  }
+}

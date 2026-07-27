@@ -23,6 +23,10 @@ $cases = @(
   [ordered]@{ id = "mod-set-configuration-change"; source_only = @("upgrade-modset-source") }
 )
 
+if ($FixtureName -eq "assert-upgrade-3-2-1-to-3-2-2") {
+  $cases += [ordered]@{ id = "affected-planet-discovery"; source_only = @() }
+}
+
 $rows = @()
 foreach ($case in $cases) {
   $rowOutput = Join-Path $outputParent "$ToVersion-upgrade-$($case.id).json"

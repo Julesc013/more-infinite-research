@@ -193,6 +193,22 @@ fixtures:
       - external-dangling-unlock-recipe-effect-pruned
       - external-valid-unlock-recipe-effect-retained
 
+  py-postprocessing-stale-unlock:
+    requires_features: [recipe_productivity]
+    path: fixtures/pypostprocessing-stale-unlock
+    assertion_path: fixtures/assert-py-postprocessing-stale-unlock
+    external_mod_identity: pypostprocessing
+    exact_real_campaign: py-casting-finalizer-repair
+    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    validates:
+      - pypostprocessing-final-fixes-runs-before-mir
+      - late-casting-mk02-stale-unlock-reconstruction
+      - missing-casting-gear-unlock-pruned
+      - valid-casting-mk02-siblings-retained-in-order
+      - exact-single-reviewed-external-sanitation-row
+      - zero-additional-unreviewed-prunes
+      - final-unlock-recipe-target-integrity
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
@@ -471,6 +487,38 @@ fixtures:
       - independent-result-row-per-upgrade-archetype
       - exact-3-2-1-candidate-normal-mod-directory-load
 
+  upgrade-3-2-1-to-3-2-2:
+    requires_features: [recipe_productivity, scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-2-1-to-3-2-2
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.1"
+    additional_recovery_source_versions: ["3.2.0"]
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+      - affected-planet-discovery
+    validates:
+      - exact-3-2-1-source-archive-for-3-2-2
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - researched-planet-discovery-restoration
+      - direct-3-2-0-affected-save-planet-restoration
+      - direct-3-2-1-affected-save-planet-restoration
+      - affected-save-starmap-and-travel-recovery
+      - no-force-wide-technology-effect-reset
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-2-candidate-normal-mod-directory-load
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

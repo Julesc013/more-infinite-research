@@ -378,6 +378,34 @@
       "notes": "pY modpack entry point; expected to surface dependency and overhaul policy issues."
     },
     {
+      "name": "py-casting-finalizer-repair",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-exact-archives",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "pypetroleumhandling",
+        "pypostprocessing",
+        "pyrawores"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "diagnostic-only",
+      "notes": "Exact reduced Py 2.1 closure for issue #35: pypostprocessing finalizes before MIR, casting-gear is absent, casting-mk02 retains only valid unlocks, and sanitation matches the reviewed one-row budget."
+    },
+    {
       "name": "nullius",
       "targets": [
         "2.0",

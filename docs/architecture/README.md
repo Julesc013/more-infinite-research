@@ -71,6 +71,7 @@ Current control files:
 - `control.lua`: loads the runtime registration stage.
 - `prototypes/mir/runtime/scripted_techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
 - `prototypes/mir/runtime/settings_profile.lua`: exports current effective MIR startup settings to a profile string, validates pasted profile strings, and exposes a small remote interface for tools. It does not mutate startup settings at runtime.
+- `prototypes/mir/runtime/planet_discovery_recovery.lua`: performs the version-gated 3.2.2 repair for valid researched space locations left locked by 3.2.0 or 3.2.1; it never resets force-wide technology effects.
 - `prototypes/mir/runtime/effects/spoilage_preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `prototypes/mir/runtime/effects/agricultural_growth_speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 

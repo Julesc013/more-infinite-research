@@ -3866,6 +3866,11 @@ Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixture
   "mir-fixture-rigor-late-recipe-removal"
 )
 
+Invoke-RuntimeScenario -ScenarioName "py-postprocessing-stale-unlock" -EnabledFixtureNames @(
+  "pypostprocessing",
+  "mir-fixture-assert-py-postprocessing-stale-unlock"
+)
+
 Invoke-RuntimeScenario -ScenarioName "space-exploration-recipe-removal" -EnabledFixtureNames @(
   "space-exploration",
   "mir-fixture-assert-final-recipe-effect-integrity"
