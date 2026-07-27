@@ -411,14 +411,15 @@ release_artifacts:
       automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
       focused_runtime_evidence: .mir/evidence/2.5.0-exact-zip-loads.json
       upgrade_evidence: .mir/evidence/2.5.0-upgrade-proof.json
+      exact_py_evidence: .mir/evidence/2.5.0-py-exact.json
       runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
       approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
-      automated_gate: focused-static-exact-zip-upgrade-approved-delta-performance-passed-exact-py-and-full-pending
+      automated_gate: focused-static-exact-zip-upgrade-approved-delta-performance-and-py-passed-full-pending
       release_gate: full-automated-manual-and-protected-pending-exact-p9
       manual_review: pending-exact-p9
       protected_qualification: pending-exact-p9
       publication_status: unreleased
-      status: automated-playtest-candidate-c24-projection-focused-runtime-and-release-evidence-passed-exact-py-full-manual-protected-pending
+      status: automated-playtest-candidate-c24-projection-focused-runtime-release-and-py-evidence-passed-full-manual-protected-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

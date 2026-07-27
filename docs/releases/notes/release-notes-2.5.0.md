@@ -38,4 +38,4 @@ superseded_by: []
 
 ## Release status
 
-P9 is an unreleased candidate. Exact Base and official Space Age ZIP loads, the direct 2.4.9 upgrade matrix, the 319-row approved delta, and all six paired performance lanes pass. Exact Py 2.0 runtime, full no-reuse, manual, protected, seal, and promotion gates remain pending.
+P9 is an unreleased candidate. Exact Base and official Space Age ZIP loads, the direct 2.4.9 upgrade matrix, the 319-row approved delta, all six paired performance lanes, and the exact 11-mod Py 2.0 integrity campaign pass. Full no-reuse, manual, protected, seal, and promotion gates remain pending.

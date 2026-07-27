@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-27T15:24:01.917475Z",
+  "factorio_line": "2.0",
+  "factorio_binary": {
+    "name": "factorio.exe",
+    "version": "2.0.77.84539",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "mir_archive": {
+    "path": "more-infinite-research_2.5.0.zip",
+    "sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "source_commit": "a2568f37073a9cdd70e548dcf58e38cf6c8feb53",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "2.5.0-py-exact-lock.json",
+    "sha256": "1BF513CED2C37A9EA815687E1F2FFC7DFA749BCE51A29886C676EA9528FE441B"
+  },
+  "sanitation_budget": {
+    "policy": "mir-ecosystem-sanitation-budget-v1",
+    "path": ".mir/sanitation-budgets.json",
+    "sha256": "B1F4BB87F0FA6E90BC450170175A06FBF720A41E3703611012103D365358A1BC"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "py-casting-finalizer-repair",
+      "requested_roots": [
+        "pypetroleumhandling",
+        "pypostprocessing",
+        "pyrawores"
+      ],
+      "actual_executed_roots": [
+        "pypetroleumhandling",
+        "pypostprocessing",
+        "pyrawores"
+      ],
+      "resolved_mods": [
+        "pycoalprocessing",
+        "pycoalprocessinggraphics",
+        "pyfusionenergy",
+        "pyfusionenergygraphics",
+        "pyindustry",
+        "pyindustrygraphics",
+        "pypetroleumhandling",
+        "pypetroleumhandlinggraphics",
+        "pypostprocessing",
+        "pyrawores",
+        "pyraworesgraphics"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "pycoalprocessing",
+          "version": "3.0.44",
+          "sha256": "e9e8c3b6385832a7b15ba4de1eb37d0dcfab42be490be88b6156463aa59ea9b2",
+          "source": "local_zip"
+        },
+        {
+          "name": "pycoalprocessinggraphics",
+          "version": "3.0.9",
+          "sha256": "b154858eb935e21ca254e2c719d808d562eed15ccdad2e2b905460018847671e",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyfusionenergy",
+          "version": "3.0.17",
+          "sha256": "0826fb05b90ca759739d5e6452493855a410af8a33f3a9ddf40e7d2a1fe546d3",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyfusionenergygraphics",
+          "version": "3.0.4",
+          "sha256": "56cb48d5458717ccd145ee1ff7d6b255a9fee9714d400d8aa6b6b839c24a25b3",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyindustry",
+          "version": "3.0.21",
+          "sha256": "c9ea8e877a1906ff8bf2ba1ebce8b8e8b2962f10c9f4802b11eec1fa95d0db59",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyindustrygraphics",
+          "version": "3.0.3",
+          "sha256": "cd009909069db19b75754fb55cc22c95fcb273aadf375b8695946a918b494c5d",
+          "source": "local_zip"
+        },
+        {
+          "name": "pypetroleumhandling",
+          "version": "3.0.23",
+          "sha256": "c20b03a9eee9a67355de860d66ff4c6a673fbeceb3331fd18b7d1b8b2a847abd",
+          "source": "local_zip"
+        },
+        {
+          "name": "pypetroleumhandlinggraphics",
+          "version": "3.0.5",
+          "sha256": "8049cd729f8319024d77d1a02b30d04aec8044d35a6010e35a75bb0fd8c96222",
+          "source": "local_zip"
+        },
+        {
+          "name": "pypostprocessing",
+          "version": "3.0.42",
+          "sha256": "d5af3599eb16247e669ccb029ccf710a238afaca615e90afbd73475fee73e252",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyrawores",
+          "version": "3.0.25",
+          "sha256": "edb00f09f3fb24fe2166e5a7676e589c53b97b3aa7c7489c5985a3dcc8df7637",
+          "source": "local_zip"
+        },
+        {
+          "name": "pyraworesgraphics",
+          "version": "3.0.4",
+          "sha256": "1715c790d6797e9354821726e9fb34e7589e885506c74cbd224a0626a810d79a",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 28.18682,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "sanitation_budget": {
+        "scope": "campaigns",
+        "key": "py-casting-finalizer-repair",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "fixtures/compat-matrix/manual-scenarios.json",
+      "claim_level": "diagnostic-only"
+    }
+  ]
+}

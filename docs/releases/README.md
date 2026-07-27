@@ -18,7 +18,7 @@ MIR 3.2.1 is the tagged Factorio 2.1 patch baseline. MIR 3.2.2 C24 is the active
 
 MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
-MIR 2.5.0 `2.5-P9` is the provisional Factorio 2.0 semantic projection of final C24. It retains the published 2.4.9 target capabilities, the concrete planet resolver, and the Py finalizer-ordering correction while excluding the 3.2-only affected-save repair. Focused static and synthetic gates, exact Base and official Space Age ZIP loads, direct 2.4.9 upgrades, the approved delta, and paired performance pass; exact Py 2.0 runtime, full, manual, protected, sealing, promotion, tagging, and publication gates remain pending.
+MIR 2.5.0 `2.5-P9` is the provisional Factorio 2.0 semantic projection of final C24. It retains the published 2.4.9 target capabilities, the concrete planet resolver, and the Py finalizer-ordering correction while excluding the 3.2-only affected-save repair. Focused static and synthetic gates, exact Base and official Space Age ZIP loads, direct 2.4.9 upgrades, the approved delta, paired performance, and the exact Py 2.0 integrity campaign pass; full, manual, protected, sealing, promotion, tagging, and publication gates remain pending.
 
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)
