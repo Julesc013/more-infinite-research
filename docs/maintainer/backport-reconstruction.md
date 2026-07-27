@@ -16,7 +16,7 @@ MIR backports use an explicit dual-parent integration boundary. The first parent
 
 The canonical contract for MIR 2.5.0 is `.mir/backports/2.5.0.json`. It binds the immutable MIR 2.4.9 baseline, the exact MIR 3.2.2 package source and release tag, the preintegration Factorio 2.0 checkpoint, every adapted package path, the target capability profile, and the exact expected candidate identities.
 
-Before integration, create and publish the manifest's annotated `archive/2.5-pre-3.2.2-q2` tag at the locked preintegration commit. This tag retains the complete reviewed target projection history even if `tmp/2.0` is later deleted.
+Before integration, create and publish the manifest's annotated `archive/2.5-pre-3.2.2-q3` tag at the locked preintegration commit. This tag retains the complete reviewed target projection history even if `tmp/2.0` is later deleted.
 
 Validate the contract while the source and archive tags are still pending:
 
