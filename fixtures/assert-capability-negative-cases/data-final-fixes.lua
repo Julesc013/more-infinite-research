@@ -8,7 +8,6 @@ local denied_recipes = {
   ["mir-loader-like-container"] = true,
   ["mir-drill-like-container"] = true,
   ["mir-hidden-placeable-machine"] = true,
-  ["mir-parameter-placeable-machine"] = true,
   ["mir-productivity-disabled-machine"] = true,
   ["mir-zero-cap-placeable-machine"] = true,
   ["mir-recycling-placeable-machine"] = true,
@@ -34,7 +33,6 @@ local compiler_context = require("__more-infinite-research__.prototypes.mir.pipe
 
 local expected_hard = {
   ["mir-hidden-placeable-machine"] = "hidden_internal",
-  ["mir-parameter-placeable-machine"] = "parameter_recipe",
   ["mir-productivity-disabled-machine"] = "productivity_disabled",
   ["mir-zero-cap-placeable-machine"] = "zero_productivity_cap",
   ["mir-recycling-placeable-machine"] = "recycling_loop",

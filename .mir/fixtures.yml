@@ -613,6 +613,7 @@ fixtures:
       - canonical-recipe-risk-hard-flags
       - canonical-recipe-risk-review-flags
       - plausible-placeable-output-negative-cases
+      - factorio-2.0-invalid-parameter-recipe-omission
       - hard-risk-cannot-be-overridden
       - review-risk-requires-exact-pack-or-review
       - planner-risk-fingerprint-parity

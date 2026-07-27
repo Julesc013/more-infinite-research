@@ -137,7 +137,8 @@ local function add_placeable_risk(name, recipe_options, ingredients, results)
 end
 
 add_placeable_risk("mir-hidden-placeable-machine", {hidden = true})
-add_placeable_risk("mir-parameter-placeable-machine", {parameter = true})
+-- Factorio 2.0 rejects parameter recipes with concrete ingredients/results
+-- before MIR can observe them. The parameter risk case remains a 2.1 fixture.
 add_placeable_risk("mir-productivity-disabled-machine", {allow_productivity = false})
 add_placeable_risk("mir-zero-cap-placeable-machine", {maximum_productivity = 0})
 add_placeable_risk("mir-recycling-placeable-machine", {categories = {"recycling"}})
