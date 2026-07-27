@@ -183,6 +183,15 @@ Invoke-RepoCheck "backport source lock is current when present" {
   & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "canonical backport reconstruction manifests are complete" {
+  $manifestRoot = Join-Path $repo ".mir\backports"
+  if (Test-Path -LiteralPath $manifestRoot -PathType Container) {
+    foreach ($manifest in @(Get-ChildItem -LiteralPath $manifestRoot -Filter "*.json" -File | Sort-Object Name)) {
+      & (Join-Path $repo "scripts\Test-MIRBackportManifest.ps1") -RepoRoot $repo -ManifestPath $manifest.FullName -AllowPendingTags
+    }
+  }
+}
+
 Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
   & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
 }

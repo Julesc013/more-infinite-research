@@ -28,7 +28,9 @@ The locked modern-to-backport sequence is:
 → project and independently qualify 2.5.5 for Factorio 2.0
 ```
 
-The 2.5.0 branch starts from immutable 2.4.9 and ports final 3.2.2 semantics through explicit Factorio 2.0 capability adapters. It must not merge Factorio 2.1-only metadata or borrow Factorio 2.1 evidence. Portable 3.2.5 changes are classified when developed so 2.5.5 can consume a frozen, reviewed delta instead of reimplementing it later.
+The 2.5.0 branch starts from immutable 2.4.9 and ports final 3.2.2 semantics through explicit Factorio 2.0 capability adapters. Its final integration commit is an explicit two-parent merge: the first parent is the reviewed Factorio 2.0 lineage and the second parent is the immutable `3.2.2` tag. The merge result remains a target projection and must not import Factorio 2.1-only metadata or borrow Factorio 2.1 evidence. Portable 3.2.5 changes are classified when developed so 2.5.5 can consume a frozen, reviewed delta instead of reimplementing it later.
+
+The machine-readable reconstruction contract lives at `.mir/backports/2.5.0.json`; the complete procedure is [deterministic backport reconstruction](backport-reconstruction.md). The target preintegration checkpoint receives an immutable archive tag before the two-parent merge. This retains the complete 2.0 projection history and allows `tmp/2.0` to be deleted and reconstructed without making a moving branch unique source authority.
 
 MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
@@ -91,7 +93,7 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Frozen canonical Factorio `2.1` MIR `3.2.1` line; exact emergency `3.2.2` promotion only. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line for 3.2.5 compiler refinement and reviewed promotion. | `3.x.x` after `3.0.0` |
-| `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
+| `legacy` | Staged, unreleased MIR `2.5.0` branch; immutable public Factorio `2.0` baseline remains tag `2.4.9` until final qualification. | Published 2.4.x baseline plus staged 2.5.0 candidate. |
 | `tmp/2.0` | Factorio `2.0` worktree projecting final 3.2.2 semantics for 2.5.0, then frozen 3.2.5 portable deltas for 2.5.5. | Unreleased `2.5.0` from published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
@@ -109,7 +111,7 @@ Use these branch roles during the transition:
 | `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
 | `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
 
-`tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
+`tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line. Before sealing a backport, repeat its materialization from immutable tags in a disposable worktree and require the same integration tree and package identities.
 
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a Factorio `2.0` port can be validated while `dev` remains available for Factorio `2.1` fixes.
 

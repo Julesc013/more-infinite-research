@@ -1294,6 +1294,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - backporting-policy
+  - path: docs/maintainer/backport-reconstruction.md
+    title: "Deterministic Backport Reconstruction"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - dual-parent-backport-integration
+      - backport-reconstruction-contract
   - path: docs/maintainer/build-and-package.md
     title: "Build And Package"
     status: current

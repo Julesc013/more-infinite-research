@@ -28,7 +28,7 @@ branches:
       - validation
 
   legacy:
-    purpose: frozen Factorio 2.0 line at released MIR 2.4.9
+    purpose: staged unreleased MIR 2.5.0 candidate line; public Factorio 2.0 baseline remains immutable tag 2.4.9 until final qualification
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -42,7 +42,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    purpose: maintained Factorio 2.0 MIR 2.5.0 semantic companion and verification-overhaul backport branch
+    purpose: disposable Factorio 2.0 MIR 2.5.0 projection workspace; final integration uses target-first and immutable-3.2.2-second parent ancestry
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport

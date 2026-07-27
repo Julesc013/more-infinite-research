@@ -27,6 +27,8 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
+  .\scripts\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
   .\scripts\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
   .\scripts\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
   .\scripts\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
@@ -493,6 +495,34 @@ switch ($area) {
   "package" {
     if ($verb -ne "build") { throw "Unknown package command: $verb" }
     & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+  }
+  "backport" {
+    $manifest = Get-MIRArgValue -Items $Args -Name "--manifest" -Default ".mir/backports/2.5.0.json"
+    switch ($verb) {
+      "validate" {
+        $params = @{RepoRoot=$repo.Path; ManifestPath=$manifest}
+        if (Test-MIRArgSwitch -Items $Args -Name "--allow-pending-tags") { $params.AllowPendingTags = $true }
+        & (Join-Path $scriptRoot "Test-MIRBackportManifest.ps1") @params
+      }
+      "materialize" {
+        $worktree = Get-MIRArgValue -Items $Args -Name "--worktree"
+        if ([string]::IsNullOrWhiteSpace($worktree)) { throw "backport materialize requires --worktree." }
+        $params = @{RepoRoot=$repo.Path; ManifestPath=$manifest; Worktree=$worktree}
+        foreach ($binding in @(
+          @{Option="--source"; Parameter="Source"},
+          @{Option="--baseline"; Parameter="Baseline"},
+          @{Option="--target"; Parameter="Target"}
+        )) {
+          $value = Get-MIRArgValue -Items $Args -Name $binding.Option
+          if ($value) { $params[$binding.Parameter] = $value }
+        }
+        $receipt = Get-MIRArgValue -Items $Args -Name "--receipt"
+        if ($receipt) { $params.ReceiptPath = $receipt }
+        if (Test-MIRArgSwitch -Items $Args -Name "--keep-worktree") { $params.KeepWorktree = $true }
+        & (Join-Path $scriptRoot "Materialize-MIRBackport.ps1") @params
+      }
+      default { throw "Unknown backport command: $verb" }
+    }
   }
   "storage" {
     if ($verb -notin @("audit", "clean")) { throw "Unknown storage command: $verb" }

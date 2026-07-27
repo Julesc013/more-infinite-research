@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "target_release": "2.5.0",
+  "target_factorio": "2.0",
+  "baseline": {
+    "release": "2.4.9",
+    "tag": "2.4.9",
+    "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
+  },
+  "source": {
+    "release": "3.2.2",
+    "tag": "3.2.2",
+    "tag_state": "pending-final-qualification",
+    "tag_commit": "",
+    "candidate_id": "C24",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+    "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
+  },
+  "integration": {
+    "strategy": "dual-parent-target-projection-v1",
+    "first_parent_role": "factorio-2.0-lineage",
+    "second_parent_role": "immutable-modern-release",
+    "preintegration_tag": "archive/2.5-pre-3.2.2",
+    "preintegration_tag_state": "pending",
+    "preintegration_commit": "b58c8995984e185a75176e6c818fe0b6f5b1f0af",
+    "preintegration_tree": "7e58844e8e2970923b3795a2f37bb6b3613a2840",
+    "target_package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+    "target_profile": "2.0",
+    "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C"
+  },
+  "package_path_classification": [
+    {"path": "README.md", "class": "shared-with-target-adapter", "reason": "Factorio 2.0 player-facing capability projection"},
+    {"path": "changelog.txt", "class": "shared-with-target-adapter", "reason": "MIR 2.5.0 target-line release history"},
+    {"path": "info.json", "class": "shared-with-target-adapter", "reason": "MIR 2.5.0 and Factorio 2.0 package metadata"},
+    {"path": "prototypes/mir/platform/factorio/target_profiles.lua", "class": "shared-with-target-adapter", "reason": "Factorio 2.0 capability profile"},
+    {"path": "prototypes/mir/providers/pipeline/budget.lua", "class": "shared-with-target-adapter", "reason": "Factorio 2.0 target budget"},
+    {"path": "prototypes/mir/runtime/planet_discovery_recovery.lua", "class": "shared-with-target-adapter", "reason": "2.x upgrade boundary excludes 3.2.x-only recovery versions"},
+    {"path": "prototypes/mir/runtime/scripted_techs.lua", "class": "shared-with-target-adapter", "reason": "Factorio 2.0 runtime API projection"}
+  ],
+  "excluded_capabilities": [
+    "factorio-2.1-package-metadata",
+    "factorio-2.1-release-evidence",
+    "mod-data-publication",
+    "productivity-family-adoption",
+    "cargo-landing-pad-count",
+    "max-cargo-bay-unloading-distance"
+  ],
+  "expected_target": {
+    "candidate_id": "2.5-P9",
+    "integration_tree": "7e58844e8e2970923b3795a2f37bb6b3613a2840",
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "bytes": 1029914,
+    "entries": 290
+  }
+}
