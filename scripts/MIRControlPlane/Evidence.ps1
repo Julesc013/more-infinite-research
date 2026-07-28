@@ -221,6 +221,10 @@ function Resolve-MIRCPTaskEvidenceAction {
   if (@($class.modes_forcing_fresh | ForEach-Object { [string]$_ }) -contains $Mode) {
     return [pscustomobject][ordered]@{action="RUN"; reason="freshness class $($Task.freshness) forces $Mode"; object_digest=""; followup=""}
   }
+  $runtimeInputs = @($Task.effective_inputs | Where-Object { [string]$_ -in @("prior-release-archive", "factorio-installation", "mod-closure") })
+  if ($runtimeInputs.Count -gt 0) {
+    return [pscustomobject][ordered]@{action="RUN"; reason="worker-resolved runtime input(s) require execution: $($runtimeInputs -join ', ')"; object_digest=""; followup=""}
+  }
   if ([string]::IsNullOrWhiteSpace($EvidenceIndex) -or -not (Test-Path -LiteralPath $EvidenceIndex -PathType Leaf)) {
     return [pscustomobject][ordered]@{action="RUN"; reason="no rebuildable evidence index supplied"; object_digest=""; followup=""}
   }

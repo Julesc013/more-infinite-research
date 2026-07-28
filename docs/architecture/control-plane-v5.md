@@ -47,9 +47,11 @@ Task records declare prerequisites, semantic domains, effective inputs, outputs,
 
 Aggregate nodes read child results and never execute child commands. `static.full` remains a v4 shadow input during migration but is not an executing v5 task.
 
-The initial atomic catalog contains 22 executable nodes and one result-only aggregate. It separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, observation/evaluation replay, immutable context materialization, content-addressed evidence, package identity, package composition, deterministic construction, performance policy, and control-plane records. Commands are argument arrays rather than shell strings.
+The initial atomic catalog contains 25 executable nodes and one result-only aggregate. It separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, observation/evaluation replay, immutable context materialization, content-addressed evidence, execution, CI workflow, package identity, package composition, deterministic construction, performance policy and measurement, and control-plane records. Commands are argument arrays rather than shell strings.
 
 `scripts/Invoke-MIRControlPlane.ps1 plan` supports `changed`, `qualify-incremental`, `calibrate-fresh`, and `rerun-failure` modes. Every selected row includes its semantic impact reason, freshness class, resource class, prerequisites, and effective-input digest. Unknown paths select the complete graph and fail governance until ownership is added.
+
+An effective-input digest contains canonical content identities for every repository file matched by the TaskNode declaration, plus the governed candidate and package-source identities for virtual inputs. Runtime-only inputs such as a Factorio installation, prior archive, or mod closure are explicitly marked worker-resolved; they cannot silently masquerade as repository content.
 
 ## Observation and evaluation
 
@@ -78,6 +80,10 @@ Each context directory is named by a digest over ten exact members: plan, candid
 Evidence is stored by SHA-256 under `artifacts/evidence/objects/sha256/`. Indexes and leases are rebuildable coordination data. Revocation may target a producer ABI, evaluator ABI, canonicalization ABI, digest set, or time range without discarding unrelated observations.
 
 The evidence object's address is the SHA-256 of its canonical UTF-8 bytes. Rebuilding the index verifies filename/address parity, parses every object, applies `.mir/control-plane/evidence-revocations.json`, and can explicitly move malformed objects into quarantine. Exact unrevoked passing evidence yields `REUSE`; absent evidence yields `RUN`; stale, revoked, or invalid matches yield `INVALID` with a required `RUN` follow-up. Fresh calibration still forces `RUN`. Process and CI-job leases are mutable, expiring coordination only; a matching active lease is adopted and never counted as passing evidence.
+
+`.github/workflows/control-plane-v5.yml` is the executable CI DAG. One job builds the exact locked source archive and context. Static and package task sets then run independently in topological order, protected self-hosted workers capture one Factorio process per exact environment signature, and the paired runtime-performance campaign runs afterward under a target-scoped exclusive concurrency lock. Every worker uploads content-addressed objects. The sole final status, `MIR / verification-gate`, reconstructs the index and requires exact passing objects for every planned executable TaskNode and every Factorio-backed environment batch; job status alone is never accepted.
+
+Package workers receive both the immutable context and a checkout at the descriptor's exact source commit. Identity and composition compare source roots, content identity, archive bytes, and the complete entry set. Determinism builds that exact checkout twice and requires both outputs to be byte-identical to `context/candidate.zip`.
 
 ## Acceptance
 

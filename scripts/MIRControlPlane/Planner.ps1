@@ -165,6 +165,88 @@ function Add-MIRCPTaskPrerequisiteClosure {
   }
 }
 
+function Get-MIRCPRepositoryInputFiles {
+  param([string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $paths = @(& git -C $repo ls-files --cached --others --exclude-standard 2>$null)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate governed repository inputs." }
+  return @($paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+}
+
+function ConvertTo-MIRCPInputGlobRegex {
+  param([Parameter(Mandatory)][string]$Pattern)
+  $escaped = [regex]::Escape($Pattern.Replace("\", "/"))
+  $escaped = $escaped.Replace("\*\*/", "(?:.*/)?")
+  $escaped = $escaped.Replace("\*\*", ".*")
+  $escaped = $escaped.Replace("\*", "[^/]*")
+  $escaped = $escaped.Replace("\?", "[^/]")
+  return "^$escaped$"
+}
+
+function Get-MIRCPInputFileIdentity {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [hashtable]$IdentityCache = @{},
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $cacheKey = $RelativePath.ToLowerInvariant()
+  if ($IdentityCache.ContainsKey($cacheKey)) { return $IdentityCache[$cacheKey] }
+  $path = Join-Path $repo $RelativePath
+  $extension = [IO.Path]::GetExtension($RelativePath).ToLowerInvariant()
+  $isText = $extension -in @(".cfg", ".json", ".jsonl", ".lua", ".md", ".ps1", ".psm1", ".txt", ".yml", ".yaml") -or [IO.Path]::GetFileName($RelativePath) -eq "LICENSE"
+  if ($isText) {
+    $text = [IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+    $identity = [pscustomobject][ordered]@{path=$RelativePath;kind="text";bytes=$bytes.Length;sha256=(Get-MIRCPSha256Text -Value $text)}
+    $IdentityCache[$cacheKey] = $identity
+    return $identity
+  }
+  $item = Get-Item -LiteralPath $path
+  $identity = [pscustomobject][ordered]@{path=$RelativePath;kind="binary";bytes=[int64]$item.Length;sha256=(Get-MIRCPSha256File -Path $path)}
+  $IdentityCache[$cacheKey] = $identity
+  return $identity
+}
+
+function Get-MIRCPEffectiveInputManifest {
+  param(
+    [Parameter(Mandatory)]$Task,
+    [Parameter(Mandatory)]$ReleaseRecord,
+    [Parameter(Mandatory)][string]$Target,
+    [string[]]$RepositoryFiles = @(),
+    [hashtable]$IdentityCache = @{},
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  if ($RepositoryFiles.Count -eq 0) { $RepositoryFiles = @(Get-MIRCPRepositoryInputFiles -RepoRoot $repo) }
+  $rows = [Collections.Generic.List[object]]::new()
+  foreach ($input in @($Task.effective_inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)) {
+    if ($input -in @("candidate-archive", "context:candidate")) {
+      $rows.Add([pscustomobject][ordered]@{input=$input;kind="release-candidate";release=[string]$ReleaseRecord.release;archive_sha256=[string]$ReleaseRecord.package.archive_sha256;content_sha256=[string]$ReleaseRecord.package.content_sha256;bytes=[int64]$ReleaseRecord.package.bytes;entries=[int]$ReleaseRecord.package.entries})
+      continue
+    }
+    if ($input -eq "package-source") {
+      $rows.Add([pscustomobject][ordered]@{input=$input;kind="release-package-source";source_commit=[string]$ReleaseRecord.package.source_commit;source_tree=[string]$ReleaseRecord.package.source_tree;source_sha256=[string]$ReleaseRecord.package.source_sha256})
+      continue
+    }
+    if ($input -in @("prior-release-archive", "factorio-installation", "mod-closure")) {
+      $rows.Add([pscustomobject][ordered]@{input=$input;kind="runtime-context-input";resolution="worker-required";target=$Target})
+      continue
+    }
+    if ($input.StartsWith("result:", [StringComparison]::Ordinal)) {
+      $rows.Add([pscustomobject][ordered]@{input=$input;kind="aggregate-result"})
+      continue
+    }
+    $regex = ConvertTo-MIRCPInputGlobRegex -Pattern $input
+    $matches = @($RepositoryFiles | Where-Object { $_ -match $regex } | Sort-Object -Unique)
+    $files = @($matches | ForEach-Object { Get-MIRCPInputFileIdentity -RelativePath $_ -IdentityCache $IdentityCache -RepoRoot $repo })
+    $rows.Add([pscustomobject][ordered]@{input=$input;kind="repository-content";matches=$files})
+  }
+  $identity = [pscustomobject][ordered]@{schema=1;task_id=[string]$Task.id;target=$Target;inputs=@($rows)}
+  $fileCount = @($rows | ForEach-Object { if ([string]$_.kind -eq "repository-content") { @($_.matches).Count } else { 0 } } | Measure-Object -Sum).Sum
+  return [pscustomobject][ordered]@{schema=1;sha256=(Get-MIRCPSha256Object -Value $identity);file_count=[int]$fileCount;rows=@($rows)}
+}
+
 function New-MIRCPPlan {
   param(
     [ValidateSet("changed", "qualify-incremental", "calibrate-fresh", "rerun-failure")][string]$Mode = "changed",
@@ -175,6 +257,7 @@ function New-MIRCPPlan {
     [string]$TrustClass = "",
     [string]$Target = "2.1",
     [string]$Release = "",
+    [switch]$SelectionOnly,
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
@@ -244,9 +327,16 @@ function New-MIRCPPlan {
     }
   }
   $order = @(Get-MIRCPTaskTopologicalOrder -TaskMap $taskMap -SelectedIds @($selected))
+  $repositoryFiles = @(Get-MIRCPRepositoryInputFiles -RepoRoot $repo)
+  $inputIdentityCache = @{}
   $rows = @($order | ForEach-Object {
     $task = $taskMap[$_]
-    $effectiveInputSha256 = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{task=$task; release=[string]$releaseRecord.release; candidate_sha256=[string]$releaseRecord.package.archive_sha256; target=$Target})
+    $inputManifest = if ($SelectionOnly) {
+      [pscustomobject][ordered]@{sha256=(Get-MIRCPSha256Object -Value @($task.effective_inputs));file_count=0}
+    } else {
+      Get-MIRCPEffectiveInputManifest -Task $task -ReleaseRecord $releaseRecord -Target $Target -RepositoryFiles $repositoryFiles -IdentityCache $inputIdentityCache -RepoRoot $repo
+    }
+    $effectiveInputSha256 = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{task=$task; effective_input_manifest_sha256=[string]$inputManifest.sha256; release=[string]$releaseRecord.release; candidate_sha256=[string]$releaseRecord.package.archive_sha256; target=$Target})
     $evidenceDecision = if ([string]$task.kind -eq "aggregate") {
       [pscustomobject][ordered]@{action="AGGREGATE"; reason="result-only aggregate"; object_digest=""; followup=""}
     } elseif ($null -ne (Get-Command Resolve-MIRCPTaskEvidenceAction -ErrorAction SilentlyContinue)) {
@@ -264,6 +354,8 @@ function New-MIRCPPlan {
       depends_on = @($task.depends_on | Where-Object { $selected.Contains([string]$_) })
       reasons = @($reasons[[string]$task.id])
       effective_input_sha256 = $effectiveInputSha256
+      effective_input_manifest_sha256 = [string]$inputManifest.sha256
+      effective_input_file_count = [int]$inputManifest.file_count
       evidence_decision = $evidenceDecision
     }
   })
@@ -292,7 +384,7 @@ function Assert-MIRCPMutationCalibration {
   if ([int]$authority.schema -ne 1 -or [int]$authority.false_negative_budget -ne 0) { throw "Impact mutation calibration must require zero false negatives." }
   $checked = 0
   foreach ($case in @($authority.cases)) {
-    $result = New-MIRCPPlan -Mode changed -ChangedPath @($case.changed_paths) -RepoRoot $repo
+    $result = New-MIRCPPlan -Mode changed -ChangedPath @($case.changed_paths) -SelectionOnly -RepoRoot $repo
     $selected = @($result.plan.tasks.id | ForEach-Object { [string]$_ })
     $requiredTasks = if ($null -ne $case.PSObject.Properties["required_tasks"]) { @($case.required_tasks) } else { @() }
     $forbiddenTasks = if ($null -ne $case.PSObject.Properties["forbidden_tasks"]) { @($case.forbidden_tasks) } else { @() }

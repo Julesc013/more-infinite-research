@@ -26,6 +26,13 @@ if ([int]$calibration.false_negative_budget -ne 0) { throw "Impact mutation cali
 $planA = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
 $planB = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
 if ([string]$planA.plan_id -ne [string]$planB.plan_id -or [bool]$planA.plan.impact.governance_failure) { throw "Semantic planner is nondeterministic or failed to own its own implementation." }
+$releaseForInputs = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
+$docsInput = Get-MIRCPEffectiveInputManifest -Task ((Get-MIRCPTaskMap -RepoRoot $repo)["docs.schema"]) -ReleaseRecord $releaseForInputs -Target "2.1" -RepoRoot $repo
+$docsManifestRow = @($docsInput.rows | Where-Object input -eq ".mir/docs.yml")
+$docsFileRow = @($docsManifestRow.matches | Where-Object path -eq ".mir/docs.yml")
+if ($docsManifestRow.Count -ne 1 -or $docsFileRow.Count -ne 1 -or [string]$docsFileRow[0].sha256 -ne (Get-MIRCPSha256Text -Value ([IO.File]::ReadAllText((Join-Path $repo ".mir/docs.yml")).Replace("`r`n", "`n").Replace("`r", "`n")))) {
+  throw "Effective-input manifest is not bound to canonical repository file content."
+}
 $freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
 if ([int]$freshPlan.plan.task_count -ne [int]$records.tasks -or -not [bool]$freshPlan.plan.aggregate_is_result_only) { throw "Fresh calibration does not select the complete TaskNode graph or treats aggregates as executable." }
 $aggregateRows = @($freshPlan.plan.tasks | Where-Object kind -eq "aggregate")

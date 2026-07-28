@@ -1,0 +1,24 @@
+param(
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+)
+
+$ErrorActionPreference = "Stop"
+$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+$path = Join-Path $repo ".github/workflows/control-plane-v5.yml"
+if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Control Plane v5 workflow is missing." }
+$workflow = Get-Content -Raw -LiteralPath $path
+foreach ($token in @(
+  "name: MIR Control Plane v5", "context:", "static:", "package:", "environments:", "performance:",
+  "verification-gate:", "name: MIR / verification-gate", "New-MIRVerificationContext.ps1",
+  "-Operation record-context", "-Operation run-set", "-Operation environment", "-Operation performance",
+  "-Operation aggregate", "-SourceRepoRoot source", "cancel-in-progress: false", "merge-multiple: true"
+)) {
+  if ($workflow -notmatch [regex]::Escape($token)) { throw "Control Plane v5 workflow omits required token: $token" }
+}
+if ($workflow -notmatch 'needs:\s*\[context,\s*static,\s*package,\s*environments,\s*performance\]') { throw "The final verification gate does not depend on every execution job." }
+if ($workflow -notmatch 'runs-on:\s*\[self-hosted,\s*Windows\][\s\S]+?-Operation environment') { throw "Factorio environment workers are not bound to protected self-hosted Windows runners." }
+if ($workflow -notmatch 'group:\s*mir-v5-performance-\$\{\{\s*inputs\.target\s*\}\}') { throw "Performance work lacks an exclusive target-scoped concurrency group." }
+if ($workflow -match '(?i)(--no-reuse|-NoReuse)') { throw "Workflow uses a global no-reuse switch instead of proposition freshness." }
+$gateNames = @([regex]::Matches($workflow, '(?m)^\s+name:\s+MIR / verification-gate\s*$'))
+if ($gateNames.Count -ne 1) { throw "Workflow must expose exactly one MIR / verification-gate status." }
+Write-Host "[ok] v5 CI has one immutable context, parallel static/package work, exact environment workers, exclusive performance, and one evidence-only aggregate gate."

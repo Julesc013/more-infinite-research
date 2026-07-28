@@ -1,0 +1,298 @@
+name: MIR Control Plane v5
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "Exact immutable package-source commit"
+        required: true
+        default: "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+      release:
+        description: "Governed release record"
+        required: true
+        default: "3.2.2"
+      target:
+        description: "Factorio target"
+        required: true
+        type: choice
+        options:
+          - "2.1"
+      mode:
+        description: "Verification freshness mode"
+        required: true
+        type: choice
+        default: "calibrate-fresh"
+        options:
+          - "calibrate-fresh"
+          - "qualify-incremental"
+      prior_release:
+        description: "Trusted-runner path to the exact prior release archive"
+        required: true
+      local_mod_zip_dir:
+        description: "Trusted-runner path to the governed local mod ZIP closure"
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  MIR_CP_TRUST_CLASS: protected-release
+
+jobs:
+  context:
+    name: verification-context
+    runs-on: windows-latest
+    outputs:
+      context_id: ${{ steps.export.outputs.context_id }}
+      environments: ${{ steps.export.outputs.environments }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+          path: source
+      - name: Verify immutable source and package lock
+        shell: pwsh
+        env:
+          MIR_CP_RELEASE: ${{ inputs.release }}
+          MIR_CP_TARGET: ${{ inputs.target }}
+          MIR_CP_SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
+          if ([string]$record.target -ne $env:MIR_CP_TARGET) { throw "Release target mismatch." }
+          if ([string]$record.package.source_commit -ne $env:MIR_CP_SOURCE_REF) { throw "Package-source commit mismatch." }
+          if ((git -C source rev-parse HEAD).Trim() -ne $env:MIR_CP_SOURCE_REF) { throw "Source checkout mismatch." }
+          ./scripts/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
+      - name: Build exact candidate from immutable package source
+        shell: pwsh
+        run: ./source/scripts/Build-MIRPackage.ps1
+      - id: export
+        name: Materialize context and exact environment matrix
+        shell: pwsh
+        env:
+          MIR_CP_MODE: ${{ inputs.mode }}
+          MIR_CP_RELEASE: ${{ inputs.release }}
+          MIR_CP_TARGET: ${{ inputs.target }}
+        run: |
+          $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
+          $candidate = Join-Path source ([string]$record.package.archive)
+          $result = ./scripts/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
+            -Release $env:MIR_CP_RELEASE -CandidatePath $candidate -SourceRepoRoot source -OutputRoot out/verification-context |
+            ConvertFrom-Json
+          "context_id=$([string]$result.context_id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          $registry = Get-Content -Raw -LiteralPath (Join-Path $result.path "expanded-scenarios.json") | ConvertFrom-Json
+          $rows = @($registry.batches | Where-Object process_required | ForEach-Object {
+            [ordered]@{
+              batch_id = [string]$_.id
+              safe_id = ([string]$_.environment_signature).Substring(0, 16).ToLowerInvariant()
+              environment_signature = [string]$_.environment_signature
+            }
+          })
+          "environments=$(@{include=$rows} | ConvertTo-Json -Depth 8 -Compress)" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Record context completion as immutable evidence
+        shell: pwsh
+        run: |
+          $context = "out/verification-context/${{ steps.export.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-v5-context
+          path: |
+            out/verification-context/${{ steps.export.outputs.context_id }}
+            artifacts/evidence
+            out/control-plane-v5/results
+          if-no-files-found: error
+
+  static:
+    name: static-task-graph
+    needs: context
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-v5-context
+          path: .
+      - name: Remove coordination copies from the worker input
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/evidence) { Remove-Item -LiteralPath artifacts/evidence -Recurse -Force }
+          if (Test-Path out/control-plane-v5/results) { Remove-Item -LiteralPath out/control-plane-v5/results -Recurse -Force }
+      - name: Execute static and evaluation nodes in topological order
+        shell: pwsh
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
+            -Kind static,evaluation -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-v5-evidence-static
+          path: |
+            artifacts/evidence
+            out/control-plane-v5/results
+          if-no-files-found: error
+
+  package:
+    name: package-task-graph
+    needs: context
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+          path: source
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-v5-context
+          path: .
+      - name: Remove coordination copies from the worker input
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/evidence) { Remove-Item -LiteralPath artifacts/evidence -Recurse -Force }
+          if (Test-Path out/control-plane-v5/results) { Remove-Item -LiteralPath out/control-plane-v5/results -Recurse -Force }
+      - name: Execute package nodes in topological order
+        shell: pwsh
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
+            -Kind package -ExcludeTask verification.context -SourceRepoRoot source `
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-v5-evidence-package
+          path: |
+            artifacts/evidence
+            out/control-plane-v5/results
+          if-no-files-found: error
+
+  environments:
+    name: environment / ${{ matrix.safe_id }}
+    needs: context
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.context.outputs.environments) }}
+    concurrency:
+      group: mir-v5-${{ matrix.environment_signature }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-v5-context
+          path: .
+      - name: Remove coordination copies from the worker input
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/evidence) { Remove-Item -LiteralPath artifacts/evidence -Recurse -Force }
+          if (Test-Path out/control-plane-v5/results) { Remove-Item -LiteralPath out/control-plane-v5/results -Recurse -Force }
+      - name: Capture one exact Factorio environment and evaluate offline
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
+            -BatchId '${{ matrix.batch_id }}' -FactorioBin $env:FACTORIO_BIN `
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-v5-evidence-environment-${{ matrix.safe_id }}
+          path: |
+            artifacts/evidence
+            out/control-plane-v5/results
+          if-no-files-found: error
+
+  performance:
+    name: performance-exclusive
+    if: always()
+    needs: [context, static, package, environments]
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    concurrency:
+      group: mir-v5-performance-${{ inputs.target }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-v5-context
+          path: .
+      - name: Remove coordination copies from the worker input
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/evidence) { Remove-Item -LiteralPath artifacts/evidence -Recurse -Force }
+          if (Test-Path out/control-plane-v5/results) { Remove-Item -LiteralPath out/control-plane-v5/results -Recurse -Force }
+      - name: Run fresh paired performance qualification alone
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ inputs.prior_release }}
+          MIR_LOCAL_MOD_ZIPS: ${{ inputs.local_mod_zip_dir }}
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation performance -ContextPath $context `
+            -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE `
+            -LocalModZipDir $env:MIR_LOCAL_MOD_ZIPS -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-v5-evidence-performance
+          path: |
+            artifacts/evidence
+            out/control-plane-v5/results
+            out/control-plane-v5/performance-evidence.json
+          if-no-files-found: error
+
+  verification-gate:
+    name: MIR / verification-gate
+    if: always()
+    needs: [context, static, package, environments, performance]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-v5-context
+          path: .
+      - name: Merge immutable worker objects
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-v5-evidence-*
+          path: .
+          merge-multiple: true
+      - name: Require exact evidence for every task and environment
+        shell: pwsh
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation aggregate -ContextPath $context `
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence |
+            Tee-Object -FilePath out/control-plane-v5/aggregate-result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-v5-qualification-${{ needs.context.outputs.context_id }}
+          path: |
+            out/verification-context/${{ needs.context.outputs.context_id }}
+            artifacts/evidence
+            out/control-plane-v5/aggregate-result.json
+          if-no-files-found: error

@@ -30,6 +30,9 @@ if (-not [bool]$revoked.revoked -or [string]$revoked.rule_id -ne "TEST-PRODUCER-
 
 $index = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $root
 if ([int]$index.objects -ne 1 -or [int]$index.invalid -ne 0) { throw "Evidence index rebuild did not find the exact object set." }
+$runtimeTask = [pscustomobject][ordered]@{id="self-test";freshness="content-eternal";effective_inputs=@("factorio-installation")}
+$runtimeDecision = Resolve-MIRCPTaskEvidenceAction -Task $runtimeTask -EffectiveInputSha256 $identityKey -Mode changed -EvidenceIndex $index.path -TrustClass "self-test" -RepoRoot $repo
+if ([string]$runtimeDecision.action -ne "RUN" -or [string]$runtimeDecision.reason -notmatch "worker-resolved") { throw "Worker-resolved runtime evidence was reused from an unresolved base identity." }
 $lease1 = Acquire-MIRCPEvidenceLease -IdentityKey $identityKey -Scope process -TtlMinutes 30 -RepoRoot $repo -Root $root
 $lease2 = Acquire-MIRCPEvidenceLease -IdentityKey $identityKey -Scope process -TtlMinutes 30 -RepoRoot $repo -Root $root
 if ([string]$lease1.disposition -ne "ACQUIRE" -or [string]$lease2.disposition -ne "ADOPT") { throw "Matching in-progress evidence work was not adopted." }
@@ -63,4 +66,4 @@ if (-not (Test-Path -LiteralPath $badDir -PathType Container)) { [void](New-Item
 $quarantined = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $root -QuarantineInvalid
 if ([int]$quarantined.invalid -ne 1 -or @(Get-ChildItem -LiteralPath (Join-Path $store "quarantine") -File).Count -ne 1) { throw "Invalid evidence was not quarantined explicitly." }
 
-Write-Host "[ok] content-addressed evidence round-trips, indexes rebuild, exact evidence reuses, fresh calibration reruns, matching leases adopt, revocation invalidates, and corrupt objects quarantine."
+Write-Host "[ok] content-addressed evidence round-trips, indexes rebuild, exact evidence reuses, runtime inputs and fresh calibration rerun, matching leases adopt, revocation invalidates, and corrupt objects quarantine."
