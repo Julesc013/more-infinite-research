@@ -1005,6 +1005,7 @@ fixtures:
       - 100000-in-memory-canonical-recipe-facts
       - 1000-structural-family-candidates
       - deterministic-randomized-insertion-order
+      - operation-set-output-invariance-excludes-environment-identity
       - published-compiler-telemetry-with-isolated-stress-context
       - high-family-candidate-fanout
       - single-recipe-fact-scan
