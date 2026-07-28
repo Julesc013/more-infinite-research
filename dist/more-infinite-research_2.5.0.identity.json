@@ -4,9 +4,9 @@
   "version": "2.5.0",
   "factorio_version": "2.0",
   "archive": "dist/more-infinite-research_2.5.0.zip",
-  "archive_bytes": 1029823,
+  "archive_bytes": 1029914,
   "archive_entries": 290,
-  "archive_sha256": "D7A6CDC34F0EF1BAA75AA66D3CAAA4EA46E7FD405631461D15D254421BB2999F",
+  "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
   "focused_test": "scripts/Test-MIRSpaceLocationTargetInventory.ps1",
   "status": "focused-emergency-build-passed-full-release-qualification-pending"
 }
