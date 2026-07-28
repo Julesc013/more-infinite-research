@@ -66,7 +66,6 @@ Generated: 2026-07-28
 ## Explicit release obligations
 
 - [ ] `v5-shadow-equivalence` for `2.5-P9`
-- [ ] `deterministic-dual-parent-reconstruction` for `2.5-P9`
 - [ ] `candidate-qualification` for `2.5-P9`
 - [ ] `manual-acceptance` for `2.5-P9`
 - [ ] `protected-qualification` for `2.5-P9`

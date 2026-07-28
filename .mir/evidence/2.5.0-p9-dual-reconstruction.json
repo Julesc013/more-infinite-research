@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "mir-v5-dual-parent-reconstruction",
+  "status": "passed",
+  "target_release": "2.5.0",
+  "target_candidate": "2.5-P9",
+  "baseline_tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+  "source_tag_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+  "preintegration_tag_commit": "bd197e54ef737a88350565f46451fe04a2add676",
+  "rehearsals": 2,
+  "integration_commit": "96a269872ddb19716f00c586bc9534beb7eadfc4",
+  "integration_parents": [
+    "bd197e54ef737a88350565f46451fe04a2add676",
+    "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378"
+  ],
+  "integration_tree": "1fefd2c383f079645f3ae670062c0ce4b4728ddd",
+  "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+  "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+  "bytes": 1029914,
+  "entries": 290,
+  "receipt_material_sha256": "3046CBB6305F17948833E71A0F3F7D9B41EC1E2067037EA7176ACE40F143E589",
+  "receipts": [
+    {
+      "rehearsal": "R1",
+      "receipt_sha256": "1340621C6462A1EE226823838EBBBD2268495F065A2B011D3D942BDD788F1E4D",
+      "reconstructed_at": "2026-07-28T18:18:17.0556839+00:00"
+    },
+    {
+      "rehearsal": "R2",
+      "receipt_sha256": "0EE53D375C7EA229E10565518AEBD2DEFB48131C9E7DEE325E63F8506982612E",
+      "reconstructed_at": "2026-07-28T18:18:49.7024032+00:00"
+    }
+  ]
+}

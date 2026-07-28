@@ -28,7 +28,6 @@
       "qualification": "focused-qualified",
       "remaining_obligations": [
         "v5-shadow-equivalence",
-        "deterministic-dual-parent-reconstruction",
         "candidate-qualification",
         "manual-acceptance",
         "protected-qualification",

@@ -48,8 +48,21 @@ try {
   & (Join-Path $Worktree "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $Worktree
   if ($LASTEXITCODE -ne 0) { throw "Reconstructed backport source lock failed." }
 
-  & git -C $Worktree -c user.name="MIR Backport Materializer" -c user.email="mir-backport@invalid" commit -m "merge(backport): project MIR $($manifest.source.release) onto Factorio $($manifest.target_factorio)"
-  if ($LASTEXITCODE -ne 0) { throw "Unable to create the two-parent reconstruction commit." }
+  $parentCommitEpochs = @($projectionCommit, $sourceCommit | ForEach-Object {
+    [int64](([string](& git -C $RepoRoot show -s --format=%ct $_)).Trim())
+  })
+  $deterministicCommitDate = [DateTimeOffset]::FromUnixTimeSeconds((($parentCommitEpochs | Measure-Object -Maximum).Maximum) + 1).ToString("yyyy-MM-ddTHH:mm:ssK")
+  $previousAuthorDate = $env:GIT_AUTHOR_DATE
+  $previousCommitterDate = $env:GIT_COMMITTER_DATE
+  try {
+    $env:GIT_AUTHOR_DATE = $deterministicCommitDate
+    $env:GIT_COMMITTER_DATE = $deterministicCommitDate
+    & git -C $Worktree -c user.name="MIR Backport Materializer" -c user.email="mir-backport@invalid" commit -m "merge(backport): project MIR $($manifest.source.release) onto Factorio $($manifest.target_factorio)"
+    if ($LASTEXITCODE -ne 0) { throw "Unable to create the two-parent reconstruction commit." }
+  } finally {
+    $env:GIT_AUTHOR_DATE = $previousAuthorDate
+    $env:GIT_COMMITTER_DATE = $previousCommitterDate
+  }
   $mergeCommit = (& git -C $Worktree rev-parse HEAD).Trim()
   $parents = @((& git -C $Worktree show -s --format=%P HEAD).Trim() -split ' ')
   if ($parents.Count -ne 2 -or $parents[0] -ne $projectionCommit -or $parents[1] -ne $sourceCommit) {

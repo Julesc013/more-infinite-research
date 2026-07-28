@@ -35,11 +35,17 @@
         "kind": "backport-contract",
         "path": ".mir/backports/2.5.0.json"
       }
+    ],
+    "backport_reconstruction": [
+      {
+        "kind": "dual-parent-reconstruction",
+        "path": ".mir/evidence/2.5.0-p9-dual-reconstruction.json",
+        "sha256": "A1F3CA2EB5FCD284BE2663DD84A5B4A526E1308F28D7223922BB3614F36CD7F6"
+      }
     ]
   },
   "remaining_obligations": [
     "v5-shadow-equivalence",
-    "deterministic-dual-parent-reconstruction",
     "candidate-qualification",
     "manual-acceptance",
     "protected-qualification",
@@ -50,5 +56,5 @@
     "public-byte-verification"
   ],
   "backport_manifest": ".mir/backports/2.5.0.json",
-  "updated_at": "2026-07-28T12:00:00Z"
+  "updated_at": "2026-07-28T18:19:00Z"
 }

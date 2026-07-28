@@ -699,6 +699,7 @@ validation_tooling:
     backport_reconstruction_contract: .mir/backports/2.5.0.json
     backport_reconstruction_gate: scripts/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
+    backport_reconstruction_evidence_gate: scripts/Test-MIRBackportReconstruction.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     package_composition: scripts/Measure-MIRPackageComposition.ps1
     package_composition_gate: scripts/Test-MIRPackageComposition.ps1
