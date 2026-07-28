@@ -26,6 +26,9 @@ function Read-MIRCPJson {
 function ConvertTo-MIRCPCanonicalValue {
   param($Value)
   if ($null -eq $Value) { return $null }
+  if ($Value -is [datetime]) { return $Value.ToUniversalTime().ToString("o", [Globalization.CultureInfo]::InvariantCulture) }
+  if ($Value -is [datetimeoffset]) { return $Value.ToUniversalTime().ToString("o", [Globalization.CultureInfo]::InvariantCulture) }
+  if ($Value -is [guid]) { return $Value.ToString("D") }
   if ($Value -is [string] -or $Value -is [bool] -or $Value -is [char] -or $Value.GetType().IsPrimitive -or $Value -is [decimal]) {
     return $Value
   }

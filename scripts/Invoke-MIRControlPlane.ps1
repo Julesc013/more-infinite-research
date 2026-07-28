@@ -1,5 +1,5 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay", "context", "evidence-index")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [switch]$AllLocks,
   [switch]$Check,
@@ -7,14 +7,20 @@ param(
   [string]$ChangedSince = "",
   [string[]]$ChangedPath = @(),
   [string[]]$FailedTask = @(),
+  [string]$EvidenceIndex = "",
+  [string]$TrustClass = "",
   [string]$Target = "2.1",
   [string]$Release = "",
-  [string]$Output = "out/control-plane-v5-plan.json"
+  [string]$Output = "out/control-plane-v5-plan.json",
+  [string]$ContextOutputRoot = "out/verification-context",
+  [string]$EvidenceRoot = "",
+  [string]$CandidatePath = "",
+  [string]$SourceRepoRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
   . (Join-Path $PSScriptRoot "MIRControlPlane/$module.ps1")
 }
 
@@ -36,6 +42,8 @@ MIR Control Plane v5
   registry -Check           Fail when the execution registry is stale.
   replay                    Replay historical v4 evidence through the pure v5 evaluator.
   replay -Check             Fail when the deterministic replay report is stale.
+  context                   Materialize one immutable, digest-checked verification context.
+  evidence-index            Rebuild the evidence index from content-addressed objects.
 "@ | Write-Host
   }
   "validate" {
@@ -60,7 +68,7 @@ MIR Control Plane v5
     Update-MIRCPViews -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 10
   }
   "plan" {
-    $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -Target $Target -Release $Release -RepoRoot $repo
+    $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -EvidenceIndex $EvidenceIndex -TrustClass $TrustClass -Target $Target -Release $Release -RepoRoot $repo
     Write-MIRCPJson -Path $Output -Value $plan -RepoRoot $repo
     $plan | ConvertTo-Json -Depth 30
   }
@@ -69,5 +77,11 @@ MIR Control Plane v5
   }
   "replay" {
     Update-MIRCPV4ReplayReport -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 20
+  }
+  "context" {
+    New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $ContextOutputRoot -RepoRoot $repo | ConvertTo-Json -Depth 10
+  }
+  "evidence-index" {
+    Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot | ConvertTo-Json -Depth 10
   }
 }

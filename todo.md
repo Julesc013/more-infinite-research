@@ -23,6 +23,7 @@ Generated: 2026-07-28
 | `control-plane.records` | `static` | `planned` | docs.generated, harness.schemas |
 | `docs.generated` | `static` | `planned` |  |
 | `docs.schema` | `static` | `planned` |  |
+| `evidence.store` | `static` | `planned` | harness.schemas, observation.evaluation |
 | `harness.quality` | `static` | `planned` |  |
 | `harness.schemas` | `static` | `planned` |  |
 | `locale.contract` | `static` | `planned` |  |
@@ -35,7 +36,8 @@ Generated: 2026-07-28
 | `scenario.registry` | `static` | `planned` | harness.schemas |
 | `settings.contract` | `static` | `planned` |  |
 | `shadow.equivalence` | `evaluation` | `planned` | control-plane.records, scenario.registry |
-| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, release.authority, backport.contract, harness.schemas, harness.quality, scenario.registry, observation.evaluation, package.identity, package.composition, package.determinism, performance.contract, control-plane.records |
+| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, release.authority, backport.contract, harness.schemas, harness.quality, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context |
+| `verification.context` | `package` | `planned` | control-plane.records, scenario.registry, observation.evaluation, package.identity |
 
 ## Open change and incident records
 

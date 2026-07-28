@@ -5,14 +5,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
 
-foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json")) {
+foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json", "verification-context.schema.json", "evidence-object.schema.json", "evidence-manifest.schema.json", "evidence-revocation.schema.json")) {
   $schema = Read-MIRCPJson -Path "verification/schema/$schemaName" -RepoRoot $repo
   if ([string]$schema.'$schema' -ne "https://json-schema.org/draft/2020-12/schema" -or [string]$schema.type -ne "object" -or $schema.additionalProperties -ne $false) {
     throw "Control-plane schema is not strict JSON Schema 2020-12: $schemaName"

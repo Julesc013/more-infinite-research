@@ -24,6 +24,10 @@ $contracts = [ordered]@{
   "assertion.schema.json" = @("schema", "id", "version", "type", "reads", "proposition", "expected")
   "evaluation.schema.json" = @("schema", "evaluation_abi", "evaluation_key", "observation_sha256", "assertion", "status", "actual", "expected", "proposition", "evidence_digest")
   "execution-registry.schema.json" = @("schema", "authority", "target", "observation_abi", "source", "metrics", "scenarios", "batches")
+  "verification-context.schema.json" = @("schema", "authority", "context_abi", "context_id", "mode", "target", "release", "candidate_id", "plan_id", "members")
+  "evidence-object.schema.json" = @("schema", "kind", "object_abi", "context_digest", "identity_key", "subject", "producer", "payload", "links")
+  "evidence-manifest.schema.json" = @("schema", "authority", "context_digest", "plan_id", "producer", "objects", "task_results", "status")
+  "evidence-revocation.schema.json" = @("schema", "authority", "default_disposition", "rules")
 }
 
 foreach ($entry in $contracts.GetEnumerator()) {

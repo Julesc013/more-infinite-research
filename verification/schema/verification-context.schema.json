@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/verification-context.schema.json",
+  "title": "MIR immutable verification context manifest",
+  "type": "object",
+  "required": ["schema", "authority", "context_abi", "context_id", "mode", "target", "release", "candidate_id", "plan_id", "members"],
+  "properties": {
+    "schema": {"const": 1},
+    "authority": {"const": "mir-control-plane-v5-verification-context"},
+    "context_abi": {"type": "integer", "minimum": 1},
+    "context_id": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "mode": {"enum": ["changed", "qualify-incremental", "calibrate-fresh", "rerun-failure"]},
+    "target": {"type": "string"},
+    "release": {"type": "string"},
+    "candidate_id": {"type": "string"},
+    "plan_id": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "members": {"type": "array", "minItems": 10, "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

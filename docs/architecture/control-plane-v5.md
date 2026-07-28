@@ -47,7 +47,7 @@ Task records declare prerequisites, semantic domains, effective inputs, outputs,
 
 Aggregate nodes read child results and never execute child commands. `static.full` remains a v4 shadow input during migration but is not an executing v5 task.
 
-The initial atomic catalog contains 20 executable nodes and one result-only aggregate. It separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, observation/evaluation replay, package identity, package composition, deterministic construction, performance policy, and control-plane records. Commands are argument arrays rather than shell strings.
+The initial atomic catalog contains 22 executable nodes and one result-only aggregate. It separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, observation/evaluation replay, immutable context materialization, content-addressed evidence, package identity, package composition, deterministic construction, performance policy, and control-plane records. Commands are argument arrays rather than shell strings.
 
 `scripts/Invoke-MIRControlPlane.ps1 plan` supports `changed`, `qualify-incremental`, `calibrate-fresh`, and `rerun-failure` modes. Every selected row includes its semantic impact reason, freshness class, resource class, prerequisites, and effective-input digest. Unknown paths select the complete graph and fail governance until ownership is added.
 
@@ -73,7 +73,11 @@ Freshness is proposition-specific: content-eternal, environment-bound, candidate
 
 Planning emits one immutable verification-context bundle. Workers verify its digest and do not rediscover candidate, target, transition, scenarios, closures, or policy.
 
+Each context directory is named by a digest over ten exact members: plan, candidate descriptor, release transition, expanded tasks, expanded scenarios, package-domain manifest, target profile, environment locks, control-plane lock, and `candidate.zip`. A manifest binds every member's byte length and SHA-256; `context-digest.txt` repeats the reconstructed context identity. Existing contexts are validated and reused byte-for-byte, never overwritten.
+
 Evidence is stored by SHA-256 under `artifacts/evidence/objects/sha256/`. Indexes and leases are rebuildable coordination data. Revocation may target a producer ABI, evaluator ABI, canonicalization ABI, digest set, or time range without discarding unrelated observations.
+
+The evidence object's address is the SHA-256 of its canonical UTF-8 bytes. Rebuilding the index verifies filename/address parity, parses every object, applies `.mir/control-plane/evidence-revocations.json`, and can explicitly move malformed objects into quarantine. Exact unrevoked passing evidence yields `REUSE`; absent evidence yields `RUN`; stale, revoked, or invalid matches yield `INVALID` with a required `RUN` follow-up. Fresh calibration still forces `RUN`. Process and CI-job leases are mutable, expiring coordination only; a matching active lease is adopted and never counted as passing evidence.
 
 ## Acceptance
 

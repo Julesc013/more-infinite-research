@@ -171,6 +171,8 @@ function New-MIRCPPlan {
     [string]$ChangedSince = "",
     [string[]]$ChangedPath = @(),
     [string[]]$FailedTask = @(),
+    [string]$EvidenceIndex = "",
+    [string]$TrustClass = "",
     [string]$Target = "2.1",
     [string]$Release = "",
     [string]$RepoRoot = ""
@@ -244,16 +246,25 @@ function New-MIRCPPlan {
   $order = @(Get-MIRCPTaskTopologicalOrder -TaskMap $taskMap -SelectedIds @($selected))
   $rows = @($order | ForEach-Object {
     $task = $taskMap[$_]
+    $effectiveInputSha256 = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{task=$task; release=[string]$releaseRecord.release; candidate_sha256=[string]$releaseRecord.package.archive_sha256; target=$Target})
+    $evidenceDecision = if ([string]$task.kind -eq "aggregate") {
+      [pscustomobject][ordered]@{action="AGGREGATE"; reason="result-only aggregate"; object_digest=""; followup=""}
+    } elseif ($null -ne (Get-Command Resolve-MIRCPTaskEvidenceAction -ErrorAction SilentlyContinue)) {
+      Resolve-MIRCPTaskEvidenceAction -Task $task -EffectiveInputSha256 $effectiveInputSha256 -Mode $Mode -EvidenceIndex $EvidenceIndex -TrustClass $TrustClass -RepoRoot $repo
+    } else {
+      [pscustomobject][ordered]@{action="RUN"; reason="evidence resolver not loaded"; object_digest=""; followup=""}
+    }
     [pscustomobject][ordered]@{
       id = [string]$task.id
       kind = [string]$task.kind
       layer = [string]$task.layer
-      action = if ([string]$task.kind -eq "aggregate") { "AGGREGATE" } else { "RUN" }
+      action = [string]$evidenceDecision.action
       freshness = [string]$task.freshness
       resource_class = [string]$task.resource_class
       depends_on = @($task.depends_on | Where-Object { $selected.Contains([string]$_) })
       reasons = @($reasons[[string]$task.id])
-      effective_input_sha256 = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{task=$task; release=[string]$releaseRecord.release; candidate_sha256=[string]$releaseRecord.package.archive_sha256; target=$Target})
+      effective_input_sha256 = $effectiveInputSha256
+      evidence_decision = $evidenceDecision
     }
   })
   $body = [pscustomobject][ordered]@{

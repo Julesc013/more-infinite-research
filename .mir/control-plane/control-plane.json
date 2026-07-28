@@ -27,6 +27,7 @@
     "ownership": ".mir/control-plane/ownership.json",
     "package_locks": ".mir/control-plane/package-locks.json",
     "mutation_calibration": ".mir/control-plane/mutation-calibration.json",
+    "evidence_revocations": ".mir/control-plane/evidence-revocations.json",
     "v4_equivalence": ".mir/control-plane/v4-v5-equivalence.json",
     "scenario_source": "fixtures/compat-matrix/expected-scenarios.json",
     "execution_registry": "validation/generated/execution-registry.json",

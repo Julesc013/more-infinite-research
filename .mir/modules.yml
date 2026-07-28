@@ -639,6 +639,11 @@ validation_tooling:
     control_plane_assertion_schema: verification/schema/assertion.schema.json
     control_plane_evaluation_schema: verification/schema/evaluation.schema.json
     control_plane_execution_registry_schema: verification/schema/execution-registry.schema.json
+    control_plane_verification_context_schema: verification/schema/verification-context.schema.json
+    control_plane_evidence_object_schema: verification/schema/evidence-object.schema.json
+    control_plane_evidence_manifest_schema: verification/schema/evidence-manifest.schema.json
+    control_plane_evidence_revocation_schema: verification/schema/evidence-revocation.schema.json
+    control_plane_evidence_revocations: .mir/control-plane/evidence-revocations.json
     control_plane_execution_registry: validation/generated/execution-registry.json
     control_plane_historical_replay: .mir/control-plane/baselines/3.2.2-v5-replay.json
     control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
@@ -649,6 +654,7 @@ validation_tooling:
     control_plane_observations: scripts/MIRControlPlane/Observation.ps1
     control_plane_evidence: scripts/MIRControlPlane/Evidence.ps1
     control_plane_views: scripts/MIRControlPlane/Views.ps1
+    control_plane_context: scripts/MIRControlPlane/Context.ps1
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
     control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: scripts/Test-MIRControlPlane.ps1
@@ -656,6 +662,9 @@ validation_tooling:
     control_plane_execution_registry_gate: scripts/Test-MIRExecutionRegistry.ps1
     control_plane_observation_replay_generator: scripts/Update-MIRObservationReplay.ps1
     control_plane_observation_gate: scripts/Test-MIRObservationEvaluation.ps1
+    control_plane_context_builder: scripts/New-MIRVerificationContext.ps1
+    control_plane_context_gate: scripts/Test-MIRVerificationContext.ps1
+    control_plane_evidence_gate: scripts/Test-MIREvidenceStore.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: scripts/MIRAssurance/Core.ps1
     assurance_domains: scripts/MIRAssurance/Domains.ps1

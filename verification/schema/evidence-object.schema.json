@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/evidence-object.schema.json",
+  "title": "MIR content-addressed evidence object",
+  "type": "object",
+  "required": ["schema", "kind", "object_abi", "context_digest", "identity_key", "subject", "producer", "payload", "links"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"enum": ["observation", "evaluation", "task-result", "execution-manifest", "aggregate", "seal", "artifact-descriptor"]},
+    "object_abi": {"type": "integer", "minimum": 1},
+    "context_digest": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "identity_key": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "subject": {"type": "object"},
+    "producer": {"type": "object"},
+    "payload": {"type": "object"},
+    "links": {"type": "array", "items": {"type": "string", "pattern": "^[0-9A-F]{64}$"}}
+  },
+  "additionalProperties": false
+}
