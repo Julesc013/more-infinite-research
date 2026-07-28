@@ -15,31 +15,43 @@ Generated: 2026-07-28
 
 | Task | Kind | State | Dependencies |
 | --- | --- | --- | --- |
+| `approved-delta.measurement` | `capture` | `planned` | package.identity, upgrade.measurement |
 | `architecture.dependencies` | `static` | `planned` |  |
 | `architecture.files` | `static` | `planned` |  |
 | `backport.contract` | `static` | `planned` |  |
+| `backport.reconstruction` | `transition` | `planned` | package.determinism, shadow.equivalence |
 | `ci.workflow` | `static` | `planned` | executor.contract |
 | `compiler.contract` | `static` | `planned` |  |
 | `compiler.schema` | `static` | `planned` |  |
 | `control-plane.records` | `static` | `planned` | docs.generated, harness.schemas |
 | `docs.generated` | `static` | `planned` |  |
 | `docs.schema` | `static` | `planned` |  |
+| `ecosystem.measurement` | `capture` | `planned` | package.identity, scenario.registry |
 | `evidence.store` | `static` | `planned` | harness.schemas, observation.evaluation |
 | `executor.contract` | `static` | `planned` | evidence.store, verification.context |
 | `harness.quality` | `static` | `planned` |  |
 | `harness.schemas` | `static` | `planned` |  |
 | `locale.contract` | `static` | `planned` |  |
+| `manual.acceptance` | `manual` | `planned` | package.identity, upgrade.measurement, ecosystem.measurement, approved-delta.measurement, performance.measurement |
 | `observation.evaluation` | `static` | `planned` | harness.schemas, scenario.registry |
 | `package.composition` | `package` | `planned` | package.identity |
 | `package.determinism` | `package` | `planned` | package.identity |
 | `package.identity` | `package` | `planned` |  |
 | `performance.contract` | `static` | `planned` |  |
 | `performance.measurement` | `performance` | `planned` | package.identity, performance.contract, scenario.registry |
+| `promotion` | `promotion` | `planned` | seal |
+| `protected.qualification` | `transition` | `planned` | qualification.full |
+| `public-byte-verification` | `promotion` | `planned` | publication |
+| `publication` | `promotion` | `planned` | tag |
+| `qualification.full` | `aggregate` | `planned` | static.full, shadow.equivalence, upgrade.measurement, ecosystem.measurement, approved-delta.measurement, performance.measurement, manual.acceptance |
 | `release.authority` | `static` | `planned` | docs.generated |
 | `scenario.registry` | `static` | `planned` | harness.schemas |
+| `seal` | `transition` | `planned` | protected.qualification |
 | `settings.contract` | `static` | `planned` |  |
 | `shadow.equivalence` | `evaluation` | `planned` | control-plane.records, scenario.registry |
 | `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, release.authority, backport.contract, harness.schemas, harness.quality, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context, executor.contract, ci.workflow |
+| `tag` | `promotion` | `planned` | promotion |
+| `upgrade.measurement` | `capture` | `planned` | package.identity, scenario.registry |
 | `verification.context` | `package` | `planned` |  |
 
 ## Open change and incident records

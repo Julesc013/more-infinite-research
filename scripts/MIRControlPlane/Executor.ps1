@@ -90,13 +90,15 @@ function Invoke-MIRCPTaskCommand {
   $process = [Diagnostics.Process]::new()
   $start = [Diagnostics.ProcessStartInfo]::new()
   $start.FileName = Join-Path $PSHOME "pwsh.exe"
-  $start.WorkingDirectory = $repo
   $start.UseShellExecute = $false
   $start.RedirectStandardOutput = $true
   $start.RedirectStandardError = $true
   $start.CreateNoWindow = $true
   $contextAbsolute = [string]$state.context.path
   $sourceAbsolute = if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { "" } else { (Resolve-Path -LiteralPath $SourceRepoRoot).Path }
+  $commandScope = if ($null -eq $task.PSObject.Properties["command_scope"]) { "control-plane" } else { [string]$task.command_scope }
+  if ($commandScope -eq "source" -and [string]::IsNullOrWhiteSpace($sourceAbsolute)) { throw "TaskNode $TaskId requires an exact source checkout." }
+  $start.WorkingDirectory = if ($commandScope -eq "source") { $sourceAbsolute } else { $repo }
   foreach ($argument in @($task.command.arguments)) {
     $value = [string]$argument
     if ($value -eq "<context>") { $value = $contextAbsolute }
@@ -145,6 +147,109 @@ function Invoke-MIRCPTaskSet {
   return @($completed)
 }
 
+function Assert-MIRCPExecutionSource {
+  param(
+    [Parameter(Mandatory)]$State,
+    [Parameter(Mandatory)][string]$SourceRepoRoot
+  )
+  if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { throw "This worker requires an immutable package-source checkout." }
+  $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
+  $descriptor = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "candidate-descriptor.json") | ConvertFrom-Json
+  $head = ([string](& git -C $source rev-parse HEAD)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $head -ne [string]$descriptor.source_commit) {
+    throw "Execution source $head does not match context package source $($descriptor.source_commit)."
+  }
+  return [pscustomobject][ordered]@{path=$source;descriptor=$descriptor;commit=$head}
+}
+
+function Get-MIRCPFactorioIdentity {
+  param([Parameter(Mandatory)][string]$FactorioBin)
+  $binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+  $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($binary).FileVersion
+  return [pscustomobject][ordered]@{
+    path = $binary
+    sha256 = Get-MIRCPSha256File -Path $binary
+    bytes = [int64](Get-Item -LiteralPath $binary).Length
+    version = [string]$version
+  }
+}
+
+function Write-MIRCPSpecializedTaskEvidence {
+  param(
+    [Parameter(Mandatory)]$State,
+    [Parameter(Mandatory)]$PlanRow,
+    [Parameter(Mandatory)][ValidateSet("environment-capture", "engine-realization")][string]$ObservationKind,
+    [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Status,
+    [Parameter(Mandatory)]$EnvironmentMaterial,
+    [Parameter(Mandatory)]$Facts,
+    [Parameter(Mandatory)][string]$ArtifactPath,
+    [Parameter(Mandatory)][string]$ArtifactKind,
+    [Parameter(Mandatory)][string]$TrustClass,
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  if (-not (Test-Path -LiteralPath $ArtifactPath -PathType Leaf)) {
+    throw "TaskNode $($PlanRow.id) produced no $ArtifactKind artifact."
+  }
+  $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass
+  $environmentSignature = Get-MIRCPSha256Object -Value $EnvironmentMaterial
+  $artifact = [pscustomobject][ordered]@{
+    kind = $ArtifactKind
+    sha256 = Get-MIRCPSha256File -Path $ArtifactPath
+    bytes = [int64](Get-Item -LiteralPath $ArtifactPath).Length
+  }
+  $source = [pscustomobject][ordered]@{
+    context_digest = [string]$State.context.context_id
+    task_id = [string]$PlanRow.id
+    effective_input_sha256 = [string]$PlanRow.effective_input_sha256
+  }
+  $observation = New-MIRCPObservation -Kind $ObservationKind -EnvironmentSignature $environmentSignature `
+    -Target ([string]$State.plan.target) -CandidateSha256 ([string]$State.plan.candidate_sha256) `
+    -Facts $Facts -Artifacts @($artifact) -Source $source
+  $observationObject = New-MIRCPEvidenceObject -Kind observation -ContextDigest ([string]$State.context.context_id) `
+    -IdentityKey ([string]$observation.capture_key) -Subject ([pscustomobject][ordered]@{task_id=[string]$PlanRow.id;target=[string]$State.plan.target}) `
+    -Producer $producer -Payload $observation
+  $storedObservation = Write-MIRCPEvidenceObject -Object $observationObject -RepoRoot $repo -Root $EvidenceRoot
+  $assertionIdPart = ([string]$PlanRow.id).ToLowerInvariant() -replace '[^a-z0-9/-]+', '-'
+  $assertion = [pscustomobject][ordered]@{
+    schema = 1
+    id = "assertion/$assertionIdPart/status-passed"
+    version = 1
+    type = "status-equals"
+    reads = @("facts.status")
+    proposition = "TaskNode $($PlanRow.id) captured a passing native observation."
+    expected = "passed"
+  }
+  $evaluation = Invoke-MIRCPEvaluation -Observation $observation -Assertion $assertion
+  $evaluationObject = New-MIRCPEvidenceObject -Kind evaluation -ContextDigest ([string]$State.context.context_id) `
+    -IdentityKey ([string]$evaluation.evaluation_key) -Subject ([pscustomobject][ordered]@{task_id=[string]$PlanRow.id;assertion_id=[string]$assertion.id;target=[string]$State.plan.target}) `
+    -Producer $producer -Payload $evaluation -Links @([string]$storedObservation.digest)
+  $storedEvaluation = Write-MIRCPEvidenceObject -Object $evaluationObject -RepoRoot $repo -Root $EvidenceRoot
+  $taskStatus = if ($Status -eq "passed" -and [string]$evaluation.status -eq "passed") { "passed" } else { "failed" }
+  $taskObject = New-MIRCPEvidenceObject -Kind task-result -ContextDigest ([string]$State.context.context_id) `
+    -IdentityKey ([string]$PlanRow.effective_input_sha256) -Subject ([pscustomobject][ordered]@{task_id=[string]$PlanRow.id;target=[string]$State.plan.target;release=[string]$State.plan.release}) `
+    -Producer $producer -Payload ([pscustomobject][ordered]@{
+      status = $taskStatus
+      effective_input_sha256 = [string]$PlanRow.effective_input_sha256
+      observation_object = [string]$storedObservation.digest
+      evaluation_objects = @([string]$storedEvaluation.digest)
+      artifact = $artifact
+    }) -Links @([string]$storedObservation.digest, [string]$storedEvaluation.digest)
+  $storedTask = Write-MIRCPEvidenceObject -Object $taskObject -RepoRoot $repo -Root $EvidenceRoot
+  $marker = [pscustomobject][ordered]@{
+    schema = 1
+    task_id = [string]$PlanRow.id
+    status = $taskStatus
+    context_digest = [string]$State.context.context_id
+    identity_key = [string]$PlanRow.effective_input_sha256
+    object_digest = [string]$storedTask.digest
+  }
+  [void](Write-MIRCPResultMarker -Marker $marker -RepoRoot $repo)
+  if ($taskStatus -ne "passed") { throw "TaskNode $($PlanRow.id) native observation evaluated as $taskStatus." }
+  return $marker
+}
+
 function Invoke-MIRCPEnvironmentBatch {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
@@ -152,10 +257,12 @@ function Invoke-MIRCPEnvironmentBatch {
     [Parameter(Mandatory)][string]$FactorioBin,
     [string]$TrustClass = "protected-release",
     [string]$EvidenceRoot = "",
+    [string]$SourceRepoRoot = "",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
   $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
   $batch = @($registry.batches | Where-Object id -eq $BatchId)
   if ($batch.Count -ne 1 -or -not [bool]$batch[0].process_required) { throw "Unknown or non-Factorio environment batch: $BatchId" }
@@ -164,7 +271,7 @@ function Invoke-MIRCPEnvironmentBatch {
   $summaryRoot = Join-Path $repo "out/control-plane-v5/environment-results"
   if (-not (Test-Path -LiteralPath $summaryRoot -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $summaryRoot) }
   $summaryPath = Join-Path $summaryRoot "$([string]$batch[0].environment_signature).json"
-  & (Join-Path $repo "scripts/Invoke-MIRValidation.ps1") -ScenarioWorker -FactorioBin $FactorioBin -CandidateZip (Join-Path $state.context.path "candidate.zip") -Scenario ([string]$scenarios[0].name) -ValidationSummaryPath $summaryPath
+  & (Join-Path $source.path "scripts/Invoke-MIRValidation.ps1") -ScenarioWorker -FactorioBin $FactorioBin -CandidateZip (Join-Path $state.context.path "candidate.zip") -Scenario ([string]$scenarios[0].name) -ValidationSummaryPath $summaryPath
   $exitCode = $LASTEXITCODE
   if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) { throw "Environment batch produced no structured validation summary: $BatchId" }
   $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
@@ -223,17 +330,19 @@ function Invoke-MIRCPPerformanceMeasurement {
     [string]$LocalModZipDir = "",
     [string]$TrustClass = "protected-release",
     [string]$EvidenceRoot = "",
+    [string]$SourceRepoRoot = "",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
   $row = @($state.plan.tasks | Where-Object id -eq "performance.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain performance.measurement exactly once." }
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
   $outputPath = Join-Path $repo "out/control-plane-v5/performance-evidence.json"
   $arguments = @{
-    RepoRoot = $repo
+    RepoRoot = $source.path
     Candidate = (Join-Path $state.context.path "candidate.zip")
     PriorRelease = $PriorRelease
     FactorioBin = $FactorioBin
@@ -243,7 +352,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     OutputPath = $outputPath
   }
   if (-not [string]::IsNullOrWhiteSpace($LocalModZipDir)) { $arguments.LocalModZipDir = $LocalModZipDir }
-  & (Join-Path $repo "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
+  & (Join-Path $source.path "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
   $exitCode = $LASTEXITCODE
   if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw "Performance measurement produced no compact evidence." }
   $status = if ($exitCode -eq 0) { "passed" } else { "failed" }
@@ -252,6 +361,134 @@ function Invoke-MIRCPPerformanceMeasurement {
     -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
   if ($status -ne "passed") { throw "Fresh runtime performance measurement failed." }
   return $marker
+}
+
+function Invoke-MIRCPUpgradeMeasurement {
+  param(
+    [Parameter(Mandatory)][string]$ContextPath,
+    [Parameter(Mandatory)][string]$FactorioBin,
+    [Parameter(Mandatory)][string]$PriorRelease,
+    [Parameter(Mandatory)][string]$SourceRepoRoot,
+    [string]$TrustClass = "protected-release",
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
+  $row = @($state.plan.tasks | Where-Object id -eq "upgrade.measurement")
+  if ($row.Count -ne 1) { throw "Context plan does not contain upgrade.measurement exactly once." }
+  $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
+  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
+  $outputPath = Join-Path $repo "out/control-plane-v5/upgrade-evidence.json"
+  & (Join-Path $source.path "scripts/Test-MIRUpgradeMatrix.ps1") -RepoRoot $source.path `
+    -FactorioBin $factorio.path -FromZip $prior -ToZip (Join-Path $state.context.path "candidate.zip") `
+    -FromVersion ([string]$profile.upgrade.from_version) -ToVersion ([string]$profile.upgrade.to_version) `
+    -FixtureName ([string]$profile.upgrade.fixture) -OutputPath $outputPath
+  $exitCode = $LASTEXITCODE
+  $evidence = if (Test-Path -LiteralPath $outputPath -PathType Leaf) { Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json } else { $null }
+  $status = if ($exitCode -eq 0 -and $null -ne $evidence -and [string]$evidence.status -eq "passed") { "passed" } else { "failed" }
+  $facts = [pscustomobject][ordered]@{
+    status = $status
+    from_version = [string]$profile.upgrade.from_version
+    to_version = [string]$profile.upgrade.to_version
+    fixture = [string]$profile.upgrade.fixture
+    prior_archive_sha256 = Get-MIRCPSha256File -Path $prior
+    factorio_binary_sha256 = [string]$factorio.sha256
+    evidence_status = if ($null -eq $evidence) { "missing" } else { [string]$evidence.status }
+  }
+  return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$facts.prior_archive_sha256;source_commit=[string]$source.commit}) `
+    -Facts $facts -ArtifactPath $outputPath -ArtifactKind "upgrade-evidence" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
+}
+
+function Invoke-MIRCPEcosystemMeasurement {
+  param(
+    [Parameter(Mandatory)][string]$ContextPath,
+    [Parameter(Mandatory)][string]$FactorioBin,
+    [Parameter(Mandatory)][string]$LocalModDir,
+    [Parameter(Mandatory)][string]$SourceRepoRoot,
+    [string]$TrustClass = "protected-release",
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
+  $row = @($state.plan.tasks | Where-Object id -eq "ecosystem.measurement")
+  if ($row.Count -ne 1) { throw "Context plan does not contain ecosystem.measurement exactly once." }
+  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $mods = (Resolve-Path -LiteralPath $LocalModDir).Path
+  $modRows = @(Get-ChildItem -LiteralPath $mods -Filter *.zip -File | Sort-Object Name | ForEach-Object {
+    [pscustomobject][ordered]@{name=$_.Name;bytes=[int64]$_.Length;sha256=(Get-MIRCPSha256File -Path $_.FullName)}
+  })
+  if ($modRows.Count -eq 0) { throw "Ecosystem measurement requires a non-empty local mod ZIP closure." }
+  $outputRoot = Join-Path $repo "out/control-plane-v5/ecosystem"
+  & (Join-Path $source.path "scripts/Invoke-MIRReleaseTargetedGate.ps1") -FactorioBin $factorio.path `
+    -FactorioLine ([string]$state.plan.target) -LocalModDir $mods -OutputRoot $outputRoot `
+    -CandidateZip (Join-Path $state.context.path "candidate.zip") -CandidateSourceCommit ([string]$source.commit) `
+    -SkipBuild -SkipCleanGitStatus -SkipStrictGate -NoGitPull
+  $exitCode = $LASTEXITCODE
+  $summaryPath = Join-Path $outputRoot "release-targeted-summary.json"
+  $summary = if (Test-Path -LiteralPath $summaryPath -PathType Leaf) { Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json } else { $null }
+  $failedSteps = if ($null -eq $summary) { 1 } else { @($summary.results | Where-Object status -ne "passed").Count }
+  $status = if ($exitCode -eq 0 -and $null -ne $summary -and $failedSteps -eq 0 -and [string]::IsNullOrWhiteSpace([string]$summary.failure_message)) { "passed" } else { "failed" }
+  $facts = [pscustomobject][ordered]@{
+    status = $status
+    factorio_binary_sha256 = [string]$factorio.sha256
+    mod_zip_count = $modRows.Count
+    mod_closure_sha256 = Get-MIRCPSha256Object -Value $modRows
+    steps = if ($null -eq $summary) { 0 } else { @($summary.results).Count }
+    failed_steps = $failedSteps
+  }
+  return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;mod_closure=$modRows;source_commit=[string]$source.commit}) `
+    -Facts $facts -ArtifactPath $summaryPath -ArtifactKind "ecosystem-summary" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
+}
+
+function Invoke-MIRCPApprovedDeltaMeasurement {
+  param(
+    [Parameter(Mandatory)][string]$ContextPath,
+    [Parameter(Mandatory)][string]$FactorioBin,
+    [Parameter(Mandatory)][string]$PriorRelease,
+    [Parameter(Mandatory)][string]$SourceRepoRoot,
+    [string]$TrustClass = "protected-release",
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
+  $row = @($state.plan.tasks | Where-Object id -eq "approved-delta.measurement")
+  if ($row.Count -ne 1) { throw "Context plan does not contain approved-delta.measurement exactly once." }
+  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
+  $outputPath = Join-Path $repo "out/control-plane-v5/approved-delta.json"
+  $rawRoot = Join-Path $repo "out/control-plane-v5/approved-delta-raw"
+  & (Join-Path $source.path "scripts/Export-MIRApprovedDelta.ps1") -BaselinePackage $prior `
+    -CurrentPackage (Join-Path $state.context.path "candidate.zip") -FactorioBin $factorio.path `
+    -OutputPath $outputPath -EvidenceRoot $rawRoot -ExpectedBaselineSha256 (Get-MIRCPSha256File -Path $prior) `
+    -ExpectedSourceCommit ([string]$source.commit)
+  $exportExitCode = $LASTEXITCODE
+  if ($exportExitCode -eq 0) {
+    & (Join-Path $source.path "scripts/Test-MIRApprovedDelta.ps1") -Path $outputPath `
+      -Candidate (Join-Path $state.context.path "candidate.zip") -ExpectedSourceCommit ([string]$source.commit)
+  }
+  $testExitCode = $LASTEXITCODE
+  $artifact = if (Test-Path -LiteralPath $outputPath -PathType Leaf) { Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json } else { $null }
+  $status = if ($exportExitCode -eq 0 -and $testExitCode -eq 0 -and $null -ne $artifact -and [string]$artifact.summary.status -eq "approved" -and [int]$artifact.summary.unapproved_count -eq 0) { "passed" } else { "failed" }
+  $facts = [pscustomobject][ordered]@{
+    status = $status
+    factorio_binary_sha256 = [string]$factorio.sha256
+    prior_archive_sha256 = Get-MIRCPSha256File -Path $prior
+    difference_count = if ($null -eq $artifact) { -1 } else { [int]$artifact.summary.difference_count }
+    unapproved_count = if ($null -eq $artifact) { -1 } else { [int]$artifact.summary.unapproved_count }
+    artifact_status = if ($null -eq $artifact) { "missing" } else { [string]$artifact.summary.status }
+  }
+  return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$facts.prior_archive_sha256;source_commit=[string]$source.commit}) `
+    -Facts $facts -ArtifactPath $outputPath -ArtifactKind "approved-delta" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
 
 function Complete-MIRCPAggregateGate {
@@ -279,6 +516,16 @@ function Complete-MIRCPAggregateGate {
     if ($matches.Count -eq 1) { $taskResults.Add([pscustomobject][ordered]@{task_id=[string]$batch.id;status="passed";object_digest=[string]$matches[0].digest}) }
     elseif ($matches.Count -eq 0) { throw "Aggregate gate lacks exact passing evidence for environment batch $($batch.id)." }
     else { throw "Aggregate gate found ambiguous evidence for environment batch $($batch.id)." }
+  }
+  foreach ($row in @($state.plan.tasks | Where-Object kind -eq "aggregate")) {
+    $selectedMembers = @($row.depends_on | ForEach-Object { [string]$_ })
+    $missingMembers = @($selectedMembers | Where-Object { $member = $_; @($taskResults | Where-Object task_id -eq $member).Count -ne 1 })
+    if ($missingMembers.Count -gt 0) { throw "Aggregate TaskNode $($row.id) lacks exact member results: $($missingMembers -join ', ')." }
+    $memberResults = @($taskResults | Where-Object { [string]$_.task_id -in $selectedMembers } | Sort-Object task_id)
+    $aggregateMarker = Write-MIRCPTaskResultEvidence -State $state -PlanRow $row -Status passed `
+      -Payload ([pscustomobject][ordered]@{aggregate=$true;members=@($memberResults | ForEach-Object { [pscustomobject][ordered]@{task_id=[string]$_.task_id;object_digest=[string]$_.object_digest} })}) `
+      -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
+    $taskResults.Add($aggregateMarker)
   }
   $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass
   $manifest = New-MIRCPExecutionManifest -ContextDigest ([string]$state.context.context_id) -PlanId ([string]$state.plan_envelope.plan_id) -Producer $producer -TaskResults @($taskResults) -Status passed

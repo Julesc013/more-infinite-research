@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
-foreach ($module in @("Core", "Records", "Views")) {
+foreach ($module in @("Core", "Records", "Planner", "Views")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 

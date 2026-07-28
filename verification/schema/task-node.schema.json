@@ -45,8 +45,11 @@
       },
       "additionalProperties": false
     },
+    "command_scope": {"enum": ["control-plane", "source"]},
     "aggregate_members": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "state": {"enum": ["planned", "runnable", "running", "satisfied", "failed", "blocked", "cancelled"]}
+    "state": {"enum": ["planned", "runnable", "running", "satisfied", "failed", "blocked", "cancelled"]},
+    "activation": {"enum": ["verification", "release", "publication"]},
+    "targets": {"type": "array", "items": {"enum": ["2.0", "2.1"]}, "minItems": 1, "uniqueItems": true}
   },
   "allOf": [
     {

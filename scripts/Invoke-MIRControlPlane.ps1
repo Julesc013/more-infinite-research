@@ -11,6 +11,7 @@ param(
   [string]$TrustClass = "",
   [string]$Target = "2.1",
   [string]$Release = "",
+  [ValidateSet("verification", "release", "publication", "all")][string]$Stage = "verification",
   [string]$Output = "out/control-plane-v5-plan.json",
   [string]$ContextOutputRoot = "out/verification-context",
   [string]$EvidenceRoot = "",
@@ -68,7 +69,7 @@ MIR Control Plane v5
     Update-MIRCPViews -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 10
   }
   "plan" {
-    $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -EvidenceIndex $EvidenceIndex -TrustClass $TrustClass -Target $Target -Release $Release -RepoRoot $repo
+    $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -EvidenceIndex $EvidenceIndex -TrustClass $TrustClass -Target $Target -Release $Release -Stage $Stage -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo
     Write-MIRCPJson -Path $Output -Value $plan -RepoRoot $repo
     $plan | ConvertTo-Json -Depth 30
   }

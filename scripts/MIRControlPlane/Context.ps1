@@ -173,7 +173,7 @@ function New-MIRCPVerificationContext {
   $candidate = if ([IO.Path]::IsPathRooted($CandidatePath)) { [IO.Path]::GetFullPath($CandidatePath) } else { [IO.Path]::GetFullPath((Join-Path $repo $CandidatePath)) }
   if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { throw "Verification context candidate is missing: $candidate" }
   if ((Get-MIRCPSha256File -Path $candidate) -ne [string]$releaseRecord.package.archive_sha256) { throw "Verification context candidate does not match release authority." }
-  $plan = New-MIRCPPlan -Mode $Mode -ChangedPath @("scripts/MIRControlPlane/Context.ps1") -Target $Target -Release $Release -RepoRoot $repo
+  $plan = New-MIRCPPlan -Mode $Mode -ChangedPath @("scripts/MIRControlPlane/Context.ps1") -Target $Target -Release $Release -SourceRepoRoot $sourceRepo -RepoRoot $repo
   Write-Verbose "[context] materialized plan $($plan.plan_id)"
   $registryPath = Join-Path $sourceRepo "validation/generated/execution-registry.json"
   $registry = $null
