@@ -47,6 +47,10 @@ Task records declare prerequisites, semantic domains, effective inputs, outputs,
 
 Aggregate nodes read child results and never execute child commands. `static.full` remains a v4 shadow input during migration but is not an executing v5 task.
 
+The initial atomic catalog contains 19 executable nodes and one result-only aggregate. It separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, package identity, package composition, deterministic construction, performance policy, and control-plane records. Commands are argument arrays rather than shell strings.
+
+`scripts/Invoke-MIRControlPlane.ps1 plan` supports `changed`, `qualify-incremental`, `calibrate-fresh`, and `rerun-failure` modes. Every selected row includes its semantic impact reason, freshness class, resource class, prerequisites, and effective-input digest. Unknown paths select the complete graph and fail governance until ownership is added.
+
 ## Observation and evaluation
 
 Factorio work produces canonical observations. Pure evaluators consume observation objects plus versioned assertion records. Capture, compilation, realization, and evaluation identities are independent, allowing assertion, parser, diagnostic, and presentation changes to reuse sound engine observations.
@@ -58,6 +62,8 @@ Compatible scenarios share an exact environment signature. Performance, transiti
 The planner maps changed paths to owning modules and domains, closes downstream reads, and selects proof obligations. Unknown ownership broadens selection and emits a governance failure. Mutation calibration protects the zero-false-negative invariant.
 
 Freshness is proposition-specific: content-eternal, environment-bound, candidate-bound, transition-bound, protected-release-fresh, or always-fresh. Failure-directed reruns select the failed node, invalidated prerequisites, changed downstream inputs, and remaining release-fresh obligations.
+
+`.mir/control-plane/mutation-calibration.json` deliberately mutates provider, setting, locale, release-record, control-plane, and unknown inputs. The control-plane gate requires every necessary task to remain selected and fixes the false-negative budget at zero.
 
 ## Verification context and evidence
 

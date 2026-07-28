@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/task-node.schema.json",
+  "title": "MIR Control Plane TaskNode",
+  "type": "object",
+  "required": ["schema", "id", "owner", "kind", "layer", "depends_on", "reads", "writes", "effective_inputs", "outputs", "resource_class", "freshness", "side_effect", "retry", "completion_proof", "state"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]+$"},
+    "owner": {"type": "string", "pattern": "^(CHG|INC)-[0-9]{4}-[0-9]{4}$"},
+    "kind": {"enum": ["static", "package", "capture", "evaluation", "transition", "performance", "manual", "promotion", "aggregate"]},
+    "layer": {"enum": ["F0", "F1", "F2", "F3", "F4"]},
+    "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "reads": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "writes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "effective_inputs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "outputs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "resource_class": {"enum": ["cpu-light", "cpu-heavy", "disk-heavy", "factorio", "factorio-exclusive", "human", "gate"]},
+    "freshness": {"enum": ["content-eternal", "environment-bound", "candidate-bound", "transition-bound", "protected-release-fresh", "always-fresh"]},
+    "side_effect": {"enum": ["none", "generated-files", "temporary-files", "evidence-write", "external-read", "human-attestation"]},
+    "retry": {
+      "type": "object",
+      "required": ["maximum_attempts", "retryable"],
+      "properties": {
+        "maximum_attempts": {"type": "integer", "minimum": 1, "maximum": 5},
+        "retryable": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "completion_proof": {
+      "type": "object",
+      "required": ["type", "status"],
+      "properties": {
+        "type": {"enum": ["structured-result", "aggregate-closure", "attestation", "seal"]},
+        "status": {"const": "passed"}
+      },
+      "additionalProperties": false
+    },
+    "command": {
+      "type": "object",
+      "required": ["executable", "arguments"],
+      "properties": {
+        "executable": {"enum": ["pwsh"]},
+        "arguments": {"type": "array", "items": {"type": "string"}, "minItems": 2}
+      },
+      "additionalProperties": false
+    },
+    "aggregate_members": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "state": {"enum": ["planned", "runnable", "running", "satisfied", "failed", "blocked", "cancelled"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"kind": {"const": "aggregate"}}},
+      "then": {"required": ["aggregate_members"], "not": {"required": ["command"]}},
+      "else": {"required": ["command"]}
+    }
+  ],
+  "additionalProperties": false
+}

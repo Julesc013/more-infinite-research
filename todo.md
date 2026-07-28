@@ -13,7 +13,28 @@ Generated: 2026-07-28
 
 ## Executable TaskNodes
 
-No open TaskNodes.
+| Task | Kind | State | Dependencies |
+| --- | --- | --- | --- |
+| `architecture.dependencies` | `static` | `planned` |  |
+| `architecture.files` | `static` | `planned` |  |
+| `backport.contract` | `static` | `planned` |  |
+| `compiler.contract` | `static` | `planned` |  |
+| `compiler.schema` | `static` | `planned` |  |
+| `control-plane.records` | `static` | `planned` | docs.generated, harness.schemas |
+| `docs.generated` | `static` | `planned` |  |
+| `docs.schema` | `static` | `planned` |  |
+| `harness.quality` | `static` | `planned` |  |
+| `harness.schemas` | `static` | `planned` |  |
+| `locale.contract` | `static` | `planned` |  |
+| `package.composition` | `package` | `planned` | package.identity |
+| `package.determinism` | `package` | `planned` | package.identity |
+| `package.identity` | `package` | `planned` |  |
+| `performance.contract` | `static` | `planned` |  |
+| `release.authority` | `static` | `planned` | docs.generated |
+| `scenario.registry` | `static` | `planned` | harness.schemas |
+| `settings.contract` | `static` | `planned` |  |
+| `shadow.equivalence` | `evaluation` | `planned` | control-plane.records, scenario.registry |
+| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, release.authority, backport.contract, harness.schemas, harness.quality, scenario.registry, package.identity, package.composition, package.determinism, performance.contract, control-plane.records |
 
 ## Open change and incident records
 

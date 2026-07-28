@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "authority": "mir-control-plane-v5-impact-mutation-calibration",
+  "false_negative_budget": 0,
+  "cases": [
+    {"id": "provider", "changed_paths": ["prototypes/mir/planner/costs.lua"], "required_tasks": ["architecture.files", "compiler.schema", "compiler.contract", "package.identity", "scenario.registry"]},
+    {"id": "settings", "changed_paths": ["settings.lua"], "required_tasks": ["settings.contract", "locale.contract", "package.identity", "scenario.registry"]},
+    {"id": "locale", "changed_paths": ["locale/en/mir.cfg"], "required_tasks": ["locale.contract", "package.identity"], "forbidden_tasks": ["performance.contract"]},
+    {"id": "release-record", "changed_paths": [".mir/releases/3.2.2.json"], "required_tasks": ["release.authority", "docs.generated", "control-plane.records"]},
+    {"id": "control-plane", "changed_paths": ["scripts/MIRControlPlane/Planner.ps1"], "required_tasks": ["control-plane.records", "harness.schemas", "shadow.equivalence"]},
+    {"id": "unknown", "changed_paths": ["unowned/new-input.bin"], "required_policy": "select-all-and-fail-governance"}
+  ]
+}

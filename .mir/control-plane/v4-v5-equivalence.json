@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "authority": "mir-control-plane-v5-shadow-equivalence",
+  "state": "pending",
+  "calibration_candidates": ["3.2.2", "2.5.0"],
+  "dimensions": ["candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities", "approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs"],
+  "acceptance": {"exact_plan_obligation_equivalence": true, "exact_verdict_equivalence": true, "fresh_independent_calibration_required": true},
+  "proofs": []
+}

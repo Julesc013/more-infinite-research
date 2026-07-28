@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "authority": "mir-control-plane-v5-freshness",
+  "classes": {
+    "content-eternal": {"reuse_scope": ["effective-input-digest", "component-abi"], "modes_forcing_fresh": ["calibrate-fresh"]},
+    "environment-bound": {"reuse_scope": ["environment-signature", "observation-abi"], "modes_forcing_fresh": ["calibrate-fresh"]},
+    "candidate-bound": {"reuse_scope": ["candidate-content-sha256", "effective-input-digest"], "modes_forcing_fresh": ["calibrate-fresh"]},
+    "transition-bound": {"reuse_scope": ["prior-content-sha256", "candidate-content-sha256", "effective-input-digest"], "modes_forcing_fresh": ["calibrate-fresh"]},
+    "protected-release-fresh": {"reuse_scope": ["protected-run-id", "candidate-content-sha256"], "modes_forcing_fresh": ["qualify-incremental", "calibrate-fresh"]},
+    "always-fresh": {"reuse_scope": [], "modes_forcing_fresh": ["changed", "qualify-incremental", "calibrate-fresh", "rerun-failure"]}
+  },
+  "calibration_triggers": ["verifier-abi", "impact-engine", "factorio-binary", "target-profile", "scheduled-independent-calibration"]
+}

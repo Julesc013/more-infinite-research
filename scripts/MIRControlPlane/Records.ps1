@@ -82,11 +82,15 @@ function Assert-MIRCPRecords {
     if (@($transition.proofs).Count -eq 0) { throw "Transition $($transition.id) has no admission proof." }
     if ([string]$transition.admission -eq "grandfathered-import" -and [string]::IsNullOrWhiteSpace([string]$transition.exception)) { throw "Grandfathered transition $($transition.id) requires an explicit exception." }
   }
+  $taskGraph = Assert-MIRCPTaskGraph -RepoRoot $repo
   return [pscustomobject][ordered]@{
     changes = $changes.Count
     incidents = $incidents.Count
     releases = $releases.Count
     transitions = $transitions.Count
+    tasks = $taskGraph.tasks
+    executable_tasks = $taskGraph.executable
+    aggregate_tasks = $taskGraph.aggregates
     states = $states.Count
   }
 }

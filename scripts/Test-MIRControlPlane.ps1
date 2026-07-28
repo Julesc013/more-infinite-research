@@ -12,7 +12,7 @@ foreach ($module in @("Core", "Records", "Planner", "Evidence", "Views", "Shadow
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
 
-foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json")) {
+foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json")) {
   $schema = Read-MIRCPJson -Path "verification/schema/$schemaName" -RepoRoot $repo
   if ([string]$schema.'$schema' -ne "https://json-schema.org/draft/2020-12/schema" -or [string]$schema.type -ne "object" -or $schema.additionalProperties -ne $false) {
     throw "Control-plane schema is not strict JSON Schema 2020-12: $schemaName"
@@ -21,6 +21,15 @@ foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.j
 
 $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
+$calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo
+if ([int]$calibration.false_negative_budget -ne 0) { throw "Impact mutation calibration permits false negatives." }
+$planA = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
+$planB = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
+if ([string]$planA.plan_id -ne [string]$planB.plan_id -or [bool]$planA.plan.impact.governance_failure) { throw "Semantic planner is nondeterministic or failed to own its own implementation." }
+$freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
+if ([int]$freshPlan.plan.task_count -ne [int]$records.tasks -or -not [bool]$freshPlan.plan.aggregate_is_result_only) { throw "Fresh calibration does not select the complete TaskNode graph or treats aggregates as executable." }
+$aggregateRows = @($freshPlan.plan.tasks | Where-Object kind -eq "aggregate")
+if ($aggregateRows.Count -ne 1 -or [string]$aggregateRows[0].action -ne "AGGREGATE") { throw "Result-only aggregate was scheduled as executable work." }
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo
 if ([string]$backport.source.tag_state -ne "immutable" -or [string]$backport.source.tag_commit -ne "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378") {
@@ -36,4 +45,4 @@ foreach ($token in @("control_plane_policy", "control_plane_entrypoint", "contro
   if ($modules -notmatch $token) { throw "Module manifest is missing $token." }
 }
 
-Write-Host "[ok] MIR Control Plane v5 records ($($records.changes) changes, $($records.incidents) incidents, $($records.releases) releases) and package freeze $($freeze.lock_id) are valid."
+Write-Host "[ok] MIR Control Plane v5 records ($($records.changes) changes, $($records.incidents) incidents, $($records.releases) releases, $($records.tasks) tasks), package freeze $($freeze.lock_id), and $($calibration.cases) zero-false-negative impact mutations are valid."

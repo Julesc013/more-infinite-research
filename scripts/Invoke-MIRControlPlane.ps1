@@ -1,8 +1,15 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [switch]$AllLocks,
-  [switch]$Check
+  [switch]$Check,
+  [ValidateSet("changed", "qualify-incremental", "calibrate-fresh", "rerun-failure")][string]$Mode = "changed",
+  [string]$ChangedSince = "",
+  [string[]]$ChangedPath = @(),
+  [string[]]$FailedTask = @(),
+  [string]$Target = "2.1",
+  [string]$Release = "",
+  [string]$Output = "out/control-plane-v5-plan.json"
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,6 +30,8 @@ MIR Control Plane v5
   status                    Print current release roles and shadow status.
   views                     Generate release, branch, publication, backport, TODO, and dashboard views.
   views -Check              Fail when any generated control-plane view is stale.
+  plan                      Build an explainable semantic-impact TaskNode plan.
+  plan -Mode calibrate-fresh  Select every atomic task for independent calibration.
 "@ | Write-Host
   }
   "validate" {
@@ -45,5 +54,10 @@ MIR Control Plane v5
   }
   "views" {
     Update-MIRCPViews -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 10
+  }
+  "plan" {
+    $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -Target $Target -Release $Release -RepoRoot $repo
+    Write-MIRCPJson -Path $Output -Value $plan -RepoRoot $repo
+    $plan | ConvertTo-Json -Depth 30
   }
 }

@@ -629,6 +629,12 @@ validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
     control_plane_policy: .mir/control-plane/control-plane.json
+    control_plane_domains: .mir/control-plane/domains.json
+    control_plane_ownership: .mir/control-plane/ownership.json
+    control_plane_freshness: .mir/control-plane/freshness.json
+    control_plane_mutation_calibration: .mir/control-plane/mutation-calibration.json
+    control_plane_shadow_authority: .mir/control-plane/v4-v5-equivalence.json
+    control_plane_task_schema: verification/schema/task-node.schema.json
     control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
     control_plane_core: scripts/MIRControlPlane/Core.ps1
     control_plane_records: scripts/MIRControlPlane/Records.ps1
@@ -636,6 +642,7 @@ validation_tooling:
     control_plane_evidence: scripts/MIRControlPlane/Evidence.ps1
     control_plane_views: scripts/MIRControlPlane/Views.ps1
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
+    control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: scripts/Test-MIRControlPlane.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: scripts/MIRAssurance/Core.ps1
