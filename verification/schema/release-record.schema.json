@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/release-record.schema.json",
+  "title": "MIR immutable ReleaseRecord",
+  "type": "object",
+  "required": ["schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at"],
+  "properties": {
+    "schema": {"const": 1},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "candidate_id": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
+    "package": {"type": "object"},
+    "proofs": {"type": "object"},
+    "assurance_exceptions": {"type": "array", "items": {"type": "object"}},
+    "remaining_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "source_release": {"type": "object"},
+    "baseline_release": {"type": "object"},
+    "release_notes": {"type": "string"},
+    "incident_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "backport_manifest": {"type": "string"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

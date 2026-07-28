@@ -10,8 +10,8 @@
   "source": {
     "release": "3.2.2",
     "tag": "3.2.2",
-    "tag_state": "pending-final-qualification",
-    "tag_commit": "",
+    "tag_state": "immutable",
+    "tag_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
     "candidate_id": "C24",
     "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
     "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "authority": "mir-control-plane-v5-package-locks",
+  "locks": [
+    {
+      "id": "mir-3.2.2-c24",
+      "target": "2.1",
+      "release": "3.2.2",
+      "candidate_id": "C24",
+      "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+      "package_source_tree": "afe3959e40c868578f3182bea5b4ce725dcfd222",
+      "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+      "archive": "dist/more-infinite-research_3.2.2.zip",
+      "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+      "archive_bytes": 1030817,
+      "archive_entries": 291,
+      "mode": "immutable-tagged-baseline"
+    },
+    {
+      "id": "mir-2.5.0-p9",
+      "target": "2.0",
+      "release": "2.5.0",
+      "candidate_id": "2.5-P9",
+      "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+      "package_source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
+      "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+      "archive": "dist/more-infinite-research_2.5.0.zip",
+      "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+      "archive_bytes": 1029914,
+      "archive_entries": 290,
+      "mode": "frozen-unreleased-calibration-candidate"
+    }
+  ]
+}

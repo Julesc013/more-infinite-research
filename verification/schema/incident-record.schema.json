@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/incident-record.schema.json",
+  "title": "MIR IncidentRecord",
+  "type": "object",
+  "required": ["schema", "id", "title", "external_issue", "state", "failing_environment", "reproduction", "root_cause", "repair_changes", "regression_propositions", "affected_releases", "candidate_binding", "closure"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^INC-[0-9]{4}-[0-9]{4}$"},
+    "title": {"type": "string", "minLength": 1},
+    "external_issue": {"type": "string", "minLength": 1},
+    "state": {"enum": ["reported", "reproduced", "root-cause-proven", "repair-planned", "repaired", "regression-proven", "candidate-bound", "released", "closed"]},
+    "failing_environment": {"type": "object"},
+    "reproduction": {"type": "object"},
+    "root_cause": {"type": "object"},
+    "repair_changes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "regression_propositions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "affected_releases": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "candidate_binding": {"type": "object"},
+    "closure": {"type": "object"}
+  },
+  "additionalProperties": false
+}

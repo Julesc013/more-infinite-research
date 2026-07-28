@@ -628,6 +628,15 @@ compiler_context:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    control_plane_policy: .mir/control-plane/control-plane.json
+    control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
+    control_plane_core: scripts/MIRControlPlane/Core.ps1
+    control_plane_records: scripts/MIRControlPlane/Records.ps1
+    control_plane_planner: scripts/MIRControlPlane/Planner.ps1
+    control_plane_evidence: scripts/MIRControlPlane/Evidence.ps1
+    control_plane_views: scripts/MIRControlPlane/Views.ps1
+    control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
+    control_plane_gate: scripts/Test-MIRControlPlane.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: scripts/MIRAssurance/Core.ps1
     assurance_domains: scripts/MIRAssurance/Domains.ps1
@@ -702,6 +711,17 @@ validation_tooling:
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
+    - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
+    - typed change incident task release and transition records are authoritative and human-readable status files are generated views
+    - F0 through F4 are classification labels while the scheduler follows explicit task prerequisites and resource constraints
+    - aggregate nodes evaluate completed atomic results and never execute their children
+    - environment capture compilation realization and evaluation use independent content identities
+    - compatible assertions share one exact environment capture while incompatible isolation contracts remain separate
+    - proposition freshness is explicit and no release uses a global no-reuse switch except governed independent calibration
+    - unknown path ownership broadens impact selection and fails governance until classified
+    - verification workers consume one immutable context digest and upload content-addressed objects plus execution manifests
+    - producer evaluator and canonicalization revocation may invalidate derived evaluations without discarding sound observations
+    - v5 remains shadow-only until exact v4 equivalence and one fresh independent calibration pass
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
     - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint

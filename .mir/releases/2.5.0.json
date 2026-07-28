@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "release": "2.5.0",
+  "candidate_id": "2.5-P9",
+  "target": "2.0",
+  "branch": "tmp/2.0",
+  "state": "focused-qualified",
+  "package": {
+    "source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+    "source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
+    "source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+    "content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "bytes": 1029914,
+    "entries": 290
+  },
+  "source_release": {
+    "release": "3.2.2",
+    "tag": "3.2.2",
+    "tag_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378"
+  },
+  "baseline_release": {
+    "release": "2.4.9",
+    "tag": "2.4.9",
+    "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
+  },
+  "proofs": {
+    "focused_qualification": []
+  },
+  "remaining_obligations": [
+    "v5-shadow-equivalence",
+    "deterministic-dual-parent-reconstruction",
+    "candidate-qualification",
+    "manual-acceptance",
+    "protected-qualification",
+    "seal",
+    "promotion",
+    "tag",
+    "publication",
+    "public-byte-verification"
+  ],
+  "backport_manifest": ".mir/backports/2.5.0.json",
+  "updated_at": "2026-07-28T12:00:00Z"
+}

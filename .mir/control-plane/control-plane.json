@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "policy_id": "mir-control-plane-v5",
+  "component_abis": {
+    "record": 1,
+    "planner": 1,
+    "capture": 1,
+    "compilation": 1,
+    "realization": 1,
+    "evaluation": 1,
+    "canonicalization": 1,
+    "evidence_store": 1,
+    "view_generator": 1,
+    "shadow": 1
+  },
+  "records": {
+    "changes": ".mir/changes",
+    "incidents": ".mir/incidents",
+    "tasks": ".mir/tasks",
+    "releases": ".mir/releases",
+    "transitions": ".mir/release-transitions",
+    "current": ".mir/releases/current.json"
+  },
+  "catalogs": {
+    "domains": ".mir/control-plane/domains.json",
+    "freshness": ".mir/control-plane/freshness.json",
+    "ownership": ".mir/control-plane/ownership.json",
+    "package_locks": ".mir/control-plane/package-locks.json",
+    "mutation_calibration": ".mir/control-plane/mutation-calibration.json",
+    "v4_equivalence": ".mir/control-plane/v4-v5-equivalence.json",
+    "scenario_source": "fixtures/compat-matrix/expected-scenarios.json",
+    "execution_registry": "validation/generated/execution-registry.json"
+  },
+  "outputs": {
+    "verification_context": "out/verification-context",
+    "evidence_store": "artifacts/evidence",
+    "todo": "todo.md",
+    "current_candidate": "docs/releases/current-candidate.md",
+    "release_dashboard": "docs/releases/control-plane-dashboard.md",
+    "branch_status": ".mir/generated/branch-status.json",
+    "publication_checklist": ".mir/generated/publication-checklist.json",
+    "backport_queue": ".mir/generated/backport-queue.json"
+  },
+  "release_states": [
+    "planned",
+    "source-frozen",
+    "package-built",
+    "focused-qualified",
+    "candidate-qualified",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
+  "rules": {
+    "package_roots_locked": true,
+    "unknown_ownership_is_conservative": true,
+    "aggregate_tasks_execute_children": false,
+    "mutable_job_status_is_evidence": false,
+    "cross_target_reuse_requires_target_neutral_scope": true,
+    "release_views_are_generated": true,
+    "ai_may_omit_required_proof": false
+  }
+}

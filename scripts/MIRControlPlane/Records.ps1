@@ -1,0 +1,138 @@
+function Get-MIRCPPolicy {
+  param([string]$RepoRoot = "")
+  return Read-MIRCPJson -Path ".mir/control-plane/control-plane.json" -RepoRoot $RepoRoot
+}
+
+function Get-MIRCPRecordSet {
+  param(
+    [Parameter(Mandatory)][ValidateSet("changes", "incidents", "tasks", "releases", "transitions")][string]$Kind,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $policy = Get-MIRCPPolicy -RepoRoot $repo
+  $relative = [string]$policy.records.$Kind
+  $root = Join-Path $repo $relative
+  if (-not (Test-Path -LiteralPath $root -PathType Container)) { return @() }
+  return @(Get-ChildItem -LiteralPath $root -Filter *.json -File | Where-Object Name -ne "current.json" | Sort-Object Name | ForEach-Object {
+    Read-MIRCPJson -Path $_.FullName -RepoRoot $repo
+  })
+}
+
+function Assert-MIRCPRequiredProperties {
+  param(
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)][string[]]$Names,
+    [Parameter(Mandatory)][string]$Context
+  )
+  foreach ($name in $Names) {
+    $property = $Record.PSObject.Properties[$name]
+    if ($null -eq $property -or $null -eq $property.Value) {
+      throw "$Context is missing required property '$name'."
+    }
+  }
+}
+
+function Assert-MIRCPRecords {
+  param([string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $policy = Get-MIRCPPolicy -RepoRoot $repo
+  if ([int]$policy.schema -ne 1 -or [string]$policy.policy_id -ne "mir-control-plane-v5") {
+    throw "Control-plane policy schema or identity is invalid."
+  }
+
+  $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
+  $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
+  $releases = @(Get-MIRCPRecordSet -Kind releases -RepoRoot $repo)
+  if ($changes.Count -eq 0 -or $releases.Count -eq 0) { throw "Control-plane change and release authorities must not be empty." }
+
+  foreach ($change in $changes) {
+    Assert-MIRCPRequiredProperties -Record $change -Names @("schema", "id", "title", "kind", "package_visible", "domains_read", "domains_written", "affected_targets", "test_obligations", "state") -Context "ChangeRecord"
+    if ([string]$change.id -notmatch '^CHG-[0-9]{4}-[0-9]{4}$') { throw "Invalid ChangeRecord id: $($change.id)" }
+  }
+  foreach ($incident in $incidents) {
+    Assert-MIRCPRequiredProperties -Record $incident -Names @("schema", "id", "title", "state", "failing_environment", "root_cause", "regression_propositions", "candidate_binding", "closure") -Context "IncidentRecord"
+    if ([string]$incident.id -notmatch '^INC-[0-9]{4}-[0-9]{4}$') { throw "Invalid IncidentRecord id: $($incident.id)" }
+  }
+
+  $states = @($policy.release_states | ForEach-Object { [string]$_ })
+  foreach ($release in $releases) {
+    Assert-MIRCPRequiredProperties -Record $release -Names @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at") -Context "ReleaseRecord"
+    if ($states -notcontains [string]$release.state) { throw "Release $($release.release) uses unknown state '$($release.state)'." }
+    foreach ($field in @("source_commit", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries")) {
+      if ($null -eq $release.package.PSObject.Properties[$field]) { throw "Release $($release.release) package is missing '$field'." }
+    }
+  }
+
+  $pointer = Read-MIRCPJson -Path ([string]$policy.records.current) -RepoRoot $repo
+  $known = @($releases | ForEach-Object { [string]$_.release })
+  foreach ($role in @($pointer.roles.PSObject.Properties)) {
+    if ($role.Name -in @("canonical", "backport_calibration") -and $known -notcontains [string]$role.Value) {
+      throw "Current release role '$($role.Name)' points to unknown record '$($role.Value)'."
+    }
+  }
+  return [pscustomobject][ordered]@{
+    changes = $changes.Count
+    incidents = $incidents.Count
+    releases = $releases.Count
+    states = $states.Count
+  }
+}
+
+function Get-MIRCPCommitPackageSourceHash {
+  param(
+    [Parameter(Mandatory)][string]$Commit,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
+  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-cp-package-" + [guid]::NewGuid().ToString("N"))
+  $archive = Join-Path $temporaryRoot "source.zip"
+  $source = Join-Path $temporaryRoot "source"
+  try {
+    [void](New-Item -ItemType Directory -Force -Path $temporaryRoot)
+    $roots = @(Get-MIRPackageSourceRoots)
+    & git -C $repo archive --format=zip --output=$archive $Commit -- @roots 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Unable to extract package roots at commit $Commit." }
+    Expand-Archive -LiteralPath $archive -DestinationPath $source
+    return Get-MIRPackageSourceFingerprint -RepoRoot $source
+  } finally {
+    if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
+      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+    }
+  }
+}
+
+function Assert-MIRCPPackageFreeze {
+  param(
+    [string]$RepoRoot = "",
+    [switch]$AllLocks
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
+  $authority = Read-MIRCPJson -Path ".mir/control-plane/package-locks.json" -RepoRoot $repo
+  if ([int]$authority.schema -ne 1 -or [string]$authority.authority -ne "mir-control-plane-v5-package-locks") {
+    throw "Package-lock authority is invalid."
+  }
+  $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
+  $target = [string]$info.factorio_version
+  $active = @($authority.locks | Where-Object target -eq $target)
+  if ($active.Count -ne 1) { throw "Expected exactly one package lock for current target $target." }
+  $currentHash = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  if ($currentHash -ne [string]$active[0].package_source_sha256) {
+    throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
+  }
+  $archivePath = Join-Path $repo ([string]$active[0].archive)
+  if (Test-Path -LiteralPath $archivePath -PathType Leaf) {
+    if ((Get-MIRCPSha256File -Path $archivePath) -ne [string]$active[0].archive_sha256) { throw "Locked archive hash changed: $($active[0].archive)" }
+    if ((Get-Item -LiteralPath $archivePath).Length -ne [long]$active[0].archive_bytes) { throw "Locked archive size changed: $($active[0].archive)" }
+  }
+  if ($AllLocks) {
+    foreach ($lock in @($authority.locks)) {
+      $commitHash = Get-MIRCPCommitPackageSourceHash -Commit ([string]$lock.package_source_commit) -RepoRoot $repo
+      if ($commitHash -ne [string]$lock.package_source_sha256) {
+        throw "Committed package source for lock $($lock.id) differs: expected $($lock.package_source_sha256), observed $commitHash."
+      }
+    }
+  }
+  return [pscustomobject][ordered]@{lock_id=[string]$active[0].id; target=$target; package_source_sha256=$currentHash}
+}

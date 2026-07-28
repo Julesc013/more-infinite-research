@@ -1,0 +1,70 @@
+---
+title: "MIR Control Plane v5"
+status: current
+applies_to: "post-3.2.2"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-28
+supersedes: []
+superseded_by: []
+---
+
+# MIR Control Plane v5
+
+Control Plane v5 is a tooling-only fixed point after immutable MIR 3.2.2. It does not authorize player-visible changes to C24 or the frozen 2.5-P9 projection.
+
+## Authority
+
+Humans edit typed records under `.mir/changes/`, `.mir/incidents/`, `.mir/tasks/`, `.mir/releases/`, and `.mir/release-transitions/`. The current-role pointer is `.mir/releases/current.json`. Release ledgers, TODOs, candidate documents, dashboards, branch status, publication checklists, backport queues, and release-note identity blocks are generated views.
+
+Every release follows the ordered state machine:
+
+```text
+planned
+→ source-frozen
+→ package-built
+→ focused-qualified
+→ candidate-qualified
+→ manually-accepted
+→ protected-qualified
+→ sealed
+→ promoted
+→ tagged
+→ published
+→ publicly-verified
+```
+
+Transitions require immutable proof objects. A historical release imported with an explicit assurance exception may calibrate v5 but cannot satisfy a future release gate.
+
+## Package freeze
+
+`.mir/control-plane/package-locks.json` binds C24 and P9 package-source, content, archive, size, and entry identities. Every v5 commit must pass the package-freeze gate. Tooling, manifests, generated views, and evidence indexes may change; package roots may not.
+
+## Task graph
+
+Task records declare prerequisites, semantic domains, effective inputs, outputs, resources, freshness, side effects, retry policy, and completion proof. F0 through F4 remain classification labels only. Scheduling follows prerequisites and resource constraints.
+
+Aggregate nodes read child results and never execute child commands. `static.full` remains a v4 shadow input during migration but is not an executing v5 task.
+
+## Observation and evaluation
+
+Factorio work produces canonical observations. Pure evaluators consume observation objects plus versioned assertion records. Capture, compilation, realization, and evaluation identities are independent, allowing assertion, parser, diagnostic, and presentation changes to reuse sound engine observations.
+
+Compatible scenarios share an exact environment signature. Performance, transition, destructive fault-injection, distinct-setting, distinct-closure, source-save, and clean-process proofs remain isolated.
+
+## Impact, freshness, and reruns
+
+The planner maps changed paths to owning modules and domains, closes downstream reads, and selects proof obligations. Unknown ownership broadens selection and emits a governance failure. Mutation calibration protects the zero-false-negative invariant.
+
+Freshness is proposition-specific: content-eternal, environment-bound, candidate-bound, transition-bound, protected-release-fresh, or always-fresh. Failure-directed reruns select the failed node, invalidated prerequisites, changed downstream inputs, and remaining release-fresh obligations.
+
+## Verification context and evidence
+
+Planning emits one immutable verification-context bundle. Workers verify its digest and do not rediscover candidate, target, transition, scenarios, closures, or policy.
+
+Evidence is stored by SHA-256 under `artifacts/evidence/objects/sha256/`. Indexes and leases are rebuildable coordination data. Revocation may target a producer ABI, evaluator ABI, canonicalization ABI, digest set, or time range without discarding unrelated observations.
+
+## Acceptance
+
+V5 runs in shadow until it agrees with v4 on candidate identity, required obligations, scenarios and environments, approved delta, upgrade, performance, manual result, aggregate verdict, and seal inputs for 3.2.2 and P9. Promotion requires one complete fresh independent calibration after verifier, impact, target-profile, or Factorio changes.

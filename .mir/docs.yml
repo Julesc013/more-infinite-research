@@ -535,6 +535,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.3-2.6-semantic-platform-roadmap
+  - path: docs/architecture/control-plane-v5.md
+    title: "MIR Control Plane v5"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-control-plane-v5
+      - control-plane-release-state-machine
+      - control-plane-package-freeze
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

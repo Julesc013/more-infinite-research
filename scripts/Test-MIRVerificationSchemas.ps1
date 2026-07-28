@@ -15,6 +15,9 @@ $contracts = [ordered]@{
   "manual-release-attestation.schema.json" = @("schema", "kind", "candidate_sha256", "candidate_content_sha256", "source_commit", "checklist_version", "items", "status", "attestation_sha256")
   "playtest-report.schema.json" = @("schema", "kind", "created_at", "candidate", "factorio", "environment", "observation", "compiler", "attachments")
   "upgrade-matrix.schema.json" = @("schema", "kind", "status", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows")
+  "change-record.schema.json" = @("schema", "id", "title", "kind", "package_visible", "domains_read", "domains_written", "affected_targets", "test_obligations", "state")
+  "incident-record.schema.json" = @("schema", "id", "title", "state", "failing_environment", "root_cause", "regression_propositions", "candidate_binding", "closure")
+  "release-record.schema.json" = @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at")
 }
 
 foreach ($entry in $contracts.GetEnumerator()) {

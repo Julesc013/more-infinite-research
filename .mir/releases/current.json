@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "authority": "mir-current-release-roles-v1",
+  "roles": {
+    "canonical": "3.2.2",
+    "backport_calibration": "2.5.0",
+    "published_factorio_2_1": "3.2.2",
+    "published_factorio_2_0": "2.4.9"
+  }
+}
