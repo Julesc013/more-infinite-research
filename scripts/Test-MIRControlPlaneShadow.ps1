@@ -4,7 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Evidence", "Views", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Shadow")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 

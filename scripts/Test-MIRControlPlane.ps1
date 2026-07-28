@@ -5,14 +5,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Evidence", "Views", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Shadow")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
 
-foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json")) {
+foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json")) {
   $schema = Read-MIRCPJson -Path "verification/schema/$schemaName" -RepoRoot $repo
   if ([string]$schema.'$schema' -ne "https://json-schema.org/draft/2020-12/schema" -or [string]$schema.type -ne "object" -or $schema.additionalProperties -ne $false) {
     throw "Control-plane schema is not strict JSON Schema 2020-12: $schemaName"
@@ -30,6 +30,10 @@ $freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("scripts/MIRCont
 if ([int]$freshPlan.plan.task_count -ne [int]$records.tasks -or -not [bool]$freshPlan.plan.aggregate_is_result_only) { throw "Fresh calibration does not select the complete TaskNode graph or treats aggregates as executable." }
 $aggregateRows = @($freshPlan.plan.tasks | Where-Object kind -eq "aggregate")
 if ($aggregateRows.Count -ne 1 -or [string]$aggregateRows[0].action -ne "AGGREGATE") { throw "Result-only aggregate was scheduled as executable work." }
+$registry = Update-MIRCPExecutionRegistry -Target "2.1" -RepoRoot $repo -Check
+$registryResult = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo
+$replay = Update-MIRCPV4ReplayReport -RepoRoot $repo -Check
+if ([string]$replay.verdict -ne "passed" -or [int]$replay.metrics.source_evidence -ne 130) { throw "Historical v4 evidence replay is incomplete." }
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo
 if ([string]$backport.source.tag_state -ne "immutable" -or [string]$backport.source.tag_commit -ne "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378") {
@@ -45,4 +49,4 @@ foreach ($token in @("control_plane_policy", "control_plane_entrypoint", "contro
   if ($modules -notmatch $token) { throw "Module manifest is missing $token." }
 }
 
-Write-Host "[ok] MIR Control Plane v5 records ($($records.changes) changes, $($records.incidents) incidents, $($records.releases) releases, $($records.tasks) tasks), package freeze $($freeze.lock_id), and $($calibration.cases) zero-false-negative impact mutations are valid."
+Write-Host "[ok] MIR Control Plane v5 records ($($records.changes) changes, $($records.incidents) incidents, $($records.releases) releases, $($records.tasks) tasks), package freeze $($freeze.lock_id), $($registryResult.scenarios) exact-environment scenarios, 130 replayed observations, and $($calibration.cases) zero-false-negative impact mutations are valid."

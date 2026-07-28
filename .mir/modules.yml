@@ -635,15 +635,27 @@ validation_tooling:
     control_plane_mutation_calibration: .mir/control-plane/mutation-calibration.json
     control_plane_shadow_authority: .mir/control-plane/v4-v5-equivalence.json
     control_plane_task_schema: verification/schema/task-node.schema.json
+    control_plane_observation_schema: verification/schema/observation.schema.json
+    control_plane_assertion_schema: verification/schema/assertion.schema.json
+    control_plane_evaluation_schema: verification/schema/evaluation.schema.json
+    control_plane_execution_registry_schema: verification/schema/execution-registry.schema.json
+    control_plane_execution_registry: validation/generated/execution-registry.json
+    control_plane_historical_replay: .mir/control-plane/baselines/3.2.2-v5-replay.json
     control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
     control_plane_core: scripts/MIRControlPlane/Core.ps1
     control_plane_records: scripts/MIRControlPlane/Records.ps1
     control_plane_planner: scripts/MIRControlPlane/Planner.ps1
+    control_plane_scenarios: scripts/MIRControlPlane/Scenario.ps1
+    control_plane_observations: scripts/MIRControlPlane/Observation.ps1
     control_plane_evidence: scripts/MIRControlPlane/Evidence.ps1
     control_plane_views: scripts/MIRControlPlane/Views.ps1
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
     control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: scripts/Test-MIRControlPlane.ps1
+    control_plane_execution_registry_generator: scripts/Update-MIRExecutionRegistry.ps1
+    control_plane_execution_registry_gate: scripts/Test-MIRExecutionRegistry.ps1
+    control_plane_observation_replay_generator: scripts/Update-MIRObservationReplay.ps1
+    control_plane_observation_gate: scripts/Test-MIRObservationEvaluation.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: scripts/MIRAssurance/Core.ps1
     assurance_domains: scripts/MIRAssurance/Domains.ps1

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/evaluation.schema.json",
+  "title": "MIR offline evaluation",
+  "type": "object",
+  "required": ["schema", "evaluation_abi", "evaluation_key", "observation_sha256", "assertion", "status", "actual", "expected", "proposition", "evidence_digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "evaluation_abi": {"type": "integer", "minimum": 1},
+    "evaluation_key": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "observation_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "assertion": {"type": "object"},
+    "status": {"enum": ["passed", "failed", "invalid"]},
+    "actual": {},
+    "expected": {},
+    "proposition": {"type": "string"},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+  },
+  "additionalProperties": false
+}

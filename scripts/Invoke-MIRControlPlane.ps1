@@ -1,5 +1,5 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [switch]$AllLocks,
   [switch]$Check,
@@ -14,7 +14,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Evidence", "Views", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Shadow")) {
   . (Join-Path $PSScriptRoot "MIRControlPlane/$module.ps1")
 }
 
@@ -32,6 +32,10 @@ MIR Control Plane v5
   views -Check              Fail when any generated control-plane view is stale.
   plan                      Build an explainable semantic-impact TaskNode plan.
   plan -Mode calibrate-fresh  Select every atomic task for independent calibration.
+  registry                  Generate the exact-environment scenario execution registry.
+  registry -Check           Fail when the execution registry is stale.
+  replay                    Replay historical v4 evidence through the pure v5 evaluator.
+  replay -Check             Fail when the deterministic replay report is stale.
 "@ | Write-Host
   }
   "validate" {
@@ -59,5 +63,11 @@ MIR Control Plane v5
     $plan = New-MIRCPPlan -Mode $Mode -ChangedSince $ChangedSince -ChangedPath $ChangedPath -FailedTask $FailedTask -Target $Target -Release $Release -RepoRoot $repo
     Write-MIRCPJson -Path $Output -Value $plan -RepoRoot $repo
     $plan | ConvertTo-Json -Depth 30
+  }
+  "registry" {
+    Update-MIRCPExecutionRegistry -Target $Target -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 30
+  }
+  "replay" {
+    Update-MIRCPV4ReplayReport -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 20
   }
 }
