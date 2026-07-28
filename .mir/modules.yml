@@ -671,6 +671,8 @@ validation_tooling:
     control_plane_context_package_gate: scripts/Test-MIRContextPackage.ps1
     control_plane_context_registry_gate: scripts/Test-MIRContextExecutionRegistry.ps1
     control_plane_release_obligation_gate: scripts/Test-MIRReleaseObligation.ps1
+    control_plane_shadow_baseline_generator: scripts/Update-MIRShadowBaselines.ps1
+    control_plane_shadow_analysis_generator: scripts/Update-MIRShadowAnalysis.ps1
     control_plane_workflow: .github/workflows/control-plane-v5.yml
     control_plane_workflow_gate: scripts/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1

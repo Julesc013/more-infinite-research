@@ -50,6 +50,28 @@ $registry = Update-MIRCPExecutionRegistry -Target "2.1" -RepoRoot $repo -Check
 $registryResult = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo
 $replay = Update-MIRCPV4ReplayReport -RepoRoot $repo -Check
 if ([string]$replay.verdict -ne "passed" -or [int]$replay.metrics.source_evidence -ne 130) { throw "Historical v4 evidence replay is incomplete." }
+$shadowContract = Assert-MIRCPShadowContract -RepoRoot $repo
+$shadow = Read-MIRCPJson -Path ".mir/control-plane/shadow-analysis.json" -RepoRoot $repo
+$expectedShadowCounts = @{
+  "3.2.2" = @{ v4 = 113; v5 = 116 }
+  "2.5.0" = @{ v4 = 109; v5 = 112 }
+}
+foreach ($candidate in @($shadow.candidates)) {
+  $version = [string]$candidate.release
+  if (-not $expectedShadowCounts.ContainsKey($version)) { throw "Shadow analysis contains an unexpected candidate: $version" }
+  foreach ($dimension in @("candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities")) {
+    if ([string]$candidate.dimensions.$dimension.status -ne "passed") {
+      throw "Shadow analysis has not proven $version structural dimension $dimension."
+    }
+  }
+  if ([int]$candidate.dimensions.'scenario-identities'.v4 -ne [int]$expectedShadowCounts[$version].v4 -or
+      [int]$candidate.dimensions.'scenario-identities'.v5 -ne [int]$expectedShadowCounts[$version].v5) {
+    throw "Shadow scenario counts changed for $version."
+  }
+}
+if ([string]$shadow.status -ne "pending" -or @($shadow.pending_dimensions).Count -ne 7 -or [int]$shadowContract.pending.Count -ne 7) {
+  throw "Shadow cutover must remain pending on exactly the seven recorded outcome/seal dimensions."
+}
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo
 if ([string]$backport.source.tag_state -ne "immutable" -or [string]$backport.source.tag_commit -ne "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378") {

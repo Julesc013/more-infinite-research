@@ -18,8 +18,10 @@ Generated: 2026-07-28
 | `approved-delta.measurement` | `capture` | `planned` | package.identity, upgrade.measurement |
 | `architecture.dependencies` | `static` | `planned` |  |
 | `architecture.files` | `static` | `planned` |  |
+| `assurance.self-test` | `static` | `planned` | harness.schemas |
 | `backport.contract` | `static` | `planned` |  |
 | `backport.reconstruction` | `transition` | `planned` | package.determinism, shadow.equivalence |
+| `balance.contract` | `static` | `planned` |  |
 | `ci.workflow` | `static` | `planned` | executor.contract |
 | `compiler.contract` | `static` | `planned` |  |
 | `compiler.schema` | `static` | `planned` |  |
@@ -33,6 +35,7 @@ Generated: 2026-07-28
 | `harness.schemas` | `static` | `planned` |  |
 | `locale.contract` | `static` | `planned` |  |
 | `manual.acceptance` | `manual` | `planned` | package.identity, upgrade.measurement, ecosystem.measurement, approved-delta.measurement, performance.measurement |
+| `museum.compiler` | `static` | `planned` | architecture.files |
 | `observation.evaluation` | `static` | `planned` | harness.schemas, scenario.registry |
 | `package.composition` | `package` | `planned` | package.identity |
 | `package.determinism` | `package` | `planned` | package.identity |
@@ -44,12 +47,13 @@ Generated: 2026-07-28
 | `public-byte-verification` | `promotion` | `planned` | publication |
 | `publication` | `promotion` | `planned` | tag |
 | `qualification.full` | `aggregate` | `planned` | static.full, shadow.equivalence, upgrade.measurement, ecosystem.measurement, approved-delta.measurement, performance.measurement, manual.acceptance |
+| `release-history.integrity` | `static` | `planned` |  |
 | `release.authority` | `static` | `planned` | docs.generated |
 | `scenario.registry` | `static` | `planned` | harness.schemas |
 | `seal` | `transition` | `planned` | protected.qualification |
 | `settings.contract` | `static` | `planned` |  |
 | `shadow.equivalence` | `evaluation` | `planned` | control-plane.records, scenario.registry |
-| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, release.authority, backport.contract, harness.schemas, harness.quality, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context, executor.contract, ci.workflow |
+| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, balance.contract, museum.compiler, release-history.integrity, release.authority, backport.contract, harness.schemas, harness.quality, assurance.self-test, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context, executor.contract, ci.workflow |
 | `tag` | `promotion` | `planned` | promotion |
 | `upgrade.measurement` | `capture` | `planned` | package.identity, scenario.registry |
 | `verification.context` | `package` | `planned` |  |

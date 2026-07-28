@@ -5,5 +5,29 @@
   "calibration_candidates": ["3.2.2", "2.5.0"],
   "dimensions": ["candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities", "approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs"],
   "acceptance": {"exact_plan_obligation_equivalence": true, "exact_verdict_equivalence": true, "fresh_independent_calibration_required": true},
-  "proofs": []
+  "obligation_mapping": {
+    "docs.check": ["docs.schema"],
+    "tooling.self-test": ["assurance.self-test"],
+    "static.architecture": ["architecture.files", "architecture.dependencies"],
+    "static.compiler": ["compiler.schema", "compiler.contract"],
+    "static.settings": ["settings.contract"],
+    "static.locales": ["locale.contract"],
+    "static.balance": ["balance.contract"],
+    "static.museum": ["museum.compiler"],
+    "static.package": ["package.identity", "package.composition", "package.determinism"],
+    "static.release-history": ["release-history.integrity"],
+    "static.full": ["static.full"],
+    "performance.static": ["performance.contract"],
+    "release.approved-delta": ["approved-delta.measurement"],
+    "runtime.upgrade": ["upgrade.measurement"],
+    "runtime.ecosystem": ["ecosystem.measurement"],
+    "runtime.performance-regression": ["performance.measurement"],
+    "manual.release-review": ["manual.acceptance"]
+  },
+  "additional_v5_obligations": ["docs.generated", "release.authority", "backport.contract", "harness.schemas", "harness.quality", "scenario.registry", "observation.evaluation", "evidence.store", "control-plane.records", "verification.context", "executor.contract", "ci.workflow", "shadow.equivalence", "qualification.full"],
+  "allowed_v5_scenario_additions": ["package-build", "runtime-state-contract", "static-validation"],
+  "proofs": [
+    {"kind": "static-shadow-analysis", "path": ".mir/control-plane/shadow-analysis.json"},
+    {"kind": "historical-v4-replay", "path": ".mir/control-plane/baselines/3.2.2-v5-replay.json"}
+  ]
 }
