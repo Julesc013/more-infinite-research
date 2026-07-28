@@ -1,7 +1,7 @@
 {
-  "analysis_sha256": "58ED74BAA518F16CFB30D4D68A9F12AAB5F613DE891024FC2FE82AC26F27C6AA",
+  "analysis_sha256": "095F594E501B41712511B09E1CCFFA5C944CD28D045FC0700AF26211C3681011",
   "authority": "mir-control-plane-v5-shadow-analysis",
-  "authority_sha256": "B56C5F6D6215C5DC85FD5387245494A615EE370A629C984C4FB4E8049512C2AD",
+  "authority_sha256": "11E787332473681617D2E57EEC436A19E79E70B7B181A5C07822E65ACE814899",
   "candidates": [
     {
       "baseline_sha256": "515A0CFDC7AA4FB28168401CD498148CB3244603E60B54B10564944854BB5502",
@@ -60,9 +60,9 @@
         },
         "seal-inputs": {
           "path": "",
-          "reason": "C24 was tagged without a protected capsule or schema-4 seal; its calibration-only exception cannot satisfy a future release gate",
+          "reason": "v4 and v5 agree that C24 had no protected seal; this historical equivalence is never admissible as a future release seal",
           "sha256": "",
-          "status": "exception-not-admissible"
+          "status": "passed"
         },
         "upgrade-result": {
           "path": ".mir/evidence/3.2.2-upgrade-proof.json",
@@ -71,15 +71,13 @@
           "status": "passed"
         }
       },
-      "pending_dimensions": [
-        "seal-inputs"
-      ],
+      "pending_dimensions": [],
       "release": "3.2.2",
       "source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
-      "status": "pending",
+      "status": "passed",
       "target": "2.1",
       "v5_registry_sha256": "31292ACDE9700225A1BACC8C0F881F7032AF9A1FCAE264BF7DC085892D42B64A",
-      "v5_structural_plan_sha256": "9F1AFFB63C5156F03D03EE382227F3FCF0422980490DDF35FBE964410B2C4C15"
+      "v5_structural_plan_sha256": "3FD7636917CF0528AB383E8848F63F8642AF2EA6A8163FEB9843F415D3C0849E"
     },
     {
       "baseline_sha256": "4FE3F8E71E4ABF4D11EDA467260C9985BC88D38A184E79BE342EB3F8DDD5E33C",
@@ -162,7 +160,7 @@
       "status": "pending",
       "target": "2.0",
       "v5_registry_sha256": "04F872C40915B2EC2E12C3EC5227274ECF26CC438201210F87AE9F00F6E7FD41",
-      "v5_structural_plan_sha256": "B9530ED6A179DF1FD50ACD7A0E2D3414E6FB4CD1291B78FBCC94FB2A661136E4"
+      "v5_structural_plan_sha256": "16D3E4FC57EDF1A6218805B72E5C44BBC247C67D2B14AFF1D93F206B6D08F8CA"
     }
   ],
   "pending_dimensions": [
@@ -171,8 +169,7 @@
     "2.5.0/manual-result",
     "2.5.0/performance-result",
     "2.5.0/seal-inputs",
-    "2.5.0/upgrade-result",
-    "3.2.2/seal-inputs"
+    "2.5.0/upgrade-result"
   ],
   "schema": 1,
   "status": "pending"

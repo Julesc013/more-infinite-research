@@ -12,7 +12,9 @@ foreach ($token in @(
   "verification-gate:", "name: MIR / verification-gate", "New-MIRVerificationContext.ps1",
   "-Operation record-context", "-Operation run-set", "-Operation environment", "-Operation upgrade",
   "-Operation ecosystem", "-Operation approved-delta", "-Operation performance", "-Operation aggregate",
-  "-SourceRepoRoot source", "-Kind manual", "-TrustClass protected-release", "cancel-in-progress: false", "merge-multiple: true"
+  "-SourceRepoRoot source", "-Stage release", "-ExcludeTask shadow.equivalence", "-Kind manual", "-AggregateTaskId qualification.full",
+  "Invoke-MIRControlPlane.ps1 backport", "Invoke-MIRControlPlane.ps1 seal", "-TaskId shadow.equivalence", "Invoke-MIRControlPlane.ps1 promotion",
+  "MIR_PROTECTED_ENVIRONMENT: release-candidate", "MIR_TRUSTED_RUNNER: self-hosted-windows", "-TrustClass protected-release", "cancel-in-progress: false", "merge-multiple: true"
 )) {
   if ($workflow -notmatch [regex]::Escape($token)) { throw "Control Plane v5 workflow omits required token: $token" }
 }

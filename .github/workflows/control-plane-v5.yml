@@ -38,6 +38,8 @@ permissions:
 
 env:
   MIR_CP_TRUST_CLASS: ci
+  MIR_PROTECTED_ENVIRONMENT: release-candidate
+  MIR_TRUSTED_RUNNER: self-hosted-windows
 
 jobs:
   context:
@@ -81,7 +83,7 @@ jobs:
           $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           $candidate = Join-Path source ([string]$record.package.archive)
           $result = ./scripts/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
-            -Release $env:MIR_CP_RELEASE -CandidatePath $candidate -SourceRepoRoot source -OutputRoot out/verification-context |
+            -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -OutputRoot out/verification-context |
             ConvertFrom-Json
           "context_id=$([string]$result.context_id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           $registry = Get-Content -Raw -LiteralPath (Join-Path $result.path "expanded-scenarios.json") | ConvertFrom-Json
@@ -136,7 +138,7 @@ jobs:
         run: |
           $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
           ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
-            -Kind static,evaluation -SourceRepoRoot source `
+            -Kind static,evaluation -ExcludeTask shadow.equivalence -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot artifacts/evidence
       - uses: actions/upload-artifact@v4
         with:
@@ -421,6 +423,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+          path: source
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
@@ -436,8 +443,23 @@ jobs:
         run: |
           $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
           ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation aggregate -ContextPath $context `
-            -TrustClass protected-release -EvidenceRoot artifacts/evidence |
+            -AggregateTaskId qualification.full -TrustClass protected-release -EvidenceRoot artifacts/evidence |
             Tee-Object -FilePath out/control-plane-v5/aggregate-result.json
+      - name: Admit reconstruction, seal, shadow cutover, and promotion
+        shell: pwsh
+        env:
+          MIR_CP_TARGET: ${{ inputs.target }}
+        run: |
+          $context = "out/verification-context/${{ needs.context.outputs.context_id }}"
+          if ($env:MIR_CP_TARGET -eq "2.0") {
+            ./scripts/Invoke-MIRControlPlane.ps1 backport -ContextPath $context -EvidenceRoot artifacts/evidence | Out-Host
+          }
+          ./scripts/Invoke-MIRControlPlane.ps1 seal -ContextPath $context -EvidenceRoot artifacts/evidence |
+            Tee-Object -FilePath out/control-plane-v5/seal-result.json
+          ./scripts/Invoke-MIRControlPlane.ps1 release -ContextPath $context -TaskId shadow.equivalence `
+            -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot artifacts/evidence | Out-Host
+          ./scripts/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot artifacts/evidence |
+            Tee-Object -FilePath out/control-plane-v5/promotion-result.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -446,4 +468,6 @@ jobs:
             out/verification-context/${{ needs.context.outputs.context_id }}
             artifacts/evidence
             out/control-plane-v5/aggregate-result.json
+            out/control-plane-v5/seal-result.json
+            out/control-plane-v5/promotion-result.json
           if-no-files-found: error

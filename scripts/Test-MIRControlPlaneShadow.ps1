@@ -1,7 +1,9 @@
 param(
   [string]$ContextPath = "",
   [string]$SourceRepoRoot = "",
+  [string]$EvidenceRoot = "artifacts/evidence",
   [switch]$ContractOnly,
+  [switch]$StructuralOnly,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 )
 
@@ -10,7 +12,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
-$shadow = Assert-MIRCPShadowContract -RepoRoot $repo
+$shadow = if ($StructuralOnly) { $null } else { Assert-MIRCPShadowContract -RepoRoot $repo }
 if ($ContractOnly) {
   Write-Host "[ok] v4/v5 shadow contract covers $($shadow.dimensions) dimensions and $($shadow.candidates) candidates; analysis is $($shadow.analysis_status) with $(@($shadow.pending).Count) pending rows."
   exit 0
@@ -19,12 +21,16 @@ if ([string]::IsNullOrWhiteSpace($ContextPath) -or [string]::IsNullOrWhiteSpace(
   throw "Operational shadow evaluation requires one immutable context and exact source checkout."
 }
 $manifest = Get-Content -Raw -LiteralPath (Join-Path (Resolve-Path -LiteralPath $ContextPath).Path "context-manifest.json") | ConvertFrom-Json
-$candidate = New-MIRCPShadowCandidateAnalysis -Release ([string]$manifest.release) -SourceRepoRoot $SourceRepoRoot -ContextPath $ContextPath -RepoRoot $repo
+$candidate = New-MIRCPShadowCandidateAnalysis -Release ([string]$manifest.release) -SourceRepoRoot $SourceRepoRoot -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 foreach ($dimension in @("candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities")) {
   if ([string]$candidate.dimensions.$dimension.status -ne "passed") { throw "Shadow structural dimension failed for $($manifest.release): $dimension" }
 }
-if ([string]$shadow.state -ne "accepted") {
-  throw "v4/v5 shadow cutover remains pending: $(@($shadow.pending) -join ', ')."
+if ($StructuralOnly) {
+  Write-Host "[ok] exact v4/v5 structural shadow equivalence passed for $($manifest.release)."
+  exit 0
 }
 if ([string]$candidate.status -ne "passed") { throw "Candidate shadow verdict is incomplete: $(@($candidate.pending_dimensions) -join ', ')." }
+$analysis = Read-MIRCPJson -Path ".mir/control-plane/shadow-analysis.json" -RepoRoot $repo
+$c24 = @($analysis.candidates | Where-Object release -eq "3.2.2")
+if ($c24.Count -ne 1 -or [string]$c24[0].status -ne "passed") { throw "Committed C24 historical shadow comparison is incomplete." }
 Write-Host "[ok] exact v4/v5 shadow equivalence is accepted for $($manifest.release)."

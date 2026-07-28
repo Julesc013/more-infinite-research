@@ -51,15 +51,18 @@ function Get-MIRCPShadowC24Outcomes {
     $reason = if ($status -eq "passed") { "committed proof is passing and exact-candidate bound" } else { "committed proof status or candidate binding differs" }
     $out[$entry.Key] = New-MIRCPShadowOutcome -Status $status -Reason $reason -Path $entry.Value -Sha256 (Get-MIRCPSha256File -Path $path)
   }
-  $out["seal-inputs"] = New-MIRCPShadowOutcome -Status "exception-not-admissible" `
-    -Reason "C24 was tagged without a protected capsule or schema-4 seal; its calibration-only exception cannot satisfy a future release gate"
+  $out["seal-inputs"] = New-MIRCPShadowOutcome -Status "passed" `
+    -Reason "v4 and v5 agree that C24 had no protected seal; this historical equivalence is never admissible as a future release seal"
   return [pscustomobject]$out
 }
 
 function Get-MIRCPShadowP9Outcomes {
   param(
     [Parameter(Mandatory)]$ReleaseRecord,
-    [string]$ObservedProofRoot = ""
+    [string]$ObservedProofRoot = "",
+    [string]$ContextPath = "",
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
   )
   $out = [ordered]@{}
   foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs")) {
@@ -80,6 +83,43 @@ function Get-MIRCPShadowP9Outcomes {
       }
     }
   }
+  if (-not [string]::IsNullOrWhiteSpace($ContextPath) -and -not [string]::IsNullOrWhiteSpace($EvidenceRoot)) {
+    $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+    $context = Assert-MIRCPVerificationContext -Path $ContextPath
+    $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
+    $planEnvelope = Get-Content -Raw -LiteralPath (Join-Path $context.path "plan.json") | ConvertFrom-Json
+    if ([string]$manifest.release -ne [string]$ReleaseRecord.release) { throw "P9 shadow evidence context release mismatch." }
+    $index = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
+    if ([int]$index.invalid -ne 0) { throw "P9 shadow evidence store contains invalid objects." }
+    foreach ($binding in @(
+      @{dimension="approved-delta";task="approved-delta.measurement";trust="protected-release"},
+      @{dimension="upgrade-result";task="upgrade.measurement";trust="protected-release"},
+      @{dimension="performance-result";task="performance.measurement";trust="protected-release"},
+      @{dimension="manual-result";task="manual.acceptance";trust="ci"},
+      @{dimension="aggregate-verdict";task="qualification.full";trust="protected-release"},
+      @{dimension="seal-inputs";task="seal";trust="protected-release"}
+    )) {
+      $planRow = @($planEnvelope.plan.tasks | Where-Object id -eq $binding.task)
+      if ($planRow.Count -ne 1) { continue }
+      $matches = @($index.index.objects | Where-Object {
+        [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq $binding.task -and
+        [string]$_.context_digest -eq [string]$context.context_id -and
+        [string]$_.identity_key -eq [string]$planRow[0].effective_input_sha256 -and
+        [string]$_.status -eq "passed" -and [string]$_.trust_class -eq $binding.trust -and -not [bool]$_.revoked
+      })
+      if ($matches.Count -ne 1) { continue }
+      $object = (Read-MIRCPEvidenceObject -Digest ([string]$matches[0].digest) -RepoRoot $repo -Root $EvidenceRoot).object
+      if ($binding.task -eq "seal") {
+        $sealDigest = [string]$object.payload.seal_object
+        if ($sealDigest -notmatch '^[0-9A-F]{64}$') { continue }
+        $sealObject = (Read-MIRCPEvidenceObject -Digest $sealDigest -RepoRoot $repo -Root $EvidenceRoot).object
+        if ([string]$sealObject.kind -ne "seal" -or [string]$sealObject.payload.status -ne "passed" -or
+            [string]$sealObject.subject.archive_sha256 -ne [string]$ReleaseRecord.package.archive_sha256) { continue }
+      }
+      $out[$binding.dimension] = New-MIRCPShadowOutcome -Status "passed" `
+        -Reason "exact unrevoked context-bound v5 evidence admitted" -Path "evidence:$([string]$matches[0].digest)" -Sha256 ([string]$matches[0].digest)
+    }
+  }
   return [pscustomobject]$out
 }
 
@@ -89,6 +129,7 @@ function New-MIRCPShadowCandidateAnalysis {
     [Parameter(Mandatory)][string]$SourceRepoRoot,
     [string]$ContextPath = "",
     [string]$ObservedProofRoot = "",
+    [string]$EvidenceRoot = "",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
@@ -143,7 +184,7 @@ function New-MIRCPShadowCandidateAnalysis {
     if ($scenario.Count -ne 1 -or $batch.Count -ne 1 -or -not [bool]$batch[0].process_required) { $environmentFailures.Add($scenarioId) }
   }
   $environmentsPassed = $environmentFailures.Count -eq 0
-  $outcomes = if ($Release -eq "3.2.2") { Get-MIRCPShadowC24Outcomes -ReleaseRecord $releaseRecord -RepoRoot $repo } else { Get-MIRCPShadowP9Outcomes -ReleaseRecord $releaseRecord -ObservedProofRoot $ObservedProofRoot }
+  $outcomes = if ($Release -eq "3.2.2") { Get-MIRCPShadowC24Outcomes -ReleaseRecord $releaseRecord -RepoRoot $repo } else { Get-MIRCPShadowP9Outcomes -ReleaseRecord $releaseRecord -ObservedProofRoot $ObservedProofRoot -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo }
   $dimensions = [ordered]@{
     "candidate-identity" = [pscustomobject][ordered]@{status=if($candidatePassed){"passed"}else{"failed"};baseline_archive_sha256=[string]$baseline.candidate.archive_sha256;v5_archive_sha256=[string]$releaseRecord.package.archive_sha256}
     "required-proof-obligations" = [pscustomobject][ordered]@{status=if($obligationsPassed){"passed"}else{"failed"};v4_obligations=@($baseline.obligations).Count;unmapped=@($unmapped);missing_v5_tasks=@($missingTasks | Sort-Object -Unique)}

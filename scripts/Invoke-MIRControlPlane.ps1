@@ -1,5 +1,5 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay", "context", "evidence-index")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay", "context", "evidence-index", "aggregate", "qualification", "release", "backport", "seal", "promotion")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [switch]$AllLocks,
   [switch]$Check,
@@ -8,20 +8,23 @@ param(
   [string[]]$ChangedPath = @(),
   [string[]]$FailedTask = @(),
   [string]$EvidenceIndex = "",
-  [string]$TrustClass = "",
+  [string]$TrustClass = "ci",
   [string]$Target = "2.1",
   [string]$Release = "",
   [ValidateSet("verification", "release", "publication", "all")][string]$Stage = "verification",
   [string]$Output = "out/control-plane-v5-plan.json",
   [string]$ContextOutputRoot = "out/verification-context",
   [string]$EvidenceRoot = "",
+  [string]$ContextPath = "",
+  [string]$AggregateTaskId = "",
+  [string]$TaskId = "",
   [string]$CandidatePath = "",
   [string]$SourceRepoRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release")) {
   . (Join-Path $PSScriptRoot "MIRControlPlane/$module.ps1")
 }
 
@@ -45,6 +48,12 @@ MIR Control Plane v5
   replay -Check             Fail when the deterministic replay report is stale.
   context                   Materialize one immutable, digest-checked verification context.
   evidence-index            Rebuild the evidence index from content-addressed objects.
+  aggregate                 Resolve one result-only aggregate from exact admitted evidence.
+  qualification             Complete protected qualification.full for a release-stage context.
+  release                   Execute one named release/publication admission TaskNode.
+  backport                  Admit governed dual-parent reconstruction proof for a 2.0 context.
+  seal                      Create a protected content-addressed release seal.
+  promotion                 Admit promotion only after exact seal and shadow proof closure.
 "@ | Write-Host
   }
   "validate" {
@@ -80,9 +89,27 @@ MIR Control Plane v5
     Update-MIRCPV4ReplayReport -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 20
   }
   "context" {
-    New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $ContextOutputRoot -RepoRoot $repo | ConvertTo-Json -Depth 10
+    New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -Stage $Stage -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $ContextOutputRoot -RepoRoot $repo | ConvertTo-Json -Depth 10
   }
   "evidence-index" {
     Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot | ConvertTo-Json -Depth 10
+  }
+  "aggregate" {
+    Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId $AggregateTaskId -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "qualification" {
+    Complete-MIRCPQualification -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RequireFresh:($Mode -eq "calibrate-fresh") -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "release" {
+    Invoke-MIRCPReleaseTaskAdmission -ContextPath $ContextPath -TaskId $TaskId -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "backport" {
+    Invoke-MIRCPBackportAdmission -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "seal" {
+    New-MIRCPReleaseSeal -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "promotion" {
+    Invoke-MIRCPPromotionAdmission -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
   }
 }

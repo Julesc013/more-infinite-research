@@ -24,7 +24,7 @@
     "runtime.performance-regression": ["performance.measurement"],
     "manual.release-review": ["manual.acceptance"]
   },
-  "additional_v5_obligations": ["docs.generated", "release.authority", "backport.contract", "harness.schemas", "harness.quality", "scenario.registry", "observation.evaluation", "evidence.store", "control-plane.records", "verification.context", "executor.contract", "ci.workflow", "shadow.equivalence", "qualification.full"],
+  "additional_v5_obligations": ["docs.generated", "release.authority", "backport.contract", "harness.schemas", "harness.quality", "scenario.registry", "observation.evaluation", "evidence.store", "control-plane.records", "verification.context", "executor.contract", "release.controller", "ci.workflow", "shadow.structural", "qualification.full"],
   "allowed_v5_scenario_additions": ["package-build", "runtime-state-contract", "static-validation"],
   "proofs": [
     {"kind": "static-shadow-analysis", "path": ".mir/control-plane/shadow-analysis.json"},

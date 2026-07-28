@@ -659,6 +659,8 @@ validation_tooling:
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
     control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: scripts/Test-MIRControlPlane.ps1
+    control_plane_release: scripts/MIRControlPlane/Release.ps1
+    control_plane_release_gate: scripts/Test-MIRControlPlaneRelease.ps1
     control_plane_execution_registry_generator: scripts/Update-MIRExecutionRegistry.ps1
     control_plane_execution_registry_gate: scripts/Test-MIRExecutionRegistry.ps1
     control_plane_observation_replay_generator: scripts/Update-MIRObservationReplay.ps1

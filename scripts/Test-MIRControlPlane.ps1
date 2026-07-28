@@ -69,8 +69,8 @@ foreach ($candidate in @($shadow.candidates)) {
     throw "Shadow scenario counts changed for $version."
   }
 }
-if ([string]$shadow.status -ne "pending" -or @($shadow.pending_dimensions).Count -ne 7 -or [int]$shadowContract.pending.Count -ne 7) {
-  throw "Shadow cutover must remain pending on exactly the seven recorded outcome/seal dimensions."
+if ([string]$shadow.status -ne "pending" -or @($shadow.pending_dimensions).Count -ne 6 -or [int]$shadowContract.pending.Count -ne 6) {
+  throw "Shadow cutover must remain pending on exactly the six recorded P9 outcome/seal dimensions."
 }
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo

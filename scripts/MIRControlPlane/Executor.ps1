@@ -7,13 +7,50 @@ function Get-MIRCPContextExecutionState {
   return [pscustomobject][ordered]@{context=$context; manifest=$manifest; plan_envelope=$planEnvelope; plan=$planEnvelope.plan}
 }
 
+function Assert-MIRCPProtectedExecutionEnvironment {
+  param([string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $policy = Read-MIRCPJson -Path "validation/trust.json" -RepoRoot $repo
+  $class = $policy.classes.'protected-release'
+  $checks = [ordered]@{
+    repository = [string]$env:GITHUB_REPOSITORY
+    workflow = [string]$env:GITHUB_WORKFLOW
+    event = [string]$env:GITHUB_EVENT_NAME
+    ref = [string]$env:GITHUB_REF
+    environment = [string]$env:MIR_PROTECTED_ENVIRONMENT
+    runner_identity = [string]$env:MIR_TRUSTED_RUNNER
+    runner_environment = [string]$env:RUNNER_ENVIRONMENT
+  }
+  foreach ($field in @("repository", "workflow", "event", "ref")) {
+    $plural = @{repository="repositories";workflow="workflows";event="events";ref="refs"}[$field]
+    if (@($class.$plural | ForEach-Object { [string]$_ }) -notcontains [string]$checks[$field]) { throw "Protected-release producer has untrusted $field identity." }
+  }
+  foreach ($field in @("environment", "runner_identity", "runner_environment")) {
+    if ([string]$checks[$field] -ne [string]$class.$field) { throw "Protected-release producer has untrusted $field identity." }
+  }
+  foreach ($field in @("GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_JOB", "RUNNER_NAME")) {
+    if ([string]::IsNullOrWhiteSpace([string][Environment]::GetEnvironmentVariable($field))) { throw "Protected-release producer is missing $field." }
+  }
+  return [pscustomobject]$checks
+}
+
 function New-MIRCPExecutorProducer {
-  param([Parameter(Mandatory)][string]$TrustClass)
+  param([Parameter(Mandatory)][string]$TrustClass, [string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  if ($TrustClass -eq "protected-release") { [void](Assert-MIRCPProtectedExecutionEnvironment -RepoRoot $repo) }
   return [pscustomobject][ordered]@{
     component = "mir-control-plane-v5-executor"
     abi = 1
     trust_class = $TrustClass
     repository = [string]$env:GITHUB_REPOSITORY
+    workflow = [string]$env:GITHUB_WORKFLOW
+    event = [string]$env:GITHUB_EVENT_NAME
+    ref = [string]$env:GITHUB_REF
+    environment = [string]$env:MIR_PROTECTED_ENVIRONMENT
+    runner_identity = [string]$env:MIR_TRUSTED_RUNNER
+    runner_environment = [string]$env:RUNNER_ENVIRONMENT
+    commit = ([string](& git -C $repo rev-parse HEAD)).Trim()
+    trust_policy_sha256 = Get-MIRCPSha256File -Path (Join-Path $repo "validation/trust.json")
     run_id = [string]$env:GITHUB_RUN_ID
     run_attempt = [string]$env:GITHUB_RUN_ATTEMPT
     job = [string]$env:GITHUB_JOB
@@ -43,7 +80,11 @@ function Write-MIRCPTaskResultEvidence {
     [string]$EvidenceRoot = "",
     [string]$RepoRoot = ""
   )
-  $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass
+  $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass -RepoRoot $RepoRoot
+  if ($TrustClass -eq "protected-release") {
+    $controlLock = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "control-plane-lock.json") | ConvertFrom-Json
+    if ([string]$producer.commit -ne [string]$controlLock.qualification_source_commit) { throw "Protected-release producer commit differs from the immutable context control-plane lock." }
+  }
   $fullPayload = [ordered]@{status=$Status; effective_input_sha256=[string]$PlanRow.effective_input_sha256}
   foreach ($property in $Payload.PSObject.Properties) { $fullPayload[$property.Name] = $property.Value }
   $object = New-MIRCPEvidenceObject -Kind task-result -ContextDigest ([string]$State.context.context_id) -IdentityKey ([string]$PlanRow.effective_input_sha256) `
@@ -106,6 +147,7 @@ function Invoke-MIRCPTaskCommand {
       if ([string]::IsNullOrWhiteSpace($sourceAbsolute)) { throw "TaskNode $TaskId requires an exact source checkout." }
       $value = $sourceAbsolute
     }
+    if ($value -eq "<evidence-root>") { $value = Get-MIRCPEvidenceRoot -RepoRoot $repo -Root $EvidenceRoot }
     [void]$start.ArgumentList.Add($value)
   }
   $process.StartInfo = $start
@@ -275,7 +317,7 @@ function Invoke-MIRCPEnvironmentBatch {
   $exitCode = $LASTEXITCODE
   if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) { throw "Environment batch produced no structured validation summary: $BatchId" }
   $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
-  $scenarioSummary = @($summary.scenarios | Where-Object name -eq [string]$scenarios[0].name)
+  $scenarioSummary = @($summary.scenarios | Where-Object { [string]$_.name -eq [string]$scenarios[0].name })
   if ($scenarioSummary.Count -ne 1) { throw "Environment summary does not contain its declared scenario." }
   $assertionFacts = [ordered]@{}
   foreach ($assertion in @($scenarios[0].assertions)) {
@@ -495,6 +537,7 @@ function Complete-MIRCPAggregateGate {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
     [string]$TrustClass = "protected-release",
+    [string]$AggregateTaskId = "",
     [string]$EvidenceRoot = "",
     [string]$RepoRoot = ""
   )
@@ -503,21 +546,44 @@ function Complete-MIRCPAggregateGate {
   $indexResult = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
   if ([int]$indexResult.invalid -ne 0) { throw "Evidence store contains invalid objects." }
   $objects = @($indexResult.index.objects)
+  $selectedIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  if ([string]::IsNullOrWhiteSpace($AggregateTaskId)) {
+    foreach ($row in @($state.plan.tasks)) { [void]$selectedIds.Add([string]$row.id) }
+  } else {
+    $aggregateTarget = @($state.plan.tasks | Where-Object { [string]$_.id -eq $AggregateTaskId -and [string]$_.kind -eq "aggregate" })
+    if ($aggregateTarget.Count -ne 1) { throw "Context plan does not contain aggregate TaskNode $AggregateTaskId exactly once." }
+    [void]$selectedIds.Add($AggregateTaskId)
+    $changed = $true
+    while ($changed) {
+      $changed = $false
+      foreach ($row in @($state.plan.tasks | Where-Object { $selectedIds.Contains([string]$_.id) })) {
+        foreach ($dependency in @($row.depends_on)) { if ($selectedIds.Add([string]$dependency)) { $changed = $true } }
+      }
+    }
+  }
   $taskResults = [Collections.Generic.List[object]]::new()
-  foreach ($row in @($state.plan.tasks | Where-Object kind -ne "aggregate")) {
+  $taskMap = Get-MIRCPTaskMap -RepoRoot $repo
+  foreach ($row in @($state.plan.tasks | Where-Object { [string]$_.kind -ne "aggregate" -and $selectedIds.Contains([string]$_.id) })) {
     $matches = @($objects | Where-Object { [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq [string]$row.id -and [string]$_.identity_key -eq [string]$row.effective_input_sha256 -and [string]$_.status -eq "passed" -and -not [bool]$_.revoked })
-    if ([string]$row.action -ne "REUSE") { $matches = @($matches | Where-Object context_digest -eq [string]$state.context.context_id) }
+    if ([string]$row.action -ne "REUSE") { $matches = @($matches | Where-Object { [string]$_.context_digest -eq [string]$state.context.context_id }) }
+    if ($TrustClass -eq "protected-release") {
+      $task = $taskMap[[string]$row.id]
+      if ([string]$task.kind -eq "manual") { $matches = @($matches | Where-Object trust_class -eq "ci") }
+      elseif ([string]$task.freshness -in @("protected-release-fresh", "always-fresh")) { $matches = @($matches | Where-Object trust_class -eq "protected-release") }
+    }
     if ($matches.Count -eq 0) { throw "Aggregate gate lacks exact passing evidence for TaskNode $($row.id)." }
     $taskResults.Add([pscustomobject][ordered]@{task_id=[string]$row.id;status="passed";object_digest=[string]$matches[0].digest})
   }
   $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
-  foreach ($batch in @($registry.batches | Where-Object process_required)) {
+  $requiresEnvironmentBatches = $selectedIds.Contains("ecosystem.measurement")
+  foreach ($batch in @($registry.batches | Where-Object { $requiresEnvironmentBatches -and [bool]$_.process_required })) {
     $matches = @($objects | Where-Object { [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq [string]$batch.id -and [string]$_.context_digest -eq [string]$state.context.context_id -and [string]$_.status -eq "passed" -and -not [bool]$_.revoked })
+    if ($TrustClass -eq "protected-release") { $matches = @($matches | Where-Object trust_class -eq "protected-release") }
     if ($matches.Count -eq 1) { $taskResults.Add([pscustomobject][ordered]@{task_id=[string]$batch.id;status="passed";object_digest=[string]$matches[0].digest}) }
     elseif ($matches.Count -eq 0) { throw "Aggregate gate lacks exact passing evidence for environment batch $($batch.id)." }
     else { throw "Aggregate gate found ambiguous evidence for environment batch $($batch.id)." }
   }
-  foreach ($row in @($state.plan.tasks | Where-Object kind -eq "aggregate")) {
+  foreach ($row in @($state.plan.tasks | Where-Object { [string]$_.kind -eq "aggregate" -and $selectedIds.Contains([string]$_.id) })) {
     $selectedMembers = @($row.depends_on | ForEach-Object { [string]$_ })
     $missingMembers = @($selectedMembers | Where-Object { $member = $_; @($taskResults | Where-Object task_id -eq $member).Count -ne 1 })
     if ($missingMembers.Count -gt 0) { throw "Aggregate TaskNode $($row.id) lacks exact member results: $($missingMembers -join ', ')." }
@@ -527,10 +593,10 @@ function Complete-MIRCPAggregateGate {
       -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
     $taskResults.Add($aggregateMarker)
   }
-  $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass
+  $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass -RepoRoot $repo
   $manifest = New-MIRCPExecutionManifest -ContextDigest ([string]$state.context.context_id) -PlanId ([string]$state.plan_envelope.plan_id) -Producer $producer -TaskResults @($taskResults) -Status passed
   $manifestObject = New-MIRCPEvidenceObject -Kind execution-manifest -ContextDigest ([string]$state.context.context_id) -IdentityKey (Get-MIRCPSha256Object -Value $manifest) `
     -Subject ([pscustomobject][ordered]@{plan_id=[string]$state.plan_envelope.plan_id;target=[string]$state.plan.target}) -Producer $producer -Payload $manifest -Links @($taskResults.object_digest)
   $stored = Write-MIRCPEvidenceObject -Object $manifestObject -RepoRoot $repo -Root $EvidenceRoot
-  return [pscustomobject][ordered]@{status="passed";context_digest=[string]$state.context.context_id;plan_id=[string]$state.plan_envelope.plan_id;task_results=$taskResults.Count;manifest_object=[string]$stored.digest}
+  return [pscustomobject][ordered]@{status="passed";context_digest=[string]$state.context.context_id;plan_id=[string]$state.plan_envelope.plan_id;aggregate_task=if([string]::IsNullOrWhiteSpace($AggregateTaskId)){"all"}else{$AggregateTaskId};task_results=$taskResults.Count;manifest_object=[string]$stored.digest}
 }

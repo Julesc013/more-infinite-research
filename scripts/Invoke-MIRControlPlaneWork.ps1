@@ -11,6 +11,7 @@ param(
   [string]$LocalModDir = "",
   [string]$SourceRepoRoot = "",
   [string]$TrustClass = "ci",
+  [string]$AggregateTaskId = "",
   [string]$EvidenceRoot = "artifacts/evidence"
 )
 
@@ -27,5 +28,5 @@ switch ($Operation) {
   "ecosystem" { Invoke-MIRCPEcosystemMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -LocalModDir $LocalModDir -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
   "approved-delta" { Invoke-MIRCPApprovedDeltaMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
   "performance" { Invoke-MIRCPPerformanceMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -LocalModZipDir $LocalModZipDir -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "aggregate" { Complete-MIRCPAggregateGate -ContextPath $ContextPath -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
+  "aggregate" { Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId $AggregateTaskId -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
 }

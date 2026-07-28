@@ -28,4 +28,56 @@ try {
   if ($_.Exception.Message -match "lacks exact passing evidence") { $aggregateFailedClosed = $true } else { throw }
 }
 if (-not $aggregateFailedClosed) { throw "Aggregate gate accepted an incomplete evidence set." }
-Write-Host "[ok] executor consumes one immutable context, writes exact task evidence, and aggregate evaluation fails closed on missing work."
+$protectedSpoofRejected = $false
+try {
+  [void](New-MIRCPExecutorProducer -TrustClass "protected-release" -RepoRoot $repo)
+} catch {
+  if ($_.Exception.Message -match "Protected-release producer") { $protectedSpoofRejected = $true } else { throw }
+}
+if (-not $protectedSpoofRejected) { throw "A local process could claim protected-release producer identity." }
+$protectedFields = @(
+  "GITHUB_REPOSITORY", "GITHUB_WORKFLOW", "GITHUB_EVENT_NAME", "GITHUB_REF", "MIR_PROTECTED_ENVIRONMENT",
+  "MIR_TRUSTED_RUNNER", "RUNNER_ENVIRONMENT", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_JOB", "RUNNER_NAME"
+)
+$savedProtectedEnvironment = @{}
+foreach ($field in $protectedFields) { $savedProtectedEnvironment[$field] = [Environment]::GetEnvironmentVariable($field, "Process") }
+$hostedRunnerRejected = $false
+try {
+  $trustedLookingHostedRunner = @{
+    GITHUB_REPOSITORY="Julesc013/more-infinite-research"; GITHUB_WORKFLOW="MIR Control Plane v5"; GITHUB_EVENT_NAME="workflow_dispatch";
+    GITHUB_REF="refs/heads/toolchain/assurance-v5"; MIR_PROTECTED_ENVIRONMENT="release-candidate"; MIR_TRUSTED_RUNNER="self-hosted-windows";
+    RUNNER_ENVIRONMENT="github-hosted"; GITHUB_RUN_ID="1"; GITHUB_RUN_ATTEMPT="1"; GITHUB_JOB="test"; RUNNER_NAME="hosted-test"
+  }
+  foreach ($entry in $trustedLookingHostedRunner.GetEnumerator()) { [Environment]::SetEnvironmentVariable([string]$entry.Key, [string]$entry.Value, "Process") }
+  try { [void](New-MIRCPExecutorProducer -TrustClass "protected-release" -RepoRoot $repo) } catch {
+    if ($_.Exception.Message -match "runner_environment") { $hostedRunnerRejected = $true } else { throw }
+  }
+} finally {
+  foreach ($field in $protectedFields) { [Environment]::SetEnvironmentVariable($field, $savedProtectedEnvironment[$field], "Process") }
+}
+if (-not $hostedRunnerRejected) { throw "A hosted runner could claim the protected self-hosted identity." }
+$unknownAggregateRejected = $false
+try {
+  [void](Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "not-an-aggregate" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo)
+} catch {
+  if ($_.Exception.Message -match "does not contain aggregate TaskNode") { $unknownAggregateRejected = $true } else { throw }
+}
+if (-not $unknownAggregateRejected) { throw "Aggregate subgraph selection accepted an unknown aggregate TaskNode." }
+$selected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+[void]$selected.Add("static.full")
+$executionState = Get-MIRCPContextExecutionState -ContextPath $context.path
+$changed = $true
+while ($changed) {
+  $changed = $false
+  foreach ($row in @($executionState.plan.tasks | Where-Object { $selected.Contains([string]$_.id) })) {
+    foreach ($dependency in @($row.depends_on)) { if ($selected.Add([string]$dependency)) { $changed = $true } }
+  }
+}
+$existingIds = @((Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $evidenceRoot).index.objects | Where-Object kind -eq "task-result" | ForEach-Object { [string]$_.task_id })
+foreach ($row in @($executionState.plan.tasks | Where-Object { $selected.Contains([string]$_.id) -and [string]$_.kind -ne "aggregate" -and $existingIds -notcontains [string]$_.id })) {
+  [void](Write-MIRCPTaskResultEvidence -State $executionState -PlanRow $row -Status passed `
+    -Payload ([pscustomobject][ordered]@{self_test=$true}) -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo)
+}
+$staticAggregate = Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "static.full" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
+if ([string]$staticAggregate.status -ne "passed" -or [string]$staticAggregate.aggregate_task -ne "static.full") { throw "Static-only aggregate did not close independently." }
+Write-Host "[ok] executor consumes one immutable context, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."

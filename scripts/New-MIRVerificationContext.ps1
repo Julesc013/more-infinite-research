@@ -3,6 +3,7 @@ param(
   [ValidateSet("changed", "qualify-incremental", "calibrate-fresh", "rerun-failure")][string]$Mode = "qualify-incremental",
   [string]$Target = "2.1",
   [string]$Release = "",
+  [ValidateSet("verification", "release", "publication", "all")][string]$Stage = "verification",
   [string]$CandidatePath = "",
   [string]$SourceRepoRoot = "",
   [string]$OutputRoot = "out/verification-context"
@@ -13,5 +14,5 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
-$context = New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $OutputRoot -RepoRoot $repo
+$context = New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -Stage $Stage -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $OutputRoot -RepoRoot $repo
 $context | ConvertTo-Json -Depth 10

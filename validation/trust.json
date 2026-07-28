@@ -21,7 +21,8 @@
         "Julesc013/more-infinite-research"
       ],
       "workflows": [
-        "Assurance Full Qualification"
+        "Assurance Full Qualification",
+        "MIR Control Plane v5"
       ],
       "events": [
         "workflow_dispatch"
@@ -29,10 +30,12 @@
       "refs": [
         "refs/heads/dev",
         "refs/heads/main",
-        "refs/heads/tmp/2.0"
+        "refs/heads/tmp/2.0",
+        "refs/heads/toolchain/assurance-v5"
       ],
       "environment": "release-candidate",
-      "runner_identity": "self-hosted-windows"
+      "runner_identity": "self-hosted-windows",
+      "runner_environment": "self-hosted"
     },
     "maintainer-manual": {
       "release_eligible": false,

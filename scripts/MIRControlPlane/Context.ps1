@@ -158,6 +158,7 @@ function New-MIRCPVerificationContext {
     [ValidateSet("changed", "qualify-incremental", "calibrate-fresh", "rerun-failure")][string]$Mode = "qualify-incremental",
     [string]$Target = "2.1",
     [string]$Release = "",
+    [ValidateSet("verification", "release", "publication", "all")][string]$Stage = "verification",
     [string]$CandidatePath = "",
     [string]$SourceRepoRoot = "",
     [string]$OutputRoot = "out/verification-context",
@@ -173,7 +174,7 @@ function New-MIRCPVerificationContext {
   $candidate = if ([IO.Path]::IsPathRooted($CandidatePath)) { [IO.Path]::GetFullPath($CandidatePath) } else { [IO.Path]::GetFullPath((Join-Path $repo $CandidatePath)) }
   if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { throw "Verification context candidate is missing: $candidate" }
   if ((Get-MIRCPSha256File -Path $candidate) -ne [string]$releaseRecord.package.archive_sha256) { throw "Verification context candidate does not match release authority." }
-  $plan = New-MIRCPPlan -Mode $Mode -ChangedPath @("scripts/MIRControlPlane/Context.ps1") -Target $Target -Release $Release -SourceRepoRoot $sourceRepo -RepoRoot $repo
+  $plan = New-MIRCPPlan -Mode $Mode -ChangedPath @("scripts/MIRControlPlane/Context.ps1") -Target $Target -Release $Release -Stage $Stage -SourceRepoRoot $sourceRepo -RepoRoot $repo
   Write-Verbose "[context] materialized plan $($plan.plan_id)"
   $registryPath = Join-Path $sourceRepo "validation/generated/execution-registry.json"
   $registry = $null
@@ -217,7 +218,8 @@ function New-MIRCPVerificationContext {
   }
   $controlPlaneFiles = @(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
-    ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json"
+    ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
+    "validation/trust.json"
   )
   $controlPlaneLock = [pscustomobject][ordered]@{
     schema = 1
@@ -244,16 +246,16 @@ function New-MIRCPVerificationContext {
   $root = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
   if (-not (Test-Path -LiteralPath $root -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $root) }
   Write-Verbose "[context] staging under $root"
-  $stage = Join-Path $root ("staging-" + [guid]::NewGuid().ToString("N"))
-  [void](New-Item -ItemType Directory -Path $stage)
+  $stagingDirectory = Join-Path $root ("staging-" + [guid]::NewGuid().ToString("N"))
+  [void](New-Item -ItemType Directory -Path $stagingDirectory)
   foreach ($entry in $files.GetEnumerator()) {
     Write-Verbose "[context] writing $($entry.Key)"
-    Write-MIRCPJson -Path (Join-Path $stage $entry.Key) -Value $entry.Value -RepoRoot $repo
+    Write-MIRCPJson -Path (Join-Path $stagingDirectory $entry.Key) -Value $entry.Value -RepoRoot $repo
   }
-  [IO.File]::WriteAllText((Join-Path $stage "expanded-scenarios.json"), $registryContent, [Text.UTF8Encoding]::new($false))
-  Copy-Item -LiteralPath $targetProfilePath -Destination (Join-Path $stage "target-profile.json")
-  Copy-Item -LiteralPath $candidate -Destination (Join-Path $stage "candidate.zip")
-  $members = @(Get-MIRCPContextMemberRows -Directory $stage)
+  [IO.File]::WriteAllText((Join-Path $stagingDirectory "expanded-scenarios.json"), $registryContent, [Text.UTF8Encoding]::new($false))
+  Copy-Item -LiteralPath $targetProfilePath -Destination (Join-Path $stagingDirectory "target-profile.json")
+  Copy-Item -LiteralPath $candidate -Destination (Join-Path $stagingDirectory "candidate.zip")
+  $members = @(Get-MIRCPContextMemberRows -Directory $stagingDirectory)
   $manifest = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-control-plane-v5-verification-context"
@@ -267,17 +269,17 @@ function New-MIRCPVerificationContext {
     members = $members
   }
   $manifest.context_id = Get-MIRCPSha256Object -Value (Get-MIRCPContextIdentity -Manifest $manifest)
-  Write-MIRCPJson -Path (Join-Path $stage "context-manifest.json") -Value $manifest -RepoRoot $repo
-  [IO.File]::WriteAllText((Join-Path $stage "context-digest.txt"), ([string]$manifest.context_id + "`n"), [Text.UTF8Encoding]::new($false))
+  Write-MIRCPJson -Path (Join-Path $stagingDirectory "context-manifest.json") -Value $manifest -RepoRoot $repo
+  [IO.File]::WriteAllText((Join-Path $stagingDirectory "context-digest.txt"), ([string]$manifest.context_id + "`n"), [Text.UTF8Encoding]::new($false))
   $destination = Join-Path $root ([string]$manifest.context_id)
   if (Test-Path -LiteralPath $destination -PathType Container) {
     $existing = Assert-MIRCPVerificationContext -Path $destination
     if ([string]$existing.context_id -ne [string]$manifest.context_id) { throw "Existing context directory has a conflicting identity." }
-    $resolvedStage = [IO.Path]::GetFullPath($stage)
+    $resolvedStage = [IO.Path]::GetFullPath($stagingDirectory)
     if (-not $resolvedStage.StartsWith(($root.TrimEnd('\') + '\'), [StringComparison]::OrdinalIgnoreCase)) { throw "Unsafe context staging cleanup target: $resolvedStage" }
     Remove-Item -LiteralPath $resolvedStage -Recurse -Force
     return $existing
   }
-  Move-Item -LiteralPath $stage -Destination $destination
+  Move-Item -LiteralPath $stagingDirectory -Destination $destination
   return Assert-MIRCPVerificationContext -Path $destination
 }
