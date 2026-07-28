@@ -12,10 +12,13 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 }
 $context = Assert-MIRCPVerificationContext -Path $ContextPath
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
-$descriptor = Get-Content -Raw -LiteralPath (Join-Path $context.path "candidate-descriptor.json") | ConvertFrom-Json
+$controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
 $sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()
-if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$descriptor.source_commit) {
-  throw "Scenario registry source does not match the context package-source commit."
+$sourceTree = ([string](& git -C $source rev-parse "HEAD^{tree}")).Trim()
+$sourceWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source
+if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or
+    $sourceTree -ne [string]$controlLock.scenario_source_tree -or $sourceWorktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {
+  throw "Scenario registry source does not match the immutable context qualification-source lock."
 }
 $registry = Get-Content -Raw -LiteralPath (Join-Path $context.path "expanded-scenarios.json") | ConvertFrom-Json
 if ([string]$registry.target -ne [string]$manifest.target) { throw "Context registry target does not match its immutable manifest." }
