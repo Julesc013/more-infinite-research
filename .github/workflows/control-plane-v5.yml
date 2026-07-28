@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source_ref:
-        description: "Exact immutable package-source commit"
+        description: "Exact immutable qualification-source commit"
         required: true
         default: "29f81addc0eec9b571afd6428c9e3529c4497a1b"
       release:
@@ -66,7 +66,14 @@ jobs:
         run: |
           $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           if ([string]$record.target -ne $env:MIR_CP_TARGET) { throw "Release target mismatch." }
-          if ([string]$record.package.source_commit -ne $env:MIR_CP_SOURCE_REF) { throw "Package-source commit mismatch." }
+          $expectedSource = [string]$record.package.source_commit
+          if ($env:MIR_CP_TARGET -eq "2.0") {
+            $proofRow = @($record.proofs.backport_reconstruction)
+            if ($proofRow.Count -ne 1) { throw "Target 2.0 requires one governed reconstruction proof." }
+            $proof = Get-Content -Raw -LiteralPath ([string]$proofRow[0].path) | ConvertFrom-Json
+            $expectedSource = [string]$proof.integration_commit
+          }
+          if ($expectedSource -ne $env:MIR_CP_SOURCE_REF) { throw "Qualification-source commit mismatch." }
           if ((git -C source rev-parse HEAD).Trim() -ne $env:MIR_CP_SOURCE_REF) { throw "Source checkout mismatch." }
           ./scripts/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
       - name: Build exact candidate from immutable package source

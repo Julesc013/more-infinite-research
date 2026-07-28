@@ -28,6 +28,56 @@ function Get-MIRCPQualificationBundleForContext {
   return $null
 }
 
+function Get-MIRCPTrackedWorktreeSha256 {
+  param([Parameter(Mandatory)][string]$SourceRepoRoot)
+  $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
+  $changes = @(& git -C $source status --porcelain --untracked-files=no)
+  if ($LASTEXITCODE -ne 0) { throw "Could not inspect qualification source worktree state." }
+  if ($changes.Count -eq 0) { return "" }
+  $diff = ((& git -C $source diff --binary --no-ext-diff HEAD | Out-String).Replace("`r`n", "`n").Replace("`r", "`n"))
+  if ($LASTEXITCODE -ne 0) { throw "Could not fingerprint qualification source tracked changes." }
+  return Get-MIRCPSha256Text -Value $diff
+}
+
+function Get-MIRCPQualificationSourceIdentity {
+  param(
+    [Parameter(Mandatory)]$ReleaseRecord,
+    [Parameter(Mandatory)][string]$SourceRepoRoot,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
+  $commit = ([string](& git -C $source rev-parse HEAD)).Trim()
+  $tree = ([string](& git -C $source rev-parse "HEAD^{tree}")).Trim()
+  if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$' -or $tree -notmatch '^[0-9a-f]{40}$') { throw "Qualification source is not an exact Git checkout." }
+  $untracked = @(& git -C $source ls-files --others --exclude-standard)
+  if ($LASTEXITCODE -ne 0 -or $untracked.Count -ne 0) { throw "Qualification source checkout has untracked governed files." }
+  $worktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source
+  $sourceIsController = $source.TrimEnd('\') -eq $repo.TrimEnd('\')
+  if (-not [string]::IsNullOrWhiteSpace($worktreeSha256) -and ([string]$ReleaseRecord.target -eq "2.0" -or -not $sourceIsController)) {
+    throw "Qualification source checkout has tracked changes."
+  }
+  $role = "candidate-source"
+  $proofDigest = ""
+  if ([string]$ReleaseRecord.target -eq "2.0") {
+    $proofRows = @($ReleaseRecord.proofs.backport_reconstruction)
+    if ($proofRows.Count -ne 1) { throw "Factorio 2.0 qualification requires exactly one governed reconstruction proof." }
+    $proofPath = Join-Path $repo ([string]$proofRows[0].path)
+    if (-not (Test-Path -LiteralPath $proofPath -PathType Leaf)) { throw "Backport reconstruction proof is missing." }
+    $proofDigest = Get-MIRCPSha256File -Path $proofPath
+    if ($proofDigest -ne [string]$proofRows[0].sha256) { throw "Backport reconstruction proof digest differs from release authority." }
+    $proof = Get-Content -Raw -LiteralPath $proofPath | ConvertFrom-Json
+    if ([string]$proof.status -ne "passed" -or [string]$proof.target_release -ne [string]$ReleaseRecord.release -or
+        [string]$proof.target_candidate -ne [string]$ReleaseRecord.candidate_id -or
+        [string]$proof.archive_sha256 -ne [string]$ReleaseRecord.package.archive_sha256 -or
+        $commit -ne [string]$proof.integration_commit -or $tree -ne [string]$proof.integration_tree) {
+      throw "Qualification source does not match the exact governed dual-parent integration lineage."
+    }
+    $role = "dual-parent-integration"
+  }
+  return [pscustomobject][ordered]@{role=$role;commit=$commit;tree=$tree;worktree_sha256=$worktreeSha256;proof_sha256=$proofDigest}
+}
+
 function New-MIRCPContextDomainManifest {
   param(
     [Parameter(Mandatory)]$ReleaseRecord,
@@ -174,6 +224,7 @@ function New-MIRCPVerificationContext {
   $candidate = if ([IO.Path]::IsPathRooted($CandidatePath)) { [IO.Path]::GetFullPath($CandidatePath) } else { [IO.Path]::GetFullPath((Join-Path $repo $CandidatePath)) }
   if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { throw "Verification context candidate is missing: $candidate" }
   if ((Get-MIRCPSha256File -Path $candidate) -ne [string]$releaseRecord.package.archive_sha256) { throw "Verification context candidate does not match release authority." }
+  $qualificationSource = Get-MIRCPQualificationSourceIdentity -ReleaseRecord $releaseRecord -SourceRepoRoot $sourceRepo -RepoRoot $repo
   $plan = New-MIRCPPlan -Mode $Mode -ChangedPath @("scripts/MIRControlPlane/Context.ps1") -Target $Target -Release $Release -Stage $Stage -SourceRepoRoot $sourceRepo -RepoRoot $repo
   Write-Verbose "[context] materialized plan $($plan.plan_id)"
   $registryPath = Join-Path $sourceRepo "validation/generated/execution-registry.json"
@@ -225,7 +276,11 @@ function New-MIRCPVerificationContext {
     schema = 1
     policy_id = "mir-control-plane-v5"
     qualification_source_commit = ([string](& git -C $repo rev-parse HEAD)).Trim()
-    scenario_source_commit = ([string](& git -C $sourceRepo rev-parse HEAD)).Trim()
+    scenario_source_role = [string]$qualificationSource.role
+    scenario_source_commit = [string]$qualificationSource.commit
+    scenario_source_tree = [string]$qualificationSource.tree
+    scenario_source_worktree_sha256 = [string]$qualificationSource.worktree_sha256
+    scenario_source_proof_sha256 = [string]$qualificationSource.proof_sha256
     component_abis = (Get-MIRCPPolicy -RepoRoot $repo).component_abis
     files = @($controlPlaneFiles | ForEach-Object { [pscustomobject][ordered]@{path=$_; sha256=(Get-MIRCPSha256File -Path (Join-Path $repo $_))} })
     task_catalog_sha256 = Get-MIRCPSha256Object -Value @(Get-MIRCPTaskRecords -RepoRoot $repo | Sort-Object id)

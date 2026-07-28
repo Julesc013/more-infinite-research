@@ -31,6 +31,8 @@ function Assert-MIRCPProtectedExecutionEnvironment {
   foreach ($field in @("GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_JOB", "RUNNER_NAME")) {
     if ([string]::IsNullOrWhiteSpace([string][Environment]::GetEnvironmentVariable($field))) { throw "Protected-release producer is missing $field." }
   }
+  $tracked = @(& git -C $repo status --porcelain --untracked-files=no)
+  if ($LASTEXITCODE -ne 0 -or $tracked.Count -ne 0) { throw "Protected-release producer control-plane checkout is not clean." }
   return [pscustomobject]$checks
 }
 
@@ -194,14 +196,18 @@ function Assert-MIRCPExecutionSource {
     [Parameter(Mandatory)]$State,
     [Parameter(Mandatory)][string]$SourceRepoRoot
   )
-  if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { throw "This worker requires an immutable package-source checkout." }
+  if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { throw "This worker requires an immutable qualification-source checkout." }
   $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "candidate-descriptor.json") | ConvertFrom-Json
+  $controlLock = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "control-plane-lock.json") | ConvertFrom-Json
   $head = ([string](& git -C $source rev-parse HEAD)).Trim()
-  if ($LASTEXITCODE -ne 0 -or $head -ne [string]$descriptor.source_commit) {
-    throw "Execution source $head does not match context package source $($descriptor.source_commit)."
+  $tree = ([string](& git -C $source rev-parse "HEAD^{tree}")).Trim()
+  $worktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source
+  if ($LASTEXITCODE -ne 0 -or $head -ne [string]$controlLock.scenario_source_commit -or $tree -ne [string]$controlLock.scenario_source_tree -or
+      $worktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {
+    throw "Execution source does not match the immutable context qualification-source lock."
   }
-  return [pscustomobject][ordered]@{path=$source;descriptor=$descriptor;commit=$head}
+  return [pscustomobject][ordered]@{path=$source;descriptor=$descriptor;commit=$head;tree=$tree;worktree_sha256=$worktreeSha256}
 }
 
 function Get-MIRCPFactorioIdentity {

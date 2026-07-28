@@ -16,14 +16,19 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 
 [void](Assert-MIRCPVerificationContext -Path $context)
 $descriptor = Get-Content -Raw -LiteralPath (Join-Path $context "candidate-descriptor.json") | ConvertFrom-Json
+$controlLock = Get-Content -Raw -LiteralPath (Join-Path $context "control-plane-lock.json") | ConvertFrom-Json
 $candidate = Join-Path $context "candidate.zip"
 $sourceCommit = Get-MIRGitCommit -RepoRoot $sourceRepo
-if ($sourceCommit -ne [string]$descriptor.source_commit) {
-  throw "Package source checkout $sourceCommit does not match context source commit $($descriptor.source_commit)."
+if ($sourceCommit -ne [string]$controlLock.scenario_source_commit) {
+  throw "Qualification source checkout $sourceCommit does not match the immutable context source lock."
 }
 $sourceTree = ([string](& git -C $sourceRepo rev-parse "HEAD^{tree}")).Trim()
-if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$descriptor.source_tree) {
-  throw "Package source tree does not match the immutable context descriptor."
+if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$controlLock.scenario_source_tree) {
+  throw "Qualification source tree does not match the immutable context source lock."
+}
+$sourceWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $sourceRepo
+if ($sourceWorktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {
+  throw "Qualification source tracked state does not match the immutable context source lock."
 }
 if (Test-MIRPackageSourceGitDirty -RepoRoot $sourceRepo) {
   throw "Package source checkout has package-visible changes."
@@ -83,8 +88,10 @@ if ($Check -eq "determinism") {
 [pscustomobject][ordered]@{
   status = "passed"
   check = $Check
+  qualification_source_role = [string]$controlLock.scenario_source_role
   source_commit = $sourceCommit
   source_tree = $sourceTree
+  source_worktree_sha256 = $sourceWorktreeSha256
   archive_sha256 = $archiveSha
   content_sha256 = $archiveContent
   bytes = (Get-Item -LiteralPath $candidate).Length
