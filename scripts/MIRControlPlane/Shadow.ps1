@@ -139,13 +139,26 @@ function New-MIRCPShadowCandidateAnalysis {
   $baseline = Read-MIRCPJson -Path $baselinePath -RepoRoot $repo
   $releaseRecord = Get-MIRCPReleaseByVersion -Release $Release -RepoRoot $repo
   $sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()
-  if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$releaseRecord.package.source_commit) { throw "Shadow source for $Release is not its exact package-source commit." }
-  $registry = if ([string]::IsNullOrWhiteSpace($ContextPath)) {
-    New-MIRCPExecutionRegistry -Target ([string]$releaseRecord.target) -RepoRoot $source
+  if ([string]::IsNullOrWhiteSpace($ContextPath)) {
+    if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$releaseRecord.package.source_commit) {
+      throw "Shadow baseline source for $Release is not its exact package-source commit."
+    }
   } else {
     $context = Assert-MIRCPVerificationContext -Path $ContextPath
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
     if ([string]$manifest.release -ne $Release) { throw "Shadow context release differs from requested analysis release." }
+    $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
+    $sourceTree = ([string](& git -C $source rev-parse "HEAD^{tree}")).Trim()
+    $worktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source
+    if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or
+        $sourceTree -ne [string]$controlLock.scenario_source_tree -or
+        $worktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {
+      throw "Shadow source for $Release does not match its immutable context qualification-source lock."
+    }
+  }
+  $registry = if ([string]::IsNullOrWhiteSpace($ContextPath)) {
+    New-MIRCPExecutionRegistry -Target ([string]$releaseRecord.target) -RepoRoot $source
+  } else {
     Get-Content -Raw -LiteralPath (Join-Path $context.path "expanded-scenarios.json") | ConvertFrom-Json
   }
   [void](Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $source)
