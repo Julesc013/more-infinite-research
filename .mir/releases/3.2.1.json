@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "release": "3.2.1",
+  "candidate_id": "C21",
+  "target": "2.1",
+  "branch": "main",
+  "state": "published",
+  "package": {
+    "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+    "source_tree": "f3ba606fb152fbf07951f8af52da129c819f0672",
+    "source_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
+    "archive": "dist/more-infinite-research_3.2.1.zip",
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
+    "bytes": 1029716,
+    "entries": 290
+  },
+  "proofs": {
+    "tag": [
+      {
+        "name": "3.2.1",
+        "commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf"
+      }
+    ]
+  },
+  "assurance_exceptions": [
+    {
+      "id": "C21-PROTECTED-SEAL-ABSENT",
+      "reason": "Protected run 30229114461 failed and did not qualify the immutable tag.",
+      "disposition": "historical-release-only",
+      "may_satisfy_future_release_gate": false
+    }
+  ],
+  "release_notes": "docs/releases/notes/release-notes-3.2.1.md",
+  "updated_at": "2026-07-27T00:00:00Z"
+}

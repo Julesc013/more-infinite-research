@@ -43,6 +43,7 @@ function Assert-MIRCPRecords {
   $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
   $releases = @(Get-MIRCPRecordSet -Kind releases -RepoRoot $repo)
+  $transitions = @(Get-MIRCPRecordSet -Kind transitions -RepoRoot $repo)
   if ($changes.Count -eq 0 -or $releases.Count -eq 0) { throw "Control-plane change and release authorities must not be empty." }
 
   foreach ($change in $changes) {
@@ -66,14 +67,26 @@ function Assert-MIRCPRecords {
   $pointer = Read-MIRCPJson -Path ([string]$policy.records.current) -RepoRoot $repo
   $known = @($releases | ForEach-Object { [string]$_.release })
   foreach ($role in @($pointer.roles.PSObject.Properties)) {
-    if ($role.Name -in @("canonical", "backport_calibration") -and $known -notcontains [string]$role.Value) {
+    if ($known -notcontains [string]$role.Value) {
       throw "Current release role '$($role.Name)' points to unknown record '$($role.Value)'."
     }
+  }
+  foreach ($transition in $transitions) {
+    Assert-MIRCPRequiredProperties -Record $transition -Names @("schema", "id", "release", "from", "to", "admission", "proofs", "recorded_at") -Context "ReleaseTransition"
+    if ([string]$transition.id -notmatch '^REL-[0-9]+\.[0-9]+\.[0-9]+-[a-z0-9-]+$') { throw "Invalid ReleaseTransition id: $($transition.id)" }
+    if ($known -notcontains [string]$transition.release) { throw "Transition $($transition.id) points to unknown release $($transition.release)." }
+    $fromIndex = [Array]::IndexOf($states, [string]$transition.from)
+    $toIndex = [Array]::IndexOf($states, [string]$transition.to)
+    if ($fromIndex -lt 0 -or $toIndex -le $fromIndex) { throw "Transition $($transition.id) does not advance through known release states." }
+    if ([string]$transition.admission -eq "proof" -and $toIndex -ne ($fromIndex + 1)) { throw "Proof transition $($transition.id) skips a required state." }
+    if (@($transition.proofs).Count -eq 0) { throw "Transition $($transition.id) has no admission proof." }
+    if ([string]$transition.admission -eq "grandfathered-import" -and [string]::IsNullOrWhiteSpace([string]$transition.exception)) { throw "Grandfathered transition $($transition.id) requires an explicit exception." }
   }
   return [pscustomobject][ordered]@{
     changes = $changes.Count
     incidents = $incidents.Count
     releases = $releases.Count
+    transitions = $transitions.Count
     states = $states.Count
   }
 }

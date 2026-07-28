@@ -58,6 +58,25 @@ MIR 3.2.2 is an emergency Pyanodons startup-integrity and affected-save planet-d
 - Direct six-row 3.2.1-to-3.2.2 upgrade matrix: passed for Base, Space Age native owners, automatic families, base continuations, mod-set changes, and affected planet discovery.
 - Exact paired 3.2.1-to-3.2.2 performance campaign: passed all ten total-load and compiler-phase lanes without changing the governed budgets.
 - Exact 15-mod Py 3.1 trigger closure: passed on Factorio 2.1.12 with `casting-gear` and its dangling unlock absent, all valid effects retained, and zero unexpected sanitation.
-- Full no-reuse, protected qualification, schema-4 seal, and independent seal check: pending.
+- Full local no-reuse qualification and package-focused maintainer review: passed.
+- Protected qualification, schema-4 seal, and promotion proof: not recorded before the immutable tag; tracked as assurance exception `C24-PROTECTED-SEAL-ABSENT` and forbidden as precedent for future release gates.
 
-Publish only the exact recorded ZIP after every remaining gate passes; do not rebuild it during publication.
+Any publication must use the exact recorded ZIP; do not rebuild it during publication.
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
+## Immutable release identity
+
+> Generated from `.mir/releases/3.2.2.json`. The typed record is authoritative.
+
+| Field | Value |
+| --- | --- |
+| State | `tagged` |
+| Candidate | `C24` |
+| Package source commit | `29f81addc0eec9b571afd6428c9e3529c4497a1b` |
+| Archive SHA-256 | `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8` |
+| Content SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
+| Tag | `3.2.2` |
+| Tag commit | `1138ed55ad7ad42e38cf9e821d1d4e7de5df6378` |
+| Assurance exceptions | `C24-PROTECTED-SEAL-ABSENT` |
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:END -->

@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: frozen Factorio 2.1 stable line at published MIR 3.2.1; accepts only the validated MIR 3.2.2 emergency release candidate
+    purpose: frozen Factorio 2.1 line at immutable tag MIR 3.2.2; product work is stopped while Control Plane v5 is established
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -17,7 +17,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: MIR 3.2.2 Py and planet-recovery emergency hotfix qualification; returns to MIR 3.2.5 development after publication
+    purpose: Control Plane v5 development and release-engineering repair; no MIR product work until v5 shadow equivalence is admitted
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -404,12 +404,17 @@ release_artifacts:
       exact_py_gate: passed-exact-15-mod-closure-zero-prune
       exact_py_evidence: .mir/evidence/3.2.2-py-exact.json
       exact_py_evidence_sha256: 32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00
-      automated_gate: pending-full-no-reuse
-      manual_attestation_gate: pending-exact-patch-review
-      protected_release_gate: pending
-      release_gate: full-and-protected-qualification-pending
-      publication_status: unreleased
-      status: c24-focused-and-exact-py-passed-full-validation-pending
+      automated_gate: passed-full-local-no-reuse
+      local_automated_qualification: .mir/evidence/3.2.2-local-automated-qualification.json
+      local_automated_qualification_sha256: AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF
+      manual_attestation_gate: maintainer-patch-review-approved
+      protected_release_gate: not-recorded-before-tag
+      release_gate: immutable-tag-with-recorded-assurance-exception
+      publication_status: tagged
+      tag: "3.2.2"
+      tag_commit: 1138ed55ad7ad42e38cf9e821d1d4e7de5df6378
+      assurance_exception: C24-PROTECTED-SEAL-ABSENT
+      status: c24-tagged-control-plane-calibration-baseline
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
@@ -427,9 +432,15 @@ release_artifacts:
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      release_gate: project-final-3.2.2-hotfix-before-2.5.0-release
+      archive: dist/more-infinite-research_2.5.0.zip
+      archive_bytes: 1029914
+      archive_entries: 290
+      archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
+      package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
+      package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
+      release_gate: v5-shadow-equivalence-and-remaining-release-state-proofs
       publication_status: unreleased
-      status: backport-pending-from-3.2.2
+      status: p9-focused-qualified
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

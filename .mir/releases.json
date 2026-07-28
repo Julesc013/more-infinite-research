@@ -1,137 +1,146 @@
 {
-  "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-27",
-  "published_baselines": {
-    "factorio-2.1": {
-      "mir_version": "3.2.1",
-      "branch": "main",
-      "tag": "3.2.1",
-      "tag_commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf",
-      "package_source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
-      "archive": "dist/more-infinite-research_3.2.1.zip",
-      "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
-      "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
-      "status": "published-mod-portal-tagged-github-release-pending"
-    },
-    "factorio-2.0": {
-      "mir_version": "2.4.9",
-      "branch": "legacy",
-      "tag": "2.4.9",
-      "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
-      "archive": "dist/more-infinite-research_2.4.9.zip",
-      "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
-      "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
-      "status": "published-frozen"
-    }
-  },
   "development": {
+    "factorio-2.0": {
+      "archive": "dist/more-infinite-research_2.5.0.zip",
+      "archive_bytes": 1029914,
+      "archive_class": "frozen-unreleased-calibration-candidate",
+      "archive_entries": 290,
+      "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+      "assurance_exception_ids": [],
+      "branch": "tmp/2.0",
+      "candidate_id": "2.5-P9",
+      "development_branch": "tmp/2.0",
+      "manual_review": "pending",
+      "mir_version": "2.5.0",
+      "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+      "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+      "package_source_material": {
+        "file_count": 290,
+        "hash_algorithm": "git-commit-normalized-package-v1",
+        "schema": 1,
+        "source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692"
+      },
+      "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+      "package_source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
+      "protected_qualification": "pending",
+      "publication_status": "focused-qualified",
+      "qualification": "focused-qualified",
+      "remaining_obligations": [
+        "v5-shadow-equivalence",
+        "deterministic-dual-parent-reconstruction",
+        "candidate-qualification",
+        "manual-acceptance",
+        "protected-qualification",
+        "seal",
+        "promotion",
+        "tag",
+        "publication",
+        "public-byte-verification"
+      ],
+      "remaining_states": [
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "source_anchor": "3.2.2",
+      "status": "2.5-P9-focused-qualified"
+    },
     "factorio-2.1": {
-      "mir_version": "3.2.2",
-      "candidate_id": "C24",
-      "branch": "main",
-      "development_branch": "dev",
-      "source_anchor": "3.2.1",
+      "approved_delta": "bounded-c21-to-c24-hotfix-reviewed",
       "archive": "dist/more-infinite-research_3.2.2.zip",
       "archive_bytes": 1030817,
+      "archive_class": "immutable-tagged-release",
       "archive_entries": 291,
-      "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
-      "package_source_tree": "afe3959e40c868578f3182bea5b4ce725dcfd222",
-      "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
-      "package_source_material": {
-        "schema": 1,
-        "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "afe3959e40c868578f3182bea5b4ce725dcfd222",
-        "file_count": 291
-      },
       "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
-      "package_content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
-      "archive_class": "unreleased-emergency-hotfix-candidate",
-      "qualification": "focused-hotfix-and-exact-py-validation-passed-full-validation-pending",
+      "assurance_exception_ids": [
+        "C24-PROTECTED-SEAL-ABSENT"
+      ],
+      "branch": "main",
+      "candidate_id": "C24",
+      "candidate_qualification_evidence": ".mir/evidence/3.2.2-local-automated-qualification.json",
+      "candidate_qualification_sha256": "AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF",
+      "development_branch": "dev",
       "exact_py_evidence": ".mir/evidence/3.2.2-py-exact.json",
       "exact_py_evidence_sha256": "32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00",
+      "manual_review": "maintainer-patch-review-approved",
+      "mir_version": "3.2.2",
+      "package_content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+      "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+      "package_source_material": {
+        "file_count": 291,
+        "hash_algorithm": "git-commit-normalized-package-v1",
+        "schema": 1,
+        "source_tree": "afe3959e40c868578f3182bea5b4ce725dcfd222"
+      },
+      "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+      "package_source_tree": "afe3959e40c868578f3182bea5b4ce725dcfd222",
       "performance_evidence": ".mir/evidence/3.2.2-performance-regression.json",
-      "performance_evidence_sha256": "9713544E56107CABFAD859C59D1466B9DF908185A7BB37323DC09C829D7A3657",
-      "performance_qualification": "passed-exact-paired-3.2.1-to-3.2.2",
-      "approved_delta": "bounded-c21-to-c24-hotfix-reviewed",
-      "minimum_factorio_qualification": ".mir/evidence/3.2.2-factorio-2.1.8-floor-smokes.json",
-      "upgrade_qualification": "exact-3.2.1-to-3.2.2-six-archetype-runtime-passed",
-      "upgrade_evidence": ".mir/evidence/3.2.2-upgrade-proof.json",
-      "runtime_qualification": "focused-package-loads-and-exact-py-passed-full-runtime-pending",
-      "manual_review": "exact-patch-review-pending",
-      "protected_qualification": "pending",
-      "release_decision": {
-        "decision": "prepare-exact-py-and-planet-recovery-hotfix",
-        "recorded_at": "2026-07-27",
-        "package_delta_from_c21": "py-finalizer-order-and-version-gated-planet-discovery-recovery",
-        "focused_validation": "passed",
-        "full_validation": "pending",
-        "mod_portal": "pending-3.2.2",
-        "github_release": "tag-only-requested-release-created-by-maintainer",
-        "artifact_rule": "publish-the-recorded-zip-without-rebuilding"
-      },
-      "publication_status": "unreleased",
-      "status": "c24-focused-and-exact-py-passed-full-validation-pending",
-      "supersedes_candidate": {
-        "candidate_id": "C21",
-        "archive_bytes": 1029716,
-        "archive_entries": 290,
-        "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
-        "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
-        "package_source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
-        "package_source_tree": "f3ba606fb152fbf07951f8af52da129c819f0672",
-        "package_source_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
-        "tag": "3.2.1",
-        "tag_commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf",
-        "status": "published-mod-portal-tagged-github-release-pending",
-        "reason": "C24 adds exact Py finalizer ordering and repairs valid researched planet discoveries left locked by 3.2.0 or 3.2.1."
-      },
-      "earlier_rejected_candidate": {
-        "candidate_id": "C22",
-        "package_source_commit": "7ebe10dd52e34c8df54dc98dbc0f1375a134c4b8",
-        "package_source_tree": "789069c794d86fbd734475ae2fc6c3555581b0cb",
-        "archive_bytes": 1030828,
-        "archive_entries": 291,
-        "archive_sha256": "638CF9254915B24824BEA6FD66D420B15CD41876334D32AC2ED5D81136D9A938",
-        "package_content_sha256": "B2E5745CB6ED6F093509B358FDBC8D64D45F0BE3A7439B65A6A8CD8FAD5CD0C4",
-        "reason": "packaged changelog exceeded the governed 132-character Factorio syntax limit",
-        "status": "rejected-before-runtime-qualification"
-      },
-      "rejected_candidate": {
-        "candidate_id": "C23",
-        "package_source_commit": "6360f8883e5c7673aa745657456c86daa416e8e8",
-        "package_source_tree": "b8ebd213f9269bd04af1a696defa2b9d5b3dfc1c",
-        "archive_bytes": 1030830,
-        "archive_entries": 291,
-        "archive_sha256": "F67DFB0CE6C65C8381EDD8E662DD9CFE61ADA13345973478204277E8D5B2D0A5",
-        "package_content_sha256": "C001AD761633ED2AED8DD30EFD49727820548A752A46CA132CABBF0AF1D943B5",
-        "reason": "the inherited 3.2.1 changelog bullets still exceeded the governed 132-character Factorio syntax limit",
-        "status": "rejected-before-runtime-qualification"
-      }
-    },
-    "factorio-2.0": {
-      "mir_version": "2.5.0",
-      "branch": "tmp/2.0",
-      "source_anchor": "3.2.2-final-source-freeze",
-      "prior_release": "2.4.9",
-      "archive": null,
-      "archive_class": "projection-pending-from-final-3.2.2-source",
-      "qualification": "pending-3.2.2-hotfix-projection",
-      "publication_status": "unreleased",
-      "status": "backport-pending-from-3.2.2"
+      "performance_evidence_sha256": "4E62CB3BBE25DB26935C7D94D7A8A77C80DE8D857B267611620D67CB8AEFF86B",
+      "protected_qualification": "not-recorded-before-tag",
+      "publication_status": "tagged",
+      "qualification": "tagged",
+      "remaining_states": [
+        "published",
+        "publicly-verified"
+      ],
+      "source_anchor": "3.2.1",
+      "status": "C24-tagged",
+      "tag": "3.2.2",
+      "tag_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+      "upgrade_qualification": "exact-3.2.1-to-3.2.2-six-archetype-runtime-passed"
     }
   },
-  "views": {
-    "branch_policy": ".mir/branches.yml",
-    "release_wave": ".mir/release-wave.yml",
-    "distribution_inventory": ".mir/distributions.json",
-    "maintainer_queue": "todo.md",
-    "promotion_workflow": ".github/workflows/assurance-promotion.yml"
+  "generated_from": [
+    ".mir/releases/current.json",
+    ".mir/releases/3.2.2.json",
+    ".mir/releases/2.5.0.json",
+    ".mir/releases/3.2.1.json",
+    ".mir/releases/2.4.9.json"
+  ],
+  "published_baselines": {
+    "factorio-2.0": {
+      "archive": "dist/more-infinite-research_2.4.9.zip",
+      "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+      "branch": "legacy",
+      "mir_version": "2.4.9",
+      "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+      "package_source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+      "status": "release-publicly-verified",
+      "tag": "2.4.9",
+      "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
+    },
+    "factorio-2.1": {
+      "archive": "dist/more-infinite-research_3.2.1.zip",
+      "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+      "branch": "main",
+      "mir_version": "3.2.1",
+      "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188",
+      "package_source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+      "status": "release-published",
+      "tag": "3.2.1",
+      "tag_commit": "666bf1c24795036e934db2d31ae93b84b2e4cacf"
+    }
   },
   "rules": {
-    "published_archives_are_immutable": true,
-    "development_archives_are_not_releases": true,
     "backports_start_after_canonical_source_freeze": true,
-    "manual_view_disagreement_fails_validation": true
+    "development_archives_are_not_releases": true,
+    "manual_view_disagreement_fails_validation": true,
+    "published_archives_are_immutable": true,
+    "typed_release_records_are_authoritative": true
+  },
+  "schema": 1,
+  "updated_at": "2026-07-28",
+  "views": {
+    "backport_queue": ".mir/generated/backport-queue.json",
+    "branch_policy": ".mir/branches.yml",
+    "maintainer_queue": "todo.md",
+    "publication_checklist": ".mir/generated/publication-checklist.json",
+    "release_dashboard": "docs/releases/control-plane-dashboard.md"
   }
 }

@@ -9,6 +9,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - generated-current-candidate-view
+  - path: docs/releases/control-plane-dashboard.md
+    title: "MIR Control Plane Dashboard"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-control-plane-dashboard
   - path: docs/reference/generated/technology-quality-and-promotion.md
     title: "Technology Quality And Promotion Inventory"
     status: current

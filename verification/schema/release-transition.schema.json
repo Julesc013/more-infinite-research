@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/release-transition.schema.json",
+  "title": "MIR ReleaseTransition",
+  "type": "object",
+  "required": ["schema", "id", "release", "from", "to", "admission", "proofs", "recorded_at"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^REL-[0-9]+\\.[0-9]+\\.[0-9]+-[a-z0-9-]+$"},
+    "release": {"type": "string"},
+    "from": {"type": "string"},
+    "to": {"type": "string"},
+    "admission": {"enum": ["proof", "grandfathered-import"]},
+    "proofs": {"type": "array", "items": {"type": "object"}},
+    "exception": {"type": "string"},
+    "recorded_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

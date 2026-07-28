@@ -26,7 +26,16 @@
     "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
   },
   "proofs": {
-    "focused_qualification": []
+    "focused_qualification": [
+      {
+        "kind": "package-lock",
+        "path": ".mir/control-plane/package-locks.json"
+      },
+      {
+        "kind": "backport-contract",
+        "path": ".mir/backports/2.5.0.json"
+      }
+    ]
   },
   "remaining_obligations": [
     "v5-shadow-equivalence",

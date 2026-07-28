@@ -37,7 +37,9 @@ function ConvertTo-MIRCPCanonicalValue {
     return $out
   }
   if ($Value -is [Collections.IEnumerable] -and $Value -isnot [string]) {
-    return @($Value | ForEach-Object { ConvertTo-MIRCPCanonicalValue -Value $_ })
+    $items = @($Value | ForEach-Object { ConvertTo-MIRCPCanonicalValue -Value $_ })
+    Write-Output -NoEnumerate $items
+    return
   }
   $record = [ordered]@{}
   foreach ($property in @($Value.PSObject.Properties | Sort-Object Name)) {
@@ -82,7 +84,7 @@ function Write-MIRCPJson {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $resolved = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
-  $content = (ConvertTo-MIRCPCanonicalValue -Value $Value | ConvertTo-Json -Depth 100) + "`n"
+  $content = ((ConvertTo-MIRCPCanonicalValue -Value $Value | ConvertTo-Json -Depth 100) + "`n").Replace("`r`n", "`n")
   if ($Check) {
     if (-not (Test-Path -LiteralPath $resolved -PathType Leaf)) { throw "Generated JSON is missing: $Path" }
     $existing = (Get-Content -Raw -LiteralPath $resolved).Replace("`r`n", "`n")

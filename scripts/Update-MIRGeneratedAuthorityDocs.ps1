@@ -5,6 +5,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo "scripts/MIRControlPlane/Core.ps1")
+. (Join-Path $repo "scripts/MIRControlPlane/Records.ps1")
+. (Join-Path $repo "scripts/MIRControlPlane/Views.ps1")
+Update-MIRCPViews -RepoRoot $repo -Check:$Check | Out-Null
 
 function Read-MIRJson([string]$RelativePath) {
   return Get-Content -Raw -LiteralPath (Join-Path $repo $RelativePath) | ConvertFrom-Json
@@ -86,7 +90,7 @@ $candidateLines = @(
   "",
   "Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree."
 )
-Set-MIRGeneratedDocument "docs/releases/current-candidate.md" $candidateLines
+# Current-candidate and all other release-engineering views are emitted by Control Plane v5 above.
 
 $profiles = Read-MIRJson ".mir/technology-quality-profiles.json"
 $governance = Read-MIRJson ".mir/technology-governance.json"

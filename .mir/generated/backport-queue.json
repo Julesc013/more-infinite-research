@@ -1,0 +1,34 @@
+{
+  "authority": "mir-generated-backport-queue-v1",
+  "candidate_id": "2.5-P9",
+  "generated_from": [
+    ".mir/releases/2.5.0.json",
+    ".mir/backports/2.5.0.json"
+  ],
+  "release": "2.5.0",
+  "remaining_obligations": [
+    "v5-shadow-equivalence",
+    "deterministic-dual-parent-reconstruction",
+    "candidate-qualification",
+    "manual-acceptance",
+    "protected-qualification",
+    "seal",
+    "promotion",
+    "tag",
+    "publication",
+    "public-byte-verification"
+  ],
+  "remaining_states": [
+    "candidate-qualified",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
+  "schema": 1,
+  "state": "focused-qualified",
+  "target": "2.0"
+}

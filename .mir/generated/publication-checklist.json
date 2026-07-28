@@ -1,0 +1,24 @@
+{
+  "assurance_exceptions": [
+    {
+      "disposition": "grandfathered-import-for-v5-calibration-only",
+      "id": "C24-PROTECTED-SEAL-ABSENT",
+      "may_satisfy_future_release_gate": false,
+      "reason": "The immutable tag was created after local qualification and manual acceptance without a committed protected-qualification capsule or schema-4 seal."
+    }
+  ],
+  "authority": "mir-generated-publication-checklist-v1",
+  "candidate_id": "C24",
+  "generated_from": [
+    ".mir/releases/current.json",
+    ".mir/releases/3.2.2.json"
+  ],
+  "publication_admitted": false,
+  "release": "3.2.2",
+  "remaining_states": [
+    "published",
+    "publicly-verified"
+  ],
+  "schema": 1,
+  "state": "tagged"
+}

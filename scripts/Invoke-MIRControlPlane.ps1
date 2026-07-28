@@ -1,7 +1,8 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
-  [switch]$AllLocks
+  [switch]$AllLocks,
+  [switch]$Check
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,6 +21,8 @@ MIR Control Plane v5
   package-freeze -AllLocks  Reconstruct every locked commit package identity.
   baseline                  Print the immutable 3.2.2 v4 baseline.
   status                    Print current release roles and shadow status.
+  views                     Generate release, branch, publication, backport, TODO, and dashboard views.
+  views -Check              Fail when any generated control-plane view is stale.
 "@ | Write-Host
   }
   "validate" {
@@ -39,5 +42,8 @@ MIR Control Plane v5
       backport = Get-MIRCPCurrentRelease -Role backport_calibration -RepoRoot $repo
       shadow = Get-MIRCPShadowStatus -RepoRoot $repo
     } | ConvertTo-Json -Depth 20
+  }
+  "views" {
+    Update-MIRCPViews -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 10
   }
 }
