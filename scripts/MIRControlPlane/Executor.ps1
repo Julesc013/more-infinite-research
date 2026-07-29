@@ -638,7 +638,9 @@ function Invoke-MIRCPEcosystemMeasurement {
 }
 
 function Get-MIRCPZipPackageObservation {
-  param([Parameter(Mandatory)][string]$Path)
+  param([Parameter(Mandatory)][string]$Path, [string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $resolved = (Resolve-Path -LiteralPath $Path).Path
   $archive = [IO.Compression.ZipFile]::OpenRead($resolved)
