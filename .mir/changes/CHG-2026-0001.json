@@ -16,6 +16,7 @@
     "assurance.observation",
     "assurance.evaluation",
     "assurance.evidence",
+    "release.approved-delta",
     "release.generated-views"
   ],
   "affected_targets": [
@@ -29,7 +30,8 @@
     "control-plane.records",
     "control-plane.graph",
     "control-plane.package-freeze",
-    "control-plane.shadow"
+    "control-plane.shadow",
+    "control-plane.native-approved-delta"
   ],
   "backport_disposition": {
     "factorio-2.1": "shared-control-plane",

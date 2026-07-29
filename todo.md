@@ -64,6 +64,7 @@ Generated: 2026-07-28
 
 - [ ] `CHG-2026-0001` — Establish MIR Control Plane v5 (`implemented`)
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
+- [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `pending-fresh-calibration`
 
 ## Explicit release obligations
 

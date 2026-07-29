@@ -734,6 +734,7 @@ validation_tooling:
     mod_interaction_gate: scripts/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
     approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
+    control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
     runtime_performance_gate: scripts/Test-MIRPerformanceRegression.ps1
     manual_release_review_gate: scripts/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
@@ -790,6 +791,7 @@ validation_tooling:
     - every executed scenario resolves through a target-bound declaration record
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
+    - v5 native patch-delta observations separate exact ZIP entry capture from versioned pure policy evaluation and bind the evaluated candidate rather than a superseded release-ledger row
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
