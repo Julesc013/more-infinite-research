@@ -656,6 +656,7 @@ validation_tooling:
     control_plane_views: scripts/MIRControlPlane/Views.ps1
     control_plane_context: scripts/MIRControlPlane/Context.ps1
     control_plane_executor: scripts/MIRControlPlane/Executor.ps1
+    control_plane_calibration: scripts/MIRControlPlane/Calibration.ps1
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
     control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: scripts/Test-MIRControlPlane.ps1
@@ -761,11 +762,12 @@ validation_tooling:
     - proposition freshness is explicit and no release uses a global no-reuse switch except governed independent calibration
     - unknown path ownership broadens impact selection and fails governance until classified
     - verification workers consume one immutable context digest and upload content-addressed objects plus execution manifests
-    - native Factorio workers must match the context locked binary bytes version and official data tree before observation capture
+    - native Factorio workers must match the context locked composite installation binary bytes version and official data tree before observation capture while process local full scan reuse remains exact key bound
     - producer evaluator and canonicalization revocation may invalidate derived evaluations without discarding sound observations
     - v5 toolchain admission requires exact C24 historical verdict equivalence P9 pending verdict parity and one fresh independent C24 calibration pass
     - P9 operational shadow cutover requires exact admitted outcome and seal evidence and never treats pending parity as release proof
     - P9 qualification may use the governed integration commit or a clean descendant only while the complete package source fingerprint remains frozen
+    - fresh C24 calibration executes every planned TaskNode and exact environment batch under one immutable context and emits one compact proof only after unambiguous evidence closure
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
     - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint

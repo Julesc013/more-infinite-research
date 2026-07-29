@@ -214,6 +214,9 @@ function Get-MIRCPFactorioIdentity {
   param([Parameter(Mandatory)][string]$FactorioBin)
   $binary = (Resolve-Path -LiteralPath $FactorioBin).Path
   $binaryItem = Get-Item -LiteralPath $binary
+  if ($null -eq $script:MIRCPFactorioIdentityCache) { $script:MIRCPFactorioIdentityCache = @{} }
+  $cacheKey = "$binary|$($binaryItem.Length)|$($binaryItem.LastWriteTimeUtc.Ticks)"
+  if ($script:MIRCPFactorioIdentityCache.ContainsKey($cacheKey)) { return $script:MIRCPFactorioIdentityCache[$cacheKey] }
   $installRoot = $binaryItem.Directory.Parent.Parent.FullName
   $officialRoots = @("data/core", "data/base", "data/quality", "data/elevated-rails", "data/space-age")
   $officialFiles = @()
@@ -232,21 +235,36 @@ function Get-MIRCPFactorioIdentity {
     }
   )
   $officialData = [pscustomobject][ordered]@{
+    kind = "external-tree"
+    state = "present"
     root = $installRoot
     file_count = $officialRows.Count
     sha256 = Get-MIRCPSha256Text -Value $(if ($officialRows.Count -gt 0) { $officialRows -join "`n" } else { "EMPTY:factorio-official-data" })
   }
   $binarySha256 = Get-MIRCPSha256File -Path $binary
+  $binaryFingerprint = [pscustomobject][ordered]@{
+    kind = "external-file"
+    state = "present"
+    name = $binaryItem.Name
+    size_bytes = [int64]$binaryItem.Length
+    sha256 = $binarySha256
+  }
+  $installationMaterial = [ordered]@{binary=$binaryFingerprint;official_data=$officialData}
+  # Environment locks imported from v4 retain the v4 ordered compact-JSON identity.
+  $installationSha256 = Get-MIRCPSha256Text -Value ($installationMaterial | ConvertTo-Json -Depth 40 -Compress)
   $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($binary).FileVersion
-  return [pscustomobject][ordered]@{
+  $identity = [pscustomobject][ordered]@{
     path = $binary
     root = $installRoot
-    sha256 = $binarySha256
+    sha256 = $installationSha256
+    installation_sha256 = $installationSha256
     bytes = [int64]$binaryItem.Length
     version = [string]$version
     binary = [pscustomobject][ordered]@{bytes=[int64]$binaryItem.Length;sha256=$binarySha256}
     official_data = $officialData
   }
+  $script:MIRCPFactorioIdentityCache[$cacheKey] = $identity
+  return $identity
 }
 
 function Test-MIRCPFactorioIdentityMatchesLock {
@@ -254,6 +272,8 @@ function Test-MIRCPFactorioIdentityMatchesLock {
     [Parameter(Mandatory)]$Identity,
     [Parameter(Mandatory)]$Lock
   )
+  if ($null -ne $Lock.PSObject.Properties["installation_sha256"] -and
+      [string]$Lock.installation_sha256 -ne [string]$Identity.installation_sha256) { return $false }
   if ([string]$Lock.binary.sha256 -ne [string]$Identity.binary.sha256) { return $false }
   if ($null -ne $Lock.binary.PSObject.Properties["bytes"] -and [int64]$Lock.binary.bytes -gt 0 -and
       [int64]$Lock.binary.bytes -ne [int64]$Identity.binary.bytes) { return $false }
@@ -506,7 +526,8 @@ function Invoke-MIRCPUpgradeMeasurement {
     to_version = [string]$profile.upgrade.to_version
     fixture = [string]$profile.upgrade.fixture
     prior_archive_sha256 = Get-MIRCPSha256File -Path $prior
-    factorio_binary_sha256 = [string]$factorio.sha256
+    factorio_installation_sha256 = [string]$factorio.installation_sha256
+    factorio_binary_sha256 = [string]$factorio.binary.sha256
     evidence_status = if ($null -eq $evidence) { "missing" } else { [string]$evidence.status }
   }
   return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
@@ -547,7 +568,8 @@ function Invoke-MIRCPEcosystemMeasurement {
   $status = if ($exitCode -eq 0 -and $null -ne $summary -and $failedSteps -eq 0 -and [string]::IsNullOrWhiteSpace([string]$summary.failure_message)) { "passed" } else { "failed" }
   $facts = [pscustomobject][ordered]@{
     status = $status
-    factorio_binary_sha256 = [string]$factorio.sha256
+    factorio_installation_sha256 = [string]$factorio.installation_sha256
+    factorio_binary_sha256 = [string]$factorio.binary.sha256
     mod_zip_count = $modRows.Count
     mod_closure_sha256 = Get-MIRCPSha256Object -Value $modRows
     steps = if ($null -eq $summary) { 0 } else { @($summary.results).Count }
@@ -591,7 +613,8 @@ function Invoke-MIRCPApprovedDeltaMeasurement {
   $status = if ($exportExitCode -eq 0 -and $testExitCode -eq 0 -and $null -ne $artifact -and [string]$artifact.summary.status -eq "approved" -and [int]$artifact.summary.unapproved_count -eq 0) { "passed" } else { "failed" }
   $facts = [pscustomobject][ordered]@{
     status = $status
-    factorio_binary_sha256 = [string]$factorio.sha256
+    factorio_installation_sha256 = [string]$factorio.installation_sha256
+    factorio_binary_sha256 = [string]$factorio.binary.sha256
     prior_archive_sha256 = Get-MIRCPSha256File -Path $prior
     difference_count = if ($null -eq $artifact) { -1 } else { [int]$artifact.summary.difference_count }
     unapproved_count = if ($null -eq $artifact) { -1 } else { [int]$artifact.summary.unapproved_count }

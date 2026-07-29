@@ -1,5 +1,5 @@
 param(
-  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay", "context", "evidence-index", "aggregate", "qualification", "release", "backport", "seal", "promotion")][string]$Command = "help",
+  [Parameter(Position=0)][ValidateSet("help", "validate", "package-freeze", "baseline", "status", "views", "plan", "registry", "replay", "context", "evidence-index", "aggregate", "calibrate", "calibration-proof", "qualification", "release", "backport", "seal", "promotion")][string]$Command = "help",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [switch]$AllLocks,
   [switch]$Check,
@@ -19,12 +19,17 @@ param(
   [string]$AggregateTaskId = "",
   [string]$TaskId = "",
   [string]$CandidatePath = "",
-  [string]$SourceRepoRoot = ""
+  [string]$SourceRepoRoot = "",
+  [string]$FactorioBin = "",
+  [string]$PriorRelease = "",
+  [string]$LocalModDir = "",
+  [string]$LocalModZipDir = "",
+  [switch]$Resume
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release", "Calibration")) {
   . (Join-Path $PSScriptRoot "MIRControlPlane/$module.ps1")
 }
 
@@ -49,6 +54,8 @@ MIR Control Plane v5
   context                   Materialize one immutable, digest-checked verification context.
   evidence-index            Rebuild the evidence index from content-addressed objects.
   aggregate                 Resolve one result-only aggregate from exact admitted evidence.
+  calibrate                 Run or resume a complete local C24 fresh calibration context.
+  calibration-proof         Materialize the compact proof for a completed fresh calibration.
   qualification             Complete protected qualification.full for a release-stage context.
   release                   Execute one named release/publication admission TaskNode.
   backport                  Admit governed dual-parent reconstruction proof for a 2.0 context.
@@ -96,6 +103,14 @@ MIR Control Plane v5
   }
   "aggregate" {
     Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId $AggregateTaskId -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "calibrate" {
+    Invoke-MIRCPFreshCalibration -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease `
+      -LocalModDir $LocalModDir -LocalModZipDir $LocalModZipDir -SourceRepoRoot $SourceRepoRoot `
+      -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -Resume:$Resume -RepoRoot $repo | ConvertTo-Json -Depth 12
+  }
+  "calibration-proof" {
+    New-MIRCPFreshCalibrationProof -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -Output $Output -RepoRoot $repo | ConvertTo-Json -Depth 12
   }
   "qualification" {
     Complete-MIRCPQualification -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RequireFresh:($Mode -eq "calibrate-fresh") -RepoRoot $repo | ConvertTo-Json -Depth 12

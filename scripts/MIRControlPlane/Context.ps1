@@ -282,7 +282,7 @@ function New-MIRCPVerificationContext {
   $controlPlaneFiles = @(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
-    "validation/trust.json"
+    "validation/trust.json", "scripts/MIRControlPlane/Calibration.ps1", "scripts/Invoke-MIRControlPlane.ps1"
   )
   $controlPlaneLock = [pscustomobject][ordered]@{
     schema = 1

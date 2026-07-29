@@ -5,12 +5,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
+foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release", "Calibration")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
+foreach ($command in @("Invoke-MIRCPFreshCalibration", "New-MIRCPFreshCalibrationProof")) {
+  if ($null -eq (Get-Command $command -CommandType Function -ErrorAction SilentlyContinue)) { throw "Control-plane calibration command is unavailable: $command" }
+}
 
 foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json", "verification-context.schema.json", "evidence-object.schema.json", "evidence-manifest.schema.json", "evidence-revocation.schema.json")) {
   $schema = Read-MIRCPJson -Path "verification/schema/$schemaName" -RepoRoot $repo
