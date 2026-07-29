@@ -768,6 +768,7 @@ validation_tooling:
     - P9 operational shadow cutover requires exact admitted outcome and seal evidence and never treats pending parity as release proof
     - P9 qualification may use the governed integration commit or a clean descendant only while the complete package source fingerprint remains frozen
     - fresh C24 calibration executes every planned TaskNode and exact environment batch under one immutable context and emits one compact proof only after unambiguous evidence closure
+    - release history integrity executes against the current governance checkout because the frozen package source predates its tag and distribution inventory while candidate bytes remain separately package locked
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
     - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint
