@@ -931,6 +931,7 @@ fixtures:
       - 25000-node-in-memory-strongly-connected-component
       - 1000-small-in-memory-strongly-connected-components
       - deterministic-randomized-insertion-order
+      - operation-set-output-invariance-excludes-environment-identity
       - bounded-64-node-scc-diagnostics
       - 900-second-portable-graph-stress-budget
       - high-family-candidate-fanout
@@ -948,6 +949,7 @@ fixtures:
       - 100000-in-memory-canonical-recipe-facts
       - 1000-structural-family-candidates
       - deterministic-randomized-insertion-order
+      - operation-set-output-invariance-excludes-environment-identity
       - published-compiler-telemetry-with-isolated-stress-context
       - high-family-candidate-fanout
       - single-recipe-fact-scan
