@@ -69,11 +69,23 @@ function Get-MIRCPQualificationSourceIdentity {
     $proof = Get-Content -Raw -LiteralPath $proofPath | ConvertFrom-Json
     if ([string]$proof.status -ne "passed" -or [string]$proof.target_release -ne [string]$ReleaseRecord.release -or
         [string]$proof.target_candidate -ne [string]$ReleaseRecord.candidate_id -or
-        [string]$proof.archive_sha256 -ne [string]$ReleaseRecord.package.archive_sha256 -or
-        $commit -ne [string]$proof.integration_commit -or $tree -ne [string]$proof.integration_tree) {
-      throw "Qualification source does not match the exact governed dual-parent integration lineage."
+        [string]$proof.archive_sha256 -ne [string]$ReleaseRecord.package.archive_sha256) {
+      throw "Qualification source does not match the governed dual-parent reconstruction proof."
     }
-    $role = "dual-parent-integration"
+    $integrationTree = ([string](& git -C $source rev-parse "$([string]$proof.integration_commit)^{tree}")).Trim()
+    & git -C $source merge-base --is-ancestor ([string]$proof.integration_commit) $commit
+    $integrationIsAncestor = $LASTEXITCODE -eq 0
+    . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
+    $currentPackageSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $source
+    if (-not $integrationIsAncestor -or $integrationTree -ne [string]$proof.integration_tree -or
+        $currentPackageSha256 -ne [string]$ReleaseRecord.package.source_sha256) {
+      throw "Qualification source is not a package-identical descendant of the governed dual-parent integration."
+    }
+    $role = if ($commit -eq [string]$proof.integration_commit -and $tree -eq [string]$proof.integration_tree) {
+      "dual-parent-integration"
+    } else {
+      "dual-parent-integration-successor"
+    }
   }
   return [pscustomobject][ordered]@{role=$role;commit=$commit;tree=$tree;worktree_sha256=$worktreeSha256;proof_sha256=$proofDigest}
 }

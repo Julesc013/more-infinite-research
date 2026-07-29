@@ -68,9 +68,23 @@ foreach ($candidate in @($shadow.candidates)) {
       [int]$candidate.dimensions.'scenario-identities'.v5 -ne [int]$expectedShadowCounts[$version].v5) {
     throw "Shadow scenario counts changed for $version."
   }
+  if ([int]$candidate.dimensions.'environment-identities'.mapped -ne [int]$expectedShadowCounts[$version].v4 -or
+      [string]$candidate.dimensions.'environment-identities'.mapping_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      @($candidate.dimensions.'environment-identities'.mappings).Count -ne [int]$expectedShadowCounts[$version].v4) {
+    throw "Shadow environment identity mapping is incomplete for $version."
+  }
 }
-if ([string]$shadow.status -ne "pending" -or @($shadow.pending_dimensions).Count -ne 6 -or [int]$shadowContract.pending.Count -ne 6) {
-  throw "Shadow cutover must remain pending on exactly the six recorded P9 outcome/seal dimensions."
+if ([string]$shadow.status -ne "passed" -or @($shadow.pending_dimensions).Count -ne 0 -or [int]$shadowContract.pending.Count -ne 0) {
+  throw "Toolchain-admission shadow analysis must prove exact structural and pending-verdict parity for both candidates."
+}
+$p9Shadow = @($shadow.candidates | Where-Object release -eq "2.5.0")
+if ($p9Shadow.Count -ne 1 -or [string]$p9Shadow[0].comparison_mode -ne "toolchain-admission") {
+  throw "Committed P9 shadow analysis is not explicitly scoped to toolchain admission."
+}
+foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs")) {
+  if ([string]$p9Shadow[0].dimensions.$dimension.status -ne "passed" -or [string]$p9Shadow[0].dimensions.$dimension.reason -notmatch "v4=pending and v5=pending") {
+    throw "P9 admission parity is not explicit for $dimension."
+  }
 }
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo

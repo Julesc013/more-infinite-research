@@ -64,9 +64,17 @@ function Get-MIRCPShadowP9Outcomes {
     [string]$EvidenceRoot = "",
     [string]$RepoRoot = ""
   )
+  $hasContext = -not [string]::IsNullOrWhiteSpace($ContextPath)
+  $hasEvidence = -not [string]::IsNullOrWhiteSpace($EvidenceRoot)
+  if ($hasContext -ne $hasEvidence) { throw "Operational P9 shadow comparison requires both ContextPath and EvidenceRoot." }
+  $operationalCutover = $hasContext -and $hasEvidence
   $out = [ordered]@{}
   foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs")) {
-    $out[$dimension] = New-MIRCPShadowOutcome -Status pending -Reason "no committed admissible exact-P9 proof"
+    $out[$dimension] = if ($operationalCutover) {
+      New-MIRCPShadowOutcome -Status pending -Reason "no admitted exact-P9 operational proof"
+    } else {
+      New-MIRCPShadowOutcome -Status passed -Reason "admission parity: v4=pending and v5=pending; release-specific proof remains required for operational cutover"
+    }
   }
   if (-not [string]::IsNullOrWhiteSpace($ObservedProofRoot) -and (Test-Path -LiteralPath $ObservedProofRoot -PathType Container)) {
     foreach ($row in @(
@@ -77,13 +85,13 @@ function Get-MIRCPShadowP9Outcomes {
       if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
       $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
       if ([string]$record.status -eq "passed" -and [string]$record.candidate.archive_sha256 -eq [string]$ReleaseRecord.package.archive_sha256) {
-        $out[$row.dimension] = New-MIRCPShadowOutcome -Status "observed-unadmitted" `
-          -Reason "exact-candidate focused proof exists outside the governed v5 branch and is not admitted as qualification evidence" `
+        $out[$row.dimension] = New-MIRCPShadowOutcome -Status $(if ($operationalCutover) { "observed-unadmitted" } else { "passed" }) `
+          -Reason $(if ($operationalCutover) { "exact-candidate focused proof exists outside the governed v5 branch and is not admitted as qualification evidence" } else { "admission parity remains v4=pending and v5=pending; an external focused observation exists but is not admitted" }) `
           -Path $row.file -Sha256 (Get-MIRCPSha256File -Path $path)
       }
     }
   }
-  if (-not [string]::IsNullOrWhiteSpace($ContextPath) -and -not [string]::IsNullOrWhiteSpace($EvidenceRoot)) {
+  if ($operationalCutover) {
     $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
     $context = Assert-MIRCPVerificationContext -Path $ContextPath
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
@@ -191,18 +199,54 @@ function New-MIRCPShadowCandidateAnalysis {
   $scenariosPassed = $missingScenarios.Count -eq 0 -and (($addedNames -join "`n") -ceq ($expectedAdditions -join "`n"))
 
   $environmentFailures = [Collections.Generic.List[string]]::new()
+  $environmentMappings = [Collections.Generic.List[object]]::new()
+  $baselineEnvironments = @($baseline.environments)
+  $baselineEnvironmentIds = @($baselineEnvironments.test_id | ForEach-Object { [string]$_ } | Sort-Object)
+  if (($baselineEnvironmentIds -join "`n") -cne ($baselineScenarios -join "`n")) {
+    $environmentFailures.Add("baseline environment rows do not exactly cover baseline scenario identities")
+  }
   foreach ($scenarioId in $baselineScenarios) {
+    $v4 = @($baselineEnvironments | Where-Object test_id -eq $scenarioId)
     $scenario = @($registry.scenarios | Where-Object id -eq $scenarioId)
     $batch = @($registry.batches | Where-Object { @($_.scenario_ids | ForEach-Object { [string]$_ }) -contains $scenarioId })
-    if ($scenario.Count -ne 1 -or $batch.Count -ne 1 -or -not [bool]$batch[0].process_required) { $environmentFailures.Add($scenarioId) }
+    if ($v4.Count -ne 1 -or $scenario.Count -ne 1 -or $batch.Count -ne 1) {
+      $environmentFailures.Add("$scenarioId does not resolve to exactly one v4 row, v5 scenario, and v5 batch")
+      continue
+    }
+    $v4Hashes = @([string]$v4[0].definition_sha256, [string]$v4[0].scenario_sha256, [string]$v4[0].input_key)
+    $v5Signature = [string]$scenario[0].environment.signature_sha256
+    $batchSignature = [string]$batch[0].environment_signature
+    if (@($v4Hashes | Where-Object { $_ -notmatch '^[0-9A-F]{64}$' }).Count -ne 0 -or
+        $v5Signature -notmatch '^[0-9A-F]{64}$' -or $batchSignature -ne $v5Signature -or
+        -not [bool]$batch[0].process_required -or @($batch[0].scenario_ids).Count -ne 1 -or
+        [string]$batch[0].scenario_ids[0] -ne $scenarioId) {
+      $environmentFailures.Add("$scenarioId has a non-exact identity or non-isolated process batch")
+      continue
+    }
+    $environmentMappings.Add([pscustomobject][ordered]@{
+      scenario_id = $scenarioId
+      v4_definition_sha256 = [string]$v4[0].definition_sha256
+      v4_scenario_sha256 = [string]$v4[0].scenario_sha256
+      v4_input_key = [string]$v4[0].input_key
+      v5_environment_signature = $v5Signature
+      v5_batch_id = [string]$batch[0].id
+      v5_authority_sha256 = Get-MIRCPSha256Object -Value $scenario[0].authority
+    })
   }
-  $environmentsPassed = $environmentFailures.Count -eq 0
+  if (@($baselineEnvironments.input_key | Sort-Object -Unique).Count -ne $baselineScenarios.Count) {
+    $environmentFailures.Add("v4 baseline input identities are not unique")
+  }
+  if (@($environmentMappings.v5_environment_signature | Sort-Object -Unique).Count -ne $baselineScenarios.Count -or
+      @($environmentMappings.v5_batch_id | Sort-Object -Unique).Count -ne $baselineScenarios.Count) {
+    $environmentFailures.Add("v5 environment signatures or process batches are not one-to-one")
+  }
+  $environmentsPassed = $environmentFailures.Count -eq 0 -and $environmentMappings.Count -eq $baselineScenarios.Count
   $outcomes = if ($Release -eq "3.2.2") { Get-MIRCPShadowC24Outcomes -ReleaseRecord $releaseRecord -RepoRoot $repo } else { Get-MIRCPShadowP9Outcomes -ReleaseRecord $releaseRecord -ObservedProofRoot $ObservedProofRoot -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo }
   $dimensions = [ordered]@{
     "candidate-identity" = [pscustomobject][ordered]@{status=if($candidatePassed){"passed"}else{"failed"};baseline_archive_sha256=[string]$baseline.candidate.archive_sha256;v5_archive_sha256=[string]$releaseRecord.package.archive_sha256}
     "required-proof-obligations" = [pscustomobject][ordered]@{status=if($obligationsPassed){"passed"}else{"failed"};v4_obligations=@($baseline.obligations).Count;unmapped=@($unmapped);missing_v5_tasks=@($missingTasks | Sort-Object -Unique)}
     "scenario-identities" = [pscustomobject][ordered]@{status=if($scenariosPassed){"passed"}else{"failed"};v4=$baselineScenarios.Count;v5=$v5Scenarios.Count;missing=$missingScenarios;added=$addedScenarioIds}
-    "environment-identities" = [pscustomobject][ordered]@{status=if($environmentsPassed){"passed"}else{"failed"};mapped=$baselineScenarios.Count;failures=@($environmentFailures)}
+    "environment-identities" = [pscustomobject][ordered]@{status=if($environmentsPassed){"passed"}else{"failed"};mapped=$environmentMappings.Count;mapping_sha256=Get-MIRCPSha256Object -Value @($environmentMappings);failures=@($environmentFailures);mappings=@($environmentMappings)}
   }
   foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs")) { $dimensions[$dimension] = $outcomes.$dimension }
   $pending = @($dimensions.GetEnumerator() | Where-Object { [string]$_.Value.status -ne "passed" } | ForEach-Object { [string]$_.Key })
@@ -224,6 +268,7 @@ function New-MIRCPShadowCandidateAnalysis {
   }
   return [pscustomobject][ordered]@{
     release = $Release
+    comparison_mode = if ([string]::IsNullOrWhiteSpace($ContextPath)) { "toolchain-admission" } else { "operational-cutover" }
     candidate_id = [string]$releaseRecord.candidate_id
     target = [string]$releaseRecord.target
     source_commit = $sourceCommit

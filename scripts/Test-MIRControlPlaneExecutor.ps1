@@ -28,6 +28,20 @@ try {
   if ($_.Exception.Message -match "lacks exact passing evidence") { $aggregateFailedClosed = $true } else { throw }
 }
 if (-not $aggregateFailedClosed) { throw "Aggregate gate accepted an incomplete evidence set." }
+$syntheticIdentity = [pscustomobject][ordered]@{
+  version = "self-test"
+  binary = [pscustomobject][ordered]@{bytes=10;sha256="A" * 64}
+  official_data = [pscustomobject][ordered]@{file_count=2;sha256="B" * 64}
+}
+$syntheticLock = [pscustomobject][ordered]@{
+  version = "self-test"
+  binary = [pscustomobject][ordered]@{bytes=10;sha256="A" * 64}
+  official_data = [pscustomobject][ordered]@{file_count=2;sha256="B" * 64}
+}
+$lockMatches = Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $syntheticLock
+$syntheticLock.binary.sha256 = "C" * 64
+$wrongBinaryRejected = -not (Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $syntheticLock)
+if (-not $lockMatches -or -not $wrongBinaryRejected) { throw "Executor Factorio lock comparison contract is incomplete." }
 $protectedSpoofRejected = $false
 try {
   [void](New-MIRCPExecutorProducer -TrustClass "protected-release" -RepoRoot $repo)

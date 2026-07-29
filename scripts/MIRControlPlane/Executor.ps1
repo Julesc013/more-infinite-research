@@ -213,13 +213,72 @@ function Assert-MIRCPExecutionSource {
 function Get-MIRCPFactorioIdentity {
   param([Parameter(Mandatory)][string]$FactorioBin)
   $binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+  $binaryItem = Get-Item -LiteralPath $binary
+  $installRoot = $binaryItem.Directory.Parent.Parent.FullName
+  $officialRoots = @("data/core", "data/base", "data/quality", "data/elevated-rails", "data/space-age")
+  $officialFiles = @()
+  foreach ($relativeRoot in $officialRoots) {
+    $path = Join-Path $installRoot $relativeRoot
+    if (Test-Path -LiteralPath $path -PathType Leaf) {
+      $officialFiles += Get-Item -LiteralPath $path
+    } elseif (Test-Path -LiteralPath $path -PathType Container) {
+      $officialFiles += Get-ChildItem -LiteralPath $path -Recurse -File
+    }
+  }
+  $officialRows = @(
+    foreach ($file in @($officialFiles | Sort-Object FullName -Unique)) {
+      $relative = [IO.Path]::GetRelativePath($installRoot, $file.FullName).Replace("\", "/")
+      "$relative`t$($file.Length)`t$(Get-MIRCPSha256File -Path $file.FullName)"
+    }
+  )
+  $officialData = [pscustomobject][ordered]@{
+    root = $installRoot
+    file_count = $officialRows.Count
+    sha256 = Get-MIRCPSha256Text -Value $(if ($officialRows.Count -gt 0) { $officialRows -join "`n" } else { "EMPTY:factorio-official-data" })
+  }
+  $binarySha256 = Get-MIRCPSha256File -Path $binary
   $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($binary).FileVersion
   return [pscustomobject][ordered]@{
     path = $binary
-    sha256 = Get-MIRCPSha256File -Path $binary
-    bytes = [int64](Get-Item -LiteralPath $binary).Length
+    root = $installRoot
+    sha256 = $binarySha256
+    bytes = [int64]$binaryItem.Length
     version = [string]$version
+    binary = [pscustomobject][ordered]@{bytes=[int64]$binaryItem.Length;sha256=$binarySha256}
+    official_data = $officialData
   }
+}
+
+function Test-MIRCPFactorioIdentityMatchesLock {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$Lock
+  )
+  if ([string]$Lock.binary.sha256 -ne [string]$Identity.binary.sha256) { return $false }
+  if ($null -ne $Lock.binary.PSObject.Properties["bytes"] -and [int64]$Lock.binary.bytes -gt 0 -and
+      [int64]$Lock.binary.bytes -ne [int64]$Identity.binary.bytes) { return $false }
+  if ($null -ne $Lock.PSObject.Properties["version"] -and -not [string]::IsNullOrWhiteSpace([string]$Lock.version) -and
+      [string]$Lock.version -ne [string]$Identity.version) { return $false }
+  if ($null -ne $Lock.PSObject.Properties["official_data"] -and $null -ne $Lock.official_data) {
+    if ([int]$Lock.official_data.file_count -ne [int]$Identity.official_data.file_count -or
+        [string]$Lock.official_data.sha256 -ne [string]$Identity.official_data.sha256) { return $false }
+  }
+  return $true
+}
+
+function Assert-MIRCPFactorioContextLock {
+  param(
+    [Parameter(Mandatory)]$State,
+    [Parameter(Mandatory)][string]$FactorioBin
+  )
+  $locksRecord = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "environment-locks.json") | ConvertFrom-Json
+  $locks = @($locksRecord.factorio)
+  if ($locks.Count -eq 0) { throw "Verification context contains no governed Factorio installation lock." }
+  $identity = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  foreach ($lock in $locks) {
+    if (Test-MIRCPFactorioIdentityMatchesLock -Identity $identity -Lock $lock) { return $identity }
+  }
+  throw "Factorio installation does not match any exact context lock: version=$($identity.version), binary=$($identity.binary.sha256), official-data=$($identity.official_data.sha256)."
 }
 
 function Write-MIRCPSpecializedTaskEvidence {
@@ -311,6 +370,7 @@ function Invoke-MIRCPEnvironmentBatch {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
+  $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
   $batch = @($registry.batches | Where-Object id -eq $BatchId)
   if ($batch.Count -ne 1 -or -not [bool]$batch[0].process_required) { throw "Unknown or non-Factorio environment batch: $BatchId" }
@@ -333,6 +393,8 @@ function Invoke-MIRCPEnvironmentBatch {
   $facts = [pscustomobject][ordered]@{
     status = [string]$summary.status
     factorio_binary_version = [string]$summary.factorio_binary_version
+    factorio_binary_sha256 = [string]$factorio.binary.sha256
+    factorio_official_data_sha256 = [string]$factorio.official_data.sha256
     candidate_sha256 = [string]$summary.validation_package_sha256
     candidate_content_sha256 = [string]$summary.validation_package_content_sha256
     validation_harness_sha256 = [string]$summary.validation_harness_sha256
@@ -384,6 +446,7 @@ function Invoke-MIRCPPerformanceMeasurement {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
+  [void](Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin)
   $row = @($state.plan.tasks | Where-Object id -eq "performance.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain performance.measurement exactly once." }
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
@@ -427,7 +490,7 @@ function Invoke-MIRCPUpgradeMeasurement {
   $row = @($state.plan.tasks | Where-Object id -eq "upgrade.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain upgrade.measurement exactly once." }
   $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
-  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
   $outputPath = Join-Path $repo "out/control-plane-v5/upgrade-evidence.json"
   & (Join-Path $source.path "scripts/Test-MIRUpgradeMatrix.ps1") -RepoRoot $source.path `
@@ -466,7 +529,7 @@ function Invoke-MIRCPEcosystemMeasurement {
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
   $row = @($state.plan.tasks | Where-Object id -eq "ecosystem.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain ecosystem.measurement exactly once." }
-  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $mods = (Resolve-Path -LiteralPath $LocalModDir).Path
   $modRows = @(Get-ChildItem -LiteralPath $mods -Filter *.zip -File | Sort-Object Name | ForEach-Object {
     [pscustomobject][ordered]@{name=$_.Name;bytes=[int64]$_.Length;sha256=(Get-MIRCPSha256File -Path $_.FullName)}
@@ -510,7 +573,7 @@ function Invoke-MIRCPApprovedDeltaMeasurement {
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
   $row = @($state.plan.tasks | Where-Object id -eq "approved-delta.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain approved-delta.measurement exactly once." }
-  $factorio = Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin
+  $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
   $outputPath = Join-Path $repo "out/control-plane-v5/approved-delta.json"
   $rawRoot = Join-Path $repo "out/control-plane-v5/approved-delta-raw"
