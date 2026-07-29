@@ -553,6 +553,7 @@ docs:
       - mir-control-plane-v5
       - control-plane-release-state-machine
       - control-plane-package-freeze
+      - control-plane-performance-materialization
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

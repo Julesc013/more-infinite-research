@@ -66,6 +66,8 @@ Generated: 2026-07-28
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
 - [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `pending-complete-fresh-calibration`
 - [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `pending-fresh-performance-measurement`
+- [ ] `INC-2026-0038` — C24 performance probe final phase depended on Git checkout line endings; closure `pending-fresh-performance-measurement`
+- [ ] `INC-2026-0039` — Static image governance scanned ignored control-plane source overlays; closure `pending-static-regression-proof`
 
 ## Explicit release obligations
 

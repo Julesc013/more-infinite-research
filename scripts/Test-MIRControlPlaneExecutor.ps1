@@ -13,7 +13,16 @@ $candidate = Join-Path $repo ([string]$release.package.archive)
 if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
   & (Join-Path $repo "scripts/Build-MIRPackage.ps1") | Out-Host
 }
-$context = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -CandidatePath $candidate -OutputRoot "out/control-plane-v5-self-test/executor-contexts" -RepoRoot $repo
+$performanceSource = Join-Path $repo "out/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
+if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceSource))
+  & git -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --local --no-hardlinks --no-checkout -- $repo $performanceSource 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Could not clone exact performance source for executor self-test." }
+  & git -C $performanceSource checkout --detach ([string]$release.package.source_commit) 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Could not check out exact performance source for executor self-test." }
+}
+$context = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -CandidatePath $candidate `
+  -SourceRepoRoot $performanceSource -OutputRoot "out/control-plane-v5-self-test/executor-contexts" -RepoRoot $repo
 $executionState = Get-MIRCPContextExecutionState -ContextPath $context.path -RepoRoot $repo
 $canonicalCandidate = Get-MIRCPCanonicalCandidateArchive -State $executionState -RepoRoot $repo
 $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
@@ -33,6 +42,25 @@ $performanceAuthority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Pat
 if ([string]$performanceAuthority.campaign.candidate.candidate_id -ne "C24" -or
     [string]$performanceAuthority.campaign.candidate.archive_sha256 -ne [string]$release.package.archive_sha256) {
   throw "Controller performance authority is not bound to exact C24."
+}
+$overlay = New-MIRCPPerformanceSourceOverlay -State $executionState `
+  -Source ([pscustomobject][ordered]@{path=$performanceSource;commit=[string]$candidateDescriptor.source_commit}) `
+  -Descriptor $candidateDescriptor -TargetProfile $targetProfile -RepoRoot $repo
+$probePath = Join-Path $overlay.path ([string]$overlay.canonical_probe.path)
+$probeBytes = [IO.File]::ReadAllBytes($probePath)
+$sourceProbeText = [IO.File]::ReadAllText((Join-Path $performanceSource ([string]$overlay.canonical_probe.path))).Replace("`r`n", "`n").Replace("`r", "`n")
+$overlayStatus = @(& git -C $overlay.path status --porcelain --untracked-files=all)
+if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.source_sha256 -or
+    [string]$overlay.canonical_probe.materialization -ne "utf8-no-bom-lf-v1" -or
+    [string]$overlay.canonical_probe.sha256 -ne (Get-MIRCPSha256Text -Value $sourceProbeText) -or
+    $probeBytes -contains [byte]13 -or
+    [string]$overlay.manifest_sha256 -notmatch '^[0-9A-F]{64}$' -or
+    [string]$overlay.harness_sha256 -notmatch '^[0-9A-F]{64}$' -or
+    @($overlay.manifest.files).Count -ne 2 -or
+    $overlayStatus.Count -ne 2 -or
+    $overlayStatus -notcontains " M .mir/performance-campaign.json" -or
+    $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua") {
+  throw "Performance source overlay is not exact, checkout-independent, and package-preserving."
 }
 $baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"
 $baselineObservation = Get-MIRCPZipPackageObservation -Path $baselineCandidate

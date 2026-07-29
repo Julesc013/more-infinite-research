@@ -533,6 +533,27 @@ function Assert-MIRCPPerformanceCampaignAuthority {
   return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path)}
 }
 
+function Set-MIRCPCanonicalPerformanceProbeText {
+  param([Parameter(Mandatory)][string]$OverlayRoot)
+  $relativePath = "fixtures/performance-regression-probe/data-final-fixes.lua"
+  $path = Join-Path $OverlayRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "Performance probe final-fixes source is absent: $path"
+  }
+  $text = [IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n")
+  if ([string]::IsNullOrWhiteSpace($text)) { throw "Performance probe final-fixes source is empty." }
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  [IO.File]::WriteAllBytes($path, $bytes)
+  if ($bytes -contains [byte]13) { throw "Canonical performance probe still contains carriage returns." }
+  return [pscustomobject][ordered]@{
+    path = $relativePath
+    materialization = "utf8-no-bom-lf-v1"
+    bytes = [int64]$bytes.Length
+    line_feeds = @($bytes | Where-Object { $_ -eq 10 }).Count
+    sha256 = Get-MIRCPSha256File -Path $path
+  }
+}
+
 function New-MIRCPPerformanceSourceOverlay {
   param(
     [Parameter(Mandatory)]$State,
@@ -561,12 +582,42 @@ function New-MIRCPPerformanceSourceOverlay {
   $overlayPath = Join-Path $destination ".mir/performance-campaign.json"
   [IO.File]::Copy($authorityPath, $overlayPath, $true)
   if ((Get-MIRCPSha256File -Path $overlayPath) -ne [string]$authority.sha256) { throw "Performance authority overlay changed the governed campaign bytes." }
+  $probe = Set-MIRCPCanonicalPerformanceProbeText -OverlayRoot $destination
   $status = @(& git -C $destination status --porcelain --untracked-files=all)
-  $unexpected = @($status | Where-Object { [string]$_ -notmatch '^ M \.mir/performance-campaign\.json$' })
-  if ($status.Count -ne 1 -or $unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its single governed package-excluded file." }
+  $allowedChanges = @(
+    " M .mir/performance-campaign.json",
+    " M fixtures/performance-regression-probe/data-final-fixes.lua"
+  )
+  $unexpected = @($status | Where-Object { $allowedChanges -notcontains [string]$_ })
+  if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
   $packageSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $destination
   if ($packageSha256 -ne [string]$Descriptor.source_sha256) { throw "Performance authority overlay changed package-visible source." }
-  return [pscustomobject][ordered]@{path=$destination;authority_sha256=[string]$authority.sha256;package_source_sha256=$packageSha256}
+  $harnessSha256 = & {
+    param([string]$Root)
+    . (Join-Path $Root "scripts/validation/PerformanceCampaign.ps1")
+    Get-MIRPerformanceHarnessFingerprint -RepoRoot $Root
+  } $destination
+  $manifest = [pscustomobject][ordered]@{
+    schema = 1
+    kind = "mir-performance-source-overlay"
+    source_commit = [string]$Source.commit
+    files = @(
+      [pscustomobject][ordered]@{path=".mir/performance-campaign.json";materialization="controller-exact-bytes-v1";bytes=[int64](Get-Item -LiteralPath $overlayPath).Length;sha256=[string]$authority.sha256},
+      $probe
+    )
+    harness_sha256 = [string]$harnessSha256
+    package_source_sha256 = $packageSha256
+  }
+  return [pscustomobject][ordered]@{
+    path = $destination
+    authority = $authority
+    authority_sha256 = [string]$authority.sha256
+    canonical_probe = $probe
+    harness_sha256 = [string]$harnessSha256
+    manifest = $manifest
+    manifest_sha256 = Get-MIRCPSha256Object -Value $manifest
+    package_source_sha256 = $packageSha256
+  }
 }
 
 function Invoke-MIRCPPerformanceMeasurement {
@@ -609,29 +660,49 @@ function Invoke-MIRCPPerformanceMeasurement {
   if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw "Performance measurement produced no compact evidence." }
   $evidence = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json
   $failedLanes = @($evidence.lanes | Where-Object { [string]$_.status -ne "passed" })
+  $expectedLaneIds = @(@($overlay.authority.campaign.lanes | ForEach-Object { [string]$_.id }) + @($overlay.authority.campaign.phase_lanes | ForEach-Object { [string]$_.id }))
+  $actualLaneIds = @($evidence.lanes | ForEach-Object { [string]$_.id })
+  $laneSetExact = $actualLaneIds.Count -eq $expectedLaneIds.Count -and
+    @($actualLaneIds | Sort-Object -Unique).Count -eq $actualLaneIds.Count -and
+    (Test-MIRCPExactPathSet -Expected $expectedLaneIds -Actual $actualLaneIds)
   $priorSha256 = Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $PriorRelease).Path
+  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$profile.upgrade.from_version) -RepoRoot $repo
   $status = if ($exitCode -eq 0 -and [int]$evidence.schema -eq 3 -and [string]$evidence.kind -eq "mir-runtime-performance-regression" -and
-    [string]$evidence.status -eq "passed" -and $failedLanes.Count -eq 0 -and
+    [string]$evidence.status -eq "passed" -and $failedLanes.Count -eq 0 -and $laneSetExact -and
+    [string]$evidence.candidate.version -eq [string]$descriptor.release -and
     [string]$evidence.candidate.archive_sha256 -eq [string]$descriptor.archive_sha256 -and
     [string]$evidence.candidate.package_content_sha256 -eq [string]$descriptor.content_sha256 -and
     [string]$evidence.candidate.source_commit -eq [string]$source.commit -and
+    [string]$evidence.baseline.version -eq [string]$baseline.release -and
     [string]$evidence.baseline.archive_sha256 -eq $priorSha256 -and
-    [string]$evidence.factorio.binary_sha256 -eq [string]$factorio.binary.sha256) { "passed" } else { "failed" }
+    [string]$evidence.baseline.package_content_sha256 -eq [string]$baseline.package.content_sha256 -and
+    [string]$evidence.factorio.version -eq [string]$profile.qualification_factorio_version -and
+    [string]$evidence.factorio.binary_sha256 -eq [string]$factorio.binary.sha256 -and
+    [string]$evidence.comparability.scenarios_sha256 -eq [string]$overlay.authority_sha256 -and
+    [string]$evidence.comparability.harness_sha256 -eq [string]$overlay.harness_sha256 -and
+    [int]$evidence.run_policy.warmup_runs -eq [int]$overlay.authority.campaign.run_policy.warmup_runs -and
+    [int]$evidence.run_policy.minimum_measured_runs_per_package -eq [int]$overlay.authority.campaign.run_policy.minimum_measured_runs_per_package -and
+    [string]$evidence.run_policy.order -eq [string]$overlay.authority.campaign.run_policy.order) { "passed" } else { "failed" }
   $facts = [pscustomobject][ordered]@{
     status = $status
-    measurement_mode = "paired-balanced-native-v1"
+    measurement_mode = "paired-balanced-native-v2"
     campaign_authority_sha256 = [string]$overlay.authority_sha256
+    overlay_manifest_sha256 = [string]$overlay.manifest_sha256
+    canonical_probe_sha256 = [string]$overlay.canonical_probe.sha256
+    harness_sha256 = [string]$overlay.harness_sha256
     package_source_sha256 = [string]$overlay.package_source_sha256
     factorio_installation_sha256 = [string]$factorio.installation_sha256
     factorio_binary_sha256 = [string]$factorio.binary.sha256
     prior_archive_sha256 = $priorSha256
     lane_count = @($evidence.lanes).Count
+    expected_lane_count = $expectedLaneIds.Count
+    lane_set_exact = $laneSetExact
     failed_lane_count = $failedLanes.Count
     third_party_closure_sha256 = [string]$evidence.comparability.third_party_closure_sha256
     artifact_status = [string]$evidence.status
   }
   return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
-    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;overlay_manifest_sha256=[string]$overlay.manifest_sha256;harness_sha256=[string]$overlay.harness_sha256;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
     -Facts $facts -ArtifactPath $outputPath -ArtifactKind "runtime-performance-evidence" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
 

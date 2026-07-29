@@ -373,19 +373,24 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
 
   $assetSourceText = Get-Content -Raw -LiteralPath $assetSourcePath
   $imageExtensions = @(".png", ".jpg", ".jpeg", ".webp", ".gif")
+  $governedPaths = @(& git -C $repo ls-files --cached --others --exclude-standard)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate governed repository assets." }
   $imageFiles = @(
-    Get-ChildItem -LiteralPath $repo -Recurse -File |
-      Where-Object {
-        $relative = [System.IO.Path]::GetRelativePath($repo.Path, $_.FullName).Replace("\", "/")
-        $extension = $_.Extension.ToLowerInvariant()
+    foreach ($candidatePath in @($governedPaths | Sort-Object -Unique)) {
+      $relative = ([string]$candidatePath).Replace("\", "/")
+      $path = Join-Path $repo $relative
+      if (Test-Path -LiteralPath $path -PathType Leaf) {
+        $extension = [IO.Path]::GetExtension($relative).ToLowerInvariant()
+        if (
         $imageExtensions -contains $extension `
-          -and -not $relative.StartsWith(".git/") `
           -and -not $relative.StartsWith(".mir/target-lines/") `
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
           -and -not $relative.StartsWith("dist/") `
           -and -not $relative.StartsWith("tmp/")
+        ) { Get-Item -LiteralPath $path }
       }
+    }
   )
 
   foreach ($imageFile in $imageFiles) {
