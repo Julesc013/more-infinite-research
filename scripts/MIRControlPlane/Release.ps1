@@ -72,7 +72,7 @@ function Complete-MIRCPQualification {
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.plan.stage -notin @("release", "publication", "all")) { throw "Qualification requires a release-stage immutable context." }
   if ($RequireFresh -and [string]$state.plan.mode -ne "calibrate-fresh") { throw "Independent qualification requires a calibrate-fresh context." }
   $result = Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId "qualification.full" -TrustClass "protected-release" -EvidenceRoot $EvidenceRoot -RepoRoot $repo
@@ -84,7 +84,7 @@ function Complete-MIRCPQualification {
 function Invoke-MIRCPBackportAdmission {
   param([Parameter(Mandatory)][string]$ContextPath, [string]$EvidenceRoot = "", [string]$RepoRoot = "")
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.plan.target -ne "2.0") { throw "Backport admission applies only to Factorio 2.0 contexts." }
   return Invoke-MIRCPTaskCommand -ContextPath $ContextPath -TaskId "backport.reconstruction" -TrustClass "protected-release" -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
@@ -92,7 +92,7 @@ function Invoke-MIRCPBackportAdmission {
 function New-MIRCPReleaseSeal {
   param([Parameter(Mandatory)][string]$ContextPath, [string]$EvidenceRoot = "", [string]$RepoRoot = "")
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.plan.stage -notin @("release", "publication", "all")) { throw "Seal creation requires a release-stage immutable context." }
   $indexResult = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
   if ([int]$indexResult.invalid -ne 0) { throw "Evidence store contains invalid objects." }
@@ -132,6 +132,7 @@ function New-MIRCPReleaseSeal {
     context_digest = [string]$state.context.context_id
     plan_id = [string]$state.plan_envelope.plan_id
     control_plane_commit = [string]$controlLock.qualification_source_commit
+    control_plane_worktree_sha256 = [string]$controlLock.qualification_source_worktree_sha256
     component_abis = $controlLock.component_abis
     qualification_manifest = [string]$qualified[0].digest
   }
@@ -160,7 +161,7 @@ function Invoke-MIRCPReleaseTaskAdmission {
 function Invoke-MIRCPPromotionAdmission {
   param([Parameter(Mandatory)][string]$ContextPath, [string]$EvidenceRoot = "", [string]$RepoRoot = "")
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   $index = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
   $objects = @($index.index.objects)
   foreach ($required in @("seal", "shadow.equivalence")) {

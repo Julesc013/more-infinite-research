@@ -279,15 +279,24 @@ function New-MIRCPVerificationContext {
     bytes = [int64]$releaseRecord.package.bytes
     entries = [int]$releaseRecord.package.entries
   }
+  $controllerUntracked = @(& git -C $repo ls-files --others --exclude-standard)
+  if ($LASTEXITCODE -ne 0 -or $controllerUntracked.Count -ne 0) { throw "Control-plane checkout has untracked governed files." }
+  $controllerWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $repo
   $controlPlaneFiles = @(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
-    "validation/trust.json", "scripts/MIRControlPlane/Calibration.ps1", "scripts/Invoke-MIRControlPlane.ps1"
+    "validation/trust.json", "scripts/Invoke-MIRControlPlane.ps1", "scripts/Invoke-MIRControlPlaneWork.ps1",
+    "scripts/MIRControlPlane/Core.ps1", "scripts/MIRControlPlane/Records.ps1", "scripts/MIRControlPlane/Planner.ps1",
+    "scripts/MIRControlPlane/Scenario.ps1", "scripts/MIRControlPlane/Observation.ps1", "scripts/MIRControlPlane/Evidence.ps1",
+    "scripts/MIRControlPlane/Views.ps1", "scripts/MIRControlPlane/Context.ps1", "scripts/MIRControlPlane/Shadow.ps1",
+    "scripts/MIRControlPlane/Executor.ps1", "scripts/MIRControlPlane/Release.ps1", "scripts/MIRControlPlane/Calibration.ps1"
   )
   $controlPlaneLock = [pscustomobject][ordered]@{
     schema = 1
     policy_id = "mir-control-plane-v5"
     qualification_source_commit = ([string](& git -C $repo rev-parse HEAD)).Trim()
+    qualification_source_worktree_sha256 = $controllerWorktreeSha256
+    qualification_source_clean = [string]::IsNullOrWhiteSpace($controllerWorktreeSha256)
     scenario_source_role = [string]$qualificationSource.role
     scenario_source_commit = [string]$qualificationSource.commit
     scenario_source_tree = [string]$qualificationSource.tree
@@ -326,7 +335,7 @@ function New-MIRCPVerificationContext {
   $manifest = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-control-plane-v5-verification-context"
-    context_abi = 1
+    context_abi = 2
     context_id = ""
     mode = $Mode
     target = $Target

@@ -12,7 +12,7 @@ function Invoke-MIRCPFreshCalibration {
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.manifest.mode -ne "calibrate-fresh" -or [string]$state.manifest.release -ne "3.2.2") {
     throw "Toolchain admission calibration requires a fresh C24 verification context."
   }
@@ -146,7 +146,7 @@ function New-MIRCPFreshCalibrationProof {
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath
+  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.manifest.mode -ne "calibrate-fresh" -or [string]$state.manifest.release -ne "3.2.2") {
     throw "Fresh calibration proof requires a calibrate-fresh C24 context."
   }
@@ -194,6 +194,7 @@ function New-MIRCPFreshCalibrationProof {
   [void](Assert-MIRCPPackageFreeze -RepoRoot $repo)
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $controlLock = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "control-plane-lock.json") | ConvertFrom-Json
+  if (-not [bool]$controlLock.qualification_source_clean) { throw "Fresh calibration proof requires a clean committed control-plane checkout." }
   $environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "environment-locks.json") | ConvertFrom-Json
   $body = [pscustomobject][ordered]@{
     schema = 1
@@ -208,6 +209,7 @@ function New-MIRCPFreshCalibrationProof {
     context_id = [string]$state.context.context_id
     plan_id = [string]$state.plan_envelope.plan_id
     control_plane_commit = [string]$controlLock.qualification_source_commit
+    control_plane_worktree_sha256 = [string]$controlLock.qualification_source_worktree_sha256
     component_abis = $controlLock.component_abis
     factorio_locks = @($environmentLocks.factorio)
     task_results = [pscustomobject][ordered]@{count=$taskRows.Count;sha256=(Get-MIRCPSha256Object -Value @($taskRows))}
