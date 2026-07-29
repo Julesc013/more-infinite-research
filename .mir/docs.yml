@@ -1406,6 +1406,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - protected-release-sequence
+  - path: docs/maintainer/offline-continuity-and-final-release-runbook.md
+    title: "MIR 2.5.0 Offline Continuity And Final Release Runbook"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.0-offline-continuity
+      - mir-2.5.0-final-release-sequence
+      - control-plane-v5-cutover-sequence
   - path: docs/maintainer/settings-governance.md
     title: "Settings Governance"
     status: current
