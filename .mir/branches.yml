@@ -1,7 +1,31 @@
 schema: 1
 
+remote_topology:
+  recorded_at: 2026-07-29
+  permanent_branches:
+    - main
+    - dev
+    - legacy
+  active_temporary_branches:
+    - tmp/2.0
+  inactive_policy_templates:
+    - factorio-2.0-lane
+    - port/1.1-to-0.18
+  archive_tag_namespaces:
+    - archive/branch-cleanup-2026-07-29/
+    - archive/local-branch-cleanup-2026-07-29/
+  cleanup:
+    removed_remote_branches: 74
+    archived_unique_heads: 24
+    superseded_pull_request: 31
+  rules:
+    - published target-line history belongs to immutable release or archive tags, not permanent work branches
+    - main and dev must not be made identical to Factorio 2.0 target branches
+    - legacy may advance to the active tmp/2.0 candidate only through governed promotion
+
 branches:
   main:
+    remote_state: permanent
     purpose: frozen Factorio 2.1 line at immutable tag MIR 3.2.2; product work is stopped while Control Plane v5 is established
     factorio_version: "2.1"
     accepts:
@@ -17,6 +41,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
+    remote_state: permanent
     purpose: Control Plane v5 development and release-engineering repair; no MIR product work until v5 shadow equivalence is admitted
     factorio_version: "2.1"
     accepts:
@@ -28,6 +53,7 @@ branches:
       - validation
 
   legacy:
+    remote_state: permanent
     purpose: staged unreleased MIR 2.5.0 candidate line; public Factorio 2.0 baseline remains immutable tag 2.4.9 until final qualification
     factorio_version: "2.0"
     accepts:
@@ -42,6 +68,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
+    remote_state: active-temporary
     purpose: disposable Factorio 2.0 MIR 2.5.0 projection workspace; final integration uses target-first and immutable-3.2.2-second parent ancestry
     factorio_version: "2.0"
     accepts:
@@ -56,6 +83,7 @@ branches:
       - unproven-feature-parity
 
   factorio-2.0-lane:
+    remote_state: inactive-policy-template
     purpose: planned Space Exploration and other 2.0-only campaign lane
     factorio_version: "2.0"
     accepts:
@@ -64,6 +92,7 @@ branches:
       - no-2.1-only-prototype-assumption
 
   port/1.1-to-0.18:
+    remote_state: inactive-policy-template
     purpose: short-lived Factorio 0.18 bridge/archive package branch seeded from the validated 1.9.3 source point
     factorio_version: "0.18"
     accepts:

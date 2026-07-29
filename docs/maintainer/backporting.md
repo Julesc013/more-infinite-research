@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-26
+last_reviewed: 2026-07-29
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-26
+Updated: 2026-07-29
 
 ## Current 3.2 Release Roles
 
@@ -89,10 +89,12 @@ Do not use `0.8.1` or any other `0.8.x` release number for Factorio `1.0`. That 
 
 Use these branch roles during the transition:
 
+The live GitHub branch topology was reduced on 2026-07-29 to `main`, `dev`, `legacy`, and the active `tmp/2.0` release workspace. `dev` contains the current Control Plane v5 implementation; `main` remains the frozen MIR 3.2.2 product line; `legacy` remains behind the unpromoted P9 candidate; and `tmp/2.0` retains that exact Factorio 2.0 projection. Published target-line workspaces, rebuild branches, safety branches, obsolete automation branches, and the superseded PR 31 head were removed after every uniquely referenced head was preserved under `archive/branch-cleanup-2026-07-29/` or `archive/local-branch-cleanup-2026-07-29/` annotated tags.
+
 | Branch or worktree | Role | New release line |
 | --- | --- | ---: |
-| `main` | Frozen canonical Factorio `2.1` MIR `3.2.1` line; exact emergency `3.2.2` promotion only. | `3.x.x` after `3.0.0` |
-| `dev` | Development canonical Factorio `2.1` line for 3.2.5 compiler refinement and reviewed promotion. | `3.x.x` after `3.0.0` |
+| `main` | Frozen canonical Factorio `2.1` MIR `3.2.2` product line. | `3.x.x` after `3.0.0` |
+| `dev` | Control Plane v5 and release-engineering line; product work remains stopped until shadow cutover is admitted. | `3.x.x` after `3.0.0` |
 | `legacy` | Staged, unreleased MIR `2.5.0` branch; immutable public Factorio `2.0` baseline remains tag `2.4.9` until final qualification. | Published 2.4.x baseline plus staged 2.5.0 candidate. |
 | `tmp/2.0` | Factorio `2.0` worktree projecting final 3.2.2 semantics for 2.5.0, then frozen 3.2.5 portable deltas for 2.5.5. | Unreleased `2.5.0` from published `2.4.9`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
@@ -110,6 +112,8 @@ Use these branch roles during the transition:
 | `tmp/0.8` | Working Factorio `0.8` port branch or worktree. | `0.8.x` |
 | `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
 | `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
+
+Rows other than the four live branch names are historical or future branch templates. They do not imply that a corresponding GitHub branch remains present after publication or archival.
 
 `tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line. Before sealing a backport, repeat its materialization from immutable tags in a disposable worktree and require the same integration tree and package identities.
 
