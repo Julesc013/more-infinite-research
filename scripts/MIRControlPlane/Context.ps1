@@ -284,7 +284,7 @@ function New-MIRCPVerificationContext {
   $controllerWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $repo
   $controlPlaneFiles = @(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
-    ".mir/control-plane/approved-delta-policies.json",
+    ".mir/control-plane/approved-delta-policies.json", ".mir/performance-campaign.json",
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
     "validation/trust.json", "scripts/Invoke-MIRControlPlane.ps1", "scripts/Invoke-MIRControlPlaneWork.ps1",
     "scripts/MIRControlPlane/Core.ps1", "scripts/MIRControlPlane/Records.ps1", "scripts/MIRControlPlane/Planner.ps1",

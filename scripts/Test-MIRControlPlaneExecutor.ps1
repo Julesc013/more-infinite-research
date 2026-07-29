@@ -22,8 +22,17 @@ if ((Split-Path -Leaf $canonicalCandidate) -ne "more-infinite-research_3.2.2.zip
     [int]$executionState.manifest.context_abi -ne 2 -or
     $null -eq $controlLock.PSObject.Properties["qualification_source_worktree_sha256"] -or
     @($controlLock.files | Where-Object path -eq "scripts/MIRControlPlane/Executor.ps1").Count -ne 1 -or
-    @($controlLock.files | Where-Object path -eq ".mir/control-plane/approved-delta-policies.json").Count -ne 1) {
+    @($controlLock.files | Where-Object path -eq ".mir/control-plane/approved-delta-policies.json").Count -ne 1 -or
+    @($controlLock.files | Where-Object path -eq ".mir/performance-campaign.json").Count -ne 1) {
   throw "Executor context lock or canonical immutable-candidate staging contract is incomplete."
+}
+$targetProfile = Get-Content -Raw -LiteralPath (Join-Path $context.path "target-profile.json") | ConvertFrom-Json
+$candidateDescriptor = Get-Content -Raw -LiteralPath (Join-Path $context.path "candidate-descriptor.json") | ConvertFrom-Json
+$performanceAuthority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo ".mir/performance-campaign.json") `
+  -Descriptor $candidateDescriptor -TargetProfile $targetProfile -RepoRoot $repo
+if ([string]$performanceAuthority.campaign.candidate.candidate_id -ne "C24" -or
+    [string]$performanceAuthority.campaign.candidate.archive_sha256 -ne [string]$release.package.archive_sha256) {
+  throw "Controller performance authority is not bound to exact C24."
 }
 $baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"
 $baselineObservation = Get-MIRCPZipPackageObservation -Path $baselineCandidate

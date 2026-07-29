@@ -17,6 +17,7 @@
     "assurance.evaluation",
     "assurance.evidence",
     "release.approved-delta",
+    "release.performance",
     "release.generated-views"
   ],
   "affected_targets": [

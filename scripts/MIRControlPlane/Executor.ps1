@@ -506,6 +506,69 @@ function Invoke-MIRCPEnvironmentBatch {
   return [pscustomobject][ordered]@{batch_id=$BatchId; status=$status; object_digest=[string]$storedTask.digest; evaluations=$evaluationDigests.Count}
 }
 
+function Assert-MIRCPPerformanceCampaignAuthority {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Descriptor,
+    [Parameter(Mandatory)]$TargetProfile,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $campaign = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $Path) | ConvertFrom-Json
+  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$TargetProfile.upgrade.from_version) -RepoRoot $repo
+  if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$Descriptor.release -or
+      [string]$campaign.factorio_line -ne [string]$Descriptor.target -or
+      [string]$campaign.factorio_version -ne [string]$TargetProfile.qualification_factorio_version -or
+      [string]$campaign.baseline.version -ne [string]$baseline.release -or
+      [string]$campaign.baseline.archive_sha256 -ne [string]$baseline.package.archive_sha256 -or
+      [string]$campaign.baseline.package_content_sha256 -ne [string]$baseline.package.content_sha256 -or
+      [string]$campaign.candidate.candidate_id -ne [string]$Descriptor.candidate_id -or
+      [string]$campaign.candidate.version -ne [string]$Descriptor.release -or
+      [string]$campaign.candidate.package_source_commit -ne [string]$Descriptor.source_commit -or
+      [string]$campaign.candidate.package_source_sha256 -ne [string]$Descriptor.source_sha256 -or
+      [string]$campaign.candidate.archive_sha256 -ne [string]$Descriptor.archive_sha256 -or
+      [string]$campaign.candidate.package_content_sha256 -ne [string]$Descriptor.content_sha256) {
+    throw "Performance campaign does not bind the immutable context candidate, baseline, target, and Factorio version."
+  }
+  return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path)}
+}
+
+function New-MIRCPPerformanceSourceOverlay {
+  param(
+    [Parameter(Mandatory)]$State,
+    [Parameter(Mandatory)]$Source,
+    [Parameter(Mandatory)]$Descriptor,
+    [Parameter(Mandatory)]$TargetProfile,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
+  $authorityPath = Join-Path $repo ".mir/performance-campaign.json"
+  $authority = Assert-MIRCPPerformanceCampaignAuthority -Path $authorityPath -Descriptor $Descriptor -TargetProfile $TargetProfile -RepoRoot $repo
+  $root = Join-Path $repo "out/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
+  $destination = Join-Path $root "performance"
+  if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
+    [void](New-Item -ItemType Directory -Force -Path $root)
+    $staging = Join-Path $root ("performance-staging-" + [guid]::NewGuid().ToString("N"))
+    & git clone --local --no-hardlinks --no-checkout -- ([string]$Source.path) $staging 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Could not clone the immutable qualification source for the performance authority overlay." }
+    & git -C $staging checkout --detach ([string]$Source.commit) 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Could not check out the immutable qualification source for the performance authority overlay." }
+    Move-Item -LiteralPath $staging -Destination $destination
+  }
+  $head = ([string](& git -C $destination rev-parse HEAD)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $head -ne [string]$Source.commit) { throw "Performance authority overlay source commit differs from the immutable context source." }
+  $overlayPath = Join-Path $destination ".mir/performance-campaign.json"
+  [IO.File]::Copy($authorityPath, $overlayPath, $true)
+  if ((Get-MIRCPSha256File -Path $overlayPath) -ne [string]$authority.sha256) { throw "Performance authority overlay changed the governed campaign bytes." }
+  $status = @(& git -C $destination status --porcelain --untracked-files=all)
+  $unexpected = @($status | Where-Object { [string]$_ -notmatch '^ M \.mir/performance-campaign\.json$' })
+  if ($status.Count -ne 1 -or $unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its single governed package-excluded file." }
+  $packageSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $destination
+  if ($packageSha256 -ne [string]$Descriptor.source_sha256) { throw "Performance authority overlay changed package-visible source." }
+  return [pscustomobject][ordered]@{path=$destination;authority_sha256=[string]$authority.sha256;package_source_sha256=$packageSha256}
+}
+
 function Invoke-MIRCPPerformanceMeasurement {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
@@ -521,32 +584,55 @@ function Invoke-MIRCPPerformanceMeasurement {
   $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
   $source = Assert-MIRCPExecutionSource -State $state -SourceRepoRoot $SourceRepoRoot
   $candidate = Get-MIRCPCanonicalCandidateArchive -State $state -RepoRoot $repo
-  [void](Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin)
+  $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $row = @($state.plan.tasks | Where-Object id -eq "performance.measurement")
   if ($row.Count -ne 1) { throw "Context plan does not contain performance.measurement exactly once." }
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
-  $outputPath = Join-Path $repo "out/control-plane-v5/performance-evidence.json"
+  $overlay = New-MIRCPPerformanceSourceOverlay -State $state -Source $source -Descriptor $descriptor -TargetProfile $profile -RepoRoot $repo
+  $outputRoot = Join-Path $repo "out/control-plane-v5/performance/$([string]$state.context.context_id)"
+  $outputPath = Join-Path $outputRoot "evidence.json"
   $arguments = @{
-    RepoRoot = $source.path
+    RepoRoot = $overlay.path
     Candidate = $candidate
     PriorRelease = $PriorRelease
-    FactorioBin = $FactorioBin
-    ExpectedSourceCommit = [string]$descriptor.source_commit
+    FactorioBin = $factorio.path
+    ExpectedSourceCommit = [string]$source.commit
     ExpectedBaselineVersion = [string]$profile.upgrade.from_version
     ExpectedFactorioVersion = [string]$profile.qualification_factorio_version
     OutputPath = $outputPath
+    ArtifactRoot = (Join-Path $outputRoot "artifacts")
   }
   if (-not [string]::IsNullOrWhiteSpace($LocalModZipDir)) { $arguments.LocalModZipDir = $LocalModZipDir }
-  & (Join-Path $source.path "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
+  & (Join-Path $overlay.path "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
   $exitCode = $LASTEXITCODE
   if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw "Performance measurement produced no compact evidence." }
-  $status = if ($exitCode -eq 0) { "passed" } else { "failed" }
-  $marker = Write-MIRCPTaskResultEvidence -State $state -PlanRow $row[0] -Status $status `
-    -Payload ([pscustomobject][ordered]@{exit_code=[int]$exitCode; performance_evidence_sha256=(Get-MIRCPSha256File -Path $outputPath); performance_evidence_bytes=(Get-Item $outputPath).Length}) `
-    -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
-  if ($status -ne "passed") { throw "Fresh runtime performance measurement failed." }
-  return $marker
+  $evidence = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json
+  $failedLanes = @($evidence.lanes | Where-Object { [string]$_.status -ne "passed" })
+  $priorSha256 = Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $PriorRelease).Path
+  $status = if ($exitCode -eq 0 -and [int]$evidence.schema -eq 3 -and [string]$evidence.kind -eq "mir-runtime-performance-regression" -and
+    [string]$evidence.status -eq "passed" -and $failedLanes.Count -eq 0 -and
+    [string]$evidence.candidate.archive_sha256 -eq [string]$descriptor.archive_sha256 -and
+    [string]$evidence.candidate.package_content_sha256 -eq [string]$descriptor.content_sha256 -and
+    [string]$evidence.candidate.source_commit -eq [string]$source.commit -and
+    [string]$evidence.baseline.archive_sha256 -eq $priorSha256 -and
+    [string]$evidence.factorio.binary_sha256 -eq [string]$factorio.binary.sha256) { "passed" } else { "failed" }
+  $facts = [pscustomobject][ordered]@{
+    status = $status
+    measurement_mode = "paired-balanced-native-v1"
+    campaign_authority_sha256 = [string]$overlay.authority_sha256
+    package_source_sha256 = [string]$overlay.package_source_sha256
+    factorio_installation_sha256 = [string]$factorio.installation_sha256
+    factorio_binary_sha256 = [string]$factorio.binary.sha256
+    prior_archive_sha256 = $priorSha256
+    lane_count = @($evidence.lanes).Count
+    failed_lane_count = $failedLanes.Count
+    third_party_closure_sha256 = [string]$evidence.comparability.third_party_closure_sha256
+    artifact_status = [string]$evidence.status
+  }
+  return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
+    -Facts $facts -ArtifactPath $outputPath -ArtifactKind "runtime-performance-evidence" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
 
 function Invoke-MIRCPUpgradeMeasurement {
