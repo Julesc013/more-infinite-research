@@ -177,10 +177,20 @@ superseded_candidates:
     reason: Platform science changed from additive cryogenic to metallurgic-to-cryogenic replacement
     status: superseded-focused-qualified-candidate
 
+  - source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
+    candidate_id: C27
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310
+    package_content_sha256: 6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188
+    size_bytes: 1032404
+    entries: 291
+    reason: bounded structural matching optimization and final progression safety invariants required new package bytes
+    status: superseded-pre-optimization-candidate
+
 candidate:
   artifact: dist/more-infinite-research_3.2.3.zip
-  source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
-  package_source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
+  source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
+  package_source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
   automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
   status: package-built

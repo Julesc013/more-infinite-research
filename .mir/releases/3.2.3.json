@@ -1,33 +1,33 @@
 {
   "schema": 1,
   "release": "3.2.3",
-  "candidate_id": "C27",
+  "candidate_id": "C28",
   "target": "2.1",
   "branch": "tmp/3.2.3",
   "state": "package-built",
   "package": {
-    "source_commit": "f5724fe9fd022efe96596264d454ee05a5c9d208",
-    "source_tree": "ba980e7f7aabfcc9920afe56dd40ba44aa5e0744",
-    "source_sha256": "6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188",
+    "source_commit": "35b41fdb9969b72c7c5256a42eed4a25de1e9e85",
+    "source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935",
+    "source_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
     "archive": "dist/more-infinite-research_3.2.3.zip",
-    "archive_sha256": "1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310",
-    "content_sha256": "6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188",
-    "bytes": 1032404,
-    "entries": 291
+    "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1",
+    "content_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+    "bytes": 1034738,
+    "entries": 292
   },
   "proofs": {
     "source_freeze": [
       {
         "kind": "package-lock",
         "path": ".mir/control-plane/package-locks.json",
-        "candidate_id": "C27"
+        "candidate_id": "C28"
       }
     ],
     "package_build": [
       {
         "kind": "deterministic-package",
         "path": "scripts/Test-MIRDeterministicPackage.ps1",
-        "archive_sha256": "1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310"
+        "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1"
       }
     ]
   },
@@ -55,6 +55,18 @@
       "entries": 291,
       "reason": "The Platform Productivity science contract was corrected from additive cryogenic science to replacement of metallurgic science with cryogenic science.",
       "status": "superseded-focused-qualified-candidate"
+    },
+    {
+      "candidate_id": "C27",
+      "source_commit": "f5724fe9fd022efe96596264d454ee05a5c9d208",
+      "source_tree": "ba980e7f7aabfcc9920afe56dd40ba44aa5e0744",
+      "source_sha256": "6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188",
+      "archive_sha256": "1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310",
+      "content_sha256": "6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188",
+      "bytes": 1032404,
+      "entries": 291,
+      "reason": "A bounded behavior-preserving structural matching optimization and final progression safety invariants required new package bytes.",
+      "status": "superseded-pre-optimization-candidate"
     }
   ],
   "assurance_exceptions": [],
@@ -71,5 +83,5 @@
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
   "incident_ids": [],
-  "updated_at": "2026-07-30T11:08:02Z"
+  "updated_at": "2026-07-30T13:36:46Z"
 }
