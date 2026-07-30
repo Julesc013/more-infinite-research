@@ -72,6 +72,7 @@ Generated: 2026-07-30
 - [ ] `INC-2026-0041` — Ice and platform productivity progression preceded Aquilo access; closure `pending-release-qualification`
 - [ ] `INC-2026-0042` — Modded logistics recipes were omitted when names did not match fixed tiers; closure `pending-release-qualification`
 - [ ] `INC-2026-0043` — C29 active candidate was omitted from the tracked distribution inventory; closure `pending-complete-fresh-calibration`
+- [ ] `INC-2026-0044` — Fresh C24 calibration exceeded the diagnostics-on absolute performance ceiling; closure `pending-independent-quiet-host-performance-and-calibration`
 
 ## Explicit release obligations
 

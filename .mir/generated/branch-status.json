@@ -2,6 +2,14 @@
   "authority": "mir-generated-branch-status-v1",
   "branches": [
     {
+      "branch": "dev",
+      "candidate_id": "C29",
+      "release": "3.2.3",
+      "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "state": "package-built",
+      "target": "2.1"
+    },
+    {
       "branch": "legacy",
       "candidate_id": "2.4.9-final",
       "release": "2.4.9",
@@ -32,14 +40,6 @@
       "source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
       "state": "focused-qualified",
       "target": "2.0"
-    },
-    {
-      "branch": "tmp/3.2.3",
-      "candidate_id": "C29",
-      "release": "3.2.3",
-      "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
-      "state": "package-built",
-      "target": "2.1"
     }
   ],
   "generated_from": ".mir/releases/*.json",

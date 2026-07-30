@@ -57,7 +57,7 @@
       "archive_entries": 292,
       "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
       "assurance_exception_ids": [],
-      "branch": "tmp/3.2.3",
+      "branch": "dev",
       "candidate_id": "C29",
       "development_branch": "dev",
       "manual_review": "pending",

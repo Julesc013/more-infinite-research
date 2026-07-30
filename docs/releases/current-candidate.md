@@ -19,7 +19,7 @@ superseded_by: []
 | MIR version | `3.2.3` |
 | Candidate | `C29` |
 | Target | `2.1` |
-| Branch | `tmp/3.2.3` |
+| Branch | `dev` |
 | State | `package-built` |
 | Package source commit | `c5d11aab76ffee479ca4aaba3bb8fa4387918762` |
 | Package source tree | `222eca24fc2fd83e462ac8632290eb9b9092cec8` |

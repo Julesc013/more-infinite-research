@@ -3,7 +3,7 @@
   "release": "3.2.3",
   "candidate_id": "C29",
   "target": "2.1",
-  "branch": "tmp/3.2.3",
+  "branch": "dev",
   "state": "package-built",
   "package": {
     "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
@@ -95,9 +95,10 @@
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
   "incident_ids": [
+    "INC-2026-0044",
     "INC-2026-0043",
     "INC-2026-0041",
     "INC-2026-0042"
   ],
-  "updated_at": "2026-07-30T15:35:00Z"
+  "updated_at": "2026-07-30T17:22:00Z"
 }

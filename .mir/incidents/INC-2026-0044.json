@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0044",
+  "title": "Fresh C24 calibration exceeded the diagnostics-on absolute performance ceiling",
+  "external_issue": "internal://control-plane/c24-diagnostics-on-performance-ceiling",
+  "state": "investigating",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "context_id": "0A2E8EA26F796E00C35EB595FABC51BFACAA5061578AD19B85C84F72AC252829",
+    "task": "performance.measurement"
+  },
+  "reproduction": {
+    "status": "exact-fresh-campaign-failed-one-lane",
+    "factorio_version": "2.1.12",
+    "lane": "diagnostics-on.factorio-total",
+    "baseline_median_seconds": 7.578,
+    "candidate_median_seconds": 8.233,
+    "percentage_delta": 8.649347,
+    "maximum_regression_percent": 20,
+    "maximum_candidate_seconds": 8.0,
+    "baseline_runs_seconds": [7.578, 7.437, 7.879, 7.695, 5.973],
+    "candidate_runs_seconds": [7.324, 6.975, 8.493, 8.233, 8.351],
+    "other_budget_results": "The other five total-time lanes and all four compiler-phase lanes passed.",
+    "retained_raw_result": "out/control-plane-v5/performance/0A2E8EA26F796E00C35EB595FABC51BFACAA5061578AD19B85C84F72AC252829/artifacts/campaign-result.json",
+    "retained_raw_result_sha256": "680C486A265085012FCC89F951034FEDD741D14FC39043052AA27D22A367585F"
+  },
+  "root_cause": {
+    "status": "investigating",
+    "summary": "The exact paired campaign passed its relative regression allowance but the C24 candidate median crossed the independent 8.0-second diagnostics-on ceiling late in a fixed-order campaign. This result is a genuine release gate failure. The available observation does not yet distinguish host drift from a repeatable candidate cost, so the ceiling is not waived and the failed context is not resumed."
+  },
+  "repair_changes": [],
+  "regression_propositions": [
+    "a quiet-host exact C21/C24 paired campaign passes every relative and absolute performance budget",
+    "the diagnostics-on candidate median is at or below 8.0 seconds",
+    "the exact C21 and C24 package identities and Factorio 2.1.12 binary remain unchanged",
+    "a failed non-retryable performance TaskNode is never converted into passing evidence or reused",
+    "Control Plane v5 admission uses a new immutable context and a complete fresh calibration"
+  ],
+  "affected_releases": [
+    "3.2.2",
+    "3.2.3"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  },
+  "closure": {
+    "status": "pending-independent-quiet-host-performance-and-calibration",
+    "proof_required": "an independent exact paired performance pass on a quiet host followed by a complete fresh C24 calibration under a new immutable context"
+  }
+}
