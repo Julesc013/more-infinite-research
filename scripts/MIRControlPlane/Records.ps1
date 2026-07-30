@@ -132,8 +132,14 @@ function Assert-MIRCPPackageFreeze {
   }
   $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
   $target = [string]$info.factorio_version
-  $active = @($authority.locks | Where-Object target -eq $target)
-  if ($active.Count -ne 1) { throw "Expected exactly one package lock for current target $target." }
+  $current = Read-MIRCPJson -Path ".mir/releases/current.json" -RepoRoot $repo
+  $canonicalRelease = [string]$current.roles.canonical
+  $active = @($authority.locks | Where-Object {
+    [string]$_.target -eq $target -and [string]$_.release -eq $canonicalRelease
+  })
+  if ($active.Count -ne 1) {
+    throw "Expected exactly one package lock for canonical release $canonicalRelease on target $target."
+  }
   $currentHash = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   if ($currentHash -ne [string]$active[0].package_source_sha256) {
     throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."

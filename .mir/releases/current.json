@@ -2,7 +2,7 @@
   "schema": 1,
   "authority": "mir-current-release-roles-v1",
   "roles": {
-    "canonical": "3.2.2",
+    "canonical": "3.2.3",
     "backport_calibration": "2.5.0",
     "tagged_factorio_2_1": "3.2.2",
     "published_factorio_2_1": "3.2.1",

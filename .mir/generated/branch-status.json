@@ -32,6 +32,14 @@
       "source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
       "state": "focused-qualified",
       "target": "2.0"
+    },
+    {
+      "branch": "tmp/3.2.3",
+      "candidate_id": "C25",
+      "release": "3.2.3",
+      "source_commit": "a3f52a8c5e6c1717bb8f238115b58aa747a08037",
+      "state": "package-built",
+      "target": "2.1"
     }
   ],
   "generated_from": ".mir/releases/*.json",

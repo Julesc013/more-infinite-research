@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "release": "3.2.3",
+  "candidate_id": "C25",
+  "target": "2.1",
+  "branch": "tmp/3.2.3",
+  "state": "package-built",
+  "package": {
+    "source_commit": "a3f52a8c5e6c1717bb8f238115b58aa747a08037",
+    "source_tree": "cdb6650437ad9feb480525eded9cd58cb612d597",
+    "source_sha256": "4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793",
+    "archive": "dist/more-infinite-research_3.2.3.zip",
+    "archive_sha256": "9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED",
+    "content_sha256": "4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793",
+    "bytes": 1032412,
+    "entries": 291
+  },
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "package-lock",
+        "path": ".mir/control-plane/package-locks.json",
+        "candidate_id": "C25"
+      }
+    ],
+    "package_build": [
+      {
+        "kind": "deterministic-package",
+        "path": "scripts/Test-MIRDeterministicPackage.ps1",
+        "archive_sha256": "9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED"
+      }
+    ]
+  },
+  "assurance_exceptions": [],
+  "remaining_obligations": [
+    "focused-qualification",
+    "candidate-qualification",
+    "manual-acceptance",
+    "protected-qualification",
+    "seal",
+    "promotion",
+    "tag",
+    "publication",
+    "public-byte-verification"
+  ],
+  "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
+  "incident_ids": [],
+  "updated_at": "2026-07-30T08:25:33Z"
+}

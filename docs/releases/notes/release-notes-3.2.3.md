@@ -34,3 +34,21 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 ## Release status
 
 The package identity and qualification evidence will be inserted after the candidate is frozen. Publication, promotion, and tagging remain blocked until exact local, manual, and protected release gates pass.
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
+## Immutable release identity
+
+> Generated from `.mir/releases/3.2.3.json`. The typed record is authoritative.
+
+| Field | Value |
+| --- | --- |
+| State | `package-built` |
+| Candidate | `C25` |
+| Package source commit | `a3f52a8c5e6c1717bb8f238115b58aa747a08037` |
+| Archive SHA-256 | `9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED` |
+| Content SHA-256 | `4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793` |
+| Tag | `pending` |
+| Tag commit | `pending` |
+| Assurance exceptions | `pending` |
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:END -->

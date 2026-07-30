@@ -1,11 +1,11 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.2"
+applies_to: "3.2.3"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-28
+last_reviewed: 2026-07-30
 supersedes: []
 superseded_by: []
 ---
@@ -16,25 +16,32 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.2` |
-| Candidate | `C24` |
+| MIR version | `3.2.3` |
+| Candidate | `C25` |
 | Target | `2.1` |
-| Branch | `main` |
-| State | `tagged` |
-| Package source commit | `29f81addc0eec9b571afd6428c9e3529c4497a1b` |
-| Package source tree | `afe3959e40c868578f3182bea5b4ce725dcfd222` |
-| Package source SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
-| Archive | `dist/more-infinite-research_3.2.2.zip` |
-| Archive bytes | `1030817` |
+| Branch | `tmp/3.2.3` |
+| State | `package-built` |
+| Package source commit | `a3f52a8c5e6c1717bb8f238115b58aa747a08037` |
+| Package source tree | `cdb6650437ad9feb480525eded9cd58cb612d597` |
+| Package source SHA-256 | `4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793` |
+| Archive | `dist/more-infinite-research_3.2.3.zip` |
+| Archive bytes | `1032412` |
 | Archive entries | `291` |
-| Archive SHA-256 | `8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8` |
-| Package content SHA-256 | `25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F` |
+| Archive SHA-256 | `9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED` |
+| Package content SHA-256 | `4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793` |
 
 ## Remaining state transitions
 
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
 - [ ] `published`
 - [ ] `publicly-verified`
 
 ## Assurance exceptions
 
-- `C24-PROTECTED-SEAL-ABSENT`: The immutable tag was created after local qualification and manual acceptance without a committed protected-qualification capsule or schema-4 seal. Disposition: `grandfathered-import-for-v5-calibration-only`.
+None.

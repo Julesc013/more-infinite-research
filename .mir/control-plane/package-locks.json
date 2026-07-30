@@ -17,6 +17,20 @@
       "mode": "immutable-tagged-baseline"
     },
     {
+      "id": "mir-3.2.3-c25",
+      "target": "2.1",
+      "release": "3.2.3",
+      "candidate_id": "C25",
+      "package_source_commit": "a3f52a8c5e6c1717bb8f238115b58aa747a08037",
+      "package_source_tree": "cdb6650437ad9feb480525eded9cd58cb612d597",
+      "package_source_sha256": "4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793",
+      "archive": "dist/more-infinite-research_3.2.3.zip",
+      "archive_sha256": "9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED",
+      "archive_bytes": 1032412,
+      "archive_entries": 291,
+      "mode": "frozen-unreleased-hotfix-candidate"
+    },
+    {
       "id": "mir-2.5.0-p9",
       "target": "2.0",
       "release": "2.5.0",

@@ -159,11 +159,11 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.2.3.zip
-  source_commit: pending
-  package_source_commit: pending
+  source_commit: a3f52a8c5e6c1717bb8f238115b58aa747a08037
+  package_source_commit: a3f52a8c5e6c1717bb8f238115b58aa747a08037
   automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
-  status: hotfix-implementation-and-qualification
+  status: package-built
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority
