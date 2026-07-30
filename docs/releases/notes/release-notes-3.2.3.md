@@ -23,6 +23,20 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 - Modded belt, underground-belt, splitter, lane-splitter, loader, and inserter recipes can join their established productivity streams through final `place_result` prototype structure instead of name conventions.
 - Recipes that explicitly deny productivity or set a zero productivity cap remain excluded from structural attachment.
 
+## Upgrading from 3.2.2
+
+- Existing Landfill Productivity and Ice Productivity levels are retained.
+- Current Ice Productivity research and fractional progress are retained; completing later levels now requires cryogenic science.
+- Platform Productivity starts unresearched. Landfill levels are not copied into it, because that would bypass the new Aquilo gate and convert the earlier +2%/+1% bonuses into +10%/+5% bonuses.
+- After configuration change, Landfill no longer owns either Platform recipe and each recipe has exactly one owner: Platform Productivity.
+- The exact 3.2.2-to-C29 upgrade fixture saved and independently reloaded the upgraded Space Age game.
+
+## Compiler efficiency
+
+- Structural logistics discovery now builds one immutable entity/item/module fact index per compilation instead of repeatedly scanning prototype types.
+- Unlock-derived science and emitted effects consume the same cached stream-match result, so a stream's membership is computed at most once for one exact descriptor, recipe-fact, and target-profile identity.
+- Runtime fixtures enforce one index build, one recipe-fact scan, deterministic randomized-order output, and zero duplicate effect owners.
+
 ## Advanced Belts
 
 - The Factorio 2.1 structural fixture covers arbitrary belt, loader, inserter, and module prototype families without relying on mod-specific names.
@@ -33,7 +47,7 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 
 ## Release status
 
-The package identity and qualification evidence will be inserted after the candidate is frozen. Publication, promotion, and tagging remain blocked until exact local, manual, and protected release gates pass.
+Candidate C29 is frozen and its deterministic package, full static gate, focused exact runtime scenarios, and exact 3.2.2 upgrade/reload transition have passed. Candidate aggregation, paired performance, manual acceptance, protected qualification, sealing, promotion, publication, and tagging remain pending.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity

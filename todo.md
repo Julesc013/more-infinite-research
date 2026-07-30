@@ -69,6 +69,8 @@ Generated: 2026-07-30
 - [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `pending-fresh-performance-measurement`
 - [ ] `INC-2026-0038` — C24 performance probe final phase depended on Git checkout line endings; closure `pending-fresh-performance-measurement`
 - [ ] `INC-2026-0040` — Context-addressed performance artifacts exceeded Factorio's Windows path boundary; closure `pending-fresh-performance-measurement`
+- [ ] `INC-2026-0041` — Ice and platform productivity progression preceded Aquilo access; closure `pending-release-qualification`
+- [ ] `INC-2026-0042` — Modded logistics recipes were omitted when names did not match fixed tiers; closure `pending-release-qualification`
 
 ## Explicit release obligations
 

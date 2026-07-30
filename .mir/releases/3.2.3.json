@@ -94,6 +94,9 @@
     "public-byte-verification"
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
-  "incident_ids": [],
-  "updated_at": "2026-07-30T13:52:25Z"
+  "incident_ids": [
+    "INC-2026-0041",
+    "INC-2026-0042"
+  ],
+  "updated_at": "2026-07-30T14:45:40Z"
 }
