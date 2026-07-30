@@ -145,6 +145,23 @@ local function assert_compiler_telemetry()
         .. " actual=" .. tostring(evidence.counts[counter]))
     end
   end
+  if evidence.counts.item_prototype_index_builds ~= 1 then
+    fail("item/entity/module prototype index must be built exactly once; actual="
+      .. tostring(evidence.counts.item_prototype_index_builds))
+  end
+  if evidence.counts.recipe_index_scans ~= 1 then
+    fail("recipe fact index must scan recipes exactly once; actual="
+      .. tostring(evidence.counts.recipe_index_scans))
+  end
+  if evidence.counts.stream_match_max_computations_per_identity > 1 then
+    fail("stream matching recomputed an immutable stream identity; maximum="
+      .. tostring(evidence.counts.stream_match_max_computations_per_identity))
+  end
+  if evidence.counts.stream_match_cache_misses > evidence.counts.stream_rows + 1 then
+    fail("stream match cache created more identities than governed streams; misses="
+      .. tostring(evidence.counts.stream_match_cache_misses)
+      .. " stream_rows=" .. tostring(evidence.counts.stream_rows))
+  end
   for _, phase in ipairs({
     "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
     "graph", "planning", "postconditions"
@@ -908,23 +925,6 @@ local function assert_technology_has_science(technology_name, expected_packs)
     if not actual[pack_name] then
       fail("technology " .. technology_name .. " is missing science pack " .. pack_name .. ".")
     end
-  end
-  if evidence.counts.item_prototype_index_builds ~= 1 then
-    fail("item/entity/module prototype index must be built exactly once; actual="
-      .. tostring(evidence.counts.item_prototype_index_builds))
-  end
-  if evidence.counts.recipe_index_scans ~= 1 then
-    fail("recipe fact index must scan recipes exactly once; actual="
-      .. tostring(evidence.counts.recipe_index_scans))
-  end
-  if evidence.counts.stream_match_max_computations_per_identity > 1 then
-    fail("stream matching recomputed an immutable stream identity; maximum="
-      .. tostring(evidence.counts.stream_match_max_computations_per_identity))
-  end
-  if evidence.counts.stream_match_cache_misses > evidence.counts.stream_rows + 1 then
-    fail("stream match cache created more identities than governed streams; misses="
-      .. tostring(evidence.counts.stream_match_cache_misses)
-      .. " stream_rows=" .. tostring(evidence.counts.stream_rows))
   end
 end
 
