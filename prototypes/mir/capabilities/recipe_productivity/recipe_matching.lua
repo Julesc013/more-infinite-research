@@ -1,6 +1,11 @@
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local R = {}
 
@@ -133,30 +138,18 @@ local function add_module_outputs(want, options)
   local minimum = tonumber(options.module_tier_min)
   local maximum = tonumber(options.module_tier_max)
   if not tier_set and minimum == nil and maximum == nil then return end
-  for name, module in pairs(data_raw.prototypes("module")) do
-    local tier = type(module) == "table" and tonumber(module.tier) or nil
-    if tier
-      and (not tier_set or tier_set[tier])
-      and (minimum == nil or tier >= minimum)
-      and (maximum == nil or tier <= maximum)
-    then
-      want[name] = true
-    end
-  end
+  for _, name in ipairs(item_prototype_facts.module_items({
+    module_tiers = tiers,
+    module_tier_min = minimum,
+    module_tier_max = maximum
+  })) do want[name] = true end
 end
 
 local function add_place_result_outputs(want, entity_types)
   if type(entity_types) ~= "table" then return end
-  local accepted = {}
-  for _, entity_type in ipairs(entity_types) do accepted[entity_type] = true end
-  lookup.each_item_prototype(function(name, item)
-    if type(item) == "table"
-      and item.place_result
-      and accepted[lookup.entity_prototype_type(item.place_result)]
-    then
-      want[name] = true
-    end
-  end)
+  for _, name in ipairs(item_prototype_facts.placeable_items_for_entity_types(entity_types)) do
+    want[name] = true
+  end
 end
 
 local function gather_by_items(items, patterns, options)
@@ -209,7 +202,7 @@ local function gather_by_items(items, patterns, options)
   return list
 end
 
-function R.recipes_for_stream(spec, per_level_default)
+local function recipes_for_stream_uncached(spec, per_level_default)
   if spec.groups then
     local buckets, assigned = {}, {}
     for _, g in ipairs(spec.groups) do
@@ -270,6 +263,46 @@ function R.recipes_for_stream(spec, per_level_default)
     match_stream = spec
   })
   return {{change = per_level_default, recipes = list}}
+end
+
+local function stream_match_identity(stream_key, spec, per_level_default)
+  return fingerprint.of({
+    schema = 1,
+    stream_key = stream_key,
+    descriptor = spec,
+    per_level_default = per_level_default,
+    recipe_facts = recipe_facts.fingerprint(),
+    target_profile = target_profiles.current()
+  })
+end
+
+function R.buckets_view(stream_key, spec, per_level_default)
+  if type(stream_key) ~= "string" or stream_key == "" then
+    error("MIR stream matching cache requires a stable stream key.", 2)
+  end
+  local context = compiler_context.current()
+  local cache = context:state_view("stream_match_index", function()
+    return {schema = 1, by_identity = {}, computations_by_identity = {}}
+  end)
+  local identity = stream_match_identity(stream_key, spec, per_level_default)
+  local cached = cache.by_identity[identity]
+  if cached then
+    telemetry.count("stream_match_cache_hits", 1)
+    return cached
+  end
+  telemetry.count("stream_match_cache_misses", 1)
+  cache.computations_by_identity[identity] = (cache.computations_by_identity[identity] or 0) + 1
+  telemetry.observe_max("stream_match_max_computations_per_identity", cache.computations_by_identity[identity])
+  local buckets = recipes_for_stream_uncached(spec, per_level_default)
+  cache.by_identity[identity] = buckets
+  return buckets
+end
+
+function R.recipes_for_stream(spec, per_level_default, stream_key)
+  if stream_key then
+    return deepcopy(R.buckets_view(stream_key, spec, per_level_default))
+  end
+  return recipes_for_stream_uncached(spec, per_level_default)
 end
 
 return R

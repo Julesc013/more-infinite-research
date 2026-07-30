@@ -55,7 +55,31 @@ function M.valid_research_ingredients(ingredients)
   return M.any_lab_accepts_all(packs)
 end
 
-function M.best_lab_compatible_ingredients(ingredients, context)
+local function required_set(required_packs)
+  local out = {}
+  for _, pack in ipairs(required_packs or {}) do out[pack] = true end
+  return out
+end
+
+local function contains_required(ingredients, required)
+  for pack, _ in pairs(required) do
+    local found = false
+    for _, ingredient in ipairs(ingredients or {}) do
+      if M.ingredient_name(ingredient) == pack then found = true; break end
+    end
+    if not found then return false, pack end
+  end
+  return true
+end
+
+function M.best_lab_compatible_ingredients(ingredients, context, required_packs)
+  local required = required_set(required_packs)
+  local source_has_required, missing_required = contains_required(ingredients, required)
+  if not source_has_required then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because required science pack " .. tostring(missing_required) .. " was not selected.")
+    return nil, "missing-required"
+  end
   if policy() == "engine-default" then
     local unchanged = deepcopy(ingredients or {})
     local reachable = #unchanged > 0
@@ -84,6 +108,12 @@ function M.best_lab_compatible_ingredients(ingredients, context)
     end
   end
   if #source == 0 then return nil, "empty" end
+  local reachable_has_required, unreachable_required = contains_required(source, required)
+  if not reachable_has_required then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
+      .. " because required science pack " .. tostring(unreachable_required) .. " is unreachable.")
+    return nil, "required-unreachable"
+  end
   if M.valid_research_ingredients(source) then return source, "full" end
   if policy() == "skip" then
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
@@ -103,7 +133,8 @@ function M.best_lab_compatible_ingredients(ingredients, context)
       local name = M.ingredient_name(ingredient)
       if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
     end
-    if #candidate > 0 and M.valid_research_ingredients(candidate)
+    local candidate_has_required = contains_required(candidate, required)
+    if candidate_has_required and #candidate > 0 and M.valid_research_ingredients(candidate)
       and (not best or #candidate > #best) then
       best, best_lab = candidate, entry.name
     end

@@ -70,6 +70,14 @@ local STREAM_EXTRA_PACKS = {
   research_science_pack_productivity = {}
 }
 
+-- These packs are progression gates, not compatibility suggestions.
+-- Compatibility overlays and lab reduction must never remove them from an
+-- emitted technology.
+local STREAM_REQUIRED_PACKS = {
+  research_ice = {"cryogenic-science-pack"},
+  research_platform = {"cryogenic-science-pack"}
+}
+
 local function startup_setting(name)
   return effective_settings.get(name)
 end
@@ -96,10 +104,10 @@ local function append_ingredient(out, seen, name, amount)
   end
 end
 
-local function stream_recipe_names(spec)
+local function stream_recipe_names(key, spec)
   local seen = {}
   local out = {}
-  for _, bucket in ipairs(recipes.recipes_for_stream(spec or {}, C.shared.per_level_default) or {}) do
+  for _, bucket in ipairs(recipes.buckets_view(key, spec or {}, C.shared.per_level_default) or {}) do
     for _, recipe_name in ipairs(bucket.recipes or {}) do
       if not seen[recipe_name] then
         seen[recipe_name] = true
@@ -111,9 +119,9 @@ local function stream_recipe_names(spec)
   return out
 end
 
-local function science_from_unlocks(spec)
+local function science_from_unlocks(key, spec)
   local out, seen = {}, {}
-  for _, recipe_name in ipairs(stream_recipe_names(spec)) do
+  for _, recipe_name in ipairs(stream_recipe_names(key, spec)) do
     for _, tech_name in ipairs(science.researchable_unlockers_for_recipe(recipe_name)) do
       local tech = data_raw.technology(tech_name)
       for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
@@ -180,7 +188,7 @@ function M.pick_science_for_stream(spec, key)
   if desired == "all" then
     for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   elseif desired == "derive-from-unlocks" then
-    for _, ingredient in ipairs(science_from_unlocks(spec)) do
+    for _, ingredient in ipairs(science_from_unlocks(key, spec)) do
       add_if_science_pack_exists(packs, ingredient_name(ingredient))
     end
   elseif type(desired) == "table" then
@@ -198,9 +206,11 @@ function M.pick_science_for_stream(spec, key)
   end
 
   local denied = {}
+  local required = {}
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
   local policy_roles = compatibility_policy.science_roles_for_stream(key)
   for _, role in ipairs(policy_roles) do
-    if role.role == "exclude" then denied[role.pack] = true end
+    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
   end
   for _, role in ipairs(policy_roles) do
     if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
@@ -211,6 +221,9 @@ function M.pick_science_for_stream(spec, key)
       add_if_science_pack_exists(packs, p)
     end
   end
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do
+    add_if_science_pack_exists(packs, pack)
+  end
 
   local out, seen = {}, {}
   for _, name in ipairs(packs) do
@@ -219,7 +232,22 @@ function M.pick_science_for_stream(spec, key)
       table.insert(out, {name, 1})
     end
   end
-  return M.apply_science_pack_ingredient_policy(out)
+  local selected = M.apply_science_pack_ingredient_policy(out)
+  local selected_names = {}
+  for _, ingredient in ipairs(selected or {}) do
+    selected_names[ingredient_name(ingredient)] = true
+  end
+  for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do
+    if science.science_pack_exists(pack) and not selected_names[pack] then
+      table.insert(selected, {pack, 1})
+      selected_names[pack] = true
+    end
+  end
+  return selected
+end
+
+function M.required_science_packs_for_stream(key)
+  return deepcopy(STREAM_REQUIRED_PACKS[key] or {})
 end
 
 return M

@@ -11,10 +11,10 @@ local function startup_setting(name)
   return effective_settings.get(name)
 end
 
-local function stream_recipe_names(spec)
+local function stream_recipe_names(key, spec)
   local seen = {}
   local out = {}
-  for _, bucket in ipairs(recipes.recipes_for_stream(spec or {}, C.shared.per_level_default) or {}) do
+  for _, bucket in ipairs(recipes.buckets_view(key, spec or {}, C.shared.per_level_default) or {}) do
     for _, recipe_name in ipairs(bucket.recipes or {}) do
       if not seen[recipe_name] then
         seen[recipe_name] = true
@@ -50,7 +50,11 @@ end
 
 function M.build_for(key, ingredients)
   local spec = C.get(key) or {}
-  local packs = ingredients or science.best_lab_compatible_ingredients(science_selector.pick_science_for_stream(spec, key), key)
+  local packs = ingredients or science.best_lab_compatible_ingredients(
+    science_selector.pick_science_for_stream(spec, key),
+    key,
+    science_selector.required_science_packs_for_stream(key)
+  )
   local reqs, seen = {}, {}
   local function add(t)
     if t and science.technology_is_researchable(t) and not seen[t] then
@@ -74,7 +78,7 @@ function M.build_for(key, ingredients)
     end
   end
   if spec.prerequisites == "derive-from-unlocks" then
-    for _, recipe_name in ipairs(stream_recipe_names(spec)) do
+    for _, recipe_name in ipairs(stream_recipe_names(key, spec)) do
       for _, tech_name in ipairs(science.researchable_unlockers_for_recipe(recipe_name)) do
         add(tech_name)
       end

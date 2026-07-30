@@ -134,6 +134,7 @@ modules:
     - prototypes/mir/pipeline/mutations/max_level.lua
   index:
     - prototypes/mir/index/registry_builder.lua
+    - prototypes/mir/index/item_prototype_facts.lua
     - prototypes/mir/index/recipe_facts.lua
     - prototypes/mir/index/recipe_risk_facts.lua
     - prototypes/mir/index/relationships.lua

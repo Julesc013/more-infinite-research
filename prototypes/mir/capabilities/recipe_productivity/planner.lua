@@ -5,7 +5,7 @@ local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_
 local M = {}
 
 function M.match_buckets(key, spec)
-  local buckets = recipes.recipes_for_stream(spec, C.shared.per_level_default)
+  local buckets = recipes.recipes_for_stream(spec, C.shared.per_level_default, key)
   D.recipe_matches(key, buckets)
   return buckets
 end
