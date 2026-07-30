@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-advanced-belts-sa-productivity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Advanced Belts SA Productivity",
+  "author": "Julesc013",
+  "description": "Asserts that structurally discovered Advanced Belts SA logistics recipes receive MIR belt productivity.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "space-age >= 2.1.8",
+    "more-infinite-research",
+    "AdvancedBeltsSA >= 2.3.3"
+  ]
+}

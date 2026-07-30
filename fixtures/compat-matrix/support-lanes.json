@@ -55,6 +55,23 @@
       "backport_candidate": true
     },
     {
+      "mod": "AdvancedBeltsSA",
+      "claim_lane": "fixture-backed stream family plus external data-stage probe",
+      "claim_level": "belt-family crafting productivity only",
+      "mir_behavior": "research_belts",
+      "capability_lane": "logistics-belt-manufacturing",
+      "tested_by": [
+        "mir-fixture-semantic-family-attach",
+        "mir-fixture-assert-semantic-family-attach",
+        "AdvancedBeltsSA_2.3.3 metadata-adapted data-stage assertion"
+      ],
+      "blocked_exact_profiles": [
+        "Factorio 2.0 runtime unavailable locally",
+        "AdvancedBeltsSA 2.3.3 is not a Factorio 2.1 archive"
+      ],
+      "backport_candidate": true
+    },
+    {
       "mod": "atan-ash",
       "claim_lane": "fixture-backed stream family",
       "claim_level": "ash separation productivity only",

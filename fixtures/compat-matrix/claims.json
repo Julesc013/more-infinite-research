@@ -44,6 +44,29 @@
       "public_text": "MIR covers visible AAI-style loader crafting recipes through belt productivity; it does not change loader throughput, modes, fluids, or compatibility hooks."
     },
     {
+      "mod": "AdvancedBeltsSA",
+      "claim_level": "belt-family crafting productivity only",
+      "maturity": "fixture-qualified",
+      "behavior": "generated",
+      "scope": "partial-family",
+      "capabilities": {
+        "logistics-belt-manufacturing": "generated-through-existing-stream",
+        "cryogenic-fluid-return": "preserved"
+      },
+      "tested_factorio": "2.1.12",
+      "tested_mod_versions": [
+        "AdvancedBeltsSA_2.3.3 data-stage probe"
+      ],
+      "generated_streams": [],
+      "fixtures": [
+        "mir-fixture-semantic-family-attach",
+        "mir-fixture-assert-semantic-family-attach",
+        "mir-fixture-assert-advanced-belts-sa-productivity"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR attaches structurally valid Advanced Belts-style belt, splitter, lane-splitter, and underground-belt crafting recipes to Belt productivity while preserving productivity-ignored returned coolant. AdvancedBeltsSA 2.3.3 itself declares Factorio 2.0 and does not pass Factorio 2.1 final prototype validation."
+    },
+    {
       "mod": "atan-ash",
       "claim_level": "ash separation productivity only",
       "maturity": "fixture-qualified",

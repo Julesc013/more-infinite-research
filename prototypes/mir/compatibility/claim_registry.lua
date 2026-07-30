@@ -116,6 +116,31 @@ M.claims = {
     }
   },
   {
+    id = "advanced-belts-sa",
+    mod = "AdvancedBeltsSA",
+    doc = "docs/compatibility/targets/advanced-belts-sa.md",
+    claim_level = "partial-support",
+    maturity = "fixture-qualified",
+    behavior = "generated",
+    scope = "partial-family",
+    public_claim = "belt-family crafting productivity only",
+    capabilities = {
+      ["logistics-belt-manufacturing"] = "generated-through-existing-stream",
+      ["cryogenic-fluid-return"] = "preserved"
+    },
+    generated_through_existing_stream = "research_belts",
+    fixtures = {
+      "fixtures/semantic-family-attach",
+      "fixtures/assert-semantic-family-attach",
+      "fixtures/assert-advanced-belts-sa-productivity"
+    },
+    diagnostic_only = {
+      "belt-throughput",
+      "upgrade-planner",
+      "factorio-2.1-full-archive-load"
+    }
+  },
+  {
     id = "big-mining-drill",
     mod = "big-mining-drill",
     doc = "docs/compatibility/targets/big-mining-drill.md",

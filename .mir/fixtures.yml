@@ -674,6 +674,29 @@ fixtures:
       - loader-recipe-candidates
       - belt-stream-coverage
 
+  advanced-belts-sa:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-attach
+    supplemental_assertion_path: fixtures/assert-advanced-belts-sa-productivity
+    external_mod_identity: AdvancedBeltsSA
+    claim: advanced-belts-sa
+    external_probe:
+      mod_version: 2.3.3
+      source_factorio_line: "2.0"
+      source_archive_sha256: A5D62D3EB189442574209625369E60EBFB04956921D7704A354823A80AAF241A
+      factorio_2_1_adapter_sha256: B0CFF99215E17C28E9176523CA2F6FE1E4E5A697709602849755A853CBA7E53F
+      unchanged_payload_sha256: 1781F4D17C23927B335451051AA25949F20ED74386775D1FFAC71F7103B04ABB
+      observed: mir-twelve-recipe-data-stage-assertions-passed
+      terminal_blocker: upstream-recipe-prototypes-use-factorio-2.0-category-schema
+    validates:
+      - name-independent-place-result-belt-discovery
+      - exact-twelve-recipe-belt-stream-coverage
+      - omitted-productivity-flag-compatibility
+      - explicit-productivity-denial-preservation
+      - cryogenic-fluid-return-productivity-exclusion
+      - external-archive-data-stage-assertion-before-upstream-engine-rejection
+
   big-mining-drill:
     requires_features: [recipe_productivity]
     path: fixtures/big-mining-drill

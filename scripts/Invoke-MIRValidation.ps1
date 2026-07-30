@@ -954,8 +954,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "pentapod-egg", owner = "recipe-prod-research_breeding-1", change = 0.10 }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "nutrients-from-bioflux", owner = "recipe-prod-research_nutrients-1", change = 0.10 }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "capture-robot-rocket", owner = "recipe-prod-research_capture_robot_rockets-1", change = 0.10 }' },
-    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "ice-platform", owner = "recipe-prod-research_landfill-1", change = 0.02 }' },
-    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "space-platform-foundation", owner = "recipe-prod-research_landfill-1", change = 0.01 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "ice-platform", owner = "recipe-prod-research_platform-1", change = 0.10 }' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "space-platform-foundation", owner = "recipe-prod-research_platform-1", change = 0.05 }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_recipe_not_owned_by("nutrients-from-spoilage", "recipe-prod-research_nutrients-1")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_technology_has_science("recipe-prod-research_nutrients-1"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_native_follower_robot_continuation()' },
@@ -4329,7 +4329,10 @@ $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
 $spaceAgeLandfillLine = Get-LastStreamReportLine -Key "research_landfill"
-Assert-ReportLineContains -Line $spaceAgeLandfillLine -Expected "effects=4" -Context "Space Age landfill and platform productivity scenario"
+Assert-ReportLineContains -Line $spaceAgeLandfillLine -Expected "effects=2" -Context "Space Age landfill productivity scenario"
+$spaceAgePlatformLine = Get-LastStreamReportLine -Key "research_platform"
+Assert-ReportLineContains -Line $spaceAgePlatformLine -Expected "effects=2" -Context "Space Age platform productivity scenario"
+Assert-ReportScienceContains -Line $spaceAgePlatformLine -Expected "cryogenic-science-pack" -Context "Space Age platform cryogenic science scenario"
 $spaceAgeArtificialSoilLine = Get-LastStreamReportLine -Key "research_artificial_soil"
 Assert-ReportLineGenerated -Line $spaceAgeArtificialSoilLine -Context "Space Age artificial soil productivity scenario"
 Assert-ReportScienceContains -Line $spaceAgeArtificialSoilLine -Expected "agricultural-science-pack" -Context "Space Age artificial soil agricultural science scenario"

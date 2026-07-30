@@ -7,6 +7,8 @@ remote_topology:
     - dev
     - legacy
   active_temporary_branches:
+    - tmp/3.2.3
+  held_temporary_branches:
     - tmp/2.0
   inactive_policy_templates:
     - factorio-2.0-lane
@@ -22,6 +24,7 @@ remote_topology:
     - published target-line history belongs to immutable release or archive tags, not permanent work branches
     - main and dev must not be made identical to Factorio 2.0 target branches
     - legacy may advance to the active tmp/2.0 candidate only through governed promotion
+    - tmp/3.2.3 is the bounded Factorio 2.1 hotfix lane and may promote only to main after complete release admission
 
 branches:
   main:
@@ -68,8 +71,8 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    remote_state: active-temporary
-    purpose: disposable Factorio 2.0 MIR 2.5.0 projection workspace; final integration uses target-first and immutable-3.2.2-second parent ancestry
+    remote_state: held-temporary
+    purpose: held Factorio 2.0 MIR 2.5.0 projection workspace; final integration uses target-first and immutable-3.2.2-second parent ancestry
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport
@@ -81,6 +84,22 @@ branches:
       - 2.1-only-metadata
       - generated-id-rename
       - unproven-feature-parity
+
+  tmp/3.2.3:
+    remote_state: local-active-temporary
+    purpose: bounded MIR 3.2.3 Factorio 2.1 hotfix, exact qualification, and promotion workspace based on immutable 3.2.2 plus Control Plane v5 tooling
+    factorio_version: "2.1"
+    accepts:
+      - release-hotfix
+      - compatibility-fix
+      - fixture
+      - release-evidence
+      - docs-correction
+      - control-plane-candidate-adapter
+    rejects:
+      - unrelated-product-development
+      - generated-id-rename
+      - bypassed-manual-or-protected-gate
 
   factorio-2.0-lane:
     remote_state: inactive-policy-template

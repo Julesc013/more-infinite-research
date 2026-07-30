@@ -241,7 +241,11 @@ function R.recipes_for_stream(spec, per_level_default)
         end
       end
       if #filtered > 0 then
-        table.insert(buckets, {change = g.change or per_level_default, recipes = filtered})
+        table.insert(buckets, {
+          change = g.change or per_level_default,
+          recipes = filtered,
+          structural_fallback = g.structural_fallback == true
+        })
       end
     end
     return buckets

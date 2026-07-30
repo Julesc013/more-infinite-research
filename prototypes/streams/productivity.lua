@@ -666,6 +666,7 @@ return {
     },
     {
       change=0.005,
+      structural_fallback=true,
       place_result_entity_types={
         "transport-belt",
         "underground-belt",
@@ -685,6 +686,7 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} },
     {
       change=0.01,
+      structural_fallback=true,
       place_result_entity_types={"inserter"},
       reject_explicit_productivity_denial=true
     }

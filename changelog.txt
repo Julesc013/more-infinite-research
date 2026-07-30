@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.3
+Date: 2026-07-30
+
+  Changes:
+
+    - Added Platform productivity with +10% ice-platform and +5% space-platform-foundation productivity per level.
+    - Gated Platform productivity with Landfill's progression packs plus cryogenic science.
+
+  Bugfixes:
+
+    - Required cryogenic science for Ice productivity so Aquilo ice recipes are not researchable from Nauvis progression alone.
+    - Added name-independent structural discovery for modded belts, underground belts, splitters, lane splitters, loaders, and inserters.
+    - Added structural Advanced Belts-style coverage for all three post-Turbo logistics tiers while preserving productivity-ignored cryogenic fluid returns; the current AdvancedBeltsSA archive itself still targets Factorio 2.0.
+    - Preserved explicit recipe productivity denials when applying structural logistics compatibility.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.2.2
 Date: 2026-07-27
 

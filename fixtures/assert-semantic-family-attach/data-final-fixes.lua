@@ -2,7 +2,10 @@ local expected = {
   ["recipe-prod-research_belts-1"] = {
     recipe = "assemble-alpha",
     change = 0.01,
-    additional_recipes = {"pack-only-recipe", "assemble-unflagged-belt"}
+    additional_recipes = {
+      ["pack-only-recipe"] = 0.01,
+      ["assemble-unflagged-belt"] = 0.005
+    }
   },
   ["recipe-prod-research_mining_drill-1"] = {recipe = "assemble-beta", change = 0.05},
   ["recipe-prod-research_furnace-1"] = {recipe = "assemble-gamma", change = 0.02},
@@ -28,10 +31,15 @@ for technology_name, wanted in pairs(expected) do
     end
   end
   if not found then fail(wanted.recipe .. " was not attached to " .. technology_name) end
-  for _, additional_recipe in ipairs(wanted.additional_recipes or {}) do
+  for additional_recipe, additional_change in pairs(wanted.additional_recipes or {}) do
     local additional_found = false
     for _, effect in ipairs(technology.effects or {}) do
-      if effect.type == "change-recipe-productivity" and effect.recipe == additional_recipe then additional_found = true end
+      if effect.type == "change-recipe-productivity" and effect.recipe == additional_recipe then
+        additional_found = true
+        if math.abs((tonumber(effect.change) or 0) - additional_change) > 0.000000001 then
+          fail(additional_recipe .. " has wrong change " .. tostring(effect.change))
+        end
+      end
     end
     if not additional_found then fail(additional_recipe .. " was not attached to " .. technology_name) end
   end
