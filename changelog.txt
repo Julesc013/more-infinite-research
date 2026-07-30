@@ -10,8 +10,9 @@ Date: 2026-07-30
   Bugfixes:
 
     - Required cryogenic science for Ice productivity so Aquilo ice recipes are not researchable from Nauvis progression alone.
-    - Added name-independent structural discovery for modded belts, underground belts, splitters, lane splitters, loaders, and inserters.
-    - Added structural Advanced Belts-style coverage for all three post-Turbo logistics tiers while preserving productivity-ignored cryogenic fluid returns; the current AdvancedBeltsSA archive itself still targets Factorio 2.0.
+    - Added name-independent discovery for modded belts, underground belts, splitters, lane splitters, loaders, and inserters.
+    - Added structural Advanced Belts coverage for all three post-Turbo logistics tiers.
+    - Preserved productivity-ignored cryogenic fluid returns; AdvancedBeltsSA 2.3.3 remains a Factorio 2.0 archive.
     - Preserved explicit recipe productivity denials when applying structural logistics compatibility.
 
 ---------------------------------------------------------------------------------------------------
