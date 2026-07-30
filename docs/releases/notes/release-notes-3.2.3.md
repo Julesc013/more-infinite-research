@@ -19,7 +19,7 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 - Ice productivity now requires cryogenic science, so its Aquilo recipe coverage is no longer available from Nauvis progression alone.
 - Ice-platform and space-platform-foundation crafting have moved out of Landfill productivity into a separate, default-on Platform productivity technology.
 - Platform productivity grants +10% ice-platform and +5% space-platform-foundation productivity per level.
-- Platform productivity uses Landfill's science progression and additionally requires cryogenic science.
+- Platform productivity uses Landfill's science progression with cryogenic science replacing metallurgic science.
 - Modded belt, underground-belt, splitter, lane-splitter, loader, and inserter recipes can join their established productivity streams through final `place_result` prototype structure instead of name conventions.
 - Recipes that explicitly deny productivity or set a zero productivity cap remain excluded from structural attachment.
 

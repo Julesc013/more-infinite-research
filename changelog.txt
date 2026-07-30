@@ -5,7 +5,7 @@ Date: 2026-07-30
   Changes:
 
     - Added Platform productivity with +10% ice-platform and +5% space-platform-foundation productivity per level.
-    - Gated Platform productivity with Landfill's progression packs plus cryogenic science.
+    - Gated Platform productivity with cryogenic science replacing Landfill's metallurgic science requirement.
 
   Bugfixes:
 
