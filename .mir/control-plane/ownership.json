@@ -7,6 +7,7 @@
     {"pattern": "todo.md", "module": "control-plane-views", "writes": ["docs.generated"]},
     {"pattern": ".mir/docs.yml", "module": "documentation-governance", "writes": ["docs.source"]},
     {"pattern": ".mir/modules.yml", "module": "architecture-governance", "writes": ["architecture.boundaries"]},
+    {"pattern": ".mir/targets.json", "module": "target-profile-governance", "writes": ["architecture.boundaries", "product.compiler", "scenario.catalog"]},
     {"pattern": ".mir/streams.yml", "module": "stream-governance", "writes": ["product.compiler", "product.settings", "scenario.catalog"]},
     {"pattern": ".mir/compatibility.yml", "module": "compatibility-governance", "writes": ["product.compiler", "scenario.catalog"]},
     {"pattern": ".mir/fixtures.yml", "module": "fixture-governance", "writes": ["scenario.catalog"]},

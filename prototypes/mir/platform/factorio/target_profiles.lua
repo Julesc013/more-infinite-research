@@ -52,7 +52,7 @@ local M = {
         "scripted-effect"
       },
       asset_policy = "modern-optional-dlc",
-      expected_stream_count = 75,
+      expected_stream_count = 76,
       features = {
         compatibility_repairs = true,
         pipeline_extent = true,
