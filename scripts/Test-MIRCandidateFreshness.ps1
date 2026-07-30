@@ -163,6 +163,7 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "requalifying-after-validation-harness-change",
+  "package-built",
   "release-candidate-awaiting-external-qualification",
   "release-candidate-awaiting-manual-review",
   "release-candidate-accepted",
@@ -212,6 +213,43 @@ if ($status -eq "requalifying-after-validation-harness-change") {
     throw "Package-visible working-tree changes are not allowed during harness-only requalification."
   }
   Write-Host "[ok] MIR release evidence is explicitly requalifying after a validation-harness change; stale evidence cannot be promoted."
+  exit 0
+}
+
+if ($status -eq "package-built") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "A package-built candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Package-built source commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-qualification" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending-exact-candidate-review") {
+    throw "A package-built candidate must keep automated and exact manual qualification explicitly pending."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A package-built candidate must not retain qualification evidence fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after the package-built freeze." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after the package-built freeze: $($changedPackagePaths -join ', ')"
+  }
+  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/$($packageInfo.version).json") | ConvertFrom-Json
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if ([string]$release.state -ne "package-built" -or [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive -ne $artifactRelative -or -not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256) {
+    throw "Package-built candidate bytes do not match the typed ReleaseRecord."
+  }
+  Write-Host "[ok] MIR candidate package bytes are frozen while automated and exact manual qualification remain pending."
   exit 0
 }
 
