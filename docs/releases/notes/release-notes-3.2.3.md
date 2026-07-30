@@ -43,10 +43,10 @@ The package identity and qualification evidence will be inserted after the candi
 | Field | Value |
 | --- | --- |
 | State | `package-built` |
-| Candidate | `C28` |
-| Package source commit | `35b41fdb9969b72c7c5256a42eed4a25de1e9e85` |
-| Archive SHA-256 | `662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1` |
-| Content SHA-256 | `51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB` |
+| Candidate | `C29` |
+| Package source commit | `c5d11aab76ffee479ca4aaba3bb8fa4387918762` |
+| Archive SHA-256 | `BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1` |
+| Content SHA-256 | `4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4` |
 | Tag | `pending` |
 | Tag commit | `pending` |
 | Assurance exceptions | `pending` |

@@ -55,23 +55,23 @@
       "archive_bytes": 1034738,
       "archive_class": "frozen-unreleased-calibration-candidate",
       "archive_entries": 292,
-      "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1",
+      "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
       "assurance_exception_ids": [],
       "branch": "tmp/3.2.3",
-      "candidate_id": "C28",
+      "candidate_id": "C29",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.3",
-      "package_content_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
-      "package_source_commit": "35b41fdb9969b72c7c5256a42eed4a25de1e9e85",
+      "package_content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+      "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
       "package_source_material": {
         "file_count": 292,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935"
+        "source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8"
       },
-      "package_source_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
-      "package_source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935",
+      "package_source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+      "package_source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
       "protected_qualification": "pending",
       "publication_status": "package-built",
       "qualification": "package-built",
@@ -98,7 +98,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.1",
-      "status": "C28-package-built"
+      "status": "C29-package-built"
     }
   },
   "generated_from": [

@@ -17,15 +17,15 @@
       "mode": "immutable-tagged-baseline"
     },
     {
-      "id": "mir-3.2.3-c28",
+      "id": "mir-3.2.3-c29",
       "target": "2.1",
       "release": "3.2.3",
-      "candidate_id": "C28",
-      "package_source_commit": "35b41fdb9969b72c7c5256a42eed4a25de1e9e85",
-      "package_source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935",
-      "package_source_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+      "candidate_id": "C29",
+      "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "package_source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
+      "package_source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
       "archive": "dist/more-infinite-research_3.2.3.zip",
-      "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1",
+      "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
       "archive_bytes": 1034738,
       "archive_entries": 292,
       "mode": "frozen-unreleased-hotfix-candidate"

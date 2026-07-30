@@ -187,10 +187,20 @@ superseded_candidates:
     reason: bounded structural matching optimization and final progression safety invariants required new package bytes
     status: superseded-pre-optimization-candidate
 
+  - source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
+    candidate_id: C28
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1
+    package_content_sha256: 51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB
+    size_bytes: 1034738
+    entries: 292
+    reason: exact Base runtime integrity exposed a stale shipped 2.1 stream-count authority
+    status: superseded-runtime-fixture-rejected-candidate
+
 candidate:
   artifact: dist/more-infinite-research_3.2.3.zip
-  source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
-  package_source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
+  source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
+  package_source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
   automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
   status: package-built

@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "release": "3.2.3",
-  "candidate_id": "C28",
+  "candidate_id": "C29",
   "target": "2.1",
   "branch": "tmp/3.2.3",
   "state": "package-built",
   "package": {
-    "source_commit": "35b41fdb9969b72c7c5256a42eed4a25de1e9e85",
-    "source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935",
-    "source_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+    "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+    "source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
+    "source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
     "archive": "dist/more-infinite-research_3.2.3.zip",
-    "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1",
-    "content_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+    "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
+    "content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
     "bytes": 1034738,
     "entries": 292
   },
@@ -20,14 +20,14 @@
       {
         "kind": "package-lock",
         "path": ".mir/control-plane/package-locks.json",
-        "candidate_id": "C28"
+        "candidate_id": "C29"
       }
     ],
     "package_build": [
       {
         "kind": "deterministic-package",
         "path": "scripts/Test-MIRDeterministicPackage.ps1",
-        "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1"
+        "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1"
       }
     ]
   },
@@ -67,6 +67,18 @@
       "entries": 291,
       "reason": "A bounded behavior-preserving structural matching optimization and final progression safety invariants required new package bytes.",
       "status": "superseded-pre-optimization-candidate"
+    },
+    {
+      "candidate_id": "C28",
+      "source_commit": "35b41fdb9969b72c7c5256a42eed4a25de1e9e85",
+      "source_tree": "c23d57bf21f20b4b0a5c346a0715dfc168955935",
+      "source_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+      "archive_sha256": "662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1",
+      "content_sha256": "51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB",
+      "bytes": 1034738,
+      "entries": 292,
+      "reason": "Exact Base runtime integrity exposed a stale shipped 2.1 stream-count authority after Platform Productivity increased the catalog from 75 to 76.",
+      "status": "superseded-runtime-fixture-rejected-candidate"
     }
   ],
   "assurance_exceptions": [],
@@ -83,5 +95,5 @@
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
   "incident_ids": [],
-  "updated_at": "2026-07-30T13:36:46Z"
+  "updated_at": "2026-07-30T13:52:25Z"
 }
