@@ -519,6 +519,25 @@ fixtures:
       - no-force-wide-technology-effect-reset
       - independent-result-row-per-upgrade-archetype
       - exact-3-2-2-candidate-normal-mod-directory-load
+
+  upgrade-3-2-2-to-3-2-3:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-2-to-3-2-3
+    harness: scripts/Test-MIRUpgrade.ps1
+    primary_source_version: "3.2.2"
+    target_candidate: C29
+    archetypes:
+      - space-age-native-owner
+    validates:
+      - exact-3-2-2-source-archive-for-3-2-3
+      - Landfill-and-Ice-level-retention
+      - current-Ice-research-and-fractional-progress-retention
+      - no-automatic-Platform-level-grant
+      - exact-Platform-owner-transfer
+      - no-duplicate-productivity-owner
+      - startup-setting-retention
+      - upgraded-save-reload
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

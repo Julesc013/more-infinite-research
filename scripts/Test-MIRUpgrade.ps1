@@ -15,6 +15,47 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "scripts\validation\FactorioProcess.ps1")
 
+function Invoke-MIRUpgradeServerUntilSaved {
+  param(
+    [Parameter(Mandatory)][string]$FilePath,
+    [Parameter(Mandatory)][string[]]$Arguments,
+    [Parameter(Mandatory)][string]$LogPath,
+    [Parameter(Mandatory)][string]$Marker,
+    [Parameter(Mandatory)][string]$SavedMapPath,
+    [int]$TimeoutMs = 30000
+  )
+
+  $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $FilePath
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+  foreach ($arg in $Arguments) { [void]$processInfo.ArgumentList.Add($arg) }
+
+  $process = [System.Diagnostics.Process]::Start($processInfo)
+  $deadline = [DateTime]::UtcNow.AddMilliseconds($TimeoutMs)
+  $ready = $false
+  while ([DateTime]::UtcNow -lt $deadline) {
+    if ($process.HasExited) { return $process.ExitCode }
+    if ((Test-Path -LiteralPath $LogPath) -and (Test-Path -LiteralPath $SavedMapPath -PathType Leaf)) {
+      $text = Get-Content -Raw -LiteralPath $LogPath
+      if ($text.Contains($Marker) -and $text.Contains("Hosting game") -and $text.Contains("Saving finished")) {
+        $ready = $true
+        break
+      }
+    }
+    Start-Sleep -Milliseconds 200
+  }
+  if (-not $ready) {
+    try { $process.Kill($true) } catch { $process.Kill() }
+    throw "Factorio did not materialize the governed upgraded save within $TimeoutMs ms."
+  }
+
+  try { $process.Kill($true) } catch { $process.Kill() }
+  $process.WaitForExit()
+  return 0
+}
+
 function Resolve-MIRUpgradePath {
   param([Parameter(Mandatory)][string]$Path)
   if ([System.IO.Path]::IsPathRooted($Path)) { return (Resolve-Path -LiteralPath $Path).Path }
@@ -102,7 +143,8 @@ $upgradeSlug = (($FromVersion + "-to-" + $ToVersion + "-" + $artifactSlug) -repl
 $root = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-upgrade-$upgradeSlug-" + [guid]::NewGuid().ToString("N"))
 $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
-New-Item -ItemType Directory -Force -Path $mods, $userdata | Out-Null
+$saves = Join-Path $userdata "saves"
+New-Item -ItemType Directory -Force -Path $mods, $userdata, $saves | Out-Null
 $config = Join-Path $root "config.ini"
 @(
   "[path]",
@@ -111,6 +153,14 @@ $config = Join-Path $root "config.ini"
   "[other]",
   "check-updates=false"
 ) | Set-Content -LiteralPath $config -Encoding UTF8
+$serverSettings = Join-Path $root "server-settings.json"
+[ordered]@{
+  name = "MIR governed upgrade reload proof"
+  description = "Private ephemeral upgrade validation server"
+  visibility = [ordered]@{ public = $false; lan = $false }
+  require_user_verification = $false
+  auto_pause = $false
+} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $serverSettings -Encoding UTF8
 
 $enableDlc = -not $isLegacyFactorio
 if ($Archetype) { $enableDlc = $Archetype -in @("space-age-native-owner", "affected-planet-discovery") }
@@ -180,11 +230,26 @@ foreach ($sourceModName in $sourceOnlyModNames) {
 }
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc
 
-$loadArgs = @(
-  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-  "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
-)
-$loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+$requiresReloadProof = $FixtureName -eq "assert-upgrade-3-2-2-to-3-2-3"
+$governedUpgradedSave = Join-Path $userdata "saves\mir-323-upgraded.zip"
+$governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
+$loadArgs = if ($requiresReloadProof) {
+  @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--server-settings", $serverSettings, "--start-server", $save
+  )
+} else {
+  @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
+  )
+}
+$loadExitCode = if ($requiresReloadProof) {
+  Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $loadArgs -LogPath $log `
+    -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave
+} else {
+  Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+}
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
@@ -193,6 +258,24 @@ if (-not $loadText.Contains($loadMarker)) {
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence -FactorioBinaryPath $factorio
+
+$reloadEvidence = ""
+if ($requiresReloadProof) {
+  $upgradedSave = $governedUpgradedSave
+  $reloadArgs = @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--benchmark", $upgradedSave, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
+  )
+  $reloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
+  $reloadText = Get-Content -Raw -LiteralPath $log
+  $reloadMarker = "[mir-fixture] $ToVersion upgraded save reload proof complete archetype=$Archetype"
+  if (-not $reloadText.Contains($reloadMarker)) {
+    throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
+  }
+  $reloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-reload.txt"
+  Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio
+}
 
 $assertions = if ($Archetype) {
   $common = @(
@@ -205,7 +288,18 @@ $assertions = if ($Archetype) {
   )
   switch ($Archetype) {
     "base-default" { $common + @("base-only-mod-set-retained") }
-    "space-age-native-owner" { $common + @("space-age-native-owner-retained") }
+    "space-age-native-owner" {
+      if ($requiresReloadProof) {
+        $common + @(
+          "landfill-level-retained", "ice-level-retained", "current-ice-research-retained",
+          "fractional-ice-progress-retained", "platform-starts-unresearched",
+          "landfill-platform-effects-removed", "platform-owner-transfer-exact",
+          "duplicate-owner-forbidden", "startup-settings-retained", "upgraded-save-reload-passed"
+        )
+      } else {
+        $common + @("space-age-native-owner-retained")
+      }
+    }
     "automatic-family-creation" { $common + @("automatic-generated-family-retained", "automatic-recipe-target-retained") }
     "base-continuations" { $common + @("base-continuation-retained") }
     "mod-set-configuration-change" { $common + @("source-only-mod-removed", "removed-recipe-target-sanitized") }
@@ -240,7 +334,7 @@ $assertions = if ($Archetype) {
   )
 }
 
-[ordered]@{
+$result = [ordered]@{
   schema = 2
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
@@ -256,6 +350,11 @@ $assertions = if ($Archetype) {
   create_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $createEvidence).Hash
   load_log = (Split-Path -Leaf $loadEvidence)
   load_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $loadEvidence).Hash
-} | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
+}
+if ($reloadEvidence) {
+  $result.reload_log = (Split-Path -Leaf $reloadEvidence)
+  $result.reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $reloadEvidence).Hash
+}
+$result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
 Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $output"
