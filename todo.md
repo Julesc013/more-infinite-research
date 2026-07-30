@@ -8,7 +8,7 @@ Generated: 2026-07-30
 
 | Release | Candidate | State | Next required state |
 | --- | --- | --- | --- |
-| `3.2.3` | `C25` | `package-built` | `focused-qualified` |
+| `3.2.3` | `C26` | `package-built` | `focused-qualified` |
 | `2.5.0` | `2.5-P9` | `focused-qualified` | `candidate-qualified` |
 
 ## Executable TaskNodes
