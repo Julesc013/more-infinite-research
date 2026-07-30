@@ -13,8 +13,8 @@ if ($golden.schema -ne 1 -or $golden.baseline -ne "immutable-3.0.5") {
 }
 $actual = @($manifest.streams.PSObject.Properties.Name | Sort-Object)
 $expected = @($golden.technology_ids | ForEach-Object { [string]$_ } | Sort-Object)
-if ($expected.Count -ne 70) {
-  throw "Stable technology golden plan must preserve exactly 70 released identities."
+if ($expected.Count -ne 71) {
+  throw "Stable technology golden plan must preserve the 70 prior identities plus the registered 3.2.3 Platform Productivity identity."
 }
 foreach ($stableId in $expected) {
   if ($stableId -notin $actual) {

@@ -62,6 +62,7 @@ local settings_sort_names = {
   research_oil_cracking_productivity = "Oil cracking productivity",
   research_oil_processing_productivity = "Oil processing productivity",
   research_plastic = "Plastic productivity",
+  research_platform = "Platform productivity",
   research_processing_unit = "Processing unit productivity",
   research_quantum_processor = "Quantum processor productivity",
   research_rails = "Rail productivity",

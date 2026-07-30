@@ -1064,8 +1064,8 @@ if is_space_age then
     { recipe = "nutrients-from-bioflux", owner = "recipe-prod-research_nutrients-1", change = 0.10 },
     { recipe = "nutrients-from-biter-egg", owner = "recipe-prod-research_nutrients-1", change = 0.10 },
     { recipe = "capture-robot-rocket", owner = "recipe-prod-research_capture_robot_rockets-1", change = 0.10 },
-    { recipe = "ice-platform", owner = "recipe-prod-research_landfill-1", change = 0.02 },
-    { recipe = "space-platform-foundation", owner = "recipe-prod-research_landfill-1", change = 0.01 }
+    { recipe = "ice-platform", owner = "recipe-prod-research_platform-1", change = 0.10 },
+    { recipe = "space-platform-foundation", owner = "recipe-prod-research_platform-1", change = 0.05 }
   }) do
     assert_required_recipe_owner(expectation.recipe, expectation.owner, expectation.change)
   end
@@ -1087,6 +1087,15 @@ if is_space_age then
   assert_technology_has_science("recipe-prod-research_capture_robot_rockets-1", {
     "military-science-pack",
     "agricultural-science-pack"
+  })
+  assert_technology_has_science("recipe-prod-research_ice-1", {
+    "space-science-pack",
+    "cryogenic-science-pack"
+  })
+  assert_technology_has_science("recipe-prod-research_platform-1", {
+    "metallurgic-science-pack",
+    "space-science-pack",
+    "cryogenic-science-pack"
   })
 
   for owner_name, expected_recipes in pairs({

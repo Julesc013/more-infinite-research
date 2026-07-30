@@ -95,6 +95,7 @@ local governed_stream_keys = {
   "research_oil_cracking_productivity",
   "research_oil_processing_productivity",
   "research_plastic",
+  "research_platform",
   "research_processing_unit",
   "research_quantum_processor",
   "research_rails",

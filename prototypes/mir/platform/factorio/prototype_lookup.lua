@@ -106,6 +106,14 @@ function L.entity_prototype(name)
   return nil
 end
 
+function L.entity_prototype_type(name)
+  if not name then return nil end
+  for _, type_name in ipairs(L.entity_types()) do
+    if data_raw.prototype(type_name, name) then return type_name end
+  end
+  return nil
+end
+
 function L.each_entity_prototype(callback)
   for _, type_name in ipairs(L.entity_types()) do
     for name, prototype in pairs(data_raw.prototypes(type_name)) do

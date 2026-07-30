@@ -29,15 +29,18 @@ end
 
 local function add_recipe(name, result, ingredient, options)
   options = options or {}
-  table.insert(prototypes, {
+  local recipe = {
     type = "recipe",
     name = name,
     categories = {options.category or "crafting"},
     enabled = true,
     ingredients = {{type = "item", name = ingredient or "iron-plate", amount = 1}},
-    results = {{type = "item", name = result, amount = 1}},
-    allow_productivity = options.allow_productivity ~= false
-  })
+    results = {{type = "item", name = result, amount = 1}}
+  }
+  if not options.omit_productivity_flag then
+    recipe.allow_productivity = options.allow_productivity ~= false
+  end
+  table.insert(prototypes, recipe)
 end
 
 if data.raw["loader-1x1"] and data.raw["loader-1x1"]["loader-1x1"] then
@@ -47,6 +50,14 @@ else
 end
 add_item("opaque-transfer-node", "__base__/graphics/icons/transport-belt.png", "belt", "opaque-transfer-node")
 add_recipe("assemble-alpha", "opaque-transfer-node", "transport-belt")
+
+clone_entity("transport-belt", "transport-belt", "opaque-unflagged-belt", "opaque-unflagged-belt")
+add_item("opaque-unflagged-belt", "__base__/graphics/icons/transport-belt.png", "belt", "opaque-unflagged-belt")
+add_recipe("assemble-unflagged-belt", "opaque-unflagged-belt", "transport-belt", {omit_productivity_flag = true})
+
+clone_entity("transport-belt", "transport-belt", "opaque-denied-belt", "opaque-denied-belt")
+add_item("opaque-denied-belt", "__base__/graphics/icons/transport-belt.png", "belt", "opaque-denied-belt")
+add_recipe("assemble-denied-belt", "opaque-denied-belt", "transport-belt", {allow_productivity = false})
 
 clone_entity("mining-drill", "electric-mining-drill", "opaque-extractor", "opaque-extractor")
 add_item("opaque-extractor", "__base__/graphics/icons/electric-mining-drill.png", "extraction-machine", "opaque-extractor")

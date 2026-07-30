@@ -474,10 +474,23 @@ return {
 
   research_landfill = { icon_tech = "landfill", groups = {
     { change = 0.10, items = { "landfill" } },
-    { change = 0.05, items = { "foundation" } },
-    { change = 0.02, items = { "ice-platform" } },
-    { change = 0.01, items = { "space-platform-foundation" } }
-  }, productivity_permission_recipes = {
+    { change = 0.05, items = { "foundation" } }
+  }, exclude_recipe_patterns = {
+    "^atan%-landfill%-from%-ash$",
+    "^atan%-foundation%-from%-ash$"
+  }, exclude_ingredient_patterns={"scrap"} },
+
+  research_platform = {
+    ui_visibility = space_age_setting_visibility(),
+    generation_requirements = {
+      require_all_items = {"ice-platform", "space-platform-foundation"}
+    },
+    icon_item = "ice-platform",
+    groups = {
+      { change = 0.10, items = { "ice-platform" } },
+      { change = 0.05, items = { "space-platform-foundation" } }
+    },
+    productivity_permission_recipes = {
     {
       name = "ice-platform",
       required_mods = {"space-age"}
@@ -486,10 +499,7 @@ return {
       name = "space-platform-foundation",
       required_mods = {"space-age"}
     }
-  }, exclude_recipe_patterns = {
-    "^atan%-landfill%-from%-ash$",
-    "^atan%-foundation%-from%-ash$"
-  }, exclude_ingredient_patterns={"scrap"} },
+  } },
 
   research_artificial_soil = {
     ui_visibility = space_age_setting_visibility(),
@@ -653,6 +663,18 @@ return {
         "^hyper%-splitter$",
         "^.+%-hyper%-loader$"
       }
+    },
+    {
+      change=0.005,
+      place_result_entity_types={
+        "transport-belt",
+        "underground-belt",
+        "splitter",
+        "lane-splitter",
+        "loader",
+        "loader-1x1"
+      },
+      reject_explicit_productivity_denial=true
     }
   }},
 
@@ -660,7 +682,12 @@ return {
     { change=0.10, items={"inserter","burner-inserter"} },
     { change=0.05, items={"fast-inserter","long-handed-inserter"} },
     { change=0.02, items={"bulk-inserter"}, item_patterns={"bulk%-inserter"} },
-    { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
+    { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} },
+    {
+      change=0.01,
+      place_result_entity_types={"inserter"},
+      reject_explicit_productivity_denial=true
+    }
   }},
 
   research_auto_assembling_machine = {

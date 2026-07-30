@@ -47,7 +47,7 @@ Cardinality policy is scoped by provider, family, partition, and profile. It mea
 
 ## Compatibility And Identity Boundary
 
-- Preserve all 70 released stream and technology IDs.
+- Preserve all 70 pre-3.2.3 released stream and technology IDs plus the stable 3.2.3 Platform Productivity ID.
 - First automatic behavior is attach-only: high-confidence recipes may join an existing stable stream. It creates no per-recipe technology IDs.
 - Predeclared family technologies require an explicit manifest row and migration review before emission is enabled.
 - Ambiguous, risky, loop-forming, hidden, or externally owned candidates remain proposal-only or diagnostic-only.
@@ -70,4 +70,4 @@ The compiler boundary compiles captured state through `compile(snapshot, policy)
 
 Each gate requires focused pure tests, static validation, deterministic plan evidence, a generated-ID parity check, and target runtime validation before it can become a release candidate.
 
-`fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 identities. `automatic-family-technology-ids.json` separately locks reviewed 3.1.0 generic-family identities. Both must pass before runtime validation; a future family technology must update its reviewed golden explicitly rather than appearing as incidental compiler output.
+`fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 identities and the registered 3.2.3 Platform Productivity identity. `automatic-family-technology-ids.json` separately locks reviewed 3.1.0 generic-family identities. Both must pass before runtime validation; a future family technology must update its reviewed golden explicitly rather than appearing as incidental compiler output.

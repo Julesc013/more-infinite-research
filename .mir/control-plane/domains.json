@@ -39,6 +39,12 @@
     "control-plane.records": ["control-plane.records"],
     "control-plane.graph": ["control-plane.records"],
     "control-plane.package-freeze": ["package.identity"],
-    "control-plane.shadow": ["shadow.equivalence"]
+    "control-plane.shadow": ["shadow.equivalence"],
+    "product.compiler": ["compiler.schema", "compiler.contract"],
+    "product.settings": ["settings.contract"],
+    "product.locale": ["locale.contract"],
+    "product.package": ["package.composition", "package.determinism"],
+    "compatibility.advanced-belts": ["ecosystem.measurement"],
+    "transition.upgrade": ["upgrade.measurement"]
   }
 }

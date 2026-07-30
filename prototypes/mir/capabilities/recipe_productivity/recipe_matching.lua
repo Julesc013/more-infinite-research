@@ -76,6 +76,16 @@ local function has_productive_shared_input_output(recipe)
   return false
 end
 
+local function has_explicit_productivity_denial(recipe)
+  if recipe.declared_allow_productivity == false then return true end
+  if tonumber(recipe.declared_maximum_productivity) == 0 then return true end
+  for _, variant in ipairs(recipe.variants or {}) do
+    if variant.declared_allow_productivity == false then return true end
+    if tonumber(variant.declared_maximum_productivity) == 0 then return true end
+  end
+  return false
+end
+
 local function should_skip_recipe(recipe_name, recipe, options)
   if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
     return true
@@ -84,6 +94,9 @@ local function should_skip_recipe(recipe_name, recipe, options)
     return true
   end
   if recipe_is_hidden(recipe) and not options.include_hidden then
+    return true
+  end
+  if options.reject_explicit_productivity_denial and has_explicit_productivity_denial(recipe) then
     return true
   end
   if has_productive_shared_input_output(recipe) and not options.allow_shared_input_output then return true end
@@ -132,6 +145,20 @@ local function add_module_outputs(want, options)
   end
 end
 
+local function add_place_result_outputs(want, entity_types)
+  if type(entity_types) ~= "table" then return end
+  local accepted = {}
+  for _, entity_type in ipairs(entity_types) do accepted[entity_type] = true end
+  lookup.each_item_prototype(function(name, item)
+    if type(item) == "table"
+      and item.place_result
+      and accepted[lookup.entity_prototype_type(item.place_result)]
+    then
+      want[name] = true
+    end
+  end)
+end
+
 local function gather_by_items(items, patterns, options)
   local want = {}
   options = options or {}
@@ -141,6 +168,7 @@ local function gather_by_items(items, patterns, options)
   add_pattern_outputs(want, patterns, lookup.each_item_prototype)
   add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)
   add_module_outputs(want, options)
+  add_place_result_outputs(want, options.place_result_entity_types)
   local candidate_categories, candidate_patterns = {}, {}
   local stream_match = options.match_stream and options.match_stream.match
   if options.match_mode == "by_category_or_match" and stream_match then
@@ -198,6 +226,8 @@ function R.recipes_for_stream(spec, per_level_default)
         module_tiers = g.module_tiers,
         module_tier_min = g.module_tier_min,
         module_tier_max = g.module_tier_max,
+        place_result_entity_types = g.place_result_entity_types,
+        reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
         match_mode = g.mode or spec.mode,
         match_stream = g.match and g or spec
       })
@@ -230,6 +260,8 @@ function R.recipes_for_stream(spec, per_level_default)
     module_tiers = spec.module_tiers,
     module_tier_min = spec.module_tier_min,
     module_tier_max = spec.module_tier_max,
+    place_result_entity_types = spec.place_result_entity_types,
+    reject_explicit_productivity_denial = spec.reject_explicit_productivity_denial,
     match_mode = spec.mode,
     match_stream = spec
   })

@@ -1,5 +1,9 @@
 local expected = {
-  ["recipe-prod-research_belts-1"] = {recipe = "assemble-alpha", change = 0.01, additional_recipe = "pack-only-recipe"},
+  ["recipe-prod-research_belts-1"] = {
+    recipe = "assemble-alpha",
+    change = 0.01,
+    additional_recipes = {"pack-only-recipe", "assemble-unflagged-belt"}
+  },
   ["recipe-prod-research_mining_drill-1"] = {recipe = "assemble-beta", change = 0.05},
   ["recipe-prod-research_furnace-1"] = {recipe = "assemble-gamma", change = 0.02},
   ["recipe-prod-research_electric_energy-1"] = {recipe = "assemble-delta", change = 0.02},
@@ -24,12 +28,12 @@ for technology_name, wanted in pairs(expected) do
     end
   end
   if not found then fail(wanted.recipe .. " was not attached to " .. technology_name) end
-  if wanted.additional_recipe then
+  for _, additional_recipe in ipairs(wanted.additional_recipes or {}) do
     local additional_found = false
     for _, effect in ipairs(technology.effects or {}) do
-      if effect.type == "change-recipe-productivity" and effect.recipe == wanted.additional_recipe then additional_found = true end
+      if effect.type == "change-recipe-productivity" and effect.recipe == additional_recipe then additional_found = true end
     end
-    if not additional_found then fail("pack-seeded candidate was not attached to " .. technology_name) end
+    if not additional_found then fail(additional_recipe .. " was not attached to " .. technology_name) end
   end
 end
 
@@ -50,7 +54,7 @@ for technology_name, technology in pairs(data.raw.technology or {}) do
 end
 
 
-for _, denied_recipe in ipairs({"pack-hard-productivity-false", "pack-hard-recycling"}) do
+for _, denied_recipe in ipairs({"assemble-denied-belt", "pack-hard-productivity-false", "pack-hard-recycling"}) do
   for technology_name, technology in pairs(data.raw.technology or {}) do
     if technology.max_level == "infinite" then
       for _, effect in ipairs(technology.effects or {}) do

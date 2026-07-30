@@ -778,6 +778,20 @@
         "stream:research_plastic"
       ]
     },
+    "recipe-prod-research_platform-1": {
+      "introduced_in": "3.2.3",
+      "source": "stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "platform",
+      "policy": "exact-space-age-recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_platform-1",
+      "stream_key": "research_platform",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_platform"
+      ]
+    },
     "recipe-prod-research_processing_unit-1": {
       "introduced_in": "pre-2.2.0",
       "source": "legacy_stream_table:productivity",
