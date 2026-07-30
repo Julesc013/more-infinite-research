@@ -209,6 +209,12 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
 }
+$executorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRControlPlane\Executor.ps1")
+foreach ($snippet in @("compact-context-scratch-v1", "conservative_path_budget", "maximum_factorio_path_length", "Move-MIRCPPerformanceArtifacts", "paired-balanced-native-v3")) {
+  if ($executorSource -notmatch [regex]::Escape($snippet)) {
+    throw "Control-plane performance execution lacks required compact-path behavior '$snippet'."
+  }
+}
 $performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"

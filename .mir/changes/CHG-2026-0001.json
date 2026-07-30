@@ -32,7 +32,8 @@
     "control-plane.graph",
     "control-plane.package-freeze",
     "control-plane.shadow",
-    "control-plane.native-approved-delta"
+    "control-plane.native-approved-delta",
+    "control-plane.performance-path-budget"
   ],
   "backport_disposition": {
     "factorio-2.1": "shared-control-plane",

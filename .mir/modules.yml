@@ -793,6 +793,7 @@ validation_tooling:
     - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
     - v5 native patch-delta observations separate exact ZIP entry capture from versioned pure policy evaluation and bind the evaluated candidate rather than a superseded release-ledger row
     - v5 performance execution uses source-side measurement code with a context-addressed controller-authority overlay, deterministic UTF-8 LF probe materialization, an exact overlay manifest, and an unchanged immutable package-source fingerprint
+    - v5 Factorio performance execution uses a fresh context-bound compact scratch root within a conservative path budget, then verifies and relocates raw artifacts into the context-addressed evidence tree
     - repository-wide validation enumerates tracked and non-ignored untracked governed files and cannot treat ignored control-plane staging clones as repository source
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations

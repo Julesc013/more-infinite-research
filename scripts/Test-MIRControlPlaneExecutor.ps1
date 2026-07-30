@@ -139,6 +139,22 @@ try {
   foreach ($field in $protectedFields) { [Environment]::SetEnvironmentVariable($field, $savedProtectedEnvironment[$field], "Process") }
 }
 if (-not $hostedRunnerRejected) { throw "A hosted runner could claim the protected self-hosted identity." }
+$scratchContextId = Get-MIRCPSha256Text -Value ("executor-path-budget/" + [guid]::NewGuid().ToString("N"))
+$scratchState = [pscustomobject][ordered]@{context=[pscustomobject][ordered]@{context_id=$scratchContextId}}
+$scratchCampaign = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/performance-campaign.json") | ConvertFrom-Json
+$scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign
+$scratchPayload = Join-Path $scratch.path "path-budget-self-test.txt"
+"exact-context-bound-scratch" | Set-Content -LiteralPath $scratchPayload -Encoding UTF8
+$scratchDestination = Join-Path $repo "out/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
+$scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination
+if ([string]$scratch.strategy -ne "compact-context-scratch-v1" -or
+    [int]$scratch.maximum_factorio_path_length -gt [int]$scratch.conservative_path_budget -or
+    [string]$scratchRelocation.context_id -ne $scratchContextId -or
+    [int]$scratchRelocation.file_count -ne 2 -or
+    (Test-Path -LiteralPath $scratch.path) -or
+    -not (Test-Path -LiteralPath (Join-Path $scratchDestination "control-plane-execution-root.json") -PathType Leaf)) {
+  throw "Compact performance staging or verified raw-artifact relocation is incomplete."
+}
 $unknownAggregateRejected = $false
 try {
   [void](Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "not-an-aggregate" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo)
@@ -162,4 +178,4 @@ foreach ($row in @($executionState.plan.tasks | Where-Object { $selected.Contain
 }
 $staticAggregate = Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "static.full" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
 if ([string]$staticAggregate.status -ne "passed" -or [string]$staticAggregate.aggregate_task -ne "static.full") { throw "Static-only aggregate did not close independently." }
-Write-Host "[ok] executor consumes one controller-locked immutable context, stages exact candidate bytes under Factorio's canonical archive name, natively evaluates the exact C24 four-path delta, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."
+Write-Host "[ok] executor consumes one controller-locked immutable context, stages exact candidate bytes under Factorio's canonical archive name, constrains Factorio performance paths below the conservative Windows budget, relocates context-bound raw artifacts, natively evaluates the exact C24 four-path delta, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."

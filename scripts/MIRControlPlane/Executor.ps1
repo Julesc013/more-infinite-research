@@ -620,6 +620,92 @@ function New-MIRCPPerformanceSourceOverlay {
   }
 }
 
+function New-MIRCPCompactPerformanceArtifactRoot {
+  param(
+    [Parameter(Mandatory)]$State,
+    [Parameter(Mandatory)]$Campaign
+  )
+  $contextId = [string]$State.context.context_id
+  if ($contextId -notmatch '^[0-9A-F]{64}$') {
+    throw "Compact performance staging requires an exact context digest."
+  }
+  $scratchParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  $path = Join-Path $scratchParent ("mircp-p-" + $contextId.Substring(0, 24))
+  if (Test-Path -LiteralPath $path) {
+    throw "Compact performance staging already exists and will not be overwritten: $path"
+  }
+  $maximumPathLength = 0
+  $maximumPath = ""
+  foreach ($lane in @($Campaign.lanes | Where-Object { [string]$_.runner -eq "exact-package-load" })) {
+    $laneSafe = ([string]$lane.id -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
+    $probePath = Join-Path $path ("{0}\measured-25-candidate\mods\mir-fixture-performance-regression-probe_0.1.0\data-final-fixes.lua" -f $laneSafe)
+    if ($probePath.Length -gt $maximumPathLength) {
+      $maximumPathLength = $probePath.Length
+      $maximumPath = $probePath
+    }
+  }
+  $pathBudget = 240
+  if ($maximumPathLength -gt $pathBudget) {
+    throw "Compact performance staging exceeds the conservative Factorio path budget ($maximumPathLength > $pathBudget): $maximumPath"
+  }
+  [void](New-Item -ItemType Directory -Path $path)
+  $marker = [pscustomobject][ordered]@{
+    schema = 1
+    kind = "mir-control-plane-performance-execution-root"
+    context_id = $contextId
+    strategy = "compact-context-scratch-v1"
+    conservative_path_budget = $pathBudget
+    maximum_factorio_path_length = $maximumPathLength
+  }
+  $markerPath = Join-Path $path "control-plane-execution-root.json"
+  $marker | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $markerPath -Encoding UTF8
+  return [pscustomobject][ordered]@{
+    path = $path
+    marker_path = $markerPath
+    context_id = $contextId
+    strategy = [string]$marker.strategy
+    conservative_path_budget = $pathBudget
+    maximum_factorio_path_length = $maximumPathLength
+  }
+}
+
+function Move-MIRCPPerformanceArtifacts {
+  param(
+    [Parameter(Mandatory)]$ExecutionRoot,
+    [Parameter(Mandatory)][string]$Destination
+  )
+  if (-not (Test-Path -LiteralPath ([string]$ExecutionRoot.path) -PathType Container)) {
+    throw "Compact performance execution root is absent: $($ExecutionRoot.path)"
+  }
+  if (Test-Path -LiteralPath $Destination) {
+    throw "Performance artifact destination already exists and will not be merged: $Destination"
+  }
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination))
+  Move-Item -LiteralPath ([string]$ExecutionRoot.path) -Destination $Destination
+  if (Test-Path -LiteralPath ([string]$ExecutionRoot.path)) {
+    throw "Compact performance execution root still exists after artifact relocation."
+  }
+  $markerPath = Join-Path $Destination "control-plane-execution-root.json"
+  if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
+    throw "Relocated performance artifacts lack their execution-root binding marker."
+  }
+  $marker = Get-Content -Raw -LiteralPath $markerPath | ConvertFrom-Json
+  if ([string]$marker.context_id -ne [string]$ExecutionRoot.context_id -or
+      [string]$marker.strategy -ne [string]$ExecutionRoot.strategy) {
+    throw "Relocated performance artifacts do not bind the expected context and staging strategy."
+  }
+  $files = @(Get-ChildItem -LiteralPath $Destination -Recurse -File)
+  return [pscustomobject][ordered]@{
+    path = $Destination
+    strategy = [string]$marker.strategy
+    context_id = [string]$marker.context_id
+    conservative_path_budget = [int]$marker.conservative_path_budget
+    maximum_factorio_path_length = [int]$marker.maximum_factorio_path_length
+    file_count = $files.Count
+    bytes = [int64](($files | Measure-Object -Property Length -Sum).Sum)
+  }
+}
+
 function Invoke-MIRCPPerformanceMeasurement {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
@@ -643,6 +729,8 @@ function Invoke-MIRCPPerformanceMeasurement {
   $overlay = New-MIRCPPerformanceSourceOverlay -State $state -Source $source -Descriptor $descriptor -TargetProfile $profile -RepoRoot $repo
   $outputRoot = Join-Path $repo "out/control-plane-v5/performance/$([string]$state.context.context_id)"
   $outputPath = Join-Path $outputRoot "evidence.json"
+  $executionRoot = New-MIRCPCompactPerformanceArtifactRoot -State $state -Campaign $overlay.authority.campaign
+  $artifactDestination = Join-Path $outputRoot "artifacts"
   $arguments = @{
     RepoRoot = $overlay.path
     Candidate = $candidate
@@ -652,11 +740,32 @@ function Invoke-MIRCPPerformanceMeasurement {
     ExpectedBaselineVersion = [string]$profile.upgrade.from_version
     ExpectedFactorioVersion = [string]$profile.qualification_factorio_version
     OutputPath = $outputPath
-    ArtifactRoot = (Join-Path $outputRoot "artifacts")
+    ArtifactRoot = [string]$executionRoot.path
   }
   if (-not [string]::IsNullOrWhiteSpace($LocalModZipDir)) { $arguments.LocalModZipDir = $LocalModZipDir }
-  & (Join-Path $overlay.path "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
-  $exitCode = $LASTEXITCODE
+  $measurementError = $null
+  $relocationError = $null
+  $relocation = $null
+  $exitCode = 1
+  try {
+    & (Join-Path $overlay.path "scripts/Invoke-MIRPerformanceQualification.ps1") @arguments
+    $exitCode = $LASTEXITCODE
+  } catch {
+    $measurementError = $_
+  } finally {
+    try {
+      $relocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $executionRoot -Destination $artifactDestination
+    } catch {
+      $relocationError = $_
+    }
+  }
+  if ($null -ne $relocationError) {
+    if ($null -ne $measurementError) {
+      throw "Performance measurement failed ('$($measurementError.Exception.Message)') and raw-artifact relocation also failed ('$($relocationError.Exception.Message)')."
+    }
+    throw $relocationError
+  }
+  if ($null -ne $measurementError) { throw $measurementError }
   if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw "Performance measurement produced no compact evidence." }
   $evidence = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json
   $failedLanes = @($evidence.lanes | Where-Object { [string]$_.status -ne "passed" })
@@ -685,7 +794,12 @@ function Invoke-MIRCPPerformanceMeasurement {
     [string]$evidence.run_policy.order -eq [string]$overlay.authority.campaign.run_policy.order) { "passed" } else { "failed" }
   $facts = [pscustomobject][ordered]@{
     status = $status
-    measurement_mode = "paired-balanced-native-v2"
+    measurement_mode = "paired-balanced-native-v3"
+    execution_root_strategy = [string]$relocation.strategy
+    conservative_path_budget = [int]$relocation.conservative_path_budget
+    maximum_factorio_path_length = [int]$relocation.maximum_factorio_path_length
+    raw_artifact_file_count = [int]$relocation.file_count
+    raw_artifact_bytes = [int64]$relocation.bytes
     campaign_authority_sha256 = [string]$overlay.authority_sha256
     overlay_manifest_sha256 = [string]$overlay.manifest_sha256
     canonical_probe_sha256 = [string]$overlay.canonical_probe.sha256
@@ -702,7 +816,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     artifact_status = [string]$evidence.status
   }
   return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
-    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;overlay_manifest_sha256=[string]$overlay.manifest_sha256;harness_sha256=[string]$overlay.harness_sha256;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;overlay_manifest_sha256=[string]$overlay.manifest_sha256;harness_sha256=[string]$overlay.harness_sha256;execution_root_strategy=[string]$facts.execution_root_strategy;conservative_path_budget=[int]$facts.conservative_path_budget;maximum_factorio_path_length=[int]$facts.maximum_factorio_path_length;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
     -Facts $facts -ArtifactPath $outputPath -ArtifactKind "runtime-performance-evidence" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
 

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0040",
+  "title": "Context-addressed performance artifacts exceeded Factorio's Windows path boundary",
+  "external_issue": "internal://control-plane/performance-windows-path-budget",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "context_id": "C2D2E84525C255705C443F4AC09A152F0DC766D0FE44274EBA41F8B86D055D50",
+    "task": "performance.measurement"
+  },
+  "reproduction": {
+    "status": "reproduced-and-isolated",
+    "error": "Performance probe marker is absent from the baseline warmup factorio.log.",
+    "observed": "The context-addressed probe data.lua path was 251 characters and loaded, while data-final-fixes.lua was 263 characters and Factorio silently omitted that stage.",
+    "isolation": "The exact failed staged mods were copied to a unique C:\\tmp smoke root. At a 103-character probe final-fixes path, Factorio 2.1.12 loaded the stage and emitted the structured MIR_PERFORMANCE_PROBE marker."
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "The executor passed the long immutable-context evidence directory directly to Factorio as its write and mod root. The semantic context address is required for retained evidence, but it is not safe as a Windows engine execution path. The final-fixes filename crossed Factorio's effective legacy path boundary even though PowerShell could create and inspect the file."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:compact-context-performance-scratch-v1",
+    "CHG-2026-0001:verified-performance-artifact-relocation-v1",
+    "CHG-2026-0001:performance-path-budget-admission-v1"
+  ],
+  "regression_propositions": [
+    "the executor creates a fresh compact scratch root bound to the exact immutable context",
+    "the longest exact-package probe final-fixes path remains at or below the conservative 240-character budget",
+    "scratch roots are never overwritten or merged",
+    "raw run artifacts are relocated to the context-addressed evidence tree after engine execution",
+    "the relocated marker must bind the same context and execution-root strategy",
+    "the exact failed staged mods emit the final structured probe marker from a compact path"
+  ],
+  "repair_proof": {
+    "status": "exact-archive-probe-smoke-passed",
+    "execution_context_id": "5CFCFB06EBD9FF8DBD26B818B6D422643DE55EBC0B987B8A9655CDCC0532CF82",
+    "execution_root_strategy": "compact-context-scratch-v1",
+    "maximum_factorio_path_length": 192,
+    "conservative_path_budget": 240,
+    "baseline_archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "candidate_archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "probe_smoke_sha256": "206B7C1FEEB121F535B70F82A8B2B7272593CEC62C793917D6B37FD45BA4C5EF",
+    "execution_root_marker_sha256": "59E15C35F356F5F0FEE919CB073C341AC7308592302AE898870F18BB534D88A2",
+    "relocated_file_count": 32,
+    "result": "C21 and C24 both emitted mir-performance-regression-probe"
+  },
+  "affected_releases": [
+    "3.2.2"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  },
+  "closure": {
+    "status": "pending-fresh-performance-measurement",
+    "proof_required": "fresh exact paired performance measurement and complete C24 calibration under a new immutable context"
+  }
+}
