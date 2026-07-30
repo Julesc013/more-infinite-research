@@ -2281,6 +2281,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.3-release-notes
+  - path: docs/releases/3.2.2-to-3.2.3-repository-change-report.md
+    title: "MIR 3.2.2 To 3.2.3 Repository Change Report"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.2-to-3.2.3-repository-change-report
   - path: docs/releases/notes/release-notes-3.2.1.md
     title: "MIR 3.2.1 Release Notes"
     status: historical-checkpoint
