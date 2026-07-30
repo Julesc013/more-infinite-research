@@ -144,6 +144,9 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.2" -or
 $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
 $activeCandidate = $releaseLedger.development.'factorio-2.1'
+$currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/current.json") | ConvertFrom-Json
+$activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($activeCandidate.mir_version).json") | ConvertFrom-Json
+$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($currentRoles.roles.tagged_factorio_2_1).json") | ConvertFrom-Json
 $campaignBindsActiveCandidate = $null -ne $activeCandidate -and
   [string]$campaign.candidate.candidate_id -eq [string]$activeCandidate.candidate_id -and
   [string]$campaign.candidate.version -eq [string]$activeCandidate.mir_version -and
@@ -151,6 +154,16 @@ $campaignBindsActiveCandidate = $null -ne $activeCandidate -and
   [string]$campaign.candidate.package_source_sha256 -eq [string]$activeCandidate.package_source_sha256 -and
   [string]$campaign.candidate.archive_sha256 -eq [string]$activeCandidate.archive_sha256 -and
   [string]$campaign.candidate.package_content_sha256 -eq [string]$activeCandidate.package_content_sha256
+$campaignBindsTaggedBaseline = $ValidateManifestOnly -and
+  [string]$activeTypedRelease.state -in @("planned", "source-frozen", "package-built") -and
+  $null -eq $activeTypedRelease.proofs.PSObject.Properties["performance_measurement"] -and
+  [string]$taggedTypedRelease.state -eq "tagged" -and
+  [string]$campaign.candidate.candidate_id -eq [string]$taggedTypedRelease.candidate_id -and
+  [string]$campaign.candidate.version -eq [string]$taggedTypedRelease.release -and
+  [string]$campaign.candidate.package_source_commit -eq [string]$taggedTypedRelease.package.source_commit -and
+  [string]$campaign.candidate.package_source_sha256 -eq [string]$taggedTypedRelease.package.source_sha256 -and
+  [string]$campaign.candidate.archive_sha256 -eq [string]$taggedTypedRelease.package.archive_sha256 -and
+  [string]$campaign.candidate.package_content_sha256 -eq [string]$taggedTypedRelease.package.content_sha256
 $supersededCandidate = $activeCandidate.supersedes_candidate
 $campaignBindsSupersededCandidate = $ValidateManifestOnly -and
   [string]$activeCandidate.runtime_qualification -eq "pending" -and
@@ -170,6 +183,7 @@ $campaignBindsC16HistoricalCheckpoint = $ValidateManifestOnly -and
   [string]$campaign.candidate.archive_sha256 -eq "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D" -and
   [string]$campaign.candidate.package_content_sha256 -eq "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
 if (-not $campaignBindsActiveCandidate -and
+    -not $campaignBindsTaggedBaseline -and
     -not $campaignBindsSupersededCandidate -and
     -not $campaignBindsC16HistoricalCheckpoint) {
   throw "Performance campaign candidate authority differs from the active Factorio 2.1 release candidate."
@@ -253,6 +267,8 @@ if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed'
 if ($ValidateManifestOnly) {
   $binding = if ($campaignBindsActiveCandidate) {
     "the active candidate"
+  } elseif ($campaignBindsTaggedBaseline) {
+    "the immutable tagged baseline while current performance qualification is explicitly pending"
   } elseif ($campaignBindsSupersededCandidate) {
     "the exact superseded candidate while current performance qualification is explicitly pending"
   } else {

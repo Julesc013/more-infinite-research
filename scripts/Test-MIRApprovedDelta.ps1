@@ -9,6 +9,18 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
+$activeReleasePath = Join-Path $repo ".mir/releases/$activeVersion.json"
+if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
+  $activeRelease = Get-Content -Raw -LiteralPath $activeReleasePath | ConvertFrom-Json
+  if ([string]$activeRelease.state -in @("planned", "source-frozen", "package-built")) {
+    if ($null -ne $activeRelease.proofs.PSObject.Properties["approved_delta"] -or
+        @($activeRelease.remaining_obligations | ForEach-Object { [string]$_ }) -notcontains "focused-qualification") {
+      throw "A pre-qualification release must not claim approved-delta proof and must retain focused qualification."
+    }
+    Write-Host "[ok] active candidate is pre-qualification; approved-delta evidence remains explicitly pending."
+    exit 0
+  }
+}
 if ($activeVersion -eq "3.2.2") {
   $arguments = @{
     RepoRoot = $repo
