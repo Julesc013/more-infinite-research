@@ -6,6 +6,7 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 
 local R = {}
 
@@ -203,27 +204,31 @@ local function gather_by_items(items, patterns, options)
 end
 
 local function recipes_for_stream_uncached(spec, per_level_default)
+  local automatic_policy = automatic_compiler_policy.current()
   if spec.groups then
     local buckets, assigned = {}, {}
     for _, g in ipairs(spec.groups) do
-      local list = gather_by_items(g.items, g.item_patterns, {
-        fluids = g.fluids,
-        fluid_patterns = merge_lists(spec.fluid_patterns, g.fluid_patterns),
-        extra_outputs = g.extra_outputs,
-        recipe_patterns = merge_lists(spec.recipe_patterns, g.recipe_patterns),
-        exclude_recipe_patterns = merge_lists(spec.exclude_recipe_patterns, g.exclude_recipe_patterns),
-        exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
-        include_hidden = spec.include_hidden or g.include_hidden,
-        include_recycling = spec.include_recycling or g.include_recycling,
-        allow_shared_input_output = spec.allow_shared_input_output or g.allow_shared_input_output,
-        module_tiers = g.module_tiers,
-        module_tier_min = g.module_tier_min,
-        module_tier_max = g.module_tier_max,
-        place_result_entity_types = g.place_result_entity_types,
-        reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
-        match_mode = g.mode or spec.mode,
-        match_stream = g.match and g or spec
-      })
+      local list = {}
+      if not g.structural_fallback or automatic_policy.apply_changes then
+        list = gather_by_items(g.items, g.item_patterns, {
+          fluids = g.fluids,
+          fluid_patterns = merge_lists(spec.fluid_patterns, g.fluid_patterns),
+          extra_outputs = g.extra_outputs,
+          recipe_patterns = merge_lists(spec.recipe_patterns, g.recipe_patterns),
+          exclude_recipe_patterns = merge_lists(spec.exclude_recipe_patterns, g.exclude_recipe_patterns),
+          exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
+          include_hidden = spec.include_hidden or g.include_hidden,
+          include_recycling = spec.include_recycling or g.include_recycling,
+          allow_shared_input_output = spec.allow_shared_input_output or g.allow_shared_input_output,
+          module_tiers = g.module_tiers,
+          module_tier_min = g.module_tier_min,
+          module_tier_max = g.module_tier_max,
+          place_result_entity_types = g.place_result_entity_types,
+          reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
+          match_mode = g.mode or spec.mode,
+          match_stream = g.match and g or spec
+        })
+      end
       local filtered = {}
       for _, recipe_name in ipairs(list) do
         -- Groups are ordered from broad/common to niche/high tier. If a later
@@ -244,6 +249,9 @@ local function recipes_for_stream_uncached(spec, per_level_default)
     return buckets
   end
 
+  if spec.structural_fallback and not automatic_policy.apply_changes then
+    return {}
+  end
   local list = gather_by_items(spec.items, spec.item_patterns, {
     fluids = spec.fluids,
     fluid_patterns = spec.fluid_patterns,
@@ -272,7 +280,8 @@ local function stream_match_identity(stream_key, spec, per_level_default)
     descriptor = spec,
     per_level_default = per_level_default,
     recipe_facts = recipe_facts.fingerprint(),
-    target_profile = target_profiles.current()
+    target_profile = target_profiles.current(),
+    automatic_productivity_action = automatic_compiler_policy.current().action
   })
 end
 
