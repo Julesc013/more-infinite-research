@@ -51,6 +51,7 @@
     {"pattern": "changelog.txt", "module": "package-text", "writes": ["product.package"]},
     {"pattern": "LICENSE", "module": "package-text", "writes": ["product.package"]},
     {"pattern": "thumbnail.png", "module": "package-assets", "writes": ["product.package"]},
+    {"pattern": "dist/*.zip", "module": "release-archives", "writes": ["product.package", "release.authority"]},
     {"pattern": ".mir/branches.yml", "module": "branch-policy", "writes": ["release.authority"]},
     {"pattern": ".mir/release-wave.yml", "module": "release-wave", "writes": ["release.presentation"]},
     {"pattern": ".mir/releases.json", "module": "legacy-release-view", "writes": ["release.presentation"]},
