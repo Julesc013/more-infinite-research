@@ -35,9 +35,9 @@
     },
     {
       "branch": "tmp/3.2.3",
-      "candidate_id": "C26",
+      "candidate_id": "C27",
       "release": "3.2.3",
-      "source_commit": "c101f7cfafae8be154b0780142873233a25acd2a",
+      "source_commit": "f5724fe9fd022efe96596264d454ee05a5c9d208",
       "state": "package-built",
       "target": "2.1"
     }

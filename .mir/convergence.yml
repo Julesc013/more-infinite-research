@@ -167,10 +167,20 @@ superseded_candidates:
     reason: Factorio changelog line-length validation required package-visible source correction
     status: superseded-unqualified-candidate
 
+  - source_commit: c101f7cfafae8be154b0780142873233a25acd2a
+    candidate_id: C26
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 4DB5B3F8A4CE14CC1A4AEE889103316DAF34F03F19AAFB80C58F2575C5AE444F
+    package_content_sha256: 40060D97708C77E15FD17E67A9030B1F9A2EB70D353345B0AE10A3EE74721223
+    size_bytes: 1032397
+    entries: 291
+    reason: Platform science changed from additive cryogenic to metallurgic-to-cryogenic replacement
+    status: superseded-focused-qualified-candidate
+
 candidate:
   artifact: dist/more-infinite-research_3.2.3.zip
-  source_commit: c101f7cfafae8be154b0780142873233a25acd2a
-  package_source_commit: c101f7cfafae8be154b0780142873233a25acd2a
+  source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
+  package_source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
   automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
   status: package-built

@@ -17,18 +17,18 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.3` |
-| Candidate | `C26` |
+| Candidate | `C27` |
 | Target | `2.1` |
 | Branch | `tmp/3.2.3` |
 | State | `package-built` |
-| Package source commit | `c101f7cfafae8be154b0780142873233a25acd2a` |
-| Package source tree | `66effd558858c3e2fea52678fa5316902be57796` |
-| Package source SHA-256 | `40060D97708C77E15FD17E67A9030B1F9A2EB70D353345B0AE10A3EE74721223` |
+| Package source commit | `f5724fe9fd022efe96596264d454ee05a5c9d208` |
+| Package source tree | `ba980e7f7aabfcc9920afe56dd40ba44aa5e0744` |
+| Package source SHA-256 | `6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188` |
 | Archive | `dist/more-infinite-research_3.2.3.zip` |
-| Archive bytes | `1032397` |
+| Archive bytes | `1032404` |
 | Archive entries | `291` |
-| Archive SHA-256 | `4DB5B3F8A4CE14CC1A4AEE889103316DAF34F03F19AAFB80C58F2575C5AE444F` |
-| Package content SHA-256 | `40060D97708C77E15FD17E67A9030B1F9A2EB70D353345B0AE10A3EE74721223` |
+| Archive SHA-256 | `1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310` |
+| Package content SHA-256 | `6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188` |
 
 ## Remaining state transitions
 
