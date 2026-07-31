@@ -1424,6 +1424,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "local_library_zip_count" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "generated_local_scenarios_selected" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "local_zip_scenarios_selected" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)' },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "`$loadResultsPath = Join-Path `$resolvedOutputDir `"load-results.json`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'if ($enabled.ContainsKey("space-age"))' },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("artifacts/")' },

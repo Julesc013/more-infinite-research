@@ -313,7 +313,7 @@ function Get-MIRLockEntriesByName {
   return $out
 }
 
-$resolvedOutputDir = New-MIRDirectory -Path $OutputDir
+$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)
 $resolvedCacheDir = New-MIRDirectory -Path $ModCacheDir
 
 function Resolve-MIRZipInputPaths {
@@ -1227,6 +1227,7 @@ $lock = [ordered]@{
   mods = $lockEntries
 }
 
+$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir
 $lockPath = Join-Path $resolvedOutputDir "compat-candidates.lock.json"
 $reportPath = Join-Path $resolvedOutputDir "compat-report.md"
 $failureCsvPath = Join-Path $resolvedOutputDir "failures.csv"

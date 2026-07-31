@@ -71,16 +71,27 @@ $probePath = Join-Path $overlay.path ([string]$overlay.canonical_probe.path)
 $probeBytes = [IO.File]::ReadAllBytes($probePath)
 $sourceProbeText = [IO.File]::ReadAllText((Join-Path $performanceSource ([string]$overlay.canonical_probe.path))).Replace("`r`n", "`n").Replace("`r", "`n")
 $overlayStatus = @(& git -C $overlay.path status --porcelain --untracked-files=all)
+$compatAuditManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "scripts/Invoke-MIRCompatAudit.ps1" })
+$controllerCompatAuditSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$compatOutputResolveIndex = $compatAuditText.IndexOf('$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)', [StringComparison]::Ordinal)
+$compatOutputMaterializeIndex = $compatAuditText.IndexOf('$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir', [StringComparison]::Ordinal)
+$compatLockIndex = $compatAuditText.IndexOf('$lockPath = Join-Path $resolvedOutputDir "compat-candidates.lock.json"', [StringComparison]::Ordinal)
 if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.source_sha256 -or
     [string]$overlay.canonical_probe.materialization -ne "utf8-no-bom-lf-v1" -or
     [string]$overlay.canonical_probe.sha256 -ne (Get-MIRCPSha256Text -Value $sourceProbeText) -or
     $probeBytes -contains [byte]13 -or
     [string]$overlay.manifest_sha256 -notmatch '^[0-9A-F]{64}$' -or
     [string]$overlay.harness_sha256 -notmatch '^[0-9A-F]{64}$' -or
-    @($overlay.manifest.files).Count -ne 2 -or
-    $overlayStatus.Count -ne 2 -or
+    @($overlay.manifest.files).Count -ne 3 -or
+    $compatAuditManifestRows.Count -ne 1 -or
+    [string]$compatAuditManifestRows[0].sha256 -ne $controllerCompatAuditSha256 -or
+    [string]$compatAuditManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
+    $compatOutputResolveIndex -lt 0 -or $compatOutputMaterializeIndex -le $compatOutputResolveIndex -or $compatLockIndex -le $compatOutputMaterializeIndex -or
+    $overlayStatus.Count -ne 3 -or
     $overlayStatus -notcontains " M .mir/performance-campaign.json" -or
-    $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua") {
+    $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua" -or
+    $overlayStatus -notcontains " M scripts/Invoke-MIRCompatAudit.ps1") {
   throw "Performance source overlay is not exact, checkout-independent, and package-preserving."
 }
 $baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"
@@ -200,12 +211,14 @@ $scratchContextId = Get-MIRCPSha256Text -Value ("executor-path-budget/" + [guid]
 $scratchState = [pscustomobject][ordered]@{context=[pscustomobject][ordered]@{context_id=$scratchContextId}}
 $scratchCampaign = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/performance-campaign.json") | ConvertFrom-Json
 $scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaign $scratchCampaign
+$compatBudgetPath = Join-Path $scratch.path "medium-ecosystem.factorio-total\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
 $scratchPayload = Join-Path $scratch.path "path-budget-self-test.txt"
 "exact-context-bound-scratch" | Set-Content -LiteralPath $scratchPayload -Encoding UTF8
 $scratchDestination = Join-Path $repo "out/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
 $scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination
 if ([string]$scratch.strategy -ne "compact-context-scratch-v1" -or
     [int]$scratch.maximum_factorio_path_length -gt [int]$scratch.conservative_path_budget -or
+    [int]$scratch.maximum_factorio_path_length -lt $compatBudgetPath.Length -or
     [string]$scratchRelocation.context_id -ne $scratchContextId -or
     [int]$scratchRelocation.file_count -ne 2 -or
     (Test-Path -LiteralPath $scratch.path) -or

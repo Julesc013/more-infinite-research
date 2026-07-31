@@ -36,7 +36,8 @@
     "control-plane.performance-path-budget",
     "control-plane.distribution-inventory",
     "control-plane.idempotent-aggregate-closure",
-    "control-plane.manifest-bound-calibration-proof"
+    "control-plane.manifest-bound-calibration-proof",
+    "control-plane.compat-audit-output-durability"
   ],
   "backport_disposition": {
     "factorio-2.1": "shared-control-plane",

@@ -36,6 +36,7 @@
     {"pattern": "validation/generated/**", "module": "scenario-composition", "writes": ["scenario.catalog"]},
     {"pattern": "fixtures/**", "module": "fixtures", "writes": ["scenario.catalog"]},
     {"pattern": "scripts/validation/**", "module": "validation-harness", "writes": ["assurance.harness"]},
+    {"pattern": "scripts/Invoke-MIRCompatAudit.ps1", "module": "validation-harness", "writes": ["assurance.harness"]},
     {"pattern": "scripts/Invoke-MIRValidation.ps1", "module": "validation-harness", "writes": ["assurance.harness"]},
     {"pattern": "scripts/New-MIRFactorioLineTestAdapter.ps1", "module": "validation-harness", "writes": ["assurance.harness", "scenario.catalog"]},
     {"pattern": "scripts/Materialize-MIRBackport.ps1", "module": "backport-materializer", "writes": ["assurance.harness", "product.package", "transition.upgrade"]},

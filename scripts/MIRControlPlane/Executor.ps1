@@ -507,11 +507,18 @@ function New-MIRCPPerformanceSourceOverlay {
   $overlayPath = Join-Path $destination ".mir/performance-campaign.json"
   [IO.File]::Copy($authorityPath, $overlayPath, $true)
   if ((Get-MIRCPSha256File -Path $overlayPath) -ne [string]$authority.sha256) { throw "Performance authority overlay changed the governed campaign bytes." }
+  $compatAuditRelativePath = "scripts/Invoke-MIRCompatAudit.ps1"
+  $compatAuditControllerPath = Join-Path $repo $compatAuditRelativePath
+  $compatAuditOverlayPath = Join-Path $destination $compatAuditRelativePath
+  [IO.File]::Copy($compatAuditControllerPath, $compatAuditOverlayPath, $true)
+  $compatAuditSha256 = Get-MIRCPSha256File -Path $compatAuditControllerPath
+  if ((Get-MIRCPSha256File -Path $compatAuditOverlayPath) -ne $compatAuditSha256) { throw "Performance authority overlay changed the controller compatibility-audit bytes." }
   $probe = Set-MIRCPCanonicalPerformanceProbeText -OverlayRoot $destination
   $status = @(& git -C $destination status --porcelain --untracked-files=all)
   $allowedChanges = @(
     " M .mir/performance-campaign.json",
-    " M fixtures/performance-regression-probe/data-final-fixes.lua"
+    " M fixtures/performance-regression-probe/data-final-fixes.lua",
+    " M scripts/Invoke-MIRCompatAudit.ps1"
   )
   $unexpected = @($status | Where-Object { $allowedChanges -notcontains [string]$_ })
   if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
@@ -528,7 +535,8 @@ function New-MIRCPPerformanceSourceOverlay {
     source_commit = [string]$Source.commit
     files = @(
       [pscustomobject][ordered]@{path=".mir/performance-campaign.json";materialization="controller-exact-bytes-v1";bytes=[int64](Get-Item -LiteralPath $overlayPath).Length;sha256=[string]$authority.sha256},
-      $probe
+      $probe,
+      [pscustomobject][ordered]@{path=$compatAuditRelativePath;materialization="controller-exact-bytes-v1";bytes=[int64](Get-Item -LiteralPath $compatAuditOverlayPath).Length;sha256=$compatAuditSha256}
     )
     harness_sha256 = [string]$harnessSha256
     package_source_sha256 = $packageSha256
@@ -567,6 +575,14 @@ function New-MIRCPCompactPerformanceArtifactRoot {
     if ($probePath.Length -gt $maximumPathLength) {
       $maximumPathLength = $probePath.Length
       $maximumPath = $probePath
+    }
+  }
+  foreach ($lane in @($Campaign.lanes | Where-Object { [string]$_.runner -eq "compat-audit" })) {
+    $laneSafe = ([string]$lane.id -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
+    $compatPath = Join-Path $path ("{0}\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua" -f $laneSafe)
+    if ($compatPath.Length -gt $maximumPathLength) {
+      $maximumPathLength = $compatPath.Length
+      $maximumPath = $compatPath
     }
   }
   $pathBudget = 240
