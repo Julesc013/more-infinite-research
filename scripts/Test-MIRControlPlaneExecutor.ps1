@@ -115,6 +115,10 @@ if ($c30DeltaPolicy.Count -ne 1 -or [string]$currentObservation.archive_sha256 -
     -not (Test-MIRCPExactPathSet -Expected @($c30DeltaPolicy[0].allowed_changed_paths) -Actual $c30ChangedPaths)) {
   throw "Native C30 approved-delta policy does not accept only the exact immutable 3.2.2-to-3.2.3 package delta."
 }
+$selectedC30Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVersion "3.2.2" -ToVersion "3.2.3" -CandidateId "C30" -RepoRoot $repo)
+if ($selectedC30Policies.Count -ne 1 -or [string]$selectedC30Policies[0].id -ne "c30-platform-logistics-hotfix-v1") {
+  throw "Public C30 approved-delta dispatch does not select the exact native C30 policy."
+}
 $evidenceRoot = "out/control-plane-v5-self-test/executor-evidence/$([guid]::NewGuid().ToString('N'))"
 $contextResult = Write-MIRCPContextCompletionEvidence -ContextPath $context.path -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
 $taskResult = Invoke-MIRCPTaskCommand -ContextPath $context.path -TaskId "harness.schemas" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo

@@ -885,6 +885,28 @@ function Test-MIRCPExactPathSet {
   return ($expectedRows -join "`n") -ceq ($actualRows -join "`n")
 }
 
+function Get-MIRCPNativePatchDeltaPolicy {
+  param(
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)][string]$FromVersion,
+    [Parameter(Mandatory)][string]$ToVersion,
+    [Parameter(Mandatory)][string]$CandidateId,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $authority = Read-MIRCPJson -Path ".mir/control-plane/approved-delta-policies.json" -RepoRoot $repo
+  if ([int]$authority.schema -ne 1 -or [string]$authority.authority -ne "mir-control-plane-v5-approved-delta-policies") {
+    throw "Approved-delta policy authority is invalid."
+  }
+  $matches = @($authority.policies | Where-Object {
+    [string]$_.target -eq $Target -and [string]$_.from_version -eq $FromVersion -and
+    [string]$_.to_version -eq $ToVersion -and [string]$_.candidate_id -eq $CandidateId
+  })
+  if ($matches.Count -gt 1) {
+    throw "More than one native approved-delta policy matches $FromVersion -> $ToVersion $CandidateId."
+  }
+  return @($matches)
+}
 function Invoke-MIRCPNativePatchDeltaMeasurement {
   param(
     [Parameter(Mandatory)]$State,
@@ -901,16 +923,11 @@ function Invoke-MIRCPNativePatchDeltaMeasurement {
   . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $State.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $policyAuthorityPath = Join-Path $repo ".mir/control-plane/approved-delta-policies.json"
-  $policyAuthority = Get-Content -Raw -LiteralPath $policyAuthorityPath | ConvertFrom-Json
-  if ([int]$policyAuthority.schema -ne 1 -or [string]$policyAuthority.authority -ne "mir-control-plane-v5-approved-delta-policies") {
-    throw "Approved-delta policy authority is invalid."
-  }
   $baseline = Get-MIRCPZipPackageObservation -Path $PriorRelease
   $current = Get-MIRCPZipPackageObservation -Path $Candidate
-  $policies = @($policyAuthority.policies | Where-Object {
-    [string]$_.target -eq [string]$State.plan.target -and [string]$_.from_version -eq [string]$baseline.version -and
-    [string]$_.to_version -eq [string]$current.version -and [string]$_.candidate_id -eq [string]$descriptor.candidate_id
-  })
+  $policies = @(Get-MIRCPNativePatchDeltaPolicy -Target ([string]$State.plan.target) `
+    -FromVersion ([string]$baseline.version) -ToVersion ([string]$current.version) `
+    -CandidateId ([string]$descriptor.candidate_id) -RepoRoot $repo)
   if ($policies.Count -ne 1) { throw "Expected exactly one native approved-delta policy for $($baseline.version) -> $($current.version) $($descriptor.candidate_id)." }
   $policy = $policies[0]
   $baselineByPath = @{}
@@ -996,7 +1013,10 @@ function Invoke-MIRCPApprovedDeltaMeasurement {
   $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $priorObservation = Get-MIRCPZipPackageObservation -Path $prior
-  if ([string]$priorObservation.version -eq "3.2.1" -and [string]$descriptor.release -eq "3.2.2") {
+  $nativePolicies = @(Get-MIRCPNativePatchDeltaPolicy -Target ([string]$state.plan.target) `
+    -FromVersion ([string]$priorObservation.version) -ToVersion ([string]$descriptor.release) `
+    -CandidateId ([string]$descriptor.candidate_id) -RepoRoot $repo)
+  if ($nativePolicies.Count -eq 1) {
     return Invoke-MIRCPNativePatchDeltaMeasurement -State $state -PlanRow $row[0] -Source $source -Candidate $candidate `
       -PriorRelease $prior -Factorio $factorio -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
   }

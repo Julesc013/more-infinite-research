@@ -32,7 +32,8 @@
     "C24 calibration continues to select 3.2.2-C24",
     "C30 qualification selects 3.2.3-C30 with exact 3.2.2 baseline and C30 package identities",
     "the C30 approved-delta policy matches exactly one added, zero removed, and 67 changed package paths",
-    "no package-visible C30 byte changes"
+    "no package-visible C30 byte changes",
+    "the public approved-delta executor selects any exact native release policy, including C30, instead of hard-coding C24"
   ],
   "affected_releases": [
     "3.2.3"
