@@ -5,7 +5,7 @@ applies_to: "3.2.3"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-30
+last_reviewed: 2026-07-31
 supersedes: []
 superseded_by: []
 ---
@@ -17,18 +17,18 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.3` |
-| Candidate | `C29` |
+| Candidate | `C30` |
 | Target | `2.1` |
 | Branch | `dev` |
 | State | `package-built` |
-| Package source commit | `c5d11aab76ffee479ca4aaba3bb8fa4387918762` |
-| Package source tree | `222eca24fc2fd83e462ac8632290eb9b9092cec8` |
-| Package source SHA-256 | `4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4` |
+| Package source commit | `c1fd8b932c8d916a14925678056e08893b87b2db` |
+| Package source tree | `222848c6bb3c96fe4641c67cdea12b3581576185` |
+| Package source SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
 | Archive | `dist/more-infinite-research_3.2.3.zip` |
-| Archive bytes | `1034738` |
+| Archive bytes | `1034824` |
 | Archive entries | `292` |
-| Archive SHA-256 | `BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1` |
-| Package content SHA-256 | `4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4` |
+| Archive SHA-256 | `0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2` |
+| Package content SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
 
 ## Remaining state transitions
 

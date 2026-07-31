@@ -525,7 +525,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-2-to-3-2-3
     harness: scripts/Test-MIRUpgrade.ps1
     primary_source_version: "3.2.2"
-    target_candidate: C29
+    target_candidate: C30
     archetypes:
       - space-age-native-owner
     validates:

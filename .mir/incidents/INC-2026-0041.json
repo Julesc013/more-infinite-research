@@ -7,14 +7,18 @@
   "failing_environment": {
     "target": "2.1",
     "release": "3.2.2",
-    "mods": ["base", "space-age", "more-infinite-research"],
+    "mods": [
+      "base",
+      "space-age",
+      "more-infinite-research"
+    ],
     "reported_behavior": "Ice Productivity unlocked with Space Science on Nauvis even though its observed ice recipe benefit was Aquilo-specific."
   },
   "reproduction": {
     "status": "reproduced-and-regression-proven",
     "source_candidate": "C24",
     "source_archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
-    "result": "The 3.2.2 Landfill stream owned ice-platform and space-platform-foundation while Ice research lacked cryogenic science. Exact C29 runtime and upgrade fixtures prove the corrected progression and ownership transfer."
+    "result": "The 3.2.2 Landfill stream owned ice-platform and space-platform-foundation while Ice research lacked cryogenic science. Exact C29 runtime and upgrade fixtures proved the corrected progression and ownership transfer; exact C30 Base and Space Age generation-integrity scenarios preserve that result after the automatic-action correction."
   },
   "root_cause": {
     "status": "proven",
@@ -33,15 +37,17 @@
     "an exact 3.2.2 save retains Landfill and Ice levels and current Ice progress while Platform starts unresearched",
     "the upgraded C29 save persists and reloads without duplicate ownership"
   ],
-  "affected_releases": ["3.2.2"],
+  "affected_releases": [
+    "3.2.2"
+  ],
   "candidate_binding": {
-    "candidate_id": "C29",
-    "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
-    "content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
-    "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762"
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db"
   },
   "closure": {
     "status": "pending-release-qualification",
-    "proof_required": "complete C29 candidate aggregate, exact manual acceptance, protected qualification, verified seal, promotion, and published 3.2.3 bytes"
+    "proof_required": "complete C30 candidate aggregate, exact C30 upgrade, manual acceptance, protected qualification, verified seal, promotion, and published 3.2.3 bytes"
   }
 }

@@ -1,18 +1,18 @@
 {
   "schema": 1,
   "release": "3.2.3",
-  "candidate_id": "C29",
+  "candidate_id": "C30",
   "target": "2.1",
   "branch": "dev",
   "state": "package-built",
   "package": {
-    "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
-    "source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
-    "source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+    "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "source_tree": "222848c6bb3c96fe4641c67cdea12b3581576185",
+    "source_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
     "archive": "dist/more-infinite-research_3.2.3.zip",
-    "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
-    "content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
-    "bytes": 1034738,
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "bytes": 1034824,
     "entries": 292
   },
   "proofs": {
@@ -20,14 +20,14 @@
       {
         "kind": "package-lock",
         "path": ".mir/control-plane/package-locks.json",
-        "candidate_id": "C29"
+        "candidate_id": "C30"
       }
     ],
     "package_build": [
       {
         "kind": "deterministic-package",
         "path": "scripts/Test-MIRDeterministicPackage.ps1",
-        "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1"
+        "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
       }
     ]
   },
@@ -79,6 +79,18 @@
       "entries": 292,
       "reason": "Exact Base runtime integrity exposed a stale shipped 2.1 stream-count authority after Platform Productivity increased the catalog from 75 to 76.",
       "status": "superseded-runtime-fixture-rejected-candidate"
+    },
+    {
+      "candidate_id": "C29",
+      "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
+      "source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+      "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
+      "content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+      "bytes": 1034738,
+      "entries": 292,
+      "reason": "Exact full runtime validation proved that structural fallback attachment ignored the disabled automatic-productivity action.",
+      "status": "superseded-runtime-fixture-rejected-candidate"
     }
   ],
   "assurance_exceptions": [],
@@ -96,9 +108,10 @@
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
   "incident_ids": [
     "INC-2026-0044",
+    "INC-2026-0045",
     "INC-2026-0043",
     "INC-2026-0041",
     "INC-2026-0042"
   ],
-  "updated_at": "2026-07-30T17:22:00Z"
+  "updated_at": "2026-07-31T08:14:22Z"
 }

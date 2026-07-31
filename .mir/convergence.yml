@@ -196,11 +196,20 @@ superseded_candidates:
     entries: 292
     reason: exact Base runtime integrity exposed a stale shipped 2.1 stream-count authority
     status: superseded-runtime-fixture-rejected-candidate
+  - source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
+    candidate_id: C29
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1
+    package_content_sha256: 4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4
+    size_bytes: 1034738
+    entries: 292
+    reason: exact full runtime validation proved structural fallback ignored the disabled automatic-productivity action
+    status: superseded-runtime-fixture-rejected-candidate
 
 candidate:
   artifact: dist/more-infinite-research_3.2.3.zip
-  source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
-  package_source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
+  source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+  package_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
   automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
   status: package-built

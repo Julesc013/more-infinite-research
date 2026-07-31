@@ -3,9 +3,9 @@
   "branches": [
     {
       "branch": "dev",
-      "candidate_id": "C29",
+      "candidate_id": "C30",
       "release": "3.2.3",
-      "source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
       "state": "package-built",
       "target": "2.1"
     },

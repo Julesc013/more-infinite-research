@@ -5,7 +5,7 @@ applies_to: "3.2.3"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-30
+last_reviewed: 2026-07-31
 supersedes: []
 superseded_by: []
 ---
@@ -29,7 +29,7 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 - Current Ice Productivity research and fractional progress are retained; completing later levels now requires cryogenic science.
 - Platform Productivity starts unresearched. Landfill levels are not copied into it, because that would bypass the new Aquilo gate and convert the earlier +2%/+1% bonuses into +10%/+5% bonuses.
 - After configuration change, Landfill no longer owns either Platform recipe and each recipe has exactly one owner: Platform Productivity.
-- The exact 3.2.2-to-C29 upgrade fixture saved and independently reloaded the upgraded Space Age game.
+- The C29 predecessor fixture saved and independently reloaded the upgraded Space Age game. The final exact C30 transition rerun remains a release-qualification gate.
 
 ## Compiler efficiency
 
@@ -47,7 +47,7 @@ MIR 3.2.3 is a focused Space Age progression and modded-logistics productivity h
 
 ## Release status
 
-Candidate C29 is frozen and its deterministic package, full static gate, focused exact runtime scenarios, and exact 3.2.2 upgrade/reload transition have passed. Candidate aggregation, paired performance, manual acceptance, protected qualification, sealing, promotion, publication, and tagging remain pending.
+Candidate C30 is frozen. Its deterministic package reproduced twice and its exact automatic-action, structural-logistics, compiler-contract, Base, and Space Age focused scenarios passed. C29 predecessor results remain diagnostic only; complete exact C30 qualification, upgrade, approved delta, ecosystem, paired performance, manual acceptance, protected qualification, sealing, promotion, publication, and tagging remain pending.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity
@@ -57,10 +57,10 @@ Candidate C29 is frozen and its deterministic package, full static gate, focused
 | Field | Value |
 | --- | --- |
 | State | `package-built` |
-| Candidate | `C29` |
-| Package source commit | `c5d11aab76ffee479ca4aaba3bb8fa4387918762` |
-| Archive SHA-256 | `BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1` |
-| Content SHA-256 | `4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4` |
+| Candidate | `C30` |
+| Package source commit | `c1fd8b932c8d916a14925678056e08893b87b2db` |
+| Archive SHA-256 | `0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2` |
+| Content SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
 | Tag | `pending` |
 | Tag commit | `pending` |
 | Assurance exceptions | `pending` |

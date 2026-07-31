@@ -52,26 +52,26 @@
     },
     "factorio-2.1": {
       "archive": "dist/more-infinite-research_3.2.3.zip",
-      "archive_bytes": 1034738,
+      "archive_bytes": 1034824,
       "archive_class": "frozen-unreleased-calibration-candidate",
       "archive_entries": 292,
-      "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
+      "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
       "assurance_exception_ids": [],
       "branch": "dev",
-      "candidate_id": "C29",
+      "candidate_id": "C30",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.3",
-      "package_content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
-      "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "package_content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+      "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
       "package_source_material": {
         "file_count": 292,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8"
+        "source_tree": "222848c6bb3c96fe4641c67cdea12b3581576185"
       },
-      "package_source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
-      "package_source_tree": "222eca24fc2fd83e462ac8632290eb9b9092cec8",
+      "package_source_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+      "package_source_tree": "222848c6bb3c96fe4641c67cdea12b3581576185",
       "protected_qualification": "pending",
       "publication_status": "package-built",
       "qualification": "package-built",
@@ -98,7 +98,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.1",
-      "status": "C29-package-built"
+      "status": "C30-package-built"
     }
   },
   "generated_from": [
@@ -140,7 +140,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-07-30",
+  "updated_at": "2026-07-31",
   "views": {
     "backport_queue": ".mir/generated/backport-queue.json",
     "branch_policy": ".mir/branches.yml",
