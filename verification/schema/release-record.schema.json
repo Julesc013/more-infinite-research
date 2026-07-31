@@ -12,6 +12,16 @@
     "branch": {"type": "string", "minLength": 1},
     "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
     "package": {"type": "object"},
+    "upgrade": {
+      "type": "object",
+      "required": ["from_version", "to_version", "fixture"],
+      "properties": {
+        "from_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "to_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "fixture": {"type": "string", "pattern": "^assert-upgrade-[a-z0-9-]+$"}
+      },
+      "additionalProperties": false
+    },
     "proofs": {"type": "object"},
     "assurance_exceptions": {"type": "array", "items": {"type": "object"}},
     "remaining_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},

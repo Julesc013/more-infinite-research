@@ -15,4 +15,19 @@ $memberNames = @($manifest.members.path | ForEach-Object { [string]$_ })
 foreach ($required in @("plan.json", "candidate-descriptor.json", "release-transition.json", "expanded-tasks.json", "expanded-scenarios.json", "domain-manifest.json", "target-profile.json", "environment-locks.json", "control-plane-lock.json", "candidate.zip")) {
   if ($memberNames -notcontains $required) { throw "Verification context omits $required." }
 }
-Write-Host "[ok] immutable verification context $($first.context_id) contains $($first.members) digest-checked members and exact C24 candidate bytes."
+$environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $first.path "environment-locks.json") | ConvertFrom-Json
+if ([int]$manifest.context_abi -ne 3 -or @($environmentLocks.factorio).Count -lt 1) {
+  throw "Executable verification context does not bind ABI 3 and at least one governed Factorio installation."
+}
+$stagedProfilePath = Join-Path $first.path "target-profile.json"
+if ([string]$environmentLocks.target_profile.sha256 -ne (Get-MIRCPSha256File -Path $stagedProfilePath)) {
+  throw "Environment lock does not bind the exact projected target profile."
+}
+$c30Release = Get-MIRCPReleaseByVersion -Release "3.2.3" -RepoRoot $repo
+$baseProfile = Get-Content -Raw -LiteralPath (Join-Path $repo "validation/profiles/factorio-2.1.json") | ConvertFrom-Json
+$c30Profile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $c30Release -RepoRoot $repo
+if ([string]$c30Profile.upgrade.from_version -ne "3.2.2" -or [string]$c30Profile.upgrade.to_version -ne "3.2.3" -or
+    [string]$c30Profile.upgrade.fixture -ne "assert-upgrade-3-2-2-to-3-2-3") {
+  throw "C30 target-profile projection does not bind the exact governed save transition."
+}
+Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, and release-specific upgrade projection."

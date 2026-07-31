@@ -119,19 +119,177 @@ function New-MIRCPContextDomainManifest {
   }
 }
 
+function Resolve-MIRCPTargetProfileForRelease {
+  param(
+    [Parameter(Mandatory)]$BaseProfile,
+    [Parameter(Mandatory)]$ReleaseRecord,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $profile = $BaseProfile | ConvertTo-Json -Depth 40 | ConvertFrom-Json
+  if ($null -eq $ReleaseRecord.PSObject.Properties["upgrade"]) { return $profile }
+  foreach ($field in @("from_version", "to_version", "fixture")) {
+    if ($null -eq $ReleaseRecord.upgrade.PSObject.Properties[$field] -or
+        [string]::IsNullOrWhiteSpace([string]$ReleaseRecord.upgrade.$field)) {
+      throw "Release $($ReleaseRecord.release) upgrade authority is missing $field."
+    }
+  }
+  if ([string]$ReleaseRecord.upgrade.to_version -ne [string]$ReleaseRecord.release) {
+    throw "Release $($ReleaseRecord.release) upgrade authority targets $($ReleaseRecord.upgrade.to_version)."
+  }
+  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$ReleaseRecord.upgrade.from_version) -RepoRoot $repo
+  if ([string]$baseline.target -ne [string]$ReleaseRecord.target) {
+    throw "Release $($ReleaseRecord.release) upgrade baseline targets $($baseline.target), not $($ReleaseRecord.target)."
+  }
+  $fixturePath = Join-Path $repo ("fixtures/" + [string]$ReleaseRecord.upgrade.fixture)
+  if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
+    throw "Release $($ReleaseRecord.release) upgrade fixture is missing: $($ReleaseRecord.upgrade.fixture)"
+  }
+  $profile.upgrade = [pscustomobject][ordered]@{
+    from_version = [string]$ReleaseRecord.upgrade.from_version
+    to_version = [string]$ReleaseRecord.upgrade.to_version
+    fixture = [string]$ReleaseRecord.upgrade.fixture
+  }
+  return $profile
+}
+
+function Get-MIRCPFactorioIdentity {
+  param([Parameter(Mandatory)][string]$FactorioBin)
+  $binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+  $binaryItem = Get-Item -LiteralPath $binary
+  if ($null -eq $script:MIRCPFactorioIdentityCache) { $script:MIRCPFactorioIdentityCache = @{} }
+  $cacheKey = "$binary|$($binaryItem.Length)|$($binaryItem.LastWriteTimeUtc.Ticks)"
+  if ($script:MIRCPFactorioIdentityCache.ContainsKey($cacheKey)) { return $script:MIRCPFactorioIdentityCache[$cacheKey] }
+  $installRoot = $binaryItem.Directory.Parent.Parent.FullName
+  $officialRoots = @("data/core", "data/base", "data/quality", "data/elevated-rails", "data/space-age")
+  $officialFiles = @()
+  foreach ($relativeRoot in $officialRoots) {
+    $path = Join-Path $installRoot $relativeRoot
+    if (Test-Path -LiteralPath $path -PathType Leaf) {
+      $officialFiles += Get-Item -LiteralPath $path
+    } elseif (Test-Path -LiteralPath $path -PathType Container) {
+      $officialFiles += Get-ChildItem -LiteralPath $path -Recurse -File
+    }
+  }
+  $officialRows = @(
+    foreach ($file in @($officialFiles | Sort-Object FullName -Unique)) {
+      $relative = [IO.Path]::GetRelativePath($installRoot, $file.FullName).Replace("\", "/")
+      "$relative`t$($file.Length)`t$(Get-MIRCPSha256File -Path $file.FullName)"
+    }
+  )
+  $officialData = [pscustomobject][ordered]@{
+    kind = "external-tree"
+    state = "present"
+    root = $installRoot
+    file_count = $officialRows.Count
+    sha256 = Get-MIRCPSha256Text -Value $(if ($officialRows.Count -gt 0) { $officialRows -join "`n" } else { "EMPTY:factorio-official-data" })
+  }
+  $binarySha256 = Get-MIRCPSha256File -Path $binary
+  $binaryFingerprint = [pscustomobject][ordered]@{
+    kind = "external-file"
+    state = "present"
+    name = $binaryItem.Name
+    size_bytes = [int64]$binaryItem.Length
+    sha256 = $binarySha256
+  }
+  $portableOfficialData = [pscustomobject][ordered]@{
+    kind = [string]$officialData.kind
+    state = [string]$officialData.state
+    file_count = [int]$officialData.file_count
+    sha256 = [string]$officialData.sha256
+  }
+  $installationMaterial = [ordered]@{binary=$binaryFingerprint;official_data=$portableOfficialData}
+  $legacyInstallationMaterial = [ordered]@{binary=$binaryFingerprint;official_data=$officialData}
+  $installationSha256 = Get-MIRCPSha256Text -Value ($installationMaterial | ConvertTo-Json -Depth 40 -Compress)
+  # Qualification evidence imported from v4 used a composite identity containing
+  # the absolute installation root. Retain it only as a matching alias while all
+  # ABI-3 locks emit the path-independent identity above.
+  $legacyInstallationSha256 = Get-MIRCPSha256Text -Value ($legacyInstallationMaterial | ConvertTo-Json -Depth 40 -Compress)
+  $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($binary).ProductVersion
+  if ([string]::IsNullOrWhiteSpace([string]$version)) { throw "Factorio executable has no product version: $binary" }
+  $identity = [pscustomobject][ordered]@{
+    path = $binary
+    root = $installRoot
+    sha256 = $installationSha256
+    installation_sha256 = $installationSha256
+    legacy_installation_sha256 = $legacyInstallationSha256
+    bytes = [int64]$binaryItem.Length
+    version = [string]$version
+    binary = [pscustomobject][ordered]@{bytes=[int64]$binaryItem.Length;sha256=$binarySha256}
+    official_data = $officialData
+  }
+  $script:MIRCPFactorioIdentityCache[$cacheKey] = $identity
+  return $identity
+}
+
+function Test-MIRCPFactorioIdentityMatchesLock {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$Lock
+  )
+  if ($null -ne $Lock.PSObject.Properties["installation_sha256"]) {
+    $acceptedInstallationHashes = @([string]$Identity.installation_sha256)
+    if ($null -ne $Identity.PSObject.Properties["legacy_installation_sha256"]) {
+      $acceptedInstallationHashes += [string]$Identity.legacy_installation_sha256
+    }
+    if ($acceptedInstallationHashes -notcontains [string]$Lock.installation_sha256) { return $false }
+  }
+  if ([string]$Lock.binary.sha256 -ne [string]$Identity.binary.sha256) { return $false }
+  if ($null -ne $Lock.binary.PSObject.Properties["bytes"] -and [int64]$Lock.binary.bytes -gt 0 -and
+      [int64]$Lock.binary.bytes -ne [int64]$Identity.binary.bytes) { return $false }
+  if ($null -ne $Lock.PSObject.Properties["version"] -and -not [string]::IsNullOrWhiteSpace([string]$Lock.version) -and
+      [string]$Lock.version -ne [string]$Identity.version) { return $false }
+  if ($null -ne $Lock.PSObject.Properties["official_data"] -and $null -ne $Lock.official_data) {
+    if ([int]$Lock.official_data.file_count -ne [int]$Identity.official_data.file_count -or
+        [string]$Lock.official_data.sha256 -ne [string]$Identity.official_data.sha256) { return $false }
+  }
+  return $true
+}
+
+function New-MIRCPFactorioEnvironmentLock {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$TargetProfile,
+    [string]$Source = "context-materialization"
+  )
+  $expectedVersion = [string]$TargetProfile.qualification_factorio_version
+  if ([string]::IsNullOrWhiteSpace($expectedVersion) -or [string]$Identity.version -ne $expectedVersion) {
+    throw "Factorio context seed version $($Identity.version) does not match target qualification version $expectedVersion."
+  }
+  if ([string]$Identity.installation_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [string]$Identity.binary.sha256 -notmatch '^[0-9A-F]{64}$' -or [int64]$Identity.binary.bytes -le 0 -or
+      [string]$Identity.official_data.sha256 -notmatch '^[0-9A-F]{64}$' -or [int]$Identity.official_data.file_count -le 0) {
+    throw "Factorio context seed identity is incomplete."
+  }
+  return [pscustomobject][ordered]@{
+    source = $Source
+    version = [string]$Identity.version
+    installation_sha256 = [string]$Identity.installation_sha256
+    binary = [pscustomobject][ordered]@{bytes=[int64]$Identity.binary.bytes;sha256=[string]$Identity.binary.sha256}
+    official_data = [pscustomobject][ordered]@{file_count=[int]$Identity.official_data.file_count;sha256=[string]$Identity.official_data.sha256}
+  }
+}
+
 function New-MIRCPEnvironmentLocks {
   param(
     [Parameter(Mandatory)]$ReleaseRecord,
     $QualificationBundle,
     [Parameter(Mandatory)]$TargetProfile,
-    [Parameter(Mandatory)][string]$TargetProfilePath,
+    [Parameter(Mandatory)][string]$TargetProfileSha256,
     [Parameter(Mandatory)][string]$ScenarioRegistrySha256,
+    $FactorioIdentity = $null,
     [string]$SourceRepoRoot = "",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $sourceRepo = if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { $repo } else { (Resolve-Path -LiteralPath $SourceRepoRoot).Path }
   $factorioLocks = [Collections.Generic.List[object]]::new()
+  if ($null -ne $FactorioIdentity) {
+    $materializedLock = New-MIRCPFactorioEnvironmentLock -Identity $FactorioIdentity -TargetProfile $TargetProfile
+    if (@($factorioLocks | Where-Object { Test-MIRCPFactorioIdentityMatchesLock -Identity $FactorioIdentity -Lock $_ }).Count -eq 0) {
+      $factorioLocks.Add($materializedLock)
+    }
+  }
   if ($null -ne $QualificationBundle -and $null -ne $QualificationBundle.record.PSObject.Properties["evidence"]) {
     foreach ($evidence in @($QualificationBundle.record.evidence)) {
       if ($null -eq $evidence.inputs -or $null -eq $evidence.inputs.PSObject.Properties["factorio"]) { continue }
@@ -142,7 +300,10 @@ function New-MIRCPEnvironmentLocks {
         binary = [pscustomobject][ordered]@{bytes=[int64]$factorio.binary.size_bytes; sha256=[string]$factorio.binary.sha256}
         official_data = [pscustomobject][ordered]@{file_count=[int]$factorio.official_data.file_count; sha256=[string]$factorio.official_data.sha256}
       }
-      if (@($factorioLocks | Where-Object { (Get-MIRCPSha256Object -Value $_) -eq (Get-MIRCPSha256Object -Value $lock) }).Count -eq 0) { $factorioLocks.Add($lock) }
+      $matchesSelectedIdentity = $null -ne $FactorioIdentity -and (Test-MIRCPFactorioIdentityMatchesLock -Identity $FactorioIdentity -Lock $lock)
+      if (-not $matchesSelectedIdentity -and @($factorioLocks | Where-Object { (Get-MIRCPSha256Object -Value $_) -eq (Get-MIRCPSha256Object -Value $lock) }).Count -eq 0) {
+        $factorioLocks.Add($lock)
+      }
     }
   }
   if ($factorioLocks.Count -eq 0 -and [string]$ReleaseRecord.target -eq "2.0") {
@@ -157,13 +318,16 @@ function New-MIRCPEnvironmentLocks {
       })
     }
   }
+  if ($factorioLocks.Count -eq 0) {
+    throw "Verification context requires at least one governed Factorio installation lock; provide -FactorioBin for a new candidate."
+  }
   return [pscustomobject][ordered]@{
     schema = 1
     target = [string]$ReleaseRecord.target
     target_profile = [pscustomobject][ordered]@{
       id = [string]$TargetProfile.id
       path = "target-profile.json"
-      sha256 = Get-MIRCPSha256File -Path $TargetProfilePath
+      sha256 = $TargetProfileSha256
     }
     factorio = @($factorioLocks)
     fixture_authority_sha256 = Get-MIRCPSha256File -Path (Join-Path $sourceRepo ".mir/fixtures.yml")
@@ -210,6 +374,10 @@ function Assert-MIRCPVerificationContext {
     $item = Get-Item -LiteralPath $memberPath
     if ([int64]$item.Length -ne [int64]$member.bytes -or (Get-MIRCPSha256File -Path $memberPath) -ne [string]$member.sha256) { throw "Verification context member changed: $($member.path)" }
   }
+  if ([int]$manifest.context_abi -ge 3) {
+    $environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $resolved "environment-locks.json") | ConvertFrom-Json
+    if (@($environmentLocks.factorio).Count -lt 1) { throw "Executable verification context contains no governed Factorio installation lock." }
+  }
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $resolved "candidate-descriptor.json") | ConvertFrom-Json
   if ((Get-MIRCPSha256File -Path (Join-Path $resolved "candidate.zip")) -ne [string]$descriptor.archive_sha256) { throw "Verification context candidate bytes do not match the descriptor." }
   return [pscustomobject][ordered]@{status="valid"; context_id=$expectedId; path=$resolved; members=@($manifest.members).Count; plan_id=[string]$manifest.plan_id}
@@ -223,6 +391,7 @@ function New-MIRCPVerificationContext {
     [ValidateSet("verification", "release", "publication", "all")][string]$Stage = "verification",
     [string]$CandidatePath = "",
     [string]$SourceRepoRoot = "",
+    [string]$FactorioBin = "",
     [string]$OutputRoot = "out/verification-context",
     [string]$RepoRoot = ""
   )
@@ -256,7 +425,11 @@ function New-MIRCPVerificationContext {
   }
   $registrySha256 = Get-MIRCPSha256Text -Value $registryContent
   $targetProfilePath = Join-Path $sourceRepo "validation/profiles/factorio-$Target.json"
-  $targetProfile = Get-Content -Raw -LiteralPath $targetProfilePath | ConvertFrom-Json
+  $baseTargetProfile = Get-Content -Raw -LiteralPath $targetProfilePath | ConvertFrom-Json
+  $targetProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseTargetProfile -ReleaseRecord $releaseRecord -RepoRoot $repo
+  $targetProfileContent = (($targetProfile | ConvertTo-Json -Depth 40) + "`n").Replace("`r`n", "`n")
+  $targetProfileSha256 = Get-MIRCPSha256Text -Value $targetProfileContent
+  $factorioIdentity = if ([string]::IsNullOrWhiteSpace($FactorioBin)) { $null } else { Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin }
   $transition = Get-MIRCPReleaseTransitionForContext -Release $Release -RepoRoot $repo
   $bundle = Get-MIRCPQualificationBundleForContext -ReleaseRecord $releaseRecord -RepoRoot $repo
   Write-Verbose "[context] resolved registry, profile, transition, and qualification bundle"
@@ -316,7 +489,7 @@ function New-MIRCPVerificationContext {
     "release-transition.json" = $transition
     "expanded-tasks.json" = $expandedTasks
     "domain-manifest.json" = New-MIRCPContextDomainManifest -ReleaseRecord $releaseRecord -QualificationBundle $bundle -RepoRoot $repo
-    "environment-locks.json" = New-MIRCPEnvironmentLocks -ReleaseRecord $releaseRecord -QualificationBundle $bundle -TargetProfile $targetProfile -TargetProfilePath $targetProfilePath -ScenarioRegistrySha256 $registrySha256 -SourceRepoRoot $sourceRepo -RepoRoot $repo
+    "environment-locks.json" = New-MIRCPEnvironmentLocks -ReleaseRecord $releaseRecord -QualificationBundle $bundle -TargetProfile $targetProfile -TargetProfileSha256 $targetProfileSha256 -ScenarioRegistrySha256 $registrySha256 -FactorioIdentity $factorioIdentity -SourceRepoRoot $sourceRepo -RepoRoot $repo
     "control-plane-lock.json" = $controlPlaneLock
   }
   Write-Verbose "[context] assembled context member values"
@@ -330,13 +503,13 @@ function New-MIRCPVerificationContext {
     Write-MIRCPJson -Path (Join-Path $stagingDirectory $entry.Key) -Value $entry.Value -RepoRoot $repo
   }
   [IO.File]::WriteAllText((Join-Path $stagingDirectory "expanded-scenarios.json"), $registryContent, [Text.UTF8Encoding]::new($false))
-  Copy-Item -LiteralPath $targetProfilePath -Destination (Join-Path $stagingDirectory "target-profile.json")
+  [IO.File]::WriteAllText((Join-Path $stagingDirectory "target-profile.json"), $targetProfileContent, [Text.UTF8Encoding]::new($false))
   Copy-Item -LiteralPath $candidate -Destination (Join-Path $stagingDirectory "candidate.zip")
   $members = @(Get-MIRCPContextMemberRows -Directory $stagingDirectory)
   $manifest = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-control-plane-v5-verification-context"
-    context_abi = 2
+    context_abi = 3
     context_id = ""
     mode = $Mode
     target = $Target

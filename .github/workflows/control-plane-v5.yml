@@ -44,7 +44,8 @@ env:
 jobs:
   context:
     name: verification-context
-    runs-on: windows-latest
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
     outputs:
       context_id: ${{ steps.export.outputs.context_id }}
       environments: ${{ steps.export.outputs.environments }}
@@ -86,11 +87,12 @@ jobs:
           MIR_CP_MODE: ${{ inputs.mode }}
           MIR_CP_RELEASE: ${{ inputs.release }}
           MIR_CP_TARGET: ${{ inputs.target }}
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
           $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           $candidate = Join-Path source ([string]$record.package.archive)
           $result = ./scripts/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
-            -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -OutputRoot out/verification-context |
+            -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot out/verification-context |
             ConvertFrom-Json
           "context_id=$([string]$result.context_id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           $registry = Get-Content -Raw -LiteralPath (Join-Path $result.path "expanded-scenarios.json") | ConvertFrom-Json

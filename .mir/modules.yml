@@ -764,9 +764,9 @@ validation_tooling:
     - proposition freshness is explicit and no release uses a global no-reuse switch except governed independent calibration
     - unknown path ownership broadens impact selection and fails governance until classified
     - verification workers consume one immutable context digest and upload content-addressed objects plus execution manifests
-    - executable context ABI 2 binds the controller commit tracked worktree and complete control plane implementation file set and rejects any later checkout drift
+    - executable context ABI 3 binds the controller commit tracked worktree complete control plane implementation file set and at least one target-version-matching Factorio installation lock and rejects any later checkout drift
     - native adapters stage context candidate bytes under the exact Factorio info json archive name while preserving and rechecking the immutable archive digest
-    - native Factorio workers must match the context locked composite installation binary bytes version and official data tree before observation capture while process local full scan reuse remains exact key bound
+    - new-candidate context materialization captures an explicitly selected Factorio binary and complete official data identity on a protected self-hosted runner emits a path-independent composite lock retains path-bound v4 identities only as matching aliases and requires native workers to match that immutable lock before observation capture while process local full scan reuse remains exact key bound
     - producer evaluator and canonicalization revocation may invalidate derived evaluations without discarding sound observations
     - v5 toolchain admission requires exact C24 historical verdict equivalence P9 pending verdict parity and one fresh independent C24 calibration pass
     - P9 operational shadow cutover requires exact admitted outcome and seal evidence and never treats pending parity as release proof
@@ -774,6 +774,7 @@ validation_tooling:
     - fresh C24 calibration executes every planned TaskNode and exact environment batch under one immutable context and emits one compact proof only after unambiguous evidence closure
     - release history integrity executes against the current governance checkout because the frozen package source predates its tag and distribution inventory while candidate bytes remain separately package locked
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
+    - release records own release-specific upgrade baseline target and fixture authority which context materialization projects over the stable target-line engine profile and binds by exact staged profile digest
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
     - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint
     - matching workers are adopted through explicit process or CI-job leases bound to host identity process incarnation trust class and expiry and duplicate fingerprint work is never cancelled in progress

@@ -28,7 +28,7 @@ $canonicalCandidate = Get-MIRCPCanonicalCandidateArchive -State $executionState 
 $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
 if ((Split-Path -Leaf $canonicalCandidate) -ne "more-infinite-research_3.2.2.zip" -or
     (Get-MIRCPSha256File -Path $canonicalCandidate) -ne [string]$release.package.archive_sha256 -or
-    [int]$executionState.manifest.context_abi -ne 2 -or
+    [int]$executionState.manifest.context_abi -ne 3 -or
     $null -eq $controlLock.PSObject.Properties["qualification_source_worktree_sha256"] -or
     @($controlLock.files | Where-Object path -eq "scripts/MIRControlPlane/Executor.ps1").Count -ne 1 -or
     @($controlLock.files | Where-Object path -eq ".mir/control-plane/approved-delta-policies.json").Count -ne 1 -or
@@ -98,6 +98,7 @@ if (-not $aggregateFailedClosed) { throw "Aggregate gate accepted an incomplete 
 $syntheticIdentity = [pscustomobject][ordered]@{
   version = "self-test"
   installation_sha256 = "D" * 64
+  legacy_installation_sha256 = "E" * 64
   binary = [pscustomobject][ordered]@{bytes=10;sha256="A" * 64}
   official_data = [pscustomobject][ordered]@{file_count=2;sha256="B" * 64}
 }
@@ -107,10 +108,28 @@ $syntheticLock = [pscustomobject][ordered]@{
   binary = [pscustomobject][ordered]@{bytes=10;sha256="A" * 64}
   official_data = [pscustomobject][ordered]@{file_count=2;sha256="B" * 64}
 }
-$lockMatches = Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $syntheticLock
+$syntheticProfile = [pscustomobject]@{qualification_factorio_version="self-test"}
+$materializedLock = New-MIRCPFactorioEnvironmentLock -Identity $syntheticIdentity -TargetProfile $syntheticProfile
+$lockMatches = Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $materializedLock
+$legacyLock = [pscustomobject][ordered]@{
+  version = "self-test"
+  installation_sha256 = "E" * 64
+  binary = [pscustomobject][ordered]@{bytes=10;sha256="A" * 64}
+  official_data = [pscustomobject][ordered]@{file_count=2;sha256="B" * 64}
+}
+$legacyLockMatches = Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $legacyLock
+$wrongVersionRejected = $false
+try {
+  [void](New-MIRCPFactorioEnvironmentLock -Identity $syntheticIdentity -TargetProfile ([pscustomobject]@{qualification_factorio_version="other"}))
+} catch {
+  if ($_.Exception.Message -match "does not match target qualification version") { $wrongVersionRejected = $true } else { throw }
+}
 $syntheticLock.installation_sha256 = "C" * 64
 $wrongInstallationRejected = -not (Test-MIRCPFactorioIdentityMatchesLock -Identity $syntheticIdentity -Lock $syntheticLock)
-if (-not $lockMatches -or -not $wrongInstallationRejected) { throw "Executor Factorio lock comparison contract is incomplete." }
+if (-not $lockMatches -or -not $legacyLockMatches -or -not $wrongVersionRejected -or -not $wrongInstallationRejected -or
+    [string]$materializedLock.source -ne "context-materialization") {
+  throw "Context and executor Factorio lock contracts are incomplete."
+}
 $protectedSpoofRejected = $false
 try {
   [void](New-MIRCPExecutorProducer -TrustClass "protected-release" -RepoRoot $repo)
@@ -178,4 +197,4 @@ foreach ($row in @($executionState.plan.tasks | Where-Object { $selected.Contain
 }
 $staticAggregate = Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "static.full" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
 if ([string]$staticAggregate.status -ne "passed" -or [string]$staticAggregate.aggregate_task -ne "static.full") { throw "Static-only aggregate did not close independently." }
-Write-Host "[ok] executor consumes one controller-locked immutable context, stages exact candidate bytes under Factorio's canonical archive name, constrains Factorio performance paths below the conservative Windows budget, relocates context-bound raw artifacts, natively evaluates the exact C24 four-path delta, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."
+Write-Host "[ok] executor consumes one ABI-3 controller-locked immutable context with a target-version-bound Factorio installation seed, stages exact candidate bytes under Factorio's canonical archive name, constrains Factorio performance paths below the conservative Windows budget, relocates context-bound raw artifacts, natively evaluates the exact C24 four-path delta, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."

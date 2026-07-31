@@ -51,7 +51,7 @@ MIR Control Plane v5
   registry -Check           Fail when the execution registry is stale.
   replay                    Replay historical v4 evidence through the pure v5 evaluator.
   replay -Check             Fail when the deterministic replay report is stale.
-  context                   Materialize one immutable, digest-checked verification context.
+  context                   Materialize one immutable, digest-checked context; seed new candidates with -FactorioBin.
   evidence-index            Rebuild the evidence index from content-addressed objects.
   aggregate                 Resolve one result-only aggregate from exact admitted evidence.
   calibrate                 Run or resume a complete local C24 fresh calibration context.
@@ -96,7 +96,7 @@ MIR Control Plane v5
     Update-MIRCPV4ReplayReport -RepoRoot $repo -Check:$Check | ConvertTo-Json -Depth 20
   }
   "context" {
-    New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -Stage $Stage -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -OutputRoot $ContextOutputRoot -RepoRoot $repo | ConvertTo-Json -Depth 10
+    New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -Stage $Stage -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -FactorioBin $FactorioBin -OutputRoot $ContextOutputRoot -RepoRoot $repo | ConvertTo-Json -Depth 10
   }
   "evidence-index" {
     Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot | ConvertTo-Json -Depth 10

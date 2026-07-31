@@ -4,7 +4,7 @@
   "component_abis": {
     "record": 1,
     "planner": 1,
-    "capture": 1,
+    "capture": 2,
     "compilation": 1,
     "realization": 1,
     "evaluation": 1,
