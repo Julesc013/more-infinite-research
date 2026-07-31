@@ -34,7 +34,9 @@
     "control-plane.shadow",
     "control-plane.native-approved-delta",
     "control-plane.performance-path-budget",
-    "control-plane.distribution-inventory"
+    "control-plane.distribution-inventory",
+    "control-plane.idempotent-aggregate-closure",
+    "control-plane.manifest-bound-calibration-proof"
   ],
   "backport_disposition": {
     "factorio-2.1": "shared-control-plane",

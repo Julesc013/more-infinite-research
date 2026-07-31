@@ -11,8 +11,35 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
-foreach ($command in @("Invoke-MIRCPFreshCalibration", "New-MIRCPFreshCalibrationProof")) {
+foreach ($command in @("Invoke-MIRCPFreshCalibration", "New-MIRCPFreshCalibrationProof", "Resolve-MIRCPManifestTaskResult")) {
   if ($null -eq (Get-Command $command -CommandType Function -ErrorAction SilentlyContinue)) { throw "Control-plane calibration command is unavailable: $command" }
+}
+$closureContext = "D" * 64
+$closureIdentity = "C" * 64
+$selectedClosureDigest = "A" * 64
+$unselectedDuplicateDigest = "B" * 64
+$closureManifestRows = @([pscustomobject][ordered]@{
+  task_id = "static.full"
+  status = "passed"
+  context_digest = $closureContext
+  identity_key = $closureIdentity
+  object_digest = $selectedClosureDigest
+})
+$closureEvidenceRows = @(
+  [pscustomobject][ordered]@{digest=$selectedClosureDigest;kind="task-result";task_id="static.full";status="passed";context_digest=$closureContext;identity_key=$closureIdentity;trust_class="ci";revoked=$false},
+  [pscustomobject][ordered]@{digest=$unselectedDuplicateDigest;kind="task-result";task_id="static.full";status="passed";context_digest=$closureContext;identity_key=$closureIdentity;trust_class="ci";revoked=$false}
+)
+$selectedClosureRow = Resolve-MIRCPManifestTaskResult -ManifestTaskResults $closureManifestRows -EvidenceObjects $closureEvidenceRows `
+  -TaskId "static.full" -IdentityKey $closureIdentity -ContextDigest $closureContext -TrustClass "ci"
+$duplicateClosureRejected = $false
+try {
+  [void](Resolve-MIRCPManifestTaskResult -ManifestTaskResults @($closureManifestRows + $closureManifestRows) -EvidenceObjects $closureEvidenceRows `
+    -TaskId "static.full" -IdentityKey $closureIdentity -ContextDigest $closureContext -TrustClass "ci")
+} catch {
+  if ($_.Exception.Message -match "requires one exact TaskNode result") { $duplicateClosureRejected = $true } else { throw }
+}
+if ([string]$selectedClosureRow.digest -ne $selectedClosureDigest -or -not $duplicateClosureRejected) {
+  throw "Fresh-calibration proof selection is not exact-manifest-bound and ambiguity-rejecting."
 }
 
 foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json", "verification-context.schema.json", "evidence-object.schema.json", "evidence-manifest.schema.json", "evidence-revocation.schema.json")) {

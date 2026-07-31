@@ -234,5 +234,13 @@ foreach ($row in @($executionState.plan.tasks | Where-Object { $selected.Contain
     -Payload ([pscustomobject][ordered]@{self_test=$true}) -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo)
 }
 $staticAggregate = Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "static.full" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
-if ([string]$staticAggregate.status -ne "passed" -or [string]$staticAggregate.aggregate_task -ne "static.full") { throw "Static-only aggregate did not close independently." }
-Write-Host "[ok] executor consumes one ABI-3 controller-locked immutable context with a target-version-bound Factorio installation seed, stages exact candidate bytes under Factorio's canonical archive name, constrains Factorio performance paths below the conservative Windows budget, relocates context-bound raw artifacts, natively evaluates the exact C24 four-path delta, scopes named aggregates, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing or unknown work."
+$repeatedStaticAggregate = Complete-MIRCPAggregateGate -ContextPath $context.path -AggregateTaskId "static.full" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
+$staticAggregateObjects = @((Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $evidenceRoot).index.objects | Where-Object {
+  [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq "static.full" -and
+  [string]$_.context_digest -eq [string]$executionState.context.context_id -and -not [bool]$_.revoked
+})
+if ([string]$staticAggregate.status -ne "passed" -or [string]$staticAggregate.aggregate_task -ne "static.full" -or
+    [string]$repeatedStaticAggregate.status -ne "passed" -or $staticAggregateObjects.Count -ne 1) {
+  throw "Static-only aggregate did not close independently and idempotently."
+}
+Write-Host "[ok] executor consumes one ABI-3 controller-locked immutable context with a target-version-bound Factorio installation seed, stages exact candidate bytes under Factorio's canonical archive name, constrains Factorio performance paths below the conservative Windows budget, relocates context-bound raw artifacts, natively evaluates the exact C24 four-path delta, scopes named aggregates idempotently, writes exact task evidence, rejects protected and hosted-runner spoofing, and fails closed on missing, ambiguous, or unknown work."

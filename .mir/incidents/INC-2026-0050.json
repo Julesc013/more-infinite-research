@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0050",
+  "title": "Nested aggregate re-emission made fresh-calibration proof selection ambiguous",
+  "external_issue": "internal://control-plane/manifest-bound-aggregate-closure",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "context_id": "35E51B2601E37087D9C08C45CD0E810256EB58C060CB323BBECEF92FF8B4798E",
+    "plan_id": "2675F8A39C4166A88612900AD1A0A1ECF294078B0EB986A400BA58C467EDE2A5",
+    "task": "calibration-proof"
+  },
+  "reproduction": {
+    "status": "reproduced-by-proof-watcher",
+    "observed": "The exact C24 calibration passed 36 planned TaskNodes, all 113 environment batches, and qualification.full, but proof materialization found two valid same-identity static.full objects because qualification.full re-emitted its aggregate dependency.",
+    "qualification_manifest": "D0014B8E623EF3BFE9D2276211BA528BD1A87D18ED2ED9C8ECB7A78D41E3F35A",
+    "worker_terminal_status": "calibration-passed-proof-generation-failed-closed"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "Complete-MIRCPAggregateGate always emitted aggregate dependencies again when closing a parent aggregate, while New-MIRCPFreshCalibrationProof searched the complete evidence store instead of resolving the one exact TaskNode object selected by the final qualification execution manifest."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:idempotent-aggregate-task-results",
+    "CHG-2026-0001:manifest-bound-calibration-proof"
+  ],
+  "regression_propositions": [
+    "repeating one exact aggregate closure retains one current TaskNode result",
+    "ordinary and aggregate evidence ambiguity fails closed",
+    "fresh-calibration proof selection follows the exact final qualification manifest object digest",
+    "unselected valid history cannot override the final qualification manifest closure",
+    "duplicate TaskNode identities inside the final manifest fail closed",
+    "the immutable pre-repair C24 context is not reinterpreted by repaired controller code",
+    "C24, P9, and C30 package bytes remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.2",
+    "3.2.3",
+    "2.5.0"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+    "package_bytes_changed": false,
+    "downstream_c30_archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+  },
+  "closure": {
+    "status": "pending-new-immutable-c24-calibration",
+    "proof_required": "one complete fresh C24 calibration and compact manifest-bound proof under the repaired committed controller; the pre-repair green context remains immutable readiness evidence only"
+  }
+}

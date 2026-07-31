@@ -1087,6 +1087,7 @@ function Complete-MIRCPAggregateGate {
       elseif ([string]$task.freshness -in @("protected-release-fresh", "always-fresh")) { $matches = @($matches | Where-Object trust_class -eq "protected-release") }
     }
     if ($matches.Count -eq 0) { throw "Aggregate gate lacks exact passing evidence for TaskNode $($row.id)." }
+    if ($matches.Count -gt 1) { throw "Aggregate gate found ambiguous evidence for TaskNode $($row.id)." }
     $taskResults.Add([pscustomobject][ordered]@{task_id=[string]$row.id;status="passed";object_digest=[string]$matches[0].digest})
   }
   $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
@@ -1103,9 +1104,33 @@ function Complete-MIRCPAggregateGate {
     $missingMembers = @($selectedMembers | Where-Object { $member = $_; @($taskResults | Where-Object task_id -eq $member).Count -ne 1 })
     if ($missingMembers.Count -gt 0) { throw "Aggregate TaskNode $($row.id) lacks exact member results: $($missingMembers -join ', ')." }
     $memberResults = @($taskResults | Where-Object { [string]$_.task_id -in $selectedMembers } | Sort-Object task_id)
-    $aggregateMarker = Write-MIRCPTaskResultEvidence -State $state -PlanRow $row -Status passed `
-      -Payload ([pscustomobject][ordered]@{aggregate=$true;members=@($memberResults | ForEach-Object { [pscustomobject][ordered]@{task_id=[string]$_.task_id;object_digest=[string]$_.object_digest} })}) `
-      -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
+    $memberPayload = @($memberResults | ForEach-Object { [pscustomobject][ordered]@{task_id=[string]$_.task_id;object_digest=[string]$_.object_digest} })
+    $aggregateMatches = @($objects | Where-Object {
+      [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq [string]$row.id -and
+      [string]$_.context_digest -eq [string]$state.context.context_id -and
+      [string]$_.identity_key -eq [string]$row.effective_input_sha256 -and
+      [string]$_.status -eq "passed" -and [string]$_.trust_class -eq $TrustClass -and -not [bool]$_.revoked
+    })
+    if ($aggregateMatches.Count -gt 1) { throw "Aggregate gate found ambiguous evidence for aggregate TaskNode $($row.id)." }
+    if ($aggregateMatches.Count -eq 1) {
+      $existingAggregate = (Read-MIRCPEvidenceObject -Digest ([string]$aggregateMatches[0].digest) -RepoRoot $repo -Root $EvidenceRoot).object
+      if (-not [bool]$existingAggregate.payload.aggregate -or
+          (Get-MIRCPSha256Object -Value @($existingAggregate.payload.members)) -ne (Get-MIRCPSha256Object -Value $memberPayload)) {
+        throw "Existing aggregate TaskNode $($row.id) does not bind the exact selected member closure."
+      }
+      $aggregateMarker = [pscustomobject][ordered]@{
+        schema = 1
+        task_id = [string]$row.id
+        status = "passed"
+        context_digest = [string]$state.context.context_id
+        identity_key = [string]$row.effective_input_sha256
+        object_digest = [string]$aggregateMatches[0].digest
+      }
+    } else {
+      $aggregateMarker = Write-MIRCPTaskResultEvidence -State $state -PlanRow $row -Status passed `
+        -Payload ([pscustomobject][ordered]@{aggregate=$true;members=$memberPayload}) `
+        -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
+    }
     $taskResults.Add($aggregateMarker)
   }
   $producer = New-MIRCPExecutorProducer -TrustClass $TrustClass -RepoRoot $repo

@@ -138,6 +138,35 @@ function Invoke-MIRCPFreshCalibration {
   }
 }
 
+function Resolve-MIRCPManifestTaskResult {
+  param(
+    [Parameter(Mandatory)][object[]]$ManifestTaskResults,
+    [Parameter(Mandatory)][object[]]$EvidenceObjects,
+    [Parameter(Mandatory)][string]$TaskId,
+    [Parameter(Mandatory)][string]$IdentityKey,
+    [Parameter(Mandatory)][string]$ContextDigest,
+    [Parameter(Mandatory)][string]$TrustClass
+  )
+  $manifestMatches = @($ManifestTaskResults | Where-Object {
+    [string]$_.task_id -eq $TaskId -and [string]$_.identity_key -eq $IdentityKey -and
+    [string]$_.context_digest -eq $ContextDigest -and [string]$_.status -eq "passed"
+  })
+  if ($manifestMatches.Count -ne 1) {
+    throw "Qualification manifest requires one exact TaskNode result for $TaskId; found $($manifestMatches.Count)."
+  }
+  $digest = [string]$manifestMatches[0].object_digest
+  $objectMatches = @($EvidenceObjects | Where-Object {
+    [string]$_.digest -eq $digest -and [string]$_.kind -eq "task-result" -and
+    [string]$_.task_id -eq $TaskId -and [string]$_.context_digest -eq $ContextDigest -and
+    [string]$_.identity_key -eq $IdentityKey -and [string]$_.status -eq "passed" -and
+    [string]$_.trust_class -eq $TrustClass -and -not [bool]$_.revoked
+  })
+  if ($objectMatches.Count -ne 1) {
+    throw "Qualification manifest TaskNode $TaskId does not resolve to one exact current evidence object."
+  }
+  return $objectMatches[0]
+}
+
 function New-MIRCPFreshCalibrationProof {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
@@ -153,29 +182,6 @@ function New-MIRCPFreshCalibrationProof {
   $indexResult = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
   if ([int]$indexResult.invalid -ne 0) { throw "Calibration proof cannot use an invalid evidence store." }
   $objects = @($indexResult.index.objects)
-  $taskRows = [Collections.Generic.List[object]]::new()
-  foreach ($row in @($state.plan.tasks)) {
-    $matches = @($objects | Where-Object {
-      [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq [string]$row.id -and
-      [string]$_.context_digest -eq [string]$state.context.context_id -and
-      [string]$_.identity_key -eq [string]$row.effective_input_sha256 -and
-      [string]$_.status -eq "passed" -and [string]$_.trust_class -eq "ci" -and -not [bool]$_.revoked
-    })
-    if ($matches.Count -ne 1) { throw "Fresh calibration proof requires one exact TaskNode result for $($row.id); found $($matches.Count)." }
-    $taskRows.Add([pscustomobject][ordered]@{task_id=[string]$row.id;digest=[string]$matches[0].digest})
-  }
-  $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
-  $environmentRows = [Collections.Generic.List[object]]::new()
-  foreach ($batch in @($registry.batches | Where-Object process_required)) {
-    $identity = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{context=[string]$state.context.context_id;batch=$batch})
-    $matches = @($objects | Where-Object {
-      [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq [string]$batch.id -and
-      [string]$_.context_digest -eq [string]$state.context.context_id -and [string]$_.identity_key -eq $identity -and
-      [string]$_.status -eq "passed" -and [string]$_.trust_class -eq "ci" -and -not [bool]$_.revoked
-    })
-    if ($matches.Count -ne 1) { throw "Fresh calibration proof requires one exact environment result for $($batch.id); found $($matches.Count)." }
-    $environmentRows.Add([pscustomobject][ordered]@{batch_id=[string]$batch.id;digest=[string]$matches[0].digest})
-  }
   $qualificationManifests = [Collections.Generic.List[object]]::new()
   foreach ($row in @($objects | Where-Object {
     [string]$_.kind -eq "execution-manifest" -and [string]$_.context_digest -eq [string]$state.context.context_id -and
@@ -187,6 +193,29 @@ function New-MIRCPFreshCalibrationProof {
     }
   }
   if ($qualificationManifests.Count -ne 1) { throw "Fresh calibration proof requires one complete qualification execution manifest." }
+  $manifestTaskResults = @($qualificationManifests[0].record.payload.task_results)
+  $duplicateManifestTasks = @($manifestTaskResults | Group-Object task_id | Where-Object Count -ne 1)
+  if ($duplicateManifestTasks.Count -ne 0) {
+    throw "Fresh calibration qualification manifest contains duplicate TaskNode identities: $(@($duplicateManifestTasks.Name) -join ', ')."
+  }
+  $taskRows = [Collections.Generic.List[object]]::new()
+  foreach ($row in @($state.plan.tasks)) {
+    $match = Resolve-MIRCPManifestTaskResult -ManifestTaskResults $manifestTaskResults -EvidenceObjects $objects `
+      -TaskId ([string]$row.id) -IdentityKey ([string]$row.effective_input_sha256) `
+      -ContextDigest ([string]$state.context.context_id) -TrustClass "ci"
+    $taskRows.Add([pscustomobject][ordered]@{task_id=[string]$row.id;digest=[string]$match.digest})
+  }
+  $registry = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "expanded-scenarios.json") | ConvertFrom-Json
+  $environmentRows = [Collections.Generic.List[object]]::new()
+  foreach ($batch in @($registry.batches | Where-Object process_required)) {
+    $identity = Get-MIRCPSha256Object -Value ([pscustomobject][ordered]@{context=[string]$state.context.context_id;batch=$batch})
+    $match = Resolve-MIRCPManifestTaskResult -ManifestTaskResults $manifestTaskResults -EvidenceObjects $objects `
+      -TaskId ([string]$batch.id) -IdentityKey $identity -ContextDigest ([string]$state.context.context_id) -TrustClass "ci"
+    $environmentRows.Add([pscustomobject][ordered]@{batch_id=[string]$batch.id;digest=[string]$match.digest})
+  }
+  if ($manifestTaskResults.Count -ne ($taskRows.Count + $environmentRows.Count)) {
+    throw "Fresh calibration qualification manifest contains results outside the exact plan and environment closure."
+  }
   $mutation = Assert-MIRCPMutationCalibration -RepoRoot $repo
   if ([int]$mutation.false_negative_budget -ne 0) { throw "Fresh calibration mutation false-negative budget is not zero." }
   $shadow = Assert-MIRCPShadowContract -RepoRoot $repo
