@@ -37,11 +37,32 @@ if ((Split-Path -Leaf $canonicalCandidate) -ne "more-infinite-research_3.2.2.zip
 }
 $targetProfile = Get-Content -Raw -LiteralPath (Join-Path $context.path "target-profile.json") | ConvertFrom-Json
 $candidateDescriptor = Get-Content -Raw -LiteralPath (Join-Path $context.path "candidate-descriptor.json") | ConvertFrom-Json
-$performanceAuthority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo ".mir/performance-campaign.json") `
+$performanceCampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $candidateDescriptor -RepoRoot $repo
+$performanceAuthority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo $performanceCampaignRelativePath) `
   -Descriptor $candidateDescriptor -TargetProfile $targetProfile -RepoRoot $repo
 if ([string]$performanceAuthority.campaign.candidate.candidate_id -ne "C24" -or
-    [string]$performanceAuthority.campaign.candidate.archive_sha256 -ne [string]$release.package.archive_sha256) {
-  throw "Controller performance authority is not bound to exact C24."
+    [string]$performanceAuthority.campaign.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
+    @($controlLock.files | Where-Object path -eq $performanceCampaignRelativePath).Count -ne 1) {
+  throw "Controller performance authority is not bound to exact versioned C24 campaign."
+}
+$c30Release = Get-MIRCPReleaseByVersion -Release "3.2.3" -RepoRoot $repo
+$c30Descriptor = [pscustomobject][ordered]@{
+  release = [string]$c30Release.release
+  candidate_id = [string]$c30Release.candidate_id
+  target = [string]$c30Release.target
+  source_commit = [string]$c30Release.package.source_commit
+  source_sha256 = [string]$c30Release.package.source_sha256
+  archive_sha256 = [string]$c30Release.package.archive_sha256
+  content_sha256 = [string]$c30Release.package.content_sha256
+}
+$c30BaseProfile = Get-Content -Raw -LiteralPath (Join-Path $repo "validation/profiles/factorio-2.1.json") | ConvertFrom-Json
+$c30Profile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $c30BaseProfile -ReleaseRecord $c30Release -RepoRoot $repo
+$c30CampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $c30Descriptor -RepoRoot $repo
+$c30Authority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo $c30CampaignRelativePath) `
+  -Descriptor $c30Descriptor -TargetProfile $c30Profile -RepoRoot $repo
+if ([string]$c30Authority.campaign.baseline.version -ne "3.2.2" -or
+    [string]$c30Authority.campaign.candidate.candidate_id -ne "C30") {
+  throw "Controller performance authority is not bound to exact versioned C30 campaign."
 }
 $overlay = New-MIRCPPerformanceSourceOverlay -State $executionState `
   -Source ([pscustomobject][ordered]@{path=$performanceSource;commit=[string]$candidateDescriptor.source_commit}) `
@@ -80,6 +101,19 @@ if ($deltaPolicy.Count -ne 1 -or [string]$baselineObservation.archive_sha256 -ne
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_removed_paths) -Actual $removedPaths) -or
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_changed_paths) -Actual $changedPaths)) {
   throw "Native C24 approved-delta policy does not accept only the exact immutable four-path patch."
+}$c30Observation = Get-MIRCPZipPackageObservation -Path (Join-Path $repo "dist/more-infinite-research_3.2.3.zip")
+$c30Paths = @{}
+foreach ($file in @($c30Observation.files)) { $c30Paths[[string]$file.path] = [string]$file.sha256 }
+$c30AddedPaths = @($c30Paths.Keys | Where-Object { -not $currentPaths.ContainsKey($_) } | Sort-Object)
+$c30RemovedPaths = @($currentPaths.Keys | Where-Object { -not $c30Paths.ContainsKey($_) } | Sort-Object)
+$c30ChangedPaths = @($c30Paths.Keys | Where-Object { $currentPaths.ContainsKey($_) -and $currentPaths[$_] -cne $c30Paths[$_] } | Sort-Object)
+$c30DeltaPolicy = @($deltaAuthority.policies | Where-Object id -eq "c30-platform-logistics-hotfix-v1")
+if ($c30DeltaPolicy.Count -ne 1 -or [string]$currentObservation.archive_sha256 -ne [string]$c30DeltaPolicy[0].baseline.archive_sha256 -or
+    [string]$c30Observation.archive_sha256 -ne [string]$c30DeltaPolicy[0].candidate.archive_sha256 -or
+    -not (Test-MIRCPExactPathSet -Expected @($c30DeltaPolicy[0].allowed_added_paths) -Actual $c30AddedPaths) -or
+    -not (Test-MIRCPExactPathSet -Expected @($c30DeltaPolicy[0].allowed_removed_paths) -Actual $c30RemovedPaths) -or
+    -not (Test-MIRCPExactPathSet -Expected @($c30DeltaPolicy[0].allowed_changed_paths) -Actual $c30ChangedPaths)) {
+  throw "Native C30 approved-delta policy does not accept only the exact immutable 3.2.2-to-3.2.3 package delta."
 }
 $evidenceRoot = "out/control-plane-v5-self-test/executor-evidence/$([guid]::NewGuid().ToString('N'))"
 $contextResult = Write-MIRCPContextCompletionEvidence -ContextPath $context.path -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo

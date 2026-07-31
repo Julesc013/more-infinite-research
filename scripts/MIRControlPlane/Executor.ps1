@@ -488,7 +488,8 @@ function New-MIRCPPerformanceSourceOverlay {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   . (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
-  $authorityPath = Join-Path $repo ".mir/performance-campaign.json"
+  $authorityRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $Descriptor -RepoRoot $repo
+  $authorityPath = Join-Path $repo $authorityRelativePath
   $authority = Assert-MIRCPPerformanceCampaignAuthority -Path $authorityPath -Descriptor $Descriptor -TargetProfile $TargetProfile -RepoRoot $repo
   $root = Join-Path $repo "out/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
   $destination = Join-Path $root "performance"

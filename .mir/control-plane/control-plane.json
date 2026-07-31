@@ -4,7 +4,7 @@
   "component_abis": {
     "record": 1,
     "planner": 1,
-    "capture": 2,
+    "capture": 3,
     "compilation": 1,
     "realization": 1,
     "evaluation": 1,
@@ -27,6 +27,7 @@
     "freshness": ".mir/control-plane/freshness.json",
     "ownership": ".mir/control-plane/ownership.json",
     "package_locks": ".mir/control-plane/package-locks.json",
+    "performance_campaigns": ".mir/performance-campaigns",
     "mutation_calibration": ".mir/control-plane/mutation-calibration.json",
     "evidence_revocations": ".mir/control-plane/evidence-revocations.json",
     "v4_equivalence": ".mir/control-plane/v4-v5-equivalence.json",

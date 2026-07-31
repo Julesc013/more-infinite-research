@@ -153,6 +153,24 @@ function Resolve-MIRCPTargetProfileForRelease {
   return $profile
 }
 
+function Get-MIRCPPerformanceCampaignRelativePath {
+  param(
+    [Parameter(Mandatory)]$Descriptor,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $release = [string]$Descriptor.release
+  $candidateId = [string]$Descriptor.candidate_id
+  if ($release -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or $candidateId -notmatch '^[A-Za-z0-9.-]+$') {
+    throw "Performance campaign selector received an unsafe release or candidate identity."
+  }
+  $relativePath = ".mir/performance-campaigns/$release-$candidateId.json"
+  if (-not (Test-Path -LiteralPath (Join-Path $repo $relativePath) -PathType Leaf)) {
+    throw "Performance campaign authority is missing for $release $candidateId."
+  }
+  return $relativePath
+}
+
 function Get-MIRCPFactorioIdentity {
   param([Parameter(Mandatory)][string]$FactorioBin)
   $binary = (Resolve-Path -LiteralPath $FactorioBin).Path
@@ -452,12 +470,13 @@ function New-MIRCPVerificationContext {
     bytes = [int64]$releaseRecord.package.bytes
     entries = [int]$releaseRecord.package.entries
   }
+  $performanceCampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $candidateDescriptor -RepoRoot $repo
   $controllerUntracked = @(& git -C $repo ls-files --others --exclude-standard)
   if ($LASTEXITCODE -ne 0 -or $controllerUntracked.Count -ne 0) { throw "Control-plane checkout has untracked governed files." }
   $controllerWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $repo
   $controlPlaneFiles = @(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
-    ".mir/control-plane/approved-delta-policies.json", ".mir/performance-campaign.json",
+    ".mir/control-plane/approved-delta-policies.json", ".mir/performance-campaign.json", $performanceCampaignRelativePath,
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
     "validation/trust.json", "scripts/Invoke-MIRControlPlane.ps1", "scripts/Invoke-MIRControlPlaneWork.ps1",
     "scripts/MIRControlPlane/Core.ps1", "scripts/MIRControlPlane/Records.ps1", "scripts/MIRControlPlane/Planner.ps1",

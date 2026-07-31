@@ -23,6 +23,7 @@
     {"pattern": ".mir/incidents/**", "module": "control-plane-records", "writes": ["assurance.control-plane"]},
     {"pattern": ".mir/tasks/**", "module": "control-plane-records", "writes": ["assurance.catalog"]},
     {"pattern": ".mir/control-plane/**", "module": "control-plane-kernel", "writes": ["assurance.control-plane"]},
+    {"pattern": ".mir/performance-campaigns/**", "module": "control-plane-kernel", "writes": ["assurance.control-plane", "performance.gameplay"]},
     {"pattern": "scripts/MIRControlPlane/**", "module": "control-plane-kernel", "writes": ["assurance.control-plane"]},
     {"pattern": "scripts/Invoke-MIRControlPlane.ps1", "module": "control-plane-facade", "writes": ["assurance.control-plane"]},
     {"pattern": "scripts/Invoke-MIRControlPlaneWork.ps1", "module": "control-plane-work-facade", "writes": ["assurance.control-plane"]},

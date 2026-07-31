@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0048",
+  "title": "C30 qualification had no exact delta or performance campaign authority",
+  "external_issue": "internal://control-plane/candidate-measurement-authority-selection",
+  "state": "regression-proven-pending-qualification",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C30",
+    "context_id": "6AF6F9DDE2C5F90787713476961D8AF9B0D3BE63FA2CB2F519EEF0808609CFCC",
+    "context_abi": 3
+  },
+  "reproduction": {
+    "status": "reproduced-by-authority-inspection",
+    "observed": "The approved-delta catalog contained only C24 and the single mutable performance campaign bound C24 against 3.2.1. Exact C30 adapters would therefore fail after otherwise valid work instead of measuring 3.2.2 against C30.",
+    "approved_delta_candidate_rows": 0,
+    "performance_campaign_candidate": "C24",
+    "required_baseline": "3.2.2"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "Approved-delta policies supported multiple releases but no C30 row had been frozen. Performance authority still used one unversioned file for both historical C24 calibration and active candidate qualification, so advancing it would have broken C24 while retaining it blocked C30."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:versioned-performance-campaign-authority",
+    "CHG-2026-0001:c30-exact-approved-delta-policy"
+  ],
+  "regression_propositions": [
+    "C24 and C30 performance campaigns coexist as immutable release-candidate authorities",
+    "context materialization locks exactly the campaign selected by release and candidate ID",
+    "C24 calibration continues to select 3.2.2-C24",
+    "C30 qualification selects 3.2.3-C30 with exact 3.2.2 baseline and C30 package identities",
+    "the C30 approved-delta policy matches exactly one added, zero removed, and 67 changed package paths",
+    "no package-visible C30 byte changes"
+  ],
+  "affected_releases": [
+    "3.2.3"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "pending-exact-c30-delta-performance-and-complete-qualification",
+    "proof_required": "a new immutable context locking the versioned C30 campaign, followed by passing exact approved-delta, paired performance, candidate, and protected qualification"
+  }
+}

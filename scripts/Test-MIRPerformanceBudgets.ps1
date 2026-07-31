@@ -147,6 +147,25 @@ $activeCandidate = $releaseLedger.development.'factorio-2.1'
 $currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/current.json") | ConvertFrom-Json
 $activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($activeCandidate.mir_version).json") | ConvertFrom-Json
 $taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($currentRoles.roles.tagged_factorio_2_1).json") | ConvertFrom-Json
+$activeCampaignPath = Join-Path $RepoRoot ".mir/performance-campaigns/$($activeCandidate.mir_version)-$($activeCandidate.candidate_id).json"
+if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
+  throw "Active candidate has no versioned performance campaign authority."
+}
+$activeCampaign = Get-Content -Raw -LiteralPath $activeCampaignPath | ConvertFrom-Json
+if ([int]$activeCampaign.schema -ne 2 -or
+    [string]$activeCampaign.release -ne [string]$activeTypedRelease.release -or
+    [string]$activeCampaign.factorio_line -ne [string]$activeTypedRelease.target -or
+    [string]$activeCampaign.baseline.version -ne [string]$taggedTypedRelease.release -or
+    [string]$activeCampaign.baseline.archive_sha256 -ne [string]$taggedTypedRelease.package.archive_sha256 -or
+    [string]$activeCampaign.baseline.package_content_sha256 -ne [string]$taggedTypedRelease.package.content_sha256 -or
+    [string]$activeCampaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+    [string]$activeCampaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+    [string]$activeCampaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+    [string]$activeCampaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+    [string]$activeCampaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+    [string]$activeCampaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+  throw "Versioned performance campaign does not bind the exact active candidate and tagged baseline."
+}
 $campaignBindsActiveCandidate = $null -ne $activeCandidate -and
   [string]$campaign.candidate.candidate_id -eq [string]$activeCandidate.candidate_id -and
   [string]$campaign.candidate.version -eq [string]$activeCandidate.mir_version -and
