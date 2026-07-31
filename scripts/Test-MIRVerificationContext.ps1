@@ -18,8 +18,9 @@ foreach ($required in @("plan.json", "candidate-descriptor.json", "release-trans
 $environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $first.path "environment-locks.json") | ConvertFrom-Json
 $controlLock = Get-Content -Raw -LiteralPath (Join-Path $first.path "control-plane-lock.json") | ConvertFrom-Json
 if ([int]$manifest.context_abi -ne 3 -or @($environmentLocks.factorio).Count -lt 1 -or
-    @($controlLock.files | Where-Object path -eq ".mir/performance-campaigns/3.2.2-C24.json").Count -ne 1) {
-  throw "Executable verification context does not bind ABI 3, a Factorio installation, and its exact versioned performance campaign."
+    @($controlLock.files | Where-Object path -eq ".mir/performance-campaigns/3.2.2-C24.json").Count -ne 1 -or
+    @($controlLock.files | Where-Object path -eq ".mir/control-plane/v4-v5-equivalence.json").Count -ne 1) {
+  throw "Executable verification context does not bind ABI 3, a Factorio installation, its exact versioned performance campaign, and shadow cutover authority."
 }
 $stagedProfilePath = Join-Path $first.path "target-profile.json"
 if ([string]$environmentLocks.target_profile.sha256 -ne (Get-MIRCPSha256File -Path $stagedProfilePath)) {

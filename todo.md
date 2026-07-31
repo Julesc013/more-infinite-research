@@ -77,6 +77,7 @@ Generated: 2026-07-31
 - [ ] `INC-2026-0046` — New-candidate verification context omitted a Factorio installation lock; closure `pending-complete-c30-qualification-and-c24-calibration`
 - [ ] `INC-2026-0047` — C30 context selected the stale C24 upgrade transition; closure `pending-exact-c30-upgrade-and-complete-qualification`
 - [ ] `INC-2026-0048` — C30 qualification had no exact delta or performance campaign authority; closure `pending-exact-c30-delta-performance-and-complete-qualification`
+- [ ] `INC-2026-0049` — Non-calibration release shadow evaluation required a nonexistent v4 baseline; closure `pending-fresh-c24-calibration-and-c30-requalification`
 
 ## Explicit release obligations
 

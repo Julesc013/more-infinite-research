@@ -54,6 +54,30 @@ $registryResult = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $r
 $replay = Update-MIRCPV4ReplayReport -RepoRoot $repo -Check
 if ([string]$replay.verdict -ne "passed" -or [int]$replay.metrics.source_evidence -ne 130) { throw "Historical v4 evidence replay is incomplete." }
 $shadowContract = Assert-MIRCPShadowContract -RepoRoot $repo
+$policy = Get-MIRCPPolicy -RepoRoot $repo
+$proofSha256 = "A" * 64
+$implementationCommit = "b" * 40
+$syntheticProof = [pscustomobject][ordered]@{authority="mir-control-plane-v5-fresh-independent-calibration";status="passed";release="3.2.2";control_plane_commit=$implementationCommit;component_abis=$policy.component_abis}
+$syntheticLock = [pscustomobject][ordered]@{component_abis=$policy.component_abis}
+$pendingInheritance = Test-MIRCPInheritedShadowCutoverContract -Authority (Get-MIRCPShadowAuthority -RepoRoot $repo) `
+  -Cutover (Get-MIRCPShadowAuthority -RepoRoot $repo).target_cutovers.'2.1' -CalibrationProof $syntheticProof `
+  -ControlLock $syntheticLock -Policy $policy -Target "2.1" -ProofSha256 $proofSha256 -ProofRevoked $false
+if ([string]$pendingInheritance.status -ne "failed" -or @($pendingInheritance.failures) -notcontains "global v4/v5 equivalence is not accepted") {
+  throw "C30 inherited shadow admission did not fail closed while global equivalence is pending."
+}
+$acceptedAuthority = [pscustomobject][ordered]@{state="accepted";calibration_candidates=@("3.2.2","2.5.0")}
+$acceptedCutover = [pscustomobject][ordered]@{state="accepted";calibration_release="3.2.2";proof_sha256=$proofSha256;implementation_commit=$implementationCommit;component_abis=$policy.component_abis}
+$acceptedInheritance = Test-MIRCPInheritedShadowCutoverContract -Authority $acceptedAuthority -Cutover $acceptedCutover `
+  -CalibrationProof $syntheticProof -ControlLock $syntheticLock -Policy $policy -Target "2.1" -ProofSha256 $proofSha256 -ProofRevoked $false
+if ([string]$acceptedInheritance.status -ne "passed" -or @($acceptedInheritance.failures).Count -ne 0) { throw "Exact accepted C24 cutover did not admit later Factorio 2.1 release inheritance." }
+$revokedInheritance = Test-MIRCPInheritedShadowCutoverContract -Authority $acceptedAuthority -Cutover $acceptedCutover `
+  -CalibrationProof $syntheticProof -ControlLock $syntheticLock -Policy $policy -Target "2.1" -ProofSha256 $proofSha256 -ProofRevoked $true
+if ([string]$revokedInheritance.status -ne "failed" -or @($revokedInheritance.failures) -notcontains "fresh calibration proof is revoked") { throw "Inherited shadow admission accepted a revoked calibration proof." }
+$p9InheritanceRejected = $false
+try { [void](Assert-MIRCPInheritedShadowCutover -ReleaseRecord (Get-MIRCPReleaseByVersion -Release "2.5.0" -RepoRoot $repo) -ContextPath "missing" -SourceRepoRoot "missing" -RepoRoot $repo) } catch {
+  if ($_.Exception.Message -match "Calibration candidates cannot use inherited") { $p9InheritanceRejected = $true } else { throw }
+}
+if (-not $p9InheritanceRejected) { throw "P9 was permitted to inherit C24 shadow admission instead of requiring target-local operational proof." }
 $shadow = Read-MIRCPJson -Path ".mir/control-plane/shadow-analysis.json" -RepoRoot $repo
 $expectedShadowCounts = @{
   "3.2.2" = @{ v4 = 113; v5 = 116 }

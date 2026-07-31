@@ -11,7 +11,7 @@
     "canonicalization": 1,
     "evidence_store": 1,
     "view_generator": 1,
-    "shadow": 1,
+    "shadow": 2,
     "release_controller": 1
   },
   "records": {

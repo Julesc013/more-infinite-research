@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0049",
+  "title": "Non-calibration release shadow evaluation required a nonexistent v4 baseline",
+  "external_issue": "internal://control-plane/inherited-shadow-cutover",
+  "state": "regression-proven-pending-c24-cutover",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C30",
+    "context_id": "C72C7ACB3ECACE2359CA1C89B722DC588F96537BC61F48079A222F9F75481355",
+    "plan_id": "CFFE04E84B83968A13371DD4691058F2AB2271BE202A34D8DFB8A20816FAA72B",
+    "task": "shadow.structural"
+  },
+  "reproduction": {
+    "status": "reproduced-by-offline-worker",
+    "observed": "The exact C30 offline worker passed preceding static and package tasks, then Test-MIRControlPlaneShadow passed release 3.2.3 to a calibration-only candidate analyzer whose accepted values were 3.2.2 and 2.5.0.",
+    "worker_terminal_status": "failed-before-factorio-environments"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "The shadow test treated every later release as a new v4/v5 calibration candidate instead of separating calibration releases from releases inheriting an already accepted target cutover."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:per-target-inherited-shadow-cutover",
+    "CHG-2026-0001:protected-release-proof-closure"
+  ],
+  "regression_propositions": [
+    "C30 is rejected while global or Factorio 2.1 C24 cutover state is pending",
+    "a later Factorio 2.1 release is admitted only by an exact passing unrevoked C24 calibration proof with identical component ABIs",
+    "P9 remains a calibration candidate and cannot inherit C24 admission",
+    "full inherited shadow admission requires exact protected qualification and exact-candidate seal evidence",
+    "verification contexts lock the accepted calibration proof when it exists",
+    "no package-visible C30 byte changes"
+  ],
+  "affected_releases": [
+    "3.2.3",
+    "2.5.0"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "pending-fresh-c24-calibration-and-c30-requalification",
+    "proof_required": "complete fresh C24 calibration, accepted Factorio 2.1 cutover authority, then a new immutable C30 context through local and protected qualification"
+  }
+}

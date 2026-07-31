@@ -471,11 +471,18 @@ function New-MIRCPVerificationContext {
     entries = [int]$releaseRecord.package.entries
   }
   $performanceCampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $candidateDescriptor -RepoRoot $repo
+  $shadowAuthority = Read-MIRCPJson -Path ".mir/control-plane/v4-v5-equivalence.json" -RepoRoot $repo
+  $cutoverProofFiles = @($shadowAuthority.target_cutovers.PSObject.Properties | ForEach-Object {
+    [string]$_.Value.proof_path
+  } | Where-Object {
+    -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path -LiteralPath (Join-Path $repo $_) -PathType Leaf)
+  } | Sort-Object -Unique)
   $controllerUntracked = @(& git -C $repo ls-files --others --exclude-standard)
   if ($LASTEXITCODE -ne 0 -or $controllerUntracked.Count -ne 0) { throw "Control-plane checkout has untracked governed files." }
   $controllerWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $repo
-  $controlPlaneFiles = @(
+  $controlPlaneFiles = @(@(
     ".mir/control-plane/control-plane.json", ".mir/control-plane/domains.json", ".mir/control-plane/freshness.json",
+    ".mir/control-plane/v4-v5-equivalence.json",
     ".mir/control-plane/approved-delta-policies.json", ".mir/performance-campaign.json", $performanceCampaignRelativePath,
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
     "validation/trust.json", "scripts/Invoke-MIRControlPlane.ps1", "scripts/Invoke-MIRControlPlaneWork.ps1",
@@ -483,7 +490,7 @@ function New-MIRCPVerificationContext {
     "scripts/MIRControlPlane/Scenario.ps1", "scripts/MIRControlPlane/Observation.ps1", "scripts/MIRControlPlane/Evidence.ps1",
     "scripts/MIRControlPlane/Views.ps1", "scripts/MIRControlPlane/Context.ps1", "scripts/MIRControlPlane/Shadow.ps1",
     "scripts/MIRControlPlane/Executor.ps1", "scripts/MIRControlPlane/Release.ps1", "scripts/MIRControlPlane/Calibration.ps1"
-  )
+  ) + $cutoverProofFiles | Sort-Object -Unique)
   $controlPlaneLock = [pscustomobject][ordered]@{
     schema = 1
     policy_id = "mir-control-plane-v5"

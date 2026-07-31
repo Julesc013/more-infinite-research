@@ -10,6 +10,126 @@ function Get-MIRCPShadowBaselinePath {
   throw "No governed v4 shadow baseline for $Release."
 }
 
+function Test-MIRCPInheritedShadowCutoverContract {
+  param(
+    [Parameter(Mandatory)]$Authority,
+    [Parameter(Mandatory)]$Cutover,
+    [Parameter(Mandatory)]$CalibrationProof,
+    [Parameter(Mandatory)]$ControlLock,
+    [Parameter(Mandatory)]$Policy,
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)][string]$ProofSha256,
+    [Parameter(Mandatory)][bool]$ProofRevoked
+  )
+  $failures = [Collections.Generic.List[string]]::new()
+  if ([string]$Authority.state -ne "accepted") { $failures.Add("global v4/v5 equivalence is not accepted") }
+  if ([string]$Cutover.state -ne "accepted") { $failures.Add("target cutover is not accepted") }
+  if ([string]$Cutover.calibration_release -notin @($Authority.calibration_candidates | ForEach-Object { [string]$_ })) { $failures.Add("target cutover does not name a calibration release") }
+  if ([string]$CalibrationProof.authority -ne "mir-control-plane-v5-fresh-independent-calibration" -or [string]$CalibrationProof.status -ne "passed") { $failures.Add("fresh calibration proof is not passing") }
+  if ([string]$CalibrationProof.release -ne [string]$Cutover.calibration_release) { $failures.Add("fresh calibration proof release differs from target cutover") }
+  if ($ProofSha256 -ne [string]$Cutover.proof_sha256) { $failures.Add("fresh calibration proof digest differs from target cutover") }
+  if ($ProofRevoked) { $failures.Add("fresh calibration proof is revoked") }
+  if ([string]$CalibrationProof.control_plane_commit -ne [string]$Cutover.implementation_commit) { $failures.Add("fresh calibration implementation commit differs from target cutover") }
+  if ($null -eq $CalibrationProof.component_abis -or $null -eq $Cutover.component_abis -or $null -eq $ControlLock.component_abis -or $null -eq $Policy.component_abis) {
+    $failures.Add("component ABIs differ from the accepted calibration")
+  } else {
+    $proofAbis = Get-MIRCPSha256Object -Value $CalibrationProof.component_abis
+    $cutoverAbis = Get-MIRCPSha256Object -Value $Cutover.component_abis
+    $contextAbis = Get-MIRCPSha256Object -Value $ControlLock.component_abis
+    $policyAbis = Get-MIRCPSha256Object -Value $Policy.component_abis
+    if ($proofAbis -ne $cutoverAbis -or $proofAbis -ne $contextAbis -or $proofAbis -ne $policyAbis) { $failures.Add("component ABIs differ from the accepted calibration") }
+  }
+  return [pscustomobject][ordered]@{status=if($failures.Count -eq 0){"passed"}else{"failed"};target=$Target;calibration_release=[string]$Cutover.calibration_release;failures=@($failures)}
+}
+
+function Assert-MIRCPInheritedShadowCutover {
+  param(
+    [Parameter(Mandatory)]$ReleaseRecord,
+    [Parameter(Mandatory)][string]$ContextPath,
+    [Parameter(Mandatory)][string]$SourceRepoRoot,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $authority = Get-MIRCPShadowAuthority -RepoRoot $repo
+  if ([string]$ReleaseRecord.release -in @($authority.calibration_candidates | ForEach-Object { [string]$_ })) { throw "Calibration candidates cannot use inherited shadow admission." }
+  $cutoverProperty = $authority.target_cutovers.PSObject.Properties[[string]$ReleaseRecord.target]
+  if ($null -eq $cutoverProperty) { throw "No governed shadow cutover exists for target $($ReleaseRecord.target)." }
+  $cutover = $cutoverProperty.Value
+  if ([string]::IsNullOrWhiteSpace([string]$cutover.proof_path)) { throw "Target shadow cutover has no calibration proof path." }
+  $proofPath = Join-Path $repo ([string]$cutover.proof_path)
+  if (-not (Test-Path -LiteralPath $proofPath -PathType Leaf)) { throw "Accepted target shadow calibration proof is missing." }
+  $proof = Get-Content -Raw -LiteralPath $proofPath | ConvertFrom-Json
+  $proofSha256 = Get-MIRCPSha256File -Path $proofPath
+  $proofBody = [ordered]@{}
+  foreach ($property in $proof.PSObject.Properties | Where-Object Name -ne "calibration_sha256") { $proofBody[$property.Name] = $property.Value }
+  if ([string]$proof.calibration_sha256 -ne (Get-MIRCPSha256Object -Value ([pscustomobject]$proofBody))) { throw "Fresh calibration proof self-digest is invalid." }
+  $calibrationRelease = Get-MIRCPReleaseByVersion -Release ([string]$cutover.calibration_release) -RepoRoot $repo
+  if ([string]$proof.candidate_archive_sha256 -ne [string]$calibrationRelease.package.archive_sha256 -or
+      [string]$proof.candidate_content_sha256 -ne [string]$calibrationRelease.package.content_sha256 -or
+      [string]$proof.package_source_commit -ne [string]$calibrationRelease.package.source_commit) {
+    throw "Fresh calibration proof is not exact-candidate bound to its calibration release."
+  }
+  $revocations = Get-MIRCPEvidenceRevocationAuthority -RepoRoot $repo
+  $revocableDigests = @($proofSha256, [string]$proof.qualification_manifest)
+  $proofRevoked = @($revocations.rules | Where-Object {
+    [bool]$_.active -and [string]$_.type -eq "object-digest-set" -and
+    @($_.digests | ForEach-Object { [string]$_ } | Where-Object { $_ -in $revocableDigests }).Count -ne 0
+  }).Count -ne 0
+  $context = Assert-MIRCPVerificationContext -Path $ContextPath
+  $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
+  $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
+  if ([string]$manifest.release -ne [string]$ReleaseRecord.release) { throw "Inherited shadow context release mismatch." }
+  $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
+  $sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()
+  $sourceTree = ([string](& git -C $source rev-parse "HEAD^{tree}")).Trim()
+  $sourceWorktree = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source
+  if ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or
+      $sourceTree -ne [string]$controlLock.scenario_source_tree -or $sourceWorktree -ne [string]$controlLock.scenario_source_worktree_sha256) {
+    throw "Inherited shadow source does not match its immutable context qualification-source lock."
+  }
+  foreach ($lockedPath in @(".mir/control-plane/v4-v5-equivalence.json", [string]$cutover.proof_path)) {
+    $matches = @($controlLock.files | Where-Object path -eq $lockedPath)
+    if ($matches.Count -ne 1 -or [string]$matches[0].sha256 -ne (Get-MIRCPSha256File -Path (Join-Path $repo $lockedPath))) { throw "Inherited shadow context does not lock exact authority $lockedPath." }
+  }
+  $result = Test-MIRCPInheritedShadowCutoverContract -Authority $authority -Cutover $cutover -CalibrationProof $proof `
+    -ControlLock $controlLock -Policy (Get-MIRCPPolicy -RepoRoot $repo) -Target ([string]$ReleaseRecord.target) `
+    -ProofSha256 $proofSha256 -ProofRevoked $proofRevoked
+  if ([string]$result.status -ne "passed") { throw "Inherited shadow cutover rejected $($ReleaseRecord.release): $(@($result.failures) -join '; ')." }
+  & git -C $repo merge-base --is-ancestor ([string]$cutover.implementation_commit) ([string]$controlLock.qualification_source_commit)
+  if ($LASTEXITCODE -ne 0) { throw "Context control-plane commit does not descend from the accepted cutover implementation." }
+  return $result
+}
+
+function Assert-MIRCPInheritedReleaseProofClosure {
+  param(
+    [Parameter(Mandatory)]$ReleaseRecord,
+    [Parameter(Mandatory)][string]$ContextPath,
+    [Parameter(Mandatory)][string]$EvidenceRoot,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $context = Assert-MIRCPVerificationContext -Path $ContextPath
+  $plan = Get-Content -Raw -LiteralPath (Join-Path $context.path "plan.json") | ConvertFrom-Json
+  $index = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $EvidenceRoot
+  if ([int]$index.invalid -ne 0) { throw "Inherited shadow evidence store contains invalid objects." }
+  foreach ($binding in @(@{task="qualification.full";trust="protected-release"}, @{task="seal";trust="protected-release"})) {
+    $row = @($plan.plan.tasks | Where-Object id -eq $binding.task)
+    $matches = @($index.index.objects | Where-Object {
+      [string]$_.kind -eq "task-result" -and [string]$_.task_id -eq $binding.task -and
+      [string]$_.context_digest -eq [string]$context.context_id -and
+      [string]$_.identity_key -eq [string]$row[0].effective_input_sha256 -and
+      [string]$_.status -eq "passed" -and [string]$_.trust_class -eq $binding.trust -and -not [bool]$_.revoked
+    })
+    if ($row.Count -ne 1 -or $matches.Count -ne 1) { throw "Inherited shadow admission requires one exact unrevoked $($binding.task) result." }
+    if ($binding.task -eq "seal") {
+      $taskObject = (Read-MIRCPEvidenceObject -Digest ([string]$matches[0].digest) -RepoRoot $repo -Root $EvidenceRoot).object
+      $seal = (Read-MIRCPEvidenceObject -Digest ([string]$taskObject.payload.seal_object) -RepoRoot $repo -Root $EvidenceRoot).object
+      if ([string]$seal.kind -ne "seal" -or [string]$seal.payload.status -ne "passed" -or
+          [string]$seal.subject.archive_sha256 -ne [string]$ReleaseRecord.package.archive_sha256) { throw "Inherited shadow seal is not exact-candidate bound." }
+    }
+  }
+  return [pscustomobject][ordered]@{status="passed";release=[string]$ReleaseRecord.release;context_id=[string]$context.context_id}
+}
 function New-MIRCPShadowOutcome {
   param(
     [Parameter(Mandatory)][string]$Status,
@@ -133,7 +253,7 @@ function Get-MIRCPShadowP9Outcomes {
 
 function New-MIRCPShadowCandidateAnalysis {
   param(
-    [Parameter(Mandatory)][ValidateSet("3.2.2", "2.5.0")][string]$Release,
+    [Parameter(Mandatory)][string]$Release,
     [Parameter(Mandatory)][string]$SourceRepoRoot,
     [string]$ContextPath = "",
     [string]$ObservedProofRoot = "",
@@ -143,6 +263,7 @@ function New-MIRCPShadowCandidateAnalysis {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
   $authority = Get-MIRCPShadowAuthority -RepoRoot $repo
+  if ($Release -notin @($authority.calibration_candidates | ForEach-Object { [string]$_ })) { throw "Release $Release is not a governed shadow calibration candidate." }
   $baselinePath = Get-MIRCPShadowBaselinePath -Release $Release
   $baseline = Read-MIRCPJson -Path $baselinePath -RepoRoot $repo
   $releaseRecord = Get-MIRCPReleaseByVersion -Release $Release -RepoRoot $repo
@@ -297,6 +418,14 @@ function Assert-MIRCPShadowContract {
   $required = @("candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities", "approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs")
   if ([int]$authority.schema -ne 1 -or [string]$authority.authority -ne "mir-control-plane-v5-shadow-equivalence") { throw "Shadow equivalence authority is invalid." }
   foreach ($dimension in $required) { if (@($authority.dimensions) -notcontains $dimension) { throw "Shadow authority omits dimension $dimension." } }
+  foreach ($target in @("2.1", "2.0")) {
+    $cutover = $authority.target_cutovers.PSObject.Properties[$target]
+    if ($null -eq $cutover -or [string]$cutover.Value.state -notin @("pending", "accepted") -or
+        [string]$cutover.Value.calibration_release -notin @($authority.calibration_candidates | ForEach-Object { [string]$_ })) {
+      throw "Shadow authority has no valid target cutover for $target."
+    }
+  }
+  if ([string]$authority.state -eq "accepted" -and [string]$authority.target_cutovers.'2.1'.state -ne "accepted") { throw "Global shadow acceptance requires accepted Factorio 2.1 C24 cutover." }
   if (-not [bool]$authority.acceptance.exact_plan_obligation_equivalence -or -not [bool]$authority.acceptance.exact_verdict_equivalence -or -not [bool]$authority.acceptance.fresh_independent_calibration_required) { throw "Shadow acceptance weakened a required condition." }
   $taskMap = Get-MIRCPTaskMap -RepoRoot $repo
   $baselineObligations = @((Read-MIRCPJson -Path (Get-MIRCPShadowBaselinePath -Release "3.2.2") -RepoRoot $repo).obligations.id | ForEach-Object { [string]$_ } | Sort-Object)

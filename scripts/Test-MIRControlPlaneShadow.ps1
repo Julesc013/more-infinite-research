@@ -21,6 +21,17 @@ if ([string]::IsNullOrWhiteSpace($ContextPath) -or [string]::IsNullOrWhiteSpace(
   throw "Operational shadow evaluation requires one immutable context and exact source checkout."
 }
 $manifest = Get-Content -Raw -LiteralPath (Join-Path (Resolve-Path -LiteralPath $ContextPath).Path "context-manifest.json") | ConvertFrom-Json
+$releaseRecord = Get-MIRCPReleaseByVersion -Release ([string]$manifest.release) -RepoRoot $repo
+$authority = Get-MIRCPShadowAuthority -RepoRoot $repo
+$isCalibrationCandidate = [string]$manifest.release -in @($authority.calibration_candidates | ForEach-Object { [string]$_ })
+if (-not $isCalibrationCandidate) {
+  $inherited = Assert-MIRCPInheritedShadowCutover -ReleaseRecord $releaseRecord -ContextPath $ContextPath -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo
+  if (-not $StructuralOnly) {
+    [void](Assert-MIRCPInheritedReleaseProofClosure -ReleaseRecord $releaseRecord -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo)
+  }
+  Write-Host "[ok] inherited v4/v5 shadow cutover is accepted for $($manifest.release) from $($inherited.calibration_release)."
+  exit 0
+}
 $candidate = New-MIRCPShadowCandidateAnalysis -Release ([string]$manifest.release) -SourceRepoRoot $SourceRepoRoot -ContextPath $ContextPath -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 foreach ($dimension in @("candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities")) {
   if ([string]$candidate.dimensions.$dimension.status -ne "passed") { throw "Shadow structural dimension failed for $($manifest.release): $dimension" }

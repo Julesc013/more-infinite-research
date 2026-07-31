@@ -3,6 +3,24 @@
   "authority": "mir-control-plane-v5-shadow-equivalence",
   "state": "pending",
   "calibration_candidates": ["3.2.2", "2.5.0"],
+  "target_cutovers": {
+    "2.1": {
+      "state": "pending",
+      "calibration_release": "3.2.2",
+      "proof_path": ".mir/control-plane/fresh-calibration.json",
+      "proof_sha256": "",
+      "implementation_commit": "",
+      "component_abis": null
+    },
+    "2.0": {
+      "state": "pending",
+      "calibration_release": "2.5.0",
+      "proof_path": "",
+      "proof_sha256": "",
+      "implementation_commit": "",
+      "component_abis": null
+    }
+  },
   "dimensions": ["candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities", "approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs"],
   "acceptance": {"exact_plan_obligation_equivalence": true, "exact_verdict_equivalence": true, "fresh_independent_calibration_required": true},
   "obligation_mapping": {
