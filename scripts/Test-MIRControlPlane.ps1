@@ -95,8 +95,10 @@ $proofSha256 = "A" * 64
 $implementationCommit = "b" * 40
 $syntheticProof = [pscustomobject][ordered]@{authority="mir-control-plane-v5-fresh-independent-calibration";status="passed";release="3.2.2";control_plane_commit=$implementationCommit;component_abis=$policy.component_abis}
 $syntheticLock = [pscustomobject][ordered]@{component_abis=$policy.component_abis}
-$pendingInheritance = Test-MIRCPInheritedShadowCutoverContract -Authority (Get-MIRCPShadowAuthority -RepoRoot $repo) `
-  -Cutover (Get-MIRCPShadowAuthority -RepoRoot $repo).target_cutovers.'2.1' -CalibrationProof $syntheticProof `
+$pendingAuthority = [pscustomobject][ordered]@{state="pending";calibration_candidates=@("3.2.2","2.5.0")}
+$pendingCutover = [pscustomobject][ordered]@{state="pending";calibration_release="3.2.2";proof_sha256="";implementation_commit="";component_abis=$null}
+$pendingInheritance = Test-MIRCPInheritedShadowCutoverContract -Authority $pendingAuthority `
+  -Cutover $pendingCutover -CalibrationProof $syntheticProof `
   -ControlLock $syntheticLock -Policy $policy -Target "2.1" -ProofSha256 $proofSha256 -ProofRevoked $false
 if ([string]$pendingInheritance.status -ne "failed" -or @($pendingInheritance.failures) -notcontains "global v4/v5 equivalence is not accepted") {
   throw "C30 inherited shadow admission did not fail closed while global equivalence is pending."

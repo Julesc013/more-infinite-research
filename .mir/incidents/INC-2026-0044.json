@@ -3,7 +3,7 @@
   "id": "INC-2026-0044",
   "title": "Fresh C24 calibration exceeded the diagnostics-on absolute performance ceiling",
   "external_issue": "internal://control-plane/c24-diagnostics-on-performance-ceiling",
-  "state": "regression-proven-pending-calibration",
+  "state": "closed",
   "failing_environment": {
     "target": "2.1",
     "release": "3.2.2",
@@ -74,7 +74,11 @@
     "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b"
   },
   "closure": {
-    "status": "pending-complete-fresh-calibration",
-    "proof_required": "a complete fresh C24 calibration under a new immutable context; the retained quiet-host exact paired pass satisfies the independent performance reproduction proposition but is not substituted for calibration closure"
+    "status": "closed-exact-c24-fresh-calibration",
+    "proof_required": "a complete fresh C24 calibration under a new immutable context; the retained quiet-host exact paired pass satisfies the independent performance reproduction proposition but is not substituted for calibration closure",
+    "proof_path": ".mir/control-plane/fresh-calibration.json",
+    "proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2",
+    "context_digest": "F97E2730F4729D835ED4B24593F184A715F02286F53E38F192DEA571322E6975",
+    "qualification_manifest_digest": "41034B2E5B1729681BFC26DCC1E86D50EEF68C3236289D5E4FB7C33ECCD3F24C"
   }
 }

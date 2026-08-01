@@ -3,7 +3,7 @@
   "id": "INC-2026-0049",
   "title": "Non-calibration release shadow evaluation required a nonexistent v4 baseline",
   "external_issue": "internal://control-plane/inherited-shadow-cutover",
-  "state": "regression-proven-pending-c24-cutover",
+  "state": "regression-proven",
   "failing_environment": {
     "target": "2.1",
     "release": "3.2.3",
@@ -45,7 +45,9 @@
     "package_bytes_changed": false
   },
   "closure": {
-    "status": "pending-fresh-c24-calibration-and-c30-requalification",
-    "proof_required": "complete fresh C24 calibration, accepted Factorio 2.1 cutover authority, then a new immutable C30 context through local and protected qualification"
+    "status": "c24-cutover-accepted-pending-c30-requalification",
+    "proof_required": "new immutable C30 context through exact protected qualification inherited shadow admission seal and promotion",
+    "c24_proof_path": ".mir/control-plane/fresh-calibration.json",
+    "c24_proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2"
   }
 }

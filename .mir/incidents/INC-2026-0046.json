@@ -3,7 +3,7 @@
   "id": "INC-2026-0046",
   "title": "New-candidate verification context omitted a Factorio installation lock",
   "external_issue": "internal://control-plane/context-factorio-lock-seed",
-  "state": "regression-proven-pending-calibration",
+  "state": "regression-proven",
   "failing_environment": {
     "target": "2.1",
     "release": "3.2.3",
@@ -43,7 +43,9 @@
     "package_bytes_changed": false
   },
   "closure": {
-    "status": "pending-complete-c30-qualification-and-c24-calibration",
-    "proof_required": "a new immutable ABI-3 C30 context with exact Factorio 2.1.12 lock, complete C30 local/protected qualification, and a complete fresh C24 v5 calibration under ABI 3"
+    "status": "c24-calibration-passed-pending-complete-c30-qualification",
+    "proof_required": "complete exact C30 local and protected qualification under a new immutable ABI-3 context with the exact Factorio 2.1.12 installation lock",
+    "c24_proof_path": ".mir/control-plane/fresh-calibration.json",
+    "c24_proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2"
   }
 }

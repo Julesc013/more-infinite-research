@@ -65,23 +65,23 @@ Generated: 2026-07-31
 - [ ] `CHG-2026-0001` — Establish MIR Control Plane v5 (`implemented`)
 - [ ] `CHG-2026-0002` — MIR 3.2.3 platform progression and structural logistics hotfix (`implemented`)
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
-- [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `pending-complete-fresh-calibration`
-- [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `pending-fresh-performance-measurement`
-- [ ] `INC-2026-0038` — C24 performance probe final phase depended on Git checkout line endings; closure `pending-fresh-performance-measurement`
-- [ ] `INC-2026-0040` — Context-addressed performance artifacts exceeded Factorio's Windows path boundary; closure `pending-fresh-performance-measurement`
+- [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0038` — C24 performance probe final phase depended on Git checkout line endings; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0040` — Context-addressed performance artifacts exceeded Factorio's Windows path boundary; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0041` — Ice and platform productivity progression preceded Aquilo access; closure `pending-release-qualification`
 - [ ] `INC-2026-0042` — Modded logistics recipes were omitted when names did not match fixed tiers; closure `pending-release-qualification`
-- [ ] `INC-2026-0043` — C29 active candidate was omitted from the tracked distribution inventory; closure `pending-complete-fresh-calibration`
-- [ ] `INC-2026-0044` — Fresh C24 calibration exceeded the diagnostics-on absolute performance ceiling; closure `pending-complete-fresh-calibration`
+- [ ] `INC-2026-0043` — C29 active candidate was omitted from the tracked distribution inventory; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0044` — Fresh C24 calibration exceeded the diagnostics-on absolute performance ceiling; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0045` — C29 structural fallback ignored the disabled automatic-productivity action; closure `pending-complete-c30-release-qualification`
-- [ ] `INC-2026-0046` — New-candidate verification context omitted a Factorio installation lock; closure `pending-complete-c30-qualification-and-c24-calibration`
+- [ ] `INC-2026-0046` — New-candidate verification context omitted a Factorio installation lock; closure `c24-calibration-passed-pending-complete-c30-qualification`
 - [ ] `INC-2026-0047` — C30 context selected the stale C24 upgrade transition; closure `pending-exact-c30-upgrade-and-complete-qualification`
 - [ ] `INC-2026-0048` — C30 qualification had no exact delta or performance campaign authority; closure `pending-exact-c30-delta-performance-and-complete-qualification`
-- [ ] `INC-2026-0049` — Non-calibration release shadow evaluation required a nonexistent v4 baseline; closure `pending-fresh-c24-calibration-and-c30-requalification`
-- [ ] `INC-2026-0050` — Nested aggregate re-emission made fresh-calibration proof selection ambiguous; closure `pending-new-immutable-c24-calibration`
-- [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `pending-new-immutable-c24-calibration`
+- [ ] `INC-2026-0049` — Non-calibration release shadow evaluation required a nonexistent v4 baseline; closure `c24-cutover-accepted-pending-c30-requalification`
+- [ ] `INC-2026-0050` — Nested aggregate re-emission made fresh-calibration proof selection ambiguous; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0052` — Canonical protected workflow had no registered default-branch dispatcher; closure `pending-exact-protected-c30-dispatch`
-- [ ] `INC-2026-0053` — Compact calibration-proof resolver requested fields absent from execution-manifest rows; closure `pending-exact-fresh-calibration-proof-materialization`
+- [ ] `INC-2026-0053` — Compact calibration-proof resolver requested fields absent from execution-manifest rows; closure `closed-exact-c24-fresh-calibration`
 
 ## Explicit release obligations
 

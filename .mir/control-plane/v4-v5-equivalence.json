@@ -1,16 +1,31 @@
 {
   "schema": 1,
   "authority": "mir-control-plane-v5-shadow-equivalence",
-  "state": "pending",
-  "calibration_candidates": ["3.2.2", "2.5.0"],
+  "state": "accepted",
+  "calibration_candidates": [
+    "3.2.2",
+    "2.5.0"
+  ],
   "target_cutovers": {
     "2.1": {
-      "state": "pending",
+      "state": "accepted",
       "calibration_release": "3.2.2",
       "proof_path": ".mir/control-plane/fresh-calibration.json",
-      "proof_sha256": "",
-      "implementation_commit": "",
-      "component_abis": null
+      "proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2",
+      "implementation_commit": "42df8500b969c299fc5275dd0a20e8165e0fc37d",
+      "component_abis": {
+        "canonicalization": 1,
+        "capture": 3,
+        "compilation": 1,
+        "evaluation": 1,
+        "evidence_store": 1,
+        "planner": 1,
+        "realization": 1,
+        "record": 1,
+        "release_controller": 1,
+        "shadow": 2,
+        "view_generator": 1
+      }
     },
     "2.0": {
       "state": "pending",
@@ -21,31 +36,110 @@
       "component_abis": null
     }
   },
-  "dimensions": ["candidate-identity", "required-proof-obligations", "scenario-identities", "environment-identities", "approved-delta", "upgrade-result", "performance-result", "manual-result", "aggregate-verdict", "seal-inputs"],
-  "acceptance": {"exact_plan_obligation_equivalence": true, "exact_verdict_equivalence": true, "fresh_independent_calibration_required": true},
-  "obligation_mapping": {
-    "docs.check": ["docs.schema"],
-    "tooling.self-test": ["assurance.self-test"],
-    "static.architecture": ["architecture.files", "architecture.dependencies"],
-    "static.compiler": ["compiler.schema", "compiler.contract"],
-    "static.settings": ["settings.contract"],
-    "static.locales": ["locale.contract"],
-    "static.balance": ["balance.contract"],
-    "static.museum": ["museum.compiler"],
-    "static.package": ["package.identity", "package.composition", "package.determinism"],
-    "static.release-history": ["release-history.integrity"],
-    "static.full": ["static.full"],
-    "performance.static": ["performance.contract"],
-    "release.approved-delta": ["approved-delta.measurement"],
-    "runtime.upgrade": ["upgrade.measurement"],
-    "runtime.ecosystem": ["ecosystem.measurement"],
-    "runtime.performance-regression": ["performance.measurement"],
-    "manual.release-review": ["manual.acceptance"]
+  "dimensions": [
+    "candidate-identity",
+    "required-proof-obligations",
+    "scenario-identities",
+    "environment-identities",
+    "approved-delta",
+    "upgrade-result",
+    "performance-result",
+    "manual-result",
+    "aggregate-verdict",
+    "seal-inputs"
+  ],
+  "acceptance": {
+    "exact_plan_obligation_equivalence": true,
+    "exact_verdict_equivalence": true,
+    "fresh_independent_calibration_required": true
   },
-  "additional_v5_obligations": ["docs.generated", "release.authority", "backport.contract", "harness.schemas", "harness.quality", "scenario.registry", "observation.evaluation", "evidence.store", "control-plane.records", "verification.context", "executor.contract", "release.controller", "ci.workflow", "shadow.structural", "qualification.full"],
-  "allowed_v5_scenario_additions": ["package-build", "runtime-state-contract", "static-validation"],
+  "obligation_mapping": {
+    "docs.check": [
+      "docs.schema"
+    ],
+    "tooling.self-test": [
+      "assurance.self-test"
+    ],
+    "static.architecture": [
+      "architecture.files",
+      "architecture.dependencies"
+    ],
+    "static.compiler": [
+      "compiler.schema",
+      "compiler.contract"
+    ],
+    "static.settings": [
+      "settings.contract"
+    ],
+    "static.locales": [
+      "locale.contract"
+    ],
+    "static.balance": [
+      "balance.contract"
+    ],
+    "static.museum": [
+      "museum.compiler"
+    ],
+    "static.package": [
+      "package.identity",
+      "package.composition",
+      "package.determinism"
+    ],
+    "static.release-history": [
+      "release-history.integrity"
+    ],
+    "static.full": [
+      "static.full"
+    ],
+    "performance.static": [
+      "performance.contract"
+    ],
+    "release.approved-delta": [
+      "approved-delta.measurement"
+    ],
+    "runtime.upgrade": [
+      "upgrade.measurement"
+    ],
+    "runtime.ecosystem": [
+      "ecosystem.measurement"
+    ],
+    "runtime.performance-regression": [
+      "performance.measurement"
+    ],
+    "manual.release-review": [
+      "manual.acceptance"
+    ]
+  },
+  "additional_v5_obligations": [
+    "docs.generated",
+    "release.authority",
+    "backport.contract",
+    "harness.schemas",
+    "harness.quality",
+    "scenario.registry",
+    "observation.evaluation",
+    "evidence.store",
+    "control-plane.records",
+    "verification.context",
+    "executor.contract",
+    "release.controller",
+    "ci.workflow",
+    "shadow.structural",
+    "qualification.full"
+  ],
+  "allowed_v5_scenario_additions": [
+    "package-build",
+    "runtime-state-contract",
+    "static-validation"
+  ],
   "proofs": [
-    {"kind": "static-shadow-analysis", "path": ".mir/control-plane/shadow-analysis.json"},
-    {"kind": "historical-v4-replay", "path": ".mir/control-plane/baselines/3.2.2-v5-replay.json"}
+    {
+      "kind": "static-shadow-analysis",
+      "path": ".mir/control-plane/shadow-analysis.json"
+    },
+    {
+      "kind": "historical-v4-replay",
+      "path": ".mir/control-plane/baselines/3.2.2-v5-replay.json"
+    }
   ]
 }
