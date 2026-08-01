@@ -139,9 +139,9 @@ if ($isFactorio20Backport) {
     commit = '7ebe93029695bbf809a15a14c6540530738a9e62'
   }
   $expectedCurrent = [ordered]@{
-    archive = '4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589'
-    content = '07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9'
-    commit = '39f2238c4f83790bf0d2bf5f1459503e96c41925'
+    archive = '65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1'
+    content = '5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1'
+    commit = '493e71a6c883c2e191e1e13c7647cf38a8a8b261'
   }
   if ($artifact.baseline.factorio_version -ne '2.0' -or
       [string]$artifact.baseline.archive_sha256 -ne $expectedBaseline.archive -or
@@ -153,7 +153,7 @@ if ($isFactorio20Backport) {
       [string]$artifact.current.package_content_sha256 -ne $expectedCurrent.content -or
       [string]$artifact.current.source_commit -ne $expectedCurrent.commit -or
       [string]$artifact.current.package_source_commit -ne $expectedCurrent.commit) {
-    throw 'Approved-delta current side does not bind the exact P10 2.5.0 package authority.'
+    throw 'Approved-delta current side does not bind the exact P11 2.5.0 package authority.'
   }
   $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\releases.json') | ConvertFrom-Json
   $releaseAuthority = $releaseLedger.development.'factorio-2.0'
@@ -186,12 +186,12 @@ if ($isFactorio20Backport) {
     if ($LASTEXITCODE -ne 0) { throw 'Approved-delta qualification source is not an ancestor of ExpectedSourceCommit.' }
     [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
     & git -C $repo diff --quiet $expectedCurrent.commit $ExpectedSourceCommit -- @packageRoots
-    if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after P10 package-source authority.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after P11 package-source authority.' }
     $candidateSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $candidatePath).Hash
     $candidateContentSha = Get-MIRZipContentFingerprint -Path $candidatePath
     if ($candidateSha -ne $expectedCurrent.archive -or $candidateContentSha -ne $expectedCurrent.content -or
         $candidateContentSha -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
-      throw 'Approved-delta does not bind the exact P10 candidate bytes and package source.'
+      throw 'Approved-delta does not bind the exact P11 candidate bytes and package source.'
     }
   }
 
@@ -240,7 +240,7 @@ if ($isFactorio20Backport) {
       $fieldsSha -ne '731736C4768372582DFCFD886A8F0118472CA7801E007C95667478B5DAB08E2A') {
     throw 'Approved-delta reviewed rows or exact field set drifted.'
   }
-  $binding = if ($ValidateStructureOnly) { 'governed artifact structure' } else { 'the exact P10 candidate' }
+  $binding = if ($ValidateStructureOnly) { 'governed artifact structure' } else { 'the exact P11 candidate' }
   Write-Host "[ok] MIR 2.5 approved delta binds $binding, seven exact Factorio 2.0.77 scenarios, and 375 exact intentional differences with zero unknowns."
   return
 }

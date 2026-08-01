@@ -507,7 +507,7 @@ function Test-ExactBackportTechnologyIdentityAddition {
   return $removed.Count -eq 0 -and ($added -join '|') -eq (@($expected | Sort-Object) -join '|')
 }
 
-function Test-ExactP10PlatformSettingAddition {
+function Test-ExactP11PlatformSettingAddition {
   param([string]$Path, $Before, $After)
 
   if ($null -ne $Before -or
@@ -531,7 +531,7 @@ function Test-ExactP10PlatformSettingAddition {
     $After.current_value -eq $expected.value -and @($After.PSObject.Properties.Name).Count -eq 2
 }
 
-function Test-ExactP10PlatformRegistryAddition {
+function Test-ExactP11PlatformRegistryAddition {
   param([string]$Path, $Before, $After)
 
   if ($null -ne $Before -or
@@ -543,7 +543,7 @@ function Test-ExactP10PlatformRegistryAddition {
     @($After.PSObject.Properties.Name).Count -eq 3
 }
 
-function Test-ExactP10PlatformTechnologyAddition {
+function Test-ExactP11PlatformTechnologyAddition {
   param([string]$Path, $Before, $After)
 
   if ($null -ne $Before -or
@@ -554,7 +554,7 @@ function Test-ExactP10PlatformTechnologyAddition {
     '56C55DB207F8F98DB890EE61305DF9505DBBB34D39237DCAEE86792D6BDB87A9'
 }
 
-function Test-ExactP10IceCryogenicProgression {
+function Test-ExactP11IceCryogenicProgression {
   param([string]$Path, $Before, $After)
 
   if ($Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.recipe-prod-research_ice-1\.(?<field>prerequisites|science_ingredients)$') {
@@ -575,7 +575,7 @@ function Test-ExactP10IceCryogenicProgression {
     (Get-TextSha256 -Text (Get-CanonicalJson -Value $After)) -eq $expected.after
 }
 
-function Test-ExactP10StructuralBeltsExpansion {
+function Test-ExactP11StructuralBeltsExpansion {
   param([string]$Path, $Before, $After)
 
   if ($Path -ne 'scenarios.approved-delta-automatic-family-controls.technologies.recipe-prod-research_belts-1.effects') {
@@ -617,41 +617,41 @@ function Get-DifferenceDisposition {
     $Before,
     $After
   )
-  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformSettingAddition -Path $Path -Before $Before -After $After)) {
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP11PlatformSettingAddition -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
-      reason = "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment."
+      reason = "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment."
       intentional = $true
       migration_impact = "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities."
-      required_evidence = @("P10 settings schema and locale gates", "Space Age platform progression fixture", "exact 2.0 runtime delta")
+      required_evidence = @("P11 settings schema and locale gates", "Space Age platform progression fixture", "exact 2.0 runtime delta")
     }
   }
-  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformRegistryAddition -Path $Path -Before $Before -After $After)) {
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP11PlatformRegistryAddition -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
-      reason = "P10 registers the one stable Platform Productivity stream identity only in the exact Space Age environments."
+      reason = "P11 registers the one stable Platform Productivity stream identity only in the exact Space Age environments."
       intentional = $true
       migration_impact = "Existing identities remain unchanged; Space Age saves gain one new unresearched Aquilo-gated technology."
       required_evidence = @("generated identity registry", "Platform owner-transfer fixture", "2.4.9 upgrade matrix")
     }
   }
-  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformTechnologyAddition -Path $Path -Before $Before -After $After)) {
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP11PlatformTechnologyAddition -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
-      reason = "P10 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects."
+      reason = "P11 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects."
       intentional = $true
       migration_impact = "Platform ownership moves from Landfill to a separate unresearched cryogenic-gated identity; Landfill and Ice research levels are retained."
       required_evidence = @("exact Platform technology contract", "owner-transfer and upgrade assertions", "exact 2.0 runtime delta")
     }
   }
-  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10IceCryogenicProgression -Path $Path -Before $Before -After $After)) {
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP11IceCryogenicProgression -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
-      reason = "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients."
+      reason = "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients."
       intentional = $true
       migration_impact = "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression."
       required_evidence = @("final emitted science invariant", "accepting-lab and researchability checks", "2.4.9 upgrade matrix")
     }
   }
-  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10StructuralBeltsExpansion -Path $Path -Before $Before -After $After)) {
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP11StructuralBeltsExpansion -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
-      reason = "P10 attaches the exact opaque-name belt fixture through the conservative structural fallback at 0.5% per level."
+      reason = "P11 attaches the exact opaque-name belt fixture through the conservative structural fallback at 0.5% per level."
       intentional = $true
       migration_impact = "Known reviewed belt tiers retain precedence; eligible unknown belt-family recipes gain the conservative fallback."
       required_evidence = @("semantic family attachment fixture", "disabled automatic-productivity regression", "native AdvancedBeltsSA gate")

@@ -1,10 +1,10 @@
 {
   "schema": 4,
   "projection_schema": 3,
-  "candidate_id": "2.5-P10",
+  "candidate_id": "2.5-P11",
   "mir_version": "2.5.0",
   "target": "2.0",
-  "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
+  "target_profile_sha256": "FCFE3DA082609DF87EA7D9E2AE7F2A29924653E849801251F0134E8B35015B57",
   "baseline": {
     "version": "2.4.9",
     "reference": "2.4.9",
@@ -34,9 +34,9 @@
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
-    "package_source_tree": "e3c923ee60af526563d16c1718e9a264b72a942d",
-    "package_source_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
+    "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+    "package_source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685",
+    "package_source_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
@@ -51,8 +51,8 @@
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
-    "content_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+    "content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
     "bytes": 1033875,
     "entries": 291,
     "forbidden_entries": 0,
@@ -63,17 +63,25 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "pending-exact-p10",
-    "synthetic_py_finalizer": "pending-exact-p10",
-    "runtime": "pending-exact-p10",
-    "manual_review": "pending-exact-p10",
-    "protected_qualification": "pending-exact-p10",
+    "target_static": "pending-exact-p11",
+    "synthetic_py_finalizer": "pending-exact-p11",
+    "runtime": "pending-exact-p11",
+    "manual_review": "pending-exact-p11",
+    "protected_qualification": "pending-exact-p11",
     "publication": "unreleased"
   },
   "release_notes": "docs/releases/notes/release-notes-2.5.0.md",
   "candidate_document": "docs/releases/2.5.0-provisional-3.2.3-backport.md",
   "playtest_guide": "docs/releases/2.5.0-playtest-guide.md",
   "superseded_candidates": [
+    {
+      "candidate_id": "2.5-P10",
+      "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
+      "package_content_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
+      "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
+      "reason": "superseded after the broad Base generation fixture proved the target profile expected 73 descriptors while the projected Platform stream made 74",
+      "status": "superseded-during-local-qualification"
+    },
     {
       "candidate_id": "2.5-P9",
       "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",

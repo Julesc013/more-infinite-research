@@ -79,7 +79,7 @@ if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($canonicalTagCommit)) {
 & git -C $RepoRoot merge-base --is-ancestor $portableCommit $canonicalTagCommit
 if ($LASTEXITCODE -ne 0) { throw "C30 package source is not contained by canonical tag $canonicalTag." }
 & git -C $RepoRoot merge-base --is-ancestor $canonicalTagCommit HEAD
-if ($LASTEXITCODE -ne 0) { throw "Canonical tag $canonicalTag is not retained in the P10 dual-parent lineage." }
+if ($LASTEXITCODE -ne 0) { throw "Canonical tag $canonicalTag is not retained in the P11 dual-parent lineage." }
 $projectionTree = (& git -C $RepoRoot show -s --format=%T $projectionCommit).Trim()
 if ($LASTEXITCODE -ne 0 -or $projectionTree -ne [string]$lock.projection.package_source_tree) {
   throw "The locked 2.5 package-source tree does not match its commit."
@@ -109,7 +109,7 @@ $delta = Get-Content -Raw -LiteralPath $deltaPath | ConvertFrom-Json
 if ([int]$delta.schema -ne 1 -or [string]$delta.kind -ne "mir-portable-delta-ledger" -or
     [string]$delta.source.version -ne "3.2.3" -or [string]$delta.source.candidate_id -ne "C30" -or
     [string]$delta.source.package_source_commit -ne $portableCommit -or
-    [string]$delta.target.version -ne "2.5.0" -or [string]$delta.target.candidate_id -ne "2.5-P10" -or
+    [string]$delta.target.version -ne "2.5.0" -or [string]$delta.target.candidate_id -ne "2.5-P11" -or
     [string]$delta.target.package_source_commit -ne $projectionCommit -or
     -not [bool]$delta.rules.wholesale_merge_forbidden -or -not [bool]$delta.rules.target_specific_evidence_required -or
     [bool]$delta.rules.factorio_2_1_evidence_reusable) {
@@ -127,6 +127,7 @@ $expectedDeltaIds = @(
   "c30-structural-logistics",
   "c30-structural-indexing",
   "c30-automatic-action-guard",
+  "p11-platform-stream-count-authority",
   "c30-timeboxed-release-assurance"
 ) | Sort-Object
 $actualDeltaIds = @($delta.changes.id | Sort-Object -Unique)
@@ -169,13 +170,13 @@ if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.4.9" `
     -or [string]$lock.upgrade_contract.oldest_maintained_optional -ne "2.4.5") {
   throw "The 2.5 upgrade contract must require 2.4.9 and retain 2.4.5 as the optional oldest-maintained row."
 }
-if ([string]$lock.qualification.target_static -ne "pending-exact-p10" `
-    -or [string]$lock.qualification.synthetic_py_finalizer -ne "pending-exact-p10" `
-    -or [string]$lock.qualification.runtime -ne "pending-exact-p10" `
-    -or [string]$lock.qualification.manual_review -ne "pending-exact-p10" `
-    -or [string]$lock.qualification.protected_qualification -ne "pending-exact-p10" `
+if ([string]$lock.qualification.target_static -ne "pending-exact-p11" `
+    -or [string]$lock.qualification.synthetic_py_finalizer -ne "pending-exact-p11" `
+    -or [string]$lock.qualification.runtime -ne "pending-exact-p11" `
+    -or [string]$lock.qualification.manual_review -ne "pending-exact-p11" `
+    -or [string]$lock.qualification.protected_qualification -ne "pending-exact-p11" `
     -or [string]$lock.qualification.publication -ne "unreleased") {
-  throw "P10 must begin with all exact target qualification, review, protection, and publication gates pending."
+  throw "P11 must begin with all exact target qualification, review, protection, and publication gates pending."
 }
 
 foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_document, [string]$lock.playtest_guide)) {

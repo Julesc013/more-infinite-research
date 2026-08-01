@@ -18,7 +18,7 @@ MIR 3.2.3 C30 is the tagged Factorio 2.1 source baseline for the current Factori
 
 MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
-MIR 2.5.0 2.5-P10 is the package-built Factorio 2.0 semantic projection of tagged C30. It retains the 2.4.9 target capabilities, the concrete planet resolver, and the Py finalizer correction; adds Ice and Platform progression plus structural logistics support; and excludes 2.1-only metadata and evidence. Every exact P10 qualification gate is pending.
+MIR 2.5.0 2.5-P11 is the package-built Factorio 2.0 semantic projection of tagged C30. It retains the 2.4.9 target capabilities, the concrete planet resolver, and the Py finalizer correction; adds Ice and Platform progression plus structural logistics support; corrects the exact target catalog authority to 74 streams; and excludes 2.1-only metadata and evidence. Every exact P11 qualification gate is pending.
 
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)

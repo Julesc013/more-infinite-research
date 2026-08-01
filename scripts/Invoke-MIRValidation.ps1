@@ -558,20 +558,20 @@ if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
       if ([string]$artifact.current.source_commit -eq [string]$backportAuthority.package_source_commit -and
           [string]$artifact.current.archive_sha256 -eq [string]$backportAuthority.archive_sha256) {
         & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -Path $backportDelta -ValidateStructureOnly
-      } elseif ([string]$backportAuthority.candidate_id -eq "2.5-P10" -and
+      } elseif ([string]$backportAuthority.candidate_id -eq "2.5-P11" -and
                 [string]$backportAuthority.release_gate -match "pending") {
-        Write-Host "[pending] the existing approved delta is superseded P9 evidence; exact P10 evidence has not yet been generated."
+        Write-Host "[pending] the existing approved delta is superseded P10 evidence; exact P11 evidence has not yet been generated."
       } else {
         throw "Approved-delta evidence does not bind the active Factorio 2.0 candidate."
       }
     } else {
       $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
       $backportAuthority = $releaseLedger.development."factorio-2.0"
-      if ([string]$backportAuthority.candidate_id -ne "2.5-P10" -or
+      if ([string]$backportAuthority.candidate_id -ne "2.5-P11" -or
           [string]$backportAuthority.release_gate -notmatch "pending") {
         throw "The active release authority does not permit missing approved-delta evidence."
       }
-      Write-Host "[pending] exact P10 approved-delta evidence has not yet been generated; the release plan remains blocked."
+      Write-Host "[pending] exact P11 approved-delta evidence has not yet been generated; the release plan remains blocked."
     }
   }
 }

@@ -11,9 +11,9 @@
   },
   "target": {
     "version": "2.5.0",
-    "candidate_id": "2.5-P10",
-    "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
-    "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589"
+    "candidate_id": "2.5-P11",
+    "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1"
   },
   "rules": {
     "wholesale_merge_forbidden": true,
@@ -29,7 +29,7 @@
         "prototypes/mir/index/prototype_lookup.lua",
         "prototypes/mir/verification/effect_target_inventory.lua"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
     },
     {
       "id": "c24-py-finalizer-ordering",
@@ -38,7 +38,7 @@
       "target_paths": [
         "info.json"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
     },
     {
       "id": "c24-affected-save-planet-recovery",
@@ -57,7 +57,7 @@
       "target_paths": [
         "fixtures/pypostprocessing-stale-unlock"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
     },
     {
       "id": "c24-py-real-closure",
@@ -68,7 +68,7 @@
         ".mir/compatibility.yml",
         "fixtures/compat-matrix/manual-scenarios.json"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
     },
     {
       "id": "c21-c24-release-assurance",
@@ -91,7 +91,7 @@
         "prototypes/mir/research/stream_catalog.lua",
         "prototypes/mir/research/selector.lua"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
     },
     {
       "id": "c30-structural-logistics",
@@ -102,7 +102,7 @@
         "prototypes/mir/research/stream_compiler.lua",
         "prototypes/mir/research/scenario_facts.lua"
       ],
-      "evidence": "pending-exact-p10-runtime-and-advancedbeltssa"
+      "evidence": "pending-exact-p11-runtime-and-advancedbeltssa"
     },
     {
       "id": "c30-structural-indexing",
@@ -112,7 +112,7 @@
         "prototypes/mir/research/stream_compiler.lua",
         "prototypes/mir/research/scenario_facts.lua"
       ],
-      "evidence": "pending-exact-p10-work-volume-and-performance"
+      "evidence": "pending-exact-p11-work-volume-and-performance"
     },
     {
       "id": "c30-automatic-action-guard",
@@ -121,7 +121,18 @@
       "target_paths": [
         "prototypes/mir/research/stream_compiler.lua"
       ],
-      "evidence": "pending-exact-p10-runtime"
+      "evidence": "pending-exact-p11-runtime"
+    },
+    {
+      "id": "p11-platform-stream-count-authority",
+      "source_version": "3.2.3",
+      "disposition": "factorio-2.0-target-profile-correction",
+      "target_paths": [
+        ".mir/targets.json",
+        "prototypes/mir/platform/factorio/target_profiles.lua"
+      ],
+      "reason": "The projected Platform stream increases the exact Factorio 2.0 descriptor catalog from 73 to 74; P10 retained the pre-Platform count and failed the broad Base generation fixture.",
+      "evidence": "pending-exact-p11-generation-integrity"
     },
     {
       "id": "c30-timeboxed-release-assurance",

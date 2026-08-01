@@ -28,6 +28,6 @@ Planned evidence:
 - `mir-fixture-assert-advanced-belts-sa-productivity`;
 - exact AdvancedBeltsSA 2.3.3 archive SHA-256 `A5D62D3EB189442574209625369E60EBFB04956921D7704A354823A80AAF241A`.
 
-The 2.5.0 target uses the unmodified AdvancedBeltsSA 2.3.3 archive on its native Factorio 2.0 line. Exact Factorio 2.0.77 qualification is pending for P10; until that run passes, this page records implementation scope rather than a public load-checked claim.
+The 2.5.0 target uses the unmodified AdvancedBeltsSA 2.3.3 archive on its native Factorio 2.0 line. Exact Factorio 2.0.77 qualification is pending for P11; until that run passes, this page records implementation scope rather than a public load-checked claim.
 
 AdvancedBelts 2.0.7 targets Factorio 1.1 and remains a separate target-line projection and exact-binary qualification obligation.

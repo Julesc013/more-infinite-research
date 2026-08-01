@@ -15,7 +15,7 @@ Updated: 2026-08-01
 
 ## Current 3.2 Release Roles
 
-MIR 3.2.3 C30 is the tagged Factorio 2.1 semantic source, and MIR 2.4.9 on legacy remains the immutable Factorio 2.0 baseline. MIR 2.5.0 P10 is the package-built target projection of C30. The verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release.
+MIR 3.2.3 C30 is the tagged Factorio 2.1 semantic source, and MIR 2.4.9 on legacy remains the immutable Factorio 2.0 baseline. MIR 2.5.0 P11 is the package-built target projection of C30. The verifier may be shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release.
 
 MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
@@ -79,7 +79,7 @@ Use these branch roles during the transition:
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.4.9` stable baseline. | Published 2.4.x line; severe fixes only. |
-| tmp/2.0 | Maintained Factorio 2.0 semantic companion and verification-overhaul branch. | Provisional 2.5.0 P10 semantic projection of tagged C30, with literal ancestry from published 2.4.9 and tagged 3.2.3. |
+| tmp/2.0 | Maintained Factorio 2.0 semantic companion and verification-overhaul branch. | Provisional 2.5.0 P11 semantic projection of tagged C30, with literal ancestry from published 2.4.9 and tagged 3.2.3. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
@@ -116,7 +116,7 @@ The required workflow is:
 
 Portable fixes found during target qualification return to `dev` when they are genuinely target-neutral. Target metadata, removed capabilities, lower dependency floors, and target release wording never merge upward.
 
-The current 2.5-P10 archive binds tagged C30 package source c1fd8b932c8d916a14925678056e08893b87b2db, target package source 39f2238c4f83790bf0d2bf5f1459503e96c41925, and the eight exact adapted package paths recorded in .mir/backport-source-lock.json. The 3.2-only affected-save recovery is explicitly omitted; Ice and Platform progression, structural logistics discovery, the automatic-action guard, and compiler indexing are ported for independent Factorio 2.0 qualification. P9 evidence remains superseded history. tmp branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to dev, but target-line metadata downgrades should not be merged back into the current line.
+The current 2.5-P11 archive binds tagged C30 package source c1fd8b932c8d916a14925678056e08893b87b2db, target package source 493e71a6c883c2e191e1e13c7647cf38a8a8b261, and the eight exact adapted package paths recorded in .mir/backport-source-lock.json. The 3.2-only affected-save recovery is explicitly omitted; Ice and Platform progression, structural logistics discovery, the automatic-action guard, compiler indexing, and the corrected 74-stream Factorio 2.0 target authority are ported for independent qualification. P9 and P10 evidence remain superseded history. tmp branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to dev, but target-line metadata downgrades should not be merged back into the current line.
 
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a Factorio `2.0` port can be validated while `dev` remains available for Factorio `2.1` fixes.
 

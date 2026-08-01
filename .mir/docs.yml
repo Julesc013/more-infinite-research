@@ -2231,7 +2231,7 @@ docs:
       - mir-2.5.0-provisional-3.2.3-backport
       - mir-2.5.0-candidate-identity
   - path: docs/releases/2.5.0-playtest-guide.md
-    title: "MIR 2.5.0 P10 Playtest Guide"
+    title: "MIR 2.5.0 P11 Playtest Guide"
     status: current
     audience: maintainer
     doc_type: how-to

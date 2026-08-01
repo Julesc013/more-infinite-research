@@ -36,12 +36,12 @@ $factorioPath = Resolve-MIRLocalPath -Path $FactorioBin
 $modLibraryPath = Resolve-MIRLocalPath -Path $LocalModZipDir
 $outputFile = Resolve-MIRLocalPath -Path $OutputPath
 $authority = (Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json).development."factorio-2.0"
-if ([string]$authority.candidate_id -ne "2.5-P10") { throw "AdvancedBeltsSA qualification requires active candidate 2.5-P10." }
+if ([string]$authority.candidate_id -ne "2.5-P11") { throw "AdvancedBeltsSA qualification requires active candidate 2.5-P11." }
 
-$candidateHash = Assert-MIRExactSha256 -Path $candidatePath -Expected ([string]$authority.archive_sha256) -Label "P10 candidate"
+$candidateHash = Assert-MIRExactSha256 -Path $candidatePath -Expected ([string]$authority.archive_sha256) -Label "P11 candidate"
 $candidateContentHash = Get-MIRZipContentFingerprint -Path $candidatePath
 if ($candidateContentHash -ne [string]$authority.package_content_sha256) {
-  throw "P10 candidate content fingerprint mismatch: $candidateContentHash"
+  throw "P11 candidate content fingerprint mismatch: $candidateContentHash"
 }
 
 $qualificationCommit = (& git -C $repo rev-parse HEAD).Trim()
@@ -50,10 +50,10 @@ if ($ExpectedSourceCommit -and $qualificationCommit -ne $ExpectedSourceCommit) {
 }
 $packageSourceCommit = [string]$authority.package_source_commit
 & git -C $repo merge-base --is-ancestor $packageSourceCommit $qualificationCommit
-if ($LASTEXITCODE -ne 0) { throw "P10 package source is not an ancestor of the qualification source." }
+if ($LASTEXITCODE -ne 0) { throw "P11 package source is not an ancestor of the qualification source." }
 $packageRoots = @(Get-MIRPackageSourceRoots)
 & git -C $repo diff --quiet $packageSourceCommit $qualificationCommit -- @packageRoots
-if ($LASTEXITCODE -ne 0) { throw "Package-visible source changed after the P10 package source." }
+if ($LASTEXITCODE -ne 0) { throw "Package-visible source changed after the P11 package source." }
 
 if (-not (Test-Path -LiteralPath $factorioPath -PathType Leaf)) { throw "Factorio binary is missing: $factorioPath" }
 $factorioVersion = Get-MIRFactorioBinaryVersion -Path $factorioPath
@@ -143,7 +143,7 @@ $evidence = [ordered]@{
   kind = "mir-advanced-belts-sa-native-qualification"
   status = "passed"
   release = "2.5.0"
-  candidate_id = "2.5-P10"
+  candidate_id = "2.5-P11"
   candidate = [ordered]@{
     path = [IO.Path]::GetRelativePath($repo, $candidatePath).Replace("\", "/")
     archive_sha256 = $candidateHash
@@ -174,5 +174,5 @@ $evidence = [ordered]@{
 $outputParent = Split-Path -Parent $outputFile
 New-Item -ItemType Directory -Force -Path $outputParent | Out-Null
 $evidence | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $outputFile -Encoding UTF8
-Write-Host "[ok] Exact P10 AdvancedBeltsSA 2.3.3 native Factorio 2.0.77 qualification passed."
+Write-Host "[ok] Exact P11 AdvancedBeltsSA 2.3.3 native Factorio 2.0.77 qualification passed."
 Write-Host "[ok] Evidence: $outputFile"

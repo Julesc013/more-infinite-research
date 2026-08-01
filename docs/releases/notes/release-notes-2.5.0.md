@@ -5,7 +5,7 @@ applies_to: "2.5.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-02
 supersedes: []
 superseded_by: []
 ---
@@ -28,18 +28,18 @@ superseded_by: []
 
 - Target: Factorio 2.0.
 - Qualification binary: Factorio 2.0.77.
-- AdvancedBeltsSA 2.3.3: exact native load and structural assertions pending P10 qualification.
+- AdvancedBeltsSA 2.3.3: exact native load and structural assertions pending P11 qualification.
 - Exact Py support claim: startup-integrity correction for the locked 2.0 closure; this is not a blanket claim of full Py technology-generation support.
 
 ## Candidate integrity
 
-- Candidate: 2.5-P10.
+- Candidate: 2.5-P11.
 - Baseline commit: 7ebe93029695bbf809a15a14c6540530738a9e62.
 - Portable C30 source: c1fd8b932c8d916a14925678056e08893b87b2db.
-- Package source: 39f2238c4f83790bf0d2bf5f1459503e96c41925.
-- ZIP SHA-256: 4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589.
+- Package source: 493e71a6c883c2e191e1e13c7647cf38a8a8b261.
+- ZIP SHA-256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1.
 - ZIP size: 1,033,875 bytes; 291 entries.
 
 ## Release status
 
-P10 is an unreleased package-built candidate. Exact target static, runtime, upgrade, approved-delta, ecosystem, performance, manual, protected, seal, promotion, and publication gates remain pending. P9 results remain superseded historical evidence and are not current P10 proof.
+P11 is an unreleased package-built candidate. Exact target static, runtime, upgrade, approved-delta, ecosystem, performance, manual, protected, seal, promotion, and publication gates remain pending. P9 and P10 results remain superseded historical evidence and are not current P11 proof.
