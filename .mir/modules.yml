@@ -762,6 +762,7 @@ validation_tooling:
     - aggregate nodes evaluate completed atomic results and never execute their children
     - aggregate TaskNode closure adopts one exact existing same-context same-trust result only when its member digest set is identical and rejects missing conflicting or ambiguous evidence
     - fresh calibration proof authority is the one exact final qualification execution-manifest closure and rejects duplicate identities or results outside that closure
+    - compact execution manifest rows select only task identity status and object digest while the dereferenced content addressed TaskNode object supplies and must exactly match context input identity trust and revocation authority
     - environment capture compilation realization and evaluation use independent content identities
     - compatible assertions share one exact environment capture while incompatible isolation contracts remain separate
     - proposition freshness is explicit and no release uses a global no-reuse switch except governed independent calibration

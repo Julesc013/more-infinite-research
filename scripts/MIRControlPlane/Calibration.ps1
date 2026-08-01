@@ -148,8 +148,7 @@ function Resolve-MIRCPManifestTaskResult {
     [Parameter(Mandatory)][string]$TrustClass
   )
   $manifestMatches = @($ManifestTaskResults | Where-Object {
-    [string]$_.task_id -eq $TaskId -and [string]$_.identity_key -eq $IdentityKey -and
-    [string]$_.context_digest -eq $ContextDigest -and [string]$_.status -eq "passed"
+    [string]$_.task_id -eq $TaskId -and [string]$_.status -eq "passed"
   })
   if ($manifestMatches.Count -ne 1) {
     throw "Qualification manifest requires one exact TaskNode result for $TaskId; found $($manifestMatches.Count)."

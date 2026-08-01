@@ -81,6 +81,7 @@ Generated: 2026-07-31
 - [ ] `INC-2026-0050` — Nested aggregate re-emission made fresh-calibration proof selection ambiguous; closure `pending-new-immutable-c24-calibration`
 - [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `pending-new-immutable-c24-calibration`
 - [ ] `INC-2026-0052` — Canonical protected workflow had no registered default-branch dispatcher; closure `pending-exact-protected-c30-dispatch`
+- [ ] `INC-2026-0053` — Compact calibration-proof resolver requested fields absent from execution-manifest rows; closure `pending-exact-fresh-calibration-proof-materialization`
 
 ## Explicit release obligations
 

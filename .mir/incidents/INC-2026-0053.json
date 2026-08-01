@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0053",
+  "title": "Compact calibration-proof resolver requested fields absent from execution-manifest rows",
+  "external_issue": "internal://control-plane/compact-manifest-proof-resolution",
+  "state": "repaired-pending-proof-materialization",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "controller_commit": "42df8500b969c299fc5275dd0a20e8165e0fc37d",
+    "context_digest": "F97E2730F4729D835ED4B24593F184A715F02286F53E38F192DEA571322E6975",
+    "plan_id": "D14C1EE52AF8179F8F85CD3A0D597786C435C6D358D6018975ECD57CFC62F668",
+    "qualification_manifest_digest": "41034B2E5B1729681BFC26DCC1E86D50EEF68C3236289D5E4FB7C33ECCD3F24C",
+    "proof_result": "Qualification manifest requires one exact TaskNode result for architecture.dependencies; found 0."
+  },
+  "reproduction": {
+    "status": "reproduced-from-immutable-evidence",
+    "observed": "The passing qualification manifest contains 149 compact rows with task_id, status, and object_digest. The proof resolver additionally filtered those rows by identity_key and context_digest, fields intentionally stored only in each dereferenced content-addressed TaskNode object."
+  },
+  "root_cause": {
+    "status": "proven-schema-reader-mismatch",
+    "summary": "The proof reader treated compact execution-manifest index rows as complete TaskNode evidence records. It therefore rejected every valid row before performing its existing strict digest, context, input identity, trust, status, and revocation checks on the referenced object."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:compact-manifest-proof-resolution",
+    "CHG-2026-0001:strict-dereferenced-task-object-validation"
+  ],
+  "regression_propositions": [
+    "compact manifest rows resolve by their unique passed task_id and object_digest",
+    "duplicate manifest task identities remain rejected",
+    "the dereferenced object must exactly match task id context input identity trust status and revocation authority",
+    "the passed C24 context and its 41034B2E qualification manifest remain immutable",
+    "C24 P9 and C30 package bytes remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.2",
+    "3.2.3"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+    "package_bytes_changed": false,
+    "downstream_c30_archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+  },
+  "closure": {
+    "status": "pending-exact-fresh-calibration-proof-materialization",
+    "proof_required": "materialize and independently verify the fresh C24 calibration proof from the exact F97E2730 context and 41034B2E qualification manifest"
+  }
+}

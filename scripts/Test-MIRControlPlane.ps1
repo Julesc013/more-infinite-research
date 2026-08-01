@@ -21,8 +21,6 @@ $unselectedDuplicateDigest = "B" * 64
 $closureManifestRows = @([pscustomobject][ordered]@{
   task_id = "static.full"
   status = "passed"
-  context_digest = $closureContext
-  identity_key = $closureIdentity
   object_digest = $selectedClosureDigest
 })
 $closureEvidenceRows = @(
@@ -38,8 +36,19 @@ try {
 } catch {
   if ($_.Exception.Message -match "requires one exact TaskNode result") { $duplicateClosureRejected = $true } else { throw }
 }
-if ([string]$selectedClosureRow.digest -ne $selectedClosureDigest -or -not $duplicateClosureRejected) {
-  throw "Fresh-calibration proof selection is not exact-manifest-bound and ambiguity-rejecting."
+$mismatchedClosureRejected = $false
+try {
+  $mismatchedEvidenceRows = @([pscustomobject][ordered]@{
+    digest=$selectedClosureDigest;kind="task-result";task_id="static.full";status="passed";context_digest=$closureContext;
+    identity_key=("E" * 64);trust_class="ci";revoked=$false
+  })
+  [void](Resolve-MIRCPManifestTaskResult -ManifestTaskResults $closureManifestRows -EvidenceObjects $mismatchedEvidenceRows `
+    -TaskId "static.full" -IdentityKey $closureIdentity -ContextDigest $closureContext -TrustClass "ci")
+} catch {
+  if ($_.Exception.Message -match "does not resolve to one exact current evidence object") { $mismatchedClosureRejected = $true } else { throw }
+}
+if ([string]$selectedClosureRow.digest -ne $selectedClosureDigest -or -not $duplicateClosureRejected -or -not $mismatchedClosureRejected) {
+  throw "Fresh-calibration proof selection is not compact-manifest-bound, object-identity-strict, and ambiguity-rejecting."
 }
 
 foreach ($schemaName in @("change-record.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json", "verification-context.schema.json", "evidence-object.schema.json", "evidence-manifest.schema.json", "evidence-revocation.schema.json")) {
