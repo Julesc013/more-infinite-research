@@ -55,6 +55,21 @@
       "backport_candidate": true
     },
     {
+      "mod": "AdvancedBeltsSA",
+      "claim_lane": "fixture-backed stream family plus native Factorio 2.0 archive",
+      "claim_level": "belt-family crafting productivity only",
+      "mir_behavior": "research_belts",
+      "capability_lane": "logistics-belt-manufacturing",
+      "tested_by": [
+        "mir-fixture-semantic-family-attach",
+        "mir-fixture-assert-semantic-family-attach"
+      ],
+      "blocked_exact_profiles": [
+        "native Factorio 2.0.77 plus AdvancedBeltsSA 2.3.3 assertion pending"
+      ],
+      "backport_candidate": false
+    },
+    {
       "mod": "atan-ash",
       "claim_lane": "fixture-backed stream family",
       "claim_level": "ash separation productivity only",

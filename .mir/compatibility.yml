@@ -264,6 +264,25 @@ targets:
         - loader-modes
         - compatibility-hooks
 
+    advanced-belts-sa:
+      mod: AdvancedBeltsSA
+      doc: docs/compatibility/targets/advanced-belts-sa.md
+      claim_level: partial-support
+      maturity: unverified
+      behavior: generated
+      scope: partial-family
+      public_claim: belt-family crafting productivity only
+      fixtures:
+        - fixtures/semantic-family-attach
+        - fixtures/assert-semantic-family-attach
+        - fixtures/assert-advanced-belts-sa-productivity
+      streams: []
+      generated_through_existing_stream: research_belts
+      diagnostic_only:
+        - belt-throughput
+        - upgrade-planner
+        - native-factorio-2.0-load-pending
+
     big-mining-drill:
       mod: big-mining-drill
       doc: docs/compatibility/targets/big-mining-drill.md

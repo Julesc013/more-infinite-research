@@ -1095,6 +1095,13 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/advanced-belts-sa.md
+    title: "Advanced Belts Space Age Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/atan-air-scrubbing.md
     title: "ATAN Air Scrubbing Compatibility"
     status: current
