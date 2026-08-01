@@ -1,5 +1,15 @@
 {
-  "assurance_exceptions": [],
+  "assurance_exceptions": [
+    {
+      "generic_policy_changed": false,
+      "id": "C30-TIMEBOXED-PUBLICATION-2026-08-01",
+      "kind": "release-specific-timeboxed-publication",
+      "normal_gates_waived_for_publication_only": true,
+      "path": ".mir/evidence/3.2.3-timeboxed-publication.json",
+      "sha256": "A207143474A0098F0C47CA3E5FD687FCE6F21222856D52CAACA940420352269C",
+      "status": "authorized"
+    }
+  ],
   "authority": "mir-generated-publication-checklist-v1",
   "candidate_id": "C30",
   "generated_from": [

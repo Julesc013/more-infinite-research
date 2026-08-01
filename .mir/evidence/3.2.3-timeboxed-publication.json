@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "authority": "mir-c30-timeboxed-publication-exception",
+  "id": "C30-TIMEBOXED-PUBLICATION-2026-08-01",
+  "status": "authorized",
+  "authorized_by": "Julesc013",
+  "authorized_at": "2026-08-01T08:16:26.6279978Z",
+  "reason": "Fixed Mod Portal publication deadline; publish the exact known C30 bytes while preserving unfinished assurance truthfully.",
+  "scope": [
+    "fast-forward main to the exception-bearing dev commit",
+    "create annotated tag 3.2.3",
+    "publish only the exact frozen C30 archive"
+  ],
+  "candidate": {
+    "release": "3.2.3",
+    "candidate_id": "C30",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "bytes": 1034824,
+    "entries": 292
+  },
+  "hard_canaries": [
+    {
+      "id": "deterministic-package-identity",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-post-performance-focused-v2.stdout.log"
+    },
+    {
+      "id": "exact-base-load",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-base-generation-integrity.json"
+    },
+    {
+      "id": "exact-space-age-load",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-space-age-generation-integrity.json"
+    },
+    {
+      "id": "exact-3.2.2-to-3.2.3-upgrade-save-reload",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner.json"
+    },
+    {
+      "id": "platform-ice-progression-and-owner-transfer",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner.json"
+    },
+    {
+      "id": "disabled-automatic-productivity",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-semantic-family-off.json"
+    },
+    {
+      "id": "structural-logistics-attachment",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-semantic-family-attach.json"
+    },
+    {
+      "id": "aai-loader-attachment",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-aai-loader-belt-productivity.json"
+    },
+    {
+      "id": "static-package-release-authority",
+      "status": "passed",
+      "evidence": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-static-authoritative-20260731.log"
+    }
+  ],
+  "control_plane_cutover": {
+    "status": "accepted",
+    "target": "2.1",
+    "proof_path": ".mir/control-plane/fresh-calibration.json",
+    "proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2"
+  },
+  "unfinished_obligations": [
+    {
+      "id": "complete-c30-candidate-qualification",
+      "status": "not-completed"
+    },
+    {
+      "id": "exact-c30-manual-acceptance",
+      "status": "not-completed"
+    },
+    {
+      "id": "protected-qualification",
+      "status": "failed-before-context-materialization",
+      "run_id": "30691118480",
+      "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/30691118480"
+    },
+    {
+      "id": "release-seal",
+      "status": "not-completed"
+    },
+    {
+      "id": "normal-promotion-admission",
+      "status": "not-completed"
+    },
+    {
+      "id": "public-byte-verification",
+      "status": "pending-publication"
+    }
+  ],
+  "normal_release_state": "package-built",
+  "generic_promotion_policy_changed": false,
+  "post_publication_requirement": "Complete all unfinished qualification, manual, protected, seal, and verification obligations against the exact published C30 bytes; never reinterpret this exception as a passing seal.",
+  "artifacts": [
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner-from-3.2.2-create.txt",
+      "sha256": "175D8FB6B8D96E3BDF38A336F19F77978396E21BB50CB6EE8E04E78E6095E66A",
+      "bytes": 10186
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner-from-3.2.2-load.txt",
+      "sha256": "9E73CA7CF0EC6E76562FEC04795D93A5DD71F66AC5043C1BDFCE9774617CCA21",
+      "bytes": 21251
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner-from-3.2.2-reload.txt",
+      "sha256": "D702E157728D9EF04170B18C66392632C9860E7DDFDE195C39612B4352F3291D",
+      "bytes": 31403
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/3.2.3-upgrade-space-age-native-owner.json",
+      "sha256": "73D11535090017E54723C93BD6DF1E44A92CDC5C25243E5F8B08E6BD5406E61F",
+      "bytes": 1858
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-aai-loader-belt-productivity.json",
+      "sha256": "483A097C77EF04E7217B5DC3540D2C121832EED916C95978ADA78510584F9C4F",
+      "bytes": 2179
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-base-generation-integrity.json",
+      "sha256": "24EE51C18418CFC348D868C3461465ABFEC6FFE2BE1319FCE94D5D7AD696FFB0",
+      "bytes": 2149
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-semantic-family-attach.json",
+      "sha256": "1EE69E2FF6F826977DBC828AB616FB6F572328CE0C556F5E8F6636172D21921D",
+      "bytes": 2161
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-semantic-family-off.json",
+      "sha256": "5CD6919EC7BD867F105DCD018EEFB4200DD161C9A3FC38176D88E4DC09498A0B",
+      "bytes": 2155
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-focused-space-age-generation-integrity.json",
+      "sha256": "878F6D5A636F6634417FD9E3760F00B4E64A1A1EB235E56C607DDAF09B9D374C",
+      "bytes": 2164
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-post-performance-focused-v2.stdout.log",
+      "sha256": "3622CA04A188C738105C8AB95D70BD62A2F52ED91A70F673D38CBD2BFCC73827",
+      "bytes": 4249
+    },
+    {
+      "path": ".mir/evidence/3.2.3-timeboxed-publication/mir-c30-static-authoritative-20260731.log",
+      "sha256": "37E315015036CD6B905A249859FA5C00DC5AB6DC03F67EB345FC0D5DD49904BA",
+      "bytes": 12138
+    }
+  ],
+  "record_sha256": "E57142AF1BAEB0FB452B4F31539B846EAAB22F63BE08889E029E562308EDB2AD"
+}

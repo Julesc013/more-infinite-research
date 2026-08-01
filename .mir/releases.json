@@ -56,7 +56,9 @@
       "archive_class": "frozen-unreleased-calibration-candidate",
       "archive_entries": 292,
       "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
-      "assurance_exception_ids": [],
+      "assurance_exception_ids": [
+        "C30-TIMEBOXED-PUBLICATION-2026-08-01"
+      ],
       "branch": "dev",
       "candidate_id": "C30",
       "development_branch": "dev",
@@ -140,7 +142,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-07-31",
+  "updated_at": "2026-08-01",
   "views": {
     "backport_queue": ".mir/generated/backport-queue.json",
     "branch_policy": ".mir/branches.yml",

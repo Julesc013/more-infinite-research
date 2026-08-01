@@ -5,7 +5,7 @@ applies_to: "3.2.3"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-01
 supersedes: []
 superseded_by: []
 ---
@@ -44,4 +44,4 @@ superseded_by: []
 
 ## Assurance exceptions
 
-None.
+- `C30-TIMEBOXED-PUBLICATION-2026-08-01`:  Disposition: `pending`.

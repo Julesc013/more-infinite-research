@@ -98,7 +98,17 @@
       "status": "superseded-runtime-fixture-rejected-candidate"
     }
   ],
-  "assurance_exceptions": [],
+  "assurance_exceptions": [
+    {
+      "id": "C30-TIMEBOXED-PUBLICATION-2026-08-01",
+      "kind": "release-specific-timeboxed-publication",
+      "status": "authorized",
+      "path": ".mir/evidence/3.2.3-timeboxed-publication.json",
+      "sha256": "A207143474A0098F0C47CA3E5FD687FCE6F21222856D52CAACA940420352269C",
+      "normal_gates_waived_for_publication_only": true,
+      "generic_policy_changed": false
+    }
+  ],
   "remaining_obligations": [
     "focused-qualification",
     "candidate-qualification",
@@ -126,5 +136,5 @@
     "INC-2026-0052",
     "INC-2026-0053"
   ],
-  "updated_at": "2026-07-31T11:24:14Z"
+  "updated_at": "2026-08-01T08:16:26.7580103Z"
 }

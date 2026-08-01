@@ -63,6 +63,6 @@ Candidate C30 is frozen. Its deterministic package reproduced twice and its exac
 | Content SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
 | Tag | `pending` |
 | Tag commit | `pending` |
-| Assurance exceptions | `pending` |
+| Assurance exceptions | `C30-TIMEBOXED-PUBLICATION-2026-08-01` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->
