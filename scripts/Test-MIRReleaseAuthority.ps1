@@ -43,8 +43,8 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$backport.status -notmatch '^automated-playtest-candidate-') {
     throw "Factorio 2.0 authority must describe an unreleased automated playtest candidate with manual and protected qualification pending."
   }
-  if ([string]$backport.portable_source_commit -ne "29f81addc0eec9b571afd6428c9e3529c4497a1b") {
-    throw "The 2.5 portable source must bind the exact final C24 package-source commit."
+  if ([string]$backport.portable_source_commit -ne "c1fd8b932c8d916a14925678056e08893b87b2db") {
+    throw "The 2.5 portable source must bind the exact tagged C30 package-source commit."
   }
   foreach ($commitField in @("portable_source_commit", "package_source_commit")) {
     $commit = [string]$backport.$commitField
@@ -58,7 +58,7 @@ if ([string]$info.factorio_version -eq "2.0") {
   if ([int]$sourceLock.schema -ne 4 -or [string]$sourceLock.portable_source.commit -ne [string]$backport.portable_source_commit -or
       [string]$sourceLock.projection.package_source_commit -ne [string]$backport.package_source_commit -or
       [string]$sourceLock.projection.portable_delta_ledger -ne [string]$backport.portable_delta_ledger) {
-    throw "The 2.5 release ledger and exact C24 portable source lock disagree."
+    throw "The 2.5 release ledger and exact C30 portable source lock disagree."
   }
   & git -C $repo merge-base --is-ancestor ([string]$backport.package_source_commit) HEAD
   if ($LASTEXITCODE -ne 0) { throw "The provisional 2.5 package-source commit is not an ancestor of qualification HEAD." }

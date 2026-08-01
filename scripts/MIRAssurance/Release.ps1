@@ -683,8 +683,8 @@ function Invoke-MIRAssuranceSelfTest {
   if ([string]$Context.target -eq '2.0' -and [string]$Context.info.version -eq '2.5.0') {
     $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
     $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
-    if ([string]$authority.candidate_id -ne '2.5-P9') {
-      throw 'P9 target-scoped candidate identity self-test failed.'
+    if ([string]$authority.candidate_id -ne '2.5-P10') {
+      throw 'P10 target-scoped candidate identity self-test failed.'
     }
     $null = Assert-MIRReleaseEvidenceSourceAuthority `
       -RepoRoot $repo `
@@ -709,7 +709,7 @@ function Invoke-MIRAssuranceSelfTest {
         -RecordedEvidenceCommit '7ebe93029695bbf809a15a14c6540530738a9e62'
     } catch { $untrustedCommitRejected = $true }
     if (-not $untrustedCommitRejected) {
-      throw 'Evidence from outside the P9 package-source lineage was accepted.'
+      throw 'Evidence from outside the P10 package-source lineage was accepted.'
     }
   }
 

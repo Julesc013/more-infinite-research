@@ -5,7 +5,7 @@ applies_to: "2.5.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-27
+last_reviewed: 2026-08-01
 supersedes: []
 superseded_by: []
 ---
@@ -15,9 +15,12 @@ superseded_by: []
 ## Highlights
 
 - Backports the MIR 3.2 compiler platform, deterministic planning, fail-closed integrity checks, settings, localization, and established research streams to Factorio 2.0.
+- Adds a separate Platform Productivity research stream: plus 10 percent for ice platforms and plus 5 percent for space-platform foundations.
+- Gates Ice and Platform progression with cryogenic science while keeping the target-appropriate Factorio 2.0 science profile.
+- Discovers compatible modded belts, underground belts, splitters, lane splitters, loaders, inserters, and module tiers structurally instead of relying only on fixed names.
+- Preserves explicit productivity denial, recycling and catalyst safety, and disabled automatic-productivity policy.
 - Preserves valid concrete planet-discovery effects while pruning genuinely missing location targets.
 - Loads after Pyanodons Post-processing and sanitizes the final Py technology surface when targets are genuinely removed.
-- The exact Py 2.0 closure retains valid `casting-gear` and ordered `casting-mk02` effects with zero external prunes; the synthetic late-removal fixture separately proves stale-unlock cleanup.
 - Keeps Factorio 2.0-specific science, prototype, effect, dependency, and capability behavior; Factorio 2.1-only surfaces remain excluded.
 - Uses 2.4.9 as the mandatory direct upgrade and approved-delta baseline.
 
@@ -25,17 +28,18 @@ superseded_by: []
 
 - Target: Factorio 2.0.
 - Qualification binary: Factorio 2.0.77.
+- AdvancedBeltsSA 2.3.3: exact native load and structural assertions pending P10 qualification.
 - Exact Py support claim: startup-integrity correction for the locked 2.0 closure; this is not a blanket claim of full Py technology-generation support.
 
 ## Candidate integrity
 
-- Candidate: `2.5-P9`.
-- Baseline commit: `7ebe93029695bbf809a15a14c6540530738a9e62`.
-- Portable C24 source: `29f81addc0eec9b571afd6428c9e3529c4497a1b`.
-- Package source: `f446d89f94ce4b9dc26f04c31c92f9bcffbac70d`.
-- ZIP SHA-256: `30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3`.
-- ZIP size: `1,029,914` bytes; `290` entries.
+- Candidate: 2.5-P10.
+- Baseline commit: 7ebe93029695bbf809a15a14c6540530738a9e62.
+- Portable C30 source: c1fd8b932c8d916a14925678056e08893b87b2db.
+- Package source: 39f2238c4f83790bf0d2bf5f1459503e96c41925.
+- ZIP SHA-256: 4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589.
+- ZIP size: 1,033,875 bytes; 291 entries.
 
 ## Release status
 
-P9 is an unreleased candidate. Exact Base and official Space Age ZIP loads, the direct 2.4.9 upgrade matrix, the 319-row approved delta, all six paired performance lanes, and the exact 11-mod Py 2.0 integrity campaign pass. Full no-reuse, manual, protected, seal, and promotion gates remain pending.
+P10 is an unreleased package-built candidate. Exact target static, runtime, upgrade, approved-delta, ecosystem, performance, manual, protected, seal, promotion, and publication gates remain pending. P9 results remain superseded historical evidence and are not current P10 proof.

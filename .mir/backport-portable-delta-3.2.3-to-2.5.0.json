@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "kind": "mir-portable-delta-ledger",
+  "source": {
+    "version": "3.2.3",
+    "candidate_id": "C30",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "tag": "3.2.3",
+    "tag_status": "tagged"
+  },
+  "target": {
+    "version": "2.5.0",
+    "candidate_id": "2.5-P10",
+    "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
+    "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589"
+  },
+  "rules": {
+    "wholesale_merge_forbidden": true,
+    "target_specific_evidence_required": true,
+    "factorio_2_1_evidence_reusable": false
+  },
+  "changes": [
+    {
+      "id": "c21-concrete-planet-resolver",
+      "source_version": "3.2.1",
+      "disposition": "already-present-retain-and-requalify",
+      "target_paths": [
+        "prototypes/mir/index/prototype_lookup.lua",
+        "prototypes/mir/verification/effect_target_inventory.lua"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c24-py-finalizer-ordering",
+      "source_version": "3.2.2",
+      "disposition": "portable-through-target-metadata",
+      "target_paths": [
+        "info.json"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c24-affected-save-planet-recovery",
+      "source_version": "3.2.2",
+      "disposition": "omitted-version-specific",
+      "source_paths": [
+        "prototypes/mir/runtime/planet_discovery_recovery.lua",
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "reason": "The repair is explicitly gated to 3.2.0/3.2.1 -> 3.2.2 and no released 2.x package introduced that damaged state."
+    },
+    {
+      "id": "c24-py-synthetic-fixture",
+      "source_version": "3.2.2",
+      "disposition": "portable-with-factorio-2.0-adapter",
+      "target_paths": [
+        "fixtures/pypostprocessing-stale-unlock"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c24-py-real-closure",
+      "source_version": "3.2.2",
+      "disposition": "requires-independent-2.0-proof",
+      "target_paths": [
+        ".mir/fixtures.yml",
+        ".mir/compatibility.yml",
+        "fixtures/compat-matrix/manual-scenarios.json"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c21-c24-release-assurance",
+      "source_version": "3.2.1-3.2.2",
+      "disposition": "selective-target-neutral-port",
+      "reason": "Only target-neutral release tooling and schemas are carried; Factorio 2.1 candidate evidence and seals are never reused."
+    },
+    {
+      "id": "factorio-2.1-metadata-and-effects",
+      "source_version": "3.2.1-3.2.3",
+      "disposition": "rejected-target-incompatible",
+      "reason": "Factorio 2.1 dependency floors, cargo modifiers, and 2.1 ecosystem identities remain excluded by the 2.0 target profile."
+    },
+    {
+      "id": "c30-platform-ice-progression",
+      "source_version": "3.2.3",
+      "disposition": "portable-with-factorio-2.0-science-adapter",
+      "target_paths": [
+        ".mir/streams.yml",
+        "prototypes/mir/research/stream_catalog.lua",
+        "prototypes/mir/research/selector.lua"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c30-structural-logistics",
+      "source_version": "3.2.3",
+      "disposition": "portable-and-target-requalified",
+      "target_paths": [
+        "prototypes/mir/research/stream_catalog.lua",
+        "prototypes/mir/research/stream_compiler.lua",
+        "prototypes/mir/research/scenario_facts.lua"
+      ],
+      "evidence": "pending-exact-p10-runtime-and-advancedbeltssa"
+    },
+    {
+      "id": "c30-structural-indexing",
+      "source_version": "3.2.3",
+      "disposition": "portable-behavior-preserving-optimization",
+      "target_paths": [
+        "prototypes/mir/research/stream_compiler.lua",
+        "prototypes/mir/research/scenario_facts.lua"
+      ],
+      "evidence": "pending-exact-p10-work-volume-and-performance"
+    },
+    {
+      "id": "c30-automatic-action-guard",
+      "source_version": "3.2.3",
+      "disposition": "portable-regression-fix",
+      "target_paths": [
+        "prototypes/mir/research/stream_compiler.lua"
+      ],
+      "evidence": "pending-exact-p10-runtime"
+    },
+    {
+      "id": "c30-timeboxed-release-assurance",
+      "source_version": "3.2.3",
+      "disposition": "rejected-target-incompatible",
+      "reason": "The 3.2.3 time-boxed publication exception and all Factorio 2.1 observations are historical source context, not reusable Factorio 2.0 release authority."
+    }
+  ]
+}

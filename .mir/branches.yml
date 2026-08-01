@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: frozen Factorio 2.1 stable line at MIR 3.2.1 pending final protected evidence import and 3.2.2 hotfix promotion
+    purpose: frozen Factorio 2.1 stable line at tagged MIR 3.2.3
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: MIR 3.2.2 Py and planet-recovery emergency hotfix qualification; returns to MIR 3.2.5 development after publication
+    purpose: canonical Factorio 2.1 development and shared Control Plane v5 release engineering after MIR 3.2.3
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -111,20 +111,20 @@ feature_line_lineage:
   feature_pairs:
     - canonical: "3.2.x"
       factorio_2_0_companion: "2.5.x"
-      canonical_release_tag: "3.2.2"
-      status: c24-tag-pending-p9-semantic-projection-static-green-runtime-pending
+      canonical_release_tag: "3.2.3"
+      status: c30-tagged-p10-semantic-projection-package-built-target-qualification-pending
     - canonical: "3.3.x"
       factorio_2_0_companion: "2.6.x"
       canonical_release_tag: "3.3.0"
       status: planned
   patch_policy: patch-numbers-are-target-local-and-need-not-advance-in-lockstep
   final_2_5_0_source_gate:
-    canonical_tag: "3.2.2"
+    canonical_tag: "3.2.3"
     prior_target_tag: "2.4.9"
     exact_portable_delta_ledger_required: true
     prior_target_tag_ancestry_required: true
-    current_provisional_candidate_satisfies_gate: false
-    action_after_canonical_release: verify-final-c24-source-and-exact-target-projection-before-2.5-qualification
+    current_provisional_candidate_satisfies_gate: true
+    action_after_canonical_release: independently-qualify-exact-c30-derived-p10-before-promotion
 
 release_artifacts:
   published_archives_are_immutable: true
@@ -367,14 +367,34 @@ release_artifacts:
       sha256: 8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8
       package_content_sha256: 25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F
       tag: "3.2.2"
-      publication_status: pending
-      status: exact-package-source-pending-final-qualification-and-tag
+      publication_status: published
+      status: published-frozen
+    mir_3_2_3:
+      version: "3.2.3"
+      branch: main
+      target_factorio: "2.1"
+      source_anchor: mir_3_2_2
+      candidate_id: C30
+      package_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+      artifact: dist/more-infinite-research_3.2.3.zip
+      sha256: 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+      package_content_sha256: 2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9
+      tag_commit: 1abe07573cde814c3cacf6153b5ae64dee4038ba
+      tag: "3.2.3"
+      publication_status: tagged
+      status: tagged-frozen-source-for-target-projection
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
       source_anchor: mir_3_2_2
       superseded_candidates:
+        - candidate_id: "2.5-P9"
+          package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
+          archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
+          package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
+          reason: superseded by the tagged MIR 3.2.3 semantic projection before final qualification
+          status: superseded-before-final-qualification
         - candidate_id: "2.5-P8"
           package_source_commit: ee88e54af52294452fb4d94cd9e3eae1a8929d3d
           archive_sha256: A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F
@@ -399,27 +419,27 @@ release_artifacts:
       assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.9.zip
-      candidate_id: "2.5-P9"
-      portable_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
-      portable_delta_ledger: .mir/backport-portable-delta-3.2.2-to-2.5.0.json
-      package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
+      candidate_id: "2.5-P10"
+      portable_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+      portable_delta_ledger: .mir/backport-portable-delta-3.2.3-to-2.5.0.json
+      package_source_commit: 39f2238c4f83790bf0d2bf5f1459503e96c41925
       archive: dist/more-infinite-research_2.5.0.zip
-      archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
-      package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
-      archive_bytes: 1029914
-      archive_entries: 290
-      automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
-      focused_runtime_evidence: .mir/evidence/2.5.0-exact-zip-loads.json
-      upgrade_evidence: .mir/evidence/2.5.0-upgrade-proof.json
-      exact_py_evidence: .mir/evidence/2.5.0-py-exact.json
-      runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
-      approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
-      automated_gate: focused-static-exact-zip-upgrade-approved-delta-performance-and-py-passed-full-pending
-      release_gate: full-automated-manual-and-protected-pending-exact-p9
-      manual_review: pending-exact-p9
-      protected_qualification: pending-exact-p9
+      archive_sha256: 4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589
+      package_content_sha256: 07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9
+      archive_bytes: 1033875
+      archive_entries: 291
+      automated_qualification: pending-exact-p10
+      focused_runtime_evidence: pending-exact-p10
+      upgrade_evidence: pending-exact-p10
+      exact_py_evidence: pending-exact-p10
+      runtime_performance_evidence: pending-exact-p10
+      approved_delta_evidence: pending-exact-p10
+      automated_gate: package-built-all-exact-p10-qualification-pending
+      release_gate: all-automated-manual-protected-seal-and-promotion-pending-exact-p10
+      manual_review: pending-exact-p10
+      protected_qualification: pending-exact-p10
       publication_status: unreleased
-      status: automated-playtest-candidate-c24-projection-focused-runtime-release-and-py-evidence-passed-full-manual-protected-pending
+      status: automated-playtest-candidate-c30-projection-package-built-all-exact-p10-qualification-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

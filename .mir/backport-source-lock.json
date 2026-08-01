@@ -1,10 +1,10 @@
 {
   "schema": 4,
   "projection_schema": 3,
-  "candidate_id": "2.5-P9",
+  "candidate_id": "2.5-P10",
   "mir_version": "2.5.0",
   "target": "2.0",
-  "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
+  "target_profile_sha256": "5A38F9E6BE6F3A98D88E945FB3378D762719645D1414B557BE5F9BDF145C828B",
   "baseline": {
     "version": "2.4.9",
     "reference": "2.4.9",
@@ -14,46 +14,47 @@
     "content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
   },
   "portable_source": {
-    "release": "3.2.2",
-    "candidate_id": "C24",
-    "commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
-    "source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
-    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
-    "tag": "3.2.2",
-    "tag_status": "pending-final-qualification"
+    "release": "3.2.3",
+    "candidate_id": "C30",
+    "commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "source_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "tag": "3.2.3",
+    "tag_status": "tagged"
   },
   "lineage": {
     "policy": "canonical-semantic-projection",
-    "state": "final-c24-semantic-source-pending-tag",
-    "canonical_release_tag": "3.2.2",
-    "canonical_release_tag_status": "pending",
-    "portable_source_commit_is_ancestor": false,
+    "state": "tagged-3.2.3-semantic-source-pending-target-qualification",
+    "canonical_release_tag": "3.2.3",
+    "canonical_release_tag_status": "tagged",
+    "portable_source_commit_is_ancestor": true,
     "prior_target_tag": "2.4.9",
     "prior_target_tag_is_ancestor": true,
     "final_candidate_requires_exact_portable_delta_ledger": true,
     "next_feature_pair": "3.3.x-to-2.6.x"
   },
   "projection": {
-    "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
-    "package_source_tree": "02a7df650556c77d03ff071d5968b7fc36a91692",
-    "package_source_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+    "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
+    "package_source_tree": "e3c923ee60af526563d16c1718e9a264b72a942d",
+    "package_source_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
     "adapted_package_paths": [
       "README.md",
       "changelog.txt",
       "info.json",
+      "prototypes/mir/compatibility/claim_registry.lua",
       "prototypes/mir/platform/factorio/target_profiles.lua",
       "prototypes/mir/providers/pipeline/budget.lua",
       "prototypes/mir/runtime/planet_discovery_recovery.lua",
       "prototypes/mir/runtime/scripted_techs.lua"
     ],
-    "portable_delta_ledger": ".mir/backport-portable-delta-3.2.2-to-2.5.0.json"
+    "portable_delta_ledger": ".mir/backport-portable-delta-3.2.3-to-2.5.0.json"
   },
   "candidate": {
     "archive": "dist/more-infinite-research_2.5.0.zip",
-    "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
-    "content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
-    "bytes": 1029914,
-    "entries": 290,
+    "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
+    "content_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
+    "bytes": 1033875,
+    "entries": 291,
     "forbidden_entries": 0,
     "class": "automated-playtest-candidate"
   },
@@ -62,17 +63,25 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "passed-focused-p7",
-    "synthetic_py_finalizer": "passed-exact-p9",
-    "runtime": "pending-exact-p9",
-    "manual_review": "pending-exact-p9",
-    "protected_qualification": "pending-exact-p9",
+    "target_static": "pending-exact-p10",
+    "synthetic_py_finalizer": "pending-exact-p10",
+    "runtime": "pending-exact-p10",
+    "manual_review": "pending-exact-p10",
+    "protected_qualification": "pending-exact-p10",
     "publication": "unreleased"
   },
   "release_notes": "docs/releases/notes/release-notes-2.5.0.md",
-  "candidate_document": "docs/releases/2.5.0-provisional-c24-backport.md",
+  "candidate_document": "docs/releases/2.5.0-provisional-3.2.3-backport.md",
   "playtest_guide": "docs/releases/2.5.0-playtest-guide.md",
   "superseded_candidates": [
+    {
+      "candidate_id": "2.5-P9",
+      "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+      "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
+      "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+      "reason": "superseded by the tagged MIR 3.2.3 semantic projection before final qualification",
+      "status": "superseded-before-final-qualification"
+    },
     {
       "candidate_id": "2.5-P8",
       "archive_sha256": "A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F",
