@@ -4,7 +4,7 @@
   "candidate_id": "2.5-P10",
   "mir_version": "2.5.0",
   "target": "2.0",
-  "target_profile_sha256": "5A38F9E6BE6F3A98D88E945FB3378D762719645D1414B557BE5F9BDF145C828B",
+  "target_profile_sha256": "24E7C3AE78C994A386BC33C41CC6EC3724F2A9A861B794C3812C341C35F1A92C",
   "baseline": {
     "version": "2.4.9",
     "reference": "2.4.9",
