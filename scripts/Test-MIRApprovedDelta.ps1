@@ -236,7 +236,7 @@ if ($isFactorio20Backport) {
   }
   $rowsSha = Get-MIRStringSha256 -Value (Get-MIRDeltaCanonicalJson -Value $differences)
   $fieldsSha = Get-MIRStringSha256 -Value (@($differences.field) -join "`n")
-  if ($rowsSha -ne '84B9BAB680F15E3B62BDD2FA327275183F07B2CE90129B5C36333BAF41A196EA' -or
+  if ($rowsSha -ne '9C7461C75EECF9C823324A72462356170BE9045C5C2C333CEFE68CC5B9DA23AB' -or
       $fieldsSha -ne '731736C4768372582DFCFD886A8F0118472CA7801E007C95667478B5DAB08E2A') {
     throw 'Approved-delta reviewed rows or exact field set drifted.'
   }

@@ -11,16 +11,16 @@
   "current": {
     "version": "2.5.0",
     "factorio_version": "2.0",
-    "source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
-    "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
-    "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
-    "package_content_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9"
+    "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+    "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+    "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
     "script": "scripts/Export-MIRApprovedDelta.ps1",
-    "qualification_source_commit": "e3456bac47ab00a6c03ba3eba970217b0a328feb",
-    "producer_sha256": "47EB1978BFB24FE48A03D9CB00D21871ECC677054094764F0C76658CC46AAC8D",
+    "qualification_source_commit": "40a45c04ab9013da8122d066357d787bb5ab8639",
+    "producer_sha256": "A59D69F802E4846D65908A857C980F850EAC9582BB7368FF8190A9D298CC8900",
     "factorio_binary_version": "2.0.77.84539",
     "scenarios": [
       "approved-delta-automatic-family-controls",
@@ -101,7 +101,7 @@
     {
       "field": "package.archive_sha256",
       "before": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
-      "after": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
+      "after": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -114,7 +114,7 @@
     {
       "field": "package.package_content_sha256",
       "before": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
-      "after": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
+      "after": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -5736,11 +5736,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -5784,11 +5784,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -5832,11 +5832,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -5880,11 +5880,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -5941,11 +5941,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -5989,11 +5989,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -6229,7 +6229,7 @@
           "type": "change-recipe-productivity"
         }
       ],
-      "reason": "P10 attaches the exact opaque-name belt fixture through the conservative structural fallback at 0.5% per level.",
+      "reason": "P11 attaches the exact opaque-name belt fixture through the conservative structural fallback at 0.5% per level.",
       "intentional": true,
       "migration_impact": "Known reviewed belt tiers retain precedence; eligible unknown belt-family recipes gain the conservative fallback.",
       "required_evidence": [
@@ -11631,11 +11631,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -11679,11 +11679,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -11727,11 +11727,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -11775,11 +11775,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -11836,11 +11836,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -11884,11 +11884,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17396,11 +17396,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17444,11 +17444,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17492,11 +17492,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17540,11 +17540,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17601,11 +17601,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -17649,11 +17649,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23161,11 +23161,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23209,11 +23209,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23257,11 +23257,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23305,11 +23305,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23366,11 +23366,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23414,11 +23414,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -23726,7 +23726,7 @@
         "kind": "stream",
         "key": "research_platform"
       },
-      "reason": "P10 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
+      "reason": "P11 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
       "intentional": true,
       "migration_impact": "Existing identities remain unchanged; Space Age saves gain one new unresearched Aquilo-gated technology.",
       "required_evidence": [
@@ -29226,11 +29226,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29274,11 +29274,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29322,11 +29322,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29370,11 +29370,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29431,11 +29431,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29479,11 +29479,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -29759,7 +29759,7 @@
         "production-science-pack",
         "space-science-pack"
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -29829,7 +29829,7 @@
           "amount": 1
         }
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -30038,7 +30038,7 @@
           "level": 1
         }
       },
-      "reason": "P10 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
+      "reason": "P11 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
       "intentional": true,
       "migration_impact": "Platform ownership moves from Landfill to a separate unresearched cryogenic-gated identity; Landfill and Ice research levels are retained.",
       "required_evidence": [
@@ -30392,7 +30392,7 @@
         "kind": "stream",
         "key": "research_platform"
       },
-      "reason": "P10 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
+      "reason": "P11 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
       "intentional": true,
       "migration_impact": "Existing identities remain unchanged; Space Age saves gain one new unresearched Aquilo-gated technology.",
       "required_evidence": [
@@ -35876,11 +35876,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -35924,11 +35924,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -35972,11 +35972,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -36020,11 +36020,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -36081,11 +36081,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -36129,11 +36129,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -36409,7 +36409,7 @@
         "production-science-pack",
         "space-science-pack"
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -36479,7 +36479,7 @@
           "amount": 1
         }
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -36688,7 +36688,7 @@
           "level": 1
         }
       },
-      "reason": "P10 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
+      "reason": "P11 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
       "intentional": true,
       "migration_impact": "Platform ownership moves from Landfill to a separate unresearched cryogenic-gated identity; Landfill and Ice research levels are retained.",
       "required_evidence": [
@@ -37042,7 +37042,7 @@
         "kind": "stream",
         "key": "research_platform"
       },
-      "reason": "P10 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
+      "reason": "P11 registers the one stable Platform Productivity stream identity only in the exact Space Age environments.",
       "intentional": true,
       "migration_impact": "Existing identities remain unchanged; Space Age saves gain one new unresearched Aquilo-gated technology.",
       "required_evidence": [
@@ -42526,11 +42526,11 @@
         "value_type": "number",
         "current_value": 8000
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -42574,11 +42574,11 @@
         "value_type": "number",
         "current_value": 2
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -42622,11 +42622,11 @@
         "value_type": "number",
         "current_value": 10
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -42670,11 +42670,11 @@
         "value_type": "boolean",
         "current_value": true
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -42731,11 +42731,11 @@
         "value_type": "number",
         "current_value": 0
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -42779,11 +42779,11 @@
         "value_type": "number",
         "current_value": 60
       },
-      "reason": "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
+      "reason": "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment.",
       "intentional": true,
       "migration_impact": "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities.",
       "required_evidence": [
-        "P10 settings schema and locale gates",
+        "P11 settings schema and locale gates",
         "Space Age platform progression fixture",
         "exact 2.0 runtime delta"
       ]
@@ -43059,7 +43059,7 @@
         "production-science-pack",
         "space-science-pack"
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -43129,7 +43129,7 @@
           "amount": 1
         }
       ],
-      "reason": "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
+      "reason": "P11 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients.",
       "intentional": true,
       "migration_impact": "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression.",
       "required_evidence": [
@@ -43338,7 +43338,7 @@
           "level": 1
         }
       },
-      "reason": "P10 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
+      "reason": "P11 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects.",
       "intentional": true,
       "migration_impact": "Platform ownership moves from Landfill to a separate unresearched cryogenic-gated identity; Landfill and Ice research levels are retained.",
       "required_evidence": [
