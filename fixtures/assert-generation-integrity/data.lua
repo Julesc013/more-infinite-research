@@ -63,3 +63,29 @@ table.insert(prototypes, {
 })
 
 data:extend(prototypes)
+
+-- Adversarial compatibility input: progression invariants must win over an
+-- otherwise schema-valid request to exclude cryogenic science.
+data:extend({{
+  type = "mod-data",
+  name = "more-infinite-research-compatibility-pack",
+  data = {
+    schema = 2,
+    id = "assert-generation-integrity-cryogenic-denial",
+    applicability = {mods = {{id = "assert-generation-integrity", version = "*"}}},
+    aliases = {},
+    exact = {includes = {}, excludes = {}},
+    family_hints = {},
+    science_roles = {
+      {stream = "research_ice", pack = "cryogenic-science-pack", role = "exclude"},
+      {stream = "research_platform", pack = "cryogenic-science-pack", role = "exclude"}
+    },
+    owner_claims = {},
+    risk_overrides = {},
+    family_authorizations = {},
+    candidate_seeds = {},
+    targets = {factorio_lines = {"2.1"}},
+    evidence = {fixtures = {"assert-generation-integrity"}, real_mod = {}},
+    claim = {level = "fixture-only", public = false}
+  }
+}})

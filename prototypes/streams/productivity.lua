@@ -481,6 +481,7 @@ return {
   }, exclude_ingredient_patterns={"scrap"} },
 
   research_platform = {
+    required_mods = {"space-age"},
     ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_all_items = {"ice-platform", "space-platform-foundation"}

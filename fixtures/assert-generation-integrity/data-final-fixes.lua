@@ -70,7 +70,12 @@ local function assert_compiler_telemetry()
   end
   for _, counter in ipairs({
     "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
-    "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
+    "recipe_index_scans", "recipe_fact_copies", "item_prototype_index_builds",
+    "entity_prototype_index_rows", "entity_prototype_index_lookups",
+    "item_prototype_index_rows", "placeable_item_index_rows", "placeable_item_index_lookups",
+    "module_tier_index_rows", "module_tier_index_lookups", "stream_match_cache_hits",
+    "stream_match_cache_misses", "stream_match_max_computations_per_identity",
+    "candidate_operations", "accepted_operations",
     "rejected_operations", "diagnostic_rows", "generation_plan_rows", "generation_plan_public_bytes",
     "generation_plan_internal_bytes", "technology_design_count", "technology_design_canonical_bytes",
     "coverage_rows", "coverage_public_bytes", "coverage_internal_bytes", "context_state_keys",
@@ -141,6 +146,23 @@ local function assert_compiler_telemetry()
         .. " maximum=" .. tostring(maximum)
         .. " actual=" .. tostring(evidence.counts[counter]))
     end
+  end
+  if evidence.counts.item_prototype_index_builds ~= 1 then
+    fail("item/entity/module prototype index must be built exactly once; actual="
+      .. tostring(evidence.counts.item_prototype_index_builds))
+  end
+  if evidence.counts.recipe_index_scans ~= 1 then
+    fail("recipe fact index must scan recipes exactly once; actual="
+      .. tostring(evidence.counts.recipe_index_scans))
+  end
+  if evidence.counts.stream_match_max_computations_per_identity > 1 then
+    fail("stream matching recomputed an immutable stream identity; maximum="
+      .. tostring(evidence.counts.stream_match_max_computations_per_identity))
+  end
+  if evidence.counts.stream_match_cache_misses > evidence.counts.stream_rows + 1 then
+    fail("stream match cache created more identities than governed streams; misses="
+      .. tostring(evidence.counts.stream_match_cache_misses)
+      .. " stream_rows=" .. tostring(evidence.counts.stream_rows))
   end
   for _, phase in ipairs({
     "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
@@ -953,6 +975,27 @@ local function assert_technology_lacks_science(technology_name, unexpected_packs
   end
 end
 
+local function assert_accepting_lab(technology_name)
+  local technology = techs[technology_name]
+  if not technology or not technology.unit then
+    fail("technology " .. technology_name .. " is missing while checking lab acceptance.")
+  end
+  local required = {}
+  for _, ingredient in ipairs(technology.unit.ingredients or {}) do
+    required[ingredient.name or ingredient[1]] = true
+  end
+  for _, lab in pairs(data.raw.lab or {}) do
+    local accepted = {}
+    for _, input in ipairs(lab.inputs or {}) do accepted[input] = true end
+    local complete = true
+    for pack_name in pairs(required) do
+      if not accepted[pack_name] then complete = false; break end
+    end
+    if complete then return end
+  end
+  fail("technology " .. technology_name .. " has no lab accepting its final science set.")
+end
+
 local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
   local owner = techs[owner_name]
   if not owner or owner.max_level ~= "infinite" or owner.upgrade ~= true then
@@ -1083,6 +1126,8 @@ if is_space_age then
   }) do
     assert_required_recipe_owner(expectation.recipe, expectation.owner, expectation.change)
   end
+  assert_recipe_not_owned_by("ice-platform", "recipe-prod-research_landfill-1")
+  assert_recipe_not_owned_by("space-platform-foundation", "recipe-prod-research_landfill-1")
 
   for _, recipe_name in ipairs({
     "capture-robot-rocket",
@@ -1113,6 +1158,8 @@ if is_space_age then
   assert_technology_lacks_science("recipe-prod-research_platform-1", {
     "metallurgic-science-pack"
   })
+  assert_accepting_lab("recipe-prod-research_ice-1")
+  assert_accepting_lab("recipe-prod-research_platform-1")
 
   for owner_name, expected_recipes in pairs({
     ["asteroid-productivity"] = {
@@ -1141,6 +1188,9 @@ if is_space_age then
     assert_exact_owner_recipe_set(owner_name, expected_recipes, 0.1)
   end
 else
+  if techs["recipe-prod-research_platform-1"] then
+    fail("Platform productivity must not materialize without Space Age.")
+  end
   for _, expectation in ipairs({
     { recipe = "processing-unit", owner = "recipe-prod-research_processing_unit-1" },
     { recipe = "low-density-structure", owner = "recipe-prod-research_low_density_structure-1" },
