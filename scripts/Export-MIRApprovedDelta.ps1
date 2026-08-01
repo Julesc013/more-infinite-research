@@ -496,6 +496,7 @@ function Test-ExactBackportTechnologyIdentityAddition {
     $expected += @(
       'recipe-prod-research_capture_robot_rockets-1',
       'recipe-prod-research_nutrients-1',
+      'recipe-prod-research_platform-1',
       'recipe-prod-research_spoilage_preservation-1'
     )
   }
@@ -504,6 +505,86 @@ function Test-ExactBackportTechnologyIdentityAddition {
   $added = @($afterValues | Where-Object { $beforeValues -notcontains $_ } | Sort-Object)
   $removed = @($beforeValues | Where-Object { $afterValues -notcontains $_ })
   return $removed.Count -eq 0 -and ($added -join '|') -eq (@($expected | Sort-Object) -join '|')
+}
+
+function Test-ExactP10PlatformSettingAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($null -ne $Before -or
+      $Path -notmatch '^scenarios\.(?<scenario>[^.]+)\.settings\.ips-(?<field>cost-base|cost-growth|effect-per-level|enable|max-level|research-time)-research_platform$' -or
+      $Matches.scenario -notin @(
+        'approved-delta-automatic-family-controls', 'approved-delta-base',
+        'approved-delta-base-continuations', 'approved-delta-compat-atan',
+        'approved-delta-compat-space-age-galore', 'approved-delta-native-owner-adoption',
+        'approved-delta-space-age')) {
+    return $false
+  }
+  $expected = @{
+    'cost-base' = @{ type = 'number'; value = 8000 }
+    'cost-growth' = @{ type = 'number'; value = 2 }
+    'effect-per-level' = @{ type = 'number'; value = 10 }
+    'enable' = @{ type = 'boolean'; value = $true }
+    'max-level' = @{ type = 'number'; value = 0 }
+    'research-time' = @{ type = 'number'; value = 60 }
+  }[$Matches.field]
+  return [string]$After.value_type -eq $expected.type -and
+    $After.current_value -eq $expected.value -and @($After.PSObject.Properties.Name).Count -eq 2
+}
+
+function Test-ExactP10PlatformRegistryAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($null -ne $Before -or
+      $Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.generated_registry\.recipe-prod-research_platform-1$') {
+    return $false
+  }
+  return [string]$After.name -eq 'recipe-prod-research_platform-1' -and
+    [string]$After.kind -eq 'stream' -and [string]$After.key -eq 'research_platform' -and
+    @($After.PSObject.Properties.Name).Count -eq 3
+}
+
+function Test-ExactP10PlatformTechnologyAddition {
+  param([string]$Path, $Before, $After)
+
+  if ($null -ne $Before -or
+      $Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.recipe-prod-research_platform-1$') {
+    return $false
+  }
+  return (Get-TextSha256 -Text (Get-CanonicalJson -Value $After)) -eq
+    '56C55DB207F8F98DB890EE61305DF9505DBBB34D39237DCAEE86792D6BDB87A9'
+}
+
+function Test-ExactP10IceCryogenicProgression {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -notmatch '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.recipe-prod-research_ice-1\.(?<field>prerequisites|science_ingredients)$') {
+    return $false
+  }
+  $expected = if ($Matches.field -eq 'prerequisites') {
+    @{
+      before = '914EA9D35CFFBA28CA6BDD71C9D902A9C4D1A0F0EAE78290BFC2A42A931927FA'
+      after = 'FA7E140331E84C21C2CED61C21DDD3AAFC9769D4C7C2CAE11FEF895B5C1A8FE0'
+    }
+  } else {
+    @{
+      before = '25C4CBD4F9A8ADBCE69287662D34C0530D1BCCB627FF1E24EA5FE5F9552211B0'
+      after = 'D31E32A1C2B021B35CB37AE8F861F9BD80D97BDB82FCE2712E7B848C3E22142D'
+    }
+  }
+  return (Get-TextSha256 -Text (Get-CanonicalJson -Value $Before)) -eq $expected.before -and
+    (Get-TextSha256 -Text (Get-CanonicalJson -Value $After)) -eq $expected.after
+}
+
+function Test-ExactP10StructuralBeltsExpansion {
+  param([string]$Path, $Before, $After)
+
+  if ($Path -ne 'scenarios.approved-delta-automatic-family-controls.technologies.recipe-prod-research_belts-1.effects') {
+    return $false
+  }
+  return (Get-TextSha256 -Text (Get-CanonicalJson -Value $Before)) -eq
+      'FB22FADC4B630F12E98DF57AFE9F7606BBCCB68DCBA44F8BDFD62B3BF2BDB112' -and
+    (Get-TextSha256 -Text (Get-CanonicalJson -Value $After)) -eq
+      '3DF8EAC7FEF97A62F17C3FBF51C7719237B6D9AE3DA16D93F05F092EFAEA4486'
 }
 
 function Test-ExactBackportBreedingExpansion {
@@ -536,6 +617,46 @@ function Get-DifferenceDisposition {
     $Before,
     $After
   )
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformSettingAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "P10 adds the exact governed Platform Productivity setting surface in every target-2.0 delta environment."
+      intentional = $true
+      migration_impact = "The new Space Age-only stream uses the standard reviewed defaults without changing existing setting identities."
+      required_evidence = @("P10 settings schema and locale gates", "Space Age platform progression fixture", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformRegistryAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "P10 registers the one stable Platform Productivity stream identity only in the exact Space Age environments."
+      intentional = $true
+      migration_impact = "Existing identities remain unchanged; Space Age saves gain one new unresearched Aquilo-gated technology."
+      required_evidence = @("generated identity registry", "Platform owner-transfer fixture", "2.4.9 upgrade matrix")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10PlatformTechnologyAddition -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "P10 adds the exact Space Age Platform Productivity technology with 10% ice-platform and 5% space-platform-foundation effects."
+      intentional = $true
+      migration_impact = "Platform ownership moves from Landfill to a separate unresearched cryogenic-gated identity; Landfill and Ice research levels are retained."
+      required_evidence = @("exact Platform technology contract", "owner-transfer and upgrade assertions", "exact 2.0 runtime delta")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10IceCryogenicProgression -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "P10 adds cryogenic science to the final emitted Ice Productivity prerequisites and science ingredients."
+      intentional = $true
+      migration_impact = "Completed Ice levels and current progress remain; continuing research now respects Aquilo progression."
+      required_evidence = @("final emitted science invariant", "accepting-lab and researchability checks", "2.4.9 upgrade matrix")
+    }
+  }
+  if ($script:IsFactorio20BackportDelta -and (Test-ExactP10StructuralBeltsExpansion -Path $Path -Before $Before -After $After)) {
+    return [ordered]@{
+      reason = "P10 attaches the exact opaque-name belt fixture through the conservative structural fallback at 0.5% per level."
+      intentional = $true
+      migration_impact = "Known reviewed belt tiers retain precedence; eligible unknown belt-family recipes gain the conservative fallback."
+      required_evidence = @("semantic family attachment fixture", "disabled automatic-productivity regression", "native AdvancedBeltsSA gate")
+    }
+  }
   if ($script:IsFactorio20BackportDelta -and (Test-ExactBackportSettingDifference -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
       reason = "2.5 adds exact settings for nutrients and capture-robot-rocket productivity and default-enables the reviewed disruptive continuations."
