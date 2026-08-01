@@ -95,12 +95,19 @@ function Get-MIRAssuranceInputFingerprint {
       $relativePath = Resolve-MIRAssuranceManualReviewAttestationPath -Info $Context.info
       $path = Join-Path $repo $relativePath
       if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        throw "Manual-review attestation is absent: $relativePath"
+        return [ordered]@{
+          kind="manual-review-attestation"
+          version=[string]$Context.info.version
+          path=$relativePath
+          status="absent"
+          sha256=(Get-MIRAssuranceTextHash -Text "ABSENT-MANUAL-REVIEW:$relativePath")
+        }
       }
       return [ordered]@{
         kind="manual-review-attestation"
         version=[string]$Context.info.version
         path=$relativePath
+        status="present"
         sha256=(Get-MIRAssuranceSha256 -Path $path)
       }
     }

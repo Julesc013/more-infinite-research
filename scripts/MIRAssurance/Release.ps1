@@ -626,6 +626,16 @@ function Invoke-MIRAssuranceSelfTest {
   if (-not $unsafeManualReviewRejected) {
     throw "Manual-review resolver accepted an unsafe version value."
   }
+  $missingManualVersion = "99.99.99"
+  $missingManualPath = Join-Path $repo (Resolve-MIRAssuranceManualReviewAttestationPath -Info ([pscustomobject]@{version=$missingManualVersion}))
+  if (Test-Path -LiteralPath $missingManualPath) {
+    throw "Reserved missing-manual self-test path unexpectedly exists: $missingManualPath"
+  }
+  $missingManualFingerprint = Get-MIRAssuranceInputFingerprint -InputName "manual-review-attestation" -Plan ([ordered]@{}) -Context ([pscustomobject]@{info=[pscustomobject]@{version=$missingManualVersion}}) -Test ([ordered]@{})
+  if ([string]$missingManualFingerprint.status -ne "absent" -or
+      [string]$missingManualFingerprint.sha256 -notmatch '^[A-F0-9]{64}$') {
+    throw "Missing manual review was not represented as a deterministic planning input."
+  }
 
   $dependencyA = Get-MIRAssuranceDependencyContract -Info ([pscustomobject]@{
     name="more-infinite-research"; version="3.1.9"; factorio_version="2.1"; dependencies=@("base >= 2.1.8")
