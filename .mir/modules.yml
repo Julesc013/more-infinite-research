@@ -802,6 +802,7 @@ validation_tooling:
     - v5 performance execution uses source-side measurement code with a context-addressed controller-authority overlay, deterministic UTF-8 LF probe materialization, an exact overlay manifest, and an unchanged immutable package-source fingerprint
     - v5 Factorio performance execution uses a fresh context-bound compact scratch root within a conservative path budget, then verifies and relocates raw artifacts into the context-addressed evidence tree
     - compatibility-audit performance lanes defer output-directory materialization until governed artifact emission, and historical-source overlays bind the exact controller audit bytes and both runner families in the path budget
+    - the registered assurance-full workflow path delegates every exact protected input to the reusable canonical Control Plane v5 workflow on the selected ref
     - repository-wide validation enumerates tracked and non-ignored untracked governed files and cannot treat ignored control-plane staging clones as repository source
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations

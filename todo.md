@@ -80,6 +80,7 @@ Generated: 2026-07-31
 - [ ] `INC-2026-0049` — Non-calibration release shadow evaluation required a nonexistent v4 baseline; closure `pending-fresh-c24-calibration-and-c30-requalification`
 - [ ] `INC-2026-0050` — Nested aggregate re-emission made fresh-calibration proof selection ambiguous; closure `pending-new-immutable-c24-calibration`
 - [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `pending-new-immutable-c24-calibration`
+- [ ] `INC-2026-0052` — Canonical protected workflow had no registered default-branch dispatcher; closure `pending-exact-protected-c30-dispatch`
 
 ## Explicit release obligations
 

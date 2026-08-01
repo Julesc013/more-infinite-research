@@ -1,6 +1,36 @@
 name: MIR Control Plane v5
 
 on:
+  workflow_call:
+    inputs:
+      source_ref:
+        description: "Exact immutable qualification-source commit"
+        required: true
+        type: string
+      release:
+        description: "Governed release record"
+        required: true
+        type: string
+      target:
+        description: "Factorio target"
+        required: true
+        type: string
+      mode:
+        description: "Verification freshness mode"
+        required: true
+        type: string
+      prior_release:
+        description: "Trusted-runner path to the exact prior release archive"
+        required: true
+        type: string
+      local_mod_zip_dir:
+        description: "Trusted-runner path to the governed local mod ZIP closure"
+        required: false
+        type: string
+        default: ""
+    secrets:
+      FACTORIO_BIN:
+        required: true
   workflow_dispatch:
     inputs:
       source_ref:

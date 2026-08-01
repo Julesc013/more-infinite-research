@@ -30,4 +30,18 @@ foreach ($operation in @("environment", "upgrade", "ecosystem", "approved-delta"
 if ($workflow -match '(?i)(--no-reuse|-NoReuse)') { throw "Workflow uses a global no-reuse switch instead of proposition freshness." }
 $gateNames = @([regex]::Matches($workflow, '(?m)^\s+name:\s+MIR / verification-gate\s*$'))
 if ($gateNames.Count -ne 1) { throw "Workflow must expose exactly one MIR / verification-gate status." }
-Write-Host "[ok] v5 CI has one immutable context, exact-source native capture stages, a fail-closed manual boundary, exclusive performance, and one protected evidence-only aggregate gate."
+$registeredPath = Join-Path $repo ".github/workflows/assurance-full.yml"
+if (-not (Test-Path -LiteralPath $registeredPath -PathType Leaf)) { throw "Registered protected-workflow dispatcher is missing." }
+$registered = Get-Content -Raw -LiteralPath $registeredPath
+foreach ($token in @(
+  "name: Assurance Full Qualification", "workflow_dispatch:", "uses: ./.github/workflows/control-plane-v5.yml",
+  "source_ref: `${{ inputs.source_ref }}", "release: `${{ inputs.release }}", "target: `${{ inputs.target }}",
+  "mode: `${{ inputs.mode }}", "prior_release: `${{ inputs.prior_release }}",
+  "local_mod_zip_dir: `${{ inputs.local_mod_zip_dir }}", "secrets: inherit"
+)) {
+  if ($registered -notmatch [regex]::Escape($token)) { throw "Registered protected-workflow dispatcher omits required token: $token" }
+}
+if ($workflow -notmatch '(?m)^  workflow_call:\s*$' -or $workflow -notmatch '(?s)workflow_call:.+?secrets:.+?FACTORIO_BIN:.+?required:\s*true') {
+  throw "Canonical Control Plane v5 workflow is not reusable through the registered dispatcher."
+}
+Write-Host "[ok] v5 CI has one registered reusable entry point, one immutable context, exact-source native capture stages, a fail-closed manual boundary, exclusive performance, and one protected evidence-only aggregate gate."
