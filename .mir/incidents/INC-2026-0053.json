@@ -12,26 +12,33 @@
     "context_digest": "F97E2730F4729D835ED4B24593F184A715F02286F53E38F192DEA571322E6975",
     "plan_id": "D14C1EE52AF8179F8F85CD3A0D597786C435C6D358D6018975ECD57CFC62F668",
     "qualification_manifest_digest": "41034B2E5B1729681BFC26DCC1E86D50EEF68C3236289D5E4FB7C33ECCD3F24C",
-    "proof_result": "Qualification manifest requires one exact TaskNode result for architecture.dependencies; found 0."
+    "proof_result": "Qualification manifest requires one exact TaskNode result for architecture.dependencies; found 0.",
+    "descendant_verifier_result": "Executor checkout does not match the immutable context control-plane lock."
   },
   "reproduction": {
     "status": "reproduced-from-immutable-evidence",
-    "observed": "The passing qualification manifest contains 149 compact rows with task_id, status, and object_digest. The proof resolver additionally filtered those rows by identity_key and context_digest, fields intentionally stored only in each dereferenced content-addressed TaskNode object."
+    "observed": "The passing qualification manifest contains 149 compact rows with task_id, status, and object_digest. The proof resolver additionally filtered those rows by identity_key and context_digest, fields intentionally stored only in each dereferenced content-addressed TaskNode object. After the compact-row fix, post-execution proof materialization also correctly revealed that the executor state loader cannot be used by a later verifier because it requires the current checkout to equal the execution commit."
   },
   "root_cause": {
     "status": "proven-schema-reader-mismatch",
-    "summary": "The proof reader treated compact execution-manifest index rows as complete TaskNode evidence records. It therefore rejected every valid row before performing its existing strict digest, context, input identity, trust, status, and revocation checks on the referenced object."
+    "summary": "The proof reader treated compact execution-manifest index rows as complete TaskNode evidence records. It therefore rejected every valid row before performing its existing strict digest, context, input identity, trust, status, and revocation checks on the referenced object. Proof materialization also reused the execution-state loader, conflating immutable execution identity with a later verifier that must be separately bound."
   },
   "repair_changes": [
     "CHG-2026-0001:compact-manifest-proof-resolution",
-    "CHG-2026-0001:strict-dereferenced-task-object-validation"
+    "CHG-2026-0001:strict-dereferenced-task-object-validation",
+    "CHG-2026-0001:descendant-calibration-proof-verifier",
+    "CHG-2026-0001:exact-evidence-producer-binding"
   ],
   "regression_propositions": [
     "compact manifest rows resolve by their unique passed task_id and object_digest",
     "duplicate manifest task identities remain rejected",
     "the dereferenced object must exactly match task id context input identity trust status and revocation authority",
     "the passed C24 context and its 41034B2E qualification manifest remain immutable",
-    "C24 P9 and C30 package bytes remain unchanged"
+    "C24 P9 and C30 package bytes remain unchanged",
+    "post-execution proof materialization requires a clean committed descendant of the immutable controller",
+    "the verifier component ABI set must exactly equal the calibrated ABI set",
+    "the proof binds both immutable controller commit and proof verifier commit",
+    "every admitted execution manifest and TaskNode object producer commit equals the immutable controller"
   ],
   "affected_releases": [
     "3.2.2",

@@ -138,6 +138,36 @@ function Invoke-MIRCPFreshCalibration {
   }
 }
 
+function Get-MIRCPCalibrationProofState {
+  param([Parameter(Mandatory)][string]$ContextPath, [string]$RepoRoot = "")
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $context = Assert-MIRCPVerificationContext -Path $ContextPath
+  $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json
+  if ([int]$manifest.context_abi -ne 3) { throw "Calibration proof requires verification context ABI 3." }
+  $planEnvelope = Get-Content -Raw -LiteralPath (Join-Path $context.path "plan.json") | ConvertFrom-Json
+  if ([string]$planEnvelope.plan_id -ne [string]$manifest.plan_id) { throw "Calibration proof context plan does not match its manifest." }
+  $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
+  $verifierCommit = ([string](& git -C $repo rev-parse HEAD)).Trim()
+  $untracked = @(& git -C $repo ls-files --others --exclude-standard)
+  $worktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $repo
+  if ($LASTEXITCODE -ne 0 -or $untracked.Count -ne 0 -or -not [string]::IsNullOrWhiteSpace($worktreeSha256)) {
+    throw "Calibration proof verifier requires a clean committed checkout."
+  }
+  & git -C $repo merge-base --is-ancestor ([string]$controlLock.qualification_source_commit) $verifierCommit
+  if ($LASTEXITCODE -ne 0) { throw "Calibration proof verifier does not descend from the immutable context controller." }
+  $policy = Get-MIRCPPolicy -RepoRoot $repo
+  if ((Get-MIRCPSha256Object -Value $controlLock.component_abis) -ne (Get-MIRCPSha256Object -Value $policy.component_abis)) {
+    throw "Calibration proof verifier component ABIs differ from the immutable context controller."
+  }
+  return [pscustomobject][ordered]@{
+    context = $context
+    manifest = $manifest
+    plan_envelope = $planEnvelope
+    plan = $planEnvelope.plan
+    control_lock = $controlLock
+    verifier_commit = $verifierCommit
+  }
+}
 function Resolve-MIRCPManifestTaskResult {
   param(
     [Parameter(Mandatory)][object[]]$ManifestTaskResults,
@@ -174,7 +204,7 @@ function New-MIRCPFreshCalibrationProof {
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $state = Get-MIRCPContextExecutionState -ContextPath $ContextPath -RepoRoot $repo
+  $state = Get-MIRCPCalibrationProofState -ContextPath $ContextPath -RepoRoot $repo
   if ([string]$state.manifest.mode -ne "calibrate-fresh" -or [string]$state.manifest.release -ne "3.2.2") {
     throw "Fresh calibration proof requires a calibrate-fresh C24 context."
   }
@@ -192,7 +222,17 @@ function New-MIRCPFreshCalibrationProof {
     }
   }
   if ($qualificationManifests.Count -ne 1) { throw "Fresh calibration proof requires one complete qualification execution manifest." }
+  $controlLock = $state.control_lock
+  if ([string]$qualificationManifests[0].record.producer.commit -ne [string]$controlLock.qualification_source_commit) {
+    throw "Fresh calibration qualification manifest producer differs from the immutable context controller."
+  }
   $manifestTaskResults = @($qualificationManifests[0].record.payload.task_results)
+  foreach ($manifestResult in $manifestTaskResults) {
+    $taskObject = (Read-MIRCPEvidenceObject -Digest ([string]$manifestResult.object_digest) -RepoRoot $repo -Root $EvidenceRoot).object
+    if ([string]$taskObject.producer.commit -ne [string]$controlLock.qualification_source_commit) {
+      throw "Fresh calibration TaskNode evidence producer differs from the immutable context controller: $([string]$manifestResult.task_id)."
+    }
+  }
   $duplicateManifestTasks = @($manifestTaskResults | Group-Object task_id | Where-Object Count -ne 1)
   if ($duplicateManifestTasks.Count -ne 0) {
     throw "Fresh calibration qualification manifest contains duplicate TaskNode identities: $(@($duplicateManifestTasks.Name) -join ', ')."
@@ -221,7 +261,7 @@ function New-MIRCPFreshCalibrationProof {
   if ([string]$shadow.analysis_status -ne "passed" -or @($shadow.pending).Count -ne 0) { throw "Fresh calibration proof requires passing toolchain-admission shadow analysis." }
   [void](Assert-MIRCPPackageFreeze -RepoRoot $repo)
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
-  $controlLock = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "control-plane-lock.json") | ConvertFrom-Json
+  $controlLock = $state.control_lock
   if (-not [bool]$controlLock.qualification_source_clean) { throw "Fresh calibration proof requires a clean committed control-plane checkout." }
   $environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "environment-locks.json") | ConvertFrom-Json
   $body = [pscustomobject][ordered]@{
@@ -237,6 +277,7 @@ function New-MIRCPFreshCalibrationProof {
     context_id = [string]$state.context.context_id
     plan_id = [string]$state.plan_envelope.plan_id
     control_plane_commit = [string]$controlLock.qualification_source_commit
+    proof_verifier_commit = [string]$state.verifier_commit
     control_plane_worktree_sha256 = [string]$controlLock.qualification_source_worktree_sha256
     component_abis = $controlLock.component_abis
     factorio_locks = @($environmentLocks.factorio)

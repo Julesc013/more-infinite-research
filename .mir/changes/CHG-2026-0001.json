@@ -38,6 +38,7 @@
     "control-plane.idempotent-aggregate-closure",
     "control-plane.manifest-bound-calibration-proof",
     "control-plane.compact-manifest-proof-resolution",
+    "control-plane.descendant-calibration-proof-verifier",
     "control-plane.compat-audit-output-durability",
     "control-plane.registered-protected-workflow-dispatch"
   ],
