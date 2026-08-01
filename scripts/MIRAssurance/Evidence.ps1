@@ -822,6 +822,14 @@ function Resolve-MIRAssuranceCommandText {
       $resolved = $resolved.Replace([string]$entry.Key, (Quote-MIRAssuranceCommandArgument -Value ([string]$entry.Value)))
     }
   }
+  if ($resolved.Contains("<package-source-commit>")) {
+    $releaseAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    $packageSourceCommit = [string]$releaseAuthority.package_source_commit
+    if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+      throw "Command requires <package-source-commit>, but the target-scoped release authority has no valid package-source commit."
+    }
+    $resolved = $resolved.Replace("<package-source-commit>", (Quote-MIRAssuranceCommandArgument -Value $packageSourceCommit))
+  }
   if ($resolved -match '<[^>]+>') { throw "Unresolved assurance command placeholder: $resolved" }
   return $resolved
 }
