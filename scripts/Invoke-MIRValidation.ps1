@@ -754,6 +754,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanAshFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\atan-ash\data.lua")
   $atanAshAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-ash-separation\data-final-fixes.lua")
   $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
+  $advancedBeltsAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-advanced-belts-sa-productivity\data-final-fixes.lua")
   $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
   $semanticFamilyFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-semantic-family-attach\data-final-fixes.lua")
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
@@ -987,6 +988,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'recipe-prod-research_ash_separation-1' },
     @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'atan-landfill-from-ash' },
     @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
+    @{ File = "fixtures\assert-advanced-belts-sa-productivity\data-final-fixes.lua"; Text = $advancedBeltsAssertText; Snippet = '"high-speed-lanesplitter"' },
+    @{ File = "fixtures\assert-advanced-belts-sa-productivity\data-final-fixes.lua"; Text = $advancedBeltsAssertText; Snippet = 'ignored_by_productivity' },
     @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
     @{ File = "fixtures\assert-semantic-family-attach\data-final-fixes.lua"; Text = $semanticFamilyFixtureText; Snippet = 'attachment-only default emitted generated family technology' },
     @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
@@ -1890,7 +1893,10 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
     '"mod": "aai-loaders"',
     '"capability_lane": "logistics-loader-manufacturing"',
     '"mir-fixture-assert-aai-loader-belt-productivity"',
-    '"backport_candidate": true'
+    '"backport_candidate": true',
+    '"mod": "AdvancedBeltsSA"',
+    '"claim_lane": "fixture-backed stream family plus native Factorio 2.0 archive"',
+    '"native Factorio 2.0.77 plus AdvancedBeltsSA 2.3.3 assertion pending"'
   )
 
   foreach ($snippet in $requiredSnippets) {
@@ -2464,6 +2470,7 @@ $nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles"
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",
+  "mir-fixture-assert-advanced-belts-sa-productivity",
   "mir-fixture-assert-air-scrubbing-clean-filter",
   "mir-fixture-assert-atan-ash-separation",
   "mir-fixture-assert-atan-nuclear-science-productivity",

@@ -227,6 +227,22 @@
       ]
     },
     {
+      "id": "runtime.advanced-belts-sa",
+      "kind": "runtime-evidence",
+      "layer": "F4",
+      "command": "./scripts/Test-MIRAdvancedBeltsSA.ps1 -Candidate <candidate> -FactorioBin <factorio> -LocalModZipDir <mods> -ExpectedSourceCommit <source-commit> -OutputPath artifacts/assurance/2.5.0-advanced-belts-sa.json",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        "mod-closure",
+        "fixtures/assert-advanced-belts-sa-productivity/**",
+        "scripts/Test-MIRAdvancedBeltsSA.ps1",
+        "scripts/validation/FactorioProcess.ps1",
+        "scripts/validation/PackageIdentity.ps1"
+      ]
+    },
+    {
       "id": "release.approved-delta",
       "kind": "release-evidence",
       "layer": "F4",
