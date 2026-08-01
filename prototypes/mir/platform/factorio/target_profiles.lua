@@ -137,7 +137,7 @@ local M = {
         "scripted-effect"
       },
       asset_policy = "factorio-2.0-dlc",
-      expected_stream_count = 73,
+      expected_stream_count = 74,
       features = {
         compatibility_repairs = true,
         pipeline_extent = true,
