@@ -376,6 +376,7 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
           -and -not $relative.StartsWith("dist/") `
+          -and -not $relative.StartsWith("out/") `
           -and -not $relative.StartsWith("tmp/")
       }
   )
@@ -1460,6 +1461,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "`$loadResultsPath = Join-Path `$resolvedOutputDir `"load-results.json`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'if ($enabled.ContainsKey("space-age"))' },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("artifacts/")' },
+    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("out/")' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "skip_reason = `"dependency_resolution_failure`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Invoke-MIRScenarioLoad" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'validation\SettingsOverrides.ps1' },
