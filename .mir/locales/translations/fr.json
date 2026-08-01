@@ -269,6 +269,12 @@
       "provenance": "preexisting"
     },
     {
+      "key": "technology-name.more-infinite-research.research_platform",
+      "source_sha256": "B7E9BDB102AF3BF2B0873E0A8BF1632673AF80A0E3F31C2104C7B17E88E4BE7C",
+      "translation": "Productivité de la plateforme",
+      "provenance": "machine-assisted"
+    },
+    {
       "key": "technology-name.more-infinite-research.research_artificial_soil",
       "source_sha256": "D3EFCEAB620B07D0AEA342782F9D85CD91D825057B966175166D8BA602600EA6",
       "translation": "Productivité du sol artificiel",

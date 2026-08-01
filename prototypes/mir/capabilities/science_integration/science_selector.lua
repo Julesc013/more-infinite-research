@@ -12,6 +12,7 @@ local STREAM_EXTRA_PACKS = {
   research_concrete = {"space-science-pack"},
   research_furnace = {"metallurgic-science-pack"},
   research_landfill = {"metallurgic-science-pack", "space-science-pack"},
+  research_platform = {"metallurgic-science-pack", "space-science-pack", "cryogenic-science-pack"},
   research_artificial_soil = {"agricultural-science-pack", "space-science-pack"},
   research_molten_metals = {"metallurgic-science-pack"},
   research_mining_drill = {"metallurgic-science-pack"},
@@ -35,7 +36,7 @@ local STREAM_EXTRA_PACKS = {
   research_bioflux = {"agricultural-science-pack"},
   research_carbon = {"space-science-pack"},
   research_carbon_fiber = {"agricultural-science-pack"},
-  research_ice = {"space-science-pack"},
+  research_ice = {"space-science-pack", "cryogenic-science-pack"},
   research_rockets = {"agricultural-science-pack", "military-science-pack"},
 
   research_sulfur = {"metallurgic-science-pack"},

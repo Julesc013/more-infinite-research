@@ -82,6 +82,7 @@ for _, stream_key in ipairs({
   "research_lithium",
   "research_molten_metals",
   "research_nutrients",
+  "research_platform",
   "research_quantum_processor",
   "research_spoilage_preservation",
   "research_supercapacitor",
