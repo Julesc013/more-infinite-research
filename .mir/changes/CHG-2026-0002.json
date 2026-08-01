@@ -22,7 +22,7 @@
     "factorio-2.0",
     "factorio-1.1"
   ],
-  "migration_impact": "Adds one stable Platform Productivity technology and settings family; existing Landfill and Ice technology identities remain stable. Target-line backports require independent package and binary qualification.",
+  "migration_impact": "Adds one stable Platform Productivity technology and settings family, with cryogenic science replacing metallurgic science while retaining Landfill's remaining progression; existing Landfill and Ice technology identities remain stable. Target-line backports require independent package and binary qualification.",
   "release_note_impact": "3.2.3 hotfix notes required",
   "test_obligations": [
     "product.compiler",

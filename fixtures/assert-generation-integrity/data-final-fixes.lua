@@ -937,6 +937,22 @@ local function assert_technology_has_science(technology_name, expected_packs)
   end
 end
 
+local function assert_technology_lacks_science(technology_name, unexpected_packs)
+  local technology = techs[technology_name]
+  if not technology or not technology.unit or type(technology.unit.ingredients) ~= "table" then
+    fail("technology " .. technology_name .. " has no research unit ingredients.")
+  end
+  local actual = {}
+  for _, ingredient in ipairs(technology.unit.ingredients) do
+    actual[ingredient.name or ingredient[1]] = true
+  end
+  for _, pack_name in ipairs(unexpected_packs) do
+    if actual[pack_name] then
+      fail("technology " .. technology_name .. " unexpectedly includes science pack " .. pack_name .. ".")
+    end
+  end
+end
+
 local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
   local owner = techs[owner_name]
   if not owner or owner.max_level ~= "infinite" or owner.upgrade ~= true then
@@ -1091,9 +1107,11 @@ if is_space_age then
     "cryogenic-science-pack"
   })
   assert_technology_has_science("recipe-prod-research_platform-1", {
-    "metallurgic-science-pack",
     "space-science-pack",
     "cryogenic-science-pack"
+  })
+  assert_technology_lacks_science("recipe-prod-research_platform-1", {
+    "metallurgic-science-pack"
   })
 
   for owner_name, expected_recipes in pairs({

@@ -938,6 +938,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'S.researchable_unlockers_for_recipe = ready(pack_production_reachability.researchable_unlockers_for_recipe)' },
     @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'context:set_service(SERVICE_PREFIX .. "pack_production_status",' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'research_platform = {"space-science-pack", "cryogenic-science-pack"}' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'science.technology_researchability_reason(tech_name)' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'data.raw.recipe[target] = nil' },
@@ -963,6 +964,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "space-platform-foundation", owner = "recipe-prod-research_platform-1", change = 0.05 }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_recipe_not_owned_by("nutrients-from-spoilage", "recipe-prod-research_nutrients-1")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_technology_has_science("recipe-prod-research_nutrients-1"' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_technology_lacks_science("recipe-prod-research_platform-1"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
@@ -4323,7 +4325,9 @@ $spaceAgeLandfillLine = Get-LastStreamReportLine -Key "research_landfill"
 Assert-ReportLineContains -Line $spaceAgeLandfillLine -Expected "effects=2" -Context "Space Age landfill productivity scenario"
 $spaceAgePlatformLine = Get-LastStreamReportLine -Key "research_platform"
 Assert-ReportLineContains -Line $spaceAgePlatformLine -Expected "effects=2" -Context "Space Age platform productivity scenario"
+Assert-ReportScienceContains -Line $spaceAgePlatformLine -Expected "space-science-pack" -Context "Space Age platform space science scenario"
 Assert-ReportScienceContains -Line $spaceAgePlatformLine -Expected "cryogenic-science-pack" -Context "Space Age platform cryogenic science scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgePlatformLine -Unexpected "metallurgic-science-pack" -Context "Space Age platform metallurgic-to-cryogenic replacement scenario"
 $spaceAgeArtificialSoilLine = Get-LastStreamReportLine -Key "research_artificial_soil"
 Assert-ReportLineGenerated -Line $spaceAgeArtificialSoilLine -Context "Space Age artificial soil productivity scenario"
 Assert-ReportScienceContains -Line $spaceAgeArtificialSoilLine -Expected "agricultural-science-pack" -Context "Space Age artificial soil agricultural science scenario"
