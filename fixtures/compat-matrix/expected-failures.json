@@ -82,6 +82,14 @@
       "notes": "Reviewed Factorio 2.0 local zip sweep load failure reproduced without MIR in artifacts/backport-2-3-0-upstream-load-isolation-runner."
     },
     {
+      "scenario": "^local-2-0-base-baseline$",
+      "mod": "^local-2-0-base-baseline$",
+      "kind": "^invalid_science_pack$",
+      "stream_pattern": "^research_ice$",
+      "reason_pattern": "^no_lab_compatible_science$",
+      "notes": "P11 requires cryogenic science for Ice Productivity. In Base-only Factorio 2.0 there is no compatible cryogenic lab, so MIR must skip this exact stream instead of generating unresearchable research."
+    },
+    {
       "scenario": "^nauv-so$",
       "mod": "^nauv-so$",
       "kind": "^invalid_science_pack$",

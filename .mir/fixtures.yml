@@ -125,6 +125,23 @@ local_campaign_manifest:
     - local-2-1-aai-loaders-industry
     - local-2-1-aai-representative-extensions
 
+expected_failure_manifest:
+  path: fixtures/compat-matrix/expected-failures.json
+  schema: 1
+  matcher: scripts/Convert-MIRCompatAuditResults.ps1
+  match_fields:
+    - scenario
+    - mod
+    - kind
+    - stream
+    - reason
+  exact_target_observations:
+    - target: "2.0"
+      scenario: local-2-0-base-baseline
+      stream: research_ice
+      reason: no_lab_compatible_science
+      disposition: expected-safe-skip
+
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json

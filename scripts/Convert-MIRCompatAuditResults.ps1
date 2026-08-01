@@ -105,11 +105,13 @@ function Find-MIRExpectedFailure {
     $scenarioPattern = [string](Get-MIRObjectProperty -Object $rule -Name "scenario_pattern" -Default (Get-MIRObjectProperty -Object $rule -Name "scenario" -Default ""))
     $modPattern = [string](Get-MIRObjectProperty -Object $rule -Name "mod_pattern" -Default (Get-MIRObjectProperty -Object $rule -Name "mod" -Default ""))
     $kindPattern = [string](Get-MIRObjectProperty -Object $rule -Name "kind_pattern" -Default (Get-MIRObjectProperty -Object $rule -Name "kind" -Default ""))
+    $streamPattern = [string](Get-MIRObjectProperty -Object $rule -Name "stream_pattern" -Default (Get-MIRObjectProperty -Object $rule -Name "stream" -Default ""))
     $reasonPattern = [string](Get-MIRObjectProperty -Object $rule -Name "reason_pattern" -Default "")
 
     if (-not (Test-MIRExpectedPattern -Value ([string]$Group.scenario) -Pattern $scenarioPattern)) { continue }
     if (-not (Test-MIRExpectedPattern -Value ([string]$Group.mod) -Pattern $modPattern)) { continue }
     if (-not (Test-MIRExpectedPattern -Value ([string]$Group.kind) -Pattern $kindPattern)) { continue }
+    if (-not (Test-MIRExpectedPattern -Value ([string]$Group.stream) -Pattern $streamPattern)) { continue }
     if (-not (Test-MIRExpectedPattern -Value ([string]$Group.reason) -Pattern $reasonPattern)) { continue }
 
     return $rule
