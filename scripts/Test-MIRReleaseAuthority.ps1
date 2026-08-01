@@ -38,10 +38,11 @@ if ([string]$info.factorio_version -eq "2.0") {
   if ([string]$info.version -ne "2.5.0" -or [string]$backport.mir_version -ne "2.5.0" -or
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or
       [string]$backport.archive_class -ne "automated-playtest-candidate" -or
-      [string]$backport.manual_review -notlike "pending*" -or [string]$backport.protected_qualification -notlike "pending*" -or
+      [string]$backport.manual_review -ne ".mir/evidence/2.5.0-manual-review-attestation.json" -or
+      [string]$backport.protected_qualification -notlike "pending*" -or
       [string]$backport.publication_status -ne "unreleased" -or
-      [string]$backport.status -notmatch '^automated-playtest-candidate-') {
-    throw "Factorio 2.0 authority must describe an unreleased automated playtest candidate with manual and protected qualification pending."
+      [string]$backport.status -notmatch '^automated-playtest-candidate-.*manual-passed-') {
+    throw "Factorio 2.0 authority must describe an unreleased automated and manually accepted candidate with protected qualification pending."
   }
   if ([string]$backport.portable_source_commit -ne "c1fd8b932c8d916a14925678056e08893b87b2db") {
     throw "The 2.5 portable source must bind the exact tagged C30 package-source commit."
@@ -93,14 +94,16 @@ if ([string]$info.factorio_version -eq "2.0") {
   $automatedRelativePath = ".mir/evidence/2.5.0-local-automated-qualification.json"
   $performanceRelativePath = ".mir/evidence/2.5.0-performance-regression.json"
   $approvedDeltaRelativePath = "approved-delta/2.4.9-to-2.5.0.json"
+  $manualRelativePath = ".mir/evidence/2.5.0-manual-review-attestation.json"
   if ([string]$backport.automated_qualification -ne $automatedRelativePath -or
       [string]$backport.focused_runtime_evidence -ne $automatedRelativePath -or
       [string]$backport.upgrade_evidence -ne $automatedRelativePath -or
       [string]$backport.exact_py_evidence -ne $automatedRelativePath -or
       [string]$backport.runtime_performance_evidence -ne $performanceRelativePath -or
       [string]$backport.approved_delta_evidence -ne $approvedDeltaRelativePath -or
-      [string]$backport.release_gate -ne "manual-protected-seal-and-promotion-pending-exact-p11") {
-    throw "Canonical P11 authority does not describe exact local automated qualification with later gates pending."
+      [string]$backport.manual_review -ne $manualRelativePath -or
+      [string]$backport.release_gate -ne "protected-seal-and-promotion-pending-exact-p11") {
+    throw "Canonical P11 authority does not describe exact local automated and manual qualification with protected release gates pending."
   }
   $automated = Read-MIRText $automatedRelativePath | ConvertFrom-Json
   if ([int]$automated.schema -ne 1 -or
@@ -126,6 +129,41 @@ if ([string]$info.factorio_version -eq "2.0") {
     throw "Tracked P11 performance or approved-delta evidence no longer matches the automated qualification authority."
   }
 
+  . (Join-Path $repo "scripts\validation\ReleaseAttestations.ps1")
+  $manual = Read-MIRText $manualRelativePath | ConvertFrom-Json
+  $expectedManualItems = @(
+    "technology-tree-visual", "icon-visual", "locale-fit-and-truncation",
+    "settings-ux", "save-ui", "human-balance", "configuration-change-give-item-safety"
+  )
+  if ([int]$manual.schema -ne 2 -or [string]$manual.kind -ne "mir-manual-release-review" -or
+      [string]$manual.status -ne "passed" -or [string]$manual.candidate_sha256 -ne [string]$backport.archive_sha256 -or
+      [string]$manual.candidate_content_sha256 -ne [string]$backport.package_content_sha256 -or
+      [string]$manual.source_commit -ne [string]$backport.package_source_commit -or
+      [string]$manual.factorio_version -ne "2.0.77" -or
+      [string]$manual.factorio_binary_sha256 -ne "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B" -or
+      [string]$manual.reviewer -ne "Julesc013" -or [string]::IsNullOrWhiteSpace([string]$manual.reviewed_at) -or
+      (@($manual.items.id | Sort-Object) -join "`n") -ne (@($expectedManualItems | Sort-Object) -join "`n") -or
+      @($manual.items | Where-Object { [string]$_.status -ne "passed" }).Count -ne 0) {
+    throw "Tracked P11 manual review authority is not an exact passing schema-2 attestation."
+  }
+  $manualMaterial = ConvertTo-MIRReleaseOrderedMap -Object $manual
+  $manualMaterial.Remove("attestation_sha256")
+  if ([string]$manual.attestation_sha256 -ne (Get-MIRReleaseTextSha256 -Text ($manualMaterial | ConvertTo-Json -Depth 40 -Compress))) {
+    throw "Tracked P11 manual review attestation self-hash is invalid."
+  }
+  foreach ($item in @($manual.items)) {
+    if ([string]::IsNullOrWhiteSpace([string]$item.notes) -or @($item.artifacts).Count -eq 0) {
+      throw "Tracked P11 manual review item is incomplete: $($item.id)"
+    }
+    foreach ($artifact in @($item.artifacts)) {
+      $artifactPath = Join-Path $repo ([string]$artifact.path)
+      if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+          [string]$artifact.sha256 -ne (Get-MIRReleasePortableArtifactSha256 -Path $artifactPath)) {
+        throw "Tracked P11 manual review artifact is absent or invalid: $($artifact.path)"
+      }
+    }
+  }
+
   $distributions = Read-MIRText ".mir/distributions.json" | ConvertFrom-Json
   $distributionRows = @($distributions.distributions)
   $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "2.5.0" })
@@ -141,7 +179,7 @@ if ([string]$info.factorio_version -eq "2.0") {
   foreach ($value in @($backport.candidate_id, $backport.package_source_commit, $backport.archive_sha256, $backport.package_content_sha256)) {
     if (-not $releaseWave.Contains([string]$value)) { throw "2.5 release-wave view omits canonical value $value" }
   }
-  Write-Host "[ok] provisional MIR 2.5 release, package-source, local automated qualification, distribution, and pending-gate authorities agree."
+  Write-Host "[ok] provisional MIR 2.5 release, package-source, local automated/manual qualification, distribution, and pending protected-gate authorities agree."
   return
 }
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or

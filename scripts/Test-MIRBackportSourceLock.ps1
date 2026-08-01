@@ -171,13 +171,14 @@ if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.4.9" `
   throw "The 2.5 upgrade contract must require 2.4.9 and retain 2.4.5 as the optional oldest-maintained row."
 }
 $automatedQualification = ".mir/evidence/2.5.0-local-automated-qualification.json"
+$manualQualification = ".mir/evidence/2.5.0-manual-review-attestation.json"
 if ([string]$lock.qualification.target_static -ne $automatedQualification `
     -or [string]$lock.qualification.synthetic_py_finalizer -ne $automatedQualification `
     -or [string]$lock.qualification.runtime -ne $automatedQualification `
-    -or [string]$lock.qualification.manual_review -ne "pending-exact-p11" `
+    -or [string]$lock.qualification.manual_review -ne $manualQualification `
     -or [string]$lock.qualification.protected_qualification -ne "pending-exact-p11" `
     -or [string]$lock.qualification.publication -ne "unreleased") {
-  throw "P11 must bind exact local automated qualification while manual, protected, and publication gates remain pending."
+  throw "P11 must bind exact local automated/manual qualification while protected and publication gates remain pending."
 }
 $automatedQualificationPath = Join-Path $RepoRoot $automatedQualification
 if (-not (Test-Path -LiteralPath $automatedQualificationPath -PathType Leaf)) {
@@ -199,6 +200,23 @@ if ([int]$automated.schema -ne 1 `
     -or [string]$automated.aggregate.only_failed_task -ne "manual.release-review" `
     -or [string]$automated.checks.manual_review.status -ne "missing-required-attestation") {
   throw "P11 local automated qualification authority is invalid."
+}
+$manualQualificationPath = Join-Path $RepoRoot $manualQualification
+if (-not (Test-Path -LiteralPath $manualQualificationPath -PathType Leaf)) {
+  throw "P11 manual qualification authority is missing."
+}
+$manual = Get-Content -Raw -LiteralPath $manualQualificationPath | ConvertFrom-Json
+if ([int]$manual.schema -ne 2 `
+    -or [string]$manual.kind -ne "mir-manual-release-review" `
+    -or [string]$manual.status -ne "passed" `
+    -or [string]$manual.candidate_sha256 -ne [string]$lock.candidate.archive_sha256 `
+    -or [string]$manual.candidate_content_sha256 -ne [string]$lock.candidate.content_sha256 `
+    -or [string]$manual.source_commit -ne $projectionCommit `
+    -or [string]$manual.factorio_version -ne "2.0.77" `
+    -or [string]$manual.reviewer -ne "Julesc013" `
+    -or @($manual.items).Count -ne 7 `
+    -or @($manual.items | Where-Object { [string]$_.status -ne "passed" }).Count -ne 0) {
+  throw "P11 manual qualification authority is invalid."
 }
 
 foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_document, [string]$lock.playtest_guide)) {

@@ -1,12 +1,15 @@
 {
   "schema": 1,
-  "kind": "mir-emergency-package-identity",
+  "kind": "mir-candidate-package-identity",
   "version": "2.5.0",
   "factorio_version": "2.0",
   "archive": "dist/more-infinite-research_2.5.0.zip",
+  "candidate_id": "2.5-P11",
+  "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+  "package_source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685",
+  "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
   "archive_bytes": 1033875,
   "archive_entries": 291,
   "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
-  "focused_test": "scripts/Test-MIRSpaceLocationTargetInventory.ps1",
-  "status": "focused-emergency-build-passed-full-release-qualification-pending"
+  "status": "package-built-local-automated-and-manual-qualified-protected-release-pending"
 }

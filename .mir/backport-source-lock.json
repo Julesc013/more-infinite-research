@@ -66,7 +66,7 @@
     "target_static": ".mir/evidence/2.5.0-local-automated-qualification.json",
     "synthetic_py_finalizer": ".mir/evidence/2.5.0-local-automated-qualification.json",
     "runtime": ".mir/evidence/2.5.0-local-automated-qualification.json",
-    "manual_review": "pending-exact-p11",
+    "manual_review": ".mir/evidence/2.5.0-manual-review-attestation.json",
     "protected_qualification": "pending-exact-p11",
     "publication": "unreleased"
   },
