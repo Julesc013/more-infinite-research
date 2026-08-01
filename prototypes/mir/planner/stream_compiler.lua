@@ -221,12 +221,25 @@ local function attach_family_recipes(key, buckets)
   local attachments = family_resolver.attachments_for_stream(key)
   if #attachments == 0 then return buckets end
 
-  local assigned, buckets_by_change = {}, {}
+  local assigned, fallback_bucket_by_recipe, buckets_by_change = {}, {}, {}
   for _, bucket in ipairs(buckets or {}) do
     buckets_by_change[bucket.change] = bucket
-    for _, recipe_name in ipairs(bucket.recipes or {}) do assigned[recipe_name] = true end
+    for _, recipe_name in ipairs(bucket.recipes or {}) do
+      assigned[recipe_name] = true
+      if bucket.structural_fallback then fallback_bucket_by_recipe[recipe_name] = bucket end
+    end
   end
   for _, attachment in ipairs(attachments) do
+    local fallback_bucket = fallback_bucket_by_recipe[attachment.recipe]
+    if fallback_bucket then
+      local retained = {}
+      for _, recipe_name in ipairs(fallback_bucket.recipes or {}) do
+        if recipe_name ~= attachment.recipe then table.insert(retained, recipe_name) end
+      end
+      fallback_bucket.recipes = retained
+      assigned[attachment.recipe] = nil
+      fallback_bucket_by_recipe[attachment.recipe] = nil
+    end
     if not assigned[attachment.recipe] then
       local bucket = buckets_by_change[attachment.change]
       if not bucket then
@@ -238,8 +251,12 @@ local function attach_family_recipes(key, buckets)
       assigned[attachment.recipe] = true
     end
   end
-  for _, bucket in ipairs(buckets or {}) do table.sort(bucket.recipes) end
-  return buckets
+  local compact = {}
+  for _, bucket in ipairs(buckets or {}) do
+    table.sort(bucket.recipes)
+    if #bucket.recipes > 0 then table.insert(compact, bucket) end
+  end
+  return compact
 end
 
 local function plan_stream(key, raw_spec)
