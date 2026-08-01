@@ -1,9 +1,12 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.5.0
-Date: 2026-07-27
+Date: 2026-08-01
 
   Changes:
 
+    - Added separate Platform productivity with +10% ice platform and +5% space platform foundation per level.
+    - Added generic structural productivity discovery for modded belt and inserter recipes.
+    - Indexed entity, item, module, and stream matches once per compiler context.
     - Completed all 50 Factorio-supported locales and added source-hash-bound generation and regression checks.
     - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
     - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
@@ -38,6 +41,10 @@ Date: 2026-07-27
 
   Bugfixes:
 
+    - Required cryogenic science for Ice and Platform productivity and removed Platform's metallurgic pack.
+    - Removed ice platform and space platform foundation from Landfill productivity ownership.
+    - Honored disabled automatic-productivity actions in structural logistics fallback matching.
+    - Preserved explicit productivity denials and productivity-ignored returned fluids for modded logistics recipes.
     - Ordered MIR after Pyanodons Post-processing so sanitation runs against Py's final rebuilt technology tree.
     - Fixed casting-mk02 referencing the removed casting-gear recipe after Pyanodons finalization.
     - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.

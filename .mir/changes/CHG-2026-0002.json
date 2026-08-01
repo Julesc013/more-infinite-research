@@ -23,7 +23,7 @@
     "factorio-1.1"
   ],
   "migration_impact": "Adds one stable Platform Productivity technology and settings family, with cryogenic science replacing metallurgic science while retaining Landfill's remaining progression; existing Landfill and Ice technology identities remain stable. Target-line backports require independent package and binary qualification.",
-  "release_note_impact": "3.2.3 hotfix notes required",
+  "release_note_impact": "3.2.3 source notes and 2.5.0 P10 backport notes required",
   "test_obligations": [
     "product.compiler",
     "product.settings",
@@ -34,7 +34,7 @@
   ],
   "backport_disposition": {
     "factorio-2.1": "release in MIR 3.2.3",
-    "factorio-2.0": "portable structural logistics portion; queue after held MIR 2.5.0 is resumed",
+    "factorio-2.0": "ported into MIR 2.5.0 P10; requires exact Factorio 2.0 package, upgrade, ecosystem, and binary qualification",
     "factorio-1.1": "portable AdvancedBelts portion; requires target-line projection and exact Factorio 1.1 qualification"
   },
   "state": "implemented"
