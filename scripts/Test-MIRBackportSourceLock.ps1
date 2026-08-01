@@ -170,13 +170,35 @@ if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.4.9" `
     -or [string]$lock.upgrade_contract.oldest_maintained_optional -ne "2.4.5") {
   throw "The 2.5 upgrade contract must require 2.4.9 and retain 2.4.5 as the optional oldest-maintained row."
 }
-if ([string]$lock.qualification.target_static -ne "pending-exact-p11" `
-    -or [string]$lock.qualification.synthetic_py_finalizer -ne "pending-exact-p11" `
-    -or [string]$lock.qualification.runtime -ne "pending-exact-p11" `
+$automatedQualification = ".mir/evidence/2.5.0-local-automated-qualification.json"
+if ([string]$lock.qualification.target_static -ne $automatedQualification `
+    -or [string]$lock.qualification.synthetic_py_finalizer -ne $automatedQualification `
+    -or [string]$lock.qualification.runtime -ne $automatedQualification `
     -or [string]$lock.qualification.manual_review -ne "pending-exact-p11" `
     -or [string]$lock.qualification.protected_qualification -ne "pending-exact-p11" `
     -or [string]$lock.qualification.publication -ne "unreleased") {
-  throw "P11 must begin with all exact target qualification, review, protection, and publication gates pending."
+  throw "P11 must bind exact local automated qualification while manual, protected, and publication gates remain pending."
+}
+$automatedQualificationPath = Join-Path $RepoRoot $automatedQualification
+if (-not (Test-Path -LiteralPath $automatedQualificationPath -PathType Leaf)) {
+  throw "P11 local automated qualification authority is missing."
+}
+$automated = Get-Content -Raw -LiteralPath $automatedQualificationPath | ConvertFrom-Json
+if ([int]$automated.schema -ne 1 `
+    -or [string]$automated.kind -ne "mir-local-automated-qualification" `
+    -or [string]$automated.release -ne "2.5.0" `
+    -or [string]$automated.candidate_id -ne "2.5-P11" `
+    -or [string]$automated.target -ne "2.0" `
+    -or [string]$automated.status -ne "machine-verifiable-passed-manual-and-protected-gates-pending" `
+    -or [bool]$automated.release_eligible `
+    -or [string]$automated.package_source_commit -ne $projectionCommit `
+    -or [string]$automated.candidate.archive_sha256 -ne [string]$lock.candidate.archive_sha256 `
+    -or [string]$automated.candidate.package_content_sha256 -ne [string]$lock.candidate.content_sha256 `
+    -or [int]$automated.aggregate.passed -ne 126 `
+    -or [int]$automated.aggregate.failed -ne 1 `
+    -or [string]$automated.aggregate.only_failed_task -ne "manual.release-review" `
+    -or [string]$automated.checks.manual_review.status -ne "missing-required-attestation") {
+  throw "P11 local automated qualification authority is invalid."
 }
 
 foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_document, [string]$lock.playtest_guide)) {

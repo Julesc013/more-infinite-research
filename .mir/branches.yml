@@ -428,18 +428,18 @@ release_artifacts:
       package_content_sha256: 5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1
       archive_bytes: 1033875
       archive_entries: 291
-      automated_qualification: pending-exact-p11
-      focused_runtime_evidence: pending-exact-p11
-      upgrade_evidence: pending-exact-p11
-      exact_py_evidence: pending-exact-p11
-      runtime_performance_evidence: pending-exact-p11
-      approved_delta_evidence: pending-exact-p11
-      automated_gate: package-built-all-exact-p11-qualification-pending
-      release_gate: all-automated-manual-protected-seal-and-promotion-pending-exact-p11
+      automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
+      focused_runtime_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
+      upgrade_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
+      exact_py_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
+      runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
+      approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
+      automated_gate: local-automated-passed-exact-p11
+      release_gate: manual-protected-seal-and-promotion-pending-exact-p11
       manual_review: pending-exact-p11
       protected_qualification: pending-exact-p11
       publication_status: unreleased
-      status: automated-playtest-candidate-c30-projection-package-built-all-exact-p11-qualification-pending
+      status: automated-playtest-candidate-c30-projection-local-automated-passed-manual-protected-seal-and-promotion-pending
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

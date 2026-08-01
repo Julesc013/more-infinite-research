@@ -28,7 +28,7 @@ superseded_by: []
 
 - Target: Factorio 2.0.
 - Qualification binary: Factorio 2.0.77.
-- AdvancedBeltsSA 2.3.3: exact native load and structural assertions pending P11 qualification.
+- AdvancedBeltsSA 2.3.3: exact native load and structural assertions passed on Factorio 2.0.77.
 - Exact Py support claim: startup-integrity correction for the locked 2.0 closure; this is not a blanket claim of full Py technology-generation support.
 
 ## Candidate integrity
@@ -42,4 +42,4 @@ superseded_by: []
 
 ## Release status
 
-P11 is an unreleased package-built candidate. Exact target static, runtime, upgrade, approved-delta, ecosystem, performance, manual, protected, seal, promotion, and publication gates remain pending. P9 and P10 results remain superseded historical evidence and are not current P11 proof.
+P11 is an unreleased, locally automated-qualified candidate. All 126 machine-verifiable tasks pass against the exact archive, including exact runtime, upgrade, ecosystem, approved-delta, AdvancedBeltsSA, and six-lane paired performance evidence. Exact maintainer manual acceptance, protected qualification, seal verification, promotion, tagging, and publication remain pending. P9 and P10 results remain superseded historical evidence and are not current P11 proof.

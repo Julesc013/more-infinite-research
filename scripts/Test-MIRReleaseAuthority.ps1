@@ -90,6 +90,42 @@ if ([string]$info.factorio_version -eq "2.0") {
     throw "Provisional 2.5 archive no longer matches canonical candidate authority."
   }
 
+  $automatedRelativePath = ".mir/evidence/2.5.0-local-automated-qualification.json"
+  $performanceRelativePath = ".mir/evidence/2.5.0-performance-regression.json"
+  $approvedDeltaRelativePath = "approved-delta/2.4.9-to-2.5.0.json"
+  if ([string]$backport.automated_qualification -ne $automatedRelativePath -or
+      [string]$backport.focused_runtime_evidence -ne $automatedRelativePath -or
+      [string]$backport.upgrade_evidence -ne $automatedRelativePath -or
+      [string]$backport.exact_py_evidence -ne $automatedRelativePath -or
+      [string]$backport.runtime_performance_evidence -ne $performanceRelativePath -or
+      [string]$backport.approved_delta_evidence -ne $approvedDeltaRelativePath -or
+      [string]$backport.release_gate -ne "manual-protected-seal-and-promotion-pending-exact-p11") {
+    throw "Canonical P11 authority does not describe exact local automated qualification with later gates pending."
+  }
+  $automated = Read-MIRText $automatedRelativePath | ConvertFrom-Json
+  if ([int]$automated.schema -ne 1 -or
+      [string]$automated.kind -ne "mir-local-automated-qualification" -or
+      [string]$automated.release -ne [string]$backport.mir_version -or
+      [string]$automated.candidate_id -ne [string]$backport.candidate_id -or
+      [string]$automated.target -ne "2.0" -or
+      [string]$automated.status -ne "machine-verifiable-passed-manual-and-protected-gates-pending" -or
+      [bool]$automated.release_eligible -or
+      [string]$automated.package_source_commit -ne [string]$backport.package_source_commit -or
+      [string]$automated.candidate.archive_sha256 -ne [string]$backport.archive_sha256 -or
+      [string]$automated.candidate.package_content_sha256 -ne [string]$backport.package_content_sha256 -or
+      [int]$automated.aggregate.executed -ne 127 -or
+      [int]$automated.aggregate.passed -ne 126 -or
+      [int]$automated.aggregate.failed -ne 1 -or
+      [int]$automated.aggregate.reused -ne 0 -or
+      [string]$automated.aggregate.only_failed_task -ne "manual.release-review" -or
+      [string]$automated.checks.manual_review.status -ne "missing-required-attestation") {
+    throw "Tracked P11 local automated qualification authority is invalid."
+  }
+  if ((Get-MIRFileSha256 -Path (Join-Path $repo $performanceRelativePath)) -ne [string]$automated.checks.runtime_performance.evidence_sha256 -or
+      (Get-MIRFileSha256 -Path (Join-Path $repo $approvedDeltaRelativePath)) -ne [string]$automated.checks.approved_delta.evidence_sha256) {
+    throw "Tracked P11 performance or approved-delta evidence no longer matches the automated qualification authority."
+  }
+
   $distributions = Read-MIRText ".mir/distributions.json" | ConvertFrom-Json
   $distributionRows = @($distributions.distributions)
   $candidateRows = @($distributionRows | Where-Object { [string]$_.version -eq "2.5.0" })
@@ -105,7 +141,7 @@ if ([string]$info.factorio_version -eq "2.0") {
   foreach ($value in @($backport.candidate_id, $backport.package_source_commit, $backport.archive_sha256, $backport.package_content_sha256)) {
     if (-not $releaseWave.Contains([string]$value)) { throw "2.5 release-wave view omits canonical value $value" }
   }
-  Write-Host "[ok] provisional MIR 2.5 release, package-source, distribution, and pending-gate authorities agree."
+  Write-Host "[ok] provisional MIR 2.5 release, package-source, local automated qualification, distribution, and pending-gate authorities agree."
   return
 }
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or

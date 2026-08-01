@@ -63,9 +63,9 @@
     "oldest_maintained_optional": "2.4.5"
   },
   "qualification": {
-    "target_static": "pending-exact-p11",
-    "synthetic_py_finalizer": "pending-exact-p11",
-    "runtime": "pending-exact-p11",
+    "target_static": ".mir/evidence/2.5.0-local-automated-qualification.json",
+    "synthetic_py_finalizer": ".mir/evidence/2.5.0-local-automated-qualification.json",
+    "runtime": ".mir/evidence/2.5.0-local-automated-qualification.json",
     "manual_review": "pending-exact-p11",
     "protected_qualification": "pending-exact-p11",
     "publication": "unreleased"

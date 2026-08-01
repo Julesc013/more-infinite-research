@@ -29,7 +29,7 @@
         "prototypes/mir/index/prototype_lookup.lua",
         "prototypes/mir/verification/effect_target_inventory.lua"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c24-py-finalizer-ordering",
@@ -38,7 +38,7 @@
       "target_paths": [
         "info.json"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c24-affected-save-planet-recovery",
@@ -57,7 +57,7 @@
       "target_paths": [
         "fixtures/pypostprocessing-stale-unlock"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c24-py-real-closure",
@@ -68,7 +68,7 @@
         ".mir/compatibility.yml",
         "fixtures/compat-matrix/manual-scenarios.json"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c21-c24-release-assurance",
@@ -91,7 +91,7 @@
         "prototypes/mir/research/stream_catalog.lua",
         "prototypes/mir/research/selector.lua"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c30-structural-logistics",
@@ -102,7 +102,7 @@
         "prototypes/mir/research/stream_compiler.lua",
         "prototypes/mir/research/scenario_facts.lua"
       ],
-      "evidence": "pending-exact-p11-runtime-and-advancedbeltssa"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c30-structural-indexing",
@@ -112,7 +112,7 @@
         "prototypes/mir/research/stream_compiler.lua",
         "prototypes/mir/research/scenario_facts.lua"
       ],
-      "evidence": "pending-exact-p11-work-volume-and-performance"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c30-automatic-action-guard",
@@ -121,7 +121,7 @@
       "target_paths": [
         "prototypes/mir/research/stream_compiler.lua"
       ],
-      "evidence": "pending-exact-p11-runtime"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "p11-platform-stream-count-authority",
@@ -132,7 +132,7 @@
         "prototypes/mir/platform/factorio/target_profiles.lua"
       ],
       "reason": "The projected Platform stream increases the exact Factorio 2.0 descriptor catalog from 73 to 74; P10 retained the pre-Platform count and failed the broad Base generation fixture.",
-      "evidence": "pending-exact-p11-generation-integrity"
+      "evidence": ".mir/evidence/2.5.0-local-automated-qualification.json"
     },
     {
       "id": "c30-timeboxed-release-assurance",
