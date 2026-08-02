@@ -1320,6 +1320,14 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/2.5.0-post-release-stabilization.md
+    title: "MIR 2.5.0 Post-Release Stabilization"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.0-post-release-stabilization
   - path: docs/maintainer/backporting.md
     title: "Target-Line Versioning And Backports"
     status: current

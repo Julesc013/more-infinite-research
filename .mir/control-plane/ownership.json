@@ -17,6 +17,7 @@
     {"pattern": ".mir/releases/**", "module": "release-authority", "writes": ["release.authority"]},
     {"pattern": ".mir/release-transitions/**", "module": "release-authority", "writes": ["release.authority"]},
     {"pattern": ".mir/backports/**", "module": "backport-authority", "writes": ["release.authority", "transition.upgrade"]},
+    {"pattern": ".mir/backport-*.json", "module": "backport-authority", "writes": ["release.authority", "transition.upgrade"]},
     {"pattern": ".mir/evidence/**", "module": "governed-evidence", "writes": ["assurance.evidence"]},
     {"pattern": ".mir/generated/**", "module": "control-plane-views", "writes": ["release.presentation"]},
     {"pattern": ".mir/changes/**", "module": "control-plane-records", "writes": ["assurance.control-plane"]},
