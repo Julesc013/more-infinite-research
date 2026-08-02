@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "REL-2.5.0-publicly-verified",
+  "release": "2.5.0",
+  "from": "focused-qualified",
+  "to": "publicly-verified",
+  "admission": "grandfathered-import",
+  "exception": "P11-TIMEBOXED-PUBLICATION-2026-08-02",
+  "proofs": [
+    {
+      "kind": "local-qualification",
+      "path": ".mir/evidence/2.5.0-local-automated-qualification.json"
+    },
+    {
+      "kind": "manual-attestation",
+      "path": ".mir/evidence/2.5.0-manual-review-attestation.json"
+    },
+    {
+      "kind": "timeboxed-publication",
+      "path": ".mir/evidence/2.5.0-timeboxed-publication-decision.json"
+    },
+    {
+      "kind": "public-receipt",
+      "path": ".mir/evidence/2.5.0-publication.json"
+    }
+  ],
+  "recorded_at": "2026-08-02T09:17:25.689Z"
+}

@@ -1,15 +1,13 @@
 schema: 1
 
 remote_topology:
-  recorded_at: 2026-07-29
+  recorded_at: 2026-08-02
   permanent_branches:
     - main
     - dev
     - legacy
-  active_temporary_branches:
-    - tmp/3.2.3
-  held_temporary_branches:
-    - tmp/2.0
+  active_temporary_branches: []
+  held_temporary_branches: []
   inactive_policy_templates:
     - factorio-2.0-lane
     - port/1.1-to-0.18
@@ -21,23 +19,22 @@ remote_topology:
     archived_unique_heads: 24
     superseded_pull_request: 31
   rules:
-    - published target-line history belongs to immutable release or archive tags, not permanent work branches
+    - main is the immutable published Factorio 2.1 baseline at MIR 3.2.3
+    - dev is the shared Control Plane, test, tooling, and MIR 3.3 preparation branch
+    - legacy is the published Factorio 2.0 maintenance line at MIR 2.5.0 and advances only through governed promotion
+    - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
     - main and dev must not be made identical to Factorio 2.0 target branches
-    - legacy may advance to the active tmp/2.0 candidate only through governed promotion
-    - tmp/3.2.3 is the bounded Factorio 2.1 hotfix lane and may promote only to main after complete release admission
 
 branches:
   main:
     remote_state: permanent
-    purpose: frozen Factorio 2.1 line at immutable tag MIR 3.2.2; product work is stopped while Control Plane v5 is established
+    purpose: immutable published MIR 3.2.3 Factorio 2.1 baseline; emergency release fixes only
     factorio_version: "2.1"
     accepts:
       - release-hotfix
       - docs-correction
       - fixture-correction
-      - unpublished-version-package-build
       - validated-release-candidate-promotion
-      - maintainer-directed-release-staging-with-recorded-assurance-exceptions
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes
@@ -45,7 +42,7 @@ branches:
 
   dev:
     remote_state: permanent
-    purpose: Control Plane v5 development and release-engineering repair; no MIR product work until v5 shadow equivalence is admitted
+    purpose: shared Control Plane v5, validation tooling, canonical fixes, and MIR 3.3 preparation
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -54,53 +51,23 @@ branches:
       - fixtures
       - refactors
       - validation
+      - canonical-target-neutral-fix
 
   legacy:
     remote_state: permanent
-    purpose: staged unreleased MIR 2.5.0 candidate line; public Factorio 2.0 baseline remains immutable tag 2.4.9 until final qualification
+    purpose: immutable published MIR 2.5.0 Factorio 2.0 maintenance baseline; promotion-only until a fully qualified 2.5.x candidate exists
     factorio_version: "2.0"
     accepts:
-      - safety-fix
-      - compatibility-diagnostic-fix
+      - governed-2.5.x-promotion
+      - release-evidence
       - docs-correction
-      - exact-policy-fix
     rejects:
+      - scratch-work
+      - direct-product-development
       - 3.0-directory-reorg
       - schema-breaking-change
       - generated-id-rename
       - broad-new-generation
-
-  tmp/2.0:
-    remote_state: held-temporary
-    purpose: held Factorio 2.0 MIR 2.5.0 projection workspace; final integration uses target-first and immutable-3.2.2-second parent ancestry
-    factorio_version: "2.0"
-    accepts:
-      - platform-compatible-backport
-      - target-profile-adapter
-      - 2.0-fixture
-      - release-evidence
-      - docs-correction
-    rejects:
-      - 2.1-only-metadata
-      - generated-id-rename
-      - unproven-feature-parity
-
-  tmp/3.2.3:
-    remote_state: local-active-temporary
-    purpose: bounded MIR 3.2.3 Factorio 2.1 hotfix, exact qualification, and promotion workspace based on immutable 3.2.2 plus Control Plane v5 tooling
-    factorio_version: "2.1"
-    accepts:
-      - release-hotfix
-      - compatibility-fix
-      - fixture
-      - release-evidence
-      - docs-correction
-      - control-plane-candidate-adapter
-    rejects:
-      - unrelated-product-development
-      - generated-id-rename
-      - bypassed-manual-or-protected-gate
-
   factorio-2.0-lane:
     remote_state: inactive-policy-template
     purpose: planned Space Exploration and other 2.0-only campaign lane
@@ -463,32 +430,56 @@ release_artifacts:
       tag_commit: 1138ed55ad7ad42e38cf9e821d1d4e7de5df6378
       assurance_exception: C24-PROTECTED-SEAL-ABSENT
       status: c24-tagged-control-plane-calibration-baseline
+    mir_3_2_3:
+      version: "3.2.3"
+      branch: main
+      development_branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_2_2
+      candidate_id: C30
+      package_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+      package_source_tree: 222848c6bb3c96fe4641c67cdea12b3581576185
+      archive: dist/more-infinite-research_3.2.3.zip
+      archive_bytes: 1034824
+      archive_entries: 292
+      archive_sha256: 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+      package_content_sha256: 2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9
+      tag: "3.2.3"
+      tag_commit: 1abe07573cde814c3cacf6153b5ae64dee4038ba
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.3
+      mod_portal_status: published
+      publication_evidence: .mir/evidence/3.2.3-publication.json
+      release_gate: timeboxed-maintainer-publication-with-post-publication-assurance-obligations
+      publication_status: published-public-identities-verified
+      status: published-frozen
     mir_2_5_0:
       version: "2.5.0"
-      branch: tmp/2.0
+      branch: legacy
       target_factorio: "2.0"
-      source_anchor: mir_3_2_2_final_source
-      prior_candidate:
-        source_anchor: mir_3_1_2
-        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
-        artifact: dist/more-infinite-research_2.5.0.zip
-        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
-        history_document: docs/archive/superseded/2.5.0-precanonical-candidate.md
-        status: superseded-unpublished-candidate
-      assurance_policy: mir-verification-v4
-      assurance_evidence_schema: 4
-      verification_profile: validation/profiles/factorio-2.0.json
+      source_anchor: mir_3_2_3
       prior_release: dist/more-infinite-research_2.4.9.zip
+      candidate_id: "2.5-P11"
+      portable_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+      portable_delta_ledger: .mir/backport-portable-delta-3.2.3-to-2.5.0.json
+      package_source_commit: 493e71a6c883c2e191e1e13c7647cf38a8a8b261
+      package_source_tree: c8c84c7c1797a9378c76984908f516aef2d6d685
       archive: dist/more-infinite-research_2.5.0.zip
-      archive_bytes: 1029914
-      archive_entries: 290
-      archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
-      package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
-      package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
-      release_gate: v5-shadow-equivalence-and-remaining-release-state-proofs
-      publication_status: unreleased
-      status: p9-focused-qualified
+      archive_sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
+      package_content_sha256: 5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1
+      archive_bytes: 1033875
+      archive_entries: 291
+      automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
+      manual_review: .mir/evidence/2.5.0-manual-review-attestation.json
+      publication_decision: .mir/evidence/2.5.0-timeboxed-publication-decision.json
+      publication_evidence: .mir/evidence/2.5.0-publication.json
+      tag: "2.5.0"
+      tag_commit: bea21b068fb38dc26479b619454e50d5b4cf4793
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.5.0
+      mod_portal_status: published
+      protected_qualification: running-post-publication-run-30740083663
+      release_gate: timeboxed-maintainer-publication-protected-follow-up-running
+      publication_status: published-public-identities-verified
+      status: published-frozen-protected-follow-up-running
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -931,16 +922,16 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.2.0"
+      version: "3.2.3"
       branch: main
       development_branch: dev
       target_factorio: "2.1"
-      purpose: published frozen MIR 3.2.0 foundation; emergency fixes only
+      purpose: immutable published MIR 3.2.3 baseline; emergency fixes only
     factorio_2_0_companion:
       version: "2.5.0"
-      branch: tmp/2.0
+      branch: legacy
       target_factorio: "2.0"
-      purpose: target-specific Factorio 2.0 backport from published MIR 3.2.0
+      purpose: immutable published P11 baseline; possible 2.5.1 only for confirmed package defects
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1
@@ -971,10 +962,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.2.5"
+      version: "3.3.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: post-3.2.0 compiler refinement, reviewed technology promotion, compatibility expansion, and patch consolidation
+      purpose: canonical semantic-platform development after the 2.5.0 stabilization decision
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

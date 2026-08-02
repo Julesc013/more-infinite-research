@@ -1,33 +1,19 @@
 {
   "authority": "mir-generated-backport-queue-v1",
-  "candidate_id": "2.5-P9",
+  "candidate_id": "2.5-P11",
   "generated_from": [
     ".mir/releases/2.5.0.json",
     ".mir/backports/2.5.0.json"
   ],
   "release": "2.5.0",
   "remaining_obligations": [
-    "v5-shadow-equivalence",
-    "candidate-qualification",
-    "manual-acceptance",
-    "protected-qualification",
-    "seal",
-    "promotion",
-    "tag",
-    "publication",
-    "public-byte-verification"
+    "protected-qualification-post-publication",
+    "protected-candidate-seal-post-publication",
+    "normal-promotion-admission-reconciliation",
+    "24-hour-stabilization-decision"
   ],
-  "remaining_states": [
-    "candidate-qualified",
-    "manually-accepted",
-    "protected-qualified",
-    "sealed",
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
+  "remaining_states": [],
   "schema": 1,
-  "state": "focused-qualified",
+  "state": "publicly-verified",
   "target": "2.0"
 }

@@ -16,19 +16,9 @@
     ".mir/releases/current.json",
     ".mir/releases/3.2.3.json"
   ],
-  "publication_admitted": false,
+  "publication_admitted": true,
   "release": "3.2.3",
-  "remaining_states": [
-    "focused-qualified",
-    "candidate-qualified",
-    "manually-accepted",
-    "protected-qualified",
-    "sealed",
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
+  "remaining_states": [],
   "schema": 1,
-  "state": "package-built"
+  "state": "publicly-verified"
 }

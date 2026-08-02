@@ -3,8 +3,15 @@
   "release": "3.2.3",
   "candidate_id": "C30",
   "target": "2.1",
-  "branch": "dev",
-  "state": "package-built",
+  "branch": "main",
+  "state": "publicly-verified",
+  "source_release": {
+    "release": "3.2.2",
+    "tag": "3.2.2",
+    "tag_commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+    "candidate_id": "C24",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  },
   "package": {
     "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
     "source_tree": "222848c6bb3c96fe4641c67cdea12b3581576185",
@@ -33,6 +40,30 @@
         "kind": "deterministic-package",
         "path": "scripts/Test-MIRDeterministicPackage.ps1",
         "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+      }
+    ],
+    "tag": [
+      {
+        "kind": "annotated-tag",
+        "name": "3.2.3",
+        "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+        "tag_object": "95af6bb56e50e48abfbe92dbb5f6a51bc445413f"
+      }
+    ],
+    "publication": [
+      {
+        "kind": "github-and-mod-portal-publication",
+        "path": ".mir/evidence/3.2.3-publication.json",
+        "sha256": "0D1894EEE0069765E2652945FF1F389F61C9941FE36F94749BB14FEF7F95C357",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "public_byte_verification": [
+      {
+        "kind": "public-asset-identity",
+        "path": ".mir/evidence/3.2.3-publication.json",
+        "sha256": "0D1894EEE0069765E2652945FF1F389F61C9941FE36F94749BB14FEF7F95C357",
+        "digest_policy": "utf8-lf"
       }
     ]
   },
@@ -110,15 +141,12 @@
     }
   ],
   "remaining_obligations": [
-    "focused-qualification",
-    "candidate-qualification",
-    "manual-acceptance",
-    "protected-qualification",
-    "seal",
-    "promotion",
-    "tag",
-    "publication",
-    "public-byte-verification"
+    "focused-qualification-post-publication",
+    "candidate-qualification-post-publication",
+    "manual-acceptance-reconciliation",
+    "protected-qualification-post-publication",
+    "seal-post-publication",
+    "normal-promotion-admission-reconciliation"
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.3.md",
   "incident_ids": [
@@ -136,5 +164,5 @@
     "INC-2026-0052",
     "INC-2026-0053"
   ],
-  "updated_at": "2026-08-01T08:16:26.7580103Z"
+  "updated_at": "2026-08-02T09:17:25.689Z"
 }

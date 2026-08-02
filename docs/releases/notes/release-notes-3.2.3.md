@@ -56,13 +56,13 @@ Candidate C30 is frozen. Its deterministic package reproduced twice and its exac
 
 | Field | Value |
 | --- | --- |
-| State | `package-built` |
+| State | `publicly-verified` |
 | Candidate | `C30` |
 | Package source commit | `c1fd8b932c8d916a14925678056e08893b87b2db` |
 | Archive SHA-256 | `0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2` |
 | Content SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
-| Tag | `pending` |
-| Tag commit | `pending` |
+| Tag | `3.2.3` |
+| Tag commit | `1abe07573cde814c3cacf6153b5ae64dee4038ba` |
 | Assurance exceptions | `C30-TIMEBOXED-PUBLICATION-2026-08-01` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

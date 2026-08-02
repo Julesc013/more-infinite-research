@@ -11,12 +11,52 @@ function Assert-MIRField($Object, [string]$Name, $Expected, [string]$Scope) {
   }
 }
 
+function Get-MIRReleaseProofSha256 {
+  param([Parameter(Mandatory)][string]$Path, [string]$DigestPolicy = "raw")
+  if ($DigestPolicy -eq "utf8-lf") {
+    $text = (Get-Content -Raw -LiteralPath $Path).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  }
+  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+}
+
+function Assert-MIRReleaseProofFiles {
+  param([Parameter(Mandatory)]$Release)
+  foreach ($group in @($Release.proofs.PSObject.Properties)) {
+    foreach ($proof in @($group.Value)) {
+      if ($null -eq $proof -or $null -eq $proof.PSObject.Properties["path"]) { continue }
+      $proofPath = Join-Path $repo ([string]$proof.path)
+      if (-not (Test-Path -LiteralPath $proofPath -PathType Leaf)) { throw "Release proof is missing: $($proof.path)" }
+      if ($null -ne $proof.PSObject.Properties["sha256"]) {
+        $policy = if ($null -ne $proof.PSObject.Properties["digest_policy"]) { [string]$proof.digest_policy } else { "raw" }
+        if ((Get-MIRReleaseProofSha256 -Path $proofPath -DigestPolicy $policy) -ne [string]$proof.sha256) {
+          throw "Release proof hash changed: $($proof.path)"
+        }
+      }
+    }
+  }
+}
+
+function Assert-MIRReleaseTag {
+  param([Parameter(Mandatory)]$Release)
+  $tagProof = @($Release.proofs.tag)
+  if ($tagProof.Count -ne 1) { throw "Release $($Release.release) requires exactly one annotated-tag proof." }
+  $tagName = [string]$tagProof[0].name
+  $tagCommit = (& git -C $repo rev-parse "$tagName^{}").Trim()
+  $tagObject = (& git -C $repo rev-parse "$tagName^{tag}").Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]$tagProof[0].commit -ne $tagCommit -or [string]$tagProof[0].tag_object -ne $tagObject) {
+    throw "ReleaseRecord tag proof disagrees with Git for $tagName."
+  }
+}
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $null = Update-MIRCPViews -RepoRoot $repo -Check
 $null = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks
 $canonical = Get-MIRCPCurrentRelease -Role canonical -RepoRoot $repo
 $currentRoles = Read-MIRCPJson -Path ".mir/releases/current.json" -RepoRoot $repo
 $taggedModern = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.tagged_factorio_2_1) -RepoRoot $repo
+$publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.published_factorio_2_1) -RepoRoot $repo
+$publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.published_factorio_2_0) -RepoRoot $repo
 $backport = Get-MIRCPCurrentRelease -Role backport_calibration -RepoRoot $repo
 $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
 
@@ -27,30 +67,25 @@ $releaseStates = @((Get-MIRCPPolicy -RepoRoot $repo).release_states | ForEach-Ob
 if ([Array]::IndexOf($releaseStates, [string]$canonical.state) -lt [Array]::IndexOf($releaseStates, "package-built")) {
   throw "Canonical release authority must be at least package-built."
 }
-if ([string]$taggedModern.release -ne "3.2.2" -or [string]$taggedModern.candidate_id -ne "C24" -or [string]$taggedModern.state -ne "tagged") {
-  throw "Tagged Factorio 2.1 authority must retain immutable MIR 3.2.2 C24."
-}
-if ([string]$backport.release -ne "2.5.0" -or [string]$backport.candidate_id -ne "2.5-P9" -or [string]$backport.state -ne "focused-qualified") {
-  throw "Backport calibration authority must bind focused-qualified MIR 2.5.0 P9."
-}
-
-$tagCommit = (& git -C $repo rev-parse '3.2.2^{}').Trim()
-$tagObject = (& git -C $repo rev-parse '3.2.2^{tag}').Trim()
-if ($LASTEXITCODE -ne 0 -or $tagCommit -ne "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378" -or $tagObject -ne "e5b2a85a23e6aa765759a47b43b66e053ad92077") {
-  throw "Annotated tag 3.2.2 no longer resolves to its immutable commit and tag object."
-}
-$tagProof = @($taggedModern.proofs.tag)
-if ($tagProof.Count -ne 1 -or [string]$tagProof[0].commit -ne $tagCommit -or [string]$tagProof[0].tag_object -ne $tagObject) {
-  throw "ReleaseRecord tag proof disagrees with Git."
-}
-
-foreach ($proofGroup in @("focused_qualification", "candidate_qualification", "manual_acceptance")) {
-  if ($null -eq $taggedModern.proofs.PSObject.Properties[$proofGroup]) { continue }
-  foreach ($proof in @($taggedModern.proofs.$proofGroup)) {
-    $proofPath = Join-Path $repo ([string]$proof.path)
-    if (-not (Test-Path -LiteralPath $proofPath -PathType Leaf)) { throw "Release proof is missing: $($proof.path)" }
-    if ((Get-FileHash -LiteralPath $proofPath -Algorithm SHA256).Hash -ne [string]$proof.sha256) { throw "Release proof hash changed: $($proof.path)" }
+foreach ($row in @(
+  [pscustomobject]@{record=$taggedModern;target="2.1";minimum="tagged";role="tagged Factorio 2.1"},
+  [pscustomobject]@{record=$publishedModern;target="2.1";minimum="published";role="published Factorio 2.1"},
+  [pscustomobject]@{record=$publishedBackport;target="2.0";minimum="published";role="published Factorio 2.0"}
+)) {
+  if ([string]$row.record.target -ne [string]$row.target -or
+      [Array]::IndexOf($releaseStates, [string]$row.record.state) -lt [Array]::IndexOf($releaseStates, [string]$row.minimum)) {
+    throw "$($row.role) authority is not an admitted immutable release."
   }
+}
+if ([string]$backport.target -ne "2.0" -or [string]$backport.release -ne [string]$publishedBackport.release -or
+    [string]$backport.candidate_id -ne [string]$publishedBackport.candidate_id) {
+  throw "Current Factorio 2.0 maintenance authority must bind the published target baseline."
+}
+
+Assert-MIRReleaseTag -Release $taggedModern
+Assert-MIRReleaseTag -Release $publishedBackport
+foreach ($release in @($canonical, $backport, $taggedModern, $publishedModern, $publishedBackport) | Sort-Object release -Unique) {
+  Assert-MIRReleaseProofFiles -Release $release
 }
 
 $archivePath = Join-Path $repo ([string]$canonical.package.archive)

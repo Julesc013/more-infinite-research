@@ -33,7 +33,10 @@ function Get-CommitJson {
 }
 
 $manifest = Get-Content -Raw -LiteralPath $ManifestPath | ConvertFrom-Json
-if ([int]$manifest.schema -ne 1 -or [string]$manifest.integration.strategy -ne "dual-parent-target-projection-v1") {
+$strategy = [string]$manifest.integration.strategy
+if (([int]$manifest.schema -eq 1 -and $strategy -ne "dual-parent-target-projection-v1") -or
+    ([int]$manifest.schema -eq 2 -and $strategy -ne "integrated-target-successor-v2") -or
+    [int]$manifest.schema -notin @(1, 2)) {
   throw "Unsupported MIR backport manifest."
 }
 foreach ($field in @("target_release", "target_factorio")) {
@@ -64,34 +67,57 @@ if (-not $sourceTagExists) {
   Assert-Ancestor -Ancestor $sourcePackageCommit -Descendant $sourceTagCommit -Message "Source package commit is not an ancestor of the immutable source tag."
 }
 
-$projectionCommit = Resolve-ManifestCommit -Value ([string]$manifest.integration.preintegration_commit) -Name "preintegration"
 $targetPackageCommit = Resolve-ManifestCommit -Value ([string]$manifest.integration.target_package_source_commit) -Name "target package"
-$projectionTree = (& git -C $RepoRoot rev-parse "$projectionCommit^{tree}").Trim()
-if ($projectionTree -ne [string]$manifest.integration.preintegration_tree -or
-    $projectionTree -ne [string]$manifest.expected_target.integration_tree) {
-  throw "Preintegration tree identity disagrees with the manifest."
-}
-Assert-Ancestor -Ancestor $baselineCommit -Descendant $projectionCommit -Message "Preintegration target lineage does not descend from the immutable 2.4.9 baseline."
-Assert-Ancestor -Ancestor $targetPackageCommit -Descendant $projectionCommit -Message "Target package source is not an ancestor of the preintegration checkpoint."
-
-$projectionTag = [string]$manifest.integration.preintegration_tag
-$projectionTagExists = $true
-$projectionTagCommit = ""
-try { $projectionTagCommit = Resolve-ManifestCommit -Value $projectionTag -Name "preintegration tag" } catch { $projectionTagExists = $false }
-if (-not $projectionTagExists) {
-  if (-not $AllowPendingTags -or [string]$manifest.integration.preintegration_tag_state -notmatch '^pending') {
-    throw "Preintegration archive tag is unavailable: $projectionTag"
+if ($strategy -eq "dual-parent-target-projection-v1") {
+  $projectionCommit = Resolve-ManifestCommit -Value ([string]$manifest.integration.preintegration_commit) -Name "preintegration"
+  $projectionTree = (& git -C $RepoRoot rev-parse "$projectionCommit^{tree}").Trim()
+  if ($projectionTree -ne [string]$manifest.integration.preintegration_tree -or
+      $projectionTree -ne [string]$manifest.expected_target.integration_tree) {
+    throw "Preintegration tree identity disagrees with the manifest."
   }
-} elseif ($projectionTagCommit -ne $projectionCommit) {
-  throw "Preintegration archive tag does not resolve to the locked target commit."
-}
+  Assert-Ancestor -Ancestor $baselineCommit -Descendant $projectionCommit -Message "Preintegration target lineage does not descend from the immutable baseline."
+  Assert-Ancestor -Ancestor $targetPackageCommit -Descendant $projectionCommit -Message "Target package source is not an ancestor of the preintegration checkpoint."
 
-$sourceLock = Get-CommitJson -Commit $projectionCommit -Path ".mir/backport-source-lock.json"
+  $projectionTag = [string]$manifest.integration.preintegration_tag
+  $projectionTagExists = $true
+  $projectionTagCommit = ""
+  try { $projectionTagCommit = Resolve-ManifestCommit -Value $projectionTag -Name "preintegration tag" } catch { $projectionTagExists = $false }
+  if (-not $projectionTagExists) {
+    if (-not $AllowPendingTags -or [string]$manifest.integration.preintegration_tag_state -notmatch '^pending') {
+      throw "Preintegration archive tag is unavailable: $projectionTag"
+    }
+  } elseif ($projectionTagCommit -ne $projectionCommit) {
+    throw "Preintegration archive tag does not resolve to the locked target commit."
+  }
+  $sourceLock = Get-CommitJson -Commit $projectionCommit -Path ".mir/backport-source-lock.json"
+} else {
+  if (-not $sourceTagExists) { throw "Integrated-successor manifests require the immutable modern release tag." }
+  $projectionCommit = Resolve-ManifestCommit -Value ([string]$manifest.integration.commit) -Name "integration"
+  $projectionTree = (& git -C $RepoRoot rev-parse "$projectionCommit^{tree}").Trim()
+  $targetTree = (& git -C $RepoRoot rev-parse "$targetPackageCommit^{tree}").Trim()
+  $parents = @(((& git -C $RepoRoot show -s --format=%P $projectionCommit).Trim()) -split ' ')
+  if ($projectionTree -ne [string]$manifest.integration.tree -or
+      $projectionTree -ne [string]$manifest.expected_target.integration_tree) {
+    throw "Integration tree identity disagrees with the manifest."
+  }
+  if ($targetTree -ne [string]$manifest.expected_target.package_source_tree) {
+    throw "Target package-source tree identity disagrees with the manifest."
+  }
+  if ($parents.Count -ne 2 -or $parents[0] -ne [string]$manifest.integration.first_parent -or
+      $parents[1] -ne [string]$manifest.integration.second_parent -or $parents[1] -ne $sourceTagCommit) {
+    throw "Integrated-successor parent ordering disagrees with the manifest."
+  }
+  Assert-Ancestor -Ancestor $baselineCommit -Descendant $projectionCommit -Message "Integration lineage does not descend from the immutable baseline."
+  Assert-Ancestor -Ancestor $projectionCommit -Descendant $targetPackageCommit -Message "Target package source is not an integration successor."
+  $sourceLockCommit = Resolve-ManifestCommit -Value ([string]$manifest.integration.source_lock_commit) -Name "source lock"
+  Assert-Ancestor -Ancestor $targetPackageCommit -Descendant $sourceLockCommit -Message "P11 source lock does not descend from the exact package source."
+  $sourceLock = Get-CommitJson -Commit $sourceLockCommit -Path ".mir/backport-source-lock.json"
+}
 if ([int]$sourceLock.schema -lt 4 -or [string]$sourceLock.portable_source.commit -ne $sourcePackageCommit) {
-  throw "Preintegration source lock does not bind the exact modern package source."
+  throw "Backport source lock does not bind the exact modern package source."
 }
 if ([string]$sourceLock.projection.package_source_commit -ne $targetPackageCommit) {
-  throw "Preintegration source lock does not bind the exact target package source."
+  throw "Backport source lock does not bind the exact target package source."
 }
 if ([string]$sourceLock.portable_source.archive_sha256 -ne [string]$manifest.source.archive_sha256 -or
     [string]$sourceLock.portable_source.source_sha256 -ne [string]$manifest.source.package_source_sha256 -or

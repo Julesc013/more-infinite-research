@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "kind": "mir-local-automated-qualification",
+  "release": "2.5.0",
+  "candidate_id": "2.5-P11",
+  "target": "2.0",
+  "recorded_at": "2026-08-01T18:06:26.1718546Z",
+  "status": "machine-verifiable-passed-manual-and-protected-gates-pending",
+  "release_eligible": false,
+  "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+  "local_evidence_source_commit": "227f2e662ed0d3eb1d744037fd582401ae2dffa5",
+  "manual_binding_repair_commit": "ce94f5a2cfece0ea5c625d4a458b1b296dab2091",
+  "candidate": {
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_bytes": 1033875,
+    "archive_entries": 291,
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+    "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1"
+  },
+  "factorio": {
+    "version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "plan": {
+    "artifact": "artifacts/assurance/p11-post-ecosystem-fix-plan.json",
+    "artifact_sha256": "08924DA4D2700322DE1024811C97FF9A923C3FB221300C6B0F08E7512458B168",
+    "plan_material_sha256": "7309E1BDD47FBA9359392EB5579D966C42A15B8D46EDA2CBD04987D959FB89E5",
+    "required_test_set_sha256": "592C1A93F4781BC7C6E709DEAA32C9E754FA4ACDE5C7F118CE95FD7181434980",
+    "candidate_descriptor_sha256": "9B26FAD396117CFD97215B82F1637D14D3D24E5749A907B497826AB85E6CC40C",
+    "validation_harness_sha256": "062ADCD30F5EBED2B93B25ECFDC80EB1B52C517BF74EC40380EA4E1E69AAF7B2",
+    "expected_test_count": 127,
+    "run_count": 127,
+    "reuse_count": 0,
+    "wait_count": 0,
+    "invalid_count": 0
+  },
+  "aggregate": {
+    "artifact": "artifacts/assurance/p11-post-ecosystem-fix-summary.json",
+    "artifact_sha256": "421ED0FAD35A829D281C15F061D05AD58AFCFA38CD77BB68F2D0A4BD6B0FCDD0",
+    "status": "machine-verifiable-passed-manual-attestation-absent",
+    "executed": 127,
+    "passed": 126,
+    "failed": 1,
+    "reused": 0,
+    "unexpected": 0,
+    "only_failed_task": "manual.release-review",
+    "source_plan_failure": "unresolved-package-source-placeholder",
+    "post_repair_direct_validation": "manual-attestation-absent"
+  },
+  "checks": {
+    "static_and_deterministic": {
+      "status": "passed",
+      "candidate_rebuild": "byte-identical",
+      "scenario_count": 109,
+      "passed_scenarios": 109,
+      "failed_scenarios": 0,
+      "static_full_fingerprint_sha256": "F72B6D5F03222307AB4F2C11099B6F636CFED81E2C3C6FEA82E8438713A89279",
+      "static_full_result_digest": "80D72CDF6204DE285EE285956BEF2211AB39B342AB67AF9E62DF925FA32520A6"
+    },
+    "advanced_belts_sa": {
+      "status": "passed",
+      "summary": "artifacts/assurance/2.5.0-advanced-belts-sa.json",
+      "summary_sha256": "6BBE8E4B86B1F5BD10FB8E6DD0E84ACDA3EDF70EBEEF343C099174979B280C98",
+      "assurance_fingerprint_sha256": "3C3922B0E05B632404D4E0DB28776F662890E22CEA694ACB721CBB7C96667CA5",
+      "assurance_result_digest": "4DE6FC7E6C402E051AC779A3A714346B87B6431A570AF5B0141129C6095AD047"
+    },
+    "exact_upgrade": {
+      "status": "passed",
+      "summary": "artifacts/assurance/2.5.0-upgrade-proof.json",
+      "summary_sha256": "E8EA0557EEE2504B5970C88CFCA332C5B99020A0DA6A5F9AEFA0E57E2EA675A5",
+      "baseline_archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+      "row_count": 5,
+      "assurance_fingerprint_sha256": "FF2517C147E572C649DA44D2F34A1E0D5A759AABA454748C3455EE5485A7E8E3",
+      "assurance_result_digest": "7F8DF933F116941A2435018C74744F86B038AE5E939926D9A370D926BA2C0367"
+    },
+    "targeted_ecosystem": {
+      "status": "passed",
+      "scope": "representative-local-scenario-plus-exact-runtime-fixtures",
+      "summary": "artifacts/release-targeted-20260802-032104/release-targeted-summary.json",
+      "summary_sha256": "08F81A12B79EA682421AFF32909D1CA1361576BCE4A9AA3FD9D49096CC23BDAD",
+      "assurance_fingerprint_sha256": "5B2440A56542FF6C919430D3E33DC5031AD09F988A36E140D0A22572E452F8B0",
+      "assurance_result_digest": "B7F5BC89EFD8202AD8BFC4D77B53FC7824F5374FC0A44B7C17640AC71AC2937A"
+    },
+    "approved_delta": {
+      "status": "passed",
+      "evidence": "approved-delta/2.4.9-to-2.5.0.json",
+      "evidence_sha256": "56A0740619D0A2CA3019BDA39561930CF211BA17875FB3C7D79391900D95300B",
+      "baseline": "2.4.9",
+      "factorio_version": "2.0.77",
+      "scenario_count": 7,
+      "difference_count": 375,
+      "intentional_count": 375,
+      "unapproved_count": 0,
+      "assurance_fingerprint_sha256": "C34B141FE335C0174C973598F27BD4062342BC21A5869C5B5175A1F6A964B2B8",
+      "assurance_result_digest": "B42EAFC935DD1B823A03DBFB5B284ED6FBD9AFB485DBB44E13CEEEF126AC72DD"
+    },
+    "runtime_performance": {
+      "status": "passed",
+      "evidence": ".mir/evidence/2.5.0-performance-regression.json",
+      "evidence_sha256": "CF84FB34239CDD99CCE00DEF7C5CCE1B29D4C6CD5AF05C837589EBE4F75DDA34",
+      "measurement_harness_sha256": "E66796042C0E3A23287B856B7E4EFE53EA2D3013CDDD1D38213387788D7A82F4",
+      "assurance_fingerprint_sha256": "D9FEEB4ADB2B3E15883F1286D9EC9A4CFA50ED5144B9F159048E03C7EE76140C",
+      "assurance_result_digest": "027D6D3714319DC66619F89BEA0942209F75262C58B5A24AC5BA157194C403D0",
+      "warmup_runs_per_package_per_lane": 1,
+      "measured_runs_per_package_per_lane": 5,
+      "measured_execution_count": 60,
+      "total_execution_count": 72,
+      "lane_count": 6,
+      "failed_lanes": 0
+    },
+    "manual_review": {
+      "status": "missing-required-attestation",
+      "required_path": ".mir/evidence/2.5.0-manual-review-attestation.json",
+      "review_packet": "artifacts/interactive-review-p11/interactive-review.json",
+      "review_packet_sha256": "D9DF86B4C6CC93FF685D97AC47C381DE9A5362C3364B447AB302AA3981E9C019",
+      "template_sha256": "35CEE9B97B78B597C975EECFE7A4B1B76CC132AFAB918127EE1B6182DE8A4F91",
+      "assurance_test_id": "manual.release-review",
+      "original_assurance_fingerprint_sha256": "2084B26D4943D9DB2516CF932554F3ADCB77AD756932391F30F1B36C92443A42",
+      "direct_validator_stderr_sha256": "ED0EAD10A8665A8ADEC0A6F2EB049D6FFA8CBF7132F22630B71E0A2102A44483"
+    }
+  },
+  "remaining_release_blockers": [
+    "maintainer-authored schema-2 package review attestation for the exact P11 candidate",
+    "protected full qualification and candidate seal",
+    "promotion to legacy only after protected qualification and seal verification"
+  ]
+}

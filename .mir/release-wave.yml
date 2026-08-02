@@ -418,6 +418,28 @@ waves:
     tag_commit: 1138ed55ad7ad42e38cf9e821d1d4e7de5df6378
     assurance_exception: C24-PROTECTED-SEAL-ABSENT
     status: c24-tagged-control-plane-calibration-baseline
+  mir_3_2_3:
+    version: "3.2.3"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    source_anchor: mir_3_2_2
+    candidate_id: C30
+    archive: dist/more-infinite-research_3.2.3.zip
+    archive_class: immutable-published-release
+    archive_bytes: 1034824
+    archive_entries: 292
+    archive_sha256: 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+    package_content_sha256: 2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9
+    package_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+    package_source_tree: 222848c6bb3c96fe4641c67cdea12b3581576185
+    publication_evidence: .mir/evidence/3.2.3-publication.json
+    protected_release_gate: pending-post-publication
+    release_gate: timeboxed-maintainer-publication-with-recorded-assurance-exceptions
+    publication_status: published-public-identities-verified
+    tag: "3.2.3"
+    tag_commit: 1abe07573cde814c3cacf6153b5ae64dee4038ba
+    status: published-frozen
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy
@@ -481,18 +503,27 @@ waves:
 
   mir_2_5_0:
     version: "2.5.0"
-    branch: tmp/2.0
+    branch: legacy
     target_factorio: "2.0"
-    source_anchor: mir_3_2_2_final_source
+    source_anchor: mir_3_2_3
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
+    candidate_id: "2.5-P11"
     archive: dist/more-infinite-research_2.5.0.zip
-    archive_class: frozen-unreleased-calibration-candidate
-    archive_bytes: 1029914
-    archive_entries: 290
-    archive_sha256: 30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3
-    package_content_sha256: 02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2
-    package_source_commit: f446d89f94ce4b9dc26f04c31c92f9bcffbac70d
-    release_gate: v5-shadow-equivalence-and-remaining-release-state-proofs
-    publication_status: unreleased
-    status: p9-focused-qualified
+    archive_class: immutable-published-release
+    archive_bytes: 1033875
+    archive_entries: 291
+    archive_sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
+    package_content_sha256: 5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1
+    package_source_commit: 493e71a6c883c2e191e1e13c7647cf38a8a8b261
+    package_source_tree: c8c84c7c1797a9378c76984908f516aef2d6d685
+    automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
+    manual_review: .mir/evidence/2.5.0-manual-review-attestation.json
+    publication_decision: .mir/evidence/2.5.0-timeboxed-publication-decision.json
+    publication_evidence: .mir/evidence/2.5.0-publication.json
+    protected_release_gate: running-post-publication-run-30740083663
+    release_gate: timeboxed-maintainer-publication-protected-follow-up-running
+    publication_status: published-public-identities-verified
+    tag: "2.5.0"
+    tag_commit: bea21b068fb38dc26479b619454e50d5b4cf4793
+    status: published-frozen-protected-follow-up-running

@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "kind": "mir-manual-release-review",
+  "candidate_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+  "candidate_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+  "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+  "checklist_version": "mir-manual-release-review-v1",
+  "factorio_version": "2.0.77",
+  "factorio_binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "reviewer": "Julesc013",
+  "reviewed_at": "2026-08-01T18:54:53.0899962Z",
+  "items": [
+    {
+      "id": "technology-tree-visual",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked technology-tree-visual passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "icon-visual",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked icon-visual passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "locale-fit-and-truncation",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked locale-fit-and-truncation passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "settings-ux",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked settings-ux passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "save-ui",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked save-ui passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "human-balance",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked human-balance passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    },
+    {
+      "id": "configuration-change-give-item-safety",
+      "status": "passed",
+      "notes": "Julesc013 explicitly marked configuration-change-give-item-safety passed for exact P11 after the Factorio 2.0.77 manual run; no release-blocking issue was reported.",
+      "artifacts": [
+        {
+          "path": ".mir/evidence/2.5.0-manual-review/reviewer-confirmation.md",
+          "sha256": "EE7881BA491F982BCDA886B85794A6D0B044511EE1221B7526DE007243FEA2A9"
+        }
+      ]
+    }
+  ],
+  "status": "passed",
+  "attestation_sha256": "EF865C2BA0B6E0ADA304920CB5DD6639708E3B4CC94E296C718BD0890696FB97"
+}

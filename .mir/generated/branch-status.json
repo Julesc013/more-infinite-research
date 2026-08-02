@@ -2,18 +2,18 @@
   "authority": "mir-generated-branch-status-v1",
   "branches": [
     {
-      "branch": "dev",
-      "candidate_id": "C30",
-      "release": "3.2.3",
-      "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
-      "state": "package-built",
-      "target": "2.1"
-    },
-    {
       "branch": "legacy",
       "candidate_id": "2.4.9-final",
       "release": "2.4.9",
       "source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
+      "candidate_id": "2.5-P11",
+      "release": "2.5.0",
+      "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
       "state": "publicly-verified",
       "target": "2.0"
     },
@@ -34,12 +34,12 @@
       "target": "2.1"
     },
     {
-      "branch": "tmp/2.0",
-      "candidate_id": "2.5-P9",
-      "release": "2.5.0",
-      "source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
-      "state": "focused-qualified",
-      "target": "2.0"
+      "branch": "main",
+      "candidate_id": "C30",
+      "release": "3.2.3",
+      "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+      "state": "publicly-verified",
+      "target": "2.1"
     }
   ],
   "generated_from": ".mir/releases/*.json",

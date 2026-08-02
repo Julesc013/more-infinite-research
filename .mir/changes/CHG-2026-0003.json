@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0003",
+  "title": "Reconcile published 3.2.3 and 2.5.0 authorities and stabilize P11",
+  "kind": "release-engineering",
+  "package_visible": false,
+  "domains_read": [
+    "release.authority",
+    "assurance.evidence",
+    "product.package",
+    "backport.lineage"
+  ],
+  "domains_written": [
+    "release.authority",
+    "assurance.evidence",
+    "backport.lineage",
+    "release.presentation"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "none",
+  "release_note_impact": "none; post-release authority and stabilization only",
+  "test_obligations": [
+    "release.authority",
+    "product.package",
+    "backport.lineage",
+    "assurance.evidence"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical tooling and governance on dev",
+    "factorio-2.0": "exact target records and immutable P11 evidence reconciled on dev; legacy remains promotion-only"
+  },
+  "state": "implemented"
+}

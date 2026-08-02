@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "authority": "mir-maintainer-timeboxed-publication-decision",
+  "decision_id": "P11-TIMEBOXED-PUBLICATION-2026-08-02",
+  "release": "2.5.0",
+  "candidate_id": "2.5-P11",
+  "candidate_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+  "candidate_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+  "candidate_bytes": 1033875,
+  "candidate_entries": 291,
+  "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+  "factorio_version": "2.0.77",
+  "reviewer": "Julesc013",
+  "decision": "publish-at-fixed-cutoff",
+  "issued_at": "2026-08-01T23:46:00Z",
+  "known_passed": [
+    "126/126 machine-verifiable tasks",
+    "109 exact Factorio scenarios",
+    "five upgrade/reload lanes",
+    "AdvancedBeltsSA 2.3.3 native qualification",
+    "375 approved differences and zero unknowns",
+    "six performance lanes",
+    "deterministic packaging",
+    "exact P11 manual review"
+  ],
+  "protected_campaign": {
+    "workflow": "assurance-full.yml",
+    "run_id": "30716314749",
+    "head_commit": "99b19ab192a01fb9f61a4fef4c371dcefdb47b19",
+    "state_at_decision": "running",
+    "final_state": "completed-infrastructure-failure",
+    "failed_job": "F3 / scenario/2.0/approved-delta-automatic-family-controls",
+    "test_process_exit_code": 0,
+    "failure_classification": "artifact-upload-transport",
+    "failure_detail": "The exact scenario passed, but actions/upload-artifact failed with ENOTFOUND during the network outage; F4 was skipped because the F3 job status was failed.",
+    "completed_jobs_at_last_observation": 45,
+    "failed_jobs_at_last_observation": 0,
+    "post_publication_follow_up_required": true
+  },
+  "protected_retry": {
+    "workflow": "assurance-full.yml",
+    "run_id": "30740083663",
+    "head_commit": "815f934af75e38df1b627bc41025f3f7a340b137",
+    "state": "running-post-publication"
+  },
+  "not_completed_at_tagging": [
+    "protected qualification",
+    "protected candidate seal",
+    "normal promotion admission"
+  ],
+  "statement": "This is a time-boxed maintainer publication decision. It is not a protected qualification or release seal.",
+  "follow_up_required": true
+}

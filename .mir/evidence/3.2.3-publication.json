@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "authority": "mir-publication-receipt-v1",
+  "release": "3.2.3",
+  "candidate_id": "C30",
+  "recorded_at": "2026-08-01T08:31:06.225Z",
+  "package": {
+    "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "archive_sha1": "6CFA68D65864618AAE1C9741C6C1220BD40108A8",
+    "bytes": 1034824,
+    "entries": 292
+  },
+  "tag": {
+    "name": "3.2.3",
+    "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "tag_object": "95af6bb56e50e48abfbe92dbb5f6a51bc445413f"
+  },
+  "github": {
+    "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.3",
+    "asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.3/more-infinite-research_3.2.3.zip",
+    "published_at": "2026-08-01T08:21:34Z",
+    "asset_id": 497725164,
+    "asset_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "asset_bytes": 1034824,
+    "verified": true
+  },
+  "mod_portal": {
+    "api_url": "https://mods.factorio.com/api/mods/more-infinite-research/full",
+    "download_path": "/download/more-infinite-research/6a6daecabdaaf0c6a8bb55b1",
+    "released_at": "2026-08-01T08:31:06.225Z",
+    "asset_sha1": "6CFA68D65864618AAE1C9741C6C1220BD40108A8",
+    "baseline_archive_sha1": "6CFA68D65864618AAE1C9741C6C1220BD40108A8",
+    "verified": true,
+    "verification_method": "official-release-api-sha1-matched-to-immutable-baseline"
+  },
+  "status": "published-public-identities-verified"
+}
