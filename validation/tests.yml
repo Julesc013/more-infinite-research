@@ -24,6 +24,7 @@
         "scripts/MIRAssurance/**",
         "scripts/Test-MIRAssurance.ps1",
         "scripts/Test-MIRNativeOwnerCostModels.ps1",
+        "scripts/Test-MIRResearchCostModels.ps1",
         "scripts/mir.ps1",
         "tools/mir_verify/**",
         ".mir/assurance.json",

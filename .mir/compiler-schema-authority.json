@@ -8,6 +8,7 @@
     "CompilerResult": {"current": 3, "readable": [3], "writable": [3], "compatibility_projection": 2},
     "RuntimeEnvironmentIdentity": {"current": 2, "readable": [2], "writable": [2], "compatibility_projection": 1},
     "QualificationEnvironmentIdentity": {"current": 1, "readable": [1], "writable": [1]},
+    "ResearchCostModel": {"current": 1, "readable": [1], "writable": [1]},
     "TransformationOperation": {"current": 2, "readable": [2], "writable": [2]},
     "TransformationPlan": {"current": 2, "readable": [2], "writable": [2]},
     "MutationJournal": {"current": 2, "readable": [2], "writable": [2]}

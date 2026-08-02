@@ -97,6 +97,7 @@ modules:
   settings:
     - prototypes/mir/settings/registry.lua
     - prototypes/mir/settings/catalog.lua
+    - prototypes/mir/settings/cost_contract.lua
     - prototypes/mir/settings/automatic_compiler_contract.lua
     - prototypes/mir/settings/automatic_compiler_policy.lua
     - prototypes/mir/settings/defaults.lua
@@ -166,6 +167,11 @@ modules:
     - prototypes/mir/domain/effects/generated_target_contracts.lua
     - prototypes/mir/domain/native_owner/contract.lua
     - prototypes/mir/domain/native_owner/cost_model.lua
+    - prototypes/mir/domain/research_cost/model.lua
+    - prototypes/mir/domain/research_cost/formula.lua
+    - prototypes/mir/domain/research_cost/validation.lua
+    - prototypes/mir/domain/research_cost/classification.lua
+    - prototypes/mir/domain/research_cost/projection.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
@@ -688,6 +694,7 @@ validation_tooling:
     assurance_tests: scripts/Test-MIRAssurance.ps1
     release_authority: scripts/Test-MIRReleaseAuthority.ps1
     native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
+    research_cost_model_tests: scripts/Test-MIRResearchCostModels.ps1
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation

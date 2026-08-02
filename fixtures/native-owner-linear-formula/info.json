@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-native-owner-linear-formula",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Native Owner Linear Formula",
+  "author": "Julesc013",
+  "description": "Replaces one Space Age native owner cost formula with a supported external linear formula.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "space-age >= 2.1.8"
+  ]
+}

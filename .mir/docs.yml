@@ -562,6 +562,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+  - path: docs/releases/3.2.4-unified-research-cost-curves.md
+    title: "MIR 3.2.4 Unified Research Cost Curves"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.4-research-cost-model
   - path: docs/architecture/target-profiles.md
     title: "Target Capability Profiles"
     status: current
@@ -1647,6 +1655,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - settings-reference
+  - path: docs/reference/schemas/research-cost-model.md
+    title: "ResearchCostModel Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - research-cost-model-schema
   - path: docs/reference/settings-reference.md
     title: "Settings Reference"
     status: archived

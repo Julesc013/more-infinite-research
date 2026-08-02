@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -27,6 +27,7 @@ This table names one machine authority, validator, and reference contract for ea
 | ProviderClaim | 1 | `prototypes/mir/providers/pipeline/provider_claim.lua` | compiler-contract provider matrix | semantic duplicate collapse and ambiguity rejection |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
 | TechnologyDesign | 2 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator, semantic schema-drift checks, and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
+| ResearchCostModel | 1 | `prototypes/mir/domain/research_cost/model.lua` | `scripts/Test-MIRResearchCostModels.ps1`, native-owner fixtures, and compiler schema drift | generated streams, native-owner adoption, and base continuations |
 | Technology hard gate | 1 | `.mir/technology-hard-gates.json`, generated hard-gate authority, and `gate.lua` | GenerationPlan, SafetyQualification, and compiler-contract fixture | total evidence-bearing decisions including N/A applicability proof |
 | SafetyQualification | 1 | `prototypes/mir/domain/technology/safety_qualification.lua` | TechnologyCatalog and compiler-contract fixture | deterministic selection eligibility |
 | DesignAssessment | 1 | `prototypes/mir/domain/technology/design_assessment.lua` | lifecycle and compiler-contract fixtures | design review independent from safety |

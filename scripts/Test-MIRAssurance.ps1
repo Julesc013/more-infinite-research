@@ -264,31 +264,46 @@ try {
   if (Test-Path -LiteralPath $externalTreeRoot) { Remove-Item -LiteralPath $externalTreeRoot -Recurse -Force }
 }
 
-$workflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\assurance-full.yml")
-foreach ($requiredWorkflowSnippet in @(
-  "MIR_TRUST_CLASS: protected-release",
-  "f0:",
-  "needs: [plan, f0]",
-  "needs: [plan, f1]",
-  "needs: [plan, f2]",
-  "needs: [plan, f3]",
-  "needs: [plan, f0, f1, f2, f3, f4]",
-  "--no-reuse --output out/verification-plan.json",
-  "out/assurance-inputs",
-  "out/worker-delta",
-  'if (''${{ matrix.test_id }}'' -eq ''runtime.performance-regression'')',
-  '.mir/evidence/$version-performance-regression.json',
-  "path: artifacts/assurance/evidence",
-  "assurance seal"
+$wrapper = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\assurance-full.yml")
+foreach ($requiredWrapperSnippet in @(
+  "uses: ./.github/workflows/control-plane-v5.yml",
+  'source_ref: ${{ inputs.source_ref }}',
+  'release: ${{ inputs.release }}',
+  'target: ${{ inputs.target }}',
+  'mode: ${{ inputs.mode }}',
+  'prior_release: ${{ inputs.prior_release }}',
+  'local_mod_zip_dir: ${{ inputs.local_mod_zip_dir }}',
+  "secrets: inherit"
 )) {
-  if (-not $workflow.Contains($requiredWorkflowSnippet)) {
-    throw "Full assurance workflow does not enforce the required protected F0-F4 chain: $requiredWorkflowSnippet"
+  if (-not $wrapper.Contains($requiredWrapperSnippet)) {
+    throw "Assurance dispatch wrapper does not bind the reusable v5 workflow input: $requiredWrapperSnippet"
   }
 }
-if ($workflow -match 'dist/\*\.zip' -or
-    ([regex]::Matches($workflow, 'actions/cache/restore@v4')).Count -ne 1 -or
-    -not $workflow.Contains('${{ needs.plan.outputs.candidate_path }}')) {
-  throw "Full assurance workflow must transfer the exact candidate, keep workers ledger-free, and restore the shared ledger only at the gate."
+
+$workflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\control-plane-v5.yml")
+foreach ($requiredWorkflowSnippet in @(
+  "MIR_CP_TRUST_CLASS: ci",
+  "MIR_PROTECTED_ENVIRONMENT: release-candidate",
+  "environment: release-candidate",
+  "needs: [context, package]",
+  "needs: [context, static, package, environments, transitions, ecosystem]",
+  "needs: [context, transitions, ecosystem, performance]",
+  "needs: [context, static, package, environments, transitions, ecosystem, performance, manual]",
+  "-TrustClass protected-release -EvidenceRoot artifacts/evidence",
+  "-AggregateTaskId qualification.full -TrustClass protected-release",
+  "Invoke-MIRControlPlane.ps1 seal",
+  "-TaskId shadow.equivalence",
+  "Invoke-MIRControlPlane.ps1 promotion",
+  'ref: ${{ inputs.source_ref }}',
+  "pattern: mir-v5-evidence-*",
+  "mir-v5-qualification-"
+)) {
+  if (-not $workflow.Contains($requiredWorkflowSnippet)) {
+    throw "Reusable v5 workflow does not enforce the required protected evidence chain: $requiredWorkflowSnippet"
+  }
+}
+if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
+  throw "Protected qualification must transfer the exact context candidate rather than select an arbitrary distribution glob."
 }
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")

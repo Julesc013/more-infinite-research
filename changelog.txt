@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.4
+Date: 2026-08-03
+
+  Changes:
+
+    - Added a per-level linear cost increment setting for every MIR research stream and base continuation.
+    - Unified fixed, linear, exponential, and hybrid costs under one numeric research-cost contract.
+    - Clarified the existing growth setting as the exponential multiplier; no model dropdown was added.
+
+  Compatibility:
+
+    - Preserved recognized native and modded research formulas byte-for-byte when settings stay at defaults.
+    - Canonicalized explicit overrides and rejected unknown external formulas instead of guessing their meaning.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.2.3
 Date: 2026-07-30
 

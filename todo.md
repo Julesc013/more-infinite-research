@@ -65,6 +65,7 @@ Generated: 2026-08-02
 - [ ] `CHG-2026-0001` — Establish MIR Control Plane v5 (`implemented`)
 - [ ] `CHG-2026-0002` — MIR 3.2.3 platform progression and structural logistics hotfix (`implemented`)
 - [ ] `CHG-2026-0003` — Reconcile published 3.2.3 and 2.5.0 authorities and stabilize P11 (`implemented`)
+- [ ] `CHG-2026-0004` — MIR 3.2.4 unified research cost curves (`implemented`)
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
 - [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `closed-exact-c24-fresh-calibration`

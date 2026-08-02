@@ -2347,7 +2347,12 @@ if ($checkpointActive) {
     "space-age-native-owner-settings-default",
     "space-age-native-owner-settings-disabled",
     "space-age-native-owner-settings-cost-base",
+    "space-age-native-owner-settings-cost-linear",
     "space-age-native-owner-settings-cost-growth",
+    "space-age-native-owner-settings-fixed-default",
+    "space-age-native-owner-settings-fixed-override",
+    "space-age-native-owner-settings-linear-default",
+    "space-age-native-owner-settings-linear-override",
     "space-age-native-owner-settings-research-time",
     "space-age-native-owner-settings-max-level",
     "space-age-native-owner-settings-effect",
@@ -2517,7 +2522,7 @@ function Initialize-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
@@ -2640,12 +2645,14 @@ function Initialize-RuntimeScenario {
     switch ($NativeOwnerSettingsProfile) {
       "disabled" { $nativeOwnerOverrides["ips-enable-$key"] = $false }
       "cost-base" { $nativeOwnerOverrides["ips-cost-base-$key"] = 2000 }
+      "cost-linear" { $nativeOwnerOverrides["ips-cost-linear-increment-$key"] = 2500 }
       "cost-growth" { $nativeOwnerOverrides["ips-cost-growth-$key"] = 1.25 }
       "research-time" { $nativeOwnerOverrides["ips-research-time-$key"] = 90 }
       "max-level" { $nativeOwnerOverrides["ips-max-level-$key"] = 7 }
       "effect" { $nativeOwnerOverrides["ips-effect-per-level-$key"] = 25 }
       "combined" {
         $nativeOwnerOverrides["ips-cost-base-$key"] = 2000
+        $nativeOwnerOverrides["ips-cost-linear-increment-$key"] = 2500
         $nativeOwnerOverrides["ips-cost-growth-$key"] = 1.25
         $nativeOwnerOverrides["ips-research-time-$key"] = 90
         $nativeOwnerOverrides["ips-max-level-$key"] = 7
@@ -2727,7 +2734,7 @@ function Invoke-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
@@ -2846,9 +2853,9 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [hashtable]$EffectPerLevelOverrides = @{},
     [hashtable]$InitialStartupSettingOverrides = @{},
     [hashtable]$ChangedStartupSettingOverrides = @{},
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$InitialNativeOwnerSettingsProfile = "",
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$ChangedNativeOwnerSettingsProfile = "",
     [switch]$ScriptedDiagnostics,
     [switch]$EnableSpaceAge
@@ -4467,7 +4474,12 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
     "space-age-native-owner-settings-default",
     "space-age-native-owner-settings-disabled",
     "space-age-native-owner-settings-cost-base",
+    "space-age-native-owner-settings-cost-linear",
     "space-age-native-owner-settings-cost-growth",
+    "space-age-native-owner-settings-fixed-default",
+    "space-age-native-owner-settings-fixed-override",
+    "space-age-native-owner-settings-linear-default",
+    "space-age-native-owner-settings-linear-override",
     "space-age-native-owner-settings-research-time",
     "space-age-native-owner-settings-max-level",
     "space-age-native-owner-settings-effect",
@@ -4592,6 +4604,22 @@ Invoke-RuntimeScenario -ScenarioName "base-effect-setting-retention" -EnabledFix
 ) -BaseEffectPerLevelOverrides @{
   "research-speed" = 120
   "worker-robots-storage" = 2
+}
+
+Invoke-RuntimeScenario -ScenarioName "base-research-cost-linear" -EnabledFixtureNames @(
+  "mir-fixture-assert-base-research-cost"
+) -EnabledBaseExtensionKeys @("worker-robots-storage") -StartupSettingOverrides @{
+  "mir-cost-base-worker-robots-storage" = 1000
+  "mir-cost-linear-increment-worker-robots-storage" = 250
+  "mir-cost-growth-worker-robots-storage" = 1
+}
+
+Invoke-RuntimeScenario -ScenarioName "base-stream-research-cost-hybrid" -EnabledFixtureNames @(
+  "mir-fixture-assert-stream-research-cost"
+) -EnabledStreamKeys @("research_gears") -StartupSettingOverrides @{
+  "ips-cost-base-research_gears" = 1000
+  "ips-cost-linear-increment-research_gears" = 250
+  "ips-cost-growth-research_gears" = 1.5
 }
 
 Invoke-WeaponSpeedPolicyMatrix -Context "Weapon shooting speed policy"

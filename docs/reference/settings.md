@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-03
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -23,11 +23,20 @@ Governed technology settings preserve the same keys:
 ```text
 ips-enable-<stream>
 ips-cost-base-<stream>
+ips-cost-linear-increment-<stream>
 ips-cost-growth-<stream>
 ips-max-level-<stream>
 ips-research-time-<stream>
 ips-effect-per-level-<stream>
 ```
+
+Research costs use the schema-1 `mir-research-cost-v1` contract:
+
+```text
+cost(L) = (B + A * (L - S)) * G ^ (L - S)
+```
+
+`S` is the first controlled level, `B >= 1` is its base cost, `A >= 0` is the integer additive increment, and `G >= 1` is the exponential multiplier. The derived kind is fixed, linear, exponential, or hybrid; it is not a setting. Base extensions use the corresponding `mir-cost-base-<technology>`, `mir-cost-linear-increment-<technology>`, and stable `mir-cost-growth-<technology>` IDs. Additive increments default to zero. Unchanged external formulas are preserved verbatim, supported formulas are canonicalized only after an explicit override, and unknown formulas reject override rather than executing or approximating third-party text.
 
 MIR uses `hidden = true` for provider-specific or unsupported stream settings and for retained migration-only setting IDs. It does not use `forced_value` for those settings, because saved and imported values must remain readable.
 

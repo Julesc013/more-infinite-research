@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0004",
+  "title": "MIR 3.2.4 unified research cost curves",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "compatibility.native-owner"
+  ],
+  "domains_written": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "product.locale",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Adds stable startup settings for an additive per-level cost increment. Defaults are zero, existing setting IDs remain stable, unchanged external formulas remain byte-for-byte unchanged, and no model-selection dropdown is introduced.",
+  "release_note_impact": "3.2.4 unified research-cost curve notes required",
+  "test_obligations": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "product.locale",
+    "compatibility.native-owner",
+    "scenario.catalog",
+    "transition.upgrade"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical implementation and release on dev/main as MIR 3.2.4",
+    "factorio-2.0": "project after the 2.5.0 stabilization decision; independently qualify as 2.5.1 only if a confirmed defect requires that release, otherwise queue for 2.6"
+  },
+  "state": "implemented"
+}

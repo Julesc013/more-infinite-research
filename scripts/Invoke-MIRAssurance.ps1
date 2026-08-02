@@ -172,6 +172,8 @@ switch ($command) {
     if ($LASTEXITCODE -ne 0) { throw "Locale assurance failed." }
   }
   "balance" {
+    & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+    if ($LASTEXITCODE -ne 0) { throw "Research-cost model validation failed." }
     & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
     if ($LASTEXITCODE -ne 0) { throw "Native-owner balance contract validation failed." }
     $snapshot = [ordered]@{
@@ -182,6 +184,9 @@ switch ($command) {
       generated_stream_manifest_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"))
       settings_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\settings.yml"))
       planner_costs_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\planner\costs.lua"))
+      research_cost_model_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\model.lua"))
+      research_cost_formula_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\formula.lua"))
+      research_cost_classification_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\research_cost\classification.lua"))
       native_owner_cost_models_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\native-owner-cost-models.json"))
       native_owner_contract_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\native_owner\contract.lua"))
       native_owner_formula_adapter_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\domain\native_owner\cost_model.lua"))

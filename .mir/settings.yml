@@ -68,6 +68,11 @@ rules:
   native_owner_cost_override_requires_recognized_formula: true
   native_owner_effect_override_is_relevant_effects_only: true
   native_owner_binding_is_startup_only_and_restart_required: true
+  research_cost_model_is_derived_from_base_increment_and_multiplier: true
+  research_cost_growth_factor_is_never_below_one: true
+  research_cost_linear_increment_is_never_below_zero: true
+  research_cost_model_has_no_player_facing_mode_dropdown: true
+  unchanged_external_cost_formulas_are_preserved_verbatim: true
 
 profiles:
   schema: 1
@@ -131,6 +136,7 @@ groups:
     generated_settings:
       - enable
       - base_cost
+      - linear_increment
       - growth
       - max_level
       - research_time
@@ -138,10 +144,28 @@ groups:
     name_patterns:
       enable: ips-enable-%s
       base_cost: ips-cost-base-%s
+      linear_increment: ips-cost-linear-increment-%s
       growth: ips-cost-growth-%s
       max_level: ips-max-level-%s
       research_time: ips-research-time-%s
       effect_per_level: ips-effect-per-level-%s
+  base_continuation:
+    generated_settings:
+      - enable
+      - base_cost
+      - linear_increment
+      - growth
+      - max_level
+      - research_time
+      - effect_per_level
+    name_patterns:
+      enable: mir-enable-%s
+      base_cost: mir-cost-base-%s
+      linear_increment: mir-cost-linear-increment-%s
+      growth: mir-cost-growth-%s
+      max_level: mir-max-level-%s
+      research_time: mir-research-time-%s
+      effect_per_level: mir-effect-per-level-%s
 
 streams:
   research_processing_unit:

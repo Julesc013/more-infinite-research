@@ -23,6 +23,9 @@ if ($contracts.Count -ne $expected.Count) { throw "Expected exactly five native-
 $streamSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\streams\productivity.lua")
 $settingsManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\settings.yml")
 $costModelSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\native_owner\cost_model.lua")
+$researchCostSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\model.lua")
+$formulaSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\formula.lua")
+$classificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\classification.lua")
 $bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\planner\native_owner_binding.lua")
 
 foreach ($contract in $contracts) {
@@ -32,12 +35,14 @@ foreach ($contract in $contracts) {
   if ([string]$contract.owner -ne $row.owner -or [string]$contract.product -ne $row.product) {
     throw "Native-owner mapping drifted for $stream."
   }
-  if ([string]$contract.native.count_formula -ne "1.5^L*1000" -or [double]$contract.native.base -ne 1000 `
+  if ([string]$contract.native.count_formula -ne "1.5^L*1000" -or [double]$contract.native.base -ne 1500 `
+      -or [double]$contract.native.linear_increment -ne 0 `
       -or [double]$contract.native.growth -ne 1.5 -or [double]$contract.native.research_time -ne 60 `
       -or [string]$contract.native.max_level -ne "infinite" -or [double]$contract.native.effect_per_level -ne 0.1) {
     throw "Native Factorio 2.1 balance values drifted for $stream."
   }
-  if ([double]$contract.mir_catalog_defaults.base -ne 8000 -or [double]$contract.mir_catalog_defaults.growth -ne 2 `
+  if ([double]$contract.mir_catalog_defaults.base -ne 8000 -or [double]$contract.mir_catalog_defaults.linear_increment -ne 0 `
+      -or [double]$contract.mir_catalog_defaults.growth -ne 2 `
       -or [double]$contract.mir_catalog_defaults.research_time -ne 60 -or [double]$contract.mir_catalog_defaults.max_level -ne 0 `
       -or [double]$contract.mir_catalog_defaults.effect_percentage_points -ne 10) {
     throw "MIR catalog-default characterization drifted for $stream."
@@ -52,17 +57,23 @@ foreach ($contract in $contracts) {
   }
 }
 
-foreach ($prefix in @("ips-enable-%s", "ips-cost-base-%s", "ips-cost-growth-%s", "ips-max-level-%s", "ips-research-time-%s", "ips-effect-per-level-%s")) {
+foreach ($prefix in @("ips-enable-%s", "ips-cost-base-%s", "ips-cost-linear-increment-%s", "ips-cost-growth-%s", "ips-max-level-%s", "ips-research-time-%s", "ips-effect-per-level-%s")) {
   if ($settingsManifest -notmatch [regex]::Escape($prefix)) { throw "Stable native-owner setting pattern missing: $prefix" }
 }
-foreach ($adapter in @('growth-to-level-times-base', 'base-times-growth-to-level-minus-one', 'recognized-fixed-count', 'unrecognized-external-formula')) {
+foreach ($adapter in @('recognized-fixed-count', 'unrecognized-external-formula')) {
   if ($costModelSource -notmatch [regex]::Escape($adapter)) { throw "Native-owner formula adapter missing: $adapter" }
 }
-$costPairIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or growth\.changed' -and
+if ($classificationSource -notmatch '"recognized-"\s*\.\.') { throw "Research-cost classifier does not derive recognized styles from the canonical kind." }
+foreach ($kind in @('fixed', 'linear', 'exponential', 'hybrid')) {
+  if ($formulaSource -notmatch ('"' + [regex]::Escape($kind) + '"')) { throw "Research-cost formula kind missing: $kind" }
+}
+if ($researchCostSource -notmatch 'mir-research-cost-v1') { throw "ResearchCostModel formula ABI is missing." }
+$costTrioIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or linear_increment\.changed or growth\.changed' -and
   $bindingSource -match 'base = cost_changed and base\.value or nil' -and
+  $bindingSource -match 'linear_increment = cost_changed and linear_increment\.value or nil' -and
   $bindingSource -match 'growth = cost_changed and growth\.value or nil'
-if (-not $costPairIsAtomic) {
-  throw "Native-owner cost settings must activate the complete visible base/growth pair."
+if (-not $costTrioIsAtomic) {
+  throw "Native-owner cost settings must activate the complete visible base/increment/growth trio."
 }
 
-Write-Host "[ok] five Factorio 2.1 native-owner balance contracts and safe formula adapters passed."
+Write-Host "[ok] five Factorio 2.1 native-owner balance contracts and unified safe formula adapters passed."

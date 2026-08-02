@@ -276,6 +276,19 @@
     },
     {
       "assertion_ids": [
+        "assertion/2.1/space-age-native-owner-settings-fixed-override/native-owner-fixed-count-canonical-override"
+      ],
+      "environment_signature": "24B2972448A9C72E428EB0D339C46FE482372EB60C4DB59E932BB158F91A088F",
+      "id": "environment/2.1/24b2972448a9c72e428eb0d339c46fe482372eb60c4db59e932bb158f91a088f",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/space-age-native-owner-settings-fixed-override"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
         "assertion/2.1/base-cargo-space-age-gate/factorio-load-and-assertion-fixtures-pass"
       ],
       "environment_signature": "2B4EB5A0F9914E389A8A61F597B59F0273124CA7FBACC436F4B26FC2C8E57C4E",
@@ -467,6 +480,19 @@
       "resource_class": "factorio-exclusive",
       "scenario_ids": [
         "scenario/2.1/atan-ash-separation"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
+        "assertion/2.1/space-age-native-owner-settings-linear-default/native-owner-linear-formula-default-preserved"
+      ],
+      "environment_signature": "481AFAE50D682E38B21F0DA6B531AF051DB124E948A9EBD270E26013C85576F5",
+      "id": "environment/2.1/481afae50d682e38b21f0da6b531af051db124e948a9ebd270e26013c85576f5",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/space-age-native-owner-settings-linear-default"
       ],
       "schema": 1
     },
@@ -680,6 +706,19 @@
     },
     {
       "assertion_ids": [
+        "assertion/2.1/base-stream-research-cost-hybrid/stream-research-cost-hybrid"
+      ],
+      "environment_signature": "6EDD70419943CE974676480B60653FDDA4630E0EDEF0F456833F5969C789FB8C",
+      "id": "environment/2.1/6edd70419943ce974676480b60653fdda4630e0edef0f456833f5969c789fb8c",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/base-stream-research-cost-hybrid"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
         "assertion/2.1/settings-profile-roundtrip/factorio-load-and-assertion-fixtures-pass"
       ],
       "environment_signature": "73855B1A1267A46280BB36143FF2379845BAF3DF751E79022DCB452B43D78BF4",
@@ -818,6 +857,19 @@
       "resource_class": "factorio-exclusive",
       "scenario_ids": [
         "scenario/2.1/compiler-contracts"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
+        "assertion/2.1/base-research-cost-linear/base-research-cost-linear"
+      ],
+      "environment_signature": "8B094C0418977FC778142BEA4C92580C099A5C9BFFCA5E24BE67BE277B75C090",
+      "id": "environment/2.1/8b094c0418977fc778142bea4c92580c099a5c9bffca5e24be67be277b75c090",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/base-research-cost-linear"
       ],
       "schema": 1
     },
@@ -1031,6 +1083,19 @@
     },
     {
       "assertion_ids": [
+        "assertion/2.1/space-age-native-owner-settings-fixed-default/native-owner-fixed-count-default-preserved"
+      ],
+      "environment_signature": "9E7288FF6173F0D00E067E66ED9BE1F9A22E86639981447D549E6E502026BCF6",
+      "id": "environment/2.1/9e7288ff6173f0d00e067e66ed9be1f9a22e86639981447d549e6e502026bcf6",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/space-age-native-owner-settings-fixed-default"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
         "assertion/2.1/technology-prerequisite-rewire/factorio-load-and-assertion-fixtures-pass"
       ],
       "environment_signature": "A0D0E7754C5DA5BAE7D790F35F5B498A2CE9C01CD6DC8B25AA8AC77AE80479F4",
@@ -1078,6 +1143,19 @@
       "resource_class": "factorio-exclusive",
       "scenario_ids": [
         "scenario/2.1/weapon-overlap-conditional-coverage-absent"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
+        "assertion/2.1/space-age-native-owner-settings-cost-linear/native-owner-cost-linear-override"
+      ],
+      "environment_signature": "A2C5864BD3B9AFF15633DC1D6FBE5AE797648BE0CB6606089810ADA50858C77E",
+      "id": "environment/2.1/a2c5864bd3b9aff15633dc1d6fbe5ae797648be0cb6606089810ada50858c77e",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/space-age-native-owner-settings-cost-linear"
       ],
       "schema": 1
     },
@@ -1143,6 +1221,19 @@
       "resource_class": "factorio-exclusive",
       "scenario_ids": [
         "scenario/2.1/checkbox-disabled-default-on-features"
+      ],
+      "schema": 1
+    },
+    {
+      "assertion_ids": [
+        "assertion/2.1/space-age-native-owner-settings-linear-override/native-owner-linear-formula-canonical-override"
+      ],
+      "environment_signature": "B39B19336704685B45263077D987E90101EFAF37278FF7834922701057497931",
+      "id": "environment/2.1/b39b19336704685b45263077d987e90101efaf37278ff7834922701057497931",
+      "process_required": true,
+      "resource_class": "factorio-exclusive",
+      "scenario_ids": [
+        "scenario/2.1/space-age-native-owner-settings-linear-override"
       ],
       "schema": 1
     },
@@ -1512,16 +1603,16 @@
     }
   ],
   "metrics": {
-    "assertions": 117,
+    "assertions": 124,
     "avoided_factorio_launches": 1,
-    "batches": 116,
-    "declarations": 116,
-    "environment_templates": 116,
-    "factorio_assertions": 114,
-    "factorio_scenarios": 113,
-    "isolated_fallbacks": 29,
-    "literal_runner_authorities": 87,
-    "projected_factorio_processes": 113
+    "batches": 123,
+    "declarations": 123,
+    "environment_templates": 123,
+    "factorio_assertions": 121,
+    "factorio_scenarios": 120,
+    "isolated_fallbacks": 34,
+    "literal_runner_authorities": 89,
+    "projected_factorio_processes": 120
   },
   "observation_abi": 1,
   "scenarios": [
@@ -1543,7 +1634,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "CAB0D32F032E96E4E5D04812DC6D5EA5C2A82086814380037AC42BF42F35A916",
         "environment_parameters": [],
-        "line": 3913,
+        "line": 3920,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1599,7 +1690,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "11DD6453D767DA8475FD9CBE4D82C4CC2AB525DB5491F7A6D63CB2FD521C468E",
         "environment_parameters": [],
-        "line": 4034,
+        "line": 4041,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1666,7 +1757,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4559,
+        "line": 4571,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1737,7 +1828,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4571,
+        "line": 4583,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1798,7 +1889,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6E7902ABE579AEE213004FF27E4E4FD9E2A691F165EF495501C1979E7BAC24B6",
         "environment_parameters": [],
-        "line": 3830,
+        "line": 3837,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1855,7 +1946,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "4D571115BC29D630DDE012C8F044998814D672B52A5A3082FC1BC27B52973D6A",
         "environment_parameters": [],
-        "line": 3835,
+        "line": 3842,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1919,7 +2010,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3839,
+        "line": 3846,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1981,7 +2072,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "C981D2C04079D6261C866AAE9A206DCEA8805A24F174477677E00E1426FA5B80",
         "environment_parameters": [],
-        "line": 3850,
+        "line": 3857,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2046,7 +2137,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3845,
+        "line": 3852,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2122,7 +2213,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3855,
+        "line": 3862,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2197,7 +2288,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3860,
+        "line": 3867,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2261,7 +2352,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "C27BBC36DF194E0C1231FC63B1DE3B5082819390AA76D973B15F2DDBEA6B1FC3",
         "environment_parameters": [],
-        "line": 3989,
+        "line": 3996,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2318,7 +2409,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "34F538734FDCB25FDA41B5C11FEA88C838E987CF10FBCD222C92EC6492DF5A96",
         "environment_parameters": [],
-        "line": 3979,
+        "line": 3986,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2375,7 +2466,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "E72E064603ED1B19019A8954080EFBEEDBB449D879658FADA631DC5B0FD6F35D",
         "environment_parameters": [],
-        "line": 4632,
+        "line": 4660,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2442,7 +2533,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4611,
+        "line": 4639,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2517,7 +2608,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4590,
+        "line": 4602,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2589,7 +2680,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4581,
+        "line": 4593,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2654,7 +2745,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "136316808DEFB0B398235D40A4B71BA14C91402F934F24330EB673345113CE36",
         "environment_parameters": [],
-        "line": 3898,
+        "line": 3905,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2707,7 +2798,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6348AF517964D6A0CD26B1EAEA732398D8904EB897F5758CC47EA61FE642E4E0",
         "environment_parameters": [],
-        "line": 3864,
+        "line": 3871,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2774,7 +2865,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4143,
+        "line": 4150,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2843,7 +2934,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4151,
+        "line": 4158,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2888,6 +2979,101 @@
       "assertions": [
         {
           "expected": "passed",
+          "id": "assertion/2.1/base-research-cost-linear/base-research-cost-linear",
+          "proposition": "Scenario 'base-research-cost-linear' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.base-research-cost-linear.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "command": "Invoke-RuntimeScenario",
+        "command_sha256": "5DAA8B8969C01D1C7FDE597EBC7F7A7ADF5CD98AFEBBABC3FA117BD3A9468076",
+        "environment_parameters": [
+          {
+            "literal_strings": [
+              "worker-robots-storage"
+            ],
+            "name": "enabledbaseextensionkeys",
+            "static": true,
+            "value": "@(\"worker-robots-storage\")",
+            "value_kind": "static-ast"
+          },
+          {
+            "literal_strings": [
+              "mir-cost-base-worker-robots-storage",
+              "mir-cost-linear-increment-worker-robots-storage",
+              "mir-cost-growth-worker-robots-storage"
+            ],
+            "name": "startupsettingoverrides",
+            "static": true,
+            "value": "@{ \"mir-cost-base-worker-robots-storage\" = 1000 \"mir-cost-linear-increment-worker-robots-storage\" = 250 \"mir-cost-growth-worker-robots-storage\" = 1 }",
+            "value_kind": "static-ast"
+          }
+        ],
+        "line": 4609,
+        "type": "runner-literal-ast"
+      },
+      "batchable": true,
+      "environment": {
+        "signature_sha256": "8B094C0418977FC778142BEA4C92580C099A5C9BFFCA5E24BE67BE277B75C090",
+        "template": {
+          "fixture_bundle": "mir-fixture-assert-base-research-cost",
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": null,
+          "observation_abi": 1,
+          "official_modules": "base",
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": [
+            {
+              "literal_strings": [
+                "worker-robots-storage"
+              ],
+              "name": "enabledbaseextensionkeys",
+              "static": true,
+              "value": "@(\"worker-robots-storage\")",
+              "value_kind": "static-ast"
+            },
+            {
+              "literal_strings": [
+                "mir-cost-base-worker-robots-storage",
+                "mir-cost-linear-increment-worker-robots-storage",
+                "mir-cost-growth-worker-robots-storage"
+              ],
+              "name": "startupsettingoverrides",
+              "static": true,
+              "value": "@{ \"mir-cost-base-worker-robots-storage\" = 1000 \"mir-cost-linear-increment-worker-robots-storage\" = 250 \"mir-cost-growth-worker-robots-storage\" = 1 }",
+              "value_kind": "static-ast"
+            }
+          ],
+          "source_mode": "exact-package",
+          "surface": "base",
+          "target": "2.1",
+          "timeout_seconds": 120
+        }
+      },
+      "group": "base",
+      "id": "scenario/2.1/base-research-cost-linear",
+      "kind": "runtime",
+      "name": "base-research-cost-linear",
+      "schema": 1,
+      "tags": [
+        "base",
+        "full",
+        "research-cost",
+        "runtime"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
           "id": "assertion/2.1/base-scripted-candidates-enabled/factorio-load-and-assertion-fixtures-pass",
           "proposition": "Scenario 'base-scripted-candidates-enabled' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
           "reads": [
@@ -2913,7 +3099,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4235,
+        "line": 4242,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2985,7 +3171,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4186,
+        "line": 4193,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3036,6 +3222,101 @@
       "assertions": [
         {
           "expected": "passed",
+          "id": "assertion/2.1/base-stream-research-cost-hybrid/stream-research-cost-hybrid",
+          "proposition": "Scenario 'base-stream-research-cost-hybrid' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.stream-research-cost-hybrid.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "command": "Invoke-RuntimeScenario",
+        "command_sha256": "631ED5F1571DAE9FB97CABE7714452BC6F0B709D3DAC48E1EB42742A49E2E7DD",
+        "environment_parameters": [
+          {
+            "literal_strings": [
+              "research_gears"
+            ],
+            "name": "enabledstreamkeys",
+            "static": true,
+            "value": "@(\"research_gears\")",
+            "value_kind": "static-ast"
+          },
+          {
+            "literal_strings": [
+              "ips-cost-base-research_gears",
+              "ips-cost-linear-increment-research_gears",
+              "ips-cost-growth-research_gears"
+            ],
+            "name": "startupsettingoverrides",
+            "static": true,
+            "value": "@{ \"ips-cost-base-research_gears\" = 1000 \"ips-cost-linear-increment-research_gears\" = 250 \"ips-cost-growth-research_gears\" = 1.5 }",
+            "value_kind": "static-ast"
+          }
+        ],
+        "line": 4617,
+        "type": "runner-literal-ast"
+      },
+      "batchable": true,
+      "environment": {
+        "signature_sha256": "6EDD70419943CE974676480B60653FDDA4630E0EDEF0F456833F5969C789FB8C",
+        "template": {
+          "fixture_bundle": "mir-fixture-assert-stream-research-cost",
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": null,
+          "observation_abi": 1,
+          "official_modules": "base",
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": [
+            {
+              "literal_strings": [
+                "research_gears"
+              ],
+              "name": "enabledstreamkeys",
+              "static": true,
+              "value": "@(\"research_gears\")",
+              "value_kind": "static-ast"
+            },
+            {
+              "literal_strings": [
+                "ips-cost-base-research_gears",
+                "ips-cost-linear-increment-research_gears",
+                "ips-cost-growth-research_gears"
+              ],
+              "name": "startupsettingoverrides",
+              "static": true,
+              "value": "@{ \"ips-cost-base-research_gears\" = 1000 \"ips-cost-linear-increment-research_gears\" = 250 \"ips-cost-growth-research_gears\" = 1.5 }",
+              "value_kind": "static-ast"
+            }
+          ],
+          "source_mode": "exact-package",
+          "surface": "base",
+          "target": "2.1",
+          "timeout_seconds": 120
+        }
+      },
+      "group": "base",
+      "id": "scenario/2.1/base-stream-research-cost-hybrid",
+      "kind": "runtime",
+      "name": "base-stream-research-cost-hybrid",
+      "schema": 1,
+      "tags": [
+        "base",
+        "full",
+        "research-cost",
+        "runtime"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
           "id": "assertion/2.1/better-bot-battery-owner-skip/factorio-load-and-assertion-fixtures-pass",
           "proposition": "Scenario 'better-bot-battery-owner-skip' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
           "reads": [
@@ -3048,8 +3329,8 @@
       ],
       "authority": {
         "lines": [
-          3581,
-          3782
+          3588,
+          3789
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3105,7 +3386,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "57677CDD0290D2D4F6F9AA88CE2E78BE69A5F3A2E7FBC8695326D720243C29BF",
         "environment_parameters": [],
-        "line": 3924,
+        "line": 3931,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3161,7 +3442,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "F22A3B0AC349B16E12810E923662B6C90845D32C8EA976426759A707333C04E7",
         "environment_parameters": [],
-        "line": 3687,
+        "line": 3694,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3215,8 +3496,8 @@
       ],
       "authority": {
         "lines": [
-          3590,
-          3824
+          3597,
+          3831
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3270,8 +3551,8 @@
       ],
       "authority": {
         "lines": [
-          3605,
-          4170
+          3612,
+          4177
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3325,8 +3606,8 @@
       ],
       "authority": {
         "lines": [
-          3600,
-          4165
+          3607,
+          4172
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3382,7 +3663,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "97581A0CBF422ECB399F5D834CE1C66FBD215156EC7E6044132861EEF7F331E9",
         "environment_parameters": [],
-        "line": 4011,
+        "line": 4018,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3451,7 +3732,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4023,
+        "line": 4030,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3520,7 +3801,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "F19BB562E32FA9C74CBC30094C90FE61EB5DBEF552E4FC34727E9FD532B571F7",
         "environment_parameters": [],
-        "line": 3936,
+        "line": 3943,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3584,7 +3865,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4132,
+        "line": 4139,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3653,7 +3934,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4623,
+        "line": 4651,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3712,7 +3993,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "4858C13694E48094F1BEB9B29BAD667EFCC3CF4CE9FD2FF3E1D479B053FFDBC1",
         "environment_parameters": [],
-        "line": 3880,
+        "line": 3887,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3776,7 +4057,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3876,
+        "line": 3883,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3845,7 +4126,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3803,
+        "line": 3810,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3906,8 +4187,8 @@
       ],
       "authority": {
         "lines": [
-          3572,
-          3773
+          3579,
+          3780
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3973,7 +4254,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4224,
+        "line": 4231,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4051,7 +4332,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4216,
+        "line": 4223,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4125,7 +4406,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "1DED71D9FF763C3CB6B4EDC512D8923BA289C304A290A031113A451D9420E533",
         "environment_parameters": [],
-        "line": 4599,
+        "line": 4627,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4233,7 +4514,7 @@
         "command": "Invoke-PackageZipSmokeScenario",
         "command_sha256": "8FB26AFAC243B303A9539F32B383B430313425C57351FF818F9DD83774496A26",
         "environment_parameters": [],
-        "line": 3538,
+        "line": 3545,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -4295,7 +4576,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3540,
+        "line": 3547,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -4368,7 +4649,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4065,
+        "line": 4072,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4435,7 +4716,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4070,
+        "line": 4077,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4565,7 +4846,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4075,
+        "line": 4082,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4760,7 +5041,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4088,
+        "line": 4095,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4905,7 +5186,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4118,
+        "line": 4125,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5001,7 +5282,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4111,
+        "line": 4118,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5106,7 +5387,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4125,
+        "line": 4132,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5218,7 +5499,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4101,
+        "line": 4108,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5304,7 +5585,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "E919B7F098B876EDD346AC3B03F1B307F96E5BE8ECC979C2CDE37C89AFC2FAA5",
         "environment_parameters": [],
-        "line": 3888,
+        "line": 3895,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5361,7 +5642,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FD83CF3B866631E1F39EA9C86E910BE41F4E306D5DA4B149D681E76859EB365E",
         "environment_parameters": [],
-        "line": 3671,
+        "line": 3678,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5414,7 +5695,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "3CCEBBA3ADCDAF2CAB77EC81B9E643770659D86942F688059D0FBAD803D4A659",
         "environment_parameters": [],
-        "line": 3629,
+        "line": 3636,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5472,7 +5753,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FE2AE0399073A13661E3995707D728C4A41D52EEBFF83EA80F4FBB88A2AE7570",
         "environment_parameters": [],
-        "line": 3884,
+        "line": 3891,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5597,7 +5878,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4376,
+        "line": 4383,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5697,7 +5978,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3317,
+        "line": 3324,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5770,7 +6051,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FD34840B3522ED7CA5C2D395FC50C843DD5458A111FDEB3C07CE1A5DA13C8BD0",
         "environment_parameters": [],
-        "line": 3944,
+        "line": 3951,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5827,7 +6108,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "DB7F6D3BD17BB0E650D6649C7F1FBA90009422B6F5742CBD96572E0AE5BABED7",
         "environment_parameters": [],
-        "line": 3974,
+        "line": 3981,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5884,7 +6165,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "12372C56E871B52C0EE9C94AA54F23A2FBB4591C483028035B1D74BDC9D27728",
         "environment_parameters": [],
-        "line": 3955,
+        "line": 3962,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5941,7 +6222,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "946E1C566E48B72E0CBBB123AFD775C54451344C3562252A1960FA50CD61CC24",
         "environment_parameters": [],
-        "line": 3964,
+        "line": 3971,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5998,7 +6279,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "1FECC5D73BF4D4EE501C0DDEE30490C2CCB587EBE4C5107393897E4256BE3E20",
         "environment_parameters": [],
-        "line": 3969,
+        "line": 3976,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6055,7 +6336,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "610A1E707E3D80EF449177154AE8E6A6579AF925FB1ABAB5E53EB1AD21DBBF2C",
         "environment_parameters": [],
-        "line": 4139,
+        "line": 4146,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6116,7 +6397,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3791,
+        "line": 3798,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6188,7 +6469,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4644,
+        "line": 4672,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6259,7 +6540,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4638,
+        "line": 4666,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6330,7 +6611,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4652,
+        "line": 4680,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6404,7 +6685,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4522,
+        "line": 4534,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6475,7 +6756,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3940,
+        "line": 3947,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6548,7 +6829,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4326,
+        "line": 4333,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6632,7 +6913,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4545,
+        "line": 4557,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6946,6 +7227,68 @@
       "assertions": [
         {
           "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-cost-linear/native-owner-cost-linear-override",
+          "proposition": "Scenario 'space-age-native-owner-settings-cost-linear' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-cost-linear-override.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "lines": [],
+        "matching_literal_calls": 0,
+        "reason": "no unique literal runner call",
+        "type": "declaration-isolated-fallback"
+      },
+      "batchable": false,
+      "environment": {
+        "signature_sha256": "A2C5864BD3B9AFF15633DC1D6FBE5AE797648BE0CB6606089810ADA50858C77E",
+        "template": {
+          "fixture_bundle": [
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-native-owner-settings-source"
+          ],
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": "space-age-native-owner-settings-cost-linear",
+          "observation_abi": 1,
+          "official_modules": [
+            "base",
+            "elevated-rails",
+            "quality",
+            "space-age"
+          ],
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": {
+            "NativeOwnerSettingsProfile": "cost-linear"
+          },
+          "source_mode": "exact-package",
+          "surface": "space-age",
+          "target": "2.1",
+          "timeout_seconds": 180
+        }
+      },
+      "group": "space-age",
+      "id": "scenario/2.1/space-age-native-owner-settings-cost-linear",
+      "kind": "runtime",
+      "name": "space-age-native-owner-settings-cost-linear",
+      "schema": 1,
+      "tags": [
+        "full",
+        "native-owner-settings",
+        "runtime",
+        "space-age"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
           "id": "assertion/2.1/space-age-native-owner-settings-default/native-owner-default-preservation",
           "proposition": "Scenario 'space-age-native-owner-settings-default' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
           "reads": [
@@ -7119,6 +7462,258 @@
       "id": "scenario/2.1/space-age-native-owner-settings-effect",
       "kind": "runtime",
       "name": "space-age-native-owner-settings-effect",
+      "schema": 1,
+      "tags": [
+        "full",
+        "native-owner-settings",
+        "runtime",
+        "space-age"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-fixed-default/native-owner-fixed-count-default-preserved",
+          "proposition": "Scenario 'space-age-native-owner-settings-fixed-default' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-fixed-count-default-preserved.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "lines": [],
+        "matching_literal_calls": 0,
+        "reason": "no unique literal runner call",
+        "type": "declaration-isolated-fallback"
+      },
+      "batchable": false,
+      "environment": {
+        "signature_sha256": "9E7288FF6173F0D00E067E66ED9BE1F9A22E86639981447D549E6E502026BCF6",
+        "template": {
+          "fixture_bundle": [
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-native-owner-fixed-count",
+            "mir-fixture-native-owner-settings-source"
+          ],
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": "space-age-native-owner-settings-fixed-default",
+          "observation_abi": 1,
+          "official_modules": [
+            "base",
+            "elevated-rails",
+            "quality",
+            "space-age"
+          ],
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": {
+            "NativeOwnerSettingsProfile": "default"
+          },
+          "source_mode": "exact-package",
+          "surface": "space-age",
+          "target": "2.1",
+          "timeout_seconds": 180
+        }
+      },
+      "group": "space-age",
+      "id": "scenario/2.1/space-age-native-owner-settings-fixed-default",
+      "kind": "runtime",
+      "name": "space-age-native-owner-settings-fixed-default",
+      "schema": 1,
+      "tags": [
+        "full",
+        "native-owner-settings",
+        "runtime",
+        "space-age"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-fixed-override/native-owner-fixed-count-canonical-override",
+          "proposition": "Scenario 'space-age-native-owner-settings-fixed-override' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-fixed-count-canonical-override.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "lines": [],
+        "matching_literal_calls": 0,
+        "reason": "no unique literal runner call",
+        "type": "declaration-isolated-fallback"
+      },
+      "batchable": false,
+      "environment": {
+        "signature_sha256": "24B2972448A9C72E428EB0D339C46FE482372EB60C4DB59E932BB158F91A088F",
+        "template": {
+          "fixture_bundle": [
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-native-owner-fixed-count",
+            "mir-fixture-native-owner-settings-source"
+          ],
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": "space-age-native-owner-settings-fixed-override",
+          "observation_abi": 1,
+          "official_modules": [
+            "base",
+            "elevated-rails",
+            "quality",
+            "space-age"
+          ],
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": {
+            "NativeOwnerSettingsProfile": "cost-linear"
+          },
+          "source_mode": "exact-package",
+          "surface": "space-age",
+          "target": "2.1",
+          "timeout_seconds": 180
+        }
+      },
+      "group": "space-age",
+      "id": "scenario/2.1/space-age-native-owner-settings-fixed-override",
+      "kind": "runtime",
+      "name": "space-age-native-owner-settings-fixed-override",
+      "schema": 1,
+      "tags": [
+        "full",
+        "native-owner-settings",
+        "runtime",
+        "space-age"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-linear-default/native-owner-linear-formula-default-preserved",
+          "proposition": "Scenario 'space-age-native-owner-settings-linear-default' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-linear-formula-default-preserved.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "lines": [],
+        "matching_literal_calls": 0,
+        "reason": "no unique literal runner call",
+        "type": "declaration-isolated-fallback"
+      },
+      "batchable": false,
+      "environment": {
+        "signature_sha256": "481AFAE50D682E38B21F0DA6B531AF051DB124E948A9EBD270E26013C85576F5",
+        "template": {
+          "fixture_bundle": [
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-native-owner-linear-formula",
+            "mir-fixture-native-owner-settings-source"
+          ],
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": "space-age-native-owner-settings-linear-default",
+          "observation_abi": 1,
+          "official_modules": [
+            "base",
+            "elevated-rails",
+            "quality",
+            "space-age"
+          ],
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": {
+            "NativeOwnerSettingsProfile": "default"
+          },
+          "source_mode": "exact-package",
+          "surface": "space-age",
+          "target": "2.1",
+          "timeout_seconds": 180
+        }
+      },
+      "group": "space-age",
+      "id": "scenario/2.1/space-age-native-owner-settings-linear-default",
+      "kind": "runtime",
+      "name": "space-age-native-owner-settings-linear-default",
+      "schema": 1,
+      "tags": [
+        "full",
+        "native-owner-settings",
+        "runtime",
+        "space-age"
+      ],
+      "target": "2.1"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-linear-override/native-owner-linear-formula-canonical-override",
+          "proposition": "Scenario 'space-age-native-owner-settings-linear-override' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-linear-formula-canonical-override.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        }
+      ],
+      "authority": {
+        "lines": [],
+        "matching_literal_calls": 0,
+        "reason": "no unique literal runner call",
+        "type": "declaration-isolated-fallback"
+      },
+      "batchable": false,
+      "environment": {
+        "signature_sha256": "B39B19336704685B45263077D987E90101EFAF37278FF7834922701057497931",
+        "template": {
+          "fixture_bundle": [
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-native-owner-linear-formula",
+            "mir-fixture-native-owner-settings-source"
+          ],
+          "isolation": "fresh-data-stage",
+          "legacy_scenario": "space-age-native-owner-settings-linear-override",
+          "observation_abi": 1,
+          "official_modules": [
+            "base",
+            "elevated-rails",
+            "quality",
+            "space-age"
+          ],
+          "process_kind": "factorio",
+          "process_model": "one-factorio-process-per-exact-environment",
+          "scenario_kind": "runtime",
+          "settings": {
+            "NativeOwnerSettingsProfile": "cost-linear"
+          },
+          "source_mode": "exact-package",
+          "surface": "space-age",
+          "target": "2.1",
+          "timeout_seconds": 180
+        }
+      },
+      "group": "space-age",
+      "id": "scenario/2.1/space-age-native-owner-settings-linear-override",
+      "kind": "runtime",
+      "name": "space-age-native-owner-settings-linear-override",
       "schema": 1,
       "tags": [
         "full",
@@ -7404,7 +7999,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4412,
+        "line": 4419,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7478,7 +8073,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4405,
+        "line": 4412,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7552,7 +8147,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4371,
+        "line": 4378,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7635,7 +8230,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4394,
+        "line": 4401,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7726,7 +8321,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4206,
+        "line": 4213,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7824,7 +8419,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4274,
+        "line": 4281,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7940,7 +8535,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4246,
+        "line": 4253,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8217,7 +8812,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4192,
+        "line": 4199,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8308,7 +8903,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4553,
+        "line": 4565,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8390,7 +8985,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4419,
+        "line": 4426,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8520,7 +9115,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4454,
+        "line": 4461,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8594,7 +9189,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4514,
+        "line": 4526,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8668,7 +9263,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4446,
+        "line": 4453,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8734,7 +9329,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6E8D78B6CE58F8BF64B6E4083341354DB4CD359D2CC38F097BAA87AB1A00675A",
         "environment_parameters": [],
-        "line": 3893,
+        "line": 3900,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8800,7 +9395,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3813,
+        "line": 3820,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8913,7 +9508,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "59EB8AE75AF73714F339BCD852D0E1521CCE8017C565F207F4BB66BF2902F7CA",
         "environment_parameters": [],
-        "line": 3706,
+        "line": 3713,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8969,7 +9564,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "860C6147918303056D673773A8775367A77C0558A986658621FDFFEBCF2D5F35",
         "environment_parameters": [],
-        "line": 3724,
+        "line": 3731,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9028,7 +9623,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "7206508BF10F8F0E55D31D106565A9001F2318896D83789B7196A1FFC6D5DFDD",
         "environment_parameters": [],
-        "line": 3742,
+        "line": 3749,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9085,7 +9680,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "EA8DFA1BD6D07C67A2A1DB5ED692DD14658210E93E9CB18699CD239AF894329E",
         "environment_parameters": [],
-        "line": 3756,
+        "line": 3763,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9144,7 +9739,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "62B1CD35CE87E02E3428E93A4C8592581D7FB861F34A7E68BFD8CBBE4D767282",
         "environment_parameters": [],
-        "line": 4618,
+        "line": 4646,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9434,7 +10029,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3326,
+        "line": 3333,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9595,11 +10190,11 @@
   ],
   "schema": 1,
   "source": {
-    "ast_command_count": 103,
+    "ast_command_count": 105,
     "catalog": "fixtures/compat-matrix/expected-scenarios.json",
-    "catalog_sha256": "E2B378496FD73A9EBE2D15A816F90387D6818E8FF948170E6B3473E9EBD9F60A",
+    "catalog_sha256": "F4A877BBD29276334A95AC5061F6D963CB73B937A6328B30C0F4F2F4FB5CB09A",
     "runner": "scripts/Invoke-MIRValidation.ps1",
-    "runner_sha256": "7A3A35AC6A62069FA16F43BBAB7069D46F57856805CD6BEBB2DBA8CCF5FC9488",
+    "runner_sha256": "E89D383DBC8D771C2FD21ABBE005EAE8E54F389109D7A45F43241A3A6042351F",
     "unmatched_literal_scenarios": [
       "reduced-settings-surface"
     ]

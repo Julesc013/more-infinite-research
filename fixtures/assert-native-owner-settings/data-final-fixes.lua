@@ -57,6 +57,7 @@ local expected_binding_count = 0
 for _, stream in ipairs(streams) do
   local enabled = setting("ips-enable-" .. stream.key)
   local base = setting("ips-cost-base-" .. stream.key)
+  local linear_increment = setting("ips-cost-linear-increment-" .. stream.key)
   local growth = setting("ips-cost-growth-" .. stream.key)
   local max_level = setting("ips-max-level-" .. stream.key)
   local research_time = setting("ips-research-time-" .. stream.key)
@@ -65,8 +66,12 @@ for _, stream in ipairs(streams) do
   if not owner then fail("missing native owner " .. stream.owner) end
 
   local unrecognized = stream.key == "research_processing_unit"
-    and owner.unit.count_formula == "1000 + 100 * L"
-  local cost_changed = base ~= 8000 or growth ~= 2
+    and owner.unit.count_formula == "1000 + 100 * L^2"
+  local recognized_linear = stream.key == "research_processing_unit"
+    and owner.unit.count_formula == "1000 + 250 * (L - 1)"
+  local recognized_fixed = stream.key == "research_processing_unit"
+    and owner.unit.count == 1000 and owner.unit.count_formula == nil
+  local cost_changed = base ~= 8000 or linear_increment ~= 0 or growth ~= 2
   local time_changed = research_time ~= 60 and research_time > 0
   local max_changed = max_level ~= 0
   local effect_changed = effect_percent ~= 10
@@ -81,7 +86,7 @@ for _, stream in ipairs(streams) do
     if string.find(signature, signature_prefix, 1, true) then
       fail("unsafe cost override unexpectedly bound unrecognized formula for " .. stream.owner)
     end
-    if owner.unit.count_formula ~= "1000 + 100 * L" then
+    if owner.unit.count_formula ~= "1000 + 100 * L^2" then
       fail("unsafe cost override changed unrecognized formula for " .. stream.owner)
     end
   else
@@ -100,16 +105,34 @@ for _, stream in ipairs(streams) do
     end
 
     if unrecognized then
-      if owner.unit.count_formula ~= "1000 + 100 * L" then
+      if owner.unit.count_formula ~= "1000 + 100 * L^2" then
         fail("default settings did not preserve unrecognized formula for " .. stream.owner)
       end
+    elseif recognized_fixed and not cost_changed then
+      if owner.unit.count ~= 1000 or owner.unit.count_formula ~= nil then
+        fail("default settings did not preserve fixed count for " .. stream.owner)
+      end
     else
-      local expected_base = cost_changed and base or 1000
-      local expected_growth = cost_changed and growth or 1.5
-      local expected_formula = number_text(expected_growth) .. "^L*" .. number_text(expected_base)
+      local expected_formula = recognized_linear and "1000 + 250 * (L - 1)" or "1.5^L*1000"
+      if cost_changed then
+        local offset = "(L-1)"
+        if linear_increment == 0 and growth == 1 then
+          expected_formula = number_text(base)
+        elseif linear_increment > 0 and growth == 1 then
+          expected_formula = number_text(base) .. "+" .. number_text(linear_increment) .. "*" .. offset
+        elseif linear_increment == 0 then
+          expected_formula = number_text(base) .. "*" .. number_text(growth) .. "^" .. offset
+        else
+          expected_formula = "(" .. number_text(base) .. "+" .. number_text(linear_increment)
+            .. "*" .. offset .. ")*" .. number_text(growth) .. "^" .. offset
+        end
+      end
       if owner.unit.count_formula ~= expected_formula then
         fail(stream.owner .. " formula differs; expected " .. expected_formula
           .. " got " .. tostring(owner.unit.count_formula))
+      end
+      if cost_changed and owner.unit.count ~= nil then
+        fail(stream.owner .. " retained a fixed count after projection to a configured curve")
       end
     end
 

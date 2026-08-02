@@ -43,6 +43,7 @@ if ([int]$compilerSchemaAuthority.schema -ne 1 -or
 foreach ($entry in @{
   CompilationSnapshot=2; PolicySnapshot=1; CompilerInput=2; CompilerResult=3;
   RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1;
+  ResearchCostModel=1;
   TransformationOperation=2; TransformationPlan=2; MutationJournal=2
 }.GetEnumerator()) {
   if ([int]$compilerSchemaAuthority.records.($entry.Key).current -ne [int]$entry.Value) {
@@ -109,6 +110,7 @@ Assert-MIRText "prototypes\mir\planner\compilation_plan.lua" "schema = 2"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInput schema 2 record is required"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 3 planned or final record is required"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
+Assert-MIRText "prototypes\mir\domain\research_cost\model.lua" 'M.formula_abi = "mir-research-cost-v1"'
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "function M.compatibility_projection"
@@ -124,6 +126,7 @@ foreach ($row in @(
   "| CompilerProvider | 1 |",
   "| CompatibilityPack | 2 |",
   "| TechnologyDesign | 2 |",
+  "| ResearchCostModel | 1 |",
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
   "| CompilationSnapshot | 2 |",
