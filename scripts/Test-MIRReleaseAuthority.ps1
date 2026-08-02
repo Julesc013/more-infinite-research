@@ -39,10 +39,10 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or
       [string]$backport.archive_class -ne "automated-playtest-candidate" -or
       [string]$backport.manual_review -ne ".mir/evidence/2.5.0-manual-review-attestation.json" -or
-      [string]$backport.protected_qualification -notlike "pending*" -or
-      [string]$backport.publication_status -ne "unreleased" -or
-      [string]$backport.status -notmatch '^automated-playtest-candidate-.*manual-passed-') {
-    throw "Factorio 2.0 authority must describe an unreleased automated and manually accepted candidate with protected qualification pending."
+      [string]$backport.protected_qualification -ne "running-post-publication-run-30716314749" -or
+      [string]$backport.publication_status -ne "timeboxed-maintainer-authorized-awaiting-tag" -or
+      [string]$backport.status -notmatch '^exact-p11-local-automated-and-manual-passed-timeboxed-publication-authorized-') {
+    throw "Factorio 2.0 authority must describe exact automated and manual acceptance, the time-boxed publication decision, and unfinished protected qualification."
   }
   if ([string]$backport.portable_source_commit -ne "c1fd8b932c8d916a14925678056e08893b87b2db") {
     throw "The 2.5 portable source must bind the exact tagged C30 package-source commit."
@@ -95,6 +95,7 @@ if ([string]$info.factorio_version -eq "2.0") {
   $performanceRelativePath = ".mir/evidence/2.5.0-performance-regression.json"
   $approvedDeltaRelativePath = "approved-delta/2.4.9-to-2.5.0.json"
   $manualRelativePath = ".mir/evidence/2.5.0-manual-review-attestation.json"
+  $publicationDecisionRelativePath = ".mir/evidence/2.5.0-timeboxed-publication-decision.json"
   if ([string]$backport.automated_qualification -ne $automatedRelativePath -or
       [string]$backport.focused_runtime_evidence -ne $automatedRelativePath -or
       [string]$backport.upgrade_evidence -ne $automatedRelativePath -or
@@ -102,8 +103,23 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$backport.runtime_performance_evidence -ne $performanceRelativePath -or
       [string]$backport.approved_delta_evidence -ne $approvedDeltaRelativePath -or
       [string]$backport.manual_review -ne $manualRelativePath -or
-      [string]$backport.release_gate -ne "protected-seal-and-promotion-pending-exact-p11") {
-    throw "Canonical P11 authority does not describe exact local automated and manual qualification with protected release gates pending."
+      [string]$backport.publication_decision -ne $publicationDecisionRelativePath -or
+      [string]$backport.protected_qualification -ne "running-post-publication-run-30716314749" -or
+      [string]$backport.release_gate -ne "timeboxed-maintainer-publication-authorized-protected-seal-pending-post-publication-exact-p11") {
+    throw "Canonical P11 authority does not describe the exact local qualification, maintainer publication decision, and unfinished protected gate."
+  }
+  $publicationDecision = Read-MIRText $publicationDecisionRelativePath | ConvertFrom-Json
+  if ([int]$publicationDecision.schema -ne 1 -or
+      [string]$publicationDecision.authority -ne "mir-maintainer-timeboxed-publication-decision" -or
+      [string]$publicationDecision.release -ne [string]$backport.mir_version -or
+      [string]$publicationDecision.candidate_id -ne [string]$backport.candidate_id -or
+      [string]$publicationDecision.candidate_sha256 -ne [string]$backport.archive_sha256 -or
+      [string]$publicationDecision.candidate_content_sha256 -ne [string]$backport.package_content_sha256 -or
+      [string]$publicationDecision.source_commit -ne [string]$backport.package_source_commit -or
+      [string]$publicationDecision.decision -ne "publish-at-fixed-cutoff" -or
+      [string]$publicationDecision.statement -notmatch "not a protected qualification or release seal" -or
+      -not [bool]$publicationDecision.follow_up_required) {
+    throw "The exact P11 time-boxed publication decision is invalid."
   }
   $automated = Read-MIRText $automatedRelativePath | ConvertFrom-Json
   if ([int]$automated.schema -ne 1 -or
