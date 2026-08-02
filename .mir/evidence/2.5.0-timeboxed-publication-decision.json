@@ -28,9 +28,20 @@
     "run_id": "30716314749",
     "head_commit": "99b19ab192a01fb9f61a4fef4c371dcefdb47b19",
     "state_at_decision": "running",
+    "final_state": "completed-infrastructure-failure",
+    "failed_job": "F3 / scenario/2.0/approved-delta-automatic-family-controls",
+    "test_process_exit_code": 0,
+    "failure_classification": "artifact-upload-transport",
+    "failure_detail": "The exact scenario passed, but actions/upload-artifact failed with ENOTFOUND during the network outage; F4 was skipped because the F3 job status was failed.",
     "completed_jobs_at_last_observation": 45,
     "failed_jobs_at_last_observation": 0,
     "post_publication_follow_up_required": true
+  },
+  "protected_retry": {
+    "workflow": "assurance-full.yml",
+    "run_id": "30740083663",
+    "head_commit": "815f934af75e38df1b627bc41025f3f7a340b137",
+    "state": "running-post-publication"
   },
   "not_completed_at_tagging": [
     "protected qualification",

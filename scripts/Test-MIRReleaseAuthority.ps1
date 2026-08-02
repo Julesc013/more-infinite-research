@@ -39,7 +39,7 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or
       [string]$backport.archive_class -ne "automated-playtest-candidate" -or
       [string]$backport.manual_review -ne ".mir/evidence/2.5.0-manual-review-attestation.json" -or
-      [string]$backport.protected_qualification -ne "running-post-publication-run-30716314749" -or
+      [string]$backport.protected_qualification -ne "running-post-publication-run-30740083663" -or
       [string]$backport.publication_status -ne "timeboxed-maintainer-authorized-awaiting-tag" -or
       [string]$backport.status -notmatch '^exact-p11-local-automated-and-manual-passed-timeboxed-publication-authorized-') {
     throw "Factorio 2.0 authority must describe exact automated and manual acceptance, the time-boxed publication decision, and unfinished protected qualification."
@@ -104,7 +104,7 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$backport.approved_delta_evidence -ne $approvedDeltaRelativePath -or
       [string]$backport.manual_review -ne $manualRelativePath -or
       [string]$backport.publication_decision -ne $publicationDecisionRelativePath -or
-      [string]$backport.protected_qualification -ne "running-post-publication-run-30716314749" -or
+      [string]$backport.protected_qualification -ne "running-post-publication-run-30740083663" -or
       [string]$backport.release_gate -ne "timeboxed-maintainer-publication-authorized-protected-seal-pending-post-publication-exact-p11") {
     throw "Canonical P11 authority does not describe the exact local qualification, maintainer publication decision, and unfinished protected gate."
   }
@@ -117,6 +117,10 @@ if ([string]$info.factorio_version -eq "2.0") {
       [string]$publicationDecision.candidate_content_sha256 -ne [string]$backport.package_content_sha256 -or
       [string]$publicationDecision.source_commit -ne [string]$backport.package_source_commit -or
       [string]$publicationDecision.decision -ne "publish-at-fixed-cutoff" -or
+      [string]$publicationDecision.protected_campaign.final_state -ne "completed-infrastructure-failure" -or
+      [int]$publicationDecision.protected_campaign.test_process_exit_code -ne 0 -or
+      [string]$publicationDecision.protected_retry.run_id -ne "30740083663" -or
+      [string]$publicationDecision.protected_retry.state -ne "running-post-publication" -or
       [string]$publicationDecision.statement -notmatch "not a protected qualification or release seal" -or
       -not [bool]$publicationDecision.follow_up_required) {
     throw "The exact P11 time-boxed publication decision is invalid."

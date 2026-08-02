@@ -437,7 +437,7 @@ release_artifacts:
       automated_gate: local-automated-passed-exact-p11
       release_gate: timeboxed-maintainer-publication-authorized-protected-seal-pending-post-publication-exact-p11
       manual_review: .mir/evidence/2.5.0-manual-review-attestation.json
-      protected_qualification: running-post-publication-run-30716314749
+      protected_qualification: running-post-publication-run-30740083663
       publication_decision: .mir/evidence/2.5.0-timeboxed-publication-decision.json
       publication_status: timeboxed-maintainer-authorized-awaiting-tag
       status: exact-p11-local-automated-and-manual-passed-timeboxed-publication-authorized-protected-running-post-publication
