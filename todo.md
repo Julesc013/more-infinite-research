@@ -8,7 +8,7 @@ Generated: 2026-08-02
 
 | Release | Candidate | State | Next required state |
 | --- | --- | --- | --- |
-| `3.2.3` | `C30` | `publicly-verified` | `complete` |
+| `3.2.4` | `C31` | `package-built` | `focused-qualified` |
 | `2.5.0` | `2.5-P11` | `publicly-verified` | `complete` |
 
 ## Executable TaskNodes

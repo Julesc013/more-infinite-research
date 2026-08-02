@@ -31,6 +31,20 @@
       "mode": "immutable-public-release"
     },
     {
+      "id": "mir-3.2.4-c31",
+      "target": "2.1",
+      "release": "3.2.4",
+      "candidate_id": "C31",
+      "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+      "package_source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c",
+      "package_source_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+      "archive": "dist/more-infinite-research_3.2.4.zip",
+      "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
+      "archive_bytes": 1048419,
+      "archive_entries": 298,
+      "mode": "frozen-candidate"
+    },
+    {
       "id": "mir-2.5.0-p11",
       "target": "2.0",
       "release": "2.5.0",

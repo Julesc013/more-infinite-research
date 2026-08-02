@@ -2,6 +2,14 @@
   "authority": "mir-generated-branch-status-v1",
   "branches": [
     {
+      "branch": "dev",
+      "candidate_id": "C31",
+      "release": "3.2.4",
+      "source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+      "state": "package-built",
+      "target": "2.1"
+    },
+    {
       "branch": "legacy",
       "candidate_id": "2.4.9-final",
       "release": "2.4.9",

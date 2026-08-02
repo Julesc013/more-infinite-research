@@ -1,7 +1,7 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.3"
+applies_to: "3.2.4"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
@@ -16,24 +16,32 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.3` |
-| Candidate | `C30` |
+| MIR version | `3.2.4` |
+| Candidate | `C31` |
 | Target | `2.1` |
-| Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `c1fd8b932c8d916a14925678056e08893b87b2db` |
-| Package source tree | `222848c6bb3c96fe4641c67cdea12b3581576185` |
-| Package source SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
-| Archive | `dist/more-infinite-research_3.2.3.zip` |
-| Archive bytes | `1034824` |
-| Archive entries | `292` |
-| Archive SHA-256 | `0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2` |
-| Package content SHA-256 | `2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9` |
+| Branch | `dev` |
+| State | `package-built` |
+| Package source commit | `088e8a2758a63873addd22f32b3e83aaf24d03b4` |
+| Package source tree | `c69da6616091f1297e51676983eb5b9ef4847e4c` |
+| Package source SHA-256 | `C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C` |
+| Archive | `dist/more-infinite-research_3.2.4.zip` |
+| Archive bytes | `1048419` |
+| Archive entries | `298` |
+| Archive SHA-256 | `64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1` |
+| Package content SHA-256 | `C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 
-- `C30-TIMEBOXED-PUBLICATION-2026-08-01`:  Disposition: `pending`.
+- `pending`:  Disposition: `pending`.

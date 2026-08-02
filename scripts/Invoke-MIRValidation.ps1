@@ -346,15 +346,8 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   }
 }
 
-Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
-  $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
-  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
-  if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
-    throw "Stream compiler count formulas must use compact multiplication syntax."
-  }
-  if ($baseContinuationsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
-    throw "Base continuation count formulas must use compact multiplication syntax."
-  }
+Invoke-RepoCheck "generated count formulas use the unified canonical research-cost model" {
+  & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {

@@ -173,16 +173,14 @@ $campaignBindsActiveCandidate = $null -ne $activeCandidate -and
   [string]$campaign.candidate.package_source_sha256 -eq [string]$activeCandidate.package_source_sha256 -and
   [string]$campaign.candidate.archive_sha256 -eq [string]$activeCandidate.archive_sha256 -and
   [string]$campaign.candidate.package_content_sha256 -eq [string]$activeCandidate.package_content_sha256
-$campaignBindsTaggedBaseline = $ValidateManifestOnly -and
-  [string]$activeTypedRelease.state -in @("planned", "source-frozen", "package-built") -and
-  $null -eq $activeTypedRelease.proofs.PSObject.Properties["performance_measurement"] -and
-  [string]$taggedTypedRelease.state -eq "tagged" -and
-  [string]$campaign.candidate.candidate_id -eq [string]$taggedTypedRelease.candidate_id -and
-  [string]$campaign.candidate.version -eq [string]$taggedTypedRelease.release -and
-  [string]$campaign.candidate.package_source_commit -eq [string]$taggedTypedRelease.package.source_commit -and
-  [string]$campaign.candidate.package_source_sha256 -eq [string]$taggedTypedRelease.package.source_sha256 -and
-  [string]$campaign.candidate.archive_sha256 -eq [string]$taggedTypedRelease.package.archive_sha256 -and
-  [string]$campaign.candidate.package_content_sha256 -eq [string]$taggedTypedRelease.package.content_sha256
+$campaignBindsC24CalibrationAuthority = $ValidateManifestOnly -and
+  [string]$campaign.release -eq "3.2.2" -and
+  [string]$campaign.candidate.candidate_id -eq "C24" -and
+  [string]$campaign.candidate.version -eq "3.2.2" -and
+  [string]$campaign.candidate.package_source_commit -eq "29f81addc0eec9b571afd6428c9e3529c4497a1b" -and
+  [string]$campaign.candidate.package_source_sha256 -eq "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F" -and
+  [string]$campaign.candidate.archive_sha256 -eq "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8" -and
+  [string]$campaign.candidate.package_content_sha256 -eq "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F"
 $supersededCandidate = $activeCandidate.supersedes_candidate
 $campaignBindsSupersededCandidate = $ValidateManifestOnly -and
   [string]$activeCandidate.runtime_qualification -eq "pending" -and
@@ -202,10 +200,10 @@ $campaignBindsC16HistoricalCheckpoint = $ValidateManifestOnly -and
   [string]$campaign.candidate.archive_sha256 -eq "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D" -and
   [string]$campaign.candidate.package_content_sha256 -eq "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
 if (-not $campaignBindsActiveCandidate -and
-    -not $campaignBindsTaggedBaseline -and
+    -not $campaignBindsC24CalibrationAuthority -and
     -not $campaignBindsSupersededCandidate -and
     -not $campaignBindsC16HistoricalCheckpoint) {
-  throw "Performance campaign candidate authority differs from the active Factorio 2.1 release candidate."
+  throw "Root performance campaign is neither the immutable C24 calibration authority nor an allowed active/historical candidate."
 }
 if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
     [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
@@ -286,8 +284,8 @@ if ($compatAuditSource -notmatch 'process_passed\s*=\s*\[bool\]\$result\.passed'
 if ($ValidateManifestOnly) {
   $binding = if ($campaignBindsActiveCandidate) {
     "the active candidate"
-  } elseif ($campaignBindsTaggedBaseline) {
-    "the immutable tagged baseline while current performance qualification is explicitly pending"
+  } elseif ($campaignBindsC24CalibrationAuthority) {
+    "the immutable C24 calibration authority while the active candidate uses its exact versioned campaign"
   } elseif ($campaignBindsSupersededCandidate) {
     "the exact superseded candidate while current performance qualification is explicitly pending"
   } else {

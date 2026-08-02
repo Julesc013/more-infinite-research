@@ -230,8 +230,12 @@ foreach ($sourceModName in $sourceOnlyModNames) {
 }
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc
 
-$requiresReloadProof = $FixtureName -eq "assert-upgrade-3-2-2-to-3-2-3"
-$governedUpgradedSave = Join-Path $userdata "saves\mir-323-upgraded.zip"
+$requiresReloadProof = $FixtureName -in @(
+  "assert-upgrade-3-2-2-to-3-2-3",
+  "assert-upgrade-3-2-3-to-3-2-4"
+)
+$governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
+$governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
 $governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 $loadArgs = if ($requiresReloadProof) {
   @(

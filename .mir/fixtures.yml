@@ -543,6 +543,24 @@ fixtures:
       - startup-setting-retention
       - upgraded-save-reload
 
+  upgrade-3-2-3-to-3-2-4:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-4
+    harness: scripts/Test-MIRUpgrade.ps1
+    primary_source_version: "3.2.3"
+    target_candidate: C31
+    archetypes:
+      - space-age-native-owner
+    validates:
+      - exact-3-2-3-source-archive-for-3-2-4
+      - existing-base-and-growth-setting-retention
+      - zero-default-linear-increment-settings
+      - default-cost-formula-preservation
+      - technology-level-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-storage-retention
+      - upgraded-save-reload
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

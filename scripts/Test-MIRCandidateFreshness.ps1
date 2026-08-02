@@ -152,8 +152,14 @@ function Assert-MIRCandidateBoundEvidence {
 $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
 if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
   & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
-  Write-Host "[ok] MIR target-line freshness is governed by the validated backport source lock."
-  exit 0
+  $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
+  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  if ([string]$currentInfo.version -eq [string]$sourceLock.mir_version -and
+      [string]$currentInfo.factorio_version -eq [string]$sourceLock.target) {
+    Write-Host "[ok] MIR target-line freshness is governed by the validated backport source lock."
+    exit 0
+  }
+  Write-Host "[check] historical backport source lock is valid; continuing with the current-line candidate freshness gate."
 }
 
 $manifestPath = Join-Path $repo ".mir\convergence.yml"

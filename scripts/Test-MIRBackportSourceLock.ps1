@@ -28,6 +28,134 @@ function Get-MIRSourceLockMapNames {
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
+if ([int]$lock.schema -eq 4 -and [int]$lock.projection_schema -eq 3) {
+  foreach ($field in @("candidate_id", "mir_version", "target", "target_profile_sha256", "release_notes", "candidate_document", "playtest_guide")) {
+    if ([string]::IsNullOrWhiteSpace([string]$lock.$field)) { throw "Published backport source lock is missing $field." }
+  }
+  if ([string]$lock.candidate_id -ne "2.5-P11" -or [string]$lock.mir_version -ne "2.5.0" -or
+      [string]$lock.target -ne "2.0" -or [string]$lock.candidate.class -ne "immutable-published-release" -or
+      [int]$lock.candidate.forbidden_entries -ne 0) {
+    throw "Published backport source lock does not describe the immutable MIR 2.5.0/P11 release."
+  }
+
+  foreach ($commitField in @(
+    [pscustomobject]@{name="baseline.commit"; value=[string]$lock.baseline.commit},
+    [pscustomobject]@{name="portable_source.commit"; value=[string]$lock.portable_source.commit},
+    [pscustomobject]@{name="projection.package_source_commit"; value=[string]$lock.projection.package_source_commit}
+  )) {
+    Assert-MIRSourceLockCommit -Name $commitField.name -Commit $commitField.value
+  }
+
+  $baselineTagCommit = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.baseline.reference)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $baselineTagCommit -ne [string]$lock.baseline.commit) {
+    throw "Published backport baseline tag does not resolve to its locked commit."
+  }
+  $portableTagCommit = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.portable_source.tag)).Trim()
+  if ($LASTEXITCODE -ne 0) { throw "Published backport portable-source tag is unavailable." }
+  & git -C $RepoRoot merge-base --is-ancestor ([string]$lock.portable_source.commit) $portableTagCommit
+  if ($LASTEXITCODE -ne 0) { throw "Portable package source is not an ancestor of its immutable release tag." }
+
+  $publishedTagCommit = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.mir_version)).Trim()
+  if ($LASTEXITCODE -ne 0) { throw "Published target tag $($lock.mir_version) is unavailable." }
+  foreach ($ancestor in @([string]$lock.baseline.commit, $portableTagCommit, [string]$lock.projection.package_source_commit)) {
+    & git -C $RepoRoot merge-base --is-ancestor $ancestor $publishedTagCommit
+    if ($LASTEXITCODE -ne 0) { throw "Published target tag omits required dual-parent/projection ancestor $ancestor." }
+  }
+
+  $projectionTree = (& git -C $RepoRoot show -s --format=%T ([string]$lock.projection.package_source_commit)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $projectionTree -ne [string]$lock.projection.package_source_tree) {
+    throw "Published projection source tree differs from the lock."
+  }
+  $script:repo = $RepoRoot
+  . (Join-Path $RepoRoot "scripts/MIRAssurance/Hashing.ps1")
+  $projectionHash = Get-MIRAssuranceCommitPackageSourceHash -Commit ([string]$lock.projection.package_source_commit)
+  if ($projectionHash -ne [string]$lock.projection.package_source_sha256 -or
+      $projectionHash -ne [string]$lock.candidate.content_sha256) {
+    throw "Published projection package-source/content identity differs from the lock."
+  }
+
+  . (Join-Path $RepoRoot "scripts/validation/PackageIdentity.ps1")
+  $targetManifestText = @(
+    & git -C $RepoRoot show "$([string]$lock.projection.package_source_commit):.mir/targets.json"
+  ) -join "`n"
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($targetManifestText)) {
+    throw "Published projection target-profile manifest is unavailable at its package-source commit."
+  }
+  $targetManifest = $targetManifestText | ConvertFrom-Json
+  $targetProfile = $targetManifest.profiles.PSObject.Properties[[string]$lock.target].Value
+  if ($null -eq $targetProfile) { throw "Published projection target profile is absent from its commit-bound manifest." }
+  $targetProfileHash = Get-MIRTargetProfileFingerprint -Profile $targetProfile
+  if ($targetProfileHash -ne [string]$lock.target_profile_sha256) {
+    throw "Published projection target profile differs from the lock."
+  }
+
+  $adapted = @($lock.projection.adapted_package_paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  $actualAdapted = @(
+    & git -C $RepoRoot diff --name-only ([string]$lock.portable_source.commit) ([string]$lock.projection.package_source_commit) -- @(Get-MIRPackageSourceRoots) |
+      ForEach-Object { ([string]$_).Replace("\", "/") } |
+      Sort-Object -Unique
+  )
+  if ($LASTEXITCODE -ne 0 -or @(Compare-Object -ReferenceObject $adapted -DifferenceObject $actualAdapted).Count -ne 0) {
+    throw "Published projection adapted paths do not cover the exact portable-source delta."
+  }
+
+  $deltaPath = Join-Path $RepoRoot ([string]$lock.projection.portable_delta_ledger)
+  if (-not (Test-Path -LiteralPath $deltaPath -PathType Leaf)) { throw "Published projection portable-delta ledger is missing." }
+  $delta = Get-Content -Raw -LiteralPath $deltaPath | ConvertFrom-Json
+  if ([int]$delta.schema -ne 1 -or [string]$delta.kind -ne "mir-portable-delta-ledger" -or
+      [string]$delta.source.version -ne [string]$lock.portable_source.release -or
+      [string]$delta.source.candidate_id -ne [string]$lock.portable_source.candidate_id -or
+      [string]$delta.source.package_source_commit -ne [string]$lock.portable_source.commit -or
+      [string]$delta.source.archive_sha256 -ne [string]$lock.portable_source.archive_sha256 -or
+      [string]$delta.target.version -ne [string]$lock.mir_version -or
+      [string]$delta.target.candidate_id -ne [string]$lock.candidate_id -or
+      [string]$delta.target.package_source_commit -ne [string]$lock.projection.package_source_commit -or
+      [string]$delta.target.archive_sha256 -ne [string]$lock.candidate.archive_sha256 -or
+      -not [bool]$delta.rules.wholesale_merge_forbidden -or
+      -not [bool]$delta.rules.target_specific_evidence_required -or
+      [bool]$delta.rules.factorio_2_1_evidence_reusable) {
+    throw "Published projection portable-delta ledger disagrees with the source lock."
+  }
+  foreach ($path in @(
+    [string]$lock.qualification.target_static,
+    [string]$lock.qualification.runtime,
+    [string]$lock.qualification.manual_review,
+    [string]$lock.release_notes,
+    [string]$lock.candidate_document,
+    [string]$lock.playtest_guide
+  )) {
+    $publishedObject = "{0}:{1}" -f $publishedTagCommit, $path
+    & git -C $RepoRoot cat-file -e $publishedObject 2>$null
+    if ($LASTEXITCODE -ne 0) {
+      throw "Published projection authority is missing: $path"
+    }
+  }
+  $typedReleasePath = Join-Path $RepoRoot ".mir/releases/$($lock.mir_version).json"
+  $typedRelease = Get-Content -Raw -LiteralPath $typedReleasePath | ConvertFrom-Json
+  $publicationProof = @($typedRelease.proofs.public_byte_verification)
+  if ([string]$typedRelease.candidate_id -ne [string]$lock.candidate_id -or
+      [string]$typedRelease.package.source_commit -ne [string]$lock.projection.package_source_commit -or
+      [string]$typedRelease.package.archive_sha256 -ne [string]$lock.candidate.archive_sha256 -or
+      [string]$typedRelease.package.content_sha256 -ne [string]$lock.candidate.content_sha256 -or
+      $publicationProof.Count -ne 1 -or
+      [string]$publicationProof[0].path -ne [string]$lock.qualification.publication_receipt -or
+      [string]$publicationProof[0].digest_policy -ne "utf8-lf") {
+    throw "Published projection typed release/public-byte proof disagrees with the source lock."
+  }
+  $publicationPath = Join-Path $RepoRoot ([string]$publicationProof[0].path)
+  if (-not (Test-Path -LiteralPath $publicationPath -PathType Leaf)) {
+    throw "Published projection public-byte receipt is missing."
+  }
+  $publicationText = (Get-Content -Raw -LiteralPath $publicationPath).Replace("`r`n", "`n").Replace("`r", "`n")
+  $publicationHash = [Convert]::ToHexString(
+    [Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($publicationText))
+  )
+  if ($publicationHash -ne [string]$publicationProof[0].sha256) {
+    throw "Published projection public-byte receipt differs from its typed immutable digest."
+  }
+  Write-Host "[ok] MIR 2.5.0/P11 schema-4 source lock binds exact 2.4.9 + 3.2.3 ancestry, package projection, target profile, portable delta, and published evidence."
+  return
+}
 if ([int]$lock.schema -ne 1 -or [int]$lock.projection_schema -ne 1) {
   throw "Unsupported MIR backport source-lock schema."
 }

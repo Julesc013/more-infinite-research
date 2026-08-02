@@ -33,4 +33,10 @@ if ([string]$c30Profile.upgrade.from_version -ne "3.2.2" -or [string]$c30Profile
     [string]$c30Profile.upgrade.fixture -ne "assert-upgrade-3-2-2-to-3-2-3") {
   throw "C30 target-profile projection does not bind the exact governed save transition."
 }
-Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, and release-specific upgrade projection."
+$c31Release = Get-MIRCPReleaseByVersion -Release "3.2.4" -RepoRoot $repo
+$c31Profile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $c31Release -RepoRoot $repo
+if ([string]$c31Profile.upgrade.from_version -ne "3.2.3" -or [string]$c31Profile.upgrade.to_version -ne "3.2.4" -or
+    [string]$c31Profile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-4") {
+  throw "C31 target-profile projection does not bind the exact governed save transition."
+}
+Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, and C30/C31 release-specific upgrade projections."
