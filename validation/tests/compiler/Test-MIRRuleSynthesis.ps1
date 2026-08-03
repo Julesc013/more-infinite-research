@@ -11,7 +11,7 @@ try {
   $outputs = @()
   foreach ($family in @("mining-drill-manufacturing", "assembling-machine-manufacturing", "logistics-manufacturing")) {
     $output = Join-Path $tempRoot ($family + ".json")
-    & (Join-Path $RepoRoot "scripts\Invoke-MIRRuleSynthesis.ps1") -Family $family -OutputPath $output
+    & (Join-Path $RepoRoot "tools\commands\technology\Invoke-MIRRuleSynthesis.ps1") -Family $family -OutputPath $output
     $proposal = Get-Content -Raw -LiteralPath $output | ConvertFrom-Json
     if ($proposal.schema -ne 1 -or $proposal.kind -ne "mir-family-rule-proposal" -or $proposal.status -ne "REVIEW_REQUIRED") {
       throw "Rule synthesis did not produce a review-required proposal for $family."
@@ -26,7 +26,7 @@ try {
     $outputs += $output
   }
   $repeat = Join-Path $tempRoot "repeat.json"
-  & (Join-Path $RepoRoot "scripts\Invoke-MIRRuleSynthesis.ps1") -Family "mining-drill-manufacturing" -OutputPath $repeat
+  & (Join-Path $RepoRoot "tools\commands\technology\Invoke-MIRRuleSynthesis.ps1") -Family "mining-drill-manufacturing" -OutputPath $repeat
   if ((Get-FileHash -Algorithm SHA256 -LiteralPath $outputs[0]).Hash -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $repeat).Hash) {
     throw "Rule synthesis output is not byte deterministic."
   }

@@ -68,7 +68,7 @@ offline_rule_synthesis:
   authority: .mir/rule-synthesis.json
   corpus: .mir/technology-review-corpus.json
   snapshots: .mir/technology-review-snapshots.json
-  synthesizer: scripts/Invoke-MIRRuleSynthesis.ps1
+  synthesizer: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
   validator: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
   validates:
     - all-positive-coverage

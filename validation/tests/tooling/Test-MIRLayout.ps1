@@ -70,7 +70,8 @@ foreach ($technologyAlias in @(
   @{from=("scripts/" + "New-MIRTechnologyLifecycleRecord.ps1");to="tools.commands.technology.lifecycle-record"},
   @{from=("scripts/" + "New-MIRTechnologyQualityAssessment.ps1");to="tools.commands.technology.quality-assessment"},
   @{from=("scripts/" + "New-MIRTechnologyReviewDossier.ps1");to="tools.commands.technology.review-dossier"},
-  @{from=("scripts/" + "Update-MIRTechnologyGovernance.ps1");to="tools.commands.technology.governance"}
+  @{from=("scripts/" + "Update-MIRTechnologyGovernance.ps1");to="tools.commands.technology.governance"},
+  @{from=("scripts/" + "Invoke-MIRRuleSynthesis.ps1");to="tools.commands.technology.rule-synthesis"}
 )) {
   if (@($aliases.aliases | Where-Object {
     $_.from -eq $technologyAlias.from -and $_.to -eq $technologyAlias.to -and $_.mode -eq "read-only"
@@ -204,7 +205,7 @@ if ($plannerCommandMigrationPreview.mode -ne "preview" -or $plannerCommandMigrat
 }
 $technologyCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRTechnologyCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($technologyCommandMigrationPreview.mode -ne "preview" -or $technologyCommandMigrationPreview.changed -ne 0 -or
-    $technologyCommandMigrationPreview.commands -ne 7) {
+    $technologyCommandMigrationPreview.commands -ne 8) {
   throw "Technology-command migration is incomplete or not idempotent: $($technologyCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
 $controlCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRControlCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
@@ -279,7 +280,8 @@ $legacyTechnologyCommands = @(
   (Join-Path $repo "scripts/New-MIRTechnologyLifecycleRecord.ps1"),
   (Join-Path $repo "scripts/New-MIRTechnologyQualityAssessment.ps1"),
   (Join-Path $repo "scripts/New-MIRTechnologyReviewDossier.ps1"),
-  (Join-Path $repo "scripts/Update-MIRTechnologyGovernance.ps1")
+  (Join-Path $repo "scripts/Update-MIRTechnologyGovernance.ps1"),
+  (Join-Path $repo "scripts/Invoke-MIRRuleSynthesis.ps1")
 )
 foreach ($wrapperPath in $legacyTechnologyCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath

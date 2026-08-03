@@ -14,6 +14,7 @@ $commands = [ordered]@{
   "scripts/New-MIRTechnologyQualityAssessment.ps1" = "tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1"
   "scripts/New-MIRTechnologyReviewDossier.ps1" = "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1"
   "scripts/Update-MIRTechnologyGovernance.ps1" = "tools/commands/technology/Update-MIRTechnologyGovernance.ps1"
+  "scripts/Invoke-MIRRuleSynthesis.ps1" = "tools/commands/technology/Invoke-MIRRuleSynthesis.ps1"
 }
 
 $moveCount = 0
@@ -48,6 +49,15 @@ foreach ($legacyRelative in $commands.Keys) {
         )
         if ($canonicalText -ceq $legacyText) {
           throw "Technology governance root bootstrap was not rewritten."
+        }
+      }
+      if ($legacyRelative -eq "scripts/Invoke-MIRRuleSynthesis.ps1") {
+        $canonicalText = $canonicalText.Replace(
+          'Join-Path $PSScriptRoot ".."',
+          'Join-Path $PSScriptRoot "../../.."'
+        )
+        if ($canonicalText -ceq $legacyText) {
+          throw "Rule synthesis root bootstrap was not rewritten."
         }
       }
       [IO.File]::WriteAllText($canonicalPath, $canonicalText, $utf8NoBom)

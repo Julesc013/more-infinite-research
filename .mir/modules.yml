@@ -780,7 +780,7 @@ validation_tooling:
     technology_review_dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
     technology_promotion_admission: validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
     technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
-    offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
+    offline_rule_synthesis: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
     offline_rule_synthesis_gate: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
     mod_interaction_graph: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
     mod_interaction_gate: validation/tests/compatibility/Test-MIRModInteractions.ps1

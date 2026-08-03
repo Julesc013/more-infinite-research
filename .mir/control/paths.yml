@@ -61,6 +61,7 @@ paths:
   tools.commands.technology.quality-assessment: tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1
   tools.commands.technology.review-dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
   tools.commands.technology.governance: tools/commands/technology/Update-MIRTechnologyGovernance.ps1
+  tools.commands.technology.rule-synthesis: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
   tools.commands.control: tools/commands/control
   tools.commands.control.facade: tools/commands/control/Invoke-MIRControlPlane.ps1
   tools.commands.control.work: tools/commands/control/Invoke-MIRControlPlaneWork.ps1

@@ -721,6 +721,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - offline-family-rule-synthesis
+      - technology-rule-synthesis-command
   - path: docs/reference/mod-interaction-graph.md
     title: "Semantic Mod Interaction Graph"
     status: current

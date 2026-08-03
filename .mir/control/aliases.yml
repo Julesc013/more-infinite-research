@@ -218,6 +218,10 @@ aliases:
     to: tools.commands.technology.governance
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Invoke-MIRRuleSynthesis.ps1
+    to: tools.commands.technology.rule-synthesis
+    mode: read-only
+    introduced: 3.2.5
   - from: scripts/Invoke-MIRControlPlane.ps1
     to: tools.commands.control.facade
     mode: read-only
