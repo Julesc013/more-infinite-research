@@ -37,7 +37,7 @@ $lease1 = Acquire-MIRCPEvidenceLease -IdentityKey $identityKey -Scope process -T
 $lease2 = Acquire-MIRCPEvidenceLease -IdentityKey $identityKey -Scope process -TtlMinutes 30 -RepoRoot $repo -Root $root
 if ([string]$lease1.disposition -ne "ACQUIRE" -or [string]$lease2.disposition -ne "ADOPT") { throw "Matching in-progress evidence work was not adopted." }
 
-$basePlan = New-MIRCPPlan -Mode changed -ChangedPath @("verification/schema/observation.schema.json") -Target "2.1" -Release "3.2.2" -RepoRoot $repo
+$basePlan = New-MIRCPPlan -Mode changed -ChangedPath @("spec/schemas/observation.schema.json") -Target "2.1" -Release "3.2.2" -RepoRoot $repo
 $taskRow = @($basePlan.plan.tasks | Where-Object id -eq "harness.schemas")
 if ($taskRow.Count -ne 1) { throw "Evidence reuse self-test could not select harness.schemas." }
 $taskEvidence = New-MIRCPEvidenceObject -Kind task-result -ContextDigest $contextDigest -IdentityKey ([string]$taskRow[0].effective_input_sha256) `
@@ -45,10 +45,10 @@ $taskEvidence = New-MIRCPEvidenceObject -Kind task-result -ContextDigest $contex
   -Payload ([pscustomobject][ordered]@{status="passed"; canonicalization_abi=1})
 $taskEvidenceResult = Write-MIRCPEvidenceObject -Object $taskEvidence -RepoRoot $repo -Root $root
 $index = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $root
-$reusePlan = New-MIRCPPlan -Mode changed -ChangedPath @("verification/schema/observation.schema.json") -Target "2.1" -Release "3.2.2" -EvidenceIndex $index.path -TrustClass "self-test" -RepoRoot $repo
+$reusePlan = New-MIRCPPlan -Mode changed -ChangedPath @("spec/schemas/observation.schema.json") -Target "2.1" -Release "3.2.2" -EvidenceIndex $index.path -TrustClass "self-test" -RepoRoot $repo
 $reuseRow = @($reusePlan.plan.tasks | Where-Object id -eq "harness.schemas")
 if ([string]$reuseRow[0].action -ne "REUSE") { throw "Exact unrevoked evidence was not reused." }
-$freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("verification/schema/observation.schema.json") -Target "2.1" -Release "3.2.2" -EvidenceIndex $index.path -TrustClass "self-test" -RepoRoot $repo
+$freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("spec/schemas/observation.schema.json") -Target "2.1" -Release "3.2.2" -EvidenceIndex $index.path -TrustClass "self-test" -RepoRoot $repo
 $freshRow = @($freshPlan.plan.tasks | Where-Object id -eq "harness.schemas")
 if ([string]$freshRow[0].action -ne "RUN") { throw "Independent calibration reused content-eternal evidence." }
 

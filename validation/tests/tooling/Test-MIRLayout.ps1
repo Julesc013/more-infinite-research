@@ -10,6 +10,12 @@ if ($paths.paths.PSObject.Properties["releases.deltas"].Value -ne ".mir/releases
 if (@($aliases.aliases | Where-Object from -eq "approved-delta/").Count -ne 1) {
   throw "Historical approved-delta alias is missing."
 }
+$legacySchemaAlias = "verification/" + "schema/"
+if (@($aliases.aliases | Where-Object {
+  $_.from -eq $legacySchemaAlias -and $_.to -eq "spec.schemas" -and $_.mode -eq "read-only"
+}).Count -ne 1) {
+  throw "Historical verification schema alias is missing or writable."
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -37,6 +43,15 @@ if ($manifest.summary.legacy -eq 0) { throw "Migration baseline unexpectedly con
 $migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIROutputRoots.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($migrationPreview.mode -ne "preview" -or $migrationPreview.changed -ne 0) {
   throw "Output-root migration is not idempotent: $($migrationPreview | ConvertTo-Json -Compress)"
+}
+$schemaMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRSchemaRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($schemaMigrationPreview.mode -ne "preview" -or $schemaMigrationPreview.changed -ne 0) {
+  throw "Schema-root migration is not idempotent: $($schemaMigrationPreview | ConvertTo-Json -Compress)"
+}
+$legacySchemaGlob = ("verification/" + "schema/**")
+$legacySchemaFiles = @(& git -C $repo ls-files $legacySchemaGlob)
+if ($LASTEXITCODE -ne 0 -or $legacySchemaFiles.Count -ne 0) {
+  throw "Legacy physical verification schema files remain tracked."
 }
 
 foreach ($workflow in @(Get-ChildItem -LiteralPath (Join-Path $repo ".github/workflows") -File)) {

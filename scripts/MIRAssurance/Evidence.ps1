@@ -189,7 +189,7 @@ function Get-MIRAssuranceInputFingerprint {
         "fixtures/upgrade-modset-source/**",
         "scripts/Test-MIRUpgrade.ps1",
         "scripts/Test-MIRUpgradeMatrix.ps1",
-        "verification/schema/upgrade-matrix.schema.json"
+        "spec/schemas/upgrade-matrix.schema.json"
       )
     }
     "candidate-seal" {

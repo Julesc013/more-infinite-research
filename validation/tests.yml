@@ -32,7 +32,7 @@
         "validation/domains.yml",
         "validation/trust.json",
         ".mir/releases.json",
-        "verification/schema/**",
+        "spec/schemas/**",
         "validation/profiles/**"
       ]
     },
@@ -280,7 +280,7 @@
         "fixtures/performance-regression-probe/**",
         "scripts/Invoke-MIRCompatAudit.ps1",
         "scripts/MIRCompatAudit/**",
-        "verification/schema/runtime-performance-evidence.schema.json",
+        "spec/schemas/runtime-performance-evidence.schema.json",
         "scripts/Invoke-MIRPerformanceQualification.ps1",
         "scripts/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
@@ -300,7 +300,7 @@
         "candidate",
         "factorio",
         "manual-review-attestation",
-        "verification/schema/manual-release-attestation.schema.json",
+        "spec/schemas/manual-release-attestation.schema.json",
         "scripts/Test-MIRManualReleaseReview.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
         "scripts/validation/PackageIdentity.ps1"
@@ -349,7 +349,7 @@
         "upgrade-fixture",
         "fixtures/upgrade-modset-source/**",
         "scripts/Test-MIRUpgradeMatrix.ps1",
-        "verification/schema/upgrade-matrix.schema.json",
+        "spec/schemas/upgrade-matrix.schema.json",
         "scenario-harness",
         "settings"
       ]

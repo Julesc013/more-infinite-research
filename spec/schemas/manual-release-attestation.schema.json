@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/manual-release-attestation.schema.json",
   "$id": "https://more-infinite-research.invalid/verification/manual-release-attestation.schema.json",
   "title": "MIR package-focused manual release review",
   "type": "object",

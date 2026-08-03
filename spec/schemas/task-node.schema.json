@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/task-node.schema.json",
   "$id": "https://more-infinite-research.invalid/verification/task-node.schema.json",
   "title": "MIR Control Plane TaskNode",
   "type": "object",

@@ -52,7 +52,7 @@ if ([string]$selectedClosureRow.digest -ne $selectedClosureDigest -or -not $dupl
 }
 
 foreach ($schemaName in @("change-record.schema.json", "candidate-closure.schema.json", "incident-record.schema.json", "release-record.schema.json", "release-transition.schema.json", "task-node.schema.json", "observation.schema.json", "assertion.schema.json", "evaluation.schema.json", "execution-registry.schema.json", "verification-context.schema.json", "evidence-object.schema.json", "evidence-manifest.schema.json", "evidence-revocation.schema.json")) {
-  $schema = Read-MIRCPJson -Path "verification/schema/$schemaName" -RepoRoot $repo
+  $schema = Read-MIRCPJson -Path "spec/schemas/$schemaName" -RepoRoot $repo
   if ([string]$schema.'$schema' -ne "https://json-schema.org/draft/2020-12/schema" -or [string]$schema.type -ne "object" -or $schema.additionalProperties -ne $false) {
     throw "Control-plane schema is not strict JSON Schema 2020-12: $schemaName"
   }

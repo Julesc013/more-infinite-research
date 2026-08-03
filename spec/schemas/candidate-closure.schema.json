@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/candidate-closure.schema.json",
   "$id": "https://more-infinite-research.invalid/verification/candidate-closure.schema.json",
   "title": "MIR immutable CandidateClosureRecord",
   "type": "object",

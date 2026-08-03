@@ -288,7 +288,7 @@ function Get-MIRAssurancePackageFiles {
 
 function Get-MIRAssuranceRunnerHash {
   if ($script:MIRAssuranceRunnerHashCache) { return $script:MIRAssuranceRunnerHashCache }
-  $files = @(Resolve-MIRAssurancePatternFiles -Patterns @("scripts/**", "tools/mir_verify/**", "verification/schema/**"))
+  $files = @(Resolve-MIRAssurancePatternFiles -Patterns @("scripts/**", "tools/mir_verify/**", "spec/schemas/**"))
   $script:MIRAssuranceRunnerHashCache = Get-MIRAssuranceTreeHash -Paths $files
   return $script:MIRAssuranceRunnerHashCache
 }
@@ -304,7 +304,7 @@ function Get-MIRAssuranceHarnessFiles {
     "validation/domains.yml",
     "validation/profiles/**",
     "validation/trust.json",
-    "verification/schema/**",
+    "spec/schemas/**",
     "tools/mir_verify/**"
   ))
 }

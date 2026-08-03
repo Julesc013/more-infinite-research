@@ -3,7 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$schemaRoot = Join-Path $RepoRoot "verification\schema"
+$schemaRoot = Join-Path $RepoRoot "spec\schemas"
 $contracts = [ordered]@{
   "test.schema.json" = @("id", "kind", "layer", "requires_factorio")
   "plan.schema.json" = @("schema", "policy_id", "target", "profile", "expected_test_ids", "plan_material_sha256", "tests")
@@ -42,6 +42,9 @@ foreach ($entry in $contracts.GetEnumerator()) {
   }
   if ([string]::IsNullOrWhiteSpace([string]$schema.'$id') -or [string]$schema.type -ne "object") {
     throw "Verification schema lacks an object identity: $($entry.Key)"
+  }
+  if ([string]$schema.'x-mir-canonical-path' -ne "spec/schemas/$($entry.Key)") {
+    throw "Verification schema lacks its canonical repository path: $($entry.Key)"
   }
   $required = @($schema.required | ForEach-Object { [string]$_ })
   $propertyNames = @($schema.properties.PSObject.Properties.Name)

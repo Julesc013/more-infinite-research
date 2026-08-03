@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/playtest-report.schema.json",
   "$id": "https://more-infinite-research.invalid/verification/playtest-report.schema.json",
   "title": "MIR identity-bound playtest observation",
   "type": "object",

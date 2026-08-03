@@ -11,7 +11,7 @@ superseded_by: []
 ---
 # Playtest Intake
 
-Playtest observations are useful only when they are bound to the exact candidate, Factorio installation, mod closure, settings, and save that produced them. Create a bundle with `scripts/New-MIRPlaytestBundle.ps1`; its `report.json` conforms to `verification/schema/playtest-report.schema.json`.
+Playtest observations are useful only when they are bound to the exact candidate, Factorio installation, mod closure, settings, and save that produced them. Create a bundle with `scripts/New-MIRPlaytestBundle.ps1`; its `report.json` conforms to `spec/schemas/playtest-report.schema.json`.
 
 The bundle records the candidate archive/content/source identities, Factorio binary identity, installed official-mod content fingerprints, `mod-list.json`, third-party archive hashes, optional startup-settings and save hashes, the observation, compact compiler fingerprints, and portable attachment hashes. Logs and text artifacts are redacted before copying. Saves are copied only when `-IncludeSave` is explicitly supplied.
 

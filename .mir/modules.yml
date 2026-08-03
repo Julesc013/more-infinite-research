@@ -645,25 +645,26 @@ validation_tooling:
     repository_layout_command: tools/commands/workspace/Invoke-MIRLayoutCheck.ps1
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
     repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
+    repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json
-    control_plane_candidate_closure_schema: verification/schema/candidate-closure.schema.json
+    control_plane_candidate_closure_schema: spec/schemas/candidate-closure.schema.json
     control_plane_candidate_closures: .mir/candidate-closures
     control_plane_domains: .mir/control-plane/domains.json
     control_plane_ownership: .mir/control-plane/ownership.json
     control_plane_freshness: .mir/control-plane/freshness.json
     control_plane_mutation_calibration: .mir/control-plane/mutation-calibration.json
     control_plane_shadow_authority: .mir/control-plane/v4-v5-equivalence.json
-    control_plane_task_schema: verification/schema/task-node.schema.json
-    control_plane_observation_schema: verification/schema/observation.schema.json
-    control_plane_assertion_schema: verification/schema/assertion.schema.json
-    control_plane_evaluation_schema: verification/schema/evaluation.schema.json
-    control_plane_execution_registry_schema: verification/schema/execution-registry.schema.json
-    control_plane_verification_context_schema: verification/schema/verification-context.schema.json
-    control_plane_evidence_object_schema: verification/schema/evidence-object.schema.json
-    control_plane_evidence_manifest_schema: verification/schema/evidence-manifest.schema.json
-    control_plane_evidence_revocation_schema: verification/schema/evidence-revocation.schema.json
+    control_plane_task_schema: spec/schemas/task-node.schema.json
+    control_plane_observation_schema: spec/schemas/observation.schema.json
+    control_plane_assertion_schema: spec/schemas/assertion.schema.json
+    control_plane_evaluation_schema: spec/schemas/evaluation.schema.json
+    control_plane_execution_registry_schema: spec/schemas/execution-registry.schema.json
+    control_plane_verification_context_schema: spec/schemas/verification-context.schema.json
+    control_plane_evidence_object_schema: spec/schemas/evidence-object.schema.json
+    control_plane_evidence_manifest_schema: spec/schemas/evidence-manifest.schema.json
+    control_plane_evidence_revocation_schema: spec/schemas/evidence-revocation.schema.json
     control_plane_evidence_revocations: .mir/control-plane/evidence-revocations.json
     control_plane_execution_registry: validation/generated/execution-registry.json
     control_plane_historical_replay: .mir/control-plane/baselines/3.2.2-v5-replay.json
@@ -766,8 +767,8 @@ validation_tooling:
     localization_gate: scripts/Test-MIRLocales.ps1
     localization_core: scripts/localization/MIRLocalization.psm1
     release_attestations: scripts/validation/ReleaseAttestations.ps1
-    runtime_performance_evidence_schema: verification/schema/runtime-performance-evidence.schema.json
-    manual_release_attestation_schema: verification/schema/manual-release-attestation.schema.json
+    runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
+    manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
     pipeline_documentation: scripts/Update-MIRPipelineDocumentation.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
@@ -805,7 +806,7 @@ validation_tooling:
     - release records own release-specific upgrade baseline target and fixture authority which context materialization projects over the stable target-line engine profile and binds by exact staged profile digest
     - approved delta and performance authorities are selected by exact release candidate and baseline identity so historical calibration and active qualification coexist without mutable authority replacement
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
-    - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint
+    - canonical plan result capsule bundle and seal JSON schemas live under spec/schemas and are bound into the verifier release fingerprint
     - matching workers are adopted through explicit process or CI-job leases bound to host identity process incarnation trust class and expiry and duplicate fingerprint work is never cancelled in progress
     - the aggregate verification gate requires exact evidence for every planned instance and never trusts mutable job status
     - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives

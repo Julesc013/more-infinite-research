@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/change-record.schema.json",
   "$id": "https://more-infinite-research.invalid/verification/change-record.schema.json",
   "title": "MIR ChangeRecord",
   "type": "object",
