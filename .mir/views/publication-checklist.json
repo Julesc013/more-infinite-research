@@ -1,7 +1,8 @@
 {
   "assurance_exceptions": [],
   "authority": "mir-generated-publication-checklist-v1",
-  "candidate_id": "C32",
+  "candidate_floor": "C32",
+  "candidate_id": "not-assigned",
   "generated_from": [
     "path:releases.current",
     "path:releases.records/3.2.5.json"

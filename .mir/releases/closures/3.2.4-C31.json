@@ -7,7 +7,7 @@
   "reason": "The maintainer consolidated the unreleased 3.2.4 cost-model candidate and the planned compatibility-observability work into one public 3.2.5 convergence release.",
   "successor": {
     "release": "3.2.5",
-    "candidate_id": "C32"
+    "candidate_floor": "C32"
   },
   "package": {
     "source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",

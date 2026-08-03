@@ -1,7 +1,8 @@
 {
   "schema": 1,
   "release": "3.2.5",
-  "candidate_id": "C32",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "C32",
   "target": "2.1",
   "branch": "dev",
   "state": "planned",
@@ -44,7 +45,9 @@
     "publication",
     "public-byte-verification"
   ],
-  "release_notes": "docs/releases/3.2.5-convergence-release.md",
-  "incident_ids": [],
-  "updated_at": "2026-08-03T09:35:03.907Z"
+  "release_notes": "docs/releases/notes/release-notes-3.2.5.md",
+  "incident_ids": [
+    "INC-2026-0054"
+  ],
+  "updated_at": "2026-08-03T22:14:04.749Z"
 }

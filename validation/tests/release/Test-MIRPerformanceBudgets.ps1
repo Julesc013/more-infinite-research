@@ -14,6 +14,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $RepoRoot "tools/lib/control/Core.ps1")
 
 function Resolve-MIRPerformancePath {
   param([Parameter(Mandatory)][string]$Path)
@@ -148,9 +149,10 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.2" -or
 $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
 $activeCandidate = $releaseLedger.development.'factorio-2.1'
-$currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/current.json") | ConvertFrom-Json
-$activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($activeCandidate.mir_version).json") | ConvertFrom-Json
-$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($currentRoles.roles.tagged_factorio_2_1).json") | ConvertFrom-Json
+$releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $RepoRoot -Id "releases.records"
+$currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "current.json")) | ConvertFrom-Json
+$activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($activeCandidate.mir_version).json")) | ConvertFrom-Json
+$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($currentRoles.roles.tagged_factorio_2_1).json")) | ConvertFrom-Json
 $activeCampaignPath = Join-Path $RepoRoot ".mir/performance-campaigns/$($activeCandidate.mir_version)-$($activeCandidate.candidate_id).json"
 $releaseStates = @((Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/control-plane/control-plane.json") | ConvertFrom-Json).release_states)
 $activeStateIndex = [Array]::IndexOf($releaseStates, [string]$activeTypedRelease.state)

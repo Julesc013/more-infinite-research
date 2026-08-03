@@ -7,6 +7,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $RepoRoot "tools/lib/control/Core.ps1")
 $lockPath = Join-Path $RepoRoot ".mir\backport-source-lock.json"
 if (-not (Test-Path -LiteralPath $lockPath -PathType Leaf)) {
   Write-Host "[skip] MIR backport source lock is not present on this branch."
@@ -134,7 +135,8 @@ if ([int]$lock.schema -eq 4 -and [int]$lock.projection_schema -eq 3) {
       throw "Published projection authority is missing: $path"
     }
   }
-  $typedReleasePath = Join-Path $RepoRoot ".mir/releases/$($lock.mir_version).json"
+  $typedReleaseRoot = Resolve-MIRCPPathId -RepoRoot $RepoRoot -Id "releases.records"
+  $typedReleasePath = Join-Path $RepoRoot (Join-Path $typedReleaseRoot "$($lock.mir_version).json")
   $typedRelease = Get-Content -Raw -LiteralPath $typedReleasePath | ConvertFrom-Json
   $publicationProof = @($typedRelease.proofs.public_byte_verification)
   if ([string]$typedRelease.candidate_id -ne [string]$lock.candidate_id -or

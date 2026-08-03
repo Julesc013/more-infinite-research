@@ -3,12 +3,12 @@
   "id": "INC-2026-0054",
   "title": "Runtime research progress uses inverse cost-transition ratio",
   "external_issue": "internal://runtime/research-cost-transition-progress",
-  "state": "root-cause-proven",
+  "state": "repaired",
   "failing_environment": {
     "target": "2.1",
     "release_line": "3.1.9-through-planned-3.2.5",
     "surface": "productivity family adoption configuration change",
-    "runtime_campaign": "not-run-for-this-audit"
+    "runtime_campaign": "development scenario space-age-native-owner-settings-config-change passed; candidate-bound and reload-equivalence campaigns remain pending"
   },
   "reproduction": {
     "status": "reproduced-by-source-and-api-contract-analysis",
@@ -47,10 +47,10 @@
     "planned_candidate_floor": "C32",
     "candidate_id": "not-assigned",
     "package_identity": "not-frozen",
-    "package_bytes_changed": false
+    "package_bytes_changed": true
   },
   "closure": {
-    "status": "pending-3.2.5-cost-transition-repair-and-transition-proof",
-    "proof_required": "descriptor-based canonical evaluation, corrected progress conversion, all sixteen transition rows, configuration-change and reload equivalence, exact engine realization, and target disposition before candidate freeze"
+    "status": "repair-implemented-pending-complete-regression-proof",
+    "proof_required": "exact 3.2.3 default parity, configuration-change and reload equivalence, idempotence, exact candidate engine realization, and Factorio 2.0 target disposition before candidate freeze"
   }
 }

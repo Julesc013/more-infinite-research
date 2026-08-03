@@ -95,7 +95,7 @@ jobs:
           MIR_CP_TARGET: ${{ inputs.target }}
           MIR_CP_SOURCE_REF: ${{ inputs.source_ref }}
         run: |
-          $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
+          $record = Get-Content -Raw -LiteralPath ".mir/releases/records/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           if ([string]$record.target -ne $env:MIR_CP_TARGET) { throw "Release target mismatch." }
           $expectedSource = [string]$record.package.source_commit
           if ($env:MIR_CP_TARGET -eq "2.0") {
@@ -119,7 +119,7 @@ jobs:
           MIR_CP_TARGET: ${{ inputs.target }}
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
-          $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
+          $record = Get-Content -Raw -LiteralPath ".mir/releases/records/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           $candidate = Join-Path source ([string]$record.package.archive)
           $result = ./tools/commands/control/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
             -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot .work/output/verification-context |

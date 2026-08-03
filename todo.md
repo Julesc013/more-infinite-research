@@ -6,10 +6,10 @@ Generated: 2026-08-03
 
 ## Release queue
 
-| Release | Candidate | State | Next required state |
-| --- | --- | --- | --- |
-| `3.2.5` | `C32` | `planned` | `source-frozen` |
-| `2.5.0` | `2.5-P11` | `publicly-verified` | `complete` |
+| Release | Candidate | Reserved floor | State | Next required state |
+| --- | --- | --- | --- | --- |
+| `3.2.5` | `not-assigned` | `C32` | `planned` | `source-frozen` |
+| `2.5.0` | `2.5-P11` | `pending` | `publicly-verified` | `complete` |
 
 ## Executable TaskNodes
 
@@ -69,7 +69,7 @@ Generated: 2026-08-03
 - [ ] `CHG-2026-0004` — MIR 3.2.5 unified research cost curves (`implemented`)
 - [ ] `CHG-2026-0005` — MIR 3.2.5 compatibility observability and convergence (`planned`)
 - [ ] `CHG-2026-0006` — MIR 3.3 and 2.6 host-neutral extension platform (`planned`)
-- [ ] `CHG-2026-0007` — Correct research-cost transitions, digest layers, and formula bounds (`planned`)
+- [ ] `CHG-2026-0007` — Correct research-cost transitions, digest layers, and formula bounds (`implemented`)
 - [ ] `CHG-2026-0008` — Enforce semantic-domain integrity and ownership specificity (`implemented`)
 - [ ] `CHG-2026-0009` — Make logical path IDs the sole durable path authority (`implemented`)
 - [ ] `CHG-2026-0010` — Separate candidate reservation from identity and make releases append-only (`planned`)
@@ -96,7 +96,7 @@ Generated: 2026-08-03
 - [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0052` — Canonical protected workflow had no registered default-branch dispatcher; closure `pending-exact-protected-c30-dispatch`
 - [ ] `INC-2026-0053` — Compact calibration-proof resolver requested fields absent from execution-manifest rows; closure `closed-exact-c24-fresh-calibration`
-- [ ] `INC-2026-0054` — Runtime research progress uses inverse cost-transition ratio; closure `pending-3.2.5-cost-transition-repair-and-transition-proof`
+- [ ] `INC-2026-0054` — Runtime research progress uses inverse cost-transition ratio; closure `repair-implemented-pending-complete-regression-proof`
 
 ## Explicit release obligations
 

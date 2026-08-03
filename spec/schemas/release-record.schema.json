@@ -9,6 +9,7 @@
     "schema": {"const": 1},
     "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "candidate_id": {"type": "string", "minLength": 1},
+    "candidate_floor": {"type": "string", "pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*)$"},
     "target": {"type": "string", "minLength": 1},
     "branch": {"type": "string", "minLength": 1},
     "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
@@ -58,6 +59,16 @@
     "updated_at": {"type": "string", "format": "date-time"}
   },
   "allOf": [
+    {
+      "if": {"properties": {"state": {"const": "planned"}}},
+      "then": {
+        "required": ["candidate_floor"],
+        "properties": {"candidate_id": {"const": "not-assigned"}}
+      },
+      "else": {
+        "properties": {"candidate_id": {"pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*|[0-9]+\\.[0-9]+\\.[0-9]+-final)$"}}
+      }
+    },
     {
       "if": {"properties": {"state": {"const": "source-frozen"}}},
       "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256"]}}}

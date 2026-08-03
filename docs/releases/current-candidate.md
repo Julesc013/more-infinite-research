@@ -17,7 +17,8 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.5` |
-| Candidate | `C32` |
+| Candidate identity | `not-assigned` |
+| Reserved candidate floor | `C32` |
 | Target | `2.1` |
 | Branch | `dev` |
 | State | `planned` |

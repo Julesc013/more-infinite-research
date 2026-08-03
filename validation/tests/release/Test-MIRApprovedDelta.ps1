@@ -12,8 +12,10 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\control\Core.ps1")
 $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
-$activeReleasePath = Join-Path $repo ".mir/releases/$activeVersion.json"
+$releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
+$activeReleasePath = Join-Path $repo (Join-Path $releaseRecordRoot "$activeVersion.json")
 if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
   $activeRelease = Get-Content -Raw -LiteralPath $activeReleasePath | ConvertFrom-Json
   if ([string]$activeRelease.state -in @("planned", "source-frozen", "package-built")) {

@@ -10,6 +10,7 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\control\Core.ps1")
 
 function Get-MIRCandidateFields {
   param([Parameter(Mandatory)][string]$Text)
@@ -250,7 +251,8 @@ if ($status -eq "package-built") {
     throw "Package-visible paths changed after the package-built freeze: $($changedPackagePaths -join ', ')"
   }
   $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/$($packageInfo.version).json") | ConvertFrom-Json
+  $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
   $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
   $artifactPath = Join-Path $repo $artifactRelative
   if ([string]$release.state -ne "package-built" -or [string]$release.package.source_commit -ne $packageSourceCommit -or

@@ -104,6 +104,10 @@ Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows
 
 ## Qualification And Sealing
 
+### Candidate reservation and assignment
+
+A planned release reserves a `candidate_floor` but has `candidate_id: not-assigned`. A reservation is sequencing policy, not evidence and not a package identity. At source freeze, assign the first exact candidate ID at or above that floor and bind it to the frozen source commit, tree, and package-source digest in the ReleaseRecord and append-only transition record. Any later package-visible source change invalidates that candidate and requires a new candidate ID; never rewrite an existing candidate's source or archive identity. Generated views must show reservation and exact candidate identity separately.
+
 For MIR 3.2.0:
 
 ```powershell

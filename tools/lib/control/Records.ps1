@@ -60,6 +60,17 @@ function Assert-MIRCPRecords {
   foreach ($release in $releases) {
     Assert-MIRCPRequiredProperties -Record $release -Names @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at") -Context "ReleaseRecord"
     if ($states -notcontains [string]$release.state) { throw "Release $($release.release) uses unknown state '$($release.state)'." }
+    $candidateFloorPattern = '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
+    $candidateIdentityPattern = '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*|[0-9]+\.[0-9]+\.[0-9]+-final)$'
+    if ([string]$release.state -eq "planned") {
+      if ([string]$release.candidate_id -ne "not-assigned" -or
+          $null -eq $release.PSObject.Properties["candidate_floor"] -or
+          [string]$release.candidate_floor -notmatch $candidateFloorPattern) {
+        throw "Planned release $($release.release) must have an unassigned candidate identity and a valid reserved candidate floor."
+      }
+    } elseif ([string]$release.candidate_id -notmatch $candidateIdentityPattern) {
+      throw "Release $($release.release) must bind an exact candidate identity after planning."
+    }
     $stateIndex = [Array]::IndexOf($states, [string]$release.state)
     $requiredPackageFields = if ($stateIndex -eq 0) {
       @()
@@ -97,7 +108,13 @@ function Assert-MIRCPRecords {
     foreach ($field in @("source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries")) {
       if ([string]$closure.package.$field -cne [string]$source[0].package.$field) { throw "CandidateClosureRecord $($closure.id) package field '$field' differs from its immutable ReleaseRecord." }
     }
-    $successor = @($releases | Where-Object { [string]$_.release -eq [string]$closure.successor.release -and [string]$_.candidate_id -eq [string]$closure.successor.candidate_id })
+    $successorCandidate = if ($null -ne $closure.successor.PSObject.Properties["candidate_id"]) {
+      [string]$closure.successor.candidate_id
+    } else { [string]$closure.successor.candidate_floor }
+    $successor = @($releases | Where-Object {
+      [string]$_.release -eq [string]$closure.successor.release -and
+      ([string]$_.candidate_id -eq $successorCandidate -or [string]$_.candidate_floor -eq $successorCandidate)
+    })
     if ($successor.Count -ne 1) { throw "CandidateClosureRecord $($closure.id) does not identify one successor ReleaseRecord." }
     if ([string]$pointer.roles.canonical -eq [string]$closure.release) { throw "Canonical release $($closure.release) is closed and cannot remain active." }
   }

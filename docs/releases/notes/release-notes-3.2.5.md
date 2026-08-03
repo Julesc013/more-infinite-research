@@ -1,0 +1,60 @@
+---
+title: "MIR 3.2.5 Release Notes"
+status: current
+applies_to: "3.2.5"
+audience: player
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-08-04
+supersedes: ["docs/releases/3.2.4-unified-research-cost-curves.md"]
+superseded_by: []
+---
+
+# MIR 3.2.5
+
+MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3. It absorbs the unpublished 3.2.4 work; there is no public 3.2.4 upgrade step and no 3.2.4 release package should be installed as an intermediate.
+
+## Research costs
+
+- Every MIR research stream and base continuation gains a per-level linear cost increment while retaining its existing base-cost and exponential-growth controls.
+- Fixed, linear, exponential, and hybrid curves use one formula: `(base + increment * offset) * growth ^ offset`.
+- Existing default settings retain the prior cost behavior because the new increment defaults to zero.
+- Recognized native-owner formulas remain byte-for-byte unchanged when their controls remain at defaults.
+- Explicit overrides of unknown or over-budget external formulas fail closed instead of guessing a conversion.
+
+## Corrected configuration changes
+
+- MIR now carries compact versioned old/new cost descriptors into runtime instead of reparsing research formulas there.
+- When a recognized adopted native owner changes cost, MIR preserves completed unit-equivalent work by converting the old fractional progress with `old_cost / new_cost`.
+- The active technology, exact level, queue, completed levels, and unrelated force state remain untouched by the conversion.
+- A malformed, tampered, unknown, or over-budget descriptor is refused safely and produces a stable diagnostic.
+
+## Compatibility and stability
+
+- Existing technology, setting, locale, runtime-state, and profile identifiers remain stable.
+- Old profiles remain readable and unknown future profile fields remain preserved.
+- New cost controls use neutral defaults.
+- The public upgrade path is 3.2.3 to 3.2.5.
+- MIR 2.5.5 is a later conditional Factorio 2.0 projection and is not produced by this release.
+
+## Candidate status
+
+The source remains under development. `C32` is a reserved candidate floor, not an assigned candidate identity. Development packages are for testing only until exact upgrade, reload-equivalence, ecosystem, performance, manual, protected, seal, publication, and public-byte gates are complete.
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
+## Immutable release identity
+
+> Generated from `path:releases.records/3.2.5.json`. The typed record is authoritative.
+
+| Field | Value |
+| --- | --- |
+| State | `planned` |
+| Candidate | `not-assigned` |
+| Package source commit | `pending` |
+| Archive SHA-256 | `pending` |
+| Content SHA-256 | `pending` |
+| Tag | `pending` |
+| Tag commit | `pending` |
+| Assurance exceptions | `pending` |
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:END -->

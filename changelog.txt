@@ -1,17 +1,25 @@
 ---------------------------------------------------------------------------------------------------
-Version: 3.2.4
-Date: 2026-08-03
+Version: 3.2.5
+Date: 2026-08-04
 
   Changes:
 
     - Added a per-level linear cost increment setting for every MIR research stream and base continuation.
     - Unified fixed, linear, exponential, and hybrid costs under one numeric research-cost contract.
     - Clarified the existing growth setting as the exponential multiplier; no model dropdown was added.
+    - Consolidated the unpublished 3.2.4 work into the direct public upgrade from 3.2.3 to 3.2.5.
+
+  Bugfixes:
+
+    - Corrected native-owner research progress conversion to preserve completed work when configured costs change.
+    - Replaced runtime formula reparsing with bounded versioned old/new cost descriptors.
+    - Refused malformed, tampered, unknown, or over-budget transition descriptors without guessing or resetting force state.
 
   Compatibility:
 
     - Preserved recognized native and modded research formulas byte-for-byte when settings stay at defaults.
     - Canonicalized explicit overrides and rejected unknown external formulas instead of guessing their meaning.
+    - Preserved the selected research, level, queue, completed levels, and unrelated force state during supported cost transitions.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.3

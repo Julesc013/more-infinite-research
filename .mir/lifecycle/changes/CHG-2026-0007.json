@@ -39,5 +39,5 @@
     "factorio-2.1": "canonical descriptor, evaluator, progress-preservation, parser-budget, and 16-row transition implementation before the first real 3.2.5 candidate",
     "factorio-2.0": "project only where the target runtime capability exists; otherwise record an explicit omission and independently qualify the 2.5.5 or 2.6 behavior"
   },
-  "state": "planned"
+  "state": "implemented"
 }

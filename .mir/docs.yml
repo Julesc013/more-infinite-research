@@ -597,6 +597,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-convergence-release
+  - path: docs/releases/3.2.5-development-readiness.md
+    title: "MIR 3.2.5 Development Readiness"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-development-readiness
+  - path: docs/releases/3.2.5-migration-guide.md
+    title: "MIR 3.2.5 Migration Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-migration
   - path: docs/releases/3.2.5-to-2.6-convergence-programme.md
     title: "MIR 3.2.5 To 2.6 Convergence Programme"
     status: current
@@ -2392,6 +2408,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.3-release-notes
+  - path: docs/releases/notes/release-notes-3.2.5.md
+    title: "MIR 3.2.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-release-notes
   - path: docs/releases/3.2.2-to-3.2.3-repository-change-report.md
     title: "MIR 3.2.2 To 3.2.3 Repository Change Report"
     status: current

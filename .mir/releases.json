@@ -50,7 +50,8 @@
       "archive_sha256": "",
       "assurance_exception_ids": [],
       "branch": "dev",
-      "candidate_id": "C32",
+      "candidate_floor": "C32",
+      "candidate_id": "not-assigned",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.5",
@@ -100,7 +101,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "C32-planned"
+      "status": "not-assigned-planned"
     }
   },
   "generated_from": [

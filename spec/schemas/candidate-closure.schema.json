@@ -14,11 +14,15 @@
     "reason": {"type": "string", "minLength": 1},
     "successor": {
       "type": "object",
-      "required": ["release", "candidate_id"],
       "properties": {
         "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
-        "candidate_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*$"}
+        "candidate_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*$"},
+        "candidate_floor": {"type": "string", "pattern": "^C[1-9][0-9]*$"}
       },
+      "oneOf": [
+        {"required": ["release", "candidate_id"]},
+        {"required": ["release", "candidate_floor"]}
+      ],
       "additionalProperties": false
     },
     "package": {
