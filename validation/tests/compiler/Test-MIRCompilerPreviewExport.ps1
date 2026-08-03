@@ -34,7 +34,7 @@ try {
     }}
   } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
 
-  & (Join-Path $RepoRoot "scripts\Export-MIRCompilerPreview.ps1") `
+  & (Join-Path $RepoRoot "tools\commands\technology\Export-MIRCompilerPreview.ps1") `
     -CatalogPath $catalogPath -EvidencePath $evidencePath -OutputDirectory $outputPath -Top 10
   $summary = Get-Content -Raw -LiteralPath (Join-Path $outputPath "compiler-preview-summary.json") | ConvertFrom-Json
   $markdown = Get-Content -Raw -LiteralPath (Join-Path $outputPath "compiler-preview-summary.md")

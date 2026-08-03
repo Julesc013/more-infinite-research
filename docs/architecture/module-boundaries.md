@@ -731,6 +731,8 @@ All cross-layer imports are declared in `.mir/module-dependencies.json`. The mat
 
 ## Architecture Lints
 
+Maintained technology lifecycle commands live under `tools/commands/technology/`. The historical `scripts/` entry points are parameter-compatible read-only wrappers governed by `.mir/control/aliases.yml`, so existing automation remains reversible while new callers have one canonical owner. The generated promotion registry deliberately retains its historical generator attribution until the 3.2.5 package source is bound; changing that package-visible comment during the layout migration would change candidate identity without changing behavior.
+
 Static validation should eventually fail when:
 
 - top-level MIR Lua imports form a dependency cycle;

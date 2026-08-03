@@ -158,6 +158,34 @@ aliases:
     to: tools.commands.compatibility.pack
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Compare-MIRTechnologyDesigns.ps1
+    to: tools.commands.technology.design-diff
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Export-MIRCompilerPreview.ps1
+    to: tools.commands.technology.preview-export
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Export-MIRTechnologyCatalog.ps1
+    to: tools.commands.technology.catalog-export
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRTechnologyLifecycleRecord.ps1
+    to: tools.commands.technology.lifecycle-record
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRTechnologyQualityAssessment.ps1
+    to: tools.commands.technology.quality-assessment
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRTechnologyReviewDossier.ps1
+    to: tools.commands.technology.review-dossier
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRTechnologyGovernance.ps1
+    to: tools.commands.technology.governance
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

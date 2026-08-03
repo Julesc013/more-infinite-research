@@ -1004,7 +1004,7 @@ Assert-MIRNoPatternInLuaTree `
 
 Assert-MIRNoTopLevelRequireCycles
 
-& (Get-MIRPath -RelativePath "scripts/Update-MIRTechnologyGovernance.ps1") -Check
+& (Get-MIRPath -RelativePath "tools/commands/technology/Update-MIRTechnologyGovernance.ps1") -Check
 if ($LASTEXITCODE -ne 0) {
   throw "Generated technology governance registry is stale."
 }

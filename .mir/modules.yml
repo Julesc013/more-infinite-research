@@ -656,6 +656,7 @@ validation_tooling:
     repository_workspace_command_migrator: tools/maintenance/Move-MIRWorkspaceCommands.ps1
     repository_docs_command_migrator: tools/maintenance/Move-MIRDocsCommands.ps1
     repository_planner_command_migrator: tools/maintenance/Move-MIRPlannerCommands.ps1
+    repository_technology_command_migrator: tools/maintenance/Move-MIRTechnologyCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -758,14 +759,16 @@ validation_tooling:
     planner_snapshot_minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
     compatibility_pack_scaffold: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
-    technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
-    compiler_preview_export: scripts/Export-MIRCompilerPreview.ps1
+    technology_catalog_export: tools/commands/technology/Export-MIRTechnologyCatalog.ps1
+    compiler_preview_export: tools/commands/technology/Export-MIRCompilerPreview.ps1
     compiler_preview_export_gate: validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
     technology_governance_source: .mir/technology-governance.json
-    technology_governance_generator: scripts/Update-MIRTechnologyGovernance.ps1
-    technology_quality_assessment: scripts/New-MIRTechnologyQualityAssessment.ps1
-    technology_review_dossier: scripts/New-MIRTechnologyReviewDossier.ps1
+    technology_governance_generator: tools/commands/technology/Update-MIRTechnologyGovernance.ps1
+    technology_design_diff: tools/commands/technology/Compare-MIRTechnologyDesigns.ps1
+    technology_lifecycle_record: tools/commands/technology/New-MIRTechnologyLifecycleRecord.ps1
+    technology_quality_assessment: tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1
+    technology_review_dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
     technology_promotion_admission: validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
     technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1

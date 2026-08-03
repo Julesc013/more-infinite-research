@@ -101,7 +101,7 @@
       "requires_factorio": false,
       "inputs": [
         ".mir/public-artifact-budgets.json",
-        "scripts/Export-MIRCompilerPreview.ps1",
+        "tools/commands/technology/Export-MIRCompilerPreview.ps1",
         "validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1"
       ]
     },

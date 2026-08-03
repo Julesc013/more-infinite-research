@@ -461,14 +461,14 @@ switch ($area) {
         $params = @{CatalogPath=$catalog; CandidateId=$candidateId; ProfilePath=$profilePath; OutputPath=$output}
         $metrics = Get-MIRArgValue -Items $Args -Name "--metrics"
         if ($metrics) { $params.MetricsPath = $metrics }
-        & (Join-Path $scriptRoot "New-MIRTechnologyQualityAssessment.ps1") @params
+        & (Join-Path $repoRoot "tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1") @params
       }
       "review-dossier" {
         if ([string]::IsNullOrWhiteSpace($candidateId)) { throw "technology review-dossier requires --candidate." }
         $params = @{CatalogPath=$catalog; CandidateId=$candidateId; OutputPath=$output}
         $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"
         if ($assessment) { $params.AssessmentPath = $assessment }
-        & (Join-Path $scriptRoot "New-MIRTechnologyReviewDossier.ps1") @params
+        & (Join-Path $repoRoot "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1") @params
       }
       "promotion-gate" {
         $assessment = Get-MIRArgValue -Items $Args -Name "--assessment"

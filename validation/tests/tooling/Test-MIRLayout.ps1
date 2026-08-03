@@ -63,6 +63,19 @@ foreach ($plannerAlias in @(
     $_.from -eq $plannerAlias.from -and $_.to -eq $plannerAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical planner/compatibility-command alias is missing or writable: $($plannerAlias.from)" }
 }
+foreach ($technologyAlias in @(
+  @{from=("scripts/" + "Compare-MIRTechnologyDesigns.ps1");to="tools.commands.technology.design-diff"},
+  @{from=("scripts/" + "Export-MIRCompilerPreview.ps1");to="tools.commands.technology.preview-export"},
+  @{from=("scripts/" + "Export-MIRTechnologyCatalog.ps1");to="tools.commands.technology.catalog-export"},
+  @{from=("scripts/" + "New-MIRTechnologyLifecycleRecord.ps1");to="tools.commands.technology.lifecycle-record"},
+  @{from=("scripts/" + "New-MIRTechnologyQualityAssessment.ps1");to="tools.commands.technology.quality-assessment"},
+  @{from=("scripts/" + "New-MIRTechnologyReviewDossier.ps1");to="tools.commands.technology.review-dossier"},
+  @{from=("scripts/" + "Update-MIRTechnologyGovernance.ps1");to="tools.commands.technology.governance"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $technologyAlias.from -and $_.to -eq $technologyAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical technology-command alias is missing or writable: $($technologyAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -147,6 +160,11 @@ if ($plannerCommandMigrationPreview.mode -ne "preview" -or $plannerCommandMigrat
     $plannerCommandMigrationPreview.commands -ne 5) {
   throw "Planner-command migration is incomplete or not idempotent: $($plannerCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$technologyCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRTechnologyCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($technologyCommandMigrationPreview.mode -ne "preview" -or $technologyCommandMigrationPreview.changed -ne 0 -or
+    $technologyCommandMigrationPreview.commands -ne 7) {
+  throw "Technology-command migration is incomplete or not idempotent: $($technologyCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -190,6 +208,21 @@ foreach ($wrapperPath in $legacyPlannerCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 30) {
     throw "Legacy planner/compatibility command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyTechnologyCommands = @(
+  (Join-Path $repo "scripts/Compare-MIRTechnologyDesigns.ps1"),
+  (Join-Path $repo "scripts/Export-MIRCompilerPreview.ps1"),
+  (Join-Path $repo "scripts/Export-MIRTechnologyCatalog.ps1"),
+  (Join-Path $repo "scripts/New-MIRTechnologyLifecycleRecord.ps1"),
+  (Join-Path $repo "scripts/New-MIRTechnologyQualityAssessment.ps1"),
+  (Join-Path $repo "scripts/New-MIRTechnologyReviewDossier.ps1"),
+  (Join-Path $repo "scripts/Update-MIRTechnologyGovernance.ps1")
+)
+foreach ($wrapperPath in $legacyTechnologyCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 20) {
+    throw "Legacy technology command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

@@ -105,7 +105,7 @@ try {
   $catalogSourcePath = Join-Path $tempRoot "catalog-source.json"
   $catalogPath = Join-Path $tempRoot "catalog.json"
   $catalogSource | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath $catalogSourcePath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\Export-MIRTechnologyCatalog.ps1") -CatalogPath $catalogSourcePath -OutputPath $catalogPath
+  & (Join-Path $RepoRoot "tools\commands\technology\Export-MIRTechnologyCatalog.ps1") -CatalogPath $catalogSourcePath -OutputPath $catalogPath
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   if ($catalog.schema -ne 3 -or $catalog.phase -ne "final" -or @($catalog.candidates).Count -ne 1 -or @($catalog.qualifications).Count -ne 2 `
       -or @($catalog.alternative_qualifications).Count -ne 2 -or @($catalog.current_selections).Count -ne 1 `
@@ -141,7 +141,7 @@ try {
   $approvalRequestPath = Join-Path $tempRoot "approval-request.json"
   $approvalPath = Join-Path $tempRoot "approval.json"
   $approvalRequest | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $approvalRequestPath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind Approval -InputPath $approvalRequestPath -OutputPath $approvalPath
+  & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1") -Kind Approval -InputPath $approvalRequestPath -OutputPath $approvalPath
   $approval = Get-Content -Raw -LiteralPath $approvalPath | ConvertFrom-Json
   if ($approval.decision -ne "approved" -or [string]::IsNullOrWhiteSpace([string]$approval.approval_fingerprint_sha256) `
       -or [string]::IsNullOrWhiteSpace([string]$approval.applicability.structural_envelope.envelope_fingerprint_sha256)) {
@@ -160,7 +160,7 @@ try {
   $qualityMetricsPath = Join-Path $tempRoot "quality-metrics.json"
   $assessmentPath = Join-Path $tempRoot "assessment.json"
   $qualityMetrics | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $qualityMetricsPath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\New-MIRTechnologyQualityAssessment.ps1") `
+  & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyQualityAssessment.ps1") `
     -CatalogPath $catalogPath -CandidateId $after.candidate_id `
     -ProfilePath (Join-Path $RepoRoot ".mir\technology-quality-profiles.json") `
     -ProfileId "existing-stream-attachment-v1" `
@@ -172,7 +172,7 @@ try {
     throw "Technology quality assessment did not bind the exact selected alternative."
   }
   $dossierPath = Join-Path $tempRoot "review-dossier.json"
-  & (Join-Path $RepoRoot "scripts\New-MIRTechnologyReviewDossier.ps1") `
+  & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyReviewDossier.ps1") `
     -CatalogPath $catalogPath -CandidateId $after.candidate_id -AssessmentPath $assessmentPath -OutputPath $dossierPath
   $dossier = Get-Content -Raw -LiteralPath $dossierPath | ConvertFrom-Json
   if ($dossier.candidate_id -ne $after.candidate_id -or @($dossier.rejected_alternatives).Count -ne 1 `
@@ -182,8 +182,8 @@ try {
 
   $approvedDiffPath = Join-Path $tempRoot "approved-diff.json"
   $driftDiffPath = Join-Path $tempRoot "drift-diff.json"
-  & (Join-Path $RepoRoot "scripts\Compare-MIRTechnologyDesigns.ps1") -BeforePath $beforePath -AfterPath $afterPath -ApprovalPath $approvalPath -OutputPath $approvedDiffPath
-  & (Join-Path $RepoRoot "scripts\Compare-MIRTechnologyDesigns.ps1") -BeforePath $beforePath -AfterPath $driftPath -ApprovalPath $approvalPath -OutputPath $driftDiffPath
+  & (Join-Path $RepoRoot "tools\commands\technology\Compare-MIRTechnologyDesigns.ps1") -BeforePath $beforePath -AfterPath $afterPath -ApprovalPath $approvalPath -OutputPath $approvedDiffPath
+  & (Join-Path $RepoRoot "tools\commands\technology\Compare-MIRTechnologyDesigns.ps1") -BeforePath $beforePath -AfterPath $driftPath -ApprovalPath $approvalPath -OutputPath $driftDiffPath
   if ((Get-Content -Raw -LiteralPath $approvedDiffPath | ConvertFrom-Json).status -ne "APPROVED") {
     throw "Exact approved TechnologyDesign was not accepted."
   }
@@ -198,7 +198,7 @@ try {
     $decisionRequestPath = Join-Path $tempRoot "$($decision.ToLowerInvariant())-request.json"
     $decisionPath = Join-Path $tempRoot "$($decision.ToLowerInvariant()).json"
     $decisionRequest | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $decisionRequestPath -Encoding UTF8
-    & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind $decision -InputPath $decisionRequestPath -OutputPath $decisionPath
+    & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1") -Kind $decision -InputPath $decisionRequestPath -OutputPath $decisionPath
   }
 
   $promotionRequest = [ordered]@{
@@ -210,7 +210,7 @@ try {
   $promotionRequestPath = Join-Path $tempRoot "promotion-request.json"
   $promotionPath = Join-Path $tempRoot "promotion.json"
   $promotionRequest | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $promotionRequestPath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind Promotion -InputPath $promotionRequestPath -OutputPath $promotionPath
+  & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1") -Kind Promotion -InputPath $promotionRequestPath -OutputPath $promotionPath
   $admissionPath = Join-Path $tempRoot "admission.json"
   & (Join-Path $RepoRoot "validation\tests\compiler\Test-MIRTechnologyPromotionAdmission.ps1") `
     -CatalogPath $catalogPath -AssessmentPath $assessmentPath -ApprovalPath $approvalPath `
@@ -265,7 +265,7 @@ try {
   $invalidPromotion | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $invalidPromotionPath -Encoding UTF8
   $invalidRejected = $false
   try {
-    & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind Promotion -InputPath $invalidPromotionPath -OutputPath (Join-Path $tempRoot "invalid-output.json")
+    & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1") -Kind Promotion -InputPath $invalidPromotionPath -OutputPath (Join-Path $tempRoot "invalid-output.json")
   } catch { $invalidRejected = $true }
   if (-not $invalidRejected) { throw "Identity-state regression was not rejected." }
 
@@ -276,7 +276,7 @@ try {
   }
   $migrationRequestPath = Join-Path $tempRoot "migration-request.json"
   $migrationRequest | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $migrationRequestPath -Encoding UTF8
-  & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind Migration -InputPath $migrationRequestPath -OutputPath (Join-Path $tempRoot "migration.json")
+  & (Join-Path $RepoRoot "tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1") -Kind Migration -InputPath $migrationRequestPath -OutputPath (Join-Path $tempRoot "migration.json")
 } finally {
   if (Test-Path -LiteralPath $tempRoot) { Remove-Item -LiteralPath $tempRoot -Recurse -Force }
 }

@@ -44,6 +44,14 @@ paths:
   tools.commands.planner.snapshot-minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
   tools.commands.compatibility: tools/commands/compatibility
   tools.commands.compatibility.pack: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
+  tools.commands.technology: tools/commands/technology
+  tools.commands.technology.design-diff: tools/commands/technology/Compare-MIRTechnologyDesigns.ps1
+  tools.commands.technology.preview-export: tools/commands/technology/Export-MIRCompilerPreview.ps1
+  tools.commands.technology.catalog-export: tools/commands/technology/Export-MIRTechnologyCatalog.ps1
+  tools.commands.technology.lifecycle-record: tools/commands/technology/New-MIRTechnologyLifecycleRecord.ps1
+  tools.commands.technology.quality-assessment: tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1
+  tools.commands.technology.review-dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
+  tools.commands.technology.governance: tools/commands/technology/Update-MIRTechnologyGovernance.ps1
   tools.lib: tools/lib
   tools.lib.assurance: tools/lib/assurance
   tools.lib.cli: tools/lib/cli
