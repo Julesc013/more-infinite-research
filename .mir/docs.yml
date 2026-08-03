@@ -605,6 +605,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-to-2.6-convergence-programme
+  - path: docs/releases/ultimate-convergence-audit-action-register.md
+    title: "MIR Ultimate Convergence Audit Action Register"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-ultimate-convergence-audit-actions
   - path: docs/adr/0028-3-2-5-convergence-release.md
     title: "ADR 0028: MIR 3.2.5 Convergence Release"
     status: current
@@ -1484,6 +1492,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - structured-playtest-intake
+  - path: docs/maintainer/ultimate-convergence-follow-up-prompt.md
+    title: "Ultimate Convergence Follow-Up Audit Prompt"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-ultimate-convergence-follow-up-prompt
   - path: docs/maintainer/README.md
     title: "Maintainer Guide"
     status: current

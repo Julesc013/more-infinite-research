@@ -69,6 +69,15 @@ Generated: 2026-08-03
 - [ ] `CHG-2026-0004` — MIR 3.2.5 unified research cost curves (`implemented`)
 - [ ] `CHG-2026-0005` — MIR 3.2.5 compatibility observability and convergence (`planned`)
 - [ ] `CHG-2026-0006` — MIR 3.3 and 2.6 host-neutral extension platform (`planned`)
+- [ ] `CHG-2026-0007` — Correct research-cost transitions, digest layers, and formula bounds (`planned`)
+- [ ] `CHG-2026-0008` — Enforce semantic-domain integrity and ownership specificity (`planned`)
+- [ ] `CHG-2026-0009` — Make logical path IDs the sole durable path authority (`planned`)
+- [ ] `CHG-2026-0010` — Separate candidate reservation from identity and make releases append-only (`planned`)
+- [ ] `CHG-2026-0011` — Reconcile P11 protected proof, BZ ambiguity, and stabilization (`planned`)
+- [ ] `CHG-2026-0012` — Complete the 3.3 authority DAG, planned mutation, runtime, and migration cutover (`planned`)
+- [ ] `CHG-2026-0013` — Build proposition-bound Merkle assurance and isolated execution (`planned`)
+- [ ] `CHG-2026-0014` — Add typed settings and ProcessIR economy safety (`planned`)
+- [ ] `CHG-2026-0015` — Generate deterministic 2.5.5 and 2.6 target projections (`planned`)
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
 - [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `closed-exact-c24-fresh-calibration`
@@ -87,6 +96,7 @@ Generated: 2026-08-03
 - [ ] `INC-2026-0051` — Long compatibility planning lost its empty performance output directory; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0052` — Canonical protected workflow had no registered default-branch dispatcher; closure `pending-exact-protected-c30-dispatch`
 - [ ] `INC-2026-0053` — Compact calibration-proof resolver requested fields absent from execution-manifest rows; closure `closed-exact-c24-fresh-calibration`
+- [ ] `INC-2026-0054` — Runtime research progress uses inverse cost-transition ratio; closure `pending-3.2.5-cost-transition-repair-and-transition-proof`
 
 ## Explicit release obligations
 

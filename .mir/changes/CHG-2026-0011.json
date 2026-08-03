@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0011",
+  "title": "Reconcile P11 protected proof, BZ ambiguity, and stabilization",
+  "kind": "release",
+  "package_visible": false,
+  "domains_read": [
+    "release.authority",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "performance.gameplay",
+    "observation.gameplay"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "assurance.evidence",
+    "assurance.evaluation"
+  ],
+  "affected_targets": [
+    "factorio-2.0"
+  ],
+  "migration_impact": "Recover retained P11 observations, re-evaluate only sound evidence, complete exact performance and BZ classification, and record append-only post-publication qualification or an independently qualified P12. Published 2.5.0 bytes and publication facts remain immutable.",
+  "release_note_impact": "Publish a 2.5.1 note only for a confirmed package defect; assurance, tooling, transport, or classification closure remains maintainer evidence.",
+  "test_obligations": [
+    "release.authority",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "performance.gameplay",
+    "observation.gameplay",
+    "control-plane.package-freeze"
+  ],
+  "backport_disposition": {
+    "factorio-2.0": "P11 post-publication proof closure or independently qualified P12; never an empty maintenance release"
+  },
+  "state": "planned"
+}

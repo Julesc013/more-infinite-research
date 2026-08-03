@@ -28,8 +28,8 @@
     "factorio-2.1",
     "factorio-2.0"
   ],
-  "migration_impact": "Introduces MIR Extension Protocol v1 as a host-neutral, capability-negotiated, data-first protocol. MIR 3.3.x and 2.6.x share one semantic protocol while using target-specific discovery transports. The legacy compatibility-pack transport remains supported through the first complete modern and Factorio 2.0 release pair.",
-  "release_note_impact": "MIR 3.3.0 and 2.6.0 require extension-protocol, SDK, compatibility-window, target-omission, fork-continuity, and migration documentation.",
+  "migration_impact": "Introduces MIR Extension Protocol v1 as a host-neutral, capability-negotiated, data-first protocol. MIR 3.3.x and 2.6.x share one semantic protocol while using target-specific discovery transports. The legacy compatibility-pack transport remains supported through the first complete modern and Factorio 2.0 release pair. MIR 3.3.0 stabilizes only compatibility, profile/tuning, proof, presentation, capability-negotiation, and dependency/conflict surfaces; family providers, setting contributions, runtime descriptors, and trusted adapters remain separately capability-gated until qualified.",
+  "release_note_impact": "MIR 3.3.0 and 2.6.0 require extension-protocol, stable-versus-experimental capability, registration-deadline, finalization-requirement, runtime-storage continuity, SDK, compatibility-window, target-omission, fork-continuity, and migration documentation.",
   "test_obligations": [
     "architecture.boundaries",
     "product.compiler",

@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
 # Maintainer Guide
 
-Updated: 2026-07-23
+Updated: 2026-08-04
 
 This guide describes the intended 3.0 workflow for adding compatibility without copying generator logic into per-mod files.
 
@@ -20,6 +20,8 @@ Use `docs/architecture/module-boundaries.md` for where new files belong. New shi
 Use [settings governance](settings-governance.md) for startup setting IDs, visibility metadata, provider-gated settings, visible official technology settings, and backport behavior.
 
 Use [local artifact retention and storage](artifact-retention.md) to preserve the shared `testmods_*` libraries while removing completed run staging data safely.
+
+Use the [ultimate convergence follow-up audit prompt](ultimate-convergence-follow-up-prompt.md) after concurrent repository or Control Plane work to check every finding in the [ultimate convergence audit action register](../releases/ultimate-convergence-audit-action-register.md) without treating documentation as implementation or proof.
 
 ## Adding Or Moving Shipped Lua
 

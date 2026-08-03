@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0054",
+  "title": "Runtime research progress uses inverse cost-transition ratio",
+  "external_issue": "internal://runtime/research-cost-transition-progress",
+  "state": "root-cause-proven",
+  "failing_environment": {
+    "target": "2.1",
+    "release_line": "3.1.9-through-planned-3.2.5",
+    "surface": "productivity family adoption configuration change",
+    "runtime_campaign": "not-run-for-this-audit"
+  },
+  "reproduction": {
+    "status": "reproduced-by-source-and-api-contract-analysis",
+    "observed": "The runtime computes before * current_count / previous_count and recognizes only fixed count plus two legacy exponential formula forms. Factorio defines research_progress as the current fractional progress in [0,1], so unit-equivalent work preservation requires before * previous_count / current_count. Linear and hybrid canonical formulas are not evaluated."
+  },
+  "root_cause": {
+    "status": "proven-inverse-conversion-and-duplicated-parser",
+    "summary": "Runtime code reconstructs cost from a narrow string grammar and applies the new-to-old ratio. It lacks the versioned semantic descriptors produced by the canonical research-cost authority."
+  },
+  "repair_changes": [
+    "CHG-2026-0007:versioned-cost-transition-descriptor",
+    "CHG-2026-0007:old-cost-over-new-cost-progress-conversion",
+    "CHG-2026-0007:complete-sixteen-row-transition-matrix",
+    "CHG-2026-0007:bounded-canonical-evaluator"
+  ],
+  "regression_propositions": [
+    "fixed linear exponential and hybrid form a complete sixteen-row transition matrix",
+    "completed unit-equivalent work is preserved across every recognized model transition",
+    "current research exact level fractional progress queue and completed levels are preserved",
+    "configuration change save reload and a second reload are idempotent",
+    "continuous execution equals save reload execution",
+    "unknown or over-budget descriptors fail closed without guessing",
+    "default behavior remains equivalent to public 3.2.3 except for the named correction",
+    "Factorio 2.0 receives an explicit target disposition and independent proof"
+  ],
+  "affected_releases": [
+    "3.1.9",
+    "3.2.0",
+    "3.2.1",
+    "3.2.2",
+    "3.2.3",
+    "3.2.4",
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "not-frozen",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "pending-3.2.5-cost-transition-repair-and-transition-proof",
+    "proof_required": "descriptor-based canonical evaluation, corrected progress conversion, all sixteen transition rows, configuration-change and reload equivalence, exact engine realization, and target disposition before candidate freeze"
+  }
+}

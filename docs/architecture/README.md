@@ -17,7 +17,7 @@ Use the [current compiler architecture matrix](current-architecture-matrix.md) f
 
 Use the [cross-release convergence programme](../releases/3.2.5-to-2.6-convergence-programme.md) for the protected sequence from 3.2.5 through 2.6, and the [MIR 3.3 and 2.6 convergence platform roadmap](3.3-2.6-convergence-platform-roadmap.md) for future compiler, target-projection, assurance, and ecosystem work. The preserved [semantic-platform roadmap](3.3-2.6-semantic-platform-roadmap.md) is a historical checkpoint, not current authority.
 
-The [MIR Extension Protocol v1 roadmap](mir-extension-protocol-v1.md) defines the host-neutral extension boundary planned for 3.3. It does not authorize package-visible work in 3.2.5 or a 2.5.5 candidate before the projection-feasibility gate.
+The [MIR Extension Protocol v1 roadmap](mir-extension-protocol-v1.md) defines the host-neutral extension boundary planned for 3.3. It does not authorize package-visible work in 3.2.5 or a 2.5.5 candidate before the projection-feasibility gate. The [ultimate convergence audit action register](../releases/ultimate-convergence-audit-action-register.md) records the immediate authority, release, cost-transition, assurance, and target-projection corrections that must be reconciled with these roadmaps.
 
 ## Data Stage Flow
 

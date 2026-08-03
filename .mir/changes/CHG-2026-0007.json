@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0007",
+  "title": "Correct research-cost transitions, digest layers, and formula bounds",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "product.balance",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "transition.upgrade",
+    "assurance.evidence"
+  ],
+  "domains_written": [
+    "product.balance",
+    "product.compiler",
+    "product.runtime",
+    "assurance.schemas",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Replace runtime research-formula reparsing with versioned old/new cost descriptors, preserve completed unit-equivalent research work with old_fraction * old_cost / new_cost, separate semantic and authority identity, and fail closed for unknown or over-budget models.",
+  "release_note_impact": "MIR 3.2.5 must document corrected configuration-change research progress, supported model transitions, safe refusal, profile migration, and any target-specific runtime omission.",
+  "test_obligations": [
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "product.balance",
+    "transition.upgrade",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical descriptor, evaluator, progress-preservation, parser-budget, and 16-row transition implementation before the first real 3.2.5 candidate",
+    "factorio-2.0": "project only where the target runtime capability exists; otherwise record an explicit omission and independently qualify the 2.5.5 or 2.6 behavior"
+  },
+  "state": "planned"
+}

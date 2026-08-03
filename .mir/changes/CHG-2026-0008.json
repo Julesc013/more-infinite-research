@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0008",
+  "title": "Enforce semantic-domain integrity and ownership specificity",
+  "kind": "tooling",
+  "package_visible": false,
+  "domains_read": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "assurance.plan"
+  ],
+  "domains_written": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "assurance.plan"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Declare product.balance and validate every task, ownership, downstream, and obligation-alias domain reference. Resolve each source path through one most-specific rule; equal specificity requires explicit composition and broad patterns are fallback-only.",
+  "release_note_impact": "Package-excluded Control Plane governance correction; record in maintainer release evidence without presenting it as a player feature.",
+  "test_obligations": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "assurance.plan",
+    "control-plane.schemas",
+    "control-plane.records",
+    "control-plane.graph"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical Control Plane implementation on dev",
+    "factorio-2.0": "shared package-excluded governance and target-local plan verification; no legacy package change"
+  },
+  "state": "planned"
+}

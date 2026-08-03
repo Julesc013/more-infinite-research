@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0013",
+  "title": "Build proposition-bound Merkle assurance and isolated execution",
+  "kind": "tooling",
+  "package_visible": false,
+  "domains_read": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "scenario.catalog"
+  ],
+  "domains_written": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "assurance.schemas",
+    "ci.workflow"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Evolve Control Plane v5 with CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observations, bounded pure evaluators, exact batching exclusions, explicit freshness, and separated external-mod runner, aggregator, and publisher roles.",
+  "release_note_impact": "Package-excluded assurance architecture; release documentation must identify reused propositions, fresh work, exact process grouping, isolation, revocation, and final no-reuse gates.",
+  "test_obligations": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "assurance.schemas",
+    "scenario.catalog",
+    "ci.workflow"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical v5 evolution without a verifier rewrite",
+    "factorio-2.0": "target-local observation and evaluation closures with no reuse of 2.1 runtime proof"
+  },
+  "state": "planned"
+}

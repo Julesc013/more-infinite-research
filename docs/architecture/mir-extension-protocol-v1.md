@@ -210,7 +210,9 @@ claim:
 
 Each fragment has its own schema, owner, version, semantic identity, authority identity, target disposition, and proof contract. A documentation or profile edit must not invalidate an unchanged compatibility selector.
 
-## Stable declarative surfaces
+## Declarative surfaces and stability allocation
+
+The stable MIR 3.3.0 MEP-1 surface is deliberately narrow: compatibility fragments, profile/tuning fragments, proof fragments, presentation fragments, capability negotiation, and dependency/conflict declarations. Declarative family providers, static setting contributions, runtime descriptors, and trusted adapters remain experimental or deferred until their operator algebra, lifecycle deadlines, storage continuity, target behavior, budgets, and conformance corpus are qualified. Experimental surfaces use separate capability IDs and cannot be required for stable-extension conformance.
 
 ### Compatibility fragment
 
@@ -221,6 +223,8 @@ Compatibility fragments evolve the current `CompatibilityPack`: aliases, exact i
 Profiles may select safe feature enablement, safe owners, science and prerequisite policy, cost/effect values within bounds, maximum-level preferences, MIR-owned presentation, and target recommendations. Profiles cannot widen hard safety.
 
 ### Declarative family-provider fragment
+
+This surface is experimental for 3.3.0 and is targeted for qualified composition in 3.3.2 or later.
 
 A provider composes registered bounded operators for discovery, normalization, classification, risk, science, prerequisites, ownership, and balance. Ordinary providers cannot execute arbitrary callbacks.
 
@@ -242,6 +246,8 @@ New family creation remains review-gated until its operator set, complexity, tar
 
 ### Static settings contribution
 
+This surface is experimental until typed setting specifications, settings-stage discovery, target projection, locale generation, profile round trips, and collision behavior are qualified.
+
 An extension may add a genuinely necessary namespaced startup setting only during the settings stage. Most extensions should use sparse profile fields instead. A final recipe or technology discovered during the prototype stage cannot retroactively create a startup setting.
 
 ### Presentation fragment
@@ -254,9 +260,18 @@ Proof fragments declare positive and negative fixtures, expected dispositions, e
 
 ### Runtime descriptor
 
+This surface is experimental until runtime operator, storage-root, state-schema, migration, event-order, complexity, target, and reload-equivalence contracts are qualified.
+
 MEP-1 runtime descriptors initially reference only MIR-provided bounded handler operators. They declare state namespace and schema, event subscriptions, filters, migration references, target requirements, determinism, and complexity. Arbitrary runtime callbacks are not part of the stable declarative protocol.
 
 ## Registry lifecycle
+
+Registration deadlines are part of the protocol contract:
+
+- A static setting contribution must be registered no later than `settings-updates`; later discovery is rejected and cannot synthesize startup settings.
+- A prototype-stage contribution must be registered no later than `data-updates`; later discovery is rejected unless it declares a supported `FinalizationRequirement` that the host can prove.
+- `FinalizationRequirement` declares the required stage, required predecessor/successor mod IDs, target constraints, and failure disposition. If the host cannot guarantee the ordering, it quarantines the contribution with a stable diagnostic rather than guessing finalizer order.
+- Runtime descriptors are compiled from the frozen accepted registry; runtime registration cannot retroactively alter settings or prototypes.
 
 ### Settings stage
 

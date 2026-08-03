@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0010",
+  "title": "Separate candidate reservation from identity and make releases append-only",
+  "kind": "release",
+  "package_visible": false,
+  "domains_read": [
+    "release.authority",
+    "release.presentation",
+    "release.seal",
+    "assurance.evidence"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "release.seal",
+    "assurance.schemas"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Represent C32 as a reserved candidate floor while 3.2.5 is planned, assign evidence-bearing candidate_id only at source or package freeze, and model later release facts as append-only events and post-publication qualifications over immutable release identity.",
+  "release_note_impact": "Generated views and maintainer runbooks must distinguish planned reservation, exact candidate, immutable publication identity, later qualification, and current status.",
+  "test_obligations": [
+    "release.authority",
+    "release.presentation",
+    "release.seal",
+    "assurance.schemas",
+    "assurance.evidence",
+    "control-plane.records"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "apply before C32 source freeze; any package change after the first build increments the candidate",
+    "factorio-2.0": "use the same reservation/event model for P12, conditional 2.5.5, and 2.6 without rewriting P11 history"
+  },
+  "state": "planned"
+}

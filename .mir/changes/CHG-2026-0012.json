@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0012",
+  "title": "Complete the 3.3 authority DAG, planned mutation, runtime, and migration cutover",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "assurance.evidence"
+  ],
+  "domains_written": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "assurance.schemas",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Evolve current authorities into an acyclic graph, physically separate sealed safety from configurable policy, make every prototype mutation planned, complete explicit CompilerContext and CompilationRun boundaries, and generate versioned runtime state and migration handling.",
+  "release_note_impact": "MIR 3.3 requires architecture, API, migration, runtime-state, compatibility-window, target-disposition, and differential-proof documentation.",
+  "test_obligations": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog",
+    "transition.upgrade"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical staged 3.3 implementation through shadowed one-authority-at-a-time cutovers",
+    "factorio-2.0": "project frozen 3.3 semantics through reviewed adapters and independent 2.6 qualification"
+  },
+  "state": "planned"
+}
