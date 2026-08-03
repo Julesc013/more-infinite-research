@@ -52,6 +52,17 @@ foreach ($docsAlias in @(
     $_.from -eq $docsAlias.from -and $_.to -eq $docsAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical documentation-command alias is missing or writable: $($docsAlias.from)" }
 }
+foreach ($plannerAlias in @(
+  @{from=("scripts/" + "Compare-MIRPlannerReports.ps1");to="tools.commands.planner.report-diff"},
+  @{from=("scripts/" + "Compare-MIRPlannerSnapshots.ps1");to="tools.commands.planner.snapshot-diff"},
+  @{from=("scripts/" + "Export-MIRPlannerSnapshot.ps1");to="tools.commands.planner.snapshot-export"},
+  @{from=("scripts/" + "Minimize-MIRPlannerSnapshot.ps1");to="tools.commands.planner.snapshot-minimize"},
+  @{from=("scripts/" + "New-MIRCompatibilityPack.ps1");to="tools.commands.compatibility.pack"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $plannerAlias.from -and $_.to -eq $plannerAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical planner/compatibility-command alias is missing or writable: $($plannerAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -131,6 +142,11 @@ if ($docsCommandMigrationPreview.mode -ne "preview" -or $docsCommandMigrationPre
     $docsCommandMigrationPreview.commands -ne 4) {
   throw "Documentation-command migration is incomplete or not idempotent: $($docsCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$plannerCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRPlannerCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($plannerCommandMigrationPreview.mode -ne "preview" -or $plannerCommandMigrationPreview.changed -ne 0 -or
+    $plannerCommandMigrationPreview.commands -ne 5) {
+  throw "Planner-command migration is incomplete or not idempotent: $($plannerCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -161,6 +177,19 @@ foreach ($wrapperPath in $legacyDocsCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 30) {
     throw "Legacy documentation command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyPlannerCommands = @(
+  (Join-Path $repo "scripts/Compare-MIRPlannerReports.ps1"),
+  (Join-Path $repo "scripts/Compare-MIRPlannerSnapshots.ps1"),
+  (Join-Path $repo "scripts/Export-MIRPlannerSnapshot.ps1"),
+  (Join-Path $repo "scripts/Minimize-MIRPlannerSnapshot.ps1"),
+  (Join-Path $repo "scripts/New-MIRCompatibilityPack.ps1")
+)
+foreach ($wrapperPath in $legacyPlannerCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 30) {
+    throw "Legacy planner/compatibility command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

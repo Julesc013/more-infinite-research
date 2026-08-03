@@ -35,7 +35,7 @@ Use `tools/mir.ps1` first:
 .\tools\mir.ps1 package build
 .\tools\mir.ps1 local-index build --mods <path>
 .\validation\tests\tooling\Test-MIRPolicyLints.ps1
-.\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
+.\tools\commands\planner\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
 
 Common overrides:
@@ -126,11 +126,11 @@ scripts/Invoke-MIRCompatAudit.ps1
 scripts/Convert-MIRCompatAuditResults.ps1
 scripts/New-MIRCompatProfileStub.ps1
 validation/tests/tooling/Test-MIRPolicyLints.ps1
-scripts/Compare-MIRPlannerReports.ps1
-scripts/Export-MIRPlannerSnapshot.ps1
-scripts/Compare-MIRPlannerSnapshots.ps1
-scripts/Minimize-MIRPlannerSnapshot.ps1
-scripts/New-MIRCompatibilityPack.ps1
+tools/commands/planner/Compare-MIRPlannerReports.ps1
+tools/commands/planner/Export-MIRPlannerSnapshot.ps1
+tools/commands/planner/Compare-MIRPlannerSnapshots.ps1
+tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
+tools/commands/compatibility/New-MIRCompatibilityPack.ps1
 ```
 
 `Export-MIRPlannerSnapshot.ps1` converts one or more MIR audit logs into a deterministic target/source/archive-bound JSON snapshot with separate plan and coverage rows. `Compare-MIRPlannerSnapshots.ps1` reports added, removed, and changed plan identities and can require different target profiles for a target-plan diff. `Minimize-MIRPlannerSnapshot.ps1` extracts the rows tied to named recipes, streams, rules, capabilities, or subjects for a focused fixture packet. `New-MIRCompatibilityPack.ps1` creates a non-public, review-required schema-2 pack scaffold and refuses to overwrite an existing file. Static validation runs `Test-MIRPlannerTools.ps1` against all five workflows.
@@ -140,9 +140,9 @@ scripts/New-MIRCompatibilityPack.ps1
 Example target-plan workflow:
 
 ```powershell
-.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.1.log -TargetProfile 2.1 -OutputPath .\plan-2.1.json
-.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.0.log -TargetProfile 2.0 -OutputPath .\plan-2.0.json
-.\scripts\Compare-MIRPlannerSnapshots.ps1 -Before .\plan-2.1.json -After .\plan-2.0.json -RequireDifferentTargets
+.\tools\commands\planner\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.1.log -TargetProfile 2.1 -OutputPath .\plan-2.1.json
+.\tools\commands\planner\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.0.log -TargetProfile 2.0 -OutputPath .\plan-2.0.json
+.\tools\commands\planner\Compare-MIRPlannerSnapshots.ps1 -Before .\plan-2.1.json -After .\plan-2.0.json -RequireDifferentTargets
 ```
 
 Private helpers:

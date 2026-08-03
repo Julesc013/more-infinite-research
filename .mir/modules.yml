@@ -655,6 +655,7 @@ validation_tooling:
     repository_package_command_migrator: tools/maintenance/Move-MIRPackageCommands.ps1
     repository_workspace_command_migrator: tools/maintenance/Move-MIRWorkspaceCommands.ps1
     repository_docs_command_migrator: tools/maintenance/Move-MIRDocsCommands.ps1
+    repository_planner_command_migrator: tools/maintenance/Move-MIRPlannerCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -751,6 +752,11 @@ validation_tooling:
     sanitation_budgets: validation/tests/release/Test-MIRSanitationBudgets.ps1
     evidence_hygiene: validation/tests/release/Test-MIREvidenceHygiene.ps1
     planner_artifacts: validation/tests/tooling/Test-MIRPlannerTools.ps1
+    planner_report_diff: tools/commands/planner/Compare-MIRPlannerReports.ps1
+    planner_snapshot_diff: tools/commands/planner/Compare-MIRPlannerSnapshots.ps1
+    planner_snapshot_export: tools/commands/planner/Export-MIRPlannerSnapshot.ps1
+    planner_snapshot_minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
+    compatibility_pack_scaffold: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
     compiler_preview_export: scripts/Export-MIRCompilerPreview.ps1

@@ -25,8 +25,8 @@ try {
 
   $beforeSnapshot = Join-Path $root "before.json"
   $afterSnapshot = Join-Path $root "after.json"
-  & (Join-Path $RepoRoot "scripts\Export-MIRPlannerSnapshot.ps1") -AuditLogPaths $beforeLog -TargetProfile "2.1" -SourceCommit ("a" * 40) -OutputPath $beforeSnapshot
-  & (Join-Path $RepoRoot "scripts\Export-MIRPlannerSnapshot.ps1") -AuditLogPaths $afterLog -TargetProfile "2.0" -SourceCommit ("b" * 40) -OutputPath $afterSnapshot
+  & (Join-Path $RepoRoot "tools\commands\planner\Export-MIRPlannerSnapshot.ps1") -AuditLogPaths $beforeLog -TargetProfile "2.1" -SourceCommit ("a" * 40) -OutputPath $beforeSnapshot
+  & (Join-Path $RepoRoot "tools\commands\planner\Export-MIRPlannerSnapshot.ps1") -AuditLogPaths $afterLog -TargetProfile "2.0" -SourceCommit ("b" * 40) -OutputPath $afterSnapshot
 
   $before = Get-Content -Raw -LiteralPath $beforeSnapshot | ConvertFrom-Json
   if ($before.plan_rows.Count -ne 2 -or $before.coverage_rows.Count -ne 2 -or [string]::IsNullOrWhiteSpace($before.fingerprint_sha256)) {
@@ -34,22 +34,38 @@ try {
   }
 
   $diffPath = Join-Path $root "diff.json"
-  & (Join-Path $RepoRoot "scripts\Compare-MIRPlannerSnapshots.ps1") -Before $beforeSnapshot -After $afterSnapshot -OutputPath $diffPath -RequireDifferentTargets | Out-Null
+  & (Join-Path $RepoRoot "tools\commands\planner\Compare-MIRPlannerSnapshots.ps1") -Before $beforeSnapshot -After $afterSnapshot -OutputPath $diffPath -RequireDifferentTargets | Out-Null
   $diff = Get-Content -Raw -LiteralPath $diffPath | ConvertFrom-Json
   if ($diff.added_count -ne 1 -or $diff.removed_count -ne 1 -or $diff.changed_count -ne 1) {
     throw "Planner snapshot diff counts are incorrect."
   }
 
   $minimumPath = Join-Path $root "minimum.json"
-  & (Join-Path $RepoRoot "scripts\Minimize-MIRPlannerSnapshot.ps1") -InputPath $beforeSnapshot -Subjects "gear" -OutputPath $minimumPath
+  & (Join-Path $RepoRoot "tools\commands\planner\Minimize-MIRPlannerSnapshot.ps1") -InputPath $beforeSnapshot -Subjects "gear" -OutputPath $minimumPath
   $minimum = Get-Content -Raw -LiteralPath $minimumPath | ConvertFrom-Json
   if ($minimum.row_count -ne 1 -or $minimum.rows[0].recipe -ne "gear") { throw "Planner snapshot minimizer selected the wrong rows." }
 
   $packPath = Join-Path $root "example-pack.json"
-  & (Join-Path $RepoRoot "scripts\New-MIRCompatibilityPack.ps1") -Id "example-pack" -ModId "example-mod" -OutputPath $packPath
+  & (Join-Path $RepoRoot "tools\commands\compatibility\New-MIRCompatibilityPack.ps1") -Id "example-pack" -ModId "example-mod" -OutputPath $packPath
   $pack = Get-Content -Raw -LiteralPath $packPath | ConvertFrom-Json
   if ($pack.schema -ne 2 -or $pack.review.required -ne $true -or $pack.claim.public -ne $false) {
     throw "CompatibilityPack scaffold is not schema-2 review-required data."
+  }
+
+  $beforeReportRoot = Join-Path $root "before-report"
+  $afterReportRoot = Join-Path $root "after-report"
+  New-Item -ItemType Directory -Path $beforeReportRoot, $afterReportRoot | Out-Null
+  [ordered]@{ observations = @([ordered]@{ kind = "stream"; key = "alpha"; status = "generated" }) } |
+    ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $beforeReportRoot "compat-observations.json") -Encoding UTF8
+  [ordered]@{ observations = @([ordered]@{ kind = "stream"; key = "beta"; status = "generated" }) } |
+    ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $afterReportRoot "compat-observations.json") -Encoding UTF8
+  $reportDiffPath = Join-Path $root "report-diff.json"
+  & (Join-Path $RepoRoot "tools\commands\planner\Compare-MIRPlannerReports.ps1") -Before $beforeReportRoot -After $afterReportRoot -OutputPath $reportDiffPath | Out-Null
+  $reportDiff = Get-Content -Raw -LiteralPath $reportDiffPath | ConvertFrom-Json
+  $generatedSection = @($reportDiff.sections | Where-Object label -eq "generated streams")
+  if ($generatedSection.Count -ne 1 -or $generatedSection[0].before -ne 1 -or $generatedSection[0].after -ne 1 -or
+      $generatedSection[0].added -ne 1 -or $generatedSection[0].removed -ne 1) {
+    throw "Planner report diff did not classify added and removed generated streams."
   }
 } finally {
   $resolvedTemp = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())

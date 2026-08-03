@@ -138,6 +138,26 @@ aliases:
     to: tools.commands.docs.defaults
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Compare-MIRPlannerReports.ps1
+    to: tools.commands.planner.report-diff
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Compare-MIRPlannerSnapshots.ps1
+    to: tools.commands.planner.snapshot-diff
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Export-MIRPlannerSnapshot.ps1
+    to: tools.commands.planner.snapshot-export
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Minimize-MIRPlannerSnapshot.ps1
+    to: tools.commands.planner.snapshot-minimize
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRCompatibilityPack.ps1
+    to: tools.commands.compatibility.pack
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

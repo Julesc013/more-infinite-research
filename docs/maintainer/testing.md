@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -96,7 +96,7 @@ Each fixture should assert:
 Use report diffing when a mod updates or a classifier changes:
 
 ```powershell
-.\scripts\Compare-MIRPlannerReports.ps1 `
+.\tools\commands\planner\Compare-MIRPlannerReports.ps1 `
   -Before build\previous\mir-planner `
   -After build\current\mir-planner
 ```

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -213,7 +213,7 @@ The kernel now has enforceable platform pieces:
 - generated stream manifest metadata in `prototypes/mir/streams/generated_stream_manifest.json`;
 - machine-readable claims in `spec/compatibility/claims.json`;
 - static linting through `validation/tests/tooling/Test-MIRPolicyLints.ps1`;
-- report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
+- report drift comparison through `tools/commands/planner/Compare-MIRPlannerReports.ps1`;
 - negative capability fixtures for loop risks, hidden recipes, cap-zero recipes, and structural loader/drill decoys.
 
 New mod support should add policy and fixtures first. New behavior classes should add or extend a capability resolver. New false positives should become classifier or policy fixes. New bug reports should become negative fixtures.
