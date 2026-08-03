@@ -34,7 +34,7 @@ Use `scripts/mir.ps1` first:
 .\scripts\mir.ps1 report observations --run <path>
 .\scripts\mir.ps1 package build
 .\scripts\mir.ps1 local-index build --mods <path>
-.\scripts\Test-MIRPolicyLints.ps1
+.\validation\tests\tooling\Test-MIRPolicyLints.ps1
 .\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
 
@@ -115,7 +115,7 @@ scripts/Start-MIROvernightLocalSweep.ps1
 scripts/Show-MIROvernightSummary.ps1
 scripts/Build-MIRPackage.ps1
 scripts/Invoke-MIRValidation.ps1
-scripts/Test-MIRArchitecture.ps1
+validation/tests/architecture/Test-MIRArchitecture.ps1
 ```
 
 Advanced engines:
@@ -125,7 +125,7 @@ scripts/Invoke-MIRExtendedTests.ps1
 scripts/Invoke-MIRCompatAudit.ps1
 scripts/Convert-MIRCompatAuditResults.ps1
 scripts/New-MIRCompatProfileStub.ps1
-scripts/Test-MIRPolicyLints.ps1
+validation/tests/tooling/Test-MIRPolicyLints.ps1
 scripts/Compare-MIRPlannerReports.ps1
 scripts/Export-MIRPlannerSnapshot.ps1
 scripts/Compare-MIRPlannerSnapshots.ps1
@@ -156,7 +156,7 @@ The helper folders are not an architecture project to finish before useful work 
 
 ## Quality Checks
 
-`scripts/Test-MIRPowerShellQuality.ps1` validates the PowerShell tooling surface:
+`validation/tests/tooling/Test-MIRPowerShellQuality.ps1` validates the PowerShell tooling surface:
 
 - every `scripts/**/*.ps1` file parses;
 - parameter blocks do not contain duplicate parameter names;
@@ -179,7 +179,7 @@ Legacy inventory thresholds are also part of static validation. Run the standalo
 Run it directly when working only on tooling:
 
 ```powershell
-.\scripts\Test-MIRPowerShellQuality.ps1
+.\validation\tests\tooling\Test-MIRPowerShellQuality.ps1
 ```
 
 ## Design Rule

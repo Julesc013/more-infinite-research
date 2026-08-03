@@ -44,5 +44,5 @@ context_sets:
       - .mir/branches.yml
       - docs/maintainer/backporting.md
     validate:
-      - powershell: .\scripts\Test-MIRBranchPolicy.ps1 -SkipFetch
+      - powershell: .\validation\tests\release\Test-MIRBranchPolicy.ps1 -SkipFetch
 

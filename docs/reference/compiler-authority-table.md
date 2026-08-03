@@ -16,10 +16,10 @@ This table names one machine authority, validator, and reference contract for ea
 
 | Surface | Schema | Machine authority | Validator | Primary consumer |
 | --- | ---: | --- | --- | --- |
-| Effect metadata | 1 | `prototypes/mir/domain/effects/metadata.lua` | `scripts/Test-MIRCompilerSchemaDrift.ps1` | effect contracts, settings, ownership, emission |
+| Effect metadata | 1 | `prototypes/mir/domain/effects/metadata.lua` | `validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1` | effect contracts, settings, ownership, emission |
 | Effect target contracts | 1 | `.mir/technology-effect-targets.json` and generated `domain/effects/generated_target_contracts.lua` | `Update-MIRCompilerAuthorities.ps1 -Check` | pure target identity and validation contracts |
-| Stable generated streams | 1 | `prototypes/mir/streams/generated_stream_manifest.json` | `scripts/Test-MIRGoldenPlans.ps1` | stream registry and migration policy |
-| Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `scripts/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
+| Stable generated streams | 1 | `prototypes/mir/streams/generated_stream_manifest.json` | `validation/tests/tooling/Test-MIRGoldenPlans.ps1` | stream registry and migration policy |
+| Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `validation/tests/architecture/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
 | CompilerProvider | 1 | `prototypes/mir/providers/contract.lua` | `prototypes/mir/providers/registry.lua` and compiler-contract fixture | normalized FamilyRule provider adapter |
 | Provider pipeline and budget | 1 | `prototypes/mir/providers/pipeline/` | compiler-contract and scale fixtures | schema-3 ProviderDecision projection |
@@ -27,7 +27,7 @@ This table names one machine authority, validator, and reference contract for ea
 | ProviderClaim | 1 | `prototypes/mir/providers/pipeline/provider_claim.lua` | compiler-contract provider matrix | semantic duplicate collapse and ambiguity rejection |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
 | TechnologyDesign | 2 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator, semantic schema-drift checks, and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
-| ResearchCostModel | 1 | `prototypes/mir/domain/research_cost/model.lua` | `scripts/Test-MIRResearchCostModels.ps1`, native-owner fixtures, and compiler schema drift | generated streams, native-owner adoption, and base continuations |
+| ResearchCostModel | 1 | `prototypes/mir/domain/research_cost/model.lua` | `validation/tests/compiler/Test-MIRResearchCostModels.ps1`, native-owner fixtures, and compiler schema drift | generated streams, native-owner adoption, and base continuations |
 | Technology hard gate | 1 | `.mir/technology-hard-gates.json`, generated hard-gate authority, and `gate.lua` | GenerationPlan, SafetyQualification, and compiler-contract fixture | total evidence-bearing decisions including N/A applicability proof |
 | SafetyQualification | 1 | `prototypes/mir/domain/technology/safety_qualification.lua` | TechnologyCatalog and compiler-contract fixture | deterministic selection eligibility |
 | DesignAssessment | 1 | `prototypes/mir/domain/technology/design_assessment.lua` | lifecycle and compiler-contract fixtures | design review independent from safety |
@@ -52,6 +52,6 @@ This table names one machine authority, validator, and reference contract for ea
 | Public compiler artifact projections | 1 | `prototypes/mir/report/public_compiler_artifacts.lua` | architecture gate and compiler-contract fixtures | normal-load `mod-data` publication |
 | RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |
 | Runtime scenario declaration | 3 | `fixtures/compat-matrix/expected-scenarios.json` | `scripts/validation/ScenarioRegistry.ps1` | validation harness |
-| Campaign scenario declaration | 2 | `fixtures/compat-matrix/local-library-scenarios.json` | `scripts/Test-MIRScenarioManifests.ps1` | compatibility audit runner |
+| Campaign scenario declaration | 2 | `fixtures/compat-matrix/local-library-scenarios.json` | `validation/tests/compatibility/Test-MIRScenarioManifests.ps1` | compatibility audit runner |
 
 `prototypes/mir/settings/effect_contracts.lua` consumes effect metadata and may add setting defaults, but it is not a second effect classification authority. Compatibility data cannot create stream or technology identities. Every generated technology identity remains in the stable stream manifest.

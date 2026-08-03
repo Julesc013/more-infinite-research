@@ -22,7 +22,7 @@ MIR ships a complete locale file for every language directory supported by the q
 | `.mir/locales/translations/<locale>.json` | Complete per-key translations, English source hashes, and provenance. |
 | `.mir/locales/overrides.json` | Small reviewed corrections for terminology or machine-draft values that need explicit wording. |
 | `scripts/Update-MIRLocales.ps1` | Deterministic CFG and translation-memory generator. |
-| `scripts/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
+| `validation/tests/docs/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
 | `scripts/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
 
 Files below `locale/<code>/` other than English are generated outputs. Change a translation-memory value or add a narrow override, then regenerate; do not leave a hand-edited CFG that differs from its memory.
@@ -39,7 +39,7 @@ This intentionally fails and lists a language with missing or stale source hashe
 
 ```powershell
 .\scripts\Update-MIRLocales.ps1 -MachineTranslateMissing
-.\scripts\Test-MIRLocales.ps1
+.\validation\tests\docs\Test-MIRLocales.ps1
 ```
 
 Machine assistance is an initial completion mechanism, not a substitute for the exact-candidate `locale-fit-and-truncation` manual release item. Community or maintainer corrections should replace machine-assisted values in translation memory or the small override catalog and preserve the matching English source hash.

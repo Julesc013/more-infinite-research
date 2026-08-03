@@ -22,4 +22,4 @@ jobs:
           fetch-depth: 0
       - name: Validate permanent branch policy
         shell: pwsh
-        run: .\scripts\Test-MIRBranchPolicy.ps1
+        run: .\validation\tests\release\Test-MIRBranchPolicy.ps1

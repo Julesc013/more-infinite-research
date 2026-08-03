@@ -45,7 +45,7 @@ try {
 
   & (Join-Path $Worktree "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $Worktree -Check
   if ($LASTEXITCODE -ne 0) { throw "Reconstructed target profiles are stale." }
-  & (Join-Path $Worktree "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $Worktree
+  & (Join-Path $Worktree "validation\tests\release\Test-MIRBackportSourceLock.ps1") -RepoRoot $Worktree
   if ($LASTEXITCODE -ne 0) { throw "Reconstructed backport source lock failed." }
 
   $parentCommitEpochs = @($projectionCommit, $sourceCommit | ForEach-Object {

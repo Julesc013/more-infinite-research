@@ -48,6 +48,22 @@ $schemaMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/mainte
 if ($schemaMigrationPreview.mode -ne "preview" -or $schemaMigrationPreview.changed -ne 0) {
   throw "Schema-root migration is not idempotent: $($schemaMigrationPreview | ConvertTo-Json -Compress)"
 }
+$testMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRTestRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($testMigrationPreview.mode -ne "preview" -or $testMigrationPreview.changed -ne 0 -or $testMigrationPreview.tests -ne 65) {
+  throw "Test-root migration is incomplete or not idempotent: $($testMigrationPreview | ConvertTo-Json -Compress)"
+}
+$legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
+$canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
+  Where-Object Name -ne "Test-MIRLayout.ps1")
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 65) {
+  throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
+}
+foreach ($wrapper in $legacyTestWrappers) {
+  $text = Get-Content -Raw -LiteralPath $wrapper.FullName
+  if ($text -notmatch "MIR-L4-LEGACY-TEST-WRAPPER" -or $text.Split([char]10).Count -gt 30) {
+    throw "Legacy test entrypoint is not a thin forwarding wrapper: $($wrapper.Name)"
+  }
+}
 $legacySchemaGlob = ("verification/" + "schema/**")
 $legacySchemaFiles = @(& git -C $repo ls-files $legacySchemaGlob)
 if ($LASTEXITCODE -ne 0 -or $legacySchemaFiles.Count -ne 0) {
@@ -92,6 +108,13 @@ function Invoke-MIRCliProbe {
   return [pscustomobject]@{exit_code=$LASTEXITCODE;output=$output}
 }
 
+$legacySchemaTestPath = "scripts/" + "Test-MIRVerificationSchemas.ps1"
+$legacyTest = Invoke-MIRCliProbe -Entrypoint (Join-Path $repo $legacySchemaTestPath) -Arguments @("-RepoRoot", $repo)
+$canonicalTest = Invoke-MIRCliProbe -Entrypoint (Join-Path $repo "validation/tests/tooling/Test-MIRVerificationSchemas.ps1") -Arguments @("-RepoRoot", $repo)
+if ($legacyTest.exit_code -ne $canonicalTest.exit_code -or $legacyTest.output -cne $canonicalTest.output) {
+  throw "Legacy/canonical test entrypoint parity failed."
+}
+
 foreach ($arguments in @(
   [string[]]@("help"),
   [string[]]@("path", "resolve", "releases.deltas"),
@@ -104,4 +127,4 @@ foreach ($arguments in @(
   }
 }
 
-Write-Host "[ok] repository paths, output roots, hidden artifact uploads, historical aliases, ownership inventory, layout safety, and CLI facade parity agree."
+Write-Host "[ok] repository paths, canonical tests, legacy wrappers, output roots, hidden artifact uploads, historical aliases, ownership inventory, layout safety, and CLI facade parity agree."

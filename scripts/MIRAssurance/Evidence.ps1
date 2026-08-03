@@ -187,8 +187,8 @@ function Get-MIRAssuranceInputFingerprint {
       return Get-MIRAssurancePatternFingerprint -Patterns @(
         "fixtures/$fixture/**",
         "fixtures/upgrade-modset-source/**",
-        "scripts/Test-MIRUpgrade.ps1",
-        "scripts/Test-MIRUpgradeMatrix.ps1",
+        "validation/tests/runtime/Test-MIRUpgrade.ps1",
+        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
         "spec/schemas/upgrade-matrix.schema.json"
       )
     }

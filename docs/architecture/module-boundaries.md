@@ -15,7 +15,7 @@ Updated: 2026-07-24
 
 This note refines the `3.0.0` compatibility compiler plan into a concrete repository structure. The organizing rule is:
 
-The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
+The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. Canonical test implementations live under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files are parameter-compatible forwarding wrappers for historical commands only. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
 
 ```text
 Factorio root files stay thin.
@@ -106,7 +106,7 @@ Compatibility policy uses `prototypes/mir/compatibility/`. `policy_authority.lua
 
 The technology graph semantics no longer belong separately to planner and emitter code. `prototypes/mir/graph/` is the shared non-mutating kernel for canonical snapshots, iterative strongly connected components, condensation, reachability, researchability, the graph-wide researchability index, qualification, diff, and proof evidence. A completed graph qualification constructs one trusted immutable passing proof for its exact graph identity and shares that record across every accepted planned technology; rejected technologies retain their distinct causal evidence. Qualification establishes one sorted technology-name authority and its freshly owned sorted prerequisite arrays; snapshot construction and SCC analysis consume that same ordering and the SCC kernel consumes the already ordered reverse edges instead of rebuilding them. Researchability consumes the snapshot-owned stable node view. `technology_map()` remains the defensive-copy boundary for callers requiring ownership. `planner/technology_graph.lua` and `emit/technology_graph_safety.lua` are adapters: virtual and realized graphs bind exact graph, component-assignment, condensation, and proof fingerprints before parity is accepted.
 
-Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua`; `emit/icon_builder.lua` is a compatibility facade. Pure blocked-effect policy lives in `domain/technology/effect_safety_policy.lua`, while the emit facade owns mutation. `.mir/module-dependencies.json` and `scripts/Test-MIRModuleDependencies.ps1` enforce forbidden planner-to-emitter imports, overlay mutation boundaries, command authority, and an exact bounded baseline for the few remaining legacy cycles.
+Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua`; `emit/icon_builder.lua` is a compatibility facade. Pure blocked-effect policy lives in `domain/technology/effect_safety_policy.lua`, while the emit facade owns mutation. `.mir/module-dependencies.json` and `validation/tests/architecture/Test-MIRModuleDependencies.ps1` enforce forbidden planner-to-emitter imports, overlay mutation boundaries, command authority, and an exact bounded baseline for the few remaining legacy cycles.
 
 ### Technology Catalog Construction Ownership
 

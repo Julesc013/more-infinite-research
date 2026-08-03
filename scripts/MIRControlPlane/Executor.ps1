@@ -781,7 +781,7 @@ function Invoke-MIRCPUpgradeMeasurement {
   $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
   $outputPath = Join-Path $repo ".work/output/control-plane-v5/upgrade-evidence.json"
-  & (Join-Path $source.path "scripts/Test-MIRUpgradeMatrix.ps1") -RepoRoot $source.path `
+  & (Join-Path $source.path "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1") -RepoRoot $source.path `
     -FactorioBin $factorio.path -FromZip $prior -ToZip $candidate `
     -FromVersion ([string]$profile.upgrade.from_version) -ToVersion ([string]$profile.upgrade.to_version) `
     -FixtureName ([string]$profile.upgrade.fixture) -OutputPath $outputPath
@@ -1044,7 +1044,7 @@ function Invoke-MIRCPApprovedDeltaMeasurement {
     -ExpectedSourceCommit ([string]$source.commit)
   $exportExitCode = $LASTEXITCODE
   if ($exportExitCode -eq 0) {
-    & (Join-Path $source.path "scripts/Test-MIRApprovedDelta.ps1") -Path $outputPath `
+    & (Join-Path $source.path "validation/tests/release/Test-MIRApprovedDelta.ps1") -Path $outputPath `
       -Candidate $candidate -ExpectedSourceCommit ([string]$source.commit)
   }
   $testExitCode = $LASTEXITCODE

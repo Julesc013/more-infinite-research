@@ -212,7 +212,7 @@ The kernel now has enforceable platform pieces:
 - capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
 - generated stream manifest metadata in `prototypes/mir/streams/generated_stream_manifest.json`;
 - machine-readable claims in `fixtures/compat-matrix/claims.json`;
-- static linting through `scripts/Test-MIRPolicyLints.ps1`;
+- static linting through `validation/tests/tooling/Test-MIRPolicyLints.ps1`;
 - report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
 - negative capability fixtures for loop risks, hidden recipes, cap-zero recipes, and structural loader/drill decoys.
 

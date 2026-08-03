@@ -87,11 +87,11 @@ $evidenceRoot = 'C:\Projects\Factorio\v5-evidence'
 & "$cp\scripts\Invoke-MIRControlPlane.ps1" views -Check -RepoRoot $cp
 & "$cp\scripts\Invoke-MIRControlPlane.ps1" registry -Check -RepoRoot $cp
 & "$cp\scripts\Invoke-MIRControlPlane.ps1" replay -Check -RepoRoot $cp
-& "$cp\scripts\Test-MIRControlPlane.ps1" -RepoRoot $cp
-& "$cp\scripts\Test-MIRControlPlaneShadow.ps1" -ContractOnly -RepoRoot $cp
-& "$cp\scripts\Test-MIRControlPlaneExecutor.ps1" -RepoRoot $cp
-& "$cp\scripts\Test-MIRControlPlaneRelease.ps1" -RepoRoot $cp
-& "$cp\scripts\Test-MIRControlPlaneWorkflow.ps1" -RepoRoot $cp
+& "$cp\validation\tests\tooling\Test-MIRControlPlane.ps1" -RepoRoot $cp
+& "$cp\validation\tests\tooling\Test-MIRControlPlaneShadow.ps1" -ContractOnly -RepoRoot $cp
+& "$cp\validation\tests\tooling\Test-MIRControlPlaneExecutor.ps1" -RepoRoot $cp
+& "$cp\validation\tests\tooling\Test-MIRControlPlaneRelease.ps1" -RepoRoot $cp
+& "$cp\validation\tests\tooling\Test-MIRControlPlaneWorkflow.ps1" -RepoRoot $cp
 ```
 
 The parameterless shadow command is not a preflight. Operational shadow evaluation requires one immutable context and exact source checkout; `-ContractOnly` is the correct pre-context check.

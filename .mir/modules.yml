@@ -646,6 +646,7 @@ validation_tooling:
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
     repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
+    repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json
@@ -680,99 +681,99 @@ validation_tooling:
     control_plane_executor: scripts/MIRControlPlane/Executor.ps1
     control_plane_calibration: scripts/MIRControlPlane/Calibration.ps1
     control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
-    control_plane_shadow_gate: scripts/Test-MIRControlPlaneShadow.ps1
-    control_plane_gate: scripts/Test-MIRControlPlane.ps1
+    control_plane_shadow_gate: validation/tests/tooling/Test-MIRControlPlaneShadow.ps1
+    control_plane_gate: validation/tests/tooling/Test-MIRControlPlane.ps1
     control_plane_release: scripts/MIRControlPlane/Release.ps1
-    control_plane_release_gate: scripts/Test-MIRControlPlaneRelease.ps1
+    control_plane_release_gate: validation/tests/tooling/Test-MIRControlPlaneRelease.ps1
     control_plane_execution_registry_generator: scripts/Update-MIRExecutionRegistry.ps1
-    control_plane_execution_registry_gate: scripts/Test-MIRExecutionRegistry.ps1
+    control_plane_execution_registry_gate: validation/tests/tooling/Test-MIRExecutionRegistry.ps1
     control_plane_observation_replay_generator: scripts/Update-MIRObservationReplay.ps1
-    control_plane_observation_gate: scripts/Test-MIRObservationEvaluation.ps1
+    control_plane_observation_gate: validation/tests/tooling/Test-MIRObservationEvaluation.ps1
     control_plane_context_builder: scripts/New-MIRVerificationContext.ps1
-    control_plane_context_gate: scripts/Test-MIRVerificationContext.ps1
-    control_plane_evidence_gate: scripts/Test-MIREvidenceStore.ps1
+    control_plane_context_gate: validation/tests/tooling/Test-MIRVerificationContext.ps1
+    control_plane_evidence_gate: validation/tests/tooling/Test-MIREvidenceStore.ps1
     control_plane_work_entrypoint: scripts/Invoke-MIRControlPlaneWork.ps1
-    control_plane_executor_gate: scripts/Test-MIRControlPlaneExecutor.ps1
-    control_plane_context_package_gate: scripts/Test-MIRContextPackage.ps1
-    control_plane_context_registry_gate: scripts/Test-MIRContextExecutionRegistry.ps1
-    control_plane_release_obligation_gate: scripts/Test-MIRReleaseObligation.ps1
+    control_plane_executor_gate: validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1
+    control_plane_context_package_gate: validation/tests/package/Test-MIRContextPackage.ps1
+    control_plane_context_registry_gate: validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1
+    control_plane_release_obligation_gate: validation/tests/release/Test-MIRReleaseObligation.ps1
     control_plane_shadow_baseline_generator: scripts/Update-MIRShadowBaselines.ps1
     control_plane_shadow_analysis_generator: scripts/Update-MIRShadowAnalysis.ps1
     control_plane_workflow: .github/workflows/control-plane-v5.yml
-    control_plane_workflow_gate: scripts/Test-MIRControlPlaneWorkflow.ps1
+    control_plane_workflow_gate: validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: scripts/MIRAssurance/Core.ps1
     assurance_domains: scripts/MIRAssurance/Domains.ps1
     assurance_evidence: scripts/MIRAssurance/Evidence.ps1
     assurance_hashing: scripts/MIRAssurance/Hashing.ps1
     assurance_release: scripts/MIRAssurance/Release.ps1
-    assurance_tests: scripts/Test-MIRAssurance.ps1
-    release_authority: scripts/Test-MIRReleaseAuthority.ps1
-    native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
-    research_cost_model_tests: scripts/Test-MIRResearchCostModels.ps1
+    assurance_tests: validation/tests/tooling/Test-MIRAssurance.ps1
+    release_authority: validation/tests/release/Test-MIRReleaseAuthority.ps1
+    native_owner_balance_tests: validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1
+    research_cost_model_tests: validation/tests/compiler/Test-MIRResearchCostModels.ps1
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation
     museum_compiler: scripts/Museum/MuseumCompiler.psm1
     museum_build: scripts/Build-MIRMuseumTarget.ps1
-    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
-    museum_exact_runtime_gate: scripts/Test-MIRMuseumExact.ps1
-    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
+    museum_static_gate: validation/tests/runtime/Test-MIRMuseumCompiler.ps1
+    museum_exact_runtime_gate: validation/tests/runtime/Test-MIRMuseumExact.ps1
+    museum_runtime_gate: validation/tests/runtime/Test-MIRMuseumRuntime.ps1
     museum_qualification: scripts/New-MIRMuseumQualification.ps1
     museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
-    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
-    backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
+    museum_seal_check: validation/tests/runtime/Test-MIRMuseumSeal.ps1
+    backport_source_lock: validation/tests/release/Test-MIRBackportSourceLock.ps1
     backport_reconstruction_contract: .mir/backports/2.5.0.json
-    backport_reconstruction_gate: scripts/Test-MIRBackportManifest.ps1
+    backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
-    backport_reconstruction_evidence_gate: scripts/Test-MIRBackportReconstruction.ps1
+    backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     package_composition: scripts/Measure-MIRPackageComposition.ps1
-    package_composition_gate: scripts/Test-MIRPackageComposition.ps1
+    package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
     structured_evidence: scripts/validation/ResultAggregation.ps1
     factorio_process: scripts/validation/FactorioProcess.ps1
     settings_overrides: scripts/validation/SettingsOverrides.ps1
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
-    golden_plans: scripts/Test-MIRGoldenPlans.ps1
-    campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
-    sanitation_budgets: scripts/Test-MIRSanitationBudgets.ps1
-    evidence_hygiene: scripts/Test-MIREvidenceHygiene.ps1
-    planner_artifacts: scripts/Test-MIRPlannerTools.ps1
+    golden_plans: validation/tests/tooling/Test-MIRGoldenPlans.ps1
+    campaign_scenarios: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
+    sanitation_budgets: validation/tests/release/Test-MIRSanitationBudgets.ps1
+    evidence_hygiene: validation/tests/release/Test-MIREvidenceHygiene.ps1
+    planner_artifacts: validation/tests/tooling/Test-MIRPlannerTools.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
     compiler_preview_export: scripts/Export-MIRCompilerPreview.ps1
-    compiler_preview_export_gate: scripts/Test-MIRCompilerPreviewExport.ps1
+    compiler_preview_export_gate: validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
     technology_governance_source: .mir/technology-governance.json
     technology_governance_generator: scripts/Update-MIRTechnologyGovernance.ps1
     technology_quality_assessment: scripts/New-MIRTechnologyQualityAssessment.ps1
     technology_review_dossier: scripts/New-MIRTechnologyReviewDossier.ps1
-    technology_promotion_admission: scripts/Test-MIRTechnologyPromotionAdmission.ps1
-    technology_lifecycle_gate: scripts/Test-MIRTechnologyLifecycle.ps1
+    technology_promotion_admission: validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
+    technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
-    offline_rule_synthesis_gate: scripts/Test-MIRRuleSynthesis.ps1
+    offline_rule_synthesis_gate: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
     mod_interaction_graph: scripts/New-MIRModInteractionGraph.ps1
-    mod_interaction_gate: scripts/Test-MIRModInteractions.ps1
+    mod_interaction_gate: validation/tests/compatibility/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
-    approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
+    approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1
     control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
     control_plane_performance_campaigns: .mir/performance-campaigns
-    runtime_performance_gate: scripts/Test-MIRPerformanceRegression.ps1
-    manual_release_review_gate: scripts/Test-MIRManualReleaseReview.ps1
+    runtime_performance_gate: validation/tests/release/Test-MIRPerformanceRegression.ps1
+    manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
     localization_overrides: .mir/locales/overrides.json
     localization_generator: scripts/Update-MIRLocales.ps1
-    localization_gate: scripts/Test-MIRLocales.ps1
+    localization_gate: validation/tests/docs/Test-MIRLocales.ps1
     localization_core: scripts/localization/MIRLocalization.psm1
     release_attestations: scripts/validation/ReleaseAttestations.ps1
     runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
-    compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
+    compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
     pipeline_documentation: scripts/Update-MIRPipelineDocumentation.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
-    compiler_gate: scripts/Test-MIRCompiler.ps1
+    compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
     verification_domains: validation/domains.yml
     verification_profiles: validation/profiles

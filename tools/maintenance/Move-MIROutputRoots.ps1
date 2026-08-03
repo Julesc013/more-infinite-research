@@ -31,8 +31,8 @@ Get-ChildItem -LiteralPath (Join-Path $repo ".mir/tasks") -Filter *.json -File |
   ForEach-Object { $files.Add($_.FullName) }
 
 $excluded = @(
-  (Join-Path $repo "scripts/Test-MIRArtifactCleanup.ps1"),
-  (Join-Path $repo "scripts/Test-MIRPowerShellQuality.ps1"),
+  (Join-Path $repo "validation/tests/package/Test-MIRArtifactCleanup.ps1"),
+  (Join-Path $repo "validation/tests/tooling/Test-MIRPowerShellQuality.ps1"),
   (Join-Path $repo "scripts/Update-MIRShadowBaselines.ps1")
 )
 $replacements = @(

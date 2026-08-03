@@ -239,7 +239,7 @@ $readme = @(
   "",
   "Use the isolated ``$relativeEvidenceRoot/base`` and ``$relativeEvidenceRoot/space-age`` user-data roots. Do not point either run at a normal player mod directory.",
   "",
-  "The JSON templates are pending worksheets. After Factorio $ExpectedFactorioVersion is available, bind its exact binary hash, complete every check with portable screenshot/save evidence, convert the worksheet to the strict schema, compute its canonical self-hash, and run ``scripts/Test-MIRManualReleaseReview.ps1``."
+  "The JSON templates are pending worksheets. After Factorio $ExpectedFactorioVersion is available, bind its exact binary hash, complete every check with portable screenshot/save evidence, convert the worksheet to the strict schema, compute its canonical self-hash, and run ``validation/tests/release/Test-MIRManualReleaseReview.ps1``."
 )
 [System.IO.File]::WriteAllLines(
   (Join-Path $outputRoot "README.md"),

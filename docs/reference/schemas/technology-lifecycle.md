@@ -70,7 +70,7 @@ Evaluate the selected alternative against a governed profile, produce a determin
 ```powershell
 .\scripts\New-MIRTechnologyQualityAssessment.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -ProfileId release -MetricsPath metrics.json -EvidencePath evidence.json -OutputPath assessment.json
 .\scripts\New-MIRTechnologyReviewDossier.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -OutputPath dossier.json
-.\scripts\Test-MIRTechnologyPromotionAdmission.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -ApprovalPath approval.json -PromotionPath promotion.json -EvidencePath evidence.json -OutputPath admission.json
+.\validation\tests\compiler\Test-MIRTechnologyPromotionAdmission.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -ApprovalPath approval.json -PromotionPath promotion.json -EvidencePath evidence.json -OutputPath admission.json
 ```
 
 Compare leaf-field values and enforce an approval's locks:

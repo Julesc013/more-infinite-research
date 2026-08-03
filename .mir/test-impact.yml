@@ -25,13 +25,13 @@
       "tags": []
     },
     {
-      "pattern": "scripts/Test-MIRAssurance.ps1",
+      "pattern": "validation/tests/tooling/Test-MIRAssurance.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "scripts/Test-MIRReleaseAuthority.ps1",
+      "pattern": "validation/tests/release/Test-MIRReleaseAuthority.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []

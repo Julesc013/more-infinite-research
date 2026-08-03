@@ -23,7 +23,7 @@ Package validation builds from the current source tree and checks that repositor
 Run the local reproducibility gate with:
 
 ```powershell
-.\scripts\Test-MIRDeterministicPackage.ps1
+.\validation\tests\package\Test-MIRDeterministicPackage.ps1
 ```
 
 It builds two independent archives, requires identical SHA-256 values, and verifies canonical entry order and timestamps. Before release, repeat the comparison from a second clean worktree or CI checkout to prove checkout-independent identity.

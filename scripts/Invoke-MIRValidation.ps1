@@ -146,20 +146,20 @@ function Get-PolicyTextFiles {
 
 if ($DocsOnly -or $ManifestsOnly) {
   Invoke-RepoCheck "docs and governance manifests are linted" {
-    & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+    & (Join-Path $repo "validation\tests\tooling\Test-MIRGovernance.ps1") -RepoRoot $repo
   }
   exit 0
 }
 
 if ($ArchitectureOnly) {
   Invoke-RepoCheck "docs and governance manifests are linted" {
-    & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+    & (Join-Path $repo "validation\tests\tooling\Test-MIRGovernance.ps1") -RepoRoot $repo
   }
   Invoke-RepoCheck "MIR architecture boundaries are linted" {
-    & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
+    & (Join-Path $repo "validation\tests\architecture\Test-MIRArchitecture.ps1") -RepoRoot $repo
   }
   Invoke-RepoCheck "settings visibility policy is linted" {
-    & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
+    & (Join-Path $repo "validation\tests\compiler\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
   }
   Invoke-RepoCheck "legacy inventory thresholds pass" {
     & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
@@ -176,24 +176,24 @@ Invoke-RepoCheck "target profile views match canonical manifest" {
 }
 
 Invoke-RepoCheck "release authority views match the canonical ledger" {
-  & (Join-Path $repo "scripts\Test-MIRReleaseAuthority.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIRReleaseAuthority.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "backport source lock is current when present" {
-  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "canonical backport reconstruction manifests are complete" {
   $manifestRoot = Join-Path $repo ".mir\backports"
   if (Test-Path -LiteralPath $manifestRoot -PathType Container) {
     foreach ($manifest in @(Get-ChildItem -LiteralPath $manifestRoot -Filter "*.json" -File | Sort-Object Name)) {
-      & (Join-Path $repo "scripts\Test-MIRBackportManifest.ps1") -RepoRoot $repo -ManifestPath $manifest.FullName -AllowPendingTags
+      & (Join-Path $repo "validation\tests\release\Test-MIRBackportManifest.ps1") -RepoRoot $repo -ManifestPath $manifest.FullName -AllowPendingTags
     }
   }
 }
 
 Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
-  & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release metadata matches Factorio line" {
@@ -323,15 +323,15 @@ Invoke-RepoCheck "docs match opportunistic compatibility policy" {
 }
 
 Invoke-RepoCheck "docs and governance manifests are linted" {
-  & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRGovernance.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "MIR architecture boundaries are linted" {
-  & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\architecture\Test-MIRArchitecture.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "settings visibility policy is linted" {
-  & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "legacy inventory thresholds pass" {
@@ -347,7 +347,7 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
 }
 
 Invoke-RepoCheck "generated count formulas use the unified canonical research-cost model" {
-  & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
@@ -530,75 +530,75 @@ Invoke-RepoCheck "merged trash-slot technology has save migration" {
 }
 
 Invoke-RepoCheck "locale files match English fallback" {
-  & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
+  & (Join-Path $repo "validation\tests\docs\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
 Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
-  & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
-  & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compatibility\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "ecosystem campaigns declare exact sanitation budgets" {
-  & (Join-Path $repo "scripts\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "active release evidence is portable and summary-oriented" {
-  & (Join-Path $repo "scripts\Test-MIREvidenceHygiene.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIREvidenceHygiene.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
-  & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "the exact active-release approved delta is complete" {
-  & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -ValidateStructureOnly
+  & (Join-Path $repo "validation\tests\release\Test-MIRApprovedDelta.ps1") -ValidateStructureOnly
 }
 
 Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
-  & (Join-Path $repo "scripts\Test-MIRCompilerSchemaDrift.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRCompilerSchemaDrift.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "compiler contract coverage and mutation sentinels are complete" {
-  & (Join-Path $repo "scripts\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "technology lifecycle records and review tooling are schema-bound" {
-  & (Join-Path $repo "scripts\Test-MIRTechnologyLifecycle.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRTechnologyLifecycle.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "technology policy corpora and applicability envelopes are governed" {
-  & (Join-Path $repo "scripts\Test-MIRTechnologyPolicy.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRTechnologyPolicy.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "offline family-rule synthesis is deterministic and review-only" {
-  & (Join-Path $repo "scripts\Test-MIRRuleSynthesis.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compiler\Test-MIRRuleSynthesis.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "semantic mod interactions and combination campaigns are complete" {
-  & (Join-Path $repo "scripts\Test-MIRModInteractions.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compatibility\Test-MIRModInteractions.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
-  & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\compatibility\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "performance budgets declare every required surface" {
-  & (Join-Path $repo "scripts\Test-MIRPerformanceBudgets.ps1") -RepoRoot $repo -ValidateManifestOnly
+  & (Join-Path $repo "validation\tests\release\Test-MIRPerformanceBudgets.ps1") -RepoRoot $repo -ValidateManifestOnly
 }
 
 Invoke-RepoCheck "validation scenario groups and partial result aggregation are stable" {
-  & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRValidationResults.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "package and harness fingerprints are checkout-line-ending invariant" {
-  & (Join-Path $repo "scripts\Test-MIRPackageIdentity.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\package\Test-MIRPackageIdentity.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "Markdown formatter preserves structural syntax" {
-  & (Join-Path $repo "scripts\Test-MIRMarkdownFormatting.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\docs\Test-MIRMarkdownFormatting.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
@@ -1361,14 +1361,14 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $stubText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\New-MIRCompatProfileStub.ps1")
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
-  $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRLocalModLibraryCatalog.ps1")
+  $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1")
   $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
   $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\Console.ps1")
   $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\RunContext.ps1")
   $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\EventLog.ps1")
   $processSupervisorText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\ProcessSupervisor.ps1")
   $localModIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\LocalModIndex.ps1")
-  $powershellQualityText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1")
+  $powershellQualityText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\tooling\Test-MIRPowerShellQuality.ps1")
   $runProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\release-targeted.json")
   $localAuditProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\local-audit-2.1.json")
   $releaseTargeted20ProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\release-targeted-2.0.json")
@@ -1493,10 +1493,10 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'RepairSmokeModNames' },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'RepresentativeScenarioName' },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'AuditFactorioVersions' },
-    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = '[Parameter(Mandatory)][string[]]$LocalModLibraryDirs' },
-    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
-    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
-    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
+    @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = '[Parameter(Mandatory)][string[]]$LocalModLibraryDirs' },
+    @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
+    @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
+    @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\tools\mir.ps1 release gate" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
@@ -1505,8 +1505,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "report observations" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
-    @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
-    @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "possible secret output" },
+    @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
+    @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "possible secret output" },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = "Test-MIRPowerShellQuality.ps1" },
     @{ File = "scripts\MIRCli\Console.ps1"; Text = $consoleText; Snippet = "Write-MIRScenarioResult" },
     @{ File = "scripts\MIRCli\RunContext.ps1"; Text = $runContextText; Snippet = "run-manifest.json" },
@@ -1601,7 +1601,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
-  $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
+  $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\tooling\Test-MIRPolicyLints.ps1")
 
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
     throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
@@ -1695,7 +1695,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '## Capability Decisions' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" },
-    @{ File = "scripts\Test-MIRPolicyLints.ps1"; Text = $policyLintText; Snippet = "Generated stream manifest row" }
+    @{ File = "validation\tests\tooling\Test-MIRPolicyLints.ps1"; Text = $policyLintText; Snippet = "Generated stream manifest row" }
   )
 
   foreach ($check in $requiredSnippets) {
@@ -1874,11 +1874,11 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
 }
 
 Invoke-RepoCheck "compatibility policy and claim lints pass" {
-  & (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRPolicyLints.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "stable generated technology golden plan passes" {
-  & (Join-Path $repo "scripts\Test-MIRGoldenPlans.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\tooling\Test-MIRGoldenPlans.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
@@ -2257,7 +2257,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
 Invoke-RepoCheck "package construction is byte deterministic" {
   if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
+    & (Join-Path $repo "validation\tests\package\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
   } else {
     Write-Host "[skip] exact candidate lane reuses separate deterministic-package evidence"
   }

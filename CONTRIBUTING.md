@@ -62,7 +62,7 @@ For risky generation, science-pack, cargo logistics, or compatibility changes, a
 For branch policy changes:
 
 ```powershell
-.\scripts\Test-MIRBranchPolicy.ps1
+.\validation\tests\release\Test-MIRBranchPolicy.ps1
 ```
 
 ## Changelog and Mod Portal Notes
