@@ -30,6 +30,9 @@ function M.summary(cost_model)
     growth_factor = cost_model.growth_factor,
     count_formula = cost_model.count_formula,
     provenance = deepcopy(cost_model.provenance),
+    semantic_digest = cost_model.semantic_digest,
+    authority_digest = cost_model.authority_digest,
+    qualification_digest = cost_model.qualification_digest,
     fingerprint = cost_model.fingerprint
   }
 end

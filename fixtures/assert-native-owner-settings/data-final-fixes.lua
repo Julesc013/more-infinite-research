@@ -48,8 +48,8 @@ local streams = {
 local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
-if not adoption_data or adoption_data.version ~= 2 then
-  fail("expected native-owner binding mod-data schema 2")
+if not adoption_data or adoption_data.version ~= 3 then
+  fail("expected native-owner binding mod-data schema 3")
 end
 local signature = tostring(adoption_data.signature or "")
 local expected_binding_count = 0
@@ -76,7 +76,7 @@ for _, stream in ipairs(streams) do
   local max_changed = max_level ~= 0
   local effect_changed = effect_percent ~= 10
   local safely_rejected = enabled and unrecognized and cost_changed
-  local signature_prefix = "schema=2|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
+  local signature_prefix = "schema=3|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
 
   if not enabled then
     if string.find(signature, signature_prefix, 1, true) then
@@ -98,10 +98,14 @@ for _, stream in ipairs(streams) do
     if time_changed then table.insert(configured, "research_time") end
     local operation = #configured > 0 and "configure_native_owner" or "preserve_native_owner"
     local expected_fragment = signature_prefix .. operation
-      .. "|configured=" .. table.concat(configured, ",") .. "|effects=0|output="
+      .. "|configured=" .. table.concat(configured, ",") .. "|effects=0|input-cost="
     if not string.find(signature, expected_fragment, 1, true) then
       fail("binding signature mismatch for " .. stream.owner .. "; expected " .. expected_fragment
         .. " in " .. signature)
+    end
+    if not string.find(signature, "|output-cost=", 1, true)
+        or not string.find(signature, "|output=", 1, true) then
+      fail("binding signature omitted cost identities or output fingerprint for " .. stream.owner)
     end
 
     if unrecognized then

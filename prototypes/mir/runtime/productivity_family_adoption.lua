@@ -1,6 +1,7 @@
 local M = {}
 M.requires_features = {"productivity_family_adoption"}
 local runtime_state = require("prototypes.mir.runtime.state")
+local transition_descriptor = require("prototypes.mir.domain.research_cost.transition_descriptor")
 
 local ADOPTION_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 
@@ -27,8 +28,8 @@ local function current_adoption_state()
   local bindings = {}
   for _, binding in ipairs(data.bindings or {}) do
     bindings[tostring(binding.owner)] = {
-      input_unit = binding.input_unit or {},
-      output_unit = binding.output_unit or {}
+      input_descriptor = binding.input_descriptor,
+      output_descriptor = binding.output_descriptor
     }
   end
   return {
@@ -39,36 +40,27 @@ local function current_adoption_state()
   }
 end
 
-local function compact(value)
-  return tostring(value or ""):gsub("%s+", "")
-end
-
-local function research_unit_count(unit, level)
-  if type(unit) ~= "table" then return nil end
-  if type(unit.count) == "number" then return math.floor(unit.count) end
-  local formula = compact(unit.count_formula)
-  local growth, base = formula:match("^([%d%.]+)%^L%*([%d%.]+)$")
-  if growth and base then return math.floor(tonumber(growth) ^ level * tonumber(base)) end
-  base, growth = formula:match("^([%d%.]+)%*([%d%.]+)%^%(L%-1%)$")
-  if base and growth then return math.floor(tonumber(base) * tonumber(growth) ^ (level - 1)) end
-  return nil
-end
-
 local function restore_current_research_progress(previous_bindings, current_bindings)
   for _, force in pairs(game.forces) do
     local technology = force.current_research
     local current = technology and current_bindings[technology.name]
     if current then
-      local previous = previous_bindings[technology.name] or {output_unit = current.input_unit}
-      local previous_count = research_unit_count(previous.output_unit, technology.level)
-      local current_count = research_unit_count(current.output_unit, technology.level)
-      if previous_count and current_count and previous_count > 0 and current_count > 0
-          and previous_count ~= current_count then
-        local before = force.research_progress
-        local restored = math.max(0, math.min(1, before * current_count / previous_count))
+      local previous = previous_bindings[technology.name] or {}
+      -- A stored v2 binding has no descriptor. On the first v3 transition,
+      -- the current input descriptor is the exact pre-change model.
+      local previous_descriptor = previous.output_descriptor or current.input_descriptor
+      local before = force.research_progress
+      local restored, detail = transition_descriptor.convert_fraction(
+        before, previous_descriptor, current.output_descriptor, technology.level)
+      if restored and detail.previous_cost ~= detail.current_cost then
         force.research_progress = restored
         log("[more-infinite-research] Preserved current research progress for native owner "
-          .. technology.name .. " from " .. tostring(before) .. " to " .. tostring(restored) .. ".")
+          .. technology.name .. " from " .. tostring(before) .. " to " .. tostring(restored)
+          .. " using realized cost " .. tostring(detail.previous_cost)
+          .. " -> " .. tostring(detail.current_cost) .. ".")
+      elseif not restored then
+        log("[more-infinite-research] Refused unsafe current research progress conversion for native owner "
+          .. technology.name .. ": " .. tostring(detail) .. ".")
       end
     end
   end

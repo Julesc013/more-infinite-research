@@ -31,6 +31,11 @@ $researchCostSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "protot
 $formulaSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\formula.lua")
 $classificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\classification.lua")
 $bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\planner\native_owner_binding.lua")
+$transitionSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\transition_descriptor.lua")
+$emitterSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\emit\transactions\productivity_family_adoption.lua")
+$runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\runtime\productivity_family_adoption.lua")
+$progressFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-native-owner-progress\control.lua")
+$validationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRValidation.ps1")
 
 foreach ($contract in $contracts) {
   $stream = [string]$contract.stream
@@ -79,5 +84,19 @@ $costTrioIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or
 if (-not $costTrioIsAtomic) {
   throw "Native-owner cost settings must activate the complete visible base/increment/growth trio."
 }
+if ($transitionSource -notmatch 'factorio-research-unit-count-floor-v1' -or
+    $transitionSource -notmatch 'previous_cost' -or $transitionSource -notmatch 'current_cost') {
+  throw "Native-owner transition descriptor does not bind realized old/new cost evidence."
+}
+if ($emitterSource -notmatch 'VERSION\s*=\s*3' -or $runtimeSource -match 'count_formula.*match') {
+  throw "Native-owner runtime ABI is not descriptor-only schema 3."
+}
+if ($progressFixtureSource -notmatch 'rows ~= 16' -or
+    $progressFixtureSource -notmatch 'native-owner observed progress proof' -or
+    $progressFixtureSource -notmatch 'over-budget evaluation did not fail closed' -or
+    $validationSource -notmatch 'Assert-NativeOwnerResearchWorkPreserved' -or
+    $validationSource -notmatch 'did not preserve completed research-unit work') {
+  throw "Native-owner lifecycle fixture does not prove the full transition matrix and safe refusal."
+}
 
-Write-Host "[ok] five Factorio 2.1 native-owner balance contracts and unified safe formula adapters passed."
+Write-Host "[ok] five Factorio 2.1 native-owner contracts and descriptor-based work preservation passed."

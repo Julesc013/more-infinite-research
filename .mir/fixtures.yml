@@ -608,6 +608,10 @@ fixtures:
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
       - configuration-change-signature-without-global-effect-reset
+      - versioned-research-cost-transition-descriptors
+      - fixed-linear-exponential-hybrid-sixteen-row-transition-matrix
+      - completed-research-unit-work-preservation
+      - malformed-and-over-budget-transition-fail-closed
       - external-give-item-connected-player-manual-review-surface
       - other-mod-configuration-change-recipe-state-preserved
       - configuration-change-current-research-progress-retention

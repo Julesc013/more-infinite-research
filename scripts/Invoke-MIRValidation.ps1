@@ -30,6 +30,7 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "tools\lib\validation\FactorioProcess.ps1")
 . (Join-Path $repo "tools\lib\validation\SettingsOverrides.ps1")
 . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
+. (Join-Path $repo "tools\lib\control\Core.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $expectedScenariosPath = Join-Path $repo "validation\scenarios\runtime.json"
 if ($List) {
@@ -1979,7 +1980,8 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   if ($lines[0] -ne $separator) {
     throw "changelog.txt must start with exactly 99 dashes."
   }
-  $currentReleasePath = Join-Path $repo ".mir\releases\$($repoInfo.version).json"
+  $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo.Path -Id "releases.records"
+  $currentReleasePath = Join-Path $repo (Join-Path $releaseRecordRoot "$($repoInfo.version).json")
   if (-not (Test-Path -LiteralPath $currentReleasePath -PathType Leaf)) {
     throw "Current info.json version has no typed release lifecycle record."
   }
@@ -3103,6 +3105,34 @@ function Assert-LogContains {
   return $line.Line
 }
 
+function Assert-NativeOwnerResearchWorkPreserved {
+  param([string]$Context)
+  $logText = Get-Content -Raw -LiteralPath $FactorioLog
+  $transitionPattern = 'Preserved current research progress for native owner low-density-structure-productivity from (?<before>[0-9.eE+-]+) to (?<after>[0-9.eE+-]+) using realized cost (?<previous>[0-9.eE+-]+) -> (?<current>[0-9.eE+-]+)\.'
+  $observationPattern = '\[mir-fixture\] native-owner observed progress proof before=(?<before>[0-9.eE+-]+) after=(?<after>[0-9.eE+-]+) prior-cost=(?<previous>[0-9.eE+-]+) level=(?<level>[0-9]+)'
+  $transition = [regex]::Match($logText, $transitionPattern)
+  $observation = [regex]::Match($logText, $observationPattern)
+  if (-not $transition.Success -or -not $observation.Success) {
+    throw "$Context is missing parseable production transition or fixture observation evidence."
+  }
+  $culture = [Globalization.CultureInfo]::InvariantCulture
+  $before = [double]::Parse($transition.Groups['before'].Value, $culture)
+  $after = [double]::Parse($transition.Groups['after'].Value, $culture)
+  $previous = [double]::Parse($transition.Groups['previous'].Value, $culture)
+  $current = [double]::Parse($transition.Groups['current'].Value, $culture)
+  $observedBefore = [double]::Parse($observation.Groups['before'].Value, $culture)
+  $observedAfter = [double]::Parse($observation.Groups['after'].Value, $culture)
+  $observedPrevious = [double]::Parse($observation.Groups['previous'].Value, $culture)
+  $expected = [Math]::Max(0.0, [Math]::Min(1.0, $before * $previous / $current))
+  $epsilon = 0.000001
+  if ([Math]::Abs($after - $expected) -gt $epsilon -or
+      [Math]::Abs($observedBefore - $before) -gt $epsilon -or
+      [Math]::Abs($observedAfter - $after) -gt $epsilon -or
+      [Math]::Abs($observedPrevious - $previous) -gt $epsilon) {
+    throw "$Context did not preserve completed research-unit work or match the independent fixture observation."
+  }
+}
+
 function Assert-LogDoesNotContain {
   param([string]$Unexpected, [string]$Context)
   $line = Select-String -LiteralPath $FactorioLog -Pattern $Unexpected -SimpleMatch | Select-Object -Last 1
@@ -3480,7 +3510,9 @@ if ($selectionActive -and -not $checkpointActive) {
           Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
           Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context $declaration.name
           Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
-          Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
+          Assert-LogContains -Expected "[mir-fixture] research-cost transition matrix proof complete phase=configuration-changed rows=16" -Context $declaration.name
+          Assert-NativeOwnerResearchWorkPreserved -Context $declaration.name
+          Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context $declaration.name
           }
           "space-age-vanilla-family-adoption-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -3488,7 +3520,7 @@ if ($selectionActive -and -not $checkpointActive) {
               -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
               -EnableSpaceAge
             Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
-            Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context $declaration.name
+            Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|input-cost=" -Context $declaration.name
           }
           "space-age-scripted-runtime-lifecycle" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -4526,8 +4558,10 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
   Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
-  Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
-  Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "[mir-fixture] research-cost transition matrix proof complete phase=configuration-changed rows=16" -Context "space-age-native-owner-settings-config-change"
+  Assert-NativeOwnerResearchWorkPreserved -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=3|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(

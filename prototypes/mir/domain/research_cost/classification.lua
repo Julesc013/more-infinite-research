@@ -2,12 +2,18 @@ local model = require("prototypes.mir.domain.research_cost.model")
 
 local M = {}
 local EPSILON = 1e-8
+local MAXIMUM_FORMULA_BYTES = 512
+local MAXIMUM_TOKENS = 128
+local MAXIMUM_PARSE_DEPTH = 32
 
 local function close(left, right)
   return math.abs(left - right) <= EPSILON * math.max(1, math.abs(left), math.abs(right))
 end
 
 local function tokenize(text)
+  if type(text) ~= "string" or #text > MAXIMUM_FORMULA_BYTES then
+    return nil, "formula_budget_exceeded"
+  end
   local tokens, index = {}, 1
   while index <= #text do
     local char = text:sub(index, index)
@@ -33,6 +39,7 @@ local function tokenize(text)
     else
       return nil, "unsupported_token"
     end
+    if #tokens > MAXIMUM_TOKENS then return nil, "formula_budget_exceeded" end
   end
   return tokens
 end
@@ -48,7 +55,8 @@ local function parse(text)
     return token and (kind == nil or token.kind == kind) and token or nil
   end
 
-  local function primary()
+  local function primary(depth)
+    if depth > MAXIMUM_PARSE_DEPTH then error("formula_budget_exceeded") end
     local token = current()
     if not token then error("unexpected_end") end
     if token.kind == "number" or token.kind == "level" then
@@ -57,11 +65,11 @@ local function parse(text)
     end
     if token.kind == "-" then
       cursor = cursor + 1
-      return {kind = "neg", value = primary()}
+      return {kind = "neg", value = primary(depth + 1)}
     end
     if token.kind == "(" then
       cursor = cursor + 1
-      local value = expression()
+      local value = expression(depth + 1)
       if not current(")") then error("missing_parenthesis") end
       cursor = cursor + 1
       return value
@@ -69,36 +77,36 @@ local function parse(text)
     error("unexpected_token")
   end
 
-  local function power()
-    local left = primary()
+  local function power(depth)
+    local left = primary(depth)
     if current("^") then
       cursor = cursor + 1
-      return {kind = "pow", left = left, right = power()}
+      return {kind = "pow", left = left, right = power(depth + 1)}
     end
     return left
   end
 
-  local function product()
-    local left = power()
+  local function product(depth)
+    local left = power(depth)
     while current("*") or current("/") do
       local kind = current().kind
       cursor = cursor + 1
-      left = {kind = kind == "*" and "mul" or "div", left = left, right = power()}
+      left = {kind = kind == "*" and "mul" or "div", left = left, right = power(depth)}
     end
     return left
   end
 
-  expression = function()
-    local left = product()
+  expression = function(depth)
+    local left = product(depth)
     while current("+") or current("-") do
       local kind = current().kind
       cursor = cursor + 1
-      left = {kind = kind == "+" and "add" or "sub", left = left, right = product()}
+      left = {kind = kind == "+" and "add" or "sub", left = left, right = product(depth)}
     end
     return left
   end
 
-  local ok, tree = pcall(expression)
+  local ok, tree = pcall(expression, 0)
   if not ok then return nil, tree end
   if cursor <= #tokens then return nil, "trailing_token" end
   return tree

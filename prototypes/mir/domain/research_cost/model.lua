@@ -7,8 +7,9 @@ local M = {}
 
 M.schema = 1
 M.formula_abi = "mir-research-cost-v1"
+M.qualification_abi = "mir-research-cost-qualification-v1"
 
-local function identity(record)
+local function semantic_identity(record)
   return {
     schema = M.schema,
     formula_abi = M.formula_abi,
@@ -17,9 +18,27 @@ local function identity(record)
     linear_increment = record.linear_increment,
     growth_factor = record.growth_factor,
     derived_kind = record.derived_kind,
-    count_formula = record.count_formula,
-    provenance = record.provenance
+    count_formula = record.count_formula
   }
+end
+
+local function qualification_identity(record)
+  return {
+    qualification_abi = M.qualification_abi,
+    semantic_digest = record.semantic_digest,
+    property = "positive-nondecreasing",
+    maximum_offset = validation.bounds.qualification_offset,
+    status = "passed"
+  }
+end
+
+function M.semantic_identity(record)
+  return deepcopy(semantic_identity(record))
+end
+
+
+function M.semantic_digest(record)
+  return fingerprint.of(semantic_identity(record))
 end
 
 function M.new(record)
@@ -35,7 +54,15 @@ function M.new(record)
     provenance = deepcopy(record.provenance or {})
   }
   result.count_formula = formula.compile(result)
-  result.fingerprint = fingerprint.of(identity(result))
+  result.semantic_digest = M.semantic_digest(result)
+  result.authority_digest = fingerprint.of({
+    semantic_digest = result.semantic_digest,
+    provenance = result.provenance
+  })
+  result.qualification_digest = fingerprint.of(qualification_identity(result))
+  -- Compatibility alias for consumers that still name the provenance-bound
+  -- authority identity as a generic fingerprint.
+  result.fingerprint = result.authority_digest
   return result
 end
 
@@ -62,6 +89,9 @@ function M.assert_valid(record)
   local rebuilt = M.new(record)
   if rebuilt.derived_kind ~= record.derived_kind
     or rebuilt.count_formula ~= record.count_formula
+    or rebuilt.semantic_digest ~= record.semantic_digest
+    or rebuilt.authority_digest ~= record.authority_digest
+    or rebuilt.qualification_digest ~= record.qualification_digest
     or rebuilt.fingerprint ~= record.fingerprint then
     error("ResearchCostModel derived material does not match its parameters.", 2)
   end

@@ -29,6 +29,12 @@ function Get-Cost {
   return ($Base + $Increment * $offset) * [Math]::Pow($Growth, $offset)
 }
 
+function Get-WorkPreservingFraction {
+  param([double]$Fraction, [double]$PreviousCost, [double]$CurrentCost)
+  if ($PreviousCost -lt 1 -or $CurrentCost -lt 1) { throw "Realized research costs must be positive." }
+  return [Math]::Max(0.0, [Math]::Min(1.0, $Fraction * $PreviousCost / $CurrentCost))
+}
+
 $cases = @(
   @{ Kind = "fixed"; Anchor = 4; Base = 1000; Increment = 0; Growth = 1; Formula = "1000" },
   @{ Kind = "linear"; Anchor = 4; Base = 1000; Increment = 250; Growth = 1; Formula = "1000+250*(L-4)" },
@@ -46,6 +52,21 @@ foreach ($case in $cases) {
     $previous = $cost
   }
 }
+
+$transitionRows = 0
+foreach ($previous in $cases) {
+  foreach ($current in $cases) {
+    $previousCost = [Math]::Floor((Get-Cost -Level 8 -Anchor $previous.Anchor -Base $previous.Base -Increment $previous.Increment -Growth $previous.Growth))
+    $currentCost = [Math]::Floor((Get-Cost -Level 8 -Anchor $current.Anchor -Base $current.Base -Increment $current.Increment -Growth $current.Growth))
+    $actual = Get-WorkPreservingFraction -Fraction 0.42 -PreviousCost $previousCost -CurrentCost $currentCost
+    $expectedWork = [Math]::Min(0.42 * $previousCost, $currentCost)
+    if ([Math]::Abs(($actual * $currentCost) - $expectedWork) -gt 0.000001) {
+      throw "Completed work drifted for $($previous.Kind) -> $($current.Kind)."
+    }
+    $transitionRows++
+  }
+}
+if ($transitionRows -ne 16) { throw "Research-cost transition matrix must contain exactly sixteen rows." }
 
 foreach ($invalid in @(
   @{ Anchor = 0; Base = 1000; Increment = 0; Growth = 1 },
@@ -65,6 +86,9 @@ $paths = @{
   Validation = "prototypes/mir/domain/research_cost/validation.lua"
   Classification = "prototypes/mir/domain/research_cost/classification.lua"
   Projection = "prototypes/mir/domain/research_cost/projection.lua"
+  Transition = "prototypes/mir/domain/research_cost/transition_descriptor.lua"
+  AdoptionEmitter = "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+  AdoptionRuntime = "prototypes/mir/runtime/productivity_family_adoption.lua"
   Streams = "prototypes/mir/planner/stream_compiler.lua"
   NativeCost = "prototypes/mir/domain/native_owner/cost_model.lua"
   Native = "prototypes/mir/planner/native_owner_binding.lua"
@@ -77,8 +101,27 @@ foreach ($entry in $paths.GetEnumerator()) {
   $source[$entry.Key] = Get-Content -Raw -LiteralPath $path
 }
 
-foreach ($required in @("ips-cost-linear-increment-%s", "mir-cost-linear-increment-%s", "mir-research-cost-v1")) {
+foreach ($required in @("ips-cost-linear-increment-%s", "mir-cost-linear-increment-%s", "mir-research-cost-v1", "mir-research-cost-transition-v1", "mir-research-cost-qualification-v1")) {
   if (($source.Values -join "`n") -notmatch [regex]::Escape($required)) { throw "Missing research-cost contract token: $required" }
+}
+foreach ($digest in @("semantic_digest", "authority_digest", "qualification_digest")) {
+  if ($source.Model -notmatch $digest -or $source.Transition -notmatch $digest) {
+    throw "Research-cost identity layer is missing: $digest"
+  }
+}
+if ($source.AdoptionEmitter -notmatch 'VERSION\s*=\s*3' -or
+    $source.AdoptionEmitter -notmatch 'input_descriptor' -or $source.AdoptionEmitter -notmatch 'output_descriptor') {
+  throw "Native-owner adoption does not emit versioned old/new research-cost descriptors."
+}
+if ($source.AdoptionRuntime -match 'count_formula.*match|research_unit_count' -or
+    $source.AdoptionRuntime -notmatch 'transition_descriptor\.convert_fraction') {
+  throw "Runtime must consume the canonical transition descriptor without reparsing formula text."
+}
+if ($source.Transition -notmatch 'before \* previous_cost / current_cost') {
+  throw "Research-progress conversion must preserve work with the old-cost/new-cost ratio."
+}
+foreach ($budget in @('MAXIMUM_FORMULA_BYTES', 'MAXIMUM_TOKENS', 'MAXIMUM_PARSE_DEPTH', 'evaluated_cost_out_of_bounds')) {
+  if (($source.Values -join "`n") -notmatch $budget) { throw "Research-cost budget is missing: $budget" }
 }
 if ($source.Contract -match 'mode%-setting|dropdown') { throw "Research-cost contract must not expose a model dropdown." }
 if ($source.Classification -notmatch 'original_formula' -or $source.NativeCost -notmatch 'changed = false') {
@@ -97,4 +140,4 @@ if ($defaults -notmatch 'linear_increment\s*=\s*0') { throw "Default linear incr
 $unknownFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/native-owner-unrecognized-formula/data-updates.lua")
 if ($unknownFixture -notmatch 'L\^2') { throw "Unknown-formula fixture must remain outside the supported fixed/linear/exponential/hybrid family." }
 
-Write-Host "[ok] unified fixed, linear, exponential, and hybrid ResearchCostModel contract passed."
+Write-Host "[ok] unified ResearchCostModel identities, bounds, and sixteen work-preserving transitions passed."

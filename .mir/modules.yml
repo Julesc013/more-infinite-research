@@ -172,6 +172,7 @@ modules:
     - prototypes/mir/domain/research_cost/validation.lua
     - prototypes/mir/domain/research_cost/classification.lua
     - prototypes/mir/domain/research_cost/projection.lua
+    - prototypes/mir/domain/research_cost/transition_descriptor.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua

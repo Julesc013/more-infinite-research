@@ -31,11 +31,15 @@ end
 
 function M.evaluate(record, level)
   local parameters = validation.assert_parameters(record)
-  level = tonumber(level)
-  if not level then error("Research cost evaluation level must be numeric.", 2) end
+  local reason
+  level, reason = validation.level(level, parameters.anchor_level)
+  if not level then error("Research cost evaluation failed: " .. tostring(reason), 2) end
   local offset = level - parameters.anchor_level
-  return (parameters.base_cost + parameters.linear_increment * offset)
+  local value = (parameters.base_cost + parameters.linear_increment * offset)
     * (parameters.growth_factor ^ offset)
+  local bounded, bounded_reason = validation.evaluated_cost(value)
+  if not bounded then error("Research cost evaluation failed: " .. tostring(bounded_reason), 2) end
+  return bounded
 end
 
 return M

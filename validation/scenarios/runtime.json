@@ -2532,7 +2532,9 @@
         "isolation": "fresh-data-stage",
         "assertions": [
           {"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"},
-          {"id": "native-owner-current-research-progress-retained", "type": "factorio-load-and-assertion-fixtures-pass"}
+          {"id": "native-owner-current-research-work-preserved", "type": "factorio-load-and-assertion-fixtures-pass"},
+          {"id": "native-owner-sixteen-row-cost-transition-matrix", "type": "factorio-load-and-assertion-fixtures-pass"},
+          {"id": "native-owner-unsafe-cost-transition-refused", "type": "factorio-load-and-assertion-fixtures-pass"}
         ]
       },
       {

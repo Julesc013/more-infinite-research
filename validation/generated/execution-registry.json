@@ -458,8 +458,10 @@
     },
     {
       "assertion_ids": [
-        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-current-research-progress-retained",
-        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-settings-signature-reset"
+        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-current-research-work-preserved",
+        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-settings-signature-reset",
+        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-sixteen-row-cost-transition-matrix",
+        "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-unsafe-cost-transition-refused"
       ],
       "environment_signature": "4393030AE09D0B361FA755F0F49DCF3CA951CA7B56EDC77EC585A2E6AF0B600D",
       "id": "environment/2.1/4393030ae09d0b361fa755f0f49dcf3ca951ca7b56edc77ec585a2e6af0b600d",
@@ -1603,12 +1605,12 @@
     }
   ],
   "metrics": {
-    "assertions": 124,
-    "avoided_factorio_launches": 1,
+    "assertions": 126,
+    "avoided_factorio_launches": 3,
     "batches": 123,
     "declarations": 123,
     "environment_templates": 123,
-    "factorio_assertions": 121,
+    "factorio_assertions": 123,
     "factorio_scenarios": 120,
     "isolated_fallbacks": 34,
     "literal_runner_authorities": 89,
@@ -1634,7 +1636,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "CAB0D32F032E96E4E5D04812DC6D5EA5C2A82086814380037AC42BF42F35A916",
         "environment_parameters": [],
-        "line": 3927,
+        "line": 3928,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1690,7 +1692,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "11DD6453D767DA8475FD9CBE4D82C4CC2AB525DB5491F7A6D63CB2FD521C468E",
         "environment_parameters": [],
-        "line": 4048,
+        "line": 4049,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1757,7 +1759,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4578,
+        "line": 4580,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1828,7 +1830,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4590,
+        "line": 4592,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1889,7 +1891,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6E7902ABE579AEE213004FF27E4E4FD9E2A691F165EF495501C1979E7BAC24B6",
         "environment_parameters": [],
-        "line": 3844,
+        "line": 3845,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -1946,7 +1948,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "4D571115BC29D630DDE012C8F044998814D672B52A5A3082FC1BC27B52973D6A",
         "environment_parameters": [],
-        "line": 3849,
+        "line": 3850,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2010,7 +2012,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3853,
+        "line": 3854,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2072,7 +2074,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "C981D2C04079D6261C866AAE9A206DCEA8805A24F174477677E00E1426FA5B80",
         "environment_parameters": [],
-        "line": 3864,
+        "line": 3865,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2137,7 +2139,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3859,
+        "line": 3860,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2213,7 +2215,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3869,
+        "line": 3870,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2288,7 +2290,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3874,
+        "line": 3875,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2352,7 +2354,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "C27BBC36DF194E0C1231FC63B1DE3B5082819390AA76D973B15F2DDBEA6B1FC3",
         "environment_parameters": [],
-        "line": 4003,
+        "line": 4004,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2409,7 +2411,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "34F538734FDCB25FDA41B5C11FEA88C838E987CF10FBCD222C92EC6492DF5A96",
         "environment_parameters": [],
-        "line": 3993,
+        "line": 3994,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2466,7 +2468,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "E72E064603ED1B19019A8954080EFBEEDBB449D879658FADA631DC5B0FD6F35D",
         "environment_parameters": [],
-        "line": 4667,
+        "line": 4669,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2533,7 +2535,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4646,
+        "line": 4648,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2608,7 +2610,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4609,
+        "line": 4611,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2680,7 +2682,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4600,
+        "line": 4602,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2745,7 +2747,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "136316808DEFB0B398235D40A4B71BA14C91402F934F24330EB673345113CE36",
         "environment_parameters": [],
-        "line": 3912,
+        "line": 3913,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2798,7 +2800,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6348AF517964D6A0CD26B1EAEA732398D8904EB897F5758CC47EA61FE642E4E0",
         "environment_parameters": [],
-        "line": 3878,
+        "line": 3879,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2865,7 +2867,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4157,
+        "line": 4158,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -2934,7 +2936,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4165,
+        "line": 4166,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3014,7 +3016,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4616,
+        "line": 4618,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3099,7 +3101,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4249,
+        "line": 4250,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3171,7 +3173,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4200,
+        "line": 4201,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3257,7 +3259,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4624,
+        "line": 4626,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3329,8 +3331,8 @@
       ],
       "authority": {
         "lines": [
-          3595,
-          3796
+          3596,
+          3797
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3386,7 +3388,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "57677CDD0290D2D4F6F9AA88CE2E78BE69A5F3A2E7FBC8695326D720243C29BF",
         "environment_parameters": [],
-        "line": 3938,
+        "line": 3939,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3442,7 +3444,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "F22A3B0AC349B16E12810E923662B6C90845D32C8EA976426759A707333C04E7",
         "environment_parameters": [],
-        "line": 3701,
+        "line": 3702,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3496,8 +3498,8 @@
       ],
       "authority": {
         "lines": [
-          3604,
-          3838
+          3605,
+          3839
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3551,8 +3553,8 @@
       ],
       "authority": {
         "lines": [
-          3619,
-          4184
+          3620,
+          4185
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3606,8 +3608,8 @@
       ],
       "authority": {
         "lines": [
-          3614,
-          4179
+          3615,
+          4180
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -3663,7 +3665,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "97581A0CBF422ECB399F5D834CE1C66FBD215156EC7E6044132861EEF7F331E9",
         "environment_parameters": [],
-        "line": 4025,
+        "line": 4026,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3732,7 +3734,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4037,
+        "line": 4038,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3801,7 +3803,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "F19BB562E32FA9C74CBC30094C90FE61EB5DBEF552E4FC34727E9FD532B571F7",
         "environment_parameters": [],
-        "line": 3950,
+        "line": 3951,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3865,7 +3867,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4146,
+        "line": 4147,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3934,7 +3936,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4658,
+        "line": 4660,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -3993,7 +3995,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "4858C13694E48094F1BEB9B29BAD667EFCC3CF4CE9FD2FF3E1D479B053FFDBC1",
         "environment_parameters": [],
-        "line": 3894,
+        "line": 3895,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4057,7 +4059,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3890,
+        "line": 3891,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4126,7 +4128,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3817,
+        "line": 3818,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4187,8 +4189,8 @@
       ],
       "authority": {
         "lines": [
-          3586,
-          3787
+          3587,
+          3788
         ],
         "matching_literal_calls": 2,
         "reason": "multiple conditional literal runner calls",
@@ -4254,7 +4256,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4238,
+        "line": 4239,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4332,7 +4334,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4230,
+        "line": 4231,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4406,7 +4408,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "1DED71D9FF763C3CB6B4EDC512D8923BA289C304A290A031113A451D9420E533",
         "environment_parameters": [],
-        "line": 4634,
+        "line": 4636,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4514,7 +4516,7 @@
         "command": "Invoke-PackageZipSmokeScenario",
         "command_sha256": "8FB26AFAC243B303A9539F32B383B430313425C57351FF818F9DD83774496A26",
         "environment_parameters": [],
-        "line": 3552,
+        "line": 3553,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -4576,7 +4578,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3554,
+        "line": 3555,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -4649,7 +4651,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4079,
+        "line": 4080,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4716,7 +4718,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4084,
+        "line": 4085,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -4846,7 +4848,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4089,
+        "line": 4090,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5041,7 +5043,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4102,
+        "line": 4103,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5186,7 +5188,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4132,
+        "line": 4133,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5282,7 +5284,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4125,
+        "line": 4126,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5387,7 +5389,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4139,
+        "line": 4140,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5499,7 +5501,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4115,
+        "line": 4116,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5585,7 +5587,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "E919B7F098B876EDD346AC3B03F1B307F96E5BE8ECC979C2CDE37C89AFC2FAA5",
         "environment_parameters": [],
-        "line": 3902,
+        "line": 3903,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5642,7 +5644,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FD83CF3B866631E1F39EA9C86E910BE41F4E306D5DA4B149D681E76859EB365E",
         "environment_parameters": [],
-        "line": 3685,
+        "line": 3686,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5695,7 +5697,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "3CCEBBA3ADCDAF2CAB77EC81B9E643770659D86942F688059D0FBAD803D4A659",
         "environment_parameters": [],
-        "line": 3643,
+        "line": 3644,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5753,7 +5755,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FE2AE0399073A13661E3995707D728C4A41D52EEBFF83EA80F4FBB88A2AE7570",
         "environment_parameters": [],
-        "line": 3898,
+        "line": 3899,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -5878,7 +5880,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4390,
+        "line": 4391,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6051,7 +6053,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "FD34840B3522ED7CA5C2D395FC50C843DD5458A111FDEB3C07CE1A5DA13C8BD0",
         "environment_parameters": [],
-        "line": 3958,
+        "line": 3959,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6108,7 +6110,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "DB7F6D3BD17BB0E650D6649C7F1FBA90009422B6F5742CBD96572E0AE5BABED7",
         "environment_parameters": [],
-        "line": 3988,
+        "line": 3989,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6165,7 +6167,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "12372C56E871B52C0EE9C94AA54F23A2FBB4591C483028035B1D74BDC9D27728",
         "environment_parameters": [],
-        "line": 3969,
+        "line": 3970,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6222,7 +6224,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "946E1C566E48B72E0CBBB123AFD775C54451344C3562252A1960FA50CD61CC24",
         "environment_parameters": [],
-        "line": 3978,
+        "line": 3979,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6279,7 +6281,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "1FECC5D73BF4D4EE501C0DDEE30490C2CCB587EBE4C5107393897E4256BE3E20",
         "environment_parameters": [],
-        "line": 3983,
+        "line": 3984,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6336,7 +6338,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "610A1E707E3D80EF449177154AE8E6A6579AF925FB1ABAB5E53EB1AD21DBBF2C",
         "environment_parameters": [],
-        "line": 4153,
+        "line": 4154,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6397,7 +6399,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3805,
+        "line": 3806,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6469,7 +6471,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4679,
+        "line": 4681,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6540,7 +6542,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4673,
+        "line": 4675,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6611,7 +6613,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4687,
+        "line": 4689,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6685,7 +6687,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4541,
+        "line": 4543,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6756,7 +6758,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 3954,
+        "line": 3955,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6829,7 +6831,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4340,
+        "line": 4341,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -6913,7 +6915,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4564,
+        "line": 4566,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -7046,10 +7048,32 @@
         },
         {
           "expected": "passed",
-          "id": "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-current-research-progress-retained",
+          "id": "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-current-research-work-preserved",
           "proposition": "Scenario 'space-age-native-owner-settings-config-change' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
           "reads": [
-            "facts.assertions.native-owner-current-research-progress-retained.status"
+            "facts.assertions.native-owner-current-research-work-preserved.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        },
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-sixteen-row-cost-transition-matrix",
+          "proposition": "Scenario 'space-age-native-owner-settings-config-change' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-sixteen-row-cost-transition-matrix.status"
+          ],
+          "schema": 1,
+          "type": "captured-proposition",
+          "version": 1
+        },
+        {
+          "expected": "passed",
+          "id": "assertion/2.1/space-age-native-owner-settings-config-change/native-owner-unsafe-cost-transition-refused",
+          "proposition": "Scenario 'space-age-native-owner-settings-config-change' satisfies 'factorio-load-and-assertion-fixtures-pass'.",
+          "reads": [
+            "facts.assertions.native-owner-unsafe-cost-transition-refused.status"
           ],
           "schema": 1,
           "type": "captured-proposition",
@@ -7999,7 +8023,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4426,
+        "line": 4427,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8073,7 +8097,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4419,
+        "line": 4420,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8147,7 +8171,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4385,
+        "line": 4386,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8230,7 +8254,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4408,
+        "line": 4409,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8321,7 +8345,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4220,
+        "line": 4221,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8419,7 +8443,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4288,
+        "line": 4289,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8535,7 +8559,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4260,
+        "line": 4261,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8812,7 +8836,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4206,
+        "line": 4207,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8903,7 +8927,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 4572,
+        "line": 4574,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -8985,7 +9009,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4433,
+        "line": 4434,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9115,7 +9139,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4468,
+        "line": 4469,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9189,7 +9213,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4533,
+        "line": 4535,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9263,7 +9287,7 @@
             "value_kind": "switch"
           }
         ],
-        "line": 4460,
+        "line": 4461,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9329,7 +9353,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "6E8D78B6CE58F8BF64B6E4083341354DB4CD359D2CC38F097BAA87AB1A00675A",
         "environment_parameters": [],
-        "line": 3907,
+        "line": 3908,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9395,7 +9419,7 @@
             "value_kind": "static-ast"
           }
         ],
-        "line": 3827,
+        "line": 3828,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9508,7 +9532,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "59EB8AE75AF73714F339BCD852D0E1521CCE8017C565F207F4BB66BF2902F7CA",
         "environment_parameters": [],
-        "line": 3720,
+        "line": 3721,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -9564,7 +9588,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "860C6147918303056D673773A8775367A77C0558A986658621FDFFEBCF2D5F35",
         "environment_parameters": [],
-        "line": 3738,
+        "line": 3739,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9623,7 +9647,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "7206508BF10F8F0E55D31D106565A9001F2318896D83789B7196A1FFC6D5DFDD",
         "environment_parameters": [],
-        "line": 3756,
+        "line": 3757,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9680,7 +9704,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "EA8DFA1BD6D07C67A2A1DB5ED692DD14658210E93E9CB18699CD239AF894329E",
         "environment_parameters": [],
-        "line": 3770,
+        "line": 3771,
         "type": "runner-literal-ast"
       },
       "batchable": false,
@@ -9739,7 +9763,7 @@
         "command": "Invoke-RuntimeScenario",
         "command_sha256": "62B1CD35CE87E02E3428E93A4C8592581D7FB861F34A7E68BFD8CBBE4D767282",
         "environment_parameters": [],
-        "line": 4653,
+        "line": 4655,
         "type": "runner-literal-ast"
       },
       "batchable": true,
@@ -10192,9 +10216,9 @@
   "source": {
     "ast_command_count": 105,
     "catalog": "validation/scenarios/runtime.json",
-    "catalog_sha256": "F4A877BBD29276334A95AC5061F6D963CB73B937A6328B30C0F4F2F4FB5CB09A",
+    "catalog_sha256": "5D2B10E65F4F3F029BF4DB2691208890A83F2E147D984DD7A50074B02F83436B",
     "runner": "scripts/Invoke-MIRValidation.ps1",
-    "runner_sha256": "1CACF2643F93F7FCE8C2140D20890100DECE05B20EE70FE3E0A8A5B4909DA41A",
+    "runner_sha256": "1E568AB8B40ADFB72DC62164C4F6BA58D1C24D4C27BFFD718ED6C24218253D88",
     "unmatched_literal_scenarios": [
       "reduced-settings-surface"
     ]
