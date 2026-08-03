@@ -537,12 +537,30 @@ docs:
       - trusted-immutable-compiler-records
   - path: docs/architecture/3.3-2.6-semantic-platform-roadmap.md
     title: "MIR 3.3 And 2.6 Semantic Platform Roadmap"
+    status: historical-checkpoint
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/architecture/3.3-2.6-convergence-platform-roadmap.md
+    checkpoint_source_commit: 9595a6417e9849e865a4c1950c1de434c0c2c1bd
+    checkpoint_candidate_sha256: not-recorded
+  - path: docs/architecture/3.3-2.6-convergence-platform-roadmap.md
+    title: "MIR 3.3 And 2.6 Convergence Platform Roadmap"
     status: current
     audience: maintainer
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.3-2.6-semantic-platform-roadmap
+  - path: docs/architecture/mir-extension-protocol-v1.md
+    title: "MIR Extension Protocol v1 Roadmap"
+    status: current
+    audience: developer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-extension-protocol-v1-roadmap
   - path: docs/architecture/control-plane-v5.md
     title: "MIR Control Plane v5"
     status: current
@@ -579,6 +597,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-convergence-release
+  - path: docs/releases/3.2.5-to-2.6-convergence-programme.md
+    title: "MIR 3.2.5 To 2.6 Convergence Programme"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-to-2.6-convergence-programme
   - path: docs/adr/0028-3-2-5-convergence-release.md
     title: "ADR 0028: MIR 3.2.5 Convergence Release"
     status: current
@@ -596,6 +622,14 @@ docs:
     source_of_truth_for:
       - mir-dual-plane-repository
       - mir-logical-repository-paths
+  - path: docs/adr/0030-host-neutral-extension-protocol.md
+    title: "ADR 0030: Host-Neutral Extension Protocol"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-extension-protocol-v1-decision
   - path: docs/architecture/target-profiles.md
     title: "Target Capability Profiles"
     status: current

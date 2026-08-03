@@ -1,7 +1,7 @@
 schema: 1
 
 remote_topology:
-  recorded_at: 2026-08-02
+  recorded_at: 2026-08-04
   permanent_branches:
     - main
     - dev
@@ -20,7 +20,7 @@ remote_topology:
     superseded_pull_request: 31
   rules:
     - main is the immutable published Factorio 2.1 baseline at MIR 3.2.3
-    - dev is the shared Control Plane, test, tooling, and MIR 3.3 preparation branch
+    - dev owns MIR 3.2.5 convergence, the shared Control Plane and tooling, and subsequent MIR 3.3 preparation
     - legacy is the published Factorio 2.0 maintenance line at MIR 2.5.0 and advances only through governed promotion
     - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
     - main and dev must not be made identical to Factorio 2.0 target branches
@@ -42,7 +42,7 @@ branches:
 
   dev:
     remote_state: permanent
-    purpose: shared Control Plane v5, validation tooling, canonical fixes, and MIR 3.3 preparation
+    purpose: MIR 3.2.5 convergence, shared Control Plane v5, validation tooling, canonical fixes, and subsequent MIR 3.3 preparation
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -927,11 +927,22 @@ release_artifacts:
       development_branch: dev
       target_factorio: "2.1"
       purpose: immutable published MIR 3.2.3 baseline; emergency fixes only
+    current_line_convergence:
+      version: "3.2.5"
+      branch: dev
+      target_factorio: "2.1"
+      purpose: planned C32 convergence release from the immutable 3.2.3 and closed C31 lineage
     factorio_2_0_companion:
       version: "2.5.0"
       branch: legacy
       target_factorio: "2.0"
       purpose: immutable published P11 baseline; possible 2.5.1 only for confirmed package defects
+    factorio_2_0_convergence:
+      version: "2.5.5"
+      branch: legacy
+      development_branch: dev
+      target_factorio: "2.0"
+      purpose: conditional projection of immutable 3.2.5 semantics; create a temporary candidate branch only after the no-second-compiler feasibility gate passes
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1
@@ -965,7 +976,13 @@ release_artifacts:
       version: "3.3.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: canonical semantic-platform development after the 2.5.0 stabilization decision
+      purpose: canonical convergence-platform development after 3.2.5 and the conditional 2.5.5 decision
+    factorio_2_0_feature:
+      version: "2.6.0"
+      branch: legacy
+      development_branch: dev
+      target_factorio: "2.0"
+      purpose: conditional target projection generated from frozen MIR 3.3 semantics and independently qualified on Factorio 2.0
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

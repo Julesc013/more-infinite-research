@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
@@ -17,7 +17,7 @@ Updated: 2026-08-03
 
 MIR `3.2.3` is the immutable published Factorio 2.1 baseline on `main`. MIR `2.5.0` candidate `2.5-P11` is the immutable published Factorio 2.0 baseline on `legacy`. Both GitHub and the Factorio Mod Portal bind their exact release assets, and the official portal SHA-1 values match the immutable repository archives.
 
-`dev` owns Control Plane v5, shared tests and tooling, canonical target-neutral fixes, and preparation for MIR `3.3.0`. `legacy` is promotion-only maintenance; it is never a scratch branch. The deleted `tmp/2.0` remote is not part of the live topology.
+`dev` owns MIR `3.2.5` convergence, Control Plane v5, shared tests and tooling, canonical target-neutral fixes, and subsequent preparation for MIR `3.3.0`. `legacy` is promotion-only maintenance; it is never a scratch branch. The deleted `tmp/2.0` remote is not part of the live topology.
 
 The immutable P11 identity is:
 
@@ -49,11 +49,12 @@ Create a 2.5.1 package candidate only after an exact P11 package defect is repro
 The next source/target sequence is:
 
 ```text
-immutable 3.2.3 and 2.5.0 baselines
-→ 24-hour exact P11 stabilization and protected follow-up
-→ either close 2.5.0 as the qualified baseline or release one consolidated 2.5.1
+close the exact P11 assurance reconciliation and C31 unpublished checkpoint
+→ converge C32 and publish 3.2.5 only after its full gate
+→ decide whether a no-second-compiler 2.5.5 projection is feasible
+→ freeze independent 3.2.5 and final 2.5.x behavioral baselines
 → begin canonical 3.3 work on dev
-→ project 2.6 from the final immutable 2.5.x target baseline
+→ project and independently qualify 2.6 from frozen 3.3 semantics
 ```
 
 The machine-readable P11 source and capability locks live at `.mir/backport-source-lock.json` and `.mir/backport-portable-delta-3.2.3-to-2.5.0.json`. They retain literal ancestry from immutable tags `2.4.9` and `3.2.3`, exact target package identity, adapted paths, and target-local evidence. No Factorio 2.1 runtime proof substitutes for Factorio 2.0 evidence. This note records the locked maintainer policy for separating MIR release numbers by Factorio target line after the `2.2.0` compatibility-platform release. It is a release-operations note, not a feature-parity promise. Every target line still needs its own source branch, metadata, package build, Factorio binary, mod library, validation artifacts, and public release notes before it can be published.
@@ -111,12 +112,12 @@ Do not use `0.8.1` or any other `0.8.x` release number for Factorio `1.0`. That 
 
 Use these branch roles during the transition:
 
-The live GitHub branch topology contains exactly `main`, `dev`, and `legacy`. `main` is the immutable published MIR 3.2.3 line, `dev` owns shared tooling and 3.3 preparation, and `legacy` is the immutable published MIR 2.5.0 maintenance line. Temporary release branches are created only when protected qualification needs one and are deleted afterward. Historical unique heads remain available through governed archive tags.
+The live GitHub branch topology contains exactly `main`, `dev`, and `legacy`. `main` is the immutable published MIR 3.2.3 line, `dev` owns 3.2.5 convergence, shared tooling, and subsequent 3.3 preparation, and `legacy` is the immutable published MIR 2.5.0 maintenance line. Temporary release branches are created only when protected qualification needs one and are deleted afterward. Historical unique heads remain available through governed archive tags.
 
 | Branch or worktree | Role | New release line |
 | --- | --- | ---: |
 | `main` | Immutable published Factorio `2.1` MIR `3.2.3` baseline. | `3.x.x` |
-| `dev` | Shared Control Plane v5, tests, tooling, canonical fixes, and MIR `3.3.0` preparation. | `3.x.x` |
+| `dev` | MIR `3.2.5` convergence, shared Control Plane v5, tests, tooling, canonical fixes, and later MIR `3.3.0` preparation. | `3.x.x` |
 | `legacy` | Immutable published Factorio `2.0` MIR `2.5.0` baseline; advances only through governed 2.5.x promotion. | `2.5.x` maintenance |
 | detached `2.5.0` worktree | Read-only exact-tag validation baseline. | No branch |
 | local `local/2.5.1-prep` worktree | Package-identical investigation branch until a real defect justifies P12. | Local only unless protected qualification needs a remote candidate || `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |

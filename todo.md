@@ -68,6 +68,7 @@ Generated: 2026-08-03
 - [ ] `CHG-2026-0003` — Reconcile published 3.2.3 and 2.5.0 authorities and stabilize P11 (`implemented`)
 - [ ] `CHG-2026-0004` — MIR 3.2.5 unified research cost curves (`implemented`)
 - [ ] `CHG-2026-0005` — MIR 3.2.5 compatibility observability and convergence (`planned`)
+- [ ] `CHG-2026-0006` — MIR 3.3 and 2.6 host-neutral extension platform (`planned`)
 - [ ] `INC-2026-0035` — Pyanodon casting unlock startup failure; closure `pending-external-issue-close`
 - [ ] `INC-2026-0036` — C24 fresh approved-delta adapter bound stale C22 authority; closure `closed-exact-c24-fresh-calibration`
 - [ ] `INC-2026-0037` — C24 fresh performance adapter bound stale C22 campaign authority; closure `closed-exact-c24-fresh-calibration`

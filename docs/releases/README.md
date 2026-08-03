@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
@@ -14,10 +14,14 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is the persistent content-addressed verification architecture documented in [the 3.2.0 verification overhaul](3.2.0-verification-overhaul.md); no publication is claimed until the exact candidate completes the aggregate gate and remaining human review.
+MIR 3.2.3 is the immutable published Factorio 2.1 baseline, and MIR 2.5.0 is the immutable published Factorio 2.0 baseline. C31 closed as an unpublished 3.2.4 checkpoint; MIR 3.2.5 candidate C32 is the only planned public Factorio 2.1 convergence release after 3.2.3.
 
-MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
+The [3.2.5 convergence release](3.2.5-convergence-release.md) owns C32's release contract. The [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md) owns the wider sequence: 3.2.5, a conditional 2.5.5 projection decision, immutable behavioral baselines, 3.3, and a conditional independently qualified 2.6 projection.
 
+Current release authority is machine-readable in `.mir/releases/current.json` and the typed records under `.mir/releases/`; generated candidate views are not independent release state.
+
+- [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md)
+- [3.2.5 convergence release](3.2.5-convergence-release.md)
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)
 - [3.0.0 plan](3.0.0-plan.md)

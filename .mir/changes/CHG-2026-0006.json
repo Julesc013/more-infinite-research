@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0006",
+  "title": "MIR 3.3 and 2.6 host-neutral extension platform",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "assurance.schemas",
+    "assurance.evidence",
+    "release.authority"
+  ],
+  "domains_written": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.locale",
+    "product.runtime",
+    "scenario.catalog",
+    "assurance.schemas",
+    "assurance.evidence",
+    "release.authority"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Introduces MIR Extension Protocol v1 as a host-neutral, capability-negotiated, data-first protocol. MIR 3.3.x and 2.6.x share one semantic protocol while using target-specific discovery transports. The legacy compatibility-pack transport remains supported through the first complete modern and Factorio 2.0 release pair.",
+  "release_note_impact": "MIR 3.3.0 and 2.6.0 require extension-protocol, SDK, compatibility-window, target-omission, fork-continuity, and migration documentation.",
+  "test_obligations": [
+    "architecture.boundaries",
+    "product.compiler",
+    "product.settings",
+    "product.locale",
+    "product.runtime",
+    "scenario.catalog",
+    "assurance.schemas",
+    "assurance.evidence",
+    "transition.upgrade",
+    "release.authority"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical MEP-1 implementation and unique mod-data plus portable stage-bus transports in MIR 3.3.x",
+    "factorio-2.0": "the same MEP-1 semantic protocol projected through the stage-bus and target adapters, then independently qualified as MIR 2.6.x"
+  },
+  "state": "planned"
+}

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
@@ -15,7 +15,9 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 Use the [current compiler architecture matrix](current-architecture-matrix.md) for the active fact, decision, lifecycle, graph, emission, and evidence authorities. Historical checkpoint reports do not override that matrix.
 
-Use the [MIR 3.3 and 2.6 semantic platform roadmap](3.3-2.6-semantic-platform-roadmap.md) for future control-plane, compiler, target-projection, repository, test, and ecosystem work. That roadmap begins only after MIR 3.2.2 and MIR 2.5.0 are frozen; it does not alter the C24 or P9 package boundary.
+Use the [cross-release convergence programme](../releases/3.2.5-to-2.6-convergence-programme.md) for the protected sequence from 3.2.5 through 2.6, and the [MIR 3.3 and 2.6 convergence platform roadmap](3.3-2.6-convergence-platform-roadmap.md) for future compiler, target-projection, assurance, and ecosystem work. The preserved [semantic-platform roadmap](3.3-2.6-semantic-platform-roadmap.md) is a historical checkpoint, not current authority.
+
+The [MIR Extension Protocol v1 roadmap](mir-extension-protocol-v1.md) defines the host-neutral extension boundary planned for 3.3. It does not authorize package-visible work in 3.2.5 or a 2.5.5 candidate before the projection-feasibility gate.
 
 ## Data Stage Flow
 
