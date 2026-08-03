@@ -139,7 +139,7 @@
     },
     {
       "kind": "historical-v4-replay",
-      "path": ".mir/control-plane/baselines/3.2.2-v5-replay.json"
+      "path": "validation/baselines/control/3.2.2-v5-replay.json"
     }
   ]
 }

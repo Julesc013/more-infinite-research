@@ -126,7 +126,7 @@ function New-MIRCPExecutionRegistry {
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $catalogPath = Join-Path $repo "fixtures/compat-matrix/expected-scenarios.json"
+  $catalogPath = Join-Path $repo "validation/scenarios/runtime.json"
   $runnerPath = Join-Path $repo "scripts/Invoke-MIRValidation.ps1"
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   $targetProperty = $catalog.profiles.PSObject.Properties[$Target]
@@ -237,7 +237,7 @@ function New-MIRCPExecutionRegistry {
     target = $Target
     observation_abi = 1
     source = [pscustomobject][ordered]@{
-      catalog = "fixtures/compat-matrix/expected-scenarios.json"
+      catalog = "validation/scenarios/runtime.json"
       catalog_sha256 = Get-MIRCPSha256File -Path $catalogPath
       runner = "scripts/Invoke-MIRValidation.ps1"
       runner_sha256 = Get-MIRCPSha256File -Path $runnerPath
@@ -269,7 +269,7 @@ function Assert-MIRCPExecutionRegistry {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   if ([int]$Registry.schema -ne 1 -or [string]$Registry.authority -ne "mir-control-plane-v5-execution-registry") { throw "Execution registry identity is invalid." }
-  $catalog = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures/compat-matrix/expected-scenarios.json") | ConvertFrom-Json
+  $catalog = Get-Content -Raw -LiteralPath (Join-Path $repo "validation/scenarios/runtime.json") | ConvertFrom-Json
   $expected = @($catalog.profiles.PSObject.Properties[[string]$Registry.target].Value)
   if (@($Registry.scenarios).Count -ne $expected.Count) { throw "Execution registry does not cover every declared scenario." }
   $ids = @($Registry.scenarios.id | ForEach-Object { [string]$_ })

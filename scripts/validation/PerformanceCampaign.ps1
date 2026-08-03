@@ -6,7 +6,7 @@ function Get-MIRPerformanceHarnessFiles {
     ".mir/performance-budgets.json",
     ".mir/performance-campaign.json",
     ".mir/sanitation-budgets.json",
-    "fixtures/compat-matrix/local-library-scenarios.json",
+    "validation/scenarios/local-2.1.json",
     "fixtures/performance-regression-probe",
     "scripts/Invoke-MIRCompatAudit.ps1",
     "scripts/Measure-MIRPerformanceRegression.ps1",

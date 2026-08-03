@@ -35,7 +35,7 @@ foreach ($manifestProperty in @($streamManifest.streams.PSObject.Properties)) {
     throw "Generated stream manifest policy differs from .mir/streams.yml for $($manifestProperty.Name): '$($manifestProperty.Value.policy)' != '$authorityPolicy'"
   }
 }
-$scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
+$scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\scenarios\runtime.json") | ConvertFrom-Json
 if ($scenarioManifest.schema -ne 3) { throw "Runtime scenario manifest schema drifted from 3." }
 $contractCoverage = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
 $compilerSchemaAuthority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-schema-authority.json") | ConvertFrom-Json

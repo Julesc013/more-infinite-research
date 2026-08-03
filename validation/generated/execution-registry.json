@@ -10191,10 +10191,10 @@
   "schema": 1,
   "source": {
     "ast_command_count": 105,
-    "catalog": "fixtures/compat-matrix/expected-scenarios.json",
+    "catalog": "validation/scenarios/runtime.json",
     "catalog_sha256": "F4A877BBD29276334A95AC5061F6D963CB73B937A6328B30C0F4F2F4FB5CB09A",
     "runner": "scripts/Invoke-MIRValidation.ps1",
-    "runner_sha256": "529FC19693E9D4755472E6A455E810E91353C69E5C3AED8D23E8E02654AC3656",
+    "runner_sha256": "8C0A784FBA986366E5FE9CD4CBC7E8C3CC11B20933DC173C9501BC8EB6FB75B3",
     "unmatched_literal_scenarios": [
       "reduced-settings-surface"
     ]

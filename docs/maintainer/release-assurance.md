@@ -24,7 +24,7 @@ MIR release assurance is a persistent content-addressed evidence system. It plan
 | `validation/profiles/factorio-<target>.json` | Target policy, deterministic seed, evidence TTL, upgrade source and fixture |
 | `validation/trust.json` | Evidence trust classes and protected release producer requirements |
 | `spec/schemas/*.schema.json` | Strict test, plan, result, capsule, bundle, and seal contracts |
-| `fixtures/compat-matrix/expected-scenarios.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
+| `validation/scenarios/runtime.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
 | `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
 | `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
 | `out/verification-plan.json` | Reviewable plan for one candidate and target |

@@ -51,7 +51,7 @@ This table names one machine authority, validator, and reference contract for ea
 | CompilerEvidence | 2 | `prototypes/mir/domain/evidence/compiler_evidence.lua` | postcondition publication, transport adapters, and content fingerprints | assurance evidence and sanitation review |
 | Public compiler artifact projections | 1 | `prototypes/mir/report/public_compiler_artifacts.lua` | architecture gate and compiler-contract fixtures | normal-load `mod-data` publication |
 | RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |
-| Runtime scenario declaration | 3 | `fixtures/compat-matrix/expected-scenarios.json` | `scripts/validation/ScenarioRegistry.ps1` | validation harness |
-| Campaign scenario declaration | 2 | `fixtures/compat-matrix/local-library-scenarios.json` | `validation/tests/compatibility/Test-MIRScenarioManifests.ps1` | compatibility audit runner |
+| Runtime scenario declaration | 3 | `validation/scenarios/runtime.json` | `scripts/validation/ScenarioRegistry.ps1` | validation harness |
+| Campaign scenario declaration | 2 | `validation/scenarios/local-2.1.json` | `validation/tests/compatibility/Test-MIRScenarioManifests.ps1` | compatibility audit runner |
 
 `prototypes/mir/settings/effect_contracts.lua` consumes effect metadata and may add setting defaults, but it is not a second effect classification authority. Compatibility data cannot create stream or technology identities. Every generated technology identity remains in the stable stream manifest.

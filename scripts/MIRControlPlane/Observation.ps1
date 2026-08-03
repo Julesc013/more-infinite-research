@@ -242,6 +242,6 @@ function Update-MIRCPV4ReplayReport {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $report = New-MIRCPV4ReplayReport -RepoRoot $repo
-  Write-MIRCPJson -Path ".mir/control-plane/baselines/3.2.2-v5-replay.json" -Value $report -RepoRoot $repo -Check:$Check
+  Write-MIRCPJson -Path "validation/baselines/control/3.2.2-v5-replay.json" -Value $report -RepoRoot $repo -Check:$Check
   return $report
 }

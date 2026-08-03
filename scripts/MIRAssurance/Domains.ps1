@@ -261,7 +261,7 @@ function Get-MIRAssuranceScenarioFixtureFingerprint {
   if ([string]$Test.scenario.group -eq "local-mod-library") {
     $patterns += @(
       "fixtures/local-mod-library/**",
-      "fixtures/compat-matrix/local-library-scenarios*.json"
+      "validation/scenarios/local-*.json"
     )
   }
   return Get-MIRAssurancePatternFingerprint -Patterns @($patterns | Sort-Object -Unique)
@@ -271,7 +271,7 @@ function Get-MIRAssuranceScenarioHarnessFingerprint {
   return Get-MIRAssurancePatternFingerprint -Patterns @(
     "scripts/Invoke-MIRValidation.ps1",
     "scripts/validation/**",
-    "fixtures/compat-matrix/expected-scenarios.json"
+    "validation/scenarios/runtime.json"
   )
 }
 

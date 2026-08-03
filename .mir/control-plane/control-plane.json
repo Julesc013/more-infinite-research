@@ -32,9 +32,9 @@
     "mutation_calibration": ".mir/control-plane/mutation-calibration.json",
     "evidence_revocations": ".mir/control-plane/evidence-revocations.json",
     "v4_equivalence": ".mir/control-plane/v4-v5-equivalence.json",
-    "scenario_source": "fixtures/compat-matrix/expected-scenarios.json",
+    "scenario_source": "validation/scenarios/runtime.json",
     "execution_registry": "validation/generated/execution-registry.json",
-    "historical_replay": ".mir/control-plane/baselines/3.2.2-v5-replay.json"
+    "historical_replay": "validation/baselines/control/3.2.2-v5-replay.json"
   },
   "outputs": {
     "verification_context": ".work/output/verification-context",

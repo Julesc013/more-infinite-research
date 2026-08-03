@@ -229,7 +229,7 @@ function Invoke-MIRCompatAuditTier {
     } elseif (-not [string]::IsNullOrWhiteSpace($script:ManualScenariosPath)) {
       $auditParams.ManualScenariosPath = $script:ManualScenariosPath
     } else {
-      $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+      $auditParams.ManualScenariosPath = (Join-Path $repo "validation\scenarios\manual.json")
     }
   }
   if ($RunLocalModZips) {
@@ -317,7 +317,7 @@ foreach ($entry in $expandedTiers) {
           FactorioBin = $FactorioBin
           RunManualScenarios = $true
           RunLoadTests = $true
-          ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+          ManualScenariosPath = (Join-Path $repo "validation\scenarios\manual.json")
           ScenarioNames = @($auditSmokeScenario)
           CatalogPages = 0
           MaxCandidates = 0
@@ -353,9 +353,9 @@ foreach ($entry in $expandedTiers) {
         $scenarioPath = if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
           $ManualScenariosPath
         } elseif ($FactorioLine -eq "2.0") {
-          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios-2.0.json"
+          Join-Path $repo "validation\scenarios\local-2.0.json"
         } else {
-          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json"
+          Join-Path $repo "validation\scenarios\local-2.1.json"
         }
         Invoke-MIRCompatAuditTier -Name "local-library-scenarios" -RunManualScenarios -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -ManualScenariosPathOverride $scenarioPath
       }

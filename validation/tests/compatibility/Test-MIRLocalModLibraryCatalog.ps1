@@ -1,7 +1,7 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [Parameter(Mandatory)][string[]]$LocalModLibraryDirs,
-  [string]$ScenarioPath = "fixtures\compat-matrix\local-library-scenarios.json",
+  [string]$ScenarioPath = "validation\scenarios\local-2.1.json",
   [int]$MinimumZipCount = 1,
   [string]$OutputPath = "",
   [switch]$Recurse,

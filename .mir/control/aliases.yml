@@ -38,6 +38,42 @@ aliases:
     to: spec.schemas
     mode: read-only
     introduced: 3.2.5
+  - from: fixtures/compat-matrix/claims.json
+    to: spec.compatibility.claims
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/support-lanes.json
+    to: spec.compatibility.lanes
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/expected-failures.json
+    to: validation.assertions.expected-failures
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/known-exclusions.json
+    to: validation.adapters.portal-exclusions
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/expected-scenarios.json
+    to: validation.scenarios.runtime
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/manual-scenarios.json
+    to: validation.scenarios.manual
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/local-library-scenarios.json
+    to: validation.scenarios.local-2.1
+    mode: read-only
+    introduced: 3.2.5
+  - from: fixtures/compat-matrix/local-library-scenarios-2.0.json
+    to: validation.scenarios.local-2.0
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/control-plane/baselines/
+    to: validation.baselines.control
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

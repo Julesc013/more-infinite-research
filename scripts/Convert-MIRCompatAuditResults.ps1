@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory)][string]$AuditDir,
   [string]$OutputDir = $AuditDir,
-  [string]$ExpectedFailures = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\expected-failures.json")
+  [string]$ExpectedFailures = (Join-Path $PSScriptRoot "..\validation\assertions\expected-failures.json")
 )
 
 $ErrorActionPreference = "Stop"

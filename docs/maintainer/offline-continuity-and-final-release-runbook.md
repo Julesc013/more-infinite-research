@@ -124,7 +124,7 @@ $context = & "$cp\scripts\Invoke-MIRControlPlane.ps1" context `
 & "$cp\scripts\Invoke-MIRControlPlane.ps1" calibration-proof `
   -ContextPath $context.path `
   -EvidenceRoot $evidenceRoot `
-  -Output '.mir/control-plane/baselines/3.2.2-v5-fresh-calibration.json' `
+  -Output 'validation/baselines/control/3.2.2-v5-fresh-calibration.json' `
   -RepoRoot $cp
 ```
 

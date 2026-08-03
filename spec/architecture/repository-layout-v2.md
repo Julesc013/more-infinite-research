@@ -126,7 +126,7 @@ Approval is a state inside a delta record. A delta does not change directory whe
 
 ## Path services
 
-`RepoPathCatalog` reads `.mir/control/paths.yml` and resolves only canonical logical IDs and historical repository aliases. It rejects absolute paths, parent traversal, backslashes, case collisions, and link-based durable authority.
+`RepoPathCatalog` reads `.mir/control/paths.yml` and resolves only canonical logical IDs and historical repository aliases. An alias ending in `/` is a directory prefix; every other alias is an exact file path. Both forms are read-only and resolve to one canonical path without retaining duplicate authority bytes. The resolver rejects absolute paths, parent traversal, backslashes, case collisions, and link-based durable authority.
 
 `MachinePathResolver` remains separate. It may resolve Factorio binaries, local mod libraries, caches, and user-supplied absolute paths, but those values may be stored only in `.mir/local/`, `.work/`, or environment variables.
 
@@ -154,6 +154,7 @@ During the 3.2.5 layout migration:
 - no package-visible product change is mixed into a relocation commit;
 - an old command forwards to exactly one implementation;
 - new writes target canonical paths only;
+- package-visible frozen text may retain a historical read-only path until the next package-visible release slice;
 - historical evidence retains its original bytes;
 - each move has parity, rollback, and legacy-reference tests;
 - target snapshots are removed only after two exact reconstructions.

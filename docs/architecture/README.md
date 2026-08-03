@@ -211,7 +211,7 @@ The kernel now has enforceable platform pieces:
 - resolver contract validation in `prototypes/mir/capabilities/contract.lua`;
 - capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
 - generated stream manifest metadata in `prototypes/mir/streams/generated_stream_manifest.json`;
-- machine-readable claims in `fixtures/compat-matrix/claims.json`;
+- machine-readable claims in `spec/compatibility/claims.json`;
 - static linting through `validation/tests/tooling/Test-MIRPolicyLints.ps1`;
 - report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
 - negative capability fixtures for loop risks, hidden recipes, cap-zero recipes, and structural loader/drill decoys.
@@ -261,11 +261,11 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
-Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, generates local-library stress scenarios with `-RunGeneratedLocalScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, resolves supplied local root/library zips before Mod Portal metadata, supports `-Offline` for read-only local library sweeps, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, checkpoints load results after each scenario, and downloads third-party mods only when credentials are provided explicitly.
+Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `validation/scenarios/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, generates local-library stress scenarios with `-RunGeneratedLocalScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, resolves supplied local root/library zips before Mod Portal metadata, supports `-Offline` for read-only local library sweeps, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, checkpoints load results after each scenario, and downloads third-party mods only when credentials are provided explicitly.
 
 The compatibility runner writes isolated mod lists rather than inheriting the user's normal Factorio enabled-mod state. Official built-ins are listed explicitly and disabled unless the scenario needs them; requiring `space-age` expands to the full official bundle. Parsed audit rows are tolerant of blank log lines so checkpointed overnight results can still be converted after interrupted runs.
 
-Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record planner rows, recipe-cap warnings, compiler decisions, rule-surface rows, loop-risk rows, fact summaries, and lab matrices without turning them into failures. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
+Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record planner rows, recipe-cap warnings, compiler decisions, rule-surface rows, loop-risk rows, fact summaries, and lab matrices without turning them into failures. Expected failures mostly come from reviewed rules in `validation/assertions/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
 
 Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
 
@@ -281,7 +281,7 @@ Use `scripts/mir.ps1 release docs-only` or `scripts/mir.ps1 release docs-refresh
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 
-Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation. Settings visibility linting also verifies the hidden-setting readability fixture is present.
+Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/run-profiles/` are excluded from fixture-mod validation; scenarios and assertions live under `validation/` instead of masquerading as fixture mods. Settings visibility linting also verifies the hidden-setting readability fixture is present.
 
 Static validation rejects runtime tick handlers in `control.lua` and `prototypes/mir/runtime/**/*.lua`.
 

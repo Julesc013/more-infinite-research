@@ -85,12 +85,12 @@ function New-MIRV4CompactBaseline {
 
 $c24 = New-MIRV4CompactBaseline -PlanPath $C24Plan -Release "3.2.2" -CandidateId "C24" `
   -SourceLabel "artifacts/assurance/plans/verification-plan-c24-full-no-reuse.json"
-Write-MIRCPJson -Path ".mir/control-plane/baselines/3.2.2-v4.json" -Value $c24 -RepoRoot $repo -Check:$Check
+Write-MIRCPJson -Path "validation/baselines/control/3.2.2-v4.json" -Value $c24 -RepoRoot $repo -Check:$Check
 
 if (-not [string]::IsNullOrWhiteSpace($P9Plan)) {
   $p9 = New-MIRV4CompactBaseline -PlanPath $P9Plan -Release "2.5.0" -CandidateId "2.5-P9" `
     -SourceLabel "artifacts/assurance/plans/verification-plan-2.5-p9-full-no-reuse.json"
-  Write-MIRCPJson -Path ".mir/control-plane/baselines/2.5.0-p9-v4.json" -Value $p9 -RepoRoot $repo -Check:$Check
+  Write-MIRCPJson -Path "validation/baselines/control/2.5.0-p9-v4.json" -Value $p9 -RepoRoot $repo -Check:$Check
 }
 
 [pscustomobject][ordered]@{status=if($Check){"current"}else{"updated"};c24_sha256=[string]$c24.baseline_sha256;p9_written=(-not [string]::IsNullOrWhiteSpace($P9Plan))} | ConvertTo-Json

@@ -19,7 +19,7 @@ Use an exact MIR candidate archive and bind it to the source commit that produce
 ```powershell
 .\scripts\Invoke-MIRCompatAudit.ps1 `
   -RunManualScenarios `
-  -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json `
+  -ManualScenariosPath .\validation\scenarios\local-2.1.json `
   -ScenarioNames local-2-1-bz-suite-space-age `
   -LocalModLibraryDirs C:\Projects\Factorio\testmods_2.1 `
   -Offline `

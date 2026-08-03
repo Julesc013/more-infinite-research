@@ -42,7 +42,7 @@ function Get-ValueFingerprint {
 function Get-ApprovedDeltaProducerFingerprint {
   $paths = @(
     "scripts/Export-MIRApprovedDelta.ps1",
-    "fixtures/compat-matrix/expected-scenarios.json",
+    "validation/scenarios/runtime.json",
     "fixtures/export-approved-delta/data-final-fixes.lua",
     "fixtures/export-approved-delta/info.json",
     "scripts/validation/FactorioProcess.ps1",

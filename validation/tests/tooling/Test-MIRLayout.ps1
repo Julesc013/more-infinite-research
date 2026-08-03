@@ -26,8 +26,21 @@ if (-not $legacy.alias -or $legacy.mode -ne "historical-read-only" -or
     $legacy.relative_path -ne ".mir/releases/deltas/3.2.1-to-3.2.2.json") {
   throw "Historical release delta resolution failed."
 }
+$legacyCompatibilityRoot = "fixtures/" + "compat-matrix"
+$legacyScenarioPath = "$legacyCompatibilityRoot/expected-scenarios.json"
+$legacyScenario = Resolve-MIRRepoPath -RepoRoot $repo -Path $legacyScenarioPath
+if (-not $legacyScenario.alias -or $legacyScenario.mode -ne "read-only" -or
+    $legacyScenario.id -ne "validation.scenarios.runtime" -or
+    $legacyScenario.relative_path -ne "validation/scenarios/runtime.json") {
+  throw "Exact-file scenario alias resolution failed."
+}
+$legacyBaselineRoot = ".mir/control-plane/" + "baselines"
+$legacyBaseline = Resolve-MIRRepoPath -RepoRoot $repo -Path "$legacyBaselineRoot/3.2.2-v5-replay.json"
+if (-not $legacyBaseline.alias -or $legacyBaseline.relative_path -ne "validation/baselines/control/3.2.2-v5-replay.json") {
+  throw "Reviewed baseline alias resolution failed."
+}
 
-foreach ($bad in @("../outside", "C:/absolute", 'docs\bad')) {
+foreach ($bad in @("../outside", "C:/absolute", 'docs\bad', "$legacyScenarioPath/child")) {
   $rejected = $false
   try { $null = Resolve-MIRRepoPath -RepoRoot $repo -Path $bad }
   catch { $rejected = $true }
@@ -51,6 +64,15 @@ if ($schemaMigrationPreview.mode -ne "preview" -or $schemaMigrationPreview.chang
 $testMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRTestRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($testMigrationPreview.mode -ne "preview" -or $testMigrationPreview.changed -ne 0 -or $testMigrationPreview.tests -ne 65) {
   throw "Test-root migration is incomplete or not idempotent: $($testMigrationPreview | ConvertTo-Json -Compress)"
+}
+$definitionMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRValidationDefinitions.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($definitionMigrationPreview.mode -ne "preview" -or $definitionMigrationPreview.changed -ne 0 -or
+    $definitionMigrationPreview.definitions -ne 11) {
+  throw "Validation-definition migration is incomplete or not idempotent: $($definitionMigrationPreview | ConvertTo-Json -Compress)"
+}
+foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoot)) {
+  $legacyFiles = @(Get-ChildItem -LiteralPath (Join-Path $repo $legacyDefinitionRoot) -File -ErrorAction SilentlyContinue)
+  if ($legacyFiles.Count -ne 0) { throw "Legacy definition files remain under $legacyDefinitionRoot." }
 }
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |

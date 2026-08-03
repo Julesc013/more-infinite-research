@@ -1,7 +1,7 @@
 schema: 1
 
 scenario_manifest:
-  path: fixtures/compat-matrix/expected-scenarios.json
+  path: validation/scenarios/runtime.json
   schema: 3
   declarations: full-records
   record_owns:
@@ -95,9 +95,9 @@ mod_interaction_campaigns:
     - zero-uncovered-overlapping-pairs
 
 local_campaign_manifest:
-  path: fixtures/compat-matrix/local-library-scenarios.json
-  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
-  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
+  path: validation/scenarios/local-2.1.json
+  factorio_2_0_path: validation/scenarios/local-2.0.json
+  shared_manual_path: validation/scenarios/manual.json
   schema: 2
   validator: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
   record_owns:
@@ -145,7 +145,6 @@ golden_plans:
 
 fixture_roots:
   synthetic: fixtures
-  compatibility_matrix: fixtures/compat-matrix
   run_profiles: fixtures/run-profiles
 
 real_mod_gates:

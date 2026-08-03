@@ -5,8 +5,8 @@ function Get-MIRCPShadowAuthority {
 
 function Get-MIRCPShadowBaselinePath {
   param([Parameter(Mandatory)][string]$Release)
-  if ($Release -eq "3.2.2") { return ".mir/control-plane/baselines/3.2.2-v4.json" }
-  if ($Release -eq "2.5.0") { return ".mir/control-plane/baselines/2.5.0-p9-v4.json" }
+  if ($Release -eq "3.2.2") { return "validation/baselines/control/3.2.2-v4.json" }
+  if ($Release -eq "2.5.0") { return "validation/baselines/control/2.5.0-p9-v4.json" }
   throw "No governed v4 shadow baseline for $Release."
 }
 

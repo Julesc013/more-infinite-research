@@ -21,7 +21,7 @@ try {
   }
 
   $campaigns = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\combination-campaigns.json") | ConvertFrom-Json
-  $scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json")
+  $scenarioManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\scenarios\runtime.json")
   foreach ($campaign in @($campaigns.campaigns)) {
     $pairId = @($campaign.capsules | ForEach-Object {[string]$_} | Sort-Object) -join "+x+"
     $pair = @($generated.pairs | Where-Object {$_.pair_id -eq $pairId})

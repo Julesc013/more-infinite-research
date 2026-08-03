@@ -805,7 +805,7 @@ foreach ($policyConsumer in @(
   }
 }
 
-$compatibilityClaimPath = "fixtures/compat-matrix/claims.json"
+$compatibilityClaimPath = "spec/compatibility/claims.json"
 $compatibilityClaimRecord = (Read-MIRFile -RelativePath $compatibilityClaimPath) | ConvertFrom-Json -Depth 100
 $allowedMaturity = @("unverified", "observed", "load-checked", "fixture-qualified", "release-qualified")
 $allowedBehavior = @("diagnostic", "coexistence", "generated", "repaired")

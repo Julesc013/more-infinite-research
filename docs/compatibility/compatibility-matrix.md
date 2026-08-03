@@ -44,7 +44,7 @@ Support lane policy:
 - Public claims must distinguish "recipe family supported when visible" from "full external mod support" unless a real external load profile has passed.
 - Compatibility rows should record the Factorio binary and mod versions tested before moving from fixture-backed support to broad public support.
 
-The machine-readable support-lane ledger lives at `fixtures/compat-matrix/support-lanes.json`.
+The machine-readable support-lane ledger lives at `spec/compatibility/support-lanes.json`.
 
 ## Current And Near-Term Matrix
 

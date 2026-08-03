@@ -497,8 +497,8 @@ $checks = [ordered]@{
   required_groups_sha256 = Get-MIRRequiredGroupsFingerprint -RequiredGroups $requiredGroups
   validation_harness_sha256 = Get-MIRValidationHarnessFingerprint -RepoRoot $repo
   expected_scenarios_sha256 = Get-MIRFileContentSha256 `
-    -Path (Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json") `
-    -RelativePath "fixtures/compat-matrix/expected-scenarios.json"
+    -Path (Join-Path $repo "validation\scenarios\runtime.json") `
+    -RelativePath "validation/scenarios/runtime.json"
 }
 foreach ($field in $checks.Keys) {
   $expected = Get-MIRRequiredCandidateField -Fields $candidate -Name $field

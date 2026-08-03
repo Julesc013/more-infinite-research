@@ -9,9 +9,9 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 
 $manifestPaths = @(
-  "fixtures\compat-matrix\manual-scenarios.json",
-  "fixtures\compat-matrix\local-library-scenarios.json",
-  "fixtures\compat-matrix\local-library-scenarios-2.0.json"
+  "validation\scenarios\manual.json",
+  "validation\scenarios\local-2.1.json",
+  "validation\scenarios\local-2.0.json"
 )
 $allowedTargets = @("2.0", "2.1")
 $allowedClaims = @("loads", "observed", "cooperates", "diagnostic-only", "partial-support", "full-family-support", "full-pack-support")

@@ -169,7 +169,14 @@ function Get-MIRAssuranceInputFingerprint {
       return Get-MIRAssurancePatternFingerprint -Patterns @("settings*.lua", "prototypes/mir/settings/**", ".mir/settings.yml")
     }
     "mod-lock" {
-      $policy = Get-MIRAssurancePatternFingerprint -Patterns @(".mir/fixtures.yml", "fixtures/compat-matrix/**", "fixtures/local-mod-library/**")
+      $policy = Get-MIRAssurancePatternFingerprint -Patterns @(
+        ".mir/fixtures.yml",
+        "spec/compatibility/**",
+        "validation/adapters/**",
+        "validation/assertions/**",
+        "validation/scenarios/**",
+        "fixtures/local-mod-library/**"
+      )
       $closure = Get-MIRAssuranceModClosureFingerprint -ModsRoot $Context.mods
       return [ordered]@{
         kind="mod-lock-and-closure"
@@ -180,7 +187,13 @@ function Get-MIRAssuranceInputFingerprint {
     }
     "mod-closure" { return Get-MIRAssuranceModClosureFingerprint -ModsRoot $Context.mods }
     "ecosystem-profile" {
-      return Get-MIRAssurancePatternFingerprint -Patterns @("fixtures/run-profiles/**", "fixtures/compat-matrix/**")
+      return Get-MIRAssurancePatternFingerprint -Patterns @(
+        "fixtures/run-profiles/**",
+        "spec/compatibility/**",
+        "validation/adapters/**",
+        "validation/assertions/**",
+        "validation/scenarios/**"
+      )
     }
     "upgrade-fixture" {
       $fixture = [string]$Context.verification_profile.upgrade.fixture

@@ -429,7 +429,7 @@ The compatibility platform now has committed machine-readable policy surfaces:
 
 - `prototypes/mir/policy/capabilities.lua` for capability-specific policy;
 - `prototypes/mir/streams/generated_stream_manifest.json` for stable generated IDs and migration policy;
-- `fixtures/compat-matrix/claims.json` for public claim text, capability status, generated stream references, and backing fixtures;
+- `spec/compatibility/claims.json` for public claim text, capability status, generated stream references, and backing fixtures;
 - `validation/tests/tooling/Test-MIRPolicyLints.ps1` to reject missing schema fields, generated streams without manifest rows, current fixture-backed claims without fixtures, and broad public wording.
 
 Negative fixtures are mandatory for capability work that introduces a new automatic target class. The first negative fixture covers self-return, barrel return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like non-loader, and drill-like non-drill cases.

@@ -95,10 +95,10 @@ try {
 
   $lfExpected = Get-MIRFileContentSha256 `
     -Path (Join-Path $lfRoot "fixtures/case.json") `
-    -RelativePath "fixtures/compat-matrix/expected-scenarios.json"
+    -RelativePath "validation/scenarios/runtime.json"
   $crlfExpected = Get-MIRFileContentSha256 `
     -Path (Join-Path $crlfRoot "fixtures/case.json") `
-    -RelativePath "fixtures/compat-matrix/expected-scenarios.json"
+    -RelativePath "validation/scenarios/runtime.json"
   if ($lfExpected -ne $crlfExpected) {
     throw "Expected-scenario fingerprint differs between LF and CRLF checkouts."
   }

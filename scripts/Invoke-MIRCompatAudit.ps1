@@ -41,9 +41,9 @@ param(
   [switch]$ContinueOnDependencyFailure,
   [switch]$FailFast,
   [Alias("ManualScenarios")]
-  [string]$ManualScenariosPath = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\manual-scenarios.json"),
+  [string]$ManualScenariosPath = (Join-Path $PSScriptRoot "..\validation\scenarios\manual.json"),
   [string]$SanitationBudgetPath = (Join-Path $PSScriptRoot "..\.mir\sanitation-budgets.json"),
-  [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\known-exclusions.json")
+  [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\validation\adapters\portal-exclusions.json")
 )
 
 $ErrorActionPreference = "Stop"
@@ -741,9 +741,9 @@ $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject
 $manualScenarioPaths = @($ManualScenariosPath)
 if (-not $PSBoundParameters.ContainsKey("ManualScenariosPath")) {
   $lineManifest = if ($FactorioLine -eq "2.0") {
-    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios-2.0.json"
+    Join-Path $PSScriptRoot "..\validation\scenarios\local-2.0.json"
   } else {
-    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios.json"
+    Join-Path $PSScriptRoot "..\validation\scenarios\local-2.1.json"
   }
   $manualScenarioPaths += $lineManifest
 }

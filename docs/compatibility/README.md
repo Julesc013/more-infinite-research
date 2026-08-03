@@ -100,11 +100,11 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Invoke-MIRExtendedTests.ps1`: tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat runs.
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
-- `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
-- `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
-- `fixtures/compat-matrix/local-library-scenarios-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
-- `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
-- `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
+- `validation/scenarios/manual.json`: curated high-risk scenarios that should not be inferred from downloads alone.
+- `validation/scenarios/local-2.1.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
+- `validation/scenarios/local-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
+- `validation/assertions/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
+- `validation/adapters/portal-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
 All three curated scenario manifests use schema 2. Each scenario owns its target lines, kind, group, setup mode, official Space Age selection, roots, settings, expected plan boundary, timeout, and claim level. `Invoke-MIRCompatAudit.ps1` loads the shared manifest plus the selected Factorio line's local manifest automatically, filters records by target, applies the record timeout, and carries the complete declaration into reports and campaign evidence. An offline manual run no longer inherits the catalog-candidate default. `validation/tests/compatibility/Test-MIRScenarioManifests.ps1` fails static validation when a record falls back to schema-1 `mods` or top-level `include_space_age` fields.
 
@@ -227,7 +227,7 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 
 `mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `report observations`, `profile stub`, and `local-index build`. Use `--factorio`, `--mods`, `--output`, `--timeout`, and `--profile` for common overrides instead of editing scripts.
 
-`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
+`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `validation/scenarios/local-2.1.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
 Use `Test-MIRLocalModLibraryCatalog.ps1` before a local sweep when you need a metadata-only gate. It reads local zip `info.json` files, catalogs available mod names, and fails if committed local-library scenario roots are missing from the library.
 
@@ -257,7 +257,7 @@ The grouped converter writes `missing-dependencies.md`, `missing-dependencies.js
 
 Do not immediately patch code from the first local-library failure. First classify the evidence: missing local zip, known modset incompatibility, benign external owner suppression, repeated split-family pattern, MIR-generated prototype crash, or timeout. Download missing dependencies and rerun affected scenarios before promoting a failure to MIR compatibility work.
 
-Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
+Expected failures should be added only after review to `validation/assertions/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 
 Some audit observations are expected by policy even without a scenario-specific expected-failure rule. In particular, a successful load test where MIR skips a stream because a required prototype is absent is a normal compatibility gate, and a successful load test where MIR suppresses recipe productivity under an unknown external infinite owner is conservative behavior rather than a release-blocking failure. Those rows stay visible in `compat-failures.grouped.json` and can still produce review-only profile candidates, but they do not increment `unexpected_count`.
 
@@ -362,7 +362,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 
 MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
 
-Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json` and `fixtures/compat-matrix/claims.json`. Static validation lints those files so current fixture-backed claims list fixtures, generated streams have manifest rows, and public text stays narrower than "full support" unless a separate external load profile proves that claim.
+Machine-readable support data lives in `spec/compatibility/support-lanes.json` and `spec/compatibility/claims.json`. Static validation lints those files so current fixture-backed claims list fixtures, generated streams have manifest rows, and public text stays narrower than "full support" unless a separate external load profile proves that claim.
 
 Claims must stay precise:
 

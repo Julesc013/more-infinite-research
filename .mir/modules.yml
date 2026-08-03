@@ -647,6 +647,7 @@ validation_tooling:
     repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
+    repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json
@@ -668,7 +669,7 @@ validation_tooling:
     control_plane_evidence_revocation_schema: spec/schemas/evidence-revocation.schema.json
     control_plane_evidence_revocations: .mir/control-plane/evidence-revocations.json
     control_plane_execution_registry: validation/generated/execution-registry.json
-    control_plane_historical_replay: .mir/control-plane/baselines/3.2.2-v5-replay.json
+    control_plane_historical_replay: validation/baselines/control/3.2.2-v5-replay.json
     control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
     control_plane_core: scripts/MIRControlPlane/Core.ps1
     control_plane_records: scripts/MIRControlPlane/Records.ps1

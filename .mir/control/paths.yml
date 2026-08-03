@@ -5,11 +5,24 @@ paths:
   package.root: .
   spec.root: spec
   spec.architecture: spec/architecture
+  spec.compatibility: spec/compatibility
+  spec.compatibility.claims: spec/compatibility/claims.json
+  spec.compatibility.lanes: spec/compatibility/support-lanes.json
   spec.schemas: spec/schemas
   validation.root: validation
+  validation.adapters: validation/adapters
+  validation.adapters.portal-exclusions: validation/adapters/portal-exclusions.json
+  validation.assertions: validation/assertions
+  validation.assertions.expected-failures: validation/assertions/expected-failures.json
+  validation.scenarios: validation/scenarios
+  validation.scenarios.runtime: validation/scenarios/runtime.json
+  validation.scenarios.manual: validation/scenarios/manual.json
+  validation.scenarios.local-2.0: validation/scenarios/local-2.0.json
+  validation.scenarios.local-2.1: validation/scenarios/local-2.1.json
   validation.tests: validation/tests
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
+  validation.baselines.control: validation/baselines/control
   tools.root: tools
   tools.commands: tools/commands
   tools.lib: tools/lib

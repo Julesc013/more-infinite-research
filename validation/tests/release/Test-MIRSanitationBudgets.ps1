@@ -16,9 +16,9 @@ if ([int]$policy.schema -ne 1 -or [string]$policy.policy -ne "mir-ecosystem-sani
 
 $scenarioNames = @()
 foreach ($relative in @(
-  "fixtures\compat-matrix\manual-scenarios.json",
-  "fixtures\compat-matrix\local-library-scenarios.json",
-  "fixtures\compat-matrix\local-library-scenarios-2.0.json"
+  "validation\scenarios\manual.json",
+  "validation\scenarios\local-2.1.json",
+  "validation\scenarios\local-2.0.json"
 )) {
   $manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $relative) | ConvertFrom-Json
   $scenarioNames += @($manifest.scenarios | ForEach-Object { [string]$_.name })

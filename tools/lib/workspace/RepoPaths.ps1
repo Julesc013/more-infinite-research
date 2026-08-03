@@ -86,7 +86,6 @@ function Read-MIRRepoAliasCatalog {
   $seen = @{}
   foreach ($alias in $aliases) {
     Assert-MIRDurableRepoPath -Path ([string]$alias.from)
-    if (-not ([string]$alias.from).EndsWith("/")) { throw "Alias prefix must end in '/': $($alias.from)" }
     if (-not $PathCatalog.paths.PSObject.Properties[[string]$alias.to]) {
       throw "Alias '$($alias.from)' targets unknown path ID '$($alias.to)'."
     }
@@ -105,6 +104,14 @@ function Join-MIRRepoRelativePath {
   if ([string]::IsNullOrWhiteSpace($Suffix)) { return $Base.TrimEnd("/") }
   if ($Base -eq ".") { return $Suffix.TrimStart("/") }
   return "$($Base.TrimEnd("/"))/$($Suffix.TrimStart("/"))"
+}
+
+function Test-MIRRepoAliasMatch {
+  param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$From)
+  if ($From.EndsWith("/")) {
+    return $Path.StartsWith($From, [StringComparison]::Ordinal)
+  }
+  return $Path.Equals($From, [StringComparison]::Ordinal)
 }
 
 function Resolve-MIRRepoPath {
@@ -130,7 +137,14 @@ function Resolve-MIRRepoPath {
 
   Assert-MIRDurableRepoPath -Path $Path
   $aliases = Read-MIRRepoAliasCatalog -RepoRoot $RepoRoot -PathCatalog $catalog
-  $match = @($aliases.aliases | Where-Object { $Path.StartsWith([string]$_.from, [StringComparison]::Ordinal) } |
+  $invalidExactDescendant = @($aliases.aliases | Where-Object {
+    -not ([string]$_.from).EndsWith("/") -and
+    $Path.StartsWith("$([string]$_.from)/", [StringComparison]::Ordinal)
+  } | Select-Object -First 1)
+  if ($invalidExactDescendant.Count -eq 1) {
+    throw "Path cannot descend through exact file alias '$($invalidExactDescendant[0].from)': $Path"
+  }
+  $match = @($aliases.aliases | Where-Object { Test-MIRRepoAliasMatch -Path $Path -From ([string]$_.from) } |
     Sort-Object { ([string]$_.from).Length } -Descending | Select-Object -First 1)
   if ($match.Count -eq 1) {
     $target = $catalog.paths.PSObject.Properties[[string]$match[0].to]
@@ -201,7 +215,7 @@ function Get-MIRLayoutClass {
 
 function Get-MIRCanonicalTarget {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Aliases, [Parameter(Mandatory)]$Paths)
-  $alias = @($Aliases.aliases | Where-Object { $Path.StartsWith([string]$_.from, [StringComparison]::Ordinal) } |
+  $alias = @($Aliases.aliases | Where-Object { Test-MIRRepoAliasMatch -Path $Path -From ([string]$_.from) } |
     Sort-Object { ([string]$_.from).Length } -Descending | Select-Object -First 1)
   if ($alias.Count -eq 1) {
     $base = [string]$Paths.paths.PSObject.Properties[[string]$alias[0].to].Value

@@ -154,7 +154,7 @@ Capability-specific policy lives in `prototypes/mir/policy/capabilities.lua`. It
 - science policy;
 - deny-risk flags.
 
-Machine-readable compatibility claims live in `fixtures/compat-matrix/claims.json`. A claim must say which capabilities are generated, observed, or diagnostic-only; which fixtures back it; whether a generated stream exists; and the exact public text. The policy linter rejects claims that reference generated streams without a manifest row or use broad "full support" wording.
+Machine-readable compatibility claims live in `spec/compatibility/claims.json`. A claim must say which capabilities are generated, observed, or diagnostic-only; which fixtures back it; whether a generated stream exists; and the exact public text. The policy linter rejects claims that reference generated streams without a manifest row or use broad "full support" wording.
 
 Generated stream IDs are part of save compatibility. The generated stream manifest records:
 

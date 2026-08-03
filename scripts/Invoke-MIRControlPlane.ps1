@@ -72,7 +72,7 @@ MIR Control Plane v5
     Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllLocks | ConvertTo-Json -Depth 10
   }
   "baseline" {
-    Read-MIRCPJson -Path ".mir/control-plane/baselines/3.2.2-v4.json" -RepoRoot $repo | ConvertTo-Json -Depth 20
+    Read-MIRCPJson -Path "validation/baselines/control/3.2.2-v4.json" -RepoRoot $repo | ConvertTo-Json -Depth 20
   }
   "status" {
     [pscustomobject][ordered]@{

@@ -6,7 +6,7 @@ param(
   [string]$LocalModDir = $env:MIR_LOCAL_MOD_DIR,
   [string[]]$RepairSmokeModNames = @("big-mining-drill", "biolabs-in-space"),
   [string]$RepresentativeScenarioName = "local-2-1-bz-suite-space-age",
-  [string]$ManualScenariosPath = "fixtures\compat-matrix\local-library-scenarios.json",
+  [string]$ManualScenariosPath = "validation\scenarios\local-2.1.json",
   [string[]]$AuditFactorioVersions = @(),
   [string]$PullRemote = "origin",
   [string]$PullBranch = "",

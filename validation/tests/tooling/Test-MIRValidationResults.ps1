@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "scripts\validation\ScenarioRegistry.ps1")
 
 $registry = Import-MIRScenarioRegistry `
-  -Path (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") `
+  -Path (Join-Path $RepoRoot "validation\scenarios\runtime.json") `
   -TargetProfile "2.1"
 if ($registry.schema -ne 3 -or $registry.records.Count -lt 1) {
   throw "Scenario manifest schema-3 full records did not load."
