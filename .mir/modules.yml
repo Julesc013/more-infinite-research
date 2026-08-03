@@ -649,6 +649,7 @@ validation_tooling:
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
     repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1
     repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
+    repository_cli_facade_migrator: tools/maintenance/Move-MIRCliFacade.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli

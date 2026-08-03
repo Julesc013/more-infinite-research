@@ -25,7 +25,7 @@
         "validation/tests/tooling/Test-MIRAssurance.ps1",
         "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
         "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
-        "scripts/mir.ps1",
+        "tools/mir.ps1",
         "tools/mir_verify/**",
         ".mir/assurance.json",
         "validation/tests.yml",

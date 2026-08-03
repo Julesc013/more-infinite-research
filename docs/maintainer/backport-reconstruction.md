@@ -27,7 +27,7 @@ Validate the contract while the source and archive tags are still pending:
 After the exact `3.2.2` and preintegration archive tags exist, reconstruct the target line in a disposable worktree:
 
 ```powershell
-.\scripts\mir.ps1 backport materialize `
+.\tools\mir.ps1 backport materialize `
   --manifest .mir/backports/2.5.0.json `
   --worktree C:\Projects\Factorio\mir-reconstructed-2.5
 ```

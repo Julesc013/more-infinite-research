@@ -1362,7 +1362,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
   $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1")
-  $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
+  $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\mir.ps1")
   $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\Console.ps1")
   $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\RunContext.ps1")
   $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\EventLog.ps1")
@@ -1497,14 +1497,14 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
     @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
     @{ File = "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\tools\mir.ps1 release gate" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "factorio_line" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-audit-2.1" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "report observations" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = ".\tools\mir.ps1 release gate" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "factorio_line" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "local-audit-2.1" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "report observations" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
+    @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
     @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
     @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "possible secret output" },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = "Test-MIRPowerShellQuality.ps1" },

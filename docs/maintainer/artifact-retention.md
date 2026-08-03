@@ -31,25 +31,25 @@ Local validation must leave enough evidence to diagnose and summarize a run with
 Preview stale output in the current worktree:
 
 ```powershell
-.\scripts\mir.ps1 storage audit
+.\tools\mir.ps1 storage audit
 ```
 
 Preview stale output across registered worktrees located beside the current worktree:
 
 ```powershell
-.\scripts\mir.ps1 storage audit --all-worktrees
+.\tools\mir.ps1 storage audit --all-worktrees
 ```
 
 Delete the reviewed set older than seven days:
 
 ```powershell
-.\scripts\mir.ps1 storage clean --all-worktrees --apply
+.\tools\mir.ps1 storage clean --all-worktrees --apply
 ```
 
 Delete completed ephemeral output immediately after inspection by setting the age threshold to zero:
 
 ```powershell
-.\scripts\mir.ps1 storage clean --older-than-days 0 --apply
+.\tools\mir.ps1 storage clean --older-than-days 0 --apply
 ```
 
 Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of an `artifacts` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.

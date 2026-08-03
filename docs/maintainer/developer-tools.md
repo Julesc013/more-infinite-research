@@ -15,25 +15,25 @@ This repository has a small MIR developer test harness. It is not a separate pro
 
 ## Preferred Commands
 
-Use `scripts/mir.ps1` first:
+Use `tools/mir.ps1` first:
 
 ```powershell
-.\scripts\mir.ps1 docs check
-.\scripts\mir.ps1 architecture check
-.\scripts\mir.ps1 manifests check
-.\scripts\mir.ps1 release gate
-.\scripts\mir.ps1 release docs-only
-.\scripts\mir.ps1 release docs-refresh
-.\scripts\mir.ps1 overnight local
-.\scripts\mir.ps1 audit local
-.\scripts\mir.ps1 audit top25 --space-age
-.\scripts\mir.ps1 storage audit --all-worktrees
-.\scripts\mir.ps1 storage clean --all-worktrees --apply
-.\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 report missing-deps --run <path>
-.\scripts\mir.ps1 report observations --run <path>
-.\scripts\mir.ps1 package build
-.\scripts\mir.ps1 local-index build --mods <path>
+.\tools\mir.ps1 docs check
+.\tools\mir.ps1 architecture check
+.\tools\mir.ps1 manifests check
+.\tools\mir.ps1 release gate
+.\tools\mir.ps1 release docs-only
+.\tools\mir.ps1 release docs-refresh
+.\tools\mir.ps1 overnight local
+.\tools\mir.ps1 audit local
+.\tools\mir.ps1 audit top25 --space-age
+.\tools\mir.ps1 storage audit --all-worktrees
+.\tools\mir.ps1 storage clean --all-worktrees --apply
+.\tools\mir.ps1 report latest
+.\tools\mir.ps1 report missing-deps --run <path>
+.\tools\mir.ps1 report observations --run <path>
+.\tools\mir.ps1 package build
+.\tools\mir.ps1 local-index build --mods <path>
 .\validation\tests\tooling\Test-MIRPolicyLints.ps1
 .\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
@@ -94,7 +94,7 @@ For an exact release-archive compatibility gate, pass `-ModUnderTestZip` to `Inv
 Use a writable dependency-cache library for downloaded prerequisites instead of changing the read-only mod collection. For large local audits, prefer an output path on a roomy drive and choose a staging mode explicitly:
 
 ```powershell
-.\scripts\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1 --link-mode Copy
+.\tools\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1 --link-mode Copy
 ```
 
 `--link-mode Hardlink` can reduce copy time and disk usage when source zips and scenario folders are on the same drive. `Copy` is the safest cross-drive mode.
@@ -104,7 +104,7 @@ Use a writable dependency-cache library for downloaded prerequisites instead of 
 Preferred public front door:
 
 ```text
-scripts/mir.ps1
+tools/mir.ps1
 ```
 
 Stable direct commands:
@@ -173,7 +173,7 @@ Static validation runs this check:
 Legacy inventory thresholds are also part of static validation. Run the standalone checked inventory when changing module ownership:
 
 ```powershell
-.\scripts\mir.ps1 legacy inventory --check
+.\tools\mir.ps1 legacy inventory --check
 ```
 
 Run it directly when working only on tooling:

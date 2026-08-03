@@ -160,7 +160,7 @@ The immediate transition plan is:
    ```powershell
    .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
    .\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\bin\x64\factorio.exe'
-   .\scripts\mir.ps1 release gate --profile release-targeted-2.0 --factorio 'D:\Programs\Factorio\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.0' --no-git-pull
+   .\tools\mir.ps1 release gate --profile release-targeted-2.0 --factorio 'D:\Programs\Factorio\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.0' --no-git-pull
    ```
 
 6. Bring portable bug fixes and validation-tool fixes from `tmp/2.0` back to `dev`.
@@ -168,7 +168,7 @@ The immediate transition plan is:
 
    ```powershell
    .\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-   .\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull
+   .\tools\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull
    ```
 
 8. Publish the current-line release from `main` after `dev` is fast-forwarded and the release gate passes.

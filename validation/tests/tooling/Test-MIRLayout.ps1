@@ -21,6 +21,11 @@ if (@($aliases.aliases | Where-Object {
 }).Count -ne 1) {
   throw "Historical CLI-support alias is missing or writable."
 }
+if (@($aliases.aliases | Where-Object {
+  $_.from -eq ("scripts/" + "mir.ps1") -and $_.to -eq "tools.cli" -and $_.mode -eq "read-only"
+}).Count -ne 1) {
+  throw "Historical CLI-facade alias is missing or writable."
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -79,6 +84,11 @@ $toolLibraryMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/m
 if ($toolLibraryMigrationPreview.mode -ne "preview" -or $toolLibraryMigrationPreview.changed -ne 0 -or
     $toolLibraryMigrationPreview.libraries -ne 7) {
   throw "Tool-library migration is incomplete or not idempotent: $($toolLibraryMigrationPreview | ConvertTo-Json -Compress)"
+}
+$cliFacadeMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRCliFacade.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($cliFacadeMigrationPreview.mode -ne "preview" -or $cliFacadeMigrationPreview.changed -ne 0 -or
+    $cliFacadeMigrationPreview.canonical -ne "tools/mir.ps1" -or $cliFacadeMigrationPreview.legacy -ne "scripts/mir.ps1") {
+  throw "CLI-facade migration is incomplete or not idempotent: $($cliFacadeMigrationPreview | ConvertTo-Json -Compress)"
 }
 $legacyLibraryNames = @(
   ("MIR" + "Assurance"),
@@ -184,6 +194,17 @@ foreach ($workflow in @(Get-ChildItem -LiteralPath (Join-Path $repo ".github/wor
       throw "Hidden output upload lacks include-hidden-files opt-in: $($workflow.Name):$($index + 1)"
     }
   }
+}
+$legacyCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/mir.ps1")
+$publicCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/mir.ps1")
+if ($legacyCliText -notmatch "MIR-L5-LEGACY-CLI-WRAPPER" -or
+    $legacyCliText -notmatch 'tools[/\\]mir\.ps1' -or $legacyCliText.Split([char]10).Count -gt 15) {
+  throw "Legacy CLI is not a thin forwarder to the public facade."
+}
+if ($publicCliText -match "MIR-L5-LEGACY-CLI-WRAPPER" -or
+    $publicCliText -match 'Join-Path \$repo "scripts[/\\]mir\.ps1"' -or
+    -not $publicCliText.Contains("function Show-MIRHelp")) {
+  throw "Public CLI does not own the command dispatcher."
 }
 
 function Invoke-MIRCliProbe {

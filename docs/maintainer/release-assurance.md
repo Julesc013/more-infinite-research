@@ -40,9 +40,9 @@ Before running tests, materialize or inspect the verification plan. Run only the
 Use:
 
 ```powershell
-./scripts/mir.ps1 assurance doctor --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-./scripts/mir.ps1 verify plan --target 2.1 --baseline <qualified-ref> --profile auto --output out/verification-plan.json
-./scripts/mir.ps1 verify explain --target 2.1 --plan out/verification-plan.json --test <stable-id>
+./tools/mir.ps1 assurance doctor --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+./tools/mir.ps1 verify plan --target 2.1 --baseline <qualified-ref> --profile auto --output out/verification-plan.json
+./tools/mir.ps1 verify explain --target 2.1 --plan out/verification-plan.json --test <stable-id>
 ```
 
 Each test has one disposition:
@@ -83,7 +83,7 @@ A schema-4 capsule binds the test ID, target, definition hash, full effective-in
 Run one planned test with:
 
 ```powershell
-./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test <stable-id> --fingerprint <sha256> --factorio <factorio.exe>
+./tools/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test <stable-id> --fingerprint <sha256> --factorio <factorio.exe>
 ```
 
 The worker rechecks the exact evidence before execution. If a matching worker is active, it waits and adopts the completed pass. Otherwise it writes `running.json`, executes the command, writes the attempt and pass or block capsule, and clears the marker.
@@ -91,7 +91,7 @@ The worker rechecks the exact evidence before execution. If a matching worker is
 Evaluate the complete plan with:
 
 ```powershell
-./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
 ```
 
 Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time, run ID, and run attempt rather than inheriting plan-wide freshness only.
@@ -107,10 +107,10 @@ Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows
 For MIR 3.2.0:
 
 ```powershell
-./scripts/mir.ps1 assurance build --target 2.1
-./scripts/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
-./scripts/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
-./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/3.2.0-assurance-qualification.json
+./tools/mir.ps1 assurance build --target 2.1
+./tools/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
+./tools/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/3.2.0-assurance-qualification.json
 ```
 
 The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
@@ -145,8 +145,8 @@ The manual attestation must be schema 2, passed, self-hashed, tied to the exact 
 Ecosystem evidence is candidate-bound: the release-targeted gate must pass the exact candidate ZIP through every local repair and representative scenario and must not rebuild distribution bytes during verification. The composed `runtime.ecosystem` lane skips the release-gate clean-tree check because source authority is independently enforced by approved-delta, manual-attestation, and protected sealing gates. Ecosystem evidence is also bounded by `.mir/sanitation-budgets.json`. Manifest scenarios resolve through the `campaigns` scope, while target-qualified release repair smokes resolve through `local_mod_zips`. A scenario passes only when its observed external prunes exactly include every reviewed prune and contain no more than the declared maximum unreviewed prunes. Release budgets use zero; a missing budget or mismatch is `REVIEW_REQUIRED`, never a compatibility pass.
 
 ```powershell
-./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
-./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
+./tools/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
+./tools/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 
 Seal schema 4 records the candidate ID, immutable package-source commit and material hash, and later qualification-source commit and tree separately. The legacy `source_commit` and `source_tree` fields remain qualification-source aliases for evidence compatibility. A clean candidate uses `git-commit-normalized-package-v1`, binding the exact source tree and package file count while deriving the normalized package-source hash directly from committed package files. A historical candidate whose material hash was captured from a dirty precommit worktree uses `git-index-with-captured-worktree-v1`; its descriptor records each affected path, eventual Git blob, and captured worktree hash. The two explicit variants preserve clean commit authority without pretending that checkout newline conversion can recover older mixed index/worktree bytes.

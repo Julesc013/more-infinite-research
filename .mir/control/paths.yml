@@ -24,6 +24,7 @@ paths:
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
   tools.root: tools
+  tools.cli: tools/mir.ps1
   tools.commands: tools/commands
   tools.lib: tools/lib
   tools.lib.assurance: tools/lib/assurance

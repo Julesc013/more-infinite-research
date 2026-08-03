@@ -122,7 +122,7 @@ For 3.0 release candidates, require:
 ```powershell
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 .\scripts\Invoke-MIRValidation.ps1 -FactorioBin '<Factorio 2.1 binary>'
-.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull
+.\tools\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull
 git diff --check
 ```
 

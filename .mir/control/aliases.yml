@@ -102,6 +102,10 @@ aliases:
     to: tools.lib.validation
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/mir.ps1
+    to: tools.cli
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

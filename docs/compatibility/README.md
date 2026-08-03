@@ -190,15 +190,15 @@ Review-only profile stubs can be generated from grouped failures:
 Use `mir.ps1` as the preferred human entry point for repeatable local and self-hosted runs:
 
 ```powershell
-.\scripts\mir.ps1 release gate
-.\scripts\mir.ps1 overnight local
-.\scripts\mir.ps1 audit local
-.\scripts\mir.ps1 audit top25 --space-age
-.\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 report missing-deps --run <path>
-.\scripts\mir.ps1 package build
-.\scripts\mir.ps1 run -Profile local-audit-2.1
-.\scripts\mir.ps1 run -Profile local-audit-2.0
+.\tools\mir.ps1 release gate
+.\tools\mir.ps1 overnight local
+.\tools\mir.ps1 audit local
+.\tools\mir.ps1 audit top25 --space-age
+.\tools\mir.ps1 report latest
+.\tools\mir.ps1 report missing-deps --run <path>
+.\tools\mir.ps1 package build
+.\tools\mir.ps1 run -Profile local-audit-2.1
+.\tools\mir.ps1 run -Profile local-audit-2.0
 ```
 
 `--factorio-line <2.0|2.1>` can override a profile when you need the same command shape on a different Factorio line. For local overnight work, `overnight-local-2.1` uses the 2.1 library/scenario defaults and `overnight-local-2.0` uses the 2.0 defaults.

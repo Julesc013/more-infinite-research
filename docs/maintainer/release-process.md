@@ -43,8 +43,8 @@ Run the publish-candidate preflight from a clean `dev` checkout. Materialize the
 git status
 git rev-parse HEAD
 
-.\scripts\mir.ps1 assurance build --target 2.1
-.\scripts\mir.ps1 verify plan --target 2.1 --profile full --factorio <factorio-2.1.11.exe> --prior <mir-3.1.9.zip> --output out/verification-plan.json
+.\tools\mir.ps1 assurance build --target 2.1
+.\tools\mir.ps1 verify plan --target 2.1 --profile full --factorio <factorio-2.1.11.exe> --prior <mir-3.1.9.zip> --output out/verification-plan.json
 Get-Content -Raw .\out\verification-plan.json
 Get-FileHash .\dist\more-infinite-research_<version>.zip -Algorithm SHA256
 git diff --check
