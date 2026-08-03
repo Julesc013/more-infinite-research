@@ -4,10 +4,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$testRoot = [System.IO.Path]::GetFullPath((Join-Path $repo "build\package-composition-test"))
-$buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repo "build")) + [System.IO.Path]::DirectorySeparatorChar
+$testRoot = [System.IO.Path]::GetFullPath((Join-Path $repo ".work\build\package-composition-test"))
+$buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repo ".work\build")) + [System.IO.Path]::DirectorySeparatorChar
 if (-not $testRoot.StartsWith($buildRoot, [StringComparison]::OrdinalIgnoreCase)) {
-  throw "Package composition test directory escaped build/: $testRoot"
+  throw "Package composition test directory escaped .work/build/: $testRoot"
 }
 
 Add-Type -AssemblyName System.IO.Compression

@@ -555,7 +555,7 @@ function New-MIRMuseumPackage {
   Add-Type -AssemblyName System.IO.Compression
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $packageName = "$($Catalog.mod_name)_$($Target.version)"
-  $targetBuild = Join-Path $RepoRoot ("build\museum\" + [string]$Target.factorio)
+  $targetBuild = Join-Path $RepoRoot (".work\build\museum\" + [string]$Target.factorio)
   $sourceRoot = Join-Path $targetBuild "runtime"
   New-MIRMuseumTargetSource -Catalog $Catalog -Target $Target -OutputRoot $sourceRoot | Out-Null
   Test-MIRMuseumRenderedSource -Target $Target -SourceRoot $sourceRoot | Out-Null

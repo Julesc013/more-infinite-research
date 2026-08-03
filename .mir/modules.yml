@@ -644,6 +644,7 @@ validation_tooling:
     repository_path_resolver: tools/lib/workspace/RepoPaths.ps1
     repository_layout_command: tools/commands/workspace/Invoke-MIRLayoutCheck.ps1
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
+    repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json

@@ -410,7 +410,7 @@ function New-MIRCPVerificationContext {
     [string]$CandidatePath = "",
     [string]$SourceRepoRoot = "",
     [string]$FactorioBin = "",
-    [string]$OutputRoot = "out/verification-context",
+    [string]$OutputRoot = ".work/output/verification-context",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot

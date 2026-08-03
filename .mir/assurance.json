@@ -6,8 +6,8 @@
     "domains": "validation/domains.yml",
     "profiles": "validation/profiles",
     "trust": "validation/trust.json",
-    "plan": "out/verification-plan.json",
-    "evidence": "artifacts/assurance/evidence",
+    "plan": ".work/output/verification-plan.json",
+    "evidence": ".work/artifacts/assurance/evidence",
     "aggregate_gate": "MIR / verification-gate"
   },
   "profiles": {

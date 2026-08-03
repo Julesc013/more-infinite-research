@@ -37,8 +37,8 @@
     "historical_replay": ".mir/control-plane/baselines/3.2.2-v5-replay.json"
   },
   "outputs": {
-    "verification_context": "out/verification-context",
-    "evidence_store": "artifacts/evidence",
+    "verification_context": ".work/output/verification-context",
+    "evidence_store": ".work/artifacts/evidence",
     "todo": "todo.md",
     "current_candidate": "docs/releases/current-candidate.md",
     "release_dashboard": "docs/releases/control-plane-dashboard.md",

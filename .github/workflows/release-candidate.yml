@@ -55,15 +55,16 @@ jobs:
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull
+        run: ./tools/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull
 
       - name: Upload exact candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: release-candidate-${{ inputs.candidate_sha }}
           path: |
             dist/*.zip
-            artifacts/validation/*.json
-            artifacts/release-gate/**
+            .work/artifacts/validation/*.json
+            .work/artifacts/release-gate/**
           if-no-files-found: error

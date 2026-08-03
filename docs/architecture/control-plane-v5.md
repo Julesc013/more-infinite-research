@@ -45,6 +45,8 @@ Transitions require immutable proof objects. A historical release imported with 
 
 Task records declare prerequisites, semantic domains, effective inputs, outputs, resources, freshness, side effects, retry policy, and completion proof. F0 through F4 remain classification labels only. Scheduling follows prerequisites and resource constraints.
 
+Exact source inputs are strict for the controller's current source commit. When the same controller evaluates an older immutable package-source commit, an input introduced later is represented by a commit-bound source-absent row in the effective-input manifest. This makes historical absence fingerprinted evidence rather than an error or an unrecorded omission; current-source deletion still fails closed.
+
 Aggregate nodes read child results and never execute child commands. `static.full` remains a v4 shadow input during migration but is not an executing v5 task.
 
 The atomic catalog separates documentation, generated views, architecture boundaries, module dependencies, compiler schema, compiler contracts, settings, locales, release authority, backport authority, verification schemas, PowerShell quality, scenario declarations, observation/evaluation replay, immutable context materialization, content-addressed evidence, execution, CI workflow, package identity, package composition, deterministic construction, upgrade, ecosystem, approved delta, performance, manual acceptance, protected qualification, seal, reconstruction, promotion, tag, publication, public-byte verification, and control-plane records. Commands are argument arrays rather than shell strings.

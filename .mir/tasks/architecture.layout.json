@@ -11,17 +11,17 @@
   ],
   "writes": [],
   "effective_inputs": [
-    "source:.mir/control/paths.yml",
-    "source:.mir/control/aliases.yml",
-    "source:.mir/control-plane/ownership.json",
-    "source:.mir/modules.yml",
-    "source:spec/architecture/repository-layout-v2.md",
-    "source:spec/schemas/*layout*.schema.json",
-    "source:spec/schemas/*path*.schema.json",
-    "source:tools/mir.ps1",
-    "source:tools/lib/workspace/**",
-    "source:tools/commands/workspace/**",
-    "source:validation/tests/tooling/Test-MIRLayout.ps1"
+    ".mir/control/paths.yml",
+    ".mir/control/aliases.yml",
+    ".mir/control-plane/ownership.json",
+    ".mir/modules.yml",
+    "spec/architecture/repository-layout-v2.md",
+    "spec/schemas/*layout*.schema.json",
+    "spec/schemas/*path*.schema.json",
+    "tools/mir.ps1",
+    "tools/lib/workspace/**",
+    "tools/commands/workspace/**",
+    "validation/tests/tooling/Test-MIRLayout.ps1"
   ],
   "outputs": [
     "result:architecture.layout"
@@ -44,6 +44,5 @@
       "validation/tests/tooling/Test-MIRLayout.ps1"
     ]
   },
-  "command_scope": "source",
   "state": "planned"
 }

@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory)][ValidateSet("manual", "protected", "seal", "backport", "promotion", "tag", "publication", "public-byte")][string]$Obligation,
   [Parameter(Mandatory)][string]$ContextPath,
-  [string]$EvidenceRoot = "artifacts/evidence",
+  [string]$EvidenceRoot = ".work/artifacts/evidence",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 )
 

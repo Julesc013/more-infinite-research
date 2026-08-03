@@ -25,7 +25,7 @@ $binary = [string]$installation.binary
 $baseData = [string]$installation.base_data
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-if ([string]::IsNullOrWhiteSpace($EvidenceRoot)) { $EvidenceRoot = Join-Path $repo "build\museum-runtime\$FactorioVersion\$stamp-$PackageMode" }
+if ([string]::IsNullOrWhiteSpace($EvidenceRoot)) { $EvidenceRoot = Join-Path $repo ".work\build\museum-runtime\$FactorioVersion\$stamp-$PackageMode" }
 if (-not [IO.Path]::IsPathRooted($EvidenceRoot)) { $EvidenceRoot = Join-Path $repo $EvidenceRoot }
 if (Test-Path -LiteralPath $EvidenceRoot) { Remove-Item -LiteralPath $EvidenceRoot -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $EvidenceRoot | Out-Null
@@ -39,7 +39,7 @@ $runtimeDeploymentPath = ""
 $runtimePackagePath = ""
 if ($PackageMode -eq "zip") {
   if ([string]::IsNullOrWhiteSpace($PackagePath)) {
-    $built = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir "build\museum-runtime\packages"
+    $built = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir ".work\build\museum-runtime\packages"
     $PackagePath = $built.path
   }
   if (-not (Test-Path -LiteralPath $PackagePath -PathType Leaf)) { throw "Package not found: $PackagePath" }

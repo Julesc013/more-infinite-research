@@ -8,7 +8,7 @@ foreach ($module in @("Core", "Records", "Planner", "Evidence", "Views")) {
   . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
 }
 
-$root = "out/control-plane-v5-self-test/evidence/$([guid]::NewGuid().ToString('N'))"
+$root = ".work/output/control-plane-v5-self-test/evidence/$([guid]::NewGuid().ToString('N'))"
 $contextDigest = "C" * 64
 $identityKey = "D" * 64
 $producer = [pscustomobject][ordered]@{component="self-test"; abi=1; trust_class="self-test"}

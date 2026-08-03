@@ -10194,7 +10194,7 @@
     "catalog": "fixtures/compat-matrix/expected-scenarios.json",
     "catalog_sha256": "F4A877BBD29276334A95AC5061F6D963CB73B937A6328B30C0F4F2F4FB5CB09A",
     "runner": "scripts/Invoke-MIRValidation.ps1",
-    "runner_sha256": "CF11742411023C9E89E3F2503EA52E01411CFF1DB53F379EE5F39B416B2D3C82",
+    "runner_sha256": "F1FF8AE3CB306D6C84178B340E639CA3014510D4079D6416A0927763401FD22F",
     "unmatched_literal_scenarios": [
       "reduced-settings-surface"
     ]

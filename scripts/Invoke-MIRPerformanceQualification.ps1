@@ -28,7 +28,7 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$($candidateInfo.version)-performance-regression.json"
 }
 
-$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "artifacts\performance"))
+$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ".work\artifacts\performance"))
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
   $ArtifactRoot = Join-Path $performanceArtifactsRoot "$($candidateInfo.version)-qualification-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
 } elseif (-not [IO.Path]::IsPathRooted($ArtifactRoot)) {

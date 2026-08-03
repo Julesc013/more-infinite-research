@@ -15,8 +15,8 @@ $results = @()
 foreach ($target in $selected) {
   $validation = Test-MIRMuseumTarget -Catalog $catalog -Target $target
   if (-not $validation.passed) { throw "Target $($target.factorio) failed catalog validation:`n$($validation.errors -join "`n")" }
-  $first = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir "build\museum-test-a"
-  $second = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir "build\museum-test-b"
+  $first = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir ".work\build\museum-test-a"
+  $second = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir ".work\build\museum-test-b"
   if ($first.sha256 -ne $second.sha256) { throw "Target $($target.factorio) package is not deterministic." }
   if ($first.package_content_sha256 -ne $second.package_content_sha256) { throw "Target $($target.factorio) content identity is not deterministic." }
   if ($first.entries -ne 4) { throw "Target $($target.factorio) package must contain exactly four files; found $($first.entries)." }
@@ -43,8 +43,8 @@ $syntheticTarget.base_data_bytes = [long]$syntheticBaseIdentity.bytes
 $syntheticTarget.base_data_sha256 = [string]$syntheticBaseIdentity.sha256
 $syntheticValidation = Test-MIRMuseumExactInstallation -Catalog $catalog -Target $syntheticTarget -Installation $syntheticInstallation
 if (-not $syntheticValidation.passed) { throw "Repository-owned synthetic museum installation failed validation:`n$($syntheticValidation.errors -join "`n")" }
-$syntheticFirst = New-MIRMuseumPackage -Catalog $catalog -Target $syntheticTarget -RepoRoot $repo -OutputDir "build\museum-fixture-test-a"
-$syntheticSecond = New-MIRMuseumPackage -Catalog $catalog -Target $syntheticTarget -RepoRoot $repo -OutputDir "build\museum-fixture-test-b"
+$syntheticFirst = New-MIRMuseumPackage -Catalog $catalog -Target $syntheticTarget -RepoRoot $repo -OutputDir ".work\build\museum-fixture-test-a"
+$syntheticSecond = New-MIRMuseumPackage -Catalog $catalog -Target $syntheticTarget -RepoRoot $repo -OutputDir ".work\build\museum-fixture-test-b"
 if ($syntheticFirst.sha256 -ne $syntheticSecond.sha256 -or
     $syntheticFirst.package_content_sha256 -ne $syntheticSecond.package_content_sha256) {
   throw "Repository-owned synthetic museum fixture did not render deterministically."
@@ -121,7 +121,7 @@ if (-not $SkipNegativeCases) {
   Assert-ExactRejected "missing-binary" { param($t, $i) $i.binary = Join-Path $i.root "missing-factorio.exe" } "Missing target binary"
   Assert-ExactRejected "missing-base-data" { param($t, $i) $i.base_data = Join-Path $i.root "missing-base" } "Missing target base data"
 
-  $negativeFixtureRoot = Join-Path $repo "build\museum-synthetic-installation-negative"
+  $negativeFixtureRoot = Join-Path $repo ".work\build\museum-synthetic-installation-negative"
   if (Test-Path -LiteralPath $negativeFixtureRoot) { Remove-Item -LiteralPath $negativeFixtureRoot -Recurse -Force }
   Copy-Item -LiteralPath $fixtureRoot -Destination $negativeFixtureRoot -Recurse
   try {

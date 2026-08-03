@@ -15,7 +15,7 @@ function New-MIRRunContext {
   $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
   $runId = "{0}-{1}" -f $RunKind, $stamp
   if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-    $OutputRoot = Join-Path $RepoRoot "artifacts\runs\$runId"
+    $OutputRoot = Join-Path $RepoRoot ".work\artifacts\runs\$runId"
   } elseif (-not [System.IO.Path]::IsPathRooted($OutputRoot)) {
     $OutputRoot = Join-Path $RepoRoot $OutputRoot
   }

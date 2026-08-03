@@ -224,6 +224,8 @@ function Get-MIRCPEffectiveInputManifest {
   $sourceRepo = if ([string]::IsNullOrWhiteSpace($SourceRepoRoot)) { $repo } else { (Resolve-Path -LiteralPath $SourceRepoRoot).Path }
   $sourceCommit = ([string](& git -C $sourceRepo rev-parse HEAD 2>$null)).Trim()
   if ($LASTEXITCODE -ne 0 -or $sourceCommit -notmatch '^[0-9a-fA-F]{40}$') { throw "Unable to resolve immutable source repository identity." }
+  $controllerCommit = ([string](& git -C $repo rev-parse HEAD 2>$null)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $controllerCommit -notmatch '^[0-9a-fA-F]{40}$') { throw "Unable to resolve control-plane repository identity." }
   if ($RepositoryFiles.Count -eq 0) { $RepositoryFiles = @(Get-MIRCPRepositoryInputFiles -RepoRoot $repo) }
   if ($SourceRepositoryFiles.Count -eq 0) { $SourceRepositoryFiles = @(Get-MIRCPRepositoryInputFiles -RepoRoot $sourceRepo) }
   $rows = [Collections.Generic.List[object]]::new()
@@ -252,7 +254,17 @@ function Get-MIRCPEffectiveInputManifest {
     $regex = ConvertTo-MIRCPInputGlobRegex -Pattern $pattern
     $matchedFiles = @($inputFiles | Where-Object { $_ -match $regex } | Sort-Object -Unique)
     $containsWildcard = $pattern.Contains("*") -or $pattern.Contains("?")
-    if ($scope -eq "source" -and -not $containsWildcard -and $matchedFiles.Count -eq 0) { throw "Exact-source TaskNode input is missing: $pattern" }
+    if ($scope -eq "source" -and -not $containsWildcard -and $matchedFiles.Count -eq 0) {
+      if ($sourceCommit -eq $controllerCommit) { throw "Exact-source TaskNode input is missing: $pattern" }
+      $rows.Add([pscustomobject][ordered]@{
+        input = $input
+        kind = "source-absent"
+        scope = "source"
+        source_commit = $sourceCommit
+        reason = "not-present-in-immutable-source-commit"
+      })
+      continue
+    }
     $files = [Collections.Generic.List[object]]::new()
     foreach ($matchedFile in $matchedFiles) {
       $files.Add((Get-MIRCPInputFileIdentity -RelativePath ([string]$matchedFile) -IdentityCache $inputCache -RepoRoot $inputRepo))

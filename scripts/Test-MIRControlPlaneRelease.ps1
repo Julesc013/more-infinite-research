@@ -9,7 +9,7 @@ $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
 $candidate = Join-Path $repo ([string]$release.package.archive)
 if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { & (Join-Path $repo "scripts/Build-MIRPackage.ps1") | Out-Host }
 $context = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -Stage release `
-  -CandidatePath $candidate -OutputRoot "out/control-plane-v5-self-test/release-contexts" -RepoRoot $repo
+  -CandidatePath $candidate -OutputRoot ".work/output/control-plane-v5-self-test/release-contexts" -RepoRoot $repo
 $state = Get-MIRCPContextExecutionState -ContextPath $context.path
 foreach ($required in @("qualification.full", "protected.qualification", "seal", "shadow.equivalence", "promotion", "shadow.structural")) {
   if (@($state.plan.tasks.id) -notcontains $required) { throw "Release-stage context omitted $required." }
@@ -27,12 +27,12 @@ try { [void](Invoke-MIRCPBackportAdmission -ContextPath $context.path -RepoRoot 
 }
 if (-not $wrongTargetBackportRejected) { throw "Backport command accepted a Factorio 2.1 context." }
 $sealRejected = $false
-try { [void](New-MIRCPReleaseSeal -ContextPath $context.path -EvidenceRoot "out/control-plane-v5-self-test/empty-release-evidence" -RepoRoot $repo) } catch {
+try { [void](New-MIRCPReleaseSeal -ContextPath $context.path -EvidenceRoot ".work/output/control-plane-v5-self-test/empty-release-evidence" -RepoRoot $repo) } catch {
   if ($_.Exception.Message -match "requires exactly one protected qualification.full") { $sealRejected = $true } else { throw }
 }
 if (-not $sealRejected) { throw "Seal command accepted a context without protected qualification." }
 $promotionRejected = $false
-try { [void](Invoke-MIRCPPromotionAdmission -ContextPath $context.path -EvidenceRoot "out/control-plane-v5-self-test/empty-release-evidence" -RepoRoot $repo) } catch {
+try { [void](Invoke-MIRCPPromotionAdmission -ContextPath $context.path -EvidenceRoot ".work/output/control-plane-v5-self-test/empty-release-evidence" -RepoRoot $repo) } catch {
   if ($_.Exception.Message -match "requires exactly one exact passing seal") { $promotionRejected = $true } else { throw }
 }
 if (-not $promotionRejected) { throw "Promotion command accepted a context without seal and shadow closure." }

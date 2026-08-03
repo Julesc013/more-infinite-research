@@ -377,8 +377,8 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
         if (
         $imageExtensions -contains $extension `
           -and -not $relative.StartsWith(".mir/target-lines/") `
-          -and -not $relative.StartsWith("artifacts/") `
-          -and -not $relative.StartsWith("build/") `
+          -and -not $relative.StartsWith(".work/artifacts/") `
+          -and -not $relative.StartsWith(".work/build/") `
           -and -not $relative.StartsWith("dist/") `
           -and -not $relative.StartsWith("tmp/")
         ) { Get-Item -LiteralPath $path }
@@ -1421,7 +1421,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "`$loadResultsPath = Join-Path `$resolvedOutputDir `"load-results.json`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'if ($enabled.ContainsKey("space-age"))' },
-    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("artifacts/")' },
+    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith(".work/artifacts/")' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "skip_reason = `"dependency_resolution_failure`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Invoke-MIRScenarioLoad" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'validation\SettingsOverrides.ps1' },
@@ -1435,6 +1435,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "write-data=`$UserDataDir" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '".work"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
@@ -1496,7 +1497,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
     @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
     @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
-    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\scripts\mir.ps1 release gate" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\tools\mir.ps1 release gate" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "factorio_line" },
@@ -1571,7 +1572,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Use `-CollectAll` for exploratory or overnight runs.' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`AuditSmoke` is intentionally deterministic.' },
     @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\Invoke-MIRReleaseTargetedGate.ps1" },
-    @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\mir.ps1 audit local" },
+    @{ File = "README.md"; Text = $readmeText; Snippet = (".\scripts" + "\mir.ps1 audit local") },
     @{ File = "README.md"; Text = $readmeText; Snippet = "docs/maintainer/developer-tools.md" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
@@ -1978,8 +1979,21 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   if ($lines[0] -ne $separator) {
     throw "changelog.txt must start with exactly 99 dashes."
   }
-  if ($lines -notcontains "Version: $($repoInfo.version)") {
-    throw "changelog.txt must contain an entry for the current info.json version $($repoInfo.version)."
+  $currentReleasePath = Join-Path $repo ".mir\releases\$($repoInfo.version).json"
+  if (-not (Test-Path -LiteralPath $currentReleasePath -PathType Leaf)) {
+    throw "Current info.json version has no typed release lifecycle record."
+  }
+  $currentRelease = Get-Content -Raw -LiteralPath $currentReleasePath | ConvertFrom-Json
+  $releasePolicy = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\control-plane\control-plane.json") | ConvertFrom-Json
+  $releaseStates = @($releasePolicy.release_states | ForEach-Object { [string]$_ })
+  $currentStateIndex = [Array]::IndexOf($releaseStates, [string]$currentRelease.state)
+  $sourceFrozenStateIndex = [Array]::IndexOf($releaseStates, "source-frozen")
+  if ($currentStateIndex -lt 0 -or $sourceFrozenStateIndex -lt 0) {
+    throw "Current release or source-frozen lifecycle state is not governed."
+  }
+  if ($currentStateIndex -ge $sourceFrozenStateIndex -and
+      $lines -notcontains "Version: $($repoInfo.version)") {
+    throw "Source-frozen release must have a changelog entry for current info.json version $($repoInfo.version)."
   }
 
   $c21LongLineExceptions = @()
@@ -2111,7 +2125,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
   if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    $validationOutputDir = "build/validation-dist"
+    $validationOutputDir = ".work/build/validation-dist"
     & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
     $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
   } else {
@@ -2158,7 +2172,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
 
     $forbiddenPatterns = @(
-      "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
+      "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|\.work|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
       "^$([regex]::Escape($root))(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
@@ -2280,7 +2294,7 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
-  $ValidationSummaryPath = Join-Path $repo "artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+  $ValidationSummaryPath = Join-Path $repo ".work\artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
 }
 if ($Tier -eq "impacted" -and [string]::IsNullOrWhiteSpace($ChangedSince)) {
   throw "The impacted tier requires -ChangedSince <commit>."
@@ -2408,7 +2422,7 @@ if (-not $ScenarioWorker) {
   $packageBuildDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "package-build" -Kind "gate"
   $runtimeStateDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "runtime-state-contract" -Kind "gate"
   Add-MIRValidationCompletedScenario -Name $staticDeclaration.name -Group $staticDeclaration.group -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
-  Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @("build/validation-dist")
+  Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @(".work/build/validation-dist")
   Add-MIRValidationCompletedScenario -Name $runtimeStateDeclaration.name -Group $runtimeStateDeclaration.group -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
 }
 
@@ -3345,7 +3359,7 @@ if ($selectionActive -and -not $checkpointActive) {
     $selectedExecutable = @($scenarioRegistry.records | Where-Object kind -ne "gate" | Sort-Object name)
     if ($MaxParallel -gt 1 -and @($selectedExecutable | Where-Object kind -ne "runtime").Count -eq 0) {
       $history = @{}
-      $historyPath = Join-Path $repo "artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+      $historyPath = Join-Path $repo ".work\artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
       if (Test-Path -LiteralPath $historyPath) {
         try {
           $historical = Get-Content -Raw -LiteralPath $historyPath | ConvertFrom-Json

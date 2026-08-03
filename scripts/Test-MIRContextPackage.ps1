@@ -72,7 +72,7 @@ $rebuilds = @()
 if ($Check -eq "determinism") {
   $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRepo "info.json") | ConvertFrom-Json
   $archiveName = "$($info.name)_$($info.version).zip"
-  foreach ($relativeOutput in @("build/control-plane-v5-package-a", "build/control-plane-v5-package-b")) {
+  foreach ($relativeOutput in @(".work/build/control-plane-v5-package-a", ".work/build/control-plane-v5-package-b")) {
     & (Join-Path $sourceRepo "scripts/Build-MIRPackage.ps1") -OutputDir $relativeOutput -CompressionLevel Optimal | Out-Host
     if ($LASTEXITCODE -ne 0) { throw "Exact-source deterministic package build failed." }
     $rebuilt = Join-Path $sourceRepo "$relativeOutput/$archiveName"

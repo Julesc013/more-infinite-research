@@ -13,7 +13,7 @@ $candidate = Join-Path $repo ([string]$release.package.archive)
 if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
   & (Join-Path $repo "scripts/Build-MIRPackage.ps1") | Out-Host
 }
-$performanceSource = Join-Path $repo "out/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
+$performanceSource = Join-Path $repo ".work/output/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
 if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceSource))
   & git -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --local --no-hardlinks --no-checkout -- $repo $performanceSource 2>$null
@@ -21,8 +21,45 @@ if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
   & git -C $performanceSource checkout --detach ([string]$release.package.source_commit) 2>$null
   if ($LASTEXITCODE -ne 0) { throw "Could not check out exact performance source for executor self-test." }
 }
+$historicalInputTask = [pscustomobject][ordered]@{
+  id = "historical-input-self-test"
+  effective_inputs = @("source:scripts/Test-MIRResearchCostModels.ps1")
+}
+$historicalInputArgs = @{
+  Task = $historicalInputTask
+  ReleaseRecord = $release
+  Target = "2.1"
+  SourceRepoRoot = $performanceSource
+  RepoRoot = $repo
+}
+$historicalInputManifest = Get-MIRCPEffectiveInputManifest @historicalInputArgs
+$historicalAbsence = @($historicalInputManifest.rows | Where-Object {
+  [string]$_.input -eq "source:scripts/Test-MIRResearchCostModels.ps1" -and
+  [string]$_.kind -eq "source-absent" -and
+  [string]$_.source_commit -eq [string]$release.package.source_commit
+})
+if ($historicalAbsence.Count -ne 1) {
+  throw "Historical exact-source absence is not explicit and commit-bound."
+}
+$currentAbsenceRejected = $false
+try {
+  $currentInputTask = [pscustomobject][ordered]@{
+    id = "current-input-self-test"
+    effective_inputs = @("source:does-not-exist/current-input.txt")
+  }
+  [void](Get-MIRCPEffectiveInputManifest -Task $currentInputTask -ReleaseRecord $release -Target "2.1" -RepoRoot $repo)
+} catch {
+  if ($_.Exception.Message -match "Exact-source TaskNode input is missing") {
+    $currentAbsenceRejected = $true
+  } else {
+    throw
+  }
+}
+if (-not $currentAbsenceRejected) {
+  throw "Current-source exact input absence did not fail closed."
+}
 $context = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -CandidatePath $candidate `
-  -SourceRepoRoot $performanceSource -OutputRoot "out/control-plane-v5-self-test/executor-contexts" -RepoRoot $repo
+  -SourceRepoRoot $performanceSource -OutputRoot ".work/output/control-plane-v5-self-test/executor-contexts" -RepoRoot $repo
 $executionState = Get-MIRCPContextExecutionState -ContextPath $context.path -RepoRoot $repo
 $canonicalCandidate = Get-MIRCPCanonicalCandidateArchive -State $executionState -RepoRoot $repo
 $controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path "control-plane-lock.json") | ConvertFrom-Json
@@ -130,7 +167,7 @@ $selectedC30Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVers
 if ($selectedC30Policies.Count -ne 1 -or [string]$selectedC30Policies[0].id -ne "c30-platform-logistics-hotfix-v1") {
   throw "Public C30 approved-delta dispatch does not select the exact native C30 policy."
 }
-$evidenceRoot = "out/control-plane-v5-self-test/executor-evidence/$([guid]::NewGuid().ToString('N'))"
+$evidenceRoot = ".work/output/control-plane-v5-self-test/executor-evidence/$([guid]::NewGuid().ToString('N'))"
 $contextResult = Write-MIRCPContextCompletionEvidence -ContextPath $context.path -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
 $taskResult = Invoke-MIRCPTaskCommand -ContextPath $context.path -TaskId "harness.schemas" -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
 if ([string]$contextResult.status -ne "passed" -or [string]$taskResult.status -ne "passed") { throw "Executor did not record exact passing task evidence." }
@@ -214,7 +251,7 @@ $scratch = New-MIRCPCompactPerformanceArtifactRoot -State $scratchState -Campaig
 $compatBudgetPath = Join-Path $scratch.path "medium-ecosystem.factorio-total\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
 $scratchPayload = Join-Path $scratch.path "path-budget-self-test.txt"
 "exact-context-bound-scratch" | Set-Content -LiteralPath $scratchPayload -Encoding UTF8
-$scratchDestination = Join-Path $repo "out/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
+$scratchDestination = Join-Path $repo ".work/output/control-plane-v5-self-test/performance-artifact-relocation/$scratchContextId"
 $scratchRelocation = Move-MIRCPPerformanceArtifacts -ExecutionRoot $scratch -Destination $scratchDestination
 if ([string]$scratch.strategy -ne "compact-context-scratch-v1" -or
     [int]$scratch.maximum_factorio_path_length -gt [int]$scratch.conservative_path_budget -or

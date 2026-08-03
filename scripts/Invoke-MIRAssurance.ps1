@@ -12,10 +12,10 @@ $trustPath = Join-Path $repo "validation\trust.json"
 $impactPath = Join-Path $repo ".mir\test-impact.yml"
 $targetsPath = Join-Path $repo ".mir\targets.json"
 $scenarioRegistryPath = Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json"
-$artifactRoot = Join-Path $repo "artifacts\assurance"
+$artifactRoot = Join-Path $repo ".work\artifacts\assurance"
 $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
-$outRoot = Join-Path $repo "out"
+$outRoot = Join-Path $repo ".work\output"
 $evidenceSchema = 4
 $buildReceiptSchema = 2
 $assuranceRunnerVersion = "4"
@@ -94,8 +94,8 @@ switch ($command) {
     Write-MIRAssuranceJson -Value $result
   }
   "impact" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context).classification }
-  "domains" { Write-MIRAssuranceJson -Value (Get-MIRAssuranceDomainManifest -Context $context -RequireCandidate) -DefaultPath "out/domain-manifest.json" }
-  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "out/verification-plan.json" }
+  "domains" { Write-MIRAssuranceJson -Value (Get-MIRAssuranceDomainManifest -Context $context -RequireCandidate) -DefaultPath ".work/output/domain-manifest.json" }
+  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath ".work/output/verification-plan.json" }
   "fingerprint" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
     $test = Get-MIRAssurancePlannedTest -Plan $plan -TestId (Get-MIRAssuranceOption -Name "--test")
@@ -116,7 +116,7 @@ switch ($command) {
     if ($expectedFingerprint -and [string]$test.fingerprint.fingerprint_sha256 -ne $expectedFingerprint) {
       throw "Planned fingerprint mismatch for $testId."
     }
-    Write-MIRAssuranceJson -Value (Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context) -DefaultPath "artifacts/assurance/workers/$($test.safe_test_id).json"
+    Write-MIRAssuranceJson -Value (Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context) -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
   }
   "verify" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
@@ -133,7 +133,7 @@ switch ($command) {
       evidence=$results
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
-    Write-MIRAssuranceJson -Value $summary -DefaultPath "artifacts/assurance/verify-summary.json"
+    Write-MIRAssuranceJson -Value $summary -DefaultPath ".work/artifacts/assurance/verify-summary.json"
     if ($status -ne "passed") { throw "Assurance verification failed." }
   }
   "gate" {
@@ -162,7 +162,7 @@ switch ($command) {
       evidence=$results
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
-    Write-MIRAssuranceJson -Value $summary -DefaultPath "artifacts/assurance/qualification-summary.json"
+    Write-MIRAssuranceJson -Value $summary -DefaultPath ".work/artifacts/assurance/qualification-summary.json"
     if ($status -ne "passed") { throw "Assurance qualification failed." }
   }
   "seal" { Invoke-MIRAssuranceSeal -Context $context }
@@ -193,11 +193,11 @@ switch ($command) {
       native_owner_binding_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\planner\native_owner_binding.lua"))
     }
     $snapshot.fingerprint = Get-MIRAssuranceTextHash -Text (($snapshot.Values | ForEach-Object { [string]$_ }) -join "`n")
-    Write-MIRAssuranceJson -Value $snapshot -DefaultPath "artifacts/assurance/balance-snapshot.json"
+    Write-MIRAssuranceJson -Value $snapshot -DefaultPath ".work/artifacts/assurance/balance-snapshot.json"
   }
   "backport" {
     if (-not (Get-MIRAssuranceOption -Name "--profile")) { $script:Args += @("--profile", "backport") }
-    Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "artifacts/assurance/backport-plan.json"
+    Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath ".work/artifacts/assurance/backport-plan.json"
   }
   "self-test" { Invoke-MIRAssuranceSelfTest -Context $context }
   default { throw "Unknown assurance command: $command" }

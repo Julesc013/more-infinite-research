@@ -12,7 +12,7 @@ param(
   [string]$SourceRepoRoot = "",
   [string]$TrustClass = "ci",
   [string]$AggregateTaskId = "",
-  [string]$EvidenceRoot = "artifacts/evidence"
+  [string]$EvidenceRoot = ".work/artifacts/evidence"
 )
 
 $ErrorActionPreference = "Stop"

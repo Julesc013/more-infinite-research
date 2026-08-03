@@ -1,7 +1,7 @@
 param(
   [string]$ContextPath = "",
   [string]$SourceRepoRoot = "",
-  [string]$EvidenceRoot = "artifacts/evidence",
+  [string]$EvidenceRoot = ".work/artifacts/evidence",
   [switch]$ContractOnly,
   [switch]$StructuralOnly,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path

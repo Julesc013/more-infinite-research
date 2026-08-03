@@ -289,7 +289,7 @@ foreach ($requiredWorkflowSnippet in @(
   "needs: [context, static, package, environments, transitions, ecosystem]",
   "needs: [context, transitions, ecosystem, performance]",
   "needs: [context, static, package, environments, transitions, ecosystem, performance, manual]",
-  "-TrustClass protected-release -EvidenceRoot artifacts/evidence",
+  "-TrustClass protected-release -EvidenceRoot .work/artifacts/evidence",
   "-AggregateTaskId qualification.full -TrustClass protected-release",
   "Invoke-MIRControlPlane.ps1 seal",
   "-TaskId shadow.equivalence",

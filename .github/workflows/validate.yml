@@ -24,22 +24,22 @@ jobs:
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
       - name: Diagnose verifier
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
+        run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --output out/verification-plan.json
+        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --output .work/output/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $plan = Get-Content -Raw -LiteralPath .work/output/verification-plan.json | ConvertFrom-Json
           $work = @($plan.work)
           if ($work.Count -eq 0) {
             $work = @([ordered]@{
@@ -53,8 +53,9 @@ jobs:
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: mir-verification-plan
-          path: out/verification-plan.json
+          path: .work/output/verification-plan.json
           if-no-files-found: error
 
   tests:
@@ -76,12 +77,12 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           name: mir-verification-plan
-          path: out
+          path: .work/output
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -89,7 +90,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./scripts/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --plan .work/output/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -97,8 +98,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ always() && matrix.no_op != true }}
         with:
+          include-hidden-files: true
           name: mir-evidence-${{ matrix.safe_test_id }}
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           if-no-files-found: warn
 
   verification-gate:
@@ -115,11 +117,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-verification-plan
-          path: out
+          path: .work/output
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -129,22 +131,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: mir-evidence-*
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           merge-multiple: true
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./scripts/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --plan .work/output/verification-plan.json --output .work/artifacts/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
+          include-hidden-files: true
           name: mir-verification-evidence
           path: |
-            out/verification-plan.json
-            artifacts/assurance/evidence-bundle.json
+            .work/output/verification-plan.json
+            .work/artifacts/assurance/evidence-bundle.json
           if-no-files-found: warn

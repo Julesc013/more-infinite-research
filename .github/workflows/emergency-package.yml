@@ -73,13 +73,13 @@ jobs:
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $candidate = "dist/$([string]$info.name)_$([string]$info.version).zip"
           try {
-            & ./scripts/mir.ps1 package build
+            & ./tools/mir.ps1 package build
           } catch {
             throw "First package build failed: $($_.Exception.Message)"
           }
           $first = (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash
           try {
-            & ./scripts/mir.ps1 package build
+            & ./tools/mir.ps1 package build
           } catch {
             throw "Second package build failed: $($_.Exception.Message)"
           }

@@ -8,14 +8,14 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 $archiveName = "$($info.name)_$($info.version).zip"
-$relativeRoots = @("build\deterministic-package-a", "build\deterministic-package-b")
+$relativeRoots = @(".work\build\deterministic-package-a", ".work\build\deterministic-package-b")
 $absoluteRoots = @($relativeRoots | ForEach-Object { Join-Path $repo $_ })
 
 foreach ($path in $absoluteRoots) {
   $full = [System.IO.Path]::GetFullPath($path)
-  $buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repo "build")) + [System.IO.Path]::DirectorySeparatorChar
+  $buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repo ".work\build")) + [System.IO.Path]::DirectorySeparatorChar
   if (-not $full.StartsWith($buildRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Deterministic package output escaped the repository build directory: $full"
+    throw "Deterministic package output escaped .work/build/: $full"
   }
   if (Test-Path -LiteralPath $full) { Remove-Item -LiteralPath $full -Recurse -Force }
 }

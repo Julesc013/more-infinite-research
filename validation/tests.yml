@@ -145,7 +145,7 @@
       "id": "static.balance",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/mir.ps1 assurance balance",
+      "command": "./tools/mir.ps1 assurance balance",
       "requires_factorio": false,
       "inputs": [
         "balance-contract",
@@ -340,7 +340,7 @@
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath artifacts/assurance/<upgrade-to>-upgrade-proof.json",
+      "command": "./scripts/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath .work/artifacts/assurance/<upgrade-to>-upgrade-proof.json",
       "requires_factorio": true,
       "inputs": [
         "candidate",
@@ -358,7 +358,7 @@
       "id": "runtime.ecosystem",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
+      "command": "./tools/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
       "requires_factorio": true,
       "inputs": [
         "candidate",
@@ -373,7 +373,7 @@
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 assurance check-seal --seal <seal>",
+      "command": "./tools/mir.ps1 assurance check-seal --seal <seal>",
       "requires_factorio": false,
       "inputs": [
         "candidate-seal",

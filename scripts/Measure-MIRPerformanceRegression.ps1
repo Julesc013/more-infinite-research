@@ -463,7 +463,7 @@ $manualScenariosRelative = [string]$campaign.manual_scenarios
 $script:ManualScenariosPath = Resolve-MIRCampaignPath -Path $manualScenariosRelative
 if (-not (Test-Path -LiteralPath $script:ManualScenariosPath -PathType Leaf)) { throw "Manual scenario authority is absent." }
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = "artifacts\performance\3.2.0-to-3.2.1-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+  $ArtifactRoot = ".work\artifacts\performance\3.2.0-to-3.2.1-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
 }
 $script:RunRoot = Resolve-MIRCampaignPath -Path $ArtifactRoot
 New-Item -ItemType Directory -Force -Path $script:RunRoot | Out-Null

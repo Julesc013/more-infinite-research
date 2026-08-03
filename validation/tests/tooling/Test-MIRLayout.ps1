@@ -34,6 +34,43 @@ if ($manifest.summary.unclassified -ne 0 -or $manifest.summary.case_collisions -
 }
 if ($manifest.summary.legacy -eq 0) { throw "Migration baseline unexpectedly contains no legacy paths." }
 
+$migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIROutputRoots.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($migrationPreview.mode -ne "preview" -or $migrationPreview.changed -ne 0) {
+  throw "Output-root migration is not idempotent: $($migrationPreview | ConvertTo-Json -Compress)"
+}
+
+foreach ($workflow in @(Get-ChildItem -LiteralPath (Join-Path $repo ".github/workflows") -File)) {
+  $lines = @(Get-Content -LiteralPath $workflow.FullName)
+  for ($index = 0; $index -lt $lines.Count; $index++) {
+    if ($lines[$index] -notmatch "uses:\s*actions/upload-artifact@") { continue }
+    $usesIndent = ([regex]::Match($lines[$index], "^\s*").Value).Length
+    $stepStart = $index
+    if ($lines[$index] -notmatch "^\s*-\s+uses:") {
+      for ($candidate = $index - 1; $candidate -ge 0; $candidate--) {
+        $match = [regex]::Match($lines[$candidate], "^(?<indent>\s*)-\s+")
+        if ($match.Success -and $match.Groups["indent"].Value.Length -lt $usesIndent) {
+          $stepStart = $candidate
+          break
+        }
+      }
+    }
+    $stepIndent = ([regex]::Match($lines[$stepStart], "^\s*").Value).Length
+    $stepEnd = $lines.Count
+    for ($candidate = $stepStart + 1; $candidate -lt $lines.Count; $candidate++) {
+      $match = [regex]::Match($lines[$candidate], "^(?<indent>\s*)-\s+")
+      if ($match.Success -and $match.Groups["indent"].Value.Length -eq $stepIndent) {
+        $stepEnd = $candidate
+        break
+      }
+    }
+    $block = $lines[$stepStart..($stepEnd - 1)] -join "`n"
+    if ($block -match "\.work/" -and
+        $block -notmatch "(?m)^\s+include-hidden-files:\s*true\s*$") {
+      throw "Hidden output upload lacks include-hidden-files opt-in: $($workflow.Name):$($index + 1)"
+    }
+  }
+}
+
 function Invoke-MIRCliProbe {
   param([Parameter(Mandatory)][string]$Entrypoint, [Parameter(Mandatory)][string[]]$Arguments)
   $output = (& pwsh -NoProfile -File $Entrypoint @Arguments 2>&1 | Out-String).Replace("`r`n", "`n").Trim()
@@ -52,4 +89,4 @@ foreach ($arguments in @(
   }
 }
 
-Write-Host "[ok] repository paths, historical aliases, ownership inventory, layout safety, and CLI facade parity agree."
+Write-Host "[ok] repository paths, output roots, hidden artifact uploads, historical aliases, ownership inventory, layout safety, and CLI facade parity agree."

@@ -23,7 +23,7 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = Join-Path $repo "artifacts\legacy-inventory"
+  $OutputRoot = Join-Path $repo ".work\artifacts\legacy-inventory"
 }
 $output = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   $OutputRoot
@@ -329,7 +329,7 @@ $repoLegacy = [pscustomobject]@{
   scripts = [pscustomobject]@{
     count = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Recurse -File -Filter "*.ps1").Count
     mir_cli_present = [bool](Test-Path -LiteralPath (Join-Path $repo "scripts\mir.ps1"))
-    legacy_inventory_command = ".\scripts\mir.ps1 legacy inventory"
+    legacy_inventory_command = ".\tools\mir.ps1 legacy inventory"
   }
 }
 

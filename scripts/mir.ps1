@@ -21,32 +21,32 @@ Usage:
   .\tools\mir.ps1 layout inventory [--output <path>]
   .\tools\mir.ps1 path resolve <logical-id>
   .\tools\mir.ps1 path resolve --path <historical-path>
-  .\scripts\mir.ps1 docs check
-  .\scripts\mir.ps1 architecture check
-  .\scripts\mir.ps1 manifests check
-  .\scripts\mir.ps1 release gate [--profile <name>] [--no-git-pull]
-  .\scripts\mir.ps1 release docs-only
-  .\scripts\mir.ps1 release docs-refresh
-  .\scripts\mir.ps1 overnight local [--profile <name>]
-  .\scripts\mir.ps1 audit local [--profile <name>]
-  .\scripts\mir.ps1 audit top25 --space-age
-  .\scripts\mir.ps1 package build
-  .\scripts\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
-  .\scripts\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
-  .\scripts\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
-  .\scripts\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
-  .\scripts\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
-  .\scripts\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
-  .\scripts\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
-  .\scripts\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
-  .\scripts\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
-  .\scripts\mir.ps1 report latest
-  .\scripts\mir.ps1 report missing-deps --run <path>
-  .\scripts\mir.ps1 report observations --run <path>
-  .\scripts\mir.ps1 legacy inventory [--output <path>] [--check]
-  .\scripts\mir.ps1 profile stub <group-id> --grouped-failures <path>
-  .\scripts\mir.ps1 run -Profile <profile-name-or-path>
-  .\scripts\mir.ps1 local-index build --mods <path>
+  .\tools\mir.ps1 docs check
+  .\tools\mir.ps1 architecture check
+  .\tools\mir.ps1 manifests check
+  .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
+  .\tools\mir.ps1 release docs-only
+  .\tools\mir.ps1 release docs-refresh
+  .\tools\mir.ps1 overnight local [--profile <name>]
+  .\tools\mir.ps1 audit local [--profile <name>]
+  .\tools\mir.ps1 audit top25 --space-age
+  .\tools\mir.ps1 package build
+  .\tools\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
+  .\tools\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
+  .\tools\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
+  .\tools\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
+  .\tools\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
+  .\tools\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
+  .\tools\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
+  .\tools\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
+  .\tools\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
+  .\tools\mir.ps1 report latest
+  .\tools\mir.ps1 report missing-deps --run <path>
+  .\tools\mir.ps1 report observations --run <path>
+  .\tools\mir.ps1 legacy inventory [--output <path>] [--check]
+  .\tools\mir.ps1 profile stub <group-id> --grouped-failures <path>
+  .\tools\mir.ps1 run -Profile <profile-name-or-path>
+  .\tools\mir.ps1 local-index build --mods <path>
 
 Common overrides:
   --factorio <path>   Factorio binary path
@@ -145,12 +145,16 @@ function New-MIRProfileOverrides {
 }
 
 function Get-MIRLatestRunRoot {
-  $artifactRoot = Join-Path $repo "artifacts"
-  if (-not (Test-Path -LiteralPath $artifactRoot)) { throw "No artifacts directory exists." }
-  $run = Get-ChildItem -LiteralPath $artifactRoot -Directory |
+  $runRoots = @(
+    (Join-Path $repo ".work\artifacts\runs"),
+    (Join-Path $repo "artifacts")
+  )
+  $run = @($runRoots | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | ForEach-Object {
+    Get-ChildItem -LiteralPath $_ -Directory
+  }) |
     Sort-Object LastWriteTime -Descending |
     Select-Object -First 1
-  if (-not $run) { throw "No artifact run directories found." }
+  if (-not $run) { throw "No canonical or legacy artifact run directories found." }
   return $run.FullName
 }
 
@@ -594,7 +598,7 @@ switch ($area) {
   }
   "legacy" {
     if ($verb -ne "inventory") { throw "Unknown legacy command: $verb" }
-    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo "artifacts\legacy-inventory")
+    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo ".work\artifacts\legacy-inventory")
     $params = @{ OutputRoot = $output }
     if (Test-MIRArgSwitch -Items $Args -Name "--check") {
       $params.CheckThresholds = $true
@@ -617,7 +621,7 @@ switch ($area) {
   "local-index" {
     if ($verb -ne "build") { throw "Unknown local-index command: $verb" }
     $mods = Get-MIRArgValue -Items $Args -Name "--mods" -Default (Get-MIRDefaultLocalModDir)
-    $out = Get-MIRArgValue -Items $Args -Name "--out" -Default (Join-Path $repo "build\cache\local-mod-index\local-mod-index.2.1.json")
+    $out = Get-MIRArgValue -Items $Args -Name "--out" -Default (Join-Path $repo ".work\build\cache\local-mod-index\local-mod-index.2.1.json")
     New-MIRLocalModIndex -Dirs @($mods) -OutputPath $out | Out-Null
     Write-MIRSuccess "wrote $out"
   }
