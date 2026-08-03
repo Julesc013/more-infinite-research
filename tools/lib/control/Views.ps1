@@ -232,7 +232,7 @@ function New-MIRCPCurrentCandidateLines {
     "---", "title: `"Current Development Candidate`"", "status: current", "applies_to: `"$($Release.release)`"",
     "audience: release-manager", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $ReviewDate",
     "supersedes: []", "superseded_by: []", "---", "", "# Current Development Candidate", "",
-    "> Generated from typed ReleaseRecords by ``scripts/Invoke-MIRControlPlane.ps1 views``. Do not edit this view.", "",
+    "> Generated from typed ReleaseRecords by ``tools/commands/control/Invoke-MIRControlPlane.ps1 views``. Do not edit this view.", "",
     "| Field | Authority |", "| --- | --- |",
     "| MIR version | $(Format-MIRCPCode $Release.release) |",
     "| Candidate | $(Format-MIRCPCode $Release.candidate_id) |",

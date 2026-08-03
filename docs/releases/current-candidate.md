@@ -12,7 +12,7 @@ superseded_by: []
 
 # Current Development Candidate
 
-> Generated from typed ReleaseRecords by `scripts/Invoke-MIRControlPlane.ps1 views`. Do not edit this view.
+> Generated from typed ReleaseRecords by `tools/commands/control/Invoke-MIRControlPlane.ps1 views`. Do not edit this view.
 
 | Field | Authority |
 | --- | --- |

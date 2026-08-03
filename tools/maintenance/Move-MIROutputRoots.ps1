@@ -33,7 +33,8 @@ Get-ChildItem -LiteralPath (Join-Path $repo ".mir/tasks") -Filter *.json -File |
 $excluded = @(
   (Join-Path $repo "validation/tests/package/Test-MIRArtifactCleanup.ps1"),
   (Join-Path $repo "validation/tests/tooling/Test-MIRPowerShellQuality.ps1"),
-  (Join-Path $repo "scripts/Update-MIRShadowBaselines.ps1")
+  (Join-Path $repo "scripts/Update-MIRShadowBaselines.ps1"),
+  (Join-Path $repo "tools/commands/control/Update-MIRShadowBaselines.ps1")
 )
 $replacements = @(
   [pscustomobject]@{ Pattern = [regex]::Escape("./scripts/mir.ps1"); Replacement = "./tools/mir.ps1" },

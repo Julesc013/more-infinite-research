@@ -120,13 +120,22 @@ function ConvertTo-MIRCPAssertionIdPart {
   return $part.Trim('-')
 }
 
+function Resolve-MIRCPScenarioCatalogPath {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $canonicalPath = Join-Path $RepoRoot "validation/scenarios/runtime.json"
+  if (Test-Path -LiteralPath $canonicalPath -PathType Leaf) { return $canonicalPath }
+  $legacyPath = Join-Path $RepoRoot "fixtures/compat-matrix/expected-scenarios.json"
+  if (Test-Path -LiteralPath $legacyPath -PathType Leaf) { return $legacyPath }
+  throw "Scenario catalog is missing from both the canonical and governed historical path."
+}
+
 function New-MIRCPExecutionRegistry {
   param(
     [string]$Target = "2.1",
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $catalogPath = Join-Path $repo "validation/scenarios/runtime.json"
+  $catalogPath = Resolve-MIRCPScenarioCatalogPath -RepoRoot $repo
   $runnerPath = Join-Path $repo "scripts/Invoke-MIRValidation.ps1"
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   $targetProperty = $catalog.profiles.PSObject.Properties[$Target]
@@ -269,7 +278,7 @@ function Assert-MIRCPExecutionRegistry {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   if ([int]$Registry.schema -ne 1 -or [string]$Registry.authority -ne "mir-control-plane-v5-execution-registry") { throw "Execution registry identity is invalid." }
-  $catalog = Get-Content -Raw -LiteralPath (Join-Path $repo "validation/scenarios/runtime.json") | ConvertFrom-Json
+  $catalog = Get-Content -Raw -LiteralPath (Resolve-MIRCPScenarioCatalogPath -RepoRoot $repo) | ConvertFrom-Json
   $expected = @($catalog.profiles.PSObject.Properties[[string]$Registry.target].Value)
   if (@($Registry.scenarios).Count -ne $expected.Count) { throw "Execution registry does not cover every declared scenario." }
   $ids = @($Registry.scenarios.id | ForEach-Object { [string]$_ })

@@ -15,18 +15,7 @@ param(
   [string]$EvidenceRoot = ".work/artifacts/evidence"
 )
 
-$ErrorActionPreference = "Stop"
-$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Executor")) {
-  . (Join-Path $repo "tools/lib/control/$module.ps1")
-}
-switch ($Operation) {
-  "record-context" { Write-MIRCPContextCompletionEvidence -ContextPath $ContextPath -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "run-set" { Invoke-MIRCPTaskSet -ContextPath $ContextPath -Kind $Kind -ExcludeTask $ExcludeTask -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "environment" { Invoke-MIRCPEnvironmentBatch -ContextPath $ContextPath -BatchId $BatchId -FactorioBin $FactorioBin -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "upgrade" { Invoke-MIRCPUpgradeMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "ecosystem" { Invoke-MIRCPEcosystemMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -LocalModDir $LocalModDir -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "approved-delta" { Invoke-MIRCPApprovedDeltaMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "performance" { Invoke-MIRCPPerformanceMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -LocalModZipDir $LocalModZipDir -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-  "aggregate" { Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId $AggregateTaskId -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
-}
+# MIR-L5-LEGACY-COMMAND-WRAPPER: retained for historical command compatibility only.
+$canonicalCommand = Join-Path $PSScriptRoot "../tools/commands/control/Invoke-MIRControlPlaneWork.ps1"
+& $canonicalCommand @PSBoundParameters
+exit $LASTEXITCODE

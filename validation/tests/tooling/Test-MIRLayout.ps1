@@ -76,6 +76,19 @@ foreach ($technologyAlias in @(
     $_.from -eq $technologyAlias.from -and $_.to -eq $technologyAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical technology-command alias is missing or writable: $($technologyAlias.from)" }
 }
+foreach ($controlAlias in @(
+  @{from=("scripts/" + "Invoke-MIRControlPlane.ps1");to="tools.commands.control.facade"},
+  @{from=("scripts/" + "Invoke-MIRControlPlaneWork.ps1");to="tools.commands.control.work"},
+  @{from=("scripts/" + "New-MIRVerificationContext.ps1");to="tools.commands.control.context"},
+  @{from=("scripts/" + "Update-MIRExecutionRegistry.ps1");to="tools.commands.control.registry"},
+  @{from=("scripts/" + "Update-MIRObservationReplay.ps1");to="tools.commands.control.replay"},
+  @{from=("scripts/" + "Update-MIRShadowAnalysis.ps1");to="tools.commands.control.shadow-analysis"},
+  @{from=("scripts/" + "Update-MIRShadowBaselines.ps1");to="tools.commands.control.shadow-baselines"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $controlAlias.from -and $_.to -eq $controlAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical control-command alias is missing or writable: $($controlAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -165,6 +178,11 @@ if ($technologyCommandMigrationPreview.mode -ne "preview" -or $technologyCommand
     $technologyCommandMigrationPreview.commands -ne 7) {
   throw "Technology-command migration is incomplete or not idempotent: $($technologyCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$controlCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRControlCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($controlCommandMigrationPreview.mode -ne "preview" -or $controlCommandMigrationPreview.changed -ne 0 -or
+    $controlCommandMigrationPreview.commands -ne 7) {
+  throw "Control-command migration is incomplete or not idempotent: $($controlCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -223,6 +241,21 @@ foreach ($wrapperPath in $legacyTechnologyCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 20) {
     throw "Legacy technology command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyControlCommands = @(
+  (Join-Path $repo "scripts/Invoke-MIRControlPlane.ps1"),
+  (Join-Path $repo "scripts/Invoke-MIRControlPlaneWork.ps1"),
+  (Join-Path $repo "scripts/New-MIRVerificationContext.ps1"),
+  (Join-Path $repo "scripts/Update-MIRExecutionRegistry.ps1"),
+  (Join-Path $repo "scripts/Update-MIRObservationReplay.ps1"),
+  (Join-Path $repo "scripts/Update-MIRShadowAnalysis.ps1"),
+  (Join-Path $repo "scripts/Update-MIRShadowBaselines.ps1")
+)
+foreach ($wrapperPath in $legacyControlCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 40) {
+    throw "Legacy control command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

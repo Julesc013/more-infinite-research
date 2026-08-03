@@ -18,6 +18,10 @@ $moves = [ordered]@{
   ".mir/control-plane/baselines/3.2.2-v4.json" = "validation/baselines/control/3.2.2-v4.json"
   ".mir/control-plane/baselines/3.2.2-v5-replay.json" = "validation/baselines/control/3.2.2-v5-replay.json"
 }
+$preservedHistoricalReferences = @{
+  "docs/architecture/control-plane-v5.md" = @("fixtures/compat-matrix/expected-scenarios.json")
+  "tools/lib/control/Scenario.ps1" = @("fixtures/compat-matrix/expected-scenarios.json")
+}
 
 function Get-MIRActiveDefinitionFiles {
   $roots = @(".github", ".mir", "docs", "scripts", "validation", "tools", "spec", "fixtures")
@@ -74,14 +78,31 @@ foreach ($from in $moves.Keys) {
 
 $referenceFiles = @()
 foreach ($file in Get-MIRActiveDefinitionFiles) {
+  $relative = [IO.Path]::GetRelativePath($RepoRoot, $file.FullName).Replace("\", "/")
   $text = Get-Content -Raw -LiteralPath $file.FullName
   $updated = $text
+  $preservedTokens = [ordered]@{}
+  $preservedIndex = 0
+  if ($preservedHistoricalReferences.ContainsKey($relative)) {
+    foreach ($literal in @($preservedHistoricalReferences[$relative])) {
+      if (-not $updated.Contains($literal)) {
+        throw "Governed historical definition reference is missing: $relative -> $literal"
+      }
+      $token = "__MIR_PRESERVED_HISTORICAL_DEFINITION_$($preservedIndex)__"
+      $preservedTokens[$token] = $literal
+      $updated = $updated.Replace($literal, $token)
+      $preservedIndex++
+    }
+  }
   foreach ($from in $moves.Keys) {
     $updated = $updated.Replace($from, $moves[$from])
     $updated = $updated.Replace($from.Replace("/", "\"), $moves[$from].Replace("/", "\"))
   }
+  foreach ($token in $preservedTokens.Keys) {
+    $updated = $updated.Replace($token, $preservedTokens[$token])
+  }
   if ($updated -ne $text) {
-    $referenceFiles += [IO.Path]::GetRelativePath($RepoRoot, $file.FullName).Replace("\", "/")
+    $referenceFiles += $relative
     if ($Apply) { [IO.File]::WriteAllText($file.FullName, $updated, $utf8NoBom) }
   }
 }

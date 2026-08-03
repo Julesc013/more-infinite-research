@@ -14,6 +14,10 @@ $roots = [ordered]@{
   "scripts/Museum" = "tools/lib/museum"
   "scripts/validation" = "tools/lib/validation"
 }
+$preservedCompatibilityWrapperReferences = @{
+  "tools/lib/control/Executor.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
+  "validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
+}
 
 function Get-MIRActiveToolFiles {
   $activeRoots = @(".github", ".mir", "docs", "scripts", "validation", "tools", "spec", "fixtures")
@@ -104,8 +108,22 @@ $forwardCommand (Join-Path $([char]36)PSScriptRoot "$relativeFromLegacy")$forwar
 
 $referenceFiles = @()
 foreach ($file in Get-MIRActiveToolFiles) {
+  $relative = [IO.Path]::GetRelativePath($RepoRoot, $file.FullName).Replace("\", "/")
   $text = Get-Content -Raw -LiteralPath $file.FullName
   $updated = $text
+  $preservedTokens = [ordered]@{}
+  $preservedIndex = 0
+  if ($preservedCompatibilityWrapperReferences.ContainsKey($relative)) {
+    foreach ($literal in @($preservedCompatibilityWrapperReferences[$relative])) {
+      if (-not $updated.Contains($literal)) {
+        throw "Governed compatibility-wrapper reference is missing: $relative -> $literal"
+      }
+      $token = "__MIR_PRESERVED_COMPATIBILITY_WRAPPER_$($preservedIndex)__"
+      $preservedTokens[$token] = $literal
+      $updated = $updated.Replace($literal, $token)
+      $preservedIndex++
+    }
+  }
   $updated = $updated.Replace(
     '(Join-Path $PSScriptRoot "MIRCli\',
     '(Join-Path $repo "tools\lib\cli\'
@@ -119,8 +137,11 @@ foreach ($file in Get-MIRActiveToolFiles) {
     $updated = $updated.Replace($fromRoot, $toRoot)
     $updated = $updated.Replace($fromRoot.Replace("/", "\"), $toRoot.Replace("/", "\"))
   }
+  foreach ($token in $preservedTokens.Keys) {
+    $updated = $updated.Replace($token, $preservedTokens[$token])
+  }
   if ($updated -ne $text) {
-    $referenceFiles += [IO.Path]::GetRelativePath($RepoRoot, $file.FullName).Replace("\", "/")
+    $referenceFiles += $relative
     if ($Apply) { [IO.File]::WriteAllText($file.FullName, $updated, $utf8NoBom) }
   }
 }

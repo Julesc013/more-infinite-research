@@ -114,6 +114,8 @@ $sourceProbeText = [IO.File]::ReadAllText((Join-Path $performanceSource ([string
 $overlayStatus = @(& git -C $overlay.path status --porcelain --untracked-files=all)
 $compatAuditManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "scripts/Invoke-MIRCompatAudit.ps1" })
 $controllerCompatAuditSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$performanceLibraryManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "tools/lib/validation/PerformanceCampaign.ps1" })
+$controllerPerformanceLibrarySha256 = Get-MIRCPSha256File -Path (Join-Path $repo "tools/lib/validation/PerformanceCampaign.ps1")
 $compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
 $compatOutputResolveIndex = $compatAuditText.IndexOf('$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)', [StringComparison]::Ordinal)
 $compatOutputMaterializeIndex = $compatAuditText.IndexOf('$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir', [StringComparison]::Ordinal)
@@ -124,15 +126,23 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     $probeBytes -contains [byte]13 -or
     [string]$overlay.manifest_sha256 -notmatch '^[0-9A-F]{64}$' -or
     [string]$overlay.harness_sha256 -notmatch '^[0-9A-F]{64}$' -or
-    @($overlay.manifest.files).Count -ne 3 -or
+    @($overlay.manifest.files).Count -ne 22 -or
     $compatAuditManifestRows.Count -ne 1 -or
     [string]$compatAuditManifestRows[0].sha256 -ne $controllerCompatAuditSha256 -or
     [string]$compatAuditManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
+    $performanceLibraryManifestRows.Count -ne 1 -or
+    [string]$performanceLibraryManifestRows[0].sha256 -ne $controllerPerformanceLibrarySha256 -or
+    [string]$performanceLibraryManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
     $compatOutputResolveIndex -lt 0 -or $compatOutputMaterializeIndex -le $compatOutputResolveIndex -or $compatLockIndex -le $compatOutputMaterializeIndex -or
-    $overlayStatus.Count -ne 3 -or
+    $overlayStatus.Count -ne 22 -or
     $overlayStatus -notcontains " M .mir/performance-campaign.json" -or
     $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua" -or
-    $overlayStatus -notcontains " M scripts/Invoke-MIRCompatAudit.ps1") {
+    $overlayStatus -notcontains " M scripts/Invoke-MIRCompatAudit.ps1" -or
+    $overlayStatus -notcontains " M scripts/MIRCompatAudit/FactorioRunner.ps1" -or
+    $overlayStatus -notcontains " M scripts/validation/PerformanceCampaign.ps1" -or
+    $overlayStatus -notcontains "?? tools/lib/compatibility/FactorioRunner.ps1" -or
+    $overlayStatus -notcontains "?? tools/lib/validation/PerformanceCampaign.ps1" -or
+    $overlayStatus -notcontains "?? validation/scenarios/local-2.1.json") {
   throw "Performance source overlay is not exact, checkout-independent, and package-preserving."
 }
 $baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"

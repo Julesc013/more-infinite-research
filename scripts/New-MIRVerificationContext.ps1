@@ -10,10 +10,7 @@ param(
   [string]$OutputRoot = ".work/output/verification-context"
 )
 
-$ErrorActionPreference = "Stop"
-$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
-  . (Join-Path $repo "tools/lib/control/$module.ps1")
-}
-$context = New-MIRCPVerificationContext -Mode $Mode -Target $Target -Release $Release -Stage $Stage -CandidatePath $CandidatePath -SourceRepoRoot $SourceRepoRoot -FactorioBin $FactorioBin -OutputRoot $OutputRoot -RepoRoot $repo
-$context | ConvertTo-Json -Depth 10
+# MIR-L5-LEGACY-COMMAND-WRAPPER: retained for historical command compatibility only.
+$canonicalCommand = Join-Path $PSScriptRoot "../tools/commands/control/New-MIRVerificationContext.ps1"
+& $canonicalCommand @PSBoundParameters
+exit $LASTEXITCODE

@@ -106,7 +106,7 @@ jobs:
           }
           if ($expectedSource -ne $env:MIR_CP_SOURCE_REF) { throw "Qualification-source commit mismatch." }
           if ((git -C source rev-parse HEAD).Trim() -ne $env:MIR_CP_SOURCE_REF) { throw "Source checkout mismatch." }
-          ./scripts/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
       - name: Build exact candidate from immutable package source
         shell: pwsh
         run: ./source/tools/commands/package/Build-MIRPackage.ps1
@@ -121,7 +121,7 @@ jobs:
         run: |
           $record = Get-Content -Raw -LiteralPath ".mir/releases/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           $candidate = Join-Path source ([string]$record.package.archive)
-          $result = ./scripts/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
+          $result = ./tools/commands/control/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
             -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot .work/output/verification-context |
             ConvertFrom-Json
           "context_id=$([string]$result.context_id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
@@ -139,7 +139,7 @@ jobs:
         shell: pwsh
         run: |
           $context = ".work/output/verification-context/${{ steps.export.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
         with:
@@ -177,7 +177,7 @@ jobs:
         shell: pwsh
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind static,evaluation -ExcludeTask shadow.equivalence -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
@@ -215,7 +215,7 @@ jobs:
         shell: pwsh
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind package -ExcludeTask verification.context -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
@@ -262,7 +262,7 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
             -BatchId '${{ matrix.batch_id }}' -FactorioBin $env:FACTORIO_BIN `
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
@@ -309,10 +309,10 @@ jobs:
           MIR_PRIOR_RELEASE: ${{ inputs.prior_release }}
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation upgrade -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation upgrade -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation approved-delta -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation approved-delta -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
@@ -362,7 +362,7 @@ jobs:
           MIR_LOCAL_MOD_ZIPS: ${{ inputs.local_mod_zip_dir }}
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation ecosystem -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation ecosystem -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -LocalModDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
@@ -411,7 +411,7 @@ jobs:
           MIR_LOCAL_MOD_ZIPS: ${{ inputs.local_mod_zip_dir }}
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation performance -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation performance -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE `
             -LocalModZipDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
@@ -448,7 +448,7 @@ jobs:
         shell: pwsh
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind manual -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
       - uses: actions/upload-artifact@v4
         if: always()
@@ -489,7 +489,7 @@ jobs:
         shell: pwsh
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
-          ./scripts/Invoke-MIRControlPlaneWork.ps1 -Operation aggregate -ContextPath $context `
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation aggregate -ContextPath $context `
             -AggregateTaskId qualification.full -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence |
             Tee-Object -FilePath .work/output/control-plane-v5/aggregate-result.json
       - name: Admit reconstruction, seal, shadow cutover, and promotion
@@ -499,13 +499,13 @@ jobs:
         run: |
           $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
           if ($env:MIR_CP_TARGET -eq "2.0") {
-            ./scripts/Invoke-MIRControlPlane.ps1 backport -ContextPath $context -EvidenceRoot .work/artifacts/evidence | Out-Host
+            ./tools/commands/control/Invoke-MIRControlPlane.ps1 backport -ContextPath $context -EvidenceRoot .work/artifacts/evidence | Out-Host
           }
-          ./scripts/Invoke-MIRControlPlane.ps1 seal -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 seal -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
             Tee-Object -FilePath .work/output/control-plane-v5/seal-result.json
-          ./scripts/Invoke-MIRControlPlane.ps1 release -ContextPath $context -TaskId shadow.equivalence `
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 release -ContextPath $context -TaskId shadow.equivalence `
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence | Out-Host
-          ./scripts/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
             Tee-Object -FilePath .work/output/control-plane-v5/promotion-result.json
       - uses: actions/upload-artifact@v4
         if: always()

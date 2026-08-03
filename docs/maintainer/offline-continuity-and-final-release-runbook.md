@@ -5,7 +5,7 @@ applies_to: "Control Plane v5, MIR 3.2.2 C24, and MIR 2.5.0 P9"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -83,10 +83,10 @@ $mods21 = 'C:\Projects\Factorio\testmods_2.1'
 $contextRoot = 'C:\Projects\Factorio\v5-contexts'
 $evidenceRoot = 'C:\Projects\Factorio\v5-evidence'
 
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" validate -AllLocks -RepoRoot $cp
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" views -Check -RepoRoot $cp
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" registry -Check -RepoRoot $cp
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" replay -Check -RepoRoot $cp
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" validate -AllLocks -RepoRoot $cp
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" views -Check -RepoRoot $cp
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" registry -Check -RepoRoot $cp
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" replay -Check -RepoRoot $cp
 & "$cp\validation\tests\tooling\Test-MIRControlPlane.ps1" -RepoRoot $cp
 & "$cp\validation\tests\tooling\Test-MIRControlPlaneShadow.ps1" -ContractOnly -RepoRoot $cp
 & "$cp\validation\tests\tooling\Test-MIRControlPlaneExecutor.ps1" -RepoRoot $cp
@@ -101,7 +101,7 @@ The parameterless shadow command is not a preflight. Operational shadow evaluati
 Never resume a context after changing the controller. Create a new context and new evidence root.
 
 ```powershell
-$context = & "$cp\scripts\Invoke-MIRControlPlane.ps1" context `
+$context = & "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" context `
   -Mode calibrate-fresh `
   -Target 2.1 `
   -Release 3.2.2 `
@@ -110,7 +110,7 @@ $context = & "$cp\scripts\Invoke-MIRControlPlane.ps1" context `
   -ContextOutputRoot $contextRoot `
   -RepoRoot $cp | ConvertFrom-Json
 
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" calibrate `
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" calibrate `
   -ContextPath $context.path `
   -FactorioBin $factorio21 `
   -PriorRelease $prior21 `
@@ -121,7 +121,7 @@ $context = & "$cp\scripts\Invoke-MIRControlPlane.ps1" context `
   -TrustClass ci `
   -RepoRoot $cp
 
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" calibration-proof `
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" calibration-proof `
   -ContextPath $context.path `
   -EvidenceRoot $evidenceRoot `
   -Output 'validation/baselines/control/3.2.2-v5-fresh-calibration.json' `
@@ -146,7 +146,7 @@ $factorio20 = '<exact Factorio 2.0.77 executable>'
 $prior20 = "$cp\dist\more-infinite-research_2.4.9.zip"
 $mods20 = 'C:\Projects\Factorio\testmods_2.0'
 
-& "$cp\scripts\Invoke-MIRControlPlane.ps1" plan `
+& "$cp\tools\commands\control\Invoke-MIRControlPlane.ps1" plan `
   -Mode calibrate-fresh `
   -Stage release `
   -Target 2.0 `

@@ -485,7 +485,7 @@ function New-MIRCPVerificationContext {
     ".mir/control-plane/v4-v5-equivalence.json",
     ".mir/control-plane/approved-delta-policies.json", ".mir/performance-campaign.json", $performanceCampaignRelativePath,
     ".mir/control-plane/ownership.json", ".mir/control-plane/mutation-calibration.json", ".mir/control-plane/evidence-revocations.json",
-    "validation/trust.json", "scripts/Invoke-MIRControlPlane.ps1", "scripts/Invoke-MIRControlPlaneWork.ps1",
+    "validation/trust.json", "tools/commands/control/Invoke-MIRControlPlane.ps1", "tools/commands/control/Invoke-MIRControlPlaneWork.ps1",
     "tools/lib/control/Core.ps1", "tools/lib/control/Records.ps1", "tools/lib/control/Planner.ps1",
     "tools/lib/control/Scenario.ps1", "tools/lib/control/Observation.ps1", "tools/lib/control/Evidence.ps1",
     "tools/lib/control/Views.ps1", "tools/lib/control/Context.ps1", "tools/lib/control/Shadow.ps1",

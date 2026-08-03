@@ -507,20 +507,59 @@ function New-MIRCPPerformanceSourceOverlay {
   $overlayPath = Join-Path $destination ".mir/performance-campaign.json"
   [IO.File]::Copy($authorityPath, $overlayPath, $true)
   if ((Get-MIRCPSha256File -Path $overlayPath) -ne [string]$authority.sha256) { throw "Performance authority overlay changed the governed campaign bytes." }
-  $compatAuditRelativePath = "scripts/Invoke-MIRCompatAudit.ps1"
-  $compatAuditControllerPath = Join-Path $repo $compatAuditRelativePath
-  $compatAuditOverlayPath = Join-Path $destination $compatAuditRelativePath
-  [IO.File]::Copy($compatAuditControllerPath, $compatAuditOverlayPath, $true)
-  $compatAuditSha256 = Get-MIRCPSha256File -Path $compatAuditControllerPath
-  if ((Get-MIRCPSha256File -Path $compatAuditOverlayPath) -ne $compatAuditSha256) { throw "Performance authority overlay changed the controller compatibility-audit bytes." }
+  $controllerOverlayRelativePaths = @(
+    "scripts/Invoke-MIRCompatAudit.ps1",
+    "scripts/MIRCompatAudit/DependencyResolver.ps1",
+    "scripts/MIRCompatAudit/DiagnosticsParser.ps1",
+    "scripts/MIRCompatAudit/FactorioRunner.ps1",
+    "scripts/MIRCompatAudit/ModPortal.ps1",
+    "scripts/validation/PackageIdentity.ps1",
+    "scripts/validation/PerformanceCampaign.ps1",
+    "scripts/validation/ReleaseAttestations.ps1",
+    "scripts/validation/SettingsOverrides.ps1",
+    "tools/lib/compatibility/DependencyResolver.ps1",
+    "tools/lib/compatibility/DiagnosticsParser.ps1",
+    "tools/lib/compatibility/FactorioRunner.ps1",
+    "tools/lib/compatibility/ModPortal.ps1",
+    "tools/lib/validation/PackageIdentity.ps1",
+    "tools/lib/validation/PerformanceCampaign.ps1",
+    "tools/lib/validation/ReleaseAttestations.ps1",
+    "tools/lib/validation/SettingsOverrides.ps1",
+    "validation/adapters/portal-exclusions.json",
+    "validation/scenarios/local-2.1.json",
+    "validation/scenarios/manual.json"
+  )
+  $controllerOverlayRows = [Collections.Generic.List[object]]::new()
+  foreach ($relativePath in $controllerOverlayRelativePaths) {
+    $controllerPath = Join-Path $repo $relativePath
+    if (-not (Test-Path -LiteralPath $controllerPath -PathType Leaf)) {
+      throw "Performance controller overlay dependency is absent: $relativePath"
+    }
+    $overlayDependencyPath = Join-Path $destination $relativePath
+    [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $overlayDependencyPath))
+    [IO.File]::Copy($controllerPath, $overlayDependencyPath, $true)
+    $sha256 = Get-MIRCPSha256File -Path $controllerPath
+    if ((Get-MIRCPSha256File -Path $overlayDependencyPath) -ne $sha256) {
+      throw "Performance controller overlay changed dependency bytes: $relativePath"
+    }
+    $controllerOverlayRows.Add([pscustomobject][ordered]@{
+      path = $relativePath
+      materialization = "controller-exact-bytes-v1"
+      bytes = [int64](Get-Item -LiteralPath $overlayDependencyPath).Length
+      sha256 = $sha256
+    })
+  }
   $probe = Set-MIRCPCanonicalPerformanceProbeText -OverlayRoot $destination
   $status = @(& git -C $destination status --porcelain --untracked-files=all)
-  $allowedChanges = @(
-    " M .mir/performance-campaign.json",
-    " M fixtures/performance-regression-probe/data-final-fixes.lua",
-    " M scripts/Invoke-MIRCompatAudit.ps1"
+  $allowedPaths = @(
+    ".mir/performance-campaign.json"
+    "fixtures/performance-regression-probe/data-final-fixes.lua"
+    $controllerOverlayRelativePaths
   )
-  $unexpected = @($status | Where-Object { $allowedChanges -notcontains [string]$_ })
+  $unexpected = @($status | Where-Object {
+    $statusPath = ([string]$_).Substring(3).Replace("\", "/")
+    $allowedPaths -notcontains $statusPath
+  })
   if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
   $packageSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $destination
   if ($packageSha256 -ne [string]$Descriptor.source_sha256) { throw "Performance authority overlay changed package-visible source." }
@@ -535,8 +574,8 @@ function New-MIRCPPerformanceSourceOverlay {
     source_commit = [string]$Source.commit
     files = @(
       [pscustomobject][ordered]@{path=".mir/performance-campaign.json";materialization="controller-exact-bytes-v1";bytes=[int64](Get-Item -LiteralPath $overlayPath).Length;sha256=[string]$authority.sha256},
-      $probe,
-      [pscustomobject][ordered]@{path=$compatAuditRelativePath;materialization="controller-exact-bytes-v1";bytes=[int64](Get-Item -LiteralPath $compatAuditOverlayPath).Length;sha256=$compatAuditSha256}
+      $probe
+      foreach ($controllerOverlayRow in $controllerOverlayRows) { $controllerOverlayRow }
     )
     harness_sha256 = [string]$harnessSha256
     package_source_sha256 = $packageSha256

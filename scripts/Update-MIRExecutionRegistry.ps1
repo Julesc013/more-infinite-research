@@ -4,9 +4,7 @@ param(
   [switch]$Check
 )
 
-$ErrorActionPreference = "Stop"
-$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "tools/lib/control/Core.ps1")
-. (Join-Path $repo "tools/lib/control/Scenario.ps1")
-$registry = Update-MIRCPExecutionRegistry -Target $Target -RepoRoot $repo -Check:$Check
-Write-Host "[ok] execution registry: $($registry.metrics.declarations) scenarios, $($registry.metrics.assertions) assertions, $($registry.metrics.batches) exact-environment batches, $($registry.metrics.projected_factorio_processes) projected Factorio processes."
+# MIR-L5-LEGACY-COMMAND-WRAPPER: retained for historical command compatibility only.
+$canonicalCommand = Join-Path $PSScriptRoot "../tools/commands/control/Update-MIRExecutionRegistry.ps1"
+& $canonicalCommand @PSBoundParameters
+exit $LASTEXITCODE

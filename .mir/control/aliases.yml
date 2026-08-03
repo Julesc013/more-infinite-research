@@ -186,6 +186,34 @@ aliases:
     to: tools.commands.technology.governance
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Invoke-MIRControlPlane.ps1
+    to: tools.commands.control.facade
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Invoke-MIRControlPlaneWork.ps1
+    to: tools.commands.control.work
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRVerificationContext.ps1
+    to: tools.commands.control.context
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRExecutionRegistry.ps1
+    to: tools.commands.control.registry
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRObservationReplay.ps1
+    to: tools.commands.control.replay
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRShadowAnalysis.ps1
+    to: tools.commands.control.shadow-analysis
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRShadowBaselines.ps1
+    to: tools.commands.control.shadow-baselines
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

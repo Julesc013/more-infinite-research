@@ -657,6 +657,7 @@ validation_tooling:
     repository_docs_command_migrator: tools/maintenance/Move-MIRDocsCommands.ps1
     repository_planner_command_migrator: tools/maintenance/Move-MIRPlannerCommands.ps1
     repository_technology_command_migrator: tools/maintenance/Move-MIRTechnologyCommands.ps1
+    repository_control_command_migrator: tools/maintenance/Move-MIRControlCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -680,7 +681,7 @@ validation_tooling:
     control_plane_evidence_revocations: .mir/control-plane/evidence-revocations.json
     control_plane_execution_registry: validation/generated/execution-registry.json
     control_plane_historical_replay: validation/baselines/control/3.2.2-v5-replay.json
-    control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
+    control_plane_entrypoint: tools/commands/control/Invoke-MIRControlPlane.ps1
     control_plane_core: tools/lib/control/Core.ps1
     control_plane_records: tools/lib/control/Records.ps1
     control_plane_planner: tools/lib/control/Planner.ps1
@@ -696,20 +697,20 @@ validation_tooling:
     control_plane_gate: validation/tests/tooling/Test-MIRControlPlane.ps1
     control_plane_release: tools/lib/control/Release.ps1
     control_plane_release_gate: validation/tests/tooling/Test-MIRControlPlaneRelease.ps1
-    control_plane_execution_registry_generator: scripts/Update-MIRExecutionRegistry.ps1
+    control_plane_execution_registry_generator: tools/commands/control/Update-MIRExecutionRegistry.ps1
     control_plane_execution_registry_gate: validation/tests/tooling/Test-MIRExecutionRegistry.ps1
-    control_plane_observation_replay_generator: scripts/Update-MIRObservationReplay.ps1
+    control_plane_observation_replay_generator: tools/commands/control/Update-MIRObservationReplay.ps1
     control_plane_observation_gate: validation/tests/tooling/Test-MIRObservationEvaluation.ps1
-    control_plane_context_builder: scripts/New-MIRVerificationContext.ps1
+    control_plane_context_builder: tools/commands/control/New-MIRVerificationContext.ps1
     control_plane_context_gate: validation/tests/tooling/Test-MIRVerificationContext.ps1
     control_plane_evidence_gate: validation/tests/tooling/Test-MIREvidenceStore.ps1
-    control_plane_work_entrypoint: scripts/Invoke-MIRControlPlaneWork.ps1
+    control_plane_work_entrypoint: tools/commands/control/Invoke-MIRControlPlaneWork.ps1
     control_plane_executor_gate: validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1
     control_plane_context_package_gate: validation/tests/package/Test-MIRContextPackage.ps1
     control_plane_context_registry_gate: validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1
     control_plane_release_obligation_gate: validation/tests/release/Test-MIRReleaseObligation.ps1
-    control_plane_shadow_baseline_generator: scripts/Update-MIRShadowBaselines.ps1
-    control_plane_shadow_analysis_generator: scripts/Update-MIRShadowAnalysis.ps1
+    control_plane_shadow_baseline_generator: tools/commands/control/Update-MIRShadowBaselines.ps1
+    control_plane_shadow_analysis_generator: tools/commands/control/Update-MIRShadowAnalysis.ps1
     control_plane_workflow: .github/workflows/control-plane-v5.yml
     control_plane_workflow_gate: validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
