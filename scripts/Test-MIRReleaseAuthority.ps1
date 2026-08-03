@@ -64,8 +64,14 @@ if ([string]$canonical.release -ne [string]$info.version -or [string]$canonical.
   throw "Canonical release authority must bind the package version and Factorio target in info.json."
 }
 $releaseStates = @((Get-MIRCPPolicy -RepoRoot $repo).release_states | ForEach-Object { [string]$_ })
-if ([Array]::IndexOf($releaseStates, [string]$canonical.state) -lt [Array]::IndexOf($releaseStates, "package-built")) {
-  throw "Canonical release authority must be at least package-built."
+$canonicalStateIndex = [Array]::IndexOf($releaseStates, [string]$canonical.state)
+$packageBuiltStateIndex = [Array]::IndexOf($releaseStates, "package-built")
+if ($canonicalStateIndex -lt 0) {
+  throw "Canonical release authority has an unknown state: $($canonical.state)."
+}
+$canonicalHasPackage = $canonicalStateIndex -ge $packageBuiltStateIndex
+if (-not $canonicalHasPackage -and @($canonical.package.PSObject.Properties).Count -ne 0) {
+  throw "A pre-package canonical release must not claim immutable package identity."
 }
 foreach ($row in @(
   [pscustomobject]@{record=$taggedModern;target="2.1";minimum="tagged";role="tagged Factorio 2.1"},
@@ -88,24 +94,26 @@ foreach ($release in @($canonical, $backport, $taggedModern, $publishedModern, $
   Assert-MIRReleaseProofFiles -Release $release
 }
 
-$archivePath = Join-Path $repo ([string]$canonical.package.archive)
-if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) { throw "Canonical candidate archive is missing." }
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$zip = [IO.Compression.ZipFile]::OpenRead($archivePath)
-try { $entryCount = @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
-finally { $zip.Dispose() }
-if ((Get-Item -LiteralPath $archivePath).Length -ne [long]$canonical.package.bytes -or
-    $entryCount -ne [int]$canonical.package.entries -or
-    (Get-MIRFileSha256 -Path $archivePath) -ne [string]$canonical.package.archive_sha256 -or
-    (Get-MIRZipContentFingerprint -Path $archivePath) -ne [string]$canonical.package.content_sha256) {
-  throw "Canonical candidate archive no longer matches its ReleaseRecord."
-}
+if ($canonicalHasPackage) {
+  $archivePath = Join-Path $repo ([string]$canonical.package.archive)
+  if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) { throw "Canonical candidate archive is missing." }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $zip = [IO.Compression.ZipFile]::OpenRead($archivePath)
+  try { $entryCount = @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
+  finally { $zip.Dispose() }
+  if ((Get-Item -LiteralPath $archivePath).Length -ne [long]$canonical.package.bytes -or
+      $entryCount -ne [int]$canonical.package.entries -or
+      (Get-MIRFileSha256 -Path $archivePath) -ne [string]$canonical.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $archivePath) -ne [string]$canonical.package.content_sha256) {
+    throw "Canonical candidate archive no longer matches its ReleaseRecord."
+  }
 
-$sourceTree = (& git -C $repo show -s --format=%T ([string]$canonical.package.source_commit)).Trim()
-if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$canonical.package.source_tree) { throw "Canonical package source tree differs from ReleaseRecord." }
-& git -C $repo merge-base --is-ancestor ([string]$canonical.package.source_commit) HEAD
-if ($LASTEXITCODE -ne 0) { throw "Canonical package source is not an ancestor of release-engineering HEAD." }
-if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty." }
+  $sourceTree = (& git -C $repo show -s --format=%T ([string]$canonical.package.source_commit)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$canonical.package.source_tree) { throw "Canonical package source tree differs from ReleaseRecord." }
+  & git -C $repo merge-base --is-ancestor ([string]$canonical.package.source_commit) HEAD
+  if ($LASTEXITCODE -ne 0) { throw "Canonical package source is not an ancestor of release-engineering HEAD." }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty." }
+}
 
 $ledger = Read-MIRCPJson -Path ".mir/releases.json" -RepoRoot $repo
 if ([string]$ledger.authority -ne "canonical-release-ledger" -or -not [bool]$ledger.rules.typed_release_records_are_authoritative) {
@@ -128,7 +136,7 @@ if ([string]$modern.publication_status -ne [string]$canonical.state -or [string]
 }
 
 $releaseNotes = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$canonical.release_notes))
-if ($releaseNotes -notmatch 'MIR-CONTROL-PLANE-IDENTITY:BEGIN' -or $releaseNotes -notmatch [regex]::Escape([string]$canonical.package.archive_sha256)) {
+if ($canonicalHasPackage -and ($releaseNotes -notmatch 'MIR-CONTROL-PLANE-IDENTITY:BEGIN' -or $releaseNotes -notmatch [regex]::Escape([string]$canonical.package.archive_sha256))) {
   throw "Release notes do not contain the generated immutable identity block."
 }
 Write-Host "[ok] typed release records, transitions, immutable tag, package locks, evidence hashes, and generated release views agree."

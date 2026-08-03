@@ -153,8 +153,13 @@ foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result
 }
 
 $backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo
-if ([string]$backport.source.tag_state -ne "immutable" -or [string]$backport.source.tag_commit -ne "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378") {
-  throw "P9 backport authority is not bound to immutable tag 3.2.2."
+if ([string]$backport.source.release -ne "3.2.3" -or
+    [string]$backport.source.tag -ne "3.2.3" -or
+    [string]$backport.source.tag_state -ne "immutable" -or
+    [string]$backport.source.tag_commit -ne "1abe07573cde814c3cacf6153b5ae64dee4038ba" -or
+    [string]$backport.source.candidate_id -ne "C30" -or
+    [string]$backport.expected_target.candidate_id -ne "2.5-P11") {
+  throw "P11 backport authority is not bound to immutable MIR 3.2.3 candidate C30."
 }
 
 $docManifest = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/docs.yml")
