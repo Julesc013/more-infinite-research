@@ -2,8 +2,8 @@
   "authority": "mir-generated-backport-queue-v1",
   "candidate_id": "2.5-P11",
   "generated_from": [
-    ".mir/releases/2.5.0.json",
-    ".mir/backports/2.5.0.json"
+    "path:releases.records/2.5.0.json",
+    "path:releases.backports/2.5.0.json"
   ],
   "release": "2.5.0",
   "remaining_obligations": [

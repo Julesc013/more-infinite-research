@@ -10,6 +10,11 @@ if ($paths.paths.PSObject.Properties["releases.deltas"].Value -ne ".mir/releases
 if (@($aliases.aliases | Where-Object from -eq "approved-delta/").Count -ne 1) {
   throw "Historical approved-delta alias is missing."
 }
+if (@($aliases.aliases | Where-Object {
+  $_.introduced -eq "3.2.5" -and $_.sunset -ne "3.3.0"
+}).Count -ne 0) {
+  throw "Every 3.2.5 migration alias must declare the common 3.3.0 sunset."
+}
 $legacySchemaAlias = "verification/" + "schema/"
 if (@($aliases.aliases | Where-Object {
   $_.from -eq $legacySchemaAlias -and $_.to -eq "spec.schemas" -and $_.mode -eq "read-only"
@@ -129,6 +134,12 @@ if (-not $legacy.alias -or $legacy.mode -ne "historical-read-only" -or
     $legacy.relative_path -ne ".mir/releases/deltas/3.2.1-to-3.2.2.json") {
   throw "Historical release delta resolution failed."
 }
+$legacyRelease = Resolve-MIRRepoPath -RepoRoot $repo -Path ".mir/releases/3.2.5.json"
+if (-not $legacyRelease.alias -or $legacyRelease.mode -ne "read-only" -or
+    $legacyRelease.sunset -ne "3.3.0" -or
+    $legacyRelease.relative_path -ne ".mir/releases/records/3.2.5.json") {
+  throw "Exact historical release-record resolution failed."
+}
 $legacyCompatibilityRoot = "fixtures/" + "compat-matrix"
 $legacyScenarioPath = "$legacyCompatibilityRoot/expected-scenarios.json"
 $legacyScenario = Resolve-MIRRepoPath -RepoRoot $repo -Path $legacyScenarioPath
@@ -159,6 +170,11 @@ if ($manifest.summary.legacy -eq 0) { throw "Migration baseline unexpectedly con
 $migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIROutputRoots.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($migrationPreview.mode -ne "preview" -or $migrationPreview.changed -ne 0) {
   throw "Output-root migration is not idempotent: $($migrationPreview | ConvertTo-Json -Compress)"
+}
+$controlRecordMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRControlPlaneRecords.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($controlRecordMigrationPreview.mode -ne "preview" -or $controlRecordMigrationPreview.changed -ne 0 -or
+    $controlRecordMigrationPreview.migration -ne "mir-control-plane-paths-v1") {
+  throw "Control-plane record migration is incomplete or not idempotent: $($controlRecordMigrationPreview | ConvertTo-Json -Compress)"
 }
 $schemaMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRSchemaRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($schemaMigrationPreview.mode -ne "preview" -or $schemaMigrationPreview.changed -ne 0) {

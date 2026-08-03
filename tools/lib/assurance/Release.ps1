@@ -189,7 +189,7 @@ function Invoke-MIRAssuranceSeal {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }
     $path -notlike ".work/artifacts/assurance/*" -and
       $path -notlike ".work/output/*" -and
-      $path -notlike "approved-delta/*" -and
+      $path -notlike ".mir/releases/deltas/*" -and
       $path -notlike ".mir/evidence/*"
   })
   if ($nonGeneratedStatus.Count -ne 0) {
@@ -603,7 +603,7 @@ function Invoke-MIRAssuranceSelfTest {
   $activeApprovedDeltaPath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $activeApprovedDeltaProfile
   $activeApprovedDeltaFrom = [string]$activeApprovedDeltaProfile.upgrade.from_version
   $activeApprovedDeltaTo = [string]$activeApprovedDeltaProfile.upgrade.to_version
-  $expectedApprovedDeltaPath = "approved-delta/$activeApprovedDeltaFrom-to-$activeApprovedDeltaTo.json"
+  $expectedApprovedDeltaPath = Resolve-MIRAssuranceRepoPathId -Id "releases.deltas" -Suffix "$activeApprovedDeltaFrom-to-$activeApprovedDeltaTo.json"
   if ($activeApprovedDeltaPath -ne $expectedApprovedDeltaPath) {
     throw "Approved-delta transition resolver did not select the active release-transition artifact."
   }

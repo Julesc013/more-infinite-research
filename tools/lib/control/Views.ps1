@@ -5,9 +5,9 @@ function Get-MIRCPCurrentRelease {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $policy = Get-MIRCPPolicy -RepoRoot $repo
-  $pointer = Read-MIRCPJson -Path ([string]$policy.records.current) -RepoRoot $repo
+  $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $release = [string]$pointer.roles.$Role
-  return Read-MIRCPJson -Path ".mir/releases/$release.json" -RepoRoot $repo
+  return Read-MIRCPJson -Path "path:releases.records/$release.json" -RepoRoot $repo
 }
 
 function Get-MIRCPReleaseByVersion {
@@ -15,7 +15,7 @@ function Get-MIRCPReleaseByVersion {
     [Parameter(Mandatory)][string]$Release,
     [string]$RepoRoot = ""
   )
-  return Read-MIRCPJson -Path ".mir/releases/$Release.json" -RepoRoot $RepoRoot
+  return Read-MIRCPJson -Path "path:releases.records/$Release.json" -RepoRoot $RepoRoot
 }
 
 function Get-MIRCPArrayProperty {
@@ -147,7 +147,8 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
 function New-MIRCPLegacyReleaseLedger {
   param([string]$RepoRoot = "")
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  $pointer = Read-MIRCPJson -Path ".mir/releases/current.json" -RepoRoot $repo
+  $policy = Get-MIRCPPolicy -RepoRoot $repo
+  $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.canonical) -RepoRoot $repo
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
   $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_1) -RepoRoot $repo
@@ -157,11 +158,11 @@ function New-MIRCPLegacyReleaseLedger {
     schema = 1
     authority = "canonical-release-ledger"
     generated_from = @(
-      ".mir/releases/current.json",
-      ".mir/releases/$($canonical.release).json",
-      ".mir/releases/$($backport.release).json",
-      ".mir/releases/$($publishedModern.release).json",
-      ".mir/releases/$($publishedBackport.release).json"
+      "path:releases.current",
+      "path:releases.records/$($canonical.release).json",
+      "path:releases.records/$($backport.release).json",
+      "path:releases.records/$($publishedModern.release).json",
+      "path:releases.records/$($publishedBackport.release).json"
     ) | Select-Object -Unique
     updated_at = ([datetimeoffset]$updated[0]).ToString("yyyy-MM-dd")
     published_baselines = [pscustomobject][ordered]@{
@@ -176,8 +177,8 @@ function New-MIRCPLegacyReleaseLedger {
       branch_policy = ".mir/branches.yml"
       release_dashboard = "docs/releases/control-plane-dashboard.md"
       maintainer_queue = "todo.md"
-      publication_checklist = ".mir/generated/publication-checklist.json"
-      backport_queue = ".mir/generated/backport-queue.json"
+      publication_checklist = "path:views.publication-checklist"
+      backport_queue = "path:views.backport-queue"
     }
     rules = [pscustomobject][ordered]@{
       published_archives_are_immutable = $true
@@ -197,6 +198,7 @@ function Set-MIRCPGeneratedText {
     [switch]$Check
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $Path = Resolve-MIRCPPathToken -Path $Path -RepoRoot $repo
   $resolved = Join-Path $repo $Path
   $content = ($Lines -join "`n") + "`n"
   if ($Check) {
@@ -269,7 +271,7 @@ function New-MIRCPDashboardLines {
     "---", "title: `"MIR Control Plane Dashboard`"", "status: current", "applies_to: `"release-engineering`"",
     "audience: release-manager", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $ReviewDate",
     "supersedes: []", "superseded_by: []", "---", "", "# MIR Control Plane Dashboard", "",
-    "> Generated from ``.mir/releases/*.json``, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.", "",
+    "> Generated from ``path:releases.records/*.json``, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.", "",
     "## Releases", "", "| Release | Candidate | Target | Branch | State | Exceptions |", "| --- | --- | --- | --- | --- | ---: |"
   )) { $lines.Add($line) }
   foreach ($release in @($Releases | Sort-Object @{Expression={ [version]$_.release }; Descending=$true})) {
@@ -338,7 +340,7 @@ function Set-MIRCPReleaseNoteIdentityBlock {
   $tag = Get-MIRCPTagProof -Release $Release
   $block = @(
     $begin, "## Immutable release identity", "",
-    "> Generated from ``.mir/releases/$($Release.release).json``. The typed record is authoritative.", "",
+    "> Generated from ``path:releases.records/$($Release.release).json``. The typed record is authoritative.", "",
     "| Field | Value |", "| --- | --- |",
     "| State | $(Format-MIRCPCode $Release.state) |",
     "| Candidate | $(Format-MIRCPCode $Release.candidate_id) |",
@@ -368,7 +370,7 @@ function Update-MIRCPViews {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $policy = Get-MIRCPPolicy -RepoRoot $repo
-  $pointer = Read-MIRCPJson -Path ([string]$policy.records.current) -RepoRoot $repo
+  $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $releases = @(Get-MIRCPRecordSet -Kind releases -RepoRoot $repo)
   $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
@@ -377,7 +379,7 @@ function Update-MIRCPViews {
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
   $reviewDate = (@($releases.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)[0]).ToString("yyyy-MM-dd")
 
-  Write-MIRCPJson -Path ".mir/releases.json" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
+  Write-MIRCPJson -Path "path:releases.ledger" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.current_candidate) -Lines (New-MIRCPCurrentCandidateLines -Release $canonical -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.release_dashboard) -Lines (New-MIRCPDashboardLines -Releases $releases -ReviewDate $reviewDate) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.todo) -Lines (New-MIRCPTodoLines -Canonical $canonical -Backport $backport -Changes $changes -Incidents $incidents -Tasks $tasks -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
@@ -385,7 +387,7 @@ function Update-MIRCPViews {
   $branchStatus = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-branch-status-v1"
-    generated_from = ".mir/releases/*.json"
+    generated_from = "path:releases.records/*.json"
     branches = @($releases | Sort-Object branch, release | ForEach-Object { [pscustomobject][ordered]@{branch=[string]$_.branch; release=[string]$_.release; candidate_id=[string]$_.candidate_id; target=[string]$_.target; state=[string]$_.state; source_commit=[string]$_.package.source_commit} })
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.branch_status) -Value $branchStatus -RepoRoot $repo -Check:$Check
@@ -393,7 +395,7 @@ function Update-MIRCPViews {
   $publication = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-publication-checklist-v1"
-    generated_from = @(".mir/releases/current.json", ".mir/releases/$($canonical.release).json")
+    generated_from = @("path:releases.current", "path:releases.records/$($canonical.release).json")
     release = [string]$canonical.release
     candidate_id = [string]$canonical.candidate_id
     state = [string]$canonical.state
@@ -406,7 +408,7 @@ function Update-MIRCPViews {
   $backportQueue = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-backport-queue-v1"
-    generated_from = @(".mir/releases/$($backport.release).json", [string]$backport.backport_manifest)
+    generated_from = @("path:releases.records/$($backport.release).json", [string]$backport.backport_manifest)
     release = [string]$backport.release
     candidate_id = [string]$backport.candidate_id
     target = [string]$backport.target

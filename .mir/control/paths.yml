@@ -90,12 +90,16 @@ paths:
   docs.root: docs
   control.root: .mir/control
   control.catalogs: .mir/catalogs
+  control.state: .mir/control-plane
+  control.policy: .mir/control-plane/control-plane.json
   lifecycle.root: .mir/lifecycle
   lifecycle.changes: .mir/lifecycle/changes
   lifecycle.incidents: .mir/lifecycle/incidents
   lifecycle.tasks: .mir/lifecycle/tasks
   releases.root: .mir/releases
+  releases.ledger: .mir/releases.json
   releases.records: .mir/releases/records
+  releases.current: .mir/releases/records/current.json
   releases.closures: .mir/releases/closures
   releases.transitions: .mir/releases/transitions
   releases.deltas: .mir/releases/deltas
@@ -109,11 +113,16 @@ paths:
   evidence.receipts: .mir/evidence/receipts
   evidence.revocations: .mir/evidence/revocations
   views.root: .mir/views
+  views.branch-status: .mir/views/branch-status.json
+  views.publication-checklist: .mir/views/publication-checklist.json
+  views.backport-queue: .mir/views/backport-queue.json
   local.root: .mir/local
   workspace.root: .work
   workspace.artifacts: .work/artifacts
+  workspace.artifacts.evidence: .work/artifacts/evidence
   workspace.build: .work/build
   workspace.output: .work/output
+  workspace.output.verification-context: .work/output/verification-context
   workspace.lines: .work/lines
   workspace.evidence: .work/evidence
   workspace.playtest: .work/playtest

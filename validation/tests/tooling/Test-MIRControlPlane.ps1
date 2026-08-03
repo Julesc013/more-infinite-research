@@ -156,7 +156,7 @@ foreach ($dimension in @("approved-delta", "upgrade-result", "performance-result
   }
 }
 
-$backport = Read-MIRCPJson -Path ".mir/backports/2.5.0.json" -RepoRoot $repo
+$backport = Read-MIRCPJson -Path "path:releases.backports/2.5.0.json" -RepoRoot $repo
 if ([string]$backport.source.release -ne "3.2.3" -or
     [string]$backport.source.tag -ne "3.2.3" -or
     [string]$backport.source.tag_state -ne "immutable" -or

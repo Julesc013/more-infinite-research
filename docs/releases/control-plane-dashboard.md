@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR Control Plane Dashboard
 
-> Generated from `.mir/releases/*.json`, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.
+> Generated from `path:releases.records/*.json`, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.
 
 ## Releases
 

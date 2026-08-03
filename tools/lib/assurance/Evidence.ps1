@@ -29,7 +29,7 @@ function Resolve-MIRAssuranceApprovedDeltaPath {
   if ($fromVersion -notmatch $versionPattern -or $toVersion -notmatch $versionPattern) {
     throw "Approved-delta transition versions must be exact semantic versions: '$fromVersion' -> '$toVersion'."
   }
-  return "approved-delta/$fromVersion-to-$toVersion.json"
+  return Resolve-MIRAssuranceRepoPathId -Id "releases.deltas" -Suffix "$fromVersion-to-$toVersion.json"
 }
 
 function Resolve-MIRAssuranceManualReviewAttestationPath {

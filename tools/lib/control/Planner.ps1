@@ -291,6 +291,7 @@ function Get-MIRCPEffectiveInputManifest {
     $scope = if ($input.StartsWith("source:", [StringComparison]::Ordinal)) { "source" } else { "control-plane" }
     $pattern = if ($scope -eq "source") { $input.Substring("source:".Length) } else { $input }
     $inputRepo = if ($scope -eq "source") { $sourceRepo } else { $repo }
+    $pattern = Resolve-MIRCPPathToken -Path $pattern -RepoRoot $inputRepo
     $inputFiles = if ($scope -eq "source") { $SourceRepositoryFiles } else { $RepositoryFiles }
     $inputCache = if ($scope -eq "source") { $SourceIdentityCache } else { $IdentityCache }
     $regex = ConvertTo-MIRCPInputGlobRegex -Pattern $pattern

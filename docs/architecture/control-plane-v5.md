@@ -16,7 +16,7 @@ Control Plane v5 is a tooling-only fixed point after immutable MIR 3.2.2. It doe
 
 ## Authority
 
-Humans edit typed records under `.mir/changes/`, `.mir/incidents/`, `.mir/tasks/`, `.mir/releases/`, and `.mir/release-transitions/`. The current-role pointer is `.mir/releases/current.json`. Release ledgers, TODOs, candidate documents, dashboards, branch status, publication checklists, backport queues, and release-note identity blocks are generated views.
+Humans edit typed records under `.mir/lifecycle/changes/`, `.mir/lifecycle/incidents/`, `.mir/lifecycle/tasks/`, `.mir/releases/`, and `.mir/releases/transitions/`. The current-role pointer is `.mir/releases/records/current.json`. Release ledgers, TODOs, candidate documents, dashboards, branch status, publication checklists, backport queues, and release-note identity blocks are generated views.
 
 Every release follows the ordered state machine:
 

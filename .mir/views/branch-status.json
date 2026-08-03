@@ -58,6 +58,6 @@
       "target": "2.1"
     }
   ],
-  "generated_from": ".mir/releases/*.json",
+  "generated_from": "path:releases.records/*.json",
   "schema": 1
 }

@@ -18,7 +18,7 @@ MIR 3.2.3 is the immutable published Factorio 2.1 baseline, and MIR 2.5.0 is the
 
 The [3.2.5 convergence release](3.2.5-convergence-release.md) owns the release contract. The [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md) owns the wider sequence: 3.2.5, a conditional 2.5.5 projection decision, immutable behavioral baselines, 3.3, and a conditional independently qualified 2.6 projection. The [ultimate convergence audit action register](ultimate-convergence-audit-action-register.md) owns the corrections and open obligations discovered by the final plan audit.
 
-Current release authority is machine-readable in `.mir/releases/current.json` and the typed records under `.mir/releases/`; generated candidate views are not independent release state.
+Current release authority is machine-readable in `.mir/releases/records/current.json` and the typed records under `.mir/releases/records/`; generated candidate views are not independent release state.
 
 - [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md)
 - [Ultimate convergence audit action register](ultimate-convergence-audit-action-register.md)

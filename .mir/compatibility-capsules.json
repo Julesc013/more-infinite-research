@@ -33,7 +33,7 @@
     {
       "id": "space-age",
       "exact_mods": ["space-age"],
-      "evidence": ["approved-delta/3.1.9-to-3.2.0.json"],
+      "evidence": [".mir/releases/deltas/3.1.9-to-3.2.0.json"],
       "footprints": {
         "recipe_output_families": ["carbon", "mining-drill-manufacturing", "sulfur"],
         "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:mining-drill-manufacturing", "recipe-productivity:sulfur"],
@@ -47,7 +47,7 @@
     {
       "id": "space-age-galore",
       "exact_mods": ["space-age", "space-age-galore"],
-      "evidence": ["fixtures/space-age-galore-overlap", "approved-delta/3.1.9-to-3.2.0.json"],
+      "evidence": ["fixtures/space-age-galore-overlap", ".mir/releases/deltas/3.1.9-to-3.2.0.json"],
       "footprints": {
         "recipe_output_families": ["carbon", "sulfur"],
         "technology_effect_owners": ["recipe-productivity:carbon", "recipe-productivity:sulfur"],

@@ -2,9 +2,9 @@ $mirOwnershipScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../wo
 $mirOwnershipModule = New-Module -Name MIRRepositoryOwnership -ArgumentList $mirOwnershipScript -ScriptBlock {
   param([string]$ScriptPath)
   . $ScriptPath
-  Export-ModuleMember -Function Resolve-MIRPathOwnership
+  Export-ModuleMember -Function Resolve-MIRPathOwnership, Resolve-MIRRepoPath
 }
-Import-Module $mirOwnershipModule -Force -Function Resolve-MIRPathOwnership
+Import-Module $mirOwnershipModule -Force -Function Resolve-MIRPathOwnership, Resolve-MIRRepoPath
 
 function Get-MIRCPRepoRoot {
   param([string]$RepoRoot = "")
@@ -14,12 +14,40 @@ function Get-MIRCPRepoRoot {
   return (Resolve-Path -LiteralPath $RepoRoot).Path
 }
 
+function Resolve-MIRCPPathId {
+  param(
+    [Parameter(Mandatory)][string]$Id,
+    [string]$Suffix = "",
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $resolved = Resolve-MIRRepoPath -RepoRoot $repo -Id $Id
+  $relative = [string]$resolved.relative_path
+  if (-not [string]::IsNullOrWhiteSpace($Suffix)) {
+    $relative = if ($relative -eq ".") { $Suffix.TrimStart("/") } else { "$($relative.TrimEnd('/'))/$($Suffix.TrimStart('/'))" }
+  }
+  return $relative
+}
+
+function Resolve-MIRCPPathToken {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [string]$RepoRoot = ""
+  )
+  if (-not $Path.StartsWith("path:", [StringComparison]::Ordinal)) { return $Path }
+  if ($Path -notmatch '^path:(?<id>[a-z][a-z0-9.-]+)(?<suffix>/.*)?$') {
+    throw "Invalid logical repository path token: $Path"
+  }
+  return Resolve-MIRCPPathId -Id $Matches.id -Suffix ([string]$Matches.suffix) -RepoRoot $RepoRoot
+}
+
 function Read-MIRCPJson {
   param(
     [Parameter(Mandatory)][string]$Path,
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $Path = Resolve-MIRCPPathToken -Path $Path -RepoRoot $repo
   $resolved = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
   if (-not (Test-Path -LiteralPath $resolved -PathType Leaf)) {
     throw "Control-plane JSON not found: $Path"
@@ -94,6 +122,7 @@ function Write-MIRCPJson {
     [switch]$Check
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $Path = Resolve-MIRCPPathToken -Path $Path -RepoRoot $repo
   $resolved = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
   $content = ((ConvertTo-MIRCPCanonicalValue -Value $Value | ConvertTo-Json -Depth 100) + "`n").Replace("`r`n", "`n")
   if ($Check) {

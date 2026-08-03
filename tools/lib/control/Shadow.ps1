@@ -145,7 +145,7 @@ function Get-MIRCPShadowC24Outcomes {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $candidateSha = [string]$ReleaseRecord.package.archive_sha256
   $paths = [ordered]@{
-    "approved-delta" = "approved-delta/3.2.1-to-3.2.2.json"
+    "approved-delta" = "path:releases.deltas/3.2.1-to-3.2.2.json"
     "upgrade-result" = ".mir/evidence/3.2.2-upgrade-proof.json"
     "performance-result" = ".mir/evidence/3.2.2-performance-regression.json"
     "manual-result" = ".mir/evidence/3.2.2-manual-review-attestation.json"
@@ -153,7 +153,8 @@ function Get-MIRCPShadowC24Outcomes {
   }
   $out = [ordered]@{}
   foreach ($entry in $paths.GetEnumerator()) {
-    $path = Join-Path $repo $entry.Value
+    $relativePath = Resolve-MIRCPPathToken -Path ([string]$entry.Value) -RepoRoot $repo
+    $path = Join-Path $repo $relativePath
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
       $out[$entry.Key] = New-MIRCPShadowOutcome -Status pending -Reason "governed proof file is missing" -Path $entry.Value
       continue

@@ -120,7 +120,7 @@
     "normal-promotion-admission-reconciliation",
     "24-hour-stabilization-decision"
   ],
-  "backport_manifest": ".mir/backports/2.5.0.json",
+  "backport_manifest": "path:releases.backports/2.5.0.json",
   "updated_at": "2026-08-02T09:17:25.689Z",
   "superseded_candidates": [
     {

@@ -315,7 +315,7 @@ waves:
     assurance_policy: mir-verification-v4
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
-    superseded_c16_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
+    superseded_c16_approved_delta_evidence: .mir/releases/deltas/3.1.9-to-3.2.0.json
     exact_approved_delta_gate: not-recorded-exact-c20-before-publication
     superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
     exact_upgrade_gate: not-recorded-exact-c20-before-publication
@@ -403,7 +403,7 @@ waves:
     performance_gate: passed-exact-paired-3.2.1-to-3.2.2
     performance_evidence: .mir/evidence/3.2.2-performance-regression.json
     performance_evidence_sha256: 4E62CB3BBE25DB26935C7D94D7A8A77C80DE8D857B267611620D67CB8AEFF86B
-    approved_delta: approved-delta/3.2.1-to-3.2.2.json
+    approved_delta: .mir/releases/deltas/3.2.1-to-3.2.2.json
     exact_py_gate: passed-exact-15-mod-closure-zero-prune
     exact_py_evidence: .mir/evidence/3.2.2-py-exact.json
     exact_py_evidence_sha256: 32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00
@@ -489,7 +489,7 @@ waves:
     size_bytes: 893263
     entries: 209
     forbidden_entries: 0
-    approved_delta_evidence: approved-delta/2.4.5-to-2.4.9.json
+    approved_delta_evidence: .mir/releases/deltas/2.4.5-to-2.4.9.json
     automated_qualification: .mir/evidence/2.4.9-local-automated-qualification.json
     runtime_performance_evidence: .mir/evidence/2.4.9-performance-regression.json
     automated_gate: passed-106-machine-verifiable-92-runtime

@@ -9,7 +9,8 @@ function Get-MIRCPEvidenceRoot {
     return [IO.Path]::GetFullPath((Join-Path $repo $Root))
   }
   $policy = Get-MIRCPPolicy -RepoRoot $repo
-  return [IO.Path]::GetFullPath((Join-Path $repo ([string]$policy.outputs.evidence_store)))
+  $relative = Resolve-MIRCPPathToken -Path ([string]$policy.outputs.evidence_store) -RepoRoot $repo
+  return [IO.Path]::GetFullPath((Join-Path $repo $relative))
 }
 
 function Initialize-MIRCPEvidenceStore {

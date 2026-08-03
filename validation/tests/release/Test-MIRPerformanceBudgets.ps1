@@ -148,7 +148,7 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne "3.2.2" -or
 $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
 $activeCandidate = $releaseLedger.development.'factorio-2.1'
-$currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/current.json") | ConvertFrom-Json
+$currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/current.json") | ConvertFrom-Json
 $activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($activeCandidate.mir_version).json") | ConvertFrom-Json
 $taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/$($currentRoles.roles.tagged_factorio_2_1).json") | ConvertFrom-Json
 $activeCampaignPath = Join-Path $RepoRoot ".mir/performance-campaigns/$($activeCandidate.mir_version)-$($activeCandidate.candidate_id).json"

@@ -15,36 +15,36 @@
     "release_controller": 1
   },
   "records": {
-    "changes": ".mir/changes",
-    "candidate_closures": ".mir/candidate-closures",
-    "incidents": ".mir/incidents",
-    "tasks": ".mir/tasks",
-    "releases": ".mir/releases",
-    "transitions": ".mir/release-transitions",
-    "current": ".mir/releases/current.json"
+    "changes": "lifecycle.changes",
+    "candidate_closures": "releases.closures",
+    "incidents": "lifecycle.incidents",
+    "tasks": "lifecycle.tasks",
+    "releases": "releases.records",
+    "transitions": "releases.transitions",
+    "current": "releases.current"
   },
   "catalogs": {
-    "domains": ".mir/control-plane/domains.json",
-    "freshness": ".mir/control-plane/freshness.json",
-    "ownership": ".mir/control-plane/ownership.json",
-    "package_locks": ".mir/control-plane/package-locks.json",
+    "domains": "path:control.state/domains.json",
+    "freshness": "path:control.state/freshness.json",
+    "ownership": "path:control.state/ownership.json",
+    "package_locks": "path:control.state/package-locks.json",
     "performance_campaigns": ".mir/performance-campaigns",
-    "mutation_calibration": ".mir/control-plane/mutation-calibration.json",
-    "evidence_revocations": ".mir/control-plane/evidence-revocations.json",
-    "v4_equivalence": ".mir/control-plane/v4-v5-equivalence.json",
-    "scenario_source": "validation/scenarios/runtime.json",
-    "execution_registry": "validation/generated/execution-registry.json",
-    "historical_replay": "validation/baselines/control/3.2.2-v5-replay.json"
+    "mutation_calibration": "path:control.state/mutation-calibration.json",
+    "evidence_revocations": "path:control.state/evidence-revocations.json",
+    "v4_equivalence": "path:control.state/v4-v5-equivalence.json",
+    "scenario_source": "path:validation.scenarios.runtime",
+    "execution_registry": "path:validation.root/generated/execution-registry.json",
+    "historical_replay": "path:validation.baselines.control/3.2.2-v5-replay.json"
   },
   "outputs": {
-    "verification_context": ".work/output/verification-context",
-    "evidence_store": ".work/artifacts/evidence",
+    "verification_context": "path:workspace.output.verification-context",
+    "evidence_store": "path:workspace.artifacts.evidence",
     "todo": "todo.md",
-    "current_candidate": "docs/releases/current-candidate.md",
-    "release_dashboard": "docs/releases/control-plane-dashboard.md",
-    "branch_status": ".mir/generated/branch-status.json",
-    "publication_checklist": ".mir/generated/publication-checklist.json",
-    "backport_queue": ".mir/generated/backport-queue.json"
+    "current_candidate": "path:docs.root/releases/current-candidate.md",
+    "release_dashboard": "path:docs.root/releases/control-plane-dashboard.md",
+    "branch_status": "path:views.branch-status",
+    "publication_checklist": "path:views.publication-checklist",
+    "backport_queue": "path:views.backport-queue"
   },
   "release_states": [
     "planned",

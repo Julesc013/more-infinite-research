@@ -29,7 +29,7 @@ MIR adopts two repository planes:
 
 The public maintainer interface is `tools/mir.ps1`. Old command paths forward to the same implementation during a measured compatibility window.
 
-Release deltas move from `approved-delta/` to `.mir/releases/deltas/`. Approval becomes record state. Historical text is not rewritten.
+Release deltas move from `.mir/releases/deltas/` to `.mir/releases/deltas/`. Approval becomes record state. Historical text is not rewritten.
 
 Historical source copies are replaced by per-version source locks only after two independent exact materializations reproduce paths, Git modes, blobs, file counts, logical bytes, and supported package identities.
 

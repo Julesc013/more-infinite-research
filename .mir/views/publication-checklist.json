@@ -3,8 +3,8 @@
   "authority": "mir-generated-publication-checklist-v1",
   "candidate_id": "C32",
   "generated_from": [
-    ".mir/releases/current.json",
-    ".mir/releases/3.2.5.json"
+    "path:releases.current",
+    "path:releases.records/3.2.5.json"
   ],
   "publication_admitted": false,
   "release": "3.2.5",

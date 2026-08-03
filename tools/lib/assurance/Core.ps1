@@ -1,3 +1,24 @@
+$mirAssuranceRepoPathsScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../workspace/RepoPaths.ps1")).Path
+$mirAssuranceRepoPathsModule = New-Module -Name MIRAssuranceRepositoryPaths -ArgumentList $mirAssuranceRepoPathsScript -ScriptBlock {
+  param([string]$ScriptPath)
+  . $ScriptPath
+  Export-ModuleMember -Function Resolve-MIRRepoPath
+}
+Import-Module $mirAssuranceRepoPathsModule -Force -Function Resolve-MIRRepoPath
+
+function Resolve-MIRAssuranceRepoPathId {
+  param(
+    [Parameter(Mandatory)][string]$Id,
+    [string]$Suffix = ""
+  )
+  $resolved = Resolve-MIRRepoPath -RepoRoot $repo -Id $Id
+  $relative = [string]$resolved.relative_path
+  if (-not [string]::IsNullOrWhiteSpace($Suffix)) {
+    $relative = if ($relative -eq ".") { $Suffix.TrimStart("/") } else { "$($relative.TrimEnd('/'))/$($Suffix.TrimStart('/'))" }
+  }
+  return $relative
+}
+
 function Get-MIRAssuranceOption {
   param([string]$Name, [string]$Default = "")
   for ($i = 0; $i -lt $script:Args.Count; $i++) {

@@ -104,10 +104,10 @@
     }
   },
   "generated_from": [
-    ".mir/releases/current.json",
-    ".mir/releases/3.2.5.json",
-    ".mir/releases/2.5.0.json",
-    ".mir/releases/3.2.3.json"
+    "path:releases.current",
+    "path:releases.records/3.2.5.json",
+    "path:releases.records/2.5.0.json",
+    "path:releases.records/3.2.3.json"
   ],
   "published_baselines": {
     "factorio-2.0": {
@@ -143,10 +143,10 @@
   "schema": 1,
   "updated_at": "2026-08-03",
   "views": {
-    "backport_queue": ".mir/generated/backport-queue.json",
+    "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",
     "maintainer_queue": "todo.md",
-    "publication_checklist": ".mir/generated/publication-checklist.json",
+    "publication_checklist": "path:views.publication-checklist",
     "release_dashboard": "docs/releases/control-plane-dashboard.md"
   }
 }

@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot = "",
-  [string]$ManifestPath = ".mir/backports/2.5.0.json",
+  [string]$ManifestPath = ".mir/releases/backports/2.5.0.json",
   [string]$Source = "",
   [string]$Baseline = "",
   [string]$Target = "",

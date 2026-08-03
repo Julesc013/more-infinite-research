@@ -738,7 +738,7 @@ validation_tooling:
     museum_seal_writer: tools/commands/museum/New-MIRMuseumSeal.ps1
     museum_seal_check: validation/tests/runtime/Test-MIRMuseumSeal.ps1
     backport_source_lock: validation/tests/release/Test-MIRBackportSourceLock.ps1
-    backport_reconstruction_contract: .mir/backports/2.5.0.json
+    backport_reconstruction_contract: path:releases.backports/2.5.0.json
     backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1

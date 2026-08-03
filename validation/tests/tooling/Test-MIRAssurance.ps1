@@ -30,7 +30,7 @@ $releaseHistoryClassificationCases = [ordered]@{
   ".mir/target-lines/index.json" = "release-evidence"
   ".mir/target-lines/2.4.9/info.json" = "release-evidence"
   ".mir/evidence/2.4.9/publication.json" = "release-evidence"
-  "approved-delta/2.4.5-to-2.4.9.json" = "release-evidence"
+  ".mir/releases/deltas/2.4.5-to-2.4.9.json" = "release-evidence"
   "dist/more-infinite-research_2.4.9.zip" = "release-evidence"
 }
 foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
@@ -115,7 +115,7 @@ foreach ($required in @(
 $approvedDeltaTest = @($catalog.tests | Where-Object { [string]$_.id -eq "release.approved-delta" })
 if ($approvedDeltaTest.Count -ne 1 -or
     @($approvedDeltaTest[0].inputs) -notcontains "approved-delta-transition" -or
-    @($approvedDeltaTest[0].inputs | Where-Object { [string]$_ -match '^approved-delta/[0-9]' }).Count -ne 0) {
+    @($approvedDeltaTest[0].inputs | Where-Object { [string]$_ -match '^(approved-delta|\.mir/releases/deltas)/[0-9]' }).Count -ne 0) {
   throw "release.approved-delta must fingerprint the dynamically resolved release transition, not a version-specific path."
 }
 

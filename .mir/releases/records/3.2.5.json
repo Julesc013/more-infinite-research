@@ -15,7 +15,7 @@
   "development_lineage": {
     "superseded_release": "3.2.4",
     "superseded_candidate_id": "C31",
-    "candidate_closure": ".mir/candidate-closures/3.2.4-C31.json",
+    "candidate_closure": "path:releases.closures/3.2.4-C31.json",
     "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4"
   },
   "package": {},

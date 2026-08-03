@@ -63,7 +63,7 @@
         "space-age"
       ],
       "evidence": [
-        "approved-delta/3.1.9-to-3.2.0.json"
+        ".mir/releases/deltas/3.1.9-to-3.2.0.json"
       ],
       "footprints": {
         "recipe_output_families": [
@@ -105,7 +105,7 @@
       ],
       "evidence": [
         "fixtures/space-age-galore-overlap",
-        "approved-delta/3.1.9-to-3.2.0.json"
+        ".mir/releases/deltas/3.1.9-to-3.2.0.json"
       ],
       "footprints": {
         "recipe_output_families": [

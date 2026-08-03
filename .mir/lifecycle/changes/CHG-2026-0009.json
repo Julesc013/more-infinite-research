@@ -32,5 +32,16 @@
     "factorio-2.1": "canonical logical path resolver and single-write policy on dev",
     "factorio-2.0": "reuse the package-excluded resolver for reconstruction and evidence without changing published package bytes"
   },
-  "state": "planned"
+  "implementation_evidence": [
+    ".mir/evidence/receipts/control-plane-paths-v1.json",
+    ".work/output/control-plane-v5-path-migration-plan.json",
+    "validation/tests/tooling/Test-MIRLayout.ps1",
+    "validation/tests/tooling/Test-MIRControlPlane.ps1",
+    "validation/tests/tooling/Test-MIRAssurance.ps1",
+    "validation/tests/tooling/Test-MIRGovernance.ps1",
+    "validation/tests/tooling/Test-MIRPowerShellQuality.ps1",
+    "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+    "validation/tests/release/Test-MIRBackportManifest.ps1"
+  ],
+  "state": "implemented"
 }

@@ -1,6 +1,6 @@
 function Get-MIRCPPolicy {
   param([string]$RepoRoot = "")
-  return Read-MIRCPJson -Path ".mir/control-plane/control-plane.json" -RepoRoot $RepoRoot
+  return Read-MIRCPJson -Path "path:control.policy" -RepoRoot $RepoRoot
 }
 
 function Get-MIRCPRecordSet {
@@ -10,7 +10,7 @@ function Get-MIRCPRecordSet {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $policy = Get-MIRCPPolicy -RepoRoot $repo
-  $relative = [string]$policy.records.$Kind
+  $relative = Resolve-MIRCPPathId -Id ([string]$policy.records.$Kind) -RepoRoot $repo
   $root = Join-Path $repo $relative
   if (-not (Test-Path -LiteralPath $root -PathType Container)) { return @() }
   return @(Get-ChildItem -LiteralPath $root -Filter *.json -File | Where-Object Name -ne "current.json" | Sort-Object Name | ForEach-Object {
@@ -79,7 +79,7 @@ function Assert-MIRCPRecords {
     }
   }
 
-  $pointer = Read-MIRCPJson -Path ([string]$policy.records.current) -RepoRoot $repo
+  $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $known = @($releases | ForEach-Object { [string]$_.release })
   foreach ($role in @($pointer.roles.PSObject.Properties)) {
     if ($known -notcontains [string]$role.Value) {
@@ -163,9 +163,10 @@ function Assert-MIRCPPackageFreeze {
   }
   $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
   $target = [string]$info.factorio_version
-  $current = Read-MIRCPJson -Path ".mir/releases/current.json" -RepoRoot $repo
+  $policy = Get-MIRCPPolicy -RepoRoot $repo
+  $current = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $canonicalRelease = [string]$current.roles.canonical
-  $release = Read-MIRCPJson -Path ".mir/releases/$canonicalRelease.json" -RepoRoot $repo
+  $release = Read-MIRCPJson -Path "path:releases.records/$canonicalRelease.json" -RepoRoot $repo
   $active = @($authority.locks | Where-Object {
     [string]$_.target -eq $target -and [string]$_.release -eq $canonicalRelease
   })

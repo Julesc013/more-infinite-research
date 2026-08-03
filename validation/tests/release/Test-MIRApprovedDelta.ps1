@@ -1,5 +1,5 @@
 param(
-  [string]$Path = "approved-delta\3.2.1-to-3.2.2.json",
+  [string]$Path = ".mir\releases\deltas\3.2.1-to-3.2.2.json",
   [string]$Candidate = "dist\more-infinite-research_3.2.2.zip",
   [string]$ExpectedSourceCommit = "",
   [switch]$ValidateStructureOnly
@@ -28,7 +28,7 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
 if ($activeVersion -eq "3.2.2") {
   $arguments = @{
     RepoRoot = $repo
-    Path = "approved-delta\3.2.1-to-3.2.2.json"
+    Path = ".mir\releases\deltas\3.2.1-to-3.2.2.json"
     Candidate = $Candidate
     ExpectedSourceCommit = $ExpectedSourceCommit
     ValidateStructureOnly = $ValidateStructureOnly

@@ -528,7 +528,7 @@ switch ($area) {
     & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1")
   }
   "backport" {
-    $manifest = Get-MIRArgValue -Items $Args -Name "--manifest" -Default ".mir/backports/2.5.0.json"
+    $manifest = Get-MIRArgValue -Items $Args -Name "--manifest" -Default ".mir/releases/backports/2.5.0.json"
     switch ($verb) {
       "validate" {
         $params = @{RepoRoot=$repo.Path; ManifestPath=$manifest}

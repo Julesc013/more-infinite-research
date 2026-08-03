@@ -71,7 +71,7 @@ Generated: 2026-08-03
 - [ ] `CHG-2026-0006` — MIR 3.3 and 2.6 host-neutral extension platform (`planned`)
 - [ ] `CHG-2026-0007` — Correct research-cost transitions, digest layers, and formula bounds (`planned`)
 - [ ] `CHG-2026-0008` — Enforce semantic-domain integrity and ownership specificity (`implemented`)
-- [ ] `CHG-2026-0009` — Make logical path IDs the sole durable path authority (`planned`)
+- [ ] `CHG-2026-0009` — Make logical path IDs the sole durable path authority (`implemented`)
 - [ ] `CHG-2026-0010` — Separate candidate reservation from identity and make releases append-only (`planned`)
 - [ ] `CHG-2026-0011` — Reconcile P11 protected proof, BZ ambiguity, and stabilization (`planned`)
 - [ ] `CHG-2026-0012` — Complete the 3.3 authority DAG, planned mutation, runtime, and migration cutover (`planned`)

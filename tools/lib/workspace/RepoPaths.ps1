@@ -71,10 +71,10 @@ function Read-MIRRepoAliasCatalog {
     if ($line -match "^authority:\s*(\S+)\s*$") { $authority = $Matches[1]; continue }
     if ($line -match "^\s{2}-\s+from:\s*(\S+)\s*$") {
       if ($null -ne $current) { $aliases.Add([pscustomobject]$current) }
-      $current = [ordered]@{from=$Matches[1];to="";mode="";introduced=""}
+      $current = [ordered]@{from=$Matches[1];to="";suffix="";mode="";introduced="";sunset=""}
       continue
     }
-    if ($null -ne $current -and $line -match "^\s{4}(to|mode|introduced):\s*(\S+)\s*$") {
+    if ($null -ne $current -and $line -match "^\s{4}(to|suffix|mode|introduced|sunset):\s*(\S+)\s*$") {
       $current[$Matches[1]] = $Matches[2]
     }
   }
@@ -88,6 +88,9 @@ function Read-MIRRepoAliasCatalog {
     Assert-MIRDurableRepoPath -Path ([string]$alias.from)
     if (-not $PathCatalog.paths.PSObject.Properties[[string]$alias.to]) {
       throw "Alias '$($alias.from)' targets unknown path ID '$($alias.to)'."
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$alias.suffix)) {
+      Assert-MIRDurableRepoPath -Path ([string]$alias.suffix)
     }
     if ([string]$alias.mode -notin @("historical-read-only", "read-only", "local-read-only")) {
       throw "Alias '$($alias.from)' has invalid mode '$($alias.mode)'."
@@ -148,13 +151,15 @@ function Resolve-MIRRepoPath {
     Sort-Object { ([string]$_.from).Length } -Descending | Select-Object -First 1)
   if ($match.Count -eq 1) {
     $target = $catalog.paths.PSObject.Properties[[string]$match[0].to]
-    $suffix = $Path.Substring(([string]$match[0].from).Length)
+    $inputSuffix = $Path.Substring(([string]$match[0].from).Length)
+    $suffix = Join-MIRRepoRelativePath -Base ([string]$match[0].suffix) -Suffix $inputSuffix
     return [pscustomobject][ordered]@{
       input=$Path
       id=[string]$match[0].to
       relative_path=(Join-MIRRepoRelativePath -Base ([string]$target.Value) -Suffix $suffix)
       alias=$true
       mode=[string]$match[0].mode
+      sunset=[string]$match[0].sunset
     }
   }
 
