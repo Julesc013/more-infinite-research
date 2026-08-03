@@ -78,10 +78,13 @@ try {
   }
 
   $zip = Join-Path $Worktree ([string]$manifest.expected_target.archive)
-  & (Join-Path $Worktree "scripts\Build-MIRPackage.ps1")
+  $canonicalBuilder = Join-Path $Worktree "tools\commands\package\Build-MIRPackage.ps1"
+  $historicalBuilder = Join-Path $Worktree "scripts\Build-MIRPackage.ps1"
+  $builder = if (Test-Path -LiteralPath $canonicalBuilder -PathType Leaf) { $canonicalBuilder } else { $historicalBuilder }
+  & $builder
   if ($LASTEXITCODE -ne 0) { throw "First deterministic package build failed." }
   $firstSha = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
-  & (Join-Path $Worktree "scripts\Build-MIRPackage.ps1")
+  & $builder
   if ($LASTEXITCODE -ne 0) { throw "Second deterministic package build failed." }
   $secondSha = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
   if ($firstSha -ne $secondSha -or $secondSha -ne [string]$manifest.expected_target.archive_sha256) {

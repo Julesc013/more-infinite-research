@@ -11,7 +11,7 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 }
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
 $candidate = Join-Path $repo ([string]$release.package.archive)
-if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { & (Join-Path $repo "scripts/Build-MIRPackage.ps1") | Out-Host }
+if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1") | Out-Host }
 $context = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -Stage release `
   -CandidatePath $candidate -OutputRoot ".work/output/control-plane-v5-self-test/release-contexts" -RepoRoot $repo
 $state = Get-MIRCPContextExecutionState -ContextPath $context.path

@@ -106,6 +106,14 @@ aliases:
     to: tools.cli
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Build-MIRPackage.ps1
+    to: tools.commands.package.build
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Measure-MIRPackageComposition.ps1
+    to: tools.commands.package.composition
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

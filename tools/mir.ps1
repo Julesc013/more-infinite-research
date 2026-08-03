@@ -367,7 +367,7 @@ function Invoke-MIRDocsOnlyReleaseCheck {
   Assert-MIRDocsOnlyReleaseStatus -Stage "before docs-only validation"
 
   Write-MIRStep "building release package"
-  & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+  & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1")
   if ($LASTEXITCODE -ne 0) { throw "Build-MIRPackage.ps1 failed." }
 
   Write-MIRStep "running static/package validation"
@@ -525,7 +525,7 @@ switch ($area) {
   }
   "package" {
     if ($verb -ne "build") { throw "Unknown package command: $verb" }
-    & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+    & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1")
   }
   "backport" {
     $manifest = Get-MIRArgValue -Items $Args -Name "--manifest" -Default ".mir/backports/2.5.0.json"

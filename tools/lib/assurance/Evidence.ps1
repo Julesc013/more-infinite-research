@@ -1442,7 +1442,7 @@ function Get-MIRAssuranceBuildFingerprint {
     schema=$buildReceiptSchema
     target=[string]$Context.target
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
-    build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "scripts\Build-MIRPackage.ps1"))
+    build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1"))
     info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "info.json"))
   }
@@ -1475,7 +1475,7 @@ function Invoke-MIRAssuranceBuild {
     return $reused
   }
   Write-Host "[run] candidate build $($fingerprint.input_key)"
-  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") | Out-Host
+  & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "Candidate build failed." }
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate was not created: $($Context.candidate)" }
   $receipt = [ordered]@{

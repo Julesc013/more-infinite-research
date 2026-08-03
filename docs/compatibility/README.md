@@ -613,7 +613,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 
 ## Release Checklist
 
-- Run `.\scripts\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
+- Run `.\tools\commands\package\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.

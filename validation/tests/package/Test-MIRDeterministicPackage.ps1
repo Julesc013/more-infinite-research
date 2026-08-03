@@ -25,7 +25,7 @@ foreach ($path in $absoluteRoots) {
 }
 
 foreach ($relativeRoot in $relativeRoots) {
-  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $relativeRoot -CompressionLevel Optimal | Out-Host
+  & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $relativeRoot -CompressionLevel Optimal | Out-Host
 }
 
 $left = Join-Path $absoluteRoots[0] $archiveName

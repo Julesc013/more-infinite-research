@@ -56,7 +56,7 @@ try {
     "prototypes/mir/pipeline/commands.lua" = "return {changed=true}"
   }
 
-  $report = & (Join-Path $repo "scripts\Measure-MIRPackageComposition.ps1") `
+  $report = & (Join-Path $repo "tools\commands\package\Measure-MIRPackageComposition.ps1") `
     -RepoRoot $repo `
     -ArchivePath $candidatePath `
     -BaselinePath $baselinePath `
@@ -85,7 +85,7 @@ try {
   $unreviewedPath = Join-Path $testRoot "unreviewed.json"
   $rejected = $false
   try {
-    & (Join-Path $repo "scripts\Measure-MIRPackageComposition.ps1") `
+    & (Join-Path $repo "tools\commands\package\Measure-MIRPackageComposition.ps1") `
       -RepoRoot $repo `
       -ArchivePath $candidatePath `
       -BaselinePath $baselinePath `

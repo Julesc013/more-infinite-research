@@ -26,6 +26,14 @@ if (@($aliases.aliases | Where-Object {
 }).Count -ne 1) {
   throw "Historical CLI-facade alias is missing or writable."
 }
+foreach ($packageAlias in @(
+  @{from=("scripts/" + "Build-MIRPackage.ps1");to="tools.commands.package.build"},
+  @{from=("scripts/" + "Measure-MIRPackageComposition.ps1");to="tools.commands.package.composition"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $packageAlias.from -and $_.to -eq $packageAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical package-command alias is missing or writable: $($packageAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -89,6 +97,21 @@ $cliFacadeMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/mai
 if ($cliFacadeMigrationPreview.mode -ne "preview" -or $cliFacadeMigrationPreview.changed -ne 0 -or
     $cliFacadeMigrationPreview.canonical -ne "tools/mir.ps1" -or $cliFacadeMigrationPreview.legacy -ne "scripts/mir.ps1") {
   throw "CLI-facade migration is incomplete or not idempotent: $($cliFacadeMigrationPreview | ConvertTo-Json -Compress)"
+}
+$packageCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRPackageCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($packageCommandMigrationPreview.mode -ne "preview" -or $packageCommandMigrationPreview.changed -ne 0 -or
+    $packageCommandMigrationPreview.commands -ne 2) {
+  throw "Package-command migration is incomplete or not idempotent: $($packageCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
+$legacyPackageCommands = @(
+  (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
+  (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
+)
+foreach ($wrapperPath in $legacyPackageCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 30) {
+    throw "Legacy package command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
 }
 $legacyLibraryNames = @(
   ("MIR" + "Assurance"),

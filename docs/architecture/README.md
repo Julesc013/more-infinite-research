@@ -273,7 +273,7 @@ Use `scripts/Invoke-MIRExtendedTests.ps1` as the wrapper for repeatable tiers su
 
 Use `tools/mir.ps1` as the stable developer-facing command facade. It keeps existing scripts as implementation details and adds memorable verbs for release gates, overnight local sweeps, local/top-25 audits, reports, package builds, profile stubs, run profiles, and local mod-library indexing. Shared operational helpers live under `tools/lib/cli/`; treat them as a private helper folder, not as a framework that must be expanded before useful testing work can continue.
 
-Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
+Use `tools/commands/package/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. The release zip intentionally excludes developer-only docs, fixtures, scripts, and task ledgers; those remain repository evidence, not shipped mod payload. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 

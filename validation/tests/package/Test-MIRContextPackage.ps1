@@ -77,7 +77,7 @@ if ($Check -eq "determinism") {
   $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRepo "info.json") | ConvertFrom-Json
   $archiveName = "$($info.name)_$($info.version).zip"
   foreach ($relativeOutput in @(".work/build/control-plane-v5-package-a", ".work/build/control-plane-v5-package-b")) {
-    & (Join-Path $sourceRepo "scripts/Build-MIRPackage.ps1") -OutputDir $relativeOutput -CompressionLevel Optimal | Out-Host
+    & (Resolve-MIRPackageCommandPath -RepoRoot $sourceRepo -Command build) -OutputDir $relativeOutput -CompressionLevel Optimal | Out-Host
     if ($LASTEXITCODE -ne 0) { throw "Exact-source deterministic package build failed." }
     $rebuilt = Join-Path $sourceRepo "$relativeOutput/$archiveName"
     $rebuilds += [pscustomobject][ordered]@{path=$relativeOutput;sha256=(Get-MIRFileSha256 -Path $rebuilt);content_sha256=(Get-MIRZipContentFingerprint -Path $rebuilt)}

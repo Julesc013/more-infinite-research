@@ -2126,7 +2126,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   $packageName = "$($info.name)_$($info.version)"
   if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
     $validationOutputDir = ".work/build/validation-dist"
-    & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
+    & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
     $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
   } else {
     $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }

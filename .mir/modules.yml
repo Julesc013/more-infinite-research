@@ -650,6 +650,7 @@ validation_tooling:
     repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1
     repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
     repository_cli_facade_migrator: tools/maintenance/Move-MIRCliFacade.ps1
+    repository_package_command_migrator: tools/maintenance/Move-MIRPackageCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -732,7 +733,8 @@ validation_tooling:
     backport_materializer: scripts/Materialize-MIRBackport.ps1
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
-    package_composition: scripts/Measure-MIRPackageComposition.ps1
+    package_builder: tools/commands/package/Build-MIRPackage.ps1
+    package_composition: tools/commands/package/Measure-MIRPackageComposition.ps1
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1

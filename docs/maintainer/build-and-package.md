@@ -15,7 +15,7 @@ superseded_by: []
 Build a release package with:
 
 ```powershell
-.\scripts\Build-MIRPackage.ps1
+.\tools\commands\package\Build-MIRPackage.ps1
 ```
 
 Package validation builds from the current source tree and checks that repository-only material is excluded. The builder writes entries in sorted path order with a fixed 1980-01-01 ZIP timestamp and cleared platform attributes. Source file timestamps, checkout order, and staging-directory metadata therefore do not affect the archive bytes.
@@ -31,7 +31,7 @@ It builds two independent archives, requires identical SHA-256 values, and verif
 Measure and review package composition with:
 
 ```powershell
-.\scripts\Measure-MIRPackageComposition.ps1 `
+.\tools\commands\package\Measure-MIRPackageComposition.ps1 `
   -Explanation "Reviewed package growth explanation" `
   -RequireReviewedExplanation
 ```

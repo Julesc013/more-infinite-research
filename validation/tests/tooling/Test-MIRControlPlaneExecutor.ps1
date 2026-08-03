@@ -15,7 +15,7 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
 $candidate = Join-Path $repo ([string]$release.package.archive)
 if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-  & (Join-Path $repo "scripts/Build-MIRPackage.ps1") | Out-Host
+  & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1") | Out-Host
 }
 $performanceSource = Join-Path $repo ".work/output/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
 if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {

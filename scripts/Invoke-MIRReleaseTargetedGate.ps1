@@ -371,7 +371,7 @@ try {
 
   if (-not $SkipBuild) {
     Invoke-MIRReleaseGateStep -Name "package-build" -Action {
-      & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
+      & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
       & git -C $repo diff --check
     }
   }

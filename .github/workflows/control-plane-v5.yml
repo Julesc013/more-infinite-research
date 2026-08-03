@@ -109,7 +109,7 @@ jobs:
           ./scripts/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
       - name: Build exact candidate from immutable package source
         shell: pwsh
-        run: ./source/scripts/Build-MIRPackage.ps1
+        run: ./source/tools/commands/package/Build-MIRPackage.ps1
       - id: export
         name: Materialize context and exact environment matrix
         shell: pwsh

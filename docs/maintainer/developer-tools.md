@@ -113,7 +113,7 @@ Stable direct commands:
 scripts/Invoke-MIRReleaseTargetedGate.ps1
 scripts/Start-MIROvernightLocalSweep.ps1
 scripts/Show-MIROvernightSummary.ps1
-scripts/Build-MIRPackage.ps1
+tools/commands/package/Build-MIRPackage.ps1
 scripts/Invoke-MIRValidation.ps1
 validation/tests/architecture/Test-MIRArchitecture.ps1
 ```

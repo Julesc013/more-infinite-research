@@ -192,8 +192,8 @@
       "command": "./validation/tests/package/Test-MIRDeterministicPackage.ps1",
       "requires_factorio": false,
       "inputs": [
-        "scripts/Build-MIRPackage.ps1",
-        "scripts/Measure-MIRPackageComposition.ps1",
+        "tools/commands/package/Build-MIRPackage.ps1",
+        "tools/commands/package/Measure-MIRPackageComposition.ps1",
         "validation/tests/package/Test-MIRPackageComposition.ps1",
         "tools/lib/validation/PackageIdentity.ps1",
         "info.json",

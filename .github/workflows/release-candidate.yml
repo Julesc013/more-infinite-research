@@ -37,7 +37,7 @@ jobs:
       - name: Build and verify exact archive
         shell: pwsh
         run: |
-          ./scripts/Build-MIRPackage.ps1
+          ./tools/commands/package/Build-MIRPackage.ps1
           $info = Get-Content info.json -Raw | ConvertFrom-Json
           $archive = "dist/more-infinite-research_$($info.version).zip"
           $actual = (Get-FileHash $archive -Algorithm SHA256).Hash

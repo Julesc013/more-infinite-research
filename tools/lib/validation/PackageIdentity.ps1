@@ -16,6 +16,21 @@ function Get-MIRPackageSourceRoots {
   )
 }
 
+function Resolve-MIRPackageCommandPath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateSet("build", "composition")][string]$Command = "build"
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $name = if ($Command -eq "build") { "Build-MIRPackage.ps1" } else { "Measure-MIRPackageComposition.ps1" }
+  $canonical = Join-Path $repo "tools/commands/package/$name"
+  if (Test-Path -LiteralPath $canonical -PathType Leaf) { return $canonical }
+  $legacy = Join-Path $repo "scripts/$name"
+  if (Test-Path -LiteralPath $legacy -PathType Leaf) { return $legacy }
+  throw "Package command is absent from canonical and historical locations: $name"
+}
+
 function Get-MIRPackageSourceFiles {
   param([Parameter(Mandatory)][string]$RepoRoot)
 

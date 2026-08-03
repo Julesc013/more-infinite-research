@@ -49,7 +49,7 @@ Before opening a pull request:
 For most repo changes on `main` or `dev`:
 
 ```powershell
-.\scripts\Build-MIRPackage.ps1
+.\tools\commands\package\Build-MIRPackage.ps1
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 

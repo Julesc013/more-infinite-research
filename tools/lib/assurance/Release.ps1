@@ -77,16 +77,20 @@ function Get-MIRAssuranceCommitCandidateIdentity {
   try {
     New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
     . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+    $canonicalBuilder = "tools/commands/package/Build-MIRPackage.ps1"
+    $legacyBuilder = "scripts/Build-MIRPackage.ps1"
+    & git -C $repo cat-file -e "${resolvedCommit}:$canonicalBuilder" 2>$null
+    $builderPath = if ($LASTEXITCODE -eq 0) { $canonicalBuilder } else { $legacyBuilder }
     $archivePaths = @(
       @(Get-MIRPackageSourceRoots)
-      "scripts/Build-MIRPackage.ps1"
+      $builderPath
       "tools/lib/validation/PackageIdentity.ps1"
     )
     & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @archivePaths 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
     Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
     $powerShell = (Get-Process -Id $PID).Path
-    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot "scripts\Build-MIRPackage.ps1") -OutputDir "authority-dist" | Out-Null
+    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot $builderPath) -OutputDir "authority-dist" | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "Deterministic package reconstruction failed for $resolvedCommit." }
     $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRoot "info.json") | ConvertFrom-Json
     $candidate = Join-Path $sourceRoot "authority-dist\$($info.name)_$($info.version).zip"
