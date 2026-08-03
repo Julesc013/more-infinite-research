@@ -121,7 +121,7 @@
         "docs/user/settings.md",
         "docs/reference/settings.md",
         "docs/maintainer/settings-governance.md",
-        "scripts/Update-MIRREADMEStreamDefaults.ps1",
+        "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
         "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"
       ]
     },

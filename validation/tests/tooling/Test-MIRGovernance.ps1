@@ -186,7 +186,7 @@ if ($missingFromDisk.Count -gt 0) {
   throw ".mir/docs.yml references missing docs: $($missingFromDisk -join ', ')"
 }
 
-& (Join-Path $repo "scripts\Format-MIRMarkdown.ps1") -RepoRoot $repo -Check
+& (Join-Path $repo "tools\commands\docs\Format-MIRMarkdown.ps1") -RepoRoot $repo -Check
 
 $sourceTruths = @(Get-MIRManifestSourceTruths -Text $docsManifestText)
 $duplicateTruths = @($sourceTruths | Group-Object | Where-Object { $_.Count -gt 1 })

@@ -654,6 +654,7 @@ validation_tooling:
     repository_cli_facade_migrator: tools/maintenance/Move-MIRCliFacade.ps1
     repository_package_command_migrator: tools/maintenance/Move-MIRPackageCommands.ps1
     repository_workspace_command_migrator: tools/maintenance/Move-MIRWorkspaceCommands.ps1
+    repository_docs_command_migrator: tools/maintenance/Move-MIRDocsCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -780,7 +781,10 @@ validation_tooling:
     runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
-    pipeline_documentation: scripts/Update-MIRPipelineDocumentation.ps1
+    documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
+    generated_authority_documentation: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
+    pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
+    readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
     compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml

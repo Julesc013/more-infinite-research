@@ -10,8 +10,8 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
-& (Join-Path $repo "scripts\Update-MIRPipelineDocumentation.ps1") -RepoRoot $repo -Check
-& (Join-Path $repo "scripts\Update-MIRGeneratedAuthorityDocs.ps1") -RepoRoot $repo -Check
+& (Join-Path $repo "tools\commands\docs\Update-MIRPipelineDocumentation.ps1") -RepoRoot $repo -Check
+& (Join-Path $repo "tools\commands\docs\Update-MIRGeneratedAuthorityDocs.ps1") -RepoRoot $repo -Check
 
 function Assert-MIRModuleManifestSemantics {
   $manifestPath = Join-Path $repo ".mir\modules.yml"

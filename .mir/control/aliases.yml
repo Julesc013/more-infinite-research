@@ -122,6 +122,22 @@ aliases:
     to: tools.commands.workspace.cleanup
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Format-MIRMarkdown.ps1
+    to: tools.commands.docs.format
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRGeneratedAuthorityDocs.ps1
+    to: tools.commands.docs.authority
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRPipelineDocumentation.ps1
+    to: tools.commands.docs.pipeline
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRREADMEStreamDefaults.ps1
+    to: tools.commands.docs.defaults
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

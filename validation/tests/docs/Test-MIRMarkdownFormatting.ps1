@@ -7,7 +7,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-$formatter = Join-Path $RepoRoot "scripts\Format-MIRMarkdown.ps1"
+$formatter = Join-Path $RepoRoot "tools\commands\docs\Format-MIRMarkdown.ps1"
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-markdown-format-" + [Guid]::NewGuid().ToString("N"))
 
 try {
