@@ -11,7 +11,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
 $activeReleasePath = Join-Path $repo ".mir/releases/$activeVersion.json"
 if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
@@ -53,12 +53,12 @@ function Get-MIRDeltaProducerFingerprint {
     "validation/scenarios/runtime.json",
     "fixtures/export-approved-delta/data-final-fixes.lua",
     "fixtures/export-approved-delta/info.json",
-    "scripts/validation/FactorioProcess.ps1",
-    "scripts/validation/PackageIdentity.ps1",
-    "scripts/validation/ResultAggregation.ps1",
-    "scripts/validation/ScenarioRegistry.ps1",
-    "scripts/validation/SettingsOverrides.ps1",
-    "scripts/validation/TargetProfiles.ps1"
+    "tools/lib/validation/FactorioProcess.ps1",
+    "tools/lib/validation/PackageIdentity.ps1",
+    "tools/lib/validation/ResultAggregation.ps1",
+    "tools/lib/validation/ScenarioRegistry.ps1",
+    "tools/lib/validation/SettingsOverrides.ps1",
+    "tools/lib/validation/TargetProfiles.ps1"
   )
   $rows = @(
     foreach ($relative in $paths) {

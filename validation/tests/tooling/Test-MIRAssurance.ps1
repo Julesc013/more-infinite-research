@@ -52,7 +52,7 @@ $assuranceToolingClassificationCases = @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
   "scripts/Invoke-MIRAssurance.ps1",
-  "scripts/MIRAssurance/Evidence.ps1",
+  "tools/lib/assurance/Evidence.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
@@ -175,7 +175,7 @@ if ($manualTest.Count -ne 1 -or
     @($manualTest[0].inputs | Where-Object { [string]$_ -match 'manual-review-attestation\.json' }).Count -ne 0) {
   throw "manual.release-review must bind the package-source commit and dynamically fingerprint the exact versioned attestation."
 }
-. (Join-Path $RepoRoot "scripts\validation\ReleaseAttestations.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ReleaseAttestations.ps1")
 $portableHashRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-portable-hash-" + [Guid]::NewGuid().ToString("N"))
 $portableLf = Join-Path $portableHashRoot "evidence.md"
 $portableCrLf = Join-Path $portableHashRoot "evidence-crlf.md"
@@ -200,7 +200,7 @@ foreach ($target in @("2.0", "2.1")) {
   }
 }
 
-$releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
+$releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
 foreach ($requiredSealField in @(
   "mir_version",
   "target",
@@ -252,7 +252,7 @@ if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
   throw "Published snapshot byte counts must come from canonical Git blobs, not checkout line endings."
 }
 
-$coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
+$coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
 . $coreScript
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {

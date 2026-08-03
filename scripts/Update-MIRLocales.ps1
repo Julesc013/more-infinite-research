@@ -11,7 +11,7 @@ if ([string]::IsNullOrWhiteSpace($PolicyPath)) {
   $PolicyPath = Join-Path $repo ".mir\locales\manifest.json"
 }
 
-Import-Module (Join-Path $repo "scripts\localization\MIRLocalization.psm1") -Force
+Import-Module (Join-Path $repo "tools\lib\localization\MIRLocalization.psm1") -Force
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
 $sourcePath = Join-Path $repo ($policy.source_file -replace '/', '\')
 $source = Read-MIRLocaleFile -Path $sourcePath

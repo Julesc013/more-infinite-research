@@ -20,7 +20,7 @@ The checked-in Lua view is `prototypes/mir/platform/factorio/target_profiles.lua
 .\scripts\Sync-MIRTargetProfiles.ps1
 ```
 
-Static and architecture validation run the same command with `-Check` and fail when the generated view differs from `.mir/targets.json` or the active `info.json` target. PowerShell validation reads the canonical JSON directly through `scripts/validation/TargetProfiles.ps1`; it does not maintain a second hand-written target classification.
+Static and architecture validation run the same command with `-Check` and fail when the generated view differs from `.mir/targets.json` or the active `info.json` target. PowerShell validation reads the canonical JSON directly through `tools/lib/validation/TargetProfiles.ps1`; it does not maintain a second hand-written target classification.
 
 Every profile is now a `TargetProfileV2` record and declares:
 

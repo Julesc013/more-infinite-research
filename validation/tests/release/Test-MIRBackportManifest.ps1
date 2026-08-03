@@ -142,9 +142,9 @@ foreach ($entry in @($manifest.package_path_classification)) {
 }
 
 $script:repo = $RepoRoot
-. (Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1")
-. (Join-Path $RepoRoot "scripts\MIRAssurance\Hashing.ps1")
-. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
 $actualChanged = @(
   & git -C $RepoRoot diff --name-only $sourcePackageCommit $targetPackageCommit -- @(Get-MIRPackageSourceRoots) |
     ForEach-Object { ([string]$_).Replace("\", "/") } |

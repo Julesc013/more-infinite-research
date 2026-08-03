@@ -7,9 +7,9 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $RepoRoot "scripts\validation\ScenarioGroups.ps1")
-. (Join-Path $RepoRoot "scripts\validation\ResultAggregation.ps1")
-. (Join-Path $RepoRoot "scripts\validation\ScenarioRegistry.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ScenarioGroups.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ResultAggregation.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ScenarioRegistry.ps1")
 
 $registry = Import-MIRScenarioRegistry `
   -Path (Join-Path $RepoRoot "validation\scenarios\runtime.json") `

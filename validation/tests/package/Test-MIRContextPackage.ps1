@@ -13,9 +13,9 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $sourceRepo = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 $context = (Resolve-Path -LiteralPath $ContextPath).Path
-. (Join-Path $repo "scripts/validation/PackageIdentity.ps1")
+. (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
 [void](Assert-MIRCPVerificationContext -Path $context)

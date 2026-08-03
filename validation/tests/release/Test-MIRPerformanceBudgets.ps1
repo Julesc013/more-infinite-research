@@ -241,7 +241,7 @@ foreach ($requiredPath in @(
   "fixtures\performance-regression-probe\data-final-fixes.lua",
   "scripts\Invoke-MIRPerformanceQualification.ps1",
   "scripts\Measure-MIRPerformanceRegression.ps1",
-  "scripts\validation\PerformanceCampaign.ps1"
+  "tools\lib\validation\PerformanceCampaign.ps1"
 )) {
   if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $requiredPath) -PathType Leaf)) {
     throw "Performance campaign producer authority is absent: $requiredPath"
@@ -259,13 +259,13 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
 }
-$executorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRControlPlane\Executor.ps1")
+$executorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\control\Executor.ps1")
 foreach ($snippet in @("compact-context-scratch-v1", "conservative_path_budget", "maximum_factorio_path_length", "Move-MIRCPPerformanceArtifacts", "paired-balanced-native-v3")) {
   if ($executorSource -notmatch [regex]::Escape($snippet)) {
     throw "Control-plane performance execution lacks required compact-path behavior '$snippet'."
   }
 }
-$performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
+$performanceCampaignHelpers = Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
 $jsonCounter = Get-MIRPerformanceCounterValue -Counters ('{"bounded":12}' | ConvertFrom-Json) -Name "bounded"
@@ -283,11 +283,11 @@ if ($producerSource -notmatch '\[int\]\$scenarios\[0\]\.exit_code\s+-ne\s+0' -or
     $producerSource -notmatch '\[int\]\$scenarios\[0\]\.dependency_failure_count\s+-ne\s+0') {
   throw "Performance campaign must still require successful Factorio execution and an exact dependency closure for both packages."
 }
-$campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1")
+$campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
   throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
 }
-$compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+$compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
 $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
 if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or

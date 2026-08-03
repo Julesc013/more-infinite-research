@@ -66,15 +66,15 @@ $assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\In
 if ($assuranceEntry -notmatch '\$evidenceSchema\s*=\s*4') {
   throw "Assurance evidence schema differs from capsule.schema.json."
 }
-$core = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1")
+$core = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
 if ($core -notmatch 'schema=4') {
   throw "Assurance plan schema differs from plan.schema.json."
 }
-$evidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Evidence.ps1")
+$evidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 if ($evidence -notmatch 'schema="mir-test-result-v1"' -or $evidence -notmatch 'schema=2') {
   throw "Assurance result or bundle schema differs from the governed JSON schemas."
 }
-$release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
+$release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
 if ($release -notmatch 'schema=4') {
   throw "Assurance seal schema differs from seal.schema.json."
 }

@@ -8,8 +8,8 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
-. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
 
 function Get-MIRCandidateFields {
   param([Parameter(Mandatory)][string]$Text)

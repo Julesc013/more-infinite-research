@@ -9,7 +9,7 @@
     {"id": "locale", "changed_paths": ["locale/en/mir.cfg"], "required_tasks": ["locale.contract", "package.identity"], "forbidden_tasks": ["performance.contract"]},
     {"id": "release-record", "changed_paths": [".mir/releases/3.2.2.json"], "required_tasks": ["release.authority", "docs.generated", "control-plane.records"]},
     {"id": "backport-authority", "changed_paths": [".mir/backports/2.5.0.json"], "required_tasks": ["backport.contract", "release.authority", "control-plane.records"]},
-    {"id": "control-plane", "changed_paths": ["scripts/MIRControlPlane/Planner.ps1"], "required_tasks": ["control-plane.records", "harness.schemas", "shadow.structural"]},
+    {"id": "control-plane", "changed_paths": ["tools/lib/control/Planner.ps1"], "required_tasks": ["control-plane.records", "harness.schemas", "shadow.structural"]},
     {"id": "trust-policy", "changed_paths": ["validation/trust.json"], "required_tasks": ["executor.contract", "release.controller", "ci.workflow", "shadow.structural"]},
     {"id": "release-archive", "changed_paths": ["dist/more-infinite-research_3.2.3.zip"], "required_tasks": ["package.identity", "package.composition", "package.determinism", "release.authority"]},
     {"id": "unknown", "changed_paths": ["unowned/new-input.bin"], "required_policy": "select-all-and-fail-governance"}

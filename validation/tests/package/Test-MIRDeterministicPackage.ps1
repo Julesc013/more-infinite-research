@@ -8,7 +8,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 $archiveName = "$($info.name)_$($info.version).zip"

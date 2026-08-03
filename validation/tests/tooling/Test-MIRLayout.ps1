@@ -70,6 +70,55 @@ if ($definitionMigrationPreview.mode -ne "preview" -or $definitionMigrationPrevi
     $definitionMigrationPreview.definitions -ne 11) {
   throw "Validation-definition migration is incomplete or not idempotent: $($definitionMigrationPreview | ConvertTo-Json -Compress)"
 }
+$toolLibraryMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRToolLibraries.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($toolLibraryMigrationPreview.mode -ne "preview" -or $toolLibraryMigrationPreview.changed -ne 0 -or
+    $toolLibraryMigrationPreview.libraries -ne 6) {
+  throw "Tool-library migration is incomplete or not idempotent: $($toolLibraryMigrationPreview | ConvertTo-Json -Compress)"
+}
+$legacyLibraryNames = @(
+  ("MIR" + "Assurance"),
+  ("MIR" + "CompatAudit"),
+  ("MIR" + "ControlPlane"),
+  "localization",
+  "Museum",
+  "validation"
+)
+$legacyLibraryWrappers = @($legacyLibraryNames | ForEach-Object {
+  Get-ChildItem -LiteralPath (Join-Path $repo "scripts/$_") -File
+})
+$canonicalLibraries = @(Get-ChildItem -LiteralPath (Join-Path $repo "tools/lib") -Recurse -File |
+  Where-Object { $_.Extension -in @(".ps1", ".psm1") -and $_.FullName -notlike "*tools\lib\workspace\*" })
+if ($legacyLibraryWrappers.Count -ne 32 -or $canonicalLibraries.Count -ne 32) {
+  throw "Canonical tool-library/wrapper inventory drifted: canonical=$($canonicalLibraries.Count), wrappers=$($legacyLibraryWrappers.Count)."
+}
+foreach ($wrapper in $legacyLibraryWrappers) {
+  $text = Get-Content -Raw -LiteralPath $wrapper.FullName
+  if ($text -notmatch "MIR-L5-LEGACY-LIBRARY-WRAPPER" -or $text.Split([char]10).Count -gt 4) {
+    throw "Legacy library entrypoint is not a thin dot-source wrapper: $($wrapper.FullName)"
+  }
+}
+
+function Invoke-MIRInlineProbe {
+  param([Parameter(Mandatory)][string]$Command)
+  $output = (& pwsh -NoProfile -Command $Command 2>&1 | Out-String).Replace("`r`n", "`n").Trim()
+  return [pscustomobject]@{exit_code=$LASTEXITCODE;output=$output}
+}
+
+$legacyControlPath = Join-Path $repo ("scripts/" + ("MIR" + "ControlPlane") + "/Core.ps1")
+$canonicalControlPath = Join-Path $repo "tools/lib/control/Core.ps1"
+$legacyControlProbe = Invoke-MIRInlineProbe -Command ". '$($legacyControlPath.Replace("'", "''"))'; Get-MIRCPRepoRoot"
+$canonicalControlProbe = Invoke-MIRInlineProbe -Command ". '$($canonicalControlPath.Replace("'", "''"))'; Get-MIRCPRepoRoot"
+if ($legacyControlProbe.exit_code -ne 0 -or $legacyControlProbe.output -cne $canonicalControlProbe.output) {
+  throw "Legacy/canonical dot-source library parity failed."
+}
+
+$legacyMuseumPath = Join-Path $repo ("scripts/" + "Museum/MuseumCompiler.psm1")
+$canonicalMuseumPath = Join-Path $repo "tools/lib/museum/MuseumCompiler.psm1"
+$legacyMuseumProbe = Invoke-MIRInlineProbe -Command "Import-Module '$($legacyMuseumPath.Replace("'", "''"))' -Force; Get-MIRTextSha256 -Text 'layout-parity'"
+$canonicalMuseumProbe = Invoke-MIRInlineProbe -Command "Import-Module '$($canonicalMuseumPath.Replace("'", "''"))' -Force; Get-MIRTextSha256 -Text 'layout-parity'"
+if ($legacyMuseumProbe.exit_code -ne 0 -or $legacyMuseumProbe.output -cne $canonicalMuseumProbe.output) {
+  throw "Legacy/canonical module import parity failed."
+}
 foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoot)) {
   $legacyFiles = @(Get-ChildItem -LiteralPath (Join-Path $repo $legacyDefinitionRoot) -File -ErrorAction SilentlyContinue)
   if ($legacyFiles.Count -ne 0) { throw "Legacy definition files remain under $legacyDefinitionRoot." }

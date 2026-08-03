@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Views")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
 function New-MIRV4CompactBaseline {

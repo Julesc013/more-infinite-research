@@ -92,7 +92,7 @@ foreach ($requiredDiagnosticsWiring in @(
     throw "Compatibility audits do not enable candidate-safe diagnostics through the validation override mod: $requiredDiagnosticsWiring"
   }
 }
-$factorioRunnerText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+$factorioRunnerText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
 if ($factorioRunnerText.Contains("prototypes\mir\settings\test_overrides.lua")) {
   throw "Compatibility audits must not mutate the copied MIR source tree to enable diagnostics."
 }

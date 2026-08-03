@@ -9,7 +9,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Executor")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
@@ -71,7 +71,7 @@ if ((Split-Path -Leaf $canonicalCandidate) -ne "more-infinite-research_3.2.2.zip
     (Get-MIRCPSha256File -Path $canonicalCandidate) -ne [string]$release.package.archive_sha256 -or
     [int]$executionState.manifest.context_abi -ne 3 -or
     $null -eq $controlLock.PSObject.Properties["qualification_source_worktree_sha256"] -or
-    @($controlLock.files | Where-Object path -eq "scripts/MIRControlPlane/Executor.ps1").Count -ne 1 -or
+    @($controlLock.files | Where-Object path -eq "tools/lib/control/Executor.ps1").Count -ne 1 -or
     @($controlLock.files | Where-Object path -eq ".mir/control-plane/approved-delta-policies.json").Count -ne 1 -or
     @($controlLock.files | Where-Object path -eq ".mir/performance-campaign.json").Count -ne 1) {
   throw "Executor context lock or canonical immutable-candidate staging contract is incomplete."

@@ -7,7 +7,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
 
 function Write-MIRTestText {
   param(

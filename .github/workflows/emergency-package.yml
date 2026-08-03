@@ -89,7 +89,7 @@ jobs:
           $archive = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $candidate))
           try { $entries = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith('/') }).Count }
           finally { $archive.Dispose() }
-          . ./scripts/validation/PackageIdentity.ps1
+          . ./tools/lib/validation/PackageIdentity.ps1
           $identity = [ordered]@{
             schema = 1
             kind = 'mir-emergency-package-identity'

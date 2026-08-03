@@ -149,7 +149,7 @@ Private helpers:
 
 ```text
 scripts/MIRCli/*.ps1
-scripts/MIRCompatAudit/*.ps1
+tools/lib/compatibility/*.ps1
 ```
 
 The helper folders are not an architecture project to finish before useful work can happen. Use them when two or more scripts need the same behavior. Avoid creating new wrapper scripts unless a new human workflow genuinely needs one.

@@ -48,7 +48,7 @@ if ([string]$seal.mir_version -ne [string]$target.version -or [string]$seal.targ
 }
 $profileText = ($target | ConvertTo-Json -Depth 30 -Compress)
 $harnessPaths = @(
-  ".mir\canonical-lower-features.json", ".mir\museum-targets.json", "scripts\Museum\MuseumCompiler.psm1",
+  ".mir\canonical-lower-features.json", ".mir\museum-targets.json", "tools\lib\museum\MuseumCompiler.psm1",
   "scripts\Build-MIRMuseumTarget.ps1", "validation\tests\runtime\Test-MIRMuseumCompiler.ps1", "validation\tests\runtime\Test-MIRMuseumRuntime.ps1",
   "scripts\New-MIRMuseumQualification.ps1", "scripts\New-MIRMuseumSeal.ps1", "validation\tests\runtime\Test-MIRMuseumSeal.ps1"
 )

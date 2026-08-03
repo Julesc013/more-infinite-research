@@ -88,7 +88,7 @@ try {
     throw "Reconstructed archive is not the exact deterministic target candidate."
   }
 
-  . (Join-Path $Worktree "scripts\validation\PackageIdentity.ps1")
+  . (Join-Path $Worktree "tools\lib\validation\PackageIdentity.ps1")
   $contentSha = Get-MIRZipContentFingerprint -Path $zip
   $zipItem = Get-Item -LiteralPath $zip
   Add-Type -AssemblyName System.IO.Compression.FileSystem

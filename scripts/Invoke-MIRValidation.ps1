@@ -23,13 +23,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
-. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
-. (Join-Path $repo "scripts\validation\ScenarioGroups.ps1")
-. (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
-. (Join-Path $repo "scripts\validation\FactorioProcess.ps1")
-. (Join-Path $repo "scripts\validation\SettingsOverrides.ps1")
-. (Join-Path $repo "scripts\validation\ScenarioRegistry.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\validation\ScenarioGroups.ps1")
+. (Join-Path $repo "tools\lib\validation\ResultAggregation.ps1")
+. (Join-Path $repo "tools\lib\validation\FactorioProcess.ps1")
+. (Join-Path $repo "tools\lib\validation\SettingsOverrides.ps1")
+. (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $expectedScenariosPath = Join-Path $repo "validation\scenarios\runtime.json"
 if ($List) {
@@ -1355,11 +1355,11 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1")
   $extendedTestsText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
-  $modPortalText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\ModPortal.ps1")
-  $dependencyResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\DependencyResolver.ps1")
-  $diagnosticsParserText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\DiagnosticsParser.ps1")
+  $modPortalText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\ModPortal.ps1")
+  $dependencyResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\DependencyResolver.ps1")
+  $diagnosticsParserText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\DiagnosticsParser.ps1")
   $stubText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\New-MIRCompatProfileStub.ps1")
-  $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\FactorioRunner.ps1")
+  $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
   $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1")
   $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
@@ -1428,28 +1428,28 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'Enable-CopiedDiagnostics -ModsDir $modsDir' },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '"mir-validation-settings-overrides"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Get-MIRSafeScenarioFileName" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"--config", $configPath' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "write-data=`$UserDataDir" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '".work"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"fixtures"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Get-MIRSafeScenarioFileName" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"--config", $configPath' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "write-data=`$UserDataDir" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '".work"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"fixtures"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
+    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
     @{ File = "validation\scenarios\local-2.1.json"; Text = $localLibraryScenariosText; Snippet = "local-2-1-crucible-rigor-exact-dist" },
-    @{ File = "scripts\MIRCompatAudit\ModPortal.ps1"; Text = $modPortalText; Snippet = '\s+(?:>=|<=|=|>|<)\s*\d' },
-    @{ File = "scripts\MIRCompatAudit\DependencyResolver.ps1"; Text = $dependencyResolverText; Snippet = "[switch]`$IncludeRecommendedDependencies" },
-    @{ File = "scripts\MIRCompatAudit\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "[AllowEmptyString()][string]`$Line" },
-    @{ File = "scripts\MIRCompatAudit\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "IsNullOrWhiteSpace(`$line)" },
+    @{ File = "tools\lib\compatibility\ModPortal.ps1"; Text = $modPortalText; Snippet = '\s+(?:>=|<=|=|>|<)\s*\d' },
+    @{ File = "tools\lib\compatibility\DependencyResolver.ps1"; Text = $dependencyResolverText; Snippet = "[switch]`$IncludeRecommendedDependencies" },
+    @{ File = "tools\lib\compatibility\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "[AllowEmptyString()][string]`$Line" },
+    @{ File = "tools\lib\compatibility\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "IsNullOrWhiteSpace(`$line)" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[string]`$FromLockfile" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[string]`$FactorioLine = `"2.1`"" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "local-2.0.json" },

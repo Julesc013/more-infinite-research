@@ -71,14 +71,14 @@ if ([int]$lock.schema -eq 4 -and [int]$lock.projection_schema -eq 3) {
     throw "Published projection source tree differs from the lock."
   }
   $script:repo = $RepoRoot
-  . (Join-Path $RepoRoot "scripts/MIRAssurance/Hashing.ps1")
+  . (Join-Path $RepoRoot "tools/lib/assurance/Hashing.ps1")
   $projectionHash = Get-MIRAssuranceCommitPackageSourceHash -Commit ([string]$lock.projection.package_source_commit)
   if ($projectionHash -ne [string]$lock.projection.package_source_sha256 -or
       $projectionHash -ne [string]$lock.candidate.content_sha256) {
     throw "Published projection package-source/content identity differs from the lock."
   }
 
-  . (Join-Path $RepoRoot "scripts/validation/PackageIdentity.ps1")
+  . (Join-Path $RepoRoot "tools/lib/validation/PackageIdentity.ps1")
   $targetManifestText = @(
     & git -C $RepoRoot show "$([string]$lock.projection.package_source_commit):.mir/targets.json"
   ) -join "`n"
@@ -210,12 +210,12 @@ if ([string]$info.version -ne [string]$lock.mir_version -or $infoTarget -ne [str
   throw "Source-lock target identity disagrees with info.json."
 }
 
-. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
-. (Join-Path $RepoRoot "scripts\validation\TargetProfiles.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\TargetProfiles.ps1")
 $museumCatalogPath = Join-Path $RepoRoot ".mir\museum-targets.json"
 $museumTarget = $null
 if (Test-Path -LiteralPath $museumCatalogPath -PathType Leaf) {
-  Import-Module (Join-Path $RepoRoot "scripts\Museum\MuseumCompiler.psm1") -Force
+  Import-Module (Join-Path $RepoRoot "tools\lib\museum\MuseumCompiler.psm1") -Force
   $museumCatalog = Get-MIRMuseumCatalog -Path $museumCatalogPath
   $museumTarget = @($museumCatalog.targets | Where-Object { [string]$_.factorio -eq [string]$lock.target }) | Select-Object -First 1
 }

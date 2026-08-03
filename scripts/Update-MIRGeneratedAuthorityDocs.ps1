@@ -5,10 +5,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts/MIRControlPlane/Core.ps1")
-. (Join-Path $repo "scripts/MIRControlPlane/Records.ps1")
-. (Join-Path $repo "scripts/MIRControlPlane/Planner.ps1")
-. (Join-Path $repo "scripts/MIRControlPlane/Views.ps1")
+. (Join-Path $repo "tools/lib/control/Core.ps1")
+. (Join-Path $repo "tools/lib/control/Records.ps1")
+. (Join-Path $repo "tools/lib/control/Planner.ps1")
+. (Join-Path $repo "tools/lib/control/Views.ps1")
 Update-MIRCPViews -RepoRoot $repo -Check:$Check | Out-Null
 
 function Read-MIRJson([string]$RelativePath) {

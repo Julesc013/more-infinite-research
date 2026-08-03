@@ -7,7 +7,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $RepoRoot "scripts\MIRCompatAudit\ModPortal.ps1")
+. (Join-Path $RepoRoot "tools\lib\compatibility\ModPortal.ps1")
 
 $cases = @(
   @{ raw = "base >= 2.1.0"; name = "base"; kind = "required"; required = $true },

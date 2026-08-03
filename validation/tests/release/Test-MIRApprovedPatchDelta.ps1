@@ -11,7 +11,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function Resolve-MIRPatchPath([string]$Value) {

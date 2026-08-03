@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 $context = Assert-MIRCPVerificationContext -Path $ContextPath
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path "context-manifest.json") | ConvertFrom-Json

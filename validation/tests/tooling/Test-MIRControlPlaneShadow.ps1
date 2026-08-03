@@ -14,7 +14,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 $shadow = if ($StructuralOnly) { $null } else { Assert-MIRCPShadowContract -RepoRoot $repo }
 if ($ContractOnly) {

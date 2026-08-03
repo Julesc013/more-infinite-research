@@ -96,7 +96,7 @@
       "tags": ["smoke"]
     },
     {
-      "pattern": "scripts/validation/**",
+      "pattern": "tools/lib/validation/**",
       "tags": ["smoke"]
     }
   ]

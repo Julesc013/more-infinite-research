@@ -23,7 +23,7 @@ MIR ships a complete locale file for every language directory supported by the q
 | `.mir/locales/overrides.json` | Small reviewed corrections for terminology or machine-draft values that need explicit wording. |
 | `scripts/Update-MIRLocales.ps1` | Deterministic CFG and translation-memory generator. |
 | `validation/tests/docs/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
-| `scripts/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
+| `tools/lib/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
 
 Files below `locale/<code>/` other than English are generated outputs. Change a translation-memory value or add a narrow override, then regenerate; do not leave a hand-edited CFG that differs from its memory.
 

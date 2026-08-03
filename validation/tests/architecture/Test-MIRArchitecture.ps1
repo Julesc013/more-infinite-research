@@ -392,11 +392,11 @@ $requiredMirFiles = @(
 )
 
 foreach ($validationModule in @(
-  "scripts/validation/PackageIdentity.ps1",
-  "scripts/validation/TargetProfiles.ps1",
-  "scripts/validation/ScenarioGroups.ps1",
-  "scripts/validation/ResultAggregation.ps1",
-  "scripts/validation/FactorioProcess.ps1"
+  "tools/lib/validation/PackageIdentity.ps1",
+  "tools/lib/validation/TargetProfiles.ps1",
+  "tools/lib/validation/ScenarioGroups.ps1",
+  "tools/lib/validation/ResultAggregation.ps1",
+  "tools/lib/validation/FactorioProcess.ps1"
 )) {
   if (-not (Test-Path -LiteralPath (Get-MIRPath -RelativePath $validationModule) -PathType Leaf)) {
     throw "Missing validation module: $validationModule"
@@ -404,9 +404,9 @@ foreach ($validationModule in @(
 }
 
 $validationFacadeText = Read-MIRFile -RelativePath "scripts/Invoke-MIRValidation.ps1"
-Assert-MIRContains -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationFacadeText -Needle 'scripts\validation\FactorioProcess.ps1'
+Assert-MIRContains -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationFacadeText -Needle 'tools\lib\validation\FactorioProcess.ps1'
 if ($validationFacadeText -match '(?m)^function\s+(Invoke-FactorioProcess|Remove-CopiedModDirectory|Copy-ModDirectory|Copy-RepositoryModDirectory)\b') {
-  throw "Factorio process and copied-mod filesystem operations must live in scripts/validation/FactorioProcess.ps1."
+  throw "Factorio process and copied-mod filesystem operations must live in tools/lib/validation/FactorioProcess.ps1."
 }
 
 foreach ($relative in $requiredMirFiles) {

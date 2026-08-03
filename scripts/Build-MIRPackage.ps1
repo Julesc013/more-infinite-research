@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 $infoPath = Join-Path $repo "info.json"
 $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
 

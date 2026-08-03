@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
 
 function ConvertTo-MIRLuaString {
   param([string]$Value)

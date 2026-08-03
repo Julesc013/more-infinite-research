@@ -74,6 +74,30 @@ aliases:
     to: validation.baselines.control
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/MIRAssurance/
+    to: tools.lib.assurance
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/MIRCompatAudit/
+    to: tools.lib.compatibility
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/MIRControlPlane/
+    to: tools.lib.control
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/localization/
+    to: tools.lib.localization
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Museum/
+    to: tools.lib.museum
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/validation/
+    to: tools.lib.validation
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

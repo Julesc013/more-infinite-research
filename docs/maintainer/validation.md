@@ -42,7 +42,7 @@ A runtime run writes an atomic JSON summary to `artifacts/validation/factorio-<l
 - the currently running scenario, if the process is interrupted;
 - the complete run duration and terminal error, when available.
 
-Scenario groups are classified by `scripts/validation/ScenarioGroups.ps1`. The runner persists a `running` scenario before Factorio starts and updates it after the process and log checks finish. Therefore an external timeout leaves an `incomplete` record instead of being reported as a failed Factorio load. An observed nonzero exit, fatal log marker, or assertion is a failure.
+Scenario groups are classified by `tools/lib/validation/ScenarioGroups.ps1`. The runner persists a `running` scenario before Factorio starts and updates it after the process and log checks finish. Therefore an external timeout leaves an `incomplete` record instead of being reported as a failed Factorio load. An observed nonzero exit, fatal log marker, or assertion is a failure.
 
 The final gate calls `Complete-MIRValidationRun`, which rejects any required target-profile group that did not pass. `validation/tests/tooling/Test-MIRValidationResults.ps1` checks both complete and interrupted result shapes during static validation.
 

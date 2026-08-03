@@ -47,7 +47,7 @@
     },
     {
       "id": "locale",
-      "patterns": ["^locale/", "^\\.mir/locales/", "^scripts/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
+      "patterns": ["^locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
       "tests": ["static.locales", "static.package", "runtime.exact-zip"]
     },
     {
@@ -62,12 +62,12 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$", "^scripts/MIRAssurance/", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/lib/assurance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!MIRAssurance/)(?!(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
@@ -77,7 +77,7 @@
     },
     {
       "id": "museum-tooling",
-      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^fixtures/museum/", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
+      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^fixtures/museum/", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum)", "^validation/tests/runtime/Test-MIRMuseum", "^tools/lib/museum/"],
       "tests": ["static.museum"]
     },
     {

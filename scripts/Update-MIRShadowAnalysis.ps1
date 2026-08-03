@@ -9,7 +9,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 $authorityPath = Join-Path $repo ".mir/control-plane/v4-v5-equivalence.json"
 $c24 = New-MIRCPShadowCandidateAnalysis -Release "3.2.2" -SourceRepoRoot $C24SourceRepoRoot -RepoRoot $repo

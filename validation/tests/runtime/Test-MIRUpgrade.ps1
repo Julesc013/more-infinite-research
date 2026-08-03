@@ -17,7 +17,7 @@ $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $RepoRoot "scripts\validation\FactorioProcess.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
 
 function Invoke-MIRUpgradeServerUntilSaved {
   param(

@@ -51,7 +51,7 @@
       "patterns": [
         ".mir/locales/**",
         "locale/**",
-        "scripts/localization/**",
+        "tools/lib/localization/**",
         "validation/tests/docs/Test-MIRLocales.ps1",
         "scripts/Update-MIRLocales.ps1"
       ]

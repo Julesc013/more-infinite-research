@@ -21,7 +21,7 @@
       "requires_factorio": false,
       "inputs": [
         "scripts/Invoke-MIRAssurance.ps1",
-        "scripts/MIRAssurance/**",
+        "tools/lib/assurance/**",
         "validation/tests/tooling/Test-MIRAssurance.ps1",
         "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
         "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
@@ -134,7 +134,7 @@
       "inputs": [
         ".mir/locales/**",
         "locale/**",
-        "scripts/localization/**",
+        "tools/lib/localization/**",
         "scripts/Update-MIRLocales.ps1",
         "validation/tests/docs/Test-MIRLocales.ps1",
         "prototypes/mir/settings/**",
@@ -164,7 +164,7 @@
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
         "fixtures/museum/synthetic-installation/**",
-        "scripts/Museum/**",
+        "tools/lib/museum/**",
         "scripts/Build-MIRMuseumTarget.ps1",
         "validation/tests/runtime/Test-MIRMuseumCompiler.ps1"
       ]
@@ -179,7 +179,7 @@
         "museum-installations",
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
-        "scripts/Museum/**",
+        "tools/lib/museum/**",
         "scripts/Build-MIRMuseumTarget.ps1",
         "validation/tests/runtime/Test-MIRMuseumRuntime.ps1",
         "validation/tests/runtime/Test-MIRMuseumExact.ps1"
@@ -195,7 +195,7 @@
         "scripts/Build-MIRPackage.ps1",
         "scripts/Measure-MIRPackageComposition.ps1",
         "validation/tests/package/Test-MIRPackageComposition.ps1",
-        "scripts/validation/PackageIdentity.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
         "info.json",
         "package-source"
       ]
@@ -237,13 +237,13 @@
         "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
         "scripts/Invoke-MIRCompatAudit.ps1",
-        "scripts/MIRCompatAudit/**",
+        "tools/lib/compatibility/**",
         "validation/tests/release/Test-MIRPerformanceBudgets.ps1",
         "validation/tests/release/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
-        "scripts/validation/PerformanceCampaign.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/PerformanceCampaign.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
         "prototypes/mir/report/compiler_telemetry.lua"
       ]
     },
@@ -258,7 +258,7 @@
         "approved-delta-transition",
         "validation/tests/release/Test-MIRApprovedDelta.ps1",
         "validation/tests/release/Test-MIRApprovedPatchDelta.ps1",
-        "scripts/validation/PackageIdentity.ps1"
+        "tools/lib/validation/PackageIdentity.ps1"
       ]
     },
     {
@@ -279,15 +279,15 @@
         "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
         "scripts/Invoke-MIRCompatAudit.ps1",
-        "scripts/MIRCompatAudit/**",
+        "tools/lib/compatibility/**",
         "spec/schemas/runtime-performance-evidence.schema.json",
         "scripts/Invoke-MIRPerformanceQualification.ps1",
         "validation/tests/release/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
-        "scripts/validation/PerformanceCampaign.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/PackageIdentity.ps1",
-        "scripts/validation/SettingsOverrides.ps1"
+        "tools/lib/validation/PerformanceCampaign.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1"
       ]
     },
     {
@@ -302,8 +302,8 @@
         "manual-review-attestation",
         "spec/schemas/manual-release-attestation.schema.json",
         "validation/tests/release/Test-MIRManualReleaseReview.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/PackageIdentity.ps1"
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/PackageIdentity.ps1"
       ]
     },
     {

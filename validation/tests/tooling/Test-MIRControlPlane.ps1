@@ -10,7 +10,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release", "Calibration")) {
-  . (Join-Path $repo "scripts/MIRControlPlane/$module.ps1")
+  . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
@@ -66,8 +66,8 @@ $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo
 if ([int]$calibration.false_negative_budget -ne 0) { throw "Impact mutation calibration permits false negatives." }
-$planA = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
-$planB = New-MIRCPPlan -Mode changed -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
+$planA = New-MIRCPPlan -Mode changed -ChangedPath @("tools/lib/control/Planner.ps1") -RepoRoot $repo
+$planB = New-MIRCPPlan -Mode changed -ChangedPath @("tools/lib/control/Planner.ps1") -RepoRoot $repo
 if ([string]$planA.plan_id -ne [string]$planB.plan_id -or [bool]$planA.plan.impact.governance_failure) { throw "Semantic planner is nondeterministic or failed to own its own implementation." }
 $releaseForInputs = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
 $docsInput = Get-MIRCPEffectiveInputManifest -Task ((Get-MIRCPTaskMap -RepoRoot $repo)["docs.schema"]) -ReleaseRecord $releaseForInputs -Target "2.1" -SourceRepoRoot $repo -RepoRoot $repo
@@ -77,7 +77,7 @@ if ($docsManifestRow.Count -ne 1 -or [string]$docsManifestRow[0].scope -ne "sour
     $docsFileRow.Count -ne 1 -or [string]$docsFileRow[0].sha256 -ne (Get-MIRCPSha256Text -Value ([IO.File]::ReadAllText((Join-Path $repo ".mir/docs.yml")).Replace("`r`n", "`n").Replace("`r", "`n")))) {
   throw "Effective-input manifest is not bound to canonical repository file content."
 }
-$freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -RepoRoot $repo
+$freshPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("tools/lib/control/Planner.ps1") -RepoRoot $repo
 $verificationTaskCount = @(Get-MIRCPTaskRecords -RepoRoot $repo | Where-Object {
   ($null -eq $_.PSObject.Properties["activation"] -or [string]$_.activation -eq "verification") -and
   ($null -eq $_.PSObject.Properties["targets"] -or @($_.targets | ForEach-Object { [string]$_ }) -contains "2.1")
@@ -85,7 +85,7 @@ $verificationTaskCount = @(Get-MIRCPTaskRecords -RepoRoot $repo | Where-Object {
 if ([int]$freshPlan.plan.task_count -ne $verificationTaskCount -or [string]$freshPlan.plan.stage -ne "verification" -or -not [bool]$freshPlan.plan.aggregate_is_result_only) { throw "Fresh calibration does not select the complete verification-stage TaskNode graph or treats aggregates as executable." }
 $aggregateRows = @($freshPlan.plan.tasks | Where-Object kind -eq "aggregate")
 if ($aggregateRows.Count -ne 2 -or @($aggregateRows | Where-Object action -ne "AGGREGATE").Count -ne 0) { throw "Result-only aggregates were scheduled as executable work." }
-$publicationPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("scripts/MIRControlPlane/Planner.ps1") -Target "2.0" -Release "2.5.0" -Stage publication -SelectionOnly -RepoRoot $repo
+$publicationPlan = New-MIRCPPlan -Mode calibrate-fresh -ChangedPath @("tools/lib/control/Planner.ps1") -Target "2.0" -Release "2.5.0" -Stage publication -SelectionOnly -RepoRoot $repo
 foreach ($requiredPublicationNode in @("tag", "publication", "public-byte-verification", "promotion", "seal", "protected.qualification", "qualification.full", "backport.reconstruction")) {
   if (@($publicationPlan.plan.tasks.id) -notcontains $requiredPublicationNode) { throw "Publication plan omitted prerequisite $requiredPublicationNode." }
 }

@@ -648,6 +648,7 @@ validation_tooling:
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
     repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1
+    repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json
@@ -671,20 +672,20 @@ validation_tooling:
     control_plane_execution_registry: validation/generated/execution-registry.json
     control_plane_historical_replay: validation/baselines/control/3.2.2-v5-replay.json
     control_plane_entrypoint: scripts/Invoke-MIRControlPlane.ps1
-    control_plane_core: scripts/MIRControlPlane/Core.ps1
-    control_plane_records: scripts/MIRControlPlane/Records.ps1
-    control_plane_planner: scripts/MIRControlPlane/Planner.ps1
-    control_plane_scenarios: scripts/MIRControlPlane/Scenario.ps1
-    control_plane_observations: scripts/MIRControlPlane/Observation.ps1
-    control_plane_evidence: scripts/MIRControlPlane/Evidence.ps1
-    control_plane_views: scripts/MIRControlPlane/Views.ps1
-    control_plane_context: scripts/MIRControlPlane/Context.ps1
-    control_plane_executor: scripts/MIRControlPlane/Executor.ps1
-    control_plane_calibration: scripts/MIRControlPlane/Calibration.ps1
-    control_plane_shadow: scripts/MIRControlPlane/Shadow.ps1
+    control_plane_core: tools/lib/control/Core.ps1
+    control_plane_records: tools/lib/control/Records.ps1
+    control_plane_planner: tools/lib/control/Planner.ps1
+    control_plane_scenarios: tools/lib/control/Scenario.ps1
+    control_plane_observations: tools/lib/control/Observation.ps1
+    control_plane_evidence: tools/lib/control/Evidence.ps1
+    control_plane_views: tools/lib/control/Views.ps1
+    control_plane_context: tools/lib/control/Context.ps1
+    control_plane_executor: tools/lib/control/Executor.ps1
+    control_plane_calibration: tools/lib/control/Calibration.ps1
+    control_plane_shadow: tools/lib/control/Shadow.ps1
     control_plane_shadow_gate: validation/tests/tooling/Test-MIRControlPlaneShadow.ps1
     control_plane_gate: validation/tests/tooling/Test-MIRControlPlane.ps1
-    control_plane_release: scripts/MIRControlPlane/Release.ps1
+    control_plane_release: tools/lib/control/Release.ps1
     control_plane_release_gate: validation/tests/tooling/Test-MIRControlPlaneRelease.ps1
     control_plane_execution_registry_generator: scripts/Update-MIRExecutionRegistry.ps1
     control_plane_execution_registry_gate: validation/tests/tooling/Test-MIRExecutionRegistry.ps1
@@ -703,11 +704,11 @@ validation_tooling:
     control_plane_workflow: .github/workflows/control-plane-v5.yml
     control_plane_workflow_gate: validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
-    assurance_core: scripts/MIRAssurance/Core.ps1
-    assurance_domains: scripts/MIRAssurance/Domains.ps1
-    assurance_evidence: scripts/MIRAssurance/Evidence.ps1
-    assurance_hashing: scripts/MIRAssurance/Hashing.ps1
-    assurance_release: scripts/MIRAssurance/Release.ps1
+    assurance_core: tools/lib/assurance/Core.ps1
+    assurance_domains: tools/lib/assurance/Domains.ps1
+    assurance_evidence: tools/lib/assurance/Evidence.ps1
+    assurance_hashing: tools/lib/assurance/Hashing.ps1
+    assurance_release: tools/lib/assurance/Release.ps1
     assurance_tests: validation/tests/tooling/Test-MIRAssurance.ps1
     release_authority: validation/tests/release/Test-MIRReleaseAuthority.ps1
     native_owner_balance_tests: validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1
@@ -715,7 +716,7 @@ validation_tooling:
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation
-    museum_compiler: scripts/Museum/MuseumCompiler.psm1
+    museum_compiler: tools/lib/museum/MuseumCompiler.psm1
     museum_build: scripts/Build-MIRMuseumTarget.ps1
     museum_static_gate: validation/tests/runtime/Test-MIRMuseumCompiler.ps1
     museum_exact_runtime_gate: validation/tests/runtime/Test-MIRMuseumExact.ps1
@@ -728,15 +729,15 @@ validation_tooling:
     backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
-    package_identity: scripts/validation/PackageIdentity.ps1
+    package_identity: tools/lib/validation/PackageIdentity.ps1
     package_composition: scripts/Measure-MIRPackageComposition.ps1
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
-    target_metadata: scripts/validation/TargetProfiles.ps1
-    scenario_groups: scripts/validation/ScenarioGroups.ps1
-    structured_evidence: scripts/validation/ResultAggregation.ps1
-    factorio_process: scripts/validation/FactorioProcess.ps1
-    settings_overrides: scripts/validation/SettingsOverrides.ps1
-    scenario_registry: scripts/validation/ScenarioRegistry.ps1
+    target_metadata: tools/lib/validation/TargetProfiles.ps1
+    scenario_groups: tools/lib/validation/ScenarioGroups.ps1
+    structured_evidence: tools/lib/validation/ResultAggregation.ps1
+    factorio_process: tools/lib/validation/FactorioProcess.ps1
+    settings_overrides: tools/lib/validation/SettingsOverrides.ps1
+    scenario_registry: tools/lib/validation/ScenarioRegistry.ps1
     golden_plans: validation/tests/tooling/Test-MIRGoldenPlans.ps1
     campaign_scenarios: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
     sanitation_budgets: validation/tests/release/Test-MIRSanitationBudgets.ps1
@@ -767,8 +768,8 @@ validation_tooling:
     localization_overrides: .mir/locales/overrides.json
     localization_generator: scripts/Update-MIRLocales.ps1
     localization_gate: validation/tests/docs/Test-MIRLocales.ps1
-    localization_core: scripts/localization/MIRLocalization.psm1
-    release_attestations: scripts/validation/ReleaseAttestations.ps1
+    localization_core: tools/lib/localization/MIRLocalization.psm1
+    release_attestations: tools/lib/validation/ReleaseAttestations.ps1
     runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1

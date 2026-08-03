@@ -96,7 +96,7 @@ The broad skip/warn/prefer/allow native-modifier policy is deferred from `v2.1.0
 The broad mod-portal audit is local/manual because it can require Factorio credentials, large third-party downloads, and a local Factorio binary. The committed surfaces are:
 
 - `scripts/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
-- `scripts/MIRCompatAudit/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
+- `tools/lib/compatibility/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
 - `scripts/Invoke-MIRExtendedTests.ps1`: tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat runs.
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
