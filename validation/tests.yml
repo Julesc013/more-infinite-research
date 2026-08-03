@@ -165,7 +165,7 @@
         ".mir/museum-targets.json",
         "fixtures/museum/synthetic-installation/**",
         "tools/lib/museum/**",
-        "scripts/Build-MIRMuseumTarget.ps1",
+        "tools/commands/museum/Build-MIRMuseumTarget.ps1",
         "validation/tests/runtime/Test-MIRMuseumCompiler.ps1"
       ]
     },
@@ -180,7 +180,7 @@
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
         "tools/lib/museum/**",
-        "scripts/Build-MIRMuseumTarget.ps1",
+        "tools/commands/museum/Build-MIRMuseumTarget.ps1",
         "validation/tests/runtime/Test-MIRMuseumRuntime.ps1",
         "validation/tests/runtime/Test-MIRMuseumExact.ps1"
       ]

@@ -49,6 +49,10 @@ paths:
   tools.commands.compatibility.profile-stub: tools/commands/compatibility/New-MIRCompatProfileStub.ps1
   tools.commands.compatibility.line-adapter: tools/commands/compatibility/New-MIRFactorioLineTestAdapter.ps1
   tools.commands.compatibility.interaction-graph: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
+  tools.commands.museum: tools/commands/museum
+  tools.commands.museum.build: tools/commands/museum/Build-MIRMuseumTarget.ps1
+  tools.commands.museum.qualification: tools/commands/museum/New-MIRMuseumQualification.ps1
+  tools.commands.museum.seal: tools/commands/museum/New-MIRMuseumSeal.ps1
   tools.commands.technology: tools/commands/technology
   tools.commands.technology.design-diff: tools/commands/technology/Compare-MIRTechnologyDesigns.ps1
   tools.commands.technology.preview-export: tools/commands/technology/Export-MIRCompilerPreview.ps1

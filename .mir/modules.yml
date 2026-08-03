@@ -660,6 +660,7 @@ validation_tooling:
     repository_control_command_migrator: tools/maintenance/Move-MIRControlCommands.ps1
     repository_authority_command_migrator: tools/maintenance/Move-MIRAuthorityCommands.ps1
     repository_compatibility_command_migrator: tools/maintenance/Move-MIRCompatibilityCommands.ps1
+    repository_museum_command_migrator: tools/maintenance/Move-MIRMuseumCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -729,12 +730,12 @@ validation_tooling:
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation
     museum_compiler: tools/lib/museum/MuseumCompiler.psm1
-    museum_build: scripts/Build-MIRMuseumTarget.ps1
+    museum_build: tools/commands/museum/Build-MIRMuseumTarget.ps1
     museum_static_gate: validation/tests/runtime/Test-MIRMuseumCompiler.ps1
     museum_exact_runtime_gate: validation/tests/runtime/Test-MIRMuseumExact.ps1
     museum_runtime_gate: validation/tests/runtime/Test-MIRMuseumRuntime.ps1
-    museum_qualification: scripts/New-MIRMuseumQualification.ps1
-    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
+    museum_qualification: tools/commands/museum/New-MIRMuseumQualification.ps1
+    museum_seal_writer: tools/commands/museum/New-MIRMuseumSeal.ps1
     museum_seal_check: validation/tests/runtime/Test-MIRMuseumSeal.ps1
     backport_source_lock: validation/tests/release/Test-MIRBackportSourceLock.ps1
     backport_reconstruction_contract: .mir/backports/2.5.0.json

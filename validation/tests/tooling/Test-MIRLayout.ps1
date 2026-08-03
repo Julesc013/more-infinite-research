@@ -109,6 +109,15 @@ foreach ($compatibilityAlias in @(
     $_.from -eq $compatibilityAlias.from -and $_.to -eq $compatibilityAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical compatibility-command alias is missing or writable: $($compatibilityAlias.from)" }
 }
+foreach ($museumAlias in @(
+  @{from=("scripts/" + "Build-MIRMuseumTarget.ps1");to="tools.commands.museum.build"},
+  @{from=("scripts/" + "New-MIRMuseumQualification.ps1");to="tools.commands.museum.qualification"},
+  @{from=("scripts/" + "New-MIRMuseumSeal.ps1");to="tools.commands.museum.seal"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $museumAlias.from -and $_.to -eq $museumAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical museum-command alias is missing or writable: $($museumAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -213,6 +222,11 @@ if ($compatibilityCommandMigrationPreview.mode -ne "preview" -or $compatibilityC
     $compatibilityCommandMigrationPreview.commands -ne 5) {
   throw "Compatibility-command migration is incomplete or not idempotent: $($compatibilityCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$museumCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRMuseumCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($museumCommandMigrationPreview.mode -ne "preview" -or $museumCommandMigrationPreview.changed -ne 0 -or
+    $museumCommandMigrationPreview.commands -ne 3) {
+  throw "Museum-command migration is incomplete or not idempotent: $($museumCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -310,6 +324,17 @@ foreach ($wrapperPath in $legacyCompatibilityCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 60) {
     throw "Legacy compatibility command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyMuseumCommands = @(
+  (Join-Path $repo "scripts/Build-MIRMuseumTarget.ps1"),
+  (Join-Path $repo "scripts/New-MIRMuseumQualification.ps1"),
+  (Join-Path $repo "scripts/New-MIRMuseumSeal.ps1")
+)
+foreach ($wrapperPath in $legacyMuseumCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 25) {
+    throw "Legacy museum command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

@@ -12,14 +12,9 @@ param(
   [int]$TimeoutSeconds = 180,
   [string]$EvidenceRoot = ""
 )
-# Canonical validation scripts live three levels below the repository root.
-# Keep the former scripts/ base explicit while tooling internals complete L5.
-$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
-$MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
-
 $ErrorActionPreference = "Stop"
-$repo = Resolve-Path (Join-Path $MirLegacyScriptRoot "..")
-Import-Module (Join-Path $MirLegacyScriptRoot "Museum\MuseumCompiler.psm1") -Force
+$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
+Import-Module (Join-Path $repo "tools\lib\museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $target = Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion
 $installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $InstallationRoot -RegistryPath $RegistryPath

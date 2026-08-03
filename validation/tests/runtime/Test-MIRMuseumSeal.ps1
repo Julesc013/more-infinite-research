@@ -6,14 +6,9 @@ param(
   [string]$InstallationRoot = "",
   [string]$RegistryPath = ""
 )
-# Canonical validation scripts live three levels below the repository root.
-# Keep the former scripts/ base explicit while tooling internals complete L5.
-$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
-$MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
-
 $ErrorActionPreference = "Stop"
-$repo = Resolve-Path (Join-Path $MirLegacyScriptRoot "..")
-Import-Module (Join-Path $MirLegacyScriptRoot "Museum\MuseumCompiler.psm1") -Force
+$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
+Import-Module (Join-Path $repo "tools\lib\museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $target = Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion
 $installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $InstallationRoot -RegistryPath $RegistryPath
@@ -49,8 +44,8 @@ if ([string]$seal.mir_version -ne [string]$target.version -or [string]$seal.targ
 $profileText = ($target | ConvertTo-Json -Depth 30 -Compress)
 $harnessPaths = @(
   ".mir\canonical-lower-features.json", ".mir\museum-targets.json", "tools\lib\museum\MuseumCompiler.psm1",
-  "scripts\Build-MIRMuseumTarget.ps1", "validation\tests\runtime\Test-MIRMuseumCompiler.ps1", "validation\tests\runtime\Test-MIRMuseumRuntime.ps1",
-  "scripts\New-MIRMuseumQualification.ps1", "scripts\New-MIRMuseumSeal.ps1", "validation\tests\runtime\Test-MIRMuseumSeal.ps1"
+  "tools\commands\museum\Build-MIRMuseumTarget.ps1", "validation\tests\runtime\Test-MIRMuseumCompiler.ps1", "validation\tests\runtime\Test-MIRMuseumRuntime.ps1",
+  "tools\commands\museum\New-MIRMuseumQualification.ps1", "tools\commands\museum\New-MIRMuseumSeal.ps1", "validation\tests\runtime\Test-MIRMuseumSeal.ps1"
 )
 $sourcePaths = @("info.json", "config.lua", "data.lua", "locale\en\more-infinite-research.cfg", ".mir\museum\stream-manifest.json", ".mir\museum\balance.json")
 if ([string]$seal.target_profile_sha256 -ne (Get-StringSha256 ($profileText + "`n")) -or

@@ -178,6 +178,18 @@ aliases:
     to: tools.commands.compatibility.interaction-graph
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Build-MIRMuseumTarget.ps1
+    to: tools.commands.museum.build
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRMuseumQualification.ps1
+    to: tools.commands.museum.qualification
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/New-MIRMuseumSeal.ps1
+    to: tools.commands.museum.seal
+    mode: read-only
+    introduced: 3.2.5
   - from: scripts/Compare-MIRTechnologyDesigns.ps1
     to: tools.commands.technology.design-diff
     mode: read-only

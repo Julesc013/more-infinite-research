@@ -5,14 +5,9 @@ param(
   [string]$RegistryPath = "",
   [int]$TimeoutSeconds = 180
 )
-# Canonical validation scripts live three levels below the repository root.
-# Keep the former scripts/ base explicit while tooling internals complete L5.
-$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
-$MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
-
 $ErrorActionPreference = "Stop"
-$repo = Resolve-Path (Join-Path $MirLegacyScriptRoot "..")
-Import-Module (Join-Path $MirLegacyScriptRoot "Museum\MuseumCompiler.psm1") -Force
+$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
+Import-Module (Join-Path $repo "tools\lib\museum\MuseumCompiler.psm1") -Force
 $catalog = Get-MIRMuseumCatalog -Path (Join-Path $repo ".mir\museum-targets.json")
 $selected = if ($FactorioVersion -eq "all") { @($catalog.targets) } else { @(Get-MIRMuseumTarget -Catalog $catalog -FactorioVersion $FactorioVersion) }
 if ($selected.Count -gt 1 -and -not [string]::IsNullOrWhiteSpace($InstallationRoot)) {
@@ -24,7 +19,7 @@ foreach ($target in $selected) {
   $targetRoot = if ($selected.Count -eq 1) { $InstallationRoot } else { "" }
   $installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $targetRoot -RegistryPath $RegistryPath
   $package = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir ".work\build\museum-exact\packages"
-  $runtimeJson = & (Join-Path $MirLegacyScriptRoot "Test-MIRMuseumRuntime.ps1") `
+  $runtimeJson = & (Join-Path $repo "validation\tests\runtime\Test-MIRMuseumRuntime.ps1") `
     -FactorioVersion ([string]$target.factorio) `
     -PackageMode zip `
     -Reload `
