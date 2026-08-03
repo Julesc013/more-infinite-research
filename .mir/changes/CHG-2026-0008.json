@@ -32,5 +32,11 @@
     "factorio-2.1": "canonical Control Plane implementation on dev",
     "factorio-2.0": "shared package-excluded governance and target-local plan verification; no legacy package change"
   },
-  "state": "planned"
+  "implementation_evidence": [
+    "validation/tests/tooling/Test-MIRControlPlane.ps1",
+    "validation/tests/tooling/Test-MIRLayout.ps1",
+    "validation/tests/tooling/Test-MIRPowerShellQuality.ps1",
+    ".work/output/control-plane-v5-plan.json"
+  ],
+  "state": "implemented"
 }

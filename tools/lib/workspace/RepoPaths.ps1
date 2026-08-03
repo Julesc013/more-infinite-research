@@ -181,6 +181,114 @@ function Test-MIRLayoutGlob {
   return $Path -match "^$regex$"
 }
 
+function Get-MIROwnershipPatternSpecificity {
+  param([Parameter(Mandatory)][string]$Pattern)
+
+  $normalized = $Pattern.Replace("\", "/")
+  $segments = @($normalized.Split("/") | Where-Object { $_ -ne "" })
+  $literal = [regex]::Replace($normalized, "[\*\?]", "")
+  return [pscustomobject][ordered]@{
+    literal_characters = $literal.Length
+    literal_segments = @($segments | Where-Object { $_ -notmatch "[\*\?]" }).Count
+    segment_count = $segments.Count
+    wildcard_count = [regex]::Matches($normalized, "\*\*|\*|\?").Count
+  }
+}
+
+function Resolve-MIRPathOwnership {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Ownership
+  )
+
+  $normalized = $Path.Replace("\", "/")
+  $compiledProperty = $Ownership.PSObject.Properties["__mir_compiled_ownership_rules"]
+  if ($null -eq $compiledProperty) {
+    $compiledRules = @(
+      foreach ($row in @($Ownership.owners)) {
+        $pattern = [string]$row.pattern
+        $regex = [Regex]::Escape($pattern).Replace("\*\*", "__MIR_DOUBLE_STAR__").Replace("\*", "[^/]*").Replace("__MIR_DOUBLE_STAR__", ".*")
+        $specificity = Get-MIROwnershipPatternSpecificity -Pattern $pattern
+        [pscustomobject][ordered]@{
+          row = $row
+          regex = "^$regex$"
+          literal_characters = $specificity.literal_characters
+          literal_segments = $specificity.literal_segments
+          segment_count = $specificity.segment_count
+          wildcard_count = $specificity.wildcard_count
+        }
+      }
+    )
+    Add-Member -InputObject $Ownership -MemberType NoteProperty -Name "__mir_compiled_ownership_rules" -Value $compiledRules
+    $compiledProperty = $Ownership.PSObject.Properties["__mir_compiled_ownership_rules"]
+  }
+  $matches = @(
+    foreach ($compiled in @($compiledProperty.Value)) {
+      if ($normalized -notmatch [string]$compiled.regex) { continue }
+      [pscustomobject][ordered]@{
+        row = $compiled.row
+        literal_characters = $compiled.literal_characters
+        literal_segments = $compiled.literal_segments
+        segment_count = $compiled.segment_count
+        wildcard_count = $compiled.wildcard_count
+      }
+    }
+  )
+  if ($matches.Count -eq 0) { return $null }
+
+  $ordered = @($matches | Sort-Object `
+    @{Expression="literal_characters";Descending=$true}, `
+    @{Expression="literal_segments";Descending=$true}, `
+    @{Expression="segment_count";Descending=$true}, `
+    @{Expression="wildcard_count";Descending=$false}, `
+    @{Expression={ [string]$_.row.pattern };Descending=$false})
+  $winner = $ordered[0]
+  $best = @($ordered | Where-Object {
+    $_.literal_characters -eq $winner.literal_characters -and
+    $_.literal_segments -eq $winner.literal_segments -and
+    $_.segment_count -eq $winner.segment_count -and
+    $_.wildcard_count -eq $winner.wildcard_count
+  })
+
+  if ($best.Count -eq 1) {
+    return [pscustomobject][ordered]@{
+      path = $normalized
+      module = [string]$best[0].row.module
+      writes = @($best[0].row.writes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      patterns = @([string]$best[0].row.pattern)
+      composed = $false
+      specificity = [pscustomobject][ordered]@{
+        literal_characters = $winner.literal_characters
+        literal_segments = $winner.literal_segments
+        segment_count = $winner.segment_count
+        wildcard_count = $winner.wildcard_count
+      }
+    }
+  }
+
+  $winningPatterns = @($best | ForEach-Object { [string]$_.row.pattern } | Sort-Object -Unique)
+  $composition = @(@($Ownership.compositions) | Where-Object {
+    $declared = @($_.patterns | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    ($declared -join "`n") -ceq ($winningPatterns -join "`n")
+  })
+  if ($composition.Count -ne 1) {
+    throw "Ambiguous equal-specificity ownership for '$normalized': $($winningPatterns -join ', ')."
+  }
+  return [pscustomobject][ordered]@{
+    path = $normalized
+    module = [string]$composition[0].module
+    writes = @($composition[0].writes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    patterns = $winningPatterns
+    composed = $true
+    specificity = [pscustomobject][ordered]@{
+      literal_characters = $winner.literal_characters
+      literal_segments = $winner.literal_segments
+      segment_count = $winner.segment_count
+      wildcard_count = $winner.wildcard_count
+    }
+  }
+}
+
 function Test-MIRPackagePath {
   param([Parameter(Mandatory)][string]$Path)
   if ($Path -in @("info.json", "changelog.txt", "thumbnail.png", "control.lua", "data.lua", "data-updates.lua", "data-final-fixes.lua", "settings.lua", "settings-updates.lua", "settings-final-fixes.lua", "README.md", "LICENSE")) {
@@ -229,12 +337,11 @@ function Get-MIRCanonicalTarget {
 
 function Get-MIRLayoutOwnership {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Ownership)
-  foreach ($row in @($Ownership.owners)) {
-    if (Test-MIRLayoutGlob -Path $Path -Pattern ([string]$row.pattern)) {
-      return [pscustomobject]@{
-        owner=[string]$row.module
-        writer=(@($row.writes | ForEach-Object { [string]$_ }) -join ",")
-      }
+  $resolved = Resolve-MIRPathOwnership -Path $Path -Ownership $Ownership
+  if ($null -ne $resolved) {
+    return [pscustomobject]@{
+      owner=[string]$resolved.module
+      writer=(@($resolved.writes) -join ",")
     }
   }
   return [pscustomobject]@{owner="unowned";writer="none"}

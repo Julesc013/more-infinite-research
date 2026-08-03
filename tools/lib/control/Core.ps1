@@ -1,3 +1,11 @@
+$mirOwnershipScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../workspace/RepoPaths.ps1")).Path
+$mirOwnershipModule = New-Module -Name MIRRepositoryOwnership -ArgumentList $mirOwnershipScript -ScriptBlock {
+  param([string]$ScriptPath)
+  . $ScriptPath
+  Export-ModuleMember -Function Resolve-MIRPathOwnership
+}
+Import-Module $mirOwnershipModule -Force -Function Resolve-MIRPathOwnership
+
 function Get-MIRCPRepoRoot {
   param([string]$RepoRoot = "")
   if ([string]::IsNullOrWhiteSpace($RepoRoot)) {

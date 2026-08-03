@@ -48,11 +48,54 @@ function Assert-MIRCPTaskGraph {
   $freshness = Read-MIRCPJson -Path ".mir/control-plane/freshness.json" -RepoRoot $repo
   $knownFreshness = @($freshness.classes.PSObject.Properties.Name)
   $owners = @((Get-MIRCPRecordSet -Kind changes -RepoRoot $repo).id) + @((Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo).id)
+  $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
+  $domains = Read-MIRCPJson -Path ".mir/control-plane/domains.json" -RepoRoot $repo
+  $domainIds = @($domains.domains | ForEach-Object { [string]$_.id })
+  $duplicateDomains = @($domainIds | Group-Object | Where-Object Count -gt 1)
+  if ($duplicateDomains.Count -gt 0) { throw "Duplicate semantic domains: $($duplicateDomains.Name -join ', ')." }
+  foreach ($domain in @($domains.domains)) {
+    $domainOwner = $domains.domain_owners.PSObject.Properties[[string]$domain.id]
+    if ($null -eq $domainOwner -or [string]::IsNullOrWhiteSpace([string]$domainOwner.Value)) {
+      throw "Semantic domain $($domain.id) has no declared owner."
+    }
+    foreach ($downstream in @($domain.downstream)) {
+      if ($domainIds -notcontains [string]$downstream) {
+        throw "Semantic domain $($domain.id) has unknown downstream domain $downstream."
+      }
+    }
+  }
+  $knownObligations = @($changes | ForEach-Object { @($_.test_obligations) } | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  foreach ($alias in @($domains.obligation_aliases.PSObject.Properties)) {
+    if ($domainIds -notcontains [string]$alias.Name -and $knownObligations -notcontains [string]$alias.Name) {
+      throw "Obligation alias source '$($alias.Name)' is not a semantic domain or declared change obligation."
+    }
+    foreach ($target in @($alias.Value)) {
+      if (-not $map.ContainsKey([string]$target)) { throw "Obligation alias '$($alias.Name)' targets unknown TaskNode $target." }
+    }
+  }
+  $ownership = Read-MIRCPJson -Path ".mir/control-plane/ownership.json" -RepoRoot $repo
+  foreach ($rule in @($ownership.owners)) {
+    foreach ($domain in @($rule.writes)) {
+      if ($domainIds -notcontains [string]$domain) {
+        throw "Ownership rule $($rule.pattern) writes unknown semantic domain $domain."
+      }
+    }
+  }
+  foreach ($composition in @($ownership.compositions)) {
+    foreach ($domain in @($composition.writes)) {
+      if ($domainIds -notcontains [string]$domain) {
+        throw "Ownership composition $($composition.module) writes unknown semantic domain $domain."
+      }
+    }
+  }
   foreach ($task in $tasks) {
     Assert-MIRCPRequiredProperties -Record $task -Names @("schema", "id", "owner", "kind", "layer", "depends_on", "reads", "writes", "effective_inputs", "outputs", "resource_class", "freshness", "side_effect", "retry", "completion_proof", "state") -Context "TaskNode"
     if ([string]$task.id -notmatch '^[a-z0-9][a-z0-9.-]+$') { throw "Invalid TaskNode id: $($task.id)" }
     if ($owners -notcontains [string]$task.owner) { throw "TaskNode $($task.id) has unknown owner $($task.owner)." }
     if ($knownFreshness -notcontains [string]$task.freshness) { throw "TaskNode $($task.id) uses unknown freshness $($task.freshness)." }
+    foreach ($domain in @($task.reads) + @($task.writes)) {
+      if ($domainIds -notcontains [string]$domain) { throw "TaskNode $($task.id) references unknown semantic domain $domain." }
+    }
     foreach ($dependency in @($task.depends_on)) {
       if (-not $map.ContainsKey([string]$dependency)) { throw "TaskNode $($task.id) depends on unknown node $dependency." }
       if ([string]$dependency -eq [string]$task.id) { throw "TaskNode $($task.id) depends on itself." }
@@ -118,12 +161,11 @@ function Get-MIRCPSemanticImpact {
   $direct = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   $unknown = [Collections.Generic.List[string]]::new()
   foreach ($path in $ChangedPaths) {
-    $matches = @($ownership.owners | Where-Object { Test-MIRCPOwnershipPattern -Path $path -Pattern ([string]$_.pattern) })
-    if ($matches.Count -eq 0) { $unknown.Add($path); continue }
-    foreach ($match in $matches) {
-      [void]$modules.Add([string]$match.module)
-      foreach ($domain in @($match.writes)) { [void]$direct.Add([string]$domain) }
-    }
+    try { $match = Resolve-MIRPathOwnership -Path $path -Ownership $ownership }
+    catch { $unknown.Add($path); continue }
+    if ($null -eq $match) { $unknown.Add($path); continue }
+    [void]$modules.Add([string]$match.module)
+    foreach ($domain in @($match.writes)) { [void]$direct.Add([string]$domain) }
   }
   $affected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   foreach ($domain in $direct) { [void]$affected.Add($domain) }

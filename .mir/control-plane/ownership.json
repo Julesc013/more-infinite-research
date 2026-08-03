@@ -2,6 +2,8 @@
   "schema": 1,
   "authority": "mir-control-plane-v5-ownership",
   "unknown_policy": "select-all-and-fail-governance",
+  "selection_policy": "most-specific-pattern-wins",
+  "compositions": [],
   "owners": [
     {"pattern": ".gitattributes", "module": "repository-policy", "writes": ["architecture.boundaries"]},
     {"pattern": ".gitignore", "module": "repository-policy", "writes": ["architecture.boundaries"]},
