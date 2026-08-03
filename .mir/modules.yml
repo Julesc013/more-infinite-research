@@ -651,6 +651,7 @@ validation_tooling:
     repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
+    maintainer_cli_support: tools/lib/cli
     control_plane_policy: .mir/control-plane/control-plane.json
     control_plane_candidate_closure_schema: spec/schemas/candidate-closure.schema.json
     control_plane_candidate_closures: .mir/candidate-closures

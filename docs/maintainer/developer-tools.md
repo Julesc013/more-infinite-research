@@ -148,7 +148,7 @@ Example target-plan workflow:
 Private helpers:
 
 ```text
-scripts/MIRCli/*.ps1
+tools/lib/cli/*.ps1
 tools/lib/compatibility/*.ps1
 ```
 
@@ -190,7 +190,7 @@ Keep the system boring:
 mir.ps1 = user-facing command names
 run profiles = reusable defaults
 existing scripts = engines
-MIRCli = small private helper folder
+CLI helpers = small private library under tools/lib/cli
 ```
 
 Do not add more scenario types, reports, or framework modules until a real repeated pain point requires them.

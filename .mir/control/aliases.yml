@@ -78,6 +78,10 @@ aliases:
     to: tools.lib.assurance
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/MIRCli/
+    to: tools.lib.cli
+    mode: read-only
+    introduced: 3.2.5
   - from: scripts/MIRCompatAudit/
     to: tools.lib.compatibility
     mode: read-only

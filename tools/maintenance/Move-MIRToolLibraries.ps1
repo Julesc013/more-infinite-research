@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 $utf8NoBom = [Text.UTF8Encoding]::new($false)
 $roots = [ordered]@{
   "scripts/MIRAssurance" = "tools/lib/assurance"
+  "scripts/MIRCli" = "tools/lib/cli"
   "scripts/MIRCompatAudit" = "tools/lib/compatibility"
   "scripts/MIRControlPlane" = "tools/lib/control"
   "scripts/localization" = "tools/lib/localization"
@@ -105,6 +106,14 @@ $referenceFiles = @()
 foreach ($file in Get-MIRActiveToolFiles) {
   $text = Get-Content -Raw -LiteralPath $file.FullName
   $updated = $text
+  $updated = $updated.Replace(
+    '(Join-Path $PSScriptRoot "MIRCli\',
+    '(Join-Path $repo "tools\lib\cli\'
+  )
+  $updated = $updated.Replace(
+    '(Join-Path $scriptRoot "MIRCli\',
+    '(Join-Path $repo "tools\lib\cli\'
+  )
   foreach ($fromRoot in $roots.Keys) {
     $toRoot = $roots[$fromRoot]
     $updated = $updated.Replace($fromRoot, $toRoot)

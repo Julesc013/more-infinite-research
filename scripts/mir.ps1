@@ -7,10 +7,10 @@ $ErrorActionPreference = "Stop"
 
 $scriptRoot = $PSScriptRoot
 $repo = Resolve-Path (Join-Path $scriptRoot "..")
-. (Join-Path $scriptRoot "MIRCli\Console.ps1")
-. (Join-Path $scriptRoot "MIRCli\PathResolver.ps1")
-. (Join-Path $scriptRoot "MIRCli\LocalModIndex.ps1")
-. (Join-Path $scriptRoot "MIRCli\Reports.ps1")
+. (Join-Path $repo "tools\lib\cli\Console.ps1")
+. (Join-Path $repo "tools\lib\cli\PathResolver.ps1")
+. (Join-Path $repo "tools\lib\cli\LocalModIndex.ps1")
+. (Join-Path $repo "tools\lib\cli\Reports.ps1")
 
 function Show-MIRHelp {
   Write-Host @"

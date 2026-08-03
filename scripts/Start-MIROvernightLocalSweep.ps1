@@ -19,10 +19,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
-. (Join-Path $PSScriptRoot "MIRCli\RunContext.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\EventLog.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\Artifacts.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\Reports.ps1")
+. (Join-Path $repo "tools\lib\cli\RunContext.ps1")
+. (Join-Path $repo "tools\lib\cli\EventLog.ps1")
+. (Join-Path $repo "tools\lib\cli\Artifacts.ps1")
+. (Join-Path $repo "tools\lib\cli\Reports.ps1")
 
 Set-Location -LiteralPath $repo
 

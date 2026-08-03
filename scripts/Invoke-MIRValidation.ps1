@@ -1363,11 +1363,11 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
   $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1")
   $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
-  $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\Console.ps1")
-  $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\RunContext.ps1")
-  $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\EventLog.ps1")
-  $processSupervisorText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\ProcessSupervisor.ps1")
-  $localModIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\LocalModIndex.ps1")
+  $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\Console.ps1")
+  $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\RunContext.ps1")
+  $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\EventLog.ps1")
+  $processSupervisorText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\ProcessSupervisor.ps1")
+  $localModIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\LocalModIndex.ps1")
   $powershellQualityText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\tooling\Test-MIRPowerShellQuality.ps1")
   $runProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\release-targeted.json")
   $localAuditProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\local-audit-2.1.json")
@@ -1508,11 +1508,11 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
     @{ File = "validation\tests\tooling\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "possible secret output" },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = "Test-MIRPowerShellQuality.ps1" },
-    @{ File = "scripts\MIRCli\Console.ps1"; Text = $consoleText; Snippet = "Write-MIRScenarioResult" },
-    @{ File = "scripts\MIRCli\RunContext.ps1"; Text = $runContextText; Snippet = "run-manifest.json" },
-    @{ File = "scripts\MIRCli\EventLog.ps1"; Text = $eventLogText; Snippet = "events.jsonl" },
-    @{ File = "scripts\MIRCli\ProcessSupervisor.ps1"; Text = $processSupervisorText; Snippet = "Invoke-MIRProcess" },
-    @{ File = "scripts\MIRCli\LocalModIndex.ps1"; Text = $localModIndexText; Snippet = "New-MIRLocalModIndex" },
+    @{ File = "tools\lib\cli\Console.ps1"; Text = $consoleText; Snippet = "Write-MIRScenarioResult" },
+    @{ File = "tools\lib\cli\RunContext.ps1"; Text = $runContextText; Snippet = "run-manifest.json" },
+    @{ File = "tools\lib\cli\EventLog.ps1"; Text = $eventLogText; Snippet = "events.jsonl" },
+    @{ File = "tools\lib\cli\ProcessSupervisor.ps1"; Text = $processSupervisorText; Snippet = "Invoke-MIRProcess" },
+    @{ File = "tools\lib\cli\LocalModIndex.ps1"; Text = $localModIndexText; Snippet = "New-MIRLocalModIndex" },
     @{ File = "fixtures\run-profiles\release-targeted.json"; Text = $runProfileText; Snippet = '"kind": "release-targeted"' },
     @{ File = "fixtures\run-profiles\release-targeted-2.0.json"; Text = $releaseTargeted20ProfileText; Snippet = '"factorio_line": "2.0"' },
     @{ File = "fixtures\run-profiles\overnight-local-2.0.json"; Text = $overnight20ProfileText; Snippet = '"factorio_line": "2.0"' },
@@ -1575,7 +1575,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "README.md"; Text = $readmeText; Snippet = (".\scripts" + "\mir.ps1 audit local") },
     @{ File = "README.md"; Text = $readmeText; Snippet = "docs/maintainer/developer-tools.md" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
-    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
+    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "tools/lib/cli/*.ps1" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Test-MIRPowerShellQuality.ps1" }
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Test-MIRLocalModLibraryCatalog.ps1" }
   )

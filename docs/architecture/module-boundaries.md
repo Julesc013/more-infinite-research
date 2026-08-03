@@ -15,7 +15,7 @@ Updated: 2026-07-24
 
 This note refines the `3.0.0` compatibility compiler plan into a concrete repository structure. The organizing rule is:
 
-The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. Canonical test implementations live under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files are parameter-compatible forwarding wrappers for historical commands only. Canonical assurance, compatibility, control-plane, localization, museum, and validation libraries live under `tools/lib/<domain>/`; their former `scripts/` modules only dot-source the canonical implementation for historical imports. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
+The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. Canonical test implementations live under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files are parameter-compatible forwarding wrappers for historical commands only. Canonical assurance, CLI, compatibility, control-plane, localization, museum, and validation libraries live under `tools/lib/<domain>/`; their former `scripts/` modules only dot-source the canonical implementation for historical imports. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
 
 ```text
 Factorio root files stay thin.
