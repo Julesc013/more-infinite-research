@@ -1,0 +1,56 @@
+schema: 1
+authority: mir-repository-path-aliases-v1
+
+aliases:
+  - from: approved-delta/
+    to: releases.deltas
+    mode: historical-read-only
+    introduced: 3.2.5
+  - from: .mir/candidate-closures/
+    to: releases.closures
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/release-transitions/
+    to: releases.transitions
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/backports/
+    to: releases.backports
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/generated/
+    to: views.root
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/changes/
+    to: lifecycle.changes
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/incidents/
+    to: lifecycle.incidents
+    mode: read-only
+    introduced: 3.2.5
+  - from: .mir/tasks/
+    to: lifecycle.tasks
+    mode: read-only
+    introduced: 3.2.5
+  - from: verification/schema/
+    to: spec.schemas
+    mode: read-only
+    introduced: 3.2.5
+  - from: artifacts/
+    to: workspace.artifacts
+    mode: local-read-only
+    introduced: 3.2.5
+  - from: build/
+    to: workspace.build
+    mode: local-read-only
+    introduced: 3.2.5
+  - from: out/
+    to: workspace.output
+    mode: local-read-only
+    introduced: 3.2.5
+  - from: tmp/
+    to: workspace.tmp
+    mode: local-read-only
+    introduced: 3.2.5

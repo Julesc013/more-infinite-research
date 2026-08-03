@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -43,3 +43,4 @@ Initial ADR set:
 - `0026`: Runtime and qualification environments.
 - `0027`: Compiler schema compatibility.
 - `0028`: MIR 3.2.5 convergence release.
+- `0029`: Dual-plane repository, logical paths, and historical aliases.

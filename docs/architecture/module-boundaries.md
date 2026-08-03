@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-30
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -14,6 +14,8 @@ superseded_by: []
 Updated: 2026-07-24
 
 This note refines the `3.0.0` compatibility compiler plan into a concrete repository structure. The organizing rule is:
+
+The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
 
 ```text
 Factorio root files stay thin.

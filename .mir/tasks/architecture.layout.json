@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "architecture.layout",
+  "owner": "CHG-2026-0005",
+  "kind": "static",
+  "layer": "F0",
+  "depends_on": [],
+  "reads": [
+    "architecture.boundaries",
+    "assurance.control-plane"
+  ],
+  "writes": [],
+  "effective_inputs": [
+    "source:.mir/control/paths.yml",
+    "source:.mir/control/aliases.yml",
+    "source:.mir/control-plane/ownership.json",
+    "source:.mir/modules.yml",
+    "source:spec/architecture/repository-layout-v2.md",
+    "source:spec/schemas/*layout*.schema.json",
+    "source:spec/schemas/*path*.schema.json",
+    "source:tools/mir.ps1",
+    "source:tools/lib/workspace/**",
+    "source:tools/commands/workspace/**",
+    "source:validation/tests/tooling/Test-MIRLayout.ps1"
+  ],
+  "outputs": [
+    "result:architecture.layout"
+  ],
+  "resource_class": "disk-heavy",
+  "freshness": "content-eternal",
+  "side_effect": "temporary-files",
+  "retry": {
+    "maximum_attempts": 1,
+    "retryable": false
+  },
+  "completion_proof": {
+    "type": "structured-result",
+    "status": "passed"
+  },
+  "command": {
+    "executable": "pwsh",
+    "arguments": [
+      "-File",
+      "validation/tests/tooling/Test-MIRLayout.ps1"
+    ]
+  },
+  "command_scope": "source",
+  "state": "planned"
+}

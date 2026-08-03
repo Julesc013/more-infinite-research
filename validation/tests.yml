@@ -50,6 +50,26 @@
       ]
     },
     {
+      "id": "static.layout",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/tooling/Test-MIRLayout.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/paths.yml",
+        ".mir/control/aliases.yml",
+        ".mir/control-plane/ownership.json",
+        ".mir/modules.yml",
+        "spec/architecture/repository-layout-v2.md",
+        "spec/schemas/*layout*.schema.json",
+        "spec/schemas/*path*.schema.json",
+        "tools/mir.ps1",
+        "tools/lib/workspace/**",
+        "tools/commands/workspace/**",
+        "validation/tests/tooling/Test-MIRLayout.ps1"
+      ]
+    },
+    {
       "id": "static.compiler",
       "kind": "static",
       "layer": "F0",

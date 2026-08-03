@@ -586,6 +586,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-convergence-decision
+  - path: docs/adr/0029-dual-plane-repository.md
+    title: "ADR 0029: Dual-Plane Repository"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-dual-plane-repository
+      - mir-logical-repository-paths
   - path: docs/architecture/target-profiles.md
     title: "Target Capability Profiles"
     status: current

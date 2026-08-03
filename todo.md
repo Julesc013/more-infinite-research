@@ -18,6 +18,7 @@ Generated: 2026-08-03
 | `approved-delta.measurement` | `capture` | `planned` | package.identity, upgrade.measurement |
 | `architecture.dependencies` | `static` | `planned` |  |
 | `architecture.files` | `static` | `planned` |  |
+| `architecture.layout` | `static` | `planned` |  |
 | `assurance.self-test` | `static` | `planned` | harness.schemas |
 | `backport.contract` | `static` | `planned` |  |
 | `backport.reconstruction` | `transition` | `planned` | package.determinism, shadow.structural |
@@ -55,7 +56,7 @@ Generated: 2026-08-03
 | `settings.contract` | `static` | `planned` |  |
 | `shadow.equivalence` | `evaluation` | `planned` | seal |
 | `shadow.structural` | `evaluation` | `planned` | control-plane.records, scenario.registry |
-| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, balance.contract, museum.compiler, release-history.integrity, release.authority, backport.contract, harness.schemas, harness.quality, assurance.self-test, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context, executor.contract, release.controller, ci.workflow |
+| `static.full` | `aggregate` | `planned` | docs.schema, docs.generated, architecture.layout, architecture.files, architecture.dependencies, compiler.schema, compiler.contract, settings.contract, locale.contract, balance.contract, museum.compiler, release-history.integrity, release.authority, backport.contract, harness.schemas, harness.quality, assurance.self-test, scenario.registry, observation.evaluation, evidence.store, package.identity, package.composition, package.determinism, performance.contract, control-plane.records, verification.context, executor.contract, release.controller, ci.workflow |
 | `tag` | `promotion` | `planned` | promotion |
 | `upgrade.measurement` | `capture` | `planned` | package.identity, scenario.registry |
 | `verification.context` | `package` | `planned` |  |

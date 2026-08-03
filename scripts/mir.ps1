@@ -17,6 +17,10 @@ function Show-MIRHelp {
 MIR developer CLI
 
 Usage:
+  .\tools\mir.ps1 layout check [--strict] [--output <path>]
+  .\tools\mir.ps1 layout inventory [--output <path>]
+  .\tools\mir.ps1 path resolve <logical-id>
+  .\tools\mir.ps1 path resolve --path <historical-path>
   .\scripts\mir.ps1 docs check
   .\scripts\mir.ps1 architecture check
   .\scripts\mir.ps1 manifests check
@@ -383,6 +387,29 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "layout" {
+    if ($verb -notin @("check", "inventory")) { throw "Unknown layout command: $verb" }
+    $output = Get-MIRArgValue -Items $Args -Name "--output"
+    $params = @{
+      RepoRoot = $repo.Path
+      Strict = (Test-MIRArgSwitch -Items $Args -Name "--strict")
+      InventoryOnly = ($verb -eq "inventory")
+    }
+    if (-not [string]::IsNullOrWhiteSpace($output)) { $params.OutputPath = $output }
+    & (Join-Path $repo "tools/commands/workspace/Invoke-MIRLayoutCheck.ps1") @params
+  }
+  "path" {
+    if ($verb -ne "resolve") { throw "Unknown path command: $verb" }
+    $id = Get-MIRArgValue -Items $Args -Name "--id"
+    $path = Get-MIRArgValue -Items $Args -Name "--path"
+    if ([string]::IsNullOrWhiteSpace($id) -and [string]::IsNullOrWhiteSpace($path) -and $Args.Count -gt 2) {
+      $id = $Args[2]
+    }
+    $params = @{RepoRoot=$repo.Path}
+    if (-not [string]::IsNullOrWhiteSpace($id)) { $params.Id = $id }
+    if (-not [string]::IsNullOrWhiteSpace($path)) { $params.Path = $path }
+    & (Join-Path $repo "tools/commands/workspace/Resolve-MIRRepoPath.ps1") @params
+  }
   "verify" {
     $verifyCommand = switch ($verb) {
       "plan" { "plan" }

@@ -635,6 +635,17 @@ compiler_context:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    repository_path_catalog: .mir/control/paths.yml
+    repository_alias_catalog: .mir/control/aliases.yml
+    repository_path_catalog_schema: spec/schemas/repository-path-catalog.schema.json
+    repository_alias_catalog_schema: spec/schemas/path-alias-catalog.schema.json
+    repository_layout_manifest_schema: spec/schemas/layout-manifest.schema.json
+    repository_layout_specification: spec/architecture/repository-layout-v2.md
+    repository_path_resolver: tools/lib/workspace/RepoPaths.ps1
+    repository_layout_command: tools/commands/workspace/Invoke-MIRLayoutCheck.ps1
+    repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
+    repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
+    maintainer_cli: tools/mir.ps1
     control_plane_policy: .mir/control-plane/control-plane.json
     control_plane_candidate_closure_schema: verification/schema/candidate-closure.schema.json
     control_plane_candidate_closures: .mir/candidate-closures
@@ -765,6 +776,7 @@ validation_tooling:
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
+    - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
     - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
     - typed change incident task release and transition records are authoritative and human-readable status files are generated views
     - F0 through F4 are classification labels while the scheduler follows explicit task prerequisites and resource constraints
