@@ -568,7 +568,7 @@ switch ($area) {
       AllWorktrees = (Test-MIRArgSwitch -Items $Args -Name "--all-worktrees")
     }
     if ($verb -eq "clean" -and (Test-MIRArgSwitch -Items $Args -Name "--apply")) { $params.Apply = $true }
-    & (Join-Path $scriptRoot "Remove-MIRStaleArtifacts.ps1") @params
+    & (Join-Path $repo "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1") @params
   }
   "report" {
     switch ($verb) {
@@ -603,7 +603,7 @@ switch ($area) {
     if (Test-MIRArgSwitch -Items $Args -Name "--check") {
       $params.CheckThresholds = $true
     }
-    & (Join-Path $scriptRoot "Get-MIRLegacyInventory.ps1") @params
+    & (Join-Path $repo "tools/commands/workspace/Get-MIRLegacyInventory.ps1") @params
   }
   "profile" {
     if ($verb -ne "stub") { throw "Unknown profile command: $verb" }

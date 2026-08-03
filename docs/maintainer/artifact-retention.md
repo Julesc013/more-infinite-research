@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-27
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -22,9 +22,9 @@ Local validation must leave enough evidence to diagnose and summarize a run with
 | `C:\Projects\Factorio\qualification-installs` | Exact local runtime installation | Protected; never cleaned by repository tooling. |
 | `.mir/evidence/` | Tracked portable evidence | Governed release evidence; never cleaned as a local artifact. |
 | `dist/` tracked release archives | Release authority | Never cleaned as a local artifact. |
-| `artifacts/assurance/` | Content-addressed assurance and reuse evidence | Protected from stale-artifact cleanup. Prune only through its own evidence lifecycle. |
-| `artifacts/validation/` | Current validation diagnostics and failure packets | Protected from stale-artifact cleanup. |
-| Other `artifacts/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
+| `.work/artifacts/assurance/` | Content-addressed assurance and reuse evidence | Protected from stale-artifact cleanup. Prune only through its own evidence lifecycle. |
+| `.work/artifacts/validation/` | Current validation diagnostics and failure packets | Protected from stale-artifact cleanup. |
+| Other `.work/artifacts/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
 
 ## Audit And Cleanup
 
@@ -52,7 +52,7 @@ Delete completed ephemeral output immediately after inspection by setting the ag
 .\tools\mir.ps1 storage clean --older-than-days 0 --apply
 ```
 
-Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of an `artifacts` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
+Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of the canonical `.work/artifacts/` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. The deprecated `artifacts/` alias is read-only and is never a cleanup target. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
 
 ## Run Finalization
 

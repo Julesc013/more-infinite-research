@@ -14,15 +14,15 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
 $fixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-{0}" -f [guid]::NewGuid().ToString("N"))
-$cleanupScript = Join-Path $RepoRoot "scripts\Remove-MIRStaleArtifacts.ps1"
+$cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
 
 try {
   New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
   & git -C $fixtureRoot init --quiet
   if ($LASTEXITCODE -ne 0) { throw "Unable to initialize artifact-cleanup fixture repository." }
-  "/artifacts/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
+  "/.work/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
 
-  $artifactRoot = Join-Path $fixtureRoot "artifacts"
+  $artifactRoot = Join-Path $fixtureRoot ".work\artifacts"
   $protectedAssurance = Join-Path $artifactRoot "assurance"
   $protectedValidation = Join-Path $artifactRoot "validation"
   $staleRun = Join-Path $artifactRoot "stale-run"
@@ -47,7 +47,7 @@ try {
   }
   foreach ($protectedName in @("assurance", "validation")) {
     if (@($preview | Where-Object { $_.item -eq $protectedName -and $_.status -eq "protected" }).Count -ne 1) {
-      throw "Cleanup did not protect artifacts/$protectedName."
+      throw "Cleanup did not protect .work/artifacts/$protectedName."
     }
   }
 

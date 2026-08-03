@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
 # Developer Tools
 
-This repository has a small MIR developer test harness. It is not a separate product or a second framework. The goal is to keep common release, audit, package, and report tasks behind short commands while preserving the existing scripts as the implementation engines.
+This repository has a small MIR developer test harness. It is not a separate product or a second framework. The goal is to keep common release, audit, package, and report tasks behind short commands with implementations organized by domain under `tools/commands/` and reusable internals under `tools/lib/`.
 
 ## Preferred Commands
 
@@ -49,7 +49,7 @@ Common overrides:
 --profile <profile-name-or-path>
 ```
 
-`mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+`mir.ps1` delegates to canonical commands. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it. Historical `scripts/` command paths are parameter-compatible read-only wrappers during the 3.2.5 migration window.
 
 `storage audit` reports protected, recent, and cleanup-eligible artifact roots without deleting anything. `storage clean` is also a preview unless `--apply` is explicit. See [local artifact retention and storage](artifact-retention.md) for the protected storage classes, seven-day default, immediate post-run cleanup, hardlink accounting, and deletion safeguards.
 

@@ -162,7 +162,7 @@ if ($ArchitectureOnly) {
     & (Join-Path $repo "validation\tests\compiler\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
   }
   Invoke-RepoCheck "legacy inventory thresholds pass" {
-    & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
+    & (Join-Path $repo "tools\commands\workspace\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
   }
   exit 0
 }
@@ -335,7 +335,7 @@ Invoke-RepoCheck "settings visibility policy is linted" {
 }
 
 Invoke-RepoCheck "legacy inventory thresholds pass" {
-  & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
+  & (Join-Path $repo "tools\commands\workspace\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
 }
 
 Invoke-RepoCheck "no old tool-based science pack authority remains" {

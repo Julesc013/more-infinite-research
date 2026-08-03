@@ -34,6 +34,14 @@ foreach ($packageAlias in @(
     $_.from -eq $packageAlias.from -and $_.to -eq $packageAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical package-command alias is missing or writable: $($packageAlias.from)" }
 }
+foreach ($workspaceAlias in @(
+  @{from=("scripts/" + "Get-MIRLegacyInventory.ps1");to="tools.commands.workspace.inventory"},
+  @{from=("scripts/" + "Remove-MIRStaleArtifacts.ps1");to="tools.commands.workspace.cleanup"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $workspaceAlias.from -and $_.to -eq $workspaceAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical workspace-command alias is missing or writable: $($workspaceAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -103,6 +111,11 @@ if ($packageCommandMigrationPreview.mode -ne "preview" -or $packageCommandMigrat
     $packageCommandMigrationPreview.commands -ne 2) {
   throw "Package-command migration is incomplete or not idempotent: $($packageCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$workspaceCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRWorkspaceCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($workspaceCommandMigrationPreview.mode -ne "preview" -or $workspaceCommandMigrationPreview.changed -ne 0 -or
+    $workspaceCommandMigrationPreview.commands -ne 2) {
+  throw "Workspace-command migration is incomplete or not idempotent: $($workspaceCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -111,6 +124,16 @@ foreach ($wrapperPath in $legacyPackageCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 30) {
     throw "Legacy package command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyWorkspaceCommands = @(
+  (Join-Path $repo "scripts/Get-MIRLegacyInventory.ps1"),
+  (Join-Path $repo "scripts/Remove-MIRStaleArtifacts.ps1")
+)
+foreach ($wrapperPath in $legacyWorkspaceCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 35) {
+    throw "Legacy workspace command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

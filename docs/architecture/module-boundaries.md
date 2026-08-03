@@ -11,7 +11,7 @@ superseded_by: []
 ---
 # MIR 3.0.0 Repository Structure
 
-Updated: 2026-07-24
+Updated: 2026-08-03
 
 This note refines the `3.0.0` compatibility compiler plan into a concrete repository structure. The organizing rule is:
 
@@ -648,6 +648,8 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 `scripts/Invoke-MIRValidation.ps1` remains the stable validation facade. Reusable concerns live under `tools/lib/validation/`: package identity, target metadata, scenario grouping, structured evidence aggregation, and Factorio process/copied-mod handling. Extracted modules receive paths explicitly and must retain the facade's existing parameters, scenario names, group assignments, and schema-2 result contract.
 
 Deterministic package construction and composition reporting are canonical commands under `tools/commands/package/`. Their former `scripts/` entrypoints are parameter-compatible wrappers only. Source reconstruction resolves the canonical command first and falls back to the historical path only when the selected source commit predates this migration; this fallback preserves old release reconstruction without making the alias a current write authority.
+
+Repository inventory, path/layout inspection, and stale-workspace cleanup are canonical commands under `tools/commands/workspace/`. Cleanup is constrained to immediate, ignored children of `.work/artifacts/`; historical output-root aliases remain read-only and are never deletion authorities. Former `scripts/` entrypoints preserve parameters only and cannot own current behavior.
 
 The process module owns hidden process launch, timeout termination, safe copied-mod replacement, and release-shaped source copying. The settings-override module owns deterministic edits to the copied mod's declarative test override table. The scenario registry imports one target profile from the expected-scenario manifest, rejects duplicate or undeclared names, and resolves every gate, runtime, configuration-change, and package invocation through a target-bound declaration record. Scenario orchestration may call these modules but must not reimplement their operations inline.
 

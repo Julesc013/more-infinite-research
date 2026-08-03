@@ -38,6 +38,7 @@ function Get-MIRActiveFacadeReferenceFiles {
     $relative -notlike "docs/releases/*" -and
     $relative -ne "docs/architecture/3.3-2.6-semantic-platform-roadmap.md" -and
     $relative -ne "scripts/Get-MIRLegacyInventory.ps1" -and
+    $relative -ne "tools/commands/workspace/Get-MIRLegacyInventory.ps1" -and
     $relative -ne $legacyRelative -and
     $relative -ne $canonicalRelative -and
     $relative -notlike "tools/maintenance/*" -and

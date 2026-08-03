@@ -644,6 +644,8 @@ validation_tooling:
     repository_path_resolver: tools/lib/workspace/RepoPaths.ps1
     repository_layout_command: tools/commands/workspace/Invoke-MIRLayoutCheck.ps1
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
+    repository_legacy_inventory_command: tools/commands/workspace/Get-MIRLegacyInventory.ps1
+    repository_stale_artifact_command: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
     repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
@@ -651,6 +653,7 @@ validation_tooling:
     repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
     repository_cli_facade_migrator: tools/maintenance/Move-MIRCliFacade.ps1
     repository_package_command_migrator: tools/maintenance/Move-MIRPackageCommands.ps1
+    repository_workspace_command_migrator: tools/maintenance/Move-MIRWorkspaceCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
