@@ -308,7 +308,7 @@ function Invoke-MIRCompatPerformanceRun {
     [Parameter(Mandatory)][string]$PackageLabel,
     [Parameter(Mandatory)][string]$RunRoot
   )
-  $compatScript = Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1"
+  $compatScript = Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"
   $outputDir = Join-Path $RunRoot "compat"
   $logPath = Join-Path $RunRoot "compat-audit.log"
   $parameters = @{

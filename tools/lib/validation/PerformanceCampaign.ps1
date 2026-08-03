@@ -9,6 +9,7 @@ function Get-MIRPerformanceHarnessFiles {
     "validation/scenarios/local-2.1.json",
     "fixtures/performance-regression-probe",
     "scripts/Invoke-MIRCompatAudit.ps1",
+    "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
     "scripts/Measure-MIRPerformanceRegression.ps1",
     "tools/lib/compatibility",
     "tools/lib/validation/PackageIdentity.ps1",

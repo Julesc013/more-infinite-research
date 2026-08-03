@@ -112,11 +112,13 @@ $probePath = Join-Path $overlay.path ([string]$overlay.canonical_probe.path)
 $probeBytes = [IO.File]::ReadAllBytes($probePath)
 $sourceProbeText = [IO.File]::ReadAllText((Join-Path $performanceSource ([string]$overlay.canonical_probe.path))).Replace("`r`n", "`n").Replace("`r", "`n")
 $overlayStatus = @(& git -C $overlay.path status --porcelain --untracked-files=all)
-$compatAuditManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "scripts/Invoke-MIRCompatAudit.ps1" })
-$controllerCompatAuditSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$compatAuditWrapperManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "scripts/Invoke-MIRCompatAudit.ps1" })
+$controllerCompatAuditWrapperSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$compatAuditManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" })
+$controllerCompatAuditSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
 $performanceLibraryManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "tools/lib/validation/PerformanceCampaign.ps1" })
 $controllerPerformanceLibrarySha256 = Get-MIRCPSha256File -Path (Join-Path $repo "tools/lib/validation/PerformanceCampaign.ps1")
-$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
+$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
 $compatOutputResolveIndex = $compatAuditText.IndexOf('$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)', [StringComparison]::Ordinal)
 $compatOutputMaterializeIndex = $compatAuditText.IndexOf('$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir', [StringComparison]::Ordinal)
 $compatLockIndex = $compatAuditText.IndexOf('$lockPath = Join-Path $resolvedOutputDir "compat-candidates.lock.json"', [StringComparison]::Ordinal)
@@ -126,7 +128,10 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     $probeBytes -contains [byte]13 -or
     [string]$overlay.manifest_sha256 -notmatch '^[0-9A-F]{64}$' -or
     [string]$overlay.harness_sha256 -notmatch '^[0-9A-F]{64}$' -or
-    @($overlay.manifest.files).Count -ne 22 -or
+    @($overlay.manifest.files).Count -ne 23 -or
+    $compatAuditWrapperManifestRows.Count -ne 1 -or
+    [string]$compatAuditWrapperManifestRows[0].sha256 -ne $controllerCompatAuditWrapperSha256 -or
+    [string]$compatAuditWrapperManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
     $compatAuditManifestRows.Count -ne 1 -or
     [string]$compatAuditManifestRows[0].sha256 -ne $controllerCompatAuditSha256 -or
     [string]$compatAuditManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
@@ -134,10 +139,11 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     [string]$performanceLibraryManifestRows[0].sha256 -ne $controllerPerformanceLibrarySha256 -or
     [string]$performanceLibraryManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
     $compatOutputResolveIndex -lt 0 -or $compatOutputMaterializeIndex -le $compatOutputResolveIndex -or $compatLockIndex -le $compatOutputMaterializeIndex -or
-    $overlayStatus.Count -ne 22 -or
+    $overlayStatus.Count -ne 23 -or
     $overlayStatus -notcontains " M .mir/performance-campaign.json" -or
     $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua" -or
     $overlayStatus -notcontains " M scripts/Invoke-MIRCompatAudit.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" -or
     $overlayStatus -notcontains " M scripts/MIRCompatAudit/FactorioRunner.ps1" -or
     $overlayStatus -notcontains " M scripts/validation/PerformanceCampaign.ps1" -or
     $overlayStatus -notcontains "?? tools/lib/compatibility/FactorioRunner.ps1" -or

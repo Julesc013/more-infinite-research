@@ -509,6 +509,7 @@ function New-MIRCPPerformanceSourceOverlay {
   if ((Get-MIRCPSha256File -Path $overlayPath) -ne [string]$authority.sha256) { throw "Performance authority overlay changed the governed campaign bytes." }
   $controllerOverlayRelativePaths = @(
     "scripts/Invoke-MIRCompatAudit.ps1",
+    "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
     "scripts/MIRCompatAudit/DependencyResolver.ps1",
     "scripts/MIRCompatAudit/DiagnosticsParser.ps1",
     "scripts/MIRCompatAudit/FactorioRunner.ps1",

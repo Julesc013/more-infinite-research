@@ -122,9 +122,9 @@ Advanced engines:
 
 ```text
 scripts/Invoke-MIRExtendedTests.ps1
-scripts/Invoke-MIRCompatAudit.ps1
-scripts/Convert-MIRCompatAuditResults.ps1
-scripts/New-MIRCompatProfileStub.ps1
+tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1
+tools/commands/compatibility/New-MIRCompatProfileStub.ps1
 validation/tests/tooling/Test-MIRPolicyLints.ps1
 tools/commands/planner/Compare-MIRPlannerReports.ps1
 tools/commands/planner/Export-MIRPlannerSnapshot.ps1

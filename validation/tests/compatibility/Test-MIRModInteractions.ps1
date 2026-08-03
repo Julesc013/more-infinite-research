@@ -7,7 +7,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $tempPath = Join-Path ([IO.Path]::GetTempPath()) ("mir-mod-interaction-" + [guid]::NewGuid().ToString("N") + ".json")
 try {
-  & (Join-Path $RepoRoot "scripts\New-MIRModInteractionGraph.ps1") -OutputPath $tempPath
+  & (Join-Path $RepoRoot "tools\commands\compatibility\New-MIRModInteractionGraph.ps1") -OutputPath $tempPath
   $generated = Get-Content -Raw -LiteralPath $tempPath | ConvertFrom-Json
   $canonicalPath = Join-Path $RepoRoot ".mir\mod-interaction-graph.json"
   $canonical = Get-Content -Raw -LiteralPath $canonicalPath | ConvertFrom-Json

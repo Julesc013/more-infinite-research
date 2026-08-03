@@ -10194,7 +10194,7 @@
     "catalog": "validation/scenarios/runtime.json",
     "catalog_sha256": "F4A877BBD29276334A95AC5061F6D963CB73B937A6328B30C0F4F2F4FB5CB09A",
     "runner": "scripts/Invoke-MIRValidation.ps1",
-    "runner_sha256": "E632D9A6261779C9684CF25AAEDA772522E8C6C76B61FB90E1B7F30A14B935D1",
+    "runner_sha256": "1CACF2643F93F7FCE8C2140D20890100DECE05B20EE70FE3E0A8A5B4909DA41A",
     "unmatched_literal_scenarios": [
       "reduced-settings-surface"
     ]

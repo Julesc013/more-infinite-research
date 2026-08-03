@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-22
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -95,11 +95,11 @@ The broad skip/warn/prefer/allow native-modifier policy is deferred from `v2.1.0
 
 The broad mod-portal audit is local/manual because it can require Factorio credentials, large third-party downloads, and a local Factorio binary. The committed surfaces are:
 
-- `scripts/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
+- `tools/commands/compatibility/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
 - `tools/lib/compatibility/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
 - `scripts/Invoke-MIRExtendedTests.ps1`: tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat runs.
-- `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
-- `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
+- `tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
+- `tools/commands/compatibility/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `validation/scenarios/manual.json`: curated high-risk scenarios that should not be inferred from downloads alone.
 - `validation/scenarios/local-2.1.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
 - `validation/scenarios/local-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
@@ -117,7 +117,7 @@ Use `-FactorioLine 2.1` or `-FactorioLine 2.0` to keep one audit toolchain point
 Catalog and lockfile only:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -MinDownloads 10000 `
   -FactorioLine 2.1 `
   -FactorioVersions @("2.0", "2.1") `
@@ -127,7 +127,7 @@ Catalog and lockfile only:
 Download and load-test mode requires credentials and a local binary:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin "C:\path\to\factorio.exe" `
   -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
@@ -140,7 +140,7 @@ Download and load-test mode requires credentials and a local binary:
 Manual scenarios can now be executed with `-RunManualScenarios`:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin $env:FACTORIO_BIN `
   -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
@@ -159,7 +159,7 @@ Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSo
 Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -FromLockfile .\artifacts\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
   -FactorioLine 2.1 `
   -StartIndex 25 `
@@ -176,13 +176,13 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
 Grouped summaries and profile-candidate evidence are generated with:
 
 ```powershell
-.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\artifacts\compat-audit-manual
+.\tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1 -AuditDir .\artifacts\compat-audit-manual
 ```
 
 Review-only profile stubs can be generated from grouped failures:
 
 ```powershell
-.\scripts\New-MIRCompatProfileStub.ps1 `
+.\tools\commands\compatibility\New-MIRCompatProfileStub.ps1 `
   -GroupedFailures .\artifacts\compat-audit-manual\compat-failures.grouped.json `
   -GroupId FG0001
 ```

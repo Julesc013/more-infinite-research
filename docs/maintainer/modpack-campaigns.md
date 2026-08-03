@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -17,7 +17,7 @@ Run ecosystems independently before any combined stress scenario. A mega-smash c
 Use an exact MIR candidate archive and bind it to the source commit that produced it:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -RunManualScenarios `
   -ManualScenariosPath .\validation\scenarios\local-2.1.json `
   -ScenarioNames local-2-1-bz-suite-space-age `

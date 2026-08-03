@@ -619,7 +619,8 @@ docs:
     audience: maintainer
     doc_type: explanation
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - compatibility-audit-command
   - path: docs/architecture/automatic-family-compiler.md
     title: "Automatic Family Compiler"
     status: current
@@ -728,6 +729,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - semantic-mod-interaction-graph
+      - mod-interaction-graph-command
   - path: docs/reference/compiler-diagnostics.md
     title: "Compiler Diagnostic Codes"
     status: current
@@ -787,6 +789,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - architecture-overview
+      - compatibility-tooling-architecture
   - path: docs/archive/superseded/2.2.0-feature-intake.md
     title: "2.2.0 Feature Intake From The July 2026 Suggestion Transcript"
     status: archived
@@ -1297,6 +1300,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-model
+      - compatibility-command-workflows
   - path: docs/compatibility/backport-ledger.md
     title: "3.0.5 Backport Behavior Ledger"
     status: current
@@ -1403,7 +1407,8 @@ docs:
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - compatibility-command-routing
   - path: docs/maintainer/documentation-governance.md
     title: "Documentation Governance"
     status: current
@@ -2147,6 +2152,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - modpack-campaign-evidence-contract
+      - compatibility-audit-campaigns
   - path: docs/reference/reports/coverage-report.md
     title: "Coverage Report"
     status: current

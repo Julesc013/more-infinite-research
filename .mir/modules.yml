@@ -659,6 +659,7 @@ validation_tooling:
     repository_technology_command_migrator: tools/maintenance/Move-MIRTechnologyCommands.ps1
     repository_control_command_migrator: tools/maintenance/Move-MIRControlCommands.ps1
     repository_authority_command_migrator: tools/maintenance/Move-MIRAuthorityCommands.ps1
+    repository_compatibility_command_migrator: tools/maintenance/Move-MIRCompatibilityCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -761,6 +762,10 @@ validation_tooling:
     planner_snapshot_export: tools/commands/planner/Export-MIRPlannerSnapshot.ps1
     planner_snapshot_minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
     compatibility_pack_scaffold: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
+    compatibility_audit: tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+    compatibility_audit_results: tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1
+    compatibility_profile_stub: tools/commands/compatibility/New-MIRCompatProfileStub.ps1
+    compatibility_line_adapter: tools/commands/compatibility/New-MIRFactorioLineTestAdapter.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: tools/commands/technology/Export-MIRTechnologyCatalog.ps1
     compiler_preview_export: tools/commands/technology/Export-MIRCompilerPreview.ps1
@@ -776,7 +781,7 @@ validation_tooling:
     technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
     offline_rule_synthesis_gate: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
-    mod_interaction_graph: scripts/New-MIRModInteractionGraph.ps1
+    mod_interaction_graph: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
     mod_interaction_gate: validation/tests/compatibility/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
     approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1

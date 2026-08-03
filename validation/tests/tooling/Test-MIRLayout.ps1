@@ -98,6 +98,17 @@ foreach ($authorityAlias in @(
     $_.from -eq $authorityAlias.from -and $_.to -eq $authorityAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical authority-command alias is missing or writable: $($authorityAlias.from)" }
 }
+foreach ($compatibilityAlias in @(
+  @{from=("scripts/" + "Convert-MIRCompatAuditResults.ps1");to="tools.commands.compatibility.results"},
+  @{from=("scripts/" + "Invoke-MIRCompatAudit.ps1");to="tools.commands.compatibility.audit"},
+  @{from=("scripts/" + "New-MIRCompatProfileStub.ps1");to="tools.commands.compatibility.profile-stub"},
+  @{from=("scripts/" + "New-MIRFactorioLineTestAdapter.ps1");to="tools.commands.compatibility.line-adapter"},
+  @{from=("scripts/" + "New-MIRModInteractionGraph.ps1");to="tools.commands.compatibility.interaction-graph"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $compatibilityAlias.from -and $_.to -eq $compatibilityAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical compatibility-command alias is missing or writable: $($compatibilityAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -197,6 +208,11 @@ if ($authorityCommandMigrationPreview.mode -ne "preview" -or $authorityCommandMi
     $authorityCommandMigrationPreview.commands -ne 3) {
   throw "Authority-command migration is incomplete or not idempotent: $($authorityCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$compatibilityCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRCompatibilityCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($compatibilityCommandMigrationPreview.mode -ne "preview" -or $compatibilityCommandMigrationPreview.changed -ne 0 -or
+    $compatibilityCommandMigrationPreview.commands -ne 5) {
+  throw "Compatibility-command migration is incomplete or not idempotent: $($compatibilityCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -281,6 +297,19 @@ foreach ($wrapperPath in $legacyAuthorityCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 20) {
     throw "Legacy authority command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyCompatibilityCommands = @(
+  (Join-Path $repo "scripts/Convert-MIRCompatAuditResults.ps1"),
+  (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1"),
+  (Join-Path $repo "scripts/New-MIRCompatProfileStub.ps1"),
+  (Join-Path $repo "scripts/New-MIRFactorioLineTestAdapter.ps1"),
+  (Join-Path $repo "scripts/New-MIRModInteractionGraph.ps1")
+)
+foreach ($wrapperPath in $legacyCompatibilityCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 60) {
+    throw "Legacy compatibility command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

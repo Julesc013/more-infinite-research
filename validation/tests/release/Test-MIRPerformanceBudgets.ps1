@@ -288,7 +288,7 @@ if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budget
   throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
-$compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+$compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
 $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
 if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
     $durationProjectionCount -lt 2) {

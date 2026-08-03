@@ -346,7 +346,7 @@ try {
   if (-not $SkipBZSuite) {
     Invoke-MIRReleaseGateStep -Name "representative-local-scenario" -Action {
       $representativeDir = Join-Path $script:resolvedOutputRoot "representative-local-scenario"
-      & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
+      & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") `
         -FactorioBin $script:resolvedFactorioBin `
         -FactorioLine $FactorioLine `
         -FactorioVersions @($AuditFactorioVersions) `
@@ -364,7 +364,7 @@ try {
         -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
         -OutputDir $representativeDir
 
-      & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $representativeDir
+      & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $representativeDir
       Assert-MIRReleaseGateNoUnexpectedFailures -Name $RepresentativeScenarioName -AuditDir $representativeDir
     }
   }

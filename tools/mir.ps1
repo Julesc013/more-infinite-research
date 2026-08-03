@@ -611,7 +611,7 @@ switch ($area) {
     $groupId = $Args[2]
     $groupedFailures = Get-MIRArgValue -Items $Args -Name "--grouped-failures"
     if ([string]::IsNullOrWhiteSpace($groupedFailures)) { throw "--grouped-failures is required." }
-    & (Join-Path $scriptRoot "New-MIRCompatProfileStub.ps1") -GroupedFailures $groupedFailures -GroupId $groupId
+    & (Join-Path $repo "tools/commands/compatibility/New-MIRCompatProfileStub.ps1") -GroupedFailures $groupedFailures -GroupId $groupId
   }
   "run" {
     $profile = Get-MIRArgValue -Items $Args -Name "-Profile"

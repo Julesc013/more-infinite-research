@@ -258,8 +258,8 @@ function Invoke-MIRCompatAuditTier {
     $auditParams.Count = $ShardSize
   }
 
-  & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
-  & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+  & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") @auditParams
+  & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
   Assert-MIRNoAuditFailures -Name $Name -AuditDir $auditDir
 }
 
@@ -328,8 +328,8 @@ foreach ($entry in $expandedTiers) {
           OutputDir = $auditDir
         }
         if ($FailFast -and -not $CollectAll) { $auditParams.FailFast = $true }
-        & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
-        & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+        & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") @auditParams
+        & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
         Assert-MIRNoAuditFailures -Name "audit-smoke" -AuditDir $auditDir
       }
     }

@@ -82,7 +82,7 @@ foreach ($scope in $budgetSets.Keys) {
   }
 }
 
-$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
 foreach ($requiredDiagnosticsWiring in @(
   'Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine',
   'Enable-CopiedDiagnostics -ModsDir $modsDir',
