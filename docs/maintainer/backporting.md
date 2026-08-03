@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-02
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-08-02
+Updated: 2026-08-03
 
 ## Current 3.2/2.5 Release Roles
 
@@ -141,7 +141,7 @@ Rows other than the four live branch names are historical or future branch templ
 
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a Factorio `2.0` port can be validated while `dev` remains available for Factorio `2.1` fixes.
 
-Target capability classifications are centralized in `.mir/targets.json`. After retargeting `info.json` on a branch, run `.\scripts\Sync-MIRTargetProfiles.ps1` and commit the generated Lua view. PowerShell gates read the same manifest directly, and architecture validation rejects drift between the manifest, generated Lua, and current metadata.
+Target capability classifications are centralized in `.mir/targets.json`. After retargeting `info.json` on a current branch, run `.\tools\commands\targets\Sync-MIRTargetProfiles.ps1` and commit the generated Lua view. The backport materializer deliberately invokes the legacy wrapper inside immutable historical worktrees whose commits predate the canonical `tools/commands/targets/` path. PowerShell gates read the same manifest directly, and architecture validation rejects drift between the manifest, generated Lua, and current metadata.
 
 ## Immediate `2.2.0` To `1.9.2` Flow
 

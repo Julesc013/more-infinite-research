@@ -413,7 +413,7 @@ foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
 }
 
-& (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+& (Join-Path $repo "tools\commands\targets\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 if ($LASTEXITCODE -ne 0) {
   throw "Generated target profile validation failed with exit code $LASTEXITCODE."
 }

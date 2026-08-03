@@ -90,7 +90,7 @@
         "validation/tests/architecture/Test-MIRModuleDependencies.ps1",
         "validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1",
         "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1"
-        ,"scripts/Update-MIRCompilerAuthorities.ps1"
+        ,"tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
       ]
     },
     {
@@ -135,7 +135,7 @@
         ".mir/locales/**",
         "locale/**",
         "tools/lib/localization/**",
-        "scripts/Update-MIRLocales.ps1",
+        "tools/commands/localization/Update-MIRLocales.ps1",
         "validation/tests/docs/Test-MIRLocales.ps1",
         "prototypes/mir/settings/**",
         "prototypes/streams/**"

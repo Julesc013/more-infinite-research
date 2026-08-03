@@ -89,6 +89,15 @@ foreach ($controlAlias in @(
     $_.from -eq $controlAlias.from -and $_.to -eq $controlAlias.to -and $_.mode -eq "read-only"
   }).Count -ne 1) { throw "Historical control-command alias is missing or writable: $($controlAlias.from)" }
 }
+foreach ($authorityAlias in @(
+  @{from=("scripts/" + "Sync-MIRTargetProfiles.ps1");to="tools.commands.targets.sync"},
+  @{from=("scripts/" + "Update-MIRCompilerAuthorities.ps1");to="tools.commands.compiler.authorities"},
+  @{from=("scripts/" + "Update-MIRLocales.ps1");to="tools.commands.localization.update"}
+)) {
+  if (@($aliases.aliases | Where-Object {
+    $_.from -eq $authorityAlias.from -and $_.to -eq $authorityAlias.to -and $_.mode -eq "read-only"
+  }).Count -ne 1) { throw "Historical authority-command alias is missing or writable: $($authorityAlias.from)" }
+}
 
 $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
@@ -183,6 +192,11 @@ if ($controlCommandMigrationPreview.mode -ne "preview" -or $controlCommandMigrat
     $controlCommandMigrationPreview.commands -ne 7) {
   throw "Control-command migration is incomplete or not idempotent: $($controlCommandMigrationPreview | ConvertTo-Json -Compress)"
 }
+$authorityCommandMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRAuthorityCommands.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($authorityCommandMigrationPreview.mode -ne "preview" -or $authorityCommandMigrationPreview.changed -ne 0 -or
+    $authorityCommandMigrationPreview.commands -ne 3) {
+  throw "Authority-command migration is incomplete or not idempotent: $($authorityCommandMigrationPreview | ConvertTo-Json -Compress)"
+}
 $legacyPackageCommands = @(
   (Join-Path $repo "scripts/Build-MIRPackage.ps1"),
   (Join-Path $repo "scripts/Measure-MIRPackageComposition.ps1")
@@ -256,6 +270,17 @@ foreach ($wrapperPath in $legacyControlCommands) {
   $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
   if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 40) {
     throw "Legacy control command is not a thin parameter-compatible wrapper: $wrapperPath"
+  }
+}
+$legacyAuthorityCommands = @(
+  (Join-Path $repo "scripts/Sync-MIRTargetProfiles.ps1"),
+  (Join-Path $repo "scripts/Update-MIRCompilerAuthorities.ps1"),
+  (Join-Path $repo "scripts/Update-MIRLocales.ps1")
+)
+foreach ($wrapperPath in $legacyAuthorityCommands) {
+  $wrapperText = Get-Content -Raw -LiteralPath $wrapperPath
+  if ($wrapperText -notmatch "MIR-L5-LEGACY-COMMAND-WRAPPER" -or $wrapperText.Split([char]10).Count -gt 20) {
+    throw "Legacy authority command is not a thin parameter-compatible wrapper: $wrapperPath"
   }
 }
 $legacyLibraryNames = @(

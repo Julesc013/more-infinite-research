@@ -562,6 +562,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+      - authority-projection-command-boundaries
   - path: docs/releases/3.2.4-unified-research-cost-curves.md
     title: "MIR 3.2.4 Unified Research Cost Curves (Unpublished Candidate)"
     status: historical-checkpoint
@@ -603,6 +604,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - target-capability-profiles
+      - target-profile-projection-command
   - path: docs/architecture/factorio-lifecycle.md
     title: "Factorio Lifecycle Boundaries"
     status: current
@@ -751,6 +753,7 @@ docs:
     source_of_truth_for:
       - compiler-schema-authorities
       - compiler-schema-drift-policy
+      - compiler-authority-projection-command
   - path: docs/architecture/automatic-family-balance.md
     title: "Automatic Family Balance And Scope"
     status: current
@@ -1369,6 +1372,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - backporting-policy
+      - backport-target-profile-projection
   - path: docs/maintainer/backport-reconstruction.md
     title: "Deterministic Backport Reconstruction"
     status: current
@@ -1416,6 +1420,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - localization-governance
+      - localization-projection-command
   - path: docs/maintainer/fixture-workflow.md
     title: "Fixture Workflow"
     status: current

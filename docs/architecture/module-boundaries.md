@@ -17,6 +17,8 @@ This note refines the `3.0.0` compatibility compiler plan into a concrete reposi
 
 The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. Canonical test implementations live under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files are parameter-compatible forwarding wrappers for historical commands only. Canonical assurance, CLI, compatibility, control-plane, localization, museum, and validation libraries live under `tools/lib/<domain>/`; their former `scripts/` modules only dot-source the canonical implementation for historical imports. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
 
+Commands that project a machine authority into checked-in source are owned by the domain they project: target profiles under `tools/commands/targets/`, compiler authorities under `tools/commands/compiler/`, and locales under `tools/commands/localization/`. Their `scripts/` predecessors are thin parameter-compatible wrappers, not alternate implementations. The generated target-profile Lua deliberately retains its historical generator attribution until the C32 package source lock is bound, so this repository-only ownership move cannot change frozen candidate bytes. Immutable backport worktrees may still call the wrapper path that existed in their source commit.
+
 ```text
 Factorio root files stay thin.
 All meaningful shipped Lua lives under one MIR namespace.

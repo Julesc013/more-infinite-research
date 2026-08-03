@@ -214,6 +214,18 @@ aliases:
     to: tools.commands.control.shadow-baselines
     mode: read-only
     introduced: 3.2.5
+  - from: scripts/Sync-MIRTargetProfiles.ps1
+    to: tools.commands.targets.sync
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRCompilerAuthorities.ps1
+    to: tools.commands.compiler.authorities
+    mode: read-only
+    introduced: 3.2.5
+  - from: scripts/Update-MIRLocales.ps1
+    to: tools.commands.localization.update
+    mode: read-only
+    introduced: 3.2.5
   - from: artifacts/
     to: workspace.artifacts
     mode: local-read-only

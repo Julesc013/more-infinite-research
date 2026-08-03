@@ -17,7 +17,7 @@ This table names one machine authority, validator, and reference contract for ea
 | Surface | Schema | Machine authority | Validator | Primary consumer |
 | --- | ---: | --- | --- | --- |
 | Effect metadata | 1 | `prototypes/mir/domain/effects/metadata.lua` | `validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1` | effect contracts, settings, ownership, emission |
-| Effect target contracts | 1 | `.mir/technology-effect-targets.json` and generated `domain/effects/generated_target_contracts.lua` | `Update-MIRCompilerAuthorities.ps1 -Check` | pure target identity and validation contracts |
+| Effect target contracts | 1 | `.mir/technology-effect-targets.json` and generated `domain/effects/generated_target_contracts.lua` | `tools/commands/compiler/Update-MIRCompilerAuthorities.ps1 -Check` | pure target identity and validation contracts |
 | Stable generated streams | 1 | `prototypes/mir/streams/generated_stream_manifest.json` | `validation/tests/tooling/Test-MIRGoldenPlans.ps1` | stream registry and migration policy |
 | Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `validation/tests/architecture/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |

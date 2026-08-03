@@ -172,7 +172,7 @@ Invoke-RepoCheck "info.json parses" {
 }
 
 Invoke-RepoCheck "target profile views match canonical manifest" {
-  & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+  & (Join-Path $repo "tools\commands\targets\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 }
 
 Invoke-RepoCheck "release authority views match the canonical ledger" {

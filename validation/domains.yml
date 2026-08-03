@@ -53,7 +53,7 @@
         "locale/**",
         "tools/lib/localization/**",
         "validation/tests/docs/Test-MIRLocales.ps1",
-        "scripts/Update-MIRLocales.ps1"
+        "tools/commands/localization/Update-MIRLocales.ps1"
       ]
     },
     {

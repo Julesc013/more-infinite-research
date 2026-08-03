@@ -15,7 +15,7 @@ if ([int]$targetProfile.schema -ne 1 -or [string]$targetProfile.factorio_target 
 $effectRuntime = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\integrity\effect_contracts.lua")
 $effectContracts = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\effects\generated_target_contracts.lua")
 $technologyDesign = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\technology\technology_design.lua")
-& (Join-Path $RepoRoot "scripts\Update-MIRCompilerAuthorities.ps1") -RepoRoot $RepoRoot -Check
+& (Join-Path $RepoRoot "tools\commands\compiler\Update-MIRCompilerAuthorities.ps1") -RepoRoot $RepoRoot -Check
 $hardGateProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$manifest.technology_hard_gate_profile)) | ConvertFrom-Json
 $hardGateRuntime = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\technology\generated_hard_gate_authority.lua")
 if ([int]$hardGateProfile.schema -ne 1 -or [string]::IsNullOrWhiteSpace([string]$hardGateProfile.authority)) {

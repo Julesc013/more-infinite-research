@@ -228,7 +228,7 @@ if ($null -ne $museumTarget) {
 }
 if ($targetHash -ne [string]$lock.target_profile_sha256) { throw "Target profile fingerprint drifted from the backport source lock." }
 if ($null -eq $museumTarget) {
-  & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
+  & (Join-Path $RepoRoot "tools\commands\targets\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
   if ($LASTEXITCODE -ne 0) { throw "Generated target profile source is stale." }
 }
 

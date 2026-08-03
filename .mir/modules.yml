@@ -658,6 +658,7 @@ validation_tooling:
     repository_planner_command_migrator: tools/maintenance/Move-MIRPlannerCommands.ps1
     repository_technology_command_migrator: tools/maintenance/Move-MIRTechnologyCommands.ps1
     repository_control_command_migrator: tools/maintenance/Move-MIRControlCommands.ps1
+    repository_authority_command_migrator: tools/maintenance/Move-MIRAuthorityCommands.ps1
     repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
@@ -744,6 +745,7 @@ validation_tooling:
     package_composition: tools/commands/package/Measure-MIRPackageComposition.ps1
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
+    target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1
@@ -784,7 +786,7 @@ validation_tooling:
     manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
     localization_overrides: .mir/locales/overrides.json
-    localization_generator: scripts/Update-MIRLocales.ps1
+    localization_generator: tools/commands/localization/Update-MIRLocales.ps1
     localization_gate: validation/tests/docs/Test-MIRLocales.ps1
     localization_core: tools/lib/localization/MIRLocalization.psm1
     release_attestations: tools/lib/validation/ReleaseAttestations.ps1
@@ -796,6 +798,7 @@ validation_tooling:
     pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
     readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
+    compiler_authority_generator: tools/commands/compiler/Update-MIRCompilerAuthorities.ps1
     compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
     verification_domains: validation/domains.yml
@@ -803,6 +806,7 @@ validation_tooling:
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
     - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
+    - source-of-truth projections are owned by domain command families under tools commands while scripts retains parameter-compatible read-only wrappers and immutable historical worktrees may invoke their contemporary legacy paths
     - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
     - typed change incident task release and transition records are authoritative and human-readable status files are generated views
     - F0 through F4 are classification labels while the scheduler follows explicit task prerequisites and resource constraints
