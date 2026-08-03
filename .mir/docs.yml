@@ -563,13 +563,29 @@ docs:
     source_of_truth_for:
       - module-boundaries
   - path: docs/releases/3.2.4-unified-research-cost-curves.md
-    title: "MIR 3.2.4 Unified Research Cost Curves"
+    title: "MIR 3.2.4 Unified Research Cost Curves (Unpublished Candidate)"
+    status: historical-checkpoint
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.4-c31-unpublished-baseline
+  - path: docs/releases/3.2.5-convergence-release.md
+    title: "MIR 3.2.5 Convergence Release"
     status: current
     audience: maintainer
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.2.4-research-cost-model
+      - mir-3.2.5-convergence-release
+  - path: docs/adr/0028-3-2-5-convergence-release.md
+    title: "ADR 0028: MIR 3.2.5 Convergence Release"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-convergence-decision
   - path: docs/architecture/target-profiles.md
     title: "Target Capability Profiles"
     status: current

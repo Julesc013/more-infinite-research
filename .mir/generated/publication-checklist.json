@@ -1,16 +1,16 @@
 {
-  "assurance_exceptions": [
-    null
-  ],
+  "assurance_exceptions": [],
   "authority": "mir-generated-publication-checklist-v1",
-  "candidate_id": "C31",
+  "candidate_id": "C32",
   "generated_from": [
     ".mir/releases/current.json",
-    ".mir/releases/3.2.4.json"
+    ".mir/releases/3.2.5.json"
   ],
   "publication_admitted": false,
-  "release": "3.2.4",
+  "release": "3.2.5",
   "remaining_states": [
+    "source-frozen",
+    "package-built",
     "focused-qualified",
     "candidate-qualified",
     "manually-accepted",
@@ -22,5 +22,5 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "package-built"
+  "state": "planned"
 }

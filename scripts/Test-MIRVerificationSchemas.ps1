@@ -16,6 +16,7 @@ $contracts = [ordered]@{
   "playtest-report.schema.json" = @("schema", "kind", "created_at", "candidate", "factorio", "environment", "observation", "compiler", "attachments")
   "upgrade-matrix.schema.json" = @("schema", "kind", "status", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows")
   "change-record.schema.json" = @("schema", "id", "title", "kind", "package_visible", "domains_read", "domains_written", "affected_targets", "test_obligations", "state")
+  "candidate-closure.schema.json" = @("schema", "id", "release", "candidate_id", "disposition", "reason", "successor", "package", "remaining_obligations_disposition", "evidence_policy", "closed_at")
   "incident-record.schema.json" = @("schema", "id", "title", "state", "failing_environment", "root_cause", "regression_propositions", "candidate_binding", "closure")
   "release-record.schema.json" = @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at")
   "release-transition.schema.json" = @("schema", "id", "release", "from", "to", "admission", "proofs", "recorded_at")

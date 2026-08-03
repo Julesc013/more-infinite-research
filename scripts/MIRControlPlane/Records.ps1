@@ -5,7 +5,7 @@ function Get-MIRCPPolicy {
 
 function Get-MIRCPRecordSet {
   param(
-    [Parameter(Mandatory)][ValidateSet("changes", "incidents", "tasks", "releases", "transitions")][string]$Kind,
+    [Parameter(Mandatory)][ValidateSet("changes", "candidate_closures", "incidents", "tasks", "releases", "transitions")][string]$Kind,
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
@@ -41,6 +41,7 @@ function Assert-MIRCPRecords {
   }
 
   $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
+  $candidateClosures = @(Get-MIRCPRecordSet -Kind candidate_closures -RepoRoot $repo)
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
   $releases = @(Get-MIRCPRecordSet -Kind releases -RepoRoot $repo)
   $transitions = @(Get-MIRCPRecordSet -Kind transitions -RepoRoot $repo)
@@ -59,8 +60,22 @@ function Assert-MIRCPRecords {
   foreach ($release in $releases) {
     Assert-MIRCPRequiredProperties -Record $release -Names @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at") -Context "ReleaseRecord"
     if ($states -notcontains [string]$release.state) { throw "Release $($release.release) uses unknown state '$($release.state)'." }
-    foreach ($field in @("source_commit", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries")) {
-      if ($null -eq $release.package.PSObject.Properties[$field]) { throw "Release $($release.release) package is missing '$field'." }
+    $stateIndex = [Array]::IndexOf($states, [string]$release.state)
+    $requiredPackageFields = if ($stateIndex -eq 0) {
+      @()
+    } elseif ($stateIndex -eq 1) {
+      @("source_commit", "source_tree", "source_sha256")
+    } else {
+      @("source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries")
+    }
+    foreach ($field in $requiredPackageFields) {
+      if ($null -eq $release.package.PSObject.Properties[$field]) { throw "Release $($release.release) package is missing '$field' for state '$($release.state)'." }
+    }
+    foreach ($arrayField in @("assurance_exceptions", "remaining_obligations", "incident_ids")) {
+      $property = $release.PSObject.Properties[$arrayField]
+      if ($null -ne $property -and @($property.Value | Where-Object { $null -eq $_ }).Count -gt 0) {
+        throw "Release $($release.release) array '$arrayField' contains null."
+      }
     }
   }
 
@@ -70,6 +85,21 @@ function Assert-MIRCPRecords {
     if ($known -notcontains [string]$role.Value) {
       throw "Current release role '$($role.Name)' points to unknown record '$($role.Value)'."
     }
+  }
+  $closureKeys = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  foreach ($closure in $candidateClosures) {
+    Assert-MIRCPRequiredProperties -Record $closure -Names @("schema", "id", "release", "candidate_id", "disposition", "reason", "successor", "package", "remaining_obligations_disposition", "evidence_policy", "closed_at") -Context "CandidateClosureRecord"
+    $key = "$([string]$closure.release)/$([string]$closure.candidate_id)"
+    if (-not $closureKeys.Add($key)) { throw "Duplicate CandidateClosureRecord for $key." }
+    $source = @($releases | Where-Object { [string]$_.release -eq [string]$closure.release -and [string]$_.candidate_id -eq [string]$closure.candidate_id })
+    if ($source.Count -ne 1) { throw "CandidateClosureRecord $($closure.id) does not identify one ReleaseRecord." }
+    if ([string]$source[0].state -in @("tagged", "published", "publicly-verified")) { throw "Published release $key cannot be closed as an unpublished candidate." }
+    foreach ($field in @("source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries")) {
+      if ([string]$closure.package.$field -cne [string]$source[0].package.$field) { throw "CandidateClosureRecord $($closure.id) package field '$field' differs from its immutable ReleaseRecord." }
+    }
+    $successor = @($releases | Where-Object { [string]$_.release -eq [string]$closure.successor.release -and [string]$_.candidate_id -eq [string]$closure.successor.candidate_id })
+    if ($successor.Count -ne 1) { throw "CandidateClosureRecord $($closure.id) does not identify one successor ReleaseRecord." }
+    if ([string]$pointer.roles.canonical -eq [string]$closure.release) { throw "Canonical release $($closure.release) is closed and cannot remain active." }
   }
   foreach ($transition in $transitions) {
     Assert-MIRCPRequiredProperties -Record $transition -Names @("schema", "id", "release", "from", "to", "admission", "proofs", "recorded_at") -Context "ReleaseTransition"
@@ -87,6 +117,7 @@ function Assert-MIRCPRecords {
     changes = $changes.Count
     incidents = $incidents.Count
     releases = $releases.Count
+    candidate_closures = $candidateClosures.Count
     transitions = $transitions.Count
     tasks = $taskGraph.tasks
     executable_tasks = $taskGraph.executable
@@ -134,9 +165,14 @@ function Assert-MIRCPPackageFreeze {
   $target = [string]$info.factorio_version
   $current = Read-MIRCPJson -Path ".mir/releases/current.json" -RepoRoot $repo
   $canonicalRelease = [string]$current.roles.canonical
+  $release = Read-MIRCPJson -Path ".mir/releases/$canonicalRelease.json" -RepoRoot $repo
   $active = @($authority.locks | Where-Object {
     [string]$_.target -eq $target -and [string]$_.release -eq $canonicalRelease
   })
+  if ([string]$release.state -eq "planned") {
+    if ($active.Count -ne 0) { throw "Planned canonical release $canonicalRelease must not have a frozen package lock." }
+    return [pscustomobject][ordered]@{status="development-unlocked";release=$canonicalRelease;target=$target}
+  }
   if ($active.Count -ne 1) {
     throw "Expected exactly one package lock for canonical release $canonicalRelease on target $target."
   }

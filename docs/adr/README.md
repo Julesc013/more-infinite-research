@@ -42,3 +42,4 @@ Initial ADR set:
 - `0025`: Safety, quality, and promotion separation.
 - `0026`: Runtime and qualification environments.
 - `0027`: Compiler schema compatibility.
+- `0028`: MIR 3.2.5 convergence release.

@@ -43,31 +43,39 @@
       "tag_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
     },
     "factorio-2.1": {
-      "archive": "dist/more-infinite-research_3.2.4.zip",
-      "archive_bytes": 1048419,
+      "archive": "",
+      "archive_bytes": null,
       "archive_class": "frozen-unreleased-calibration-candidate",
-      "archive_entries": 298,
-      "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
+      "archive_entries": null,
+      "archive_sha256": "",
       "assurance_exception_ids": [],
       "branch": "dev",
-      "candidate_id": "C31",
+      "candidate_id": "C32",
       "development_branch": "dev",
       "manual_review": "pending",
-      "mir_version": "3.2.4",
-      "package_content_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
-      "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+      "mir_version": "3.2.5",
+      "package_content_sha256": "",
+      "package_source_commit": "",
       "package_source_material": {
-        "file_count": 298,
+        "file_count": null,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c"
+        "source_tree": ""
       },
-      "package_source_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
-      "package_source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c",
+      "package_source_sha256": "",
+      "package_source_tree": "",
       "protected_qualification": "pending",
-      "publication_status": "package-built",
-      "qualification": "package-built",
+      "publication_status": "planned",
+      "qualification": "planned",
       "remaining_obligations": [
+        "programme-contract",
+        "cost-model-completion",
+        "derived-disposition",
+        "proof-assertions",
+        "support-reporting",
+        "factorio-2.0-projection",
+        "source-freeze",
+        "package-build",
         "focused-qualification",
         "candidate-qualification",
         "manual-acceptance",
@@ -79,6 +87,8 @@
         "public-byte-verification"
       ],
       "remaining_states": [
+        "source-frozen",
+        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -90,12 +100,12 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "C31-package-built"
+      "status": "C32-planned"
     }
   },
   "generated_from": [
     ".mir/releases/current.json",
-    ".mir/releases/3.2.4.json",
+    ".mir/releases/3.2.5.json",
     ".mir/releases/2.5.0.json",
     ".mir/releases/3.2.3.json"
   ],
@@ -131,7 +141,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-02",
+  "updated_at": "2026-08-03",
   "views": {
     "backport_queue": ".mir/generated/backport-queue.json",
     "branch_policy": ".mir/branches.yml",

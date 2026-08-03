@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/candidate-closure.schema.json",
+  "title": "MIR immutable CandidateClosureRecord",
+  "type": "object",
+  "required": ["schema", "id", "release", "candidate_id", "disposition", "reason", "successor", "package", "remaining_obligations_disposition", "evidence_policy", "closed_at"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^CLOSE-[0-9]+\\.[0-9]+\\.[0-9]+-[A-Z][A-Z0-9]*$"},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "candidate_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*$"},
+    "disposition": {"enum": ["superseded-unpublished", "withdrawn-unpublished", "invalidated-unpublished"]},
+    "reason": {"type": "string", "minLength": 1},
+    "successor": {
+      "type": "object",
+      "required": ["release", "candidate_id"],
+      "properties": {
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "candidate_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*$"}
+      },
+      "additionalProperties": false
+    },
+    "package": {
+      "type": "object",
+      "required": ["source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries"],
+      "properties": {
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "archive": {"type": "string", "minLength": 1},
+        "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "remaining_obligations_disposition": {"enum": ["cancelled-by-programme-decision", "transferred-to-successor"]},
+    "evidence_policy": {"enum": ["diagnostic-and-exact-proposition-reuse-only", "diagnostic-only"]},
+    "decision": {"type": "string", "minLength": 1},
+    "closed_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

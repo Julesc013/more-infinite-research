@@ -10,6 +10,14 @@
       "target": "2.1"
     },
     {
+      "branch": "dev",
+      "candidate_id": "C32",
+      "release": "3.2.5",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.1"
+    },
+    {
       "branch": "legacy",
       "candidate_id": "2.4.9-final",
       "release": "2.4.9",

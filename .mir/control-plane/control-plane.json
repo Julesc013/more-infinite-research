@@ -16,6 +16,7 @@
   },
   "records": {
     "changes": ".mir/changes",
+    "candidate_closures": ".mir/candidate-closures",
     "incidents": ".mir/incidents",
     "tasks": ".mir/tasks",
     "releases": ".mir/releases",

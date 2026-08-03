@@ -18,6 +18,7 @@
     {"pattern": ".mir/locales/**", "module": "locale-governance", "writes": ["product.locale"]},
     {"pattern": ".mir/module-dependencies.json", "module": "architecture-governance", "writes": ["architecture.boundaries"]},
     {"pattern": ".mir/releases/**", "module": "release-authority", "writes": ["release.authority"]},
+    {"pattern": ".mir/candidate-closures/**", "module": "release-authority", "writes": ["release.authority"]},
     {"pattern": ".mir/release-transitions/**", "module": "release-authority", "writes": ["release.authority"]},
     {"pattern": ".mir/backports/**", "module": "backport-authority", "writes": ["release.authority", "transition.upgrade"]},
     {"pattern": ".mir/backport-*.json", "module": "backport-authority", "writes": ["release.authority", "transition.upgrade"]},

@@ -18,6 +18,16 @@ function Get-MIRCPReleaseByVersion {
   return Read-MIRCPJson -Path ".mir/releases/$Release.json" -RepoRoot $RepoRoot
 }
 
+function Get-MIRCPArrayProperty {
+  param(
+    [Parameter(Mandatory)]$Object,
+    [Parameter(Mandatory)][string]$Name
+  )
+  $property = $Object.PSObject.Properties[$Name]
+  if ($null -eq $property -or $null -eq $property.Value) { return @() }
+  return @($property.Value | Where-Object { $null -ne $_ })
+}
+
 function Get-MIRCPReleaseStateIndex {
   param(
     [Parameter(Mandatory)][string]$State,
@@ -74,9 +84,7 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
   $tag = Get-MIRCPTagProof -Release $Release
   $remaining = @(Get-MIRCPRemainingReleaseStates -Release $Release -RepoRoot $RepoRoot)
   [string[]]$exceptionIds = [string[]]::new(0)
-  if ($null -ne $Release.PSObject.Properties["assurance_exceptions"]) {
-    $exceptionIds = [string[]]@($Release.assurance_exceptions | ForEach-Object { [string]$_.id })
-  }
+  $exceptionIds = [string[]]@(Get-MIRCPArrayProperty -Object $Release -Name "assurance_exceptions" | ForEach-Object { [string]$_.id })
   $result = [ordered]@{
     mir_version = [string]$Release.release
     candidate_id = [string]$Release.candidate_id
@@ -84,8 +92,8 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
     development_branch = if ([string]$Release.target -eq "2.1") { "dev" } else { [string]$Release.branch }
     source_anchor = if ($null -ne $Release.PSObject.Properties["source_release"]) { [string]$Release.source_release.tag } else { "3.2.1" }
     archive = [string]$Release.package.archive
-    archive_bytes = [long]$Release.package.bytes
-    archive_entries = [int]$Release.package.entries
+    archive_bytes = if ($null -ne $Release.package.PSObject.Properties["bytes"]) { [long]$Release.package.bytes } else { $null }
+    archive_entries = if ($null -ne $Release.package.PSObject.Properties["entries"]) { [int]$Release.package.entries } else { $null }
     package_source_commit = [string]$Release.package.source_commit
     package_source_tree = [string]$Release.package.source_tree
     package_source_sha256 = [string]$Release.package.source_sha256
@@ -93,7 +101,7 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
       schema = 1
       hash_algorithm = "git-commit-normalized-package-v1"
       source_tree = [string]$Release.package.source_tree
-      file_count = [int]$Release.package.entries
+      file_count = if ($null -ne $Release.package.PSObject.Properties["entries"]) { [int]$Release.package.entries } else { $null }
     }
     archive_sha256 = [string]$Release.package.archive_sha256
     package_content_sha256 = [string]$Release.package.content_sha256
@@ -121,7 +129,7 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
     $result.candidate_qualification_sha256 = [string]$candidate[0].sha256
   }
   $result.manual_review = if ($manual.Count -gt 0) { "maintainer-patch-review-approved" } else { "pending" }
-  $result.protected_qualification = if (@($Release.assurance_exceptions | Where-Object { [string]$_.id -match "PROTECTED|SEAL" }).Count -gt 0) { "not-recorded-before-tag" } else { "pending" }
+  $result.protected_qualification = if (@(Get-MIRCPArrayProperty -Object $Release -Name "assurance_exceptions" | Where-Object { [string]$_.id -match "PROTECTED|SEAL" }).Count -gt 0) { "not-recorded-before-tag" } else { "pending" }
   if ($null -ne $tag) {
     $result.tag = [string]$tag.name
     $result.tag_commit = [string]$tag.commit
@@ -218,7 +226,7 @@ function New-MIRCPCurrentCandidateLines {
     [string]$RepoRoot = ""
   )
   $remaining = @(Get-MIRCPRemainingReleaseStates -Release $Release -RepoRoot $RepoRoot)
-  $exceptions = @($Release.assurance_exceptions)
+  $exceptions = @(Get-MIRCPArrayProperty -Object $Release -Name "assurance_exceptions")
   $lines = [Collections.Generic.List[string]]::new()
   foreach ($line in @(
     "---", "title: `"Current Development Candidate`"", "status: current", "applies_to: `"$($Release.release)`"",
@@ -326,7 +334,7 @@ function Set-MIRCPReleaseNoteIdentityBlock {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Release notes are missing: $($Release.release_notes)" }
   $begin = "<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->"
   $end = "<!-- MIR-CONTROL-PLANE-IDENTITY:END -->"
-  $exceptions = @($Release.assurance_exceptions | ForEach-Object { [string]$_.id })
+  $exceptions = @(Get-MIRCPArrayProperty -Object $Release -Name "assurance_exceptions" | ForEach-Object { [string]$_.id })
   $tag = Get-MIRCPTagProof -Release $Release
   $block = @(
     $begin, "## Immutable release identity", "",
@@ -390,7 +398,7 @@ function Update-MIRCPViews {
     candidate_id = [string]$canonical.candidate_id
     state = [string]$canonical.state
     remaining_states = @(Get-MIRCPRemainingReleaseStates -Release $canonical -RepoRoot $repo)
-    assurance_exceptions = @($canonical.assurance_exceptions)
+    assurance_exceptions = @(Get-MIRCPArrayProperty -Object $canonical -Name "assurance_exceptions")
     publication_admitted = ([string]$canonical.state -in @("published", "publicly-verified"))
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check

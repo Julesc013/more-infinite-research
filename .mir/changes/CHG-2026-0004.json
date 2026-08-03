@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "CHG-2026-0004",
-  "title": "MIR 3.2.4 unified research cost curves",
+  "title": "MIR 3.2.5 unified research cost curves",
   "kind": "product",
   "package_visible": true,
   "domains_read": [
@@ -22,7 +22,7 @@
     "factorio-2.0"
   ],
   "migration_impact": "Adds stable startup settings for an additive per-level cost increment. Defaults are zero, existing setting IDs remain stable, unchanged external formulas remain byte-for-byte unchanged, and no model-selection dropdown is introduced.",
-  "release_note_impact": "3.2.4 unified research-cost curve notes required",
+  "release_note_impact": "Consolidated 3.2.5 research-cost and compatibility notes required",
   "test_obligations": [
     "product.settings",
     "product.compiler",
@@ -33,8 +33,8 @@
     "transition.upgrade"
   ],
   "backport_disposition": {
-    "factorio-2.1": "canonical implementation and release on dev/main as MIR 3.2.4",
-    "factorio-2.0": "project after the 2.5.0 stabilization decision; independently qualify as 2.5.1 only if a confirmed defect requires that release, otherwise queue for 2.6"
+    "factorio-2.1": "canonical implementation incorporated into the single MIR 3.2.5 convergence release",
+    "factorio-2.0": "continuously project with the 3.2.5 compatibility slice and independently qualify as MIR 2.5.5"
   },
   "state": "implemented"
 }

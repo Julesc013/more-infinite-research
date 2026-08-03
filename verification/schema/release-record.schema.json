@@ -11,7 +11,20 @@
     "target": {"type": "string", "minLength": 1},
     "branch": {"type": "string", "minLength": 1},
     "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
-    "package": {"type": "object"},
+    "package": {
+      "type": "object",
+      "properties": {
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "archive": {"type": "string", "minLength": 1},
+        "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
     "upgrade": {
       "type": "object",
       "required": ["from_version", "to_version", "fixture"],
@@ -26,11 +39,32 @@
     "assurance_exceptions": {"type": "array", "items": {"type": "object"}},
     "remaining_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "source_release": {"type": "object"},
+    "development_lineage": {
+      "type": "object",
+      "required": ["superseded_release", "superseded_candidate_id", "candidate_closure", "package_source_commit"],
+      "properties": {
+        "superseded_release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "superseded_candidate_id": {"type": "string", "minLength": 1},
+        "candidate_closure": {"type": "string", "minLength": 1},
+        "package_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      },
+      "additionalProperties": false
+    },
     "baseline_release": {"type": "object"},
     "release_notes": {"type": "string"},
     "incident_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "backport_manifest": {"type": "string"},
     "updated_at": {"type": "string", "format": "date-time"}
   },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"const": "source-frozen"}}},
+      "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256"]}}}
+    },
+    {
+      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
+      "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries"]}}}
+    }
+  ],
   "additionalProperties": false
 }

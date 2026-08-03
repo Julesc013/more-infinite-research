@@ -636,6 +636,8 @@ validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
     control_plane_policy: .mir/control-plane/control-plane.json
+    control_plane_candidate_closure_schema: verification/schema/candidate-closure.schema.json
+    control_plane_candidate_closures: .mir/candidate-closures
     control_plane_domains: .mir/control-plane/domains.json
     control_plane_ownership: .mir/control-plane/ownership.json
     control_plane_freshness: .mir/control-plane/freshness.json
