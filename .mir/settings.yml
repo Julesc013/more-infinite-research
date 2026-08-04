@@ -72,6 +72,9 @@ rules:
   research_cost_growth_factor_is_never_below_one: true
   research_cost_linear_increment_is_never_below_zero: true
   research_cost_model_has_no_player_facing_mode_dropdown: true
+  base_continuation_base_setting_retains_legacy_l1_coefficient_semantics: true
+  base_continuation_formula_operands_retain_legacy_six_digit_realization: true
+  base_continuation_coefficient_is_projected_to_first_controlled_level: true
   unchanged_external_cost_formulas_are_preserved_verbatim: true
 
 profiles:

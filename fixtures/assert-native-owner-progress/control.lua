@@ -153,11 +153,25 @@ script.on_configuration_changed(function()
   if not reset_snapshot.research_progress_before_mir then
     fail("pre-MIR native-owner research observation is absent")
   end
+  local current_research_unit_count = tech.research_unit_count
+  if not current_research_unit_count or current_research_unit_count <= 0 then
+    fail("current engine research-unit count evidence is unavailable")
+  end
+  local expected_progress_after_change = math.max(0, math.min(1,
+    state.research_progress * state.research_unit_count / current_research_unit_count))
+  if math.abs(reset_snapshot.research_progress_before_mir - expected_progress_after_change) > epsilon then
+    fail("Factorio did not preserve completed research-unit work before MIR configuration handling")
+  end
+  if math.abs(observed_progress - expected_progress_after_change) > epsilon then
+    fail("MIR changed Factorio-normalized completed research-unit work")
+  end
   log("[mir-fixture] native-owner force-state preservation proof complete"
     .. " player_inventory_asserted=" .. tostring(reset_snapshot.player_inventory_available))
-  log("[mir-fixture] native-owner observed progress proof before=" .. tostring(reset_snapshot.research_progress_before_mir)
+  log("[mir-fixture] native-owner observed progress proof source-progress=" .. tostring(state.research_progress)
+    .. " before=" .. tostring(reset_snapshot.research_progress_before_mir)
     .. " after=" .. tostring(observed_progress)
     .. " prior-cost=" .. tostring(state.research_unit_count)
+    .. " current-cost=" .. tostring(current_research_unit_count)
     .. " level=" .. tostring(tech.level))
   log("[mir-fixture] native-owner progress configuration-change proof complete")
 end)

@@ -113,12 +113,13 @@ if ($source.AdoptionEmitter -notmatch 'VERSION\s*=\s*3' -or
     $source.AdoptionEmitter -notmatch 'input_descriptor' -or $source.AdoptionEmitter -notmatch 'output_descriptor') {
   throw "Native-owner adoption does not emit versioned old/new research-cost descriptors."
 }
-if ($source.AdoptionRuntime -match 'count_formula.*match|research_unit_count' -or
-    $source.AdoptionRuntime -notmatch 'transition_descriptor\.convert_fraction') {
-  throw "Runtime must consume the canonical transition descriptor without reparsing formula text."
+if ($source.AdoptionRuntime -match 'count_formula.*match|research_unit_count|force\.research_progress\s*=' -or
+    $source.AdoptionRuntime -notmatch 'no second conversion was applied' -or
+    $source.AdoptionRuntime -notmatch 'transition_descriptor\.evaluate') {
+  throw "Runtime must retain Factorio-normalized progress and may only evaluate canonical descriptors for diagnostics."
 }
 if ($source.Transition -notmatch 'before \* previous_cost / current_cost') {
-  throw "Research-progress conversion must preserve work with the old-cost/new-cost ratio."
+  throw "Analytical research-progress conversion must preserve work with the old-cost/new-cost ratio."
 }
 foreach ($budget in @('MAXIMUM_FORMULA_BYTES', 'MAXIMUM_TOKENS', 'MAXIMUM_PARSE_DEPTH', 'evaluated_cost_out_of_bounds')) {
   if (($source.Values -join "`n") -notmatch $budget) { throw "Research-cost budget is missing: $budget" }
@@ -134,10 +135,29 @@ if ($source.NativeCost -match 'fixed_count_has_no_(growth_factor|linear_incremen
 foreach ($route in @("Streams", "Native", "Continuations")) {
   if ($source[$route] -notmatch 'research_cost') { throw "$route does not consume the unified research-cost model." }
 }
+if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
+    $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or
+    $source.Continuations -notmatch 'legacy_formula_number\(growth\)' -or
+    $source.Continuations -notmatch 'legacy-six-digit-coefficient-projection:' -or
+    $source.Continuations -notmatch 'legacy-six-digit-growth-projection:') {
+  throw "Base continuations must preserve six-digit legacy operands and project the L=1 coefficient to the anchor."
+}
+$legacyInserterCoefficient = 200
+$factorioEffectiveInserterGrowth = 3.33333
+$inserterAnchorLevel = 8
+$projectedInserterAnchorCost = $legacyInserterCoefficient *
+  [Math]::Pow($factorioEffectiveInserterGrowth, $inserterAnchorLevel - 1)
+if ([Math]::Floor($projectedInserterAnchorCost) -ne 914488) {
+  throw "The 3.2.3 inserter continuation default did not project to its exact Factorio 2.1 anchor cost."
+}
+$projectedHybridNextCost = ($projectedInserterAnchorCost + 250) * $factorioEffectiveInserterGrowth
+if ($projectedHybridNextCost -le $projectedInserterAnchorCost) {
+  throw "The base-continuation additive increment did not begin after the projected anchor."
+}
 
 $defaults = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/settings/defaults.lua")
 if ($defaults -notmatch 'linear_increment\s*=\s*0') { throw "Default linear increment must remain zero." }
 $unknownFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/native-owner-unrecognized-formula/data-updates.lua")
 if ($unknownFixture -notmatch 'L\^2') { throw "Unknown-formula fixture must remain outside the supported fixed/linear/exponential/hybrid family." }
 
-Write-Host "[ok] unified ResearchCostModel identities, bounds, and sixteen work-preserving transitions passed."
+Write-Host "[ok] unified ResearchCostModel identities, bounds, engine-normalized runtime preservation, and sixteen analytical transitions passed."

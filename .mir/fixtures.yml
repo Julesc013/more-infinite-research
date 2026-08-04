@@ -560,6 +560,38 @@ fixtures:
       - fixture-storage-retention
       - upgraded-save-reload
 
+  upgrade-3-2-3-to-3-2-5:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-5
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.3"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-3-source-archive-for-3-2-5
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - existing-base-and-growth-setting-retention
+      - zero-default-linear-increment-settings
+      - default-cost-formula-preservation
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-5-development-archive-normal-mod-directory-load
+      - upgraded-save-reload
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

@@ -251,7 +251,7 @@
       "id": "release.approved-delta",
       "kind": "release-evidence",
       "layer": "F4",
-      "command": "./validation/tests/release/Test-MIRApprovedDelta.ps1 -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
+      "command": "./validation/tests/release/Test-MIRApprovedDelta.ps1 -Path <approved-delta-path> -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
       "requires_factorio": false,
       "inputs": [
         "candidate",
