@@ -56,6 +56,8 @@ Each test has one disposition:
 
 Unknown repository inputs escalate through `.mir/assurance.json`. Unknown packaged paths are included in every scenario dependency set, conservatively invalidating the scenario matrix.
 
+`development-breadth` is the canonical fresh pre-candidate campaign. It includes every development-valid static, exact-ZIP, full runtime, upgrade, ecosystem, and approved-delta row, but deliberately excludes candidate-bound performance, manual-review, and seal authority. Use it with `--no-reuse` for a complete development calibration. `full` remains the release profile and must continue to fail closed when its exact manual attestation or other candidate inputs are absent.
+
 ## Fingerprint Model
 
 The release artifact and gameplay proof are separate identities. `artifact.sha256` binds exact ZIP bytes. Package domains bind normalized groups of packaged files: `data`, `balance`, `settings`, `runtime`, `migrations`, `locale`, `assets`, `metadata`, `release-text`, and `unknown`. `dependency-contract` hashes the mod name, Factorio target, and dependency declarations while deliberately excluding the MIR version.

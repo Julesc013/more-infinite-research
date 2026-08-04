@@ -42,7 +42,7 @@ MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3
 
 The source remains under development. `C32` is a reserved candidate floor, not an assigned candidate identity. Development packages are for testing only until exact upgrade, reload-equivalence, ecosystem, performance, manual, protected, seal, publication, and public-byte gates are complete.
 
-The hosted assurance control plane now isolates each worker's exact test/fingerprint subtree and requires a plan-bound worker receipt before deterministic aggregate import. This is release tooling, not candidate evidence: `325-A1a` remains open until a fresh latest-head hosted aggregate run passes.
+The hosted assurance control plane now isolates each worker's exact test/fingerprint subtree and requires a plan-bound worker receipt before deterministic aggregate import. Latest exact repair head `409884cba10d69ead7020df17c64899fa91f633e` passed both hosted aggregates and merged through PR 45; append-only incident `INC-2026-0056` closes `325-A1a`. This is release tooling, not candidate evidence, and it does not assign C32 or advance 3.2.5 beyond `planned`.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity

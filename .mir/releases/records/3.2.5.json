@@ -47,7 +47,8 @@
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.5.md",
   "incident_ids": [
-    "INC-2026-0054"
+    "INC-2026-0054",
+    "INC-2026-0056"
   ],
-  "updated_at": "2026-08-03T22:14:04.749Z"
+  "updated_at": "2026-08-04T19:10:00.000Z"
 }

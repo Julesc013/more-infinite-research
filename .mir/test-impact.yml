@@ -25,6 +25,18 @@
       "tags": []
     },
     {
+      "pattern": ".mir/lifecycle/incidents/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/records/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Views.ps1",
       "groups": [],
       "scenarios": [],

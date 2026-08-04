@@ -101,9 +101,25 @@ if ($releaseHistoryTest.Count -ne 1 -or
     @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
   throw "static.release-history must bind the staged release-history fingerprint and run indexed snapshot integrity."
 }
-foreach ($profileName in @("fast", "full", "backport")) {
+foreach ($profileName in @("fast", "development-breadth", "full", "backport")) {
   if (@($config.profiles.$profileName) -notcontains "static.release-history") {
     throw "The $profileName assurance profile must include static.release-history."
+  }
+}
+
+$developmentBreadthExpected = @(
+  "docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings",
+  "static.locales", "static.balance", "static.museum", "static.release-history", "static.package",
+  "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade",
+  "runtime.ecosystem", "release.approved-delta"
+)
+$developmentBreadthActual = @($config.profiles.'development-breadth' | ForEach-Object { [string]$_ })
+if (($developmentBreadthActual -join "`n") -cne ($developmentBreadthExpected -join "`n")) {
+  throw "The development-breadth profile must contain every development-valid broad row in canonical order."
+}
+foreach ($candidateOnlyTest in @("runtime.performance-regression", "manual.release-review", "seal.verify")) {
+  if ($developmentBreadthActual -contains $candidateOnlyTest) {
+    throw "The development-breadth profile must not claim candidate-only authority through $candidateOnlyTest."
   }
 }
 
@@ -111,6 +127,8 @@ foreach ($requiredStaticRoutingPath in @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
   ".mir/views/**",
+  ".mir/lifecycle/incidents/**",
+  ".mir/releases/records/**",
   ".github/workflows/validate.yml",
   ".github/workflows/assurance-*.yml",
   ".github/workflows/control-plane-v5.yml",
