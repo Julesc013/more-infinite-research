@@ -5,7 +5,7 @@ applies_to: "3.2.4+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -33,3 +33,5 @@ cost(L) = (base_cost + linear_increment * (L - anchor_level))
 | `fingerprint` | Content identity over schema, ABI, parameters, derived material, and provenance |
 
 The pure validation layer requires positive nondecreasing costs. The bounded classifier accepts arithmetic syntax only, reduces the expression structurally to an affine factor times at most one exponential factor, and never executes external text. Default native-owner adoption preserves the original external formula verbatim. An explicit override rebuilds a recognized model canonically; a formula outside this family rejects the override.
+
+The model stores anchor semantics, not setting-storage semantics. In particular, the stable base-continuation `mir-cost-base-*` setting remains the historical level-one coefficient used by MIR 3.2.3 and earlier. The continuation planner first canonicalizes the coefficient and growth through the historical six-significant-digit formula boundary, then projects that coefficient by `growth_factor ^ (anchor_level - 1)` before placing it in `base_cost`. A neutral linear increment therefore reproduces the old realized curve, while a nonzero increment begins at the first controlled level.

@@ -50,7 +50,7 @@ First report the exact HEAD, upstream relation, dirty paths, current release poi
 1. Runtime research-cost transitions
 
 - Inspect prototypes/mir/runtime/productivity_family_adoption.lua and the data-stage adoption payload.
-- Confirm progress preservation uses old_fraction × old_cost / new_cost.
+- Confirm Factorio's progress normalization equals `old_fraction × old_cost / new_cost` and MIR does not apply the conversion a second time.
 - Confirm runtime consumes versioned old/new cost descriptors rather than expanding string parsing.
 - Confirm fixed, linear, exponential, and hybrid form a complete 16-row transition matrix.
 - Confirm current research, exact level, fractional progress, queue, completed levels, configuration change, save/reload, second reload, and continuous-versus-reload equivalence are covered.

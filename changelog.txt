@@ -12,16 +12,17 @@ Date: 2026-08-04
 
   Bugfixes:
 
-    - Corrected native-owner research progress conversion to preserve completed work when configured costs change.
+    - Stopped native-owner cost changes from converting Factorio-normalized research progress a second time.
     - Replaced runtime formula reparsing with bounded versioned old/new cost descriptors.
     - Refused malformed, tampered, unknown, or over-budget transition descriptors without guessing or resetting force state.
     - Corrected packaged guidance: productivity-family adoption preserves effects without a force-wide technology reset.
+    - Preserved 3.2.3 base-continuation costs by projecting stable level-one coefficients to the new curve anchor.
 
   Compatibility:
 
     - Preserved recognized native and modded research formulas byte-for-byte when settings stay at defaults.
     - Canonicalized explicit overrides and rejected unknown external formulas instead of guessing their meaning.
-    - Preserved the selected research, level, queue, completed levels, and unrelated force state during supported cost transitions.
+    - Preserved completed research work, selection, level, queue, completed levels, and unrelated force state.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.3

@@ -56,6 +56,10 @@ Each test has one disposition:
 
 Unknown repository inputs escalate through `.mir/assurance.json`. Unknown packaged paths are included in every scenario dependency set, conservatively invalidating the scenario matrix.
 
+The current target profile must exactly match the active typed release record's public upgrade source, target, and fixture. Historical releases continue to receive release-specific projected profiles, but the development planner may not fall back to an older public transition. A declared external input whose fingerprint is `missing` makes that exact plan row `INVALID`; the runner must not discover a missing prior archive, candidate, Factorio installation, or mod closure only after execution starts.
+
+Before focused qualification, `release.approved-delta` binds the active release record and the exact future transition path as `pending`; this is development-state proof that approved-delta authority has not been created. It does not create a delta artifact or an approval claim. Once the release leaves the pre-qualification states, the exact transition artifact must exist and becomes the fingerprinted input.
+
 `development-breadth` is the canonical fresh pre-candidate campaign. It includes every development-valid static, exact-ZIP, full runtime, upgrade, ecosystem, and approved-delta row, but deliberately excludes candidate-bound performance, manual-review, and seal authority. Use it with `--no-reuse` for a complete development calibration. `full` remains the release profile and must continue to fail closed when its exact manual attestation or other candidate inputs are absent.
 
 ## Fingerprint Model

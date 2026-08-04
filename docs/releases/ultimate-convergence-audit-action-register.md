@@ -37,7 +37,8 @@ The label `C32` is a reserved monotonic floor while 3.2.5 is `planned`. It is no
 
 | Finding | Repository observation | Disposition | Planned record |
 | --- | --- | --- | --- |
-| Runtime research progress uses the inverse conversion ratio and recognizes only legacy formula shapes. | Confirmed in `prototypes/mir/runtime/productivity_family_adoption.lua`. | P0 package-visible correction before candidate freeze. | `INC-2026-0054`, `CHG-2026-0007` |
+| Runtime research progress used an inverse conversion ratio and the first descriptor repair applied a correct ratio to a value Factorio had already normalized. | Confirmed by source inspection, the settings-change fixture, and direct 3.2.3-to-3.2.5 upgrade execution. | P0 package-visible correction before candidate freeze: retain the engine-normalized value without a second conversion. | `INC-2026-0054`, `CHG-2026-0007` |
+| Base-continuation migration treated stable level-one coefficients as first-controlled-level costs. | Confirmed by the exact 3.2.3 source formula and the failed direct base-continuation upgrade row. | P0 package-visible correction before candidate freeze: project the stable coefficient onto the canonical model anchor and prove default parity. | `INC-2026-0057`, `CHG-2026-0007` |
 | P11 remains public but has post-publication proof and stabilization obligations. | Confirmed by the typed 2.5.0 record and retained follow-up evidence. | P0 append-only reconciliation; do not rewrite publication history. | `CHG-2026-0011` |
 | Ownership writes `product.balance`, but the semantic-domain catalog does not declare it. | Confirmed by the ownership and domain authorities. | P0 package-excluded referential-integrity repair. | `CHG-2026-0008` |
 | Logical-path policy and durable Control Plane records still expose physical paths independently. | Confirmed during the dual-plane migration. | P0 package-excluded single-resolver cutover. | `CHG-2026-0009` |
@@ -61,14 +62,14 @@ new_fraction   = completed_work / new_cost
                = old_fraction × old_cost / new_cost
 ```
 
-The current runtime code instead multiplies by `new_cost / old_cost`. It also reparses only a fixed count and two legacy exponential formula forms, so it cannot evaluate the canonical linear and hybrid models.
+The original runtime code instead multiplied by `new_cost / old_cost` and reparsed only a fixed count and two legacy exponential formula forms. The first descriptor repair corrected the algebra but missed that Factorio had already applied the completed-work normalization before MIR's configuration handler, so a second conversion still lost work.
 
 The repair contract is:
 
 1. Emit a compact versioned `CostTransitionDescriptor` for the input and output model of every adopted runtime family.
 2. Bind formula ABI, anchor, base, linear increment, growth factor, semantic digest, and authority digest.
 3. Evaluate both descriptors at the exact current technology level through one bounded canonical evaluator.
-4. Preserve completed unit-equivalent work and clamp the new fraction to `[0,1]`.
+4. Verify Factorio's completed-work normalization against the source and current realized costs, and never apply the conversion a second time.
 5. Preserve current research, queue order, completed levels, and unrelated force state.
 6. Fail closed with a stable diagnostic when either model is unknown; do not expand runtime string parsing.
 7. Make a second configuration change or reload idempotent.
