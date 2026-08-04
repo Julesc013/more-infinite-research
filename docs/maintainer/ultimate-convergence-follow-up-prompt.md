@@ -5,7 +5,7 @@ applies_to: "3.2.5, 2.5.x, 3.3.x, 2.6.x"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -190,8 +190,14 @@ Check and report exact enforcement for direct prototype writes outside executors
 
 17. Release-train execution completeness
 
-- Reconcile every `325-A0` through `325-D4` row in the canonical convergence programme with code, records, tests, and evidence.
+- Reconcile `325-A1a`, every `325-A0` through `325-D4` row, and the first complete `325-B0` slice in the canonical convergence programme with code, records, tests, and evidence.
+- Confirm fast, targeted, and scheduled worker evidence is downloaded into isolated artifact directories, every worker carries an immutable receipt for the exact plan/source/work/trust/capsule/result context, only plan-selected test/fingerprint objects are imported, every pointer/capsule/result/log/artifact digest is validated, and artifact order cannot select a stale restored pointer. Confirm protected Control Plane v5 retains immutable-object aggregation and exact aggregate validation.
+- Confirm the latest exact PR head, not an earlier same-head run, closes `325-A1a` before merge or release-state work proceeds.
 - Confirm the complete 3.2.5 freeze packet can be materialized before assigning a candidate.
+- Confirm the freeze defect register closes algebraic cost proof, numeric envelope, owner removal/transfer, descriptor authority semantics, README reset wording, exact default parity, save/reload/second reload, and Factorio 2.0 cost disposition.
+- Confirm the declared minimum product independently covers Factorio 2.1 Base/Space Age and, only after feasibility passes, Factorio 2.0 Base/Space Age.
+- Confirm the bounded mandatory ecosystem matrix locks exact versions/hashes, claim levels, fixtures or named load-checks, budgets, and terminal wording for Base, Space Age, P11/BZ, one owner pack, one broad overhaul, and one negative/conflict row.
+- Confirm `325-B0` traces one research-cost proposition through compiler semantics, terminal disposition, typed proof, bounded support output, and Factorio 2.0 projection before compatibility breadth expands.
 - Confirm every release state is admitted separately and publication consumes sealed bytes without rebuilding.
 - Confirm `255-F0` feasibility precedes every 2.5.5 branch, release record, or candidate action.
 - Confirm a passed 2.5.5 feasibility result produces new source-lock, portable-delta, backport-manifest, reconstruction, target-proof, seal, and public-byte records rather than mutating the 2.5.0 authorities.

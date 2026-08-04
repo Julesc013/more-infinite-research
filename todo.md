@@ -17,6 +17,17 @@ The ordered release train, freeze packet, stop conditions, conditional 2.5.5 pro
 
 Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.
 
+## Immediate convergence gates
+
+| Gate | Current boundary | Completion proof |
+| --- | --- | --- |
+| `325-A1a` deterministic fan-in | Implemented on the PR branch; hosted closure pending | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and a green latest-head aggregate run |
+| `325-A1b` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited `GIT_INDEX_FILE`, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |
+| `325-B0` first complete compatibility slice | Queued after hosted closure | Research-cost default parity traced through disposition, typed proof, bounded support output, and exact Factorio 2.0 disposition |
+| `325-D1` freeze defect register | Open | Algebraic cost proof, numeric envelope, owner removal/transfer, descriptor authority, README reset reconciliation, exact default parity, save/reload/second-reload, and Factorio 2.0 cost disposition are all terminal |
+| Minimum compatibility product | Declaration required before freeze | Factorio 2.1 Base/Space Age, conditional Factorio 2.0 Base/Space Age, and explicit projection or terminal disposition for every stable authority |
+| Bounded ecosystem matrix | Declaration required before freeze | Exact Base, Space Age, P11/BZ, owner-pack, broad-overhaul, and negative/conflict rows with version/hash locks, claim level, fixture/load-check, budgets, and terminal wording |
+
 | Planned change | Package visible | Targets | Completion boundary |
 | --- | --- | --- | --- |
 | `CHG-2026-0005` | `true` | `factorio-2.1`, `factorio-2.0` | Combines the unreleased C31 research-cost work with derived compatibility dispositions, proof assertions, bounded support reporting, profile hardening, and behavior-preserving compiler consolidation. The public upgrade starts at 3.2.3; stable IDs and neutral defaults are preserved. |
