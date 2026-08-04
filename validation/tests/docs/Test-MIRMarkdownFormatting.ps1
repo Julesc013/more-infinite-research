@@ -9,6 +9,18 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $formatter = Join-Path $RepoRoot "tools\commands\docs\Format-MIRMarkdown.ps1"
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-markdown-format-" + [Guid]::NewGuid().ToString("N"))
+$gitEnvironmentNames = @(
+  "GIT_INDEX_FILE", "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR",
+  "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES"
+)
+$savedGitEnvironment = @{}
+foreach ($name in $gitEnvironmentNames) {
+  $item = Get-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
+  if ($null -ne $item) {
+    $savedGitEnvironment[$name] = [string]$item.Value
+    Remove-Item -LiteralPath "Env:$name"
+  }
+}
 
 try {
   $docs = Join-Path $testRoot "docs"
@@ -81,6 +93,10 @@ This is a new line.
       throw "Refusing to remove unexpected Markdown test path: $resolved"
     }
     Remove-Item -LiteralPath $resolved -Recurse -Force
+  }
+  foreach ($name in $gitEnvironmentNames) {
+    if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }
+    else { Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue }
   }
 }
 
