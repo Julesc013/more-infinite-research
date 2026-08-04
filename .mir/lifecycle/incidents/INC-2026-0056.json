@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0056",
+  "title": "Hosted assurance fan-in selected stale mutable worker pointers",
+  "external_issue": "internal://assurance/deterministic-worker-evidence-fan-in",
+  "state": "closed",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.5",
+    "pull_request": 45,
+    "source_commit": "9c926ccb0436d7de0a963abd372fae4a4938b8a3",
+    "workflow_run": 30907451966,
+    "observed": "All eight fast workers passed, but whole-ledger artifacts were extracted over one shared evidence tree and stale passed.json pointers could win according to artifact extraction order."
+  },
+  "reproduction": {
+    "status": "reproduced-by-hosted-failure-and-order-permutation-regressions",
+    "observed": "Complete worker ledgers contained colliding mutable pointers. Forward and reverse extraction orders could therefore select different evidence for the same planned test and fingerprint."
+  },
+  "root_cause": {
+    "status": "proven-shared-ledger-overlay-and-mutable-pointer-authority",
+    "summary": "Worker artifacts transported complete evidence ledgers into a shared extraction directory. The aggregate consumed overwritten coordination pointers instead of selecting and validating one immutable plan-bound contribution for each exact work row."
+  },
+  "repair_changes": [
+    "PR-45:isolated-exact-test-and-fingerprint-worker-artifacts",
+    "PR-45:schema-2-plan-source-row-freshness-and-trust-receipts",
+    "PR-45:digest-validated-plan-selected-immutable-object-import",
+    "PR-45:deterministic-aggregate-pointer-reconstruction",
+    "PR-45:canonical-round-trip-plan-timestamp-serialization",
+    "PR-45:protected-control-plane-content-addressed-import-preservation"
+  ],
+  "regression_propositions": [
+    "forward and reverse artifact ordering produce the same imported evidence",
+    "stale and missing worker pointers cannot replace or invalidate complete immutable receipt-bound evidence",
+    "wrong plan, source, row, producer, trust, digest, or timestamp material is rejected",
+    "duplicate, mixed reuse-run, failure, missing, and irrelevant contribution sets close or fail for the exact governed reason",
+    "Windows traversal, canonical-path collision, alternate data stream, reparse point, entry-count, expanded-byte, and file-size hazards are rejected",
+    "DateTimeOffset and DateTime plan instants retain exact fractional UTC ticks under non-invariant culture",
+    "failed aggregation retains every successfully validated immutable object for exact retry adoption",
+    "the development package archive and normalized content identities remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "development-only",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "closed-development-assurance-gate",
+    "repair_head": "409884cba10d69ead7020df17c64899fa91f633e",
+    "repair_tree": "6511648a577429ca5923afd3b7848dfe8aa8833b",
+    "merge_commit": "e332f80d25b528b5c2ce9c5c337b168bbba27c0f",
+    "hosted_pr_run": 30939659084,
+    "hosted_push_run": 30939655457,
+    "hosted_plan_material_sha256": "B80FE83770D344382941356D68F948406B5CF6B2CD841A34C850547D8AE87503",
+    "hosted_result": "passed; eight-row proof closure with one fresh deterministic worker import and seven exact trusted reuses; zero failed, missing, rejected, duplicate, or ignored contributions",
+    "development_archive_sha256": "DBEC0DC8136D2ABF4B84F6E08B1E50961327139B696DC42190CD16D689EECD95",
+    "development_content_sha256": "EDA47A721AA81CA9D26568F7E667BAB798121D7AFBF2B0DDD9AE1A71817EAC47",
+    "boundary": "This closes 325-A1a only. It does not freeze 3.2.5, assign C32, create candidate or release qualification, authorize 2.5.5, or admit 3.3."
+  }
+}

@@ -5,7 +5,7 @@ applies_to: "3.2.5"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
