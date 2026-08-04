@@ -25,6 +25,59 @@ function Test-MIRAssuranceReleaseCandidateId {
   return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
 }
 
+function Get-MIRAssuranceReleasePlanningAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  $version = [string]$Context.info.version
+  $recordPath = Join-Path $repo ".mir\releases\records\$version.json"
+  if (-not (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
+    throw "Typed release authority is missing: .mir/releases/records/$version.json"
+  }
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+  if ([int]$record.schema -ne 1 -or
+      [string]$record.release -ne $version -or
+      [string]$record.target -ne [string]$Context.target) {
+    throw "Typed release authority does not match the verification context."
+  }
+
+  $states = @(
+    "planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified",
+    "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published",
+    "publicly-verified"
+  )
+  if ($states -notcontains [string]$record.state) {
+    throw "Typed release authority state is invalid: $($record.state)"
+  }
+
+  $authorityClass = "exact-candidate"
+  $packageSourceCommit = [string]$record.package.source_commit
+  if ([string]$record.state -eq "planned") {
+    if ([string]$record.candidate_id -ne "not-assigned" -or
+        [string]$record.candidate_floor -notmatch '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$' -or
+        @($record.package.PSObject.Properties).Count -ne 0) {
+      throw "Planned release authority must contain only an unassigned candidate reservation and no frozen package identity."
+    }
+    $authorityClass = "planned-reservation"
+    $packageSourceCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+  } else {
+    if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId ([string]$record.candidate_id)) -or
+        $packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+      throw "Post-planning release authority must bind an exact candidate and package-source commit."
+    }
+    $packageSourceCommit = Resolve-MIRAssuranceCommit -Commit $packageSourceCommit
+  }
+
+  return [pscustomobject][ordered]@{
+    release = $version
+    target = [string]$record.target
+    state = [string]$record.state
+    authority_class = $authorityClass
+    candidate_id = [string]$record.candidate_id
+    candidate_floor = [string]$record.candidate_floor
+    package_source_commit = $packageSourceCommit
+  }
+}
+
 function Get-MIRAssuranceReleaseCandidateAuthority {
   param([Parameter(Mandatory)]$Context)
 
@@ -664,6 +717,24 @@ function Invoke-MIRAssuranceSelfTest {
   foreach ($candidateId in @("C0", "C01", "C-1", "2.5-P0", "2.5-P01", "2-P1", "2.5-C1", "candidate")) {
     if (Test-MIRAssuranceReleaseCandidateId -CandidateId $candidateId) {
       throw "Invalid release candidate ID was accepted: $candidateId"
+    }
+  }
+
+  $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
+  if ([string]$planningAuthority.state -eq "planned") {
+    if ([string]$planningAuthority.authority_class -ne "planned-reservation" -or
+        [string]$planningAuthority.candidate_id -ne "not-assigned" -or
+        [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
+      throw "Planned release reservation did not produce a source-bound non-candidate planning authority."
+    }
+    $candidateAuthorityRejected = $false
+    try {
+      $null = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    } catch {
+      $candidateAuthorityRejected = $true
+    }
+    if (-not $candidateAuthorityRejected) {
+      throw "Planned release reservation was incorrectly accepted as exact candidate authority."
     }
   }
 

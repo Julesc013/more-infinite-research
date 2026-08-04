@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0016",
+  "title": "Establish the 3.2.5 release-value firewall and pre-candidate planning authority",
+  "kind": "release",
+  "package_visible": false,
+  "domains_read": [
+    "release.authority",
+    "release.presentation",
+    "assurance.plan",
+    "ci.workflow",
+    "architecture.boundaries"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "assurance.plan",
+    "ci.workflow",
+    "architecture.boundaries"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Cancel C31 candidate-specific release obligations while retaining its product lineage and exact-proposition evidence policy; permit source-bound verification planning for a valid planned reservation without granting candidate authority; render typed work states without misleading unchecked completion boxes; and make execution-registry source metadata portable across LF and CRLF checkouts without changing scenario identities.",
+  "release_note_impact": "Maintainer documentation distinguishes 3.2.5 release blockers from deferred platform work, planned reservation from exact candidate identity, and incorporated product scope from cancelled C31 candidate obligations.",
+  "test_obligations": [
+    "release.authority",
+    "release.presentation",
+    "assurance.plan",
+    "ci.workflow",
+    "architecture.boundaries",
+    "control-plane.records",
+    "scenario.registry",
+    "docs.generated"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "apply before source freeze so planning remains available while C32 is only a reserved floor",
+    "factorio-2.0": "reuse the authority split for future planned target projections without assigning a candidate early"
+  },
+  "state": "implemented"
+}

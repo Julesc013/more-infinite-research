@@ -32,6 +32,9 @@ jobs:
       - name: Diagnose verifier
         shell: pwsh
         run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
+      - name: Build byte-bound development archive
+        shell: pwsh
+        run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET
       - name: Materialize content-addressed verification plan
         shell: pwsh
         run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --output .work/output/verification-plan.json
@@ -57,6 +60,11 @@ jobs:
           name: mir-verification-plan
           path: .work/output/verification-plan.json
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-development-candidate
+          path: dist/*.zip
+          if-no-files-found: error
 
   tests:
     name: ${{ matrix.test_id }}
@@ -78,6 +86,11 @@ jobs:
         with:
           name: mir-verification-plan
           path: .work/output
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.no_op != true }}
+        with:
+          name: mir-development-candidate
+          path: dist
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
@@ -118,6 +131,10 @@ jobs:
         with:
           name: mir-verification-plan
           path: .work/output
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-development-candidate
+          path: dist
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:

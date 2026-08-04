@@ -108,6 +108,8 @@ Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows
 
 A planned release reserves a `candidate_floor` but has `candidate_id: not-assigned`. A reservation is sequencing policy, not evidence and not a package identity. At source freeze, assign the first exact candidate ID at or above that floor and bind it to the frozen source commit, tree, and package-source digest in the ReleaseRecord and append-only transition record. Any later package-visible source change invalidates that candidate and requires a new candidate ID; never rewrite an existing candidate's source or archive identity. Generated views must show reservation and exact candidate identity separately.
 
+Verification planning is valid before candidate assignment, but scenario-domain plans still require exact archive bytes. In the `planned` state, the fast workflow deterministically builds one development archive and transfers those same bytes with the plan; the plan binds its `package_source_commit` field to the current source snapshot for command reconstruction and fingerprinting, while the typed release record remains package-empty and `authority_class` remains a non-candidate planned reservation. Development-archive evidence is useful for integration and regression feedback but cannot qualify or seal a release. Source-frozen planning binds the recorded package-source commit. Candidate sealing, seal verification, promotion, and every exact-candidate assertion continue to use strict candidate authority and reject `not-assigned`, a reserved floor, missing package identity, or an unfrozen archive.
+
 For MIR 3.2.0:
 
 ```powershell
