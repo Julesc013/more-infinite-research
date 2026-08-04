@@ -312,6 +312,10 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
+  'Isolate exact development candidate from historical distributions',
+  'path: .work/candidate/*.zip',
+  'path: .work/candidate',
+  '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
   'test_id = "reuse-only"',
@@ -323,6 +327,12 @@ foreach ($requiredWorkflowSnippet in @(
   if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
     throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
   }
+}
+if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
+  throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."
+}
+if (@([regex]::Matches($validateWorkflow, '--candidate \$env:MIR_DEVELOPMENT_CANDIDATE')).Count -ne 3) {
+  throw "Hosted planning, exact workers, and the aggregate gate must all bind the isolated development candidate explicitly."
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."
