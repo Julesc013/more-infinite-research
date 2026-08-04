@@ -31,7 +31,7 @@ MIR assurance
 
 Commands:
   doctor | inventory | impact | domains | plan | fingerprint | build | run-one | verify
-  gate | qualify | seal | check-seal | locale | balance | backport | explain
+  import-workers | gate | qualify | seal | check-seal | locale | balance | backport | explain
   self-test
 
 Common options:
@@ -116,7 +116,22 @@ switch ($command) {
     if ($expectedFingerprint -and [string]$test.fingerprint.fingerprint_sha256 -ne $expectedFingerprint) {
       throw "Planned fingerprint mismatch for $testId."
     }
-    Write-MIRAssuranceJson -Value (Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context) -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
+    try {
+      $capsule = Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context
+      $null = Write-MIRAssuranceWorkerReceipt -Plan $plan -Test $test -Capsule $capsule
+      Write-MIRAssuranceJson -Value $capsule -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
+    } catch {
+      $failure = $_
+      $paths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
+      if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) {
+        $capsule = Read-MIRAssuranceEvidencePointer -Path $paths.blocked
+        if ($null -ne $capsule) {
+          $null = Write-MIRAssuranceWorkerReceipt -Plan $plan -Test $test -Capsule $capsule
+          Write-MIRAssuranceJson -Value $capsule -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
+        }
+      }
+      throw $failure
+    }
   }
   "verify" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
@@ -135,6 +150,23 @@ switch ($command) {
     }
     Write-MIRAssuranceJson -Value $summary -DefaultPath ".work/artifacts/assurance/verify-summary.json"
     if ($status -ne "passed") { throw "Assurance verification failed." }
+  }
+  "import-workers" {
+    $plan = Get-MIRAssurancePlanFromOption -Context $context -RequirePlan
+    $workers = Get-MIRAssuranceOption -Name "--workers"
+    $artifactPrefix = Get-MIRAssuranceOption -Name "--artifact-prefix"
+    if ([string]::IsNullOrWhiteSpace($workers) -or [string]::IsNullOrWhiteSpace($artifactPrefix)) {
+      throw "import-workers requires --workers <directory> and --artifact-prefix <prefix>."
+    }
+    $workerImport = Import-MIRAssuranceWorkerEvidence `
+      -Plan $plan `
+      -Context $context `
+      -WorkerRoot $workers `
+      -ArtifactPrefix $artifactPrefix
+    Write-MIRAssuranceJson -Value $workerImport -DefaultPath ".work/artifacts/assurance/worker-import.json"
+    if ([string]$workerImport.status -ne "passed") {
+      throw "Worker evidence import did not close the active plan: failed=$(@($workerImport.failed).Count), missing=$(@($workerImport.missing).Count), rejected=$(@($workerImport.rejected).Count), duplicates=$(@($workerImport.duplicates).Count)."
+    }
   }
   "gate" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context -RequirePlan

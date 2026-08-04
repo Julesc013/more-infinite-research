@@ -85,7 +85,7 @@ jobs:
         with:
           include-hidden-files: true
           name: mir-scheduled-evidence-${{ matrix.safe_test_id }}
-          path: .work/artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
   verification-gate:
@@ -110,13 +110,18 @@ jobs:
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-2.1-
-      - name: Merge worker evidence
+      - name: Download isolated worker evidence
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: mir-scheduled-evidence-*
-          path: .work/artifacts/assurance/evidence
-          merge-multiple: true
+          path: .work/artifacts/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
+        run: ./tools/mir.ps1 verify import-workers --target 2.1 --plan .work/output/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --workers .work/artifacts/assurance/worker-evidence --artifact-prefix mir-scheduled-evidence-
       - name: Aggregate forced breadth gate
         shell: pwsh
         env:
@@ -135,6 +140,7 @@ jobs:
           name: assurance-scheduled-2.1-${{ github.sha }}
           path: |
             .work/output/verification-plan.json
+            .work/artifacts/assurance/worker-import.json
             .work/artifacts/assurance/evidence-bundle.json
             .work/artifacts/assurance/scheduled-summary.json
           if-no-files-found: warn

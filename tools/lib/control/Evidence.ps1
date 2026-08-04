@@ -86,6 +86,140 @@ function Write-MIRCPEvidenceObject {
   return [pscustomobject][ordered]@{digest=$digest; path=$path; store=$store}
 }
 
+function Get-MIRCPWindowsAlternateDataStreams {
+  param([Parameter(Mandatory)][string]$Path)
+
+  if ($env:OS -ne "Windows_NT") { return @() }
+  if (-not ("MIR.NativeStreams" -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace MIR {
+  public static class NativeStreams {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct StreamData {
+      public long StreamSize;
+      [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 296)] public string StreamName;
+    }
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr FindFirstStreamW(string fileName, int infoLevel, out StreamData data, int flags);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)] public static extern bool FindNextStreamW(IntPtr handle, out StreamData data);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)] public static extern bool FindClose(IntPtr handle);
+  }
+}
+'@
+  }
+  $fullPath = [IO.Path]::GetFullPath($Path)
+  $nativePath = if ($fullPath.StartsWith("\\", [StringComparison]::Ordinal)) {
+    "\\?\UNC\" + $fullPath.Substring(2)
+  } else {
+    "\\?\" + $fullPath
+  }
+  $data = New-Object MIR.NativeStreams+StreamData
+  $handle = [MIR.NativeStreams]::FindFirstStreamW($nativePath, 0, [ref]$data, 0)
+  $invalidHandle = [IntPtr](-1)
+  if ($handle -eq $invalidHandle) {
+    $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+    throw [ComponentModel.Win32Exception]::new($errorCode, "Unable to enumerate alternate data streams for '$fullPath'.")
+  }
+  $streams = [Collections.Generic.List[string]]::new()
+  try {
+    do {
+      if ([string]$data.StreamName -ne '::$DATA') { $streams.Add([string]$data.StreamName) }
+      $hasNext = [MIR.NativeStreams]::FindNextStreamW($handle, [ref]$data)
+    } while ($hasNext)
+    $errorCode = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+    if ($errorCode -notin @(18, 38)) {
+      throw [ComponentModel.Win32Exception]::new($errorCode, "Unable to complete alternate data stream enumeration for '$fullPath'.")
+    }
+  } finally {
+    [void][MIR.NativeStreams]::FindClose($handle)
+  }
+  return @($streams)
+}
+
+function Import-MIRCPWorkerEvidenceObjects {
+  param(
+    [Parameter(Mandatory)][string]$WorkerRoot,
+    [string]$EvidenceRoot = "",
+    [string]$RepoRoot = ""
+  )
+
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $workers = if ([IO.Path]::IsPathRooted($WorkerRoot)) { [IO.Path]::GetFullPath($WorkerRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $WorkerRoot)) }
+  $repoBoundary = [IO.Path]::GetFullPath($repo).TrimEnd("\", "/") + [IO.Path]::DirectorySeparatorChar
+  if (-not $workers.StartsWith($repoBoundary, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Control-plane worker artifacts must stay inside the repository workspace."
+  }
+  if (-not (Test-Path -LiteralPath $workers -PathType Container)) {
+    return [pscustomobject][ordered]@{schema=1;status="incomplete";worker_root=$workers;artifacts=0;objects=0;ignored=0}
+  }
+
+  $artifactDirectories = @(Get-ChildItem -LiteralPath $workers -Directory -Force | Sort-Object Name)
+  if ($artifactDirectories.Count -gt 512) { throw "Control-plane worker artifact count exceeds the ingestion limit." }
+  $imported = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+  $ignored = 0
+  [long]$expandedBytes = 0
+  $entryCount = 0
+  foreach ($artifact in $artifactDirectories) {
+    if (($artifact.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Control-plane worker artifact is a symlink or reparse point: $($artifact.Name)"
+    }
+    foreach ($item in @(Get-ChildItem -LiteralPath $artifact.FullName -Recurse -Force)) {
+      $entryCount++
+      if ($entryCount -gt 100000) { throw "Control-plane worker artifacts exceed the entry-count limit." }
+      if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Control-plane worker artifacts contain a symlink or reparse point: $($item.FullName)"
+      }
+      if ($item.PSIsContainer) { continue }
+      if ($item -isnot [IO.FileInfo]) { throw "Control-plane worker artifacts contain an unsupported filesystem entry." }
+      if ($env:OS -eq "Windows_NT") {
+        $alternateStreams = @(Get-MIRCPWindowsAlternateDataStreams -Path $item.FullName)
+        if ($alternateStreams.Count -gt 0) {
+          throw "Control-plane worker artifacts contain an NTFS alternate data stream: $($item.FullName)"
+        }
+      }
+      if ([long]$item.Length -gt 536870912) { throw "Control-plane worker artifact contains an oversized file: $($item.FullName)" }
+      $expandedBytes += [long]$item.Length
+      if ($expandedBytes -gt 4294967296) { throw "Control-plane worker artifacts exceed the expanded-byte limit." }
+      $relative = [IO.Path]::GetRelativePath($artifact.FullName, $item.FullName).Replace("\", "/")
+      if ($relative -notmatch '(?:^|/)artifacts/evidence/objects/sha256/[0-9A-Fa-f]{2}/([0-9A-Fa-f]{64})\.json$') {
+        $ignored++
+        continue
+      }
+      $declaredDigest = $Matches[1].ToUpperInvariant()
+      if ($item.BaseName.ToUpperInvariant() -ne $declaredDigest -or (Get-MIRCPSha256File -Path $item.FullName) -ne $declaredDigest) {
+        throw "Control-plane worker evidence object bytes do not match their content address: $relative"
+      }
+      try { $object = Get-Content -Raw -LiteralPath $item.FullName | ConvertFrom-Json }
+      catch { throw "Control-plane worker evidence object is invalid JSON: $relative" }
+      if ([int]$object.schema -ne 1 -or [string]$object.kind -notin @("observation", "evaluation", "task-result", "execution-manifest", "aggregate", "seal", "artifact-descriptor")) {
+        throw "Control-plane worker evidence object has an invalid schema or kind: $relative"
+      }
+      $destination = Get-MIRCPEvidenceObjectPath -Digest $declaredDigest -RepoRoot $repo -Root $EvidenceRoot
+      [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination))
+      if (Test-Path -LiteralPath $destination -PathType Leaf) {
+        if ((Get-MIRCPSha256File -Path $destination) -ne $declaredDigest) { throw "Control-plane evidence store contains a conflicting immutable object: $declaredDigest" }
+      } else {
+        Copy-Item -LiteralPath $item.FullName -Destination $destination
+      }
+      [void](Read-MIRCPEvidenceObject -Digest $declaredDigest -RepoRoot $repo -Root $EvidenceRoot)
+      [void]$imported.Add($declaredDigest)
+    }
+  }
+  return [pscustomobject][ordered]@{
+    schema=1
+    status="passed"
+    worker_root=$workers
+    artifacts=$artifactDirectories.Count
+    objects=$imported.Count
+    ignored=$ignored
+    expanded_bytes=$expandedBytes
+  }
+}
+
 function Get-MIRCPEvidenceRevocationAuthority {
   param([string]$RepoRoot = "")
   return Read-MIRCPJson -Path ".mir/control-plane/evidence-revocations.json" -RepoRoot $RepoRoot

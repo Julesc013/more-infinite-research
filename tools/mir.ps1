@@ -39,7 +39,7 @@ Usage:
   .\tools\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
   .\tools\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
   .\tools\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
-  .\tools\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
+  .\tools\mir.ps1 verify <plan|fingerprint|explain|run-one|run|import-workers|gate|qualify>
   .\tools\mir.ps1 report latest
   .\tools\mir.ps1 report missing-deps --run <path>
   .\tools\mir.ps1 report observations --run <path>
@@ -421,6 +421,7 @@ switch ($area) {
       "explain" { "explain" }
       "run-one" { "run-one" }
       "run" { "verify" }
+      "import-workers" { "import-workers" }
       "gate" { "gate" }
       "qualify" { "qualify" }
       default { throw "Unknown verify command: $verb" }

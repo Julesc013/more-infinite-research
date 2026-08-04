@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet("record-context", "run-set", "environment", "upgrade", "ecosystem", "approved-delta", "performance", "aggregate")][string]$Operation,
+  [Parameter(Mandatory)][ValidateSet("record-context", "run-set", "environment", "upgrade", "ecosystem", "approved-delta", "performance", "import-workers", "aggregate")][string]$Operation,
   [Parameter(Mandatory)][string]$ContextPath,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [string[]]$Kind = @(),
@@ -12,7 +12,8 @@ param(
   [string]$SourceRepoRoot = "",
   [string]$TrustClass = "ci",
   [string]$AggregateTaskId = "",
-  [string]$EvidenceRoot = ".work/artifacts/evidence"
+  [string]$EvidenceRoot = ".work/artifacts/evidence",
+  [string]$WorkerRoot = ".work/artifacts/control-plane-worker-evidence"
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,5 +29,6 @@ switch ($Operation) {
   "ecosystem" { Invoke-MIRCPEcosystemMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -LocalModDir $LocalModDir -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
   "approved-delta" { Invoke-MIRCPApprovedDeltaMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -SourceRepoRoot $SourceRepoRoot -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
   "performance" { Invoke-MIRCPPerformanceMeasurement -ContextPath $ContextPath -FactorioBin $FactorioBin -PriorRelease $PriorRelease -LocalModZipDir $LocalModZipDir -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -SourceRepoRoot $SourceRepoRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
+  "import-workers" { Import-MIRCPWorkerEvidenceObjects -WorkerRoot $WorkerRoot -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
   "aggregate" { Complete-MIRCPAggregateGate -ContextPath $ContextPath -AggregateTaskId $AggregateTaskId -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo | ConvertTo-Json -Depth 10 }
 }
