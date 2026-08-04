@@ -535,6 +535,8 @@ docs:
       - canonical-recipe-risk-and-provider-decisions
       - technology-candidate-promotion-lifecycle
       - trusted-immutable-compiler-records
+      - research-cost-transition-authority
+      - planned-release-versus-candidate-authority
   - path: docs/architecture/3.3-2.6-semantic-platform-roadmap.md
     title: "MIR 3.3 And 2.6 Semantic Platform Roadmap"
     status: historical-checkpoint
@@ -597,6 +599,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-convergence-release
+      - mir-3.2.5-release-value-firewall
   - path: docs/releases/3.2.5-development-readiness.md
     title: "MIR 3.2.5 Development Readiness"
     status: current
@@ -637,6 +640,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-convergence-decision
+      - mir-c31-obligation-cancellation
   - path: docs/adr/0029-dual-plane-repository.md
     title: "ADR 0029: Dual-Plane Repository"
     status: current

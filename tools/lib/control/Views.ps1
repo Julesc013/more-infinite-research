@@ -318,10 +318,18 @@ function New-MIRCPTodoLines {
     foreach ($task in $openTasks) { $lines.Add("| $(Format-MIRCPCode $task.id) | $(Format-MIRCPCode $task.kind) | $(Format-MIRCPCode $task.state) | $(@($task.depends_on) -join ', ') |") }
   }
   $lines.Add("")
-  $lines.Add("## Open change and incident records")
+  $lines.Add("## Active change and incident records")
   $lines.Add("")
-  foreach ($change in @($Changes | Where-Object { [string]$_.state -notin @("verified", "closed") } | Sort-Object id)) { $lines.Add("- [ ] $(Format-MIRCPCode $change.id) — $($change.title) ($(Format-MIRCPCode $change.state))") }
-  foreach ($incident in @($Incidents | Where-Object { [string]$_.closure.status -ne "closed" } | Sort-Object id)) { $lines.Add("- [ ] $(Format-MIRCPCode $incident.id) — $($incident.title); closure $(Format-MIRCPCode $incident.closure.status)") }
+  $activeChanges = @($Changes | Where-Object { [string]$_.state -ne "closed" } | Sort-Object id)
+  $activeIncidents = @($Incidents | Where-Object { [string]$_.closure.status -notlike "closed*" } | Sort-Object id)
+  if (($activeChanges.Count + $activeIncidents.Count) -eq 0) {
+    $lines.Add("No active change or incident records.")
+  } else {
+    $lines.Add("| Record | Type | State | Title |")
+    $lines.Add("| --- | --- | --- | --- |")
+    foreach ($change in $activeChanges) { $lines.Add("| $(Format-MIRCPCode $change.id) | $(Format-MIRCPCode ("change/$($change.kind)")) | $(Format-MIRCPCode $change.state) | $($change.title) |") }
+    foreach ($incident in $activeIncidents) { $lines.Add("| $(Format-MIRCPCode $incident.id) | ``incident`` | $(Format-MIRCPCode $incident.closure.status) | $($incident.title) |") }
+  }
   $lines.Add("")
   $lines.Add("## Explicit release obligations")
   $lines.Add("")

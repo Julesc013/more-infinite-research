@@ -20,6 +20,16 @@ $trust = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\trust.js
 if ([int]$config.schema -ne 1 -or [int]$impact.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
   throw "Unsupported assurance manifest schema."
 }
+$releaseAssuranceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+foreach ($requiredTrustSelfTestSnippet in @(
+  '$differentTrustClass = if ([string]$Context.trust_class -eq "untrusted-pr")',
+  '{ "protected-integration" } else { "untrusted-pr" }',
+  '$differentTrustCapsule.producer.trust_class = $differentTrustClass'
+)) {
+  if (-not $releaseAssuranceSource.Contains($requiredTrustSelfTestSnippet)) {
+    throw "Assurance trust-class self-test does not guarantee a different decoy class: $requiredTrustSelfTestSnippet"
+  }
+}
 
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
@@ -312,6 +322,11 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
+  'Isolate exact development candidate from historical distributions',
+  'path: .work/candidate/*.zip',
+  'path: .work/candidate',
+  'Remove-Item -LiteralPath $source -Force',
+  '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
   'test_id = "reuse-only"',
@@ -323,6 +338,12 @@ foreach ($requiredWorkflowSnippet in @(
   if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
     throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
   }
+}
+if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
+  throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."
+}
+if (@([regex]::Matches($validateWorkflow, '--candidate \$env:MIR_DEVELOPMENT_CANDIDATE')).Count -ne 3) {
+  throw "Hosted planning, exact workers, and the aggregate gate must all bind the isolated development candidate explicitly."
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

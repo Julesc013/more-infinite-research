@@ -247,9 +247,9 @@ function New-MIRCPExecutionRegistry {
     observation_abi = 1
     source = [pscustomobject][ordered]@{
       catalog = "validation/scenarios/runtime.json"
-      catalog_sha256 = Get-MIRCPSha256File -Path $catalogPath
+      catalog_sha256 = Get-MIRCPPortableTextSha256 -Path $catalogPath
       runner = "scripts/Invoke-MIRValidation.ps1"
-      runner_sha256 = Get-MIRCPSha256File -Path $runnerPath
+      runner_sha256 = Get-MIRCPPortableTextSha256 -Path $runnerPath
       ast_command_count = $invocations.Count
       unmatched_literal_scenarios = $extraLiteralNames
     }

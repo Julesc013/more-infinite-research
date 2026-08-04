@@ -1,18 +1,18 @@
 ---
 title: "Current MIR Compiler Architecture Matrix"
 status: current
-applies_to: "3.2.0-dev"
+applies_to: "3.2.5-dev"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
 ---
 
 # Current MIR Compiler Architecture Matrix
 
-This matrix is the current operational map for the MIR 3.2 compiler. Historical release reports explain how individual layers arrived here; they do not override these ownership boundaries.
+This matrix is the current operational map for the MIR 3.2.5 compiler and release-engineering boundary. Historical release reports explain how individual layers arrived here; they do not override these ownership boundaries.
 
 | Concern | Canonical authority | Consumers | Mutation authority | Required parity or evidence |
 | --- | --- | --- | --- | --- |
@@ -22,6 +22,7 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 | Provider expansion | registered `CompilerProvider`, schema-1 `ProviderMetrics`, and scoped budget policy | family resolver and quality assessment | none | exact environment, partition, dispositions, depth, conflicts, time, bytes, witnesses, provenance, and completeness |
 | Compilation lifetime | schema-4 `CompilerContext` | every run-derived cache, service, and artifact | context state only | scoped packed activation, context-owned frozen services, explicit state epochs, compact public snapshots, and no cross-context state |
 | Compiler boundary | normalized schema-2 `CompilationSnapshot`, schema-1 `PolicySnapshot`, schema-2 `CompilerInput`, schema-3 `CompilerResult`, and schema-2 runtime identity | pure compiler, compatibility finalizer, and orchestrator | none | structurally shared fact domains plus exact input, planned/final result, environment, plan, journal, and qualification fingerprints |
+| Research-cost semantics | bounded canonical cost evaluator, semantic and authority digests, and `mir-research-cost-transition-v1` old/new descriptor | planner, runtime configuration-change migration, upgrade fixtures, and diagnostics | runtime migration may update only preserved research progress under an authenticated descriptor | fixed, linear, exponential, and hybrid algebra; sixteen transition pairs; `old_cost / new_cost` unit preservation; fail-closed unknown, tampered, and over-budget inputs; exact reload parity |
 | Internal record trust | module-private weak-key authorities in `core/trusted_record.lua` | gates, designs, qualifications, candidates, catalogs, transformation operations, and transformation plans | constructors and explicit import verifiers only | untrusted records receive one complete schema/cross-field/fingerprint verification; compiler-owned immutable records use cheap identity assertions; snapshots and final output remain defensive deep-verification boundaries |
 | Technology alternatives | canonical post-graph schema-3 `TechnologyCatalog` plus deterministic selection policy | GenerationPlan, CompilationPlan, preview, review dossier, assessment | none | rejected designs and total gates survive; both plans are exact projections |
 | Hard safety | `SafetyQualification` and evidence-bearing gate records | catalog selection and CompilationPlan | none | pending is proposal; passed/failed bind evaluator and evidence; provisional gates are superseded explicitly |
@@ -33,6 +34,8 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 | Presentation | `presentation/icon_builder.lua` | planning, diagnostics, and emitter facade | none | presentation construction has no dependency on mutation modules |
 | Emission | exact schema-2 TransformationPlan, plan-bound MutationJournal, `emit/technology_design_adapter.lua`, and the shared technology-operation executor | Factorio prototype table | generated technology creation and authorized patch-existing operations only | every mandatory operation proves exact before/after state; missing, duplicate, undeclared, failed, or out-of-plan work fails closed |
 | Reporting | governed public-artifact budgets, public artifact projector, diagnostics sink, and offline dossier/export tooling | mod-data, log, validation, reviewer tooling | none | compact bounded public artifacts; detailed internal artifacts only in diagnostics or preview mode; byte overflow fails publication |
+| Repository authority | logical path IDs resolved through `tools/lib/workspace/RepoPaths.ps1`, typed `.mir/` records, and generated compatibility views | control plane, assurance, validation, documentation, and maintainer commands | typed-record commands and explicitly governed generators only | one durable logical authority per path or fact; aliases are read-only; generated views fail freshness checks when stale |
+| Release planning and identity | typed `ReleaseRecord` plus append-only transition and closure records | assurance plans, generated release views, package locks, sealing, and promotion | release controller only | planned reservation and exact candidate identity are separate; pre-candidate plans bind a source snapshot but grant no candidate authority; source freeze and later states require monotonic exact identity and proof |
 
 ## Non-duplication rules
 
@@ -48,4 +51,4 @@ This matrix is the current operational map for the MIR 3.2 compiler. Historical 
 
 ## Candidate boundary
 
-Historical candidate archives remain immutable in release authority. The current development candidate and all archive, package-source, and qualification fields are generated in [Current Development Candidate](../releases/current-candidate.md) from `.mir/releases.json`; this architecture document does not duplicate mutable candidate identity. Qualification evidence transfers only when every bound package and assurance fingerprint is identical.
+Historical candidate archives remain immutable in release authority. The current development reservation or candidate and all archive, package-source, and qualification fields are generated in [Current Development Candidate](../releases/current-candidate.md) from the typed `.mir/releases/records/3.2.5.json` authority; `.mir/releases.json` is only a generated compatibility projection. This architecture document does not duplicate mutable candidate identity. Qualification evidence transfers only when every bound package and assurance fingerprint is identical.

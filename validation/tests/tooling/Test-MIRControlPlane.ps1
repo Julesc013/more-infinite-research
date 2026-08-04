@@ -62,6 +62,22 @@ foreach ($schemaName in @("change-record.schema.json", "candidate-closure.schema
   }
 }
 
+$portableDigestRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-control-plane-portable-digest-" + [guid]::NewGuid().ToString("N"))
+try {
+  [void](New-Item -ItemType Directory -Path $portableDigestRoot)
+  $lfPath = Join-Path $portableDigestRoot "lf.txt"
+  $crlfPath = Join-Path $portableDigestRoot "crlf.txt"
+  [IO.File]::WriteAllText($lfPath, "one`ntwo`n", [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($crlfPath, "one`r`ntwo`r`n", [Text.UTF8Encoding]::new($false))
+  if ((Get-MIRCPPortableTextSha256 -Path $lfPath) -ne (Get-MIRCPPortableTextSha256 -Path $crlfPath)) {
+    throw "Portable control-plane text digests differ across LF and CRLF checkouts."
+  }
+} finally {
+  if (Test-Path -LiteralPath $portableDigestRoot -PathType Container) {
+    Remove-Item -LiteralPath $portableDigestRoot -Recurse -Force
+  }
+}
+
 $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo

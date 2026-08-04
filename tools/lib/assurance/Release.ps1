@@ -25,6 +25,59 @@ function Test-MIRAssuranceReleaseCandidateId {
   return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
 }
 
+function Get-MIRAssuranceReleasePlanningAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  $version = [string]$Context.info.version
+  $recordPath = Join-Path $repo ".mir\releases\records\$version.json"
+  if (-not (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
+    throw "Typed release authority is missing: .mir/releases/records/$version.json"
+  }
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+  if ([int]$record.schema -ne 1 -or
+      [string]$record.release -ne $version -or
+      [string]$record.target -ne [string]$Context.target) {
+    throw "Typed release authority does not match the verification context."
+  }
+
+  $states = @(
+    "planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified",
+    "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published",
+    "publicly-verified"
+  )
+  if ($states -notcontains [string]$record.state) {
+    throw "Typed release authority state is invalid: $($record.state)"
+  }
+
+  $authorityClass = "exact-candidate"
+  $packageSourceCommit = [string]$record.package.source_commit
+  if ([string]$record.state -eq "planned") {
+    if ([string]$record.candidate_id -ne "not-assigned" -or
+        [string]$record.candidate_floor -notmatch '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$' -or
+        @($record.package.PSObject.Properties).Count -ne 0) {
+      throw "Planned release authority must contain only an unassigned candidate reservation and no frozen package identity."
+    }
+    $authorityClass = "planned-reservation"
+    $packageSourceCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+  } else {
+    if (-not (Test-MIRAssuranceReleaseCandidateId -CandidateId ([string]$record.candidate_id)) -or
+        $packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+      throw "Post-planning release authority must bind an exact candidate and package-source commit."
+    }
+    $packageSourceCommit = Resolve-MIRAssuranceCommit -Commit $packageSourceCommit
+  }
+
+  return [pscustomobject][ordered]@{
+    release = $version
+    target = [string]$record.target
+    state = [string]$record.state
+    authority_class = $authorityClass
+    candidate_id = [string]$record.candidate_id
+    candidate_floor = [string]$record.candidate_floor
+    package_source_commit = $packageSourceCommit
+  }
+}
+
 function Get-MIRAssuranceReleaseCandidateAuthority {
   param([Parameter(Mandatory)]$Context)
 
@@ -667,6 +720,24 @@ function Invoke-MIRAssuranceSelfTest {
     }
   }
 
+  $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
+  if ([string]$planningAuthority.state -eq "planned") {
+    if ([string]$planningAuthority.authority_class -ne "planned-reservation" -or
+        [string]$planningAuthority.candidate_id -ne "not-assigned" -or
+        [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
+      throw "Planned release reservation did not produce a source-bound non-candidate planning authority."
+    }
+    $candidateAuthorityRejected = $false
+    try {
+      $null = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    } catch {
+      $candidateAuthorityRejected = $true
+    }
+    if (-not $candidateAuthorityRejected) {
+      throw "Planned release reservation was incorrectly accepted as exact candidate authority."
+    }
+  }
+
   if ([string]$Context.target -eq "2.1" -and [string]$Context.info.version -eq "3.2.0") {
     $authority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
     $qualificationCommit = Resolve-MIRAssuranceCommit -Commit HEAD
@@ -784,10 +855,11 @@ function Invoke-MIRAssuranceSelfTest {
   if ((Test-MIRAssuranceCapsule -Capsule $fakeCapsule -Fingerprint $fingerprint -Context $Context).valid) {
     throw "A fake passing capsule without structured result evidence was accepted."
   }
-  $untrustedCapsule = ($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
-  $untrustedCapsule.producer.trust_class = "untrusted-pr"
-  $untrustedCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $untrustedCapsule
-  if ((Test-MIRAssuranceCapsule -Capsule $untrustedCapsule -Fingerprint $fingerprint -Context $Context).valid) {
+  $differentTrustClass = if ([string]$Context.trust_class -eq "untrusted-pr") { "protected-integration" } else { "untrusted-pr" }
+  $differentTrustCapsule = ($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
+  $differentTrustCapsule.producer.trust_class = $differentTrustClass
+  $differentTrustCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $differentTrustCapsule
+  if ((Test-MIRAssuranceCapsule -Capsule $differentTrustCapsule -Fingerprint $fingerprint -Context $Context).valid) {
     throw "Evidence from a different trust class was accepted."
   }
   [IO.File]::WriteAllText($paths.blocked, "{}`n", [Text.UTF8Encoding]::new($false))

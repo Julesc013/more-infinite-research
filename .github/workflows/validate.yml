@@ -32,9 +32,31 @@ jobs:
       - name: Diagnose verifier
         shell: pwsh
         run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
+      - name: Build byte-bound development archive
+        shell: pwsh
+        run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET
+      - name: Isolate exact development candidate from historical distributions
+        shell: pwsh
+        run: |
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
+          $archiveName = "$($info.name)_$($info.version).zip"
+          $source = Join-Path $PWD "dist/$archiveName"
+          $candidateRoot = Join-Path $PWD ".work/candidate"
+          $candidate = Join-Path $candidateRoot $archiveName
+          if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+            throw "Development candidate was not built: $source"
+          }
+          New-Item -ItemType Directory -Force -Path $candidateRoot | Out-Null
+          Copy-Item -LiteralPath $source -Destination $candidate -Force
+          if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -ne
+              (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash) {
+            throw "Isolated development candidate differs from the exact build output."
+          }
+          Remove-Item -LiteralPath $source -Force
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --output .work/output/verification-plan.json
+        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output .work/output/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -57,6 +79,11 @@ jobs:
           name: mir-verification-plan
           path: .work/output/verification-plan.json
           if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-development-candidate
+          path: .work/candidate/*.zip
+          if-no-files-found: error
 
   tests:
     name: ${{ matrix.test_id }}
@@ -78,6 +105,21 @@ jobs:
         with:
           name: mir-verification-plan
           path: .work/output
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.no_op != true }}
+        with:
+          name: mir-development-candidate
+          path: .work/candidate
+      - name: Resolve exact development candidate
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: |
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
+          $candidate = Join-Path $PWD ".work/candidate/$($info.name)_$($info.version).zip"
+          if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            throw "Transferred development candidate is absent: $candidate"
+          }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
@@ -90,7 +132,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --plan .work/output/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -118,6 +160,19 @@ jobs:
         with:
           name: mir-verification-plan
           path: .work/output
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-development-candidate
+          path: .work/candidate
+      - name: Resolve exact development candidate
+        shell: pwsh
+        run: |
+          $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
+          $candidate = Join-Path $PWD ".work/candidate/$($info.name)_$($info.version).zip"
+          if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            throw "Transferred development candidate is absent: $candidate"
+          }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
@@ -135,7 +190,7 @@ jobs:
           merge-multiple: true
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --plan .work/output/verification-plan.json --output .work/artifacts/assurance/evidence-bundle.json
+        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --output .work/artifacts/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4

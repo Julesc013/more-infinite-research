@@ -114,6 +114,13 @@ function Get-MIRCPSha256File {
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
 }
 
+function Get-MIRCPPortableTextSha256 {
+  param([Parameter(Mandatory)][string]$Path)
+  if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "File not found for portable text SHA-256: $Path" }
+  $text = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+  return Get-MIRCPSha256Text -Value $text
+}
+
 function Write-MIRCPJson {
   param(
     [Parameter(Mandatory)][string]$Path,

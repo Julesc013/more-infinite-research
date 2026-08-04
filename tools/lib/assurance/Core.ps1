@@ -575,7 +575,7 @@ function Get-MIRAssurancePlan {
   }
   $expanded = @(Expand-MIRAssuranceTests -Tests $selectedDefinitions -Context $Context -ImpactSelection $impactSelection)
   Write-MIRAssuranceTiming -Label "expanded-tests" -Stopwatch $timing
-  $releaseAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+  $releaseAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
   $plan = [ordered]@{
     schema=4
     policy_id=[string]$Context.verification_profile.policy_id
