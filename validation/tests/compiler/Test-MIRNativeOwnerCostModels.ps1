@@ -35,6 +35,7 @@ $transitionSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototyp
 $emitterSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\emit\transactions\productivity_family_adoption.lua")
 $runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\runtime\productivity_family_adoption.lua")
 $progressFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-native-owner-progress\control.lua")
+$compilerContractFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-compiler-contracts\data-final-fixes.lua")
 $validationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRValidation.ps1")
 
 foreach ($contract in $contracts) {
@@ -77,6 +78,11 @@ foreach ($kind in @('fixed', 'linear', 'exponential', 'hybrid')) {
   if ($formulaSource -notmatch ('"' + [regex]::Escape($kind) + '"')) { throw "Research-cost formula kind missing: $kind" }
 }
 if ($researchCostSource -notmatch 'mir-research-cost-v1') { throw "ResearchCostModel formula ABI is missing." }
+if ($compilerContractFixtureSource -notmatch 'native_model\.base\s*~=\s*1500' -or
+    $compilerContractFixtureSource -notmatch 'configured_native\.count_formula\s*~=\s*"2000\*1\.25\^\(L-1\)"' -or
+    $compilerContractFixtureSource -notmatch 'count_formula\s*=\s*"1000 \+ 100 \* L\^2"') {
+  throw "Compiler-contract fixture must assert anchor-level native base cost and canonical configured formula output."
+}
 $costTrioIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or linear_increment\.changed or growth\.changed' -and
   $bindingSource -match 'base = cost_changed and base\.value or nil' -and
   $bindingSource -match 'linear_increment = cost_changed and linear_increment\.value or nil' -and
