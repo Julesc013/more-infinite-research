@@ -309,6 +309,34 @@ function New-MIRCPTodoLines {
     $lines.Add("| $(Format-MIRCPCode $release.release) | $(Format-MIRCPCode $release.candidate_id) | $(Format-MIRCPCode $release.candidate_floor) | $(Format-MIRCPCode $release.state) | $(Format-MIRCPCode $next) |")
   }
   $lines.Add("")
+  $lines.Add("## Canonical execution programme")
+  $lines.Add("")
+  $lines.Add("The ordered release train, freeze packet, stop conditions, conditional 2.5.5 projection, and 3.3/2.6 handoff are defined in [MIR 3.2.5 To 2.6 Convergence Programme](docs/releases/3.2.5-to-2.6-convergence-programme.md). The [development readiness record](docs/releases/3.2.5-development-readiness.md) distinguishes implemented development work from open release proof, and the [follow-up audit prompt](docs/maintainer/ultimate-convergence-follow-up-prompt.md) is the worker handoff.")
+  $lines.Add("")
+  $lines.Add("Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.")
+  $lines.Add("")
+  $lines.Add("## Immediate convergence gates")
+  $lines.Add("")
+  $lines.Add("| Gate | Current boundary | Completion proof |")
+  $lines.Add("| --- | --- | --- |")
+  $lines.Add("| ``325-A1a`` deterministic fan-in | Implemented on the PR branch; hosted closure pending | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and a green latest-head aggregate run |")
+  $lines.Add("| ``325-A1b`` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited ``GIT_INDEX_FILE``, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |")
+  $lines.Add("| ``325-B0`` first complete compatibility slice | Queued after hosted closure | Research-cost default parity traced through disposition, typed proof, bounded support output, and exact Factorio 2.0 disposition |")
+  $lines.Add("| ``325-D1`` freeze defect register | Open | Algebraic cost proof, numeric envelope, owner removal/transfer, descriptor authority, README reset reconciliation, exact default parity, save/reload/second-reload, and Factorio 2.0 cost disposition are all terminal |")
+  $lines.Add("| Minimum compatibility product | Declaration required before freeze | Factorio 2.1 Base/Space Age, conditional Factorio 2.0 Base/Space Age, and explicit projection or terminal disposition for every stable authority |")
+  $lines.Add("| Bounded ecosystem matrix | Declaration required before freeze | Exact Base, Space Age, P11/BZ, owner-pack, broad-overhaul, and negative/conflict rows with version/hash locks, claim level, fixture/load-check, budgets, and terminal wording |")
+  $lines.Add("")
+  $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
+  if ($plannedChanges.Count -gt 0) {
+    $lines.Add("| Planned change | Package visible | Targets | Completion boundary |")
+    $lines.Add("| --- | --- | --- | --- |")
+    foreach ($change in $plannedChanges) {
+      $targets = @($change.affected_targets | ForEach-Object { Format-MIRCPCode ([string]$_) }) -join ", "
+      $boundary = ([string]$change.migration_impact) -replace '\|', '\|'
+      $lines.Add("| $(Format-MIRCPCode $change.id) | $(Format-MIRCPCode ([string][bool]$change.package_visible).ToLowerInvariant()) | $targets | $boundary |")
+    }
+    $lines.Add("")
+  }
   $lines.Add("## Executable TaskNodes")
   $lines.Add("")
   $openTasks = @($Tasks | Where-Object { [string]$_.state -notin @("satisfied", "cancelled") } | Sort-Object id)

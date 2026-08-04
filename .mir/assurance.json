@@ -10,6 +10,12 @@
     "evidence": ".work/artifacts/assurance/evidence",
     "aggregate_gate": "MIR / verification-gate"
   },
+  "worker_import": {
+    "max_artifacts": 512,
+    "max_entries_per_artifact": 10000,
+    "max_expanded_bytes_per_artifact": 1073741824,
+    "max_file_bytes": 536870912
+  },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
     "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.release-history", "static.package"],
@@ -62,12 +68,12 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/lib/assurance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/Invoke-MIRControlPlaneWork\\.ps1|lib/control/(?:Evidence|Views)\\.ps1)$", "^tools/lib/assurance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {

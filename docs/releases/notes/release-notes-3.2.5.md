@@ -5,7 +5,7 @@ applies_to: "3.2.5"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 supersedes: ["docs/releases/3.2.4-unified-research-cost-curves.md"]
 superseded_by: []
 ---
@@ -27,6 +27,7 @@ MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3
 - MIR now carries compact versioned old/new cost descriptors into runtime instead of reparsing research formulas there.
 - When a recognized adopted native owner changes cost, MIR preserves completed unit-equivalent work by converting the old fractional progress with `old_cost / new_cost`.
 - The active technology, exact level, queue, completed levels, and unrelated force state remain untouched by the conversion.
+- Productivity-family adoption signature changes no longer call a force-wide technology-effect reset, so unrelated mod effects and force recipe state are not reapplied.
 - A malformed, tampered, unknown, or over-budget descriptor is refused safely and produces a stable diagnostic.
 
 ## Compatibility and stability
@@ -40,6 +41,8 @@ MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3
 ## Candidate status
 
 The source remains under development. `C32` is a reserved candidate floor, not an assigned candidate identity. Development packages are for testing only until exact upgrade, reload-equivalence, ecosystem, performance, manual, protected, seal, publication, and public-byte gates are complete.
+
+The hosted assurance control plane now isolates each worker's exact test/fingerprint subtree and requires a plan-bound worker receipt before deterministic aggregate import. This is release tooling, not candidate evidence: `325-A1a` remains open until a fresh latest-head hosted aggregate run passes.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity

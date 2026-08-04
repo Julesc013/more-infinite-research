@@ -19,6 +19,54 @@
       "tags": []
     },
     {
+      "pattern": ".mir/views/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/control/Views.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/validate.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/assurance-*.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/control-plane-v5.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/control/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/control/Evidence.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/mir.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/public-artifact-budgets.json",
       "groups": ["base-load", "local-mod-library"],
       "scenarios": ["compiler-contracts", "package-zip-base", "package-zip-space-age"],
@@ -26,6 +74,24 @@
     },
     {
       "pattern": "validation/tests/tooling/Test-MIRAssurance.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/package/Test-MIRArtifactCleanup.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []

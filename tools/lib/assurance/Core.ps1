@@ -76,7 +76,10 @@ function ConvertTo-MIRAssuranceDateTimeOffset {
 function ConvertTo-MIRAssuranceTimestampText {
   param([Parameter(Mandatory)]$Value)
   if ($Value -is [DateTimeOffset] -or $Value -is [DateTime]) {
-    return (ConvertTo-MIRAssuranceDateTimeOffset -Value $Value).ToUniversalTime().ToString("o")
+    return (ConvertTo-MIRAssuranceDateTimeOffset -Value $Value).ToUniversalTime().ToString(
+      "o",
+      [Globalization.CultureInfo]::InvariantCulture
+    )
   }
   return [string]$Value
 }

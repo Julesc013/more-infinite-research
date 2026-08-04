@@ -798,6 +798,10 @@ function Invoke-MIRAssuranceSelfTest {
   $selfTestArtifactRoot = Join-Path $paths.root "work\synthetic"
   New-Item -ItemType Directory -Force -Path $selfTestArtifactRoot | Out-Null
   $selfTestResultPath = Join-Path $selfTestArtifactRoot "result.json"
+  $selfTestStdoutPath = Join-Path $selfTestArtifactRoot "stdout.txt"
+  $selfTestStderrPath = Join-Path $selfTestArtifactRoot "stderr.txt"
+  [IO.File]::WriteAllText($selfTestStdoutPath, "", [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($selfTestStderrPath, "", [Text.UTF8Encoding]::new($false))
   $selfTestAssertions = @(
     [ordered]@{
       id="synthetic"
@@ -820,7 +824,8 @@ function Invoke-MIRAssuranceSelfTest {
   $selfTestResultDescriptor = Get-MIRAssuranceArtifactDescriptor -Path $selfTestResultPath -Kind "structured-test-result"
   $selfTestResultDescriptor["schema"] = "mir-test-result-v1"
   $selfTestResultDescriptor["status"] = "passed"
-  $emptyLogHash = Get-MIRAssuranceTextHash -Text ""
+  $emptyFileHash = Get-MIRAssuranceTextHash -Text ""
+  $emptyLogHash = Get-MIRAssuranceTextHash -Text "`n"
   $capsule = [ordered]@{
     schema=$evidenceSchema
     test_id=$selfTestId
@@ -839,8 +844,8 @@ function Invoke-MIRAssuranceSelfTest {
     exit_code=0
     result=$selfTestResultDescriptor
     artifacts=@()
-    stdout_sha256=$emptyLogHash
-    stderr_sha256=$emptyLogHash
+    stdout_sha256=$emptyFileHash
+    stderr_sha256=$emptyFileHash
     log_digest=$emptyLogHash
     started_at=(Get-Date).ToUniversalTime().ToString("o")
     completed_at=(Get-Date).ToUniversalTime().ToString("o")
@@ -849,6 +854,342 @@ function Invoke-MIRAssuranceSelfTest {
   }
   $null = Write-MIRAssuranceAttempt -Capsule $capsule
   if ($null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context)) { throw "Passing exact-input evidence was not reusable." }
+
+  $fanInRoot = Join-Path $artifactRoot ("worker-import-self-test\" + [guid]::NewGuid().ToString("N"))
+  $fanInPrefix = "mir-selftest-"
+  $fanInTest = [pscustomobject][ordered]@{
+    id=$selfTestId
+    safe_test_id=$selfTestId
+    fingerprint=[pscustomobject]$fingerprint
+    force_fresh=$false
+  }
+  $fanInWork = [pscustomobject][ordered]@{
+    test_id=$selfTestId
+    safe_test_id=$selfTestId
+    fingerprint=$selfTestKey
+    disposition="RUN"
+    layer="F0"
+  }
+  $fanInPlan = [pscustomobject][ordered]@{tests=@($fanInTest); work=@($fanInWork)}
+  $fanInPlan | Add-Member -NotePropertyName plan_material_sha256 -NotePropertyValue (Get-MIRAssuranceTextHash -Text "self-test-plan-material") -Force
+  $fanInPlan | Add-Member -NotePropertyName required_test_set_sha256 -NotePropertyValue (Get-MIRAssuranceJsonHash -Value @($selfTestId)) -Force
+  $fanInPlan | Add-Member -NotePropertyName generated_at -NotePropertyValue ([string]$capsule.started_at) -Force
+  $fanInPlan | Add-Member -NotePropertyName source_commit -NotePropertyValue ([string]$capsule.producer.commit) -Force
+  $fanInPlan | Add-Member -NotePropertyName source_tree -NotePropertyValue ((& git -C $repo rev-parse "HEAD^{tree}").Trim()) -Force
+  $fanInPlan | Add-Member -NotePropertyName target -NotePropertyValue ([string]$Context.target) -Force
+  $fanInPlan | Add-Member -NotePropertyName profile -NotePropertyValue "self-test" -Force
+  $fanInPlan | Add-Member -NotePropertyName producer -NotePropertyValue $capsule.producer -Force
+  $exactFanInGeneratedAt = [DateTimeOffset]::Parse(
+    "2026-08-04T17:49:32.0321566Z",
+    [Globalization.CultureInfo]::InvariantCulture,
+    [Globalization.DateTimeStyles]::RoundtripKind
+  )
+  $fanInTimestampCases = @(
+    [pscustomobject][ordered]@{label="datetime-offset";value=$exactFanInGeneratedAt},
+    [pscustomobject][ordered]@{label="datetime";value=$exactFanInGeneratedAt.UtcDateTime}
+  )
+  $copyFanInArtifact = {
+    param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string[]]$CreationOrder)
+    New-Item -ItemType Directory -Force -Path $Root | Out-Null
+    foreach ($entry in $CreationOrder) {
+      $name = if ($entry -eq "expected") { "$fanInPrefix$selfTestId" } else { "${fanInPrefix}decoy" }
+      $destination = Join-Path $Root $name
+      New-Item -ItemType Directory -Force -Path $destination | Out-Null
+      foreach ($item in @(Get-ChildItem -LiteralPath $paths.root -Force)) {
+        Copy-Item -LiteralPath $item.FullName -Destination $destination -Recurse -Force
+      }
+      if ($entry -eq "decoy") {
+        $decoyPointerPath = Join-Path $destination "passed.json"
+        $decoyPointer = Get-Content -Raw -LiteralPath $decoyPointerPath | ConvertFrom-Json
+        $decoyPointer.input_key = "stale-colliding-pointer"
+        Write-MIRAssuranceAtomicJson -Value $decoyPointer -Path $decoyPointerPath
+        $decoyReceiptPath = Join-Path $destination "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+        $decoyReceipt = Get-Content -Raw -LiteralPath $decoyReceiptPath | ConvertFrom-Json
+        $decoyReceipt.plan.material_sha256 = Get-MIRAssuranceTextHash -Text "stale-plan-material"
+        Write-MIRAssuranceAtomicJson -Value $decoyReceipt -Path $decoyReceiptPath
+      }
+    }
+  }
+  $resetFanInDestination = {
+    [IO.File]::WriteAllText($paths.passed, "{}`n", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($paths.blocked, "{}`n", [Text.UTF8Encoding]::new($false))
+  }
+  $mixedCleanupRoots = [Collections.Generic.List[string]]::new()
+  try {
+    $originalCulture = [Threading.Thread]::CurrentThread.CurrentCulture
+    $originalUiCulture = [Threading.Thread]::CurrentThread.CurrentUICulture
+    try {
+      [Threading.Thread]::CurrentThread.CurrentCulture = [Globalization.CultureInfo]::GetCultureInfo("en-AU")
+      [Threading.Thread]::CurrentThread.CurrentUICulture = [Globalization.CultureInfo]::GetCultureInfo("en-AU")
+      foreach ($timestampCase in $fanInTimestampCases) {
+        $fanInPlan.generated_at = $timestampCase.value
+        $null = Write-MIRAssuranceWorkerReceipt -Plan $fanInPlan -Test $fanInTest -Capsule $capsule
+        $timestampReceiptPath = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+        $timestampReceipt = Get-Content -Raw -LiteralPath $timestampReceiptPath | ConvertFrom-Json
+        $expectedTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $fanInPlan.generated_at
+        $receiptTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $timestampReceipt.plan.generated_at
+        $fractionalTicks = $expectedTimestamp.UtcDateTime.Ticks % [TimeSpan]::TicksPerSecond
+        if ($fractionalTicks -eq 0 -or
+            $receiptTimestamp.UtcDateTime.Ticks -ne $expectedTimestamp.UtcDateTime.Ticks) {
+          throw "Worker receipt lost exact fractional timestamp ticks for $([string]$timestampCase.label)."
+        }
+
+        $timestampRoot = Join-Path $fanInRoot ("timestamp-" + [string]$timestampCase.label)
+        & $copyFanInArtifact $timestampRoot @("expected")
+        & $resetFanInDestination
+        $timestampImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $timestampRoot -ArtifactPrefix $fanInPrefix
+        if ([string]$timestampImport.status -ne "passed" -or
+            @($timestampImport.imported).Count -ne 1 -or
+            @($timestampImport.rejected).Count -ne 0) {
+          throw "Worker fan-in rejected canonical $([string]$timestampCase.label) plan timestamps."
+        }
+      }
+    } finally {
+      [Threading.Thread]::CurrentThread.CurrentCulture = $originalCulture
+      [Threading.Thread]::CurrentThread.CurrentUICulture = $originalUiCulture
+    }
+
+    $forwardRoot = Join-Path $fanInRoot "forward"
+    $reverseRoot = Join-Path $fanInRoot "reverse"
+    & $copyFanInArtifact $forwardRoot @("decoy", "expected")
+    & $copyFanInArtifact $reverseRoot @("expected", "decoy")
+
+    & $resetFanInDestination
+    $forwardImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $forwardRoot -ArtifactPrefix $fanInPrefix
+    $forwardPointerSha256 = Get-MIRAssuranceSha256 -Path $paths.passed
+    $forwardCapsule = Read-MIRAssuranceEvidencePointer -Path $paths.passed
+    if ($null -eq $forwardCapsule -or (Test-Path -LiteralPath $paths.blocked -PathType Leaf)) {
+      throw "Forward-order worker fan-in did not select the exact passing object: $($forwardImport | ConvertTo-Json -Depth 10 -Compress)"
+    }
+
+    & $resetFanInDestination
+    $reverseImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $reverseRoot -ArtifactPrefix $fanInPrefix
+    $reversePointerSha256 = Get-MIRAssuranceSha256 -Path $paths.passed
+    $reverseCapsule = Read-MIRAssuranceEvidencePointer -Path $paths.passed
+    if ($null -eq $reverseCapsule -or
+        $forwardPointerSha256 -ne $reversePointerSha256 -or
+        [string]$forwardCapsule.result_digest -ne [string]$reverseCapsule.result_digest -or
+        (Get-MIRAssuranceJsonHash -Value $forwardImport.imported) -ne (Get-MIRAssuranceJsonHash -Value $reverseImport.imported)) {
+      throw "Worker fan-in changed when unrelated artifact creation order was reversed."
+    }
+
+    $mismatchRoot = Join-Path $fanInRoot "mismatch"
+    & $copyFanInArtifact $mismatchRoot @("expected")
+    $mismatchPointerPath = Join-Path (Join-Path $mismatchRoot "$fanInPrefix$selfTestId") "passed.json"
+    $mismatchPointer = Get-Content -Raw -LiteralPath $mismatchPointerPath | ConvertFrom-Json
+    $mismatchPointer.input_key = "mismatched-input"
+    Write-MIRAssuranceAtomicJson -Value $mismatchPointer -Path $mismatchPointerPath
+    & $resetFanInDestination
+    $mismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $mismatchRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$mismatchImport.status -ne "passed" -or
+        [string]$mismatchImport.imported[0].pointer_status -ne "stale-ignored" -or
+        $null -eq (Read-MIRAssuranceEvidencePointer -Path $paths.passed)) {
+      throw "Worker fan-in treated a stale supplied pointer as evidence authority."
+    }
+
+    $missingPointerRoot = Join-Path $fanInRoot "missing-pointer"
+    & $copyFanInArtifact $missingPointerRoot @("expected")
+    Remove-Item -LiteralPath (Join-Path (Join-Path $missingPointerRoot "$fanInPrefix$selfTestId") "passed.json") -Force
+    & $resetFanInDestination
+    $missingPointerImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $missingPointerRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$missingPointerImport.status -ne "passed" -or
+        [string]$missingPointerImport.imported[0].pointer_status -ne "missing" -or
+        $null -eq (Read-MIRAssuranceEvidencePointer -Path $paths.passed)) {
+      throw "Worker fan-in required a mutable worker pointer instead of deriving it from immutable receipt objects."
+    }
+
+    $receiptMismatchRoot = Join-Path $fanInRoot "receipt-mismatch"
+    & $copyFanInArtifact $receiptMismatchRoot @("expected")
+    $receiptMismatchPath = Join-Path (Join-Path $receiptMismatchRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $receiptMismatch = Get-Content -Raw -LiteralPath $receiptMismatchPath | ConvertFrom-Json
+    $receiptMismatch.plan.material_sha256 = "different-verification-context"
+    Write-MIRAssuranceAtomicJson -Value $receiptMismatch -Path $receiptMismatchPath
+    $receiptMismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $receiptMismatchRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$receiptMismatchImport.status -ne "failed" -or @($receiptMismatchImport.rejected).Count -ne 1) {
+      throw "Worker fan-in accepted a receipt from a different verification context."
+    }
+
+    $producerMismatchRoot = Join-Path $fanInRoot "producer-mismatch"
+    & $copyFanInArtifact $producerMismatchRoot @("expected")
+    $producerMismatchPath = Join-Path (Join-Path $producerMismatchRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $producerMismatch = Get-Content -Raw -LiteralPath $producerMismatchPath | ConvertFrom-Json
+    $producerMismatch.producer.job = "different-worker-job"
+    Write-MIRAssuranceAtomicJson -Value $producerMismatch -Path $producerMismatchPath
+    $producerMismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $producerMismatchRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$producerMismatchImport.status -ne "failed" -or @($producerMismatchImport.rejected).Count -ne 1) {
+      throw "Worker fan-in accepted a receipt whose worker job identity differed from its evidence producer."
+    }
+
+    $duplicateRoot = Join-Path $fanInRoot "duplicate"
+    & $copyFanInArtifact $duplicateRoot @("expected")
+    Copy-Item -LiteralPath (Join-Path $duplicateRoot "$fanInPrefix$selfTestId") `
+      -Destination (Join-Path $duplicateRoot "$fanInPrefix$selfTestId-duplicate") -Recurse
+    $duplicateImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $duplicateRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$duplicateImport.status -ne "failed" -or @($duplicateImport.duplicates).Count -ne 1) {
+      throw "Worker fan-in did not reject duplicate contributions for one exact plan row."
+    }
+
+    foreach ($unsafeWorkerPath in @(
+      "C:\absolute\object.json",
+      "/absolute/object.json",
+      "../traversal/object.json",
+      "safe/..\mixed-traversal.json",
+      "safe/object.json:alternate-stream"
+    )) {
+      $unsafeRejected = $false
+      try { $null = Get-MIRAssuranceWorkerCanonicalPath -Path $unsafeWorkerPath } catch { $unsafeRejected = $true }
+      if (-not $unsafeRejected) { throw "Worker path confinement accepted unsafe syntax: $unsafeWorkerPath" }
+    }
+    $caseA = Get-MIRAssuranceWorkerCanonicalPath -Path "Case/Object.json"
+    $caseB = Get-MIRAssuranceWorkerCanonicalPath -Path "case/object.json"
+    $unicodeA = Get-MIRAssuranceWorkerCanonicalPath -Path ("unicode/" + [char]0x00E9 + ".json")
+    $unicodeB = Get-MIRAssuranceWorkerCanonicalPath -Path ("unicode/e" + [char]0x0301 + ".json")
+    if ([string]$caseA.key -ne [string]$caseB.key -or [string]$unicodeA.key -ne [string]$unicodeB.key) {
+      throw "Worker path confinement did not canonicalize case-fold and Unicode-normalization collisions."
+    }
+
+    $unicodeCollisionRoot = Join-Path $fanInRoot "unicode-collision"
+    New-Item -ItemType Directory -Force -Path $unicodeCollisionRoot | Out-Null
+    [IO.File]::WriteAllText((Join-Path $unicodeCollisionRoot (([char]0x00E9) + ".json")), "composed", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $unicodeCollisionRoot ("e" + [char]0x0301 + ".json")), "decomposed", [Text.UTF8Encoding]::new($false))
+    $unicodeCollisionRejected = $false
+    try { $null = Assert-MIRAssuranceWorkerArtifactTree -ArtifactRoot $unicodeCollisionRoot -Context $Context } catch { $unicodeCollisionRejected = $true }
+    if (-not $unicodeCollisionRejected) { throw "Worker artifact ingestion did not reject a Unicode-normalization path collision." }
+
+    if ($env:OS -eq "Windows_NT") {
+      $streamRoot = Join-Path $fanInRoot "alternate-stream"
+      New-Item -ItemType Directory -Force -Path $streamRoot | Out-Null
+      $streamFile = Join-Path $streamRoot "object.json"
+      [IO.File]::WriteAllText($streamFile, "primary", [Text.UTF8Encoding]::new($false))
+      [IO.File]::WriteAllText("${streamFile}:worker-metadata", "hidden", [Text.UTF8Encoding]::new($false))
+      $streamRejected = $false
+      try { $null = Assert-MIRAssuranceWorkerArtifactTree -ArtifactRoot $streamRoot -Context $Context } catch { $streamRejected = $true }
+      if (-not $streamRejected) { throw "Worker artifact ingestion did not reject an NTFS alternate data stream." }
+    }
+
+    $limitRoot = Join-Path $fanInRoot "limit"
+    New-Item -ItemType Directory -Force -Path $limitRoot | Out-Null
+    [IO.File]::WriteAllText((Join-Path $limitRoot "oversized.txt"), "oversized", [Text.UTF8Encoding]::new($false))
+    $limitContext = $Context.PSObject.Copy()
+    $limitContext.config = (($Context.config | ConvertTo-Json -Depth 20) | ConvertFrom-Json)
+    $limitContext.config.worker_import.max_file_bytes = 1
+    $limitRejected = $false
+    try { $null = Assert-MIRAssuranceWorkerArtifactTree -ArtifactRoot $limitRoot -Context $limitContext } catch { $limitRejected = $true }
+    if (-not $limitRejected) { throw "Worker artifact ingestion did not enforce the individual-file size limit." }
+
+    $mixedPrefix = "mir-mixed-"
+    $mixedIds = [ordered]@{
+      reuse=$selfTestId
+      success="self-test.mixed.success"
+      missing="self-test.mixed.missing"
+      failed="self-test.mixed.failed"
+    }
+    $mixedTests = [Collections.Generic.List[object]]::new()
+    $mixedWork = [Collections.Generic.List[object]]::new()
+    $mixedTests.Add($fanInTest)
+    foreach ($role in @("success", "missing", "failed")) {
+      $id = [string]$mixedIds[$role]
+      $key = Get-MIRAssuranceTextHash -Text "$id-$([guid]::NewGuid().ToString('N'))"
+      $test = [pscustomobject][ordered]@{
+        id=$id
+        safe_test_id=$id
+        fingerprint=[pscustomobject][ordered]@{
+          schema=$evidenceSchema
+          test_id=$id
+          target=[string]$Context.target
+          input_key=$key
+          fingerprint_sha256=$key
+          definition_sha256=(Get-MIRAssuranceTextHash -Text "definition-$role")
+        }
+        force_fresh=$false
+      }
+      $mixedTests.Add($test)
+      $mixedWork.Add([pscustomobject][ordered]@{test_id=$id;safe_test_id=$id;fingerprint=$key;disposition="RUN";layer="F0"})
+    }
+    $mixedPlan = [pscustomobject][ordered]@{
+      tests=@($mixedTests)
+      work=@($mixedWork)
+      plan_material_sha256=(Get-MIRAssuranceTextHash -Text "mixed-plan-$([guid]::NewGuid().ToString('N'))")
+      required_test_set_sha256=(Get-MIRAssuranceJsonHash -Value @($mixedTests.id | Sort-Object))
+      generated_at=[string]$capsule.started_at
+      source_commit=[string]$capsule.producer.commit
+      source_tree=(((& git -C $repo rev-parse "HEAD^{tree}").Trim()))
+      target=[string]$Context.target
+      profile="self-test-mixed"
+      producer=$capsule.producer
+    }
+    $newMixedContribution = {
+      param([Parameter(Mandatory)]$Test, [Parameter(Mandatory)][ValidateSet("passed", "failed")][string]$Status)
+      $mixedPaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$Test.id) -InputKey ([string]$Test.fingerprint.input_key)
+      $workRoot = Join-Path $mixedPaths.root "work\synthetic"
+      New-Item -ItemType Directory -Force -Path $workRoot | Out-Null
+      $stdout = Join-Path $workRoot "stdout.txt"
+      $stderr = Join-Path $workRoot "stderr.txt"
+      $result = Join-Path $workRoot "result.json"
+      [IO.File]::WriteAllText($stdout, "", [Text.UTF8Encoding]::new($false))
+      [IO.File]::WriteAllText($stderr, "", [Text.UTF8Encoding]::new($false))
+      $exitCode = if ($Status -eq "passed") { 0 } else { 1 }
+      $evidence = if ($Status -eq "passed") { $stdout } else { $stderr }
+      $assertions = @([ordered]@{id="executor-exit-zero";status=$Status;evidence=(Get-MIRAssuranceRepoRelativePath -Path $evidence)})
+      $structured = [ordered]@{
+        schema="mir-test-result-v1";test_id=[string]$Test.id;status=$Status;exit_code=$exitCode
+        assertions=$assertions;artifacts=@();started_at=[string]$capsule.started_at;completed_at=[string]$capsule.completed_at
+        message=if($Status -eq "passed"){""}else{"synthetic failure"}
+      }
+      Write-MIRAssuranceAtomicJson -Value $structured -Path $result
+      $descriptor = Get-MIRAssuranceArtifactDescriptor -Path $result -Kind "structured-test-result"
+      $descriptor["schema"] = "mir-test-result-v1"
+      $descriptor["status"] = $Status
+      $mixedCapsule = [ordered]@{
+        schema=$evidenceSchema;test_id=[string]$Test.id;status=$Status;conclusion=$Status;disposition="RUN"
+        input_key=[string]$Test.fingerprint.input_key;fingerprint_sha256=[string]$Test.fingerprint.fingerprint_sha256
+        definition_sha256=[string]$Test.fingerprint.definition_sha256;target=[string]$Context.target;layer="F0"
+        command="synthetic";resolved_command="synthetic";inputs=[ordered]@{};producer=$capsule.producer
+        assertions=$assertions;exit_code=$exitCode;result=$descriptor;artifacts=@()
+        stdout_sha256=(Get-MIRAssuranceSha256 -Path $stdout);stderr_sha256=(Get-MIRAssuranceSha256 -Path $stderr)
+        log_digest=(Get-MIRAssuranceTextHash -Text "`n");started_at=[string]$capsule.started_at;completed_at=[string]$capsule.completed_at
+        duration_seconds=0;message=if($Status -eq "passed"){""}else{"synthetic failure"}
+      }
+      $mixedCapsule = Write-MIRAssuranceAttempt -Capsule $mixedCapsule
+      $null = Write-MIRAssuranceWorkerReceipt -Plan $mixedPlan -Test $Test -Capsule $mixedCapsule
+      return [pscustomobject][ordered]@{paths=$mixedPaths;capsule=$mixedCapsule}
+    }
+    $mixedSuccess = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.success)[0] -Status passed
+    $mixedFailure = & $newMixedContribution -Test @($mixedTests | Where-Object id -eq $mixedIds.failed)[0] -Status failed
+    $mixedCleanupRoots.Add([string]$mixedSuccess.paths.root)
+    $mixedCleanupRoots.Add([string]$mixedFailure.paths.root)
+    $mixedRoot = Join-Path $fanInRoot "mixed"
+    New-Item -ItemType Directory -Force -Path $mixedRoot | Out-Null
+    foreach ($contribution in @($mixedSuccess, $mixedFailure)) {
+      Copy-Item -LiteralPath $contribution.paths.root -Destination (Join-Path $mixedRoot "$mixedPrefix$([string]$contribution.capsule.test_id)") -Recurse
+      Remove-Item -LiteralPath $contribution.paths.root -Recurse -Force
+    }
+    $irrelevant = Join-Path $mixedRoot "${mixedPrefix}irrelevant"
+    Copy-Item -LiteralPath (Join-Path $mixedRoot "$mixedPrefix$($mixedIds.success)") -Destination $irrelevant -Recurse
+    $irrelevantReceiptPath = Join-Path $irrelevant "worker-receipts\$([string]$mixedPlan.plan_material_sha256).json"
+    $irrelevantReceipt = Get-Content -Raw -LiteralPath $irrelevantReceiptPath | ConvertFrom-Json
+    $irrelevantReceipt.plan.material_sha256 = Get-MIRAssuranceTextHash -Text "stale-irrelevant-plan"
+    Write-MIRAssuranceAtomicJson -Value $irrelevantReceipt -Path $irrelevantReceiptPath
+    $mixedImport = Import-MIRAssuranceWorkerEvidence -Plan $mixedPlan -Context $Context -WorkerRoot $mixedRoot -ArtifactPrefix $mixedPrefix
+    $mixedSuccessPaths = Get-MIRAssuranceEvidencePaths -TestId $mixedIds.success -InputKey ([string]@($mixedTests | Where-Object id -eq $mixedIds.success)[0].fingerprint.input_key)
+    $mixedFailurePaths = Get-MIRAssuranceEvidencePaths -TestId $mixedIds.failed -InputKey ([string]@($mixedTests | Where-Object id -eq $mixedIds.failed)[0].fingerprint.input_key)
+    if ([string]$mixedImport.status -ne "failed" -or @($mixedImport.imported).Count -ne 1 -or
+        @($mixedImport.failed).Count -ne 1 -or @($mixedImport.missing).Count -ne 1 -or
+        @($mixedImport.ignored).Count -ne 1 -or $null -eq (Read-MIRAssuranceEvidencePointer -Path $paths.passed) -or
+        $null -eq (Read-MIRAssuranceEvidencePointer -Path $mixedSuccessPaths.passed) -or
+        -not (Test-Path -LiteralPath $mixedFailurePaths.blocked -PathType Leaf)) {
+      throw "Mixed REUSE/RUN worker fan-in did not retain reuse, import success, preserve failure, identify missing work, and ignore stale artifacts."
+    }
+    foreach ($mixedPaths in @($mixedSuccessPaths, $mixedFailurePaths)) {
+      if (Test-Path -LiteralPath $mixedPaths.root) { Remove-Item -LiteralPath $mixedPaths.root -Recurse -Force }
+    }
+  } finally {
+    foreach ($mixedRootToRemove in @($mixedCleanupRoots)) {
+      if (Test-Path -LiteralPath $mixedRootToRemove) { Remove-Item -LiteralPath $mixedRootToRemove -Recurse -Force }
+    }
+    if (Test-Path -LiteralPath $fanInRoot) { Remove-Item -LiteralPath $fanInRoot -Recurse -Force }
+  }
+
   $fakeCapsule = ($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
   $fakeCapsule.result = $null
   $fakeCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $fakeCapsule

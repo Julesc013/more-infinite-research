@@ -93,7 +93,7 @@ jobs:
         with:
           include-hidden-files: true
           name: mir-targeted-evidence-${{ matrix.safe_test_id }}
-          path: .work/artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
   verification-gate:
@@ -119,13 +119,17 @@ jobs:
           key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ inputs.target }}-
-      - name: Merge worker evidence
+      - name: Download isolated worker evidence
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: mir-targeted-evidence-*
-          path: .work/artifacts/assurance/evidence
-          merge-multiple: true
+          path: .work/artifacts/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./tools/mir.ps1 verify import-workers --target '${{ inputs.target }}' --plan .work/output/verification-plan.json --factorio $env:FACTORIO_BIN --workers .work/artifacts/assurance/worker-evidence --artifact-prefix mir-targeted-evidence-
       - name: Aggregate targeted gate
         shell: pwsh
         env:
@@ -143,6 +147,7 @@ jobs:
           name: assurance-targeted-${{ inputs.target }}-${{ inputs.candidate_sha }}
           path: |
             .work/output/verification-plan.json
+            .work/artifacts/assurance/worker-import.json
             .work/artifacts/assurance/evidence-bundle.json
             .work/artifacts/assurance/targeted-summary.json
           if-no-files-found: warn

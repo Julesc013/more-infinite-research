@@ -15,6 +15,18 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
 $fixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-{0}" -f [guid]::NewGuid().ToString("N"))
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
+$gitEnvironmentNames = @(
+  "GIT_INDEX_FILE", "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR",
+  "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES"
+)
+$savedGitEnvironment = @{}
+foreach ($name in $gitEnvironmentNames) {
+  $item = Get-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
+  if ($null -ne $item) {
+    $savedGitEnvironment[$name] = [string]$item.Value
+    Remove-Item -LiteralPath "Env:$name"
+  }
+}
 
 try {
   New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
@@ -68,6 +80,10 @@ try {
       throw "Artifact-cleanup fixture escaped the system temp directory: $resolvedFixture"
     }
     Remove-Item -LiteralPath $resolvedFixture -Recurse -Force
+  }
+  foreach ($name in $gitEnvironmentNames) {
+    if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }
+    else { Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue }
   }
 }
 

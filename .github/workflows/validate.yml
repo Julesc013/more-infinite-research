@@ -142,7 +142,7 @@ jobs:
         with:
           include-hidden-files: true
           name: mir-evidence-${{ matrix.safe_test_id }}
-          path: .work/artifacts/assurance/evidence
+          path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
   verification-gate:
@@ -181,13 +181,15 @@ jobs:
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
-      - name: Merge worker evidence
+      - name: Download isolated worker evidence
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: mir-evidence-*
-          path: .work/artifacts/assurance/evidence
-          merge-multiple: true
+          path: .work/artifacts/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --workers .work/artifacts/assurance/worker-evidence --artifact-prefix mir-evidence-
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
         run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --output .work/artifacts/assurance/evidence-bundle.json
@@ -204,5 +206,6 @@ jobs:
           name: mir-verification-evidence
           path: |
             .work/output/verification-plan.json
+            .work/artifacts/assurance/worker-import.json
             .work/artifacts/assurance/evidence-bundle.json
           if-no-files-found: warn

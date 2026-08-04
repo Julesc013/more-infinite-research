@@ -78,6 +78,50 @@ try {
   }
 }
 
+$workerImportRoot = Join-Path $repo (".work/output/control-plane-worker-import-test/" + [guid]::NewGuid().ToString("N"))
+try {
+  $workerRoot = Join-Path $workerImportRoot "workers"
+  $destinationStore = Join-Path $workerImportRoot "destination"
+  [void](New-Item -ItemType Directory -Force -Path $workerRoot)
+  $importContext = "1" * 64
+  $importIdentity = "2" * 64
+  $importProducer = [pscustomobject][ordered]@{schema=1;abi=1;trust_class="ci";produced_at=[datetimeoffset]::UtcNow.ToString("o")}
+  foreach ($case in @(
+    @{artifact="mir-v5-evidence-pass";status="passed";suffix="pass"},
+    @{artifact="mir-v5-evidence-failed";status="failed";suffix="failed"}
+  )) {
+    $object = New-MIRCPEvidenceObject -Kind task-result -ContextDigest $importContext `
+      -IdentityKey (Get-MIRCPSha256Text -Value "$importIdentity-$($case.suffix)") `
+      -Subject ([pscustomobject][ordered]@{task_id="worker-import-$($case.suffix)";target="2.1"}) `
+      -Producer $importProducer -Payload ([pscustomobject][ordered]@{status=$case.status})
+    $artifactEvidenceRoot = Join-Path (Join-Path $workerRoot $case.artifact) "artifacts/evidence"
+    [void](Write-MIRCPEvidenceObject -Object $object -RepoRoot $repo -Root $artifactEvidenceRoot)
+  }
+  $workerImport = Import-MIRCPWorkerEvidenceObjects -WorkerRoot $workerRoot -EvidenceRoot $destinationStore -RepoRoot $repo
+  $workerIndex = Update-MIRCPEvidenceIndex -RepoRoot $repo -Root $destinationStore
+  if ([string]$workerImport.status -ne "passed" -or [int]$workerImport.artifacts -ne 2 -or
+      [int]$workerImport.objects -ne 2 -or [int]$workerIndex.objects -ne 2 -or [int]$workerIndex.invalid -ne 0 -or
+      @($workerIndex.index.objects | Where-Object status -eq "failed").Count -ne 1) {
+    throw "Protected worker import did not retain exact passing and failed content-addressed objects."
+  }
+  if ($env:OS -eq "Windows_NT") {
+    $streamObject = Get-ChildItem -LiteralPath $workerRoot -Recurse -File | Where-Object Extension -eq ".json" | Select-Object -First 1
+    [IO.File]::WriteAllText("$($streamObject.FullName):worker-metadata", "hidden", [Text.UTF8Encoding]::new($false))
+    $streamRejected = $false
+    try { $null = Import-MIRCPWorkerEvidenceObjects -WorkerRoot $workerRoot -EvidenceRoot $destinationStore -RepoRoot $repo } catch { $streamRejected = $true }
+    if (-not $streamRejected) { throw "Protected worker import accepted an NTFS alternate data stream." }
+  }
+} finally {
+  if (Test-Path -LiteralPath $workerImportRoot) {
+    $resolvedImportRoot = [IO.Path]::GetFullPath($workerImportRoot)
+    $importBoundary = [IO.Path]::GetFullPath((Join-Path $repo ".work/output/control-plane-worker-import-test")).TrimEnd("\") + "\"
+    if (-not $resolvedImportRoot.StartsWith($importBoundary, [StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove an unsafe protected worker-import test root."
+    }
+    Remove-Item -LiteralPath $resolvedImportRoot -Recurse -Force
+  }
+}
+
 $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo

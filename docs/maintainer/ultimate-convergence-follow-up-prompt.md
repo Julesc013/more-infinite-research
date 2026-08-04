@@ -5,7 +5,7 @@ applies_to: "3.2.5, 2.5.x, 3.3.x, 2.6.x"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -18,6 +18,8 @@ Use the following prompt with the worker completing the concurrent repository/co
 
 ```text
 You are following up on the MIR 3.2.5 → conditional 2.5.5 → 3.3.x → 2.6.x convergence programme after another worker completed repository and Control Plane changes.
+
+The authoring baseline was synchronized `dev` merge `92e82a75492ac717275a11f187e59e54051f7ffc` from pull request 44. Its package-excluded Phase A checks were green, but that fact does not close P11, assign C32, qualify 3.2.5, authorize 2.5.5, or open 3.3. Treat the current repository as authoritative if it has advanced.
 
 Work safely in the current repository. Other work may still be present. Do not stash, reset, clean, overwrite, or stage unrelated changes. Begin with a read-only audit of the current committed and working-tree state. Identify which findings are already satisfied by exact code, schemas, records, tests, or evidence and which remain open. Do not infer implementation from documentation and do not infer qualification from startup success.
 
@@ -88,8 +90,8 @@ First report the exact HEAD, upstream relation, dirty paths, current release poi
 
 6. Candidate reservation
 
-- Confirm planned 3.2.5 distinguishes planned_candidate_floor/reserved_candidate_id from candidate_id.
-- Confirm candidate_id remains null until source-frozen or package-built.
+- Confirm planned 3.2.5 records `candidate_floor: C32` separately from `candidate_id: not-assigned`, and generated views describe the former only as a reserved floor.
+- Confirm candidate_id remains unassigned until source-frozen or package-built.
 - Confirm observations, performance, attestations, and proof cannot bind a reservation.
 - Confirm C32 is built once after all package-visible work; later package change becomes C33.
 - Check CHG-2026-0010.
@@ -185,6 +187,23 @@ First report the exact HEAD, upstream relation, dirty paths, current release poi
 16. Non-negotiable zero budgets
 
 Check and report exact enforcement for direct prototype writes outside executors, global context reads in pure code, unversioned schemas, unnamespaced extension IDs, late settings, safety overrides, unclassified target/package paths, undeclared domains, ambiguous owners, undeclared writes, broken adapter laws, unmigrated runtime state, stale claims, revoked sealed proof, impact false negatives, unique temporary-branch logic, post-seal rebuilds, and lost completed observations.
+
+17. Release-train execution completeness
+
+- Reconcile `325-A1a`, every `325-A0` through `325-D4` row, and the first complete `325-B0` slice in the canonical convergence programme with code, records, tests, and evidence.
+- Confirm fast, targeted, and scheduled worker evidence is downloaded into isolated artifact directories, every worker carries an immutable receipt for the exact plan/source/work/trust/capsule/result context, only plan-selected test/fingerprint objects are imported, every pointer/capsule/result/log/artifact digest is validated, and artifact order cannot select a stale restored pointer. Confirm protected Control Plane v5 retains immutable-object aggregation and exact aggregate validation.
+- Confirm the latest exact PR head, not an earlier same-head run, closes `325-A1a` before merge or release-state work proceeds.
+- Confirm the complete 3.2.5 freeze packet can be materialized before assigning a candidate.
+- Confirm the freeze defect register closes algebraic cost proof, numeric envelope, owner removal/transfer, descriptor authority semantics, README reset wording, exact default parity, save/reload/second reload, and Factorio 2.0 cost disposition.
+- Confirm the declared minimum product independently covers Factorio 2.1 Base/Space Age and, only after feasibility passes, Factorio 2.0 Base/Space Age.
+- Confirm the bounded mandatory ecosystem matrix locks exact versions/hashes, claim levels, fixtures or named load-checks, budgets, and terminal wording for Base, Space Age, P11/BZ, one owner pack, one broad overhaul, and one negative/conflict row.
+- Confirm `325-B0` traces one research-cost proposition through compiler semantics, terminal disposition, typed proof, bounded support output, and Factorio 2.0 projection before compatibility breadth expands.
+- Confirm every release state is admitted separately and publication consumes sealed bytes without rebuilding.
+- Confirm `255-F0` feasibility precedes every 2.5.5 branch, release record, or candidate action.
+- Confirm a passed 2.5.5 feasibility result produces new source-lock, portable-delta, backport-manifest, reconstruction, target-proof, seal, and public-byte records rather than mutating the 2.5.0 authorities.
+- Confirm a failed feasibility result is preserved as `deferred-with-evidence` and becomes a 3.3/2.6 design input.
+- Confirm the 3.3 M0 handoff packet contains exact publicly verified modern and latest-target baselines, or an exact 2.5.5 deferral, before any behavior-preserving platform cutover begins.
+- Report which work can proceed in parallel and the exact barrier at which it must join the critical path.
 
 For each item, return:
 

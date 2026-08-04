@@ -61,8 +61,16 @@ foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
 $assuranceToolingClassificationCases = @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
+  ".mir/views/publication-checklist.json",
+  ".github/workflows/validate.yml",
+  ".github/workflows/assurance-targeted.yml",
+  ".github/workflows/assurance-scheduled.yml",
   "scripts/Invoke-MIRAssurance.ps1",
+  "tools/mir.ps1",
+  "tools/commands/control/Invoke-MIRControlPlaneWork.ps1",
   "tools/lib/assurance/Evidence.ps1",
+  "tools/lib/control/Evidence.ps1",
+  "tools/lib/control/Views.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
@@ -102,7 +110,18 @@ foreach ($profileName in @("fast", "full", "backport")) {
 foreach ($requiredStaticRoutingPath in @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
+  ".mir/views/**",
+  ".github/workflows/validate.yml",
+  ".github/workflows/assurance-*.yml",
+  ".github/workflows/control-plane-v5.yml",
+  "tools/commands/control/**",
+  "tools/lib/control/Evidence.ps1",
+  "tools/mir.ps1",
+  "tools/lib/control/Views.ps1",
+  "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+  "validation/tests/package/Test-MIRArtifactCleanup.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
+  "validation/tests/tooling/Test-MIRControlPlane.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1"
 )) {
   $matchingRules = @($impact.paths | Where-Object { [string]$_.pattern -eq $requiredStaticRoutingPath })
@@ -342,8 +361,66 @@ foreach ($requiredWorkflowSnippet in @(
 if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
   throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."
 }
-if (@([regex]::Matches($validateWorkflow, '--candidate \$env:MIR_DEVELOPMENT_CANDIDATE')).Count -ne 3) {
-  throw "Hosted planning, exact workers, and the aggregate gate must all bind the isolated development candidate explicitly."
+if (@([regex]::Matches($validateWorkflow, '--candidate \$env:MIR_DEVELOPMENT_CANDIDATE')).Count -ne 4) {
+  throw "Hosted planning, exact workers, deterministic import, and the aggregate gate must all bind the isolated development candidate explicitly."
+}
+
+foreach ($fanInCase in @(
+  @{Path=".github\workflows\validate.yml"; Prefix="mir-evidence-"},
+  @{Path=".github\workflows\assurance-targeted.yml"; Prefix="mir-targeted-evidence-"},
+  @{Path=".github\workflows\assurance-scheduled.yml"; Prefix="mir-scheduled-evidence-"}
+)) {
+  $fanInWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $fanInCase.Path)
+  foreach ($requiredFanInSnippet in @(
+    'path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
+    'path: .work/artifacts/assurance/worker-evidence',
+    'verify import-workers',
+    "--artifact-prefix $($fanInCase.Prefix)",
+    '.work/artifacts/assurance/worker-import.json'
+  )) {
+    if (-not $fanInWorkflow.Contains($requiredFanInSnippet)) {
+      throw "Assurance workflow '$($fanInCase.Path)' omits deterministic worker fan-in: $requiredFanInSnippet"
+    }
+  }
+  if ($fanInWorkflow.Contains("merge-multiple: true")) {
+    throw "Assurance workflow '$($fanInCase.Path)' still extracts mutable worker pointers into one shared directory."
+  }
+}
+
+$protectedWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\control-plane-v5.yml")
+foreach ($requiredProtectedFanInSnippet in @(
+  'path: .work/artifacts/control-plane-worker-evidence',
+  'Import content-addressed worker objects deterministically',
+  '-Operation import-workers',
+  '.work/output/control-plane-v5/worker-import.json'
+)) {
+  if (-not $protectedWorkflow.Contains($requiredProtectedFanInSnippet)) {
+    throw "Protected qualification omits isolated content-addressed worker import: $requiredProtectedFanInSnippet"
+  }
+}
+if ($protectedWorkflow.Contains("merge-multiple: true")) {
+  throw "Protected qualification still merges worker artifact trees by extraction order."
+}
+
+$assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+foreach ($requiredIngestionGuard in @(
+  'mir-assurance-worker-receipt-v2',
+  'stale-ignored',
+  'ReparsePoint',
+  'max_entries_per_artifact',
+  'max_expanded_bytes_per_artifact',
+  'max_file_bytes',
+  'duplicate canonical object paths'
+)) {
+  if (-not $assuranceEvidence.Contains($requiredIngestionGuard)) {
+    throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
+  }
+}
+$assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+foreach ($generatedOutputExclusion in @('.work/artifacts/*', '.work/build/*', '.work/output/*')) {
+  if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
+    throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"
+  }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

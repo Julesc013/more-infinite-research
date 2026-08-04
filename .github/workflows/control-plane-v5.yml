@@ -479,12 +479,18 @@ jobs:
         with:
           name: mir-v5-context
           path: .
-      - name: Merge immutable worker objects
+      - name: Download isolated immutable worker objects
         uses: actions/download-artifact@v4
         with:
           pattern: mir-v5-evidence-*
-          path: .
-          merge-multiple: true
+          path: .work/artifacts/control-plane-worker-evidence
+      - name: Import content-addressed worker objects deterministically
+        shell: pwsh
+        run: |
+          ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation import-workers `
+            -ContextPath ".work/output/verification-context/${{ needs.context.outputs.context_id }}" `
+            -WorkerRoot .work/artifacts/control-plane-worker-evidence -EvidenceRoot .work/artifacts/evidence |
+            Tee-Object -FilePath .work/output/control-plane-v5/worker-import.json
       - name: Require exact evidence for every task and environment
         shell: pwsh
         run: |
@@ -516,6 +522,7 @@ jobs:
             .work/output/verification-context/${{ needs.context.outputs.context_id }}
             .work/artifacts/evidence
             .work/output/control-plane-v5/aggregate-result.json
+            .work/output/control-plane-v5/worker-import.json
             .work/output/control-plane-v5/seal-result.json
             .work/output/control-plane-v5/promotion-result.json
           if-no-files-found: error
