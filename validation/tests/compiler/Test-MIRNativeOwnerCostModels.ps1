@@ -36,6 +36,7 @@ $emitterSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\
 $runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\runtime\productivity_family_adoption.lua")
 $progressFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-native-owner-progress\control.lua")
 $compilerContractFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-compiler-contracts\data-final-fixes.lua")
+$adoptionFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-vanilla-family-adoption\data-final-fixes.lua")
 $validationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRValidation.ps1")
 
 foreach ($contract in $contracts) {
@@ -82,6 +83,12 @@ if ($compilerContractFixtureSource -notmatch 'native_model\.base\s*~=\s*1500' -o
     $compilerContractFixtureSource -notmatch 'configured_native\.count_formula\s*~=\s*"2000\*1\.25\^\(L-1\)"' -or
     $compilerContractFixtureSource -notmatch 'count_formula\s*=\s*"1000 \+ 100 \* L\^2"') {
   throw "Compiler-contract fixture must assert anchor-level native base cost and canonical configured formula output."
+}
+if ($adoptionFixtureSource -notmatch 'adoption_data\.version\s*==\s*3' -or
+    $adoptionFixtureSource -notmatch 'schema=3\|stream=' -or
+    $adoptionFixtureSource -notmatch '\|input-cost=' -or
+    $adoptionFixtureSource -notmatch '\|output-cost=') {
+  throw "Vanilla-family adoption fixture must assert the descriptor-only schema-3 receipt ABI."
 }
 $costTrioIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or linear_increment\.changed or growth\.changed' -and
   $bindingSource -match 'base = cost_changed and base\.value or nil' -and

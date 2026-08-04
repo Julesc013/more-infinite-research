@@ -87,20 +87,32 @@ local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
 
-if not (adoption_data and adoption_data.version == 2 and adoption_data.binding_count == 5
+if not (adoption_data and adoption_data.version == 3 and adoption_data.binding_count == 5
     and adoption_data.adopted == true and adoption_data.adopted_count >= 5) then
-  fail("expected adoption mod-data to report at least five adopted recipes.")
+  fail("expected schema-3 adoption mod-data to report five bindings and at least five adopted recipes.")
 end
 
 local signature = tostring(adoption_data.signature or "")
-for _, fragment in ipairs({
-  "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_low_density_structure|owner=low-density-structure-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_plastic|owner=plastic-bar-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_processing_unit|owner=processing-unit-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output="
+for _, expectation in ipairs({
+  { stream = "research_rocket_fuel", owner = "rocket-fuel-productivity" },
+  { stream = "research_low_density_structure", owner = "low-density-structure-productivity" },
+  { stream = "research_plastic", owner = "plastic-bar-productivity" },
+  { stream = "research_processing_unit", owner = "processing-unit-productivity" },
+  { stream = "research_steel", owner = "steel-plate-productivity" }
 }) do
-  if not string.find(signature, fragment, 1, true) then
-    fail("expected adoption signature to include " .. fragment .. "; got " .. signature)
+  local prefix = "schema=3|stream=" .. expectation.stream
+    .. "|owner=" .. expectation.owner
+    .. "|operation=adopt_native_owner_effects|configured=|effects=1|input-cost="
+  local entry_start, prefix_end = string.find(signature, prefix, 1, true)
+  if not entry_start then
+    fail("expected adoption signature to include " .. prefix .. "; got " .. signature)
+  end
+  local separator = string.find(signature, ";", prefix_end + 1, true)
+  local entry = string.sub(signature, entry_start, separator and (separator - 1) or #signature)
+  for _, marker in ipairs({ "|input-cost=", "|output-cost=", "|output=" }) do
+    local _, marker_end = string.find(entry, marker, 1, true)
+    if not marker_end or marker_end == #entry or string.sub(entry, marker_end + 1, marker_end + 1) == "|" then
+      fail("expected non-empty " .. marker .. " field in adoption signature entry " .. entry)
+    end
   end
 end
