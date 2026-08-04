@@ -879,10 +879,15 @@ function Invoke-MIRAssuranceSelfTest {
   $fanInPlan | Add-Member -NotePropertyName target -NotePropertyValue ([string]$Context.target) -Force
   $fanInPlan | Add-Member -NotePropertyName profile -NotePropertyValue "self-test" -Force
   $fanInPlan | Add-Member -NotePropertyName producer -NotePropertyValue $capsule.producer -Force
-  # Hosted PowerShell deserializes ISO JSON timestamps as DateTime values. Exercise that
-  # exact boundary so receipt freshness remains lossless and culture-independent.
-  $fanInPlan = ($fanInPlan | ConvertTo-Json -Depth 40) | ConvertFrom-Json
-  $null = Write-MIRAssuranceWorkerReceipt -Plan $fanInPlan -Test $fanInTest -Capsule $capsule
+  $exactFanInGeneratedAt = [DateTimeOffset]::Parse(
+    "2026-08-04T17:49:32.0321566Z",
+    [Globalization.CultureInfo]::InvariantCulture,
+    [Globalization.DateTimeStyles]::RoundtripKind
+  )
+  $fanInTimestampCases = @(
+    [pscustomobject][ordered]@{label="datetime-offset";value=$exactFanInGeneratedAt},
+    [pscustomobject][ordered]@{label="datetime";value=$exactFanInGeneratedAt.UtcDateTime}
+  )
   $copyFanInArtifact = {
     param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string[]]$CreationOrder)
     New-Item -ItemType Directory -Force -Path $Root | Out-Null
@@ -911,6 +916,39 @@ function Invoke-MIRAssuranceSelfTest {
   }
   $mixedCleanupRoots = [Collections.Generic.List[string]]::new()
   try {
+    $originalCulture = [Threading.Thread]::CurrentThread.CurrentCulture
+    $originalUiCulture = [Threading.Thread]::CurrentThread.CurrentUICulture
+    try {
+      [Threading.Thread]::CurrentThread.CurrentCulture = [Globalization.CultureInfo]::GetCultureInfo("en-AU")
+      [Threading.Thread]::CurrentThread.CurrentUICulture = [Globalization.CultureInfo]::GetCultureInfo("en-AU")
+      foreach ($timestampCase in $fanInTimestampCases) {
+        $fanInPlan.generated_at = $timestampCase.value
+        $null = Write-MIRAssuranceWorkerReceipt -Plan $fanInPlan -Test $fanInTest -Capsule $capsule
+        $timestampReceiptPath = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+        $timestampReceipt = Get-Content -Raw -LiteralPath $timestampReceiptPath | ConvertFrom-Json
+        $expectedTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $fanInPlan.generated_at
+        $receiptTimestamp = ConvertTo-MIRAssuranceDateTimeOffset -Value $timestampReceipt.plan.generated_at
+        $fractionalTicks = $expectedTimestamp.UtcDateTime.Ticks % [TimeSpan]::TicksPerSecond
+        if ($fractionalTicks -eq 0 -or
+            $receiptTimestamp.UtcDateTime.Ticks -ne $expectedTimestamp.UtcDateTime.Ticks) {
+          throw "Worker receipt lost exact fractional timestamp ticks for $([string]$timestampCase.label)."
+        }
+
+        $timestampRoot = Join-Path $fanInRoot ("timestamp-" + [string]$timestampCase.label)
+        & $copyFanInArtifact $timestampRoot @("expected")
+        & $resetFanInDestination
+        $timestampImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $timestampRoot -ArtifactPrefix $fanInPrefix
+        if ([string]$timestampImport.status -ne "passed" -or
+            @($timestampImport.imported).Count -ne 1 -or
+            @($timestampImport.rejected).Count -ne 0) {
+          throw "Worker fan-in rejected canonical $([string]$timestampCase.label) plan timestamps."
+        }
+      }
+    } finally {
+      [Threading.Thread]::CurrentThread.CurrentCulture = $originalCulture
+      [Threading.Thread]::CurrentThread.CurrentUICulture = $originalUiCulture
+    }
+
     $forwardRoot = Join-Path $fanInRoot "forward"
     $reverseRoot = Join-Path $fanInRoot "reverse"
     & $copyFanInArtifact $forwardRoot @("decoy", "expected")
