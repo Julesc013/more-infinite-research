@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -378,7 +378,7 @@ Claims must stay precise:
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, rocket fuel, and steel plate. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
-- The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod that changes the adopted recipe set can therefore trigger one technology-effect reset for the affected save.
+- The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod can therefore update the stored adoption binding and invoke bounded recognized research-cost conversion, but MIR does not call a force-wide technology-effect reset or reapply unrelated mod effects.
 - Module productivity can include Quality modules because the current Factorio `2.1` line uses a hidden optional Quality dependency for load order. The dependency is hidden to avoid presenting Quality as a required or recommended mod-page dependency.
 - Existing prototype IDs are kept stable unless a tested migration is provided. `v2.0.5` provides a JSON migration for the intentional trash-slot-to-inventory technology consolidation and adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.

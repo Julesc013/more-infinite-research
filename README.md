@@ -443,7 +443,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Unknown overhauls:** broad support is opportunistic, not a guarantee.
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
 - **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology. For configured vanilla Space Age productivity families, residual productivity-allowed recipes can be adopted into the existing vanilla infinite technology instead of generating a parallel MIR technology.
-- **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR resets technology effects once so already-researched vanilla family technologies apply the new recipe effects.
+- **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR records the new binding and preserves current recognized research progress without calling a force-wide technology-effect reset. This avoids reapplying unrelated mod effects or changing unrelated force recipe state.
 - **Stable IDs:** generated stream prototype IDs are intentionally kept stable unless a tested migration is provided.
 - **Scripted agriculture scope:** the current implementation applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a later manual test/spike item to avoid broad scans.
 

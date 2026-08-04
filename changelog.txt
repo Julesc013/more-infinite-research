@@ -8,12 +8,14 @@ Date: 2026-08-04
     - Unified fixed, linear, exponential, and hybrid costs under one numeric research-cost contract.
     - Clarified the existing growth setting as the exponential multiplier; no model dropdown was added.
     - Consolidated the unpublished 3.2.4 work into the direct public upgrade from 3.2.3 to 3.2.5.
+    - Bound hosted worker evidence to an exact verification-plan receipt before deterministic aggregate import.
 
   Bugfixes:
 
     - Corrected native-owner research progress conversion to preserve completed work when configured costs change.
     - Replaced runtime formula reparsing with bounded versioned old/new cost descriptors.
     - Refused malformed, tampered, unknown, or over-budget transition descriptors without guessing or resetting force state.
+    - Corrected packaged guidance: productivity-family adoption preserves effects without a force-wide technology reset.
 
   Compatibility:
 
