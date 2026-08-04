@@ -751,7 +751,7 @@ function Write-MIRAssuranceWorkerReceipt {
     plan=[ordered]@{
       material_sha256=$planMaterialSha256
       required_test_set_sha256=[string]$Plan.required_test_set_sha256
-      generated_at=[string]$Plan.generated_at
+      generated_at=(ConvertTo-MIRAssuranceTimestampText -Value $Plan.generated_at)
       source_commit=[string]$Plan.source_commit
       source_tree=[string]$Plan.source_tree
       target=[string]$Plan.target

@@ -879,6 +879,9 @@ function Invoke-MIRAssuranceSelfTest {
   $fanInPlan | Add-Member -NotePropertyName target -NotePropertyValue ([string]$Context.target) -Force
   $fanInPlan | Add-Member -NotePropertyName profile -NotePropertyValue "self-test" -Force
   $fanInPlan | Add-Member -NotePropertyName producer -NotePropertyValue $capsule.producer -Force
+  # Hosted PowerShell deserializes ISO JSON timestamps as DateTime values. Exercise that
+  # exact boundary so receipt freshness remains lossless and culture-independent.
+  $fanInPlan = ($fanInPlan | ConvertTo-Json -Depth 40) | ConvertFrom-Json
   $null = Write-MIRAssuranceWorkerReceipt -Plan $fanInPlan -Test $fanInTest -Capsule $capsule
   $copyFanInArtifact = {
     param([Parameter(Mandatory)][string]$Root, [Parameter(Mandatory)][string[]]$CreationOrder)
