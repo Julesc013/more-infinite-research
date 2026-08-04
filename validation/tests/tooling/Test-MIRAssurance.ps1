@@ -61,8 +61,10 @@ foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
 $assuranceToolingClassificationCases = @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
+  ".mir/views/publication-checklist.json",
   "scripts/Invoke-MIRAssurance.ps1",
   "tools/lib/assurance/Evidence.ps1",
+  "tools/lib/control/Views.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
@@ -102,6 +104,8 @@ foreach ($profileName in @("fast", "full", "backport")) {
 foreach ($requiredStaticRoutingPath in @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
+  ".mir/views/**",
+  "tools/lib/control/Views.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1"
 )) {

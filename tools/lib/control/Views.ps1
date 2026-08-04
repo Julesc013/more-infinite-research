@@ -309,6 +309,23 @@ function New-MIRCPTodoLines {
     $lines.Add("| $(Format-MIRCPCode $release.release) | $(Format-MIRCPCode $release.candidate_id) | $(Format-MIRCPCode $release.candidate_floor) | $(Format-MIRCPCode $release.state) | $(Format-MIRCPCode $next) |")
   }
   $lines.Add("")
+  $lines.Add("## Canonical execution programme")
+  $lines.Add("")
+  $lines.Add("The ordered release train, freeze packet, stop conditions, conditional 2.5.5 projection, and 3.3/2.6 handoff are defined in [MIR 3.2.5 To 2.6 Convergence Programme](docs/releases/3.2.5-to-2.6-convergence-programme.md). The [development readiness record](docs/releases/3.2.5-development-readiness.md) distinguishes implemented development work from open release proof, and the [follow-up audit prompt](docs/maintainer/ultimate-convergence-follow-up-prompt.md) is the worker handoff.")
+  $lines.Add("")
+  $lines.Add("Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.")
+  $lines.Add("")
+  $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
+  if ($plannedChanges.Count -gt 0) {
+    $lines.Add("| Planned change | Package visible | Targets | Completion boundary |")
+    $lines.Add("| --- | --- | --- | --- |")
+    foreach ($change in $plannedChanges) {
+      $targets = @($change.affected_targets | ForEach-Object { Format-MIRCPCode ([string]$_) }) -join ", "
+      $boundary = ([string]$change.migration_impact) -replace '\|', '\|'
+      $lines.Add("| $(Format-MIRCPCode $change.id) | $(Format-MIRCPCode ([string][bool]$change.package_visible).ToLowerInvariant()) | $targets | $boundary |")
+    }
+    $lines.Add("")
+  }
   $lines.Add("## Executable TaskNodes")
   $lines.Add("")
   $openTasks = @($Tasks | Where-Object { [string]$_.state -notin @("satisfied", "cancelled") } | Sort-Object id)

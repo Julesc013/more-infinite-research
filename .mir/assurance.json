@@ -62,7 +62,7 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/lib/assurance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/lib/assurance/", "^tools/lib/control/Views\\.ps1$", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/views/"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {

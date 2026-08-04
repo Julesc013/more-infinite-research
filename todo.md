@@ -11,6 +11,23 @@ Generated: 2026-08-03
 | `3.2.5` | `not-assigned` | `C32` | `planned` | `source-frozen` |
 | `2.5.0` | `2.5-P11` | `pending` | `publicly-verified` | `complete` |
 
+## Canonical execution programme
+
+The ordered release train, freeze packet, stop conditions, conditional 2.5.5 projection, and 3.3/2.6 handoff are defined in [MIR 3.2.5 To 2.6 Convergence Programme](docs/releases/3.2.5-to-2.6-convergence-programme.md). The [development readiness record](docs/releases/3.2.5-development-readiness.md) distinguishes implemented development work from open release proof, and the [follow-up audit prompt](docs/maintainer/ultimate-convergence-follow-up-prompt.md) is the worker handoff.
+
+Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.
+
+| Planned change | Package visible | Targets | Completion boundary |
+| --- | --- | --- | --- |
+| `CHG-2026-0005` | `true` | `factorio-2.1`, `factorio-2.0` | Combines the unreleased C31 research-cost work with derived compatibility dispositions, proof assertions, bounded support reporting, profile hardening, and behavior-preserving compiler consolidation. The public upgrade starts at 3.2.3; stable IDs and neutral defaults are preserved. |
+| `CHG-2026-0006` | `true` | `factorio-2.1`, `factorio-2.0` | Introduces MIR Extension Protocol v1 as a host-neutral, capability-negotiated, data-first protocol. MIR 3.3.x and 2.6.x share one semantic protocol while using target-specific discovery transports. The legacy compatibility-pack transport remains supported through the first complete modern and Factorio 2.0 release pair. MIR 3.3.0 stabilizes only compatibility, profile/tuning, proof, presentation, capability-negotiation, and dependency/conflict surfaces; family providers, setting contributions, runtime descriptors, and trusted adapters remain separately capability-gated until qualified. |
+| `CHG-2026-0010` | `false` | `factorio-2.1`, `factorio-2.0` | Represent C32 as a reserved candidate floor while 3.2.5 is planned, assign evidence-bearing candidate_id only at source or package freeze, and model later release facts as append-only events and post-publication qualifications over immutable release identity. |
+| `CHG-2026-0011` | `false` | `factorio-2.0` | Recover retained P11 observations, re-evaluate only sound evidence, complete exact performance and BZ classification, and record append-only post-publication qualification or an independently qualified P12. Published 2.5.0 bytes and publication facts remain immutable. |
+| `CHG-2026-0012` | `true` | `factorio-2.1`, `factorio-2.0` | Evolve current authorities into an acyclic graph, physically separate sealed safety from configurable policy, make every prototype mutation planned, complete explicit CompilerContext and CompilationRun boundaries, and generate versioned runtime state and migration handling. |
+| `CHG-2026-0013` | `false` | `factorio-2.1`, `factorio-2.0` | Evolve Control Plane v5 with CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observations, bounded pure evaluators, exact batching exclusions, explicit freshness, and separated external-mod runner, aggregator, and publisher roles. |
+| `CHG-2026-0014` | `true` | `factorio-2.1`, `factorio-2.0` | Introduce typed setting values and ordered override provenance, then derive ProcessIR from canonical recipe facts for cycle, catalyst, recycling, probability, quality, spoilage, and protected-resource safety before broad complex-overhaul productivity. |
+| `CHG-2026-0015` | `true` | `factorio-2.1`, `factorio-2.0` | Create projection feasibility before candidate authority, generate exact Factorio 2.0 trees from immutable modern semantics plus the latest qualified target baseline, and prove adapter preservation, idempotence, locality, reconstruction, migration, report transport, and target semantic parity. |
+
 ## Executable TaskNodes
 
 | Task | Kind | State | Dependencies |

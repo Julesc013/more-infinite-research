@@ -19,6 +19,18 @@
       "tags": []
     },
     {
+      "pattern": ".mir/views/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/control/Views.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/public-artifact-budgets.json",
       "groups": ["base-load", "local-mod-library"],
       "scenarios": ["compiler-contracts", "package-zip-base", "package-zip-space-age"],

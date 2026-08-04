@@ -120,7 +120,8 @@ The live GitHub branch topology contains exactly `main`, `dev`, and `legacy`. `m
 | `dev` | MIR `3.2.5` convergence, shared Control Plane v5, tests, tooling, canonical fixes, and later MIR `3.3.0` preparation. | `3.x.x` |
 | `legacy` | Immutable published Factorio `2.0` MIR `2.5.0` baseline; advances only through governed 2.5.x promotion. | `2.5.x` maintenance |
 | detached `2.5.0` worktree | Read-only exact-tag validation baseline. | No branch |
-| local `local/2.5.1-prep` worktree | Package-identical investigation branch until a real defect justifies P12. | Local only unless protected qualification needs a remote candidate || `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
+| local `local/2.5.1-prep` worktree | Package-identical investigation branch until a real defect justifies P12. | Local only unless protected qualification needs a remote candidate |
+| `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
 | `tmp/0.17` | Working Factorio `0.17` port branch or worktree. | `1.7.x` |

@@ -608,6 +608,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-development-readiness
+      - mir-3.2.5-hosted-phase-a-readiness
   - path: docs/releases/3.2.5-migration-guide.md
     title: "MIR 3.2.5 Migration Guide"
     status: current
@@ -624,6 +625,8 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-to-2.6-convergence-programme
+      - mir-3.2.5-2.5.5-execution-critical-path
+      - mir-3.3-2.6-programme-opening-gate
   - path: docs/releases/ultimate-convergence-audit-action-register.md
     title: "MIR Ultimate Convergence Audit Action Register"
     status: current
@@ -1520,6 +1523,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-ultimate-convergence-follow-up-prompt
+      - mir-release-train-follow-up-audit
   - path: docs/maintainer/README.md
     title: "Maintainer Guide"
     status: current
