@@ -161,6 +161,7 @@ foreach ($required in @(
 
 $approvedDeltaTest = @($catalog.tests | Where-Object { [string]$_.id -eq "release.approved-delta" })
 if ($approvedDeltaTest.Count -ne 1 -or
+    [string]$approvedDeltaTest[0].command -notmatch '-Path\s+<approved-delta-path>' -or
     @($approvedDeltaTest[0].inputs) -notcontains "approved-delta-transition" -or
     @($approvedDeltaTest[0].inputs | Where-Object { [string]$_ -match '^(approved-delta|\.mir/releases/deltas)/[0-9]' }).Count -ne 0) {
   throw "release.approved-delta must fingerprint the dynamically resolved release transition, not a version-specific path."
@@ -244,6 +245,44 @@ foreach ($target in @("2.0", "2.1")) {
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
   if ([int]$profile.schema -ne 1 -or [string]$profile.target -ne $target -or [string]$profile.policy_id -ne [string]$domains.policy_id) {
     throw "Verification profile is not bound to the canonical domain policy: $profilePath"
+  }
+}
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
+$currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
+if ([string]$currentRelease.state -ne "planned" -or [string]$currentRelease.candidate_id -ne "not-assigned" -or
+    [string]$currentRelease.candidate_floor -ne "C32" -or
+    [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
+    [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
+    [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
+  throw "Factorio 2.1 assurance profile must bind the planned, unassigned 3.2.5 public upgrade authority."
+}
+$upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
+$upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
+$upgradeControl = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "control.lua")
+$upgradeDataFinal = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "data-final-fixes.lua")
+foreach ($archetype in @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")) {
+  if (-not $upgradeSettings.Contains(('"' + $archetype + '"')) -or
+      -not $upgradeControl.Contains(('[' + '"' + $archetype + '"' + ']'))) {
+    throw "3.2.5 upgrade fixture does not bind archetype $archetype."
+  }
+}
+foreach ($requiredUpgradeText in @(
+  'script.active_mods["more-infinite-research"] ~= "3.2.3"',
+  'script.active_mods["more-infinite-research"] ~= "3.2.5"',
+  'game.server_save("mir-325-upgraded")',
+  '3.2.5 upgraded save reload proof complete'
+)) {
+  if (-not $upgradeControl.Contains($requiredUpgradeText)) {
+    throw "3.2.5 upgrade fixture is missing governed runtime contract: $requiredUpgradeText"
+  }
+}
+foreach ($requiredCostText in @(
+  'ips-cost-linear-increment-research_gears',
+  'mir-cost-linear-increment-worker-robots-storage',
+  '4321*1.25^(L-1)'
+)) {
+  if (-not $upgradeDataFinal.Contains($requiredCostText)) {
+    throw "3.2.5 upgrade fixture is missing cost-transition contract: $requiredCostText"
   }
 }
 

@@ -19,16 +19,17 @@ MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3
 - Every MIR research stream and base continuation gains a per-level linear cost increment while retaining its existing base-cost and exponential-growth controls.
 - Fixed, linear, exponential, and hybrid curves use one formula: `(base + increment * offset) * growth ^ offset`.
 - Existing default settings retain the prior cost behavior because the new increment defaults to zero.
+- Stable base-continuation base settings retain their level-one coefficient meaning and are projected to the first controlled level.
 - Recognized native-owner formulas remain byte-for-byte unchanged when their controls remain at defaults.
 - Explicit overrides of unknown or over-budget external formulas fail closed instead of guessing a conversion.
 
 ## Corrected configuration changes
 
 - MIR now carries compact versioned old/new cost descriptors into runtime instead of reparsing research formulas there.
-- When a recognized adopted native owner changes cost, MIR preserves completed unit-equivalent work by converting the old fractional progress with `old_cost / new_cost`.
-- The active technology, exact level, queue, completed levels, and unrelated force state remain untouched by the conversion.
+- Factorio already normalizes the active research fraction when a prototype cost changes. MIR retains that engine-normalized value and does not apply a second `old_cost / new_cost` conversion.
+- The active technology, exact level, queue, completed levels, completed unit-equivalent work, and unrelated force state remain untouched by MIR's configuration handler.
 - Productivity-family adoption signature changes no longer call a force-wide technology-effect reset, so unrelated mod effects and force recipe state are not reapplied.
-- A malformed, tampered, unknown, or over-budget descriptor is refused safely and produces a stable diagnostic.
+- A malformed, tampered, unknown, or over-budget descriptor is refused safely and produces a stable diagnostic; descriptor analysis never mutates live research progress.
 
 ## Compatibility and stability
 

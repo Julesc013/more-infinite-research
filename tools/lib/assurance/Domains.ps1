@@ -16,6 +16,23 @@ function Get-MIRAssuranceVerificationProfile {
   if ([int]$profile.schema -ne 1 -or [string]$profile.target -ne $Target) {
     throw "Verification profile is invalid for Factorio $Target`: $path"
   }
+  $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $releaseRoot = Resolve-MIRAssuranceRepoPathId -Id "releases.records"
+  $releasePath = Join-Path $repo (Join-Path $releaseRoot "$($info.version).json")
+  if (Test-Path -LiteralPath $releasePath -PathType Leaf) {
+    $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json
+    if ([string]$release.release -eq [string]$info.version -and [string]$release.target -eq $Target) {
+      foreach ($field in @("from_version", "to_version", "fixture")) {
+        if ([string]$profile.upgrade.$field -ne [string]$release.upgrade.$field) {
+          throw "Verification profile upgrade $field does not match current release authority: $path"
+        }
+      }
+      $fixturePath = Join-Path $repo ("fixtures/" + [string]$profile.upgrade.fixture)
+      if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
+        throw "Verification profile upgrade fixture is missing: $fixturePath"
+      }
+    }
+  }
   return $profile
 }
 

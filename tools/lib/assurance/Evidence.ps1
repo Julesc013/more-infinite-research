@@ -32,6 +32,60 @@ function Resolve-MIRAssuranceApprovedDeltaPath {
   return Resolve-MIRAssuranceRepoPathId -Id "releases.deltas" -Suffix "$fromVersion-to-$toVersion.json"
 }
 
+function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
+  param([Parameter(Mandatory)]$Context)
+
+  $relativePath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
+  $fromVersion = [string]$Context.verification_profile.upgrade.from_version
+  $toVersion = [string]$Context.verification_profile.upgrade.to_version
+  $releaseRoot = Resolve-MIRAssuranceRepoPathId -Id "releases.records"
+  $releaseRelativePath = Join-Path $releaseRoot "$($Context.info.version).json"
+  $releasePath = Join-Path $repo $releaseRelativePath
+  if (Test-Path -LiteralPath $releasePath -PathType Leaf) {
+    $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json
+    if ([string]$release.release -eq $toVersion -and [string]$release.target -eq [string]$Context.target) {
+      foreach ($field in @("from_version", "to_version", "fixture")) {
+        if ([string]$release.upgrade.$field -ne [string]$Context.verification_profile.upgrade.$field) {
+          throw "Approved-delta profile does not match current release upgrade authority for $field."
+        }
+      }
+      if ([string]$release.state -in @("planned", "source-frozen", "package-built")) {
+        $hasApprovedDeltaProof = $null -ne $release.proofs -and
+          $null -ne $release.proofs.PSObject.Properties["approved_delta"]
+        $remaining = @($release.remaining_obligations | ForEach-Object { [string]$_ })
+        if ($hasApprovedDeltaProof -or $remaining -notcontains "focused-qualification") {
+          throw "Pre-qualification release $toVersion has inconsistent approved-delta authority."
+        }
+        $material = [ordered]@{
+          kind="approved-delta-transition"
+          state="pending"
+          from_version=$fromVersion
+          to_version=$toVersion
+          path=$relativePath
+          release_record=(Get-MIRAssuranceRepoRelativePath -Path $releasePath)
+          release_state=[string]$release.state
+          release_record_sha256=(Get-MIRAssuranceSha256 -Path $releasePath)
+        }
+        $material["sha256"] = Get-MIRAssuranceJsonHash -Value $material
+        return $material
+      }
+    }
+  }
+
+  $path = Join-Path $repo $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "Approved-delta transition artifact is absent: $relativePath"
+  }
+  return [ordered]@{
+    kind="approved-delta-transition"
+    state="present"
+    from_version=$fromVersion
+    to_version=$toVersion
+    path=$relativePath
+    sha256=(Get-MIRAssuranceSha256 -Path $path)
+  }
+}
+
 function Resolve-MIRAssuranceManualReviewAttestationPath {
   param([Parameter(Mandatory)]$Info)
   $version = [string]$Info.version
@@ -78,18 +132,7 @@ function Get-MIRAssuranceInputFingerprint {
     }
     "prior-release" { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.prior_release -MissingLabel "prior-release" }
     "approved-delta-transition" {
-      $relativePath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
-      $path = Join-Path $repo $relativePath
-      if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-        throw "Approved-delta transition artifact is absent: $relativePath"
-      }
-      return [ordered]@{
-        kind="approved-delta-transition"
-        from_version=[string]$Context.verification_profile.upgrade.from_version
-        to_version=[string]$Context.verification_profile.upgrade.to_version
-        path=$relativePath
-        sha256=(Get-MIRAssuranceSha256 -Path $path)
-      }
+      return Get-MIRAssuranceApprovedDeltaTransitionFingerprint -Context $Context
     }
     "manual-review-attestation" {
       $relativePath = Resolve-MIRAssuranceManualReviewAttestationPath -Info $Context.info
@@ -1324,6 +1367,22 @@ function Get-MIRAssuranceEvidenceDecision {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)][string]$TestId
   )
+  $inputMap = if ($null -eq $Fingerprint.inputs) {
+    [ordered]@{}
+  } else {
+    ConvertTo-MIRAssuranceOrderedMap -Object $Fingerprint.inputs
+  }
+  $missingInputs = @(
+    foreach ($inputName in @($inputMap.Keys | Sort-Object)) {
+      $inputValue = $inputMap[$inputName]
+      if ($null -ne $inputValue -and [string]$inputValue.state -eq "missing") {
+        [string]$inputName
+      }
+    }
+  )
+  if ($missingInputs.Count -gt 0) {
+    return [ordered]@{disposition="INVALID"; reason="required-input-missing:$($missingInputs -join ',')"}
+  }
   if (@($Context.rerun_tests | Where-Object { $_ -eq $TestId }).Count -gt 0) {
     return [ordered]@{disposition="RUN"; reason="explicit-rerun"}
   }
@@ -1424,6 +1483,9 @@ function Resolve-MIRAssuranceCommandText {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)]$Plan
   )
+  $approvedDeltaPath = if ($Command.Contains("<approved-delta-path>")) {
+    Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
+  } else { "" }
   $values = [ordered]@{
     "<factorio>"=[string]$Context.factorio
     "<candidate>"=[string]$Context.candidate
@@ -1435,6 +1497,7 @@ function Resolve-MIRAssuranceCommandText {
     "<upgrade-from>"=[string]$Context.verification_profile.upgrade.from_version
     "<upgrade-to>"=[string]$Context.verification_profile.upgrade.to_version
     "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
+    "<approved-delta-path>"=[string]$approvedDeltaPath
     "<source-commit>"=[string]$Plan.source_commit
     "<package-source-commit>"=[string]$Plan.package_source_commit
     "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version

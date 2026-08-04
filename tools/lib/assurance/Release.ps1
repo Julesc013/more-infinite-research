@@ -660,10 +660,16 @@ function Invoke-MIRAssuranceSelfTest {
   if ($activeApprovedDeltaPath -ne $expectedApprovedDeltaPath) {
     throw "Approved-delta transition resolver did not select the active release-transition artifact."
   }
-  $activeApprovedDeltaFile = Join-Path $repo $activeApprovedDeltaPath
-  if (-not (Test-Path -LiteralPath $activeApprovedDeltaFile -PathType Leaf) -or
-      (Get-MIRAssuranceSha256 -Path $activeApprovedDeltaFile) -notmatch '^[A-F0-9]{64}$') {
-    throw "Active approved-delta transition artifact is absent or unreadable: $activeApprovedDeltaPath"
+  $activeApprovedDeltaFingerprint = Get-MIRAssuranceApprovedDeltaTransitionFingerprint -Context $Context
+  if ([string]$activeApprovedDeltaFingerprint.path -ne $activeApprovedDeltaPath -or
+      [string]$activeApprovedDeltaFingerprint.sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$activeApprovedDeltaFingerprint.state -notin @("pending", "present")) {
+    throw "Active approved-delta transition fingerprint is invalid: $activeApprovedDeltaPath"
+  }
+  if ([string]$activeApprovedDeltaFingerprint.state -eq "pending" -and
+      ([string]$activeApprovedDeltaFingerprint.release_state -notin @("planned", "source-frozen", "package-built") -or
+       [string]$activeApprovedDeltaFingerprint.release_record_sha256 -notmatch '^[A-F0-9]{64}$')) {
+    throw "Pending approved-delta transition does not bind exact pre-qualification release authority."
   }
   $alternateApprovedDeltaPath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile ([pscustomobject]@{
     upgrade=[pscustomobject]@{from_version="9.9.9"; to_version="9.9.10"}
@@ -793,6 +799,24 @@ function Invoke-MIRAssuranceSelfTest {
     input_key=$selfTestKey
     fingerprint_sha256=$selfTestKey
     definition_sha256=(Get-MIRAssuranceTextHash -Text "definition")
+    inputs=[ordered]@{}
+  }
+  $missingInputFingerprint = [ordered]@{
+    schema=$evidenceSchema
+    test_id="self-test.required-input"
+    target=[string]$Context.target
+    input_key=(Get-MIRAssuranceTextHash -Text "missing-required-input")
+    fingerprint_sha256=(Get-MIRAssuranceTextHash -Text "missing-required-input")
+    definition_sha256=(Get-MIRAssuranceTextHash -Text "missing-required-input-definition")
+    inputs=[ordered]@{
+      "prior-release"=[ordered]@{kind="external-file"; state="missing"; sha256=(Get-MIRAssuranceTextHash -Text "MISSING:prior-release")}
+    }
+  }
+  $missingInputDecision = Get-MIRAssuranceEvidenceDecision `
+    -Fingerprint $missingInputFingerprint -Context $Context -TestId ([string]$missingInputFingerprint.test_id)
+  if ([string]$missingInputDecision.disposition -ne "INVALID" -or
+      [string]$missingInputDecision.reason -ne "required-input-missing:prior-release") {
+    throw "Missing required external input did not invalidate the plan row before execution."
   }
   $paths = Get-MIRAssuranceEvidencePaths -TestId $selfTestId -InputKey $selfTestKey
   $selfTestArtifactRoot = Join-Path $paths.root "work\synthetic"

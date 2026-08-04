@@ -1,32 +1,32 @@
 {
   "schema": 1,
   "id": "INC-2026-0054",
-  "title": "Runtime research progress uses inverse cost-transition ratio",
+  "title": "Runtime research progress conversion loses completed work",
   "external_issue": "internal://runtime/research-cost-transition-progress",
   "state": "repaired",
   "failing_environment": {
     "target": "2.1",
     "release_line": "3.1.9-through-planned-3.2.5",
     "surface": "productivity family adoption configuration change",
-    "runtime_campaign": "development scenario space-age-native-owner-settings-config-change passed; candidate-bound and reload-equivalence campaigns remain pending"
+    "runtime_campaign": "development scenario originally passed an internal ratio check but direct 3.2.3-to-3.2.5 upgrade proof exposed a redundant second conversion; corrected development and candidate-bound campaigns remain pending"
   },
   "reproduction": {
-    "status": "reproduced-by-source-and-api-contract-analysis",
-    "observed": "The runtime computes before * current_count / previous_count and recognizes only fixed count plus two legacy exponential formula forms. Factorio defines research_progress as the current fractional progress in [0,1], so unit-equivalent work preservation requires before * previous_count / current_count. Linear and hybrid canonical formulas are not evaluated."
+    "status": "reproduced-by-source-analysis-and-engine-execution",
+    "observed": "The original runtime used an inverse ratio. Its first repair used the mathematically correct old_cost / new_cost ratio, but Factorio had already normalized active research before on_configuration_changed. The second conversion reduced valid completed work in both same-version settings changes and the direct 3.2.3-to-3.2.5 upgrade."
   },
   "root_cause": {
-    "status": "proven-inverse-conversion-and-duplicated-parser",
-    "summary": "Runtime code reconstructs cost from a narrow string grammar and applies the new-to-old ratio. It lacks the versioned semantic descriptors produced by the canonical research-cost authority."
+    "status": "proven-inverse-conversion-then-redundant-second-conversion",
+    "summary": "The legacy implementation reconstructed costs from a narrow string grammar and applied the inverse ratio. The descriptor repair corrected the algebra but still mutated an engine-normalized value. Runtime descriptors remain useful evidence, but MIR must not reapply Factorio's completed-work conversion."
   },
   "repair_changes": [
     "CHG-2026-0007:versioned-cost-transition-descriptor",
-    "CHG-2026-0007:old-cost-over-new-cost-progress-conversion",
+    "CHG-2026-0007:retain-factorio-normalized-progress-without-second-conversion",
     "CHG-2026-0007:complete-sixteen-row-transition-matrix",
     "CHG-2026-0007:bounded-canonical-evaluator"
   ],
   "regression_propositions": [
     "fixed linear exponential and hybrid form a complete sixteen-row transition matrix",
-    "completed unit-equivalent work is preserved across every recognized model transition",
+    "completed unit-equivalent work is preserved across every recognized model transition without a redundant runtime mutation",
     "current research exact level fractional progress queue and completed levels are preserved",
     "configuration change save reload and a second reload are idempotent",
     "continuous execution equals save reload execution",
@@ -50,7 +50,9 @@
     "package_bytes_changed": true
   },
   "closure": {
-    "status": "repair-implemented-pending-complete-regression-proof",
+    "status": "development-runtime-proof-passed-pending-complete-regression-proof",
+    "development_archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "development_result": "passed direct five-archetype 3.2.3-to-3.2.5 upgrade and Space Age native-owner settings configuration change without a redundant second conversion",
     "proof_required": "exact 3.2.3 default parity, configuration-change and reload equivalence, idempotence, exact candidate engine realization, and Factorio 2.0 target disposition before candidate freeze"
   }
 }

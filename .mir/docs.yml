@@ -609,6 +609,7 @@ docs:
     source_of_truth_for:
       - mir-3.2.5-development-readiness
       - mir-3.2.5-hosted-phase-a-readiness
+      - mir-3.2.5-development-runtime-findings
   - path: docs/releases/3.2.5-migration-guide.md
     title: "MIR 3.2.5 Migration Guide"
     status: current
@@ -1765,6 +1766,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - settings-reference
+      - base-continuation-cost-setting-semantics
   - path: docs/reference/schemas/research-cost-model.md
     title: "ResearchCostModel Schema"
     status: current
@@ -1773,6 +1775,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - research-cost-model-schema
+      - legacy-coefficient-anchor-projection
   - path: docs/reference/settings-reference.md
     title: "Settings Reference"
     status: archived
@@ -2255,6 +2258,9 @@ docs:
       - package-qualification-source-authority
       - runtime-performance-release-gate
       - protected-release-capsule-transfer
+      - current-verification-profile-release-binding
+      - prequalification-approved-delta-pending-binding
+      - required-external-input-planning
   - path: docs/releases/notes/release-notes-3.1.9.md
     title: "MIR 3.1.9 Release Notes"
     status: current
@@ -2424,6 +2430,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-release-notes
+      - mir-3.2.5-player-visible-progress-preservation
   - path: docs/releases/3.2.2-to-3.2.3-repository-change-report.md
     title: "MIR 3.2.2 To 3.2.3 Repository Change Report"
     status: current

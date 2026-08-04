@@ -236,7 +236,8 @@ Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -Enab
 
 $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-2-to-3-2-3",
-  "assert-upgrade-3-2-3-to-3-2-4"
+  "assert-upgrade-3-2-3-to-3-2-4",
+  "assert-upgrade-3-2-3-to-3-2-5"
 )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
@@ -297,13 +298,15 @@ $assertions = if ($Archetype) {
   switch ($Archetype) {
     "base-default" { $common + @("base-only-mod-set-retained") }
     "space-age-native-owner" {
-      if ($requiresReloadProof) {
+      if ($FixtureName -eq "assert-upgrade-3-2-2-to-3-2-3") {
         $common + @(
           "landfill-level-retained", "ice-level-retained", "current-ice-research-retained",
           "fractional-ice-progress-retained", "platform-starts-unresearched",
           "landfill-platform-effects-removed", "platform-owner-transfer-exact",
           "duplicate-owner-forbidden", "startup-settings-retained", "upgraded-save-reload-passed"
         )
+      } elseif ($requiresReloadProof) {
+        $common + @("space-age-native-owner-retained", "upgraded-save-reload-passed")
       } else {
         $common + @("space-age-native-owner-retained")
       }

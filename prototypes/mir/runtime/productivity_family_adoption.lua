@@ -40,27 +40,28 @@ local function current_adoption_state()
   }
 end
 
-local function restore_current_research_progress(previous_bindings, current_bindings)
+local function retain_engine_normalized_current_research_progress(previous_bindings, current_bindings)
   for _, force in pairs(game.forces) do
     local technology = force.current_research
     local current = technology and current_bindings[technology.name]
     if current then
       local previous = previous_bindings[technology.name] or {}
-      -- A stored v2 binding has no descriptor. On the first v3 transition,
-      -- the current input descriptor is the exact pre-change model.
-      local previous_descriptor = previous.output_descriptor or current.input_descriptor
-      local before = force.research_progress
-      local restored, detail = transition_descriptor.convert_fraction(
-        before, previous_descriptor, current.output_descriptor, technology.level)
-      if restored and detail.previous_cost ~= detail.current_cost then
-        force.research_progress = restored
-        log("[more-infinite-research] Preserved current research progress for native owner "
-          .. technology.name .. " from " .. tostring(before) .. " to " .. tostring(restored)
-          .. " using realized cost " .. tostring(detail.previous_cost)
-          .. " -> " .. tostring(detail.current_cost) .. ".")
-      elseif not restored then
-        log("[more-infinite-research] Refused unsafe current research progress conversion for native owner "
-          .. technology.name .. ": " .. tostring(detail) .. ".")
+      local progress = force.research_progress
+      local previous_cost, previous_error = transition_descriptor.evaluate(previous.output_descriptor, technology.level)
+      local current_cost, current_error = transition_descriptor.evaluate(current.output_descriptor, technology.level)
+      if previous_cost and current_cost and previous_cost ~= current_cost then
+        log("[more-infinite-research] Retained Factorio-normalized current research progress for native owner "
+          .. technology.name .. " at " .. tostring(progress)
+          .. " after realized cost " .. tostring(previous_cost)
+          .. " -> " .. tostring(current_cost) .. "; no second conversion was applied.")
+      elseif previous.output_descriptor and (not previous_cost or not current_cost) then
+        log("[more-infinite-research] Left Factorio-normalized current research progress unchanged for native owner "
+          .. technology.name .. " because descriptor evaluation was unavailable: "
+          .. tostring(previous_error or current_error) .. ".")
+      elseif not previous.output_descriptor then
+        log("[more-infinite-research] Retained Factorio-normalized current research progress for native owner "
+          .. technology.name .. " at " .. tostring(progress)
+          .. "; the prior adoption schema has no exact output descriptor, so no second conversion was applied.")
       end
     end
   end
@@ -96,7 +97,7 @@ function M.on_configuration_changed()
     return
   end
 
-  restore_current_research_progress(previous_bindings, current.bindings)
+  retain_engine_normalized_current_research_progress(previous_bindings, current.bindings)
   state.version = current.version
   state.adopted_count = current.count
   state.bindings = current.bindings

@@ -43,4 +43,11 @@ if ([string]$c31Profile.upgrade.from_version -ne "3.2.3" -or [string]$c31Profile
     [string]$c31Profile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-4") {
   throw "C31 target-profile projection does not bind the exact governed save transition."
 }
-Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, and C30/C31 release-specific upgrade projections."
+$plannedRelease = Get-MIRCPReleaseByVersion -Release "3.2.5" -RepoRoot $repo
+$plannedProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $plannedRelease -RepoRoot $repo
+if ([string]$plannedRelease.state -ne "planned" -or [string]$plannedRelease.candidate_id -ne "not-assigned" -or
+    [string]$plannedProfile.upgrade.from_version -ne "3.2.3" -or [string]$plannedProfile.upgrade.to_version -ne "3.2.5" -or
+    [string]$plannedProfile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-5") {
+  throw "Planned 3.2.5 target-profile projection does not bind the public upgrade without assigning a candidate."
+}
+Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, historical C30/C31 projections, and the unassigned 3.2.5 public upgrade."

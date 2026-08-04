@@ -106,10 +106,12 @@ if ($emitterSource -notmatch 'VERSION\s*=\s*3' -or $runtimeSource -match 'count_
 }
 if ($progressFixtureSource -notmatch 'rows ~= 16' -or
     $progressFixtureSource -notmatch 'native-owner observed progress proof' -or
+    $progressFixtureSource -notmatch 'current_research_unit_count' -or
+    $progressFixtureSource -notmatch 'MIR changed Factorio-normalized completed research-unit work' -or
     $progressFixtureSource -notmatch 'over-budget evaluation did not fail closed' -or
     $validationSource -notmatch 'Assert-NativeOwnerResearchWorkPreserved' -or
-    $validationSource -notmatch 'did not preserve completed research-unit work') {
+    $validationSource -notmatch 'did not retain Factorio-normalized completed research-unit work') {
   throw "Native-owner lifecycle fixture does not prove the full transition matrix and safe refusal."
 }
 
-Write-Host "[ok] five Factorio 2.1 native-owner contracts and descriptor-based work preservation passed."
+Write-Host "[ok] five Factorio 2.1 native-owner contracts and engine-normalized work preservation passed."

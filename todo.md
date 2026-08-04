@@ -118,8 +118,9 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 | `INC-2026-0048` | `incident` | `pending-exact-c30-delta-performance-and-complete-qualification` | C30 qualification had no exact delta or performance campaign authority |
 | `INC-2026-0049` | `incident` | `c24-cutover-accepted-pending-c30-requalification` | Non-calibration release shadow evaluation required a nonexistent v4 baseline |
 | `INC-2026-0052` | `incident` | `pending-exact-protected-c30-dispatch` | Canonical protected workflow had no registered default-branch dispatcher |
-| `INC-2026-0054` | `incident` | `repair-implemented-pending-complete-regression-proof` | Runtime research progress uses inverse cost-transition ratio |
+| `INC-2026-0054` | `incident` | `development-runtime-proof-passed-pending-complete-regression-proof` | Runtime research progress conversion loses completed work |
 | `INC-2026-0055` | `incident` | `repair-implemented-pending-hosted-regression-proof` | Generated execution registry uses stale checkout-dependent source hashes |
+| `INC-2026-0057` | `incident` | `local-exact-upgrade-proof-passed-pending-hosted-and-breadth` | Base-continuation cost migration changes stable coefficient semantics |
 
 ## Explicit release obligations
 
