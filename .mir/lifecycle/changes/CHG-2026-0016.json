@@ -22,7 +22,7 @@
     "factorio-2.1",
     "factorio-2.0"
   ],
-  "migration_impact": "Cancel C31 candidate-specific release obligations while retaining its product lineage and exact-proposition evidence policy; permit source-bound verification planning for a valid planned reservation without granting candidate authority; hash-verify and isolate the exact development candidate outside immutable historical distribution authority before plan fingerprinting; declare the observed runtime-to-research-cost-domain dependency; render typed work states without misleading unchecked completion boxes; and make execution-registry source metadata portable across LF and CRLF checkouts without changing scenario identities.",
+  "migration_impact": "Cancel C31 candidate-specific release obligations while retaining its product lineage and exact-proposition evidence policy; permit source-bound verification planning for a valid planned reservation without granting candidate authority; hash-verify and isolate the exact development candidate outside immutable historical distribution authority before plan fingerprinting; make the cross-trust rejection self-test valid in both pull-request and integration trust contexts; declare the observed runtime-to-research-cost-domain dependency; render typed work states without misleading unchecked completion boxes; and make execution-registry source metadata portable across LF and CRLF checkouts without changing scenario identities.",
   "release_note_impact": "Maintainer documentation distinguishes 3.2.5 release blockers from deferred platform work, planned reservation from exact candidate identity, and incorporated product scope from cancelled C31 candidate obligations.",
   "test_obligations": [
     "release.authority",

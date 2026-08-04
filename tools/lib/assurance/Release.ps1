@@ -855,10 +855,11 @@ function Invoke-MIRAssuranceSelfTest {
   if ((Test-MIRAssuranceCapsule -Capsule $fakeCapsule -Fingerprint $fingerprint -Context $Context).valid) {
     throw "A fake passing capsule without structured result evidence was accepted."
   }
-  $untrustedCapsule = ($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
-  $untrustedCapsule.producer.trust_class = "untrusted-pr"
-  $untrustedCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $untrustedCapsule
-  if ((Test-MIRAssuranceCapsule -Capsule $untrustedCapsule -Fingerprint $fingerprint -Context $Context).valid) {
+  $differentTrustClass = if ([string]$Context.trust_class -eq "untrusted-pr") { "protected-integration" } else { "untrusted-pr" }
+  $differentTrustCapsule = ($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
+  $differentTrustCapsule.producer.trust_class = $differentTrustClass
+  $differentTrustCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $differentTrustCapsule
+  if ((Test-MIRAssuranceCapsule -Capsule $differentTrustCapsule -Fingerprint $fingerprint -Context $Context).valid) {
     throw "Evidence from a different trust class was accepted."
   }
   [IO.File]::WriteAllText($paths.blocked, "{}`n", [Text.UTF8Encoding]::new($false))
