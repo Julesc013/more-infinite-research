@@ -48,6 +48,11 @@ jobs:
           }
           New-Item -ItemType Directory -Force -Path $candidateRoot | Out-Null
           Copy-Item -LiteralPath $source -Destination $candidate -Force
+          if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -ne
+              (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash) {
+            throw "Isolated development candidate differs from the exact build output."
+          }
+          Remove-Item -LiteralPath $source -Force
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh

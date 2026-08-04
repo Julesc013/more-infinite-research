@@ -315,6 +315,7 @@ foreach ($requiredWorkflowSnippet in @(
   'Isolate exact development candidate from historical distributions',
   'path: .work/candidate/*.zip',
   'path: .work/candidate',
+  'Remove-Item -LiteralPath $source -Force',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
