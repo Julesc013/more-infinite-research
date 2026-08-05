@@ -22,7 +22,7 @@
     "factorio-2.1",
     "factorio-2.0"
   ],
-  "migration_impact": "Keep public 3.2.3 as the sole predecessor of 3.2.5; retain 3.2.4/C31 as superseded-unpublished in its immutable release and closure records while removing its retired ZIP from the active root distribution inventory; close the admitted 325-B0 vertical slice; and defer generalized compatibility productization without creating 2.5.5 release authority or admitting 3.3 implementation.",
+  "migration_impact": "Keep public 3.2.3 as the sole predecessor of 3.2.5; retain 3.2.4/C31 as superseded-unpublished in its immutable release and closure records while preserving its exact ZIP in governed historical custody; close the admitted 325-B0 vertical slice; and defer generalized compatibility productization without creating 2.5.5 release authority or admitting 3.3 implementation.",
   "release_note_impact": "MIR 3.2.5 is explicitly narrowed to the unified research-cost release and its bounded research-cost compatibility proof/support slice. Generalized disposition, proof-authority, support-bundle, and broad Factorio 2.0 projection products move to a later release.",
   "test_obligations": [
     "release.authority",

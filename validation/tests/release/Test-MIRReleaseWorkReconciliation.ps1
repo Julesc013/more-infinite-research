@@ -178,9 +178,13 @@ if ([string]$c31Closure.disposition -ne "superseded-unpublished" -or
 }
 $distributions = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/distributions.json") | ConvertFrom-Json
 if ([int]$distributions.distribution_count -ne @($distributions.distributions).Count -or
-    @($distributions.distributions | Where-Object { [string]$_.version -eq "3.2.4" }).Count -ne 0 -or
-    (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip"))) {
-  throw "The superseded-unpublished 3.2.4 checkpoint must not remain in the active root distribution inventory."
+    @($distributions.distributions | Where-Object {
+      [string]$_.version -eq "3.2.4" -and
+      [string]$_.kind -eq "frozen-unreleased-calibration-candidate" -and
+      [string]$_.sha256 -eq "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1"
+    }).Count -ne 1 -or
+    -not (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip") -PathType Leaf)) {
+  throw "The superseded-unpublished C31 archive must remain in exact governed custody without becoming an active release."
 }
 foreach ($expectedStatus in @{
   "325-B2" = "deferred-explicitly"
