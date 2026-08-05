@@ -266,6 +266,10 @@ if (-not $isReducedLegacyLine) {
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'automatic_family.creation_maturity == "experimental"'
 Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'hidden_reason = "experimental-family-hidden-until-reviewed"'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
+Assert-Matches `
+  -RelativePath "prototypes/streams/productivity.lua" `
+  -Text $productivityText `
+  -Pattern '(?s)research_ice\s*=\s*\{\s*ui_visibility\s*=\s*space_age_setting_visibility\(\),\s*required_mods\s*=\s*\{"space-age"\}'
 if (-not $isReducedLegacyLine) {
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = space_age_setting_visibility()"
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "generation_requirements = {"

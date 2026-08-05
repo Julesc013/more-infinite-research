@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0060",
+  "title": "Base-only ecosystem smokes reached Ice productivity science selection",
+  "external_issue": "internal://compatibility/ice-productivity-space-age-gate",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.5",
+    "source_commit": "4452787b5fea4a61b99027f130671ab52ecaf57b",
+    "source_tree": "00284a95ee517454000168d2f79dc558d358063e",
+    "development_archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "test_id": "runtime.ecosystem",
+    "observed": "After the canonical scenario path repair, all nine release-targeted Factorio loads passed. Eight Base-only rows were then rejected because research_ice reported no_lab_compatible_science instead of stopping at its inactive Space Age boundary."
+  },
+  "reproduction": {
+    "status": "reproduced-by-source-bound-release-targeted-profile",
+    "artifact_root": ".work/artifacts/release-targeted-20260805-130533",
+    "observed": "aai-containers, aai-industry, aai-loaders, big-mining-drill, equipment-gantry, FluidMustFlow, jetpack, and robot_attrition each loaded successfully with zero sanitation rows. Their research_ice diagnostic had status skipped, effects zero, lab_status missing-required, and reason no_lab_compatible_science. The Space Age biolabs-in-space row generated the stream with cryogenic science and passed."
+  },
+  "root_cause": {
+    "status": "proven-stream-dependency-declared-only-in-visibility-and-science-policy",
+    "summary": "Ice productivity was hidden without Space Age and required cryogenic science, but its stream specification did not declare required_mods. Factorio Base exposes enough ice authority for the generation requirement to pass, so Base-only compilation reached the deliberately unavailable cryogenic-science selector and emitted a misleading invalid-science observation."
+  },
+  "repair_changes": [
+    "declare space-age as an exact required mod for research_ice",
+    "retain cryogenic science as the required progression pack when Space Age is active",
+    "regress the explicit stream dependency in settings and compiler admission",
+    "record the package-visible diagnostic correction in the 3.2.5 changelog"
+  ],
+  "regression_propositions": [
+    "Base-only modsets skip research_ice as missing required mod space-age before science selection",
+    "Base-only release-targeted smokes produce no invalid_science_pack group for research_ice",
+    "Space Age still generates Ice productivity with cryogenic science and an accepting lab",
+    "the full release-targeted 2.1 ecosystem profile has zero unexpected grouped failures"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "development-only",
+    "package_bytes_changed": true
+  },
+  "closure": {
+    "status": "local-repair-pending-source-bound-ecosystem-and-breadth-proof",
+    "required": "Base and Space Age compiler admission, deterministic package reconstruction, exact runtime.ecosystem pass, latest-head hosted gate, merge to dev, and fresh source-bound breadth closure",
+    "boundary": "This corrects development-package stream policy before source freeze. It does not assign C32, advance 3.2.5 beyond planned, create 2.5.5 authority, admit 3.3, or modify published distribution authority."
+  }
+}
