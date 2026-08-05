@@ -18,7 +18,7 @@ superseded_by: []
 
 | Release | Candidate | Reserved floor | Target | Branch | Historical state | Effective status | Exceptions |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `3.2.5` | `C32` | `C32` | `2.1` | `dev` | `package-built` | `package-built` | 0 |
+| `3.2.5` | `C32` | `C32` | `2.1` | `dev` | `focused-qualified` | `focused-qualified` | 0 |
 | `3.2.4` | `C31` | `pending` | `2.1` | `dev` | `package-built` | `superseded-unpublished` | 0 |
 | `3.2.3` | `C30` | `pending` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.2` | `C24` | `pending` | `2.1` | `main` | `tagged` | `tagged` | 1 |

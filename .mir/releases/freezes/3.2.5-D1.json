@@ -220,16 +220,33 @@
     ],
     "authorities": [
       {"path": "validation/profiles/factorio-2.1.json", "sha256": "E802F1DBA872B57CAD3FFD2AD298A24D6B76F332FAE498DD88CA344722106D65"},
-      {"path": "validation/tests.yml", "sha256": "A3F112A81D3CD499149E017DE1C67EC23A23B505B7696087FE1ED0BB5B6D6A45"},
+      {"path": "validation/tests.yml", "sha256": "2C323CCDD25CAFAB8792799EECDD27D564455234A042AF6405836CD7EFBC36A8"},
       {"path": "validation/scenarios/runtime.json", "sha256": "A18D8A2FAFACE89EF72ECC17ADA73CE71EB65D3F2C7C88954E8FA5ACCA524EE4"},
       {"path": "validation/scenarios/manual.json", "sha256": "D1E63692578F708E597F2CB7AE0A794300975F9F64E58B58AF4958AB0374B75C"},
       {"path": "validation/scenarios/local-2.1.json", "sha256": "A8E5AB513F155E20B7E5369DC7B317C93166DEC15457C67805D9AD67D22A6B2C"},
-      {"path": ".mir/assurance.json", "sha256": "12E1AFD725520928E6686BE9A460A87D6BA1FC453A435B0698C060D90E185FD3"},
+      {"path": ".mir/assurance.json", "sha256": "6DFEFB6640D0DA8757D792AF6828E11C94735000D2FB5DBD5C7F600A72C230B3"},
       {"path": ".mir/control-plane/control-plane.json", "sha256": "0801D2D6BCB3CBD696A826EA46578B4F0B5C96EB344F1FE97F3DA4E0D9395612"},
       {"path": "validation/trust.json", "sha256": "EECB9C322E5799006E656C450F93119D5F288F6B8A5AE9D609F87A5114E75F44"},
       {"path": ".mir/performance-budgets.json", "sha256": "F0C12A195D3490F1B85F72B05CB66141941F2AF5F6BAC08C4B9118C73C11C142"},
       {"path": "validation/tests/release/Test-MIRReleaseAuthority.ps1", "sha256": "E92B1F51B7C3552836C281C4FC361DD6F87AB1E4229846F9E52A40CA3EE1E3CA"},
       {"path": "validation/tests/release/Test-MIRSourceFreezePacket.ps1", "sha256": "53840955324D9E2D824EF9D0908E442C68A84ECAE60A6CFA5A35391C6B9B3852"}
+    ],
+    "post_freeze_amendments": [
+      {
+        "commit": "c9b14596de06f81720ac73abd5395783e3a60e24",
+        "paths": [".mir/assurance.json"],
+        "reason": "Classify source-freeze authority changes so the exact impact plan cannot omit release-history and package admission."
+      },
+      {
+        "commit": "e34566f68369c6df515f082059ed82ec9227d1b2",
+        "paths": [".mir/assurance.json"],
+        "reason": "Classify native approved-delta policy and logical-source planner changes as assurance inputs."
+      },
+      {
+        "commit": "0c484b6e10d691eafc40eb3b80ffb137bd17450b",
+        "paths": ["validation/tests.yml"],
+        "reason": "Bind ecosystem execution to the immutable package-source commit without changing package bytes or product scope."
+      }
     ]
   },
   "documentation": {

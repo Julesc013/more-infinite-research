@@ -366,34 +366,66 @@ if ($status -eq "release-candidate-awaiting-external-qualification") {
   $approvedDeltaRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_evidence_path"
   $approvedDeltaPath = Join-Path $repo $approvedDeltaRelative
   if (-not (Test-Path -LiteralPath $approvedDeltaPath -PathType Leaf) -or
-      (Get-MIRFileSha256 -Path $approvedDeltaPath) -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_sha256")) {
+      (Get-MIRFileContentSha256 -Path $approvedDeltaPath -RelativePath $approvedDeltaRelative) -ne
+        (Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_sha256")) {
     throw "Approved-delta evidence is missing or its recorded hash is stale."
   }
   $approvedDelta = Get-Content -Raw -LiteralPath $approvedDeltaPath | ConvertFrom-Json
-  if ([int]$approvedDelta.schema -ne 1 -or [string]$approvedDelta.kind -ne "mir-approved-delta" -or
-      [string]$approvedDelta.summary.status -ne "approved" -or [int]$approvedDelta.summary.unapproved_count -ne 0 -or
-      [string]$approvedDelta.current.source_commit -ne $packageSourceCommit -or
-      [string]$approvedDelta.current.archive_sha256 -ne $archiveSha256 -or
-      [string]$approvedDelta.current.package_content_sha256 -ne $packageContentSha256) {
+  $legacyApprovedDelta = (
+    [int]$approvedDelta.schema -eq 1 -and [string]$approvedDelta.kind -eq "mir-approved-delta" -and
+    [string]$approvedDelta.summary.status -eq "approved" -and [int]$approvedDelta.summary.unapproved_count -eq 0 -and
+    [string]$approvedDelta.current.source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.current.archive_sha256 -eq $archiveSha256 -and
+    [string]$approvedDelta.current.package_content_sha256 -eq $packageContentSha256
+  )
+  $nativeApprovedDelta = (
+    [int]$approvedDelta.schema -eq 1 -and [string]$approvedDelta.kind -eq "mir-control-plane-v5-approved-patch-delta" -and
+    [string]$approvedDelta.evaluation.status -eq "approved" -and [int]$approvedDelta.evaluation.unapproved_count -eq 0 -and
+    [string]$approvedDelta.observation.current.source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.observation.current.qualification_source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.observation.current.archive_sha256 -eq $archiveSha256 -and
+    [string]$approvedDelta.observation.current.content_sha256 -eq $packageContentSha256
+  )
+  if (-not $legacyApprovedDelta -and -not $nativeApprovedDelta) {
     throw "Approved-delta evidence is not an exact passing binding for the candidate."
   }
 
   $upgradeRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_path"
   $upgradePath = Join-Path $repo $upgradeRelative
   if (-not (Test-Path -LiteralPath $upgradePath -PathType Leaf) -or
-      (Get-MIRFileSha256 -Path $upgradePath) -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_sha256")) {
+      (Get-MIRFileContentSha256 -Path $upgradePath -RelativePath $upgradeRelative) -ne
+        (Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_sha256")) {
     throw "Upgrade-matrix evidence is missing or its recorded hash is stale."
   }
   $upgrade = Get-Content -Raw -LiteralPath $upgradePath | ConvertFrom-Json
   $requiredArchetypes = @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")
   $declaredArchetypes = @($upgrade.required_archetypes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
   $passingArchetypes = @($upgrade.rows | Where-Object status -eq "passed" | ForEach-Object { [string]$_.id } | Sort-Object -Unique)
+  $upgradeCommit = [string]$upgrade.source_commit
+  $upgradeCommitIsBound = $false
+  if ($upgradeCommit -match '^[0-9a-f]{40}$') {
+    & git -C $repo cat-file -e "$upgradeCommit^{commit}" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      & git -C $repo merge-base --is-ancestor $packageSourceCommit $upgradeCommit
+      $upgradeCommitIsBound = ($LASTEXITCODE -eq 0)
+    }
+  }
   if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.kind -ne "mir-upgrade-matrix" -or
-      [string]$upgrade.status -ne "passed" -or [string]$upgrade.source_commit -ne $packageSourceCommit -or
+      [string]$upgrade.status -ne "passed" -or -not $upgradeCommitIsBound -or
       [string]$upgrade.candidate.archive_sha256 -ne $archiveSha256 -or
       @(Compare-Object $requiredArchetypes $declaredArchetypes).Count -ne 0 -or
       @(Compare-Object $requiredArchetypes $passingArchetypes).Count -ne 0) {
     throw "Upgrade-matrix evidence is not an exact five-archetype passing binding for the candidate."
+  }
+
+  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
+  if ([string]$release.state -ne "focused-qualified" -or [string]$release.candidate_id -ne "C32" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive_sha256 -ne $archiveSha256 -or
+      [string]$release.package.content_sha256 -ne $packageContentSha256) {
+    throw "Focused-qualified candidate descriptor differs from the typed ReleaseRecord."
   }
 
   Write-Host "[ok] MIR candidate bytes, approved delta, and upgrade matrix are fixed while external qualification remains pending."

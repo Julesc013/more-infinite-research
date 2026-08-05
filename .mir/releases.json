@@ -66,10 +66,9 @@
       "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
       "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
       "protected_qualification": "pending",
-      "publication_status": "package-built",
-      "qualification": "package-built",
+      "publication_status": "focused-qualified",
+      "qualification": "focused-qualified",
       "remaining_obligations": [
-        "focused-qualification",
         "candidate-qualification",
         "manual-acceptance",
         "protected-qualification",
@@ -80,7 +79,6 @@
         "public-byte-verification"
       ],
       "remaining_states": [
-        "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
         "protected-qualified",
@@ -91,7 +89,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "C32-package-built"
+      "status": "C32-focused-qualified"
     }
   },
   "generated_from": [

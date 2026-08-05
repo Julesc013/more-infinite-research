@@ -21,7 +21,7 @@ superseded_by: []
 | Reserved candidate floor | `C32` |
 | Target | `2.1` |
 | Branch | `dev` |
-| State | `package-built` |
+| State | `focused-qualified` |
 | Package source commit | `a3bfbc4524b52cede425900e775384eb9c1fc4b3` |
 | Package source tree | `a038ba1bcce347c53ee906d466279854c5a8d485` |
 | Package source SHA-256 | `1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D` |
@@ -33,7 +33,6 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `focused-qualified`
 - [ ] `candidate-qualified`
 - [ ] `manually-accepted`
 - [ ] `protected-qualified`
