@@ -228,6 +228,13 @@ if ($status -eq "requalifying-after-validation-harness-change") {
   exit 0
 }
 
+function Get-MIRCandidateJsonSha256 {
+  param([Parameter(Mandatory)]$Value)
+  $json = $Value | ConvertTo-Json -Depth 100 -Compress
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($json)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+}
+
 if ($status -eq "source-frozen") {
   $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
   $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
@@ -498,6 +505,10 @@ if ($status -eq "published") {
   if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
     throw "Published candidate structured summary is missing: $summaryRelative"
   }
+  if ((Get-MIRFileContentSha256 -Path $summaryPath -RelativePath $summaryRelative) -ne
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_sha256")) {
+    throw "Published candidate structured summary hash is stale."
+  }
   $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
   $publishedSummaryExpectations = [ordered]@{
     schema = 2
@@ -561,13 +572,29 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Active release candidate artifact is missing: $artifactRelative"
 }
 
+$summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
+$summaryPath = Join-Path $repo $summaryRelative
+if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+  throw "Active release candidate structured summary is missing: $summaryRelative"
+}
+if ((Get-MIRFileContentSha256 -Path $summaryPath -RelativePath $summaryRelative) -ne
+    (Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_sha256")) {
+  throw "Active release candidate structured summary hash is stale."
+}
+$summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+$nativeAssuranceSummary = ([string]$summary.kind -eq "mir-assurance-candidate-qualification")
+
 $checks = [ordered]@{
   sha256 = Get-MIRFileSha256 -Path $artifactPath
   package_content_sha256 = Get-MIRZipContentFingerprint -Path $artifactPath
   package_source_sha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   target_profile_sha256 = Get-MIRTargetProfileFingerprint -Profile $profile
   required_groups_sha256 = Get-MIRRequiredGroupsFingerprint -RequiredGroups $requiredGroups
-  validation_harness_sha256 = Get-MIRValidationHarnessFingerprint -RepoRoot $repo
+  validation_harness_sha256 = if ($nativeAssuranceSummary) {
+    [string]$summary.validation_harness_sha256
+  } else {
+    Get-MIRValidationHarnessFingerprint -RepoRoot $repo
+  }
   expected_scenarios_sha256 = Get-MIRFileContentSha256 `
     -Path (Join-Path $repo "validation\scenarios\runtime.json") `
     -RelativePath "validation/scenarios/runtime.json"
@@ -595,12 +622,6 @@ Assert-MIRCandidateBoundEvidence `
   -Version ([string]$info.version) `
   -InteractiveStatus $(if ($status -eq "release-candidate-accepted") { "passed" } else { "pending" })
 
-$summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
-$summaryPath = Join-Path $repo $summaryRelative
-if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
-  throw "Active release candidate structured summary is missing: $summaryRelative"
-}
-$summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
 $summaryExpectations = [ordered]@{
   schema = 2
   status = "passed"
@@ -626,6 +647,41 @@ if ([bool]$summary.package_source_git_dirty) {
 }
 if ([bool]$summary.validation_harness_git_dirty) {
   throw "Structured summary was produced from a dirty validation harness."
+}
+
+if ($nativeAssuranceSummary) {
+  $qualification = $summary.qualification
+  $qualificationRows = @($qualification.rows)
+  $expectedIds = @($qualification.expected_test_ids | ForEach-Object { [string]$_ })
+  $rowIds = @($qualificationRows | ForEach-Object { [string]$_.test_id })
+  $sourceTree = (& git -C $repo show -s --format=%T $sourceCommit).Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]$summary.git_tree -ne $sourceTree -or
+      [string]$summary.package_source_commit -ne $packageSourceCommit -or
+      [string]$summary.candidate.archive -ne $artifactRelative -or
+      [string]$summary.candidate.archive_sha256 -ne $checks.sha256 -or
+      [string]$summary.candidate.content_sha256 -ne $checks.package_content_sha256 -or
+      [int64]$summary.candidate.bytes -ne (Get-Item -LiteralPath $artifactPath).Length -or
+      [string]$qualification.profile -ne "development-breadth" -or
+      [string]$qualification.plan_material_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$qualification.required_test_set_sha256 -ne (Get-MIRCandidateJsonSha256 -Value $expectedIds) -or
+      [int]$qualification.expected -ne 135 -or [int]$qualification.executed -ne 135 -or
+      [int]$qualification.reused -ne 0 -or [int]$qualification.failed -ne 0 -or
+      [int]$qualification.incomplete -ne 0 -or [int]$qualification.unexpected -ne 0 -or
+      $qualificationRows.Count -ne 135 -or @($rowIds | Sort-Object -Unique).Count -ne 135 -or
+      @(Compare-Object ($expectedIds | Sort-Object) ($rowIds | Sort-Object)).Count -ne 0 -or
+      @($qualificationRows | Where-Object {
+        [string]$_.status -ne "passed" -or [string]$_.disposition -ne "RUN" -or
+        [string]$_.fingerprint_sha256 -notmatch '^[A-F0-9]{64}$' -or
+        [string]$_.result_digest -notmatch '^[A-F0-9]{64}$'
+      }).Count -ne 0) {
+    throw "Native assurance candidate summary is not an exact fresh 135-row passing proof."
+  }
+  $freeze = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json") | ConvertFrom-Json
+  if ([string]$summary.environment.factorio_binary.sha256 -ne [string]$freeze.qualification_authority.factorio.binary_sha256 -or
+      [string]$summary.environment.official_data.sha256 -ne [string]$freeze.qualification_authority.factorio.official_data_sha256 -or
+      [string]$summary.environment.installation_sha256 -ne [string]$freeze.qualification_authority.factorio.installation_sha256) {
+    throw "Native assurance candidate summary does not bind the frozen Factorio environment."
+  }
 }
 
 $summaryRequired = @($summary.required_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
