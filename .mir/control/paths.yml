@@ -100,6 +100,8 @@ paths:
   releases.ledger: .mir/releases.json
   releases.records: .mir/releases/records
   releases.current: .mir/releases/records/current.json
+  releases.reconciliations: .mir/releases/reconciliations
+  releases.reconciliations.3.2.5: .mir/releases/reconciliations/3.2.5.json
   releases.closures: .mir/releases/closures
   releases.transitions: .mir/releases/transitions
   releases.deltas: .mir/releases/deltas
