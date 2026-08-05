@@ -104,13 +104,15 @@
   "compiler_result_dimensions": ["execution", "safety", "review", "promotion", "release"],
   "public_compiler_artifact_schema": 1,
   "public_compiler_artifact_kinds": [
-    "mir-generation-plan-public", "mir-technology-catalog-public", "mir-coverage-public", "mir-compiler-evidence-public"
+    "mir-generation-plan-public", "mir-technology-catalog-public", "mir-coverage-public",
+    "mir-compiler-evidence-public", "mir-research-cost-support-public"
   ],
   "public_compiler_mod_data_types": [
     "more-infinite-research.generation-plan-public",
     "more-infinite-research.technology-catalog-public",
     "more-infinite-research.coverage-public",
-    "more-infinite-research.compiler-evidence-public"
+    "more-infinite-research.compiler-evidence-public",
+    "more-infinite-research.research-cost-compatibility-public"
   ],
   "context_owned_state": [
     "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",

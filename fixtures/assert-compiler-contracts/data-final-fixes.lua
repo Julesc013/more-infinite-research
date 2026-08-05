@@ -1681,6 +1681,53 @@ end
 
 local production_evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
 local production_evidence = production_evidence_prototype and production_evidence_prototype.data
+;(function()
+  local research_cost_compatibility = require(
+    "__more-infinite-research__.prototypes.mir.domain.research_cost.compatibility_slice")
+  local support_prototype = (data.raw["mod-data"] or {})
+    ["more-infinite-research-research-cost-compatibility"]
+  local support = support_prototype and support_prototype.data
+  if not support or support.schema ~= 1
+    or support.kind ~= "mir-research-cost-support-public"
+    or support.proposition.id ~= "mir-research-cost-neutral-default-parity-v1"
+    or support.disposition.terminal ~= true
+    or support.disposition.status ~= "SUPPORTED"
+    or support.disposition.reason_code ~= "neutral-default-semantic-parity-proven"
+    or support.disposition.remediation_code ~= "no-remediation-required"
+    or support.proof_assertion.assertion_type ~= "mir-research-cost-proof-assertion-v1"
+    or support.proof_assertion.dimension ~= "SEMANTIC"
+    or support.proof_assertion.status ~= "PASSED"
+    or support.summary.model_count <= 0
+    or support.summary.neutral_model_count ~= support.summary.model_count
+    or support.summary.override_model_count ~= 0
+    or support.truncation.included_model_rows ~= 1
+    or support.truncation.omitted_model_rows ~= support.summary.model_count - 1
+    or support.privacy.contains_paths ~= false
+    or support.privacy.contains_mod_names ~= false
+    or support.target_dispositions.factorio_2_1.classification ~= "target-native-equivalent"
+    or support.target_dispositions.factorio_2_1.transport ~= "mod-data"
+    or support.target_dispositions.factorio_2_0.classification ~= "portable-with-adapter"
+    or support.target_dispositions.factorio_2_0.transport ~= "validation-log"
+    or support.target_dispositions.factorio_2_0.qualification ~= "requires-exact-target-proof"
+    or type(support.semantic_set_fingerprint) ~= "string"
+    or type(support.proof_assertion.assertion_fingerprint) ~= "string"
+    or type(support.support_fingerprint) ~= "string" then
+    fail("research-cost compatibility slice is incomplete, unbounded, or lacks exact target dispositions")
+  end
+  if not production_evidence
+    or support.linkage.compiler_input_fingerprint ~= production_evidence.compiler_input_fingerprint
+    or support.linkage.compiler_result_fingerprint ~= production_evidence.compiler_result_fingerprint
+    or support.linkage.realized_output_fingerprint
+      ~= production_evidence.compiler_result.execution_evidence.realized_output_fingerprint then
+    fail("research-cost compatibility slice does not bind the final compiler evidence chain")
+  end
+  research_cost_compatibility.verify_untrusted(support)
+  local tampered = deepcopy(support)
+  tampered.target_dispositions.factorio_2_0.transport = "mod-data"
+  if pcall(function() research_cost_compatibility.verify_untrusted(tampered) end) then
+    fail("research-cost compatibility slice accepted a tampered Factorio 2.0 transport disposition")
+  end
+end)()
 local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
 if not production_graph_parity or production_graph_parity.schema ~= 2
   or production_graph_parity.valid ~= true

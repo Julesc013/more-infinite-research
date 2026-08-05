@@ -893,6 +893,12 @@ fixtures:
       - separate-compilation-run-telemetry-fingerprint
       - split-subject-design-prototype-qualification-fingerprints
       - content-addressed-compiler-evidence-publication
+      - neutral-default-research-cost-compatibility-slice
+      - terminal-research-cost-disposition
+      - typed-research-cost-proof-assertion
+      - bounded-privacy-safe-research-cost-support
+      - factorio-2-0-research-cost-transport-disposition
+      - research-cost-support-tamper-rejection
       - pre-index-and-post-emission-sanitation-order
       - sanitation-retained-effect-order-ledger
       - sanitation-content-fingerprints
