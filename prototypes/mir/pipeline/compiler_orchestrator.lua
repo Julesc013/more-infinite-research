@@ -23,6 +23,7 @@ local mutation_journal = require("prototypes.mir.domain.compiler.mutation_journa
 local family_resolver = require("prototypes.mir.families.resolver")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local compiler_result_contract = require("prototypes.mir.domain.compiler.compiler_result")
+local research_cost_compatibility = require("prototypes.mir.domain.research_cost.compatibility_slice")
 local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
 
 local M = {}
@@ -336,6 +337,18 @@ function M.publish(context)
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
   end
   require("prototypes.mir.report.coverage").publish(context, {include_internal = include_internal})
+  local research_cost_support = research_cost_compatibility.build({
+    compiler_input = plan.compiler_input,
+    compiler_result = final_result,
+    compilation_fingerprint = plan.compilation_fingerprint,
+    qualification_fingerprint = plan.qualification_fingerprint,
+    stream_plan = plan.stream_plan,
+    base_extension_operations = plan.base_extension_operations,
+    current_target = target_line.factorio_version
+  })
+  research_cost_support = public_artifacts.research_cost_compatibility(research_cost_support)
+  local research_cost_support_bytes = public_artifacts.assert_byte_budget(research_cost_support)
+  telemetry.count("research_cost_support_public_bytes", research_cost_support_bytes)
   telemetry.observe_max("context_state_keys", context:state_key_count())
   local public_evidence
   for _ = 1, 4 do
@@ -349,6 +362,7 @@ function M.publish(context)
       (counters.generation_plan_public_bytes or 0)
       + (counters.technology_catalog_public_bytes or 0)
       + (counters.coverage_public_bytes or 0)
+      + (counters.research_cost_support_public_bytes or 0)
       + evidence_bytes)
   end
   record_work_volume()
@@ -356,6 +370,7 @@ function M.publish(context)
   public_evidence = public_artifacts.compiler_evidence(evidence_input)
   public_artifacts.assert_byte_budget(public_evidence)
   local internal_evidence = include_internal and compiler_evidence.build(evidence_input) or nil
+  require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)
   require("prototypes.mir.emit.compiler_evidence_adapter").publish(public_evidence, internal_evidence)
   return true
 end
