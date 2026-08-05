@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir-interactive-review",
+  "status": "pending",
+  "version": "3.2.5",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+  "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "reviewer": "",
+  "reviewed_at": "",
+  "captures": [],
+  "pending_gates": [
+    "settings-and-cost-examples",
+    "native-and-external-owner-behavior",
+    "configuration-change-progress-preservation",
+    "save-reload-idempotence",
+    "technology-tree-and-localization",
+    "bounded-support-output-and-privacy",
+    "selected-real-ecosystem-saves",
+    "maintainer-go-no-go"
+  ]
+}

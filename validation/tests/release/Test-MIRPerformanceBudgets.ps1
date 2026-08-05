@@ -186,6 +186,12 @@ if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
       [string]$activeCampaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
     throw "Versioned performance campaign does not bind the exact active candidate and tagged baseline."
   }
+  $activeManualScenarios = [string]$activeCampaign.manual_scenarios
+  $activeManualScenariosPath = Join-Path $RepoRoot $activeManualScenarios
+  if ($activeManualScenarios.Replace("\", "/") -cne "validation/scenarios/local-2.1.json" -or
+      -not (Test-Path -LiteralPath $activeManualScenariosPath -PathType Leaf)) {
+    throw "Versioned performance campaign does not bind the governed Factorio 2.1 scenario authority."
+  }
 }
 $campaignBindsActiveCandidate = $null -ne $activeCandidate -and
   [string]$campaign.candidate.candidate_id -eq [string]$activeCandidate.candidate_id -and
@@ -249,8 +255,14 @@ foreach ($requiredPath in @(
     throw "Performance campaign producer authority is absent: $requiredPath"
   }
 }
+$probeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\performance-regression-probe\data.lua")
+foreach ($governedVersion in @([string]$taggedTypedRelease.release, [string]$activeTypedRelease.release)) {
+  if ($probeSource -notmatch ('mir_version\s*==\s*"' + [regex]::Escape($governedVersion) + '"')) {
+    throw "Performance probe does not govern exact paired release $governedVersion."
+  }
+}
 $qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
-foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion")) {
+foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion", "performance-campaigns", "CampaignPath", "conservative Factorio path budget", "maximumFactorioPathLength", "mirp-", "exact governed scratch parent")) {
   if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
     throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
   }

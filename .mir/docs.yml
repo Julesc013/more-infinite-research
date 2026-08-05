@@ -609,6 +609,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.5-development-readiness
+  - path: docs/releases/3.2.5-c32-source-freeze.md
+    title: "MIR 3.2.5 C32 Source Freeze"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.5-d1-source-freeze
       - mir-3.2.5-hosted-phase-a-readiness
       - mir-3.2.5-development-runtime-findings
       - mir-3.2.5-b0-development-closure

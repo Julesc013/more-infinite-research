@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.5-c32-package-built",
+  "release": "3.2.5",
+  "from": "source-frozen",
+  "to": "package-built",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "deterministic-package",
+      "archive": "dist/more-infinite-research_3.2.5.zip",
+      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+      "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "archive_bytes": 1056249,
+      "archive_entries": 301,
+      "builds": 2
+    }
+  ],
+  "recorded_at": "2026-08-05T16:12:26.000Z"
+}

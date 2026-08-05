@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0019",
+  "title": "Prepare the MIR 3.2.5 D1 source-freeze packet",
+  "kind": "release",
+  "package_visible": false,
+  "domains_read": [
+    "product.research-cost",
+    "product.compatibility",
+    "runtime.migration",
+    "release.authority",
+    "release.distribution",
+    "assurance.plan"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "assurance.plan"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Freeze public 3.2.3 as the sole predecessor, preserve 3.2.4/C31 as superseded-unpublished lineage, select merged development revision 5 as the final package-visible 3.2.5 source, and create no 2.5.5 authority.",
+  "release_note_impact": "No player-package bytes change. The release programme binds the already admitted research-cost product to one reviewable D1 identity before C32 is assigned.",
+  "test_obligations": [
+    "release.authority",
+    "release.source-freeze-packet",
+    "release.work-package-reconciliation",
+    "docs.generated",
+    "assurance.plan",
+    "package.identity-preservation"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "apply as package-excluded source-freeze governance",
+    "factorio-2.0": "retain shipped-feature dispositions only; do not create a release record, branch, candidate, projection, or package"
+  },
+  "freeze_preparation": {
+    "work_package": "325-D1",
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "release_state": "planned",
+    "packet": ".mir/releases/freezes/3.2.5-D1.json",
+    "next_transition": "planned-to-source-frozen-after-exact-admission"
+  },
+  "state": "implemented"
+}

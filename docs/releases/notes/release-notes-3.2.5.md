@@ -59,11 +59,11 @@ The first exact ecosystem retry reached and passed all nine Factorio loads, then
 
 | Field | Value |
 | --- | --- |
-| State | `planned` |
-| Candidate | `not-assigned` |
-| Package source commit | `pending` |
-| Archive SHA-256 | `pending` |
-| Content SHA-256 | `pending` |
+| State | `candidate-qualified` |
+| Candidate | `C32` |
+| Package source commit | `a3bfbc4524b52cede425900e775384eb9c1fc4b3` |
+| Archive SHA-256 | `AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF` |
+| Content SHA-256 | `1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D` |
 | Tag | `pending` |
 | Tag commit | `pending` |
 | Assurance exceptions | `pending` |

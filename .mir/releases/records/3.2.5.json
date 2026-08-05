@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "release": "3.2.5",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C32",
   "candidate_floor": "C32",
   "target": "2.1",
   "branch": "dev",
-  "state": "planned",
+  "state": "candidate-qualified",
   "source_release": {
     "release": "3.2.3",
     "tag": "3.2.3",
@@ -19,24 +19,90 @@
     "candidate_closure": "path:releases.closures/3.2.4-C31.json",
     "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4"
   },
-  "package": {},
+  "package": {
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "archive": "dist/more-infinite-research_3.2.5.zip",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301
+  },
   "upgrade": {
     "from_version": "3.2.3",
     "to_version": "3.2.5",
     "fixture": "assert-upgrade-3-2-3-to-3-2-5"
   },
-  "proofs": {},
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "source-freeze-packet",
+        "path": ".mir/releases/freezes/3.2.5-D1.json",
+        "candidate_id": "C32",
+        "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+        "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+        "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D"
+      }
+    ],
+    "package_build": [
+      {
+        "kind": "deterministic-package",
+        "path": "scripts/Test-MIRDeterministicPackage.ps1",
+        "archive": "dist/more-infinite-research_3.2.5.zip",
+        "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+        "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+        "bytes": 1056249,
+        "entries": 301,
+        "builds": 2
+      }
+    ],
+    "focused_qualification": [
+      {
+        "kind": "approved-package-delta",
+        "path": ".mir/releases/deltas/3.2.3-to-3.2.5.json",
+        "sha256": "5EB9247EFD08BFDE691371B7DAA46FD16E20EB0D7582CEF9585E1F14C160DEC8",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "five-archetype-upgrade-matrix",
+        "path": ".mir/evidence/3.2.5-upgrade-proof.json",
+        "sha256": "121EF12D510256E17F01B1BBD7E03708D82DD70D2F4C4B656A2C145B0483EDE1",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "candidate-bound-ecosystem-campaign",
+        "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+        "sha256": "2BDF602D37F3016D2E720D3B0F404B359DBC1723031762C0DDF8794D6EB7DC41",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "paired-performance-regression",
+        "path": ".mir/evidence/3.2.5-performance-regression.json",
+        "sha256": "D249D32480E128150428C3789AB27612B5D845510810A4A06BA357DD43120239",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "candidate_qualification": [
+      {
+        "kind": "fresh-candidate-qualification",
+        "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+        "sha256": "B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E",
+        "digest_policy": "utf8-lf",
+        "source_commit": "2e2017bc662ffd816ea7f01ebda7989dfc73e0ea",
+        "source_tree": "bd38892ec69eef1d23253088d0922a6ecbc98a21",
+        "plan_material_sha256": "F06460E40F4C671E5F69A86ECB687EDA316F38F2651D7E075893CF81280AD38E",
+        "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
+        "expected": 135,
+        "executed": 135,
+        "reused": 0,
+        "failed": 0,
+        "incomplete": 0,
+        "unexpected": 0
+      }
+    ]
+  },
   "remaining_obligations": [
-    "programme-contract",
-    "cost-model-completion",
-    "derived-disposition",
-    "proof-assertions",
-    "support-reporting",
-    "factorio-2.0-projection",
-    "source-freeze",
-    "package-build",
-    "focused-qualification",
-    "candidate-qualification",
     "manual-acceptance",
     "protected-qualification",
     "seal",
@@ -54,5 +120,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-05T03:25:00.000Z"
+  "updated_at": "2026-08-05T22:52:25.779Z"
 }

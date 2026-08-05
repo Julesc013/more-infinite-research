@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.5-c32-source-frozen",
+  "release": "3.2.5",
+  "from": "planned",
+  "to": "source-frozen",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "source-freeze-packet",
+      "path": ".mir/releases/freezes/3.2.5-D1.json",
+      "candidate_id": "C32",
+      "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+      "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+      "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+      "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D"
+    }
+  ],
+  "recorded_at": "2026-08-05T16:03:31.000Z"
+}

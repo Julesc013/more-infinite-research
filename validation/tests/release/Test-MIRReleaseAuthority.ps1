@@ -76,8 +76,14 @@ if ($canonicalStateIndex -lt 0) {
   throw "Canonical release authority has an unknown state: $($canonical.state)."
 }
 $canonicalHasPackage = $canonicalStateIndex -ge $packageBuiltStateIndex
-if (-not $canonicalHasPackage -and @($canonical.package.PSObject.Properties).Count -ne 0) {
-  throw "A pre-package canonical release must not claim immutable package identity."
+if ($canonicalStateIndex -eq 0 -and @($canonical.package.PSObject.Properties).Count -ne 0) {
+  throw "A planned canonical release must not claim frozen source or package identity."
+}
+if ($canonicalStateIndex -eq 1) {
+  $sourceOnlyFields = @($canonical.package.PSObject.Properties | ForEach-Object { [string]$_.Name } | Sort-Object)
+  if (@(Compare-Object @("source_commit", "source_sha256", "source_tree") $sourceOnlyFields).Count -ne 0) {
+    throw "A source-frozen canonical release must bind only source commit, tree, and content identity before package construction."
+  }
 }
 foreach ($row in @(
   [pscustomobject]@{record=$taggedModern;target="2.1";minimum="tagged";role="tagged Factorio 2.1"},
@@ -146,3 +152,8 @@ if ($canonicalHasPackage -and ($releaseNotes -notmatch 'MIR-CONTROL-PLANE-IDENTI
   throw "Release notes do not contain the generated immutable identity block."
 }
 Write-Host "[ok] typed release records, transitions, immutable tag, package locks, evidence hashes, and generated release views agree."
+
+$freezePacket = Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json"
+if (Test-Path -LiteralPath $freezePacket -PathType Leaf) {
+  & (Join-Path $repo "validation/tests/release/Test-MIRSourceFreezePacket.ps1") -RepoRoot $repo
+}

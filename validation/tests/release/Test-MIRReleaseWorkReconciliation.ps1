@@ -34,31 +34,29 @@ if ($LASTEXITCODE -ne 0 -or $baselineTree -ne [string]$record.source_baseline.tr
 }
 
 $expectedAdmittedBaseline = [ordered]@{
-  revision = "4"
-  package_source_commit = "489b62fda979c5192ddbb8294c27a3886f6ba13e"
-  package_source_tree = "0d3fc58d69eed64bcb2199a051f9fc9f6a6c9c30"
-  archive_sha256 = "AF3F4D6AFF58B098D6729FE31B039C47497988E7515D1055F4C5C54D85B5CDBD"
-  content_sha256 = "A313E8A3E377A099FCB6E8266A3EDBDF5AEF9D77CF777B041472C772C6448877"
-  bytes = "1055804"
+  revision = "5"
+  package_source_commit = "a3bfbc4524b52cede425900e775384eb9c1fc4b3"
+  package_source_tree = "a038ba1bcce347c53ee906d466279854c5a8d485"
+  archive_sha256 = "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF"
+  content_sha256 = "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
+  bytes = "1056249"
   entries = "301"
-  package_equivalent_governance_commit = "a08384705d2c53a056cd81f48b90e6bb86b89932"
+  package_equivalent_governance_commit = "a3bfbc4524b52cede425900e775384eb9c1fc4b3"
 }
 foreach ($entry in $expectedAdmittedBaseline.GetEnumerator()) {
   if ([string]$record.admitted_development_baseline.($entry.Key) -ne [string]$entry.Value) {
-    throw "Admitted development revision 4 field changed: $($entry.Key)."
+    throw "Admitted development revision 5 field changed: $($entry.Key)."
   }
 }
 $admittedTree = (& git -C $RepoRoot show -s --format=%T ([string]$record.admitted_development_baseline.package_source_commit)).Trim()
 if ($LASTEXITCODE -ne 0 -or $admittedTree -ne [string]$record.admitted_development_baseline.package_source_tree) {
-  throw "Development revision 4 source commit and tree do not agree."
+  throw "Development revision 5 source commit and tree do not agree."
 }
 
 $release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/3.2.5.json") |
   ConvertFrom-Json
 foreach ($boundary in @{
-  release_state = "planned"
   candidate_floor = "C32"
-  candidate_id = "not-assigned"
   factorio_2_0_release_authority = "not-created"
   mir_3_3_admission = "not-admitted"
   published_dist_mutation = "forbidden"
@@ -71,6 +69,16 @@ if ([string]$release.state -ne [string]$record.boundaries.release_state -or
     [string]$release.candidate_floor -ne [string]$record.boundaries.candidate_floor -or
     [string]$release.candidate_id -ne [string]$record.boundaries.candidate_id) {
   throw "Work-package reconciliation differs from the typed 3.2.5 release authority."
+}
+$releaseBoundary = "{0}|{1}" -f [string]$record.boundaries.release_state, [string]$record.boundaries.candidate_id
+if ($releaseBoundary -notin @(
+    "planned|not-assigned",
+    "source-frozen|C32",
+    "package-built|C32",
+    "focused-qualified|C32",
+    "candidate-qualified|C32"
+  )) {
+  throw "Work-package reconciliation claims an unsupported pre-manual release boundary: $releaseBoundary"
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json")) {
   throw "A forbidden 2.5.5 release authority exists."
@@ -96,8 +104,8 @@ if ($actualIds -contains "325-A1a") {
 if ($actualIds -contains "325-B0") {
   throw "Closed work package 325-B0 must not re-enter the open reconciliation."
 }
-if ([string]$record.priority.next_work_package -ne "325-B1") {
-  throw "The current bounded product priority must be essential 325-B1 correctness."
+if ([string]$record.priority.next_work_package -notin @("325-D1", "325-D2", "325-D3")) {
+  throw "The current bounded priority must remain on the 3.2.5 freeze or qualification path."
 }
 
 $arrayFields = @(
@@ -188,10 +196,10 @@ if ([int]$distributions.distribution_count -ne @($distributions.distributions).C
 }
 foreach ($expectedStatus in @{
   "325-B2" = "deferred-explicitly"
-  "325-B3" = "narrowed-release-specific"
-  "325-B4" = "narrowed-release-specific"
+  "325-B3" = "terminal-release-specific-product"
+  "325-B4" = "terminal-release-specific-product"
   "325-B5" = "deferred-explicitly"
-  "325-C1" = "narrowed-shipped-features-only"
+  "325-C1" = "terminal-shipped-features-only"
 }.GetEnumerator()) {
   $row = @($rows | Where-Object { $_.id -eq $expectedStatus.Key })[0]
   if ([string]$row.status -ne [string]$expectedStatus.Value) {
@@ -206,10 +214,19 @@ if ($c31View.Count -ne 1 -or [string]$c31View[0].state -ne "package-built" -or
 }
 foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   $row = @($rows | Where-Object { $_.id -eq $releaseOnly })[0]
-  if ([string]$row.status -ne "blocked-by-prerequisite" -or
-      [string]$row.package_visibility -ne "none-until-admitted") {
-    throw "$releaseOnly must remain blocked and non-authoritative."
+  $allowedStatuses = switch ($releaseOnly) {
+    "325-D2" { @("blocked-by-prerequisite", "in-progress", "terminal") }
+    "325-D3" { @("blocked-by-prerequisite", "in-progress", "awaiting-manual-gate") }
+    default { @("blocked-by-prerequisite") }
+  }
+  if ([string]$row.status -notin $allowedStatuses -or
+      ([string]$releaseOnly -eq "325-D4" -and [string]$row.package_visibility -ne "none-until-admitted")) {
+    throw "$releaseOnly has advanced outside the governed freeze/qualification boundary."
   }
 }
+$d1 = @($rows | Where-Object { $_.id -eq "325-D1" })[0]
+if ([string]$d1.status -notin @("prepared-awaiting-admission", "terminal")) {
+  throw "325-D1 has an unsupported freeze-packet state."
+}
 
-Write-Host "[ok] MIR 3.2.5 closes B0, narrows the release contract, and preserves immutable development baselines without candidate, 2.5.5, or 3.3 authority."
+Write-Host "[ok] MIR 3.2.5 closes B0/B1, narrows the release contract, and preserves immutable development baselines without 2.5.5 or 3.3 authority."

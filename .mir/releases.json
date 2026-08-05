@@ -43,42 +43,34 @@
       "tag_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
     },
     "factorio-2.1": {
-      "archive": "",
-      "archive_bytes": null,
+      "archive": "dist/more-infinite-research_3.2.5.zip",
+      "archive_bytes": 1056249,
       "archive_class": "frozen-unreleased-calibration-candidate",
-      "archive_entries": null,
-      "archive_sha256": "",
+      "archive_entries": 301,
+      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
       "assurance_exception_ids": [],
       "branch": "dev",
       "candidate_floor": "C32",
-      "candidate_id": "not-assigned",
+      "candidate_id": "C32",
+      "candidate_qualification_evidence": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+      "candidate_qualification_sha256": "B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.5",
-      "package_content_sha256": "",
-      "package_source_commit": "",
+      "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
       "package_source_material": {
-        "file_count": null,
+        "file_count": 301,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": ""
+        "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485"
       },
-      "package_source_sha256": "",
-      "package_source_tree": "",
+      "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
       "protected_qualification": "pending",
-      "publication_status": "planned",
-      "qualification": "planned",
+      "publication_status": "candidate-qualified",
+      "qualification": "candidate-qualified",
       "remaining_obligations": [
-        "programme-contract",
-        "cost-model-completion",
-        "derived-disposition",
-        "proof-assertions",
-        "support-reporting",
-        "factorio-2.0-projection",
-        "source-freeze",
-        "package-build",
-        "focused-qualification",
-        "candidate-qualification",
         "manual-acceptance",
         "protected-qualification",
         "seal",
@@ -88,10 +80,6 @@
         "public-byte-verification"
       ],
       "remaining_states": [
-        "source-frozen",
-        "package-built",
-        "focused-qualified",
-        "candidate-qualified",
         "manually-accepted",
         "protected-qualified",
         "sealed",
@@ -101,7 +89,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "not-assigned-planned"
+      "status": "C32-candidate-qualified"
     }
   },
   "generated_from": [

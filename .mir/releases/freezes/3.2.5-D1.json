@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "kind": "mir-source-freeze-packet",
+  "release": "3.2.5",
+  "status": "admitted",
+  "candidate_floor": "C32",
+  "candidate_id": "C32",
+  "prepared_at": "2026-08-05T06:40:00.000Z",
+  "admitted_at": "2026-08-05T16:03:31.000Z",
+  "lineage": {
+    "public_predecessor": {
+      "release": "3.2.3",
+      "candidate_id": "C30",
+      "tag": "3.2.3",
+      "tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+      "tag_object": "95af6bb56e50e48abfbe92dbb5f6a51bc445413f",
+      "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+      "archive": "dist/more-infinite-research_3.2.3.zip",
+      "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+      "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+      "bytes": 1034824,
+      "entries": 292
+    },
+    "superseded_checkpoint": {
+      "release": "3.2.4",
+      "candidate_id": "C31",
+      "disposition": "superseded-unpublished",
+      "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+      "package_source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c",
+      "archive": "dist/more-infinite-research_3.2.4.zip",
+      "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
+      "content_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+      "bytes": 1048419,
+      "entries": 298,
+      "closure": ".mir/releases/closures/3.2.4-C31.json"
+    }
+  },
+  "source": {
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "rolling_revision": 5,
+    "development_qualification_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
+    "package_equivalent_merge_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "worktree_clean": true
+  },
+  "package_contract": {
+    "roots": [
+      "changelog.txt",
+      "control.lua",
+      "data-final-fixes.lua",
+      "data-updates.lua",
+      "data.lua",
+      "info.json",
+      "LICENSE",
+      "README.md",
+      "settings.lua",
+      "thumbnail.png",
+      "locale",
+      "migrations",
+      "prototypes"
+    ],
+    "excluded_roots": [
+      ".mir",
+      ".codex",
+      ".github",
+      ".work",
+      "artifacts",
+      "build",
+      "dist",
+      "docs",
+      "fixtures",
+      "scripts",
+      "spec",
+      "tests",
+      "tools"
+    ],
+    "package_file_count": 301,
+    "builder": {
+      "path": "tools/commands/package/Build-MIRPackage.ps1",
+      "sha256": "90F11458037D91878ABE0EBB1B1665EFFF3D120082F3CC9C5134BACF04D33C08"
+    },
+    "identity_implementation": {
+      "path": "tools/lib/validation/PackageIdentity.ps1",
+      "sha256": "58442DB6F9DD52D55580CE812F924F9793FBC3DAC9A5396EDA14E3C2AF01548E"
+    },
+    "expected": {
+      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+      "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "bytes": 1056249,
+      "entries": 301,
+      "deterministic_builds": 2
+    }
+  },
+  "product_contract": {
+    "scope": "narrowed-unified-research-cost-and-bounded-compatibility",
+    "public_abi": {
+      "settings": "stable 3.2.3 IDs plus governed fixed/linear/exponential/hybrid parameters",
+      "research_cost_formula_abi": "mir-research-cost-v1",
+      "research_cost_qualification_abi": "mir-research-cost-qualification-v1",
+      "research_cost_proof_abi": "mir-research-cost-algebraic-proof-v1",
+      "support_kind": "mir-research-cost-support-public",
+      "support_max_canonical_bytes": 16384,
+      "runtime_migrations": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ]
+    },
+    "authorities": [
+      {"path": ".mir/settings.yml", "sha256": "43CC1604B7FD20DDA973BE492ABE0AE94283115A05AF72023548C70C16BE7206"},
+      {"path": ".mir/research-cost-contract-3.2.5.json", "sha256": "0050F811CDEC13A601F8AEE4FE5CE556D3E1DF12654FC03077AD38415541592B"},
+      {"path": ".mir/public-artifact-budgets.json", "sha256": "6EE524BD1154286A31F9C3CE018252B318EB3EAC92F6191AFB36B4648B5CF688"},
+      {"path": "prototypes/mir/report/public_compiler_artifacts.lua", "sha256": "839BC36FB377892D5DFDF5B076AABAAE5C620D4A7D5F2E6D5E756A32F1319B00"},
+      {"path": "prototypes/mir/report/diagnostics_sink.lua", "sha256": "3D8688100F86FFBB99E1AFEEFB834A49CEBDED94229AEA4DE58918AD6848415E"},
+      {"path": ".mir/locales/manifest.json", "sha256": "6D49C3315B2499C017F9B0C146D4F655093C7C76F87C8695FE4643773E5DD62D"},
+      {"path": ".mir/compatibility.yml", "sha256": "9030F4E3ACE0760DEA4B271715C6AED3F4E219023BEDFD1E034EFDF85CAEDD12"},
+      {"path": ".mir/streams.yml", "sha256": "405A33FF6A80B3A7DBCB321FB37C3525C62E2F594335484B721C7E68FC3AC2F8"},
+      {"path": "docs/compatibility/claim-levels.md", "sha256": "314708F92F569CB99DB8647482BE56D542A41E3873620DA6D3FDC33A548E0C7F"}
+    ],
+    "factorio_2_0_dispositions": [
+      {"feature": "cost-model", "classification": "portable-identical"},
+      {"feature": "settings-and-profiles", "classification": "portable-with-adapter"},
+      {"feature": "progress-preservation", "classification": "portable-with-adapter"},
+      {"feature": "base-continuation", "classification": "portable-identical"},
+      {"feature": "ownership-and-adoption", "classification": "portable-with-adapter"},
+      {"feature": "bounded-support-transport", "classification": "portable-with-adapter"},
+      {"feature": "migration-state", "classification": "portable-with-adapter"},
+      {"feature": "package-metadata", "classification": "target-specific"},
+      {"feature": "localization", "classification": "portable-identical"}
+    ],
+    "deferred": [
+      "generalized-all-stream-dispositions",
+      "general-purpose-proof-platform",
+      "universal-support-bundle",
+      "broad-factorio-2.0-projection",
+      "MEP-1",
+      "ProcessIR",
+      "SafetyKernel-PolicyEngine-cutover",
+      "MIR-3.3"
+    ]
+  },
+  "transition_contract": {
+    "from_version": "3.2.3",
+    "to_version": "3.2.5",
+    "fixture": "assert-upgrade-3-2-3-to-3-2-5",
+    "required_archetypes": [
+      "base-default",
+      "space-age-native-owner",
+      "automatic-family-creation",
+      "base-continuations",
+      "mod-set-configuration-change"
+    ],
+    "curve_transitions": 16,
+    "first_reload_required": true,
+    "second_reload_required": true,
+    "approved_delta": {
+      "baseline": "dist/more-infinite-research_3.2.3.zip",
+      "policy": ".mir/control-plane/approved-delta-policies.json",
+      "candidate_bound_capture": "required-after-package-build"
+    }
+  },
+  "qualification_authority": {
+    "factorio": {
+      "version": "2.1.12",
+      "build": 87038,
+      "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27",
+      "official_data_file_count": 17296,
+      "official_data_sha256": "A301C63BDB504C8CFAAC1DE893D95E608195A1D4783DC8873FC605DB4D579470",
+      "installation_sha256": "C661AB5E3EE2408D0789DA3CA821D5D3EFC2342781DE0743F24BCF4730EFFB1E"
+    },
+    "complete_local_plan": {
+      "source_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
+      "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+      "plan_material_sha256": "E5EB38EACCC2153730B4B303C17D417541D6A0E2E3D625442A83E5B0A524297B",
+      "required_test_set_sha256": "9DE635BA6172321F4B88A5D39DF09B226CD7F3D0717FE76BD74D5967F2C70EDB",
+      "required": 128,
+      "passed": 128,
+      "executed": 126,
+      "reused": 2,
+      "failed": 0
+    },
+    "hosted_exact_head": {
+      "source_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
+      "plan_material_sha256": "BC9691D1E9FB2CA59231D6FF11D79F374ED1DC008A2982D69F211E21CC9B490D",
+      "required_test_set_sha256": "7E6A5E953B211594263D2119DC8F5DE2A36450A5AECCB255B9E38CEACC518DBC",
+      "imported": 8,
+      "rejected": 0
+    },
+    "source_bound_plan": {
+      "status": "passed",
+      "source_commit": "90c4d7b0c002a9909f80436f4a0c5cfc17bf2098",
+      "source_tree": "48d159716b00c092720af1e5624e448fbaecabc7",
+      "generated_at": "2026-08-05T15:30:28.2692223Z",
+      "completed_at": "2026-08-05T16:02:21.4337463Z",
+      "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+      "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D",
+      "required": 125,
+      "executed": 125,
+      "reused": 0,
+      "failed": 0,
+      "incomplete": 0,
+      "unknown_paths": 0,
+      "invalid_rows": 0
+    },
+    "performance_policy": {
+      "baseline": "3.2.3",
+      "warmup_runs": 1,
+      "minimum_measured_pairs": 5,
+      "order": "paired-balanced",
+      "lanes": ["base", "space-age", "medium-ecosystem", "large-ecosystem", "diagnostics-off", "diagnostics-on"]
+    },
+    "manual_scope": [
+      "settings-and-cost-examples",
+      "native-and-external-owner-behavior",
+      "configuration-change-progress",
+      "save-reload-idempotence",
+      "technology-tree-and-localization",
+      "bounded-support-output-and-privacy",
+      "selected-real-ecosystem-saves"
+    ],
+    "authorities": [
+      {"path": "validation/profiles/factorio-2.1.json", "sha256": "E802F1DBA872B57CAD3FFD2AD298A24D6B76F332FAE498DD88CA344722106D65"},
+      {"path": "validation/tests.yml", "sha256": "2C323CCDD25CAFAB8792799EECDD27D564455234A042AF6405836CD7EFBC36A8"},
+      {"path": "validation/scenarios/runtime.json", "sha256": "A18D8A2FAFACE89EF72ECC17ADA73CE71EB65D3F2C7C88954E8FA5ACCA524EE4"},
+      {"path": "validation/scenarios/manual.json", "sha256": "D1E63692578F708E597F2CB7AE0A794300975F9F64E58B58AF4958AB0374B75C"},
+      {"path": "validation/scenarios/local-2.1.json", "sha256": "A8E5AB513F155E20B7E5369DC7B317C93166DEC15457C67805D9AD67D22A6B2C"},
+      {"path": ".mir/assurance.json", "sha256": "E4B313CE007C87EE204340D58E4DAC6D25FDC70AD1F4E86142D6058191AF1187"},
+      {"path": ".mir/control-plane/control-plane.json", "sha256": "0801D2D6BCB3CBD696A826EA46578B4F0B5C96EB344F1FE97F3DA4E0D9395612"},
+      {"path": "validation/trust.json", "sha256": "EECB9C322E5799006E656C450F93119D5F288F6B8A5AE9D609F87A5114E75F44"},
+      {"path": ".mir/performance-budgets.json", "sha256": "F0C12A195D3490F1B85F72B05CB66141941F2AF5F6BAC08C4B9118C73C11C142"},
+      {"path": "validation/tests/release/Test-MIRReleaseAuthority.ps1", "sha256": "E92B1F51B7C3552836C281C4FC361DD6F87AB1E4229846F9E52A40CA3EE1E3CA"},
+      {"path": "validation/tests/release/Test-MIRSourceFreezePacket.ps1", "sha256": "53840955324D9E2D824EF9D0908E442C68A84ECAE60A6CFA5A35391C6B9B3852"}
+    ],
+    "post_freeze_amendments": [
+      {
+        "commit": "c9b14596de06f81720ac73abd5395783e3a60e24",
+        "paths": [".mir/assurance.json"],
+        "reason": "Classify source-freeze authority changes so the exact impact plan cannot omit release-history and package admission."
+      },
+      {
+        "commit": "e34566f68369c6df515f082059ed82ec9227d1b2",
+        "paths": [".mir/assurance.json"],
+        "reason": "Classify native approved-delta policy and logical-source planner changes as assurance inputs."
+      },
+      {
+        "commit": "0c484b6e10d691eafc40eb3b80ffb137bd17450b",
+        "paths": ["validation/tests.yml"],
+        "reason": "Bind ecosystem execution to the immutable package-source commit without changing package bytes or product scope."
+      },
+      {
+        "commit": "4016b244ef2d2a5eb1242e448715f5fb866cbc13",
+        "paths": [
+          ".mir/assurance.json",
+          ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+          "tools/commands/control/New-MIRCandidateQualificationEvidence.ps1",
+          "validation/tests/release/Test-MIRCandidateFreshness.ps1"
+        ],
+        "reason": "Project the exact fresh Control Plane v4 campaign into a portable candidate-bound proof and validate it without weakening package, source, row, or environment bindings."
+      }
+    ]
+  },
+  "documentation": {
+    "authorities": [
+      {"path": "docs/releases/3.2.5-migration-guide.md", "sha256": "28990DE63A6D3C6DC18B566AC5AEFBF4526A6C13C4E67FCEB9DF8D3BFEF80B60"},
+      {"path": "docs/maintainer/manual-test-plan.md", "sha256": "FCB9BCBC5ED0071570D4B1774931EB4B3100DEF39CD648453ED25FFFC9AE4EA5"},
+      {"path": "docs/user/diagnostics.md", "sha256": "6FD403C66D66F1A36B6CFE00EA2EFF7EE6E0ABB9BCAA452A861CD5FEFA056A21"},
+      {"path": "docs/releases/3.2.5-c32-source-freeze.md", "sha256": "A48E5473E8870059C98381FA5FD9C7723082A057201F69A722990CFF3E27DB5F"}
+    ]
+  },
+  "gate": {
+    "zero_unknown_changed_paths": "passed",
+    "zero_unclassified_shipped_target_dispositions": "passed",
+    "zero_unresolved_package_defects": "passed",
+    "zero_unexplained_default_drift": "passed",
+    "zero_unstable_shipped_schemas": "passed",
+    "all_package_visible_work_merged": "passed",
+    "deterministic_double_build": "passed",
+    "development_breadth": "passed",
+    "base_and_space_age": "passed",
+    "upgrade_and_reload": "passed",
+    "configuration_change": "passed",
+    "ecosystem": "passed",
+    "dev_clean_and_green": "passed",
+    "rolling_playtest_revision_preserved": "passed",
+    "candidate_assigned_only_after_source_freeze_admission": "passed"
+  },
+  "boundaries": {
+    "factorio_2_0_release_authority": "not-created",
+    "factorio_2_0_candidate": "not-created",
+    "mir_3_3_admission": "not-admitted",
+    "main": "untouched",
+    "legacy": "untouched",
+    "publication": "forbidden-before-go-no-go"
+  }
+}

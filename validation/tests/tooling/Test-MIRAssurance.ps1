@@ -37,6 +37,9 @@ if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicate
 
 $releaseHistoryClassificationCases = [ordered]@{
   ".mir/portable-return.yml" = "release-governance"
+  ".mir/control-plane/package-locks.json" = "release-governance"
+  ".mir/releases/transitions/3.2.5-c32-source-frozen.json" = "release-governance"
+  ".mir/releases/transitions/3.2.5-c32-package-built.json" = "release-governance"
   ".mir/target-lines/index.json" = "release-evidence"
   ".mir/target-lines/2.4.9/info.json" = "release-evidence"
   ".mir/evidence/2.4.9/publication.json" = "release-evidence"
@@ -70,7 +73,9 @@ $assuranceToolingClassificationCases = @(
   "tools/commands/control/Invoke-MIRControlPlaneWork.ps1",
   "tools/lib/assurance/Evidence.ps1",
   "tools/lib/control/Evidence.ps1",
+  "tools/lib/control/Planner.ps1",
   "tools/lib/control/Views.ps1",
+  ".mir/control-plane/approved-delta-policies.json",
   "tools/maintenance/Move-MIRValidationDefinitions.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
@@ -213,9 +218,21 @@ if ($museumCatalogText -match '"(binary|base_data)"\s*:' -or $museumCatalogText 
 $ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
 if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
+    [string]$ecosystemTest[0].command -notmatch '--candidate-source\s+<package-source-commit>' -or
+    @($ecosystemTest[0].inputs) -notcontains "package-source" -or
     [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
     [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
-  throw "runtime.ecosystem must execute the exact candidate ZIP and must not rebuild distribution bytes."
+  throw "runtime.ecosystem must bind the exact candidate ZIP and package source and must not rebuild distribution bytes."
+}
+$mirCliText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir.ps1")
+foreach ($sourceBindingSnippet in @(
+  'Get-MIRArgValue -Items $Items -Name "--candidate-source"',
+  '$overrides.candidate_source_commit = $candidateSource',
+  '$params.CandidateSourceCommit = [string]$candidateSourceCommit'
+)) {
+  if (-not $mirCliText.Contains($sourceBindingSnippet)) {
+    throw "MIR CLI does not forward the ecosystem candidate-source binding: $sourceBindingSnippet"
+  }
 }
 
 $performanceTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.performance-regression" })
@@ -263,12 +280,15 @@ foreach ($target in @("2.0", "2.1")) {
 }
 $currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
-if ([string]$currentRelease.state -ne "planned" -or [string]$currentRelease.candidate_id -ne "not-assigned" -or
-    [string]$currentRelease.candidate_floor -ne "C32" -or
+$currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
+if ($currentReleaseBoundary -notin @(
+      "planned|not-assigned", "source-frozen|C32", "package-built|C32",
+      "focused-qualified|C32", "candidate-qualified|C32"
+    ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the planned, unassigned 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current pre-manual 3.2.5 public upgrade authority."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
@@ -412,10 +432,9 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
-  'Isolate exact development candidate from historical distributions',
+  'Stage exact development candidate for isolated transfer',
   'path: .work/candidate/*.zip',
   'path: .work/candidate',
-  'Remove-Item -LiteralPath $source -Force',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
@@ -428,6 +447,9 @@ foreach ($requiredWorkflowSnippet in @(
   if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
     throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
   }
+}
+if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
+  throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
 }
 if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
   throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."

@@ -6,6 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
   [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+  [string]$CampaignPath = "",
   [string]$LocalModZipDir = "",
   [string]$OutputPath = "",
   [string]$ArtifactRoot = "",
@@ -21,6 +22,16 @@ $candidateInfo = Get-MIRReleasePackageInfo -Path $Candidate
 $versionParts = @([string]$ExpectedFactorioVersion -split '\.')
 if ($versionParts.Count -lt 2) { throw "ExpectedFactorioVersion must identify a target line." }
 $factorioLine = $versionParts[0..1] -join "."
+if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
+  $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases.json") | ConvertFrom-Json
+  $activeCandidate = $releaseLedger.development.PSObject.Properties["factorio-$factorioLine"].Value
+  if ($null -eq $activeCandidate -or
+      [string]$activeCandidate.mir_version -ne [string]$candidateInfo.version -or
+      [string]::IsNullOrWhiteSpace([string]$activeCandidate.candidate_id)) {
+    throw "No exact active performance campaign can be derived for MIR $($candidateInfo.version) on Factorio $factorioLine."
+  }
+  $CampaignPath = ".mir\performance-campaigns\$($candidateInfo.version)-$($activeCandidate.candidate_id).json"
+}
 if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
   $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine"
 }
@@ -29,16 +40,52 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 }
 
 $performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ".work\artifacts\performance"))
-if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = Join-Path $performanceArtifactsRoot "$($candidateInfo.version)-qualification-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+$usesGeneratedArtifactRoot = [string]::IsNullOrWhiteSpace($ArtifactRoot)
+$generatedArtifactParent = ""
+if ($usesGeneratedArtifactRoot) {
+  $windowsCompactRoot = "C:\tmp"
+  $generatedArtifactParent = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT -and (Test-Path -LiteralPath $windowsCompactRoot -PathType Container)) {
+    [IO.Path]::GetFullPath($windowsCompactRoot)
+  } else {
+    [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  }
+  $ArtifactRoot = Join-Path $generatedArtifactParent ("mirp-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 } elseif (-not [IO.Path]::IsPathRooted($ArtifactRoot)) {
   $ArtifactRoot = Join-Path $RepoRoot $ArtifactRoot
 }
 $ArtifactRoot = [IO.Path]::GetFullPath($ArtifactRoot)
-$safeArtifactPrefix = $performanceArtifactsRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-  throw "Performance artifacts must stay inside $performanceArtifactsRoot."
+$safeArtifactParent = if ($usesGeneratedArtifactRoot) { $generatedArtifactParent } else { $performanceArtifactsRoot }
+$safeArtifactPrefix = $safeArtifactParent.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+$safeGeneratedName = Split-Path -Leaf $ArtifactRoot
+if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+    ($usesGeneratedArtifactRoot -and $safeGeneratedName -notmatch '^mirp-[0-9a-f]{8}$')) {
+  throw "Performance artifacts must stay inside the exact governed scratch parent $safeArtifactParent."
 }
+if ($usesGeneratedArtifactRoot -and (Test-Path -LiteralPath $ArtifactRoot)) {
+  throw "Generated performance scratch already exists and will not be overwritten: $ArtifactRoot"
+}
+$resolvedCampaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) { [IO.Path]::GetFullPath($CampaignPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath)) }
+$campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
+$maximumFactorioPathLength = 0
+$maximumFactorioPath = ""
+foreach ($lane in @($campaign.lanes)) {
+  $laneSafe = ([string]$lane.id -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
+  $relativeProbePath = if ([string]$lane.runner -eq "compat-audit") {
+    "$laneSafe\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
+  } else {
+    "$laneSafe\measured-25-candidate\mods\mir-fixture-performance-regression-probe_0.1.0\data-final-fixes.lua"
+  }
+  $probePath = Join-Path $ArtifactRoot $relativeProbePath
+  if ($probePath.Length -gt $maximumFactorioPathLength) {
+    $maximumFactorioPathLength = $probePath.Length
+    $maximumFactorioPath = $probePath
+  }
+}
+$conservativePathBudget = 240
+if ($maximumFactorioPathLength -gt $conservativePathBudget) {
+  throw "Performance staging exceeds the conservative Factorio path budget ($maximumFactorioPathLength > $conservativePathBudget): $maximumFactorioPath"
+}
+Write-Host "[info] performance staging path budget: $maximumFactorioPathLength/$conservativePathBudget"
 $resolvedOutputPath = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $OutputPath)) }
 if (-not $KeepArtifacts -and $resolvedOutputPath.StartsWith(($ArtifactRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar), [StringComparison]::OrdinalIgnoreCase)) {
   throw "Compact performance evidence must remain outside the disposable artifact directory."
@@ -50,6 +97,7 @@ $measure = @{
   PriorRelease = $PriorRelease
   FactorioBin = $FactorioBin
   ExpectedSourceCommit = $ExpectedSourceCommit
+  CampaignPath = $CampaignPath
   LocalModZipDir = $LocalModZipDir
   OutputPath = $OutputPath
   WarmupRuns = $WarmupRuns

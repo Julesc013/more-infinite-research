@@ -1,0 +1,411 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-08-05T21:36:52.3848882Z",
+  "factorio_line": "2.1",
+  "factorio_binary": {
+    "name": "factorio.exe",
+    "version": "2.1.12.87038",
+    "sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "mir_archive": {
+    "path": "more-infinite-research_3.2.5.zip",
+    "sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "compat-candidates.lock.json",
+    "sha256": "479C4D070F39F658EA1E5F40928AF4DF9F8395512F39E448E6CF7FF983174491"
+  },
+  "sanitation_budget": {
+    "policy": "mir-ecosystem-sanitation-budget-v1",
+    "path": ".mir/sanitation-budgets.json",
+    "sha256": "A92B05B462C5D2D58E2C78D621E9EE25AEEF112E069889F14612345E806A159A"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "aai-containers",
+      "requested_roots": [
+        "aai-containers"
+      ],
+      "actual_executed_roots": [
+        "aai-containers"
+      ],
+      "resolved_mods": [
+        "aai-containers"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-containers",
+          "version": "0.4.0",
+          "sha256": "e353a4108f98b7a0b59c9324095575b195e81512c41fa87347b29d717346f47c",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 6.584808,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-aai-containers",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "aai-industry",
+      "requested_roots": [
+        "aai-industry"
+      ],
+      "actual_executed_roots": [
+        "aai-industry"
+      ],
+      "resolved_mods": [
+        "aai-industry"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-industry",
+          "version": "0.7.0",
+          "sha256": "8be588f276d9835b21ac4874113dd107b182692301487b6f7f6c542c4b1f75ac",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.819812,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-aai-industry",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "aai-loaders",
+      "requested_roots": [
+        "aai-loaders"
+      ],
+      "actual_executed_roots": [
+        "aai-loaders"
+      ],
+      "resolved_mods": [
+        "aai-loaders"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-loaders",
+          "version": "0.3.0",
+          "sha256": "1236800ae998367aae1a26d3ac3728484088d051f89c66c6c860ba1fe195c85e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 6.034182,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-aai-loaders",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "big-mining-drill",
+      "requested_roots": [
+        "big-mining-drill"
+      ],
+      "actual_executed_roots": [
+        "big-mining-drill"
+      ],
+      "resolved_mods": [
+        "big-mining-drill"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "big-mining-drill",
+          "version": "0.3.0",
+          "sha256": "7832d61e125c0092ab466d854db0e53fae58f354ad6d235288c125dcc1b9f1cd",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.591581,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-big-mining-drill",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "biolabs-in-space",
+      "requested_roots": [
+        "biolabs-in-space"
+      ],
+      "actual_executed_roots": [
+        "biolabs-in-space"
+      ],
+      "resolved_mods": [
+        "biolabs-in-space"
+      ],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [
+        {
+          "name": "biolabs-in-space",
+          "version": "1.2.0",
+          "sha256": "5fbdda7e75a921f31777d918e3324839bad1f6439228a8120eb63527922207a4",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 11.304902,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-biolabs-in-space",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "equipment-gantry",
+      "requested_roots": [
+        "equipment-gantry"
+      ],
+      "actual_executed_roots": [
+        "equipment-gantry"
+      ],
+      "resolved_mods": [
+        "equipment-gantry"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "equipment-gantry",
+          "version": "0.3.0",
+          "sha256": "b16f558a4874c7dbe936a11a8690a1a15d5e7947ce522cdb3b32fcd4077369fe",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.857619,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-equipment-gantry",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "FluidMustFlow",
+      "requested_roots": [
+        "FluidMustFlow"
+      ],
+      "actual_executed_roots": [
+        "FluidMustFlow"
+      ],
+      "resolved_mods": [
+        "FluidMustFlow"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "FluidMustFlow",
+          "version": "1.5.0",
+          "sha256": "b6b5c37f6aa38e49265a464f122fd1d8e1c88d27d50645339f894bfcbc0249ec",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.962771,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-FluidMustFlow",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "jetpack",
+      "requested_roots": [
+        "jetpack"
+      ],
+      "actual_executed_roots": [
+        "jetpack"
+      ],
+      "resolved_mods": [
+        "jetpack"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "jetpack",
+          "version": "0.5.0",
+          "sha256": "b107f7ce5f01b6e22c19e4fb88e68a1f48517b8a7efbc81fa0e83da915c45c40",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.807596,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-jetpack",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "robot_attrition",
+      "requested_roots": [
+        "robot_attrition"
+      ],
+      "actual_executed_roots": [
+        "robot_attrition"
+      ],
+      "resolved_mods": [
+        "robot_attrition"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "robot_attrition",
+          "version": "0.7.0",
+          "sha256": "6ae71b750b8021e1d7f53b7b035f104dda7329567a38610b23de055d6162edae",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "duration_seconds": 5.742452,
+      "settings": {},
+      "expected_plan": {},
+      "sanitation_budget": {
+        "scope": "local_mod_zips",
+        "key": "local-2.1-robot_attrition",
+        "expected_external_prunes": [],
+        "maximum_unreviewed_external_prunes": 0
+      },
+      "observed_external_prunes": [],
+      "missing_expected_prunes": [],
+      "unreviewed_external_prunes": [],
+      "sanitation_result": "passed",
+      "source_manifest": "",
+      "claim_level": "loads"
+    }
+  ]
+}

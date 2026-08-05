@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/source-freeze-packet.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/source-freeze-packet.schema.json",
+  "title": "MIR source-freeze packet",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "release",
+    "status",
+    "candidate_floor",
+    "candidate_id",
+    "prepared_at",
+    "lineage",
+    "source",
+    "package_contract",
+    "product_contract",
+    "transition_contract",
+    "qualification_authority",
+    "documentation",
+    "gate",
+    "boundaries"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "mir-source-freeze-packet"},
+    "release": {"const": "3.2.5"},
+    "status": {"enum": ["prepared", "admitted"]},
+    "candidate_floor": {"const": "C32"},
+    "candidate_id": {"enum": ["not-assigned", "C32"]},
+    "prepared_at": {"type": "string", "format": "date-time"},
+    "admitted_at": {"type": "string", "format": "date-time"},
+    "lineage": {"type": "object"},
+    "source": {"type": "object"},
+    "package_contract": {"type": "object"},
+    "product_contract": {"type": "object"},
+    "transition_contract": {"type": "object"},
+    "qualification_authority": {"type": "object"},
+    "documentation": {"type": "object"},
+    "gate": {"type": "object"},
+    "boundaries": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "prepared"}}},
+      "then": {"properties": {"candidate_id": {"const": "not-assigned"}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "admitted"}}},
+      "then": {
+        "required": ["admitted_at"],
+        "properties": {"candidate_id": {"const": "C32"}}
+      }
+    }
+  ],
+  "additionalProperties": false
+}

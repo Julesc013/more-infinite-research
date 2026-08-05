@@ -1,6 +1,6 @@
 param(
-  [string]$Path = ".mir\releases\deltas\3.2.1-to-3.2.2.json",
-  [string]$Candidate = "dist\more-infinite-research_3.2.2.zip",
+  [string]$Path = "",
+  [string]$Candidate = "",
   [string]$ExpectedSourceCommit = "",
   [switch]$ValidateStructureOnly
 )
@@ -13,7 +13,21 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
+. (Join-Path $repo "tools\lib\control\Executor.ps1")
 $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
+$defaultDeltaByVersion = @{
+  "3.2.2" = ".mir\releases\deltas\3.2.1-to-3.2.2.json"
+  "3.2.5" = ".mir\releases\deltas\3.2.3-to-3.2.5.json"
+}
+if ([string]::IsNullOrWhiteSpace($Path)) {
+  if (-not $defaultDeltaByVersion.ContainsKey($activeVersion)) {
+    throw "No default approved-delta artifact is registered for MIR $activeVersion."
+  }
+  $Path = [string]$defaultDeltaByVersion[$activeVersion]
+}
+if ([string]::IsNullOrWhiteSpace($Candidate)) {
+  $Candidate = "dist\more-infinite-research_$activeVersion.zip"
+}
 $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
 $activeReleasePath = Join-Path $repo (Join-Path $releaseRecordRoot "$activeVersion.json")
 if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
@@ -43,6 +57,68 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Approved-delta artifact is absent: $artifactPath"
 }
 $artifact = Get-Content -Raw -LiteralPath $artifactPath | ConvertFrom-Json
+
+if ($activeVersion -eq "3.2.5") {
+  if ([int]$artifact.schema -ne 1 -or [string]$artifact.kind -ne "mir-control-plane-v5-approved-patch-delta") {
+    throw "MIR 3.2.5 approved delta must use the native Control Plane v5 patch-delta schema."
+  }
+  $baselinePath = Join-Path $repo "dist\more-infinite-research_3.2.3.zip"
+  $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
+  foreach ($requiredArchive in @($baselinePath, $candidatePath)) {
+    if (-not (Test-Path -LiteralPath $requiredArchive -PathType Leaf)) {
+      throw "MIR 3.2.5 approved-delta archive is absent: $requiredArchive"
+    }
+  }
+  $policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVersion "3.2.3" -ToVersion "3.2.5" -CandidateId "C32" -RepoRoot $repo)
+  if ($policies.Count -ne 1 -or [string]$policies[0].id -ne "c32-unified-cost-compatibility-v1") {
+    throw "MIR 3.2.5 approved-delta policy selection is not exact."
+  }
+  $policy = $policies[0]
+  $baseline = Get-MIRCPZipPackageObservation -Path $baselinePath
+  $current = Get-MIRCPZipPackageObservation -Path $candidatePath
+  $baselineByPath = @{}
+  foreach ($file in @($baseline.files)) { $baselineByPath[[string]$file.path] = [string]$file.sha256 }
+  $currentByPath = @{}
+  foreach ($file in @($current.files)) { $currentByPath[[string]$file.path] = [string]$file.sha256 }
+  $added = @($currentByPath.Keys | Where-Object { -not $baselineByPath.ContainsKey($_) } | Sort-Object)
+  $removed = @($baselineByPath.Keys | Where-Object { -not $currentByPath.ContainsKey($_) } | Sort-Object)
+  $changed = @($currentByPath.Keys | Where-Object { $baselineByPath.ContainsKey($_) -and $baselineByPath[$_] -cne $currentByPath[$_] } | Sort-Object)
+  $policyPath = Join-Path $repo ".mir\control-plane\approved-delta-policies.json"
+  $bindings = @(
+    [pscustomobject]@{ id = "policy"; passed = ([string]$artifact.policy.id -eq [string]$policy.id -and [string]$artifact.policy.authority_sha256 -eq (Get-MIRCPSha256File -Path $policyPath)) },
+    [pscustomobject]@{ id = "baseline"; passed = ([string]$baseline.archive_sha256 -eq [string]$policy.baseline.archive_sha256 -and [string]$baseline.content_sha256 -eq [string]$policy.baseline.content_sha256 -and [int64]$baseline.bytes -eq [int64]$policy.baseline.bytes -and [int]$baseline.entries -eq [int]$policy.baseline.entries) },
+    [pscustomobject]@{ id = "candidate"; passed = ([string]$current.archive_sha256 -eq [string]$policy.candidate.archive_sha256 -and [string]$current.content_sha256 -eq [string]$policy.candidate.content_sha256 -and [int64]$current.bytes -eq [int64]$policy.candidate.bytes -and [int]$current.entries -eq [int]$policy.candidate.entries) },
+    [pscustomobject]@{ id = "release-record"; passed = ([string]$activeRelease.candidate_id -eq "C32" -and [string]$activeRelease.package.source_commit -eq [string]$policy.candidate.source_commit -and [string]$activeRelease.package.archive_sha256 -eq [string]$current.archive_sha256 -and [string]$activeRelease.package.content_sha256 -eq [string]$current.content_sha256) },
+    [pscustomobject]@{ id = "artifact-observation"; passed = ([string]$artifact.observation.baseline.archive_sha256 -eq [string]$baseline.archive_sha256 -and [string]$artifact.observation.current.archive_sha256 -eq [string]$current.archive_sha256 -and [string]$artifact.observation.current.source_commit -eq [string]$policy.candidate.source_commit) },
+    [pscustomobject]@{ id = "added-paths"; passed = (Test-MIRCPExactPathSet -Expected @($policy.allowed_added_paths) -Actual $added) },
+    [pscustomobject]@{ id = "removed-paths"; passed = (Test-MIRCPExactPathSet -Expected @($policy.allowed_removed_paths) -Actual $removed) },
+    [pscustomobject]@{ id = "changed-paths"; passed = (Test-MIRCPExactPathSet -Expected @($policy.allowed_changed_paths) -Actual $changed) },
+    [pscustomobject]@{ id = "artifact-added-paths"; passed = (Test-MIRCPExactPathSet -Expected $added -Actual @($artifact.observation.delta.added)) },
+    [pscustomobject]@{ id = "artifact-removed-paths"; passed = (Test-MIRCPExactPathSet -Expected $removed -Actual @($artifact.observation.delta.removed)) },
+    [pscustomobject]@{ id = "artifact-changed-paths"; passed = (Test-MIRCPExactPathSet -Expected $changed -Actual @($artifact.observation.delta.changed)) },
+    [pscustomobject]@{ id = "evaluation"; passed = ([string]$artifact.evaluation.status -eq "approved" -and [int]$artifact.evaluation.unapproved_count -eq 0 -and @($artifact.evaluation.predicates | Where-Object { -not [bool]$_.passed }).Count -eq 0) }
+  )
+  $failedBindings = @($bindings | Where-Object { -not [bool]$_.passed })
+  if ($failedBindings.Count -gt 0) {
+    throw "MIR 3.2.5 native approved delta failed exact bindings: $(@($failedBindings.id) -join ', ')."
+  }
+  if (-not $ValidateStructureOnly) {
+    if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) {
+      throw "Approved-delta exact-candidate validation requires -ExpectedSourceCommit."
+    }
+    $currentCommit = Get-MIRGitCommit -RepoRoot $repo
+    if ($currentCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+      throw "Approved-delta exact-candidate validation requires the clean qualification source at ExpectedSourceCommit."
+    }
+    & git -C $repo merge-base --is-ancestor ([string]$policy.candidate.source_commit) $ExpectedSourceCommit
+    if ($LASTEXITCODE -ne 0) { throw "Approved-delta package source is not an ancestor of the qualification source." }
+    [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
+    & git -C $repo diff --quiet ([string]$policy.candidate.source_commit) $ExpectedSourceCommit -- @packageRoots
+    if ($LASTEXITCODE -ne 0) { throw "Package-visible source changed after the approved-delta package authority." }
+  }
+  Write-Host "[ok] MIR 3.2.5 approved delta binds exact C32 bytes and $($added.Count + $removed.Count + $changed.Count) governed package-path differences with zero unapproved rows."
+  exit 0
+}
 
 function Get-MIRDeltaCanonicalJson {
   param($Value)

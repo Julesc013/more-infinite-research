@@ -1,0 +1,583 @@
+{
+  "schema": 3,
+  "kind": "mir-runtime-performance-regression",
+  "status": "passed",
+  "candidate": {
+    "version": "3.2.5",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3"
+  },
+  "baseline": {
+    "version": "3.2.3",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "package_content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9"
+  },
+  "factorio": {
+    "version": "2.1.12",
+    "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "comparability": {
+    "machine_sha256": "D267D3CEF075BA4B8554F9971E4EC41F795AA18D91F85072D59D47348F18D34F",
+    "official_mods_sha256": "BABFD65F2704F5E428F42A9090332EED5B7899874CF744B5C8CC9B4FA75F3C1B",
+    "third_party_closure_sha256": "F935BDD7D92CD1FC0C9C817DA83E5E3E729B16CF6D2C774B6FBF143CFB2B0B2E",
+    "settings_sha256": "DF8C6E11428401B7E3EFAE8275D465B8D8BC2691BBA572EE1A554AAC5F5CDB4C",
+    "scenarios_sha256": "54283315D58F84A9EE04CBF1F97114DABF1A56AA5EA57A9A543E4B59BF37CFBF",
+    "harness_sha256": "83BAAF906AF570A888646CA6D62C2F84A938B9738F05D5EBD59CBC7B19D9E54D"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "run_order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          4.532222,
+          4.560047,
+          4.70911,
+          4.487336,
+          4.824623
+        ],
+        "median_seconds": 4.560047,
+        "p90_seconds": 4.824623,
+        "minimum_seconds": 4.487336,
+        "maximum_seconds": 4.824623
+      },
+      "candidate": {
+        "runs_seconds": [
+          4.555907,
+          4.583804,
+          5.009332,
+          4.552149,
+          4.702698
+        ],
+        "median_seconds": 4.583804,
+        "p90_seconds": 5.009332,
+        "minimum_seconds": 4.552149,
+        "maximum_seconds": 5.009332
+      },
+      "absolute_delta_seconds": 0.023757,
+      "percentage_delta": 0.520981,
+      "status": "passed"
+    },
+    {
+      "id": "space-age.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          6.945516,
+          7.018187,
+          6.874836,
+          6.870875,
+          7.14956
+        ],
+        "median_seconds": 6.945516,
+        "p90_seconds": 7.14956,
+        "minimum_seconds": 6.870875,
+        "maximum_seconds": 7.14956
+      },
+      "candidate": {
+        "runs_seconds": [
+          7.120718,
+          6.984771,
+          7.009333,
+          7.202882,
+          7.00004
+        ],
+        "median_seconds": 7.009333,
+        "p90_seconds": 7.202882,
+        "minimum_seconds": 6.984771,
+        "maximum_seconds": 7.202882
+      },
+      "absolute_delta_seconds": 0.063817,
+      "percentage_delta": 0.918823,
+      "status": "passed"
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          9.291514,
+          9.293375,
+          9.354379,
+          9.410086,
+          9.309215
+        ],
+        "median_seconds": 9.309215,
+        "p90_seconds": 9.410086,
+        "minimum_seconds": 9.291514,
+        "maximum_seconds": 9.410086
+      },
+      "candidate": {
+        "runs_seconds": [
+          9.421068,
+          9.693225,
+          9.409792,
+          9.378432,
+          9.710393
+        ],
+        "median_seconds": 9.421068,
+        "p90_seconds": 9.710393,
+        "minimum_seconds": 9.378432,
+        "maximum_seconds": 9.710393
+      },
+      "absolute_delta_seconds": 0.111853,
+      "percentage_delta": 1.20153,
+      "status": "passed"
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          11.896568,
+          11.900675,
+          11.95986,
+          12.307442,
+          12.426475
+        ],
+        "median_seconds": 11.95986,
+        "p90_seconds": 12.426475,
+        "minimum_seconds": 11.896568,
+        "maximum_seconds": 12.426475
+      },
+      "candidate": {
+        "runs_seconds": [
+          11.829683,
+          12.043488,
+          12.582306,
+          12.321916,
+          11.922025
+        ],
+        "median_seconds": 12.043488,
+        "p90_seconds": 12.582306,
+        "minimum_seconds": 11.829683,
+        "maximum_seconds": 12.582306
+      },
+      "absolute_delta_seconds": 0.083628,
+      "percentage_delta": 0.699239,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          4.276676,
+          4.146905,
+          4.314774,
+          4.248234,
+          4.584541
+        ],
+        "median_seconds": 4.276676,
+        "p90_seconds": 4.584541,
+        "minimum_seconds": 4.146905,
+        "maximum_seconds": 4.584541
+      },
+      "candidate": {
+        "runs_seconds": [
+          4.773709,
+          4.54146,
+          4.396155,
+          4.286992,
+          4.584827
+        ],
+        "median_seconds": 4.54146,
+        "p90_seconds": 4.773709,
+        "minimum_seconds": 4.286992,
+        "maximum_seconds": 4.773709
+      },
+      "absolute_delta_seconds": 0.264784,
+      "percentage_delta": 6.19135,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          5.125497,
+          6.322459,
+          5.635356,
+          5.2633,
+          5.351436
+        ],
+        "median_seconds": 5.351436,
+        "p90_seconds": 6.322459,
+        "minimum_seconds": 5.125497,
+        "maximum_seconds": 6.322459
+      },
+      "candidate": {
+        "runs_seconds": [
+          5.644857,
+          5.468743,
+          5.273341,
+          5.30857,
+          5.449194
+        ],
+        "median_seconds": 5.449194,
+        "p90_seconds": 5.644857,
+        "minimum_seconds": 5.273341,
+        "maximum_seconds": 5.644857
+      },
+      "absolute_delta_seconds": 0.097758,
+      "percentage_delta": 1.826762,
+      "status": "passed"
+    },
+    {
+      "id": "compiler.snapshot",
+      "baseline": {
+        "runs_seconds": [
+          0.062,
+          0.065,
+          0.063,
+          0.059,
+          0.074
+        ],
+        "median_seconds": 0.063,
+        "p90_seconds": 0.074,
+        "minimum_seconds": 0.059,
+        "maximum_seconds": 0.074
+      },
+      "candidate": {
+        "runs_seconds": [
+          0.068,
+          0.061,
+          0.064,
+          0.059,
+          0.061
+        ],
+        "median_seconds": 0.061,
+        "p90_seconds": 0.068,
+        "minimum_seconds": 0.059,
+        "maximum_seconds": 0.068
+      },
+      "absolute_delta_seconds": -0.002,
+      "percentage_delta": -3.174603,
+      "status": "passed"
+    },
+    {
+      "id": "compiler.graph",
+      "baseline": {
+        "runs_seconds": [
+          0.006,
+          0.007,
+          0.02,
+          0.005,
+          0.006
+        ],
+        "median_seconds": 0.006,
+        "p90_seconds": 0.02,
+        "minimum_seconds": 0.005,
+        "maximum_seconds": 0.02
+      },
+      "candidate": {
+        "runs_seconds": [
+          0.025,
+          0.006,
+          0.006,
+          0.006,
+          0.005
+        ],
+        "median_seconds": 0.006,
+        "p90_seconds": 0.025,
+        "minimum_seconds": 0.005,
+        "maximum_seconds": 0.025
+      },
+      "absolute_delta_seconds": 0.0,
+      "percentage_delta": 0.0,
+      "status": "passed"
+    },
+    {
+      "id": "compiler.planning",
+      "baseline": {
+        "runs_seconds": [
+          1.139,
+          1.148,
+          1.208,
+          1.119,
+          1.168
+        ],
+        "median_seconds": 1.148,
+        "p90_seconds": 1.208,
+        "minimum_seconds": 1.119,
+        "maximum_seconds": 1.208
+      },
+      "candidate": {
+        "runs_seconds": [
+          1.214,
+          1.173,
+          1.21,
+          1.166,
+          1.184
+        ],
+        "median_seconds": 1.184,
+        "p90_seconds": 1.214,
+        "minimum_seconds": 1.166,
+        "maximum_seconds": 1.214
+      },
+      "absolute_delta_seconds": 0.036,
+      "percentage_delta": 3.135889,
+      "status": "passed"
+    },
+    {
+      "id": "compiler.postconditions",
+      "baseline": {
+        "runs_seconds": [
+          0.048,
+          0.052,
+          0.078,
+          0.049,
+          0.052
+        ],
+        "median_seconds": 0.052,
+        "p90_seconds": 0.078,
+        "minimum_seconds": 0.048,
+        "maximum_seconds": 0.078
+      },
+      "candidate": {
+        "runs_seconds": [
+          0.141,
+          0.053,
+          0.056,
+          0.055,
+          0.05
+        ],
+        "median_seconds": 0.055,
+        "p90_seconds": 0.141,
+        "minimum_seconds": 0.05,
+        "maximum_seconds": 0.141
+      },
+      "absolute_delta_seconds": 0.003,
+      "percentage_delta": 5.769231,
+      "status": "passed"
+    }
+  ],
+  "artifact_volume": {
+    "telemetry_schema": 1,
+    "aggregation": "maximum-observed",
+    "measurements": [
+      {
+        "surface": "diagnostics-off",
+        "measured_runs": 5,
+        "telemetry_fingerprints": [
+          "AE9ABFB369F468141115BB07D9B4D3AF3CE32FE986144198A108C9C17F54F52E",
+          "CE7884B0A3B9D5174BBE763F4950064B990FF42A4AAFE3F83777D18AC27E695F",
+          "DB7A4CBC0207DBE624D572B8A2BEC55D0465E481824E38BB5E5EF44590A58983",
+          "EEDEDA3424B0BE50D38EF9411785FB192521767A04B3893DA199165EA8956EF8",
+          "7B6E59C582CF613247FD3676331BA161298518D6D7987C128319185BFC384D75"
+        ],
+        "counters": {
+          "accepted_operations": 54,
+          "candidate_operations": 54,
+          "canonical_bytes_total": 8148242,
+          "canonical_serializations_over_one_mib": 0,
+          "canonicalization_calls": 4540,
+          "catalog_snapshot_count": 0,
+          "compilation_snapshot_deep_verifications": 0,
+          "compiler_evidence_public_bytes": 6749,
+          "compiler_input_deep_verifications": 0,
+          "compiler_total_milliseconds": 0,
+          "context_snapshot_bytes": 0,
+          "context_state_keys": 36,
+          "coverage_internal_bytes": 0,
+          "coverage_public_bytes": 651,
+          "coverage_rows": 0,
+          "cyclic_components": 0,
+          "diagnostic_rows": 0,
+          "effects": 452,
+          "entity_prototype_index_lookups": 0,
+          "entity_prototype_index_rows": 571,
+          "family_members": 0,
+          "fingerprint_calls": 4389,
+          "full_record_copy_count": 0,
+          "gate_deep_verifications": 0,
+          "generation_plan_internal_bytes": 0,
+          "generation_plan_public_bytes": 28641,
+          "generation_plan_rows": 76,
+          "graph_components": 250,
+          "graph_edges": 610,
+          "input_snapshot_bytes": 1355,
+          "item_prototype_index_builds": 1,
+          "item_prototype_index_rows": 252,
+          "maximum_canonical_bytes": 323875,
+          "module_tier_index_lookups": 4,
+          "module_tier_index_rows": 9,
+          "placeable_item_index_lookups": 2,
+          "placeable_item_index_rows": 104,
+          "policy_snapshot_deep_verifications": 0,
+          "provider_candidates": 41,
+          "provider_cardinality_review_required": 7,
+          "provider_review_required": 0,
+          "public_artifact_total_bytes": 60969,
+          "qualification_peak_memory_bytes": 128983683,
+          "qualification_snapshot_bytes": 1369,
+          "qualification_snapshot_construction_milliseconds": 0,
+          "recipe_fact_copies": 0,
+          "recipe_hard_risk_count": 177,
+          "recipe_index_scans": 1,
+          "recipe_review_risk_count": 20,
+          "recipe_risk_facts": 217,
+          "recipes": 217,
+          "rejected_operations": 0,
+          "research_cost_support_public_bytes": 2471,
+          "runtime_environment_deep_verifications": 0,
+          "safety_qualification_deep_verifications": 0,
+          "sanitation_scanned_effects": 796,
+          "sanitation_scanned_technologies": 446,
+          "snapshot_canonicalization_passes": 14,
+          "snapshot_construction_milliseconds": 0,
+          "snapshot_copied_domains": 2,
+          "snapshot_deep_copies": 3,
+          "snapshot_peak_memory_bytes": 100525097,
+          "snapshot_prototype_bytes": 527907,
+          "snapshot_reused_domains": 11,
+          "stream_match_cache_hits": 2,
+          "stream_match_cache_misses": 53,
+          "stream_match_max_computations_per_identity": 1,
+          "stream_rows": 76,
+          "technologies": 250,
+          "technology_candidate_deep_verifications": 0,
+          "technology_catalog_alternatives": 152,
+          "technology_catalog_candidates": 76,
+          "technology_catalog_canonical_bytes": 262,
+          "technology_catalog_deep_verifications": 0,
+          "technology_catalog_internal_bytes": 0,
+          "technology_catalog_public_bytes": 22457,
+          "technology_closure_cache_entries": 0,
+          "technology_closure_cached_nodes": 0,
+          "technology_design_canonical_bytes": 0,
+          "technology_design_count": 76,
+          "technology_design_deep_verifications": 0,
+          "technology_design_full_copies": 0,
+          "technology_graph_index_queries": 269,
+          "technology_graph_parity_rows": 54,
+          "technology_prerequisite_closure_max": 45,
+          "transformation_operation_deep_verifications": 0,
+          "transformation_plan_deep_verifications": 0,
+          "trusted_assertion_canonicalizations": 0,
+          "trusted_assertions": 6630,
+          "trusted_record_registrations": 1399,
+          "trusted_rejected_assertions": 0,
+          "trusted_untrusted_verifications": 0
+        }
+      },
+      {
+        "surface": "diagnostics-on",
+        "measured_runs": 5,
+        "telemetry_fingerprints": [
+          "5337674DDCBA3412EA28492160626598518A744325575928CA9476504E1DB421",
+          "230CB24669AEAA0418C777D3A5EEFF5F1209B3AF1D6C1AAB7443D27F62E81BD3",
+          "461F475E044979C3CFA93B37B206670CF2D9172964DBFE12C2AF0E3F87C6166F",
+          "37F04E4A2E5C4B0984DEC5D4E93C0B3F40D73C4FC1960FE121308C58ACAC7E77",
+          "7284567AC5FC25D8F27695830F8CEDD155985963B75EA1051285DD96BCC716E1"
+        ],
+        "counters": {
+          "accepted_operations": 54,
+          "candidate_operations": 54,
+          "canonical_bytes_total": 12743627,
+          "canonical_serializations_over_one_mib": 2,
+          "canonicalization_calls": 4619,
+          "catalog_snapshot_count": 0,
+          "compilation_snapshot_deep_verifications": 0,
+          "compiler_evidence_public_bytes": 6776,
+          "compiler_input_deep_verifications": 0,
+          "compiler_total_milliseconds": 0,
+          "context_snapshot_bytes": 0,
+          "context_state_keys": 36,
+          "coverage_internal_bytes": 38949,
+          "coverage_public_bytes": 651,
+          "coverage_rows": 217,
+          "cyclic_components": 0,
+          "diagnostic_rows": 770,
+          "effects": 452,
+          "entity_prototype_index_lookups": 0,
+          "entity_prototype_index_rows": 571,
+          "family_members": 0,
+          "fingerprint_calls": 4389,
+          "full_record_copy_count": 0,
+          "gate_deep_verifications": 0,
+          "generation_plan_internal_bytes": 1185974,
+          "generation_plan_public_bytes": 28641,
+          "generation_plan_rows": 76,
+          "graph_components": 250,
+          "graph_edges": 610,
+          "input_snapshot_bytes": 1355,
+          "item_prototype_index_builds": 1,
+          "item_prototype_index_rows": 252,
+          "maximum_canonical_bytes": 2505898,
+          "module_tier_index_lookups": 4,
+          "module_tier_index_rows": 9,
+          "placeable_item_index_lookups": 2,
+          "placeable_item_index_rows": 104,
+          "policy_snapshot_deep_verifications": 0,
+          "provider_candidates": 41,
+          "provider_cardinality_review_required": 7,
+          "provider_review_required": 0,
+          "public_artifact_total_bytes": 60996,
+          "qualification_peak_memory_bytes": 128890959,
+          "qualification_snapshot_bytes": 1369,
+          "qualification_snapshot_construction_milliseconds": 0,
+          "recipe_fact_copies": 0,
+          "recipe_hard_risk_count": 177,
+          "recipe_index_scans": 1,
+          "recipe_review_risk_count": 20,
+          "recipe_risk_facts": 217,
+          "recipes": 217,
+          "rejected_operations": 0,
+          "research_cost_support_public_bytes": 2471,
+          "runtime_environment_deep_verifications": 0,
+          "safety_qualification_deep_verifications": 0,
+          "sanitation_scanned_effects": 796,
+          "sanitation_scanned_technologies": 446,
+          "snapshot_canonicalization_passes": 14,
+          "snapshot_construction_milliseconds": 0,
+          "snapshot_copied_domains": 2,
+          "snapshot_deep_copies": 3,
+          "snapshot_peak_memory_bytes": 100686932,
+          "snapshot_prototype_bytes": 527907,
+          "snapshot_reused_domains": 11,
+          "stream_match_cache_hits": 2,
+          "stream_match_cache_misses": 53,
+          "stream_match_max_computations_per_identity": 1,
+          "stream_rows": 76,
+          "technologies": 250,
+          "technology_candidate_deep_verifications": 0,
+          "technology_catalog_alternatives": 152,
+          "technology_catalog_candidates": 76,
+          "technology_catalog_canonical_bytes": 262,
+          "technology_catalog_deep_verifications": 0,
+          "technology_catalog_internal_bytes": 2505898,
+          "technology_catalog_public_bytes": 22457,
+          "technology_closure_cache_entries": 0,
+          "technology_closure_cached_nodes": 0,
+          "technology_design_canonical_bytes": 825881,
+          "technology_design_count": 76,
+          "technology_design_deep_verifications": 0,
+          "technology_design_full_copies": 0,
+          "technology_graph_index_queries": 269,
+          "technology_graph_parity_rows": 54,
+          "technology_prerequisite_closure_max": 45,
+          "transformation_operation_deep_verifications": 0,
+          "transformation_plan_deep_verifications": 0,
+          "trusted_assertion_canonicalizations": 0,
+          "trusted_assertions": 6630,
+          "trusted_record_registrations": 1399,
+          "trusted_rejected_assertions": 0,
+          "trusted_untrusted_verifications": 0
+        }
+      }
+    ]
+  }
+}
