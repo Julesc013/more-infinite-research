@@ -44,7 +44,7 @@
     ]
   },
   "boundaries": {
-    "release_state": "focused-qualified",
+    "release_state": "candidate-qualified",
     "candidate_floor": "C32",
     "candidate_id": "C32",
     "factorio_2_0_release_authority": "not-created",
@@ -68,7 +68,7 @@
   ],
   "priority": {
     "next_work_package": "325-D3",
-    "reason": "Exact C32 bytes, approved delta, upgrade matrix, ecosystem campaign, and paired performance evidence are focused-qualified; the bounded next action is fresh no-reuse candidate qualification while exact human review remains pending."
+    "reason": "Exact C32 completed a fresh 135-row no-reuse candidate campaign with zero failed, incomplete, unexpected, or invalid rows; the bounded next action is exact-hash human playtest and maintainer go/no-go."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",

@@ -246,6 +246,16 @@
         "commit": "0c484b6e10d691eafc40eb3b80ffb137bd17450b",
         "paths": ["validation/tests.yml"],
         "reason": "Bind ecosystem execution to the immutable package-source commit without changing package bytes or product scope."
+      },
+      {
+        "commit": "4016b244ef2d2a5eb1242e448715f5fb866cbc13",
+        "paths": [
+          ".mir/assurance.json",
+          ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+          "tools/commands/control/New-MIRCandidateQualificationEvidence.ps1",
+          "validation/tests/release/Test-MIRCandidateFreshness.ps1"
+        ],
+        "reason": "Project the exact fresh Control Plane v4 campaign into a portable candidate-bound proof and validate it without weakening package, source, row, or environment bindings."
       }
     ]
   },

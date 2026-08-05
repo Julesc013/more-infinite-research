@@ -59,7 +59,7 @@ The first exact ecosystem retry reached and passed all nine Factorio loads, then
 
 | Field | Value |
 | --- | --- |
-| State | `focused-qualified` |
+| State | `candidate-qualified` |
 | Candidate | `C32` |
 | Package source commit | `a3bfbc4524b52cede425900e775384eb9c1fc4b3` |
 | Archive SHA-256 | `AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF` |
