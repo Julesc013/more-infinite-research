@@ -214,7 +214,12 @@ if ($c31View.Count -ne 1 -or [string]$c31View[0].state -ne "package-built" -or
 }
 foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   $row = @($rows | Where-Object { $_.id -eq $releaseOnly })[0]
-  if ([string]$row.status -notin @("blocked-by-prerequisite", "in-progress", "awaiting-manual-gate") -or
+  $allowedStatuses = switch ($releaseOnly) {
+    "325-D2" { @("blocked-by-prerequisite", "in-progress", "terminal") }
+    "325-D3" { @("blocked-by-prerequisite", "in-progress", "awaiting-manual-gate") }
+    default { @("blocked-by-prerequisite") }
+  }
+  if ([string]$row.status -notin $allowedStatuses -or
       ([string]$releaseOnly -eq "325-D4" -and [string]$row.package_visibility -ne "none-until-admitted")) {
     throw "$releaseOnly has advanced outside the governed freeze/qualification boundary."
   }

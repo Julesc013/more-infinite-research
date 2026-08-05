@@ -5,7 +5,7 @@
   "candidate_floor": "C32",
   "target": "2.1",
   "branch": "dev",
-  "state": "source-frozen",
+  "state": "package-built",
   "source_release": {
     "release": "3.2.3",
     "tag": "3.2.3",
@@ -22,7 +22,12 @@
   "package": {
     "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
     "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
-    "source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
+    "source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "archive": "dist/more-infinite-research_3.2.5.zip",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301
   },
   "upgrade": {
     "from_version": "3.2.3",
@@ -39,10 +44,21 @@
         "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
         "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D"
       }
+    ],
+    "package_build": [
+      {
+        "kind": "deterministic-package",
+        "path": "scripts/Test-MIRDeterministicPackage.ps1",
+        "archive": "dist/more-infinite-research_3.2.5.zip",
+        "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+        "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+        "bytes": 1056249,
+        "entries": 301,
+        "builds": 2
+      }
     ]
   },
   "remaining_obligations": [
-    "package-build",
     "focused-qualification",
     "candidate-qualification",
     "manual-acceptance",
@@ -62,5 +78,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-05T16:03:31.000Z"
+  "updated_at": "2026-08-05T16:12:26.000Z"
 }

@@ -210,9 +210,9 @@ candidate:
   artifact: dist/more-infinite-research_3.2.5.zip
   source_commit: a3bfbc4524b52cede425900e775384eb9c1fc4b3
   package_source_commit: a3bfbc4524b52cede425900e775384eb9c1fc4b3
-  automated_gate: pending-package-build
+  automated_gate: pending-qualification
   manual_gate: pending-exact-candidate-review
-  status: source-frozen
+  status: package-built
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

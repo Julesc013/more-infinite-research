@@ -15,10 +15,10 @@
       "branch": "dev",
       "candidate_floor": "C32",
       "candidate_id": "C32",
-      "effective_status": "source-frozen",
+      "effective_status": "package-built",
       "release": "3.2.5",
       "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
-      "state": "source-frozen",
+      "state": "package-built",
       "target": "2.1"
     },
     {

@@ -8,7 +8,7 @@ Generated: 2026-08-05
 
 | Release | Candidate | Reserved floor | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.5` | `C32` | `C32` | `source-frozen` | `package-built` |
+| `3.2.5` | `C32` | `C32` | `package-built` | `focused-qualified` |
 | `2.5.0` | `2.5-P11` | `pending` | `publicly-verified` | `complete` |
 
 ## Canonical execution programme
@@ -25,8 +25,9 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 | `325-A1b` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited `GIT_INDEX_FILE`, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |
 | `325-B0` first complete compatibility slice | Closed by `CHG-2026-0017` after PR 51 merged | Research-cost default parity traced through disposition, typed proof, bounded support output, exact Factorio 2.0 adapter disposition, 127/127 local admission, and latest-head hosted closure |
 | `325-B1` essential research-cost correctness | Terminal after PR 53 | Exact committed-head 128-row local and latest-head hosted proof admits the algebraic/numeric/parser contract, 3.2.3 defaults, ownership dispositions, all transitions, and first/second reload equivalence |
-| `325-D1` narrowed freeze packet | Terminal; C32 source frozen | Exact revision-5 lineage, package composition, bounded product/target contracts, environment/privacy/localization/performance/manual authorities, release documents, and the 125/125 committed-head plan are admitted before package construction |
-| `325-D2` deterministic candidate package | In progress | Build exact C32 twice from frozen package source, verify archive/content/bytes/entries, and record package-built without changing package roots |
+| `325-D1` narrowed freeze packet | Terminal; C32 source frozen | Exact revision-5 lineage, package composition, bounded product/target contracts, environment/privacy/localization/performance/manual authorities, release documents, and the 125/125 committed-head plan were admitted before package construction |
+| `325-D2` deterministic candidate package | Terminal; C32 package built | Two builds from frozen source produced exact archive `AC81CAD1...A11ADF`, content `1A2A3738...35A7D`, 1,056,249 bytes, and 301 entries |
+| `325-D3` candidate qualification | In progress | Full fresh exact-candidate proof, paired performance, manual playtest, protected qualification, seal, and promotion remain distinct gates |
 | Minimum compatibility product | Frozen for 3.2.5 | Factorio 2.1 Base/Space Age and explicit non-authorizing Factorio 2.0 dispositions cover every shipped feature in the narrowed release |
 | Bounded ecosystem matrix | Frozen for candidate qualification | Exact Base, Space Age, maintained ecosystem, owner, overhaul, and negative/conflict rows retain their version/hash locks, claim levels, fixtures, and budgets |
 

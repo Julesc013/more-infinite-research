@@ -234,7 +234,6 @@
   },
   "documentation": {
     "authorities": [
-      {"path": "docs/releases/notes/release-notes-3.2.5.md", "sha256": "CAFA7708CC55F586B5CB6F7667A3C582C04C6E6D12EDE4A025059EA241CB08E2"},
       {"path": "docs/releases/3.2.5-migration-guide.md", "sha256": "28990DE63A6D3C6DC18B566AC5AEFBF4526A6C13C4E67FCEB9DF8D3BFEF80B60"},
       {"path": "docs/maintainer/manual-test-plan.md", "sha256": "FCB9BCBC5ED0071570D4B1774931EB4B3100DEF39CD648453ED25FFFC9AE4EA5"},
       {"path": "docs/user/diagnostics.md", "sha256": "6FD403C66D66F1A36B6CFE00EA2EFF7EE6E0ABB9BCAA452A861CD5FEFA056A21"},

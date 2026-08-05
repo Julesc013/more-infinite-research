@@ -44,7 +44,7 @@
     ]
   },
   "boundaries": {
-    "release_state": "source-frozen",
+    "release_state": "package-built",
     "candidate_floor": "C32",
     "candidate_id": "C32",
     "factorio_2_0_release_authority": "not-created",
@@ -67,8 +67,8 @@
     ".mir/releases/freezes/3.2.5-D1.json"
   ],
   "priority": {
-    "next_work_package": "325-D2",
-    "reason": "D1 is admitted against its exact 125-row source-bound plan and C32 is assigned only at source freeze; the bounded next action is deterministic candidate construction."
+    "next_work_package": "325-D3",
+    "reason": "D1 is admitted and exact C32 bytes are deterministically package-built; the bounded next action is candidate-bound automated qualification, performance, and human review preparation."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
@@ -419,34 +419,37 @@
     {
       "id": "325-D2",
       "category": "release",
-      "status": "in-progress",
+      "status": "terminal",
       "required_product_surface": [
         "Assign the first exact candidate at or above C32 only after source freeze and build its deterministic package twice."
       ],
       "current_implementation": [
-        "The admitted D1 packet and append-only source-frozen transition assign exact candidate C32 to package source a3bfbc4524b52cede425900e775384eb9c1fc4b3."
+        "The admitted D1 packet and append-only source-frozen transition assign exact candidate C32 to package source a3bfbc4524b52cede425900e775384eb9c1fc4b3.",
+        "Two deterministic builds produced archive AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF, normalized content 1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D, 1056249 bytes, and 301 entries."
       ],
       "current_tests": [
         "validation/tests/release/Test-MIRReleaseAuthority.ps1",
         "validation/tests/tooling/Test-MIRAssurance.ps1"
       ],
       "current_evidence": [
-        ".mir/releases/records/3.2.5.json"
+        ".mir/releases/records/3.2.5.json",
+        ".mir/releases/transitions/3.2.5-c32-package-built.json",
+        "dist/more-infinite-research_3.2.5.zip"
       ],
       "remaining_gap": [
-        "No immutable candidate package identity exists."
+        "No D2 package-construction gap remains; candidate qualification is owned by 325-D3."
       ],
       "package_visibility": "none-until-admitted",
       "target_disposition": {
-        "factorio_2_1": "source frozen; deterministic package construction pending",
+        "factorio_2_1": "exact immutable candidate package built",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Build C32 twice, verify exact archive/content/bytes/entries, and record the package-built transition without changing package roots."
+      "next_bounded_action": "Preserve exact C32 bytes and invalidate them if any package-visible source changes."
     },
     {
       "id": "325-D3",
       "category": "release",
-      "status": "blocked-by-prerequisite",
+      "status": "in-progress",
       "required_product_surface": [
         "Focused, complete candidate, manual, protected no-reuse, seal, and shadow-equivalence proof for one immutable candidate."
       ],
@@ -459,18 +462,18 @@
         "validation/tests/tooling/Test-MIRControlPlaneShadow.ps1"
       ],
       "current_evidence": [
-        "development-playtest-revision-3:development-evidence-only"
+        "development-playtest-revision-5:development-evidence-only",
+        "dist/more-infinite-research_3.2.5.zip"
       ],
       "remaining_gap": [
-        "325-D2 has not created an immutable candidate.",
         "Development proof cannot substitute for candidate-bound protected qualification or manual acceptance."
       ],
       "package_visibility": "none-until-admitted",
       "target_disposition": {
-        "factorio_2_1": "blocked until one exact candidate exists",
+        "factorio_2_1": "C32 exists; exact qualification and human acceptance pending",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Take no qualification or seal action until 325-D2 creates an immutable candidate."
+      "next_bounded_action": "Run full fresh candidate-bound automated proof and paired performance, then stage exact C32 for human playtest and go/no-go."
     },
     {
       "id": "325-D4",

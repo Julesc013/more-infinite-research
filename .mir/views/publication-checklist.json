@@ -10,7 +10,6 @@
   "publication_admitted": false,
   "release": "3.2.5",
   "remaining_states": [
-    "package-built",
     "focused-qualified",
     "candidate-qualified",
     "manually-accepted",
@@ -22,5 +21,5 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "source-frozen"
+  "state": "package-built"
 }
