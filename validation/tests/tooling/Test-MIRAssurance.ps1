@@ -71,6 +71,7 @@ $assuranceToolingClassificationCases = @(
   "tools/lib/assurance/Evidence.ps1",
   "tools/lib/control/Evidence.ps1",
   "tools/lib/control/Views.ps1",
+  "tools/maintenance/Move-MIRValidationDefinitions.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
@@ -84,6 +85,18 @@ foreach ($path in $assuranceToolingClassificationCases) {
   )
   if ($matchedClasses -notcontains "assurance-tooling" -or $matchedClasses -contains "test-harness") {
     throw "Static assurance path '$path' must select assurance-tooling without selecting the Factorio test harness: $($matchedClasses -join ', ')."
+  }
+}
+
+$ecosystemProfileClass = @($config.classes | Where-Object { [string]$_.id -eq "ecosystem-profile" })
+if ($ecosystemProfileClass.Count -ne 1 -or
+    @($ecosystemProfileClass[0].tests) -notcontains "runtime.ecosystem" -or
+    @($ecosystemProfileClass[0].tests) -notcontains "static.full") {
+  throw "The ecosystem-profile assurance class must select static.full and runtime.ecosystem."
+}
+foreach ($path in @("fixtures/run-profiles/release-targeted-2.1.json", "validation/scenarios/local-2.1.json")) {
+  if (@($ecosystemProfileClass[0].patterns | Where-Object { $path -match [string]$_ }).Count -eq 0) {
+    throw "Ecosystem authority path '$path' does not select the ecosystem-profile assurance class."
   }
 }
 
@@ -136,6 +149,7 @@ foreach ($requiredStaticRoutingPath in @(
   "tools/lib/control/Evidence.ps1",
   "tools/mir.ps1",
   "tools/lib/control/Views.ps1",
+  "tools/maintenance/**",
   "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
   "validation/tests/package/Test-MIRArtifactCleanup.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",

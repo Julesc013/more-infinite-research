@@ -45,6 +45,10 @@ The source remains under development. `C32` is a reserved candidate floor, not a
 
 The hosted assurance control plane now isolates each worker's exact test/fingerprint subtree and requires a plan-bound worker receipt before deterministic aggregate import. Latest exact repair head `409884cba10d69ead7020df17c64899fa91f633e` passed both hosted aggregates and merged through PR 45; append-only incident `INC-2026-0056` closes `325-A1a`. This is release tooling, not candidate evidence, and it does not assign C32 or advance 3.2.5 beyond `planned`.
 
+Fresh development-breadth execution later exposed `INC-2026-0058`: the release-targeted ecosystem profiles still referenced retired pre-migration scenario paths. The package-excluded repair binds the profiles to `validation/scenarios/local-2.1.json` or `local-2.0.json`, teaches the migration tool to recognize JSON-escaped paths, and rejects missing or noncanonical profile authorities during static admission. Focused admission also repaired `INC-2026-0059`, an output-root migration preview that incorrectly depended on an untracked legacy `.mir/tasks` directory.
+
+The first exact ecosystem retry reached and passed all nine Factorio loads, then exposed `INC-2026-0060`: Base-only rows reached Ice productivity's deliberately unavailable cryogenic-science selector. Ice productivity now declares its Space Age dependency before science selection, while the Space Age lane retains cryogenic science and accepting-lab proof. This is a package-visible development correction; exact source-bound ecosystem and breadth closure remain required.
+
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity
 

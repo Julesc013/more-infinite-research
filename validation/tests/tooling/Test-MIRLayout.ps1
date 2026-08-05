@@ -189,6 +189,58 @@ if ($definitionMigrationPreview.mode -ne "preview" -or $definitionMigrationPrevi
     $definitionMigrationPreview.definitions -ne 11) {
   throw "Validation-definition migration is incomplete or not idempotent: $($definitionMigrationPreview | ConvertTo-Json -Compress)"
 }
+$definitionMigrationScratch = [IO.Path]::GetFullPath([IO.Path]::Combine(
+  [IO.Path]::GetTempPath(),
+  "mir-validation-definition-migration-$([Guid]::NewGuid().ToString('N'))"
+))
+$resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+if (-not $definitionMigrationScratch.StartsWith($resolvedTempRoot, [StringComparison]::OrdinalIgnoreCase)) {
+  throw "Validation-definition migration scratch escaped the temporary directory."
+}
+try {
+  foreach ($canonicalDefinition in @(
+    "spec/compatibility/claims.json",
+    "spec/compatibility/support-lanes.json",
+    "validation/assertions/expected-failures.json",
+    "validation/adapters/portal-exclusions.json",
+    "validation/scenarios/runtime.json",
+    "validation/scenarios/manual.json",
+    "validation/scenarios/local-2.1.json",
+    "validation/scenarios/local-2.0.json",
+    "validation/baselines/control/2.5.0-p9-v4.json",
+    "validation/baselines/control/3.2.2-v4.json",
+    "validation/baselines/control/3.2.2-v5-replay.json"
+  )) {
+    $canonicalPath = Join-Path $definitionMigrationScratch $canonicalDefinition
+    $null = New-Item -ItemType Directory -Path (Split-Path -Parent $canonicalPath) -Force
+    "{}" | Set-Content -LiteralPath $canonicalPath -Encoding utf8
+  }
+  $escapedReferencePath = Join-Path $definitionMigrationScratch "fixtures/run-profiles/escaped-reference.json"
+  $null = New-Item -ItemType Directory -Path (Split-Path -Parent $escapedReferencePath) -Force
+  [ordered]@{manual_scenarios_path="fixtures\compat-matrix\local-library-scenarios.json"} |
+    ConvertTo-Json | Set-Content -LiteralPath $escapedReferencePath -Encoding utf8
+
+  $escapedPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRValidationDefinitions.ps1") -RepoRoot $definitionMigrationScratch | ConvertFrom-Json
+  if ($escapedPreview.mode -ne "preview" -or $escapedPreview.changed -ne 1 -or
+      $escapedPreview.reference_files -ne 1 -or
+      @($escapedPreview.rewritten) -notcontains "fixtures/run-profiles/escaped-reference.json") {
+    throw "Validation-definition migration did not detect a JSON-escaped legacy path: $($escapedPreview | ConvertTo-Json -Compress)"
+  }
+  $escapedApply = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRValidationDefinitions.ps1") -RepoRoot $definitionMigrationScratch -Apply | ConvertFrom-Json
+  $escapedProfile = Get-Content -Raw -LiteralPath $escapedReferencePath | ConvertFrom-Json
+  if ($escapedApply.changed -ne 1 -or
+      ([string]$escapedProfile.manual_scenarios_path).Replace("\", "/") -cne "validation/scenarios/local-2.1.json") {
+    throw "Validation-definition migration did not rewrite a JSON-escaped legacy path canonically."
+  }
+  $escapedIdempotence = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRValidationDefinitions.ps1") -RepoRoot $definitionMigrationScratch | ConvertFrom-Json
+  if ($escapedIdempotence.changed -ne 0) {
+    throw "Validation-definition migration is not idempotent after rewriting a JSON-escaped legacy path."
+  }
+} finally {
+  if (Test-Path -LiteralPath $definitionMigrationScratch) {
+    Remove-Item -LiteralPath $definitionMigrationScratch -Recurse -Force
+  }
+}
 $toolLibraryMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRToolLibraries.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($toolLibraryMigrationPreview.mode -ne "preview" -or $toolLibraryMigrationPreview.changed -ne 0 -or
     $toolLibraryMigrationPreview.libraries -ne 7) {

@@ -17,6 +17,7 @@ Date: 2026-08-04
     - Refused malformed, tampered, unknown, or over-budget transition descriptors without guessing or resetting force state.
     - Corrected packaged guidance: productivity-family adoption preserves effects without a force-wide technology reset.
     - Preserved 3.2.3 base-continuation costs by projecting stable level-one coefficients to the new curve anchor.
+    - Classified Ice productivity as Space Age-only before science-pack selection in Base-only modsets.
 
   Compatibility:
 

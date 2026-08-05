@@ -66,6 +66,7 @@
         "tools/mir.ps1",
         "tools/lib/workspace/**",
         "tools/commands/workspace/**",
+        "tools/maintenance/**",
         "validation/tests/tooling/Test-MIRLayout.ps1"
       ]
     },

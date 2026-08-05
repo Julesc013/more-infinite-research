@@ -79,6 +79,12 @@
       "tags": []
     },
     {
+      "pattern": "tools/maintenance/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/public-artifact-budgets.json",
       "groups": ["base-load", "local-mod-library"],
       "scenarios": ["compiler-contracts", "package-zip-base", "package-zip-space-age"],
