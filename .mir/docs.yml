@@ -1776,6 +1776,15 @@ docs:
     source_of_truth_for:
       - research-cost-model-schema
       - legacy-coefficient-anchor-projection
+  - path: docs/reference/schemas/research-cost-compatibility-slice.md
+    title: "Research-Cost Compatibility Slice Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - research-cost-compatibility-slice-schema
+      - research-cost-target-disposition-projection
   - path: docs/reference/settings-reference.md
     title: "Settings Reference"
     status: archived

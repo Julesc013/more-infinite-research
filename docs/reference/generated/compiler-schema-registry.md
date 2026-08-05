@@ -22,6 +22,7 @@ superseded_by: []
 | `MutationJournal` | 2 | 2 | 2 | none |
 | `PolicySnapshot` | 1 | 1 | 1 | none |
 | `QualificationEnvironmentIdentity` | 1 | 1 | 1 | none |
+| `ResearchCostCompatibilitySlice` | 1 | 1 | 1 | none |
 | `ResearchCostModel` | 1 | 1 | 1 | none |
 | `RuntimeEnvironmentIdentity` | 2 | 2 | 2 | 1 |
 | `TransformationOperation` | 2 | 2 | 2 | none |

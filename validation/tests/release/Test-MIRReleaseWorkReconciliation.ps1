@@ -114,11 +114,31 @@ foreach ($authority in @($record.authorities)) {
 }
 
 $b0 = @($rows | Where-Object { $_.id -eq "325-B0" })[0]
+if ([string]$b0.status -ne "implemented-awaiting-closure") {
+  throw "325-B0 must remain implemented-awaiting-closure until exact-head admission succeeds."
+}
+$b0Implementation = @($b0.current_implementation) -join "`n"
+foreach ($required in @(
+  "compatibility_slice.lua",
+  "terminal neutral-default proposition",
+  "typed proof",
+  "target-aware",
+  "fails closed"
+)) {
+  if ($b0Implementation -notmatch [regex]::Escape($required)) {
+    throw "325-B0 does not expose its implemented end-to-end surface: $required"
+  }
+}
 $b0Gap = @($b0.remaining_gap) -join "`n"
 foreach ($required in @("terminal", "proof assertion", "support projection", "Factorio 2.0")) {
   if ($b0Gap -notmatch [regex]::Escape($required)) {
     throw "325-B0 does not expose its required end-to-end gap: $required"
   }
+}
+if ([string]$b0.target_disposition.factorio_2_1 -notmatch "target-native-equivalent" -or
+    [string]$b0.target_disposition.factorio_2_0 -notmatch "portable-with-adapter" -or
+    [string]$b0.target_disposition.factorio_2_0 -notmatch "no 2.5.5 authority") {
+  throw "325-B0 target dispositions are not exact or preserve forbidden-boundary language."
 }
 foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   $row = @($rows | Where-Object { $_.id -eq $releaseOnly })[0]

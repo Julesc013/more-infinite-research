@@ -173,6 +173,7 @@ modules:
     - prototypes/mir/domain/research_cost/classification.lua
     - prototypes/mir/domain/research_cost/projection.lua
     - prototypes/mir/domain/research_cost/transition_descriptor.lua
+    - prototypes/mir/domain/research_cost/compatibility_slice.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
@@ -288,6 +289,7 @@ modules:
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
     - prototypes/mir/emit/compiler_evidence_adapter.lua
+    - prototypes/mir/emit/research_cost_compatibility_adapter.lua
     - prototypes/mir/emit/transactions/productivity_family_adoption.lua
   report:
     - prototypes/mir/report/decision_export.lua
@@ -387,6 +389,7 @@ mutation_commands:
     - no sanitation-covered target prototype family may be created or removed after input sanitation
     - CompilationPlan separates compilation qualification and run fingerprints
     - postcondition publication emits target-neutral content-addressed compiler evidence with mod-data and validation-log adapters
+    - final APPLIED compiler results derive one bounded neutral-default research-cost disposition with typed evidence and explicit Factorio 2.1 mod-data and Factorio 2.0 validation-log transport rows
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output

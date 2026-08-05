@@ -47,7 +47,7 @@ if ([int]$compilerSchemaAuthority.schema -ne 1 -or
 foreach ($entry in @{
   CompilationSnapshot=2; PolicySnapshot=1; CompilerInput=2; CompilerResult=3;
   RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1;
-  ResearchCostModel=1;
+  ResearchCostModel=1; ResearchCostCompatibilitySlice=1;
   TransformationOperation=2; TransformationPlan=2; MutationJournal=2
 }.GetEnumerator()) {
   if ([int]$compilerSchemaAuthority.records.($entry.Key).current -ne [int]$entry.Value) {
@@ -115,6 +115,7 @@ Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInpu
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 3 planned or final record is required"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
 Assert-MIRText "prototypes\mir\domain\research_cost\model.lua" 'M.formula_abi = "mir-research-cost-v1"'
+Assert-MIRText "prototypes\mir\domain\research_cost\compatibility_slice.lua" 'mir-research-cost-compatibility-slice-v1'
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "function M.compatibility_projection"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "function M.compatibility_projection"
@@ -131,6 +132,7 @@ foreach ($row in @(
   "| CompatibilityPack | 2 |",
   "| TechnologyDesign | 2 |",
   "| ResearchCostModel | 1 |",
+  "| ResearchCostCompatibilitySlice | 1 |",
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
   "| CompilationSnapshot | 2 |",
@@ -158,6 +160,7 @@ foreach ($docCheck in @(
   @{Path="docs\reference\schemas\generation-plan.md"; Needle="schema 3"},
   @{Path="docs\reference\schemas\technology-design.md"; Needle='`TechnologyDesign` schema 2'},
   @{Path="docs\reference\schemas\compiler-evidence.md"; Needle='`CompilerEvidence` schema 2'},
+  @{Path="docs\reference\schemas\research-cost-compatibility-slice.md"; Needle='`ResearchCostCompatibilitySlice` schema 1'},
   @{Path="docs\reference\schemas\recipe-fact-v2.md"; Needle="schema-2"},
   @{Path="docs\reference\schemas\scenario-manifest.md"; Needle="schema 3"}
   @{Path="docs\reference\schemas\compiler-boundary.md"; Needle='`CompilerResult` | 3'}

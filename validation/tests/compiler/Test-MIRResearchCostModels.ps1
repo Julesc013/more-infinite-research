@@ -87,6 +87,12 @@ $paths = @{
   Classification = "prototypes/mir/domain/research_cost/classification.lua"
   Projection = "prototypes/mir/domain/research_cost/projection.lua"
   Transition = "prototypes/mir/domain/research_cost/transition_descriptor.lua"
+  CompatibilitySlice = "prototypes/mir/domain/research_cost/compatibility_slice.lua"
+  CompatibilityAdapter = "prototypes/mir/emit/research_cost_compatibility_adapter.lua"
+  PublicArtifacts = "prototypes/mir/report/public_compiler_artifacts.lua"
+  PublicArtifactBudget = "prototypes/mir/domain/compiler/public_artifact_budget.lua"
+  ModData = "prototypes/mir/emit/mod_data.lua"
+  Orchestrator = "prototypes/mir/pipeline/compiler_orchestrator.lua"
   AdoptionEmitter = "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
   AdoptionRuntime = "prototypes/mir/runtime/productivity_family_adoption.lua"
   Streams = "prototypes/mir/planner/stream_compiler.lua"
@@ -101,7 +107,19 @@ foreach ($entry in $paths.GetEnumerator()) {
   $source[$entry.Key] = Get-Content -Raw -LiteralPath $path
 }
 
-foreach ($required in @("ips-cost-linear-increment-%s", "mir-cost-linear-increment-%s", "mir-research-cost-v1", "mir-research-cost-transition-v1", "mir-research-cost-qualification-v1")) {
+foreach ($required in @(
+  "ips-cost-linear-increment-%s",
+  "mir-cost-linear-increment-%s",
+  "mir-research-cost-v1",
+  "mir-research-cost-transition-v1",
+  "mir-research-cost-qualification-v1",
+  "mir-research-cost-compatibility-slice-v1",
+  "mir-research-cost-neutral-default-parity-v1",
+  "mir-research-cost-proof-assertion-v1",
+  "mir-research-cost-support-public",
+  "target-native-equivalent",
+  "portable-with-adapter"
+)) {
   if (($source.Values -join "`n") -notmatch [regex]::Escape($required)) { throw "Missing research-cost contract token: $required" }
 }
 foreach ($digest in @("semantic_digest", "authority_digest", "qualification_digest")) {
@@ -120,6 +138,45 @@ if ($source.AdoptionRuntime -match 'count_formula.*match|research_unit_count|for
 }
 if ($source.Transition -notmatch 'before \* previous_cost / current_cost') {
   throw "Analytical research-progress conversion must preserve work with the old-cost/new-cost ratio."
+}
+foreach ($required in @(
+  'compiler_input\.assert_trusted',
+  'compiler_result\.assert_trusted',
+  'result_phase\s*~=\s*"final"',
+  'dimensions\.execution\s*~=\s*"APPLIED"',
+  'semantic_set_fingerprint',
+  'proof_assertion',
+  'target_dispositions',
+  'terminal\s*=\s*true',
+  'neutral-default-semantic-parity-proven',
+  'no-remediation-required',
+  'validation-log'
+)) {
+  if ($source.CompatibilitySlice -notmatch $required) {
+    throw "Research-cost compatibility slice is missing required fail-closed material: $required"
+  }
+}
+if ($source.CompatibilitySlice -match 'data\.raw') {
+  throw "Research-cost compatibility-slice domain authority must not inspect or mutate data.raw."
+}
+if ($source.CompatibilityAdapter -notmatch 'target_line\.mod_data_supported\(\)' -or
+    $source.CompatibilityAdapter -notmatch 'emit_research_cost_compatibility' -or
+    $source.CompatibilityAdapter -notmatch '\[MIR-RESEARCH-COST-SUPPORT\]') {
+  throw "Research-cost compatibility support lacks its target-aware mod-data/validation-log adapter."
+}
+if ($source.ModData -notmatch 'more-infinite-research-research-cost-compatibility' -or
+    $source.ModData -notmatch 'more-infinite-research\.research-cost-compatibility-public') {
+  throw "Research-cost compatibility support is not emitted through the governed mod-data adapter."
+}
+if ($source.PublicArtifactBudget -notmatch '\["mir-research-cost-support-public"\]\s*=\s*16384' -or
+    $source.PublicArtifacts -notmatch 'function M\.research_cost_compatibility') {
+  throw "Research-cost compatibility support does not have a hard 16 KiB public projection budget."
+}
+$finalResultIndex = $source.Orchestrator.IndexOf('local final_result = context:state_view("final_compiler_result")')
+$sliceIndex = $source.Orchestrator.IndexOf('research_cost_compatibility.build({')
+if ($finalResultIndex -lt 0 -or $sliceIndex -le $finalResultIndex -or
+    $source.Orchestrator -notmatch 'research_cost_compatibility_adapter"\)\.publish') {
+  throw "Research-cost compatibility support must derive and publish only after final CompilerResult authority exists."
 }
 foreach ($budget in @('MAXIMUM_FORMULA_BYTES', 'MAXIMUM_TOKENS', 'MAXIMUM_PARSE_DEPTH', 'evaluated_cost_out_of_bounds')) {
   if (($source.Values -join "`n") -notmatch $budget) { throw "Research-cost budget is missing: $budget" }

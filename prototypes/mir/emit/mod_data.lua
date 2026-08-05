@@ -90,6 +90,16 @@ function M.emit_compiler_evidence(artifact)
   })
 end
 
+function M.emit_research_cost_compatibility(artifact)
+  if not artifact then return end
+  return emit({
+    type = "mod-data",
+    name = "more-infinite-research-research-cost-compatibility",
+    data_type = "more-infinite-research.research-cost-compatibility-public",
+    data = artifact
+  })
+end
+
 function M.emit_internal_compiler_evidence(artifact)
   if not artifact then return end
   return emit({
