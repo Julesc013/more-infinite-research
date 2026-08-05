@@ -35,7 +35,7 @@ jobs:
       - name: Build byte-bound development archive
         shell: pwsh
         run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET
-      - name: Isolate exact development candidate from historical distributions
+      - name: Stage exact development candidate for isolated transfer
         shell: pwsh
         run: |
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
@@ -52,7 +52,6 @@ jobs:
               (Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash) {
             throw "Isolated development candidate differs from the exact build output."
           }
-          Remove-Item -LiteralPath $source -Force
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh
