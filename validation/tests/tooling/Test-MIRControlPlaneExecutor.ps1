@@ -27,7 +27,10 @@ if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
 }
 $historicalInputTask = [pscustomobject][ordered]@{
   id = "historical-input-self-test"
-  effective_inputs = @("source:validation/tests/compiler/Test-MIRResearchCostModels.ps1")
+  effective_inputs = @(
+    "source:validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+    "source:path:releases.deltas/3.2.1-to-3.2.2.json"
+  )
 }
 $historicalInputArgs = @{
   Task = $historicalInputTask
@@ -44,6 +47,14 @@ $historicalAbsence = @($historicalInputManifest.rows | Where-Object {
 })
 if ($historicalAbsence.Count -ne 1) {
   throw "Historical exact-source absence is not explicit and commit-bound."
+}
+$historicalLogicalAbsence = @($historicalInputManifest.rows | Where-Object {
+  [string]$_.input -eq "source:path:releases.deltas/3.2.1-to-3.2.2.json" -and
+  [string]$_.kind -eq "source-absent" -and
+  [string]$_.source_commit -eq [string]$release.package.source_commit
+})
+if ($historicalLogicalAbsence.Count -ne 1) {
+  throw "Historical logical-path absence was not resolved by the locked control-plane catalog."
 }
 $currentAbsenceRejected = $false
 try {
@@ -186,6 +197,29 @@ if ($c30DeltaPolicy.Count -ne 1 -or [string]$currentObservation.archive_sha256 -
 $selectedC30Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVersion "3.2.2" -ToVersion "3.2.3" -CandidateId "C30" -RepoRoot $repo)
 if ($selectedC30Policies.Count -ne 1 -or [string]$selectedC30Policies[0].id -ne "c30-platform-logistics-hotfix-v1") {
   throw "Public C30 approved-delta dispatch does not select the exact native C30 policy."
+}
+$c32Candidate = Join-Path $repo "dist/more-infinite-research_3.2.5.zip"
+if (-not (Test-Path -LiteralPath $c32Candidate -PathType Leaf)) {
+  throw "C32 approved-delta regression requires the exact governed 3.2.5 candidate archive."
+}
+$c32Observation = Get-MIRCPZipPackageObservation -Path $c32Candidate
+$c32Paths = @{}
+foreach ($file in @($c32Observation.files)) { $c32Paths[[string]$file.path] = [string]$file.sha256 }
+$c32AddedPaths = @($c32Paths.Keys | Where-Object { -not $c30Paths.ContainsKey($_) } | Sort-Object)
+$c32RemovedPaths = @($c30Paths.Keys | Where-Object { -not $c32Paths.ContainsKey($_) } | Sort-Object)
+$c32ChangedPaths = @($c32Paths.Keys | Where-Object { $c30Paths.ContainsKey($_) -and $c30Paths[$_] -cne $c32Paths[$_] } | Sort-Object)
+$c32DeltaPolicy = @($deltaAuthority.policies | Where-Object id -eq "c32-unified-cost-compatibility-v1")
+if ($c32DeltaPolicy.Count -ne 1 -or
+    [string]$c30Observation.archive_sha256 -ne [string]$c32DeltaPolicy[0].baseline.archive_sha256 -or
+    [string]$c32Observation.archive_sha256 -ne [string]$c32DeltaPolicy[0].candidate.archive_sha256 -or
+    -not (Test-MIRCPExactPathSet -Expected @($c32DeltaPolicy[0].allowed_added_paths) -Actual $c32AddedPaths) -or
+    -not (Test-MIRCPExactPathSet -Expected @($c32DeltaPolicy[0].allowed_removed_paths) -Actual $c32RemovedPaths) -or
+    -not (Test-MIRCPExactPathSet -Expected @($c32DeltaPolicy[0].allowed_changed_paths) -Actual $c32ChangedPaths)) {
+  throw "Native C32 approved-delta policy does not accept only the exact immutable 3.2.3-to-3.2.5 package delta."
+}
+$selectedC32Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVersion "3.2.3" -ToVersion "3.2.5" -CandidateId "C32" -RepoRoot $repo)
+if ($selectedC32Policies.Count -ne 1 -or [string]$selectedC32Policies[0].id -ne "c32-unified-cost-compatibility-v1") {
+  throw "Public C32 approved-delta dispatch does not select the exact native C32 policy."
 }
 $evidenceRoot = ".work/output/control-plane-v5-self-test/executor-evidence/$([guid]::NewGuid().ToString('N'))"
 $contextResult = Write-MIRCPContextCompletionEvidence -ContextPath $context.path -TrustClass "self-test" -EvidenceRoot $evidenceRoot -RepoRoot $repo
