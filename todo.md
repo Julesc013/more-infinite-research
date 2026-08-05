@@ -24,8 +24,8 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 | `325-A1a` deterministic fan-in | Closed by `INC-2026-0056` after PR 45 merged | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and exact latest-head hosted proof closure |
 | `325-A1b` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited `GIT_INDEX_FILE`, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |
 | `325-B0` first complete compatibility slice | Closed by `CHG-2026-0017` after PR 51 merged | Research-cost default parity traced through disposition, typed proof, bounded support output, exact Factorio 2.0 adapter disposition, 127/127 local admission, and latest-head hosted closure |
-| `325-B1` essential research-cost correctness | Implemented locally; governed admission pending | Exact committed-head local and hosted proof admits the algebraic/numeric/parser contract, 3.2.3 defaults, ownership dispositions, all transitions, and first/second reload equivalence |
-| `325-D1` narrowed freeze packet | Open | Essential B1 proof, release-specific environments/privacy/localization/performance/manual scope, exact package composition and ABI delta, shipped-feature Factorio 2.0 dispositions, and the source-bound plan are terminal |
+| `325-B1` essential research-cost correctness | Terminal after PR 53 | Exact committed-head 128-row local and latest-head hosted proof admits the algebraic/numeric/parser contract, 3.2.3 defaults, ownership dispositions, all transitions, and first/second reload equivalence |
+| `325-D1` narrowed freeze packet | Prepared for governed admission | Exact revision-5 lineage, package composition, bounded product/target contracts, environment/privacy/localization/performance/manual authorities, release documents, and source-bound plan are reviewable before C32 assignment |
 | Minimum compatibility product | Declaration required before freeze | Factorio 2.1 Base/Space Age, conditional Factorio 2.0 Base/Space Age, and explicit projection or terminal disposition for every stable authority |
 | Bounded ecosystem matrix | Declaration required before freeze | Exact Base, Space Age, P11/BZ, owner-pack, broad-overhaul, and negative/conflict rows with version/hash locks, claim level, fixture/load-check, budgets, and terminal wording |
 
@@ -112,6 +112,7 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 | `CHG-2026-0016` | `change/release` | `implemented` | Establish the 3.2.5 release-value firewall and pre-candidate planning authority |
 | `CHG-2026-0017` | `change/release` | `implemented` | Close 325-B0 and narrow the MIR 3.2.5 release contract |
 | `CHG-2026-0018` | `change/product` | `implemented` | Complete essential MIR 3.2.5 research-cost correctness |
+| `CHG-2026-0019` | `change/release` | `implemented` | Prepare the MIR 3.2.5 D1 source-freeze packet |
 | `INC-2026-0035` | `incident` | `pending-external-issue-close` | Pyanodon casting unlock startup failure |
 | `INC-2026-0041` | `incident` | `pending-release-qualification` | Ice and platform productivity progression preceded Aquilo access |
 | `INC-2026-0042` | `incident` | `pending-release-qualification` | Modded logistics recipes were omitted when names did not match fixed tiers |

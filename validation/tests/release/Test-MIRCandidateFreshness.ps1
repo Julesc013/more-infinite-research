@@ -174,6 +174,7 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "requalifying-after-validation-harness-change",
+  "source-frozen",
   "package-built",
   "release-candidate-awaiting-external-qualification",
   "release-candidate-awaiting-manual-review",
@@ -224,6 +225,38 @@ if ($status -eq "requalifying-after-validation-harness-change") {
     throw "Package-visible working-tree changes are not allowed during harness-only requalification."
   }
   Write-Host "[ok] MIR release evidence is explicitly requalifying after a validation-harness change; stale evidence cannot be promoted."
+  exit 0
+}
+
+if ($status -eq "source-frozen") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "A source-frozen candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Source-frozen package commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-package-build" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending-exact-candidate-review") {
+    throw "A source-frozen candidate must keep package build and exact manual review explicitly pending."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A source-frozen candidate contains unsupported fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after source freeze." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after source freeze: $($changedPackagePaths -join ', ')"
+  }
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.5.json") | ConvertFrom-Json
+  if ([string]$release.state -ne "source-frozen" -or [string]$release.candidate_id -ne "C32" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit) {
+    throw "Source-frozen candidate descriptor differs from the typed ReleaseRecord."
+  }
+  Write-Host "[ok] MIR candidate source is frozen while deterministic package construction remains pending."
   exit 0
 }
 

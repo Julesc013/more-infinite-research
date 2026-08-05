@@ -25,6 +25,7 @@ $contracts = [ordered]@{
   "release-record.schema.json" = @("schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at")
   "release-transition.schema.json" = @("schema", "id", "release", "from", "to", "admission", "proofs", "recorded_at")
   "release-work-package-reconciliation.schema.json" = @("schema", "kind", "release", "reconciled_at", "source_baseline", "boundaries", "authorities", "priority", "work_packages")
+  "source-freeze-packet.schema.json" = @("schema", "kind", "release", "status", "candidate_floor", "candidate_id", "prepared_at", "lineage", "source", "package_contract", "product_contract", "transition_contract", "qualification_authority", "documentation", "gate", "boundaries")
   "task-node.schema.json" = @("schema", "id", "owner", "kind", "layer", "depends_on", "reads", "writes", "effective_inputs", "outputs", "resource_class", "freshness", "side_effect", "retry", "completion_proof", "state")
   "observation.schema.json" = @("schema", "kind", "observation_abi", "canonicalization_abi", "capture_key", "environment_signature", "target", "candidate_sha256", "facts", "diagnostics", "artifacts")
   "assertion.schema.json" = @("schema", "id", "version", "type", "reads", "proposition", "expected")
