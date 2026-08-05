@@ -218,9 +218,21 @@ if ($museumCatalogText -match '"(binary|base_data)"\s*:' -or $museumCatalogText 
 $ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
 if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
+    [string]$ecosystemTest[0].command -notmatch '--candidate-source\s+<package-source-commit>' -or
+    @($ecosystemTest[0].inputs) -notcontains "package-source" -or
     [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
     [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
-  throw "runtime.ecosystem must execute the exact candidate ZIP and must not rebuild distribution bytes."
+  throw "runtime.ecosystem must bind the exact candidate ZIP and package source and must not rebuild distribution bytes."
+}
+$mirCliText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir.ps1")
+foreach ($sourceBindingSnippet in @(
+  'Get-MIRArgValue -Items $Items -Name "--candidate-source"',
+  '$overrides.candidate_source_commit = $candidateSource',
+  '$params.CandidateSourceCommit = [string]$candidateSourceCommit'
+)) {
+  if (-not $mirCliText.Contains($sourceBindingSnippet)) {
+    throw "MIR CLI does not forward the ecosystem candidate-source binding: $sourceBindingSnippet"
+  }
 }
 
 $performanceTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.performance-regression" })

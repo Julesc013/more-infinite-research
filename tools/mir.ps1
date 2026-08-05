@@ -99,6 +99,7 @@ function New-MIRProfileOverrides {
   $factorioLine = Get-MIRArgValue -Items $Items -Name "--factorio-line"
   $mods = Get-MIRArgValue -Items $Items -Name "--mods"
   $candidate = Get-MIRArgValue -Items $Items -Name "--candidate"
+  $candidateSource = Get-MIRArgValue -Items $Items -Name "--candidate-source"
   $output = Get-MIRArgValue -Items $Items -Name "--output"
   $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
   $linkMode = Get-MIRArgValue -Items $Items -Name "--link-mode"
@@ -117,6 +118,9 @@ function New-MIRProfileOverrides {
   }
   if (-not [string]::IsNullOrWhiteSpace($candidate)) {
     $overrides.candidate_zip = $candidate
+  }
+  if (-not [string]::IsNullOrWhiteSpace($candidateSource)) {
+    $overrides.candidate_source_commit = $candidateSource
   }
   if (-not [string]::IsNullOrWhiteSpace($output)) {
     $overrides.output_root = $output
@@ -232,6 +236,7 @@ function Invoke-MIRRunProfile {
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
       $candidateZip = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "candidate_zip"
+      $candidateSourceCommit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "candidate_source_commit"
       $repairSmokeModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "repair_smoke_mod_names"
       $representativeScenarioName = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "representative_scenario_name"
       $manualScenariosPath = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "manual_scenarios_path"
@@ -242,6 +247,7 @@ function Invoke-MIRRunProfile {
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($candidateZip) { $params.CandidateZip = [string]$candidateZip }
+      if ($candidateSourceCommit) { $params.CandidateSourceCommit = [string]$candidateSourceCommit }
       if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
       if ($representativeScenarioName) { $params.RepresentativeScenarioName = [string]$representativeScenarioName }
       if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
