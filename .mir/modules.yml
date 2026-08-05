@@ -730,6 +730,7 @@ validation_tooling:
     release_authority: validation/tests/release/Test-MIRReleaseAuthority.ps1
     native_owner_balance_tests: validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1
     research_cost_model_tests: validation/tests/compiler/Test-MIRResearchCostModels.ps1
+    research_cost_release_contract: .mir/research-cost-contract-3.2.5.json
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation

@@ -988,6 +988,57 @@ if rejected_unrecognized or rejected_reason ~= "unrecognized_cost_formula" then
   fail("unsafe unrecognized cost formula override did not fail closed")
 end
 
+focused_contracts.assert_essential_research_cost_contract = function()
+  local research_cost_classification = require("__more-infinite-research__.prototypes.mir.domain.research_cost.classification")
+  local research_cost_model = require("__more-infinite-research__.prototypes.mir.domain.research_cost.model")
+  local research_cost_validation = require("__more-infinite-research__.prototypes.mir.domain.research_cost.validation")
+  local algebraic_model = research_cost_model.new({
+    anchor_level = 4,
+    base_cost = 1000,
+    linear_increment = 250,
+    growth_factor = 1.5,
+    provenance = {fixture = "essential-325-B1"}
+  })
+  local algebraic_proof = research_cost_validation.algebraic_proof(algebraic_model)
+  if not algebraic_proof or algebraic_proof.proof_abi ~= "mir-research-cost-algebraic-proof-v1"
+      or algebraic_proof.property ~= "positive-nondecreasing"
+      or algebraic_proof.maximum_offset ~= 100
+      or algebraic_proof.maximum_exponent ~= 100 then
+    fail("research-cost algebraic qualification authority is incomplete")
+  end
+  if research_cost_model.qualification_identity(algebraic_model).proof_abi ~= algebraic_proof.proof_abi then
+    fail("ResearchCostModel qualification digest is not bound to the algebraic proof ABI")
+  end
+
+  local parser_budget_cases = {
+    {formula = string.rep("1+", 128) .. "1", reason = "formula_budget_exceeded"},
+    {formula = string.rep("1+", 48) .. "1", reason = "formula_budget_exceeded"},
+    {formula = string.rep("(", 33) .. "1" .. string.rep(")", 33), reason = "formula_budget_exceeded"},
+    {formula = string.rep("1", 513), reason = "formula_budget_exceeded"},
+    {formula = "1e301", reason = "numeric_literal_out_of_bounds"},
+    {formula = "2^(L+1000001)", reason = "formula_exponent_out_of_bounds"}
+  }
+  for _, row in ipairs(parser_budget_cases) do
+    local classified = research_cost_classification.formula(row.formula, {anchor_level = 1})
+    if classified.recognized or classified.reason ~= row.reason then
+      fail("research-cost parser budget did not fail closed with " .. row.reason
+        .. ": " .. tostring(classified.reason))
+    end
+  end
+
+  expect_error("research-cost evaluated envelope", "evaluated_cost_out_of_bounds", function()
+    research_cost_model.new({
+      anchor_level = 1,
+      base_cost = 2147483647,
+      linear_increment = 2147483647,
+      growth_factor = 1000,
+      provenance = {fixture = "essential-325-B1-overflow"}
+    })
+  end)
+end
+focused_contracts.assert_essential_research_cost_contract()
+focused_contracts.assert_essential_research_cost_contract = nil
+
 focused_contracts.compilation_context = compiler_context.new()
 focused_contracts.finalize_compilation = function(...)
   return compiler_context.with_active(

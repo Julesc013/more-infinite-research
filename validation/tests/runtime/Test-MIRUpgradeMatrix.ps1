@@ -58,6 +58,13 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
+  if ($FixtureName -eq "assert-upgrade-3-2-3-to-3-2-5" -and
+      ("upgraded-save-reload-passed" -notin $assertions -or
+       "upgraded-save-second-reload-passed" -notin $assertions -or
+       [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or
+       [string]::IsNullOrWhiteSpace([string]$result.second_reload_log_sha256))) {
+    throw "Upgrade matrix row lacks exact first/second reload evidence: $($case.id)"
+  }
   $relative = [IO.Path]::GetRelativePath($RepoRoot, (Resolve-Path -LiteralPath $rowOutput).Path).Replace('\', '/')
   $rows += [ordered]@{
     id = [string]$case.id

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0018",
+  "title": "Complete essential MIR 3.2.5 research-cost correctness",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "product.research-cost",
+    "product.compatibility",
+    "runtime.migration",
+    "release.authority",
+    "assurance.plan"
+  ],
+  "domains_written": [
+    "product.research-cost",
+    "product.compatibility",
+    "runtime.migration",
+    "release.presentation",
+    "assurance.plan"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Keep public 3.2.3 as the sole predecessor; preserve stable technology and setting IDs, neutral defaults, selected research, completed science-unit work, queues, unrelated force state, and one effective owner; require an idempotent second reload for every governed direct-upgrade archetype; and create no 2.5.5 release authority.",
+  "release_note_impact": "MIR 3.2.5 validates fixed, linear, exponential, and hybrid research costs with algebraic positivity and monotonicity proof, explicit numeric and parser budgets, exact 3.2.3 default vectors, two-reload upgrade proof, owner removal and transfer dispositions, and explicit Factorio 2.0 dispositions for every shipped feature.",
+  "test_obligations": [
+    "compiler.research-cost",
+    "compiler.contracts",
+    "runtime.upgrade",
+    "runtime.configuration-change",
+    "runtime.base",
+    "runtime.space-age",
+    "package.determinism",
+    "release.authority",
+    "assurance.plan"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "apply as the final package-visible essential 325-B1 correction before source freeze",
+    "factorio-2.0": "retain the explicit shipped-feature disposition inventory only; bind exact runtime realization after public 3.2.5 and a positive feasibility decision"
+  },
+  "state": "implemented"
+}
