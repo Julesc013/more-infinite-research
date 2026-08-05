@@ -50,6 +50,22 @@ function Get-MIRCPRemainingReleaseStates {
   return @($states[($index + 1)..($states.Count - 1)])
 }
 
+function Get-MIRCPEffectiveReleaseStatus {
+  param(
+    [Parameter(Mandatory)]$Release,
+    [Parameter(Mandatory)]$CandidateClosures
+  )
+  $matches = @($CandidateClosures | Where-Object {
+    [string]$_.release -eq [string]$Release.release -and
+    [string]$_.candidate_id -eq [string]$Release.candidate_id
+  })
+  if ($matches.Count -gt 1) {
+    throw "Release $($Release.release)/$($Release.candidate_id) has multiple candidate closures."
+  }
+  if ($matches.Count -eq 1) { return [string]$matches[0].disposition }
+  return [string]$Release.state
+}
+
 function Get-MIRCPTagProof {
   param([Parameter(Mandatory)]$Release)
   $rows = if ($null -ne $Release.proofs.PSObject.Properties["tag"]) { @($Release.proofs.tag) } else { @() }
@@ -268,6 +284,7 @@ function New-MIRCPCurrentCandidateLines {
 function New-MIRCPDashboardLines {
   param(
     [Parameter(Mandatory)]$Releases,
+    [Parameter(Mandatory)]$CandidateClosures,
     [Parameter(Mandatory)][string]$ReviewDate
   )
   $lines = [Collections.Generic.List[string]]::new()
@@ -275,12 +292,13 @@ function New-MIRCPDashboardLines {
     "---", "title: `"MIR Control Plane Dashboard`"", "status: current", "applies_to: `"release-engineering`"",
     "audience: release-manager", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $ReviewDate",
     "supersedes: []", "superseded_by: []", "---", "", "# MIR Control Plane Dashboard", "",
-    "> Generated from ``path:releases.records/*.json``, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.", "",
-    "## Releases", "", "| Release | Candidate | Reserved floor | Target | Branch | State | Exceptions |", "| --- | --- | --- | --- | --- | --- | ---: |"
+    "> Generated from ``path:releases.records/*.json``, CandidateClosureRecords, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.", "",
+    "## Releases", "", "| Release | Candidate | Reserved floor | Target | Branch | Historical state | Effective status | Exceptions |", "| --- | --- | --- | --- | --- | --- | --- | ---: |"
   )) { $lines.Add($line) }
   foreach ($release in @($Releases | Sort-Object @{Expression={ [version]$_.release }; Descending=$true})) {
     $exceptionCount = if ($null -ne $release.PSObject.Properties["assurance_exceptions"]) { @($release.assurance_exceptions).Count } else { 0 }
-    $lines.Add("| $(Format-MIRCPCode $release.release) | $(Format-MIRCPCode $release.candidate_id) | $(Format-MIRCPCode $release.candidate_floor) | $(Format-MIRCPCode $release.target) | $(Format-MIRCPCode $release.branch) | $(Format-MIRCPCode $release.state) | $exceptionCount |")
+    $effectiveStatus = Get-MIRCPEffectiveReleaseStatus -Release $release -CandidateClosures $CandidateClosures
+    $lines.Add("| $(Format-MIRCPCode $release.release) | $(Format-MIRCPCode $release.candidate_id) | $(Format-MIRCPCode $release.candidate_floor) | $(Format-MIRCPCode $release.target) | $(Format-MIRCPCode $release.branch) | $(Format-MIRCPCode $release.state) | $(Format-MIRCPCode $effectiveStatus) | $exceptionCount |")
   }
   $lines.Add("")
   $lines.Add("A state is an admitted fact, not a mutable job status. Every later transition requires its own immutable proof record.")
@@ -321,8 +339,9 @@ function New-MIRCPTodoLines {
   $lines.Add("| --- | --- | --- |")
   $lines.Add("| ``325-A1a`` deterministic fan-in | Closed by ``INC-2026-0056`` after PR 45 merged | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and exact latest-head hosted proof closure |")
   $lines.Add("| ``325-A1b`` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited ``GIT_INDEX_FILE``, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |")
-  $lines.Add("| ``325-B0`` first complete compatibility slice | Next product slice; not yet admitted | Research-cost default parity traced through disposition, typed proof, bounded support output, and exact Factorio 2.0 disposition |")
-  $lines.Add("| ``325-D1`` freeze defect register | Open | Algebraic cost proof, numeric envelope, owner removal/transfer, descriptor authority, README reset reconciliation, exact default parity, save/reload/second-reload, and Factorio 2.0 cost disposition are all terminal |")
+  $lines.Add("| ``325-B0`` first complete compatibility slice | Closed by ``CHG-2026-0017`` after PR 51 merged | Research-cost default parity traced through disposition, typed proof, bounded support output, exact Factorio 2.0 adapter disposition, 127/127 local admission, and latest-head hosted closure |")
+  $lines.Add("| ``325-B1`` essential research-cost correctness | Next package-visible product slice | Exact 3.2.3 defaults, numeric/parser envelope, ownership removal/transfer, save/reload/second-reload equivalence, engine realization, and shipped-feature target dispositions are terminal |")
+  $lines.Add("| ``325-D1`` narrowed freeze packet | Open | Essential B1 proof, release-specific environments/privacy/localization/performance/manual scope, exact package composition and ABI delta, shipped-feature Factorio 2.0 dispositions, and the source-bound plan are terminal |")
   $lines.Add("| Minimum compatibility product | Declaration required before freeze | Factorio 2.1 Base/Space Age, conditional Factorio 2.0 Base/Space Age, and explicit projection or terminal disposition for every stable authority |")
   $lines.Add("| Bounded ecosystem matrix | Declaration required before freeze | Exact Base, Space Age, P11/BZ, owner-pack, broad-overhaul, and negative/conflict rows with version/hash locks, claim level, fixture/load-check, budgets, and terminal wording |")
   $lines.Add("")
@@ -412,6 +431,7 @@ function Update-MIRCPViews {
   $policy = Get-MIRCPPolicy -RepoRoot $repo
   $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
   $releases = @(Get-MIRCPRecordSet -Kind releases -RepoRoot $repo)
+  $candidateClosures = @(Get-MIRCPRecordSet -Kind candidate_closures -RepoRoot $repo)
   $changes = @(Get-MIRCPRecordSet -Kind changes -RepoRoot $repo)
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
   $tasks = @(Get-MIRCPRecordSet -Kind tasks -RepoRoot $repo)
@@ -421,14 +441,25 @@ function Update-MIRCPViews {
 
   Write-MIRCPJson -Path "path:releases.ledger" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.current_candidate) -Lines (New-MIRCPCurrentCandidateLines -Release $canonical -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
-  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.release_dashboard) -Lines (New-MIRCPDashboardLines -Releases $releases -ReviewDate $reviewDate) -RepoRoot $repo -Check:$Check
+  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.release_dashboard) -Lines (New-MIRCPDashboardLines -Releases $releases -CandidateClosures $candidateClosures -ReviewDate $reviewDate) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.todo) -Lines (New-MIRCPTodoLines -Canonical $canonical -Backport $backport -Changes $changes -Incidents $incidents -Tasks $tasks -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
 
   $branchStatus = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-branch-status-v1"
-    generated_from = "path:releases.records/*.json"
-    branches = @($releases | Sort-Object branch, release | ForEach-Object { [pscustomobject][ordered]@{branch=[string]$_.branch; release=[string]$_.release; candidate_id=[string]$_.candidate_id; candidate_floor=[string]$_.candidate_floor; target=[string]$_.target; state=[string]$_.state; source_commit=[string]$_.package.source_commit} })
+    generated_from = @("path:releases.records/*.json", "path:releases.candidate-closures/*.json")
+    branches = @($releases | Sort-Object branch, release | ForEach-Object {
+      [pscustomobject][ordered]@{
+        branch = [string]$_.branch
+        release = [string]$_.release
+        candidate_id = [string]$_.candidate_id
+        candidate_floor = [string]$_.candidate_floor
+        target = [string]$_.target
+        state = [string]$_.state
+        effective_status = Get-MIRCPEffectiveReleaseStatus -Release $_ -CandidateClosures $candidateClosures
+        source_commit = [string]$_.package.source_commit
+      }
+    })
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.branch_status) -Value $branchStatus -RepoRoot $repo -Check:$Check
 
