@@ -40,15 +40,29 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 }
 
 $performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ".work\artifacts\performance"))
-if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = Join-Path $performanceArtifactsRoot ("p-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
+$usesGeneratedArtifactRoot = [string]::IsNullOrWhiteSpace($ArtifactRoot)
+$generatedArtifactParent = ""
+if ($usesGeneratedArtifactRoot) {
+  $windowsCompactRoot = "C:\tmp"
+  $generatedArtifactParent = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT -and (Test-Path -LiteralPath $windowsCompactRoot -PathType Container)) {
+    [IO.Path]::GetFullPath($windowsCompactRoot)
+  } else {
+    [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  }
+  $ArtifactRoot = Join-Path $generatedArtifactParent ("mirp-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 } elseif (-not [IO.Path]::IsPathRooted($ArtifactRoot)) {
   $ArtifactRoot = Join-Path $RepoRoot $ArtifactRoot
 }
 $ArtifactRoot = [IO.Path]::GetFullPath($ArtifactRoot)
-$safeArtifactPrefix = $performanceArtifactsRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-  throw "Performance artifacts must stay inside $performanceArtifactsRoot."
+$safeArtifactParent = if ($usesGeneratedArtifactRoot) { $generatedArtifactParent } else { $performanceArtifactsRoot }
+$safeArtifactPrefix = $safeArtifactParent.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+$safeGeneratedName = Split-Path -Leaf $ArtifactRoot
+if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+    ($usesGeneratedArtifactRoot -and $safeGeneratedName -notmatch '^mirp-[0-9a-f]{8}$')) {
+  throw "Performance artifacts must stay inside the exact governed scratch parent $safeArtifactParent."
+}
+if ($usesGeneratedArtifactRoot -and (Test-Path -LiteralPath $ArtifactRoot)) {
+  throw "Generated performance scratch already exists and will not be overwritten: $ArtifactRoot"
 }
 $resolvedCampaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) { [IO.Path]::GetFullPath($CampaignPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath)) }
 $campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
