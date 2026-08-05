@@ -69,13 +69,18 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/Invoke-MIRControlPlaneWork\\.ps1|lib/control/(?:Evidence|Views)\\.ps1)$", "^tools/lib/assurance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/Invoke-MIRControlPlaneWork\\.ps1|lib/control/(?:Evidence|Views)\\.ps1)$", "^tools/lib/assurance/", "^tools/maintenance/", "^validation/tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
       "id": "test-harness",
       "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIRAssurance|release/Test-MIRReleaseAuthority)\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
+    },
+    {
+      "id": "ecosystem-profile",
+      "patterns": ["^fixtures/run-profiles/", "^validation/scenarios/local-(?:2\\.0|2\\.1)\\.json$"],
+      "tests": ["static.full", "runtime.ecosystem"]
     },
     {
       "id": "release-governance",

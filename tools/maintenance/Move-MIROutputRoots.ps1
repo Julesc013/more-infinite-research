@@ -27,8 +27,11 @@ foreach ($relative in @(
   $path = Join-Path $repo $relative
   if (Test-Path -LiteralPath $path -PathType Leaf) { $files.Add($path) }
 }
-Get-ChildItem -LiteralPath (Join-Path $repo ".mir/tasks") -Filter *.json -File |
-  ForEach-Object { $files.Add($_.FullName) }
+$legacyTaskRoot = Join-Path $repo ".mir/tasks"
+if (Test-Path -LiteralPath $legacyTaskRoot -PathType Container) {
+  Get-ChildItem -LiteralPath $legacyTaskRoot -Filter *.json -File |
+    ForEach-Object { $files.Add($_.FullName) }
+}
 
 $excluded = @(
   (Join-Path $repo "validation/tests/package/Test-MIRArtifactCleanup.ps1"),

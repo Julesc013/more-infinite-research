@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0059",
+  "title": "Output-root migration preview required an untracked legacy task directory",
+  "external_issue": "internal://tooling/output-root-migration-clean-worktree",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "repository-layout",
+    "release": "3.2.5",
+    "source_commit": "4452787b5fea4a61b99027f130671ab52ecaf57b",
+    "worktree": "fresh isolated Git worktree",
+    "test_id": "static.layout",
+    "observed": "Move-MIROutputRoots.ps1 failed before producing its idempotence preview because it unconditionally enumerated .mir/tasks, a retired untracked compatibility directory that happened to exist only in the long-lived main workspace."
+  },
+  "reproduction": {
+    "status": "reproduced-by-fresh-worktree-static-layout",
+    "observed": "The isolated branch contained every tracked repository file and no .mir/tasks directory. The same test appeared healthy in the main workspace only because disposable local state masked the assumption."
+  },
+  "root_cause": {
+    "status": "proven-optional-legacy-root-treated-as-required",
+    "summary": "The output-root migration scans a retired task location for backward-compatible rewrites, but its enumerator did not guard the optional directory. Migration idempotence therefore depended on untracked workstation state."
+  },
+  "repair_changes": [
+    "treat an absent .mir/tasks legacy root as an empty migration input",
+    "retain scanning behavior when the legacy directory is present",
+    "restore the hidden-file upload opt-in for the .work development-candidate artifact",
+    "run static.layout from the clean isolated repair worktree"
+  ],
+  "regression_propositions": [
+    "output-root migration preview succeeds when .mir/tasks is absent",
+    "the preview remains idempotent in a fresh tracked-only worktree",
+    "every .work artifact upload explicitly includes hidden files",
+    "the exact development package archive and normalized content identities remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "development-only",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "local-repair-pending-focused-and-hosted-static-proof",
+    "required": "fresh-worktree static.layout, static.full, latest-head hosted gate, and merge to dev",
+    "boundary": "This is repository tooling only. It does not assign C32, advance 3.2.5 beyond planned, create 2.5.5 authority, admit 3.3, or modify published distribution authority."
+  }
+}

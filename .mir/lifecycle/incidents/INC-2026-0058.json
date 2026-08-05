@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0058",
+  "title": "Release-targeted ecosystem profiles referenced retired scenario paths",
+  "external_issue": "internal://assurance/ecosystem-profile-scenario-authority",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.5",
+    "source_commit": "4452787b5fea4a61b99027f130671ab52ecaf57b",
+    "source_tree": "00284a95ee517454000168d2f79dc558d358063e",
+    "development_archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "breadth_plan_material_sha256": "1A3B40918CEE08A81E4420EC2A81AA1D1F818A4705CA0891455BD67C97626E6C",
+    "test_id": "runtime.ecosystem",
+    "test_fingerprint": "057E015994B3EFDD4171774048CE440A71EDF128A0F2E1B1475C9EE64E95D78A",
+    "observed": "The fresh development-breadth campaign completed 133 exact rows, then runtime.ecosystem failed before Factorio execution because release-targeted-2.1.json named fixtures/compat-matrix/local-library-scenarios.json after that authority had moved to validation/scenarios/local-2.1.json."
+  },
+  "reproduction": {
+    "status": "reproduced-by-exact-source-bound-breadth-row",
+    "blocked_capsule_sha256": "3EAFEF8480440D684EABFF450111FC2BFF03F4EDF3ED50DE85C77BF2034F15D7",
+    "observed": "The release gate exited in 0.582 seconds with an exact missing-file error. The canonical 2.1 and 2.0 scenario manifests were present, and the repository path catalog and fixture manifest already named their validation/scenarios locations."
+  },
+  "root_cause": {
+    "status": "proven-incomplete-json-path-migration-and-profile-validation",
+    "summary": "The validation-definition migrator replaced forward slashes and single backslashes but did not recognize JSON-escaped double backslashes. Four active run profiles therefore retained retired paths. Scenario-manifest validation checked the canonical manifests but did not require each run profile to bind an existing canonical scenario authority."
+  },
+  "repair_changes": [
+    "bind all 2.1 and 2.0 run profiles to validation/scenarios/local-<line>.json",
+    "teach the definition migrator to rewrite JSON-escaped path separators",
+    "regress JSON-escaped migration detection, rewrite, and idempotence",
+    "require every governed run profile to bind an existing canonical scenario manifest",
+    "bind the layout test fingerprint to the maintenance tools it executes",
+    "classify maintenance-tool changes explicitly in the impact authority",
+    "select runtime.ecosystem whenever a governed ecosystem profile or local scenario authority changes"
+  ],
+  "regression_propositions": [
+    "release-targeted 2.1 resolves validation/scenarios/local-2.1.json before ecosystem execution",
+    "release-targeted and local-audit 2.0 resolve validation/scenarios/local-2.0.json",
+    "JSON-escaped retired scenario paths are detected and rewritten canonically",
+    "a second migration preview is idempotent",
+    "a missing or noncanonical run-profile scenario authority fails static admission",
+    "ecosystem profile changes materialize runtime.ecosystem in targeted verification plans",
+    "the exact development package archive and normalized content identities remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "development-only",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "local-repair-pending-source-bound-ecosystem-and-breadth-proof",
+    "required": "focused static admission, exact runtime.ecosystem pass, unchanged deterministic package identity, latest-head hosted gate, merge to dev, and fresh source-bound breadth closure",
+    "boundary": "This repair changes release tooling and validation references only. It does not assign C32, advance 3.2.5 beyond planned, create 2.5.5 authority, admit 3.3, or modify published distribution authority."
+  }
+}

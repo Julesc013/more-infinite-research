@@ -86,4 +86,22 @@ foreach ($relativePath in $manifestPaths) {
   }
 }
 
-Write-Host "[ok] MIR scenario schema 2 manifests own targets, setup, roots, settings, expected plans, timeouts, and claim levels."
+$profileScenarioPaths = [ordered]@{
+  "fixtures/run-profiles/release-targeted.json" = "validation/scenarios/local-2.1.json"
+  "fixtures/run-profiles/release-targeted-2.1.json" = "validation/scenarios/local-2.1.json"
+  "fixtures/run-profiles/release-targeted-2.0.json" = "validation/scenarios/local-2.0.json"
+  "fixtures/run-profiles/local-audit-2.0.json" = "validation/scenarios/local-2.0.json"
+}
+foreach ($profileRelativePath in $profileScenarioPaths.Keys) {
+  $profile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $profileRelativePath) | ConvertFrom-Json
+  $declaredPath = ([string]$profile.manual_scenarios_path).Replace("\", "/")
+  $expectedPath = [string]$profileScenarioPaths[$profileRelativePath]
+  if ($declaredPath -cne $expectedPath) {
+    throw "$profileRelativePath must bind the canonical scenario authority $expectedPath; found $declaredPath."
+  }
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $declaredPath) -PathType Leaf)) {
+    throw "$profileRelativePath names a missing scenario authority: $declaredPath"
+  }
+}
+
+Write-Host "[ok] MIR scenario schema 2 manifests and run profiles bind canonical targets, setup, roots, settings, expected plans, timeouts, and claim levels."

@@ -21,6 +21,8 @@ $moves = [ordered]@{
 $preservedHistoricalReferences = @{
   "docs/architecture/control-plane-v5.md" = @("fixtures/compat-matrix/expected-scenarios.json")
   "tools/lib/control/Scenario.ps1" = @("fixtures/compat-matrix/expected-scenarios.json")
+  ".mir/lifecycle/incidents/INC-2026-0058.json" = @("fixtures/compat-matrix/local-library-scenarios.json")
+  "validation/tests/tooling/Test-MIRLayout.ps1" = @("fixtures\compat-matrix\local-library-scenarios.json")
 }
 
 function Get-MIRActiveDefinitionFiles {
@@ -97,6 +99,7 @@ foreach ($file in Get-MIRActiveDefinitionFiles) {
   foreach ($from in $moves.Keys) {
     $updated = $updated.Replace($from, $moves[$from])
     $updated = $updated.Replace($from.Replace("/", "\"), $moves[$from].Replace("/", "\"))
+    $updated = $updated.Replace($from.Replace("/", "\\"), $moves[$from].Replace("/", "\\"))
   }
   foreach ($token in $preservedTokens.Keys) {
     $updated = $updated.Replace($token, $preservedTokens[$token])
