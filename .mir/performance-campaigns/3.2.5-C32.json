@@ -21,7 +21,7 @@
     "minimum_measured_runs_per_package": 5,
     "order": "paired-balanced"
   },
-  "manual_scenarios": "fixtures/compat-matrix/local-library-scenarios.json",
+  "manual_scenarios": "validation/scenarios/local-2.1.json",
   "phase_source_lane": "diagnostics-off.factorio-total",
   "artifact_volume_lanes": [
     "diagnostics-off.factorio-total",

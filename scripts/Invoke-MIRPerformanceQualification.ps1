@@ -6,6 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
   [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+  [string]$CampaignPath = "",
   [string]$LocalModZipDir = "",
   [string]$OutputPath = "",
   [string]$ArtifactRoot = "",
@@ -21,6 +22,16 @@ $candidateInfo = Get-MIRReleasePackageInfo -Path $Candidate
 $versionParts = @([string]$ExpectedFactorioVersion -split '\.')
 if ($versionParts.Count -lt 2) { throw "ExpectedFactorioVersion must identify a target line." }
 $factorioLine = $versionParts[0..1] -join "."
+if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
+  $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases.json") | ConvertFrom-Json
+  $activeCandidate = $releaseLedger.development.PSObject.Properties["factorio-$factorioLine"].Value
+  if ($null -eq $activeCandidate -or
+      [string]$activeCandidate.mir_version -ne [string]$candidateInfo.version -or
+      [string]::IsNullOrWhiteSpace([string]$activeCandidate.candidate_id)) {
+    throw "No exact active performance campaign can be derived for MIR $($candidateInfo.version) on Factorio $factorioLine."
+  }
+  $CampaignPath = ".mir\performance-campaigns\$($candidateInfo.version)-$($activeCandidate.candidate_id).json"
+}
 if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
   $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine"
 }
@@ -50,6 +61,7 @@ $measure = @{
   PriorRelease = $PriorRelease
   FactorioBin = $FactorioBin
   ExpectedSourceCommit = $ExpectedSourceCommit
+  CampaignPath = $CampaignPath
   LocalModZipDir = $LocalModZipDir
   OutputPath = $OutputPath
   WarmupRuns = $WarmupRuns
