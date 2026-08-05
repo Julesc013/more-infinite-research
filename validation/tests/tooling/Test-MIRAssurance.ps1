@@ -37,6 +37,9 @@ if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicate
 
 $releaseHistoryClassificationCases = [ordered]@{
   ".mir/portable-return.yml" = "release-governance"
+  ".mir/control-plane/package-locks.json" = "release-governance"
+  ".mir/releases/transitions/3.2.5-c32-source-frozen.json" = "release-governance"
+  ".mir/releases/transitions/3.2.5-c32-package-built.json" = "release-governance"
   ".mir/target-lines/index.json" = "release-evidence"
   ".mir/target-lines/2.4.9/info.json" = "release-evidence"
   ".mir/evidence/2.4.9/publication.json" = "release-evidence"
@@ -263,12 +266,15 @@ foreach ($target in @("2.0", "2.1")) {
 }
 $currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
-if ([string]$currentRelease.state -ne "planned" -or [string]$currentRelease.candidate_id -ne "not-assigned" -or
-    [string]$currentRelease.candidate_floor -ne "C32" -or
+$currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
+if ($currentReleaseBoundary -notin @(
+      "planned|not-assigned", "source-frozen|C32", "package-built|C32",
+      "focused-qualified|C32", "candidate-qualified|C32"
+    ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the planned, unassigned 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current pre-manual 3.2.5 public upgrade authority."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
