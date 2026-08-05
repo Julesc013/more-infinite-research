@@ -9,6 +9,8 @@ foreach ($module in @("Core", "Records", "Planner", "Views")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
+& (Join-Path $repo "validation/tests/release/Test-MIRReleaseWorkReconciliation.ps1") -RepoRoot $repo
+
 function Assert-MIRField($Object, [string]$Name, $Expected, [string]$Scope) {
   if ([string]$Object.$Name -ne [string]$Expected) {
     throw "$Scope field '$Name' changed. Expected '$Expected', got '$($Object.$Name)'."

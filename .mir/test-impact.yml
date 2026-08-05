@@ -37,6 +37,12 @@
       "tags": []
     },
     {
+      "pattern": ".mir/releases/reconciliations/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Views.ps1",
       "groups": [],
       "scenarios": [],
