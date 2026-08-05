@@ -1,12 +1,15 @@
 local M = {}
 
+M.proof_abi = "mir-research-cost-algebraic-proof-v1"
+
 M.bounds = {
   anchor_level = {minimum = 1, maximum = 1000000},
   base_cost = {minimum = 1, maximum = 2147483647},
   linear_increment = {minimum = 0, maximum = 2147483647},
   growth_factor = {minimum = 1, maximum = 1000},
   evaluated_cost = {minimum = 1, maximum = 1e300},
-  qualification_offset = 100
+  qualification_offset = 100,
+  maximum_exponent = 100
 }
 
 local function finite(value)
@@ -66,18 +69,43 @@ function M.assert_parameters(record)
   return normalized
 end
 
+function M.algebraic_proof(record)
+  local parameters, reason = M.parameters(record)
+  if not parameters then return nil, reason end
+  return {
+    proof_abi = M.proof_abi,
+    property = "positive-nondecreasing",
+    constraints = {
+      "base_cost>=1",
+      "linear_increment>=0",
+      "growth_factor>=1",
+      "offset>=0"
+    },
+    argument = "C(n+1)/C(n)>=1 from nonnegative affine growth and growth_factor>=1",
+    maximum_offset = M.bounds.qualification_offset,
+    maximum_exponent = M.bounds.maximum_exponent,
+    status = "passed"
+  }
+end
+
+function M.assert_algebraic_proof(record)
+  local proof, reason = M.algebraic_proof(record)
+  if not proof then error("ResearchCostModel algebraic proof failed: " .. tostring(reason), 2) end
+  return proof
+end
+
 function M.is_positive_nondecreasing(record, maximum_offset)
   local parameters, reason = M.parameters(record)
   if not parameters then return false, reason end
   maximum_offset = maximum_offset or M.bounds.qualification_offset
-  local previous
-  for offset = 0, maximum_offset do
-    local value = (parameters.base_cost + parameters.linear_increment * offset)
-      * (parameters.growth_factor ^ offset)
-    if not M.evaluated_cost(value) then return false, "evaluated_cost_out_of_bounds" end
-    if previous and value < previous then return false, "decreasing_cost" end
-    previous = value
-  end
+  if not integer(maximum_offset) or maximum_offset < 0
+      or maximum_offset > M.bounds.maximum_exponent then return false, "qualification_offset_out_of_bounds" end
+  -- Positivity and monotonicity follow algebraically from B >= 1, A >= 0,
+  -- G >= 1, and n >= 0. Because the curve is nondecreasing, one bounded
+  -- endpoint evaluation proves the complete governed qualification interval.
+  local endpoint = (parameters.base_cost + parameters.linear_increment * maximum_offset)
+    * (parameters.growth_factor ^ maximum_offset)
+  if not M.evaluated_cost(endpoint) then return false, "evaluated_cost_out_of_bounds" end
   return true
 end
 

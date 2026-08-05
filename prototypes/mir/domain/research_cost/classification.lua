@@ -2,16 +2,21 @@ local model = require("prototypes.mir.domain.research_cost.model")
 
 local M = {}
 local EPSILON = 1e-8
-local MAXIMUM_FORMULA_BYTES = 512
-local MAXIMUM_TOKENS = 128
-local MAXIMUM_PARSE_DEPTH = 32
+M.bounds = {
+  formula_bytes = 512,
+  tokens = 128,
+  parse_depth = 32,
+  ast_nodes = 96,
+  absolute_numeric_literal = 1e300,
+  absolute_exponent_constant = 1000000
+}
 
 local function close(left, right)
   return math.abs(left - right) <= EPSILON * math.max(1, math.abs(left), math.abs(right))
 end
 
 local function tokenize(text)
-  if type(text) ~= "string" or #text > MAXIMUM_FORMULA_BYTES then
+  if type(text) ~= "string" or #text > M.bounds.formula_bytes then
     return nil, "formula_budget_exceeded"
   end
   local tokens, index = {}, 1
@@ -28,7 +33,10 @@ local function tokenize(text)
         while index <= #text and text:sub(index, index):match("%d") do index = index + 1 end
       end
       local value = tonumber(text:sub(start, index - 1))
-      if not value then return nil, "invalid_number" end
+      if not value or value ~= value or value == math.huge or value == -math.huge
+          or math.abs(value) > M.bounds.absolute_numeric_literal then
+        return nil, "numeric_literal_out_of_bounds"
+      end
       tokens[#tokens + 1] = {kind = "number", value = value}
     elseif char == "L" or char == "l" then
       tokens[#tokens + 1] = {kind = "level"}
@@ -39,7 +47,7 @@ local function tokenize(text)
     else
       return nil, "unsupported_token"
     end
-    if #tokens > MAXIMUM_TOKENS then return nil, "formula_budget_exceeded" end
+    if #tokens > M.bounds.tokens then return nil, "formula_budget_exceeded" end
   end
   return tokens
 end
@@ -48,7 +56,14 @@ local function parse(text)
   local tokens, reason = tokenize(text)
   if not tokens then return nil, reason end
   local cursor = 1
+  local node_count = 0
   local expression
+
+  local function node(value)
+    node_count = node_count + 1
+    if node_count > M.bounds.ast_nodes then error("formula_budget_exceeded", 0) end
+    return value
+  end
 
   local function current(kind)
     local token = tokens[cursor]
@@ -56,32 +71,32 @@ local function parse(text)
   end
 
   local function primary(depth)
-    if depth > MAXIMUM_PARSE_DEPTH then error("formula_budget_exceeded") end
+    if depth > M.bounds.parse_depth then error("formula_budget_exceeded", 0) end
     local token = current()
-    if not token then error("unexpected_end") end
+    if not token then error("unexpected_end", 0) end
     if token.kind == "number" or token.kind == "level" then
       cursor = cursor + 1
-      return token
+      return node(token)
     end
     if token.kind == "-" then
       cursor = cursor + 1
-      return {kind = "neg", value = primary(depth + 1)}
+      return node({kind = "neg", value = primary(depth + 1)})
     end
     if token.kind == "(" then
       cursor = cursor + 1
       local value = expression(depth + 1)
-      if not current(")") then error("missing_parenthesis") end
+      if not current(")") then error("missing_parenthesis", 0) end
       cursor = cursor + 1
       return value
     end
-    error("unexpected_token")
+    error("unexpected_token", 0)
   end
 
   local function power(depth)
     local left = primary(depth)
     if current("^") then
       cursor = cursor + 1
-      return {kind = "pow", left = left, right = power(depth + 1)}
+      return node({kind = "pow", left = left, right = power(depth + 1)})
     end
     return left
   end
@@ -91,7 +106,7 @@ local function parse(text)
     while current("*") or current("/") do
       local kind = current().kind
       cursor = cursor + 1
-      left = {kind = kind == "*" and "mul" or "div", left = left, right = power(depth)}
+      left = node({kind = kind == "*" and "mul" or "div", left = left, right = power(depth)})
     end
     return left
   end
@@ -101,7 +116,7 @@ local function parse(text)
     while current("+") or current("-") do
       local kind = current().kind
       cursor = cursor + 1
-      left = {kind = kind == "+" and "add" or "sub", left = left, right = product(depth)}
+      left = node({kind = kind == "+" and "add" or "sub", left = left, right = product(depth)})
     end
     return left
   end
@@ -246,6 +261,10 @@ function M.formula(text, options)
   local anchor = M.anchor_level(options.technology_name, options.anchor_level)
   local tree, reason = parse(text)
   if not tree then return {recognized = false, reason = reason, original_formula = text} end
+  local shape = components(tree)
+  if shape and math.abs(shape.exponent_constant) > M.bounds.absolute_exponent_constant then
+    return {recognized = false, reason = "formula_exponent_out_of_bounds", original_formula = text}
+  end
   local values = sample(tree, anchor)
   if not values or values[1] <= 0 then
     return {recognized = false, reason = "invalid_cost_values", original_formula = text}
@@ -257,7 +276,6 @@ function M.formula(text, options)
     anchor_level = "technology-first-level"
   }
 
-  local shape = components(tree)
   if shape then
     local scale = shape.growth ^ (anchor + shape.exponent_constant)
     local base = (shape.linear.constant + shape.linear.slope * anchor) * scale

@@ -43,6 +43,12 @@
       "tags": []
     },
     {
+      "pattern": ".mir/research-cost-contract-3.2.5.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Views.ps1",
       "groups": [],
       "scenarios": [],

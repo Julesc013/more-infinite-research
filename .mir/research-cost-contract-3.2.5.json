@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "kind": "mir-research-cost-contract",
+  "release": "3.2.5",
+  "public_predecessor": "3.2.3",
+  "authority_state": "product-complete-awaiting-source-freeze",
+  "model": {
+    "schema": 1,
+    "formula_abi": "mir-research-cost-v1",
+    "qualification_abi": "mir-research-cost-qualification-v1",
+    "proof_abi": "mir-research-cost-algebraic-proof-v1",
+    "formula": "(base_cost + linear_increment * (L - anchor_level)) * growth_factor ^ (L - anchor_level)",
+    "derived_kinds": [
+      "fixed",
+      "linear",
+      "exponential",
+      "hybrid"
+    ],
+    "algebraic_constraints": [
+      "base_cost>=1",
+      "linear_increment>=0",
+      "growth_factor>=1",
+      "offset>=0"
+    ],
+    "algebraic_argument": "For n>=0, both affine factors are positive, (B+A(n+1))/(B+An)>=1, G>=1, and therefore C(n+1)/C(n)>=1.",
+    "bounds": {
+      "anchor_level": { "minimum": 1, "maximum": 1000000, "integer": true },
+      "base_cost": { "minimum": 1, "maximum": 2147483647, "finite": true },
+      "linear_increment": { "minimum": 0, "maximum": 2147483647, "integer": true },
+      "growth_factor": { "minimum": 1, "maximum": 1000, "finite": true },
+      "qualification_offset": 100,
+      "maximum_exponent": 100,
+      "evaluated_cost": { "minimum": 1, "maximum": 1e300, "finite": true }
+    }
+  },
+  "parser_bounds": {
+    "formula_bytes": 512,
+    "tokens": 128,
+    "parse_depth": 32,
+    "ast_nodes": 96,
+    "absolute_numeric_literal": 1e300,
+    "absolute_exponent_constant": 1000000,
+    "unknown_formula_default": "preserve-verbatim",
+    "unknown_formula_override": "reject-fail-closed"
+  },
+  "default_vectors": [
+    {
+      "id": "base-default",
+      "fixture_profile": "assert-upgrade-3-2-3-to-3-2-5:base-default",
+      "proposition": "Base-only 3.2.3 settings, current research, level, and completed work survive at neutral 3.2.5 defaults."
+    },
+    {
+      "id": "space-age-native-owner",
+      "fixture_profile": "assert-upgrade-3-2-3-to-3-2-5:space-age-native-owner",
+      "proposition": "A Space Age native owner retains its unique ownership, settings, level, current research, and completed work."
+    },
+    {
+      "id": "automatic-family-creation",
+      "fixture_profile": "assert-upgrade-3-2-3-to-3-2-5:automatic-family-creation",
+      "proposition": "A generated family and its recipe target survive the direct public-predecessor upgrade."
+    },
+    {
+      "id": "base-continuations",
+      "fixture_profile": "assert-upgrade-3-2-3-to-3-2-5:base-continuations",
+      "proposition": "The six-significant-digit 3.2.3 coefficient and growth operands reproduce the exact first controlled continuation cost."
+    },
+    {
+      "id": "mod-set-configuration-change",
+      "fixture_profile": "assert-upgrade-3-2-3-to-3-2-5:mod-set-configuration-change",
+      "proposition": "Removing an external recipe owner removes the stale target without losing unrelated force or research state."
+    }
+  ],
+  "transition_matrix": {
+    "from_kinds": ["fixed", "linear", "exponential", "hybrid"],
+    "to_kinds": ["fixed", "linear", "exponential", "hybrid"],
+    "rows": 16,
+    "progress_authority": "Factorio-normalized completed science-unit work; MIR applies no second conversion",
+    "configuration_change_required": true,
+    "first_reload_required": true,
+    "second_reload_required": true,
+    "idempotence_required": true
+  },
+  "ownership_dispositions": [
+    {
+      "state": "native-owner-retained",
+      "disposition": "retain-one-effective-owner",
+      "evidence": "scenario:space-age-native-owner-settings-default"
+    },
+    {
+      "state": "external-owner-adopted",
+      "disposition": "adopt-transactionally-with-versioned-descriptors",
+      "evidence": "scenario:space-age-vanilla-family-adoption"
+    },
+    {
+      "state": "owner-removed",
+      "disposition": "remove-stale-target-and-preserve-unrelated-state",
+      "evidence": "upgrade:mod-set-configuration-change"
+    },
+    {
+      "state": "owner-transferred",
+      "disposition": "transfer-to-one-effective-native-owner",
+      "evidence": "scenario:space-age-vanilla-family-adoption-config-change"
+    },
+    {
+      "state": "ambiguous-owner",
+      "disposition": "fail-closed-without-duplicate-owner",
+      "evidence": "scenario:space-age-vanilla-family-mixed-owner"
+    },
+    {
+      "state": "automatic-action-disabled",
+      "disposition": "no-mutation",
+      "evidence": "scenario:semantic-family-off"
+    }
+  ],
+  "factorio_2_0_dispositions": [
+    {
+      "feature": "cost-model",
+      "classification": "portable-identical",
+      "adapter": "none",
+      "reason": "The pure fixed/linear/exponential/hybrid formula and bounded algebra use target-neutral Lua."
+    },
+    {
+      "feature": "settings-and-profiles",
+      "classification": "portable-with-adapter",
+      "adapter": "project target metadata and supported startup-setting descriptors",
+      "reason": "Semantic values are portable while the legacy line owns target metadata and exact package settings."
+    },
+    {
+      "feature": "progress-preservation",
+      "classification": "portable-with-adapter",
+      "adapter": "bind the target runtime configuration-change observation API",
+      "reason": "Completed-work preservation is identical; the exact runtime realization must be rebound on Factorio 2.0."
+    },
+    {
+      "feature": "base-continuation",
+      "classification": "portable-identical",
+      "adapter": "none",
+      "reason": "Legacy six-significant-digit operand projection and anchor arithmetic are target-neutral."
+    },
+    {
+      "feature": "ownership-and-adoption",
+      "classification": "portable-with-adapter",
+      "adapter": "project only owners and effects present in the target capability catalog",
+      "reason": "One-owner semantics are portable; prototype availability is target-specific."
+    },
+    {
+      "feature": "bounded-support-transport",
+      "classification": "portable-with-adapter",
+      "adapter": "validation-log",
+      "reason": "Factorio 2.0 lacks the governed mod-data transport used on 2.1."
+    },
+    {
+      "feature": "migration-state",
+      "classification": "portable-with-adapter",
+      "adapter": "rebind exact predecessor and target runtime save schema",
+      "reason": "Stable setting and technology identities are portable but release-specific migration evidence is target-bound."
+    },
+    {
+      "feature": "package-metadata",
+      "classification": "target-specific",
+      "adapter": "Factorio 2.0 info.json and dependency projection",
+      "reason": "Modern package metadata must never be copied unchanged onto the legacy line."
+    },
+    {
+      "feature": "localization",
+      "classification": "portable-identical",
+      "adapter": "none",
+      "reason": "The shipped setting and release text keys are generated for the same governed locale set."
+    }
+  ],
+  "release_evidence_requirements": [
+    "compiler-contracts",
+    "research-cost-static-contract",
+    "five-direct-3.2.3-upgrade-archetypes",
+    "sixteen-configuration-change-transitions",
+    "first-and-second-upgraded-save-reload",
+    "base-and-space-age-exact-zip-smoke",
+    "candidate-bound-approved-delta",
+    "candidate-bound-performance",
+    "candidate-bound-manual-review",
+    "protected-no-reuse-qualification"
+  ],
+  "boundaries": {
+    "candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "release_state": "planned",
+    "factorio_2_0_release_authority": "not-created",
+    "factorio_2_0_candidate": "not-created",
+    "mir_3_3_admission": "not-admitted"
+  }
+}

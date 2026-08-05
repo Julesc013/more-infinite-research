@@ -89,6 +89,7 @@ $paths = @{
   Transition = "prototypes/mir/domain/research_cost/transition_descriptor.lua"
   CompatibilitySlice = "prototypes/mir/domain/research_cost/compatibility_slice.lua"
   CompatibilityAdapter = "prototypes/mir/emit/research_cost_compatibility_adapter.lua"
+  ContractAuthority = ".mir/research-cost-contract-3.2.5.json"
   PublicArtifacts = "prototypes/mir/report/public_compiler_artifacts.lua"
   PublicArtifactBudget = "prototypes/mir/domain/compiler/public_artifact_budget.lua"
   ModData = "prototypes/mir/emit/mod_data.lua"
@@ -113,6 +114,7 @@ foreach ($required in @(
   "mir-research-cost-v1",
   "mir-research-cost-transition-v1",
   "mir-research-cost-qualification-v1",
+  "mir-research-cost-algebraic-proof-v1",
   "mir-research-cost-compatibility-slice-v1",
   "mir-research-cost-neutral-default-parity-v1",
   "mir-research-cost-proof-assertion-v1",
@@ -178,8 +180,31 @@ if ($finalResultIndex -lt 0 -or $sliceIndex -le $finalResultIndex -or
     $source.Orchestrator -notmatch 'research_cost_compatibility_adapter"\)\.publish') {
   throw "Research-cost compatibility support must derive and publish only after final CompilerResult authority exists."
 }
-foreach ($budget in @('MAXIMUM_FORMULA_BYTES', 'MAXIMUM_TOKENS', 'MAXIMUM_PARSE_DEPTH', 'evaluated_cost_out_of_bounds')) {
+foreach ($budget in @(
+  'formula_bytes\s*=\s*512',
+  'tokens\s*=\s*128',
+  'parse_depth\s*=\s*32',
+  'ast_nodes\s*=\s*96',
+  'absolute_numeric_literal\s*=\s*1e300',
+  'absolute_exponent_constant\s*=\s*1000000',
+  'evaluated_cost_out_of_bounds'
+)) {
   if (($source.Values -join "`n") -notmatch $budget) { throw "Research-cost budget is missing: $budget" }
+}
+foreach ($proofMaterial in @(
+  'function M\.algebraic_proof',
+  'base_cost>=1',
+  'linear_increment>=0',
+  'growth_factor>=1',
+  'maximum_exponent\s*=\s*100',
+  'qualification_offset_out_of_bounds'
+)) {
+  if (($source.Values -join "`n") -notmatch $proofMaterial) {
+    throw "Research-cost algebraic proof material is missing: $proofMaterial"
+  }
+}
+if ($source.Transition -notmatch 'research_cost_model\.qualification_identity\(rebuilt\)') {
+  throw "Transition descriptors must consume the canonical ResearchCostModel qualification identity."
 }
 if ($source.Contract -match 'mode%-setting|dropdown') { throw "Research-cost contract must not expose a model dropdown." }
 if ($source.Classification -notmatch 'original_formula' -or $source.NativeCost -notmatch 'changed = false') {
@@ -217,4 +242,40 @@ if ($defaults -notmatch 'linear_increment\s*=\s*0') { throw "Default linear incr
 $unknownFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/native-owner-unrecognized-formula/data-updates.lua")
 if ($unknownFixture -notmatch 'L\^2') { throw "Unknown-formula fixture must remain outside the supported fixed/linear/exponential/hybrid family." }
 
-Write-Host "[ok] unified ResearchCostModel identities, bounds, engine-normalized runtime preservation, and sixteen analytical transitions passed."
+$contract = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $paths.ContractAuthority) | ConvertFrom-Json
+if ([int]$contract.schema -ne 1 -or [string]$contract.kind -ne "mir-research-cost-contract" -or
+    [string]$contract.release -ne "3.2.5" -or [string]$contract.public_predecessor -ne "3.2.3" -or
+    [string]$contract.authority_state -ne "product-complete-awaiting-source-freeze") {
+  throw "The MIR 3.2.5 research-cost contract has invalid release authority."
+}
+if ([string]$contract.model.proof_abi -ne "mir-research-cost-algebraic-proof-v1" -or
+    [int]$contract.model.bounds.qualification_offset -ne 100 -or
+    [double]$contract.model.bounds.evaluated_cost.maximum -ne 1e300 -or
+    [int]$contract.parser_bounds.formula_bytes -ne 512 -or
+    [int]$contract.parser_bounds.tokens -ne 128 -or
+    [int]$contract.parser_bounds.parse_depth -ne 32 -or
+    [int]$contract.parser_bounds.ast_nodes -ne 96 -or
+    [double]$contract.parser_bounds.absolute_numeric_literal -ne 1e300 -or
+    [int]$contract.parser_bounds.absolute_exponent_constant -ne 1000000) {
+  throw "The MIR 3.2.5 research-cost numeric/parser envelope is incomplete."
+}
+$kinds = @($contract.model.derived_kinds | ForEach-Object { [string]$_ })
+if (($kinds -join ',') -ne 'fixed,linear,exponential,hybrid' -or
+    [int]$contract.transition_matrix.rows -ne 16 -or
+    -not [bool]$contract.transition_matrix.second_reload_required) {
+  throw "The MIR 3.2.5 cost-kind or transition authority is incomplete."
+}
+$defaultVectors = @($contract.default_vectors | ForEach-Object { [string]$_.id })
+foreach ($requiredVector in @('base-default','space-age-native-owner','automatic-family-creation','base-continuations','mod-set-configuration-change')) {
+  if ($requiredVector -notin $defaultVectors) { throw "Missing exact 3.2.3 default vector: $requiredVector" }
+}
+$targetFeatures = @($contract.factorio_2_0_dispositions | ForEach-Object { [string]$_.feature })
+foreach ($requiredFeature in @('cost-model','settings-and-profiles','progress-preservation','base-continuation','ownership-and-adoption','bounded-support-transport','migration-state','package-metadata','localization')) {
+  if ($requiredFeature -notin $targetFeatures) { throw "Missing shipped-feature Factorio 2.0 disposition: $requiredFeature" }
+}
+if ([string]$contract.boundaries.factorio_2_0_release_authority -ne 'not-created' -or
+    [string]$contract.boundaries.candidate_id -ne 'not-assigned') {
+  throw "Research-cost product proof must not create candidate or Factorio 2.0 release authority."
+}
+
+Write-Host "[ok] unified ResearchCostModel identities, algebraic and parser bounds, exact defaults, target dispositions, and sixteen transitions passed."

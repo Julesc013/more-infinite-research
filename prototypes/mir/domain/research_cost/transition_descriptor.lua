@@ -82,13 +82,8 @@ function M.validate(descriptor)
   if fingerprint.of(semantic_record(descriptor)) ~= descriptor.semantic_digest then
     return fail("descriptor_semantic_digest_mismatch")
   end
-  local expected_qualification_digest = fingerprint.of({
-    qualification_abi = research_cost_model.qualification_abi,
-    semantic_digest = descriptor.semantic_digest,
-    property = "positive-nondecreasing",
-    maximum_offset = validation.bounds.qualification_offset,
-    status = "passed"
-  })
+  local expected_qualification_digest = fingerprint.of(
+    research_cost_model.qualification_identity(rebuilt))
   if descriptor.qualification_digest ~= expected_qualification_digest then
     return fail("descriptor_qualification_digest_mismatch")
   end

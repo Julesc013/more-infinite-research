@@ -269,6 +269,7 @@ $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence -FactorioBinaryPath $factorio
 
 $reloadEvidence = ""
+$secondReloadEvidence = ""
 if ($requiresReloadProof) {
   $upgradedSave = $governedUpgradedSave
   $reloadArgs = @(
@@ -284,6 +285,17 @@ if ($requiresReloadProof) {
   }
   $reloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-reload.txt"
   Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio
+
+  $secondReloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
+  if ($secondReloadExitCode -ne 0) {
+    throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
+  }
+  $secondReloadText = Get-Content -Raw -LiteralPath $log
+  if (-not $secondReloadText.Contains($reloadMarker)) {
+    throw "MIR $ToVersion upgraded-save second-reload proof marker is missing: $reloadMarker. Temporary root: $root"
+  }
+  $secondReloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-second-reload.txt"
+  Copy-MIRUpgradeLogEvidence -Source $log -Destination $secondReloadEvidence -FactorioBinaryPath $factorio
 }
 
 $assertions = if ($Archetype) {
@@ -295,6 +307,9 @@ $assertions = if ($Archetype) {
     "fixture-storage-retained",
     "exact-candidate-normal-mod-directory-load"
   )
+  if ($requiresReloadProof) {
+    $common += @("upgraded-save-reload-passed", "upgraded-save-second-reload-passed")
+  }
   switch ($Archetype) {
     "base-default" { $common + @("base-only-mod-set-retained") }
     "space-age-native-owner" {
@@ -303,10 +318,10 @@ $assertions = if ($Archetype) {
           "landfill-level-retained", "ice-level-retained", "current-ice-research-retained",
           "fractional-ice-progress-retained", "platform-starts-unresearched",
           "landfill-platform-effects-removed", "platform-owner-transfer-exact",
-          "duplicate-owner-forbidden", "startup-settings-retained", "upgraded-save-reload-passed"
+          "duplicate-owner-forbidden", "startup-settings-retained"
         )
       } elseif ($requiresReloadProof) {
-        $common + @("space-age-native-owner-retained", "upgraded-save-reload-passed")
+        $common + @("space-age-native-owner-retained")
       } else {
         $common + @("space-age-native-owner-retained")
       }
@@ -365,6 +380,10 @@ $result = [ordered]@{
 if ($reloadEvidence) {
   $result.reload_log = (Split-Path -Leaf $reloadEvidence)
   $result.reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $reloadEvidence).Hash
+}
+if ($secondReloadEvidence) {
+  $result.second_reload_log = (Split-Path -Leaf $secondReloadEvidence)
+  $result.second_reload_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $secondReloadEvidence).Hash
 }
 $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 

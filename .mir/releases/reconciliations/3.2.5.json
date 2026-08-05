@@ -59,11 +59,13 @@
     ".mir/lifecycle/changes/CHG-2026-0005.json",
     ".mir/lifecycle/changes/CHG-2026-0010.json",
     ".mir/lifecycle/changes/CHG-2026-0011.json",
-    ".mir/lifecycle/changes/CHG-2026-0017.json"
+    ".mir/lifecycle/changes/CHG-2026-0017.json",
+    ".mir/lifecycle/changes/CHG-2026-0018.json",
+    ".mir/research-cost-contract-3.2.5.json"
   ],
   "priority": {
     "next_work_package": "325-B1",
-    "reason": "325-B0 is admitted and closed. The only remaining package-visible implementation priority before freeze is essential 325-B1 correctness for the shipped research-cost contract."
+    "reason": "Essential 325-B1 correctness is implemented locally under CHG-2026-0018 and remains the current priority until exact committed-head local and hosted admission close it."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
@@ -174,37 +176,44 @@
     {
       "id": "325-B1",
       "category": "product",
-      "status": "partial",
+      "status": "implemented-awaiting-governed-admission",
       "required_product_surface": [
         "Exact 3.2.3 default vectors and all fixed, linear, exponential, and hybrid models.",
         "Configuration-change, save/reload, second-reload, numeric-envelope, parser, realization, and Factorio 2.0 proof."
       ],
       "current_implementation": [
-        "Canonical bounded cost formula, four derived kinds, three digest layers, transition descriptors, legacy operand projection, and no-double-conversion runtime behavior exist."
+        "Canonical bounded cost formula, four derived kinds, three digest layers, transition descriptors, legacy operand projection, and no-double-conversion runtime behavior exist.",
+        "The model now carries a canonical algebraic proof ABI and qualification identity with explicit positivity, monotonicity, exponent, evaluated-cost, parser byte, token, depth, AST-node, numeric-literal, and exponent-constant bounds.",
+        "The governed 3.2.3 default vectors, ownership removal and transfer dispositions, first- and second-reload requirements, and shipped-feature Factorio 2.0 dispositions are machine-readable in .mir/research-cost-contract-3.2.5.json."
       ],
       "current_tests": [
         "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
         "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
         "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "fixtures/assert-compiler-contracts/data-final-fixes.lua",
         "validation/scenarios/runtime.json"
       ],
       "current_evidence": [
         "development-playtest-revision-4:sixteen-cost-transitions",
         "development-playtest-revision-4:configuration-change-green",
         "development-playtest-revision-4:five-direct-3.2.3-upgrade-archetypes",
-        ".mir/lifecycle/changes/CHG-2026-0017.json"
+        ".mir/lifecycle/changes/CHG-2026-0017.json",
+        ".mir/lifecycle/changes/CHG-2026-0018.json",
+        ".mir/research-cost-contract-3.2.5.json",
+        "focused-local:compiler-contracts-passed-with-bounded-exponent-rejection",
+        "focused-local:five-direct-upgrade-archetypes-passed-with-first-and-second-reload"
       ],
       "remaining_gap": [
-        "Algebraic proof is not yet a frozen assertion authority.",
-        "The full numeric envelope, exact default golden packet, continuous-versus-save/reload equivalence, and Factorio 2.0 realization remain incomplete.",
-        "INC-2026-0054 and INC-2026-0057 are not candidate-bound terminal closures."
+        "The exact committed source must complete its materialized local admission plan and latest-head hosted aggregate before 325-B1 can close.",
+        "Release-specific Base, Space Age, configuration-change, ecosystem, privacy, localization, performance, and manual evidence must be rebound to the eventual frozen candidate.",
+        "INC-2026-0054 and INC-2026-0057 remain development fault evidence until the candidate-bound freeze packet records their terminal superseding proof."
       ],
       "package_visibility": "visible",
       "target_disposition": {
-        "factorio_2_1": "portable-identical within the shipped Factorio 2.1 model after remaining freeze proof",
-        "factorio_2_0": "unclassified pending exact parser, realization, runtime, and migration proof"
+        "factorio_2_1": "implemented with exact algebraic, parser, default-vector, ownership, transition, first-reload, and second-reload development proof; candidate-bound realization remains required",
+        "factorio_2_0": "explicit shipped-feature dispositions complete; exact target runtime qualification is deferred without creating release authority"
       },
-      "next_bounded_action": "Freeze exact 3.2.3 default vectors and add continuous, save/reload, and second-reload equivalence for one cost kind before expanding the extreme matrix."
+      "next_bounded_action": "Commit the bounded implementation, execute the complete exact source-bound admission plan, and admit it through a latest-head governed PR before materializing D1."
     },
     {
       "id": "325-B2",

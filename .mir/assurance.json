@@ -34,7 +34,7 @@
   "classes": [
     {
       "id": "runtime-or-migration",
-      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$"],
+      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^validation/tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
       "tests": ["static.full", "runtime.full", "runtime.upgrade"]
     },
     {
@@ -44,7 +44,7 @@
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {

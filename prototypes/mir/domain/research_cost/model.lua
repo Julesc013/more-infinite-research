@@ -23,12 +23,17 @@ local function semantic_identity(record)
 end
 
 local function qualification_identity(record)
+  local proof = validation.assert_algebraic_proof(record)
   return {
     qualification_abi = M.qualification_abi,
     semantic_digest = record.semantic_digest,
-    property = "positive-nondecreasing",
-    maximum_offset = validation.bounds.qualification_offset,
-    status = "passed"
+    proof_abi = proof.proof_abi,
+    property = proof.property,
+    constraints = proof.constraints,
+    argument = proof.argument,
+    maximum_offset = proof.maximum_offset,
+    maximum_exponent = proof.maximum_exponent,
+    status = proof.status
   }
 end
 
@@ -41,8 +46,14 @@ function M.semantic_digest(record)
   return fingerprint.of(semantic_identity(record))
 end
 
+function M.qualification_identity(record)
+  return deepcopy(qualification_identity(record))
+end
+
 function M.new(record)
   local parameters = validation.assert_parameters(record)
+  local safe, reason = validation.is_positive_nondecreasing(parameters)
+  if not safe then error("ResearchCostModel safety failed: " .. tostring(reason), 2) end
   local result = {
     schema = M.schema,
     formula_abi = M.formula_abi,

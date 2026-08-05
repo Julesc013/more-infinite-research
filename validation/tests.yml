@@ -86,8 +86,10 @@
         ".mir/technology-quality-profiles.json",
         ".mir/compiler-schema-authority.json",
         ".mir/public-artifact-budgets.json",
+        ".mir/research-cost-contract-3.2.5.json",
         "fixtures/assert-compiler-contracts/**",
         "validation/tests/compiler/Test-MIRCompiler.ps1",
+        "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
         "validation/tests/architecture/Test-MIRModuleDependencies.ps1",
         "validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1",
         "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1"
