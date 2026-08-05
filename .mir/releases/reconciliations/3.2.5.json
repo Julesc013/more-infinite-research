@@ -44,9 +44,9 @@
     ]
   },
   "boundaries": {
-    "release_state": "planned",
+    "release_state": "source-frozen",
     "candidate_floor": "C32",
-    "candidate_id": "not-assigned",
+    "candidate_id": "C32",
     "factorio_2_0_release_authority": "not-created",
     "mir_3_3_admission": "not-admitted",
     "published_dist_mutation": "forbidden"
@@ -67,8 +67,8 @@
     ".mir/releases/freezes/3.2.5-D1.json"
   ],
   "priority": {
-    "next_work_package": "325-D1",
-    "reason": "Essential 325-B1 correctness is admitted by PR 53 and development revision 5; the bounded next action is review and admission of the package-excluded D1 source-freeze packet."
+    "next_work_package": "325-D2",
+    "reason": "D1 is admitted against its exact 125-row source-bound plan and C32 is assigned only at source freeze; the bounded next action is deterministic candidate construction."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
@@ -385,7 +385,7 @@
     {
       "id": "325-D1",
       "category": "freeze",
-      "status": "prepared-awaiting-admission",
+      "status": "terminal",
       "required_product_surface": [
         "Exact 3.2.3 predecessor and lineage packet, package composition, public ABI and approved delta, final cost and bounded B0 contracts, release-specific environments, manual and performance policies, release notes, migration, shipped-feature Factorio 2.0 dispositions, and source-bound verification plan."
       ],
@@ -407,24 +407,24 @@
         ".mir/releases/freezes/3.2.5-D1.json"
       ],
       "remaining_gap": [
-        "The prepared package-excluded packet must pass its exact changed-impact plan and governed PR before the release may advance to source-frozen and assign C32."
+        "No D1 product or authority gap remains; later package, qualification, manual, protected, seal, and publication gates remain separate."
       ],
       "package_visibility": "mixed",
       "target_disposition": {
         "factorio_2_1": "freeze only after all package-visible work is complete",
         "factorio_2_0": "record dispositions only; do not create release authority"
       },
-      "next_bounded_action": "Admit the prepared D1 packet through exact local and hosted proof, then assign C32 in the append-only source-frozen transition."
+      "next_bounded_action": "Preserve the admitted packet and invalidate C32 if any later package-visible source changes."
     },
     {
       "id": "325-D2",
       "category": "release",
-      "status": "blocked-by-prerequisite",
+      "status": "in-progress",
       "required_product_surface": [
         "Assign the first exact candidate at or above C32 only after source freeze and build its deterministic package twice."
       ],
       "current_implementation": [
-        "The release record correctly reserves floor C32 while candidate_id remains not-assigned."
+        "The admitted D1 packet and append-only source-frozen transition assign exact candidate C32 to package source a3bfbc4524b52cede425900e775384eb9c1fc4b3."
       ],
       "current_tests": [
         "validation/tests/release/Test-MIRReleaseAuthority.ps1",
@@ -434,15 +434,14 @@
         ".mir/releases/records/3.2.5.json"
       ],
       "remaining_gap": [
-        "325-D1 source-freeze admission has not passed.",
         "No immutable candidate package identity exists."
       ],
       "package_visibility": "none-until-admitted",
       "target_disposition": {
-        "factorio_2_1": "blocked until source-frozen",
+        "factorio_2_1": "source frozen; deterministic package construction pending",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Take no candidate action until 325-D1 is terminal."
+      "next_bounded_action": "Build C32 twice, verify exact archive/content/bytes/entries, and record the package-built transition without changing package roots."
     },
     {
       "id": "325-D3",

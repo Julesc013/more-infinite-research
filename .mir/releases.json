@@ -51,31 +51,24 @@
       "assurance_exception_ids": [],
       "branch": "dev",
       "candidate_floor": "C32",
-      "candidate_id": "not-assigned",
+      "candidate_id": "C32",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.5",
       "package_content_sha256": "",
-      "package_source_commit": "",
+      "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
       "package_source_material": {
         "file_count": null,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": ""
+        "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485"
       },
-      "package_source_sha256": "",
-      "package_source_tree": "",
+      "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
       "protected_qualification": "pending",
-      "publication_status": "planned",
-      "qualification": "planned",
+      "publication_status": "source-frozen",
+      "qualification": "source-frozen",
       "remaining_obligations": [
-        "programme-contract",
-        "cost-model-completion",
-        "derived-disposition",
-        "proof-assertions",
-        "support-reporting",
-        "factorio-2.0-projection",
-        "source-freeze",
         "package-build",
         "focused-qualification",
         "candidate-qualification",
@@ -88,7 +81,6 @@
         "public-byte-verification"
       ],
       "remaining_states": [
-        "source-frozen",
         "package-built",
         "focused-qualified",
         "candidate-qualified",
@@ -101,7 +93,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "not-assigned-planned"
+      "status": "C32-source-frozen"
     }
   },
   "generated_from": [

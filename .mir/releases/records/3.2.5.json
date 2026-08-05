@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "release": "3.2.5",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C32",
   "candidate_floor": "C32",
   "target": "2.1",
   "branch": "dev",
-  "state": "planned",
+  "state": "source-frozen",
   "source_release": {
     "release": "3.2.3",
     "tag": "3.2.3",
@@ -19,21 +19,29 @@
     "candidate_closure": "path:releases.closures/3.2.4-C31.json",
     "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4"
   },
-  "package": {},
+  "package": {
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
+  },
   "upgrade": {
     "from_version": "3.2.3",
     "to_version": "3.2.5",
     "fixture": "assert-upgrade-3-2-3-to-3-2-5"
   },
-  "proofs": {},
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "source-freeze-packet",
+        "path": ".mir/releases/freezes/3.2.5-D1.json",
+        "candidate_id": "C32",
+        "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+        "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+        "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D"
+      }
+    ]
+  },
   "remaining_obligations": [
-    "programme-contract",
-    "cost-model-completion",
-    "derived-disposition",
-    "proof-assertions",
-    "support-reporting",
-    "factorio-2.0-projection",
-    "source-freeze",
     "package-build",
     "focused-qualification",
     "candidate-qualification",
@@ -54,5 +62,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-05T03:25:00.000Z"
+  "updated_at": "2026-08-05T16:03:31.000Z"
 }

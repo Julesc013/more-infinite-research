@@ -56,9 +56,7 @@ if ($LASTEXITCODE -ne 0 -or $admittedTree -ne [string]$record.admitted_developme
 $release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/3.2.5.json") |
   ConvertFrom-Json
 foreach ($boundary in @{
-  release_state = "planned"
   candidate_floor = "C32"
-  candidate_id = "not-assigned"
   factorio_2_0_release_authority = "not-created"
   mir_3_3_admission = "not-admitted"
   published_dist_mutation = "forbidden"
@@ -71,6 +69,16 @@ if ([string]$release.state -ne [string]$record.boundaries.release_state -or
     [string]$release.candidate_floor -ne [string]$record.boundaries.candidate_floor -or
     [string]$release.candidate_id -ne [string]$record.boundaries.candidate_id) {
   throw "Work-package reconciliation differs from the typed 3.2.5 release authority."
+}
+$releaseBoundary = "{0}|{1}" -f [string]$record.boundaries.release_state, [string]$record.boundaries.candidate_id
+if ($releaseBoundary -notin @(
+    "planned|not-assigned",
+    "source-frozen|C32",
+    "package-built|C32",
+    "focused-qualified|C32",
+    "candidate-qualified|C32"
+  )) {
+  throw "Work-package reconciliation claims an unsupported pre-manual release boundary: $releaseBoundary"
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json")) {
   throw "A forbidden 2.5.5 release authority exists."
@@ -210,6 +218,10 @@ foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
       ([string]$releaseOnly -eq "325-D4" -and [string]$row.package_visibility -ne "none-until-admitted")) {
     throw "$releaseOnly has advanced outside the governed freeze/qualification boundary."
   }
+}
+$d1 = @($rows | Where-Object { $_.id -eq "325-D1" })[0]
+if ([string]$d1.status -notin @("prepared-awaiting-admission", "terminal")) {
+  throw "325-D1 has an unsupported freeze-packet state."
 }
 
 Write-Host "[ok] MIR 3.2.5 closes B0/B1, narrows the release contract, and preserves immutable development baselines without 2.5.5 or 3.3 authority."

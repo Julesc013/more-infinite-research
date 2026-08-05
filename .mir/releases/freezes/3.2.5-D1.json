@@ -2,10 +2,11 @@
   "schema": 1,
   "kind": "mir-source-freeze-packet",
   "release": "3.2.5",
-  "status": "prepared",
+  "status": "admitted",
   "candidate_floor": "C32",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C32",
   "prepared_at": "2026-08-05T06:40:00.000Z",
+  "admitted_at": "2026-08-05T16:03:31.000Z",
   "lineage": {
     "public_predecessor": {
       "release": "3.2.3",
@@ -186,9 +187,18 @@
       "rejected": 0
     },
     "source_bound_plan": {
-      "status": "pending-d1-commit",
-      "plan_material_sha256": "PENDING",
-      "required_test_set_sha256": "PENDING",
+      "status": "passed",
+      "source_commit": "90c4d7b0c002a9909f80436f4a0c5cfc17bf2098",
+      "source_tree": "48d159716b00c092720af1e5624e448fbaecabc7",
+      "generated_at": "2026-08-05T15:30:28.2692223Z",
+      "completed_at": "2026-08-05T16:02:21.4337463Z",
+      "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+      "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D",
+      "required": 125,
+      "executed": 125,
+      "reused": 0,
+      "failed": 0,
+      "incomplete": 0,
       "unknown_paths": 0,
       "invalid_rows": 0
     },
@@ -218,17 +228,17 @@
       {"path": ".mir/control-plane/control-plane.json", "sha256": "0801D2D6BCB3CBD696A826EA46578B4F0B5C96EB344F1FE97F3DA4E0D9395612"},
       {"path": "validation/trust.json", "sha256": "EECB9C322E5799006E656C450F93119D5F288F6B8A5AE9D609F87A5114E75F44"},
       {"path": ".mir/performance-budgets.json", "sha256": "F0C12A195D3490F1B85F72B05CB66141941F2AF5F6BAC08C4B9118C73C11C142"},
-      {"path": "validation/tests/release/Test-MIRReleaseAuthority.ps1", "sha256": "ED6259F6B85C571BE90E08396F5026E7E4E7BED4F5AF93D8451AE648E21EEFCE"},
+      {"path": "validation/tests/release/Test-MIRReleaseAuthority.ps1", "sha256": "E92B1F51B7C3552836C281C4FC361DD6F87AB1E4229846F9E52A40CA3EE1E3CA"},
       {"path": "validation/tests/release/Test-MIRSourceFreezePacket.ps1", "sha256": "53840955324D9E2D824EF9D0908E442C68A84ECAE60A6CFA5A35391C6B9B3852"}
     ]
   },
   "documentation": {
     "authorities": [
-      {"path": "docs/releases/notes/release-notes-3.2.5.md", "sha256": "324EB075411ECDDC63674FEC14D5E08B49C439A323C0FCBF5963238BE1F16C61"},
+      {"path": "docs/releases/notes/release-notes-3.2.5.md", "sha256": "CAFA7708CC55F586B5CB6F7667A3C582C04C6E6D12EDE4A025059EA241CB08E2"},
       {"path": "docs/releases/3.2.5-migration-guide.md", "sha256": "28990DE63A6D3C6DC18B566AC5AEFBF4526A6C13C4E67FCEB9DF8D3BFEF80B60"},
       {"path": "docs/maintainer/manual-test-plan.md", "sha256": "FCB9BCBC5ED0071570D4B1774931EB4B3100DEF39CD648453ED25FFFC9AE4EA5"},
       {"path": "docs/user/diagnostics.md", "sha256": "6FD403C66D66F1A36B6CFE00EA2EFF7EE6E0ABB9BCAA452A861CD5FEFA056A21"},
-      {"path": "docs/releases/3.2.5-c32-source-freeze.md", "sha256": "037754062A64FC42C00E088349D218ACC5D9B55C5987E68DB6D3A5A696E8AC39"}
+      {"path": "docs/releases/3.2.5-c32-source-freeze.md", "sha256": "A48E5473E8870059C98381FA5FD9C7723082A057201F69A722990CFF3E27DB5F"}
     ]
   },
   "gate": {
@@ -246,7 +256,7 @@
     "ecosystem": "passed",
     "dev_clean_and_green": "passed",
     "rolling_playtest_revision_preserved": "passed",
-    "candidate_not_prematurely_assigned": "passed"
+    "candidate_assigned_only_after_source_freeze_admission": "passed"
   },
   "boundaries": {
     "factorio_2_0_release_authority": "not-created",

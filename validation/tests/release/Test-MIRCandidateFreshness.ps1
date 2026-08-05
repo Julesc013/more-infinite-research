@@ -256,6 +256,11 @@ if ($status -eq "source-frozen") {
       [string]$release.package.source_commit -ne $packageSourceCommit) {
     throw "Source-frozen candidate descriptor differs from the typed ReleaseRecord."
   }
+  $freeze = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json") | ConvertFrom-Json
+  if ([string]$freeze.status -ne "admitted" -or [string]$freeze.candidate_id -ne "C32" -or
+      [string]$freeze.source.package_source_commit -ne $packageSourceCommit) {
+    throw "Source-frozen candidate descriptor differs from the admitted D1 packet."
+  }
   Write-Host "[ok] MIR candidate source is frozen while deterministic package construction remains pending."
   exit 0
 }

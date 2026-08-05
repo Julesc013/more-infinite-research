@@ -2,7 +2,7 @@
   "assurance_exceptions": [],
   "authority": "mir-generated-publication-checklist-v1",
   "candidate_floor": "C32",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C32",
   "generated_from": [
     "path:releases.current",
     "path:releases.records/3.2.5.json"
@@ -10,7 +10,6 @@
   "publication_admitted": false,
   "release": "3.2.5",
   "remaining_states": [
-    "source-frozen",
     "package-built",
     "focused-qualified",
     "candidate-qualified",
@@ -23,5 +22,5 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "planned"
+  "state": "source-frozen"
 }
