@@ -69,7 +69,7 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/Invoke-MIRControlPlaneWork\\.ps1|lib/control/(?:Evidence|Views)\\.ps1)$", "^tools/lib/assurance/", "^tools/maintenance/", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/paths\\.yml$", "^\\.mir/control-plane/ownership\\.json$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/Invoke-MIRControlPlaneWork\\.ps1|lib/control/(?:Evidence|Planner|Views)\\.ps1)$", "^tools/lib/assurance/", "^tools/maintenance/", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/paths\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|ownership)\\.json$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
