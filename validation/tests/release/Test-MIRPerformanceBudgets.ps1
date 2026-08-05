@@ -262,7 +262,7 @@ foreach ($governedVersion in @([string]$taggedTypedRelease.release, [string]$act
   }
 }
 $qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
-foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion", "performance-campaigns", "CampaignPath")) {
+foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion", "performance-campaigns", "CampaignPath", "conservative Factorio path budget", "maximumFactorioPathLength")) {
   if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
     throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
   }

@@ -41,7 +41,7 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 
 $performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ".work\artifacts\performance"))
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = Join-Path $performanceArtifactsRoot "$($candidateInfo.version)-qualification-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+  $ArtifactRoot = Join-Path $performanceArtifactsRoot ("p-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 } elseif (-not [IO.Path]::IsPathRooted($ArtifactRoot)) {
   $ArtifactRoot = Join-Path $RepoRoot $ArtifactRoot
 }
@@ -50,6 +50,28 @@ $safeArtifactPrefix = $performanceArtifactsRoot.TrimEnd([IO.Path]::DirectorySepa
 if (-not $ArtifactRoot.StartsWith($safeArtifactPrefix, [StringComparison]::OrdinalIgnoreCase)) {
   throw "Performance artifacts must stay inside $performanceArtifactsRoot."
 }
+$resolvedCampaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) { [IO.Path]::GetFullPath($CampaignPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath)) }
+$campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
+$maximumFactorioPathLength = 0
+$maximumFactorioPath = ""
+foreach ($lane in @($campaign.lanes)) {
+  $laneSafe = ([string]$lane.id -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
+  $relativeProbePath = if ([string]$lane.runner -eq "compat-audit") {
+    "$laneSafe\measured-25-candidate\compat\runs\u-0123456789ab\mods\mir-validation-settings-overrides\settings-updates.lua"
+  } else {
+    "$laneSafe\measured-25-candidate\mods\mir-fixture-performance-regression-probe_0.1.0\data-final-fixes.lua"
+  }
+  $probePath = Join-Path $ArtifactRoot $relativeProbePath
+  if ($probePath.Length -gt $maximumFactorioPathLength) {
+    $maximumFactorioPathLength = $probePath.Length
+    $maximumFactorioPath = $probePath
+  }
+}
+$conservativePathBudget = 240
+if ($maximumFactorioPathLength -gt $conservativePathBudget) {
+  throw "Performance staging exceeds the conservative Factorio path budget ($maximumFactorioPathLength > $conservativePathBudget): $maximumFactorioPath"
+}
+Write-Host "[info] performance staging path budget: $maximumFactorioPathLength/$conservativePathBudget"
 $resolvedOutputPath = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $OutputPath)) }
 if (-not $KeepArtifacts -and $resolvedOutputPath.StartsWith(($ArtifactRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar), [StringComparison]::OrdinalIgnoreCase)) {
   throw "Compact performance evidence must remain outside the disposable artifact directory."
