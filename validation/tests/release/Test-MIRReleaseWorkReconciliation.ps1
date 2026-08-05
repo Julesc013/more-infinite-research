@@ -33,6 +33,26 @@ if ($LASTEXITCODE -ne 0 -or $baselineTree -ne [string]$record.source_baseline.tr
   throw "Development revision 3 source commit and tree do not agree."
 }
 
+$expectedAdmittedBaseline = [ordered]@{
+  revision = "4"
+  package_source_commit = "489b62fda979c5192ddbb8294c27a3886f6ba13e"
+  package_source_tree = "0d3fc58d69eed64bcb2199a051f9fc9f6a6c9c30"
+  archive_sha256 = "AF3F4D6AFF58B098D6729FE31B039C47497988E7515D1055F4C5C54D85B5CDBD"
+  content_sha256 = "A313E8A3E377A099FCB6E8266A3EDBDF5AEF9D77CF777B041472C772C6448877"
+  bytes = "1055804"
+  entries = "301"
+  package_equivalent_governance_commit = "a08384705d2c53a056cd81f48b90e6bb86b89932"
+}
+foreach ($entry in $expectedAdmittedBaseline.GetEnumerator()) {
+  if ([string]$record.admitted_development_baseline.($entry.Key) -ne [string]$entry.Value) {
+    throw "Admitted development revision 4 field changed: $($entry.Key)."
+  }
+}
+$admittedTree = (& git -C $RepoRoot show -s --format=%T ([string]$record.admitted_development_baseline.package_source_commit)).Trim()
+if ($LASTEXITCODE -ne 0 -or $admittedTree -ne [string]$record.admitted_development_baseline.package_source_tree) {
+  throw "Development revision 4 source commit and tree do not agree."
+}
+
 $release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/3.2.5.json") |
   ConvertFrom-Json
 foreach ($boundary in @{
@@ -58,7 +78,7 @@ if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.jso
 
 $expectedIds = @(
   "325-A1b", "325-A0", "325-A1",
-  "325-B0", "325-B1", "325-B2", "325-B3", "325-B4", "325-B5",
+  "325-B1", "325-B2", "325-B3", "325-B4", "325-B5",
   "325-C1", "325-D1", "325-D2", "325-D3", "325-D4"
 )
 $rows = @($record.work_packages)
@@ -73,8 +93,11 @@ foreach ($expectedId in $expectedIds) {
 if ($actualIds -contains "325-A1a") {
   throw "Closed work package 325-A1a must not re-enter the open reconciliation."
 }
-if ([string]$record.priority.next_work_package -ne "325-B0") {
-  throw "The current bounded product priority must remain 325-B0 until its vertical slice is admitted."
+if ($actualIds -contains "325-B0") {
+  throw "Closed work package 325-B0 must not re-enter the open reconciliation."
+}
+if ([string]$record.priority.next_work_package -ne "325-B1") {
+  throw "The current bounded product priority must be essential 325-B1 correctness."
 }
 
 $arrayFields = @(
@@ -113,32 +136,73 @@ foreach ($authority in @($record.authorities)) {
   }
 }
 
-$b0 = @($rows | Where-Object { $_.id -eq "325-B0" })[0]
-if ([string]$b0.status -ne "implemented-awaiting-closure") {
-  throw "325-B0 must remain implemented-awaiting-closure until exact-head admission succeeds."
+$closurePath = Join-Path $RepoRoot ".mir/lifecycle/changes/CHG-2026-0017.json"
+$closure = Get-Content -Raw -LiteralPath $closurePath | ConvertFrom-Json
+if ([string]$closure.state -ne "implemented" -or [bool]$closure.package_visible -or
+    [string]$closure.work_package_closure.id -ne "325-B0" -or
+    [string]$closure.work_package_closure.status -ne "closed-development-product-slice") {
+  throw "CHG-2026-0017 does not close 325-B0 as a package-excluded admitted development slice."
 }
-$b0Implementation = @($b0.current_implementation) -join "`n"
+$closureEvidence = $closure.work_package_closure
+foreach ($required in @{
+  implementation_head = "5264ab2285b56ac2a79dc1bc99724554fb558c7f"
+  implementation_tree = "0d3fc58d69eed64bcb2199a051f9fc9f6a6c9c30"
+  merge_commit = "489b62fda979c5192ddbb8294c27a3886f6ba13e"
+}.GetEnumerator()) {
+  if ([string]$closureEvidence.($required.Key) -ne [string]$required.Value) {
+    throw "325-B0 closure identity differs: $($required.Key)."
+  }
+}
+if ([int]$closureEvidence.local_admission.executed -ne 127 -or
+    [int]$closureEvidence.local_admission.passed -ne 127 -or
+    [int]$closureEvidence.local_admission.failed -ne 0 -or
+    [int]$closureEvidence.hosted_admission.worker_import.imported -ne 8 -or
+    [int]$closureEvidence.hosted_admission.worker_import.rejected -ne 0) {
+  throw "325-B0 closure admission counts are incomplete."
+}
 foreach ($required in @(
-  "compatibility_slice.lua",
-  "terminal neutral-default proposition",
-  "typed proof",
-  "target-aware",
-  "fails closed"
+  "3.2.4",
+  "superseded-unpublished",
+  "3.2.6-or-3.3",
+  "no-gate-weakening"
 )) {
-  if ($b0Implementation -notmatch [regex]::Escape($required)) {
-    throw "325-B0 does not expose its implemented end-to-end surface: $required"
+  $scopeText = $record.scope_decision | ConvertTo-Json -Depth 10 -Compress
+  if ($scopeText -notmatch [regex]::Escape($required)) {
+    throw "The narrowed 3.2.5 scope decision is missing: $required"
   }
 }
-$b0Gap = @($b0.remaining_gap) -join "`n"
-foreach ($required in @("terminal", "proof assertion", "support projection", "Factorio 2.0")) {
-  if ($b0Gap -notmatch [regex]::Escape($required)) {
-    throw "325-B0 does not expose its required end-to-end gap: $required"
+$c31Closure = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/closures/3.2.4-C31.json") | ConvertFrom-Json
+if ([string]$c31Closure.disposition -ne "superseded-unpublished" -or
+    [string]$c31Closure.successor.release -ne "3.2.5") {
+  throw "C31 must remain superseded-unpublished in favor of 3.2.5."
+}
+$distributions = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/distributions.json") | ConvertFrom-Json
+if ([int]$distributions.distribution_count -ne @($distributions.distributions).Count -or
+    @($distributions.distributions | Where-Object {
+      [string]$_.version -eq "3.2.4" -and
+      [string]$_.kind -eq "frozen-unreleased-calibration-candidate" -and
+      [string]$_.sha256 -eq "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1"
+    }).Count -ne 1 -or
+    -not (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip") -PathType Leaf)) {
+  throw "The superseded-unpublished C31 archive must remain in exact governed custody without becoming an active release."
+}
+foreach ($expectedStatus in @{
+  "325-B2" = "deferred-explicitly"
+  "325-B3" = "narrowed-release-specific"
+  "325-B4" = "narrowed-release-specific"
+  "325-B5" = "deferred-explicitly"
+  "325-C1" = "narrowed-shipped-features-only"
+}.GetEnumerator()) {
+  $row = @($rows | Where-Object { $_.id -eq $expectedStatus.Key })[0]
+  if ([string]$row.status -ne [string]$expectedStatus.Value) {
+    throw "$($expectedStatus.Key) does not preserve the explicit narrowed/deferred status."
   }
 }
-if ([string]$b0.target_disposition.factorio_2_1 -notmatch "target-native-equivalent" -or
-    [string]$b0.target_disposition.factorio_2_0 -notmatch "portable-with-adapter" -or
-    [string]$b0.target_disposition.factorio_2_0 -notmatch "no 2.5.5 authority") {
-  throw "325-B0 target dispositions are not exact or preserve forbidden-boundary language."
+$branchStatus = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/views/branch-status.json") | ConvertFrom-Json
+$c31View = @($branchStatus.branches | Where-Object { [string]$_.release -eq "3.2.4" -and [string]$_.candidate_id -eq "C31" })
+if ($c31View.Count -ne 1 -or [string]$c31View[0].state -ne "package-built" -or
+    [string]$c31View[0].effective_status -ne "superseded-unpublished") {
+  throw "Generated branch status must distinguish C31 historical state from effective status."
 }
 foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   $row = @($rows | Where-Object { $_.id -eq $releaseOnly })[0]
@@ -148,4 +212,4 @@ foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   }
 }
 
-Write-Host "[ok] MIR 3.2.5 open work packages are reconciled against immutable development revision 3 without candidate, 2.5.5, or 3.3 authority."
+Write-Host "[ok] MIR 3.2.5 closes B0, narrows the release contract, and preserves immutable development baselines without candidate, 2.5.5, or 3.3 authority."

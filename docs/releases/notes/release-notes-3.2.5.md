@@ -14,6 +14,8 @@ superseded_by: []
 
 MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3. It absorbs the unpublished 3.2.4 work; there is no public 3.2.4 upgrade step and no 3.2.4 release package should be installed as an intermediate.
 
+The release is deliberately focused on unified research costs, exact 3.2.3 upgrade/default compatibility, current compatibility corrections, and the bounded research-cost compatibility proof/support record. Generalized all-stream explanations, public proof/environment products, universal support bundles, and broad Factorio 2.0 projection productization are deferred to a later release. Release-specific migration, privacy, localization, performance, manual, protected, seal, publication, and public-byte checks remain mandatory.
+
 ## Research costs
 
 - Every MIR research stream and base continuation gains a per-level linear cost increment while retaining its existing base-cost and exponential-growth controls.

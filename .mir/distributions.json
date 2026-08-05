@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-03",
+  "generated_at": "2026-08-05",
   "distribution_count": 49,
   "policy": {
     "tagged_archives_are_immutable": true,

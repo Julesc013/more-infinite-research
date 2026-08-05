@@ -22,6 +22,26 @@
       "nine-governed-ecosystem-loads"
     ]
   },
+  "admitted_development_baseline": {
+    "revision": 4,
+    "package_source_commit": "489b62fda979c5192ddbb8294c27a3886f6ba13e",
+    "package_source_tree": "0d3fc58d69eed64bcb2199a051f9fc9f6a6c9c30",
+    "archive_sha256": "AF3F4D6AFF58B098D6729FE31B039C47497988E7515D1055F4C5C54D85B5CDBD",
+    "content_sha256": "A313E8A3E377A099FCB6E8266A3EDBDF5AEF9D77CF777B041472C772C6448877",
+    "bytes": 1055804,
+    "entries": 301,
+    "package_equivalent_governance_commit": "a08384705d2c53a056cd81f48b90e6bb86b89932",
+    "qualification": [
+      "development-playtest-revision-4",
+      "latest-playtest-green",
+      "latest-breadth-green",
+      "fresh-breadth-127-of-127",
+      "base-and-space-age-exact-zip-loads",
+      "five-direct-3.2.3-upgrade-archetypes",
+      "sixteen-cost-transitions",
+      "hosted-exact-head-aggregate-green"
+    ]
+  },
   "boundaries": {
     "release_state": "planned",
     "candidate_floor": "C32",
@@ -34,14 +54,26 @@
     "docs/releases/3.2.5-to-2.6-convergence-programme.md",
     "docs/releases/ultimate-convergence-audit-action-register.md",
     "docs/releases/3.2.5-development-readiness.md",
+    ".mir/distributions.json",
     ".mir/releases/records/3.2.5.json",
     ".mir/lifecycle/changes/CHG-2026-0005.json",
     ".mir/lifecycle/changes/CHG-2026-0010.json",
-    ".mir/lifecycle/changes/CHG-2026-0011.json"
+    ".mir/lifecycle/changes/CHG-2026-0011.json",
+    ".mir/lifecycle/changes/CHG-2026-0017.json"
   ],
   "priority": {
-    "next_work_package": "325-B0",
-    "reason": "The bounded research-cost compatibility slice is implemented, but 325-B0 remains the current priority until the exact committed source and package pass their selected admission plan and latest-head hosted closure."
+    "next_work_package": "325-B1",
+    "reason": "325-B0 is admitted and closed. The only remaining package-visible implementation priority before freeze is essential 325-B1 correctness for the shipped research-cost contract."
+  },
+  "scope_decision": {
+    "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
+    "public_predecessor": "3.2.3",
+    "superseded_release": "3.2.4",
+    "release_3_2_4": "superseded-unpublished",
+    "release_3_2_5": "narrowed-unified-research-cost-and-bounded-compatibility",
+    "generalized_productization": "deferred-to-3.2.6-or-3.3",
+    "factorio_2_0_scope": "explicit-dispositions-for-shipped-features-only",
+    "deadline_policy": "no-gate-weakening-and-any-package-visible-defect-invalidates-the-frozen-candidate"
   },
   "work_packages": [
     {
@@ -140,46 +172,6 @@
       "next_bounded_action": "Add strict append-only event schemas and a table-driven controller rejection suite without changing the planned 3.2.5 state."
     },
     {
-      "id": "325-B0",
-      "category": "product",
-      "status": "implemented-awaiting-closure",
-      "required_product_surface": [
-        "Research-cost default-parity semantic export.",
-        "One terminal Factorio 2.1 disposition.",
-        "One typed claim and proof assertion.",
-        "One bounded support projection.",
-        "One exact Factorio 2.0 disposition with adapter or omission decision."
-      ],
-      "current_implementation": [
-        "ResearchCostModel exports semantic, authority, and qualification digests and a canonical public summary.",
-        "prototypes/mir/domain/research_cost/compatibility_slice.lua derives one terminal neutral-default proposition from trusted compiler input and final APPLIED compiler results.",
-        "The compatibility slice binds compiler input, compilation, qualification, plan, final result, journal, realised output, typed proof, and whole-artifact fingerprints.",
-        "prototypes/mir/emit/research_cost_compatibility_adapter.lua projects the bounded support artifact through mod-data for Factorio 2.1 and validation-log for a future Factorio 2.0 adapter proof.",
-        "The schema-1 public projection is budgeted, deterministic, target-aware, and fails closed when any disposition or fingerprint is changed."
-      ],
-      "current_tests": [
-        "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
-        "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
-        "validation/tests/compiler/Test-MIRCompiler.ps1",
-        "fixtures/assert-compiler-contracts/data-final-fixes.lua"
-      ],
-      "current_evidence": [
-        "docs/reference/schemas/research-cost-compatibility-slice.md",
-        ".mir/compiler-contract-coverage.yml",
-        ".mir/compiler-schema-authority.json",
-        ".mir/public-artifact-budgets.json"
-      ],
-      "remaining_gap": [
-        "The exact committed source and package must pass the selected broad admission plan and latest-head hosted closure before the terminal disposition, typed proof assertion, bounded support projection, and exact Factorio 2.0 adapter disposition are admitted as the completed 325-B0 slice."
-      ],
-      "package_visibility": "visible",
-      "target_disposition": {
-        "factorio_2_1": "target-native-equivalent via bounded mod-data support projection in the exact current environment",
-        "factorio_2_0": "portable-with-adapter via bounded validation-log transport; requires exact target formula proof and creates no 2.5.5 authority"
-      },
-      "next_bounded_action": "Commit the bounded slice, materialize its exact source-bound plan, require complete latest-head local and hosted admission, then close 325-B0 append-only and advance the open product priority to 325-B1 without changing release authority."
-    },
-    {
       "id": "325-B1",
       "category": "product",
       "status": "partial",
@@ -197,9 +189,10 @@
         "validation/scenarios/runtime.json"
       ],
       "current_evidence": [
-        "development-playtest-revision-3:sixteen-cost-transitions",
-        "development-playtest-revision-3:configuration-change-green",
-        "development-playtest-revision-3:five-direct-3.2.3-upgrade-archetypes"
+        "development-playtest-revision-4:sixteen-cost-transitions",
+        "development-playtest-revision-4:configuration-change-green",
+        "development-playtest-revision-4:five-direct-3.2.3-upgrade-archetypes",
+        ".mir/lifecycle/changes/CHG-2026-0017.json"
       ],
       "remaining_gap": [
         "Algebraic proof is not yet a frozen assertion authority.",
@@ -216,7 +209,7 @@
     {
       "id": "325-B2",
       "category": "product",
-      "status": "open",
+      "status": "deferred-explicitly",
       "required_product_surface": [
         "Exactly one terminal disposition per leaf subject with observed, planned, applied, and realized linkage.",
         "Stable outcome, reason, remediation, semantic, authority, and qualification identities."
@@ -234,20 +227,20 @@
         "development-playtest-revision-3:fresh-breadth-135-of-135"
       ],
       "remaining_gap": [
-        "Terminal disposition schema and reason/remediation catalog do not exist.",
-        "Base and Space Age shadow parity and report-failure isolation are not proven."
+        "The generalized all-stream terminal disposition product is intentionally deferred to 3.2.6 or 3.3 and is not a 3.2.5 freeze blocker.",
+        "The admitted bounded 325-B0 research-cost disposition remains the only disposition product shipped by 3.2.5."
       ],
-      "package_visibility": "visible",
+      "package_visibility": "deferred-package-visible",
       "target_disposition": {
-        "factorio_2_1": "target-specific read-model implementation required",
-        "factorio_2_0": "portable-with-adapter after target-neutral disposition semantics exist"
+        "factorio_2_1": "deferred to 3.2.6 or 3.3; bounded B0 disposition only in 3.2.5",
+        "factorio_2_0": "deferred with the generalized product; the shipped B0 adapter disposition remains mandatory"
       },
-      "next_bounded_action": "Derive one research-cost leaf disposition from existing trusted artifacts without adding mutation authority, then prove one-terminal cardinality and report-failure isolation."
+      "next_bounded_action": "Take no 3.2.5 implementation action; retain the generalized product requirement for 3.2.6 or 3.3 planning after public 3.2.5."
     },
     {
       "id": "325-B3",
       "category": "product",
-      "status": "partial",
+      "status": "narrowed-release-specific",
       "required_product_surface": [
         "Typed proof assertions with independent claim dimensions.",
         "Ecosystem profiles and exact environment locks for Base, Space Age, P11/BZ, owner-pack, overhaul, and conflict rows.",
@@ -268,21 +261,21 @@
         "development-playtest-revision-3:fresh-breadth-135-of-135"
       ],
       "remaining_gap": [
-        "Load successes are not independent semantic, progression, upgrade, recovery, interactive, or performance proof.",
-        "Exact release environment locks and claim projections are not complete.",
-        "P11/BZ closure is not terminal."
+        "Exact release-specific Base, Space Age, migration, ecosystem, performance, manual, and protected environment bindings remain mandatory for frozen 3.2.5 bytes.",
+        "General-purpose public ProofAssertion and EcosystemProfile product authorities are deferred to 3.2.6 or 3.3.",
+        "P11/BZ closure remains an assurance programme obligation but does not justify generalized 3.2.5 product expansion."
       ],
       "package_visibility": "mixed",
       "target_disposition": {
-        "factorio_2_1": "tooling and package-visible claim projection both required",
-        "factorio_2_0": "target-specific exact environments required; target-neutral evidence only where declared"
+        "factorio_2_1": "release-specific exact evidence required; generalized public proof product deferred",
+        "factorio_2_0": "shipped-feature dispositions required; no broad target environment authority or 2.5.5 release authority"
       },
-      "next_bounded_action": "Create the research-cost default-parity proof assertion and bind it to exact Base and Space Age development environments without promoting a public claim."
+      "next_bounded_action": "Bind the already shipped B0 assertion and essential B1 propositions to the exact D1 release environments without creating a generalized proof product."
     },
     {
       "id": "325-B4",
       "category": "product",
-      "status": "partial",
+      "status": "narrowed-release-specific",
       "required_product_surface": [
         "Deterministic bounded JSON and localized summary-first support output.",
         "Effective-setting provenance, privacy allowlist and redaction, stable remediation codes, truncation counts, and diagnostics-off parity."
@@ -302,20 +295,20 @@
         "development-playtest-revision-3:fresh-breadth-135-of-135"
       ],
       "remaining_gap": [
-        "No support-bundle schema joins bounded machine output with localized summary and setting provenance.",
-        "Explicit privacy allowlist, redaction, truncation counts, pseudo/long-locale proof, and manual review remain open."
+        "The shipped bounded B0 support record still requires release-specific privacy, localization, truncation, diagnostics-off, and manual review for frozen bytes.",
+        "A universal support-bundle schema, generalized setting provenance, and broad remediation catalog are deferred to 3.2.6 or 3.3."
       ],
       "package_visibility": "visible",
       "target_disposition": {
-        "factorio_2_1": "mod-data plus localized log summary",
-        "factorio_2_0": "portable-with-adapter through bounded validation-log transport"
+        "factorio_2_1": "bounded B0 mod-data record plus release-specific privacy and localization proof",
+        "factorio_2_0": "shipped B0 record is portable-with-adapter through bounded validation-log transport; no generalized bundle"
       },
-      "next_bounded_action": "Project the B0 research-cost result into one bounded allowlisted support record with explicit truncation and target-aware transport."
+      "next_bounded_action": "Prove the existing bounded B0 support record against release-specific privacy, localization, truncation, and diagnostics-off obligations; add no generalized bundle product."
     },
     {
       "id": "325-B5",
       "category": "product",
-      "status": "partial",
+      "status": "deferred-explicitly",
       "required_product_surface": [
         "Only retire duplicate paths after characterization, shadow output, exact differential, measured benefit, rollback, and target disposition."
       ],
@@ -339,12 +332,12 @@
         "factorio_2_1": "case-by-case after shadow parity",
         "factorio_2_0": "case-by-case with explicit target disposition"
       },
-      "next_bounded_action": "Defer removal work; record only duplication directly encountered while implementing B0 through B4."
+      "next_bounded_action": "Make no optional 3.2.5 consolidation change; reconsider only after public 3.2.5."
     },
     {
       "id": "325-C1",
       "category": "projection",
-      "status": "open",
+      "status": "narrowed-shipped-features-only",
       "required_product_surface": [
         "One Factorio 2.0 disposition for every package-visible 3.2.5 change.",
         "Cost, profile, owner, runtime, migration, report transport, locale, metadata, reconstruction, and performance mapping."
@@ -364,22 +357,22 @@
         "validation/profiles/factorio-2.0.json"
       ],
       "remaining_gap": [
-        "Every post-3.2.3 package-visible change remains to be classified against Factorio 2.0.",
-        "Cost realization, runtime migration, no-mod-data transport, reconstruction, exact closures, and target performance are incomplete."
+        "Every feature actually shipped by narrowed 3.2.5 still requires an explicit Factorio 2.0 disposition before freeze.",
+        "Broad all-slice projection inventory, reconstruction, exact target closures, and target performance are deferred until after 3.2.5 publication and a formal feasibility decision."
       ],
       "package_visibility": "mixed",
       "target_disposition": {
         "factorio_2_1": "canonical source line",
         "factorio_2_0": "investigation only; no release, branch, or candidate authority"
       },
-      "next_bounded_action": "Add the B0 research-cost row to a non-release 3.2.5 portability inventory and prove its transport adapter law without materializing a 2.5.5 tree."
+      "next_bounded_action": "Complete a non-release inventory only for narrowed 3.2.5 shipped features and prove the B0 transport adapter law without materializing a 2.5.5 tree."
     },
     {
       "id": "325-D1",
       "category": "freeze",
       "status": "open",
       "required_product_surface": [
-        "Exact predecessor and lineage packet, package composition, public ABI and approved delta, final cost and disposition contracts, environments, manual and performance policies, release notes, migration, and source-bound verification plan."
+        "Exact 3.2.3 predecessor and lineage packet, package composition, public ABI and approved delta, final cost and bounded B0 contracts, release-specific environments, manual and performance policies, release notes, migration, shipped-feature Factorio 2.0 dispositions, and source-bound verification plan."
       ],
       "current_implementation": [
         "Public 3.2.3 and C31 identities, deterministic development package composition, approved-delta tooling, release notes, and source-bound planning exist.",
@@ -397,8 +390,8 @@
         ".mir/releases/records/3.2.3.json"
       ],
       "remaining_gap": [
-        "B0 through B4 and C1 product contracts are not complete.",
-        "The named algebraic, numeric, ownership, descriptor, default-parity, reload, and Factorio 2.0 freeze defects are not all terminal.",
+        "Essential B1 correctness and the narrowed release-specific B3, B4, and shipped-feature C1 obligations are not complete.",
+        "The named algebraic, numeric, ownership, descriptor, default-parity, reload, and shipped-feature Factorio 2.0 freeze defects are not all terminal.",
         "Final package composition, public ABI delta, environments, manual scope, performance policy, release documents, and exact plan are not frozen."
       ],
       "package_visibility": "mixed",
@@ -406,7 +399,7 @@
         "factorio_2_1": "freeze only after all package-visible work is complete",
         "factorio_2_0": "record dispositions only; do not create release authority"
       },
-      "next_bounded_action": "Keep source unfrozen and update the freeze packet incrementally as each bounded B0 through C1 obligation becomes terminal."
+      "next_bounded_action": "Keep source unfrozen; close essential B1, then materialize the complete narrowed D1 packet without adding optional package-visible scope."
     },
     {
       "id": "325-D2",

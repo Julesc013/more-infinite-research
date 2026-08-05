@@ -5,7 +5,7 @@ applies_to: "3.2.5, 2.5.5, 3.3, 2.6"
 audience: maintainer
 doc_type: adr
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -22,26 +22,25 @@ The release state machine is monotonic and has no unpublished-supersession state
 
 MIR will not publish 3.2.4. C31 remains an immutable, unpublished calibration baseline and is closed by a separate `CandidateClosureRecordV1`. Its product scope is incorporated into the development lineage of one public 3.2.5 convergence release whose public predecessor is 3.2.3. Unperformed C31-specific qualification, sealing, promotion, publication, and public-verification obligations are cancelled; they are not inherited by 3.2.5 under the C31 identity.
 
-3.2.5 combines:
+The 2026-08-05 maintainer decision narrows 3.2.5 to the product already implemented and extensively development-proven:
 
 - fixed, linear, exponential, and hybrid research costs;
-- runtime progress preservation and profile migration;
-- subject-level derived dispositions;
-- proposition-bound compatibility proof;
-- exact environment locks;
-- bounded localized support reporting;
-- privacy and untrusted-input limits;
-- only the behavior-preserving internal consolidations required by those capabilities.
+- exact 3.2.3 defaults, direct upgrades, runtime progress preservation, profile migration, coefficient anchoring, and precision compatibility;
+- current Base, Space Age, governed ecosystem, and Ice dependency compatibility corrections;
+- the admitted bounded `325-B0` research-cost disposition, typed proof assertion, privacy-safe support record, and Factorio 2.0 adapter disposition;
+- exact release-specific environment, migration, privacy, localization, performance, manual, protected, seal, publication, and public-byte proof.
+
+Generalized all-stream terminal dispositions, public proof/environment product authorities, universal support-bundle productization, broad remediation catalogs, and a complete all-change Factorio 2.0 projection inventory are deferred explicitly to 3.2.6 or 3.3. Every feature actually shipped in 3.2.5 still requires an exact target disposition. This is an explicit product-scope decision, not permission to omit release proof.
 
 3.2.5 is one release assembled through independent vertical slices. It is not one mega-commit or an unrestricted rewrite. Stable IDs, settings, defaults, and public contracts remain compatible with 3.2.3. Breaking compiler, lifecycle, extension, and process-safety platform work remains in 3.3.
 
-Factorio 2.0 projection is evaluated throughout 3.2.5 development. The final 2.5.5 package is reconstructed from the immutable 3.2.5 semantics and the latest qualified 2.5.x baseline through governed target adapters, then qualified independently.
+Factorio 2.0 disposition is evaluated for every shipped 3.2.5 feature. No 2.5.5 record, durable branch, candidate, or package authority may be created before public 3.2.5 and a formal feasibility decision.
 
 ## Release-value firewall
 
-3.2.5 source freeze is blocked by complete cost semantics and transition proof; exact default, upgrade, configuration-change, and save/reload parity; terminal per-leaf dispositions; proof and environment locks; bounded localized support and privacy contracts; package composition and manifest proof; public-contract ABI comparison; Factorio 2.0 slice dispositions; a trustworthy release controller; and exact candidate qualification.
+3.2.5 source freeze is blocked by essential cost semantics and transition proof; exact default, upgrade, configuration-change, save/reload, second-reload, ownership, parser, numeric, and realization parity; release-specific environment locks; privacy, localization, and bounded B0 support proof; package composition and manifest proof; public-contract ABI comparison; explicit Factorio 2.0 dispositions for every shipped feature; a trustworthy release controller; and exact candidate qualification.
 
-3.2.5 source freeze is not blocked by completing the entire script-to-command migration, removing all checked-in target-line mirrors, locking every museum installation source, finishing the full MIR Extension Protocol, introducing typed `SettingSpec`, adding a runtime service registry, implementing `ProcessIR`, generalizing trusted external adapters, or building broad generated target projections. Those remain separately governed 3.3, 2.6, or maintenance work unless a demonstrated 3.2.5 release blocker earns a bounded exception.
+3.2.5 source freeze is not blocked by the deferred generalized B2/B3/B4 product surfaces, the broad C1 projection inventory, optional B5 consolidation, the entire script-to-command migration, removal of all checked-in target-line mirrors, every museum installation source lock, MEP-1, typed `SettingSpec`, a runtime service registry, `ProcessIR`, generalized trusted external adapters, or broad generated target projections. Those remain separately governed 3.2.6, 3.3, 2.6, or maintenance work unless a demonstrated defect in the narrowed shipped product earns a bounded correction.
 
 ## Consequences
 
@@ -51,6 +50,7 @@ Factorio 2.0 projection is evaluated throughout 3.2.5 development. The final 2.5
 - The final approved delta compares public 3.2.3 with 3.2.5.
 - A confirmed P11 defect may still create a minimal 2.5.1 before 2.5.5.
 - Package-visible development occurs only while 3.2.5 is `planned`; C32 is frozen after all package-visible slices are integrated.
+- A package-visible defect discovered after candidate assignment consumes a later monotonic candidate; the deadline never weakens a gate or mutates frozen candidate bytes.
 
 ## Reversal
 

@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0017",
+  "title": "Close 325-B0 and narrow the MIR 3.2.5 release contract",
+  "kind": "release",
+  "package_visible": false,
+  "domains_read": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "assurance.plan",
+    "product.research-cost",
+    "product.compatibility"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "assurance.plan"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Keep public 3.2.3 as the sole predecessor of 3.2.5; retain 3.2.4/C31 as superseded-unpublished in its immutable release and closure records while preserving its exact ZIP in governed historical custody; close the admitted 325-B0 vertical slice; and defer generalized compatibility productization without creating 2.5.5 release authority or admitting 3.3 implementation.",
+  "release_note_impact": "MIR 3.2.5 is explicitly narrowed to the unified research-cost release and its bounded research-cost compatibility proof/support slice. Generalized disposition, proof-authority, support-bundle, and broad Factorio 2.0 projection products move to a later release.",
+  "test_obligations": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "assurance.plan",
+    "control-plane.records",
+    "docs.generated",
+    "package.identity-preservation"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "apply as package-excluded release governance before essential 325-B1 and source freeze",
+    "factorio-2.0": "record exact shipped-feature dispositions only; create no 2.5.5 record, branch, candidate, or package authority"
+  },
+  "maintainer_decision": {
+    "release": "3.2.5",
+    "public_predecessor": "3.2.3",
+    "superseded_unpublished": {
+      "release": "3.2.4",
+      "candidate_id": "C31",
+      "closure": ".mir/releases/closures/3.2.4-C31.json"
+    },
+    "shipped_scope": [
+      "Unified fixed, linear, exponential, and hybrid research costs.",
+      "Exact 3.2.3 neutral-default and direct-upgrade compatibility.",
+      "Correct research-progress preservation, base-continuation coefficient anchoring, and six-significant-digit compatibility behavior.",
+      "Current Base, Space Age, governed ecosystem, and Ice dependency compatibility corrections.",
+      "The bounded 325-B0 research-cost disposition, typed proof assertion, privacy-safe support record, and Factorio 2.0 adapter disposition.",
+      "Release-specific migration, privacy, localization, performance, manual, protected, seal, publication, and public-byte proof."
+    ],
+    "deferred_scope": [
+      {
+        "work_package": "325-B2",
+        "surface": "Generalized all-stream and per-leaf terminal disposition product.",
+        "destination": "3.2.6-or-3.3"
+      },
+      {
+        "work_package": "325-B3",
+        "surface": "General-purpose public ProofAssertion and EcosystemProfile product authorities beyond release-specific evidence.",
+        "destination": "3.2.6-or-3.3"
+      },
+      {
+        "work_package": "325-B4",
+        "surface": "Universal support-bundle and remediation-catalog product beyond the bounded B0 artifact.",
+        "destination": "3.2.6-or-3.3"
+      },
+      {
+        "work_package": "325-C1",
+        "surface": "Broad 3.2.5-to-2.0 projection inventory beyond explicit dispositions for shipped features.",
+        "destination": "post-3.2.5-feasibility-or-3.3"
+      }
+    ],
+    "mandatory_release_specific_obligations": [
+      "Essential 325-B1 default, numeric, parser, save/reload, ownership, realization, and shipped-feature target proof.",
+      "Exact Base, Space Age, upgrade, configuration-change, ecosystem, privacy, localization, performance, and manual evidence for frozen bytes.",
+      "Complete D1 freeze packet, candidate assignment only after source freeze, protected no-reuse qualification, seal, promotion, publication, and public-byte verification."
+    ]
+  },
+  "work_package_closure": {
+    "id": "325-B0",
+    "status": "closed-development-product-slice",
+    "implementation_head": "5264ab2285b56ac2a79dc1bc99724554fb558c7f",
+    "implementation_tree": "0d3fc58d69eed64bcb2199a051f9fc9f6a6c9c30",
+    "merge_commit": "489b62fda979c5192ddbb8294c27a3886f6ba13e",
+    "local_admission": {
+      "plan_material_sha256": "F56DFAEA5CA04333DAB90D95156F2CB082844732E7473F67897C23908BE77A98",
+      "required_test_set_sha256": "3F6EEEDB8073E2CF7F666668B808DCFC4DF8CFF1E9B36BBF93B514E67D7DE76C",
+      "executed": 127,
+      "passed": 127,
+      "failed": 0,
+      "incomplete": 0,
+      "unexpected": 0
+    },
+    "hosted_admission": {
+      "branch_policy_run": "30997445029",
+      "emergency_package_run": "30997445143",
+      "mir_run": "30997445032",
+      "plan_material_sha256": "61A2A835E214E5599181613280252B44351D5602C7E18F378048C3EB9AABDFA1",
+      "bundle_sha256": "D02C22C0EF1941F9FFCBEBC2C244DEBE7A444C26558DCBCA8D94A47ED0DB74A1",
+      "worker_import": {
+        "imported": 8,
+        "failed": 0,
+        "missing": 0,
+        "rejected": 0,
+        "duplicates": 0,
+        "ignored": 0
+      }
+    },
+    "development_package": {
+      "archive_sha256": "AF3F4D6AFF58B098D6729FE31B039C47497988E7515D1055F4C5C54D85B5CDBD",
+      "content_sha256": "A313E8A3E377A099FCB6E8266A3EDBDF5AEF9D77CF777B041472C772C6448877",
+      "bytes": 1055804,
+      "entries": 301,
+      "rolling_revision": 4
+    },
+    "release_authority_effect": "none: 3.2.5 remains planned, C32 remains an unassigned floor, 2.5.5 authority remains absent, and 3.3 remains unadmitted"
+  },
+  "state": "implemented"
+}
