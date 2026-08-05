@@ -41,7 +41,7 @@
   ],
   "priority": {
     "next_work_package": "325-B0",
-    "reason": "The shared research-cost model and development runtime proof exist, but no single compatibility proposition is yet traceable through a terminal disposition, typed proof assertion, bounded support projection, and exact Factorio 2.0 disposition."
+    "reason": "The bounded research-cost compatibility slice is implemented, but 325-B0 remains the current priority until the exact committed source and package pass their selected admission plan and latest-head hosted closure."
   },
   "work_packages": [
     {
@@ -142,7 +142,7 @@
     {
       "id": "325-B0",
       "category": "product",
-      "status": "partial",
+      "status": "implemented-awaiting-closure",
       "required_product_surface": [
         "Research-cost default-parity semantic export.",
         "One terminal Factorio 2.1 disposition.",
@@ -152,32 +152,32 @@
       ],
       "current_implementation": [
         "ResearchCostModel exports semantic, authority, and qualification digests and a canonical public summary.",
-        "Compiler input, result, plan, journal, public artifacts, and target-aware evidence transport exist.",
-        "No end-to-end research-cost compatibility-slice authority currently joins those surfaces."
+        "prototypes/mir/domain/research_cost/compatibility_slice.lua derives one terminal neutral-default proposition from trusted compiler input and final APPLIED compiler results.",
+        "The compatibility slice binds compiler input, compilation, qualification, plan, final result, journal, realised output, typed proof, and whole-artifact fingerprints.",
+        "prototypes/mir/emit/research_cost_compatibility_adapter.lua projects the bounded support artifact through mod-data for Factorio 2.1 and validation-log for a future Factorio 2.0 adapter proof.",
+        "The schema-1 public projection is budgeted, deterministic, target-aware, and fails closed when any disposition or fingerprint is changed."
       ],
       "current_tests": [
         "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
-        "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
-        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1"
+        "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
+        "validation/tests/compiler/Test-MIRCompiler.ps1",
+        "fixtures/assert-compiler-contracts/data-final-fixes.lua"
       ],
       "current_evidence": [
-        "development-playtest-revision-3:sixteen-cost-transitions",
-        "development-playtest-revision-3:five-direct-3.2.3-upgrade-archetypes",
-        ".mir/lifecycle/incidents/INC-2026-0054.json",
-        ".mir/lifecycle/incidents/INC-2026-0057.json"
+        "docs/reference/schemas/research-cost-compatibility-slice.md",
+        ".mir/compiler-contract-coverage.yml",
+        ".mir/compiler-schema-authority.json",
+        ".mir/public-artifact-budgets.json"
       ],
       "remaining_gap": [
-        "No terminal per-subject research-cost disposition record exists.",
-        "No proof assertion binds exact default parity to its environment and evidence.",
-        "No deterministic support projection exposes the result and remediation safely.",
-        "No exact Factorio 2.0 cost disposition is machine-readable."
+        "The exact committed source and package must pass the selected broad admission plan and latest-head hosted closure before the terminal disposition, typed proof assertion, bounded support projection, and exact Factorio 2.0 adapter disposition are admitted as the completed 325-B0 slice."
       ],
       "package_visibility": "visible",
       "target_disposition": {
-        "factorio_2_1": "planned native semantic export and mod-data support projection",
-        "factorio_2_0": "planned portable-with-adapter pending exact validation-log transport and target formula proof"
+        "factorio_2_1": "target-native-equivalent via bounded mod-data support projection in the exact current environment",
+        "factorio_2_0": "portable-with-adapter via bounded validation-log transport; requires exact target formula proof and creates no 2.5.5 authority"
       },
-      "next_bounded_action": "Implement one schema-1 research-cost compatibility-slice projection for the neutral-default proposition, publish it through bounded target-aware transport, and prove deterministic fail-closed output before broadening subjects."
+      "next_bounded_action": "Commit the bounded slice, materialize its exact source-bound plan, require complete latest-head local and hosted admission, then close 325-B0 append-only and advance the open product priority to 325-B1 without changing release authority."
     },
     {
       "id": "325-B1",

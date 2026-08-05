@@ -36,6 +36,7 @@ MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3
 - Existing technology, setting, locale, runtime-state, and profile identifiers remain stable.
 - Old profiles remain readable and unknown future profile fields remain preserved.
 - New cost controls use neutral defaults.
+- Normal loads expose a bounded research-cost support record that links the neutral-default proposition to the final compiler result, provides stable reason/remediation codes, and records the Factorio 2.0 validation-log adapter disposition without creating 2.5.5 authority.
 - The public upgrade path is 3.2.3 to 3.2.5.
 - MIR 2.5.5 is a later conditional Factorio 2.0 projection and is not produced by this release.
 
