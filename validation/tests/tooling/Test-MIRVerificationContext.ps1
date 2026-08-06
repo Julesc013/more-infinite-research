@@ -8,6 +8,11 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+$contextSource = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/lib/control/Context.ps1")
+$controllerProfileBinding = '$targetProfilePath = Join-Path $repo "validation/profiles/factorio-$Target.json"'
+if (-not $contextSource.Contains($controllerProfileBinding)) {
+  throw "Verification context must take the mutable target profile from the controller repository, not the frozen package source."
+}
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
