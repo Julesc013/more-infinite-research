@@ -63,6 +63,17 @@ function Get-MIRCandidateEvidenceJson {
   }
 }
 
+function Get-MIRCandidateCaptureSha256 {
+  param([Parameter(Mandatory)][string]$Path, [string]$DigestPolicy = "raw")
+  if ($DigestPolicy -eq "utf8-lf") {
+    $text = (Get-Content -Raw -LiteralPath $Path).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  }
+  if ($DigestPolicy -ne "raw") { throw "Unsupported interactive review capture digest policy: $DigestPolicy" }
+  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+}
+
 function Assert-MIRCandidateBoundEvidence {
   param(
     [Parameter(Mandatory)]$Fields,
@@ -147,7 +158,8 @@ function Assert-MIRCandidateBoundEvidence {
       if (-not (Test-Path -LiteralPath $capturePath -PathType Leaf)) {
         throw "Interactive review capture is missing: $($capture.path)"
       }
-      if ((Get-MIRFileSha256 -Path $capturePath) -ne [string]$capture.sha256) {
+      $digestPolicy = if ($null -ne $capture.PSObject.Properties["digest_policy"]) { [string]$capture.digest_policy } else { "raw" }
+      if ((Get-MIRCandidateCaptureSha256 -Path $capturePath -DigestPolicy $digestPolicy) -ne [string]$capture.sha256) {
         throw "Interactive review capture hash is stale: $($capture.path)"
       }
     }

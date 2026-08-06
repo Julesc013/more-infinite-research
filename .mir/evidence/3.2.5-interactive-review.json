@@ -16,7 +16,8 @@
     },
     {
       "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
-      "sha256": "3757CCDE1C66F83387CD2BBDD42215AFBDB5500B6A5423DD9DC467118A2E65AA"
+      "sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+      "digest_policy": "utf8-lf"
     },
     {
       "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
