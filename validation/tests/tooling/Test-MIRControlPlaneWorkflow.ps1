@@ -28,6 +28,10 @@ foreach ($token in @(
   if ($workflow -notmatch [regex]::Escape($token)) { throw "Control Plane v5 workflow omits required token: $token" }
 }
 if ($workflow -match 'merge-multiple:\s*true') { throw "Control Plane v5 must not overlay worker artifacts into one shared tree." }
+$contextDownloads = @([regex]::Matches($workflow, '(?m)^\s+name:\s+mir-v5-context\r?\n\s+path:\s+build/results\s*$'))
+if ($contextDownloads.Count -ne 8) {
+  throw "Every Control Plane v5 consumer must restore the context artifact beneath build/results."
+}
 if ($workflow -match '(?m)^\s*run:\s*\./source/tools/commands/package/Build-MIRPackage\.ps1\s*$') {
   throw "Control Plane v5 must not create an untracked candidate archive inside the immutable source checkout."
 }
