@@ -310,6 +310,23 @@
           "validation/tests/tooling/Test-MIRAssurance.ps1"
         ],
         "reason": "Requalify unchanged C32 package bytes after making the exact Factorio installation identity independent of checkout path while retaining an explicit legacy path-bound alias."
+      },
+      {
+        "commit": "db272b83408bc3f706454b34105a65e4789b5977",
+        "paths": [
+          ".mir/convergence.yml",
+          ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+          ".mir/releases.json",
+          ".mir/releases/records/3.2.5.json"
+        ],
+        "reason": "Accept the exact fresh 135-row Factorio 2.1.13 qualification using the checkout-independent installation identity while preserving unchanged C32 package bytes and the prior human acceptance."
+      },
+      {
+        "commit": "f51016133071ebc926c22133f54b2859cb3f3a28",
+        "paths": [
+          ".mir/evidence/3.2.5-interactive-review.json"
+        ],
+        "reason": "Rebind the already accepted exact-C32 interactive review to the final automated qualification evidence bytes without changing its reviewer, decision, package identity, or scope."
       }
     ]
   },
