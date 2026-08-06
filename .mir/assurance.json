@@ -72,7 +72,7 @@
     },
     {
       "id": "release-governance",
-      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(portable-return|release-wave)\\.yml$"],
+      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(portable-return|release-wave)\\.yml$", "^\\.mir/backport-(?:source-lock|portable-delta-[^/]+)\\.json$"],
       "tests": ["docs.check", "tooling.self-test", "static.release-history", "static.full", "static.package"]
     },
     {
