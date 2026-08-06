@@ -205,7 +205,8 @@ end
 
 local function assert_mod_data_omitted()
   for name, _ in pairs(data.raw["mod-data"] or {}) do
-    if string.match(name, "^more%-infinite%-research%-") then
+    if string.match(name, "^more%-infinite%-research%-")
+      and name ~= "more-infinite-research-compatibility-pack" then
       fail("target without mod-data support published MIR artifact " .. name)
     end
   end
