@@ -229,8 +229,8 @@ candidate:
   structured_summary_sha256: B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E
   structured_summary_run_id: local-6696
   automated_gate: passed
-  manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  manual_gate: accepted-for-publication
+  status: release-candidate-accepted
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

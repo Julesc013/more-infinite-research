@@ -15,10 +15,10 @@
       "branch": "dev",
       "candidate_floor": "C32",
       "candidate_id": "C32",
-      "effective_status": "candidate-qualified",
+      "effective_status": "manually-accepted",
       "release": "3.2.5",
       "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
-      "state": "candidate-qualified",
+      "state": "manually-accepted",
       "target": "2.1"
     },
     {

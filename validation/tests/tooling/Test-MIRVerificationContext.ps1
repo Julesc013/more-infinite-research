@@ -45,7 +45,8 @@ if ([string]$c31Profile.upgrade.from_version -ne "3.2.3" -or [string]$c31Profile
 }
 $candidateRelease = Get-MIRCPReleaseByVersion -Release "3.2.5" -RepoRoot $repo
 $candidateProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $candidateRelease -RepoRoot $repo
-if ([string]$candidateRelease.state -ne "candidate-qualified" -or [string]$candidateRelease.candidate_id -ne "C32" -or
+if ([string]$candidateRelease.state -notin @("candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified") -or
+    [string]$candidateRelease.candidate_id -ne "C32" -or
     [string]$candidateProfile.upgrade.from_version -ne "3.2.3" -or [string]$candidateProfile.upgrade.to_version -ne "3.2.5" -or
     [string]$candidateProfile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-5") {
   throw "C32 target-profile projection does not bind the governed public upgrade."

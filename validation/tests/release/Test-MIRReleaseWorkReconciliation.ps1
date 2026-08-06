@@ -76,9 +76,10 @@ if ($releaseBoundary -notin @(
     "source-frozen|C32",
     "package-built|C32",
     "focused-qualified|C32",
-    "candidate-qualified|C32"
+    "candidate-qualified|C32",
+    "manually-accepted|C32"
   )) {
-  throw "Work-package reconciliation claims an unsupported pre-manual release boundary: $releaseBoundary"
+  throw "Work-package reconciliation claims an unsupported release boundary: $releaseBoundary"
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json")) {
   throw "A forbidden 2.5.5 release authority exists."

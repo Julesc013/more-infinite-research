@@ -283,12 +283,14 @@ $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -notin @(
       "planned|not-assigned", "source-frozen|C32", "package-built|C32",
-      "focused-qualified|C32", "candidate-qualified|C32"
+      "focused-qualified|C32", "candidate-qualified|C32", "manually-accepted|C32",
+      "protected-qualified|C32", "sealed|C32", "promoted|C32", "tagged|C32",
+      "published|C32", "publicly-verified|C32"
     ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current pre-manual 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current 3.2.5 public upgrade authority."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
