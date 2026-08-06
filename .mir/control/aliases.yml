@@ -376,22 +376,17 @@ aliases:
     introduced: 3.2.5
     sunset: 3.3.0
   - from: artifacts/
-    to: workspace.artifacts
-    mode: local-read-only
-    introduced: 3.2.5
-    sunset: 3.3.0
-  - from: build/
-    to: workspace.build
+    to: workspace.build.results
     mode: local-read-only
     introduced: 3.2.5
     sunset: 3.3.0
   - from: out/
-    to: workspace.output
+    to: workspace.build.results
     mode: local-read-only
     introduced: 3.2.5
     sunset: 3.3.0
   - from: tmp/
-    to: workspace.tmp
+    to: workspace.build.tmp
     mode: local-read-only
     introduced: 3.2.5
     sunset: 3.3.0

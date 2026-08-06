@@ -12,7 +12,7 @@ $infoPath = Join-Path $repo "info.json"
 $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
 
 $packageName = "$($info.name)_$($info.version)"
-$buildRoot = Join-Path $repo ".work\build\package"
+$buildRoot = Join-Path $repo "build\package"
 $packageRoot = Join-Path $buildRoot $packageName
 $outputRoot = Join-Path $repo $OutputDir
 $zipPath = Join-Path $outputRoot "$packageName.zip"

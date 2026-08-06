@@ -7,6 +7,24 @@ $aliases = Read-MIRRepoAliasCatalog -RepoRoot $repo -PathCatalog $paths
 if ($paths.paths.PSObject.Properties["releases.deltas"].Value -ne ".mir/releases/deltas") {
   throw "Release delta path ID changed."
 }
+foreach ($expectedPath in @{
+  "workspace.build.results" = "build/results"
+  "workspace.build.results.evidence" = "build/results/evidence"
+  "workspace.build.results.verification-context" = "build/results/verification-context"
+  "workspace.build" = "build"
+  "workspace.build.candidate" = "build/candidate"
+  "workspace.build.tmp" = "build/tmp"
+  "distributions.playtest" = "dist/playtest"
+}.GetEnumerator()) {
+  if ($paths.paths.PSObject.Properties[$expectedPath.Key].Value -cne $expectedPath.Value) {
+    throw "Generated-data path ID drifted: $($expectedPath.Key)"
+  }
+}
+foreach ($retiredPathId in @("workspace.root", "workspace.output", "workspace.playtest", "workspace.tmp")) {
+  if ($paths.paths.PSObject.Properties[$retiredPathId]) {
+    throw "Retired workspace path ID remains canonical: $retiredPathId"
+  }
+}
 if (@($aliases.aliases | Where-Object from -eq "approved-delta/").Count -ne 1) {
   throw "Historical approved-delta alias is missing."
 }
@@ -14,6 +32,15 @@ if (@($aliases.aliases | Where-Object {
   $_.introduced -eq "3.2.5" -and $_.sunset -ne "3.3.0"
 }).Count -ne 0) {
   throw "Every 3.2.5 migration alias must declare the common 3.3.0 sunset."
+}
+foreach ($canonicalRoot in @("build/")) {
+  if (@($aliases.aliases | Where-Object from -eq $canonicalRoot).Count -ne 0) {
+    throw "Canonical generated-data root remains registered as an alias: $canonicalRoot"
+  }
+}
+$legacyOutAlias = @($aliases.aliases | Where-Object from -eq "out/")
+if ($legacyOutAlias.Count -ne 1 -or $legacyOutAlias[0].to -ne "workspace.build.results" -or $legacyOutAlias[0].mode -ne "local-read-only") {
+  throw "Retired out/ path does not resolve read-only to build/results/."
 }
 $legacySchemaAlias = "verification/" + "schema/"
 if (@($aliases.aliases | Where-Object {
@@ -167,9 +194,10 @@ if ($manifest.summary.unclassified -ne 0 -or $manifest.summary.case_collisions -
 }
 if ($manifest.summary.legacy -eq 0) { throw "Migration baseline unexpectedly contains no legacy paths." }
 
-$migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIROutputRoots.ps1") -RepoRoot $repo | ConvertFrom-Json
-if ($migrationPreview.mode -ne "preview" -or $migrationPreview.changed -ne 0) {
-  throw "Output-root migration is not idempotent: $($migrationPreview | ConvertTo-Json -Compress)"
+$migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
+if ($migrationPreview.mode -ne "preview" -or @($migrationPreview.present).Count -ne 0 -or
+    (@($migrationPreview.canonical_roots) -join ",") -cne "build,dist") {
+  throw "The deprecated .work root remains: $($migrationPreview | ConvertTo-Json -Compress)"
 }
 $controlRecordMigrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Move-MIRControlPlaneRecords.ps1") -RepoRoot $repo | ConvertFrom-Json
 if ($controlRecordMigrationPreview.mode -ne "preview" -or $controlRecordMigrationPreview.changed -ne 0 -or
@@ -466,7 +494,7 @@ foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoo
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
   Where-Object Name -ne "Test-MIRLayout.ps1")
-if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 65) {
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 67) {
   throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
 }
 foreach ($wrapper in $legacyTestWrappers) {
@@ -481,35 +509,24 @@ if ($LASTEXITCODE -ne 0 -or $legacySchemaFiles.Count -ne 0) {
   throw "Legacy physical verification schema files remain tracked."
 }
 
-foreach ($workflow in @(Get-ChildItem -LiteralPath (Join-Path $repo ".github/workflows") -File)) {
-  $lines = @(Get-Content -LiteralPath $workflow.FullName)
-  for ($index = 0; $index -lt $lines.Count; $index++) {
-    if ($lines[$index] -notmatch "uses:\s*actions/upload-artifact@") { continue }
-    $usesIndent = ([regex]::Match($lines[$index], "^\s*").Value).Length
-    $stepStart = $index
-    if ($lines[$index] -notmatch "^\s*-\s+uses:") {
-      for ($candidate = $index - 1; $candidate -ge 0; $candidate--) {
-        $match = [regex]::Match($lines[$candidate], "^(?<indent>\s*)-\s+")
-        if ($match.Success -and $match.Groups["indent"].Value.Length -lt $usesIndent) {
-          $stepStart = $candidate
-          break
-        }
-      }
-    }
-    $stepIndent = ([regex]::Match($lines[$stepStart], "^\s*").Value).Length
-    $stepEnd = $lines.Count
-    for ($candidate = $stepStart + 1; $candidate -lt $lines.Count; $candidate++) {
-      $match = [regex]::Match($lines[$candidate], "^(?<indent>\s*)-\s+")
-      if ($match.Success -and $match.Groups["indent"].Value.Length -eq $stepIndent) {
-        $stepEnd = $candidate
-        break
-      }
-    }
-    $block = $lines[$stepStart..($stepEnd - 1)] -join "`n"
-    if ($block -match "\.work/" -and
-        $block -notmatch "(?m)^\s+include-hidden-files:\s*true\s*$") {
-      throw "Hidden output upload lacks include-hidden-files opt-in: $($workflow.Name):$($index + 1)"
-    }
+$deprecatedOutputPattern = '(?i)(?:^|[^A-Za-z0-9_])\.work(?:[\\/]|["''])'
+$deprecatedReferenceExclusions = @(
+  (Join-Path $repo "tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1"),
+  (Join-Path $repo "tools/commands/package/Measure-MIRPackageComposition.ps1"),
+  (Join-Path $repo "validation/tests/tooling/Test-MIRLayout.ps1")
+)
+$activeAutomationFiles = @(
+  foreach ($root in @(".github", "scripts", "tools", "validation", ".mir/lifecycle/tasks")) {
+    Get-ChildItem -LiteralPath (Join-Path $repo $root) -File -Recurse
+  }
+  Get-Item -LiteralPath (Join-Path $repo ".mir/assurance.json")
+  Get-Item -LiteralPath (Join-Path $repo ".mir/fixtures.yml")
+  Get-Item -LiteralPath (Join-Path $repo ".mir/control-plane/control-plane.json")
+)
+foreach ($file in $activeAutomationFiles) {
+  if ($file.FullName -in $deprecatedReferenceExclusions) { continue }
+  if ((Get-Content -Raw -LiteralPath $file.FullName) -match $deprecatedOutputPattern) {
+    throw "Active automation still references the retired .work root: $($file.FullName.Substring($repo.Length + 1))"
   }
 }
 $legacyCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/mir.ps1")

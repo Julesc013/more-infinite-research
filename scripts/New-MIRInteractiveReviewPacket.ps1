@@ -3,7 +3,7 @@ param(
   [string]$SourceCommit = "",
   [string]$FactorioBin = "",
   [string]$ExpectedFactorioVersion = "2.1.11",
-  [string]$OutputDir = ".work\artifacts\interactive-review-current"
+  [string]$OutputDir = "build\results\interactive-review-current"
 )
 
 $ErrorActionPreference = "Stop"

@@ -51,7 +51,7 @@ verification_manifests:
       - same-class-reuse
   evidence:
     schema: 4
-    root: .work/artifacts/assurance/evidence
+    root: build/results/assurance/evidence
     schemas: spec/schemas
     dispositions:
       - REUSE

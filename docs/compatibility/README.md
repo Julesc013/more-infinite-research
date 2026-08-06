@@ -151,7 +151,7 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
   -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
-  -OutputDir .\artifacts\compat-audit-manual
+  -OutputDir .\build\results\compat-audit-manual
 ```
 
 Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSourceCommit`. A load-tested run then writes `campaign-evidence.json` with the candidate SHA-256, dependency-lock fingerprint, actual roots, closure versions and SHA-256 values, result, timeout state, and claim level. See [modpack campaigns](../maintainer/modpack-campaigns.md).
@@ -160,7 +160,7 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
 
 ```powershell
 .\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
-  -FromLockfile .\artifacts\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
+  -FromLockfile .\build\results\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
   -FactorioLine 2.1 `
   -StartIndex 25 `
   -Count 25 `
@@ -170,20 +170,20 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
   -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
-  -OutputDir .\artifacts\compat-audit-2.1-spaceage-all-10k-shard-25
+  -OutputDir .\build\results\compat-audit-2.1-spaceage-all-10k-shard-25
 ```
 
 Grouped summaries and profile-candidate evidence are generated with:
 
 ```powershell
-.\tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1 -AuditDir .\artifacts\compat-audit-manual
+.\tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\results\compat-audit-manual
 ```
 
 Review-only profile stubs can be generated from grouped failures:
 
 ```powershell
 .\tools\commands\compatibility\New-MIRCompatProfileStub.ps1 `
-  -GroupedFailures .\artifacts\compat-audit-manual\compat-failures.grouped.json `
+  -GroupedFailures .\build\results\compat-audit-manual\compat-failures.grouped.json `
   -GroupId FG0001
 ```
 
@@ -212,7 +212,7 @@ Use the underlying scripts directly only when debugging or composing a narrower 
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
 .\scripts\Start-MIROvernightLocalSweep.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\build\results\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
 
 `Invoke-MIRReleaseTargetedGate.ps1` is the narrow release command. It resolves the Factorio binary, picks a local mod library for the current Factorio line unless one is passed, optionally pulls the current branch, and then runs:

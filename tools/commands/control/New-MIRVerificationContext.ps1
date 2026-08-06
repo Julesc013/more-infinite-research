@@ -7,7 +7,7 @@ param(
   [string]$CandidatePath = "",
   [string]$SourceRepoRoot = "",
   [string]$FactorioBin = "",
-  [string]$OutputRoot = ".work/output/verification-context"
+  [string]$OutputRoot = "build/results/verification-context"
 )
 
 $ErrorActionPreference = "Stop"

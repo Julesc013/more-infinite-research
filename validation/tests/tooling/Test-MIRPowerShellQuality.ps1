@@ -115,10 +115,13 @@ if (-not (Test-Path -LiteralPath $gitignorePath)) {
   Add-MIRPowerShellQualityFailure -File ".gitignore" -Message "missing .gitignore"
 } else {
   $gitignoreText = Get-Content -Raw -LiteralPath $gitignorePath
-  foreach ($requiredPattern in @("/build/", "/tmp/", "/artifacts/")) {
+  foreach ($requiredPattern in @("/build/", "/dist/playtest/", "/artifacts/", "/out/", "/tmp/")) {
     if (-not $gitignoreText.Contains($requiredPattern)) {
       Add-MIRPowerShellQualityFailure -File ".gitignore" -Message "missing ignored generated-output path: $requiredPattern"
     }
+  }
+  if ($gitignoreText.Contains("/.work/")) {
+    Add-MIRPowerShellQualityFailure -File ".gitignore" -Message "retired .work root must not be ignored"
   }
 }
 

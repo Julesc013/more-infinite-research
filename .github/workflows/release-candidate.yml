@@ -65,6 +65,6 @@ jobs:
           name: release-candidate-${{ inputs.candidate_sha }}
           path: |
             dist/*.zip
-            .work/artifacts/validation/*.json
-            .work/artifacts/release-gate/**
+            build/results/validation/*.json
+            build/results/release-gate/**
           if-no-files-found: error

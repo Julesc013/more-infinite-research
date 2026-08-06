@@ -23,7 +23,7 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = Join-Path $repo ".work\artifacts\legacy-inventory"
+  $OutputRoot = Join-Path $repo "build\results\legacy-inventory"
 }
 $output = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   $OutputRoot

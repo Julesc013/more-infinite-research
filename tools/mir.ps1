@@ -150,7 +150,7 @@ function New-MIRProfileOverrides {
 
 function Get-MIRLatestRunRoot {
   $runRoots = @(
-    (Join-Path $repo ".work\artifacts\runs"),
+    (Join-Path $repo "build\results\runs"),
     (Join-Path $repo "artifacts")
   )
   $run = @($runRoots | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | ForEach-Object {
@@ -605,7 +605,7 @@ switch ($area) {
   }
   "legacy" {
     if ($verb -ne "inventory") { throw "Unknown legacy command: $verb" }
-    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo ".work\artifacts\legacy-inventory")
+    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo "build\results\legacy-inventory")
     $params = @{ OutputRoot = $output }
     if (Test-MIRArgSwitch -Items $Args -Name "--check") {
       $params.CheckThresholds = $true
@@ -628,7 +628,7 @@ switch ($area) {
   "local-index" {
     if ($verb -ne "build") { throw "Unknown local-index command: $verb" }
     $mods = Get-MIRArgValue -Items $Args -Name "--mods" -Default (Get-MIRDefaultLocalModDir)
-    $out = Get-MIRArgValue -Items $Args -Name "--out" -Default (Join-Path $repo ".work\build\cache\local-mod-index\local-mod-index.2.1.json")
+    $out = Get-MIRArgValue -Items $Args -Name "--out" -Default (Join-Path $repo "build\cache\local-mod-index\local-mod-index.2.1.json")
     New-MIRLocalModIndex -Dirs @($mods) -OutputPath $out | Out-Null
     Write-MIRSuccess "wrote $out"
   }

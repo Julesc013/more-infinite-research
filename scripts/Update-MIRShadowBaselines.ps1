@@ -1,5 +1,5 @@
 param(
-  [string]$C24Plan = "artifacts/assurance/plans/verification-plan-c24-full-no-reuse.json",
+  [string]$C24Plan = "build/results/assurance/plans/verification-plan-c24-full-no-reuse.json",
   [string]$P9Plan = "",
   [switch]$Check,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path

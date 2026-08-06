@@ -6,8 +6,8 @@
     "domains": "validation/domains.yml",
     "profiles": "validation/profiles",
     "trust": "validation/trust.json",
-    "plan": ".work/output/verification-plan.json",
-    "evidence": ".work/artifacts/assurance/evidence",
+    "plan": "build/results/assurance/verification-plan.json",
+    "evidence": "build/results/assurance/evidence",
     "aggregate_gate": "MIR / verification-gate"
   },
   "worker_import": {
@@ -69,7 +69,7 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/control/(?:Invoke-MIRControlPlaneWork|New-MIRCandidateQualificationEvidence)\\.ps1|lib/control/(?:Evidence|Planner|Views)\\.ps1)$", "^tools/lib/assurance/", "^tools/maintenance/", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/paths\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|ownership)\\.json$", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
@@ -94,7 +94,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
+      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
       "tests": ["docs.check"]
     },
     {

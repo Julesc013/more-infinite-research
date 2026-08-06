@@ -1,5 +1,5 @@
 param(
-  [string]$C24Plan = "artifacts/assurance/plans/verification-plan-c24-full-no-reuse.json",
+  [string]$C24Plan = "build/results/assurance/plans/verification-plan-c24-full-no-reuse.json",
   [string]$P9Plan = "",
   [switch]$Check,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
@@ -84,12 +84,12 @@ function New-MIRV4CompactBaseline {
 }
 
 $c24 = New-MIRV4CompactBaseline -PlanPath $C24Plan -Release "3.2.2" -CandidateId "C24" `
-  -SourceLabel "artifacts/assurance/plans/verification-plan-c24-full-no-reuse.json"
+  -SourceLabel "build/results/assurance/plans/verification-plan-c24-full-no-reuse.json"
 Write-MIRCPJson -Path "validation/baselines/control/3.2.2-v4.json" -Value $c24 -RepoRoot $repo -Check:$Check
 
 if (-not [string]::IsNullOrWhiteSpace($P9Plan)) {
   $p9 = New-MIRV4CompactBaseline -PlanPath $P9Plan -Release "2.5.0" -CandidateId "2.5-P9" `
-    -SourceLabel "artifacts/assurance/plans/verification-plan-2.5-p9-full-no-reuse.json"
+    -SourceLabel "build/results/assurance/plans/verification-plan-2.5-p9-full-no-reuse.json"
   Write-MIRCPJson -Path "validation/baselines/control/2.5.0-p9-v4.json" -Value $p9 -RepoRoot $repo -Check:$Check
 }
 

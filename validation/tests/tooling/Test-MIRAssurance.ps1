@@ -413,7 +413,7 @@ foreach ($requiredWorkflowSnippet in @(
   "needs: [context, static, package, environments, transitions, ecosystem]",
   "needs: [context, transitions, ecosystem, performance]",
   "needs: [context, static, package, environments, transitions, ecosystem, performance, manual]",
-  "-TrustClass protected-release -EvidenceRoot .work/artifacts/evidence",
+  "-TrustClass protected-release -EvidenceRoot build/results/evidence",
   "-AggregateTaskId qualification.full -TrustClass protected-release",
   "Invoke-MIRControlPlane.ps1 seal",
   "-TaskId shadow.equivalence",
@@ -433,8 +433,8 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
   'Stage exact development candidate for isolated transfer',
-  'path: .work/candidate/*.zip',
-  'path: .work/candidate',
+  'path: build/candidate/*.zip',
+  'path: build/candidate',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
@@ -465,11 +465,11 @@ foreach ($fanInCase in @(
 )) {
   $fanInWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $fanInCase.Path)
   foreach ($requiredFanInSnippet in @(
-    'path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
-    'path: .work/artifacts/assurance/worker-evidence',
+    'path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
+    'path: build/results/assurance/worker-evidence',
     'verify import-workers',
     "--artifact-prefix $($fanInCase.Prefix)",
-    '.work/artifacts/assurance/worker-import.json'
+    'build/results/assurance/worker-import.json'
   )) {
     if (-not $fanInWorkflow.Contains($requiredFanInSnippet)) {
       throw "Assurance workflow '$($fanInCase.Path)' omits deterministic worker fan-in: $requiredFanInSnippet"
@@ -482,10 +482,10 @@ foreach ($fanInCase in @(
 
 $protectedWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\control-plane-v5.yml")
 foreach ($requiredProtectedFanInSnippet in @(
-  'path: .work/artifacts/control-plane-worker-evidence',
+  'path: build/results/control-plane-worker-evidence',
   'Import content-addressed worker objects deterministically',
   '-Operation import-workers',
-  '.work/output/control-plane-v5/worker-import.json'
+  'build/results/control-plane-v5/worker-import.json'
 )) {
   if (-not $protectedWorkflow.Contains($requiredProtectedFanInSnippet)) {
     throw "Protected qualification omits isolated content-addressed worker import: $requiredProtectedFanInSnippet"
@@ -510,7 +510,7 @@ foreach ($requiredIngestionGuard in @(
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
-foreach ($generatedOutputExclusion in @('.work/artifacts/*', '.work/build/*', '.work/output/*')) {
+foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/results/*')) {
   if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
     throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"
   }

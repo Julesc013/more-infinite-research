@@ -12,7 +12,7 @@ param(
   [string]$SourceRepoRoot = "",
   [string]$TrustClass = "ci",
   [string]$AggregateTaskId = "",
-  [string]$EvidenceRoot = ".work/artifacts/evidence"
+  [string]$EvidenceRoot = "build/results/evidence"
 )
 
 # MIR-L5-LEGACY-COMMAND-WRAPPER: retained for historical command compatibility only.

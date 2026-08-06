@@ -268,7 +268,7 @@ if ($needsLocalModDir) {
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = ".\.work\artifacts\release-targeted-$stamp"
+  $OutputRoot = ".\build\results\release-targeted-$stamp"
 }
 $script:resolvedOutputRoot = Resolve-MIRReleaseGatePath -Path $OutputRoot
 New-Item -ItemType Directory -Force -Path $script:resolvedOutputRoot | Out-Null

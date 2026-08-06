@@ -1950,7 +1950,7 @@ function Invoke-MIRAssuranceTest {
       throw "Command exited with code $exitCode."
     }
     if ([string]$Test.kind -eq "factorio-scenario") {
-      $scenarioSummaryPath = Join-Path $repo ".work\artifacts\validation\$([string]$Test.safe_test_id).json"
+      $scenarioSummaryPath = Join-Path $repo "build\results\validation\$([string]$Test.safe_test_id).json"
       $capturedScenarioSummaryPath = Join-Path $workRoot "scenario-summary.json"
       Copy-Item -LiteralPath $scenarioSummaryPath -Destination $capturedScenarioSummaryPath -Force
       $scenarioResult = Get-MIRAssuranceScenarioResult -Test $Test -SummaryPath $capturedScenarioSummaryPath
@@ -2124,7 +2124,7 @@ function Invoke-MIRAssuranceGate {
     completed_at=(Get-Date).ToUniversalTime().ToString("o")
   }
   $bundle["bundle_sha256"] = Get-MIRAssuranceJsonHash -Value $bundle
-  $bundlePath = ".work/artifacts/assurance/evidence-bundle.json"
+  $bundlePath = "build/results/assurance/evidence-bundle.json"
   Write-MIRAssuranceJsonFile -Value $bundle -Path $bundlePath | Out-Null
   $requestedOutput = Get-MIRAssuranceOption -Name "--output"
   if ($requestedOutput -and (Resolve-MIRAssurancePath -Path $requestedOutput) -ne (Resolve-MIRAssurancePath -Path $bundlePath)) {

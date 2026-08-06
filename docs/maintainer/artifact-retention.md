@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-06
 supersedes: []
 superseded_by: []
 ---
@@ -22,9 +22,11 @@ Local validation must leave enough evidence to diagnose and summarize a run with
 | `C:\Projects\Factorio\qualification-installs` | Exact local runtime installation | Protected; never cleaned by repository tooling. |
 | `.mir/evidence/` | Tracked portable evidence | Governed release evidence; never cleaned as a local artifact. |
 | `dist/` tracked release archives | Release authority | Never cleaned as a local artifact. |
-| `.work/artifacts/assurance/` | Content-addressed assurance and reuse evidence | Protected from stale-artifact cleanup. Prune only through its own evidence lifecycle. |
-| `.work/artifacts/validation/` | Current validation diagnostics and failure packets | Protected from stale-artifact cleanup. |
-| Other `.work/artifacts/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
+| `build/results/assurance/` | Local content-addressed assurance and reuse copies | Protected from routine stale-result cleanup; promote any durable authority before deleting `build/`. |
+| `build/results/validation/` | Current validation diagnostics and failure packets | Protected from routine stale-result cleanup. |
+| Other `build/results/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
+| `build/` | The sole repository-local generated root: package staging, caches, generated target material, temporary files, and results | Reconstructible; delete after active commands have stopped and required compact authorities have been promoted. Git worktrees are forbidden here. |
+| `dist/playtest/` | Current local playtest handoff | May be refreshed only from qualified exact bytes; immutable rolling revisions are never overwritten. |
 
 ## Audit And Cleanup
 
@@ -52,7 +54,9 @@ Delete completed ephemeral output immediately after inspection by setting the ag
 .\tools\mir.ps1 storage clean --older-than-days 0 --apply
 ```
 
-Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of the canonical `.work/artifacts/` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. The deprecated `artifacts/` alias is read-only and is never a cleanup target. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
+Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of the canonical `build/results/` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
+
+The retired `.work/` path is forbidden and its reappearance fails the layout gate. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is a read-only legacy quarantine until the post-2.5.5 storage inventory; ordinary commands must not write there, and this focused migration does not delete it.
 
 ## Run Finalization
 

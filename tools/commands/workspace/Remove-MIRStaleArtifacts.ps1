@@ -105,7 +105,7 @@ $worktrees = @(Get-MIRArtifactWorktrees -CurrentRepoRoot $RepoRoot -IncludeAll:$
 $results = @()
 
 foreach ($worktree in $worktrees) {
-  $artifactRootCandidate = Join-Path $worktree ".work\artifacts"
+  $artifactRootCandidate = Join-Path $worktree "build/results"
   if (-not (Test-Path -LiteralPath $artifactRootCandidate -PathType Container)) { continue }
   $artifactRoot = (Resolve-Path -LiteralPath $artifactRootCandidate).Path
 
@@ -166,7 +166,8 @@ if ($Apply) {
       throw "Cleanup target escaped its artifact root: $fullPath"
     }
     if (-not (Test-Path -LiteralPath $fullPath)) { continue }
-    if (-not (Test-MIRArtifactIgnored -WorktreeRoot (Split-Path -Parent $artifactRoot) -RelativePath $row.relative_path)) {
+    $worktreeRoot = Split-Path -Parent (Split-Path -Parent $artifactRoot)
+    if (-not (Test-MIRArtifactIgnored -WorktreeRoot $worktreeRoot -RelativePath $row.relative_path)) {
       throw "Cleanup target is not ignored by Git: $fullPath"
     }
 

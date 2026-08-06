@@ -12,10 +12,10 @@ $trustPath = Join-Path $repo "validation\trust.json"
 $impactPath = Join-Path $repo ".mir\test-impact.yml"
 $targetsPath = Join-Path $repo ".mir\targets.json"
 $scenarioRegistryPath = Join-Path $repo "validation\scenarios\runtime.json"
-$artifactRoot = Join-Path $repo ".work\artifacts\assurance"
+$artifactRoot = Join-Path $repo "build\results\assurance"
 $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
-$outRoot = Join-Path $repo ".work\output"
+$outRoot = $artifactRoot
 $evidenceSchema = 4
 $buildReceiptSchema = 2
 $assuranceRunnerVersion = "4"
@@ -94,8 +94,8 @@ switch ($command) {
     Write-MIRAssuranceJson -Value $result
   }
   "impact" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context).classification }
-  "domains" { Write-MIRAssuranceJson -Value (Get-MIRAssuranceDomainManifest -Context $context -RequireCandidate) -DefaultPath ".work/output/domain-manifest.json" }
-  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath ".work/output/verification-plan.json" }
+  "domains" { Write-MIRAssuranceJson -Value (Get-MIRAssuranceDomainManifest -Context $context -RequireCandidate) -DefaultPath "build/results/assurance/domain-manifest.json" }
+  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "build/results/assurance/verification-plan.json" }
   "fingerprint" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
     $test = Get-MIRAssurancePlannedTest -Plan $plan -TestId (Get-MIRAssuranceOption -Name "--test")
@@ -119,7 +119,7 @@ switch ($command) {
     try {
       $capsule = Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context
       $null = Write-MIRAssuranceWorkerReceipt -Plan $plan -Test $test -Capsule $capsule
-      Write-MIRAssuranceJson -Value $capsule -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
+      Write-MIRAssuranceJson -Value $capsule -DefaultPath "build/results/assurance/workers/$($test.safe_test_id).json"
     } catch {
       $failure = $_
       $paths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
@@ -127,7 +127,7 @@ switch ($command) {
         $capsule = Read-MIRAssuranceEvidencePointer -Path $paths.blocked
         if ($null -ne $capsule) {
           $null = Write-MIRAssuranceWorkerReceipt -Plan $plan -Test $test -Capsule $capsule
-          Write-MIRAssuranceJson -Value $capsule -DefaultPath ".work/artifacts/assurance/workers/$($test.safe_test_id).json"
+          Write-MIRAssuranceJson -Value $capsule -DefaultPath "build/results/assurance/workers/$($test.safe_test_id).json"
         }
       }
       throw $failure
@@ -148,7 +148,7 @@ switch ($command) {
       evidence=$results
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
-    Write-MIRAssuranceJson -Value $summary -DefaultPath ".work/artifacts/assurance/verify-summary.json"
+    Write-MIRAssuranceJson -Value $summary -DefaultPath "build/results/assurance/verify-summary.json"
     if ($status -ne "passed") { throw "Assurance verification failed." }
   }
   "import-workers" {
@@ -163,7 +163,7 @@ switch ($command) {
       -Context $context `
       -WorkerRoot $workers `
       -ArtifactPrefix $artifactPrefix
-    Write-MIRAssuranceJson -Value $workerImport -DefaultPath ".work/artifacts/assurance/worker-import.json"
+    Write-MIRAssuranceJson -Value $workerImport -DefaultPath "build/results/assurance/worker-import.json"
     if ([string]$workerImport.status -ne "passed") {
       throw "Worker evidence import did not close the active plan: failed=$(@($workerImport.failed).Count), missing=$(@($workerImport.missing).Count), rejected=$(@($workerImport.rejected).Count), duplicates=$(@($workerImport.duplicates).Count)."
     }
@@ -194,7 +194,7 @@ switch ($command) {
       evidence=$results
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
-    Write-MIRAssuranceJson -Value $summary -DefaultPath ".work/artifacts/assurance/qualification-summary.json"
+    Write-MIRAssuranceJson -Value $summary -DefaultPath "build/results/assurance/qualification-summary.json"
     if ($status -ne "passed") { throw "Assurance qualification failed." }
   }
   "seal" { Invoke-MIRAssuranceSeal -Context $context }
@@ -225,11 +225,11 @@ switch ($command) {
       native_owner_binding_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\planner\native_owner_binding.lua"))
     }
     $snapshot.fingerprint = Get-MIRAssuranceTextHash -Text (($snapshot.Values | ForEach-Object { [string]$_ }) -join "`n")
-    Write-MIRAssuranceJson -Value $snapshot -DefaultPath ".work/artifacts/assurance/balance-snapshot.json"
+    Write-MIRAssuranceJson -Value $snapshot -DefaultPath "build/results/assurance/balance-snapshot.json"
   }
   "backport" {
     if (-not (Get-MIRAssuranceOption -Name "--profile")) { $script:Args += @("--profile", "backport") }
-    Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath ".work/artifacts/assurance/backport-plan.json"
+    Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "build/results/assurance/backport-plan.json"
   }
   "self-test" { Invoke-MIRAssuranceSelfTest -Context $context }
   default { throw "Unknown assurance command: $command" }

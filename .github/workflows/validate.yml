@@ -24,7 +24,7 @@ jobs:
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: .work/artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -41,7 +41,7 @@ jobs:
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
           $archiveName = "$($info.name)_$($info.version).zip"
           $source = Join-Path $PWD "dist/$archiveName"
-          $candidateRoot = Join-Path $PWD ".work/candidate"
+          $candidateRoot = Join-Path $PWD "build/candidate"
           $candidate = Join-Path $candidateRoot $archiveName
           if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
             throw "Development candidate was not built: $source"
@@ -55,12 +55,12 @@ jobs:
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output .work/output/verification-plan.json
+        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath .work/output/verification-plan.json | ConvertFrom-Json
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           $work = @($plan.work)
           if ($work.Count -eq 0) {
             $work = @([ordered]@{
@@ -76,13 +76,13 @@ jobs:
         with:
           include-hidden-files: true
           name: mir-verification-plan
-          path: .work/output/verification-plan.json
+          path: build/results/assurance/verification-plan.json
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           include-hidden-files: true
           name: mir-development-candidate
-          path: .work/candidate/*.zip
+          path: build/candidate/*.zip
           if-no-files-found: error
 
   tests:
@@ -104,18 +104,18 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           name: mir-verification-plan
-          path: .work/output
+          path: build/results/assurance
       - uses: actions/download-artifact@v4
         if: ${{ matrix.no_op != true }}
         with:
           name: mir-development-candidate
-          path: .work/candidate
+          path: build/candidate
       - name: Resolve exact development candidate
         if: ${{ matrix.no_op != true }}
         shell: pwsh
         run: |
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
-          $candidate = Join-Path $PWD ".work/candidate/$($info.name)_$($info.version).zip"
+          $candidate = Join-Path $PWD "build/candidate/$($info.name)_$($info.version).zip"
           if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
             throw "Transferred development candidate is absent: $candidate"
           }
@@ -124,7 +124,7 @@ jobs:
         if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
         with:
-          path: .work/artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -132,7 +132,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -142,7 +142,7 @@ jobs:
         with:
           include-hidden-files: true
           name: mir-evidence-${{ matrix.safe_test_id }}
-          path: .work/artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
+          path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
   verification-gate:
@@ -159,16 +159,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-verification-plan
-          path: .work/output
+          path: build/results/assurance
       - uses: actions/download-artifact@v4
         with:
           name: mir-development-candidate
-          path: .work/candidate
+          path: build/candidate
       - name: Resolve exact development candidate
         shell: pwsh
         run: |
           $info = Get-Content -Raw -LiteralPath info.json | ConvertFrom-Json
-          $candidate = Join-Path $PWD ".work/candidate/$($info.name)_$($info.version).zip"
+          $candidate = Join-Path $PWD "build/candidate/$($info.name)_$($info.version).zip"
           if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
             throw "Transferred development candidate is absent: $candidate"
           }
@@ -176,7 +176,7 @@ jobs:
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: .work/artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -186,18 +186,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: mir-evidence-*
-          path: .work/artifacts/assurance/worker-evidence
+          path: build/results/assurance/worker-evidence
       - name: Import exact worker evidence deterministically
         shell: pwsh
-        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --workers .work/artifacts/assurance/worker-evidence --artifact-prefix mir-evidence-
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --workers build/results/assurance/worker-evidence --artifact-prefix mir-evidence-
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan .work/output/verification-plan.json --output .work/artifacts/assurance/evidence-bundle.json
+        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --output build/results/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: .work/artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         if: always()
@@ -205,7 +205,7 @@ jobs:
           include-hidden-files: true
           name: mir-verification-evidence
           path: |
-            .work/output/verification-plan.json
-            .work/artifacts/assurance/worker-import.json
-            .work/artifacts/assurance/evidence-bundle.json
+            build/results/assurance/verification-plan.json
+            build/results/assurance/worker-import.json
+            build/results/assurance/evidence-bundle.json
           if-no-files-found: warn

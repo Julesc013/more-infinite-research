@@ -37,8 +37,8 @@
     "historical_replay": "path:validation.baselines.control/3.2.2-v5-replay.json"
   },
   "outputs": {
-    "verification_context": "path:workspace.output.verification-context",
-    "evidence_store": "path:workspace.artifacts.evidence",
+    "verification_context": "path:workspace.build.results.verification-context",
+    "evidence_store": "path:workspace.build.results.evidence",
     "todo": "todo.md",
     "current_candidate": "path:docs.root/releases/current-candidate.md",
     "release_dashboard": "path:docs.root/releases/control-plane-dashboard.md",

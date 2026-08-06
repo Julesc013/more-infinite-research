@@ -650,7 +650,7 @@ validation_tooling:
     repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
     repository_legacy_inventory_command: tools/commands/workspace/Get-MIRLegacyInventory.ps1
     repository_stale_artifact_command: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
-    repository_output_root_migrator: tools/maintenance/Move-MIROutputRoots.ps1
+    deprecated_work_root_cleaner: tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1
     repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
     repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
     repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1

@@ -7,7 +7,7 @@ function Invoke-MIRCPFreshCalibration {
     [Parameter(Mandatory)][string]$SourceRepoRoot,
     [string]$LocalModZipDir = "",
     [ValidateSet("ci")][string]$TrustClass = "ci",
-    [string]$EvidenceRoot = ".work/artifacts/evidence",
+    [string]$EvidenceRoot = "build/results/evidence",
     [switch]$Resume,
     [string]$RepoRoot = ""
   )
@@ -199,7 +199,7 @@ function Resolve-MIRCPManifestTaskResult {
 function New-MIRCPFreshCalibrationProof {
   param(
     [Parameter(Mandatory)][string]$ContextPath,
-    [string]$EvidenceRoot = ".work/artifacts/evidence",
+    [string]$EvidenceRoot = "build/results/evidence",
     [string]$Output = ".mir/control-plane/fresh-calibration.json",
     [string]$RepoRoot = ""
   )

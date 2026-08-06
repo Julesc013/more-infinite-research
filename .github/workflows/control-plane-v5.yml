@@ -122,7 +122,7 @@ jobs:
           $record = Get-Content -Raw -LiteralPath ".mir/releases/records/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
           $candidate = Join-Path source ([string]$record.package.archive)
           $result = ./tools/commands/control/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
-            -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot .work/output/verification-context |
+            -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot build/results/verification-context |
             ConvertFrom-Json
           "context_id=$([string]$result.context_id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           $registry = Get-Content -Raw -LiteralPath (Join-Path $result.path "expanded-scenarios.json") | ConvertFrom-Json
@@ -138,17 +138,17 @@ jobs:
       - name: Record context completion as immutable evidence
         shell: pwsh
         run: |
-          $context = ".work/output/verification-context/${{ steps.export.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ steps.export.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
-            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         with:
           include-hidden-files: true
           name: mir-v5-context
           path: |
-            .work/output/verification-context/${{ steps.export.outputs.context_id }}
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
+            build/results/verification-context/${{ steps.export.outputs.context_id }}
+            build/results/evidence
+            build/results/control-plane-v5/results
           if-no-files-found: error
 
   static:
@@ -171,22 +171,22 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Execute static and evaluation nodes in topological order
         shell: pwsh
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind static,evaluation -ExcludeTask shadow.equivalence -SourceRepoRoot source `
-            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         with:
           include-hidden-files: true
           name: mir-v5-evidence-static
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
+            build/results/evidence
+            build/results/control-plane-v5/results
           if-no-files-found: error
 
   package:
@@ -209,22 +209,22 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Execute package nodes in topological order
         shell: pwsh
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind package -ExcludeTask verification.context -SourceRepoRoot source `
-            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
+            -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         with:
           include-hidden-files: true
           name: mir-v5-evidence-package
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
+            build/results/evidence
+            build/results/control-plane-v5/results
           if-no-files-found: error
 
   environments:
@@ -254,25 +254,25 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Capture one exact Factorio environment and evaluate offline
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
             -BatchId '${{ matrix.batch_id }}' -FactorioBin $env:FACTORIO_BIN `
-            -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
+            -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-evidence-environment-${{ matrix.safe_id }}
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
+            build/results/evidence
+            build/results/control-plane-v5/results
           if-no-files-found: error
 
   transitions:
@@ -300,32 +300,32 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Capture exact upgrade and approved-delta observations
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ inputs.prior_release }}
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation upgrade -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
-            -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
+            -TrustClass protected-release -EvidenceRoot build/results/evidence
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation approved-delta -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
-            -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
+            -TrustClass protected-release -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-evidence-transitions
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
-            .work/output/control-plane-v5/upgrade-evidence.json
-            .work/output/control-plane-v5/approved-delta.json
-            .work/output/control-plane-v5/approved-delta-raw
+            build/results/evidence
+            build/results/control-plane-v5/results
+            build/results/control-plane-v5/upgrade-evidence.json
+            build/results/control-plane-v5/approved-delta.json
+            build/results/control-plane-v5/approved-delta-raw
           if-no-files-found: error
 
   ecosystem:
@@ -353,27 +353,27 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Capture the governed local-mod ecosystem closure
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_LOCAL_MOD_ZIPS: ${{ inputs.local_mod_zip_dir }}
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation ecosystem -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -LocalModDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
-            -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
+            -TrustClass protected-release -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-evidence-ecosystem
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
-            .work/output/control-plane-v5/ecosystem
+            build/results/evidence
+            build/results/control-plane-v5/results
+            build/results/control-plane-v5/ecosystem
           if-no-files-found: error
 
   performance:
@@ -401,8 +401,8 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Run fresh paired performance qualification alone
         shell: pwsh
         env:
@@ -410,20 +410,20 @@ jobs:
           MIR_PRIOR_RELEASE: ${{ inputs.prior_release }}
           MIR_LOCAL_MOD_ZIPS: ${{ inputs.local_mod_zip_dir }}
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation performance -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE `
             -LocalModZipDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
-            -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence
+            -TrustClass protected-release -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-evidence-performance
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
-            .work/output/control-plane-v5/performance-evidence.json
+            build/results/evidence
+            build/results/control-plane-v5/results
+            build/results/control-plane-v5/performance-evidence.json
           if-no-files-found: error
 
   manual:
@@ -442,22 +442,22 @@ jobs:
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
-          if (Test-Path .work/artifacts/evidence) { Remove-Item -LiteralPath .work/artifacts/evidence -Recurse -Force }
-          if (Test-Path .work/output/control-plane-v5/results) { Remove-Item -LiteralPath .work/output/control-plane-v5/results -Recurse -Force }
+          if (Test-Path build/results/evidence) { Remove-Item -LiteralPath build/results/evidence -Recurse -Force }
+          if (Test-Path build/results/control-plane-v5/results) { Remove-Item -LiteralPath build/results/control-plane-v5/results -Recurse -Force }
       - name: Admit only a maintainer-authored exact-candidate attestation
         shell: pwsh
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
-            -Kind manual -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot .work/artifacts/evidence
+            -Kind manual -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-evidence-manual
           path: |
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/results
+            build/results/evidence
+            build/results/control-plane-v5/results
           if-no-files-found: error
 
   verification-gate:
@@ -483,46 +483,46 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: mir-v5-evidence-*
-          path: .work/artifacts/control-plane-worker-evidence
+          path: build/results/control-plane-worker-evidence
       - name: Import content-addressed worker objects deterministically
         shell: pwsh
         run: |
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation import-workers `
-            -ContextPath ".work/output/verification-context/${{ needs.context.outputs.context_id }}" `
-            -WorkerRoot .work/artifacts/control-plane-worker-evidence -EvidenceRoot .work/artifacts/evidence |
-            Tee-Object -FilePath .work/output/control-plane-v5/worker-import.json
+            -ContextPath "build/results/verification-context/${{ needs.context.outputs.context_id }}" `
+            -WorkerRoot build/results/control-plane-worker-evidence -EvidenceRoot build/results/evidence |
+            Tee-Object -FilePath build/results/control-plane-v5/worker-import.json
       - name: Require exact evidence for every task and environment
         shell: pwsh
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation aggregate -ContextPath $context `
-            -AggregateTaskId qualification.full -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence |
-            Tee-Object -FilePath .work/output/control-plane-v5/aggregate-result.json
+            -AggregateTaskId qualification.full -TrustClass protected-release -EvidenceRoot build/results/evidence |
+            Tee-Object -FilePath build/results/control-plane-v5/aggregate-result.json
       - name: Admit reconstruction, seal, shadow cutover, and promotion
         shell: pwsh
         env:
           MIR_CP_TARGET: ${{ inputs.target }}
         run: |
-          $context = ".work/output/verification-context/${{ needs.context.outputs.context_id }}"
+          $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           if ($env:MIR_CP_TARGET -eq "2.0") {
-            ./tools/commands/control/Invoke-MIRControlPlane.ps1 backport -ContextPath $context -EvidenceRoot .work/artifacts/evidence | Out-Host
+            ./tools/commands/control/Invoke-MIRControlPlane.ps1 backport -ContextPath $context -EvidenceRoot build/results/evidence | Out-Host
           }
-          ./tools/commands/control/Invoke-MIRControlPlane.ps1 seal -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
-            Tee-Object -FilePath .work/output/control-plane-v5/seal-result.json
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 seal -ContextPath $context -EvidenceRoot build/results/evidence |
+            Tee-Object -FilePath build/results/control-plane-v5/seal-result.json
           ./tools/commands/control/Invoke-MIRControlPlane.ps1 release -ContextPath $context -TaskId shadow.equivalence `
-            -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot .work/artifacts/evidence | Out-Host
-          ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot .work/artifacts/evidence |
-            Tee-Object -FilePath .work/output/control-plane-v5/promotion-result.json
+            -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence | Out-Host
+          ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot build/results/evidence |
+            Tee-Object -FilePath build/results/control-plane-v5/promotion-result.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           include-hidden-files: true
           name: mir-v5-qualification-${{ needs.context.outputs.context_id }}
           path: |
-            .work/output/verification-context/${{ needs.context.outputs.context_id }}
-            .work/artifacts/evidence
-            .work/output/control-plane-v5/aggregate-result.json
-            .work/output/control-plane-v5/worker-import.json
-            .work/output/control-plane-v5/seal-result.json
-            .work/output/control-plane-v5/promotion-result.json
+            build/results/verification-context/${{ needs.context.outputs.context_id }}
+            build/results/evidence
+            build/results/control-plane-v5/aggregate-result.json
+            build/results/control-plane-v5/worker-import.json
+            build/results/control-plane-v5/seal-result.json
+            build/results/control-plane-v5/promotion-result.json
           if-no-files-found: error

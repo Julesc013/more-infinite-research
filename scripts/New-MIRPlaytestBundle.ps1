@@ -248,7 +248,7 @@ $telemetrySummary = if ($null -ne $compilerSummary -and $null -ne $compilerSumma
 
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
   $stamp = [DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss")
-  $OutputDir = Join-Path $repo ".work\artifacts\playtest\$stamp-$Category"
+  $OutputDir = Join-Path $repo "build\results\playtest\$stamp-$Category"
 }
 $outputRoot = if ([System.IO.Path]::IsPathRooted($OutputDir)) { $OutputDir } else { Join-Path $repo $OutputDir }
 if ((Test-Path -LiteralPath $outputRoot) -and @(Get-ChildItem -LiteralPath $outputRoot -Force).Count -gt 0) {

@@ -185,7 +185,7 @@ function Import-MIRCPWorkerEvidenceObjects {
       $expandedBytes += [long]$item.Length
       if ($expandedBytes -gt 4294967296) { throw "Control-plane worker artifacts exceed the expanded-byte limit." }
       $relative = [IO.Path]::GetRelativePath($artifact.FullName, $item.FullName).Replace("\", "/")
-      if ($relative -notmatch '(?:^|/)artifacts/evidence/objects/sha256/[0-9A-Fa-f]{2}/([0-9A-Fa-f]{64})\.json$') {
+      if ($relative -notmatch '(?:^|/)build/results/evidence/objects/sha256/[0-9A-Fa-f]{2}/([0-9A-Fa-f]{64})\.json$') {
         $ignored++
         continue
       }

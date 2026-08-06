@@ -103,7 +103,7 @@ try {
     throw "Reconstructed package composition disagrees with the manifest."
   }
 
-  if (-not $ReceiptPath) { $ReceiptPath = Join-Path $Worktree ".work\artifacts\backport-reconstruction\2.5.0.json" }
+  if (-not $ReceiptPath) { $ReceiptPath = Join-Path $Worktree "build\results\backport-reconstruction\2.5.0.json" }
   if (-not [IO.Path]::IsPathRooted($ReceiptPath)) { $ReceiptPath = Join-Path $Worktree $ReceiptPath }
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReceiptPath) | Out-Null
   $receiptMaterial = [ordered]@{
