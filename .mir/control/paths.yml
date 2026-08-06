@@ -110,6 +110,8 @@ paths:
   releases.backports: .mir/releases/backports
   releases.lines: .mir/releases/lines
   releases.sources: .mir/releases/sources
+  releases.waves: .mir/releases/waves
+  releases.waves.mir-3.5-authorization: .mir/releases/waves/MIR-3.5-Automated-Release-Authorization.json
   evidence.root: .mir/evidence
   evidence.manifests: .mir/evidence/manifests
   evidence.attestations: .mir/evidence/attestations

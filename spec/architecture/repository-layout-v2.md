@@ -115,13 +115,14 @@ Large immutable evidence objects live in governed external custody with content 
 ├─ backports/
 ├─ lines/
 ├─ sources/
+├─ waves/
 ├─ current.json
 ├─ distributions.json
 ├─ convergence.yml
 └─ wave.yml
 ```
 
-`lines/` contains Factorio release-line policy. `sources/` contains exact per-version reconstruction locks. A version-specific source lock is not a release line.
+`lines/` contains Factorio release-line policy. `sources/` contains exact per-version reconstruction locks. `waves/` contains cross-version release-wave authorizations and their immutable scope boundaries. A version-specific source lock is not a release line.
 
 Approval is a state inside a delta record. A delta does not change directory when it moves through draft, review, approval, supersession, or revocation.
 

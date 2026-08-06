@@ -43,6 +43,30 @@
       "tags": []
     },
     {
+      "pattern": ".mir/releases/waves/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/control/paths.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/architecture/repository-layout-v2.md",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/research-cost-contract-3.2.5.json",
       "groups": [],
       "scenarios": [],
