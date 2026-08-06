@@ -112,6 +112,8 @@ paths:
   releases.sources: .mir/releases/sources
   releases.waves: .mir/releases/waves
   releases.waves.mir-3.5-authorization: .mir/releases/waves/MIR-3.5-Automated-Release-Authorization.json
+  releases.waves.mir-3.5-outage-authorization: .mir/releases/waves/MIR-3.5-Outage-Release-Authorization.json
+  releases.waves.mir4-offline-release-authority: .mir/releases/waves/MIR4-Offline-Release-Authority.json
   evidence.root: .mir/evidence
   evidence.manifests: .mir/evidence/manifests
   evidence.attestations: .mir/evidence/attestations
