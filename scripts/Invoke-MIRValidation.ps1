@@ -338,15 +338,8 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   }
 }
 
-Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
-  $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
-  $baseContinuationsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\base_continuations.lua")
-  if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
-    throw "Stream compiler count formulas must use compact multiplication syntax."
-  }
-  if ($baseContinuationsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
-    throw "Base continuation count formulas must use compact multiplication syntax."
-  }
+Invoke-RepoCheck "generated count formulas use the unified canonical research-cost model" {
+  & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
@@ -548,7 +541,27 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
-if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
+if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.5") {
+  Invoke-RepoCheck "the normalized 2.5.0 to 2.5.5 approved delta is complete or explicitly pending" {
+    $backportDelta = Join-Path $repo "approved-delta\2.5.0-to-2.5.5.json"
+    $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
+    $backportAuthority = $releaseLedger.development."factorio-2.0"
+    if (Test-Path -LiteralPath $backportDelta -PathType Leaf) {
+      $artifact = Get-Content -Raw -LiteralPath $backportDelta | ConvertFrom-Json
+      if ([string]$artifact.current.source_commit -ne [string]$backportAuthority.package_source_commit -or
+          [string]$artifact.current.archive_sha256 -ne [string]$backportAuthority.archive_sha256) {
+        throw "Approved-delta evidence does not bind the active Factorio 2.0 candidate."
+      }
+      & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -Path $backportDelta -ValidateStructureOnly
+    } elseif ([string]$backportAuthority.candidate_id -eq "2.5-P12" -and
+              [string]$backportAuthority.release_gate -eq "local-outage-qualification-required") {
+      Write-Host "[pending] exact P12 approved-delta evidence has not yet been generated; local outage qualification remains blocked."
+    } else {
+      throw "The active release authority does not permit missing approved-delta evidence."
+    }
+  }
+}
+elseif ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.0") {
   Invoke-RepoCheck "the normalized 2.4.9 approved delta is complete or explicitly pending" {
     $backportDelta = Join-Path $repo "approved-delta\2.4.9-to-2.5.0.json"
     if (Test-Path -LiteralPath $backportDelta -PathType Leaf) {

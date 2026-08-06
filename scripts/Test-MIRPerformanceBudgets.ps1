@@ -196,7 +196,7 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures
   }
 }
 $probeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\performance-regression-probe\data.lua")
-foreach ($version in @("2.4.9", "2.5.0")) {
+foreach ($version in @([string]$campaign.baseline.version, [string]$campaign.candidate.version)) {
   if ($probeSource -notmatch [regex]::Escape($version)) {
     throw "Performance probe does not govern release-pair version '$version'."
   }

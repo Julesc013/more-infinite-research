@@ -32,6 +32,108 @@ function Get-MIRZipFileCount {
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
+if ([int]$lock.schema -eq 5) {
+  if ([int]$lock.projection_schema -ne 4 -or [string]$lock.mir_version -ne "2.5.5" -or
+      [string]$lock.candidate_id -ne "2.5-P12" -or [string]$lock.target -ne "2.0") {
+    throw "MIR 2.5.5 source-lock identity is invalid."
+  }
+
+  $baselineCommit = [string]$lock.baseline.commit
+  $portableCommit = [string]$lock.portable_source.commit
+  $projectionCommit = [string]$lock.projection.package_source_commit
+  foreach ($row in @(
+    @{Name="baseline.commit"; Commit=$baselineCommit},
+    @{Name="portable_source.commit"; Commit=$portableCommit},
+    @{Name="projection.package_source_commit"; Commit=$projectionCommit}
+  )) { Assert-MIRCommit -Name $row.Name -Commit $row.Commit }
+  Assert-MIRAncestor -Name "Published 2.5.0 baseline" -Commit $baselineCommit
+  Assert-MIRAncestor -Name "2.5.5 package-source projection" -Commit $projectionCommit
+
+  $baselineRef = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.baseline.reference)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $baselineRef -ne $baselineCommit) {
+    throw "Baseline reference $($lock.baseline.reference) does not resolve to the locked commit."
+  }
+  if ([bool]$lock.lineage.portable_source_commit_is_ancestor -or
+      [string]$lock.lineage.state -ne "exact-c32-package-source-bound-local-tag-pending" -or
+      -not [bool]$lock.lineage.final_release_requires_local_3_2_5_tag_parent) {
+    throw "The 2.5.5 lock must truthfully retain its pending local 3.2.5 tag-parent obligation."
+  }
+
+  $projectionTree = (& git -C $RepoRoot show -s --format=%T $projectionCommit).Trim()
+  if ($LASTEXITCODE -ne 0 -or $projectionTree -ne [string]$lock.projection.package_source_tree) {
+    throw "The locked 2.5.5 package-source tree does not match its commit."
+  }
+
+  . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+  . (Join-Path $RepoRoot "scripts\validation\TargetProfiles.ps1")
+  $roots = @(Get-MIRPackageSourceRoots)
+  & git -C $RepoRoot diff --quiet $projectionCommit HEAD -- @roots
+  if ($LASTEXITCODE -ne 0) { throw "Qualification commits changed package roots after the locked 2.5.5 projection." }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot) { throw "Package roots are dirty; the 2.5.5 projection cannot be verified." }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot) -ne [string]$lock.projection.package_source_sha256) {
+    throw "The projected 2.5.5 package source hash drifted."
+  }
+
+  $adaptedActual = @(& git -C $RepoRoot diff-tree --no-commit-id --name-only -r $projectionCommit)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate the 2.5.5 target transition."
+  }
+  $unclassified = @($adaptedActual | Where-Object {
+    $path = ([string]$_).Replace("\", "/")
+    @($lock.projection.adapted_package_path_patterns | Where-Object { $path -like ([string]$_) }).Count -eq 0
+  })
+  if ($unclassified.Count -gt 0) { throw "Unclassified 2.5.5 target paths: $($unclassified -join ', ')" }
+
+  $deltaPath = Join-Path $RepoRoot ([string]$lock.projection.portable_delta_ledger)
+  if (-not (Test-Path -LiteralPath $deltaPath -PathType Leaf)) { throw "The 2.5.5 portable-delta ledger is missing." }
+  $delta = Get-Content -Raw -LiteralPath $deltaPath | ConvertFrom-Json
+  if ([int]$delta.schema -ne 2 -or [string]$delta.kind -ne "mir-portable-delta-ledger" -or
+      [string]$delta.source.version -ne "3.2.5" -or [string]$delta.source.candidate_id -ne "C32" -or
+      [string]$delta.target.version -ne "2.5.5" -or [string]$delta.target.candidate_id -ne "2.5-P12" -or
+      [string]$delta.target.package_source_commit -ne $projectionCommit -or
+      -not [bool]$delta.rules.unclassified_path_forbidden -or -not [bool]$delta.rules.unclassified_semantic_forbidden) {
+    throw "The 2.5.5 portable-delta ledger identity or fail-closed rules are invalid."
+  }
+  $allowedDispositions = @(
+    "shared-unchanged", "shared-with-target-adapter", "target-native-equivalent", "compiled-out",
+    "finite-substitute", "omitted-by-capability", "release-evidence-only", "intentionally-excluded",
+    "unsupported-with-evidence"
+  )
+  if (@($delta.changes | Where-Object { [string]$_.disposition -notin $allowedDispositions }).Count -gt 0) {
+    throw "The 2.5.5 portable-delta ledger uses an unsupported disposition."
+  }
+
+  $profile = Get-MIRTargetProfile -RepoRoot $RepoRoot -FactorioVersion "2.0"
+  if ((Get-MIRTargetProfileFingerprint -Profile $profile) -ne [string]$lock.target_profile_sha256) {
+    throw "The Factorio 2.0 target profile fingerprint drifted."
+  }
+  & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
+  if ($LASTEXITCODE -ne 0) { throw "Generated target-profile Lua is stale." }
+
+  $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+  if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
+    throw "The 2.5.5 source lock disagrees with info.json."
+  }
+  $archivePath = Join-Path $RepoRoot ([string]$lock.candidate.archive)
+  if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) { throw "The 2.5.5 candidate archive is missing." }
+  if ((Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash -ne [string]$lock.candidate.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $archivePath) -ne [string]$lock.candidate.content_sha256 -or
+      (Get-Item -LiteralPath $archivePath).Length -ne [long]$lock.candidate.bytes -or
+      (Get-MIRZipFileCount -Path $archivePath) -ne [int]$lock.candidate.entries) {
+    throw "The 2.5.5 candidate archive identity disagrees with its source lock."
+  }
+  if ([string]$lock.upgrade_contract.mandatory_predecessor -ne "2.5.0" -or
+      [string]$lock.qualification.protected_qualification -ne "pending-post-outage" -or
+      [string]$lock.qualification.publication -ne "pending") {
+    throw "The 2.5.5 upgrade or outage qualification boundary is invalid."
+  }
+  foreach ($docRelative in @([string]$lock.release_notes, [string]$lock.candidate_document, [string]$lock.playtest_guide)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $docRelative) -PathType Leaf)) {
+      throw "Backport authority document is missing: $docRelative"
+    }
+  }
+  Write-Host "[ok] MIR 2.5.5 2.5-P12 source, target, archive, direct predecessor, and pending outage boundary agree."
+  return
+}
 if ([int]$lock.schema -ne 4 -or [int]$lock.projection_schema -ne 3) {
   throw "Unsupported MIR backport source-lock schema."
 }
