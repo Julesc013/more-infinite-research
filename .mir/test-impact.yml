@@ -19,6 +19,18 @@
       "tags": []
     },
     {
+      "pattern": ".mir/backport-source-lock.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/backport-portable-delta-*.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/public-artifact-budgets.json",
       "groups": ["base-load", "local-mod-library"],
       "scenarios": ["compiler-contracts", "package-zip-base", "package-zip-space-age"],
