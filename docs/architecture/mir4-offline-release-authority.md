@@ -1,9 +1,9 @@
 ---
 title: "MIR 4 Offline Release Authority"
-status: future
+status: draft
 applies_to: "4.0.0+"
 audience: maintainer
-doc_type: requirement
+doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-08-07
 supersedes: []
