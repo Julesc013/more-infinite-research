@@ -79,6 +79,12 @@
       "tags": []
     },
     {
+      "pattern": "validation/tests/release/Test-MIRCandidateFreshness.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/commands/control/**",
       "groups": [],
       "scenarios": [],
