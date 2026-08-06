@@ -2498,3 +2498,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.4.9-release-notes
+  - path: docs/architecture/mir4-offline-release-authority.md
+    title: "MIR 4 Offline Release Authority"
+    status: future
+    audience: maintainer
+    doc_type: requirement
+    owner: mir-maintainers
+    source_of_truth_for:
+      - MIR4-Offline-Release-Authority

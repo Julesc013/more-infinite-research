@@ -54,4 +54,45 @@ foreach ($action in @("force-push", "tag-movement-or-replacement", "failed-gate-
   if ($action -notin $prohibited) { throw "Required wave prohibition is missing: $action" }
 }
 
+$outagePath = Join-Path $RepoRoot ".mir/releases/waves/MIR-3.5-Outage-Release-Authorization.json"
+if (-not (Test-Path -LiteralPath $outagePath -PathType Leaf)) { throw "MIR 3 .5 outage authorization is missing." }
+$outage = Get-Content -Raw -LiteralPath $outagePath | ConvertFrom-Json
+if ([int]$outage.schema -ne 1 -or [string]$outage.kind -ne "MIR3Dot5WaveOutageReleaseAuthorizationV1") {
+  throw "MIR 3 .5 outage authorization schema or kind changed."
+}
+if ([string]$outage.maintainer -ne "Julesc013" -or [string]$outage.incident.service -ne "actions") {
+  throw "MIR 3 .5 outage authorization maintainer or incident changed."
+}
+$trust = $outage.trust_contract
+if ([string]$trust.seal_kind -ne "MirLocalOutageReleaseSealV1" -or
+    [bool]$trust.protected -or
+    [string]$trust.remote_producer -ne "none" -or
+    [string]$trust.release_authority -ne "maintainer-time-boxed-actions-outage" -or
+    -not [bool]$trust.release_eligible_under_outage_exception -or
+    [string]$trust.protected_qualification -ne "pending-post-outage" -or
+    [string]$trust.public_verification -ne "pending" -or
+    -not [bool]$trust.package_immutable_after_tag) {
+  throw "The local outage seal trust contract is not truthful and exact."
+}
+if ([bool]$outage.authorization.remote_push -or [bool]$outage.authorization.github_release_creation -or [bool]$outage.authorization.mod_portal_upload) {
+  throw "The outage authorization must not authorize remote publication."
+}
+if (@($outage.releases).Count -ne 9 -or [string]$outage.c32.archive_sha256 -ne "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF") {
+  throw "The outage authorization release set or C32 package identity changed."
+}
+
+$futurePath = Join-Path $RepoRoot ".mir/releases/waves/MIR4-Offline-Release-Authority.json"
+if (-not (Test-Path -LiteralPath $futurePath -PathType Leaf)) { throw "MIR4 offline-release future requirement is missing." }
+$future = Get-Content -Raw -LiteralPath $futurePath | ConvertFrom-Json
+if ([string]$future.requirement_id -ne "MIR4-Offline-Release-Authority" -or
+    [string]$future.status -ne "future-requirement-only" -or
+    [bool]$future.implementation_admitted -or
+    [bool]$future.boundary.mir_4_implementation -or
+    [bool]$future.boundary.terminal_dot_9_implementation) {
+  throw "MIR4 offline-release requirement crossed its future-only boundary."
+}
+foreach ($requirement in @("complete-build-and-qualification-without-github", "signed-immutable-local-evidence", "idempotent-later-github-replication", "repository-bundle-recovery")) {
+  if ($requirement -notin @($future.requirements)) { throw "MIR4 offline-release requirement is missing: $requirement" }
+}
+
 Write-Host "[ok] MIR 3 .5 automated-release authority preserves exact targets, hard gates, truthful review status, and publication boundaries."
