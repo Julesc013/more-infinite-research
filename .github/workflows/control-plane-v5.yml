@@ -170,7 +170,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -208,7 +208,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -253,7 +253,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -299,7 +299,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -352,7 +352,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -400,7 +400,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -441,7 +441,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Remove coordination copies from the worker input
         shell: pwsh
         run: |
@@ -481,7 +481,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: mir-v5-context
-          path: .
+          path: build/results
       - name: Download isolated immutable worker objects
         uses: actions/download-artifact@v4
         with:
