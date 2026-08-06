@@ -32,6 +32,10 @@ $contextDownloads = @([regex]::Matches($workflow, '(?m)^\s+name:\s+mir-v5-contex
 if ($contextDownloads.Count -ne 8) {
   throw "Every Control Plane v5 consumer must restore the context artifact beneath build/results."
 }
+$sourceIsolations = @([regex]::Matches($workflow, '(?m)^\s+- name:\s+Isolate nested source checkout from controller status\s*$'))
+if ($sourceIsolations.Count -ne 8) {
+  throw "Every Control Plane v5 nested source checkout must be excluded from controller status."
+}
 if ($workflow -match '(?m)^\s*run:\s*\./source/tools/commands/package/Build-MIRPackage\.ps1\s*$') {
   throw "Control Plane v5 must not create an untracked candidate archive inside the immutable source checkout."
 }
