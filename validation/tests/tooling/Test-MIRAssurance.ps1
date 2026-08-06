@@ -390,6 +390,34 @@ try {
   if (Test-Path -LiteralPath $externalTreeRoot) { Remove-Item -LiteralPath $externalTreeRoot -Recurse -Force }
 }
 
+$factorioFingerprintRoots = @(
+  (Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-factorio-a-" + [guid]::NewGuid().ToString("N"))),
+  (Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-factorio-b-" + [guid]::NewGuid().ToString("N")))
+)
+try {
+  foreach ($factorioRoot in $factorioFingerprintRoots) {
+    $factorioBinaryDir = Join-Path $factorioRoot "bin/x64"
+    $factorioDataDir = Join-Path $factorioRoot "data/base"
+    New-Item -ItemType Directory -Force -Path $factorioBinaryDir, $factorioDataDir | Out-Null
+    [IO.File]::WriteAllText((Join-Path $factorioBinaryDir "factorio.exe"), "same-binary", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $factorioDataDir "info.json"), "same-data", [Text.UTF8Encoding]::new($false))
+  }
+  $script:MIRAssuranceExternalFileFingerprintCache = @{}
+  $script:MIRAssuranceExternalTreeFingerprintCache = @{}
+  $factorioFingerprintA = Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath (Join-Path $factorioFingerprintRoots[0] "bin/x64/factorio.exe")
+  $factorioFingerprintB = Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath (Join-Path $factorioFingerprintRoots[1] "bin/x64/factorio.exe")
+  if ([string]$factorioFingerprintA.sha256 -ne [string]$factorioFingerprintB.sha256 -or
+      [string]$factorioFingerprintA.installation_sha256 -ne [string]$factorioFingerprintB.installation_sha256 -or
+      [string]$factorioFingerprintA.sha256 -ne [string]$factorioFingerprintA.installation_sha256 -or
+      [string]$factorioFingerprintA.legacy_installation_sha256 -eq [string]$factorioFingerprintB.legacy_installation_sha256) {
+    throw "Assurance Factorio installation identity is not path-independent with an explicit legacy alias."
+  }
+} finally {
+  foreach ($factorioRoot in $factorioFingerprintRoots) {
+    if (Test-Path -LiteralPath $factorioRoot) { Remove-Item -LiteralPath $factorioRoot -Recurse -Force }
+  }
+}
+
 $wrapper = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\assurance-full.yml")
 foreach ($requiredWrapperSnippet in @(
   "uses: ./.github/workflows/control-plane-v5.yml",

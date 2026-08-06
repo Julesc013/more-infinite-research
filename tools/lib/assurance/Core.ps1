@@ -244,14 +244,24 @@ function Get-MIRAssuranceFactorioInstallationFingerprint {
     "data/elevated-rails",
     "data/space-age"
   ) -MissingLabel "factorio-official-data"
-  $material = [ordered]@{binary=$binary; official_data=$data}
+  $portableOfficialData = [ordered]@{
+    kind=[string]$data.kind
+    state=[string]$data.state
+    file_count=[int]$data.file_count
+    sha256=[string]$data.sha256
+  }
+  $material = [ordered]@{binary=$binary; official_data=$portableOfficialData}
+  $legacyMaterial = [ordered]@{binary=$binary; official_data=$data}
+  $installationSha256 = Get-MIRAssuranceJsonHash -Value $material
   return [ordered]@{
     kind="factorio-installation"
     state="present"
     root=$installRoot
     binary=$binary
     official_data=$data
-    sha256=(Get-MIRAssuranceJsonHash -Value $material)
+    sha256=$installationSha256
+    installation_sha256=$installationSha256
+    legacy_installation_sha256=(Get-MIRAssuranceJsonHash -Value $legacyMaterial)
   }
 }
 
