@@ -273,6 +273,16 @@
           "validation/profiles/factorio-2.1.json"
         ],
         "reason": "Rebind final C32 qualification from superseded Factorio 2.1.12 to the exact available Factorio 2.1.13 binary and official-data installation without changing package bytes or product scope."
+      },
+      {
+        "commit": "5b70f1a7cd5ab13a3ef31bd90a37977b157c9aca",
+        "paths": [
+          ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md",
+          ".mir/evidence/3.2.5-interactive-review.json",
+          ".mir/evidence/3.2.5-manual-review-attestation.json",
+          ".mir/releases/records/3.2.5.json"
+        ],
+        "reason": "Record the maintainer's exact-C32 playtest acceptance and advance only the package-excluded release authority to manually-accepted."
       }
     ]
   },
