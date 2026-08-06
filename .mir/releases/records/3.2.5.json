@@ -61,7 +61,7 @@
       {
         "kind": "approved-package-delta",
         "path": ".mir/releases/deltas/3.2.3-to-3.2.5.json",
-        "sha256": "5EB9247EFD08BFDE691371B7DAA46FD16E20EB0D7582CEF9585E1F14C160DEC8",
+        "sha256": "AAC57BED3A907F56D185BBE2AA16272C0745DF3E81A1625D9F8F87431F0F1499",
         "digest_policy": "utf8-lf"
       },
       {

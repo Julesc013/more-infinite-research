@@ -232,7 +232,8 @@
       "prototypes/streams/productivity.lua"
     ],
     "allowed_removed_paths": [],
-    "authority_sha256": "249AB42F429C5798AA70ADAFB4D608443A200C364CEB1A455AE20B9762F12639",
+    "authority_digest_policy": "utf8-lf",
+    "authority_sha256": "8031B067E15F14835EB3001A0E74BD60CD561B08F3BE926D124CAE2EEE05C5BD",
     "id": "c32-unified-cost-compatibility-v1",
     "migration_impact": "Preserve selected research, completed science-unit work, queues, levels, unrelated force state, stable setting IDs, and native or external ownership while introducing the bounded research-cost compatibility record.",
     "reason": "Ship unified research-cost curves, exact 3.2.3 upgrade semantics, bounded research-cost disposition/proof/support output, and the admitted compatibility corrections in one 3.2.5 package."
