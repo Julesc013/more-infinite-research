@@ -87,11 +87,11 @@
       {
         "kind": "fresh-candidate-qualification",
         "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
-        "sha256": "B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E",
+        "sha256": "F9433D9E42F520D17EF5C92AC05785C807F06E9DA6EE149EAB4ED9C015A5ADBE",
         "digest_policy": "utf8-lf",
-        "source_commit": "2e2017bc662ffd816ea7f01ebda7989dfc73e0ea",
-        "source_tree": "bd38892ec69eef1d23253088d0922a6ecbc98a21",
-        "plan_material_sha256": "F06460E40F4C671E5F69A86ECB687EDA316F38F2651D7E075893CF81280AD38E",
+        "source_commit": "37ab25970299bbbc0aa534ffc4452924dbffb807",
+        "source_tree": "cf3facd473d3a2f7188e8b108cf04a177cb8084e",
+        "plan_material_sha256": "701A1F032F9BA6044BF709012747C5461EC16CC21F7E1FBBE4D32486D6174EB2",
         "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
         "expected": 135,
         "executed": 135,
@@ -129,5 +129,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-06T09:22:02.667Z"
+  "updated_at": "2026-08-06T10:57:14.064Z"
 }

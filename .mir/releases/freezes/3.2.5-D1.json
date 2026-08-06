@@ -294,6 +294,22 @@
           "validation/tests/release/Test-MIRApprovedDelta.ps1"
         ],
         "reason": "Requalify unchanged C32 package bytes after binding the approved-delta policy authority with the repository's checkout-independent utf8-lf digest policy."
+      },
+      {
+        "commit": "16e80826ef5a888c76f2a757d3affcca6f6ddc8f",
+        "paths": [
+          ".mir/evidence/3.2.5-c32-candidate-qualification.json"
+        ],
+        "reason": "Preserve the complete fresh 135-row Factorio 2.1.13 qualification run as diagnostic evidence while final release authority remains explicitly in requalification."
+      },
+      {
+        "commit": "9602fb3213fccee8812aa625f9352f1c5ebdea5a",
+        "paths": [
+          "tools/commands/control/New-MIRCandidateQualificationEvidence.ps1",
+          "tools/lib/assurance/Core.ps1",
+          "validation/tests/tooling/Test-MIRAssurance.ps1"
+        ],
+        "reason": "Requalify unchanged C32 package bytes after making the exact Factorio installation identity independent of checkout path while retaining an explicit legacy path-bound alias."
       }
     ]
   },
