@@ -283,6 +283,17 @@
           ".mir/releases/records/3.2.5.json"
         ],
         "reason": "Record the maintainer's exact-C32 playtest acceptance and advance only the package-excluded release authority to manually-accepted."
+      },
+      {
+        "commit": "44e8c7ef933aacf3651c96b27a1a7d9ed65262c5",
+        "paths": [
+          ".mir/convergence.yml",
+          ".mir/releases/deltas/3.2.3-to-3.2.5.json",
+          ".mir/releases/records/3.2.5.json",
+          "tools/lib/control/Executor.ps1",
+          "validation/tests/release/Test-MIRApprovedDelta.ps1"
+        ],
+        "reason": "Requalify unchanged C32 package bytes after binding the approved-delta policy authority with the repository's checkout-independent utf8-lf digest policy."
       }
     ]
   },
