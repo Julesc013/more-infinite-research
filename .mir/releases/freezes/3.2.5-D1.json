@@ -64,7 +64,6 @@
       ".mir",
       ".codex",
       ".github",
-      ".work",
       "artifacts",
       "build",
       "dist",
@@ -78,7 +77,7 @@
     "package_file_count": 301,
     "builder": {
       "path": "tools/commands/package/Build-MIRPackage.ps1",
-      "sha256": "90F11458037D91878ABE0EBB1B1665EFFF3D120082F3CC9C5134BACF04D33C08"
+      "sha256": "5229DAFBA452143D5D71C346CD9FEBF84FD6A737F1A66639A21833D9E06E4F7D"
     },
     "identity_implementation": {
       "path": "tools/lib/validation/PackageIdentity.ps1",
@@ -161,12 +160,12 @@
   },
   "qualification_authority": {
     "factorio": {
-      "version": "2.1.12",
-      "build": 87038,
-      "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27",
-      "official_data_file_count": 17296,
-      "official_data_sha256": "A301C63BDB504C8CFAAC1DE893D95E608195A1D4783DC8873FC605DB4D579470",
-      "installation_sha256": "C661AB5E3EE2408D0789DA3CA821D5D3EFC2342781DE0743F24BCF4730EFFB1E"
+      "version": "2.1.13",
+      "build": 87164,
+      "binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+      "official_data_file_count": 17308,
+      "official_data_sha256": "11C677CA4A308362BD681CA966BE13241741CE6E7429CC2CD7F3A53EFA67E703",
+      "installation_sha256": "5F026A28175FAED6434A2A231F6AB529732E1A6641BA76437422A8E8388DA2B9"
     },
     "complete_local_plan": {
       "source_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
@@ -219,13 +218,13 @@
       "selected-real-ecosystem-saves"
     ],
     "authorities": [
-      {"path": "validation/profiles/factorio-2.1.json", "sha256": "E802F1DBA872B57CAD3FFD2AD298A24D6B76F332FAE498DD88CA344722106D65"},
-      {"path": "validation/tests.yml", "sha256": "2C323CCDD25CAFAB8792799EECDD27D564455234A042AF6405836CD7EFBC36A8"},
+      {"path": "validation/profiles/factorio-2.1.json", "sha256": "D05017D39BDF4614C2E241FE0A22A36700E20C6FF8BF9EEE8580C5EFE659B841"},
+      {"path": "validation/tests.yml", "sha256": "056DA7A838DCD69A60308369CF9F2AB7FAC6E7EA57A5D88B73DEB17CFA70D4E9"},
       {"path": "validation/scenarios/runtime.json", "sha256": "A18D8A2FAFACE89EF72ECC17ADA73CE71EB65D3F2C7C88954E8FA5ACCA524EE4"},
       {"path": "validation/scenarios/manual.json", "sha256": "D1E63692578F708E597F2CB7AE0A794300975F9F64E58B58AF4958AB0374B75C"},
       {"path": "validation/scenarios/local-2.1.json", "sha256": "A8E5AB513F155E20B7E5369DC7B317C93166DEC15457C67805D9AD67D22A6B2C"},
-      {"path": ".mir/assurance.json", "sha256": "E4B313CE007C87EE204340D58E4DAC6D25FDC70AD1F4E86142D6058191AF1187"},
-      {"path": ".mir/control-plane/control-plane.json", "sha256": "0801D2D6BCB3CBD696A826EA46578B4F0B5C96EB344F1FE97F3DA4E0D9395612"},
+      {"path": ".mir/assurance.json", "sha256": "F4F2E55490F3F5BC46C2BC261CAD271817BA4CB5493890363ED0DF1D4E5247AE"},
+      {"path": ".mir/control-plane/control-plane.json", "sha256": "6D6B2966F949F4326F6D65B5B91996CE33D79F432953C93D6BD4A28719EACEBA"},
       {"path": "validation/trust.json", "sha256": "EECB9C322E5799006E656C450F93119D5F288F6B8A5AE9D609F87A5114E75F44"},
       {"path": ".mir/performance-budgets.json", "sha256": "F0C12A195D3490F1B85F72B05CB66141941F2AF5F6BAC08C4B9118C73C11C142"},
       {"path": "validation/tests/release/Test-MIRReleaseAuthority.ps1", "sha256": "E92B1F51B7C3552836C281C4FC361DD6F87AB1E4229846F9E52A40CA3EE1E3CA"},
