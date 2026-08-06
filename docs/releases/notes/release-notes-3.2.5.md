@@ -5,16 +5,14 @@ applies_to: "3.2.5"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 supersedes: ["docs/releases/3.2.4-unified-research-cost-curves.md"]
 superseded_by: []
 ---
 
 # MIR 3.2.5
 
-MIR 3.2.5 is the planned Factorio 2.1 convergence release after public MIR 3.2.3. It absorbs the unpublished 3.2.4 work; there is no public 3.2.4 upgrade step and no 3.2.4 release package should be installed as an intermediate.
-
-The release is deliberately focused on unified research costs, exact 3.2.3 upgrade/default compatibility, current compatibility corrections, and the bounded research-cost compatibility proof/support record. Generalized all-stream explanations, public proof/environment products, universal support bundles, and broad Factorio 2.0 projection productization are deferred to a later release. Release-specific migration, privacy, localization, performance, manual, protected, seal, publication, and public-byte checks remain mandatory.
+MIR 3.2.5 is the Factorio 2.1 unified research-cost and compatibility release after public MIR 3.2.3. It supports Factorio 2.1.8 and newer and was qualified against Factorio 2.1.13. It absorbs the unpublished 3.2.4 work, so players should upgrade directly from 3.2.3 and must not install a 3.2.4 development archive as an intermediate.
 
 ## Research costs
 
@@ -25,32 +23,29 @@ The release is deliberately focused on unified research costs, exact 3.2.3 upgra
 - Recognized native-owner formulas remain byte-for-byte unchanged when their controls remain at defaults.
 - Explicit overrides of unknown or over-budget external formulas fail closed instead of guessing a conversion.
 
-## Corrected configuration changes
+## Configuration changes and upgrades
 
 - MIR now carries compact versioned old/new cost descriptors into runtime instead of reparsing research formulas there.
 - Factorio already normalizes the active research fraction when a prototype cost changes. MIR retains that engine-normalized value and does not apply a second `old_cost / new_cost` conversion.
-- The active technology, exact level, queue, completed levels, completed unit-equivalent work, and unrelated force state remain untouched by MIR's configuration handler.
+- The active technology, exact level, queue, completed levels, completed unit-equivalent work, and unrelated force state are preserved by MIR's configuration handler.
 - Productivity-family adoption signature changes no longer call a force-wide technology-effect reset, so unrelated mod effects and force recipe state are not reapplied.
 - A malformed, tampered, unknown, or over-budget descriptor is refused safely and produces a stable diagnostic; descriptor analysis never mutates live research progress.
+- The supported public upgrade path is 3.2.3 to 3.2.5. Keep a normal save backup, then save and reload once more after the first successful upgrade to confirm stable state.
 
-## Compatibility and stability
+## Compatibility and support
 
 - Existing technology, setting, locale, runtime-state, and profile identifiers remain stable.
 - Old profiles remain readable and unknown future profile fields remain preserved.
 - New cost controls use neutral defaults.
-- Normal loads expose a bounded research-cost support record that links the neutral-default proposition to the final compiler result, provides stable reason/remediation codes, and records the Factorio 2.0 validation-log adapter disposition without creating 2.5.5 authority.
-- The public upgrade path is 3.2.3 to 3.2.5.
-- MIR 2.5.5 is a later conditional Factorio 2.0 projection and is not produced by this release.
+- Normal loads expose a bounded, privacy-safe research-cost support record linking the neutral-default proposition to the final compiler result and providing stable reason and remediation codes.
+- Existing Base, Space Age, native-owner, automatic-family, upgrade, configuration-change, and governed ecosystem checks remain part of the release evidence. A successful load is still only a load claim; it is not a blanket semantic-support claim for every mod combination.
+- When reporting a problem, include the exact MIR archive hash, Factorio version, enabled mod archive names and hashes, startup settings, source save, and relevant log rows. Remove usernames, absolute paths, tokens, and unrelated save data before sharing.
 
-## Candidate status
+## Known limits
 
-The source remains under development. `C32` is a reserved candidate floor, not an assigned candidate identity. Development packages are for testing only until exact upgrade, reload-equivalence, ecosystem, performance, manual, protected, seal, publication, and public-byte gates are complete.
-
-The hosted assurance control plane now isolates each worker's exact test/fingerprint subtree and requires a plan-bound worker receipt before deterministic aggregate import. Latest exact repair head `409884cba10d69ead7020df17c64899fa91f633e` passed both hosted aggregates and merged through PR 45; append-only incident `INC-2026-0056` closes `325-A1a`. This is release tooling, not candidate evidence, and it does not assign C32 or advance 3.2.5 beyond `planned`.
-
-Fresh development-breadth execution later exposed `INC-2026-0058`: the release-targeted ecosystem profiles still referenced retired pre-migration scenario paths. The package-excluded repair binds the profiles to `validation/scenarios/local-2.1.json` or `local-2.0.json`, teaches the migration tool to recognize JSON-escaped paths, and rejects missing or noncanonical profile authorities during static admission. Focused admission also repaired `INC-2026-0059`, an output-root migration preview that incorrectly depended on an untracked legacy `.mir/tasks` directory.
-
-The first exact ecosystem retry reached and passed all nine Factorio loads, then exposed `INC-2026-0060`: Base-only rows reached Ice productivity's deliberately unavailable cryogenic-science selector. Ice productivity now declares its Space Age dependency before science selection, while the Space Age lane retains cryogenic science and accepting-lab proof. This is a package-visible development correction; exact source-bound ecosystem and breadth closure remain required.
+- Unknown external research-cost formulas are preserved at defaults. MIR refuses an explicit override when it cannot prove a safe conversion instead of guessing.
+- Generalized all-stream explanations, a public proof/environment platform, universal support bundles, and broad automatic compatibility generation are outside this patch release.
+- MIR 3.2.5 is for Factorio 2.1. Do not copy it into Factorio 2.0; MIR 2.5.5 is a separate target projection with its own package and qualification.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity
