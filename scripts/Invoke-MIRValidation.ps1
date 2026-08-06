@@ -378,8 +378,8 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
         if (
         $imageExtensions -contains $extension `
           -and -not $relative.StartsWith(".mir/target-lines/") `
-          -and -not $relative.StartsWith(".work/artifacts/") `
-          -and -not $relative.StartsWith(".work/build/") `
+          -and -not $relative.StartsWith("build/results/") `
+          -and -not $relative.StartsWith("build/") `
           -and -not $relative.StartsWith("dist/") `
           -and -not $relative.StartsWith("tmp/")
         ) { Get-Item -LiteralPath $path }
@@ -1422,7 +1422,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir' },
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "`$loadResultsPath = Join-Path `$resolvedOutputDir `"load-results.json`"" },
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'if ($enabled.ContainsKey("space-age"))' },
-    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith(".work/artifacts/")' },
+    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = 'not $relative.StartsWith("build/results/")' },
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "skip_reason = `"dependency_resolution_failure`"" },
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Invoke-MIRScenarioLoad" },
     @{ File = "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'tools\lib\validation\SettingsOverrides.ps1' },
@@ -1436,7 +1436,6 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "write-data=`$UserDataDir" },
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
-    @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '".work"' },
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
     @{ File = "tools\lib\compatibility\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
@@ -2127,7 +2126,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
   if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    $validationOutputDir = ".work/build/validation-dist"
+    $validationOutputDir = "build/validation-dist"
     & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
     $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
   } else {
@@ -2174,7 +2173,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
 
     $forbiddenPatterns = @(
-      "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|\.work|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
+      "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|artifacts|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
       "^$([regex]::Escape($root))(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
@@ -2296,7 +2295,7 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
-  $ValidationSummaryPath = Join-Path $repo ".work\artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+  $ValidationSummaryPath = Join-Path $repo "build\results\validation\factorio-$($repoInfo.factorio_version)-summary.json"
 }
 if ($Tier -eq "impacted" -and [string]::IsNullOrWhiteSpace($ChangedSince)) {
   throw "The impacted tier requires -ChangedSince <commit>."
@@ -2424,7 +2423,7 @@ if (-not $ScenarioWorker) {
   $packageBuildDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "package-build" -Kind "gate"
   $runtimeStateDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "runtime-state-contract" -Kind "gate"
   Add-MIRValidationCompletedScenario -Name $staticDeclaration.name -Group $staticDeclaration.group -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
-  Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @(".work/build/validation-dist")
+  Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @("build/validation-dist")
   Add-MIRValidationCompletedScenario -Name $runtimeStateDeclaration.name -Group $runtimeStateDeclaration.group -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
 }
 
@@ -3383,7 +3382,7 @@ if ($selectionActive -and -not $checkpointActive) {
     $selectedExecutable = @($scenarioRegistry.records | Where-Object kind -ne "gate" | Sort-Object name)
     if ($MaxParallel -gt 1 -and @($selectedExecutable | Where-Object kind -ne "runtime").Count -eq 0) {
       $history = @{}
-      $historyPath = Join-Path $repo ".work\artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+      $historyPath = Join-Path $repo "build\results\validation\factorio-$($repoInfo.factorio_version)-summary.json"
       if (Test-Path -LiteralPath $historyPath) {
         try {
           $historical = Get-Content -Raw -LiteralPath $historyPath | ConvertFrom-Json

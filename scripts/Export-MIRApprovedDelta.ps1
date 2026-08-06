@@ -3,7 +3,7 @@ param(
   [string]$CurrentPackage = "dist\more-infinite-research_3.2.0.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$OutputPath = ".mir\releases\deltas\3.1.9-to-3.2.0.json",
-  [string]$EvidenceRoot = ".work\artifacts\approved-delta",
+  [string]$EvidenceRoot = "build\results\approved-delta",
   [string]$ExpectedBaselineSha256 = "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
   [string]$ExpectedSourceCommit = "",
   [switch]$SkipExecution

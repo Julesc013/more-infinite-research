@@ -164,5 +164,5 @@ jobs:
         with:
           include-hidden-files: true
           name: extended-compat-audit
-          path: .work/artifacts/extended-tests
+          path: build/results/extended-tests
           if-no-files-found: ignore

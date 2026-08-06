@@ -651,7 +651,7 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 Deterministic package construction and composition reporting are canonical commands under `tools/commands/package/`. Their former `scripts/` entrypoints are parameter-compatible wrappers only. Source reconstruction resolves the canonical command first and falls back to the historical path only when the selected source commit predates this migration; this fallback preserves old release reconstruction without making the alias a current write authority.
 
-Repository inventory, path/layout inspection, and stale-workspace cleanup are canonical commands under `tools/commands/workspace/`. Cleanup is constrained to immediate, ignored children of `.work/artifacts/`; historical output-root aliases remain read-only and are never deletion authorities. Former `scripts/` entrypoints preserve parameters only and cannot own current behavior.
+Repository inventory, path/layout inspection, and stale-artifact cleanup are canonical commands under `tools/commands/workspace/`. Cleanup is constrained to immediate, ignored children of `build/results/`; `build/` is reconstructible construction state, `dist/` is distribution state, and the retired `.work/`, `out/`, and root `tmp/` paths are never write authorities. Former `scripts/` entrypoints preserve parameters only and cannot own current behavior.
 
 Documentation formatting and deterministic documentation projections are canonical commands under `tools/commands/docs/`. During the L5 migration, generated sentences already shipped inside the package-visible README remain byte-stable and may name their read-only compatibility wrappers; non-package maintainer documentation and active validation use canonical paths.
 
@@ -756,7 +756,7 @@ The measurable transition debt report is:
 .\tools\mir.ps1 legacy inventory --check
 ```
 
-It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`, `artifacts/legacy-inventory/repo-legacy.json`, and `artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path module counts, deleted shim-directory presence, old root helper presence, old import counts, direct prototype access matches, and generated stream manifest coverage. The checked form requires zero old shim directories, zero old root helper files, zero runtime Lua files under `control/`, zero MIR-legacy/compat/lib/config/util/diagnostics imports, zero direct `data.raw` matches outside the platform adapter, and zero generated streams missing manifest rows.
+It writes `build/results/legacy-inventory/shipped-mod-legacy.json`, `build/results/legacy-inventory/repo-legacy.json`, and `build/results/legacy-inventory/legacy-summary.md`. The report tracks old-path module counts, deleted shim-directory presence, old root helper presence, old import counts, direct prototype access matches, and generated stream manifest coverage. The checked form requires zero old shim directories, zero old root helper files, zero runtime Lua files under `control/`, zero MIR-legacy/compat/lib/config/util/diagnostics imports, zero direct `data.raw` matches outside the platform adapter, and zero generated streams missing manifest rows.
 
 ## Implementation Sequence
 

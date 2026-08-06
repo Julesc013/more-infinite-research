@@ -32,9 +32,9 @@ try {
   New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
   & git -C $fixtureRoot init --quiet
   if ($LASTEXITCODE -ne 0) { throw "Unable to initialize artifact-cleanup fixture repository." }
-  "/.work/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
+  "/build/results/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
 
-  $artifactRoot = Join-Path $fixtureRoot ".work\artifacts"
+  $artifactRoot = Join-Path $fixtureRoot "build/results"
   $protectedAssurance = Join-Path $artifactRoot "assurance"
   $protectedValidation = Join-Path $artifactRoot "validation"
   $staleRun = Join-Path $artifactRoot "stale-run"
@@ -59,7 +59,7 @@ try {
   }
   foreach ($protectedName in @("assurance", "validation")) {
     if (@($preview | Where-Object { $_.item -eq $protectedName -and $_.status -eq "protected" }).Count -ne 1) {
-      throw "Cleanup did not protect .work/artifacts/$protectedName."
+      throw "Cleanup did not protect build/results/$protectedName."
     }
   }
 

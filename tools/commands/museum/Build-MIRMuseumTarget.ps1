@@ -18,7 +18,7 @@ foreach ($warning in @($validation.warnings)) { Write-Warning $warning }
 $result = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir $OutputDir
 if (-not [string]::IsNullOrWhiteSpace($MaterializeRoot)) {
   $resolvedMaterializeRoot = if ([IO.Path]::IsPathRooted($MaterializeRoot)) { $MaterializeRoot } else { Join-Path $repo $MaterializeRoot }
-  $sourceRoot = Join-Path $repo (".work\build\museum\$FactorioVersion\runtime")
+  $sourceRoot = Join-Path $repo ("build\museum\$FactorioVersion\runtime")
   foreach ($relative in @("config.lua", "data.lua", "info.json", "locale\en\more-infinite-research.cfg")) {
     $destination = Join-Path $resolvedMaterializeRoot $relative
     $parent = Split-Path -Parent $destination
@@ -27,8 +27,8 @@ if (-not [string]::IsNullOrWhiteSpace($MaterializeRoot)) {
   }
   $metadataRoot = Join-Path $resolvedMaterializeRoot ".mir\museum"
   if (-not (Test-Path -LiteralPath $metadataRoot)) { New-Item -ItemType Directory -Force -Path $metadataRoot | Out-Null }
-  Copy-Item -LiteralPath (Join-Path $repo ".work\build\museum\$FactorioVersion\stream-manifest.json") -Destination (Join-Path $metadataRoot "stream-manifest.json") -Force
-  Copy-Item -LiteralPath (Join-Path $repo ".work\build\museum\$FactorioVersion\balance.json") -Destination (Join-Path $metadataRoot "balance.json") -Force
+  Copy-Item -LiteralPath (Join-Path $repo "build\museum\$FactorioVersion\stream-manifest.json") -Destination (Join-Path $metadataRoot "stream-manifest.json") -Force
+  Copy-Item -LiteralPath (Join-Path $repo "build\museum\$FactorioVersion\balance.json") -Destination (Join-Path $metadataRoot "balance.json") -Force
 }
 
 $result | ConvertTo-Json -Depth 10

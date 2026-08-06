@@ -372,7 +372,7 @@ function Expand-MIRAssuranceTests {
         safe_test_id=$safeId
         kind="factorio-scenario"
         layer=$layer
-        command="./scripts/Invoke-MIRValidation.ps1 -ScenarioWorker -FactorioBin <factorio> -CandidateZip <candidate> -Scenario '$($record.name)' -ValidationSummaryPath '.work/artifacts/validation/$safeId.json'"
+        command="./scripts/Invoke-MIRValidation.ps1 -ScenarioWorker -FactorioBin <factorio> -CandidateZip <candidate> -Scenario '$($record.name)' -ValidationSummaryPath 'build/results/validation/$safeId.json'"
         requires_factorio=$true
         requires_candidate=$true
         inputs=@($inputs)

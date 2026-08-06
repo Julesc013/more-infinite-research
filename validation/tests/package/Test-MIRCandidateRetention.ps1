@@ -17,7 +17,7 @@ if ((Get-FileHash -LiteralPath $FactorioBin -Algorithm SHA256).Hash -ne $profile
   throw "Factorio binary hash does not match the qualified target profile."
 }
 $candidate = (Resolve-Path -LiteralPath $CandidateZip).Path
-if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $repo ".work\build\retention\$($profile.release)" }
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $repo "build\retention\$($profile.release)" }
 if (Test-Path -LiteralPath $OutputRoot) { Remove-Item -LiteralPath $OutputRoot -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
 

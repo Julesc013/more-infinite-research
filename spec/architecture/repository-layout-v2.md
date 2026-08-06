@@ -5,7 +5,7 @@ applies_to: "3.2.5+"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-06
 supersedes: []
 superseded_by: []
 ---
@@ -22,7 +22,7 @@ This is the normative directory and ownership contract for the MIR dual-plane re
 4. Durable records use logical path IDs or repository-relative `/` paths.
 5. New writes use canonical paths. Historical aliases are read-only.
 6. Factorio package construction is whitelist-based and cannot include development directories.
-7. `.work/` is disposable. `dist/` contains only publishable packages.
+7. Disposable construction state lives under `build/`; local validation results live under `build/results/`; distributable and playtest-ready packages live under `dist/`.
 8. Historical evidence text is not rewritten to follow directory moves.
 
 ## Root
@@ -39,8 +39,9 @@ This is the normative directory and ownership contract for the MIR dual-plane re
 ├─ fixtures/
 ├─ docs/
 ├─ .mir/
+├─ build/
 ├─ dist/
-└─ .work/
+└─ repository metadata and entrypoint files
 ```
 
 The standard repository integration roots `.github/`, `.agents/`, and `.codex/` remain hidden at root. `AGENTS.md`, `CONTRIBUTING.md`, `README.md`, `LICENSE`, `.gitignore`, and `.gitattributes` remain at root by convention.
@@ -99,7 +100,7 @@ Specifications do not contain one-run observations or mutable release state.
 
 `control/` owns path, ownership, ABI, repository, revocation, and control policies. `lifecycle/` owns changes, incidents, and tasks. `releases/` owns typed release state. `evidence/` owns bounded durable manifests, attestations, seals, receipts, revocations, and retention roots.
 
-Large immutable evidence objects live in governed external custody with content digests and at least one independent mirror. Local evidence caches live under `.work/evidence/` or `.mir/local/`.
+Large immutable evidence objects live in governed external custody with content digests and at least one independent mirror. Local generated evidence lives under ignored `build/results/`; machine-specific configuration lives under `.mir/local/`.
 
 `views/` is reproducible and generator-owned. `local/` is ignored and may contain machine-specific configuration only.
 
@@ -128,7 +129,7 @@ Approval is a state inside a delta record. A delta does not change directory whe
 
 `RepoPathCatalog` reads `.mir/control/paths.yml` and resolves only canonical logical IDs and historical repository aliases. An alias ending in `/` is a directory prefix; every other alias is an exact file path. Both forms are read-only and resolve to one canonical path without retaining duplicate authority bytes. The resolver rejects absolute paths, parent traversal, backslashes, case collisions, and link-based durable authority.
 
-`MachinePathResolver` remains separate. It may resolve Factorio binaries, local mod libraries, caches, and user-supplied absolute paths, but those values may be stored only in `.mir/local/`, `.work/`, or environment variables.
+`MachinePathResolver` remains separate. It may resolve Factorio binaries, local mod libraries, caches, and user-supplied absolute paths, but those values may be stored only in `.mir/local/`, ignored `build/` or `build/results/`, or environment variables.
 
 ## Naming
 
@@ -140,11 +141,16 @@ Approval is a state inside a delta record. A delta does not change directory whe
 - `views` names reproducible projections; `baselines` names reviewed expectations.
 - Public command names are stable even when implementation files move.
 
-## Workspace and distributions
+## Generated data and distributions
 
-`.work/` contains build, cache, context, evidence-cache, line-materialization, log, output, playtest, staging, temporary, and worktree data. Everything under it can be removed and reconstructed.
+The repository has two generated-data roots with non-overlapping purposes. All disposable local and CI output is contained by `build/`; `build/results/` is a named subdirectory, not another root.
 
-`dist/` contains only exact publishable candidates or released packages. Raw reports, playtest trees, staging archives, and logs are forbidden there.
+| Root | Purpose | Retention |
+| --- | --- | --- |
+| `build/` | Disposable package staging, caches, generated target material, temporary files, and local/CI results | Reconstructible and safe to delete when no command is active after compact authorities have been promoted. |
+| `dist/` | Exact candidate/release ZIPs and the ignored local `dist/playtest/` handoff | Candidate and released archives are governed; playtest copies are replaceable views over qualified bytes. |
+
+`.work/` is retired and must never be recreated. Ordinary tools write generated output only beneath `build/`. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is legacy read-only material pending the post-2.5.5 storage migration; it is not canonical and this change does not delete it. Git worktrees must be siblings of the repository or use an explicitly selected external path; they must never be nested in the repository.
 
 ## Migration invariants
 
@@ -154,7 +160,7 @@ During the 3.2.5 layout migration:
 - no package-visible product change is mixed into a relocation commit;
 - an old command forwards to exactly one implementation;
 - new writes target canonical paths only;
-- package-visible frozen text may retain a historical read-only path until the next package-visible release slice;
+- historical evidence and package-visible frozen text may retain the path that was true when captured;
 - historical evidence retains its original bytes;
 - each move has parity, rollback, and legacy-reference tests;
 - target snapshots are removed only after two exact reconstructions.

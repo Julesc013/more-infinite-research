@@ -39,7 +39,7 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$($candidateInfo.version)-performance-regression.json"
 }
 
-$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ".work\artifacts\performance"))
+$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "build\results\performance"))
 $usesGeneratedArtifactRoot = [string]::IsNullOrWhiteSpace($ArtifactRoot)
 $generatedArtifactParent = ""
 if ($usesGeneratedArtifactRoot) {

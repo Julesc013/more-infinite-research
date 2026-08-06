@@ -18,7 +18,7 @@ $results = @()
 foreach ($target in $selected) {
   $targetRoot = if ($selected.Count -eq 1) { $InstallationRoot } else { "" }
   $installation = Resolve-MIRMuseumInstallation -Target $target -RepoRoot $repo -InstallationRoot $targetRoot -RegistryPath $RegistryPath
-  $package = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir ".work\build\museum-exact\packages"
+  $package = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir "build\museum-exact\packages"
   $runtimeJson = & (Join-Path $repo "validation\tests\runtime\Test-MIRMuseumRuntime.ps1") `
     -FactorioVersion ([string]$target.factorio) `
     -PackageMode zip `

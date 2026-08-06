@@ -6,7 +6,7 @@ param(
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
-  [string]$OutputPath = ".work/artifacts/assurance/3.2.5-upgrade-proof.json"
+  [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json"
 )
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.

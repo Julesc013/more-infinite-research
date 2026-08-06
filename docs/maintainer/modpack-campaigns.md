@@ -30,7 +30,7 @@ Use an exact MIR candidate archive and bind it to the source commit that produce
   -ModUnderTestZip .\build\validation-dist\more-infinite-research_3.1.0.zip `
   -ModUnderTestSourceCommit <full-commit> `
   -RunLoadTests `
-  -OutputDir .\artifacts\campaigns\bz
+  -OutputDir .\build\results\campaigns\bz
 ```
 
 The runner writes `campaign-evidence.json`. Every executed scenario records the MIR archive SHA-256 and source commit, dependency-lock fingerprint, requested and actual roots, exact root and dependency versions with archive SHA-256, result, timeout state, and claim level. Missing archive SHA-256 blocks evidence creation.

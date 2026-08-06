@@ -78,7 +78,7 @@ try {
   }
 }
 
-$workerImportRoot = Join-Path $repo (".work/output/control-plane-worker-import-test/" + [guid]::NewGuid().ToString("N"))
+$workerImportRoot = Join-Path $repo ("build/results/control-plane-worker-import-test/" + [guid]::NewGuid().ToString("N"))
 try {
   $workerRoot = Join-Path $workerImportRoot "workers"
   $destinationStore = Join-Path $workerImportRoot "destination"
@@ -94,7 +94,7 @@ try {
       -IdentityKey (Get-MIRCPSha256Text -Value "$importIdentity-$($case.suffix)") `
       -Subject ([pscustomobject][ordered]@{task_id="worker-import-$($case.suffix)";target="2.1"}) `
       -Producer $importProducer -Payload ([pscustomobject][ordered]@{status=$case.status})
-    $artifactEvidenceRoot = Join-Path (Join-Path $workerRoot $case.artifact) "artifacts/evidence"
+    $artifactEvidenceRoot = Join-Path (Join-Path $workerRoot $case.artifact) "build/results/evidence"
     [void](Write-MIRCPEvidenceObject -Object $object -RepoRoot $repo -Root $artifactEvidenceRoot)
   }
   $workerImport = Import-MIRCPWorkerEvidenceObjects -WorkerRoot $workerRoot -EvidenceRoot $destinationStore -RepoRoot $repo
@@ -114,7 +114,7 @@ try {
 } finally {
   if (Test-Path -LiteralPath $workerImportRoot) {
     $resolvedImportRoot = [IO.Path]::GetFullPath($workerImportRoot)
-    $importBoundary = [IO.Path]::GetFullPath((Join-Path $repo ".work/output/control-plane-worker-import-test")).TrimEnd("\") + "\"
+    $importBoundary = [IO.Path]::GetFullPath((Join-Path $repo "build/results/control-plane-worker-import-test")).TrimEnd("\") + "\"
     if (-not $resolvedImportRoot.StartsWith($importBoundary, [StringComparison]::OrdinalIgnoreCase)) {
       throw "Refusing to remove an unsafe protected worker-import test root."
     }

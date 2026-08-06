@@ -11,8 +11,8 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
-$first = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -OutputRoot ".work/output/control-plane-v5-self-test/contexts" -RepoRoot $repo
-$second = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -OutputRoot ".work/output/control-plane-v5-self-test/contexts" -RepoRoot $repo
+$first = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -OutputRoot "build/results/control-plane-v5-self-test/contexts" -RepoRoot $repo
+$second = New-MIRCPVerificationContext -Mode calibrate-fresh -Target "2.1" -Release "3.2.2" -OutputRoot "build/results/control-plane-v5-self-test/contexts" -RepoRoot $repo
 if ([string]$first.context_id -ne [string]$second.context_id -or [int]$first.members -lt 10) { throw "Verification context materialization is not deterministic or complete." }
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $first.path "context-manifest.json") | ConvertFrom-Json
 $memberNames = @($manifest.members.path | ForEach-Object { [string]$_ })
@@ -43,11 +43,11 @@ if ([string]$c31Profile.upgrade.from_version -ne "3.2.3" -or [string]$c31Profile
     [string]$c31Profile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-4") {
   throw "C31 target-profile projection does not bind the exact governed save transition."
 }
-$plannedRelease = Get-MIRCPReleaseByVersion -Release "3.2.5" -RepoRoot $repo
-$plannedProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $plannedRelease -RepoRoot $repo
-if ([string]$plannedRelease.state -ne "planned" -or [string]$plannedRelease.candidate_id -ne "not-assigned" -or
-    [string]$plannedProfile.upgrade.from_version -ne "3.2.3" -or [string]$plannedProfile.upgrade.to_version -ne "3.2.5" -or
-    [string]$plannedProfile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-5") {
-  throw "Planned 3.2.5 target-profile projection does not bind the public upgrade without assigning a candidate."
+$candidateRelease = Get-MIRCPReleaseByVersion -Release "3.2.5" -RepoRoot $repo
+$candidateProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseProfile -ReleaseRecord $candidateRelease -RepoRoot $repo
+if ([string]$candidateRelease.state -ne "candidate-qualified" -or [string]$candidateRelease.candidate_id -ne "C32" -or
+    [string]$candidateProfile.upgrade.from_version -ne "3.2.3" -or [string]$candidateProfile.upgrade.to_version -ne "3.2.5" -or
+    [string]$candidateProfile.upgrade.fixture -ne "assert-upgrade-3-2-3-to-3-2-5") {
+  throw "C32 target-profile projection does not bind the governed public upgrade."
 }
-Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, historical C30/C31 projections, and the unassigned 3.2.5 public upgrade."
+Write-Host "[ok] immutable ABI-3 verification context $($first.context_id) contains $($first.members) digest-checked members, exact C24 bytes, historical C30/C31 projections, and the C32 public upgrade."

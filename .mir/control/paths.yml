@@ -121,14 +121,14 @@ paths:
   views.publication-checklist: .mir/views/publication-checklist.json
   views.backport-queue: .mir/views/backport-queue.json
   local.root: .mir/local
-  workspace.root: .work
-  workspace.artifacts: .work/artifacts
-  workspace.artifacts.evidence: .work/artifacts/evidence
-  workspace.build: .work/build
-  workspace.output: .work/output
-  workspace.output.verification-context: .work/output/verification-context
-  workspace.lines: .work/lines
-  workspace.evidence: .work/evidence
-  workspace.playtest: .work/playtest
-  workspace.tmp: .work/tmp
+  workspace.build.results: build/results
+  workspace.build.results.assurance: build/results/assurance
+  workspace.build.results.evidence: build/results/evidence
+  workspace.build.results.validation: build/results/validation
+  workspace.build.results.verification-context: build/results/verification-context
+  workspace.build: build
+  workspace.build.cache: build/cache
+  workspace.build.candidate: build/candidate
+  workspace.build.tmp: build/tmp
   distributions.root: dist
+  distributions.playtest: dist/playtest

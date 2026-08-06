@@ -105,9 +105,8 @@ function Get-MIRAssuranceRepositoryFiles {
         $_ -and
         $_ -notlike ".mir/target-lines/*" -and
         $_ -notlike ".mir/evidence/*" -and
-        $_ -notlike ".work/artifacts/*" -and
-        $_ -notlike ".work/build/*" -and
-        $_ -notlike ".work/output/*"
+        $_ -notlike "build/results/*" -and
+        $_ -notlike "build/*"
       } |
       Sort-Object -Unique
   )

@@ -85,7 +85,6 @@ function Copy-MIRModUnderTest {
     ".git",
     ".github",
     ".mir",
-    ".work",
     "AGENTS.md",
     "CONTRIBUTING.md",
     "artifacts",

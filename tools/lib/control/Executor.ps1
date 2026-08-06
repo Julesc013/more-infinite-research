@@ -43,7 +43,7 @@ function Get-MIRCPCanonicalCandidateArchive {
   if ($name -notmatch '^[A-Za-z0-9_-]+$' -or $version -notmatch '^[0-9][A-Za-z0-9._-]*$' -or $version -ne [string]$descriptor.release) {
     throw "Immutable candidate metadata cannot produce a safe canonical Factorio archive name."
   }
-  $root = Join-Path $repo ".work/output/control-plane-v5/context-candidates/$([string]$State.context.context_id)"
+  $root = Join-Path $repo "build/results/control-plane-v5/context-candidates/$([string]$State.context.context_id)"
   if (-not (Test-Path -LiteralPath $root -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $root) }
   $destination = Join-Path $root "${name}_${version}.zip"
   if (Test-Path -LiteralPath $destination -PathType Leaf) {
@@ -120,7 +120,7 @@ function Write-MIRCPResultMarker {
     [Parameter(Mandatory)][string]$RepoRoot
   )
   $safe = ([string]$Marker.task_id) -replace '[^A-Za-z0-9_.-]+', '_'
-  $path = Join-Path $RepoRoot ".work/output/control-plane-v5/results/$safe.json"
+  $path = Join-Path $RepoRoot "build/results/control-plane-v5/results/$safe.json"
   Write-MIRCPJson -Path $path -Value $Marker -RepoRoot $RepoRoot
   return $path
 }
@@ -374,7 +374,7 @@ function Invoke-MIRCPEnvironmentBatch {
   if ($batch.Count -ne 1 -or -not [bool]$batch[0].process_required) { throw "Unknown or non-Factorio environment batch: $BatchId" }
   $scenarios = @($registry.scenarios | Where-Object { [string]$_.id -in @($batch[0].scenario_ids) })
   if ($scenarios.Count -ne 1) { throw "Current scenario worker supports one scenario per exact environment; registry batch $BatchId has $($scenarios.Count)." }
-  $summaryRoot = Join-Path $repo ".work/output/control-plane-v5/environment-results"
+  $summaryRoot = Join-Path $repo "build/results/control-plane-v5/environment-results"
   if (-not (Test-Path -LiteralPath $summaryRoot -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $summaryRoot) }
   $summaryPath = Join-Path $summaryRoot "$([string]$batch[0].environment_signature).json"
   & (Join-Path $source.path "scripts/Invoke-MIRValidation.ps1") -ScenarioWorker -FactorioBin $FactorioBin -CandidateZip $candidate -Scenario ([string]$scenarios[0].name) -ValidationSummaryPath $summaryPath
@@ -491,7 +491,7 @@ function New-MIRCPPerformanceSourceOverlay {
   $authorityRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $Descriptor -RepoRoot $repo
   $authorityPath = Join-Path $repo $authorityRelativePath
   $authority = Assert-MIRCPPerformanceCampaignAuthority -Path $authorityPath -Descriptor $Descriptor -TargetProfile $TargetProfile -RepoRoot $repo
-  $root = Join-Path $repo ".work/output/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
+  $root = Join-Path $repo "build/results/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
   $destination = Join-Path $root "performance"
   if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
     [void](New-Item -ItemType Directory -Force -Path $root)
@@ -708,7 +708,7 @@ function Invoke-MIRCPPerformanceMeasurement {
   $descriptor = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "candidate-descriptor.json") | ConvertFrom-Json
   $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
   $overlay = New-MIRCPPerformanceSourceOverlay -State $state -Source $source -Descriptor $descriptor -TargetProfile $profile -RepoRoot $repo
-  $outputRoot = Join-Path $repo ".work/output/control-plane-v5/performance/$([string]$state.context.context_id)"
+  $outputRoot = Join-Path $repo "build/results/control-plane-v5/performance/$([string]$state.context.context_id)"
   $outputPath = Join-Path $outputRoot "evidence.json"
   $executionRoot = New-MIRCPCompactPerformanceArtifactRoot -State $state -Campaign $overlay.authority.campaign
   $artifactDestination = Join-Path $outputRoot "artifacts"
@@ -820,7 +820,7 @@ function Invoke-MIRCPUpgradeMeasurement {
   $profile = Get-Content -Raw -LiteralPath (Join-Path $state.context.path "target-profile.json") | ConvertFrom-Json
   $factorio = Assert-MIRCPFactorioContextLock -State $state -FactorioBin $FactorioBin
   $prior = (Resolve-Path -LiteralPath $PriorRelease).Path
-  $outputPath = Join-Path $repo ".work/output/control-plane-v5/upgrade-evidence.json"
+  $outputPath = Join-Path $repo "build/results/control-plane-v5/upgrade-evidence.json"
   & (Join-Path $source.path "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1") -RepoRoot $source.path `
     -FactorioBin $factorio.path -FromZip $prior -ToZip $candidate `
     -FromVersion ([string]$profile.upgrade.from_version) -ToVersion ([string]$profile.upgrade.to_version) `
@@ -865,7 +865,7 @@ function Invoke-MIRCPEcosystemMeasurement {
     [pscustomobject][ordered]@{name=$_.Name;bytes=[int64]$_.Length;sha256=(Get-MIRCPSha256File -Path $_.FullName)}
   })
   if ($modRows.Count -eq 0) { throw "Ecosystem measurement requires a non-empty local mod ZIP closure." }
-  $outputRoot = Join-Path $repo ".work/output/control-plane-v5/ecosystem"
+  $outputRoot = Join-Path $repo "build/results/control-plane-v5/ecosystem"
   & (Join-Path $source.path "scripts/Invoke-MIRReleaseTargetedGate.ps1") -FactorioBin $factorio.path `
     -FactorioLine ([string]$state.plan.target) -LocalModDir $mods -OutputRoot $outputRoot `
     -CandidateZip $candidate -CandidateSourceCommit ([string]$source.commit) `
@@ -1029,7 +1029,7 @@ function Invoke-MIRCPNativePatchDeltaMeasurement {
     }
     evaluation = [pscustomobject][ordered]@{status=$status;difference_count=($added.Count + $removed.Count + $changed.Count);unapproved_count=($unexpected.Count + $missing.Count);predicates=$predicates}
   }
-  $outputPath = Join-Path $repo ".work/output/control-plane-v5/approved-delta/$([string]$State.context.context_id)/evaluation.json"
+  $outputPath = Join-Path $repo "build/results/control-plane-v5/approved-delta/$([string]$State.context.context_id)/evaluation.json"
   Write-MIRCPJson -Path $outputPath -Value $output -RepoRoot $repo
   $taskStatus = if ($status -eq "approved" -and [int]$output.evaluation.unapproved_count -eq 0) { "passed" } else { "failed" }
   $facts = [pscustomobject][ordered]@{
@@ -1076,8 +1076,8 @@ function Invoke-MIRCPApprovedDeltaMeasurement {
     return Invoke-MIRCPNativePatchDeltaMeasurement -State $state -PlanRow $row[0] -Source $source -Candidate $candidate `
       -PriorRelease $prior -Factorio $factorio -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
   }
-  $outputPath = Join-Path $repo ".work/output/control-plane-v5/approved-delta.json"
-  $rawRoot = Join-Path $repo ".work/output/control-plane-v5/approved-delta-raw"
+  $outputPath = Join-Path $repo "build/results/control-plane-v5/approved-delta.json"
+  $rawRoot = Join-Path $repo "build/results/control-plane-v5/approved-delta-raw"
   & (Join-Path $source.path "scripts/Export-MIRApprovedDelta.ps1") -BaselinePackage $prior `
     -CurrentPackage $candidate -FactorioBin $factorio.path `
     -OutputPath $outputPath -EvidenceRoot $rawRoot -ExpectedBaselineSha256 (Get-MIRCPSha256File -Path $prior) `

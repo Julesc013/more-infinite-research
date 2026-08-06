@@ -21,7 +21,7 @@ param(
   [string]$FactorioLine = "2.1",
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
-  [string]$OutputRoot = ".\.work\artifacts\extended-tests",
+  [string]$OutputRoot = ".\build\results\extended-tests",
   [string]$ModUnderTestZip = "",
   [string]$ModUnderTestSourceCommit = "",
   [string]$FromLockfile,

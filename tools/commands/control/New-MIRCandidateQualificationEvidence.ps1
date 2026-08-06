@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
-  [string]$SummaryPath = ".work/artifacts/assurance/c32-candidate-qualification-verify-summary.json",
+  [string]$SummaryPath = "build/results/assurance/c32-candidate-qualification-verify-summary.json",
   [string]$OutputPath = ".mir/evidence/3.2.5-c32-candidate-qualification.json"
 )
 

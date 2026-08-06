@@ -19,10 +19,13 @@ foreach ($token in @(
   "-SourceRepoRoot source", "-Stage release", "-ExcludeTask shadow.equivalence", "-Kind manual", "-AggregateTaskId qualification.full",
   "proof.integration_commit", "Qualification-source commit mismatch",
   "Invoke-MIRControlPlane.ps1 backport", "Invoke-MIRControlPlane.ps1 seal", "-TaskId shadow.equivalence", "Invoke-MIRControlPlane.ps1 promotion",
-  "MIR_PROTECTED_ENVIRONMENT: release-candidate", "MIR_TRUSTED_RUNNER: self-hosted-windows", "-TrustClass protected-release", "cancel-in-progress: false", "merge-multiple: true"
+  "MIR_PROTECTED_ENVIRONMENT: release-candidate", "MIR_TRUSTED_RUNNER: self-hosted-windows", "-TrustClass protected-release", "cancel-in-progress: false",
+  "Download isolated immutable worker objects", "Import content-addressed worker objects deterministically", "-Operation import-workers",
+  "-WorkerRoot build/results/control-plane-worker-evidence", "Tee-Object -FilePath build/results/control-plane-v5/worker-import.json"
 )) {
   if ($workflow -notmatch [regex]::Escape($token)) { throw "Control Plane v5 workflow omits required token: $token" }
 }
+if ($workflow -match 'merge-multiple:\s*true') { throw "Control Plane v5 must not overlay worker artifacts into one shared tree." }
 if ($workflow -notmatch 'needs:\s*\[context,\s*static,\s*package,\s*environments,\s*transitions,\s*ecosystem,\s*performance,\s*manual\]') { throw "The final verification gate does not depend on every execution job." }
 if ($workflow -notmatch 'runs-on:\s*\[self-hosted,\s*Windows\][\s\S]+?-Operation environment') { throw "Factorio environment workers are not bound to protected self-hosted Windows runners." }
 if ($workflow -notmatch 'group:\s*mir-v5-performance-\$\{\{\s*inputs\.target\s*\}\}') { throw "Performance work lacks an exclusive target-scoped concurrency group." }

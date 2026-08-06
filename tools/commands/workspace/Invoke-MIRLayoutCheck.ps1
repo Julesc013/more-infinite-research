@@ -15,7 +15,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $manifest = New-MIRLayoutManifest -RepoRoot $RepoRoot
 if (-not $NoWrite) {
-  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = ".work/output/layout-manifest.json" }
+  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = "build/results/layout-manifest.json" }
   $absoluteOutput = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
   $parent = Split-Path -Parent $absoluteOutput
   if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }

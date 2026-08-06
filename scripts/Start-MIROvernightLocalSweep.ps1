@@ -76,7 +76,7 @@ $resolvedLocalLibraryDirs = @($resolvedLocalLibraryDirs | Sort-Object -Unique)
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = ".\.work\artifacts\overnight-local-$FactorioLine-$stamp"
+  $OutputRoot = ".\build\results\overnight-local-$FactorioLine-$stamp"
 }
 $resolvedOutputRoot = Resolve-MIROvernightPath -Path $OutputRoot
 New-Item -ItemType Directory -Force -Path $resolvedOutputRoot | Out-Null

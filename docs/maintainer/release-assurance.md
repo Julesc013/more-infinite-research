@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 supersedes: []
 superseded_by: []
 ---
@@ -26,7 +26,7 @@ MIR release assurance is a persistent content-addressed evidence system. It plan
 | `spec/schemas/*.schema.json` | Strict test, plan, result, capsule, bundle, and seal contracts |
 | `validation/scenarios/runtime.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
 | `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
-| `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
+| `build/results/assurance/evidence` | Persistent local or CI-restored evidence ledger |
 | `out/verification-plan.json` | Reviewable plan for one candidate and target |
 
 `tools/mir_verify/Invoke-MIRVerify.ps1` is only a forwarding entrypoint. It does not implement a second verifier.
@@ -80,7 +80,7 @@ Factorio layers are:
 
 ## Evidence Ledger
 
-Evidence lives at `artifacts/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs. Worker-supplied pointers are never aggregate authority: the importer selects the immutable capsule from the current plan-bound receipt, validates its complete object closure, and derives the destination pointer. A missing, stale, or invalid supplied pointer is recorded but cannot replace or invalidate an otherwise complete immutable contribution.
+Evidence lives at `build/results/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs. Worker-supplied pointers are never aggregate authority: the importer selects the immutable capsule from the current plan-bound receipt, validates its complete object closure, and derives the destination pointer. A missing, stale, or invalid supplied pointer is recorded but cannot replace or invalidate an otherwise complete immutable contribution.
 
 A schema-4 capsule binds the test ID, target, definition hash, full effective-input map, exact Factorio installation and resolved mod closure when applicable, trust-class-validated producer identity, exit code, structured `mir-test-result-v1`, assertion outcomes, artifact hashes, stdout and stderr hashes, timestamps, duration, and result digest. `passed.json` is only an atomic pointer to an immutable attempt capsule. Corrupt pointers are quarantined. A changed definition, verifier, policy, binary, mod archive, candidate, or other effective input creates a different fingerprint instead of rewriting history.
 
@@ -97,7 +97,7 @@ The worker rechecks the exact evidence before execution. If a matching worker is
 Evaluate the complete plan with:
 
 ```powershell
-./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output build/results/assurance/evidence-bundle.json
 ```
 
 Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time, run ID, and run attempt rather than inheriting plan-wide freshness only.
@@ -108,7 +108,7 @@ The default workflow is named `MIR`; its aggregate required check is `MIR / veri
 
 Fast, targeted, and scheduled matrix workers upload only their exact `test-id/fingerprint` subtree. Every completed worker attempt, including a failed attempt, also writes `worker-receipts/<plan-material-sha256>.json`. Receipt schema 2 binds the semantic plan and required-test-set digests, plan generation/source/target/profile, plan coordination producer, exact work row and freshness policy, contribution-preparation workflow/run/attempt/job identity, evidence producer and trust, completion state, immutable capsule hash, and result digest. The aggregate job downloads each GitHub artifact into its own artifact-name directory and invokes the plan-bound importer. The importer admits only the artifact selected by each scheduled work row, validates the receipt, capsule, structured result, stdout/stderr, and every declared artifact digest, copies only selected immutable files without overwriting different bytes, preserves failed capsules behind a derived blocking pointer, and derives passing pointers deterministically. Missing and failed rows do not stop later successful imports, duplicate exact-row contributions are release-blocking, irrelevant stale artifacts are reported and ignored, and the summary remains available even when proof closure fails. Whole-ledger artifact merging and `merge-multiple: true` are forbidden because creation or extraction order must never select evidence.
 
-Worker ingestion rejects absolute or traversing paths, mixed-slash traversal, NTFS alternate data streams, Windows device names, symlinks and reparse points, duplicate case-folded or Unicode-normalized paths, and immutable-object collisions. `.mir/assurance.json` also caps artifact count, per-artifact entries, total expanded bytes, and individual file size. Generated scenario summaries remain outputs under `.work/`; repository input enumeration excludes `.work/artifacts`, `.work/build`, and `.work/output`, while the receipt and capsule bind the resulting summary digest.
+Worker ingestion rejects absolute or traversing paths, mixed-slash traversal, NTFS alternate data streams, Windows device names, symlinks and reparse points, duplicate case-folded or Unicode-normalized paths, and immutable-object collisions. `.mir/assurance.json` also caps artifact count, per-artifact entries, total expanded bytes, and individual file size. Generated scenario summaries remain outputs under `build/results/`; repository input enumeration excludes ignored `build/results/` and `build/`, while the receipt and capsule bind the resulting summary digest.
 
 The protected full workflow remains a separate content-addressed-object path. It enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`; its plan is always fresh, uploads only the exact planned candidate, verification context, and candidate descriptor, and never transfers historical distribution archives. Each worker starts without the shared ledger and uploads content-addressed evidence objects plus non-authoritative raw outputs. The gate downloads every contribution into an isolated artifact directory, imports only canonical JSON objects whose filename and bytes match the SHA-256 address, rebuilds its evidence index from those accepted objects, evaluates the plan, writes the evidence bundle, and saves one updated immutable cache key. Mutable indexes, leases, raw outputs, artifact listing order, and completion order cannot choose the aggregate result.
 
@@ -128,7 +128,7 @@ For MIR 3.2.0:
 ./tools/mir.ps1 assurance build --target 2.1
 ./tools/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
 ./tools/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
-./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/3.2.0-assurance-qualification.json
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output build/results/assurance/3.2.0-assurance-qualification.json
 ```
 
 The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
@@ -143,7 +143,7 @@ The full and backport no-reuse plans create and validate that evidence as one ca
 
 ```powershell
 .\scripts\Invoke-MIRPerformanceQualification.ps1 `
-  -Candidate artifacts\candidate\more-infinite-research_3.2.0.zip `
+  -Candidate build\results\candidate\more-infinite-research_3.2.0.zip `
   -PriorRelease dist\more-infinite-research_3.1.9.zip `
   -FactorioBin C:\Factorio-2.1.11\bin\x64\factorio.exe `
   -LocalModZipDir C:\Factorio-mods-2.1 `
