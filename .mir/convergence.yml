@@ -208,11 +208,29 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.2.5.zip
-  source_commit: pending
+  source_commit: 43392fed9b245a14734935f1ed35cf88a7a1dfb0
   package_source_commit: a3bfbc4524b52cede425900e775384eb9c1fc4b3
-  automated_gate: pending-requalification
+  sha256: AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF
+  package_content_sha256: 1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D
+  package_source_sha256: 1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D
+  target_profile_sha256: 9C22F859CF0FEB368A0EADCABF13FB83998B76E3DCAB9CBC85DFF66E8EE925A0
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_harness_sha256: 5C694182E9B604FF05391179863400364C3E16A5AD3E027E460FC4A4A65EE538
+  expected_scenarios_sha256: A18D8A2FAFACE89EF72ECC17ADA73CE71EB65D3F2C7C88954E8FA5ACCA524EE4
+  validation_package_sha256: AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF
+  validation_package_content_sha256: 1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D
+  approved_delta_evidence_path: .mir/releases/deltas/3.2.3-to-3.2.5.json
+  approved_delta_sha256: AAC57BED3A907F56D185BBE2AA16272C0745DF3E81A1625D9F8F87431F0F1499
+  upgrade_evidence_path: .mir/evidence/3.2.5-upgrade-proof.json
+  upgrade_evidence_sha256: 121EF12D510256E17F01B1BBD7E03708D82DD70D2F4C4B656A2C145B0483EDE1
+  ecosystem_evidence_path: .mir/evidence/3.2.5-ecosystem-campaign.json
+  interactive_evidence_path: .mir/evidence/3.2.5-interactive-review.json
+  structured_summary_path: .mir/evidence/3.2.5-c32-candidate-qualification.json
+  structured_summary_sha256: 3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0
+  structured_summary_run_id: local-18304
+  automated_gate: passed
   manual_gate: accepted-for-publication
-  status: requalifying-after-validation-harness-change
+  status: release-candidate-accepted
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

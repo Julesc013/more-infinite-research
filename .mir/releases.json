@@ -53,7 +53,7 @@
       "candidate_floor": "C32",
       "candidate_id": "C32",
       "candidate_qualification_evidence": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
-      "candidate_qualification_sha256": "F9433D9E42F520D17EF5C92AC05785C807F06E9DA6EE149EAB4ED9C015A5ADBE",
+      "candidate_qualification_sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
       "development_branch": "dev",
       "manual_review": "maintainer-patch-review-approved",
       "mir_version": "3.2.5",

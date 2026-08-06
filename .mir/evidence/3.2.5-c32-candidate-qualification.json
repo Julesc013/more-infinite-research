@@ -2,11 +2,11 @@
   "schema": 2,
   "kind": "mir-assurance-candidate-qualification",
   "status": "passed",
-  "run_id": "local-10360",
+  "run_id": "local-18304",
   "mir_version": "3.2.5",
   "factorio_version": "2.1",
-  "git_commit": "37ab25970299bbbc0aa534ffc4452924dbffb807",
-  "git_tree": "cf3facd473d3a2f7188e8b108cf04a177cb8084e",
+  "git_commit": "43392fed9b245a14734935f1ed35cf88a7a1dfb0",
+  "git_tree": "f4e9019563ad4b77cdaf272a46f5a9d427bc78aa",
   "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
   "target_profile_sha256": "9C22F859CF0FEB368A0EADCABF13FB83998B76E3DCAB9CBC85DFF66E8EE925A0",
   "required_groups_sha256": "57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A",
@@ -103,11 +103,11 @@
       "files": 17308,
       "sha256": "11C677CA4A308362BD681CA966BE13241741CE6E7429CC2CD7F3A53EFA67E703"
     },
-    "installation_sha256": "3C37B430EFD073C20C4D7BB10E29DE41E241201B03A44D9FF773820AC44A70D0"
+    "installation_sha256": "5F026A28175FAED6434A2A231F6AB529732E1A6641BA76437422A8E8388DA2B9"
   },
   "qualification": {
     "profile": "development-breadth",
-    "plan_material_sha256": "701A1F032F9BA6044BF709012747C5461EC16CC21F7E1FBBE4D32486D6174EB2",
+    "plan_material_sha256": "85E90403CC88977A906071C99A7F43C10F2F645E1821B0F4CC6E00C95412A459",
     "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
     "test_catalog_sha256": "0B69C579CCDD4FD55F24AA0F0A2466881D29201D79E973873BE82B79ADFB492F",
     "verification_profile_sha256": "4D43D5BD23F37BCC5D378179C6A0C66361B0B076F2F47222E97DBAC6F516917D",
@@ -119,9 +119,9 @@
     "failed": 0,
     "incomplete": 0,
     "unexpected": 0,
-    "completed_at": "2026-08-06T10:48:36.9542278+00:00",
-    "source_summary_bytes": 2465519,
-    "source_summary_sha256": "C931581C408E127D02DF8836A589FD0D61A39B2BAAA43384CD7DDBC01E0C6AEF",
+    "completed_at": "2026-08-06T11:45:35.5815458+00:00",
+    "source_summary_bytes": 2517965,
+    "source_summary_sha256": "6EFC84B3B9FCA802069A58DF2192586E1CA808CA4B8BA7C806BEE66578FCADCE",
     "expected_test_ids": [
       "docs.check",
       "performance.static",
@@ -265,1080 +265,1080 @@
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "3F3222277DDBDCB4F292103289135624073A4FEB64901BCF5BEC1BF14D18AD49",
-        "result_digest": "4C0C81241F88C1BBC418E05C189B1C61B12FE167ABAFCD5A36D07CB4914138D1",
-        "completed_at": "2026-08-06T10:11:41.0577413+00:00"
+        "result_digest": "FDCA466E513B74AF3FEA9BDBB428E5C640CE0F65809E2A25E7F1CBDA678CBF95",
+        "completed_at": "2026-08-06T11:08:44.0949570+00:00"
       },
       {
         "test_id": "performance.static",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "90CA299AD1F6F13F84C4009CE7048958A54ACEB922CA9AD967E291F62EF0E2C8",
-        "result_digest": "63E0409626D2D5429683FDCED71A3DAE8B6DE455B4644BB4DC4AAB8B9DAD6CF1",
-        "completed_at": "2026-08-06T10:13:24.5614409+00:00"
+        "result_digest": "964127554D2549180780D755070ACF0C211AEB2F70214CA19F63280233D09EFA",
+        "completed_at": "2026-08-06T11:10:24.2260250+00:00"
       },
       {
         "test_id": "release.approved-delta",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "A9D214C6DCA724854F0C68390587651030D7EB091D0271B366889D85A6227384",
-        "result_digest": "47F9CE2F56E69CB983ED875028D73216A3A3C53A71358CB6755C6251B0BF867B",
-        "completed_at": "2026-08-06T10:48:36.9104866+00:00"
+        "result_digest": "8DC11DF0B503CFA72BA9043C0B078BDFCE17F030067CC68498F7B25AF730FF2D",
+        "completed_at": "2026-08-06T11:45:35.5307522+00:00"
       },
       {
         "test_id": "runtime.ecosystem",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "24EE5FCEE539D9D45A4FB013559388C39955352C35B8D7F09EB56E3F17EB7B0E",
-        "result_digest": "245B5DDFB22BEE9462B07B030404BC9BC075FF62878878EEC25FD5E7A4C32582",
-        "completed_at": "2026-08-06T10:48:35.6527296+00:00"
+        "fingerprint_sha256": "25811F86DE854F60D9689BD2F566511626DC72AB5AC3BC890FA53397EB928D02",
+        "result_digest": "6956D89E700A4C53066B44B292966054F2503B30B580A469D61BF2E14E6B7AF8",
+        "completed_at": "2026-08-06T11:45:34.2812357+00:00"
       },
       {
         "test_id": "runtime.upgrade",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "250055379BD7DDB8158155F08AE000B43C7B7C9C3553933307D0B04A36B7D663",
-        "result_digest": "A0D4DB25DA11C605E5343601E32F2AB84505E86BE1E6FEE5414BAC1A7F488E86",
-        "completed_at": "2026-08-06T10:43:20.7339039+00:00"
+        "fingerprint_sha256": "ECF82E7C7FB84FE3CEE79E7DD0CC5E0BB33E38B8C2C8A946E80984D9F2E4E2C9",
+        "result_digest": "9F24F2D109B8DBC3FCC76F7396C1B77D6700D151B3A86BC9CDEC70C7D1425924",
+        "completed_at": "2026-08-06T11:40:27.0598337+00:00"
       },
       {
         "test_id": "scenario/2.1/aai-loader-belt-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "80FA0686CE15CFEFC342862822426CB953F5EDFD23656B794724EAC5AB8878DA",
-        "result_digest": "247360D89B93DD17D8F759062C35873E11728FFC1848967DD35791EFF1C5F8EC",
-        "completed_at": "2026-08-06T10:16:25.5410424+00:00"
+        "fingerprint_sha256": "8B8D2BB6D73D4A3A47360D7419C44C973FADE4E3CE60C34C5511F6BD4DBEEE5F",
+        "result_digest": "59C483F7BF460009DF0211F1984F86939A3653CDD2910A25D48B62F0AFA03A0D",
+        "completed_at": "2026-08-06T11:13:10.8541467+00:00"
       },
       {
         "test_id": "scenario/2.1/air-scrubbing-clean-filter",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F06D5D8C607BC8FE19997D92E0C7F70D0432E4A4BC2C8E9AF8E9931989F640CC",
-        "result_digest": "F455496F44D688225A9A0220AD9B2E579D6AFB6DFFA6F9432F33C98147C2C3AE",
-        "completed_at": "2026-08-06T10:16:36.0575841+00:00"
+        "fingerprint_sha256": "A5A192E32301895C04D45E958614F160551009D1A912922FBBA1C5B876A5E06D",
+        "result_digest": "6AD8CB2DD2CA54A102FB35CCF4034BDE3BD93124160F4AA418FB551F4FAC13F8",
+        "completed_at": "2026-08-06T11:13:20.9051013+00:00"
       },
       {
         "test_id": "scenario/2.1/all-official-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "AC95BB14B6EEB07EA4BF5DFE564A1B612044E76109D7E2F31DC066030B3DA165",
-        "result_digest": "8D9D5DFFF756D5BA830D7FA2A6DF600EECADDE9F968D8CC63C9D9B850383AE12",
-        "completed_at": "2026-08-06T10:16:46.3403767+00:00"
+        "fingerprint_sha256": "EF2ED7BE95B5B182827D338A03CFF2AFB6A401E4E016556697C1CA93AA56E874",
+        "result_digest": "DD267B4B971C36D41B7FB2FA6B8C792FA30D1EBA8CFABC105D2C499F3FBDC165",
+        "completed_at": "2026-08-06T11:13:30.9392919+00:00"
       },
       {
         "test_id": "scenario/2.1/all-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "253110972EE1767031BB6818521BE75ECBF625FCA3CCB2F6177F74A6ECA4F45C",
-        "result_digest": "2A3A3E954C139587956AA90EACDE95C582035CC65963FE36B232A6303FF61437",
-        "completed_at": "2026-08-06T10:16:56.3752614+00:00"
+        "fingerprint_sha256": "338333E027B9938522647B6A7827B4A81C4D3DE928B04F62974A8B47FC210E08",
+        "result_digest": "8FF4D0B1C04B5F5502A8BD9C1AC45D20B870AF1DF3E25E6ED918B5E7AA9B47E5",
+        "completed_at": "2026-08-06T11:13:40.9752750+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-automatic-family-controls",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "FF27B1E3F5D851D35AAA8D7A8A3CD6FFEB0B1D551A1F03A7798497FFA9FE5F0A",
-        "result_digest": "48F08F259D75CCA29C35180A82A6A48AD344B90D0853EB98735E2CBA5D55C0C9",
-        "completed_at": "2026-08-06T10:17:06.9157318+00:00"
+        "fingerprint_sha256": "84BD96D18BD55DA52630BAED91FFA9B194C3B282934695EA70FDEE437E347A97",
+        "result_digest": "32F060A268B654A29878D85E256AE542EBFAAC6211ED5BF65B7986FE428D18D4",
+        "completed_at": "2026-08-06T11:13:51.4515328+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-base",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "881FFF9FD53DF966038FC94BBC126595BF802315558B3EDE3245E728F05D9978",
-        "result_digest": "4A45755F984683E3C6AC5FA54A7D970BF5E8576270D1E9EF029E9EE63EFB6723",
-        "completed_at": "2026-08-06T10:17:17.1618530+00:00"
+        "fingerprint_sha256": "4E5F2AC2F5C7DEEE728B3AC03A60CD01B6499CCFA0C92D1B8A85C02781E45714",
+        "result_digest": "B0E6AD22FB9179F133A46D0FA34D0E60E1CF3DF1C6D54A6671DFBF4E42A42DC0",
+        "completed_at": "2026-08-06T11:14:01.8933787+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-base-continuations",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "4EFEA259F123E70D5AD43BA86AB09595D064455494B732FB28B083F87BD49BC6",
-        "result_digest": "A4533477FD349C3FF1D9FB359A4FB91CA7A835E9E6AABFA2F908A42CE7F58F04",
-        "completed_at": "2026-08-06T10:17:28.0526653+00:00"
+        "fingerprint_sha256": "C2C5CA0474B74BE2EFB35AC1683FE5A1B5232779127E986285BE8404F05218F4",
+        "result_digest": "08DB2CD2B438E0316866F5918294A26AD1974A9BB3200353017102530F4F5CF3",
+        "completed_at": "2026-08-06T11:14:12.1576535+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-compat-atan",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "2332A99A2A35F56E1BA8B0AC5B261640801A204B406F0474EC7E3B3E4CCB986E",
-        "result_digest": "F05393D71617C832DF392ABB93B46E7C40C0EEAAB6D6369CE5523A9DC979C64C",
-        "completed_at": "2026-08-06T10:17:38.6541126+00:00"
+        "fingerprint_sha256": "DC9F0A7C64E0B55638ED5F3BB9A3C53FF21E841D1F3205F1955E1B4D02CB6625",
+        "result_digest": "4BE838B2F4CCFF8D40F4EE45D39C14DBEBE91AD082E06BD3F3CE67AD54EFD7F5",
+        "completed_at": "2026-08-06T11:14:22.4212344+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-compat-space-age-galore",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F5934420509999F3E1F968699C688643B69C6DBFC848AFB864EF37355E2F6567",
-        "result_digest": "29B95307FEEB8DA9803BB5B59B86349BE7A7AF3D9CAA7201FBB0366DDC3CCBFE",
-        "completed_at": "2026-08-06T10:17:52.9342341+00:00"
+        "fingerprint_sha256": "69E4C9F331C3D40D702DD8B12F110BB06CFD3B64664697598ACCE7BB20116C6F",
+        "result_digest": "E6B282D4B8EC3D2914353D03E33498A45855CA803B3AE98A62BB0E4A0C6C129D",
+        "completed_at": "2026-08-06T11:14:36.1080453+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-native-owner-adoption",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "DAF5F3A0EAC3303AF6AF8C428338F50850E1C3910136C5E68A63A4C1D8DFC30D",
-        "result_digest": "E860C472BBF94EB36E10CB05EED45E63A425AC9BB356BFCBAF28752F77C5E7B0",
-        "completed_at": "2026-08-06T10:18:06.9284444+00:00"
+        "fingerprint_sha256": "092FF855A266D2F5315F52C179205AEDB37C0C13A5D3DB1C005362933CBC01F9",
+        "result_digest": "15DEF6F827D66964EBF6733087D7F39352AF550966690FFF395C7625788848CF",
+        "completed_at": "2026-08-06T11:14:49.8737827+00:00"
       },
       {
         "test_id": "scenario/2.1/approved-delta-space-age",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "AD0F7EEB4005BCB8895C540E23A224DBCFA6E9DEE3BEFB8B65966953C67DA1A1",
-        "result_digest": "A86ECC9A39DC55F98A3DDB0E5B8FD50D1AE4C12ECF9A71BF2E9CAA7A437D3112",
-        "completed_at": "2026-08-06T10:18:20.5165949+00:00"
+        "fingerprint_sha256": "E7F7DA7B91A7E0047C6BBA9068C8D12EB642E4A5DEA3348786C65493E21E138B",
+        "result_digest": "3AD11913224021F3D619022970C97D24974CC47EF34A6DD49FD203662E5B1250",
+        "completed_at": "2026-08-06T11:15:04.1041507+00:00"
       },
       {
         "test_id": "scenario/2.1/atan-ash-separation",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "55FF27F0DAB8FEFB3422B8517A465ED18241DBC790231C8D9AA1537DDAFD4732",
-        "result_digest": "6549301B7547A0B5EDEAC27C44C7925DEBF674BB71CC4C30DFCA5BCC210C5D03",
-        "completed_at": "2026-08-06T10:18:30.4775623+00:00"
+        "fingerprint_sha256": "8858B6002D7CC56E033D2DC7174841CE790B7B57D9AEDDD54484E6D8953FC858",
+        "result_digest": "1DE63C7B7AB27E271AE1FDD3ED10AB64AA3713650B5F5A37DB3CE9AEE07F4926",
+        "completed_at": "2026-08-06T11:15:14.3099738+00:00"
       },
       {
         "test_id": "scenario/2.1/atan-nuclear-science-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "49F56DC3B75595FFEA4D5D47BCAF843F972C4221C2EB7149E1067B5209000188",
-        "result_digest": "3E528663736871CBC14DF48153A56052E0EF44BBC39712191F59A3933D59DDD3",
-        "completed_at": "2026-08-06T10:18:40.3427694+00:00"
+        "fingerprint_sha256": "F58151156EE889197C74FF3D58C913683E09331EB73FA322581123551FB6FC8B",
+        "result_digest": "26A108A4D0F52A3E44C17CE0BA3AB3615C4F8BBCD19754D2DBBACA71D93A98CE",
+        "completed_at": "2026-08-06T11:15:24.5157690+00:00"
       },
       {
         "test_id": "scenario/2.1/base-cargo-space-age-gate",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0E90C7692E0D4B4331C7F839E9D145A0991FEA2BC98CD67A381825915F2D1854",
-        "result_digest": "84BDDD64EE012E99048AD4460AE084F42DA925CF570A5A6BCABE23F3A3516810",
-        "completed_at": "2026-08-06T10:18:54.0109619+00:00"
+        "fingerprint_sha256": "D7076CD044E0353F4F7F17C0C0E4DB8447E7C0D41568BF9962423933ED0F7318",
+        "result_digest": "12F418AC738495299DB3CDC3E48EA8403F8A13661A59DE8B9E19534E5F74297A",
+        "completed_at": "2026-08-06T11:15:37.7741442+00:00"
       },
       {
         "test_id": "scenario/2.1/base-competitor-rollback",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "3A314C9FF2FA7DD5C5770F35AA2D3FCDC90D3109ED4B28F014BA644273D7F0A6",
-        "result_digest": "6156164F3C08FA7F4CFD96F3B6D3122A54630FF91103451D47F308CA55E35B5C",
-        "completed_at": "2026-08-06T10:19:04.4260465+00:00"
+        "fingerprint_sha256": "E58BBF4B237B145AC6F7B47F7E4D8E14E330439B685EAB5573F30E954D02ABC0",
+        "result_digest": "F84CC9E927A00B0B6312126F128110707360287300B3F7C79F43F7445032EF30",
+        "completed_at": "2026-08-06T11:15:48.0225872+00:00"
       },
       {
         "test_id": "scenario/2.1/base-effect-setting-retention",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "5FA4401FC8ECD8FC96B6807318529D018FBA409F694A92F1407E9F760B428BAD",
-        "result_digest": "20AFCA070F2A8A2CCD859B657CB8AEB8C76346E8427769347C226483CB3EBC80",
-        "completed_at": "2026-08-06T10:19:14.5405603+00:00"
+        "fingerprint_sha256": "5C6EE2D6E12A2BEBD28CACE22D69F8B1D9D8828AE92041FC03944173B23A4D72",
+        "result_digest": "8890F31820B08BAC1ECF0FA5D1BEA8AAFF75AAF59DB3091AB9645E5C068C3357",
+        "completed_at": "2026-08-06T11:15:58.2717500+00:00"
       },
       {
         "test_id": "scenario/2.1/base-extension-boundary-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7B4C461AB475D2BB354E164570678020D193487CB256D7A6900A52CFFE801E15",
-        "result_digest": "B5441EA9D630277F9C73B01252F61719D42D8868CD752EA523BF67E2418748C9",
-        "completed_at": "2026-08-06T10:19:24.7116095+00:00"
+        "fingerprint_sha256": "B3CC7425A29502B51B1E1EFCCDE118782D4231D31537CDE7DDBA967FE0A66B29",
+        "result_digest": "87CF26B127EA452EB4105BB3DD8A63077B1163508CE97877924675D7C4B24DFC",
+        "completed_at": "2026-08-06T11:16:08.6258279+00:00"
       },
       {
         "test_id": "scenario/2.1/base-fluid-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "CAA6F3C231646D14AFFD0379B1EB628E4D3D5C4D6F49D00793F2E50FC9E965A9",
-        "result_digest": "D22D3A5DAEA3F4CFEB3EF61458C03F327BA5F2A36E16C3B11E48A3E29117ED5D",
-        "completed_at": "2026-08-06T10:19:34.8522127+00:00"
+        "fingerprint_sha256": "F0FA2BE863FF51094A1E0CDE6DD2D655911FFA8615C5159DC9AB796FF3C659DB",
+        "result_digest": "518959CAD948DE167DA736CCD2506466E396A012B3079DD50647D5EC7795C8F8",
+        "completed_at": "2026-08-06T11:16:18.8421517+00:00"
       },
       {
         "test_id": "scenario/2.1/base-generation-integrity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "9BA4739E424529446276F0A3D62551BA014D38DCA1360D41BA5602D08836F512",
-        "result_digest": "531750691322BFDDD816B07B152EDC6DAB09C6932A45329C3621BC11D692EA12",
-        "completed_at": "2026-08-06T10:13:40.0264236+00:00"
+        "fingerprint_sha256": "B51EE5193E7624A38116F21B746AF469A9883515CB46153FCFA9CC7F5DC38CA0",
+        "result_digest": "79976A19A8262E75A5ADF8AFFA06ACD572E3FF2B961FE88B8E29D95689DEA95D",
+        "completed_at": "2026-08-06T11:10:43.7226757+00:00"
       },
       {
         "test_id": "scenario/2.1/base-generation-integrity-inserter-enabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "54712772EAC1AC6D315C0BC65849E4452CC7E092262E7FA2766E9C6C737FB5C4",
-        "result_digest": "50D75D6E20487E3E9677AB55366AD401217BFA79934E63C25D83C84C75532BEF",
-        "completed_at": "2026-08-06T10:19:45.0157004+00:00"
+        "fingerprint_sha256": "FA06392674092C5C80A17E4FF1D06C82D32B4AD71584019E2A79FC6F7FCAD5DF",
+        "result_digest": "96E8E7AC63A77FE53AD155682AF5B9929BCDF78B43CFA4F1836FEDD331B628C0",
+        "completed_at": "2026-08-06T11:16:29.5489146+00:00"
       },
       {
         "test_id": "scenario/2.1/base-installed-space-age-icon-assets",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F605A3586425057A6E3C729FB0EF42DB6DF1F79A0DB16EFDBBEFF646EE69D660",
-        "result_digest": "83C5468B1471AA67A61BE4D76C7FC4D3E6BB541AAD401CA7306B95B454F110BF",
-        "completed_at": "2026-08-06T10:19:55.0034624+00:00"
+        "fingerprint_sha256": "C6CB8B04B426CE36485442D974CACC7F984EC0F594EF0DAE280A3343E5558743",
+        "result_digest": "93A7E62F6BD9DEEDF4BDDC263406FB8C8770313E1CF5FC38DEE4798E7E3E12BF",
+        "completed_at": "2026-08-06T11:16:39.7634547+00:00"
       },
       {
         "test_id": "scenario/2.1/base-research-cost-linear",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F6202E373700591E216D2960BBEDD2840D55E8CB4A86BCFDA7AC518C21A99E52",
-        "result_digest": "31B25292E77FBDA92F77A487881D0AF1FEEECA4F0AD3391D00132043EBED1D53",
-        "completed_at": "2026-08-06T10:20:05.1775194+00:00"
+        "fingerprint_sha256": "66D78FEDDA6363725C928CA563397F4C8943CE4883E802D8A84B66B4F55721B8",
+        "result_digest": "96CD7056BC7DEFFD69ADFE9E4860382EB079B6C73459588A9D321822ED95C367",
+        "completed_at": "2026-08-06T11:16:49.9059447+00:00"
       },
       {
         "test_id": "scenario/2.1/base-scripted-candidates-enabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F75662B8165555174888E15C38F083870B13D2C0A6BDCC50CF28E8D121048AC2",
-        "result_digest": "49D267103032855C51EFF8F3E767C564645A0CA4EA18F837D4C0A448FF0489FC",
-        "completed_at": "2026-08-06T10:20:15.9728015+00:00"
+        "fingerprint_sha256": "CBAF0C487E899E0C7EB33E84428F7DD2AB6E2E28E4EDC3555305416B0110715F",
+        "result_digest": "F4B2E26BA25DC129ED84266D2528FC0BCA10C9130C8B82845892D0AD6239A3E4",
+        "completed_at": "2026-08-06T11:17:00.5551656+00:00"
       },
       {
         "test_id": "scenario/2.1/base-space-promethium-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "274B4ADB7A72432B886E2CBD363476FEF6450738CA85EDAB83E108A475D1B9A9",
-        "result_digest": "F98DF238662E1F15233B0AC094B72035A7493116C0C2829E3F955C081C1106F8",
-        "completed_at": "2026-08-06T10:20:29.3642877+00:00"
+        "fingerprint_sha256": "A5F6C63756C8152815E9A59C329166E1E8BF283B9741C19BA8614A2E9F1E5F57",
+        "result_digest": "92897BF377448AF21898FD54699D5DAF2709B54866EF384472716EC95C9D52E7",
+        "completed_at": "2026-08-06T11:17:14.2424574+00:00"
       },
       {
         "test_id": "scenario/2.1/base-stream-research-cost-hybrid",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "BB995523BBC2A307380435B5484698E8DABEC629D88717DB607EFC2C95532220",
-        "result_digest": "F45EDDA79E4E06F8480A3BFCC825A4FC28B79C9C252D6EA3CCE930D5846AACEA",
-        "completed_at": "2026-08-06T10:20:39.4613630+00:00"
+        "fingerprint_sha256": "4AE3AF90298EC624E24B6918423C5234A44D2E64574B73029996D6A65807E4EF",
+        "result_digest": "282E3B3F7F4DD6AE19E00A2164F346F3B01E6CA648F419FD8F514F293C5BB198",
+        "completed_at": "2026-08-06T11:17:24.4469688+00:00"
       },
       {
         "test_id": "scenario/2.1/better-bot-battery-owner-skip",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "46BB0EB0C467D6DB8DC0F4936B6CC9BA871B3BB2B725635387B0A2451D24D4E8",
-        "result_digest": "5F40414D8C361D0E243C7826F6C5E8BDE08A28CFD69E46096F0AFB67C322AADF",
-        "completed_at": "2026-08-06T10:20:49.5165332+00:00"
+        "fingerprint_sha256": "195207B95252A6934371310AAFEE42B51605431DAA7BEB29C963382BC529C078",
+        "result_digest": "8182B678E41D3EC3F508C110F78E6014DFF18E4D141CEB01749FBB6C5E490EEC",
+        "completed_at": "2026-08-06T11:17:34.8089495+00:00"
       },
       {
         "test_id": "scenario/2.1/big-mining-drill-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "DAA1FEF9F923FF458E0CBD0E3090103B9ED2AB188AAD8BE31FA8B493A5E2044E",
-        "result_digest": "6C2A4EA14C4D6BE4C01A7220329CBA5E3C08AD8BBC05E5470AECB2AD7EFC504E",
-        "completed_at": "2026-08-06T10:20:59.7412677+00:00"
+        "fingerprint_sha256": "12B3995717EA11D3D0D6F5212DEF64F6DF1B4D6FEAA5F13C7419F01ADC434BFF",
+        "result_digest": "C344877ED92C8FBB5468F536B00BA8C08EC73F2C339909773D7D05AB511C94D8",
+        "completed_at": "2026-08-06T11:17:44.8980450+00:00"
       },
       {
         "test_id": "scenario/2.1/capability-negative-cases",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F843327ECAE99C7221AB3EDF474F06523C4FE26D296EC57CBF0A1CDAA1785D30",
-        "result_digest": "EED3D3439D13664EA8E22709E2B272A69879ABCFC71D857CE21127301B5C931D",
-        "completed_at": "2026-08-06T10:21:10.0753802+00:00"
+        "fingerprint_sha256": "F1D71545843C58CE5CCFF10A6502C61BD0296EBBFC5571C0C0B5209123D9433C",
+        "result_digest": "C6351C37996B21297A372CDD11FA57BF505D3F66FCA83330943D89FB4C1E0991",
+        "completed_at": "2026-08-06T11:17:55.1865093+00:00"
       },
       {
         "test_id": "scenario/2.1/character-inventory-merged-effects",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "B99ACC01D2B27C9F1F50D28B19A8FAA338095DFC65D63C1ABCE18B2E571B55B5",
-        "result_digest": "146FD96029E49F6D3774531D95D7CC2F71790B772AF5862EB949B6FD7DFB4470",
-        "completed_at": "2026-08-06T10:21:20.0870214+00:00"
+        "fingerprint_sha256": "19368C2BD4EB7849AC77A9016B7AE766859B19459BCACBB1A523579EAA8C7F05",
+        "result_digest": "F23C43E1C1AD27351C34F059BB6A463D4B5BCFF48239EB369F813B52E65A8415",
+        "completed_at": "2026-08-06T11:18:05.1157479+00:00"
       },
       {
         "test_id": "scenario/2.1/checkbox-disabled-default-on-features",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "1BA582C0ED5A3C10DF2DE67A53BF7CB951CDA75C786DCA48A78128723D4A1CA3",
-        "result_digest": "263AB505E06E3EDC0180C180E0FC2C118D6B36AACF5383A0E1BB1C1B58224112",
-        "completed_at": "2026-08-06T10:21:30.8734943+00:00"
+        "fingerprint_sha256": "E859EC18F0FE410E7AB6F7CAD86755DD89DDB035EC7CE979E7C2E81062C1CEC3",
+        "result_digest": "8E00DAA963159676E9E42C9571547495FAD08AED3D24D06A7673B1395E8B30B0",
+        "completed_at": "2026-08-06T11:18:15.4672629+00:00"
       },
       {
         "test_id": "scenario/2.1/checkbox-enabled-default-off-features",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "D766110E0B36AE447F3E92273E89E286D697A5B82C48FE05E690F0EED9C10B51",
-        "result_digest": "C80ED85D81C53BE49C05F2A9D23F445E8F76F92B6F806C5DF4C7697F313C9586",
-        "completed_at": "2026-08-06T10:21:40.9949777+00:00"
+        "fingerprint_sha256": "3A15624D2A3FFB300AD8838337EF6D5E6B7F620943D64A33184A33519992EEDB",
+        "result_digest": "717CBF78AF161782AD025D4666A31173010E8F4C5A1B5A5A319C49EF737914A3",
+        "completed_at": "2026-08-06T11:18:25.7545568+00:00"
       },
       {
         "test_id": "scenario/2.1/combination-atan-ash-big-mining-drill",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "91C6DD6672EF520CBC98D3D1C0EFC15346555B7B03E8CFBD3471D102CBC33983",
-        "result_digest": "8C0983009045D33B1B22861603C7841F962D0BA14E33B8F5298B4A8977A346BF",
-        "completed_at": "2026-08-06T10:13:50.3291215+00:00"
+        "fingerprint_sha256": "E15450A2D3D96B1223B479471AF15C30F554A18C0BF8A022AC776E43CE99E423",
+        "result_digest": "6FF369B9898FDAF07B3111684DF4650E87ABABFEB4BE2D177E97DE8075840AB9",
+        "completed_at": "2026-08-06T11:10:53.0926996+00:00"
       },
       {
         "test_id": "scenario/2.1/combination-space-age-big-mining-drill",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "2F4527D54F3AF745B0FE121C9EAC7DBF4B344F14A8C2C48290172102A22B90F9",
-        "result_digest": "6B9ADB8206C964A0FAB42915ED4381D931F8D3FDE4CB6325FD7B153914A21643",
-        "completed_at": "2026-08-06T10:14:14.4963579+00:00"
+        "fingerprint_sha256": "6768BDB179FC507D07EC817894969D764156DD1421AE3D6335D9A93DAF011644",
+        "result_digest": "15EF5428FFC895D58CD22C69D038B56D229B08594C23DBCB495F1A71F3090F45",
+        "completed_at": "2026-08-06T11:11:09.7778223+00:00"
       },
       {
         "test_id": "scenario/2.1/compiler-contracts",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C6516AB8581A80E067674E4CB2A1DBF657FA438E850BFD05BB6B19DB46FA81DC",
-        "result_digest": "4EBF5C50E7B2705E91DD5807141F608D8AAC9A53530C394B5415BF66E0B81602",
-        "completed_at": "2026-08-06T10:14:27.4420171+00:00"
+        "fingerprint_sha256": "78D308E7647F65E03E3EA498D0F3BF482A0D02ECCFAB0B0CEAD191AEECB007F9",
+        "result_digest": "B398D0DC28D921C23FE3DF896EEBFADBA3C044E5504C3266BC83A45EED1AD927",
+        "completed_at": "2026-08-06T11:11:21.6733220+00:00"
       },
       {
         "test_id": "scenario/2.1/effect-scaling-mixed-tier",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "5320F479DC26A4A956CE269FB04222F1A66BEBB6CB9BD96634AA10ABD98B1FB4",
-        "result_digest": "B3AA28EA90221A30F5B56E42F72399B3E6D30E8277B9A73EAA8295EF039EB108",
-        "completed_at": "2026-08-06T10:21:51.0710522+00:00"
+        "fingerprint_sha256": "291524E7D9C274CD1C40A0AB289E9D3586B846EE13138CDF856955922851F26F",
+        "result_digest": "0B32C9A7C4ACE6CFE565BB0AFC538DCF6CE41CB7A46B42F69C1EA8A762A966B9",
+        "completed_at": "2026-08-06T11:18:35.8016679+00:00"
       },
       {
         "test_id": "scenario/2.1/end-game-prerequisite-gate",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "A514BE74CEB190FCB1304D3C6586E3414A6079F095E8A45DBE1ACF5F31265E62",
-        "result_digest": "83489E6D8D2F6EE08B8DF370308EE10427309DDCBD38C6ED8C47A5B06CFECC2D",
-        "completed_at": "2026-08-06T10:22:01.1382946+00:00"
+        "fingerprint_sha256": "ED1508D868F43C34612109110DBA2BBEEB9031D31551DF03B2B0CA5A8BC7CAE4",
+        "result_digest": "8635DA6CAD42F8091A399EE276FA43B70DD854E796B79928BA9CFF781B44A4D2",
+        "completed_at": "2026-08-06T11:18:45.8145847+00:00"
       },
       {
         "test_id": "scenario/2.1/external-technology-cycle",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "69B35AAECF76949A6CEF77B10977D92E9ADD92B5F917489FA8A89A1FC1BD453F",
-        "result_digest": "6976EF8EC06A3BB481EE56FAFF2287102290D72FCA38CF4403863F3E1BBAD7E1",
-        "completed_at": "2026-08-06T10:14:37.6578195+00:00"
+        "fingerprint_sha256": "D3CF39AF23C7AFE79C8084C7ED384BF6A92A280E6B8D3964568EC5611FDD1118",
+        "result_digest": "5A605EC8CB87BAF29115D8799AD8641AF197E38C50D387FEF4962C09F6CBE33C",
+        "completed_at": "2026-08-06T11:11:31.3279056+00:00"
       },
       {
         "test_id": "scenario/2.1/generated-prerequisite-safety",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "38A473C066B6B8A2A43668AE19C4F069F66B797B10E3739D0E71574275E66D58",
-        "result_digest": "9463BA532B9E7AF1E5073DDCE9831741B1BF5AC919D08BF34753893095AC99D7",
-        "completed_at": "2026-08-06T10:22:11.0384678+00:00"
+        "fingerprint_sha256": "0C32D44C80F505CA90486EA5CC1DA7686CCE05C2B347946BB996B52DB9A2EFAD",
+        "result_digest": "FB2CB8EEB0D4A22F2051B8FF495C68738C2A00399BBDCB42E51E2057499156A9",
+        "completed_at": "2026-08-06T11:18:55.7595004+00:00"
       },
       {
         "test_id": "scenario/2.1/lab-policy-engine-default",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7C42684C1141B4AF6C327D6FD764488920DC5C65F9ED5EAF9D7750E69EE9600B",
-        "result_digest": "C9C6AA6C8E4FD19E3C97585F7D25A3B495407F2FAD86E2ED8127E64A54CD1D70",
-        "completed_at": "2026-08-06T10:22:20.9285518+00:00"
+        "fingerprint_sha256": "0292B74BA8593F37BFB1EDB18D403B2A5ED4F32773F747E604BC8615F1500ECA",
+        "result_digest": "4C9B8866C55E44554AC50CAA85133F7C0736D84306F7339A9BCED014AC0E9C9A",
+        "completed_at": "2026-08-06T11:19:05.9015187+00:00"
       },
       {
         "test_id": "scenario/2.1/lab-productivity-owner-skip",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "97D349855005B1BDAAE8F0D01FF7352BA0DC74A8911EB7236442DB3FAAEBE772",
-        "result_digest": "631532F057455B82748146A4275761C26FEA3689A8738F8EE0E973AC00C9AA08",
-        "completed_at": "2026-08-06T10:22:31.1009203+00:00"
+        "fingerprint_sha256": "C64BFA688462A90D58615D69A81C08B57F5A6085CFECFA011E58406D80CE0258",
+        "result_digest": "656B8F66B056489E26AFC22FBA90E2AF6D1AD7B08DEBEB9F8A8590E7C40A45DD",
+        "completed_at": "2026-08-06T11:19:15.9649364+00:00"
       },
       {
         "test_id": "scenario/2.1/mod-progression-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "E221F2401385C34393592C62FFFA7F9D522E7C638C6B008C738287DD6A32525A",
-        "result_digest": "AFB338B893431001CB4A3D41341A992747845AAEBA80F60D4D9EEDE1A1DBF101",
-        "completed_at": "2026-08-06T10:22:42.4604935+00:00"
+        "fingerprint_sha256": "165E99B4F169C024688F76BA8B1488855D49C8857505DB5A52DFB3CA24F402BF",
+        "result_digest": "95EEF155C2B98A3B0DE36C6538FE3295C2959855C84233D5D0FE2ED75331FFC5",
+        "completed_at": "2026-08-06T11:19:26.2837501+00:00"
       },
       {
         "test_id": "scenario/2.1/official-progression-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C48F2D2B9D3EE12A001DFDB9DE3AEF7C74C112DE7F907C990331091D89D8D538",
-        "result_digest": "EF02236F4249B99B5AF6F5ACDB5721ABD850269008487E082D11C449FC03DAB0",
-        "completed_at": "2026-08-06T10:22:56.9172079+00:00"
+        "fingerprint_sha256": "0AEE94CA03ADB484E20433F31480ED2B6BC697DE1842CF5E78F8190E384281A1",
+        "result_digest": "ECC64C27DB62A05D7163E4E15932C89FEE21D46D0A9B1FFC7190601C4782C9ED",
+        "completed_at": "2026-08-06T11:19:39.8037715+00:00"
       },
       {
         "test_id": "scenario/2.1/omega-drill-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C960875A31455629C9278B98F94011B7CBAA26BCDC156AC00E7956E4F527191E",
-        "result_digest": "E36FEABB6E1DD7CDBA347F6B76498B24A123BD6E5B18986E77FB4B2A09E9D889",
-        "completed_at": "2026-08-06T10:23:07.0922070+00:00"
+        "fingerprint_sha256": "5C0900EBE5780F03F1E26418BCF1CB8DC6623DDDF7426E0A1870D15AB7E390E6",
+        "result_digest": "C1AE1D9B0878CD1DB6F66150A9BF84D02255BF4BB364D0BA09270B4211805C51",
+        "completed_at": "2026-08-06T11:19:49.9172718+00:00"
       },
       {
         "test_id": "scenario/2.1/package-zip-base",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0B2795D18333510C360E57279F03B51DA14CEA4B3BEF6A9F311A3549D6D32DD5",
-        "result_digest": "6DDDE98A8DFAD4F558569AD8AD05DC1BC8417931B4FC03B97247E6066E2A497C",
-        "completed_at": "2026-08-06T10:14:45.3767591+00:00"
+        "fingerprint_sha256": "DBCF433AC81D9302E65C9E892B0294254E1043DA74D0003A6A5E2D0511EE3B09",
+        "result_digest": "B62F5F95974F613F2037FB03A5B90AB80E61BBCB2D541310FF987837461475E2",
+        "completed_at": "2026-08-06T11:11:38.4462811+00:00"
       },
       {
         "test_id": "scenario/2.1/package-zip-space-age",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "BE5160975A2A7A81F04E64B5FC787A9895CD8CF0B1151F6595E4DF7A49E436C0",
-        "result_digest": "8162557137B3F40FCF9085A74B12AA310AE903653990E940CE05B490D72DD1AC",
-        "completed_at": "2026-08-06T10:14:55.4514154+00:00"
+        "fingerprint_sha256": "788B1127D00C0D3E7F0CC17DAECA842950372C1925B753C3C311ED4A683E8EF8",
+        "result_digest": "D9805A3808C67775A9EB64BB0E11D9AFDF51A1321EF33BE79D03E6147447415E",
+        "completed_at": "2026-08-06T11:11:47.7602655+00:00"
       },
       {
         "test_id": "scenario/2.1/pipeline-extent-multiplier",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "B92A3FE68EC8CC5398DB5B6DE95F557E427F5844675205922D4F062630C6BF37",
-        "result_digest": "8B326F205826B5CB716D7A3A85CBFDAC8127719231C2E5002BD6E28287322096",
-        "completed_at": "2026-08-06T10:23:17.4422779+00:00"
+        "fingerprint_sha256": "1C6653F47CCC5845C5F6909A7D2A843EF7B473E46D2F79A372C0CD2A0234AFE4",
+        "result_digest": "723673FC385006224DED9DA5866910F88878DB94BFF0C846D182B487812542E2",
+        "completed_at": "2026-08-06T11:19:59.9286828+00:00"
       },
       {
         "test_id": "scenario/2.1/pipeline-extent-multiplier-50",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "FD9CD29B3E08004C370FEBBF4519340F090B4D1EE91F3EF1750542E351141CE8",
-        "result_digest": "E77E3ED07590CF9A5E6D36AE8C721A2BFD17679FC00D61B40E79C60527E6DC5C",
-        "completed_at": "2026-08-06T10:23:27.5870524+00:00"
+        "fingerprint_sha256": "D8ED63B8C8A1B4BBC1D9A364970CB078EC38303C80AD04144C37DE3A2AB751A7",
+        "result_digest": "8C4E0F222A5D3FCCBD02B9B56DCCB10635CD5E18D02372CD402E4736FE48F5E9",
+        "completed_at": "2026-08-06T11:20:10.2986327+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-overrides-base",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0530FFB1BF0B7F54D0F3BC9514FD179FF3C1A3B472BBE6D55B48DC725A84E372",
-        "result_digest": "B55A050B8C7BC3BB069B9E0C2832FCB5909785E21B4B628F0FB59F63B6187C16",
-        "completed_at": "2026-08-06T10:23:37.8419354+00:00"
+        "fingerprint_sha256": "F258E0E882890099B77AD2DBF10502CAF32FA55D7E8C194941A8BE43E3E5F28D",
+        "result_digest": "4D5713E77D95DE42512050C24D006007F00A5D5B9A3D27744AB4C47CD95DA07B",
+        "completed_at": "2026-08-06T11:20:20.4629921+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-overrides-space-age",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "E7FE59EC69BFB774FAA604C8BBEE48E80FF841E66EEEB68EE172914D5708608C",
-        "result_digest": "2BFDEC60E78E266AD58664BF9D4B995C4C58F08077AF3C801EB0FBF3F7C6E6A4",
-        "completed_at": "2026-08-06T10:23:50.6837209+00:00"
+        "fingerprint_sha256": "41C999A7B4F616B5658F2D32AF6873681DBA1DAC425BEB874439B3705A2D1D6F",
+        "result_digest": "321C955455ACCB7531307FB9C7522EBED4887A7CAA1858D4E4A491ECD19A9716",
+        "completed_at": "2026-08-06T11:20:34.1853282+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-scope-engine-unchanged-baseline",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7BE26C1B80F1FEF05CC6E1226B429F40DF51C787BDF08B1ACE913543B6E40808",
-        "result_digest": "9041E33764F090FC5CBCA66C4A71EF2A8DE11491B56D970ACE9EC67B62A6B408",
-        "completed_at": "2026-08-06T10:23:59.8410083+00:00"
+        "fingerprint_sha256": "23F36D8823A105DD243CDEF6F3045661465FBC74409800C09D448B817143901F",
+        "result_digest": "952DCAEA824A93B4802A75C2D63E2D6D3EF32C48404188F0222A2F0BC3B997EB",
+        "completed_at": "2026-08-06T11:20:44.3450768+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-scope-inert-at-fixed-threshold",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "9D131FD7BA08475A3AF6ABC03CD4E2E6787B97044E7295F1B7B108DD3747662C",
-        "result_digest": "A6D1CCD835C56996095AA5377E38EC19B3216FFCBCAC95AF8354887F8D26BF79",
-        "completed_at": "2026-08-06T10:24:08.9784197+00:00"
+        "fingerprint_sha256": "ED8943C480CE8504AF3BA3958389DD074C77199C207A95C54B83371165F2BA9C",
+        "result_digest": "49A6D52422F1998788FBC0DBEB9BAA147E13DB487D1A1C05A5CA4F5C68EC0BCC",
+        "completed_at": "2026-08-06T11:20:54.6020414+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-scope-inert-at-matched-threshold",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "5E0CA4F89AF92BB93CAB93DC934D742C00E2562378236D153C8B09C0C97B5AC0",
-        "result_digest": "C82572E354AF8C9FA954D77CEE020106830E79C5150292F29EB8C3DD6E0F2267",
-        "completed_at": "2026-08-06T10:24:18.2611592+00:00"
+        "fingerprint_sha256": "84A7D154568EECAB9CA6AB398348E6C88585BA877C0B07C39E77FE208A8DA4D3",
+        "result_digest": "8C7206C6660F305604CF917C74B319C59283F27386106D63C45054837A8A2C1F",
+        "completed_at": "2026-08-06T11:21:04.8645713+00:00"
       },
       {
         "test_id": "scenario/2.1/prototype-limit-self-recycling-and-unrestricted-modules",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "D052C3E80A589779442BEF2991B6ADE9F082C8859AE1F94CB349AA9D5E654C19",
-        "result_digest": "53BCDB5C6E080704504A167CE5662753CED7698B52DC3E3D517E086DF331F779",
-        "completed_at": "2026-08-06T10:24:27.4863686+00:00"
+        "fingerprint_sha256": "E81DCB0272FC9F410F4D689BBFA8999CE383240B1DDB656CA16659ECD5BBB7AE",
+        "result_digest": "DF1FEB1104EC1F62C6BBB0C06B2154463CFD19C188D3515EC2F0FA2897D67693",
+        "completed_at": "2026-08-06T11:21:14.9962700+00:00"
       },
       {
         "test_id": "scenario/2.1/py-postprocessing-stale-unlock",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "B1791EFA49D798AF33F4DC3188CFA5CEA109E36FEBD7DF83EA9C00A0EB17C395",
-        "result_digest": "2681F094805895A3930B257C7CCEA7FF287EB480E80EAB45EF27C01804110965",
-        "completed_at": "2026-08-06T10:24:36.6369335+00:00"
+        "fingerprint_sha256": "735B91A9E5A748E4E44EE952733333AE9D066BD2EDBCBAE50E8934EAEAD8B911",
+        "result_digest": "741F54082467C7B449A4D6879DF97CBC8137E8A5C4C785DBEE9B9C0BBC22638F",
+        "completed_at": "2026-08-06T11:21:25.3819666+00:00"
       },
       {
         "test_id": "scenario/2.1/recipe-cap-diagnostics",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "6AC4681D567D1357025DC7CFE5AE73AD044F1D2EA891201B9B25A5EB3A829A6C",
-        "result_digest": "FAA425E2686D76D402A9EA8093CC6AB5E10EA30E36AD07B311E01BB76C6E913B",
-        "completed_at": "2026-08-06T10:24:45.7464357+00:00"
+        "fingerprint_sha256": "333651C8D6D5CAB7D8E40F81AD6E1DB572B0B7481A3CB9B423534E7CBAC3B1CE",
+        "result_digest": "7A907EF093CD78CBE6F8DE6116913D8F9DA7733BA1823D2CFFBDD0E8384AFDA4",
+        "completed_at": "2026-08-06T11:21:35.6128723+00:00"
       },
       {
         "test_id": "scenario/2.1/reduce-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C00349EA92694563E8716CF35C7A3C67C44D6DDC4BDE88F034E52FDB32E19A89",
-        "result_digest": "6BED73E4F568BB97B8FE6496DBF0ECC0F5C0CF0EDBE45EA50F17C1D72907F30D",
-        "completed_at": "2026-08-06T10:24:55.0380718+00:00"
+        "fingerprint_sha256": "DDBEE0AAF97E5AFDD64BE3B66F5370A565186277B06A6834E0F1DC2322638847",
+        "result_digest": "16F303A135FFA4F0D67884CE5D014A2AC08774714A224EB46551EAEA253E5C2B",
+        "completed_at": "2026-08-06T11:21:45.6801261+00:00"
       },
       {
         "test_id": "scenario/2.1/rigor-late-recipe-removal",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0612CA28C1BFCD50069C8F1D4E13F5E9C7ABFCBBC457300E60363B523B4EBB5C",
-        "result_digest": "3E29C8816BDE212FE3A6E642793277C0C37443D976A5681212B57B6F4944DD24",
-        "completed_at": "2026-08-06T10:25:04.8291222+00:00"
+        "fingerprint_sha256": "D0A30752E8DB0872F64271C2AC9FD1214730F12F7D8ABD229C6B4B743BE61BEF",
+        "result_digest": "4AE8EBF70D875557DAA59077F25DE7DED2246AB54E78040C04029C99B3969F6E",
+        "completed_at": "2026-08-06T11:21:55.6572038+00:00"
       },
       {
         "test_id": "scenario/2.1/scaled-known-productivity-competitor",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "612A560B0DCAB6D771CB6F4EBDBBC0607B3C1D8D2740F62F05F6E87E8FD79A8B",
-        "result_digest": "C6BB2758449B78E575C3E271050FB62B458B7F299A83DCE9D6921957E056BF6C",
-        "completed_at": "2026-08-06T10:25:17.1255679+00:00"
+        "fingerprint_sha256": "BD4B56D729AB59E7E1FB02AA3194E4E4EC67F36415386A3FEFBA99A283FB825C",
+        "result_digest": "67F42B9F7ADFFBD05F406750A8D5A4A1051CBA34022B37D1D5AD641423833BA2",
+        "completed_at": "2026-08-06T11:22:09.1982956+00:00"
       },
       {
         "test_id": "scenario/2.1/scaled-weapon-overlap",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0A7C2E1612C1EA77EB2E91EFA920F17C3CD7B3CD76BE511427A91C989C8F0F0B",
-        "result_digest": "CCAF2B3489F98767169C973ED332FC37D4D3078B3B8CE2033227DC98977F8F1D",
-        "completed_at": "2026-08-06T10:25:26.4054789+00:00"
+        "fingerprint_sha256": "D204E80A4488E7DD11514BE99F9484D9B8DB22B42F4CF502AC66006E9D26CC89",
+        "result_digest": "6AF1C723078D0305B3C1B5B198C49F12283292B69B224A880EB6715077BFCF1F",
+        "completed_at": "2026-08-06T11:22:19.2831788+00:00"
       },
       {
         "test_id": "scenario/2.1/semantic-family-attach",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "36AE3A0EFA5F686F9E365DF956484B543A97BD71BEB4D0C206A5222AD1F8291C",
-        "result_digest": "8F5324A77C71B1FE8DB2081A0065392ED12127D60CBC5E4DA3128236669B402A",
-        "completed_at": "2026-08-06T10:15:06.0278706+00:00"
+        "fingerprint_sha256": "AB57D67718015AC2C0EA1700BBCB6D772E0F81515EDC83280CDBF634180436D1",
+        "result_digest": "73300C7E1DBFBBFAC955FF5643DFD4FABFF77DFA4AC565415A4EE78ABA34EF32",
+        "completed_at": "2026-08-06T11:11:57.1587720+00:00"
       },
       {
         "test_id": "scenario/2.1/semantic-family-exact-pack",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "900E70779854E8A5A817D6B5A129C0DC938B851621240031B7115F0B0C92484D",
-        "result_digest": "71027509C670C99C0494AD6B33ADFE646B8D1154202DE340A1CF30A77D05CDA0",
-        "completed_at": "2026-08-06T10:15:16.3953252+00:00"
+        "fingerprint_sha256": "F846E2FCC1DC56D0A8085D3D40891CBC2A412566FFC4F694AD256AA1059BB81F",
+        "result_digest": "5B7BDEEADA7736426E7FAC327ADA545A25B15343F11E043FAE8EC18D39BF3C56",
+        "completed_at": "2026-08-06T11:12:06.5946100+00:00"
       },
       {
         "test_id": "scenario/2.1/semantic-family-generate",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "60AB2377B4FFCC6D1252B849F18699E35BAFB373BA8EC5FB18EA0B52A6E75EA0",
-        "result_digest": "E146E8A81E45E1F5DF78FEBC44E0CCD97F232F1C80D8829CF4FBFEADB5D2F0A0",
-        "completed_at": "2026-08-06T10:15:26.6499588+00:00"
+        "fingerprint_sha256": "37F7F602B305F4F60DA797B966E4FAD6F015EF88C74FF4447DDB2EC8149C6DAD",
+        "result_digest": "0627598038AB212686B37CFB5DF68804223854A9BC2A9B283B44C7AA01D38CF5",
+        "completed_at": "2026-08-06T11:12:16.0420735+00:00"
       },
       {
         "test_id": "scenario/2.1/semantic-family-off",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "9AE143E872074AD3F7E42B131B33A5C97D1B46FA347B83D2A7DD4C01294D6D2E",
-        "result_digest": "179D7DAE6360034B7A1276C0B12F76E4DD9A5EE34B63BA176895476B2F6F7AA4",
-        "completed_at": "2026-08-06T10:15:36.9423765+00:00"
+        "fingerprint_sha256": "33AA4361D5ED15ED39FFAD1584288376021466C5427BB1602E17084E6777B594",
+        "result_digest": "65603C00D41ACD5220D362C7B5DE3F2805015217F01E9D62B785FE83E6848B4C",
+        "completed_at": "2026-08-06T11:12:25.6011177+00:00"
       },
       {
         "test_id": "scenario/2.1/semantic-family-report",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "AFE6B51F6A0E20F776DBC3B71FC397D6A6C056C65DB8B0C53CC28C485AFD7B8E",
-        "result_digest": "C7ACDAE291B8A29B02671F7F27C544077328CCAFD4AD43BAD5C6F6A519F7BBE9",
-        "completed_at": "2026-08-06T10:15:47.0825875+00:00"
+        "fingerprint_sha256": "239C1841103751C7E6A8B9C52C9A8A26BFABD09E1B8EB07E4F9AA2E86D08E08E",
+        "result_digest": "2852CCAEA1F3757AC51CAA731012753C5AF6C0BABB025F2DA2FEFE0704B90512",
+        "completed_at": "2026-08-06T11:12:35.1047375+00:00"
       },
       {
         "test_id": "scenario/2.1/settings-profile-roundtrip",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "775CCB90978F219B5F30F828DB6E0DCFCFD29A12E651BA0E6FF87BE238E0FB43",
-        "result_digest": "5008F1CFB423E8C90F60C117AB174333E8D30A23633539EB768279E0BA76F293",
-        "completed_at": "2026-08-06T10:25:35.6232920+00:00"
+        "fingerprint_sha256": "3CF2AA503D2338E02E2B3F3F74D290428BA4184A004B6D9465F7AF3B960C4DEF",
+        "result_digest": "ABB6EEE855AC439C3470DBC737F37DFC3205BE20EA85B3ED2A9BA5BC149FDF52",
+        "completed_at": "2026-08-06T11:22:29.8373806+00:00"
       },
       {
         "test_id": "scenario/2.1/skip-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "4F1A148EE232E9352324F07A3EC3145F013B3BDAF113EF638595D756DCEBF321",
-        "result_digest": "01F06CF4B5568A1915A8784691F7F0A7C9E1FE8DAE098064195BC872AC8B6842",
-        "completed_at": "2026-08-06T10:25:44.7740376+00:00"
+        "fingerprint_sha256": "36C80B8001F2DB4FB2344F47950ACBEB74B58E0AB984A015A017DE98760A3D9D",
+        "result_digest": "E776E3D5DB51E49E7CA8F8B17827BC2004640C7F55A7577F1C0746A083B5CBE6",
+        "completed_at": "2026-08-06T11:22:40.4852712+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-cargo-logistics-shape",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "84B2CA640B2BEFF56FB5EE795DA0570E71BEE16A0C5C6A7372D3B1066FDE5928",
-        "result_digest": "8913704098719D7C77751CC39BC9961E6EFDC179212544A4A3024AD60D61F8B8",
-        "completed_at": "2026-08-06T10:25:57.1570422+00:00"
+        "fingerprint_sha256": "172BA6AA0366ED053C72E165ED2F1C6A6EB70698EBAD8E12652CCE02B56D8112",
+        "result_digest": "EC939F162EE8CB1F3579BFDBC3C0222F27DA6148C1E5886EF47B689EB2BAF46D",
+        "completed_at": "2026-08-06T11:22:55.0344682+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-cargo-pad-enabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "2F2BE7F265B237A026C5EF8EA4DB21965815E02D3DA3C9B0CB213A0D10A2B4CC",
-        "result_digest": "72BF4A4D746CA9C2D21E57C9DC01E1C4158142406AC858779D5A37295182FADC",
-        "completed_at": "2026-08-06T10:26:09.6144171+00:00"
+        "fingerprint_sha256": "35A70323FB74A712BED104FD9E5E6580269C2131A42AD2F48676C988700DAF57",
+        "result_digest": "72CBBF68C9DC2C7BB934FDC7E96712660707E19C91F949D5755264EE443ECAEA",
+        "completed_at": "2026-08-06T11:23:08.5340139+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-duplicate-cargo-diagnostics",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "61A8E56EDEB63909F7342599884F8815162295DFDB458E19C48E059F467A256B",
-        "result_digest": "B8E368BA948B93A4B6C340E447239727C42A16B1E57FF54F6B51231191907D26",
-        "completed_at": "2026-08-06T10:26:22.1459043+00:00"
+        "fingerprint_sha256": "52FAC505F79CCB86AA6E87F92CD3D4ACCB1048095815AD58FC2D409CB44A75EF",
+        "result_digest": "6CE2BB36F1E6B6568D251D37B758945CE569E57BA00E357BB9601F507268049B",
+        "completed_at": "2026-08-06T11:23:21.9823154+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-fluid-productivity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "4556AC14401536E3FDBE89F966063FE6415893176DDC4702DAC59F660F54A653",
-        "result_digest": "02AF8C100CB6BF7AE481B6C74543EF3BF9408F8E6BA2E086C109AE1105A34D98",
-        "completed_at": "2026-08-06T10:26:34.3546005+00:00"
+        "fingerprint_sha256": "815FF105A086BE00DA90C3069D067E9C07CF6D3068922EFC2145E0B8599F9360",
+        "result_digest": "9F69B28DAC0C90488709C87919AAF15DACAFF0132332BB27C2D2966212B1BBC6",
+        "completed_at": "2026-08-06T11:23:35.8360345+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-galore-effect-ownership",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "634CF43FF7B77CEA08F20D8870C96678550ED437D321D5CEA1743E039111F6DE",
-        "result_digest": "B3BA89844298BF82D663F75DFC92AB80C17BCC793F2FDAEE4BD376F9E74B429B",
-        "completed_at": "2026-08-06T10:16:00.8567910+00:00"
+        "fingerprint_sha256": "DF79F0D3F80816A3B19FD69D8F8150A2B80610E07728D10AD7188418C013BCE6",
+        "result_digest": "F3E2934671DB83527F54C3C2911FD271D048E5A68F41D81BC41943EF5D113EFD",
+        "completed_at": "2026-08-06T11:12:48.7419029+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-generation-integrity",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7E6847A2208F9C0D9F15CDFD5D602A6455A3223BAF9C252133217B120BA17B3E",
-        "result_digest": "6E420A34E26D34D8B86B631859A8684A4A3959A157D66226B4264E149A858A8B",
-        "completed_at": "2026-08-06T10:16:15.1694232+00:00"
+        "fingerprint_sha256": "2237F57771C54245E246FF9EC70408B6C91A6EA84DA036B8188A9689A2938BA8",
+        "result_digest": "14C3568A9E95E4D06DD0C247555E802CE9CB37E484C88ABE6E5E8EFC73435A70",
+        "completed_at": "2026-08-06T11:13:01.2559395+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-generation-integrity-inserter-enabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7EEF5609150743D294BC5F0816A331DEDE561A4737A6E99C667F841B2149A676",
-        "result_digest": "A6C15C0861E55473B36193FDF6BC2FAE673F0C3F51DBE055530E377B76FB5BAF",
-        "completed_at": "2026-08-06T10:26:46.4101439+00:00"
+        "fingerprint_sha256": "69F8F0A0549BADE966C15FF0C3A377E3EEA589F82580C88A8CFBE1CAC2AAE675",
+        "result_digest": "4BE3149624D504419506841970E06479DD20A1F63AF71ED77B2C6E042E9D9782",
+        "completed_at": "2026-08-06T11:23:49.2596063+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-combined",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "CE67E5C5ED4E7A1B67B1A5F86BFD7EBC6B201462C832A653E47BF573A646AD28",
-        "result_digest": "3E334BD307709796B64E3D05B1C70A0B299830B597A042D81585C06888DCC89D",
-        "completed_at": "2026-08-06T10:26:58.8317070+00:00"
+        "fingerprint_sha256": "71DF7A31A32197E5669BB0A3C0042356D846001A653ECDDC1D90E0F9DFD1C4E9",
+        "result_digest": "665EA94AD207147E46437F11577326C4EE31FAA30EDC141A2235E26609F9632C",
+        "completed_at": "2026-08-06T11:24:02.9903711+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-config-change",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "541A60BB4B2F7CFA971EDD152F2C0600E19B8A95759DABAF29FAB858E2A205FB",
-        "result_digest": "EE00F77E844F61704D65B1F51ABD23B8167D5A8B98AA0EC3F184B6AB6E8DC2A3",
-        "completed_at": "2026-08-06T10:27:18.6796978+00:00"
+        "fingerprint_sha256": "0A0651A5EF7D1E03A4D5286AC30AA99BB9E8C00EA77BE468A73BE8D269416082",
+        "result_digest": "E2281DC234BD1B92E1E47C31E32AF4EB4499D9A675E36F12DA68A0CF2494C06B",
+        "completed_at": "2026-08-06T11:24:25.0193286+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-cost-base",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "6D2589EE165A236003D3B0BECA548D6BC6163B7D5BFCE1FF3CF3C8D96BDD3A22",
-        "result_digest": "0ECB214AD07C5BDE261EC9FC4B6F5741DCB177F0A40F926AD01D3063F4D1DDF7",
-        "completed_at": "2026-08-06T10:27:31.5138880+00:00"
+        "fingerprint_sha256": "A85129DAE9D353D9519F39F49A53ED37E8E9213731BE02941F7CC7F156A13781",
+        "result_digest": "1AA11E4F8D3AAB805D47E63D638BA2812541D45BEC192C7A5CC404F77F22CC56",
+        "completed_at": "2026-08-06T11:24:38.7901915+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-cost-growth",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C62EEA1151FB377DC316EA3C5A42B9F58208618AE24D7A05B33537F0FCF86B10",
-        "result_digest": "D55F075C31F58AC7370C7C243FA0BA2BF084C12D2084B01DE8C258D810715D5D",
-        "completed_at": "2026-08-06T10:27:44.2473953+00:00"
+        "fingerprint_sha256": "E8C0AA541F7CF7E4808722A2FD6BE184E2636D2C566B92FB9B527C2FEBD191EF",
+        "result_digest": "B09419D353E6F5BFE34DFBD8EF231210D4637E30E20DF52F128C1E14586C698D",
+        "completed_at": "2026-08-06T11:24:53.1749564+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-cost-linear",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "51FBD23246817A42ECAEA36ACED7A9B0E6CE2D66A12643A1EA048BF5B8D3E175",
-        "result_digest": "CB30F3539DC66D4A7A52C0CFF2B3BFA901348B2F5F561D1A9B4AA83A6FFDDDF0",
-        "completed_at": "2026-08-06T10:27:56.6884024+00:00"
+        "fingerprint_sha256": "BBDBC6DCEE3639ED7E2CF7CD6F2CE91BFA4314CD5740122B675754FE0FE7AF2E",
+        "result_digest": "90C2F5C5F458FD9DEF86F4E1E4CB4D380ACBDA5EA4836117893ABD8436DAED9E",
+        "completed_at": "2026-08-06T11:25:06.8580832+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-default",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "F82FED9CB5E4DEFE042EE09FC3851021E9F616553D1A8D534437E1AB1B428D1A",
-        "result_digest": "EE5BACDF6D66495A4B12EDC289B96B7C6293A0EDDDB610B7E8FAE884F3592ED5",
-        "completed_at": "2026-08-06T10:28:08.9515227+00:00"
+        "fingerprint_sha256": "7FDB9F573109CEE67DB88543F5F13D1A8F37262A00FFC9D562FB2209184E8811",
+        "result_digest": "43367592B8C4CFB0E95D4E10ED94793FCB15AC99AD4BCC2B9AF3A21BFA500357",
+        "completed_at": "2026-08-06T11:25:20.6798292+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-disabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "ACBDA148CFDBEA57ACE3C949413E66BEB39617B35CC9C1A4AE99DD9BBF3073BC",
-        "result_digest": "5793030033E4A2C7A2C56049CB944859340391E456872067061314542663CCE0",
-        "completed_at": "2026-08-06T10:28:21.2551816+00:00"
+        "fingerprint_sha256": "2C39F6064F32D7102073BA361C3710B76D06561363C1DED1C1D7488C41AC4335",
+        "result_digest": "8ED7DB93F484780EBD8C3E8772C9B6E54DA6ADDAB1DDF1453969ABB8A4BD62C6",
+        "completed_at": "2026-08-06T11:25:34.0971999+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-effect",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "A1A467E29FABBDB07756293329A6C36F5BE87375F5789C8D9AEA6ED114890AD4",
-        "result_digest": "AC35A9C41424B03FA050474C0EC7DE56A61D7EBC54A3DDD2EB13C89CCAA2C9DA",
-        "completed_at": "2026-08-06T10:28:33.6372614+00:00"
+        "fingerprint_sha256": "C0696FC3A5CDFC49B81C1CBFF13148AA4505FEA6CA6B26CDA49CDA695A3752A5",
+        "result_digest": "7E2DBFC10750A6123BC7D65349FDDA22D1DEBAFFDE27DEA8C48E93E32AE537FD",
+        "completed_at": "2026-08-06T11:25:47.8566830+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-fixed-default",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "228F64FE608CDDC3D3571964690AB87A619B3ED7E3657C9A52F4FD82BD3D724E",
-        "result_digest": "7EDC6B1B7E1F65C7506DC251B58B03E4EDF4353F95F5031624B124ED2276E1FE",
-        "completed_at": "2026-08-06T10:28:46.2524886+00:00"
+        "fingerprint_sha256": "5D97F5D160A02427BD67325670FEA67A1350562EA1EEDCE0E1E7FE18D8E3D6DF",
+        "result_digest": "148648EF4F80CA34E922F09116EBB6257913319EBABEAEA80F96A187A29CF015",
+        "completed_at": "2026-08-06T11:26:01.7559514+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-fixed-override",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "D4A8B799634A2E97ABC7B4BEDD0F330CA1B521AB31D58F86359C8DF7F33E0267",
-        "result_digest": "16C9D0C73D49ADF3758A324EB9F7E258D0ECC2D88E712990F61A421308D2A2A0",
-        "completed_at": "2026-08-06T10:28:58.5361903+00:00"
+        "fingerprint_sha256": "1582C22D44637E656A8BA0BE8BF5C4925475EB228AACF3A0971D065747798602",
+        "result_digest": "0A115F2BAC0D05A9DC8CEB8F2DAB04EB23D5DB55DFFE9A39454A68BEB026A38A",
+        "completed_at": "2026-08-06T11:26:15.6242106+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-linear-default",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "1681BE89CF73766232E2B136565660DFF9B8AD686C093137E449D402B98AAA18",
-        "result_digest": "64EA2F93D9B2ECEA73A5BB004B122C43509B4C5EBBB058692B7F2CB724014BCC",
-        "completed_at": "2026-08-06T10:29:10.9183065+00:00"
+        "fingerprint_sha256": "81EBFC063FA1C9694328D2DED4059C6799E0524C0042405A95C79EF02BC3C26F",
+        "result_digest": "DA316D86ED4690C4475CFB4A2011B36C4052DDA22C57BC3777E65D6EBC3FEB85",
+        "completed_at": "2026-08-06T11:26:29.2871244+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-linear-override",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "6847DFCC61BDA3EB3FCEE90A0E72A5CB03829D473CDE08199C0FB2AEDC77D3D3",
-        "result_digest": "B1EE9D77A8A736E3D9950652EA59164EA7E446B378FDA932393F13537F216A5F",
-        "completed_at": "2026-08-06T10:29:23.2768429+00:00"
+        "fingerprint_sha256": "F0194004AA25458D9A88661E9C7279B5E2BDFB882AA97A96AC92AD0FAF140E27",
+        "result_digest": "415E7F14F8DDD8172D4592E74F4611A7B182B1C30CEC0E1549100A60418CBC47",
+        "completed_at": "2026-08-06T11:26:42.8137180+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-max-level",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "976504EE5E4F909E4B1744159E512DD66CB2C43814B5C8AF4C80080DD8587387",
-        "result_digest": "106E500F7955D233DEDD051892BAA611146C62E1EB630B6B4CC231C88089E9B2",
-        "completed_at": "2026-08-06T10:29:35.5733146+00:00"
+        "fingerprint_sha256": "E83D5635C712531393BD76D990D5F023944C3FC9F5C36FA7F4B7ADC212CE3D8C",
+        "result_digest": "250321474D65849670F09FA2A256B7D25384B28FE352D7184EFA691BEEE85870",
+        "completed_at": "2026-08-06T11:26:56.5253409+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-research-time",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "A96F9E81278ED7D5DEB4BDDA61277086C9DBD16FAC79DC406F2D7AF9AB97BE30",
-        "result_digest": "0E45C63244228C0B1661994C641B96BAE65D1FCA70052D51B641A7E97966FBAE",
-        "completed_at": "2026-08-06T10:29:47.6946443+00:00"
+        "fingerprint_sha256": "2749A21224A826BCC49E4199164889D2A1B3AD7B855216B3B2775814104E6042",
+        "result_digest": "97555E8AC7C2C168ED39A8F2705887FBCF9D8FB91F85750142960B9C99537162",
+        "completed_at": "2026-08-06T11:27:10.4573103+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-unrecognized-default",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0FE61074B0D0FD1F352D5CBBC63895CE738BB0DF452BCAB39021F221F5590288",
-        "result_digest": "00A7ABA97EF4B38F7BF94813E84BEF9594D1CA8310CCE3BF77A131BCEBE8077D",
-        "completed_at": "2026-08-06T10:30:00.6789867+00:00"
+        "fingerprint_sha256": "6452987E296EB1F3BFAFC8853741A39638EDC1CE7D9E307535BA21EFEE700E93",
+        "result_digest": "2D16A0CF221A5956018675865A460FFCB744E7B31C808C8775422A95CA00F964",
+        "completed_at": "2026-08-06T11:27:23.9224982+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-native-owner-settings-unrecognized-override",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "434B492E229B9240C58ED958DDD1B4EFB7D37CFD21C39CE98B2E2763E2CE799A",
-        "result_digest": "161DE7B94EE45DBBEDFFC584A4D719BF4F4AAC806BF2275767A72AB952B762C7",
-        "completed_at": "2026-08-06T10:30:13.0199381+00:00"
+        "fingerprint_sha256": "40002C868AA240A956A91F206BB43B69C2E8DA8F667969CEBD6E36D149366AE9",
+        "result_digest": "EE9D8E2B6A9A045B75A6AF2FCE4EFB3D7F8EB9B3B6D5F9B72F2990C4B660501F",
+        "completed_at": "2026-08-06T11:27:37.5136848+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-plates-n-circuit-productivity-blocked-owner",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "055E0F788409FF1AA473A505BBF990E5BFC3F5D587C247E35F91774FAB515899",
-        "result_digest": "A2F21C9CB4B317DA9A7B89B6177E38C0E504C233D1D7119B59A34793F2D4076F",
-        "completed_at": "2026-08-06T10:30:25.2703782+00:00"
+        "fingerprint_sha256": "54F6AA8760D07C54EEFD885B3BBA4AD2EF0E9CD0CA9D29259214201F8901A323",
+        "result_digest": "E0F82B37870997D5BB192A71AAB579F0D76D6CFF7DB9F3AA7F0DB1D8525B1ECB",
+        "completed_at": "2026-08-06T11:27:51.6231563+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-plates-n-circuit-productivity-change-mismatch",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "341A5054F57F5F5F82668DCD6CD68AE0FFC052B2A123875E003814E55BFBD820",
-        "result_digest": "0569FAD9D3D4CB109EA2B0E2E025D446B9C914C01C7D4D62E66B8E6CD5229BCF",
-        "completed_at": "2026-08-06T10:30:37.5430661+00:00"
+        "fingerprint_sha256": "805E3A5E737DEF14C8FF7F2081DD9DF5A63D4B52080D54AAF03BC97BFA296B71",
+        "result_digest": "EE279BFC6A38E65ED64620E275575BCA880F2365177FBA21DAEBE17F05E0B431",
+        "completed_at": "2026-08-06T11:28:05.3680261+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-plates-n-circuit-productivity-compat",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "2523AE795E941B6EF12BCF32B6C13D177A273698DCB60C852789CDB4B81B7B4D",
-        "result_digest": "6C4BBFE6A87CCE3BDA094F60A20525495D67BFEDBA8F710C40250D70CE448219",
-        "completed_at": "2026-08-06T10:30:49.9808394+00:00"
+        "fingerprint_sha256": "B9ECEF5195C8641C51279D216E421CA75D8E922E4D175EF42F86D0C0370A8215",
+        "result_digest": "96979E5302CD18C8509F3B5E1D76BCF20939FD0575A6A407B16F6A56A42C8F6C",
+        "completed_at": "2026-08-06T11:28:19.3093220+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-plates-n-circuit-productivity-partial-coverage",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "0454645E86817F285FD9D8F8B4052FE28878791A1E370461942D8524DF4BA355",
-        "result_digest": "372D273D3596D11E91E146656B66FDF5261721C647177D363F3199502F1F834F",
-        "completed_at": "2026-08-06T10:31:02.1135406+00:00"
+        "fingerprint_sha256": "6CF994CB79297B596C429F475BBC87310561FA657015D16EB289BD8709BE05C8",
+        "result_digest": "DC6B9ADEDA1529538AF331CA6C23738423029B5D353E495C8B78E1491088A351",
+        "completed_at": "2026-08-06T11:28:32.9477343+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-progression-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "72CE492879F1F6EEACA6A8CEB458ACA9E258DEB5933260AD6C9EBF970BB46E48",
-        "result_digest": "202B8D5D5CD87331064E71BDC48D017CE3C7F5897085F8CE8427440261A069B8",
-        "completed_at": "2026-08-06T10:31:14.2065535+00:00"
+        "fingerprint_sha256": "176465269D255FF32BA90388B2FC6ADAFDA497120B013FA4A0081A9AB10624E9",
+        "result_digest": "7F210EB1F26AD90D807716EB4242D36F9B379EDA848C826FB86071D7E6A219DD",
+        "completed_at": "2026-08-06T11:28:46.3594096+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-scripted-candidates-disabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "930B4D664D6094F9B7EC651FF4F142CD140DC060A2F76ACF0D4A2A554E60E93F",
-        "result_digest": "70924E5ED4B94F51636B86F8B5150136411A1A45F94BCBBCE67AD3C235223EDE",
-        "completed_at": "2026-08-06T10:31:27.1790797+00:00"
+        "fingerprint_sha256": "CCD877D07CCFB1167118C48728EBFEC24AE43A528DCC4036237F7813DEDB4A0B",
+        "result_digest": "EF8740895839D44963D84075E573CBC0E277D5A2B328D4ECAB4DEA0F4F840FE1",
+        "completed_at": "2026-08-06T11:28:59.9867410+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-scripted-candidates-enabled",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "C163C609F2CBB0050A014DD105990676DB163F875F6D018BBCF1FE8DD4A92438",
-        "result_digest": "A349AD18EEFED4BB2B3B1DF8F64560265039B8E8EBB0099043BBF29F75642343",
-        "completed_at": "2026-08-06T10:31:39.5032059+00:00"
+        "fingerprint_sha256": "70720BC1DF0AD61CBAE851836A49EF0BB03A78E411698BB19811378DD6EDAE33",
+        "result_digest": "8A42CADF45CB803BBF7D680021628F31A3FF69DA0A7468C46EC571E6259C25F0",
+        "completed_at": "2026-08-06T11:29:13.4117627+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-scripted-runtime-disable-restoration",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "7D401BD3978858AD74BFAB34B44F4501C023BFB03ABD1338212327D406FB1D89",
-        "result_digest": "8BB2BF9E4E6A3704578649BE680DFE92AFE125CD2C7C8CFFFCFAB8BEEAB91832",
-        "completed_at": "2026-08-06T10:31:58.8702567+00:00"
+        "fingerprint_sha256": "177094FB136598662D5B35F4D9A530060A37CEA4EA3CD8AE00596F3186854136",
+        "result_digest": "1330EB3A767BAEDE98D862A44CAE4EE20DDD04753E782DF1BEF711E8FE4412CD",
+        "completed_at": "2026-08-06T11:29:34.7774104+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-scripted-runtime-lifecycle",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "156C4928734DF79826C7630D2336888FE8108E135DEB8A8F4690CBBF8DD482D7",
-        "result_digest": "9F37EF84D8F862A341E4CBC1B408A41ABB47DC3BF1546D41E91C2F57CD2F44DE",
-        "completed_at": "2026-08-06T10:32:17.9936941+00:00"
+        "fingerprint_sha256": "80569383692C1970DA4E980872735423A28161397D0EC045EAC261BD4252F866",
+        "result_digest": "3D7DD03CF7F84392D05F18323D3502C54FE2473AB0B832443590D396277795D2",
+        "completed_at": "2026-08-06T11:29:56.1967181+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-scripted-runtime-reenable",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "53BA08F8C62113438885103FF102FC355E6E073FAE48A3E149F7802C0CEF8F54",
-        "result_digest": "A7120485584E646A03E8BE9C8D210DD2DFD19ED8A6893A885CD959ABE0CBB95B",
-        "completed_at": "2026-08-06T10:32:37.6484895+00:00"
+        "fingerprint_sha256": "F732F72743454CD73F362D920B8313CEC739529A53C0F5783EEA7163B03FADE8",
+        "result_digest": "8E864FD9FE962759FE7FCA35003D46A5406E5F16D54FA6F17B299E8DE9353CAE",
+        "completed_at": "2026-08-06T11:30:17.8848489+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-space-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "CDF9F5A62FCEF07751B6AC63935214C720E4E0489C22884F36B3917CEBF65147",
-        "result_digest": "CE964F82E1172C5F3877722865127D6FF33D23CBB0866ACA2D91D53BF275ED87",
-        "completed_at": "2026-08-06T10:32:51.7248962+00:00"
+        "fingerprint_sha256": "A8DDE90ED1378FFDDE884F0BD9EEADD2C42AF54958CC176AE6D9F818C24601D3",
+        "result_digest": "1CFC7CA3BCF175F563F1F7D5C3FBF7CE485080383492C4653A0A8B63001FC23C",
+        "completed_at": "2026-08-06T11:30:31.3217248+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-space-promethium-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "E5D919313A50C0E66C3D73484E1A59C98141463F504EF61A9F7CB48F5731A962",
-        "result_digest": "9779F99F4CAE656013D3B32BE3917C9A8BD6FEE143B7BD320CBFD1CC44488E2E",
-        "completed_at": "2026-08-06T10:33:03.9415112+00:00"
+        "fingerprint_sha256": "7F3180FC164ADA0C48C1FF2D7682583F0A24CA33B3FFFB7EABF0C7F8F0184858",
+        "result_digest": "42DC18026610A633688292A65A9D48154085BE015BD06709C82BC87AF1048002",
+        "completed_at": "2026-08-06T11:30:44.6674773+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-vanilla-family-adoption",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "5455A8FEF05AB55253A446F9AB11EFE42B9F511B2F0E5266BAAA946DD7667021",
-        "result_digest": "653D0B6EB8C28C8FB665EC8FC9828B46113A6B8279F3857618ED12E8DB3489FE",
-        "completed_at": "2026-08-06T10:33:16.0740048+00:00"
+        "fingerprint_sha256": "E19161BF27E662EFF20E87A0E74F08D87B317736750166C0EBF6EF014406E961",
+        "result_digest": "010C57F07CCA6918FDEC92F4DC70386E1DB1B46AED6AA202A5D35F36AF28AE8B",
+        "completed_at": "2026-08-06T11:30:58.1829236+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-vanilla-family-adoption-config-change",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "D2DCC091821875F81F52AB7BA91BC694F359D58CE088B6749E51B46A03BBFABB",
-        "result_digest": "44BCF2277E3903E0646EE9C20AB9F1D856869B166ED03189D5CB5A6C73F9D4EE",
-        "completed_at": "2026-08-06T10:33:35.3003655+00:00"
+        "fingerprint_sha256": "2A235825FF2D14AB04E146BFC3696BC0D09E81863B95F73F67F6A93F0C8DF019",
+        "result_digest": "1CAEAD8B0A9F20BE3EC89FEB6156F06E9CC98A63852FB92BE5CA4C11102D125C",
+        "completed_at": "2026-08-06T11:31:20.6860558+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-vanilla-family-exact-owner",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "63B7D31F6818799F62B980B25B041AB8D7A8F38840DEFBC845E1663073EA1ACF",
-        "result_digest": "39139EA8FD6EDBF0AF82D58A9227416972AF48A487523CE9C5501A4B87EDC2C0",
-        "completed_at": "2026-08-06T10:33:47.5594224+00:00"
+        "fingerprint_sha256": "6AC7081762DF4B07FA68DA754251EB49191E0BFA7DE39CE8DC68B3A6992FF08A",
+        "result_digest": "C560630DC899B9CEFA4942AD2D780D7BD9DE548A77418137C1BF530855B51F37",
+        "completed_at": "2026-08-06T11:31:34.3275614+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-vanilla-family-mixed-owner",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "66AC61307BA0F8211BE77C839908CB63EC2D5EF74D3100ED8760F680F15B3606",
-        "result_digest": "192F32550C1228D8F6C717BBB5A86579E4CB1C9DD40F94A33BA2D745584ACE16",
-        "completed_at": "2026-08-06T10:34:00.4236916+00:00"
+        "fingerprint_sha256": "5CEBF2ABFB70EA2DDC712EE553B5C1A9F2B4A5F7E3540CE15294D9DD7DE2F1B9",
+        "result_digest": "B3470741BAD02FC3F213336FB11CA31CF1EEF1FDBD68429565AC65F2B6DDA8CD",
+        "completed_at": "2026-08-06T11:31:48.1314349+00:00"
       },
       {
         "test_id": "scenario/2.1/space-age-vanilla-family-owner-prepatched",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "6170162570094C8DFD564B37723D57D082957A67085A6682CD0B8413D324A3A3",
-        "result_digest": "CC8C255CCC499B639D369765AA56FBC55C67FA47D6A17674F48098256C3BD673",
-        "completed_at": "2026-08-06T10:34:13.1360948+00:00"
+        "fingerprint_sha256": "5606044F4B036161A0C150BBACA2A3B4DFF755EC6CB99A4A24819B9AA9490730",
+        "result_digest": "B49ADA12C89382EF4844DA8E31FA8B5B3F27464A9BEE0D9C34996140564BA379",
+        "completed_at": "2026-08-06T11:32:01.7010813+00:00"
       },
       {
         "test_id": "scenario/2.1/space-exploration-recipe-removal",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "6BED62777756AB15CA66126FC9CAE115F619A2377CA71CDFFBB30D9A628C61B7",
-        "result_digest": "9B5BAEB08BF74C84D3AE63FA4B9A773D2597C97D8ED780906667BA483473F420",
-        "completed_at": "2026-08-06T10:34:22.1842063+00:00"
+        "fingerprint_sha256": "A4FBFE81DF8BC26E210E74A508CD76C592072418AB4AC3306D10798D3E4EBFCA",
+        "result_digest": "F13B81BA0B5A23D404EE4F27C7A43FB7D026E6712D42FC025BCCA53C9380F762",
+        "completed_at": "2026-08-06T11:32:11.8461413+00:00"
       },
       {
         "test_id": "scenario/2.1/space-pack-policy",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "702ACEEA71E0A1FB686EF9080332608FEA137B0C97A85AE85789A1825A28A4EF",
-        "result_digest": "9D84145CD20DC7EE1011219020D6BAE9A1221D4EFEA99EE24BA8D9ED153FC664",
-        "completed_at": "2026-08-06T10:34:31.5532275+00:00"
+        "fingerprint_sha256": "D3B2B7FB14C4D2052147FD8B416C93B4E86B872498A30576D2761D788F759D92",
+        "result_digest": "2F23B1FA821965E94422AA07DA49B7876F2C32ACCB9A987E902ABD740BC314E4",
+        "completed_at": "2026-08-06T11:32:22.4330062+00:00"
       },
       {
         "test_id": "scenario/2.1/synthetic-scale-graph",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "83EA895EA7557155EAA977E02D0F52006304B77C8D156CA9CCEDC4647B9C01FD",
-        "result_digest": "DB92A67D518B7744BFE8B8119769A77CAE658A02FDC64312F381FB76D3C126EB",
-        "completed_at": "2026-08-06T10:36:23.5499490+00:00"
+        "fingerprint_sha256": "B3C729842FC7D1A2D7DFE856ECD978D3FC6764E3087A6236F3C3111BAECF0049",
+        "result_digest": "AC60679E77948106D954A13AA2BE9B6082ED863B71C3F84607B9F97A26FD16E0",
+        "completed_at": "2026-08-06T11:34:26.5490161+00:00"
       },
       {
         "test_id": "scenario/2.1/synthetic-scale-graph-random-order",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "A756C92069EDC0D1886FFEB69742704CBA8A6053F5D1DDABA53D8D29D16B3F33",
-        "result_digest": "E64F317588BBECAA47BCE4AF4E473688AC70458A41D9D0EA863689815962D1C7",
-        "completed_at": "2026-08-06T10:38:37.3493114+00:00"
+        "fingerprint_sha256": "BD0E8AB074AC22A15874ACE7E03261695B5D4DD9CCCE301651E70141678F17F6",
+        "result_digest": "01C62EFBFA75B9141469E6CD9E12D4D400AB8C501D6B7C697A0B83AC45FDAE7E",
+        "completed_at": "2026-08-06T11:36:32.0158774+00:00"
       },
       {
         "test_id": "scenario/2.1/synthetic-scale-recipes",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "3A585995AE00F5E45FA0F46F4240979DB85594A748E84F4BAD6606D55707428A",
-        "result_digest": "1463BD10D63CCADCFCC5285C4B4D619BC7A602F49EAEA5B7072298372E2A3619",
-        "completed_at": "2026-08-06T10:39:26.0438483+00:00"
+        "fingerprint_sha256": "A431075D011B67A1B382983684DCA836704FC7C83C65B325061751651D244001",
+        "result_digest": "55FA938A6C40794AFAD5333742355F0344810564A4294BE4F5AB07AFD4C5D7E4",
+        "completed_at": "2026-08-06T11:37:14.2774382+00:00"
       },
       {
         "test_id": "scenario/2.1/synthetic-scale-recipes-random-order",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "31393501B38B861A4BF99843A0A81B249C614CC494AF98380E6BD798FC6A7180",
-        "result_digest": "ECA25A88A14199A3D04D3B5CAB537E929935E471B394895285EAC93ECE3357D0",
-        "completed_at": "2026-08-06T10:40:15.0832804+00:00"
+        "fingerprint_sha256": "45A5852CEFAC5CE0DC97BD51FEAF1CB6CE80A4A3B63BE8C5AABE7CCC934FB096",
+        "result_digest": "18C158F4BF1900E031593CFC1081FB750DECF7A2BF44334C5512796A5EDA972E",
+        "completed_at": "2026-08-06T11:37:56.8871415+00:00"
       },
       {
         "test_id": "scenario/2.1/technology-prerequisite-rewire",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "477BC785339EB1C86E19060630C958E48750D6C4B70A8B57322ADA8232FD618F",
-        "result_digest": "FF142CC08EF8BC5ECC699393164B3848357FB9310C55CFC5FA7DFE44917D606C",
-        "completed_at": "2026-08-06T10:40:25.3159631+00:00"
+        "fingerprint_sha256": "450E01BDBD93B136AF3CF903C910B20EC648143FCCAA60564D2CCF3B8D1F0217",
+        "result_digest": "723EF1A6F3DC92B9B11DC7C0A6658401431357659692C38913D2BB37D2126AF0",
+        "completed_at": "2026-08-06T11:38:06.3596859+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-always-coverage-absent",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "8F7802DAF10B827F43FC38AF8C872238246587B1F1E5D1BE7D0D2825F4276B6A",
-        "result_digest": "43E99BE1E318E9F091EF3E6229FE68F63861630C3BAF8569F529790AF6203EDD",
-        "completed_at": "2026-08-06T10:40:35.8146744+00:00"
+        "fingerprint_sha256": "FEDD49D2B7DBAAAE127D1B894B89BC634BB80A0FEC6E7865DE4AB8A544DED3A7",
+        "result_digest": "1E6B8D5A32ACF5396985632DA2EAD9414C2BCF26ADA70D560BAB26369A6EF6C0",
+        "completed_at": "2026-08-06T11:38:15.6316828+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-always-coverage-present",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "FDE3AEE03583620E842BEADE8359991461C3E9F7416BFFAB1AD91360B028BAEA",
-        "result_digest": "5F845A311F69E1D6132143818B2D6D978C89C46758E04B77E879DBAE0A56FED5",
-        "completed_at": "2026-08-06T10:40:46.7170726+00:00"
+        "fingerprint_sha256": "8351FBD1BF3EB30DCAB33E569A38C2CB4B52AB2BBE6D2728C447D849FCDB8252",
+        "result_digest": "5A57620FAADBDE546E6E767D0D5CC3B4089D2AD841AE824EA2E37F074F3F7C87",
+        "completed_at": "2026-08-06T11:38:24.9461160+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-conditional-coverage-absent",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "10C1646ACB5976AABF1E83389F845ABB5028B73D050A3179C8EF4885244E5302",
-        "result_digest": "6FD4B3C7678AD05B7435A42FE5A4C20E9D2DDF6E4B063DADB4A5A529A3E155C1",
-        "completed_at": "2026-08-06T10:40:56.8994330+00:00"
+        "fingerprint_sha256": "6731DDB85FF7172349467124019B5DE171DC2C17E19FC8CC735924C99A6B5321",
+        "result_digest": "34E088C758109A5B05B68DDABB104C533ED8F66B111CB401CAD1998A12708C3F",
+        "completed_at": "2026-08-06T11:38:34.3269545+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-conditional-coverage-present",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "3259E8F201FBF5B34B02A98E34166B6A61475CB65B7D6C1FC000A6A0D677A574",
-        "result_digest": "D8448C5141474848416BBD1E6F1F001001F6169F1DD289D36E855364FE370640",
-        "completed_at": "2026-08-06T10:41:07.5395428+00:00"
+        "fingerprint_sha256": "01FC124D9F89335EEA96BADCA7FB780705AC28DA9ED503A11BD476047315D2F1",
+        "result_digest": "62E5A1FEABFC6397F90875E9800FC7340CC8AB4D7B321D5AFDAECDB01851D5D5",
+        "completed_at": "2026-08-06T11:38:43.6396042+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-conditional-external-owner",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "A4844D306BEA07E065FA2FB89F9F600793A0EFC12AA7B6009BBC30F73ABE5067",
-        "result_digest": "5ECA9D6544971333BC4BEBA336231148CCA5EFB87A405E8452573023EF3258F6",
-        "completed_at": "2026-08-06T10:41:18.4735208+00:00"
+        "fingerprint_sha256": "EA4485143BDA4964584F83C52E4DEBA0F9BA657D4CC78D6E1EBF013ABEFEF248",
+        "result_digest": "75A80BB1C8598F81D5DD03AD4E32D338E612CDC0106350882EFAEC258B48E69B",
+        "completed_at": "2026-08-06T11:38:52.7548691+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-off-coverage-absent",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "797CD2F8823A9E897A1EDD0743ECD39084420C97BE86125D8355B5B18147B7C1",
-        "result_digest": "28D0BDD782A519642295459A7568151E9CB528CBF1906CA3B0AE3E8FF5B8A17A",
-        "completed_at": "2026-08-06T10:41:29.3700940+00:00"
+        "fingerprint_sha256": "02251CCA8494D3B0F25E66BEBA92CBD1E7E509B015AFC96E80F1835C86DA981A",
+        "result_digest": "320A499D7E3EF346177254976B793AD4BEE5B546F2B4EF85CC7D4E54E65B3C0D",
+        "completed_at": "2026-08-06T11:39:02.0844456+00:00"
       },
       {
         "test_id": "scenario/2.1/weapon-overlap-off-coverage-present",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "4AAE17CF24E23BCF08CCAEEA597C74546D8F1BB9F4D865E07E3D5136548EE89A",
-        "result_digest": "14DF9194FE7A70FEA30B93DC2131A9FE21E78FADCD9A2782975D28E990794A08",
-        "completed_at": "2026-08-06T10:41:40.5458212+00:00"
+        "fingerprint_sha256": "F3CFB8DC14BDCA3501FDC8782884C141A2975A1FCF8D271A901A9863E5FEBE2A",
+        "result_digest": "96B417F5A3B7EC3A5511916C17D1747773CCA47D277F4A3F397F4EFB3BF4AD12",
+        "completed_at": "2026-08-06T11:39:11.4432679+00:00"
       },
       {
         "test_id": "static.architecture",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "4F241A0E7C25AD77803701210AA1F092392432CE3493C372F2CECBE714509C27",
-        "result_digest": "587D8F71B4E7ABE9FA7D40FAB4CD386752681CDF2C13087CF1A47179E717840B",
-        "completed_at": "2026-08-06T10:12:01.0177489+00:00"
+        "result_digest": "45BD2F318F8B7CF2219F3251364C5245955684490FC8ADFF5FCD0754651C5F07",
+        "completed_at": "2026-08-06T11:09:01.6995131+00:00"
       },
       {
         "test_id": "static.balance",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "5A5F6E9BB532720F6289E6426C926AD5019854EF9B68050D11580009F93D5373",
-        "result_digest": "82D207CF09D498A4D200C3B6EE5B38D16335B395FF67A747BF2553982A842DFE",
-        "completed_at": "2026-08-06T10:12:13.7463768+00:00"
+        "result_digest": "ACAF884B760AC17BDA55D87BB80FFEF8D96E3F44277D9C2586E05EA58BCADF1F",
+        "completed_at": "2026-08-06T11:09:14.6497409+00:00"
       },
       {
         "test_id": "static.compiler",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "A994765756C808D85EA95C6488ECF69ACCD7F1F6D0332053C68637D83F0817C2",
-        "result_digest": "0BCEE1AC2DAEA0439493ECAC8DF223BE5DD947A3E4CE2900E0A148B5FA51395A",
-        "completed_at": "2026-08-06T10:12:02.4465736+00:00"
+        "result_digest": "CB5268BC2D213D8B55C5EE6ABD6012D9643EB98C5B22B9434E84DE5400BD1025",
+        "completed_at": "2026-08-06T11:09:03.0562983+00:00"
       },
       {
         "test_id": "static.full",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "8DBC0C81325810A902B5FD498027947EE0F3F6B4B689D36E14FE915C5B1A32B9",
-        "result_digest": "F461084ED740EFA19E4FC078AF406420ED52F22C713CA0577CE786BC0783614D",
-        "completed_at": "2026-08-06T10:13:24.1157013+00:00"
+        "fingerprint_sha256": "92630B3341905D0616F78448F67E792DBB6837D2F0FBCC29C4DAF39414ECFEFC",
+        "result_digest": "9DFB0EB3375B06421112E0DDF689963449FACA5C6BF2A9EB31E3F7D7BB14677F",
+        "completed_at": "2026-08-06T11:10:23.7869161+00:00"
       },
       {
         "test_id": "static.locales",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "C25AACDE00F987405DC7B6A2592ADFC0115CF94F8B1F4332A67D56C0B62B9032",
-        "result_digest": "455A91B9735DC7B1214A52A426B691F04900E7FC337384FDE0CB6550D31B0056",
-        "completed_at": "2026-08-06T10:12:12.4545865+00:00"
+        "result_digest": "91EA2357AB8D42410142AAC51D1983DEA77E2A4F3DA19F92B252E093F77A45A2",
+        "completed_at": "2026-08-06T11:09:13.1690645+00:00"
       },
       {
         "test_id": "static.museum",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "6C80BA07EF0231487D28FEAA63E6734F32F55F5F101FD3AAA4EF76CA080B14AE",
-        "result_digest": "500B8FEF4EE7F0034F6EA495A63AA571AF3C9109C4FB24B4BDAF1B1702579192",
-        "completed_at": "2026-08-06T10:12:16.4461093+00:00"
+        "result_digest": "576DBAA8D5918207114A2B02C8C9FF5E6DAA5A02EE34C66454283434B3E743A8",
+        "completed_at": "2026-08-06T11:09:17.8823280+00:00"
       },
       {
         "test_id": "static.package",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "407231763EC1625549A1C6D6D9AFF37F313BDEF9414C177CBB9B82A9096B4A84",
-        "result_digest": "21E037A6A800E38B07A0042D89B37799928824481EA136F55A6B23102CF8C142",
-        "completed_at": "2026-08-06T10:12:24.1817738+00:00"
+        "result_digest": "380D8DC42E458C97F6F6EC12A72A5933FB3C3A49B281FD86F4A1E4915D63E44E",
+        "completed_at": "2026-08-06T11:09:25.4182210+00:00"
       },
       {
         "test_id": "static.release-history",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "90B48EBC37708D819B25EADD93822991D971B5A0833044E25CFC585B2A3C1F46",
-        "result_digest": "C9DA024FCFA54F5D212CB471E864E4AD38D7DE5295ADCA948B70FEA8F01A531A",
-        "completed_at": "2026-08-06T10:12:20.7276180+00:00"
+        "result_digest": "334FC4C08D9E0808139DF6498914BC6DDF31345CD17FB423025832F5E2857F3F",
+        "completed_at": "2026-08-06T11:09:22.2693180+00:00"
       },
       {
         "test_id": "static.settings",
         "status": "passed",
         "disposition": "RUN",
         "fingerprint_sha256": "B75DBB79E05B26A5C82F072A35DA41A54418B5ABD44213E5469238E9F3AFAB40",
-        "result_digest": "FE7C0282903839E9955F2055D2D112FF7F01D29AA03415174673F63C4F457CCF",
-        "completed_at": "2026-08-06T10:12:02.8900346+00:00"
+        "result_digest": "450873CEB04B70C7F9DB06C588F0E089AA13F7F730F0D76875E9E451D55FE4EF",
+        "completed_at": "2026-08-06T11:09:03.6544399+00:00"
       },
       {
         "test_id": "tooling.self-test",
         "status": "passed",
         "disposition": "RUN",
-        "fingerprint_sha256": "07A0EDC4D5BB31BCFF0A6BD753B32B6F3CE274EF07C06C691D7B095933B687CD",
-        "result_digest": "F0C7E75CB8094FC62DCD269DD95337814F709A2BD4572D014A323AB2C57735DA",
-        "completed_at": "2026-08-06T10:11:53.9656097+00:00"
+        "fingerprint_sha256": "1DD039633D7731DDA315C6B708E61BFA200BB93DA4F22BDA6FD514BB3981F85D",
+        "result_digest": "6E4712207ED7B4B10103BD3E19B071DA8D250C7408039D9FD81B4920C56A20CB",
+        "completed_at": "2026-08-06T11:08:56.3319420+00:00"
       }
     ]
   }
