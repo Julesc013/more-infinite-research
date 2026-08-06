@@ -890,9 +890,23 @@ if ($baselineContract.factorio_version -ne $currentContract.factorio_version) {
 }
 $script:IsFactorio20BackportDelta = $baselineContract.version -eq '2.4.9' -and
   $currentContract.version -eq '2.5.0' -and $currentContract.factorio_version -eq '2.0'
+$isFactorio20DotFiveReleaseDelta = $baselineContract.version -eq '2.5.0' -and
+  $currentContract.version -eq '2.5.5' -and $currentContract.factorio_version -eq '2.0'
 $targetAuthorityKey = "factorio-$($currentContract.factorio_version)"
 $releaseAuthority = $releaseLedger.development.$targetAuthorityKey
 $baselineAuthority = $releaseLedger.published_baselines.$targetAuthorityKey
+if ($isFactorio20DotFiveReleaseDelta) {
+  $baselineTagCommit = (& git -C $repo rev-parse '2.5.0^{}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $baselineTagCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "Approved-delta export requires the immutable local 2.5.0 predecessor tag."
+  }
+  $baselineAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.0'
+    tag_commit = $baselineTagCommit
+    archive_sha256 = $baselineContract.archive_sha256
+    package_content_sha256 = $baselineContract.package_content_sha256
+  }
+}
 if ($null -eq $releaseAuthority -or $null -eq $baselineAuthority) {
   throw "Approved-delta release authority is absent for $targetAuthorityKey."
 }
