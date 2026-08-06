@@ -756,6 +756,25 @@ fixtures:
       - exact-2.0-adoption-contract-shape
       - zero-unreviewed-normalized-differences
 
+  approved-delta-2.5.0-to-2.5.5:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/2.5.0-to-2.5.5.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
+    validates:
+      - exact-factorio-2.0.77-seven-scenario-delta
+      - exact-2.5.0-tagged-predecessor
+      - unified-four-model-cost-settings
+      - native-continuation-anchor-preservation
+      - compiled-out-productivity-family-adoption
+      - bounded-target-log-report-transport
+      - exact-target-owned-replacement-identities
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
+      - zero-unreviewed-normalized-differences
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts
