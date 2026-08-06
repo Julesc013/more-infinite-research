@@ -128,11 +128,10 @@ local M = {
         technology_formula = true,
         quality = true,
         surface_conditions = true,
-        mod_data = true
+        mod_data = false
       },
       emitter_families = {
         "technology",
-        "adoption",
         "replacement",
         "scripted-effect"
       },
@@ -147,7 +146,7 @@ local M = {
         settings_profiles = true,
         scripted_techs = true,
         technology_constant_overlays = true,
-        productivity_family_adoption = true
+        productivity_family_adoption = false
       },
       supported_required_mods = {
         "space-age"

@@ -94,15 +94,17 @@ local function build_plan(key, spec, owner, binding, buckets)
   if not reachable then return nil, reachability_reason end
 
   local base = selected("ips-cost-base-" .. key)
+  local linear_increment = selected("ips-cost-linear-increment-" .. key)
   local growth = selected("ips-cost-growth-" .. key)
   local max_level = selected("ips-max-level-" .. key)
   local research_time = selected("ips-research-time-" .. key)
   local effect_value = selected(effect_contracts.stream_setting_name(key))
 
-  local model = cost_model.classify(owner.unit, binding.cost_model)
-  local cost_changed = base.changed or growth.changed
+  local model = cost_model.classify(owner.unit, binding.cost_model, {technology_name = owner.name})
+  local cost_changed = base.changed or linear_increment.changed or growth.changed
   local configured_cost, cost_reason = cost_model.configure(model, {
     base = cost_changed and base.value or nil,
+    linear_increment = cost_changed and linear_increment.value or nil,
     growth = cost_changed and growth.value or nil
   })
   if not configured_cost then return nil, cost_reason end
@@ -168,6 +170,7 @@ local function build_plan(key, spec, owner, binding, buckets)
     operation = operation,
     configured_fields = configured_fields,
     cost_model = model,
+    research_cost_model = configured_cost.model or model.research_cost_model,
     effects = effects,
     relevant_recipes = (function()
       local out = {}

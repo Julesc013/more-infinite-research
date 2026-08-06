@@ -8,9 +8,9 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the provisional `2.5.0` compiler backport.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the maintained `2.5.5` compiler backport.
 
-MIR `2.5.0` projects the MIR 3.2 compiler through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, Factorio 2.0.77 retains its proven `mod-data` and productivity-family adoption support, Factorio 2.1-only modifiers are omitted, and every runtime and compatibility claim is requalified on the 2.0 binary and mod line.
+MIR `2.5.5` projects the MIR 3.2.5 research-cost contract through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, unsupported `mod-data` emission and productivity-family adoption are compiled out, bounded research-cost support is reported through the target log adapter, Factorio 2.1-only modifiers are omitted, and every runtime claim is requalified on the 2.0 binary and mod line.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
@@ -116,10 +116,10 @@ This gives the mod a **late view** of recipes, items, labs, science packs, ammo 
 Generated stream technologies use:
 
 ```text
-base_cost * growth_factor^(L-1)
+(base_cost + linear_increment * (L - first_level)) * exponential_multiplier^(L - first_level)
 ```
 
-where `L` is the research level.
+The first generated level is the anchor. A zero additive increment with multiplier `1` is fixed, a positive increment with multiplier `1` is linear, a zero increment with multiplier above `1` is exponential, and positive values for both produce a hybrid curve. MIR derives that behavior from the numbers; there is no model dropdown.
 
 **Shared stream defaults** are:
 
@@ -127,11 +127,12 @@ where `L` is the research level.
 | --- | --- |
 | Enabled | `true` |
 | Base cost | `8000` |
-| Growth factor | `2` |
+| Additive cost per level | `0` |
+| Exponential multiplier | `2` |
 | Max level | `0` (infinite) |
 | Research unit time | `60` seconds |
 
-**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
+**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, exponential multiplier, or research unit time means *derive this from the vanilla chain*. Additive cost per level defaults to `0`.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -358,7 +359,8 @@ Every generated stream receives:
 | --- | --- | --- | --- |
 | `ips-enable-<stream-key>` | bool | stream/defaults/shared | Enables or disables generation for the stream. Scripted streams use the same checkbox for their runtime effect. |
 | `ips-cost-base-<stream-key>` | int, min `1` | stream/defaults/shared | First-level research unit base cost. |
-| `ips-cost-growth-<stream-key>` | double, min `1` | stream/defaults/shared | Multiplier between levels. `1` means flat cost. |
+| `ips-cost-linear-increment-<stream-key>` | int, min `0` | stream/defaults/shared | Research units added per level before exponential multiplication. `0` preserves existing curves by default. |
+| `ips-cost-growth-<stream-key>` | double, min `1` | stream/defaults/shared | Exponential multiplier between levels. `1` selects fixed or linear behavior. The stable ID is unchanged. |
 | `ips-max-level-<stream-key>` | int, min `0` | stream/defaults/shared | `0` means infinite; positive values cap the stream. |
 | `ips-research-time-<stream-key>` | int, min `0` | stream/defaults/shared | Seconds per research unit. `0` uses the configured default for that stream. |
 
@@ -394,8 +396,9 @@ Every base extension receives:
 | Setting pattern | Type | Meaning |
 | --- | --- | --- |
 | `mir-enable-<technology>` | bool | Enables or disables the infinite continuation. |
-| `mir-cost-base-<technology>` | int, min `0` | `0` derives the level 1 base term from the vanilla chain; positive values override it. |
-| `mir-cost-growth-<technology>` | double, min `0` | `0` derives growth from the vanilla chain; positive values override it. |
+| `mir-cost-base-<technology>` | int, min `0` | `0` derives the exact cost of the first MIR continuation level from the vanilla chain; positive values override that first-level cost. |
+| `mir-cost-linear-increment-<technology>` | int, min `0` | Research units added per continuation level before exponential multiplication. `0` means no additive growth. |
+| `mir-cost-growth-<technology>` | double, min `0` | `0` derives the exponential multiplier from the vanilla chain; positive values override it. The stable ID is unchanged. |
 | `mir-max-level-<technology>` | int, min `0` | `0` means infinite; positive values cap the generated continuation. |
 | `mir-research-time-<technology>` | int, min `0` | `0` reuses vanilla research unit time; positive values override seconds per unit. |
 
@@ -442,7 +445,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Unknown overhauls:** broad support is opportunistic, not a guarantee.
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
 - **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology. For configured vanilla Space Age productivity families, residual productivity-allowed recipes can be adopted into the existing vanilla infinite technology instead of generating a parallel MIR technology.
-- **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR resets technology effects once so already-researched vanilla family technologies apply the new recipe effects.
+- **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR records the new binding and retains Factorio's completed-work normalization without applying a second research-progress conversion or calling a force-wide technology-effect reset. This avoids losing completed research work, reapplying unrelated mod effects, or changing unrelated force recipe state.
 - **Stable IDs:** generated stream prototype IDs are intentionally kept stable unless a tested migration is provided.
 - **Scripted agriculture scope:** the current implementation applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a later manual test/spike item to avoid broad scans.
 

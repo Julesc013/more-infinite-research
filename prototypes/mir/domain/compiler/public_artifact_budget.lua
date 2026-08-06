@@ -6,7 +6,8 @@ local LIMITS = {
   ["mir-generation-plan-public"] = 524288,
   ["mir-technology-catalog-public"] = 131072,
   ["mir-coverage-public"] = 131072,
-  ["mir-compiler-evidence-public"] = 131072
+  ["mir-compiler-evidence-public"] = 131072,
+  ["mir-research-cost-support-public"] = 16384
 }
 
 function M.limit(kind)
