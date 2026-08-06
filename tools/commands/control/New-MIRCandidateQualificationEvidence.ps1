@@ -113,7 +113,7 @@ $evidence = [pscustomobject][ordered]@{
       files = [int]$factorio.official_data.file_count
       sha256 = [string]$factorio.official_data.sha256
     }
-    installation_sha256 = [string]$factorio.sha256
+    installation_sha256 = [string]$factorio.installation_sha256
   }
   qualification = [pscustomobject][ordered]@{
     profile = [string]$plan.profile

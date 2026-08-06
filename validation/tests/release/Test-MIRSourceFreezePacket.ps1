@@ -99,8 +99,12 @@ if ([string]$packet.status -eq "prepared") {
   }
 } else {
   if ([string]$packet.candidate_id -ne "C32" -or [string]$release.candidate_id -ne "C32" -or
-      [string]$release.state -notin @("source-frozen", "package-built", "focused-qualified", "candidate-qualified")) {
-    throw "An admitted D1 packet must bind exact candidate C32 and a post-planning pre-manual state."
+      [string]$release.state -notin @(
+        "source-frozen", "package-built", "focused-qualified", "candidate-qualified",
+        "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged",
+        "published", "publicly-verified"
+      )) {
+    throw "An admitted D1 packet must bind exact candidate C32 and a valid post-planning state."
   }
   if ([string]$packet.qualification_authority.source_bound_plan.plan_material_sha256 -notmatch '^[A-F0-9]{64}$' -or
       [string]$packet.qualification_authority.source_bound_plan.required_test_set_sha256 -notmatch '^[A-F0-9]{64}$') {

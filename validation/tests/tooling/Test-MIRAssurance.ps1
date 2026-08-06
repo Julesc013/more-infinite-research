@@ -283,12 +283,14 @@ $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -notin @(
       "planned|not-assigned", "source-frozen|C32", "package-built|C32",
-      "focused-qualified|C32", "candidate-qualified|C32"
+      "focused-qualified|C32", "candidate-qualified|C32", "manually-accepted|C32",
+      "protected-qualified|C32", "sealed|C32", "promoted|C32", "tagged|C32",
+      "published|C32", "publicly-verified|C32"
     ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current pre-manual 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current 3.2.5 public upgrade authority."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
@@ -386,6 +388,34 @@ try {
   }
 } finally {
   if (Test-Path -LiteralPath $externalTreeRoot) { Remove-Item -LiteralPath $externalTreeRoot -Recurse -Force }
+}
+
+$factorioFingerprintRoots = @(
+  (Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-factorio-a-" + [guid]::NewGuid().ToString("N"))),
+  (Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-factorio-b-" + [guid]::NewGuid().ToString("N")))
+)
+try {
+  foreach ($factorioRoot in $factorioFingerprintRoots) {
+    $factorioBinaryDir = Join-Path $factorioRoot "bin/x64"
+    $factorioDataDir = Join-Path $factorioRoot "data/base"
+    New-Item -ItemType Directory -Force -Path $factorioBinaryDir, $factorioDataDir | Out-Null
+    [IO.File]::WriteAllText((Join-Path $factorioBinaryDir "factorio.exe"), "same-binary", [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $factorioDataDir "info.json"), "same-data", [Text.UTF8Encoding]::new($false))
+  }
+  $script:MIRAssuranceExternalFileFingerprintCache = @{}
+  $script:MIRAssuranceExternalTreeFingerprintCache = @{}
+  $factorioFingerprintA = Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath (Join-Path $factorioFingerprintRoots[0] "bin/x64/factorio.exe")
+  $factorioFingerprintB = Get-MIRAssuranceFactorioInstallationFingerprint -FactorioPath (Join-Path $factorioFingerprintRoots[1] "bin/x64/factorio.exe")
+  if ([string]$factorioFingerprintA.sha256 -ne [string]$factorioFingerprintB.sha256 -or
+      [string]$factorioFingerprintA.installation_sha256 -ne [string]$factorioFingerprintB.installation_sha256 -or
+      [string]$factorioFingerprintA.sha256 -ne [string]$factorioFingerprintA.installation_sha256 -or
+      [string]$factorioFingerprintA.legacy_installation_sha256 -eq [string]$factorioFingerprintB.legacy_installation_sha256) {
+    throw "Assurance Factorio installation identity is not path-independent with an explicit legacy alias."
+  }
+} finally {
+  foreach ($factorioRoot in $factorioFingerprintRoots) {
+    if (Test-Path -LiteralPath $factorioRoot) { Remove-Item -LiteralPath $factorioRoot -Recurse -Force }
+  }
 }
 
 $wrapper = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\assurance-full.yml")

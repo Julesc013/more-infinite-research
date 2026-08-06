@@ -84,8 +84,9 @@ if ($activeVersion -eq "3.2.5") {
   $removed = @($baselineByPath.Keys | Where-Object { -not $currentByPath.ContainsKey($_) } | Sort-Object)
   $changed = @($currentByPath.Keys | Where-Object { $baselineByPath.ContainsKey($_) -and $baselineByPath[$_] -cne $currentByPath[$_] } | Sort-Object)
   $policyPath = Join-Path $repo ".mir\control-plane\approved-delta-policies.json"
+  $portablePolicySha256 = Get-MIRCPPortableTextSha256 -Path $policyPath
   $bindings = @(
-    [pscustomobject]@{ id = "policy"; passed = ([string]$artifact.policy.id -eq [string]$policy.id -and [string]$artifact.policy.authority_sha256 -eq (Get-MIRCPSha256File -Path $policyPath)) },
+    [pscustomobject]@{ id = "policy"; passed = ([string]$artifact.policy.id -eq [string]$policy.id -and [string]$artifact.policy.authority_digest_policy -eq "utf8-lf" -and [string]$artifact.policy.authority_sha256 -eq $portablePolicySha256) },
     [pscustomobject]@{ id = "baseline"; passed = ([string]$baseline.archive_sha256 -eq [string]$policy.baseline.archive_sha256 -and [string]$baseline.content_sha256 -eq [string]$policy.baseline.content_sha256 -and [int64]$baseline.bytes -eq [int64]$policy.baseline.bytes -and [int]$baseline.entries -eq [int]$policy.baseline.entries) },
     [pscustomobject]@{ id = "candidate"; passed = ([string]$current.archive_sha256 -eq [string]$policy.candidate.archive_sha256 -and [string]$current.content_sha256 -eq [string]$policy.candidate.content_sha256 -and [int64]$current.bytes -eq [int64]$policy.candidate.bytes -and [int]$current.entries -eq [int]$policy.candidate.entries) },
     [pscustomobject]@{ id = "release-record"; passed = ([string]$activeRelease.candidate_id -eq "C32" -and [string]$activeRelease.package.source_commit -eq [string]$policy.candidate.source_commit -and [string]$activeRelease.package.archive_sha256 -eq [string]$current.archive_sha256 -and [string]$activeRelease.package.content_sha256 -eq [string]$current.content_sha256) },

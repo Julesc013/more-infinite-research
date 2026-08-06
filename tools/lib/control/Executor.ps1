@@ -1021,7 +1021,7 @@ function Invoke-MIRCPNativePatchDeltaMeasurement {
   $output = [pscustomobject][ordered]@{
     schema = 1
     kind = "mir-control-plane-v5-approved-patch-delta"
-    policy = [pscustomobject][ordered]@{id=[string]$policy.id;authority_sha256=(Get-MIRCPSha256File -Path $policyAuthorityPath);reason=[string]$policy.reason;migration_impact=[string]$policy.migration_impact;allowed_added_paths=@($policy.allowed_added_paths);allowed_removed_paths=@($policy.allowed_removed_paths);allowed_changed_paths=@($policy.allowed_changed_paths)}
+    policy = [pscustomobject][ordered]@{id=[string]$policy.id;authority_digest_policy="utf8-lf";authority_sha256=(Get-MIRCPPortableTextSha256 -Path $policyAuthorityPath);reason=[string]$policy.reason;migration_impact=[string]$policy.migration_impact;allowed_added_paths=@($policy.allowed_added_paths);allowed_removed_paths=@($policy.allowed_removed_paths);allowed_changed_paths=@($policy.allowed_changed_paths)}
     observation = [pscustomobject][ordered]@{
       baseline = [pscustomobject][ordered]@{version=[string]$baseline.version;source_commit=[string]$baselineAuthority.source_commit;archive_sha256=[string]$baseline.archive_sha256;content_sha256=[string]$baseline.content_sha256;bytes=[int64]$baseline.bytes;entries=[int]$baseline.entries}
       current = [pscustomobject][ordered]@{version=[string]$current.version;candidate_id=[string]$descriptor.candidate_id;source_commit=[string]$candidateAuthority.source_commit;qualification_source_commit=[string]$Source.commit;archive_sha256=[string]$current.archive_sha256;content_sha256=[string]$current.content_sha256;bytes=[int64]$current.bytes;entries=[int]$current.entries}
@@ -1036,7 +1036,8 @@ function Invoke-MIRCPNativePatchDeltaMeasurement {
     status = $taskStatus
     measurement_mode = "native-patch-delta-v1"
     policy_id = [string]$policy.id
-    policy_authority_sha256 = Get-MIRCPSha256File -Path $policyAuthorityPath
+    policy_authority_digest_policy = "utf8-lf"
+    policy_authority_sha256 = Get-MIRCPPortableTextSha256 -Path $policyAuthorityPath
     factorio_installation_sha256 = [string]$Factorio.installation_sha256
     factorio_binary_sha256 = [string]$Factorio.binary.sha256
     prior_archive_sha256 = [string]$baseline.archive_sha256

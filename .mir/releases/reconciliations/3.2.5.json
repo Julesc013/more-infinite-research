@@ -44,7 +44,7 @@
     ]
   },
   "boundaries": {
-    "release_state": "candidate-qualified",
+    "release_state": "manually-accepted",
     "candidate_floor": "C32",
     "candidate_id": "C32",
     "factorio_2_0_release_authority": "not-created",
@@ -68,7 +68,7 @@
   ],
   "priority": {
     "next_work_package": "325-D3",
-    "reason": "Exact C32 completed a fresh 135-row no-reuse candidate campaign with zero failed, incomplete, unexpected, or invalid rows; the bounded next action is exact-hash human playtest and maintainer go/no-go."
+    "reason": "The maintainer accepted exact C32 after playtesting; the bounded next action is a fresh Factorio 2.1.13 protected no-reuse campaign, seal, shadow cutover, and promotion."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
@@ -463,17 +463,18 @@
       ],
       "current_evidence": [
         "development-playtest-revision-5:development-evidence-only",
-        "dist/more-infinite-research_3.2.5.zip"
+        "dist/more-infinite-research_3.2.5.zip",
+        ".mir/evidence/3.2.5-manual-review-attestation.json"
       ],
       "remaining_gap": [
-        "Development proof cannot substitute for candidate-bound protected qualification or manual acceptance."
+        "Maintainer acceptance is complete; protected no-reuse qualification, seal, shadow equivalence, and promotion remain release-blocking."
       ],
       "package_visibility": "none-until-admitted",
       "target_disposition": {
-        "factorio_2_1": "C32 exists; exact qualification and human acceptance pending",
+        "factorio_2_1": "C32 candidate qualification and human acceptance complete; Factorio 2.1.13 protected qualification pending",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Run full fresh candidate-bound automated proof and paired performance, then stage exact C32 for human playtest and go/no-go."
+      "next_bounded_action": "Run exact C32 through the Factorio 2.1.13 protected no-reuse graph, then admit its seal and promotion proof."
     },
     {
       "id": "325-D4",

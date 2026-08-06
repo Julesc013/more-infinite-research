@@ -1,23 +1,27 @@
 {
   "schema": 1,
   "kind": "mir-interactive-review",
-  "status": "pending",
+  "status": "passed",
   "version": "3.2.5",
   "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
   "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
   "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
   "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
-  "reviewer": "",
-  "reviewed_at": "",
-  "captures": [],
-  "pending_gates": [
-    "settings-and-cost-examples",
-    "native-and-external-owner-behavior",
-    "configuration-change-progress-preservation",
-    "save-reload-idempotence",
-    "technology-tree-and-localization",
-    "bounded-support-output-and-privacy",
-    "selected-real-ecosystem-saves",
-    "maintainer-go-no-go"
-  ]
+  "reviewer": "Julesc013",
+  "reviewed_at": "2026-08-06T09:07:40.9699842Z",
+  "captures": [
+    {
+      "path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md",
+      "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"
+    },
+    {
+      "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+      "sha256": "3757CCDE1C66F83387CD2BBDD42215AFBDB5500B6A5423DD9DC467118A2E65AA"
+    },
+    {
+      "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+      "sha256": "F6A00AF928F94AFF361F8D38233B61283A3B99990248A74D7E22F3B924B97FBF"
+    }
+  ],
+  "disposition": "The maintainer manually playtested exact C32, reported that it looks good, requested no package-visible change, and authorized release progression."
 }

@@ -53,9 +53,9 @@
       "candidate_floor": "C32",
       "candidate_id": "C32",
       "candidate_qualification_evidence": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
-      "candidate_qualification_sha256": "B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E",
+      "candidate_qualification_sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
       "development_branch": "dev",
-      "manual_review": "pending",
+      "manual_review": "maintainer-patch-review-approved",
       "mir_version": "3.2.5",
       "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
       "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
@@ -68,10 +68,9 @@
       "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
       "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
       "protected_qualification": "pending",
-      "publication_status": "candidate-qualified",
-      "qualification": "candidate-qualified",
+      "publication_status": "manually-accepted",
+      "qualification": "manually-accepted",
       "remaining_obligations": [
-        "manual-acceptance",
         "protected-qualification",
         "seal",
         "promotion",
@@ -80,7 +79,6 @@
         "public-byte-verification"
       ],
       "remaining_states": [
-        "manually-accepted",
         "protected-qualified",
         "sealed",
         "promoted",
@@ -89,7 +87,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.3",
-      "status": "C32-candidate-qualified"
+      "status": "C32-manually-accepted"
     }
   },
   "generated_from": [
@@ -130,7 +128,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-05",
+  "updated_at": "2026-08-06",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

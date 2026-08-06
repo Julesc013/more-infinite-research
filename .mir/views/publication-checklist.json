@@ -10,7 +10,6 @@
   "publication_admitted": false,
   "release": "3.2.5",
   "remaining_states": [
-    "manually-accepted",
     "protected-qualified",
     "sealed",
     "promoted",
@@ -19,5 +18,5 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "candidate-qualified"
+  "state": "manually-accepted"
 }
