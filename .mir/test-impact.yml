@@ -73,6 +73,12 @@
       "tags": []
     },
     {
+      "pattern": "validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/commands/control/**",
       "groups": [],
       "scenarios": [],
