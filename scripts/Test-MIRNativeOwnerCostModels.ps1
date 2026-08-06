@@ -55,14 +55,15 @@ foreach ($contract in $contracts) {
 foreach ($prefix in @("ips-enable-%s", "ips-cost-base-%s", "ips-cost-growth-%s", "ips-max-level-%s", "ips-research-time-%s", "ips-effect-per-level-%s")) {
   if ($settingsManifest -notmatch [regex]::Escape($prefix)) { throw "Stable native-owner setting pattern missing: $prefix" }
 }
-foreach ($adapter in @('growth-to-level-times-base', 'base-times-growth-to-level-minus-one', 'recognized-fixed-count', 'unrecognized-external-formula')) {
+foreach ($adapter in @('target-native-', 'recognized-', 'recognized-fixed-count', 'unrecognized-external-formula', 'research_cost_model.with_overrides')) {
   if ($costModelSource -notmatch [regex]::Escape($adapter)) { throw "Native-owner formula adapter missing: $adapter" }
 }
-$costPairIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or growth\.changed' -and
+$costPairIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or linear_increment\.changed or growth\.changed' -and
   $bindingSource -match 'base = cost_changed and base\.value or nil' -and
+  $bindingSource -match 'linear_increment = cost_changed and linear_increment\.value or nil' -and
   $bindingSource -match 'growth = cost_changed and growth\.value or nil'
 if (-not $costPairIsAtomic) {
-  throw "Native-owner cost settings must activate the complete visible base/growth pair."
+  throw "Native-owner cost settings must activate the complete visible base/linear/growth tuple."
 }
 
 Write-Host "[ok] five Factorio 2.1 native-owner balance contracts and safe formula adapters passed."
