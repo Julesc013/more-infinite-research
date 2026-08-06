@@ -19,6 +19,7 @@ foreach ($token in @(
   "-SourceRepoRoot source", "-Stage release", "-ExcludeTask shadow.equivalence", "-Kind manual", "-AggregateTaskId qualification.full",
   "proof.integration_commit", "Qualification-source commit mismatch",
   "Build-MIRPackage.ps1 -OutputDir ../build/results/candidate", '$candidate = Join-Path "build/results/candidate"',
+  "Isolate nested source checkout from controller status", 'git rev-parse --git-path info/exclude', '-Value "/source/"',
   "Invoke-MIRControlPlane.ps1 backport", "Invoke-MIRControlPlane.ps1 seal", "-TaskId shadow.equivalence", "Invoke-MIRControlPlane.ps1 promotion",
   "MIR_PROTECTED_ENVIRONMENT: release-candidate", "MIR_TRUSTED_RUNNER: self-hosted-windows", "-TrustClass protected-release", "cancel-in-progress: false",
   "Download isolated immutable worker objects", "Import content-addressed worker objects deterministically", "-Operation import-workers",

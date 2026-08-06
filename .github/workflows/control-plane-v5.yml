@@ -88,6 +88,9 @@ jobs:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
           path: source
+      - name: Isolate nested source checkout from controller status
+        shell: pwsh
+        run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
       - name: Verify immutable source and package lock
         shell: pwsh
         env:
