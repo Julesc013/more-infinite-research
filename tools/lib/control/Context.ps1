@@ -442,7 +442,7 @@ function New-MIRCPVerificationContext {
     $registryContent = (($registry | ConvertTo-Json -Depth 100) + "`n").Replace("`r`n", "`n")
   }
   $registrySha256 = Get-MIRCPSha256Text -Value $registryContent
-  $targetProfilePath = Join-Path $sourceRepo "validation/profiles/factorio-$Target.json"
+  $targetProfilePath = Join-Path $repo "validation/profiles/factorio-$Target.json"
   $baseTargetProfile = Get-Content -Raw -LiteralPath $targetProfilePath | ConvertFrom-Json
   $targetProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseTargetProfile -ReleaseRecord $releaseRecord -RepoRoot $repo
   $targetProfileContent = (($targetProfile | ConvertTo-Json -Depth 40) + "`n").Replace("`r`n", "`n")
