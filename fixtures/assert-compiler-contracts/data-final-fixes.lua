@@ -977,11 +977,11 @@ local native_model = native_owner_cost_model.classify(
   {count_formula = "1.5^L*1000"},
   {target_native_formulas = {"1.5^L*1000"}}
 )
-if native_model.kind ~= "target-native-exponential" or native_model.base ~= 1000 or native_model.growth ~= 1.5 then
+if native_model.kind ~= "target-native-exponential" or native_model.base ~= 1500 or native_model.growth ~= 1.5 then
   fail("target native cost formula was not classified")
 end
 local configured_native = native_owner_cost_model.configure(native_model, {base = 2000, growth = 1.25})
-if not configured_native or configured_native.count_formula ~= "1.25^L*2000" then
+if not configured_native or configured_native.count_formula ~= "2000*1.25^(L-1)" then
   fail("target native cost formula was not configured deterministically")
 end
 local mir_model = native_owner_cost_model.classify({count_formula = "8000 * 2^(L-1)"}, {})
@@ -989,7 +989,7 @@ local configured_mir = native_owner_cost_model.configure(mir_model, {growth = 1.
 if not configured_mir or configured_mir.count_formula ~= "8000*1.1^(L-1)" then
   fail("MIR exponential cost formula was not configured deterministically")
 end
-local unrecognized_model = native_owner_cost_model.classify({count_formula = "1000 + 100 * L"}, {})
+local unrecognized_model = native_owner_cost_model.classify({count_formula = "1000 + 100 * L^2"}, {})
 local preserved_unrecognized = native_owner_cost_model.configure(unrecognized_model, {})
 if not preserved_unrecognized or preserved_unrecognized.changed then
   fail("unrecognized cost formula was not preserved by default")
