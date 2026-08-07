@@ -76,11 +76,13 @@ foreach ($token in @("fixed", "linear", "exponential", "hybrid")) {
 }
 
 $targets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/targets.json") | ConvertFrom-Json
-$target = $targets.profiles."1.1"
+$info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$targetLine = [string]$info.factorio_version
+$target = $targets.profiles.PSObject.Properties[$targetLine].Value
 if ($null -eq $target -or [bool]$target.prototype_shapes.mod_data -or
     [bool]$target.features.productivity_family_adoption -or [bool]$target.features.settings_profiles -or
     @($target.emitter_families | Where-Object { [string]$_ -ne "technology" }).Count -ne 0) {
-  throw "Factorio 1.1 must keep research costs on the reduced technology-only boundary."
+  throw "Factorio $targetLine must keep research costs on the reduced technology-only boundary."
 }
 
-Write-Host "[ok] unified Factorio 1.1 research-cost model, sixteen transitions, and reduced target boundaries passed."
+Write-Host "[ok] unified Factorio $targetLine research-cost model, sixteen transitions, and reduced target boundaries passed."
