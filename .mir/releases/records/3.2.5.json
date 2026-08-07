@@ -4,8 +4,8 @@
   "candidate_id": "C32",
   "candidate_floor": "C32",
   "target": "2.1",
-  "branch": "dev",
-  "state": "manually-accepted",
+  "branch": "main",
+  "state": "publicly-verified",
   "source_release": {
     "release": "3.2.3",
     "tag": "3.2.3",
@@ -118,6 +118,30 @@
         "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
         "digest_policy": "utf8-lf"
       }
+    ],
+    "tag": [
+      {
+        "kind": "annotated-tag",
+        "name": "3.2.5",
+        "commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+        "tag_object": "f97e10c19859297666f7f0014ee3d91d8cf4c254"
+      }
+    ],
+    "publication": [
+      {
+        "kind": "github-publication-under-release-specific-exception",
+        "path": ".mir/evidence/3.2.5-publication.json",
+        "sha256": "24FDBFDCC2D533706F32E3820290FEE8A660C8E25145728E65FBC33597DD1BF7",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "public_byte_verification": [
+      {
+        "kind": "public-asset-identity-and-exact-engine-smokes",
+        "path": ".mir/evidence/3.2.5-publication.json",
+        "sha256": "24FDBFDCC2D533706F32E3820290FEE8A660C8E25145728E65FBC33597DD1BF7",
+        "digest_policy": "utf8-lf"
+      }
     ]
   },
   "assurance_exceptions": [
@@ -142,10 +166,7 @@
     "normal-promotion-admission-reconciliation",
     "downstream-always-guard-correction",
     "transport-robustness-correction",
-    "stage-b-public-asset-audit",
-    "tag",
-    "publication",
-    "public-byte-verification"
+    "stage-b-public-asset-audit"
   ],
   "release_notes": "docs/releases/notes/release-notes-3.2.5.md",
   "incident_ids": [
@@ -156,5 +177,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-07T18:25:18.3882405Z"
+  "updated_at": "2026-08-07T18:47:23.6994556Z"
 }

@@ -77,9 +77,23 @@ if ($releaseBoundary -notin @(
     "package-built|C32",
     "focused-qualified|C32",
     "candidate-qualified|C32",
-    "manually-accepted|C32"
+    "manually-accepted|C32",
+    "publicly-verified|C32"
   )) {
   throw "Work-package reconciliation claims an unsupported release boundary: $releaseBoundary"
+}
+if ($releaseBoundary -eq "publicly-verified|C32") {
+  $exception = @($release.assurance_exceptions | Where-Object {
+    [string]$_.id -eq "C32-TIMEBOXED-PUBLICATION-2026-08-08" -and
+    [bool]$_.normal_gates_waived_for_publication_only -and
+    -not [bool]$_.generic_policy_changed -and
+    [string]$_.protected_qualification -eq "pending-post-publication" -and
+    [string]$_.protected_seal -eq "pending-post-publication"
+  })
+  if ($exception.Count -ne 1 -or @($release.proofs.publication).Count -ne 1 -or
+      @($release.proofs.public_byte_verification).Count -ne 1) {
+    throw "Publicly verified C32 requires its exact release-specific exception, publication proof, and public-byte verification while protected gates remain pending."
+  }
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json")) {
   throw "A forbidden 2.5.5 release authority exists."
@@ -215,13 +229,26 @@ if ($c31View.Count -ne 1 -or [string]$c31View[0].state -ne "package-built" -or
 }
 foreach ($releaseOnly in @("325-D2", "325-D3", "325-D4")) {
   $row = @($rows | Where-Object { $_.id -eq $releaseOnly })[0]
-  $allowedStatuses = switch ($releaseOnly) {
-    "325-D2" { @("blocked-by-prerequisite", "in-progress", "terminal") }
-    "325-D3" { @("blocked-by-prerequisite", "in-progress", "awaiting-manual-gate") }
-    default { @("blocked-by-prerequisite") }
+  $allowedStatuses = if ($releaseBoundary -eq "publicly-verified|C32") {
+    switch ($releaseOnly) {
+      "325-D2" { @("terminal") }
+      "325-D3" { @("in-progress-post-publication-debt") }
+      default { @("completed-under-release-specific-exception") }
+    }
+  } else {
+    switch ($releaseOnly) {
+      "325-D2" { @("blocked-by-prerequisite", "in-progress", "terminal") }
+      "325-D3" { @("blocked-by-prerequisite", "in-progress", "awaiting-manual-gate") }
+      default { @("blocked-by-prerequisite") }
+    }
+  }
+  $expectedD4Visibility = if ($releaseBoundary -eq "publicly-verified|C32") {
+    "frozen-public-bytes-no-mutation"
+  } else {
+    "none-until-admitted"
   }
   if ([string]$row.status -notin $allowedStatuses -or
-      ([string]$releaseOnly -eq "325-D4" -and [string]$row.package_visibility -ne "none-until-admitted")) {
+      ([string]$releaseOnly -eq "325-D4" -and [string]$row.package_visibility -ne $expectedD4Visibility)) {
     throw "$releaseOnly has advanced outside the governed freeze/qualification boundary."
   }
 }
@@ -230,4 +257,4 @@ if ([string]$d1.status -notin @("prepared-awaiting-admission", "terminal")) {
   throw "325-D1 has an unsupported freeze-packet state."
 }
 
-Write-Host "[ok] MIR 3.2.5 closes B0/B1, narrows the release contract, and preserves immutable development baselines without 2.5.5 or 3.3 authority."
+Write-Host "[ok] MIR 3.2.5 preserves its narrowed contract, immutable package identity, truthful release state, and retained protected obligations without 2.5.5 or 3.3 authority."

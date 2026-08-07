@@ -54,13 +54,13 @@ MIR 3.2.5 is the Factorio 2.1 unified research-cost and compatibility release af
 
 | Field | Value |
 | --- | --- |
-| State | `manually-accepted` |
+| State | `publicly-verified` |
 | Candidate | `C32` |
 | Package source commit | `a3bfbc4524b52cede425900e775384eb9c1fc4b3` |
 | Archive SHA-256 | `AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF` |
 | Content SHA-256 | `1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D` |
-| Tag | `pending` |
-| Tag commit | `pending` |
+| Tag | `3.2.5` |
+| Tag commit | `62fddd86b51db7c0238731815d15ca26a4b45857` |
 | Assurance exceptions | `C32-TIMEBOXED-PUBLICATION-2026-08-08` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

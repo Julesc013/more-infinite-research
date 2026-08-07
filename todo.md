@@ -8,7 +8,7 @@ Generated: 2026-08-07
 
 | Release | Candidate | Reserved floor | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.5` | `C32` | `C32` | `manually-accepted` | `protected-qualified` |
+| `3.2.5` | `C32` | `C32` | `publicly-verified` | `complete` |
 | `2.5.0` | `2.5-P11` | `pending` | `publicly-verified` | `complete` |
 
 ## Canonical execution programme

@@ -45,13 +45,13 @@
     "factorio-2.1": {
       "archive": "dist/more-infinite-research_3.2.5.zip",
       "archive_bytes": 1056249,
-      "archive_class": "frozen-unreleased-calibration-candidate",
+      "archive_class": "immutable-publicly-verified-release",
       "archive_entries": 301,
       "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
       "assurance_exception_ids": [
         "C32-TIMEBOXED-PUBLICATION-2026-08-08"
       ],
-      "branch": "dev",
+      "branch": "main",
       "candidate_floor": "C32",
       "candidate_id": "C32",
       "candidate_qualification_evidence": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
@@ -70,29 +70,21 @@
       "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
       "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
       "protected_qualification": "pending",
-      "publication_status": "manually-accepted",
-      "qualification": "manually-accepted",
+      "publication_status": "publicly-verified",
+      "qualification": "publicly-verified",
       "remaining_obligations": [
         "protected-qualification-post-publication",
         "protected-seal-and-reconciliation-post-publication",
         "normal-promotion-admission-reconciliation",
         "downstream-always-guard-correction",
         "transport-robustness-correction",
-        "stage-b-public-asset-audit",
-        "tag",
-        "publication",
-        "public-byte-verification"
+        "stage-b-public-asset-audit"
       ],
-      "remaining_states": [
-        "protected-qualified",
-        "sealed",
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
+      "remaining_states": [],
       "source_anchor": "3.2.3",
-      "status": "C32-manually-accepted"
+      "status": "C32-publicly-verified",
+      "tag": "3.2.5",
+      "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857"
     }
   },
   "generated_from": [

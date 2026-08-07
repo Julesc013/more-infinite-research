@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "mir-release-work-package-reconciliation",
   "release": "3.2.5",
-  "reconciled_at": "2026-08-05",
+  "reconciled_at": "2026-08-08",
   "source_baseline": {
     "commit": "b1144889386cf8bc5e7561bf6399d1127cfa74cb",
     "tree": "b2671260c6fb84b75dbd86ad43e9351842cb91bb",
@@ -35,16 +35,18 @@
       "development-playtest-revision-5",
       "latest-playtest-green",
       "latest-breadth-green",
-      "fresh-breadth-128-of-128",
+      "fresh-candidate-qualification-135-of-135",
       "base-and-space-age-exact-zip-loads",
       "five-direct-3.2.3-upgrade-archetypes",
       "sixteen-cost-transitions",
       "first-and-second-upgrade-reloads",
-      "hosted-exact-head-aggregate-green"
+      "exact-factorio-2.1.13-installation-verified",
+      "maintainer-playtest-accepted",
+      "github-public-asset-base-and-space-age-smokes"
     ]
   },
   "boundaries": {
-    "release_state": "manually-accepted",
+    "release_state": "publicly-verified",
     "candidate_floor": "C32",
     "candidate_id": "C32",
     "factorio_2_0_release_authority": "not-created",
@@ -64,11 +66,13 @@
     ".mir/lifecycle/changes/CHG-2026-0018.json",
     ".mir/lifecycle/changes/CHG-2026-0019.json",
     ".mir/research-cost-contract-3.2.5.json",
-    ".mir/releases/freezes/3.2.5-D1.json"
+    ".mir/releases/freezes/3.2.5-D1.json",
+    ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+    ".mir/evidence/3.2.5-publication.json"
   ],
   "priority": {
     "next_work_package": "325-D3",
-    "reason": "The maintainer accepted exact C32 after playtesting; the bounded next action is a fresh Factorio 2.1.13 protected no-reuse campaign, seal, shadow cutover, and promotion."
+    "reason": "Exact C32 is publicly verified under C32-TIMEBOXED-PUBLICATION-2026-08-08. Protected qualification, seal/reconciliation, and normal promotion admission remain post-publication debt without permitting any package change."
   },
   "scope_decision": {
     "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
@@ -449,12 +453,13 @@
     {
       "id": "325-D3",
       "category": "release",
-      "status": "in-progress",
+      "status": "in-progress-post-publication-debt",
       "required_product_surface": [
         "Focused, complete candidate, manual, protected no-reuse, seal, and shadow-equivalence proof for one immutable candidate."
       ],
       "current_implementation": [
-        "Candidate qualification, protected aggregate, seal, manual attestation, and shadow-evaluation machinery exists from prior releases."
+        "Fresh local candidate qualification passed 135 of 135 without reuse, the exact Factorio 2.1.13 installation was verified, and the maintainer accepted the exact C32 archive after playtesting.",
+        "Protected aggregate, seal, reconciliation, and shadow-evaluation machinery remains available for the retained post-publication work."
       ],
       "current_tests": [
         "validation/tests/release/Test-MIRManualReleaseReview.ps1",
@@ -462,48 +467,51 @@
         "validation/tests/tooling/Test-MIRControlPlaneShadow.ps1"
       ],
       "current_evidence": [
-        "development-playtest-revision-5:development-evidence-only",
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json",
         "dist/more-infinite-research_3.2.5.zip",
-        ".mir/evidence/3.2.5-manual-review-attestation.json"
+        ".mir/evidence/3.2.5-manual-review-attestation.json",
+        ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        ".mir/evidence/3.2.5-publication.json"
       ],
       "remaining_gap": [
-        "Maintainer acceptance is complete; protected no-reuse qualification, seal, shadow equivalence, and promotion remain release-blocking."
+        "Fresh protected GitHub qualification was not completed because both admitted attempts ended in external transport failure.",
+        "Protected qualification, seal/reconciliation, shadow equivalence, and normal promotion-admission reconciliation remain post-publication obligations."
       ],
-      "package_visibility": "none-until-admitted",
+      "package_visibility": "frozen-public-bytes-no-mutation",
       "target_disposition": {
-        "factorio_2_1": "C32 candidate qualification and human acceptance complete; Factorio 2.1.13 protected qualification pending",
+        "factorio_2_1": "C32 candidate qualification, exact-environment verification, maintainer acceptance, publication, and public-asset smokes complete; protected qualification and sealing pending post-publication",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Run exact C32 through the Factorio 2.1.13 protected no-reuse graph, then admit its seal and promotion proof."
+      "next_bounded_action": "Complete protected qualification and seal/reconciliation only against the exact published C32 identity; never modify or republish 3.2.5."
     },
     {
       "id": "325-D4",
       "category": "release",
-      "status": "blocked-by-prerequisite",
+      "status": "completed-under-release-specific-exception",
       "required_product_surface": [
         "Promote, tag, publish, re-download, rehash, and clean-room verify the exact sealed bytes."
       ],
       "current_implementation": [
-        "Promotion, tag, publication, public-byte verification, and generated status-view machinery exists from prior releases."
+        "Main fast-forward promotion, annotated tag 3.2.5, GitHub release publication, public-byte verification, and exact-engine Base and Space Age smoke verification are complete."
       ],
       "current_tests": [
         "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
         "validation/tests/release/Test-MIRBranchPolicy.ps1"
       ],
       "current_evidence": [
-        ".mir/releases/records/3.2.3.json",
-        ".mir/evidence/3.2.3-publication.json"
+        ".mir/releases/records/3.2.5.json",
+        ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        ".mir/evidence/3.2.5-publication.json"
       ],
       "remaining_gap": [
-        "325-D3 has not produced a non-revoked sealed 3.2.5 candidate.",
-        "No promotion, tag, publication, or public-byte action is authorized."
+        "Normal protected seal and promotion-admission reconciliation remains retained post-publication; the exception is not a protected seal."
       ],
-      "package_visibility": "none-until-admitted",
+      "package_visibility": "frozen-public-bytes-no-mutation",
       "target_disposition": {
-        "factorio_2_1": "blocked until sealed",
+        "factorio_2_1": "publicly verified under release-specific exact-byte exception with protected qualification and sealing pending post-publication",
         "factorio_2_0": "not applicable; no 2.5.5 authority"
       },
-      "next_bounded_action": "Take no publication action until 325-D3 is terminal and the sealed bytes are immutable."
+      "next_bounded_action": "Preserve tag and public asset immutably; perform only the retained post-publication reconciliation against the same bytes."
     }
   ]
 }

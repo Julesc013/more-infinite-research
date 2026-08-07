@@ -22,16 +22,9 @@
     "path:releases.current",
     "path:releases.records/3.2.5.json"
   ],
-  "publication_admitted": false,
+  "publication_admitted": true,
   "release": "3.2.5",
-  "remaining_states": [
-    "protected-qualified",
-    "sealed",
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
+  "remaining_states": [],
   "schema": 1,
-  "state": "manually-accepted"
+  "state": "publicly-verified"
 }
