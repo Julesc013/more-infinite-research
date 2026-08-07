@@ -35,10 +35,21 @@ $to = Resolve-MIRUpgradePath -Path $ToZip
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $factorioBinaryVersion = [string]$factorioVersionInfo.FileVersion
 if ([string]::IsNullOrWhiteSpace($factorioBinaryVersion)) {
-  $versionOutput = @(& $factorio --version 2>$null)
-  $versionLine = @($versionOutput | Where-Object { $_ -match '^Version:\s+([0-9.]+)' } | Select-Object -First 1)
-  if ($versionLine.Count -ne 1) { throw "Unable to resolve the exact Factorio binary version." }
-  $factorioBinaryVersion = ([regex]::Match([string]$versionLine[0], '^Version:\s+([0-9.]+)')).Groups[1].Value
+  $versionProcessInfo = [System.Diagnostics.ProcessStartInfo]::new()
+  $versionProcessInfo.FileName = $factorio
+  $versionProcessInfo.UseShellExecute = $false
+  $versionProcessInfo.CreateNoWindow = $true
+  $versionProcessInfo.RedirectStandardOutput = $true
+  $versionProcessInfo.RedirectStandardError = $true
+  [void]$versionProcessInfo.ArgumentList.Add("--version")
+  $versionProcess = [System.Diagnostics.Process]::Start($versionProcessInfo)
+  $versionOutput = $versionProcess.StandardOutput.ReadToEnd() + $versionProcess.StandardError.ReadToEnd()
+  $versionProcess.WaitForExit()
+  $versionMatch = [regex]::Match($versionOutput, '(?m)^Version:\s+([0-9.]+)')
+  if ($versionProcess.ExitCode -ne 0 -or -not $versionMatch.Success) {
+    throw "Unable to resolve the exact Factorio binary version."
+  }
+  $factorioBinaryVersion = $versionMatch.Groups[1].Value
 }
 $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
