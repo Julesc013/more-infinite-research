@@ -139,11 +139,15 @@ switch ($command) {
     if ($LASTEXITCODE -ne 0) { throw "Locale assurance failed." }
   }
   "balance" {
-    & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
-    if ($LASTEXITCODE -ne 0) { throw "Native-owner balance contract validation failed." }
+    if ([string]$context.info.factorio_version -in @("2.0", "2.1")) {
+      & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
+    } else {
+      & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+    }
+    if ($LASTEXITCODE -ne 0) { throw "Target balance contract validation failed." }
     $snapshot = [ordered]@{
       schema=1
-      target=$context.target
+      target=[string]$context.info.factorio_version
       version=[string]$context.info.version
       streams_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\streams.yml"))
       generated_stream_manifest_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"))

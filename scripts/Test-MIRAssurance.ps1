@@ -37,6 +37,11 @@ $evidenceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-e
 if ($evidenceClass.Count -ne 1 -or @($evidenceClass[0].tests) -notcontains "seal.verify") {
   throw "Release evidence must retain the seal verification gate."
 }
+
+$inventoryText = (& (Join-Path $RepoRoot "scripts\mir.ps1") assurance inventory 6>&1 | Out-String)
+if ($LASTEXITCODE -ne 0 -or -not $inventoryText.Contains('"schema": 2')) {
+  throw "MIR CLI failed to forward a one-argument assurance command as one token."
+}
 if (@($evidenceClass[0].patterns | Where-Object { ".mir/evidence/1.9.5-feature-classification.json" -match [string]$_ })) {
   throw "Pre-seal feature classification must not select seal verification."
 }
