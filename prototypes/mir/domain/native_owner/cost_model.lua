@@ -1,13 +1,10 @@
+local research_cost_classification = require("prototypes.mir.domain.research_cost.classification")
+local research_cost_model = require("prototypes.mir.domain.research_cost.model")
+
 local M = {}
 
 local function compact(value)
   return tostring(value or ""):gsub("%s+", "")
-end
-
-local function number_text(value)
-  local numeric = assert(tonumber(value), "native-owner cost value must be numeric")
-  if numeric == math.floor(numeric) then return tostring(math.floor(numeric)) end
-  return tostring(numeric)
 end
 
 local function target_formula(contract, formula)
@@ -18,37 +15,32 @@ local function target_formula(contract, formula)
   return false
 end
 
-function M.classify(unit, contract)
+function M.classify(unit, contract, options)
   unit = unit or {}
+  options = options or {}
   local formula = unit.count_formula
   if type(formula) == "string" and formula ~= "" then
-    local normalized = compact(formula)
-    local growth, base = normalized:match("^([%d%.]+)%^L%*([%d%.]+)$")
-    if growth and base then
+    local classified = research_cost_classification.formula(formula, options)
+    if classified.recognized then
+      local cost = classified.model
+      local native = target_formula(contract, formula)
       return {
-        kind = target_formula(contract, formula) and "target-native-exponential" or "recognized-exponential",
-        style = "growth-to-level-times-base",
+        kind = native and ("target-native-" .. cost.derived_kind)
+          or ("recognized-" .. cost.derived_kind),
+        style = classified.style,
         original_formula = formula,
-        base = tonumber(base),
-        growth = tonumber(growth)
+        base = cost.base_cost,
+        growth = cost.growth_factor,
+        linear_increment = cost.linear_increment,
+        anchor_level = cost.anchor_level,
+        research_cost_model = cost
       }
     end
-
-    base, growth = normalized:match("^([%d%.]+)%*([%d%.]+)%^%(L%-1%)$")
-    if base and growth then
-      return {
-        kind = target_formula(contract, formula) and "target-native-exponential" or "recognized-exponential",
-        style = "base-times-growth-to-level-minus-one",
-        original_formula = formula,
-        base = tonumber(base),
-        growth = tonumber(growth)
-      }
-    end
-
     return {
       kind = "unrecognized-external-formula",
       style = "preserve-only",
-      original_formula = formula
+      original_formula = formula,
+      reason = classified.reason
     }
   end
 
@@ -57,55 +49,72 @@ function M.classify(unit, contract)
       kind = "recognized-fixed-count",
       style = "fixed-count",
       original_count = unit.count,
-      base = unit.count
+      base = unit.count,
+      growth = 1,
+      linear_increment = 0,
+      anchor_level = research_cost_classification.anchor_level(options.technology_name, options.anchor_level),
+      research_cost_model = research_cost_model.new({
+        anchor_level = research_cost_classification.anchor_level(options.technology_name, options.anchor_level),
+        base_cost = unit.count,
+        linear_increment = 0,
+        growth_factor = 1,
+        provenance = {
+          base_cost = "external-fixed-count",
+          linear_increment = "external-fixed-count",
+          growth_factor = "external-fixed-count",
+          anchor_level = "technology-first-level"
+        }
+      })
     }
   end
 
-  return {
-    kind = "missing-cost-model",
-    style = "preserve-only"
-  }
+  return {kind = "missing-cost-model", style = "preserve-only"}
 end
 
-function M.configure(model, overrides)
+function M.configure(classified, overrides)
   overrides = overrides or {}
   local base_changed = overrides.base ~= nil
   local growth_changed = overrides.growth ~= nil
-  if not base_changed and not growth_changed then
+  local increment_changed = overrides.linear_increment ~= nil
+  if not base_changed and not growth_changed and not increment_changed then
     return {
       changed = false,
-      count = model.original_count,
-      count_formula = model.original_formula
+      count = classified.original_count,
+      count_formula = classified.original_formula,
+      model = classified.research_cost_model
     }
   end
 
-  if model.style == "fixed-count" then
-    if growth_changed then return nil, "fixed_count_has_no_growth_factor" end
-    return {
-      changed = true,
-      count = overrides.base,
-      count_formula = nil
-    }
+  if classified.style == "fixed-count" then
+    local configured = research_cost_model.with_overrides(classified.research_cost_model, {
+      base_cost = overrides.base,
+      linear_increment = overrides.linear_increment,
+      growth_factor = overrides.growth
+    }, {
+      base_cost = base_changed and "user-setting" or "external-fixed-count",
+      linear_increment = increment_changed and "user-setting" or "external-fixed-count",
+      growth_factor = growth_changed and "user-setting" or "external-fixed-count",
+      anchor_level = "technology-first-level"
+    })
+    if configured.derived_kind == "fixed" then
+      return {changed = true, count = configured.base_cost, count_formula = nil, model = configured}
+    end
+    return {changed = true, count = nil, count_formula = configured.count_formula, model = configured}
   end
 
-  if model.style ~= "growth-to-level-times-base"
-      and model.style ~= "base-times-growth-to-level-minus-one" then
-    return nil, "unrecognized_cost_formula"
-  end
+  if not classified.research_cost_model then return nil, "unrecognized_cost_formula" end
 
-  local base = overrides.base or model.base
-  local growth = overrides.growth or model.growth
-  local formula
-  if model.style == "growth-to-level-times-base" then
-    formula = number_text(growth) .. "^L*" .. number_text(base)
-  else
-    formula = number_text(base) .. "*" .. number_text(growth) .. "^(L-1)"
-  end
-  return {
-    changed = true,
-    count = nil,
-    count_formula = formula
-  }
+  local configured = research_cost_model.with_overrides(classified.research_cost_model, {
+    base_cost = overrides.base,
+    linear_increment = overrides.linear_increment,
+    growth_factor = overrides.growth
+  }, {
+    base_cost = base_changed and "user-setting" or "external-formula",
+    linear_increment = increment_changed and "user-setting" or "external-formula",
+    growth_factor = growth_changed and "user-setting" or "external-formula",
+    anchor_level = "technology-first-level"
+  })
+  return {changed = true, count = nil, count_formula = configured.count_formula, model = configured}
 end
 
 return M

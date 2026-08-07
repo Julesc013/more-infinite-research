@@ -299,6 +299,10 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   }
 }
 
+Invoke-RepoCheck "generated count formulas use the unified canonical research-cost model" {
+  & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "icon_mipmaps"
   if ($matches.Count -gt 0) {
