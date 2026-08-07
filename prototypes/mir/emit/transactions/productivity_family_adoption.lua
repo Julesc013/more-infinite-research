@@ -4,10 +4,11 @@ local native_owner_contract = require("prototypes.mir.domain.native_owner.contra
 local mod_data = require("prototypes.mir.emit.mod_data")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local transition_descriptor = require("prototypes.mir.domain.research_cost.transition_descriptor")
 
 local M = {}
 local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
-local VERSION = 2
+local VERSION = 3
 local function state()
   return compiler_context.current():state_view("productivity_family_adoption", function()
     return {bindings = {}, adopted_recipes = {}}
@@ -18,6 +19,10 @@ local function same(left, right)
   return tostring(left or "") == tostring(right or "")
 end
 
+local function cost_descriptor(model)
+  return model and transition_descriptor.from_model(model) or nil
+end
+
 local function record(plan)
   local bindings = state().bindings
   local adopted_productivity_family_recipes = state().adopted_recipes
@@ -26,8 +31,8 @@ local function record(plan)
     owner = plan.owner,
     operation = plan.operation,
     configured_fields = deepcopy(plan.configured_fields or {}),
-    input_unit = deepcopy((plan.input_snapshot and plan.input_snapshot.unit) or {}),
-    output_unit = deepcopy((plan.expected_snapshot and plan.expected_snapshot.unit) or {}),
+    input_descriptor = cost_descriptor(plan.cost_model and plan.cost_model.research_cost_model),
+    output_descriptor = cost_descriptor(plan.research_cost_model),
     input_fingerprint = plan.input_fingerprint,
     output_fingerprint = plan.output_fingerprint,
     effect_count = #(plan.effects or {})
@@ -110,6 +115,8 @@ local function signature()
       .. "|operation=" .. tostring(entry.operation)
       .. "|configured=" .. table.concat(entry.configured_fields or {}, ",")
       .. "|effects=" .. tostring(entry.effect_count)
+      .. "|input-cost=" .. tostring(entry.input_descriptor and entry.input_descriptor.semantic_digest or "unrecognized")
+      .. "|output-cost=" .. tostring(entry.output_descriptor and entry.output_descriptor.semantic_digest or "unrecognized")
       .. "|output=" .. tostring(entry.output_fingerprint))
   end
   table.sort(entries)

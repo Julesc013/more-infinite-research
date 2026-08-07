@@ -34,6 +34,68 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
 $info = Read-MIRText "info.json" | ConvertFrom-Json
+if ([string]$info.factorio_version -eq "2.0" -and [string]$info.version -eq "2.5.5") {
+  if ([string]$backport.mir_version -ne "2.5.5" -or [string]$backport.candidate_id -ne "2.5-P12" -or
+      [string]$backport.branch -ne "candidate/2.5.5-projection" -or [string]$backport.source_anchor -ne "C32" -or
+      [string]$backport.portable_source_commit -ne "a3bfbc4524b52cede425900e775384eb9c1fc4b3" -or
+      [string]$backport.prior_release -ne "2.5.0" -or [string]$backport.archive_class -ne "local-candidate" -or
+      [string]$backport.qualification -ne "local-candidate-qualification-running" -or
+      [string]$backport.protected_qualification -ne "pending-post-outage" -or
+      [string]$backport.publication_status -ne "local-candidate-qualification-running" -or
+      [string]$backport.status -ne "local-candidate-qualification-running" -or
+      [string]$backport.release_gate -ne "local-outage-qualification-required") {
+    throw "Factorio 2.0 authority must describe the exact running 2.5.5 P12 outage candidate without claiming a seal."
+  }
+  $sourceLock = Read-MIRText ".mir/backport-source-lock.json" | ConvertFrom-Json
+  if ([int]$sourceLock.schema -ne 5 -or [string]$sourceLock.mir_version -ne [string]$backport.mir_version -or
+      [string]$sourceLock.portable_source.commit -ne [string]$backport.portable_source_commit -or
+      [string]$sourceLock.projection.package_source_commit -ne [string]$backport.package_source_commit -or
+      [string]$sourceLock.projection.package_source_tree -ne [string]$backport.package_source_tree -or
+      [string]$sourceLock.projection.package_source_sha256 -ne [string]$backport.package_source_sha256 -or
+      [string]$sourceLock.projection.portable_delta_ledger -ne [string]$backport.portable_delta_ledger -or
+      [string]$sourceLock.candidate.archive_sha256 -ne [string]$backport.archive_sha256 -or
+      [string]$sourceLock.candidate.content_sha256 -ne [string]$backport.package_content_sha256) {
+    throw "The 2.5.5 release ledger and source lock disagree."
+  }
+  foreach ($commitField in @("portable_source_commit", "package_source_commit")) {
+    $commit = [string]$backport.$commitField
+    if ($commit -notmatch '^[0-9a-f]{40}$') { throw "2.5.5 $commitField must be a full lowercase Git commit." }
+    & git -C $repo cat-file -e "$commit`^{commit}"
+    if ($LASTEXITCODE -ne 0) { throw "2.5.5 $commitField is unavailable: $commit" }
+  }
+  & git -C $repo merge-base --is-ancestor ([string]$backport.package_source_commit) HEAD
+  if ($LASTEXITCODE -ne 0) { throw "The 2.5.5 package source is not an ancestor of qualification HEAD." }
+
+  . (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $packageChanges = @(& git -C $repo diff --name-only ([string]$backport.package_source_commit) HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -gt 0) {
+    throw "Package-visible paths changed after the 2.5.5 package source: $($packageChanges -join ', ')"
+  }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$backport.package_source_sha256) {
+    throw "Current package roots do not reproduce the 2.5.5 package-source identity."
+  }
+  $candidatePath = Join-Path $repo ([string]$backport.archive)
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw "The 2.5.5 candidate archive is absent." }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidatePath)
+  try { $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count } finally { $candidateZip.Dispose() }
+  if ((Get-Item -LiteralPath $candidatePath).Length -ne [long]$backport.archive_bytes -or
+      $candidateEntries -ne [int]$backport.archive_entries -or
+      (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$backport.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$backport.package_content_sha256) {
+    throw "The 2.5.5 candidate archive no longer matches canonical authority."
+  }
+  $distributions = Read-MIRText ".mir/distributions.json" | ConvertFrom-Json
+  $distributionRows = @($distributions.distributions)
+  if ([int]$distributions.distribution_count -ne $distributionRows.Count -or
+      @($distributionRows | Where-Object { [string]$_.version -eq "2.5.5" }).Count -ne 0 -or
+      @($distributionRows | Where-Object { [string]$_.version -eq "2.5.0" }).Count -ne 1) {
+    throw "Unqualified 2.5.5 bytes must remain outside dist while the 2.5.0 predecessor stays inventoried."
+  }
+  Write-Host "[ok] MIR 2.5.5 P12 candidate authority is exact, unsealed, package-frozen, and pending outage qualification."
+  return
+}
 if ([string]$info.factorio_version -eq "2.0") {
   if ([string]$info.version -ne "2.5.0" -or [string]$backport.mir_version -ne "2.5.0" -or
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or

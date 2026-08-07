@@ -1,20 +1,20 @@
 {
   "schema": 2,
-  "release": "2.5.0",
+  "release": "2.5.5",
   "factorio_line": "2.0",
   "factorio_version": "2.0.77",
   "baseline": {
-    "version": "2.4.9",
-    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
-    "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
-  },
-  "candidate": {
-    "candidate_id": "2.5-P11",
     "version": "2.5.0",
-    "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
-    "package_source_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
     "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
     "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1"
+  },
+  "candidate": {
+    "candidate_id": "2.5-P12",
+    "version": "2.5.5",
+    "package_source_commit": "689940f436b004cf4e5981f1944ddb04eaa17367",
+    "package_source_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+    "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"
   },
   "run_policy": {
     "warmup_runs": 1,
@@ -23,6 +23,7 @@
   },
   "manual_scenarios": "fixtures/compat-matrix/local-library-scenarios-2.0.json",
   "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_policy": "omitted-by-capability",
   "artifact_volume_lanes": [
     "diagnostics-off.factorio-total",
     "diagnostics-on.factorio-total"

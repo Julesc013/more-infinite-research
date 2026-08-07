@@ -266,16 +266,26 @@ function Test-MIRRuntimePerformanceEvidence {
     }
   }
 
-  if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
-      [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
+  $targetManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\targets.json') | ConvertFrom-Json
+  $targetLine = [string]$candidateInfo.factorio_version
+  $targetProfile = $targetManifest.profiles.PSObject.Properties[$targetLine].Value
+  $volumeMeasurements = @($evidence.artifact_volume.measurements)
+  $artifactVolumeOmitted = $targetProfile.prototype_shapes.mod_data -eq $false
+  if ($artifactVolumeOmitted) {
+    if ([int]$evidence.artifact_volume.telemetry_schema -ne 0 -or
+        [string]$evidence.artifact_volume.aggregation -ne 'omitted-by-capability' -or
+        [string]$evidence.artifact_volume.capability -ne 'mod_data' -or $volumeMeasurements.Count -ne 0) {
+      throw "Runtime performance evidence does not truthfully record the target's mod-data capability omission."
+    }
+  } elseif ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
+            [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
     throw "Runtime performance evidence lacks the governed artifact-volume aggregation."
   }
-  $volumeMeasurements = @($evidence.artifact_volume.measurements)
   $volumeSurfaces = @($volumeMeasurements | ForEach-Object { [string]$_.surface })
   $actualVolumeSurfaces = (@($volumeSurfaces | Sort-Object) -join "`n")
   $expectedVolumeSurfaces = (@("diagnostics-off", "diagnostics-on") | Sort-Object) -join "`n"
-  if ($actualVolumeSurfaces -ne $expectedVolumeSurfaces -or
-      @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+  if (-not $artifactVolumeOmitted -and ($actualVolumeSurfaces -ne $expectedVolumeSurfaces -or
+      @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0)) {
     throw "Runtime performance evidence must contain exactly diagnostics-off and diagnostics-on artifact-volume measurements."
   }
   $performancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance.yml")

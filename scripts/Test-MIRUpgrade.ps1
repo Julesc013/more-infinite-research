@@ -199,7 +199,7 @@ $assertions = if ($Archetype) {
     "startup-profile-retained",
     "technology-level-retained",
     "current-research-retained",
-    "fractional-research-progress-retained",
+    "completed-research-unit-work-retained",
     "fixture-storage-retained",
     "exact-candidate-normal-mod-directory-load"
   )

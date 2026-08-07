@@ -166,10 +166,11 @@ if finalized_artifacts then
       }
     end
   end
-elseif mods and mods["more-infinite-research"] == "2.4.9" then
-  -- The frozen 2.4.9 registry has already left its mutable construction lifetime
-  -- by data-final-fixes. Reconstruct the exact public identity projection from
-  -- its stable technology-name contract instead of reopening that registry.
+elseif mods and (mods["more-infinite-research"] == "2.4.9"
+    or mods["more-infinite-research"] == "2.5.5") then
+  -- The frozen 2.4.9 registry and the 2.5.5 no-mod-data target adapter have no
+  -- finalized public compiler artifact here. Reconstruct the exact comparison
+  -- projection from stable technology names instead of reopening compiler state.
   local base_continuations = {
     ["braking-force-8"] = "braking-force",
     ["inserter-capacity-bonus-8"] = "inserter-capacity-bonus",

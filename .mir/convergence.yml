@@ -1,11 +1,11 @@
 schema: 1
 
 release:
-  version: "2.5.0"
-  branch: tmp/2.0
+  version: "2.5.5"
+  branch: candidate/2.5.5-projection
   factorio_version: "2.0"
-  baseline_commit: 7ebe93029695bbf809a15a14c6540530738a9e62
-  baseline_tag: "2.4.9"
+  baseline_commit: bea21b068fb38dc26479b619454e50d5b4cf4793
+  baseline_tag: "2.5.0"
   objective: target-port-behavioral-subset
   public_contract_change: minor-compatible
 

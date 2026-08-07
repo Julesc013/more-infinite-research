@@ -1,6 +1,7 @@
 local M = {}
 M.requires_features = {"productivity_family_adoption"}
 local runtime_state = require("prototypes.mir.runtime.state")
+local transition_descriptor = require("prototypes.mir.domain.research_cost.transition_descriptor")
 
 local ADOPTION_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 
@@ -27,8 +28,8 @@ local function current_adoption_state()
   local bindings = {}
   for _, binding in ipairs(data.bindings or {}) do
     bindings[tostring(binding.owner)] = {
-      input_unit = binding.input_unit or {},
-      output_unit = binding.output_unit or {}
+      input_descriptor = binding.input_descriptor,
+      output_descriptor = binding.output_descriptor
     }
   end
   return {
@@ -39,36 +40,28 @@ local function current_adoption_state()
   }
 end
 
-local function compact(value)
-  return tostring(value or ""):gsub("%s+", "")
-end
-
-local function research_unit_count(unit, level)
-  if type(unit) ~= "table" then return nil end
-  if type(unit.count) == "number" then return math.floor(unit.count) end
-  local formula = compact(unit.count_formula)
-  local growth, base = formula:match("^([%d%.]+)%^L%*([%d%.]+)$")
-  if growth and base then return math.floor(tonumber(growth) ^ level * tonumber(base)) end
-  base, growth = formula:match("^([%d%.]+)%*([%d%.]+)%^%(L%-1%)$")
-  if base and growth then return math.floor(tonumber(base) * tonumber(growth) ^ (level - 1)) end
-  return nil
-end
-
-local function restore_current_research_progress(previous_bindings, current_bindings)
+local function retain_engine_normalized_current_research_progress(previous_bindings, current_bindings)
   for _, force in pairs(game.forces) do
     local technology = force.current_research
     local current = technology and current_bindings[technology.name]
     if current then
-      local previous = previous_bindings[technology.name] or {output_unit = current.input_unit}
-      local previous_count = research_unit_count(previous.output_unit, technology.level)
-      local current_count = research_unit_count(current.output_unit, technology.level)
-      if previous_count and current_count and previous_count > 0 and current_count > 0
-          and previous_count ~= current_count then
-        local before = force.research_progress
-        local restored = math.max(0, math.min(1, before * current_count / previous_count))
-        force.research_progress = restored
-        log("[more-infinite-research] Preserved current research progress for native owner "
-          .. technology.name .. " from " .. tostring(before) .. " to " .. tostring(restored) .. ".")
+      local previous = previous_bindings[technology.name] or {}
+      local progress = force.research_progress
+      local previous_cost, previous_error = transition_descriptor.evaluate(previous.output_descriptor, technology.level)
+      local current_cost, current_error = transition_descriptor.evaluate(current.output_descriptor, technology.level)
+      if previous_cost and current_cost and previous_cost ~= current_cost then
+        log("[more-infinite-research] Retained Factorio-normalized current research progress for native owner "
+          .. technology.name .. " at " .. tostring(progress)
+          .. " after realized cost " .. tostring(previous_cost)
+          .. " -> " .. tostring(current_cost) .. "; no second conversion was applied.")
+      elseif previous.output_descriptor and (not previous_cost or not current_cost) then
+        log("[more-infinite-research] Left Factorio-normalized current research progress unchanged for native owner "
+          .. technology.name .. " because descriptor evaluation was unavailable: "
+          .. tostring(previous_error or current_error) .. ".")
+      elseif not previous.output_descriptor then
+        log("[more-infinite-research] Retained Factorio-normalized current research progress for native owner "
+          .. technology.name .. " at " .. tostring(progress)
+          .. "; the prior adoption schema has no exact output descriptor, so no second conversion was applied.")
       end
     end
   end
@@ -104,7 +97,7 @@ function M.on_configuration_changed()
     return
   end
 
-  restore_current_research_progress(previous_bindings, current.bindings)
+  retain_engine_normalized_current_research_progress(previous_bindings, current.bindings)
   state.version = current.version
   state.adopted_count = current.count
   state.bindings = current.bindings

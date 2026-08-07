@@ -2255,3 +2255,27 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.5.0-release-notes
+  - path: docs/releases/2.5.5-offline-candidate.md
+    title: "MIR 2.5.5 Offline Candidate"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.5-candidate-identity
+  - path: docs/releases/2.5.5-playtest-guide.md
+    title: "MIR 2.5.5 P12 Playtest Guide"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.5-playtest-order
+  - path: docs/releases/notes/release-notes-2.5.5.md
+    title: "MIR 2.5.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.5-release-notes

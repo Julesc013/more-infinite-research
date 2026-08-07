@@ -1,4 +1,25 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.5
+Date: 2026-08-07
+
+  Changes:
+
+    - Added per-level linear increments for fixed, linear, exponential, and hybrid research-cost curves.
+    - Added bounded target-native research-cost transition descriptors for Factorio 2.0.
+    - Preserved the established Factorio 2.0 compiler, settings, stream, and package capability profile.
+
+  Bugfixes:
+
+    - Preserved completed science-unit work when research-cost settings change.
+    - Preserved 2.5.0 neutral defaults, base-continuation anchors, and historical numeric precision.
+    - Rejected malformed or unknown transition descriptors without resetting unrelated force state.
+
+  Compatibility:
+
+    - Projected the MIR 3.2.5 cost contract onto Factorio 2.0 without requiring Factorio 2.1 mod-data prototypes.
+    - Kept unsupported productivity-family adoption compiled out under the Factorio 2.0 target profile.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.5.0
 Date: 2026-08-01
 

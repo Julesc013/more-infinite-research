@@ -611,12 +611,109 @@ function Test-ExactBackportAdoptionShapeCleanup {
   return (Get-CanonicalJson -Value $Before) -eq '{"kind":"object","fields":{"count_formula":"string","ingredients":{"kind":"table","bounded":true},"time":"number"}}'
 }
 
+function Get-MIR255DifferenceDisposition {
+  param([string]$Path, $Before, $After)
+
+  $evidence = @("exact 2.5.0 to 2.5.5 runtime delta", "2.5.0 direct-upgrade matrix", "2.5.5 target disposition ledger")
+  if ($Path -eq 'package.version' -and [string]$Before -eq '2.5.0' -and [string]$After -eq '2.5.5') {
+    return [ordered]@{ reason='The package version advances from the published 2.5.0 predecessor to 2.5.5.'; intentional=$true; migration_impact='Factorio performs the governed direct package upgrade.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.archive_sha256' -and [string]$Before -eq '65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1' -and [string]$After -eq '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C') {
+    return [ordered]@{ reason='The archive identity changes to the deterministic 2.5.5 P12 package.'; intentional=$true; migration_impact='Package custody changes; semantic differences are classified separately.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.package_content_sha256' -and [string]$Before -eq '5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1' -and [string]$After -eq '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154') {
+    return [ordered]@{ reason='The normalized package content advances to the exact 2.5.5 projection.'; intentional=$true; migration_impact='All behavioral differences remain independently classified.'; required_evidence=$evidence }
+  }
+  if ($Path -match '^package\.(runtime_source_fingerprints\.prototypes/mir/runtime/productivity_family_adoption\.lua|settings_source_fingerprints\.prototypes/mir/settings/(catalog|cost_contract|defaults|registry|stage_builder)\.lua)$' -and
+      ($null -eq $Before -or [string]$Before -match '^[0-9A-F]{64}$') -and [string]$After -match '^[0-9A-F]{64}$') {
+    return [ordered]@{ reason='The governed cost contract and target adoption adapter sources advance to the 3.2.5 semantic projection.'; intentional=$true; migration_impact='Unified cost behavior and the target-2.0 compiled-out adoption boundary are verified separately.'; required_evidence=$evidence }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.active_mods\.more-infinite-research$' -and [string]$Before -eq '2.5.0' -and [string]$After -eq '2.5.5') {
+    return [ordered]@{ reason='The scenario binds the exact predecessor and candidate package versions.'; intentional=$true; migration_impact='Package version transition only.'; required_evidence=$evidence }
+  }
+  $removedContracts = @(
+    'more-infinite-research-compiler-evidence', 'more-infinite-research-compiler-evidence-internal',
+    'more-infinite-research-coverage-report', 'more-infinite-research-coverage-report-internal',
+    'more-infinite-research-generation-plan', 'more-infinite-research-generation-plan-internal',
+    'more-infinite-research-productivity-family-adoption', 'more-infinite-research-technology-catalog',
+    'more-infinite-research-technology-catalog-internal'
+  )
+  if ($Path -match '^scenarios\.[^.]+\.mod_data_contracts\.(?<contract>[^.]+)$' -and
+      $removedContracts -contains $Matches.contract -and $null -ne $Before -and $null -eq $After) {
+    return [ordered]@{ reason='Factorio 2.0 uses the bounded log/report adapter and emits no unsupported mod-data contract.'; intentional=$true; migration_impact='Diagnostics move to the documented target log transport; save and prototype identities are unaffected.'; required_evidence=@('target log/report transport fixture', 'target profile compiled-out assertion', 'exact 2.5.0 to 2.5.5 runtime delta') }
+  }
+  if ($Path -match '^scenarios\.[^.]+\.settings\.ips-cost-linear-increment-research_[a-z0-9_]+$' -and
+      $null -eq $Before -and [string]$After.value_type -eq 'number' -and [double]$After.current_value -eq 0) {
+    return [ordered]@{ reason='2.5.5 adds the neutral-default linear cost increment setting for every governed research stream.'; intentional=$true; migration_impact='Existing exponential behavior is unchanged until a player selects a non-zero linear increment.'; required_evidence=@('unified cost-model static proof', 'all sixteen curve transitions', '2.5.0 direct-upgrade matrix') }
+  }
+  $nativeLinearSettings = @(
+    'mir-cost-linear-increment-braking-force', 'mir-cost-linear-increment-inserter-capacity-bonus',
+    'mir-cost-linear-increment-laser-shooting-speed', 'mir-cost-linear-increment-research-speed',
+    'mir-cost-linear-increment-weapon-shooting-speed', 'mir-cost-linear-increment-worker-robots-storage'
+  )
+  if ($Path -match '^scenarios\.[^.]+\.settings\.(?<setting>mir-cost-linear-increment-[a-z0-9-]+)$' -and
+      $nativeLinearSettings -contains $Matches.setting -and $null -eq $Before -and
+      [string]$After.value_type -eq 'number' -and [double]$After.current_value -eq 0) {
+    return [ordered]@{ reason='2.5.5 adds the neutral-default linear cost increment for each governed native infinite research.'; intentional=$true; migration_impact='Native continuation costs retain the predecessor curve until explicitly configured.'; required_evidence=@('native cost contract fixture', 'all sixteen curve transitions', 'configuration-change progress preservation') }
+  }
+  $formulaRows = [ordered]@{
+    'braking-force-8' = @('115*1.33333^(L-1)', '861.51212960553*1.33333^(L-8)')
+    'inserter-capacity-bonus-8' = @('200*3.33333^(L-1)', '914488.340211249*3.33333^(L-8)')
+    'laser-shooting-speed-8' = @('60*1.5^(L-1)', '1025.15625*1.5^(L-8)')
+    'research-speed-7' = @('60*1.5^(L-1)', '683.4375*1.5^(L-7)')
+    'weapon-shooting-speed-7' = @('60*1.5^(L-1)', '683.4375*1.5^(L-7)')
+    'worker-robots-storage-4' = @('200*1.5^(L-1)', '675*1.5^(L-4)')
+  }
+  if ($Path -match '^scenarios\.[^.]+\.technologies\.(?<technology>[^.]+)\.count_formula$' -and
+      $formulaRows.Contains($Matches.technology)) {
+    $expected = $formulaRows[$Matches.technology]
+    if ([string]$Before -eq $expected[0] -and [string]$After -eq $expected[1]) {
+      return [ordered]@{ reason='2.5.5 rebases the native continuation formula at its controlled anchor while preserving the exact historical coefficient.'; intentional=$true; migration_impact='Completed science-unit work and continuation progression are preserved across configuration change and reload.'; required_evidence=@('native cost contract fixture', 'configuration-change progress preservation', 'first and second reload proof') }
+    }
+  }
+  $nativeOwners = @('low-density-structure-productivity','plastic-bar-productivity','processing-unit-productivity','rocket-fuel-productivity','steel-plate-productivity')
+  if ($Path -match '^scenarios\.(approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technologies\.(?<owner>[^.]+)$' -and
+      $nativeOwners -contains $Matches.owner -and $null -ne $Before -and [string]$Before.name -eq $Matches.owner -and $null -eq $After) {
+    return [ordered]@{ reason='The Factorio 2.0 target compiles out modern productivity-family adoption instead of mutating an external native owner.'; intentional=$true; migration_impact='Unsupported adoption is omitted; governed MIR-owned replacements appear only in the explicit adoption fixture.'; required_evidence=@('target profile adoption exclusion', 'native-owner fixture', 'one-owner invariant') }
+  }
+  $replacementKeys = @('low_density_structure','plastic','processing_unit','rocket_fuel','steel')
+  if ($Path -match '^scenarios\.approved-delta-native-owner-adoption\.technologies\.recipe-prod-research_(?<key>[a-z_]+)-1$' -and
+      $replacementKeys -contains $Matches.key -and $null -eq $Before -and
+      [string]$After.name -eq "recipe-prod-research_$($Matches.key)-1" -and
+      [string]$After.count_formula -eq '8000*2^(L-1)' -and [string]$After.maximum_level -eq 'infinite' -and $After.upgrade -eq $true) {
+    return [ordered]@{ reason='With adoption compiled out, the explicit target fixture receives the exact governed MIR-owned productivity stream.'; intentional=$true; migration_impact='Stable MIR identities replace unsupported external-owner adoption without duplicate ownership.'; required_evidence=@('native-owner fixture', 'generated registry integrity', 'one-owner invariant') }
+  }
+  if ($Path -match '^scenarios\.approved-delta-native-owner-adoption\.generated_registry\.recipe-prod-research_(?<key>[a-z_]+)-1$' -and
+      $replacementKeys -contains $Matches.key -and $null -eq $Before -and
+      [string]$After.name -eq "recipe-prod-research_$($Matches.key)-1" -and [string]$After.key -eq "research_$($Matches.key)" -and [string]$After.kind -eq 'stream') {
+    return [ordered]@{ reason='The target registry records the exact stable MIR-owned replacement identity.'; intentional=$true; migration_impact='No existing MIR stable identity is renamed or reused.'; required_evidence=@('generated registry integrity', 'stable-ID inventory', 'native-owner fixture') }
+  }
+  if ($Path -match '^scenarios\.(?<scenario>approved-delta-compat-space-age-galore|approved-delta-native-owner-adoption|approved-delta-space-age)\.technology_ids$') {
+    $beforeIds = @($Before | ForEach-Object { [string]$_ })
+    $afterIds = @($After | ForEach-Object { [string]$_ })
+    $removed = @($beforeIds | Where-Object { $afterIds -notcontains $_ } | Sort-Object)
+    $added = @($afterIds | Where-Object { $beforeIds -notcontains $_ } | Sort-Object)
+    $expectedRemoved = @($nativeOwners | Sort-Object)
+    $expectedAdded = if ($Matches.scenario -eq 'approved-delta-native-owner-adoption') {
+      @($replacementKeys | ForEach-Object { "recipe-prod-research_$($_)-1" } | Sort-Object)
+    } else { @() }
+    if (($removed -join '|') -eq ($expectedRemoved -join '|') -and ($added -join '|') -eq ($expectedAdded -join '|')) {
+      return [ordered]@{ reason='The exact technology identity set reflects the target-2.0 adoption omission and governed replacement policy.'; intentional=$true; migration_impact='Only the five explicitly classified owner identities change; all other stable IDs remain fixed.'; required_evidence=@('exact technology identity delta', 'target omission inventory', 'native-owner fixture') }
+    }
+  }
+  return $null
+}
+
 function Get-DifferenceDisposition {
   param(
     [Parameter(Mandatory)][string]$Path,
     $Before,
     $After
   )
+  if ($script:IsFactorio20DotFiveReleaseDelta) {
+    $mir255Disposition = Get-MIR255DifferenceDisposition -Path $Path -Before $Before -After $After
+    if ($null -ne $mir255Disposition) { return $mir255Disposition }
+  }
   if ($script:IsFactorio20BackportDelta -and (Test-ExactP11PlatformSettingAddition -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
       reason = "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment."
@@ -890,9 +987,23 @@ if ($baselineContract.factorio_version -ne $currentContract.factorio_version) {
 }
 $script:IsFactorio20BackportDelta = $baselineContract.version -eq '2.4.9' -and
   $currentContract.version -eq '2.5.0' -and $currentContract.factorio_version -eq '2.0'
+$script:IsFactorio20DotFiveReleaseDelta = $baselineContract.version -eq '2.5.0' -and
+  $currentContract.version -eq '2.5.5' -and $currentContract.factorio_version -eq '2.0'
 $targetAuthorityKey = "factorio-$($currentContract.factorio_version)"
 $releaseAuthority = $releaseLedger.development.$targetAuthorityKey
 $baselineAuthority = $releaseLedger.published_baselines.$targetAuthorityKey
+if ($script:IsFactorio20DotFiveReleaseDelta) {
+  $baselineTagCommit = (& git -C $repo rev-parse '2.5.0^{}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $baselineTagCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "Approved-delta export requires the immutable local 2.5.0 predecessor tag."
+  }
+  $baselineAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.0'
+    tag_commit = $baselineTagCommit
+    archive_sha256 = $baselineContract.archive_sha256
+    package_content_sha256 = $baselineContract.package_content_sha256
+  }
+}
 if ($null -eq $releaseAuthority -or $null -eq $baselineAuthority) {
   throw "Approved-delta release authority is absent for $targetAuthorityKey."
 }

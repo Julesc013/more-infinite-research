@@ -71,6 +71,14 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$info.
     -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line)) {
   throw "Performance campaign authority must match the active MIR and Factorio target in info.json."
 }
+$targetManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\targets.json') | ConvertFrom-Json
+$targetProfile = $targetManifest.profiles.PSObject.Properties[[string]$campaign.factorio_line].Value
+$artifactVolumePolicy = [string]$campaign.artifact_volume_policy
+if ($artifactVolumePolicy -notin @('required', 'omitted-by-capability') -or
+    ($artifactVolumePolicy -eq 'omitted-by-capability' -and
+      ($targetProfile.prototype_shapes.mod_data -ne $false -or @($campaign.phase_lanes).Count -ne 0))) {
+  throw "Performance campaign artifact-volume policy disagrees with the target capability profile."
+}
 if ([string]$manifest.release -ne [string]$campaign.release -or
     [string]$manifest.factorio_line -ne [string]$campaign.factorio_line) {
   throw "Performance budget authority must match the active performance campaign target."
@@ -196,7 +204,7 @@ foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures
   }
 }
 $probeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\performance-regression-probe\data.lua")
-foreach ($version in @("2.4.9", "2.5.0")) {
+foreach ($version in @([string]$campaign.baseline.version, [string]$campaign.candidate.version)) {
   if ($probeSource -notmatch [regex]::Escape($version)) {
     throw "Performance probe does not govern release-pair version '$version'."
   }

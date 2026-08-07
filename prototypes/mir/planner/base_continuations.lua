@@ -20,6 +20,8 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
+local research_cost_model = require("prototypes.mir.domain.research_cost.model")
+local cost_contract = require("prototypes.mir.settings.cost_contract")
 
 local M = {}
 
@@ -82,6 +84,12 @@ local function format_number(value)
     return tostring(math.floor(value + 0.5))
   end
   return string.format("%.6g", value)
+end
+
+local function legacy_formula_number(value)
+  local numeric = tonumber(format_number(value))
+  if not numeric then error("Unable to preserve legacy base-continuation formula number.", 2) end
+  return numeric
 end
 
 local function startup_setting(name)
@@ -449,46 +457,85 @@ local function plan_chain(key)
   local growth_setting = sanitize_number(startup_setting("mir-cost-growth-" .. key))
   local force_vanilla_growth = growth_setting == 0
   local growth = nil
+  local growth_provenance = nil
   if growth_setting and growth_setting > 0 then
     growth = growth_setting
+    growth_provenance = cost_contract.base_name("growth_factor", key)
   end
   if not growth and not force_vanilla_growth then
     local default_growth = sanitize_number(spec.growth_factor)
     if default_growth and default_growth > 0 then
       growth = default_growth
+      growth_provenance = "base-extension-default:" .. key
     end
   end
   if not growth then
     growth = compute_growth_from_prev(base_tech.unit, prev_unit)
+    if growth then growth_provenance = "vanilla-chain-inheritance" end
   end
   if not growth then
     growth = compute_growth_fallback()
+    if growth then growth_provenance = "vanilla-chain-fallback" end
   end
-  if not growth or growth <= 0 then
+  if not growth or growth < 1 then
     growth = 1
+    growth_provenance = "nondecreasing-safety-floor"
   end
 
   local base_setting = sanitize_number(startup_setting("mir-cost-base-" .. key))
   local force_vanilla_base = base_setting == 0
-  local base_value = nil
+  -- The stable mir-cost-base-* setting predates ResearchCostModel and is a
+  -- global L=1 coefficient. Preserve that ABI, then project it to the first
+  -- controlled continuation level used by the canonical anchored model.
+  local base_coefficient = nil
+  local base_provenance = nil
   if base_setting and base_setting > 0 then
-    base_value = base_setting
+    base_coefficient = base_setting
+    base_provenance = cost_contract.base_name("base_cost", key)
   end
 
-  if not base_value and not force_vanilla_base then
+  if not base_coefficient and not force_vanilla_base then
     local spec_base = sanitize_number(spec.base_cost)
     if spec_base and spec_base > 0 then
-      base_value = spec_base
+      base_coefficient = spec_base
+      base_provenance = "base-extension-default:" .. key
     end
   end
-  if not base_value then
+  if not base_coefficient then
     if last_count and growth > 0 then
-      base_value = last_count / (growth ^ (base_level - 1))
+      base_coefficient = last_count / (growth ^ (base_level - 1))
+      base_provenance = "vanilla-chain-inheritance"
     end
   end
-  if not base_value or base_value <= 0 then
-    base_value = 1000
+  if not base_coefficient or base_coefficient <= 0 then
+    base_coefficient = 1000
+    base_provenance = "vanilla-chain-fallback"
   end
+
+  local linear_increment = sanitize_number(startup_setting(cost_contract.base_name("linear_increment", key)))
+  local increment_provenance = cost_contract.base_name("linear_increment", key)
+  if not linear_increment or linear_increment < 0 then
+    linear_increment = sanitize_number(spec.linear_increment) or 0
+    increment_provenance = "base-extension-default:" .. key
+  end
+  -- The pre-3.2.5 formula emitter canonicalized both operands to six
+  -- significant digits. Retain that realized curve before changing its
+  -- representation from an L=1 formula to an anchored model.
+  base_coefficient = legacy_formula_number(base_coefficient)
+  growth = legacy_formula_number(growth)
+  local first_level_base = base_coefficient * (growth ^ (desired_new_level - 1))
+  local cost_model = research_cost_model.new({
+    anchor_level = desired_new_level,
+    base_cost = first_level_base,
+    linear_increment = linear_increment,
+    growth_factor = growth,
+    provenance = {
+      base_cost = "legacy-six-digit-coefficient-projection:" .. base_provenance,
+      linear_increment = increment_provenance,
+      growth_factor = "legacy-six-digit-growth-projection:" .. growth_provenance,
+      anchor_level = "technology-first-level"
+    }
+  })
 
   local new = base_extension_builder.continuation(base_tech, {
     name = new_name,
@@ -553,7 +600,7 @@ local function plan_chain(key)
     return rejected_candidate(key, "no_lab_compatible_science", "lab_compatible")
   end
   new.unit = {
-    count_formula = format_number(base_value) .. "*" .. format_number(growth) .. "^(L-1)",
+    count_formula = cost_model.count_formula,
     ingredients = resolved_ingredients,
     time = research_time
   }
@@ -579,6 +626,7 @@ local function plan_chain(key)
     base_technology_name = chain_key .. "-" .. base_level,
     technology_name = new.name,
     technology = new,
+    research_cost_model = cost_model,
     technology_risk = technology_risk.classification(spec.technology_risk),
     diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status),
     gates = accepted_gate_vector(key, new.name)

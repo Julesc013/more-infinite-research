@@ -641,10 +641,16 @@
       "provenance": "machine-assisted"
     },
     {
-      "key": "mod-setting-name.ips-cost-growth-stream",
-      "source_sha256": "94B05CF1F0F5A96E14D88A47EE5B1F30C4DCB7F3FA98E68953EF4BE39BC9ABCB",
-      "translation": "[font=default-bold]__1__[/font] — rritja e kostos",
+      "key": "mod-setting-name.ips-cost-linear-increment-stream",
+      "source_sha256": "2F4860DB53D32D36DB08C33DD34B806B21AF3C22A82B10071E3264320389D430",
+      "translation": "[font=default-bold]__1__[/font] — kosto shtesë për nivel",
       "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-cost-growth-stream",
+      "source_sha256": "B0D8E41F785D58445071CFF1D69619B92CC1E2CF9AEF4671F754A6132C9B6CCD",
+      "translation": "[font=default-bold]__1__[/font] — rritja e kostos",
+      "provenance": "preexisting"
     },
     {
       "key": "mod-setting-name.ips-max-level-stream",
@@ -671,10 +677,16 @@
       "provenance": "machine-assisted"
     },
     {
-      "key": "mod-setting-name.mir-cost-growth",
-      "source_sha256": "E99CF506DAC568F15C51B3CB0CA41A7E8CA52E04AB63AFA1D01EE7B2E40616D9",
-      "translation": "[font=default-bold]Infinit __1__[/font] — rritja e kostos",
+      "key": "mod-setting-name.mir-cost-linear-increment",
+      "source_sha256": "D8B39338501D195739FEE8AF27A67B1E050CE30D7A04FA673FD1A9A1B3B32454",
+      "translation": "[font=default-bold]Infinit __1__[/font] — kosto shtesë për nivel",
       "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-cost-growth",
+      "source_sha256": "8D08FAB3822D6C95E839204F5C8E7C9696B382C7832F55FDEB81A3018D5707BC",
+      "translation": "[font=default-bold]Infinit __1__[/font] — rritja e kostos",
+      "provenance": "preexisting"
     },
     {
       "key": "mod-setting-name.mir-max-level",
@@ -858,15 +870,21 @@
     },
     {
       "key": "mod-setting-description.ips-cost-base-stream",
-      "source_sha256": "F74FEB07DC9C1E256DC03D25FA97004CB9FE2D43AB48AB6126A6EAB9A7FA2266",
+      "source_sha256": "C7ADD3BAFCAC0C20AAA6E42A5A5D8961C2559108AD3A4215E64B1BFC6F2C5289",
       "translation": "Kërkohen njësi kërkimore për nivelin e parë të gjeneruar prej __1__. Duhet të jetë së paku 1. Nivelet e mëvonshme llogariten nga kjo vlerë dhe nga faktori i rritjes së kostos.",
+      "provenance": "preexisting"
+    },
+    {
+      "key": "mod-setting-description.ips-cost-linear-increment-stream",
+      "source_sha256": "74893B10031C5929F6079E97F14906E6817032ECAFB34BB221ABCFECA4DC29E0",
+      "translation": "Njësi kërkimore të shtuara për çdo nivel të mëvonshëm prej __1__ përpara se të aplikohet shumëzuesi eksponencial. Përdorni 0 për kosto fikse ose thjesht eksponenciale.",
       "provenance": "machine-assisted"
     },
     {
       "key": "mod-setting-description.ips-cost-growth-stream",
-      "source_sha256": "5B3E1FDDD283CE3FEAD07A4CC9131335295A874CB06D0ADCC47F00348B864065",
+      "source_sha256": "7D468CA8CED6D18F8FF2E83AACFB4003FE7C1AC80DB29B6AFC74FC36052180DD",
       "translation": "Shumëzuesi i aplikuar për çdo nivel të mëvonshëm prej __1__. Përdorni 1 për kostot e sheshta, 1.5 për rritje 50% për nivel, ose 2 për dyfishimin e kostove.",
-      "provenance": "machine-assisted"
+      "provenance": "preexisting"
     },
     {
       "key": "mod-setting-description.ips-max-level-stream",
@@ -893,10 +911,16 @@
       "provenance": "machine-assisted"
     },
     {
-      "key": "mod-setting-description.mir-cost-growth",
-      "source_sha256": "481061F346A54D75949349D6237D3A36D520EC1C6DB8B067B9EEB4AC7F1C68AE",
-      "translation": "Shumëzuesi i aplikuar për çdo nivel të mëvonshëm të vazhdimit MIR prej __1__. Vendoseni në 0 për të trashëguar modelin e rritjes së zinxhirit të vaniljes kur është e mundur.",
+      "key": "mod-setting-description.mir-cost-linear-increment",
+      "source_sha256": "954E257EB06D5BF469390D639552A2866BA2A89FE941F6D935AAA829972BEDA0",
+      "translation": "Njësi kërkimore të shtuara për çdo nivel të mëvonshëm të vazhdimit MIR prej __1__ përpara se të aplikohet shumëzuesi eksponencial. Përdorni 0 pa rritje shtesë.",
       "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-cost-growth",
+      "source_sha256": "294C1290E97945F92C4A5730ABC1ECB3407C7A52508395C8D7D9797DADB85AE7",
+      "translation": "Shumëzuesi i aplikuar për çdo nivel të mëvonshëm të vazhdimit MIR prej __1__. Vendoseni në 0 për të trashëguar modelin e rritjes së zinxhirit të vaniljes kur është e mundur.",
+      "provenance": "preexisting"
     },
     {
       "key": "mod-setting-description.mir-max-level",

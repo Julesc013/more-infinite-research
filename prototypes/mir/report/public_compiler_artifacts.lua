@@ -251,4 +251,11 @@ function M.compiler_evidence(input)
   return public
 end
 
+function M.research_cost_compatibility(artifact)
+  require("prototypes.mir.domain.research_cost.compatibility_slice").verify_untrusted(artifact)
+  local public = deepcopy(artifact)
+  public.kind = "mir-research-cost-support-public"
+  return public
+end
+
 return M

@@ -360,6 +360,7 @@ return {
   },
   research_ice = {
     ui_visibility = space_age_setting_visibility(),
+    required_mods = {"space-age"},
     generation_requirements = {
       require_any_item = {"ice"}
     },
