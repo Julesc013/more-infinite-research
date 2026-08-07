@@ -41,9 +41,9 @@ waves:
       status: candidate-qualified-unreleased
     factorio_1_0:
       branch: tmp/1.0
-      next_version: "1.8.2"
-      staged_commit: aeb14831132572037c4288b595b22978fdda6646
-      status: staged-unqualified
+      next_version: "1.8.5"
+      staged_commit: dd2d3c89
+      status: local-build-in-progress
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"
