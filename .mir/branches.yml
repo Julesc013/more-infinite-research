@@ -385,15 +385,15 @@ release_artifacts:
       branch: candidate/1.8.5-projection
       target_factorio: "1.0"
       source_anchor: mir_1_8_2
-      package_source_commit: dd2d3c89
+      package_source_commit: dd2d3c8924fdb2c6cc4d8ad068b42b31b9d10bcb
       artifact: build/candidates/1.8.5/a/more-infinite-research_1.8.5.zip
-      sha256: PENDING-DETERMINISTIC-BUILD
-      content_sha256: PENDING-DETERMINISTIC-BUILD
-      size_bytes: 0
-      entries: 0
+      sha256: 10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD
+      content_sha256: F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B
+      size_bytes: 397589
+      entries: 174
       forbidden_entries: 0
       publication_scope: local-outage-candidate
-      status: local-build-in-progress
+      status: local-qualification-in-progress
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18

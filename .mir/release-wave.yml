@@ -42,8 +42,9 @@ waves:
     factorio_1_0:
       branch: tmp/1.0
       next_version: "1.8.5"
-      staged_commit: dd2d3c89
-      status: local-build-in-progress
+      staged_commit: dd2d3c8924fdb2c6cc4d8ad068b42b31b9d10bcb
+      archive_sha256: 10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD
+      status: local-qualification-in-progress
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"
