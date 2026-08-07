@@ -30,6 +30,7 @@ local compatibility_packs = require("prototypes.mir.compatibility.packs.registry
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local research_cost_classification = require("prototypes.mir.domain.research_cost.classification")
 
 local M = {}
 local latest_plan = nil
@@ -245,10 +246,11 @@ local function plan_stream(key, raw_spec)
 
   local spec = expand_dynamic_items(raw_spec)
 
-  local base_cost = costs.base_cost_for(key, spec)
-  local growth_factor = costs.growth_factor_for(key, spec)
+  local technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1")
+  local first_level = research_cost_classification.anchor_level(technology_name, 1)
+  local cost_model = costs.model_for(key, spec, first_level)
   local max_level = costs.max_level_for(key, spec)
-  local count_formula = tostring(base_cost) .. "*" .. tostring(growth_factor) .. "^(L-1)"
+  local count_formula = cost_model.count_formula
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
@@ -294,13 +296,14 @@ local function plan_stream(key, raw_spec)
       effects = emitted_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
+      cost_model = cost_model,
       ingredients = ingredients,
       research_time = research_time,
       max_level = max_level,
     }
     return plan_row(key, spec, "emit", "direct_effect",
       D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status), {
-        technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1"),
+        technology_name = technology_name,
         fields = fields,
         direct_effects = true,
         overlap_effects = direct_effects
@@ -364,13 +367,14 @@ local function plan_stream(key, raw_spec)
     effects = emitted_effects,
     prerequisites = prerequisites,
     count_formula = count_formula,
+    cost_model = cost_model,
     ingredients = ingredients,
     research_time = research_time,
     max_level = max_level,
   }
   return plan_row(key, spec, "emit", "recipe_productivity",
     D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status), {
-      technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1"),
+      technology_name = technology_name,
       fields = fields,
       direct_effects = false
     })

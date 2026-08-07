@@ -3,6 +3,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
+local cost_contract = require("prototypes.mir.settings.cost_contract")
 local automatic_compiler_contract = require("prototypes.mir.settings.automatic_compiler_contract")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
@@ -62,6 +63,10 @@ end
 
 local function default_growth_factor(key, stream)
   return lookup_default(key, "growth_factor", stream, C.shared.growth_factor)
+end
+
+local function default_linear_increment(key, stream)
+  return lookup_default(key, "linear_increment", stream, 0)
 end
 
 local function default_max_level_setting(key, stream)
@@ -309,6 +314,7 @@ function M.stream_setting_specs(key, stream)
       minimum_value = 1,
       maximum_value = 2147483647
     },
+    cost_contract.stream_linear_increment_spec(key, default_linear_increment(key, stream)),
     {
       type = "double-setting",
       name = "ips-cost-growth-" .. key,
@@ -341,6 +347,7 @@ end
 function M.base_extension_setting_specs(key)
   local defaults_spec = base_defaults[key] or {}
   local base_default = math.floor(base_number(defaults_spec, "base_cost", 0, 0) + 0.5)
+  local linear_default = math.floor(base_number(defaults_spec, "linear_increment", 0, 0) + 0.5)
   local growth_default = base_number(defaults_spec, "growth_factor", 0, 0)
   local research_time_default = math.floor(base_number(defaults_spec, "research_time", 60, 1) + 0.5)
   local out = {
@@ -356,6 +363,7 @@ function M.base_extension_setting_specs(key)
       minimum_value = 0,
       maximum_value = 2147483647
     },
+    cost_contract.base_linear_increment_spec(key, linear_default),
     {
       type = "double-setting",
       name = "mir-cost-growth-" .. key,

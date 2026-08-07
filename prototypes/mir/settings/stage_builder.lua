@@ -49,20 +49,24 @@ local function decorate_stream_setting(spec, tech_locale, order_prefix)
     out.order = order_prefix .. "-1"
     out.localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale}
     out.localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
-  elseif string.find(out.name, "^ips%-cost%-growth%-") then
+  elseif string.find(out.name, "^ips%-cost%-linear%-increment%-") then
     out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.ips-cost-linear-increment-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-linear-increment-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-cost%-growth%-") then
+    out.order = order_prefix .. "-3"
     out.localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale}
     out.localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
   elseif string.find(out.name, "^ips%-max%-level%-") then
-    out.order = order_prefix .. "-3"
+    out.order = order_prefix .. "-4"
     out.localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale}
     out.localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
   elseif string.find(out.name, "^ips%-research%-time%-") then
-    out.order = order_prefix .. "-4"
+    out.order = order_prefix .. "-5"
     out.localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale}
     out.localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
   elseif string.find(out.name, "^ips%-effect%-per%-level%-") then
-    out.order = order_prefix .. "-5"
+    out.order = order_prefix .. "-6"
     out.localised_name = {"mod-setting-name.ips-effect-per-level-stream", tech_locale}
     out.localised_description = {"mod-setting-description.ips-effect-per-level-stream", tech_locale}
   else
@@ -82,20 +86,24 @@ local function decorate_base_setting(spec, tech_locale, order_prefix, settings_n
     out.order = order_prefix .. "-1"
     out.localised_name = {"mod-setting-name.mir-cost-base", tech_locale}
     out.localised_description = {"mod-setting-description.mir-cost-base", tech_locale}
-  elseif string.find(out.name, "^mir%-cost%-growth%-") then
+  elseif string.find(out.name, "^mir%-cost%-linear%-increment%-") then
     out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.mir-cost-linear-increment", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-linear-increment", tech_locale}
+  elseif string.find(out.name, "^mir%-cost%-growth%-") then
+    out.order = order_prefix .. "-3"
     out.localised_name = {"mod-setting-name.mir-cost-growth", tech_locale}
     out.localised_description = {"mod-setting-description.mir-cost-growth", tech_locale}
   elseif string.find(out.name, "^mir%-max%-level%-") then
-    out.order = order_prefix .. "-3"
+    out.order = order_prefix .. "-4"
     out.localised_name = {"mod-setting-name.mir-max-level", tech_locale}
     out.localised_description = {"mod-setting-description.mir-max-level", tech_locale}
   elseif string.find(out.name, "^mir%-research%-time%-") then
-    out.order = order_prefix .. "-4"
+    out.order = order_prefix .. "-5"
     out.localised_name = {"mod-setting-name.mir-research-time", tech_locale}
     out.localised_description = {"mod-setting-description.mir-research-time", tech_locale}
   elseif string.find(out.name, "^mir%-effect%-per%-level%-") then
-    out.order = order_prefix .. "-5"
+    out.order = order_prefix .. "-6"
     out.localised_name = {"mod-setting-name.mir-effect-per-level", tech_locale}
     out.localised_description = {"mod-setting-description.mir-effect-per-level", tech_locale}
   else
