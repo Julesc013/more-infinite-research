@@ -1,0 +1,17 @@
+{
+  "schema": 3,
+  "profiles": {
+    "0.13": [
+      {"name":"static-validation","target_profile":"0.13","kind":"gate","group":"static","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","static"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"package-build","target_profile":"0.13","kind":"gate","group":"package","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","package"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"runtime-state-contract","target_profile":"0.13","kind":"gate","group":"runtime-state","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","runtime-state"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"package-zip-base","target_profile":"0.13","kind":"package","group":"exact-dist","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","exact-dist","full","package","smoke"],"isolation":"fresh-data-stage","assertions":[{"id":"factorio-load-and-assertion-fixtures-pass","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"factorio-0.13-direct-effects","target_profile":"0.13","kind":"runtime","group":"science-prerequisites","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-generated-prerequisite-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","science-prerequisites"],"isolation":"fresh-data-stage","assertions":[{"id":"legacy-direct-effects-and-science-progression","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"checkbox-enabled-default-off-features","target_profile":"0.13","kind":"runtime","group":"base-load","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","base-load","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"enabled-checkbox","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"checkbox-disabled-default-on-features","target_profile":"0.13","kind":"runtime","group":"base-load","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","base-load","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"disabled-checkbox","type":"factorio-load-and-assertion-fixtures-pass"}]}
+    ],
+    "2.1": [
+      {"name":"semantic-family-attach","target_profile":"2.1","kind":"runtime","group":"local-mod-library","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"semantic-family-attach","type":"factorio-load-and-assertion-fixtures-pass"}]}
+    ]
+  }
+}

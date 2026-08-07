@@ -320,6 +320,10 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   }
 }
 
+Invoke-RepoCheck "generated count formulas use the unified canonical research-cost model" {
+  & (Join-Path $repo "scripts\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "icon_mipmaps"
   if ($matches.Count -gt 0) {
@@ -2120,6 +2124,7 @@ function Get-FixtureInfos {
       Name = $info.name
       Version = $info.version
       Path = $fixture.FullName
+      Dependencies = @($info.dependencies)
     }
   }
   return $infos
@@ -2429,10 +2434,21 @@ function Initialize-RuntimeScenario {
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
+  $fixtureNamesDependingOnMir = @(
+    $fixtureInfos |
+      Where-Object {
+        @($_.Dependencies) | Where-Object {
+          $_ -match '^(?:\?|~|!|\(\?\))?\s*more-infinite-research(?:\s|$)'
+        }
+      } |
+      Select-Object -ExpandProperty Name
+  )
   $copiedInfoPath = Join-CopiedMIRPath -ModsDir $modsDir -RelativePath "info.json"
   $copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
   $dependencies = @($copiedInfo.dependencies)
-  foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {
+  foreach ($fixtureName in @($fixtureNames | Where-Object {
+    $_ -notin $postMirAssertionFixtures -and $_ -notin $fixtureNamesDependingOnMir
+  })) {
     $dependency = "? $fixtureName"
     if ($dependencies -notcontains $dependency) {
       $dependencies += $dependency
