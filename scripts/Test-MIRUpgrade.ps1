@@ -33,6 +33,13 @@ $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
+$factorioBinaryVersion = [string]$factorioVersionInfo.FileVersion
+if ([string]::IsNullOrWhiteSpace($factorioBinaryVersion)) {
+  $versionOutput = @(& $factorio --version 2>$null)
+  $versionLine = @($versionOutput | Where-Object { $_ -match '^Version:\s+([0-9.]+)' } | Select-Object -First 1)
+  if ($versionLine.Count -ne 1) { throw "Unable to resolve the exact Factorio binary version." }
+  $factorioBinaryVersion = ([regex]::Match([string]$versionLine[0], '^Version:\s+([0-9.]+)')).Groups[1].Value
+}
 $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
@@ -85,7 +92,7 @@ Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryN
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $commonArgs = @("--config", $config, "--no-log-rotation")
-if ([string]$factorioVersionInfo.FileVersion -notlike "0.13.*" -and [string]$factorioVersionInfo.FileVersion -notlike "0.14.*") {
+if ($factorioBinaryVersion -notlike "0.13.*" -and $factorioBinaryVersion -notlike "0.14.*") {
   $commonArgs += "--disable-audio"
 }
 $commonArgs += @("--mod-directory", $mods)
@@ -157,7 +164,7 @@ if (-not $loadText.Contains($proofMarker)) {
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ([string]$factorioVersionInfo.FileVersion -like "0.13.*" -or [string]$factorioVersionInfo.FileVersion -like "0.14.*") {
+$assertions = if ($factorioBinaryVersion -like "0.13.*" -or $factorioBinaryVersion -like "0.14.*") {
   @(
     "generated-technology-completion-state-retained",
     "current-research-retained",
@@ -199,7 +206,7 @@ $assertions = if ([string]$factorioVersionInfo.FileVersion -like "0.13.*" -or [s
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
-  factorio_binary_version = $factorioVersionInfo.FileVersion
+  factorio_binary_version = $factorioBinaryVersion
   from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   assertions = $assertions
