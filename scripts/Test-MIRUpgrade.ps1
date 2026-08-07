@@ -37,6 +37,11 @@ $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
+$fixtureDirectoryName = if ([int]$factorioVersionInfo.FileMajorPart -eq 0) {
+  "$fixtureModName`_$([string]$fixtureInfo.version)"
+} else {
+  $fixtureModName
+}
 $proofSuffix = if ($FixtureName -like "*-automatic-compiler") { " automatic compiler" } else { "" }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$ToVersion-upgrade-proof.json"
@@ -70,12 +75,24 @@ $modList = [ordered]@{ mods = @(
 ) }
 $modList | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods "mod-list.json") -Encoding UTF8
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
-Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureModName) -Recurse
+Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryName) -Recurse
 
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
+if ([int]$factorioVersionInfo.FileMajorPart -eq 0 -and -not (Test-Path -LiteralPath $save)) {
+  $sourceInitArgs = @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--start-server-load-scenario", "base/freeplay", "--until-tick", "1"
+  )
+  $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
+  $legacySave = Join-Path $userdata "saves\mir-$FromVersion-save.zip"
+  if ($sourceInitExitCode -ne 0 -or -not (Test-Path -LiteralPath $legacySave)) {
+    throw "MIR $FromVersion Factorio 0.x source-save initialization failed with exit code $sourceInitExitCode."
+  }
+  Copy-Item -LiteralPath $legacySave -Destination $save
+}
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
 }
@@ -99,14 +116,31 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
-$loadArgs = @(
-  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-  "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
-)
-$loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+$loadArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods)
+if ([int]$factorioVersionInfo.FileMajorPart -eq 0) {
+  $loadArgs += @("--start-server", $save, "--until-tick", "1")
+} else {
+  $loadArgs += @("--benchmark", $save, "--benchmark-ticks", "1")
+  $loadArgs += @("--benchmark-runs", "1", "--benchmark-sanitize")
+}
+$loadTimedOutAfterMarkerWindow = $false
+try {
+  $loadTimeoutMs = if ([int]$factorioVersionInfo.FileMajorPart -eq 0) { 30000 } else { 300000 }
+  $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs -TimeoutMs $loadTimeoutMs
+} catch {
+  if ([int]$factorioVersionInfo.FileMajorPart -eq 0 -and $_.Exception.Message -like "Factorio runtime validation timed out*") {
+    $loadTimedOutAfterMarkerWindow = $true
+    $loadExitCode = 0
+  } else {
+    throw
+  }
+}
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
 $loadText = Get-Content -Raw -LiteralPath $log
 if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
+  if ($loadTimedOutAfterMarkerWindow) {
+    throw "MIR $ToVersion upgrade load reached the 0.x headless-server marker window without producing the proof marker."
+  }
   throw "MIR $ToVersion upgrade proof marker is missing."
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"

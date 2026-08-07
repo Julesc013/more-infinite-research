@@ -6,6 +6,16 @@ fixture_roots:
   run_profiles: fixtures/run-profiles
 
 fixtures:
+  upgrade-1-4-0-to-1-4-5:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-4-0-to-1-4-5
+    validates:
+      - startup-setting-retained
+      - generated-technology-level-retained
+      - current-research-retained
+      - fractional-research-progress-retained
+      - global-runtime-state-retained
+
   generated-prerequisite-safety:
     assertion_path: fixtures/assert-generated-prerequisite-safety
     validates:
