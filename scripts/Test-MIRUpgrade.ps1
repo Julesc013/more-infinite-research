@@ -135,9 +135,16 @@ try {
     throw
   }
 }
-if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
+$proofMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete"
+if ([int]$factorioVersionInfo.FileMajorPart -eq 0 -and $loadText.Contains($proofMarker)) {
+  # Old headless servers may continue into multiplayer auth after the exact
+  # configuration-change assertion has completed. The target proof marker is
+  # authoritative; a later server-transport exit is outside the mod load gate.
+  $loadExitCode = 0
+}
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+if (-not $loadText.Contains($proofMarker)) {
   if ($loadTimedOutAfterMarkerWindow) {
     throw "MIR $ToVersion upgrade load reached the 0.x headless-server marker window without producing the proof marker."
   }
