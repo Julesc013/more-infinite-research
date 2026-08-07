@@ -52,7 +52,7 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
+      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.mir/fixtures\\.yml$", "^\\.mir/backport-source-lock\\.json$", "^\\.github/workflows/"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
@@ -62,7 +62,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
+      "patterns": ["^docs/", "^\\.mir/docs\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
       "tests": ["docs.check", "seal.verify"]
     },
     {
