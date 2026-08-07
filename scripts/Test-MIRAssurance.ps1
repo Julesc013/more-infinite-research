@@ -18,6 +18,25 @@ foreach ($required in @("static.full", "runtime.full", "runtime.upgrade", "runti
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
+$governanceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-governance" })
+if ($governanceClass.Count -ne 1) { throw "Assurance config must declare one release-governance class." }
+foreach ($path in @(
+  ".mir/backport-source-lock.json", ".mir/branches.yml", ".mir/convergence.yml",
+  ".mir/docs.yml", ".mir/fixtures.yml", ".mir/release-wave.yml"
+)) {
+  if (-not @($governanceClass[0].patterns | Where-Object { $path -match [string]$_ })) {
+    throw "Known release-governance path is unclassified: $path"
+  }
+}
+$docsClass = @($config.classes | Where-Object { [string]$_.id -eq "repository-docs" })
+if ($docsClass.Count -ne 1 -or @($docsClass[0].tests) -contains "seal.verify") {
+  throw "Repository docs must not select the promotion-only seal check before a seal exists."
+}
+$evidenceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-evidence" })
+if ($evidenceClass.Count -ne 1 -or @($evidenceClass[0].tests) -notcontains "seal.verify") {
+  throw "Release evidence must retain the seal verification gate."
+}
+
 $releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
 foreach ($requiredSealField in @("mir_version", "target", "canonical_dev_anchor")) {
   if ($releaseAssurance -notmatch ("(?m)^\s+" + [regex]::Escape($requiredSealField) + "=")) {
