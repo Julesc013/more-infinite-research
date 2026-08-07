@@ -1600,6 +1600,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-1.5.0-release-notes
+  - path: docs/releases/release-notes-1.5.5.md
+    title: "MIR 1.5.5 Factorio 0.15 Local Candidate Record"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.5-local-candidate
   - path: docs/releases/1.5.0-validation-summary.md
     title: "MIR 1.5.0 Validation Summary"
     status: current

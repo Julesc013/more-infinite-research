@@ -52,8 +52,13 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
+      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/(assurance\\.json|test)", "^\\.github/workflows/"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
+    },
+    {
+      "id": "release-governance",
+      "patterns": ["^\\.mir/(backport-source-lock\\.json|branches\\.yml|convergence\\.yml|docs\\.yml|fixtures\\.yml|release-wave\\.yml)$", "^\\.mir/evidence/(?:[^/]+/)*[^/]+-feature-classification\\.json$"],
+      "tests": ["docs.check", "tooling.self-test", "static.full"]
     },
     {
       "id": "museum-tooling",
@@ -63,11 +68,11 @@
     {
       "id": "repository-docs",
       "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
-      "tests": ["docs.check", "seal.verify"]
+      "tests": ["docs.check"]
     },
     {
       "id": "release-evidence",
-      "patterns": ["^\\.mir/evidence/", "^dist/"],
+      "patterns": ["^\\.mir/evidence/(?!.*(?:^|/)[^/]+-feature-classification\\.json$)", "^dist/"],
       "tests": ["seal.verify"]
     }
   ],
