@@ -96,7 +96,19 @@ if ($releaseBoundary -eq "publicly-verified|C32") {
   }
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json")) {
-  throw "A forbidden 2.5.5 release authority exists."
+  $lowerRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/2.5.5.json") | ConvertFrom-Json
+  $lowerException = @($lowerRelease.assurance_exceptions | Where-Object {
+    [string]$_.id -eq "MIR35-2.5.5-TIMEBOXED-PUBLICATION-2026-08-08" -and
+    [bool]$_.normal_gates_waived_for_publication_only -and
+    -not [bool]$_.generic_policy_changed -and
+    [string]$_.protected_qualification -eq "pending-post-publication" -and
+    [string]$_.protected_seal -eq "pending-post-publication"
+  })
+  if ([string]$lowerRelease.candidate_id -ne "2.5-P12" -or
+      [string]$lowerRelease.package.archive_sha256 -ne "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C" -or
+      $lowerException.Count -ne 1) {
+    throw "The 2.5.5 authority must remain bound to exact P12 bytes and the release-specific publication exception."
+  }
 }
 
 $expectedIds = @(
@@ -257,4 +269,4 @@ if ([string]$d1.status -notin @("prepared-awaiting-admission", "terminal")) {
   throw "325-D1 has an unsupported freeze-packet state."
 }
 
-Write-Host "[ok] MIR 3.2.5 preserves its narrowed contract, immutable package identity, truthful release state, and retained protected obligations without 2.5.5 or 3.3 authority."
+Write-Host "[ok] MIR 3.2.5 preserves its narrowed contract, immutable package identity, truthful release state, retained protected obligations, and no 3.3 product authority."

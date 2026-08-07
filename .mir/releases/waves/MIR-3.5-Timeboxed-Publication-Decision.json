@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5WaveTimeboxedPublicationDecisionV1",
+  "id": "MIR3Dot5WaveTimeboxedPublicationDecisionV1",
+  "authorized_at": "2026-08-08T00:00:00+10:00",
+  "maintainer": "Julesc013",
+  "status": "authorized",
+  "scope": {
+    "publication_channel": "github",
+    "releases": [
+      "2.5.5",
+      "1.9.5",
+      "1.8.5",
+      "1.7.5",
+      "1.6.5",
+      "1.5.5",
+      "1.4.5",
+      "1.3.5"
+    ],
+    "package_identity_authority": ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json",
+    "immutable_source_tag": "3.2.5",
+    "immutable_source_tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+    "mod_portal_upload_authorized": false
+  },
+  "decision": {
+    "automated_target_qualification_accepted": true,
+    "additional_manual_review": "waived-by-explicit-maintainer-authorization",
+    "personal_visual_playtest_claim": "prohibited",
+    "normal_gates_waived_for_publication_only": true,
+    "generic_policy_changed": false,
+    "package_change_permitted": false,
+    "protected_seal_fabrication_permitted": false,
+    "dot_6_dot_7_dot_8_releases": "prohibited",
+    "all_corrections_route_to_corresponding_dot_9": true
+  },
+  "maintained_release_obligations": {
+    "2.5.5": {
+      "protected_qualification": "pending-post-publication",
+      "protected_seal": "pending-post-publication",
+      "normal_promotion_admission_reconciliation": "pending-post-publication",
+      "corrective_release": "2.5.9"
+    }
+  },
+  "target_tiers": [
+    { "release": "2.5.5", "factorio": "2.0.77", "candidate": "2.5-P12", "qualification_tier": "maintained-automated-target-tier", "corrective_release": "2.5.9" },
+    { "release": "1.9.5", "factorio": "1.1.110", "candidate": "1.9.5-final", "qualification_tier": "lts-automated-target-tier", "corrective_release": "1.9.9" },
+    { "release": "1.8.5", "factorio": "1.0.0-only", "candidate": "1.8.5-final", "qualification_tier": "lts-automated-target-tier", "factorio_0_18_support_claim": false, "corrective_release": "1.8.9" },
+    { "release": "1.7.5", "factorio": "0.17.79", "candidate": "1.7.5-final", "qualification_tier": "historical-automated-target-tier", "corrective_release": "1.7.9" },
+    { "release": "1.6.5", "factorio": "0.16.51", "candidate": "1.6.5-final", "qualification_tier": "historical-automated-target-tier", "corrective_release": "1.6.9" },
+    { "release": "1.5.5", "factorio": "0.15.40", "candidate": "1.5.5-final", "qualification_tier": "historical-automated-target-tier", "corrective_release": "1.5.9" },
+    { "release": "1.4.5", "factorio": "0.14.23", "candidate": "1.4.5-final", "qualification_tier": "finite-automated-target-tier", "corrective_release": "1.4.9" },
+    { "release": "1.3.5", "factorio": "0.13.20", "candidate": "1.3.5-final", "qualification_tier": "finite-automated-target-tier", "corrective_release": "1.3.9" }
+  ],
+  "frozen_packages": [
+    { "release": "2.5.5", "source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce", "source_tree": "723201b02bdf8707f40fa7fbfcf83e738934fd69", "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C", "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154", "bytes": 1055047, "entries": 300, "qualification_record_sha256": "C1395E465638A1452E3C236A51BEDA4A2E6D2F49F4384301C8CDC7A871A827CB" },
+    { "release": "1.9.5", "source_commit": "48dd671e9a2b5ab37d1676fbbd7254ce30c046fb", "source_tree": "aa694296eb2da0d3212b68b26c456f67e0caa632", "archive_sha256": "9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC", "content_sha256": "8C8A76EEBFCA52B4A4D401565F08BFD52A285A14837CCC0A65AC689B8F80E9CA", "bytes": 397597, "entries": 174, "qualification_record_sha256": "C395A0D1D3B0FAE9EB68013699B3E6BC8309C645493F04511088DB8D9FE757AD" },
+    { "release": "1.8.5", "source_commit": "2c70c8e8654f24227fba60f3f9c6cfff5e544b57", "source_tree": "a957b4e50da6c428154fc7a4aeb7217613255c73", "archive_sha256": "10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD", "content_sha256": "F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B", "bytes": 397589, "entries": 174, "qualification_record_sha256": "8911334886F9BA26587EE4C4E216111BBD1DF09F608BDD712929036BBBBB2DF8" },
+    { "release": "1.7.5", "source_commit": "c87818b34ccddb6b0166aeb6aec42887f420e86f", "source_tree": "14464e7220adbebe1d00107e896fc7790932dcc5", "archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A", "content_sha256": "FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D", "bytes": 385229, "entries": 177, "qualification_record_sha256": "DEC5E26CB007A81DB4F2A8ACC561C60669BF418418A0A26162795EDE1EF2820B" },
+    { "release": "1.6.5", "source_commit": "dad7f39b24a43203d74c883e9927e6d18e39eac4", "source_tree": "092fd94738d019d1ca9d5269ef8ea4d78f87781f", "archive_sha256": "8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB", "content_sha256": "C19B2F407912E01E12E1D117180504787C352027B9132476A65D9C9D4F4B8392", "bytes": 385236, "entries": 177, "qualification_record_sha256": "6908B3E5CDCD62CA5975E532B38CB9ED335510BE2EA8A8F0EA260602B582F378" },
+    { "release": "1.5.5", "source_commit": "d855a68b88eb6864d537e8149f75ae73f50b0b39", "source_tree": "f3bdb4a3f86cb36d298f06d6773fbd153bc5a329", "archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD", "content_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778", "bytes": 385548, "entries": 177, "qualification_record_sha256": "A6AD6491B455FFBD2190635660D0A30B6AAEAE061061D387EF29C17F5C57ACE0" },
+    { "release": "1.4.5", "source_commit": "4698d9e84adc987453a02a6954690fce26c85c6a", "source_tree": "a93b61ed7ece35e54431f8c4c08b6bcb371d80cd", "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47", "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4", "bytes": 385987, "entries": 177, "qualification_record_sha256": "BBE114F656D7B966796291BFB3A8EF324B4323C854555E2DBAA09B731B32D5C7" },
+    { "release": "1.3.5", "source_commit": "db45a5b36955082fac197faaa057a9a43cc9e420", "source_tree": "4ded9c6d3f4c61033b5a8cc07372fdd4e1207e68", "archive_sha256": "78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0", "content_sha256": "9E57F57D760D49CF165C66DB3413E2C50D639FA2EC7DB63C44846D001E4EF88A", "bytes": 386081, "entries": 177, "qualification_record_sha256": "19859D0D45240800D05869CC893B5FA9609A42AC6267014C42BFF8DE5F4541B8" }
+  ],
+  "publication_rules": {
+    "release_order": ["2.5.5", "1.9.5", "1.8.5", "1.7.5", "1.6.5", "1.5.5", "1.4.5", "1.3.5"],
+    "upload_existing_frozen_archive_only": true,
+    "rebuild_during_publication": false,
+    "retry_transport_operation_only": true,
+    "stop_affected_release_on_identity_or_engine_failure": true
+  }
+}

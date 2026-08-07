@@ -113,6 +113,8 @@ paths:
   releases.waves: .mir/releases/waves
   releases.waves.mir-3.5-authorization: .mir/releases/waves/MIR-3.5-Automated-Release-Authorization.json
   releases.waves.mir-3.5-outage-authorization: .mir/releases/waves/MIR-3.5-Outage-Release-Authorization.json
+  releases.waves.mir-3.5-timeboxed-publication: .mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json
+  releases.waves.mir-3.5-lineage-finalization: .mir/releases/waves/MIR-3.5-Lineage-Finalization.json
   releases.waves.mir4-offline-release-authority: .mir/releases/waves/MIR4-Offline-Release-Authority.json
   evidence.root: .mir/evidence
   evidence.manifests: .mir/evidence/manifests
