@@ -53,6 +53,86 @@ local function add_technology_setting(group, setting)
   table.insert(settings_data, settings_adapter.apply(setting, group and group.ui_visibility))
 end
 
+local function copy_spec(spec)
+  local out = {}
+  for key, value in pairs(spec) do out[key] = value end
+  return out
+end
+
+local function decorate_stream_setting(spec, tech_locale, order_prefix)
+  local out = copy_spec(spec)
+  out.setting_type = "startup"
+  if string.find(out.name, "^ips%-enable%-") then
+    out.order = order_prefix .. "-0"
+    out.localised_name = {"mod-setting-name.ips-enable-stream", tech_locale}
+    out.localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, nil)
+  elseif string.find(out.name, "^ips%-cost%-base%-") then
+    out.order = order_prefix .. "-1"
+    out.localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-cost%-linear%-increment%-") then
+    out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.ips-cost-linear-increment-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-linear-increment-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-cost%-growth%-") then
+    out.order = order_prefix .. "-3"
+    out.localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-max%-level%-") then
+    out.order = order_prefix .. "-4"
+    out.localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-research%-time%-") then
+    out.order = order_prefix .. "-5"
+    out.localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-effect%-per%-level%-") then
+    out.order = order_prefix .. "-6"
+    out.localised_name = {"mod-setting-name.ips-effect-per-level-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-effect-per-level-stream", tech_locale}
+  else
+    error("Unknown generated stream setting: " .. tostring(out.name))
+  end
+  return out
+end
+
+local function decorate_base_setting(spec, tech_locale, order_prefix, settings_note)
+  local out = copy_spec(spec)
+  out.setting_type = "startup"
+  if string.find(out.name, "^mir%-enable%-") then
+    out.order = order_prefix .. "-0"
+    out.localised_name = {"mod-setting-name.mir-enable-base-tech", tech_locale}
+    out.localised_description = append_note({"mod-setting-description.mir-enable-base-tech", tech_locale}, settings_note)
+  elseif string.find(out.name, "^mir%-cost%-base%-") then
+    out.order = order_prefix .. "-1"
+    out.localised_name = {"mod-setting-name.mir-cost-base", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-base", tech_locale}
+  elseif string.find(out.name, "^mir%-cost%-linear%-increment%-") then
+    out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.mir-cost-linear-increment", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-linear-increment", tech_locale}
+  elseif string.find(out.name, "^mir%-cost%-growth%-") then
+    out.order = order_prefix .. "-3"
+    out.localised_name = {"mod-setting-name.mir-cost-growth", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-growth", tech_locale}
+  elseif string.find(out.name, "^mir%-max%-level%-") then
+    out.order = order_prefix .. "-4"
+    out.localised_name = {"mod-setting-name.mir-max-level", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-max-level", tech_locale}
+  elseif string.find(out.name, "^mir%-research%-time%-") then
+    out.order = order_prefix .. "-5"
+    out.localised_name = {"mod-setting-name.mir-research-time", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-research-time", tech_locale}
+  elseif string.find(out.name, "^mir%-effect%-per%-level%-") then
+    out.order = order_prefix .. "-6"
+    out.localised_name = {"mod-setting-name.mir-effect-per-level", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-effect-per-level", tech_locale}
+  else
+    error("Unknown base extension setting: " .. tostring(out.name))
+  end
+  return out
+end
+
 for _, setting in ipairs(settings_catalog.global_setting_prototypes()) do
   table.insert(settings_data, setting)
 end
@@ -230,12 +310,23 @@ for _, group in ipairs(technology_setting_groups) do
       localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
     })
     add_technology_setting(group, {
+      type = "int-setting",
+      name = "ips-cost-linear-increment-"..key,
+      setting_type = "startup",
+      default_value = math.floor((tonumber(lookup_default(key, "linear_increment", stream, 0)) or 0) + 0.5),
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = order_prefix.."-2",
+      localised_name = {"mod-setting-name.ips-cost-linear-increment-stream", tech_locale},
+      localised_description = {"mod-setting-description.ips-cost-linear-increment-stream", tech_locale}
+    })
+    add_technology_setting(group, {
       type = "double-setting",
       name = "ips-cost-growth-"..key,
       setting_type = "startup",
       default_value = default_growth_factor(key, stream),
       minimum_value = 1,
-      order = order_prefix.."-2",
+      order = order_prefix.."-3",
       localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
     })
@@ -305,12 +396,23 @@ for _, group in ipairs(technology_setting_groups) do
       localised_description = {"mod-setting-description.mir-cost-base", locale}
     })
     add_technology_setting(group, {
+      type = "int-setting",
+      name = "mir-cost-linear-increment-"..spec.key,
+      setting_type = "startup",
+      default_value = math.floor((tonumber(defaults_spec.linear_increment) or 0) + 0.5),
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = order_prefix.."-2",
+      localised_name = {"mod-setting-name.mir-cost-linear-increment", locale},
+      localised_description = {"mod-setting-description.mir-cost-linear-increment", locale}
+    })
+    add_technology_setting(group, {
       type = "double-setting",
       name = "mir-cost-growth-"..spec.key,
       setting_type = "startup",
       default_value = growth_default,
       minimum_value = 0,
-      order = order_prefix.."-2",
+      order = order_prefix.."-3",
       localised_name = {"mod-setting-name.mir-cost-growth", locale},
       localised_description = {"mod-setting-description.mir-cost-growth", locale}
     })

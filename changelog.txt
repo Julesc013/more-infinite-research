@@ -1,17 +1,15 @@
 ---------------------------------------------------------------------------------------------------
-Version: 1.6.0
-Date: 2026-07-13
+Version: 1.6.5
+Date: 2026-08-07
 
   Features:
 
-    - Ported the reduced native-infinite compiler and graph-safety guard to Factorio 0.16.
-    - Added the 0.16 science-pack-1, science-pack-2, science-pack-3, production, military, high-tech, and space science map.
+    - Added fixed, linear, exponential, and hybrid research-cost curves to the supported Factorio 0.16 research surface.
 
-  Changes:
+  Bugfixes:
 
-    - Kept only target-supported direct effects and base technology continuations.
-    - Kept Factorio 0.17+, 1.x, 2.x, and DLC-only behavior out of this package.
-    - Omitted recipe-productivity settings that Factorio 0.16 cannot apply, instead of exposing inert controls.
+    - Anchored continuation costs at the first controlled level while preserving the historical six-significant-digit curve.
+    - Preserved the reduced Factorio 0.16 capability boundary without newer engine, DLC, or recipe-productivity generation.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.1
