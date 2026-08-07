@@ -17,7 +17,7 @@ Updated: 2026-07-12
 
 Published MIR `3.0.5` on the Factorio 2.1 line and MIR `2.3.5` on `legacy` are immutable. Automatic-compiler work is unreleased MIR `3.1.0` on `dev`; its Factorio 2.0 semantic companion will be unreleased MIR `2.4.0` on `tmp/2.0` only after the modern implementation passes. Earlier 3.1.0 and 2.4.0 candidate commits, tags, and archives are superseded development evidence and are not publication authority.
 
-The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
+The current older-target state is MIR `1.9.5` in local outage qualification on `candidate/1.9.5-projection`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. MIR `1.9.4` remains the immutable target predecessor. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
 
 This note records the locked maintainer policy for separating MIR release numbers by Factorio target line after the `2.2.0` compatibility-platform release. It is a release-operations note, not a feature-parity promise. Every target line still needs its own source branch, metadata, package build, Factorio binary, mod library, validation artifacts, and public release notes before it can be published.
 

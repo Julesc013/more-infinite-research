@@ -380,6 +380,20 @@ release_artifacts:
       upgrade_from_1_9_3: passed
       publication_scope: unreleased
       status: candidate-qualified
+    mir_1_9_5:
+      version: "1.9.5"
+      branch: candidate/1.9.5-projection
+      target_factorio: "1.1"
+      source_anchor: mir_1_9_4
+      package_source_commit: ca194c7765e1375c522996d224a9cb0309bc6c90
+      artifact: build/candidates/1.9.5/a/more-infinite-research_1.9.5.zip
+      sha256: 9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC
+      content_sha256: 8C8A76EEBFCA52B4A4D401565F08BFD52A285A14837CCC0A65AC689B8F80E9CA
+      size_bytes: 397597
+      entries: 174
+      forbidden_entries: 0
+      publication_scope: local-outage-candidate
+      status: local-qualification-in-progress
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -567,7 +581,7 @@ release_artifacts:
       target_factorio: "2.0"
       purpose: semantic companion created only after 3.1.0 acceptance
     factorio_1_1_port:
-      version: "1.9.4"
+      version: "1.9.5"
       branch: tmp/1.1
       target_factorio: "1.1"
     factorio_0_18_bridge:
