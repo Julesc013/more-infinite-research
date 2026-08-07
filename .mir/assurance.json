@@ -52,7 +52,7 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.mir/fixtures\\.yml$", "^\\.mir/backport-source-lock\\.json$", "^\\.github/workflows/"],
+      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/(test|assurance\\.json$)", "^\\.mir/fixtures\\.yml$", "^\\.mir/backport-source-lock\\.json$", "^\\.github/workflows/"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
