@@ -84,13 +84,13 @@ Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryN
 
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
-$createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
+$commonArgs = @("--config", $config, "--no-log-rotation")
+if ([string]$factorioVersionInfo.FileVersion -notlike "0.14.*") { $commonArgs += "--disable-audio" }
+$commonArgs += @("--mod-directory", $mods)
+$createArgs = @($commonArgs) + @("--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
 if ([int]$factorioVersionInfo.FileMajorPart -eq 0 -and -not (Test-Path -LiteralPath $save)) {
-  $sourceInitArgs = @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-    "--start-server-load-scenario", "base/freeplay", "--until-tick", "1"
-  )
+  $sourceInitArgs = @($commonArgs) + @("--start-server-load-scenario", "base/freeplay", "--until-tick", "1")
   $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
   $legacySave = Join-Path $userdata "saves\mir-$FromVersion-save.zip"
   if ($sourceInitExitCode -ne 0 -or -not (Test-Path -LiteralPath $legacySave)) {
@@ -103,10 +103,7 @@ if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $is
 }
 $createText = Get-Content -Raw -LiteralPath $log
 if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
-  $sourceInitArgs = @(
-    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-    "--start-server", $save, "--until-tick", "1"
-  )
+  $sourceInitArgs = @($commonArgs) + @("--start-server", $save, "--until-tick", "1")
   $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
   if ($sourceInitExitCode -ne 0) {
     throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode."
@@ -121,7 +118,7 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
-$loadArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods)
+$loadArgs = @($commonArgs)
 if ([int]$factorioVersionInfo.FileMajorPart -eq 0) {
   $loadArgs += @("--start-server", $save, "--until-tick", "1")
 } else {
