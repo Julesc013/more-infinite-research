@@ -55,26 +55,18 @@ if ($LASTEXITCODE -ne 0 -or [string]$released20Tag -ne [string]$lock.released_2_
   throw "Released Factorio 2.0 reference $($lock.released_2_0_reference) does not resolve to the locked commit."
 }
 
-$anchorRefCommit = & git -C $RepoRoot rev-parse --verify ([string]$lock.canonical_anchor_ref)
-if ($LASTEXITCODE -ne 0 -or [string]$anchorRefCommit -ne [string]$lock.canonical_dev_anchor) {
-  throw "Canonical anchor ref $($lock.canonical_anchor_ref) is missing or stale."
+$anchorRefCommit = & git -C $RepoRoot rev-parse --verify ([string]$lock.canonical_anchor_ref) 2>$null
+if ($LASTEXITCODE -eq 0 -and [string]$anchorRefCommit -ne [string]$lock.canonical_dev_anchor) {
+  throw "Canonical anchor ref $($lock.canonical_anchor_ref) resolves to a different commit."
+}
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "[info] Optional canonical anchor ref is absent; using locked immutable commit $($lock.canonical_dev_anchor)."
 }
 & git -C $RepoRoot merge-base --is-ancestor ([string]$lock.canonical_dev_anchor) HEAD
 if ($LASTEXITCODE -ne 0) { throw "Target history does not contain the canonical development anchor." }
 
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
-$infoTarget = [string]$info.factorio_version
-if ([string]::IsNullOrWhiteSpace($infoTarget)) {
-  $identityCatalogPath = Join-Path $RepoRoot ".mir\museum-targets.json"
-  if (Test-Path -LiteralPath $identityCatalogPath -PathType Leaf) {
-    $identityCatalog = Get-Content -Raw -LiteralPath $identityCatalogPath | ConvertFrom-Json
-    $identityMuseumTarget = @($identityCatalog.targets | Where-Object { [string]$_.factorio -eq [string]$lock.target }) | Select-Object -First 1
-    if ($null -ne $identityMuseumTarget -and [string]$identityMuseumTarget.version -eq [string]$info.version) {
-      $infoTarget = [string]$identityMuseumTarget.factorio
-    }
-  }
-}
-if ([string]$info.version -ne [string]$lock.mir_version -or $infoTarget -ne [string]$lock.target) {
+if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
   throw "Source-lock target identity disagrees with info.json."
 }
 

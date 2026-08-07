@@ -76,7 +76,7 @@ $record = [ordered]@{
   }
   gates = [ordered]@{
     manifest_and_base_evidence = "passed"
-    negative_cases = "passed-26"
+    twenty_five_negative_cases = "passed"
     deterministic_clean_builds = "passed"
     package_hygiene = "passed"
     exact_zip_initial_load = if ($legacyStartupProof) { [string]$runtime.fresh_start.status } else { [string]$runtime.fresh_create }
@@ -93,3 +93,4 @@ $record = [ordered]@{
 }
 Set-MIRUtf8Text -Path $OutputPath -Text (($record | ConvertTo-Json -Depth 20) + "`n")
 $record | ConvertTo-Json -Depth 20
+
