@@ -35,7 +35,6 @@ script.on_init(function()
     research_progress = force.research_progress,
     runtime_marker = "factorio-0.13-global-state"
   }
-  game.server_save("mir-1.3.0-save")
   log("[mir-fixture] 1.3.0 upgrade source proof complete")
 end)
 
