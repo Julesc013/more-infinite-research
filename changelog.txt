@@ -1,5 +1,18 @@
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
+Version: 1.9.5
+Date: 2026-08-07
+
+  Features:
+
+    - Added fixed, linear, exponential, and hybrid research-cost curves to the supported Factorio 1.1 research surface.
+
+  Bugfixes:
+
+    - Anchored continuation costs at the first controlled level while preserving the historical six-significant-digit curve.
+    - Preserved the reduced Factorio 1.1 capability boundary without Space Age, mod-data, or native productivity-family adoption.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.4
 Date: 2026-07-15
 

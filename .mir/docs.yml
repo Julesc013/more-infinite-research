@@ -1600,3 +1600,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-1.9.4-release
+  - path: docs/releases/1.9.5.md
+    title: "MIR 1.9.5 Factorio 1.1 Local Candidate Record"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.5-local-candidate

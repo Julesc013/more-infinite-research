@@ -374,7 +374,7 @@ switch ($area) {
     & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @verifyArgs
   }
   "assurance" {
-    $assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
+    [string[]]$assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
     & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @assuranceArgs
   }
   "docs" {

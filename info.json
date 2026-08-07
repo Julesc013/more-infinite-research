@@ -1,9 +1,9 @@
 {
   "name": "more-infinite-research",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "title": "More Infinite Research",
   "author": "Julesc013",
-  "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
+  "description": "Adds configurable infinite research for Factorio 1.1 logistics, combat, laboratory, and character bonuses.",
   "factorio_version": "1.1",
   "dependencies": [
     "base >= 1.1"
