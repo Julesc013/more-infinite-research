@@ -37,6 +37,11 @@ $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
+$fixtureDirectoryName = if ([int]$factorioVersionInfo.FileMajorPart -eq 0) {
+  "$fixtureModName`_$([string]$fixtureInfo.version)"
+} else {
+  $fixtureModName
+}
 $proofSuffix = if ($FixtureName -like "*-automatic-compiler") { " automatic compiler" } else { "" }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$ToVersion-upgrade-proof.json"
@@ -70,12 +75,24 @@ $modList = [ordered]@{ mods = @(
 ) }
 $modList | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods "mod-list.json") -Encoding UTF8
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
-Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureModName) -Recurse
+Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryName) -Recurse
 
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
+if ([int]$factorioVersionInfo.FileMajorPart -eq 0 -and -not (Test-Path -LiteralPath $save)) {
+  $sourceInitArgs = @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--start-server-load-scenario", "base/freeplay", "--until-tick", "1"
+  )
+  $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
+  $legacySave = Join-Path $userdata "saves\mir-$FromVersion-save.zip"
+  if ($sourceInitExitCode -ne 0 -or -not (Test-Path -LiteralPath $legacySave)) {
+    throw "MIR $FromVersion Factorio 0.x source-save initialization failed with exit code $sourceInitExitCode."
+  }
+  Copy-Item -LiteralPath $legacySave -Destination $save
+}
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
 }
