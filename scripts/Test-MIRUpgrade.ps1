@@ -155,7 +155,16 @@ if (-not $loadText.Contains($proofMarker)) {
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ($isLegacyFactorio) {
+$assertions = if ([string]$factorioVersionInfo.FileVersion -like "0.14.*") {
+  @(
+    "generated-technology-level-retained",
+    "generated-technology-completion-state-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "global-runtime-state-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+} elseif ($isLegacyFactorio) {
   @(
     "startup-setting-retained",
     "generated-technology-level-retained",

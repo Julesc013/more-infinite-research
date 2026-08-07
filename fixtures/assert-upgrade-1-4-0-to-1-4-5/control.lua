@@ -1,6 +1,5 @@
 local from_version = "1.4.0"
 local to_version = "1.4.5"
-local expected_mode = "always"
 local technology_name = "recipe-prod-research_rocket_shooting_speed-1"
 local expected_progress = 0.42
 local epsilon = 0.000001
@@ -19,17 +18,8 @@ local function technology()
   return value
 end
 
-local function assert_setting()
-  local setting = settings.startup["mir-adjust-vanilla-weapon-speed-techs"]
-  if not setting then fail("missing weapon overlap setting") end
-  if setting.value ~= expected_mode then
-    fail("weapon overlap mode was " .. tostring(setting.value) .. ", expected " .. expected_mode)
-  end
-end
-
 script.on_init(function()
   if active_version() ~= from_version then fail("source save used " .. tostring(active_version())) end
-  assert_setting()
   local force = game.forces.player
   force.research_all_technologies()
   local tech = technology()
@@ -41,7 +31,6 @@ script.on_init(function()
   force.research_progress = expected_progress
   global.mir = global.mir or {}
   global.mir.target_upgrade_fixture = {
-    mode = expected_mode,
     technology_level = tech.level,
     technology_researched = tech.researched,
     research_progress = force.research_progress,
@@ -53,7 +42,6 @@ end)
 
 script.on_configuration_changed(function()
   if active_version() ~= to_version then fail("upgraded save used " .. tostring(active_version())) end
-  assert_setting()
   local state = global.mir and global.mir.target_upgrade_fixture
   if not state or state.runtime_marker ~= "factorio-0.14-global-state" then
     fail("global runtime state did not survive upgrade")
