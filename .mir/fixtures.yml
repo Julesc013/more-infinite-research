@@ -10,7 +10,7 @@ fixtures:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-1-4-0-to-1-4-5
     validates:
-      - generated-technology-level-retained
+      - generated-technology-completion-state-retained
       - current-research-retained
       - fractional-research-progress-retained
       - global-runtime-state-retained

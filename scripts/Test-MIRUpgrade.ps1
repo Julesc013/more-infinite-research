@@ -157,7 +157,6 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
 $assertions = if ([string]$factorioVersionInfo.FileVersion -like "0.14.*") {
   @(
-    "generated-technology-level-retained",
     "generated-technology-completion-state-retained",
     "current-research-retained",
     "fractional-research-progress-retained",

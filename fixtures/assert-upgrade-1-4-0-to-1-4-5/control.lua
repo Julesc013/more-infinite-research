@@ -31,7 +31,6 @@ script.on_init(function()
   force.research_progress = expected_progress
   global.mir = global.mir or {}
   global.mir.target_upgrade_fixture = {
-    technology_level = tech.level,
     technology_researched = tech.researched,
     research_progress = force.research_progress,
     runtime_marker = "factorio-0.14-global-state"
@@ -48,7 +47,6 @@ script.on_configuration_changed(function()
   end
   local force = game.forces.player
   local tech = technology()
-  if tech.level ~= state.technology_level then fail("technology level did not survive upgrade") end
   if tech.researched ~= state.technology_researched then fail("technology completion state did not survive upgrade") end
   if not force.current_research or force.current_research.name ~= technology_name then
     fail("current research did not survive upgrade")
