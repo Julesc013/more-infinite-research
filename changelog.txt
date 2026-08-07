@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.5
+Date: 2026-08-07
+
+  Features:
+
+    - Added fixed, linear, exponential, and hybrid research-cost curves to the supported Factorio 0.17 research surface.
+
+  Bugfixes:
+
+    - Anchored continuation costs at the first controlled level while preserving the historical six-significant-digit curve.
+    - Preserved the reduced Factorio 0.17 capability boundary without Space Age, mod-data, or recipe-productivity generation.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.7.1
 Date: 2026-07-13
 

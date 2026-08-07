@@ -3,6 +3,7 @@ local defaults = {
   shared = {
     enabled = true,
     base_cost = 8000,
+    linear_increment = 0,
     growth_factor = 2,
     max_level = 0, -- 0 or nil => infinite
     research_time = 60

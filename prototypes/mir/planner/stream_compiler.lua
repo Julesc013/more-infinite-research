@@ -15,6 +15,7 @@ local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local research_cost_classification = require("prototypes.mir.domain.research_cost.classification")
 
 local M = {}
 
@@ -121,10 +122,11 @@ local function make_stream(key, raw_spec)
 
   local spec = expand_dynamic_items(raw_spec)
 
-  local base_cost = costs.base_cost_for(key, spec)
-  local growth_factor = costs.growth_factor_for(key, spec)
+  local technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1")
+  local first_level = research_cost_classification.anchor_level(technology_name, 1)
+  local cost_model = costs.model_for(key, spec, first_level)
   local max_level = costs.max_level_for(key, spec)
-  local count_formula = tostring(base_cost) .. " * " .. tostring(growth_factor) .. "^(L-1)"
+  local count_formula = cost_model.count_formula
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
@@ -159,6 +161,7 @@ local function make_stream(key, raw_spec)
       effects = direct_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
+      cost_model = cost_model,
       ingredients = ingredients,
       research_time = research_time,
       max_level = max_level,
@@ -208,6 +211,7 @@ local function make_stream(key, raw_spec)
     effects = effects,
     prerequisites = prerequisites,
     count_formula = count_formula,
+    cost_model = cost_model,
     ingredients = ingredients,
     research_time = research_time,
     max_level = max_level,
