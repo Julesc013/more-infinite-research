@@ -22,7 +22,8 @@ $governanceClass = @($config.classes | Where-Object { [string]$_.id -eq "release
 if ($governanceClass.Count -ne 1) { throw "Assurance config must declare one release-governance class." }
 foreach ($path in @(
   ".mir/backport-source-lock.json", ".mir/branches.yml", ".mir/convergence.yml",
-  ".mir/docs.yml", ".mir/fixtures.yml", ".mir/release-wave.yml"
+  ".mir/docs.yml", ".mir/fixtures.yml", ".mir/release-wave.yml",
+  ".mir/evidence/1.9.5-feature-classification.json"
 )) {
   if (-not @($governanceClass[0].patterns | Where-Object { $path -match [string]$_ })) {
     throw "Known release-governance path is unclassified: $path"
@@ -35,6 +36,12 @@ if ($docsClass.Count -ne 1 -or @($docsClass[0].tests) -contains "seal.verify") {
 $evidenceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-evidence" })
 if ($evidenceClass.Count -ne 1 -or @($evidenceClass[0].tests) -notcontains "seal.verify") {
   throw "Release evidence must retain the seal verification gate."
+}
+if (@($evidenceClass[0].patterns | Where-Object { ".mir/evidence/1.9.5-feature-classification.json" -match [string]$_ })) {
+  throw "Pre-seal feature classification must not select seal verification."
+}
+if (-not @($evidenceClass[0].patterns | Where-Object { ".mir/evidence/candidate-seals/example.json" -match [string]$_ })) {
+  throw "Candidate-seal evidence must select seal verification."
 }
 
 $releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
