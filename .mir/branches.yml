@@ -380,6 +380,20 @@ release_artifacts:
       upgrade_from_1_9_3: passed
       publication_scope: unreleased
       status: candidate-qualified
+    mir_1_8_5:
+      version: "1.8.5"
+      branch: candidate/1.8.5-projection
+      target_factorio: "1.0"
+      source_anchor: mir_1_8_2
+      package_source_commit: dd2d3c8924fdb2c6cc4d8ad068b42b31b9d10bcb
+      artifact: build/candidates/1.8.5/a/more-infinite-research_1.8.5.zip
+      sha256: 10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD
+      content_sha256: F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B
+      size_bytes: 397589
+      entries: 174
+      forbidden_entries: 0
+      publication_scope: local-outage-candidate
+      status: local-qualification-in-progress
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -576,7 +590,7 @@ release_artifacts:
       target_factorio: "0.18"
       purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
-      version: "1.8.2"
+      version: "1.8.5"
       branch: tmp/1.0
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x

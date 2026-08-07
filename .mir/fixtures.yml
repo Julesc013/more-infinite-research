@@ -74,6 +74,16 @@ real_mod_gates:
     status: required
 
 fixtures:
+  upgrade-1-8-2-to-1-8-5:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-8-2-to-1-8-5
+    validates:
+      - startup-setting-retained
+      - generated-technology-level-retained
+      - current-research-retained
+      - fractional-research-progress-retained
+      - global-runtime-state-retained
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal

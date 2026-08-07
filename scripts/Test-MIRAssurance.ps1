@@ -18,6 +18,37 @@ foreach ($required in @("static.full", "runtime.full", "runtime.upgrade", "runti
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
+$governanceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-governance" })
+if ($governanceClass.Count -ne 1) { throw "Assurance config must declare one release-governance class." }
+foreach ($path in @(
+  ".mir/backport-source-lock.json", ".mir/branches.yml", ".mir/convergence.yml",
+  ".mir/docs.yml", ".mir/fixtures.yml", ".mir/release-wave.yml",
+  ".mir/evidence/1.9.5-feature-classification.json"
+)) {
+  if (-not @($governanceClass[0].patterns | Where-Object { $path -match [string]$_ })) {
+    throw "Known release-governance path is unclassified: $path"
+  }
+}
+$docsClass = @($config.classes | Where-Object { [string]$_.id -eq "repository-docs" })
+if ($docsClass.Count -ne 1 -or @($docsClass[0].tests) -contains "seal.verify") {
+  throw "Repository docs must not select the promotion-only seal check before a seal exists."
+}
+$evidenceClass = @($config.classes | Where-Object { [string]$_.id -eq "release-evidence" })
+if ($evidenceClass.Count -ne 1 -or @($evidenceClass[0].tests) -notcontains "seal.verify") {
+  throw "Release evidence must retain the seal verification gate."
+}
+
+$inventoryText = (& (Join-Path $RepoRoot "scripts\mir.ps1") assurance inventory 6>&1 | Out-String)
+if ($LASTEXITCODE -ne 0 -or -not $inventoryText.Contains('"schema": 2')) {
+  throw "MIR CLI failed to forward a one-argument assurance command as one token."
+}
+if (@($evidenceClass[0].patterns | Where-Object { ".mir/evidence/1.9.5-feature-classification.json" -match [string]$_ })) {
+  throw "Pre-seal feature classification must not select seal verification."
+}
+if (-not @($evidenceClass[0].patterns | Where-Object { ".mir/evidence/candidate-seals/example.json" -match [string]$_ })) {
+  throw "Candidate-seal evidence must select seal verification."
+}
+
 $releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
 foreach ($requiredSealField in @("mir_version", "target", "canonical_dev_anchor")) {
   if ($releaseAssurance -notmatch ("(?m)^\s+" + [regex]::Escape($requiredSealField) + "=")) {
