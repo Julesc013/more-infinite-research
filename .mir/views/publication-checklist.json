@@ -1,5 +1,20 @@
 {
-  "assurance_exceptions": [],
+  "assurance_exceptions": [
+    {
+      "corrective_release": "3.2.9",
+      "digest_policy": "utf8-lf",
+      "generic_policy_changed": false,
+      "id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
+      "kind": "release-specific-timeboxed-publication",
+      "normal_gates_waived_for_publication_only": true,
+      "package_change_permitted": false,
+      "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+      "protected_qualification": "pending-post-publication",
+      "protected_seal": "pending-post-publication",
+      "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
+      "status": "authorized"
+    }
+  ],
   "authority": "mir-generated-publication-checklist-v1",
   "candidate_floor": "C32",
   "candidate_id": "C32",

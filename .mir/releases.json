@@ -48,7 +48,9 @@
       "archive_class": "frozen-unreleased-calibration-candidate",
       "archive_entries": 301,
       "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
-      "assurance_exception_ids": [],
+      "assurance_exception_ids": [
+        "C32-TIMEBOXED-PUBLICATION-2026-08-08"
+      ],
       "branch": "dev",
       "candidate_floor": "C32",
       "candidate_id": "C32",
@@ -71,9 +73,12 @@
       "publication_status": "manually-accepted",
       "qualification": "manually-accepted",
       "remaining_obligations": [
-        "protected-qualification",
-        "seal",
-        "promotion",
+        "protected-qualification-post-publication",
+        "protected-seal-and-reconciliation-post-publication",
+        "normal-promotion-admission-reconciliation",
+        "downstream-always-guard-correction",
+        "transport-robustness-correction",
+        "stage-b-public-asset-audit",
         "tag",
         "publication",
         "public-byte-verification"
@@ -128,7 +133,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-06",
+  "updated_at": "2026-08-07",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

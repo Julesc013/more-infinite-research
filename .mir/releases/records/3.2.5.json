@@ -110,12 +110,39 @@
         "reviewer": "Julesc013",
         "reviewed_at": "2026-08-06T09:07:40.9699842Z"
       }
+    ],
+    "publication_exception": [
+      {
+        "kind": "timeboxed-maintainer-decision",
+        "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
+        "digest_policy": "utf8-lf"
+      }
     ]
   },
+  "assurance_exceptions": [
+    {
+      "id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
+      "kind": "release-specific-timeboxed-publication",
+      "status": "authorized",
+      "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+      "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
+      "digest_policy": "utf8-lf",
+      "normal_gates_waived_for_publication_only": true,
+      "generic_policy_changed": false,
+      "protected_qualification": "pending-post-publication",
+      "protected_seal": "pending-post-publication",
+      "package_change_permitted": false,
+      "corrective_release": "3.2.9"
+    }
+  ],
   "remaining_obligations": [
-    "protected-qualification",
-    "seal",
-    "promotion",
+    "protected-qualification-post-publication",
+    "protected-seal-and-reconciliation-post-publication",
+    "normal-promotion-admission-reconciliation",
+    "downstream-always-guard-correction",
+    "transport-robustness-correction",
+    "stage-b-public-asset-audit",
     "tag",
     "publication",
     "public-byte-verification"
@@ -129,5 +156,5 @@
     "INC-2026-0059",
     "INC-2026-0060"
   ],
-  "updated_at": "2026-08-06T11:49:33.337Z"
+  "updated_at": "2026-08-07T18:25:18.3882405Z"
 }
