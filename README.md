@@ -1,8 +1,8 @@
-# More Infinite Research 1.8.2
+# More Infinite Research 1.8.5
 
-More Infinite Research 1.8.2 is the maintained Factorio 1.0 release.
+More Infinite Research 1.8.5 is the maintained Factorio 1.0 release.
 
-It is a canonical MIR 3.1.9-derived target projection, feature-complete for the capabilities supported by the target Factorio engine. It is not identical to the Factorio 1.1 or 2.1 builds.
+It is a reduced target-native projection of the MIR 3.2.5 research-cost model. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes r
 
 The Factorio 1.0 settings surface contains only controls with a target implementation:
 
-- Per-stream enable, base cost, cost growth, maximum level, research time, and effect controls for retained streams.
+- Per-stream enable, base cost, additive cost, exponential growth, maximum level, research time, and effect controls for retained streams.
 - Enable and cost controls for retained base technology extensions.
 - Lab incompatibility policy.
 - Science-pack ingredient policy using Factorio 1.0 `tool` prototypes.
@@ -42,7 +42,7 @@ Unsupported controls are absent rather than inert. This release does not expose 
 
 ### What `0` Means
 
-For maximum-level settings, `0` means the retained stream remains infinite. Other numeric controls require a positive value within the range shown by Factorio.
+For maximum-level settings, `0` means the retained stream remains infinite. For additive cost, `0` means no linear increment. Cost growth `1` is non-exponential; combining additive cost with growth provides the hybrid curve.
 
 `Research unit time` is Factorio's seconds-per-research-unit value. It is not total completion time; total time also depends on research units, labs, lab speed, and modules.
 
