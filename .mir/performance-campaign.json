@@ -23,6 +23,7 @@
   },
   "manual_scenarios": "fixtures/compat-matrix/local-library-scenarios-2.0.json",
   "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_policy": "omitted-by-capability",
   "artifact_volume_lanes": [
     "diagnostics-off.factorio-total",
     "diagnostics-on.factorio-total"

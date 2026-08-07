@@ -71,6 +71,14 @@ if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$info.
     -or -not ([string]$campaign.factorio_version).StartsWith([string]$campaign.factorio_line)) {
   throw "Performance campaign authority must match the active MIR and Factorio target in info.json."
 }
+$targetManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\targets.json') | ConvertFrom-Json
+$targetProfile = $targetManifest.profiles.PSObject.Properties[[string]$campaign.factorio_line].Value
+$artifactVolumePolicy = [string]$campaign.artifact_volume_policy
+if ($artifactVolumePolicy -notin @('required', 'omitted-by-capability') -or
+    ($artifactVolumePolicy -eq 'omitted-by-capability' -and
+      ($targetProfile.prototype_shapes.mod_data -ne $false -or @($campaign.phase_lanes).Count -ne 0))) {
+  throw "Performance campaign artifact-volume policy disagrees with the target capability profile."
+}
 if ([string]$manifest.release -ne [string]$campaign.release -or
     [string]$manifest.factorio_line -ne [string]$campaign.factorio_line) {
   throw "Performance budget authority must match the active performance campaign target."

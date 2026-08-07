@@ -436,6 +436,18 @@ $script:CampaignFactorioLine = [string]$campaign.factorio_line
 $lanes = @($campaign.lanes)
 $phaseLanes = @($campaign.phase_lanes)
 $script:RequirePerformancePhases = $phaseLanes.Count -gt 0
+$artifactVolumePolicy = [string]$campaign.artifact_volume_policy
+if ([string]::IsNullOrWhiteSpace($artifactVolumePolicy)) { $artifactVolumePolicy = 'required' }
+if ($artifactVolumePolicy -notin @('required', 'omitted-by-capability')) {
+  throw "Performance campaign artifact-volume policy is invalid: $artifactVolumePolicy"
+}
+$targetManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\targets.json') | ConvertFrom-Json
+$targetProfile = $targetManifest.profiles.PSObject.Properties[$script:CampaignFactorioLine].Value
+if ($null -eq $targetProfile) { throw "Performance campaign target profile is absent: $script:CampaignFactorioLine" }
+$artifactVolumeSupported = $artifactVolumePolicy -eq 'required'
+if (-not $artifactVolumeSupported -and ($targetProfile.prototype_shapes.mod_data -ne $false -or $phaseLanes.Count -ne 0)) {
+  throw "Artifact-volume omission is permitted only for a target without mod-data and without phase lanes."
+}
 $budgets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-budgets.json") | ConvertFrom-Json
 $expectedLaneIds = @($budgets.regression_lanes.id | Sort-Object)
 if (($expectedLaneIds -join "`n") -ne (@($lanes.id + $phaseLanes.id | Sort-Object) -join "`n")) {
@@ -603,7 +615,7 @@ foreach ($lane in $lanes) {
         $phaseSamples[$packageLabel][$phase] += [double]$result.probe.phases.$phase.seconds
       }
     }
-    if ($packageLabel -eq "candidate") {
+    if ($artifactVolumeSupported -and $packageLabel -eq "candidate") {
       $surface = switch ([string]$lane.id) {
         "diagnostics-off.factorio-total" { "diagnostics-off" }
         "diagnostics-on.factorio-total" { "diagnostics-on" }
@@ -662,19 +674,21 @@ foreach ($phaseLane in $phaseLanes) {
 }
 
 $volumeMeasurements = @()
-foreach ($surface in @("diagnostics-off", "diagnostics-on")) {
-  $samples = @($volumeSamples[$surface])
-  if ($samples.Count -ne $MeasuredRuns) { throw "Artifact-volume surface '$surface' lacks measured candidate runs." }
-  $counterNames = @($samples[0].counters.PSObject.Properties.Name | Sort-Object)
-  $counters = [ordered]@{}
-  foreach ($name in $counterNames) {
-    $counters[$name] = [long](($samples | ForEach-Object { [long]$_.counters.$name } | Measure-Object -Maximum).Maximum)
-  }
-  $volumeMeasurements += [ordered]@{
-    surface = $surface
-    measured_runs = $samples.Count
-    telemetry_fingerprints = @($samples | ForEach-Object { ([string]$_.evidence_sha256).ToUpperInvariant() })
-    counters = $counters
+if ($artifactVolumeSupported) {
+  foreach ($surface in @("diagnostics-off", "diagnostics-on")) {
+    $samples = @($volumeSamples[$surface])
+    if ($samples.Count -ne $MeasuredRuns) { throw "Artifact-volume surface '$surface' lacks measured candidate runs." }
+    $counterNames = @($samples[0].counters.PSObject.Properties.Name | Sort-Object)
+    $counters = [ordered]@{}
+    foreach ($name in $counterNames) {
+      $counters[$name] = [long](($samples | ForEach-Object { [long]$_.counters.$name } | Measure-Object -Maximum).Maximum)
+    }
+    $volumeMeasurements += [ordered]@{
+      surface = $surface
+      measured_runs = $samples.Count
+      telemetry_fingerprints = @($samples | ForEach-Object { ([string]$_.evidence_sha256).ToUpperInvariant() })
+      counters = $counters
+    }
   }
 }
 $counterBudgetFailures = @()
@@ -736,10 +750,10 @@ $evidence = [ordered]@{
   }
   run_order = $runOrder
   lanes = $laneResults
-  artifact_volume = [ordered]@{
-    telemetry_schema = 1
-    aggregation = "maximum-observed"
-    measurements = $volumeMeasurements
+  artifact_volume = if ($artifactVolumeSupported) {
+    [ordered]@{ telemetry_schema=1; aggregation='maximum-observed'; measurements=$volumeMeasurements }
+  } else {
+    [ordered]@{ telemetry_schema=0; aggregation='omitted-by-capability'; capability='mod_data'; measurements=@() }
   }
 }
 $outputParent = Split-Path -Parent $outputFile
