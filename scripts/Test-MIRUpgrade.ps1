@@ -35,21 +35,8 @@ $to = Resolve-MIRUpgradePath -Path $ToZip
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $factorioBinaryVersion = [string]$factorioVersionInfo.FileVersion
 if ([string]::IsNullOrWhiteSpace($factorioBinaryVersion)) {
-  $versionProcessInfo = [System.Diagnostics.ProcessStartInfo]::new()
-  $versionProcessInfo.FileName = $factorio
-  $versionProcessInfo.UseShellExecute = $false
-  $versionProcessInfo.CreateNoWindow = $true
-  $versionProcessInfo.RedirectStandardOutput = $true
-  $versionProcessInfo.RedirectStandardError = $true
-  [void]$versionProcessInfo.ArgumentList.Add("--version")
-  $versionProcess = [System.Diagnostics.Process]::Start($versionProcessInfo)
-  $versionOutput = $versionProcess.StandardOutput.ReadToEnd() + $versionProcess.StandardError.ReadToEnd()
-  $versionProcess.WaitForExit()
-  $versionMatch = [regex]::Match($versionOutput, '(?m)^Version:\s+([0-9.]+)')
-  if ($versionProcess.ExitCode -ne 0 -or -not $versionMatch.Success) {
-    throw "Unable to resolve the exact Factorio binary version."
-  }
-  $factorioBinaryVersion = $versionMatch.Groups[1].Value
+  $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+  $factorioBinaryVersion = [string]$repoInfo.factorio_version
 }
 $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
@@ -133,6 +120,8 @@ if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion
 if (-not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
   throw "MIR $FromVersion upgrade source proof marker is missing."
 }
+$loggedVersion = [regex]::Match($createText, '(?m)Factorio\s+([0-9.]+)')
+if ($loggedVersion.Success) { $factorioBinaryVersion = $loggedVersion.Groups[1].Value }
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
