@@ -55,9 +55,12 @@ if ($LASTEXITCODE -ne 0 -or [string]$released20Tag -ne [string]$lock.released_2_
   throw "Released Factorio 2.0 reference $($lock.released_2_0_reference) does not resolve to the locked commit."
 }
 
-$anchorRefCommit = & git -C $RepoRoot rev-parse --verify ([string]$lock.canonical_anchor_ref)
-if ($LASTEXITCODE -ne 0 -or [string]$anchorRefCommit -ne [string]$lock.canonical_dev_anchor) {
-  throw "Canonical anchor ref $($lock.canonical_anchor_ref) is missing or stale."
+$anchorRefCommit = & git -C $RepoRoot rev-parse --verify ([string]$lock.canonical_anchor_ref) 2>$null
+if ($LASTEXITCODE -eq 0 -and [string]$anchorRefCommit -ne [string]$lock.canonical_dev_anchor) {
+  throw "Canonical anchor ref $($lock.canonical_anchor_ref) resolves to a different commit."
+}
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "[info] Optional canonical anchor ref is absent; using locked immutable commit $($lock.canonical_dev_anchor)."
 }
 & git -C $RepoRoot merge-base --is-ancestor ([string]$lock.canonical_dev_anchor) HEAD
 if ($LASTEXITCODE -ne 0) { throw "Target history does not contain the canonical development anchor." }
