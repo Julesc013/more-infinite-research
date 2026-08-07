@@ -56,9 +56,14 @@ $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
 New-Item -ItemType Directory -Force -Path $mods, $userdata | Out-Null
 $config = Join-Path $root "config.ini"
+$factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorio))
+$factorioReadData = Join-Path $factorioRoot "data"
+if (-not (Test-Path -LiteralPath $factorioReadData -PathType Container)) {
+  throw "Unable to find Factorio read-data directory for upgrade validation: $factorioReadData"
+}
 @(
   "[path]",
-  "read-data=__PATH__executable__/../../data",
+  "read-data=$($factorioReadData.Replace('\', '/'))",
   "write-data=$($userdata.Replace('\', '/'))",
   "[other]",
   "check-updates=false"
