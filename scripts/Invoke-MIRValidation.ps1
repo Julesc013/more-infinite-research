@@ -2081,6 +2081,7 @@ function Get-FixtureInfos {
       Name = $info.name
       Version = $info.version
       Path = $fixture.FullName
+      Dependencies = @($info.dependencies)
     }
   }
   return $infos
@@ -2390,10 +2391,21 @@ function Initialize-RuntimeScenario {
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
+  $fixtureNamesDependingOnMir = @(
+    $fixtureInfos |
+      Where-Object {
+        @($_.Dependencies) | Where-Object {
+          $_ -match '^(?:\?|~|!|\(\?\))?\s*more-infinite-research(?:\s|$)'
+        }
+      } |
+      Select-Object -ExpandProperty Name
+  )
   $copiedInfoPath = Join-CopiedMIRPath -ModsDir $modsDir -RelativePath "info.json"
   $copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
   $dependencies = @($copiedInfo.dependencies)
-  foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {
+  foreach ($fixtureName in @($fixtureNames | Where-Object {
+    $_ -notin $postMirAssertionFixtures -and $_ -notin $fixtureNamesDependingOnMir
+  })) {
     $dependency = "? $fixtureName"
     if ($dependencies -notcontains $dependency) {
       $dependencies += $dependency
