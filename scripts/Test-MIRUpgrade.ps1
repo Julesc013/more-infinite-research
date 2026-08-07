@@ -90,7 +90,7 @@ Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryN
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $commonArgs = @("--config", $config, "--no-log-rotation")
-if ($factorioBinaryVersion -notlike "0.13.*" -and $factorioBinaryVersion -notlike "0.14.*") {
+if ($factorioBinaryVersion -notlike "0.13*" -and $factorioBinaryVersion -notlike "0.14*") {
   $commonArgs += "--disable-audio"
 }
 $commonArgs += @("--mod-directory", $mods)
@@ -164,7 +164,7 @@ if (-not $loadText.Contains($proofMarker)) {
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ($factorioBinaryVersion -like "0.13.*" -or $factorioBinaryVersion -like "0.14.*") {
+$assertions = if ($factorioBinaryVersion -like "0.13*" -or $factorioBinaryVersion -like "0.14*") {
   @(
     "generated-technology-completion-state-retained",
     "current-research-retained",
