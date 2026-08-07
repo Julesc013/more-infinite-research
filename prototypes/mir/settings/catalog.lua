@@ -2,6 +2,7 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
+local cost_contract = require("prototypes.mir.settings.cost_contract")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -55,6 +56,10 @@ end
 
 local function default_growth_factor(key, stream)
   return lookup_default(key, "growth_factor", stream, C.shared.growth_factor)
+end
+
+local function default_linear_increment(key, stream)
+  return lookup_default(key, "linear_increment", stream, 0)
 end
 
 local function default_max_level_setting(key, stream)
@@ -240,7 +245,7 @@ function M.global_setting_prototypes()
 end
 
 function M.stream_setting_specs(key, stream)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "ips-enable-" .. key,
@@ -274,14 +279,19 @@ function M.stream_setting_specs(key, stream)
       maximum_value = 2147483647
     }
   }
+  if target_line.supports_native_infinite_technology() then
+    table.insert(out, 3, cost_contract.stream_linear_increment_spec(key, default_linear_increment(key, stream)))
+  end
+  return out
 end
 
 function M.base_extension_setting_specs(key)
   local defaults_spec = base_defaults[key] or {}
   local base_default = math.floor(base_number(defaults_spec, "base_cost", 0, 0) + 0.5)
+  local linear_default = math.floor(base_number(defaults_spec, "linear_increment", 0, 0) + 0.5)
   local growth_default = base_number(defaults_spec, "growth_factor", 0, 0)
   local research_time_default = math.floor(base_number(defaults_spec, "research_time", 60, 1) + 0.5)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "mir-enable-" .. key,
@@ -315,6 +325,10 @@ function M.base_extension_setting_specs(key)
       maximum_value = 2147483647
     }
   }
+  if target_line.supports_native_infinite_technology() then
+    table.insert(out, 3, cost_contract.base_linear_increment_spec(key, linear_default))
+  end
+  return out
 end
 
 function M.all_specs()

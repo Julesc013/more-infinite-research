@@ -85,6 +85,7 @@ return {
     setting_names = {
       enable = "ips-enable-%s",
       base_cost = "ips-cost-base-%s",
+      linear_increment = "ips-cost-linear-increment-%s",
       growth = "ips-cost-growth-%s",
       max_level = "ips-max-level-%s",
       research_time = "ips-research-time-%s"

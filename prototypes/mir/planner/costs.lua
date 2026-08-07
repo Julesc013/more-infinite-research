@@ -2,6 +2,8 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
+local cost_contract = require("prototypes.mir.settings.cost_contract")
+local research_cost_model = require("prototypes.mir.domain.research_cost.model")
 
 local M = {}
 
@@ -56,6 +58,28 @@ function M.growth_factor_for(key, spec)
   local value = startup_setting("ips-cost-growth-" .. key)
   if value ~= nil then return ensure_minimum(value, default, 1) end
   return ensure_minimum(default, C.shared.growth_factor, 1)
+end
+
+function M.linear_increment_for(key, spec)
+  local default = lookup_default(key, "linear_increment", spec, 0)
+  local value = startup_setting(cost_contract.stream_name("linear_increment", key))
+  if value ~= nil then return ensure_minimum(value, default, 0) end
+  return ensure_minimum(default, 0, 0)
+end
+
+function M.model_for(key, spec, anchor_level)
+  return research_cost_model.new({
+    anchor_level = anchor_level or 1,
+    base_cost = M.base_cost_for(key, spec),
+    linear_increment = M.linear_increment_for(key, spec),
+    growth_factor = M.growth_factor_for(key, spec),
+    provenance = {
+      base_cost = cost_contract.stream_name("base_cost", key),
+      linear_increment = cost_contract.stream_name("linear_increment", key),
+      growth_factor = cost_contract.stream_name("growth_factor", key),
+      anchor_level = "technology-first-level"
+    }
+  })
 end
 
 function M.research_time_for(key, spec)
