@@ -85,7 +85,9 @@ Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureDirectoryN
 $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $commonArgs = @("--config", $config, "--no-log-rotation")
-if ([string]$factorioVersionInfo.FileVersion -notlike "0.14.*") { $commonArgs += "--disable-audio" }
+if ([string]$factorioVersionInfo.FileVersion -notlike "0.13.*" -and [string]$factorioVersionInfo.FileVersion -notlike "0.14.*") {
+  $commonArgs += "--disable-audio"
+}
 $commonArgs += @("--mod-directory", $mods)
 $createArgs = @($commonArgs) + @("--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
