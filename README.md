@@ -1,4 +1,4 @@
-# More Infinite Research
+# More Infinite Research 1.3.5
 
 [![Factorio Mod Portal downloads](https://img.shields.io/factorio-mod-portal/dt/more-infinite-research?style=flat-square&label=downloads)](https://mods.factorio.com/mod/more-infinite-research)
 [![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research)
@@ -8,6 +8,8 @@
 [![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
 
 *Trickle down economics bring productivity gains to all industries.*
+
+MIR 1.3.5 is the Factorio 0.13 finite-substitute projection of the MIR 3.2.5 research-cost model. The canonical model is compiled into a positive bounded first-continuation count; unsupported infinite formulas and curve-selection controls remain omitted.
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
