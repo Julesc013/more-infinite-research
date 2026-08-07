@@ -100,7 +100,9 @@ function M.supports_native_infinite_technology()
 end
 
 function M.finite_research_count(count_formula)
-  local leading = tonumber(string.match(tostring(count_formula or ""), "^([%d%.]+)"))
+  local text = tostring(count_formula or "")
+  local leading = tonumber(string.match(text, "^([%d%.]+)"))
+  if not leading then leading = tonumber(string.match(text, "^%(([%d%.]+)")) end
   if not leading or leading < 1 then return 1000 end
   return math.floor(leading + 0.5)
 end

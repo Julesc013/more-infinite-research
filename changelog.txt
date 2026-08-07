@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.4.5
+Date: 2026-08-07
+
+  Features:
+
+    - Compiled the canonical research-cost model into target-supported positive finite continuation counts.
+
+  Bugfixes:
+
+    - Anchored each finite continuation at its first controlled level using the shared six-significant-digit cost semantics.
+    - Kept infinite formulas and curve-selection controls omitted because Factorio 0.14 cannot represent them safely.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.4.0
 Date: 2026-07-13
 
@@ -39,7 +52,6 @@ Date: 2026-07-13
 
     - Kept only target-supported direct effects and base technology continuations.
     - Kept Factorio 0.17+, 1.x, 2.x, and DLC-only behavior out of this package.
-
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.1
 Date: 2026-07-13
