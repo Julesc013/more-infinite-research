@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "mir-development-playtest-qualification",
+  "release": "3.2.5",
+  "development_revision": 5,
+  "status": "passed",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+  "package_source_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
+  "pull_request": 53,
+  "package": {
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301,
+    "deterministic_builds": 2
+  },
+  "local_breadth": {
+    "status": "passed",
+    "plan": "artifacts/qualification/3.2.5/0005-ga3bfbc45/local-breadth/verification-plan.json",
+    "summary": "artifacts/qualification/3.2.5/0005-ga3bfbc45/local-breadth/verification-summary.json",
+    "plan_material_sha256": "E5EB38EACCC2153730B4B303C17D417541D6A0E2E3D625442A83E5B0A524297B",
+    "required_test_set_sha256": "9DE635BA6172321F4B88A5D39DF09B226CD7F3D0717FE76BD74D5967F2C70EDB",
+    "tests": 128,
+    "executed": 126,
+    "reused": 2,
+    "failed": 0,
+    "incomplete": 0,
+    "unexpected": 0
+  },
+  "hosted_fast_gate": {
+    "status": "passed",
+    "head_commit": "90ff29e76b71d8fcb907eca37bc8057cf2f43937",
+    "merge_context_commit": "3a3d0f5f71983188fd1e997d639edd4a022ced52",
+    "merged_dev_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "branch_policy_run": 31013014137,
+    "emergency_package_run": 31013014086,
+    "mir_run": 31013014073,
+    "plan_material_sha256": "BC9691D1E9FB2CA59231D6FF11D79F374ED1DC008A2982D69F211E21CC9B490D",
+    "required_test_set_sha256": "7E6A5E953B211594263D2119DC8F5DE2A36450A5AECCB255B9E38CEACC518DBC",
+    "bundle_sha256": "D543EBDC72175DA9FF7619ED5B11D5A59C7EF52DADBD4E069CF6679DB9EB27B1",
+    "worker_import": {
+      "imported": 8,
+      "failed": 0,
+      "missing": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "ignored": 0
+    }
+  },
+  "merged_dev": {
+    "status": "passed",
+    "plan": "artifacts/qualification/3.2.5/0005-ga3bfbc45/merged-dev/verification-plan.json",
+    "plan_material_sha256": "3F701F2BA1C42B50081F0D77E284C5EAFF42C3C490449BA82ABB6E538B5512C0",
+    "checks": [
+      "tooling.self-test",
+      "static.package",
+      "runtime.upgrade",
+      "scenario/2.1/package-zip-base",
+      "scenario/2.1/package-zip-space-age",
+      "scenario/2.1/compiler-contracts",
+      "scenario/2.1/space-age-native-owner-settings-config-change"
+    ],
+    "upgrade_archetypes": 5,
+    "upgrade_reloads_per_archetype": 2,
+    "curve_transitions": 16,
+    "remaining_factorio_processes": 0
+  },
+  "playtest_gate": "passed",
+  "breadth_gate": "passed",
+  "candidate_id": null,
+  "completed_at": "2026-08-05T14:31:00Z"
+}

@@ -1,0 +1,1 @@
+MIR 1.6.5 is the frozen MIR 3 `.5` historical projection for Factorio 0.16.51, following MIR 1.6.0. Exact package identity: `8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB`. Automated historical target qualification and the downloaded public-asset load passed; no personal visual playtest is claimed. Later corrections route to 1.6.9.

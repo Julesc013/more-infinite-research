@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "release": "3.2.5",
+  "development_revision": 1,
+  "source_commit": "e332f80d25b528b5c2ce9c5c337b168bbba27c0f",
+  "source_tree": "6511648a577429ca5923afd3b7848dfe8aa8833b",
+  "archive_sha256": "DBEC0DC8136D2ABF4B84F6E08B1E50961327139B696DC42190CD16D689EECD95",
+  "content_sha256": "EDA47A721AA81CA9D26568F7E667BAB798121D7AFBF2B0DDD9AE1A71817EAC47",
+  "bytes": 1051158,
+  "entries": 299,
+  "factorio_version": "2.1.12",
+  "factorio_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27",
+  "playtest_gate": "passed",
+  "breadth_gate": "not-established",
+  "candidate_id": null,
+  "accepted_at": "2026-08-04T19:11:34.8138134Z"
+}

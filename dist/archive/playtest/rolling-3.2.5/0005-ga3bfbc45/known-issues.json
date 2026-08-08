@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "release": "3.2.5",
+  "development_revision": 5,
+  "status": "development-playtest-ready",
+  "issues": [
+    "MIR 3.2.5 remains planned and is not yet source-frozen or candidate-qualified.",
+    "C32 remains an unassigned candidate floor; this package is not yet the release candidate.",
+    "The D1 freeze packet, candidate-bound paired performance, manual acceptance, protected no-reuse qualification, seal, and promotion proof remain open.",
+    "P11 assurance and BZ classification remain open programme work outside the narrowed player-package freeze boundary.",
+    "Factorio 2.0 has explicit shipped-feature dispositions but no 2.5.5 authority exists.",
+    "MIR 3.3 work is not admitted."
+  ]
+}

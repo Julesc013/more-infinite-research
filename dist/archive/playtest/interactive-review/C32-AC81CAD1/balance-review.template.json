@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "mir-human-balance-review-worksheet",
+  "candidate_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "required_sample_kinds": [
+    "early-recipe-productivity",
+    "late-recipe-productivity",
+    "native-owner-adoption",
+    "base-continuation",
+    "direct-effect",
+    "modded-structural-attachment",
+    "intentionally-skipped-candidate",
+    "sanitation-or-compatibility-decision"
+  ],
+  "rows": [],
+  "row_fields": [
+    "sample_kind",
+    "technology_id",
+    "first_generated_level",
+    "science_set",
+    "prerequisite_milestone",
+    "effect_per_level",
+    "first_level_cost",
+    "growth_factor",
+    "research_time",
+    "maximum_useful_levels_before_cap",
+    "target_recipe_count",
+    "ownership",
+    "verdict",
+    "notes"
+  ]
+}

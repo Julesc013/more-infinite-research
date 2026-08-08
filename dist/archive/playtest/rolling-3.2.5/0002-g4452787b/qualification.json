@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "mir-development-playtest-qualification",
+  "release": "3.2.5",
+  "development_revision": 2,
+  "status": "passed",
+  "source_commit": "4452787b5fea4a61b99027f130671ab52ecaf57b",
+  "source_tree": "00284a95ee517454000168d2f79dc558d358063e",
+  "plan": {
+    "path": ".work/output/verification-plan-325-post-pr48-dev.json",
+    "material_sha256": "C753118E51ADA58F24802A733DDA479A31440374287FBBCA7A915A351EF46303",
+    "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
+    "tests": 135,
+    "unknown_paths": 0
+  },
+  "package": {
+    "archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "content_sha256": "911DE8D1B427D24B1BAB301E2681F2F44EF040DDDD8CBBA272A29D471DA334C6",
+    "bytes": 1051507,
+    "entries": 299,
+    "deterministic_builds": 2
+  },
+  "checks": [
+    {"id": "tooling.self-test", "status": "passed", "evidence": ".work/output/post-pr48-tooling-self-test.json"},
+    {"id": "static.package", "status": "passed", "evidence": ".work/output/post-pr48-static-package.json"},
+    {"id": "scenario/2.1/package-zip-base", "status": "passed", "evidence": ".work/output/post-pr48-scenario-2-1-package-zip-base.json"},
+    {"id": "scenario/2.1/package-zip-space-age", "status": "passed", "evidence": ".work/output/post-pr48-scenario-2-1-package-zip-space-age.json"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-config-change", "status": "passed", "evidence": ".work/output/post-pr48-scenario-2-1-space-age-native-owner-settings-config-change.json", "curve_transitions": 16},
+    {"id": "runtime.upgrade", "status": "passed", "evidence": ".work/output/post-pr48-runtime-upgrade.json", "archetypes": 5},
+    {"id": "package.determinism", "status": "passed", "builds": 2},
+    {"id": "factorio.process-cleanup", "status": "passed", "remaining_processes": 0},
+    {"id": "git.clean", "status": "passed"},
+    {"id": "changed-paths.mapped", "status": "passed", "unknown_paths": 0}
+  ],
+  "hosted_fast_gate": {
+    "status": "passed",
+    "run": 30961056250,
+    "source_commit": "f821c583a15b1bdbe29462d57b1abf90389b8ef7",
+    "source_tree": "00284a95ee517454000168d2f79dc558d358063e",
+    "worker_import": {"imported": 8, "failed": 0, "missing": 0, "rejected": 0, "duplicates": 0, "ignored": 0}
+  },
+  "playtest_gate": "passed",
+  "breadth_gate": "not-established",
+  "candidate_id": null,
+  "completed_at": "2026-08-05T00:13:53.6174739Z"
+}

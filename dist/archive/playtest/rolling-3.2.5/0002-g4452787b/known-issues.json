@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "release": "3.2.5",
+  "development_revision": 2,
+  "status": "development-playtest-ready",
+  "issues": [
+    "MIR 3.2.5 remains planned and is not source-frozen or candidate-qualified.",
+    "C32 remains an unassigned candidate floor; this package is not a release candidate.",
+    "The complete fresh development-breadth campaign, ecosystem matrix, performance campaign, manual acceptance, protected qualification, seal, and publication proof remain open.",
+    "P11 assurance and BZ classification remain open programme work.",
+    "Factorio 2.0 dispositions are incomplete and no 2.5.5 authority exists.",
+    "MIR 3.3 work is not admitted."
+  ]
+}

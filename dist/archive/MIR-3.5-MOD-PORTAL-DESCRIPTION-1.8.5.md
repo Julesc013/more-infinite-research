@@ -1,0 +1,1 @@
+MIR 1.8.5 is the frozen MIR 3 `.5` projection for Factorio 1.0.0 only, following MIR 1.8.2. Factorio 0.18 support is not claimed. Exact package identity: `10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD`. LTS automated target qualification and the downloaded public-asset load passed; no personal visual playtest is claimed. Later corrections route to 1.8.9.

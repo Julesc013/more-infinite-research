@@ -1,0 +1,1 @@
+MIR 1.4.5 is the frozen finite-capability MIR 3 `.5` projection for Factorio 0.14.23, following MIR 1.4.0. Exact package identity: `BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47`. Automated finite target qualification and the downloaded public-asset load passed; no personal visual playtest is claimed. Later corrections route to 1.4.9.

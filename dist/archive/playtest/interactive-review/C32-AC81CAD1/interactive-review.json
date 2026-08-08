@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "kind": "mir-interactive-review-preparation",
+  "status": "pending",
+  "version": "3.2.5",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "archive_path": "dist/more-infinite-research_3.2.5.zip",
+  "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+  "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "validation_harness_sha256": "FCAE134A0F44425808F2DB18D40C01B59FFCC2E80F97CAD6059078B384937DC7",
+  "factorio": {
+    "expected_version": "2.1.12",
+    "version": "2.1.12",
+    "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "profiles": [
+    {
+      "id": "base",
+      "official_mods": [
+        "base"
+      ]
+    },
+    {
+      "id": "space-age",
+      "official_mods": [
+        "base",
+        "quality",
+        "elevated-rails",
+        "space-age"
+      ]
+    }
+  ],
+  "required_checks": [
+    {
+      "id": "technology-tree-visual",
+      "status": "pending",
+      "criteria": "Inspect placement, arrows, infinite display, continuations, native-owner duplication, and disabled-stream gaps in base and Space Age."
+    },
+    {
+      "id": "icon-visual",
+      "status": "pending",
+      "criteria": "Inspect base fallbacks, DLC assets, overlays, contrast, UI scale, and missing-asset placeholders."
+    },
+    {
+      "id": "locale-fit-and-truncation",
+      "status": "pending",
+      "criteria": "Inspect technology, setting, and help text at ordinary UI widths in the reviewed locales."
+    },
+    {
+      "id": "settings-ux",
+      "status": "pending",
+      "criteria": "Inspect conservative defaults, automatic-compiler controls, native-owner notes, dropdown fit, and translated labels."
+    },
+    {
+      "id": "save-ui",
+      "status": "pending",
+      "criteria": "Inspect existing levels, selected research, fractional progress, native-owner values, mod removal/re-addition, and startup-setting save/reload."
+    },
+    {
+      "id": "human-balance",
+      "status": "pending",
+      "criteria": "Complete the representative balance worksheet and record a reasoned verdict for every sample."
+    },
+    {
+      "id": "configuration-change-give-item-safety",
+      "status": "pending",
+      "criteria": "With a connected player, prove an external give-item effect and unrelated force state are unchanged by the MIR adoption-signature change."
+    }
+  ],
+  "notes": [
+    "This pending packet is preparation, not schema-2 evidence that GUI review passed.",
+    "Do not reuse screenshots or saves from another candidate or Factorio binary.",
+    "Complete the final governed attestation only after Factorio 2.1.11 is identity-bound."
+  ]
+}

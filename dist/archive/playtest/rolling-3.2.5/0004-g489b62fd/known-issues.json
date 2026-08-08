@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "release": "3.2.5",
+  "development_revision": 4,
+  "status": "development-playtest-ready",
+  "issues": [
+    "MIR 3.2.5 remains planned and is not source-frozen or candidate-qualified.",
+    "C32 remains an unassigned candidate floor; this package is not a release candidate.",
+    "The performance campaign, manual acceptance, protected qualification, seal, and publication proof remain open.",
+    "325-B0 is implemented and qualified but still needs its append-only package-excluded closure record.",
+    "P11 assurance and BZ classification remain open programme work.",
+    "Factorio 2.0 requires its exact target adapter proof and no 2.5.5 authority exists.",
+    "MIR 3.3 work is not admitted."
+  ]
+}

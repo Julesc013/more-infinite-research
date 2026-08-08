@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "mir-development-playtest-qualification",
+  "release": "3.2.5",
+  "development_revision": 3,
+  "status": "passed",
+  "source_commit": "b1144889386cf8bc5e7561bf6399d1127cfa74cb",
+  "source_tree": "b2671260c6fb84b75dbd86ad43e9351842cb91bb",
+  "plan": {
+    "path": ".work/output/verification-plan-325-post-pr49-breadth-fresh.json",
+    "material_sha256": "D75E8EB8B19E623B8B8C0E1EFB26ED40312265EAFCBE3F2BB42C0F632004198F",
+    "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
+    "tests": 135,
+    "run": 135,
+    "reuse": 0,
+    "wait": 0,
+    "invalid": 0,
+    "unknown_paths": 0
+  },
+  "package": {
+    "archive_sha256": "79965DD6167488013CEEE414897C4F00350B6FE541F4459B80D49C234DBDF208",
+    "content_sha256": "489DFFB3C5998773B13256DB2298495FB97CE87F8C45C0A916E062DB1475DE0F",
+    "bytes": 1051537,
+    "entries": 299,
+    "deterministic_builds": 2
+  },
+  "checks": [
+    {"id": "tooling.self-test", "status": "passed", "evidence": ".work/output/post-pr49-tooling-self-test.json"},
+    {"id": "static.package", "status": "passed", "evidence": ".work/output/post-pr49-static-package.json"},
+    {"id": "scenario/2.1/package-zip-base", "status": "passed", "evidence": ".work/output/post-pr49-scenario-2-1-package-zip-base.json"},
+    {"id": "scenario/2.1/package-zip-space-age", "status": "passed", "evidence": ".work/output/post-pr49-scenario-2-1-package-zip-space-age.json"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-config-change", "status": "passed", "evidence": ".work/output/post-pr49-scenario-2-1-space-age-native-owner-settings-config-change.json", "curve_transitions": 16},
+    {"id": "runtime.upgrade", "status": "passed", "evidence": ".work/output/post-pr49-runtime-upgrade.json", "archetypes": 5},
+    {"id": "runtime.ecosystem", "status": "passed", "evidence": ".work/output/continuation-13-runtime.ecosystem.json", "repair_smokes": 9, "representative_scenarios": 1, "unexpected_groups": 0},
+    {"id": "package.determinism", "status": "passed", "builds": 2},
+    {"id": "factorio.process-cleanup", "status": "passed", "remaining_processes": 0},
+    {"id": "git.clean", "status": "passed"},
+    {"id": "changed-paths.mapped", "status": "passed", "unknown_paths": 0}
+  ],
+  "hosted_fast_gate": {
+    "status": "passed",
+    "pull_request": 49,
+    "push_run": 30973655159,
+    "pull_request_run": 30973800881,
+    "pr_head": "5f2cd1cbd56d937510e582a40742c0935d505fbf",
+    "merge_context_commit": "6d981dcb8b9e5733779c406f1277166e43ecc05e",
+    "merged_dev_commit": "b1144889386cf8bc5e7561bf6399d1127cfa74cb",
+    "source_tree": "b2671260c6fb84b75dbd86ad43e9351842cb91bb",
+    "worker_import": {"imported": 8, "failed": 0, "missing": 0, "rejected": 0, "duplicates": 0, "ignored": 0}
+  },
+  "playtest_gate": "passed",
+  "breadth_gate": "passed",
+  "breadth_evidence": {
+    "bundle": ".work/output/evidence-bundle-325-post-pr49-breadth-fresh.json",
+    "bundle_sha256": "7BFA71F8789D17E8CD42B00A777F16883072835ABC55B0F4F439900B675AC76A",
+    "capsule_set_sha256": "121CB75000079F35C15B5EEBD07DD2AD419768E331C92D94F05843277F5DB7C1",
+    "tests": 135,
+    "executed": 135,
+    "reused": 0,
+    "failed": 0,
+    "missing": 0
+  },
+  "candidate_id": null,
+  "completed_at": "2026-08-05T04:38:54.3436337Z"
+}
