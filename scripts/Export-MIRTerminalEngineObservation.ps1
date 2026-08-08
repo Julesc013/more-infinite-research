@@ -205,6 +205,9 @@ $record = [ordered]@{
   official_data_file_count=[int]$installation.official_data.file_count;
   official_data_sha256=[string]$installation.official_data.sha256;
   installation_sha256=[string]$installation.installation_sha256;
+  observer_protocol=1;
+  observer_tool_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash;
+  normalizer_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1") -Algorithm SHA256).Hash;
   semantic_observation_sha256=$semanticSha256; mode="base-only-read-only-observer-after-data-final-fixes";
   technologies=@($inventory.technologies); effects_and_owners=@($inventory.effects_and_owners); settings=@($inventory.settings);
   capability_omissions=@(

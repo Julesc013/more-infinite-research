@@ -3,6 +3,7 @@ param([string]$RepoRoot = "")
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path }
 . (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
 
 $dataRaw = [pscustomobject][ordered]@{
   technology = [pscustomobject][ordered]@{
@@ -39,5 +40,40 @@ $logInventory = Get-MIRTerminalEngineInventoryFromLog -Lines @(
 if (-not $logInventory.data_complete -or -not $logInventory.settings_complete -or
     @($logInventory.technologies).Count -ne 1 -or @($logInventory.effects_and_owners).Count -ne 1 -or @($logInventory.settings).Count -ne 1) {
   throw "Terminal observer line protocol did not parse its completed inventories."
+}
+
+$evidenceRoot = Join-Path $RepoRoot ".mir\evidence\terminal\baselines"
+if (Test-Path -LiteralPath $evidenceRoot -PathType Container) {
+  $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
+  $verification = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-PUBLIC-ASSET-VERIFICATION.json") | ConvertFrom-Json -Depth 100
+  $toolSha = (Get-FileHash -LiteralPath (Join-Path $RepoRoot "scripts\Export-MIRTerminalEngineObservation.ps1") -Algorithm SHA256).Hash
+  $normalizerSha = (Get-FileHash -LiteralPath (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1") -Algorithm SHA256).Hash
+  foreach ($file in @(Get-ChildItem -LiteralPath $evidenceRoot -Filter "*-engine-observation.json" -File | Sort-Object Name)) {
+    $observation = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json -Depth 100
+    $waveRows = @($wave.releases | Where-Object version -eq $observation.release)
+    $verificationRows = @($verification.releases | Where-Object version -eq $observation.release)
+    if ($waveRows.Count -ne 1 -or $verificationRows.Count -ne 1 -or
+        [string]$observation.archive_sha256 -ne [string]$waveRows[0].archive_sha256 -or
+        [string]$observation.executable_sha256 -ne [string]$verificationRows[0].factorio_executable_sha256 -or
+        [int]$observation.observer_protocol -ne 1 -or
+        [string]$observation.observer_tool_sha256 -ne $toolSha -or [string]$observation.normalizer_sha256 -ne $normalizerSha) {
+      throw "Tracked terminal engine observation identity or tool binding failed: $($file.Name)"
+    }
+    $material = [ordered]@{
+      technologies=@($observation.technologies)
+      effects_and_owners=@($observation.effects_and_owners)
+      settings=@($observation.settings)
+      data_complete=$true
+      settings_complete=(@($observation.capability_omissions.field) -notcontains "setting-prototype-stage")
+    }
+    $materialSha = Get-MIRAssuranceTextHash -Text ($material | ConvertTo-Json -Depth 100 -Compress)
+    if ([string]$observation.semantic_observation_sha256 -ne $materialSha -or @($observation.technologies).Count -eq 0) {
+      throw "Tracked terminal engine observation semantic digest or technology inventory failed: $($file.Name)"
+    }
+    $text = Get-Content -Raw -LiteralPath $file.FullName
+    if ($text -match '(?i)[A-Z]:\\|generated_at|duration_seconds') {
+      throw "Tracked terminal engine observation contains machine-local or volatile fields: $($file.Name)"
+    }
+  }
 }
 Write-Host "[ok] terminal exact-engine observation normalization is deterministic"

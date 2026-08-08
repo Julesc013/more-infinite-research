@@ -162,9 +162,9 @@ function Get-MIRTerminalEngineInventoryFromLog {
           mir4_transition_rule="import-realized-prototype-as-terminal-baseline";
           attributes=@(
             [ordered]@{name="prototype_name";value=$name},
-            [ordered]@{name="enabled";value=[string]$fields[2]},
-            [ordered]@{name="hidden";value=[string]$fields[3]},
-            [ordered]@{name="upgrade";value=[string]$fields[4]},
+            [ordered]@{name="enabled";value=$fields[2]},
+            [ordered]@{name="hidden";value=$fields[3]},
+            [ordered]@{name="upgrade";value=$fields[4]},
             [ordered]@{name="max_level";value=$fields[5]},
             [ordered]@{name="prerequisites";value=$(if ($fields[6]) { @([string]$fields[6] -split [char]31) } else { @() })},
             [ordered]@{name="unit";value=$fields[7]},
@@ -196,12 +196,12 @@ function Get-MIRTerminalEngineInventoryFromLog {
           mir4_transition_rule="import-realized-setting-as-terminal-baseline";
           attributes=@(
             [ordered]@{name="prototype_type";value=[string]$fields[1]},
-            [ordered]@{name="setting_type";value=[string]$fields[3]},
+            [ordered]@{name="setting_type";value=$fields[3]},
             [ordered]@{name="default_value";value=$fields[4]},
             [ordered]@{name="minimum_value";value=$fields[5]},
             [ordered]@{name="maximum_value";value=$fields[6]},
             [ordered]@{name="allowed_values";value=$(if ($fields[7]) { @([string]$fields[7] -split [char]31) } else { @() })},
-            [ordered]@{name="hidden";value=[string]$fields[8]},
+            [ordered]@{name="hidden";value=$fields[8]},
             [ordered]@{name="order";value=$fields[9]}
           )
         }
