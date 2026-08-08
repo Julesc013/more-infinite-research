@@ -34,6 +34,62 @@ $expected = [ordered]@{
     locales_minimum = 400
     compatibility_minimum = 10
   }
+  "2.5.5" = [ordered]@{
+    root = "7ACE30AB13C5C532863A942A74C3959FED8980A8BA588C381E0591286E8BBE1B"
+    bundle = "31E0AD38897CAAE26B80870C36F3548EBC38F74564DDB91FC5F67609319D18DB"
+    technologies_minimum = 70
+    settings_minimum = 30
+    locales_minimum = 400
+    compatibility_minimum = 0
+  }
+  "1.9.5" = [ordered]@{
+    root = "34BA4397E569A52E40317FC2E75E5CF173B1476706546ED70718D08A7D7F7377"
+    bundle = "6EA05D14B8E93232A275B7D79547F20A54F4B56BAA8FD6B9F1958762AD79CAA5"
+    technologies_minimum = 70
+    settings_minimum = 30
+    locales_minimum = 400
+    compatibility_minimum = 0
+  }
+  "1.8.5" = [ordered]@{
+    root = "5B85A4FB23EB06AD63AC97132CC0C78205E2473304291081FDD554D6B4F576D3"
+    bundle = "2D410ACBDFC736C5E77DC607FC0B526E3A15790D329D82A6268CC4EB4B62E8BE"
+    technologies_minimum = 70
+    settings_minimum = 30
+    locales_minimum = 400
+    compatibility_minimum = 0
+  }
+  "1.7.5" = [ordered]@{
+    root = "59497401C8CF701B08F6927DE428C7C25F8B900F5C0F73D9DD46ADBE572F034F"
+    bundle = "70FCF025F71D8D683D1AA2728C6FA20D6EF61FABF5310BCF2B2BF24958E4DA2E"
+    technologies_minimum = 60
+    settings_minimum = 20
+    locales_minimum = 250
+    compatibility_minimum = 0
+  }
+  "1.6.5" = [ordered]@{
+    root = "3EE468E58F7A507316877E79D9F71C2F6A6FE7213AC375243B4ABD5D4E20B5C6"
+    bundle = "AE612D533E3586FED0B20F83914F8A3828A546DEA053BAD68CB5B146FC760E01"
+    technologies_minimum = 60
+    settings_minimum = 20
+    locales_minimum = 250
+    compatibility_minimum = 0
+  }
+  "1.5.5" = [ordered]@{
+    root = "25E83329D5C9BE664DA0A97D1BDA51C42F358B6B9217D66725AEBD8A81351697"
+    bundle = "DECF3E910360D8AF93B64222D4BC64E4A1AA168F67FD09DD014F04BF61B1C738"
+    technologies_minimum = 60
+    settings_minimum = 20
+    locales_minimum = 250
+    compatibility_minimum = 0
+  }
+  "1.4.5" = [ordered]@{
+    root = "724FD0A4B54AD9D3BBF79C254AAA1499DE2342E263B2C2C1D900E95182958E91"
+    bundle = "EF93D401C794E7F862E5EF4DC57A2C77A8F650FBC489CC25E21118562B1FF709"
+    technologies_minimum = 60
+    settings_minimum = 20
+    locales_minimum = 250
+    compatibility_minimum = 0
+  }
   "1.3.5" = [ordered]@{
     root = "369B54B23FA58E3F814113E6830F01372E91856B31A567C58C923CA365F21761"
     bundle = "FB6EA09DEB429E4ED2A60CF2F4FD613850C79CCF0BB7CF1BA622A56759814282"
@@ -127,8 +183,8 @@ try {
         @($compatibility.items).Count -lt [int]$expected[$release].compatibility_minimum) {
       throw "$release declared semantic inventory fell below its calibrated floor."
     }
-    if ($release -eq "1.3.5" -and (@($compatibility.fields_unavailable).Count -eq 0 -or @($compatibility.items).Count -ne 0)) {
-      throw "1.3.5 must record the historical claim-authority omission without projecting modern claims backward."
+    if ($release -ne "3.2.5" -and (@($compatibility.fields_unavailable).Count -eq 0 -or @($compatibility.items).Count -ne 0)) {
+      throw "$release must record the historical claim-authority omission without projecting modern claims backward."
     }
 
     $generatedOutput = Join-Path $testRoot "output"
@@ -150,6 +206,54 @@ try {
         [string]$receipt.tracked_manifest_record_sha256 -ne [string]$manifest.record_sha256) {
       throw "$release double-build receipt does not bind the calibrated deterministic bundle."
     }
+  }
+
+  $matrixPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Dot5-Semantic-MatrixV1.json"
+  $matrix = Get-Content -Raw -LiteralPath $matrixPath | ConvertFrom-Json -Depth 100
+  $releaseOrder = @($expected.Keys)
+  if ([string]$matrix.kind -ne "MIR3Dot5SemanticMatrixV1" -or
+      [string]$matrix.status -ne "calibration-incomplete-realized-probes-pending" -or
+      (@($matrix.release_order) -join "|") -ne ($releaseOrder -join "|") -or
+      @($matrix.releases).Count -ne 9 -or
+      -not [bool]$matrix.completion.all_nine_static_inventories_present -or
+      [bool]$matrix.completion.all_nine_realized_engine_inventories_complete -or
+      [bool]$matrix.completion.contradictions_classified -or
+      [bool]$matrix.completion.queue_completion_permitted) {
+    throw "Terminal .5 semantic matrix is incomplete, out of order, or overclaims realized completion."
+  }
+  if ([string]$matrix.generated_by.sha256 -ne (Get-FileHash -LiteralPath (Join-Path $RepoRoot ([string]$matrix.generated_by.path)) -Algorithm SHA256).Hash) {
+    throw "Terminal .5 semantic matrix does not bind its exact generator."
+  }
+  $matrixRecordMaterial = [ordered]@{}
+  foreach ($property in $matrix.PSObject.Properties) {
+    if ($property.Name -ne "record_sha256") { $matrixRecordMaterial[$property.Name] = $property.Value }
+  }
+  if ((Get-Sha256Bytes (ConvertTo-CanonicalJsonBytes $matrixRecordMaterial)) -ne [string]$matrix.record_sha256) {
+    throw "Terminal .5 semantic matrix record digest is not canonical."
+  }
+  foreach ($release in $releaseOrder) {
+    $rows = @($matrix.releases | Where-Object release -eq $release)
+    if ($rows.Count -ne 1 -or [string]$rows[0].baseline_root_sha256 -ne [string]$expected[$release].root -or
+        [string]$rows[0].completion_state -ne "calibration-incomplete") {
+      throw "Terminal .5 semantic matrix release binding failed: $release"
+    }
+  }
+  $expectedMatrixCounts = [ordered]@{ features=6; technologies=76; settings=39; migrations=2; compatibility_claims=14 }
+  foreach ($definition in $expectedMatrixCounts.GetEnumerator()) {
+    $rows = @($matrix.matrices.($definition.Key))
+    if ($rows.Count -ne [int]$definition.Value) { throw "Terminal semantic matrix row count drifted: $($definition.Key)" }
+    foreach ($row in $rows) {
+      if (@($row.cells).Count -ne 9 -or (@($row.cells.release) -join "|") -ne ($releaseOrder -join "|")) {
+        throw "Terminal semantic matrix cell coverage is incomplete: $($definition.Key)/$($row.stable_id)"
+      }
+    }
+  }
+  if (@($matrix.unresolved_findings).Count -ne 27) { throw "Terminal .5 semantic matrix must carry all 27 calibrated realization findings." }
+
+  $generatedMatrix = Join-Path $testRoot "MIR3-Dot5-Semantic-MatrixV1.json"
+  & (Join-Path $RepoRoot "scripts\Export-MIRTerminalBaselineMatrix.ps1") -RepoRoot $RepoRoot -OutputPath $generatedMatrix | Out-Host
+  if ((Get-FileHash -LiteralPath $generatedMatrix -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $matrixPath -Algorithm SHA256).Hash) {
+    throw "Terminal .5 semantic matrix regeneration differs from the tracked authority."
   }
 } finally {
   if (Test-Path -LiteralPath $testRoot) {

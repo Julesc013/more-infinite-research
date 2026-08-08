@@ -289,6 +289,7 @@ function New-MIRCPDashboardLines {
   param(
     [Parameter(Mandatory)]$Releases,
     [Parameter(Mandatory)]$CandidateClosures,
+    [Parameter(Mandatory)]$BaselineQueue,
     [Parameter(Mandatory)][string]$ReviewDate
   )
   $lines = [Collections.Generic.List[string]]::new()
@@ -309,6 +310,17 @@ function New-MIRCPDashboardLines {
   }
   $lines.Add("")
   $lines.Add("A state is an admitted fact, not a mutable job status. Every later transition requires its own immutable proof record.")
+  $lines.Add("")
+  $lines.Add("## Terminal .5 semantic baselines")
+  $lines.Add("")
+  $lines.Add("Queue status: $(Format-MIRCPCode $BaselineQueue.status). A static capture is not a completed realized-engine baseline.")
+  $lines.Add("")
+  $lines.Add("| Predecessor | Terminal release | Target | Identity | Semantic inventory | Manifest |")
+  $lines.Add("| --- | --- | --- | --- | --- | --- |")
+  foreach ($row in @($BaselineQueue.rows)) {
+    $manifest = if ([string]::IsNullOrWhiteSpace([string]$row.baseline_manifest)) { "pending" } else { [string]$row.baseline_manifest }
+    $lines.Add("| $(Format-MIRCPCode $row.baseline_release) | $(Format-MIRCPCode $row.terminal_release) | $(Format-MIRCPCode $row.target) | $(Format-MIRCPCode $row.identity_status) | $(Format-MIRCPCode $row.semantic_inventory_status) | $(Format-MIRCPCode $manifest) |")
+  }
   return @($lines)
 }
 
@@ -319,6 +331,7 @@ function New-MIRCPTodoLines {
     [Parameter(Mandatory)]$Incidents,
     [Parameter(Mandatory)]$IncidentReconciliation,
     [Parameter(Mandatory)]$Tasks,
+    [Parameter(Mandatory)]$BaselineQueue,
     [Parameter(Mandatory)][string]$ReviewDate,
     [string]$RepoRoot = ""
   )
@@ -347,6 +360,9 @@ function New-MIRCPTodoLines {
   $lines.Add("")
   $lines.Add("| Workstream | Current boundary | Completion proof |")
   $lines.Add("| --- | --- | --- |")
+  $staticBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -in @("static-captured-realized-probes-pending", "complete") }).Count
+  $completeBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -eq "complete" }).Count
+  $lines.Add("| ``T9-0`` immutable .5 semantic baselines | $staticBaselineCount/9 static captures; $completeBaselineCount/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |")
   $lines.Add("| ``T9-A`` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |")
   $lines.Add("| ``T9-B`` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |")
   $lines.Add("| ``T9-C`` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |")
@@ -458,6 +474,7 @@ function Update-MIRCPViews {
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
   $tasks = @(Get-MIRCPRecordSet -Kind tasks -RepoRoot $repo)
   $incidentReconciliation = Read-MIRCPJson -Path ".mir/releases/terminal/MIR3-Terminal-Incident-ReconciliationV1.json" -RepoRoot $repo
+  $baselineQueue = Read-MIRCPJson -Path ".mir/releases/terminal/MIR3-Terminal-Baseline-Capture-QueueV1.json" -RepoRoot $repo
   $canonicalRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_canonical"]) { "planned_canonical" } else { "canonical" }
   $backportRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_backport"]) { "planned_backport" } else { "backport_calibration" }
   $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
@@ -467,8 +484,8 @@ function Update-MIRCPViews {
 
   Write-MIRCPJson -Path "path:releases.ledger" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.current_candidate) -Lines (New-MIRCPCurrentCandidateLines -Release $canonical -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
-  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.release_dashboard) -Lines (New-MIRCPDashboardLines -Releases $releases -CandidateClosures $candidateClosures -ReviewDate $reviewDate) -RepoRoot $repo -Check:$Check
-  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.todo) -Lines (New-MIRCPTodoLines -TerminalReleases $terminalReleases -Changes $changes -Incidents $incidents -IncidentReconciliation $incidentReconciliation -Tasks $tasks -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
+  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.release_dashboard) -Lines (New-MIRCPDashboardLines -Releases $releases -CandidateClosures $candidateClosures -BaselineQueue $baselineQueue -ReviewDate $reviewDate) -RepoRoot $repo -Check:$Check
+  Set-MIRCPGeneratedText -Path ([string]$policy.outputs.todo) -Lines (New-MIRCPTodoLines -TerminalReleases $terminalReleases -Changes $changes -Incidents $incidents -IncidentReconciliation $incidentReconciliation -Tasks $tasks -BaselineQueue $baselineQueue -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
 
   $branchStatus = [pscustomobject][ordered]@{
     schema = 1

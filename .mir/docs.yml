@@ -9,6 +9,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - terminal-repository-protection-handoff
+  - path: docs/releases/mir-3-terminal-dot5-baseline-capture.md
+    title: "MIR 3 Terminal .5 Baseline Capture"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - terminal-dot5-semantic-baseline-capture-status
   - path: docs/releases/current-candidate.md
     title: "Current Development Candidate"
     status: current
