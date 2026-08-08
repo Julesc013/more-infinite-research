@@ -4,7 +4,7 @@
   "candidate_id": "2.5-P12",
   "target": "2.0",
   "branch": "legacy",
-  "state": "candidate-qualified",
+  "state": "publicly-verified",
   "package": {
     "source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
     "source_tree": "723201b02bdf8707f40fa7fbfcf83e738934fd69",
@@ -22,7 +22,10 @@
     "source_freeze": [{ "kind": "wave-local-qualification-inventory", "path": ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json" }],
     "candidate_qualification": [{ "kind": "local-automated-target-qualification", "path": "build/archive/mir-3.5-qualified-projections-blocked-20260807T1048Z/qualification/2.5.5-local-candidate-qualification.json", "sha256": "C1395E465638A1452E3C236A51BEDA4A2E6D2F49F4384301C8CDC7A871A827CB", "qualification_root_sha256": "714FC0F54F316C89C478D946BC24DEAAC8E0389C5CB72C2DC5961753115524FE", "result": "passed-98-of-98-no-reuse" }],
     "backport_reconstruction": [{ "kind": "deterministic-two-parent-lineage", "path": ".mir/releases/waves/MIR-3.5-Lineage-Finalization.json", "sha256": "EC42486E7F8788CAAF4E1A41782778A8C335A773E6F4D6DBDEFAB96D042BFB1A", "digest_policy": "utf8-lf" }],
-    "publication_exception": [{ "kind": "wave-timeboxed-maintainer-decision", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "digest_policy": "utf8-lf" }]
+    "publication_exception": [{ "kind": "wave-timeboxed-maintainer-decision", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "digest_policy": "utf8-lf" }],
+    "tag": [{ "kind": "annotated-tag", "name": "2.5.5", "commit": "27877275854eb131efeb42672d3676c9c513c85e", "tag_object": "a3261473efa33f4e75e1e022921898db66ea88e0" }],
+    "publication": [{ "kind": "github-publication-under-release-specific-exception", "path": ".mir/evidence/MIR-3.5-wave-publication.json", "sha256": "0FE62C34DF863B0C8BEB0D9FBC67C3ED422CE2E6788C9D365A9FF1C7540FF12D", "digest_policy": "utf8-lf" }],
+    "public_byte_verification": [{ "kind": "public-asset-identity-and-exact-engine-smokes", "path": ".mir/evidence/MIR-3.5-wave-publication.json", "sha256": "0FE62C34DF863B0C8BEB0D9FBC67C3ED422CE2E6788C9D365A9FF1C7540FF12D", "digest_policy": "utf8-lf" }]
   },
   "assurance_exceptions": [{
     "id": "MIR35-2.5.5-TIMEBOXED-PUBLICATION-2026-08-08",
@@ -40,6 +43,6 @@
     "package_change_permitted": false,
     "corrective_release": "2.5.9"
   }],
-  "remaining_obligations": ["protected-qualification-post-publication", "protected-seal-and-reconciliation-post-publication", "normal-promotion-admission-reconciliation", "immutable-tagging", "github-publication", "public-byte-and-exact-engine-verification"],
-  "updated_at": "2026-08-08T00:00:00+10:00"
+  "remaining_obligations": ["protected-qualification-post-publication", "protected-seal-and-reconciliation-post-publication", "normal-promotion-admission-reconciliation"],
+  "updated_at": "2026-08-08T15:51:00+10:00"
 }

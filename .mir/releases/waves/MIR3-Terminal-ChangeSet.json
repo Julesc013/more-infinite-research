@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalChangeSetV1",
+  "id": "MIR3-Terminal-ChangeSet",
+  "recorded_at": "2026-08-08T15:51:00+10:00",
+  "status": "recorded-not-implemented",
+  "implementation_admitted": false,
+  "target_wave": "corresponding-dot-9-releases",
+  "items": [
+    "protected-post-publication-qualification-for-3.2.5",
+    "protected-post-publication-qualification-for-2.5.5",
+    "normal-seal-and-promotion-reconciliation",
+    "github-transport-resilience-corrections",
+    "downstream-always-job-guards-stop-after-context-failure-without-force-cancellation",
+    "complete-offline-release-authority-for-mir-4",
+    "route-every-product-package-migration-compatibility-locale-documentation-performance-and-assurance-finding-to-corresponding-dot-9"
+  ],
+  "boundaries": {
+    "dot_5_package_changes_permitted": false,
+    "dot_6_dot_7_dot_8_releases_permitted": false,
+    "dot_9_implementation_started": false,
+    "mir_4_implementation_started": false
+  }
+}
