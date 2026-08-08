@@ -4,6 +4,7 @@
   "status": "identities-locked-semantic-inventories-pending",
   "source_authorities": {
     "wave_index": "docs/releases/archive/MIR-3.5-WAVE-INDEX.json",
+    "mod_portal_custody": ".mir/evidence/MIR-3.5-mod-portal-custody.json",
     "release_records": ".mir/releases/records/*.5.json",
     "distribution_ledger": ".mir/distributions.json"
   },

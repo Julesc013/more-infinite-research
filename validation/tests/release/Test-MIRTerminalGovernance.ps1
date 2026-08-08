@@ -37,6 +37,20 @@ if ([string]$baselineQueue.kind -ne "MIR3-Terminal-Baseline-Capture-QueueV1" -or
     @($baselineQueue.rows | Where-Object { $_.identity_status -ne "locked" -or $_.semantic_inventory_status -ne "pending-capture" }).Count -ne 0) {
   throw "Terminal baseline queue must lock nine identities and truthfully retain semantic capture work."
 }
+$portalCustodyPath = Join-Path $RepoRoot ([string]$baselineQueue.source_authorities.mod_portal_custody)
+$portalCustody = Get-Content -Raw -LiteralPath $portalCustodyPath | ConvertFrom-Json -Depth 100
+$dot5Family = @($baselineQueue.rows.baseline_release)
+$visiblePortalRows = @($portalCustody.observations | Where-Object state -eq "api-visible-sha1-matches-frozen-archive-redownload-pending")
+$absentPortalRows = @($portalCustody.observations | Where-Object state -eq "not-uploaded-as-of-observation")
+if ([string]$portalCustody.kind -ne "MIR3Dot5ModPortalCustodyV1" -or
+    [string]$portalCustody.status -ne "partial-two-api-visible-redownload-pending-seven-not-uploaded" -or
+    (@($portalCustody.observations.version) -join "|") -ne ($dot5Family -join "|") -or
+    $visiblePortalRows.Count -ne 2 -or $absentPortalRows.Count -ne 7 -or
+    @($visiblePortalRows | Where-Object { $_.portal_sha1 -ne $_.frozen_archive_sha1 -or $_.redownload_verification -notmatch '^pending-' }).Count -ne 0 -or
+    [bool]$portalCustody.download_attempt.artifact_created -or [bool]$portalCustody.download_attempt.admitted_as_byte_evidence -or
+    [bool]$portalCustody.identity_policy.published_package_mutation_permitted) {
+  throw "The .5 Mod Portal custody authority must preserve the observed two-visible/seven-absent state without claiming byte verification."
+}
 $incidentReconciliation = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Incident-ReconciliationV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$incidentReconciliation.kind -ne "MIR3-Terminal-Incident-ReconciliationV1" -or $incidentReconciliation.rules.history_mutation_permitted -or
     $incidentReconciliation.rules.dot5_package_mutation_permitted -or @($incidentReconciliation.items | Where-Object terminal_state -eq "retained-assurance-debt").Count -lt 2) {
@@ -111,6 +125,12 @@ if (($current.planned_releases -join "|") -ne ($family -join "|") -or $current.i
 }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json
+if ([string]$wave.mod_portal_custody.authority -ne [string]$baselineQueue.source_authorities.mod_portal_custody -or
+    [string]$wave.mod_portal_custody.status -ne [string]$portalCustody.status -or
+    @($wave.releases | Where-Object mod_portal -eq "api-visible-sha1-match-redownload-pending").Count -ne 2 -or
+    @($wave.releases | Where-Object mod_portal -eq "not-uploaded-as-of-2026-08-09").Count -ne 7) {
+  throw "The archived .5 wave index does not agree with the current Mod Portal custody authority."
+}
 foreach ($release in @($wave.releases)) {
   $zip = Join-Path $RepoRoot ([string]$release.dist)
   if ((Get-Item -LiteralPath $zip).Length -ne [long]$release.bytes -or (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne [string]$release.archive_sha256) {
