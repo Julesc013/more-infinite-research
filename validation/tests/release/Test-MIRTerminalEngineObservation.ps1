@@ -29,4 +29,15 @@ if ((@($first.technologies.stable_id) -join "|") -ne "mir-tech-a|mir-tech-b" -or
     [string]$first.effects_and_owners[0].stable_id -ne "mir-tech-b#effect-001") {
   throw "Terminal engine inventory ordering or MIR filtering failed."
 }
+$logInventory = Get-MIRTerminalEngineInventoryFromLog -Lines @(
+  "  1.0 MIR_TERMINAL_SETTING`tbool-setting`tmir-enabled`tstartup`ttrue`t<nil>`t<nil>`t`tfalse`ta",
+  "  1.1 MIR_TERMINAL_TECH`tmir-tech-b`ttrue`tfalse`tfalse`tinfinite`ta`t{count_formula=`"100*L`"}`t1",
+  "  1.2 MIR_TERMINAL_EFFECT`tmir-tech-b`t1`tlaboratory-speed`t0.1`t{modifier=0.1,type=`"laboratory-speed`"}",
+  "  1.3 MIR_TERMINAL_SETTINGS_COMPLETE`t1",
+  "  1.4 MIR_TERMINAL_DATA_COMPLETE`t1`t1"
+) -Release "3.2.5" -Target "2.1" -EvidencePath ".mir/evidence/example.json"
+if (-not $logInventory.data_complete -or -not $logInventory.settings_complete -or
+    @($logInventory.technologies).Count -ne 1 -or @($logInventory.effects_and_owners).Count -ne 1 -or @($logInventory.settings).Count -ne 1) {
+  throw "Terminal observer line protocol did not parse its completed inventories."
+}
 Write-Host "[ok] terminal exact-engine observation normalization is deterministic"
