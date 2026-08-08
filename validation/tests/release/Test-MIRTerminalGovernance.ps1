@@ -24,6 +24,16 @@ foreach ($name in $authorityNames) {
 }
 $changeSet = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\MIR3-Terminal-ChangeSet.json") | ConvertFrom-Json -Depth 100
 if ([string]$changeSet.kind -ne "MIR3-Terminal-ChangeSetV1") { throw "Terminal change-set authority is invalid." }
+foreach ($findingRecordPath in @($changeSet.finding_records)) {
+  $finding = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$findingRecordPath)) | ConvertFrom-Json -Depth 100
+  if ([string]$finding.kind -ne "MIR3TerminalFindingV1" -or [string]$finding.id -notmatch '^MIR3-TERM-[0-9]{4}$' -or
+      [string]$finding.reproducer.status -ne "reproduced" -or @($finding.target_dispositions).Count -ne 9 -or
+      (@($finding.target_dispositions.target) -join "|") -ne ($family -join "|") -or
+      [string]$finding.admission.class -ne "NO_PACKAGE_CHANGE" -or [string]$finding.admission.status -ne "admitted" -or
+      [bool]$finding.visibility.package -or [bool]$finding.visibility.gameplay -or -not [bool]$finding.visibility.assurance) {
+    throw "Terminal finding is incomplete, not all-nine-disposed, or widens package authority: $findingRecordPath"
+  }
+}
 
 $admission = $authorities["MIR3TerminalFoundationAdmissionV1"]
 if ([string]$admission.status -ne "accepted" -or @($admission.stack).Count -ne 5 -or
@@ -213,11 +223,20 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
   if ([string]$schema.'x-mir-canonical-path' -ne "spec/schemas/$name.schema.json") { throw "Terminal schema canonical path is invalid: $name" }
+}
+$findingSchema = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-finding.schema.json") | ConvertFrom-Json -Depth 100
+if ($findingSchema.additionalProperties -ne $false -or @($findingSchema.required).Count -lt 15 -or
+    $findingSchema.properties.source_observation.additionalProperties -ne $false -or
+    $findingSchema.properties.reproducer.additionalProperties -ne $false -or
+    $findingSchema.properties.target_dispositions.minItems -ne 9 -or $findingSchema.properties.target_dispositions.maxItems -ne 9 -or
+    $findingSchema.properties.target_dispositions.items.additionalProperties -ne $false -or
+    $findingSchema.properties.admission.additionalProperties -ne $false -or $findingSchema.properties.closure.additionalProperties -ne $false) {
+  throw "Terminal finding schema is not strict or all-nine complete."
 }
 $baselineCommon = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-baseline-inventory-common.schema.json") | ConvertFrom-Json -Depth 100
 if ($baselineCommon.additionalProperties -ne $false -or @($baselineCommon.required).Count -lt 11 -or

@@ -599,9 +599,10 @@ $workerRoot = Join-Path $equivalenceRoot "worker"
 $pwshPath = (Get-Process -Id $PID).Path
 try {
   New-Item -ItemType Directory -Force -Path $equivalenceRoot | Out-Null
-  & git -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
+  $sourceGitRoot = Join-Path $RepoRoot ".git"
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
-  & git -c core.autocrlf=true clone --quiet --no-hardlinks $RepoRoot $workerRoot
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --no-hardlinks $RepoRoot $workerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {
