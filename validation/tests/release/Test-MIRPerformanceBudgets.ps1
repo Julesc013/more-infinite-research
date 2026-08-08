@@ -177,6 +177,8 @@ if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
     throw "Pre-package active candidate must not publish a mutable or identity-empty performance campaign authority."
   }
   $activeCampaign = Get-Content -Raw -LiteralPath $activeCampaignPath | ConvertFrom-Json
+  $activeProfilePath = Join-Path $RepoRoot "validation/profiles/factorio-2.1.json"
+  $activeProfile = Get-Content -Raw -LiteralPath $activeProfilePath | ConvertFrom-Json
   if ([int]$activeCampaign.schema -ne 2 -or
       [string]$activeCampaign.release -ne [string]$activeTypedRelease.release -or
       [string]$activeCampaign.factorio_line -ne [string]$activeTypedRelease.target -or
@@ -190,6 +192,9 @@ if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
       [string]$activeCampaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
       [string]$activeCampaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
     throw "Versioned performance campaign does not bind the exact active candidate and tagged baseline."
+  }
+  if ([string]$activeCampaign.factorio_version -ne [string]$activeProfile.qualification_factorio_version) {
+    throw "Versioned performance campaign Factorio version does not match the active qualification profile."
   }
   $activeManualScenarios = [string]$activeCampaign.manual_scenarios
   $activeManualScenariosPath = Join-Path $RepoRoot $activeManualScenarios
