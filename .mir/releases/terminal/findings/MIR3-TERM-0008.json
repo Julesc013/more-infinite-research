@@ -40,5 +40,8 @@
     "status": "admitted",
     "reason": "The failure is reproduced, bounded to package-excluded tool identity, and correctable without changing product source or frozen package bytes."
   },
-  "closure": {"status": "implemented-awaiting-proof", "evidence": null}
+  "closure": {
+    "status": "closed",
+    "evidence": "All nine exact engines freshly regenerated observations with unchanged archive, executable, official-data, installation, semantic, count, omission, and normalizer identities; Test-MIRTerminalEngineObservation.ps1, Test-MIRTerminalBaselineCapture.ps1, and Test-MIRTerminalGovernance.ps1 passed on 2026-08-09"
+  }
 }
