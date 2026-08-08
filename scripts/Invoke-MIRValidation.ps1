@@ -184,6 +184,10 @@ Invoke-RepoCheck "terminal baseline calibrations are exact and deterministic" {
   & (Join-Path $repo "validation\tests\release\Test-MIRTerminalBaselineCapture.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "terminal exact-engine observation normalization is deterministic" {
+  & (Join-Path $repo "validation\tests\release\Test-MIRTerminalEngineObservation.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "backport source lock is current when present" {
   & (Join-Path $repo "validation\tests\release\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
 }
