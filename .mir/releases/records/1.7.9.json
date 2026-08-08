@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "release": "1.7.9",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "1.7-P1",
+  "target": "0.17",
+  "branch": "tag-only",
+  "state": "planned",
+  "source_release": { "release": "1.7.5", "tag": "1.7.5", "archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A", "content_sha256": "FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D" },
+  "portable_source_release": "3.2.9",
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "package": {},
+  "proofs": {},
+  "assurance_exceptions": [],
+  "remaining_obligations": ["bind-terminal-delta", "materialize-deterministic-integration", "qualify-factorio-0.17", "tag-publish-and-publicly-verify"],
+  "incident_ids": [],
+  "updated_at": "2026-08-08T18:00:00+10:00"
+}

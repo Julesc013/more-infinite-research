@@ -42,6 +42,16 @@
       "target": "2.0"
     },
     {
+      "branch": "legacy",
+      "candidate_floor": "2.5-P13",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "2.5.9",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.0"
+    },
+    {
       "branch": "main",
       "candidate_floor": "",
       "candidate_id": "C21",
@@ -82,6 +92,16 @@
       "target": "2.1"
     },
     {
+      "branch": "main",
+      "candidate_floor": "C33",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "3.2.9",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.1"
+    },
+    {
       "branch": "tag-only",
       "candidate_floor": "",
       "candidate_id": "1.3.5-final",
@@ -89,6 +109,16 @@
       "release": "1.3.5",
       "source_commit": "db45a5b36955082fac197faaa057a9a43cc9e420",
       "state": "publicly-verified",
+      "target": "0.13"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.3-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.3.9",
+      "source_commit": "",
+      "state": "planned",
       "target": "0.13"
     },
     {
@@ -103,12 +133,32 @@
     },
     {
       "branch": "tag-only",
+      "candidate_floor": "1.4-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.4.9",
+      "source_commit": "",
+      "state": "planned",
+      "target": "0.14"
+    },
+    {
+      "branch": "tag-only",
       "candidate_floor": "",
       "candidate_id": "1.5.5-final",
       "effective_status": "publicly-verified",
       "release": "1.5.5",
       "source_commit": "d855a68b88eb6864d537e8149f75ae73f50b0b39",
       "state": "publicly-verified",
+      "target": "0.15"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.5-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.5.9",
+      "source_commit": "",
+      "state": "planned",
       "target": "0.15"
     },
     {
@@ -123,12 +173,32 @@
     },
     {
       "branch": "tag-only",
+      "candidate_floor": "1.6-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.6.9",
+      "source_commit": "",
+      "state": "planned",
+      "target": "0.16"
+    },
+    {
+      "branch": "tag-only",
       "candidate_floor": "",
       "candidate_id": "1.7.5-final",
       "effective_status": "publicly-verified",
       "release": "1.7.5",
       "source_commit": "c87818b34ccddb6b0166aeb6aec42887f420e86f",
       "state": "publicly-verified",
+      "target": "0.17"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.7-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.7.9",
+      "source_commit": "",
+      "state": "planned",
       "target": "0.17"
     },
     {
@@ -143,12 +213,32 @@
     },
     {
       "branch": "tag-only",
+      "candidate_floor": "1.8-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.8.9",
+      "source_commit": "",
+      "state": "planned",
+      "target": "1.0"
+    },
+    {
+      "branch": "tag-only",
       "candidate_floor": "",
       "candidate_id": "1.9.5-final",
       "effective_status": "publicly-verified",
       "release": "1.9.5",
       "source_commit": "48dd671e9a2b5ab37d1676fbbd7254ce30c046fb",
       "state": "publicly-verified",
+      "target": "1.1"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.9-P1",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "1.9.9",
+      "source_commit": "",
+      "state": "planned",
       "target": "1.1"
     }
   ],

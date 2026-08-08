@@ -33,5 +33,6 @@
   "backport_disposition": {
     "factorio-2.0": "P11 post-publication proof closure or independently qualified P12; never an empty maintenance release"
   },
-  "state": "planned"
+  "terminal_disposition": "Historical P11-specific work is closed as a separate queue item. Uncompleted current .5 assurance obligations are retained explicitly by CHG-2026-0020 and MIR3-Terminal-ChangeSet.",
+  "state": "closed"
 }

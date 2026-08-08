@@ -115,7 +115,7 @@ The full records, source commits, fixtures, decisions, and replayed target commi
 
 The release synthesis documents explain decisions and limitations rather than duplicating raw ledgers:
 
-- `docs/releases/3.1.9-post-2.4.5-ring-synthesis.md`
+- `docs/releases/archive/3.1.9-post-2.4.5-ring-synthesis.md`
 - `docs/releases/lower-wave-0.17-to-0.6-synthesis.md`
 - `.mir/evidence/ring-1.1-1.0/final-release-ledger.json`
 - `.mir/evidence/lower-wave/final-release-ledger.json`

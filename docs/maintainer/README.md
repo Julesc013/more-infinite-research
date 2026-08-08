@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
 ---
 # Maintainer Guide
 
-Updated: 2026-08-04
+Updated: 2026-08-08
 
 This guide describes the intended 3.0 workflow for adding compatibility without copying generator logic into per-mod files.
 
@@ -21,7 +21,7 @@ Use [settings governance](settings-governance.md) for startup setting IDs, visib
 
 Use [local artifact retention and storage](artifact-retention.md) to preserve the shared `testmods_*` libraries while removing completed run staging data safely.
 
-Use the [ultimate convergence follow-up audit prompt](ultimate-convergence-follow-up-prompt.md) after concurrent repository or Control Plane work to check every finding in the [ultimate convergence audit action register](../releases/ultimate-convergence-audit-action-register.md) without treating documentation as implementation or proof.
+Use the [MIR 3 terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md) as the single release-planning authority. The `.5` packages are immutable; `.6` through `.8` are prohibited; every later MIR 3 correction needs one target disposition before implementation. The archived [follow-up prompt](ultimate-convergence-follow-up-prompt.md) and audit register remain historical context, not executable instructions.
 
 ## Adding Or Moving Shipped Lua
 

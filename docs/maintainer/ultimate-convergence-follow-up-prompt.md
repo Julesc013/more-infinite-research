@@ -1,16 +1,18 @@
 ---
 title: "Ultimate Convergence Follow-Up Audit Prompt"
-status: current
+status: archived
 applies_to: "3.2.5, 2.5.x, 3.3.x, 2.6.x"
 audience: maintainer
-doc_type: how-to
+doc_type: archive
 owner: mir-maintainers
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-08
 supersedes: []
-superseded_by: []
+superseded_by: [docs/releases/mir-3-terminal-dot-9-programme.md]
 ---
 
 # Ultimate Convergence Follow-Up Audit Prompt
+
+> Archived worker prompt. Its `.5` convergence sequence completed, and its 3.3/2.6 path was superseded by the [MIR 3 terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md).
 
 Use the following prompt with the worker completing the concurrent repository/control-plane refactor. It asks for a read-first completeness check against the convergence audit and explicitly prevents unsupported closure claims.
 

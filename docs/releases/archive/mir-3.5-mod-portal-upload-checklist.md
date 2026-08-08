@@ -1,3 +1,15 @@
+---
+title: "MIR 3 .5 Mod Portal Upload Checklist"
+status: archived
+applies_to: "MIR 3 .5 wave"
+audience: release-manager
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-08-08
+supersedes: []
+superseded_by: [docs/releases/mod-portal-page.md]
+---
+
 # MIR 3 `.5` Mod Portal upload checklist
 
 No Mod Portal upload has been performed. Upload in this order and use only the exact files listed below.

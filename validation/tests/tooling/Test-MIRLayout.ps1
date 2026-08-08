@@ -494,7 +494,7 @@ foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoo
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
   Where-Object Name -ne "Test-MIRLayout.ps1")
-if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 67) {
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 68) {
   throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
 }
 foreach ($wrapper in $legacyTestWrappers) {
@@ -513,7 +513,8 @@ $deprecatedOutputPattern = '(?i)(?:^|[^A-Za-z0-9_])\.work(?:[\\/]|["''])'
 $deprecatedReferenceExclusions = @(
   (Join-Path $repo "tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1"),
   (Join-Path $repo "tools/commands/package/Measure-MIRPackageComposition.ps1"),
-  (Join-Path $repo "validation/tests/tooling/Test-MIRLayout.ps1")
+  (Join-Path $repo "validation/tests/tooling/Test-MIRLayout.ps1"),
+  (Join-Path $repo "validation/tests/tooling/Test-MIRPowerShellQuality.ps1")
 )
 $activeAutomationFiles = @(
   foreach ($root in @(".github", "scripts", "tools", "validation", ".mir/lifecycle/tasks")) {

@@ -46,5 +46,6 @@
     "factorio-2.1": "canonical MEP-1 implementation and unique mod-data plus portable stage-bus transports in MIR 3.3.x",
     "factorio-2.0": "the same MEP-1 semantic protocol projected through the stage-bus and target adapters, then independently qualified as MIR 2.6.x"
   },
-  "state": "planned"
+  "terminal_disposition": "Superseded as a MIR 3 release train. Viable extension-platform requirements are deferred to MIR 4 through CHG-2026-0020.",
+  "state": "closed"
 }

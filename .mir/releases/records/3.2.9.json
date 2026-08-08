@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "release": "3.2.9",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "C33",
+  "target": "2.1",
+  "branch": "main",
+  "development_branch": "dev",
+  "state": "planned",
+  "source_release": {
+    "release": "3.2.5",
+    "tag": "3.2.5",
+    "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+    "candidate_id": "C32",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
+  },
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "package": {},
+  "proofs": {},
+  "assurance_exceptions": [],
+  "remaining_obligations": [
+    "freeze-unified-terminal-finding-inventory",
+    "assign-candidate-after-source-freeze",
+    "normal-manual-protected-seal-promotion-publication-gates",
+    "archive-and-mir4-handoff"
+  ],
+  "release_notes": "docs/releases/notes/release-notes-3.2.9.md",
+  "incident_ids": [],
+  "updated_at": "2026-08-08T18:00:00+10:00"
+}

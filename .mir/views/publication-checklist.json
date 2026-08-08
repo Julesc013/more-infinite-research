@@ -1,30 +1,27 @@
 {
-  "assurance_exceptions": [
-    {
-      "corrective_release": "3.2.9",
-      "digest_policy": "utf8-lf",
-      "generic_policy_changed": false,
-      "id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
-      "kind": "release-specific-timeboxed-publication",
-      "normal_gates_waived_for_publication_only": true,
-      "package_change_permitted": false,
-      "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
-      "protected_qualification": "pending-post-publication",
-      "protected_seal": "pending-post-publication",
-      "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
-      "status": "authorized"
-    }
-  ],
+  "assurance_exceptions": [],
   "authority": "mir-generated-publication-checklist-v1",
-  "candidate_floor": "C32",
-  "candidate_id": "C32",
+  "candidate_floor": "C33",
+  "candidate_id": "not-assigned",
   "generated_from": [
     "path:releases.current",
-    "path:releases.records/3.2.5.json"
+    "path:releases.records/3.2.9.json"
   ],
-  "publication_admitted": true,
-  "release": "3.2.5",
-  "remaining_states": [],
+  "publication_admitted": false,
+  "release": "3.2.9",
+  "remaining_states": [
+    "source-frozen",
+    "package-built",
+    "focused-qualified",
+    "candidate-qualified",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
   "schema": 1,
-  "state": "publicly-verified"
+  "state": "planned"
 }

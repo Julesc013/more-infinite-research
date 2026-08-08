@@ -434,7 +434,7 @@ The compatibility platform now has committed machine-readable policy surfaces:
 
 Negative fixtures are mandatory for capability work that introduces a new automatic target class. The first negative fixture covers self-return, barrel return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like non-loader, and drill-like non-drill cases.
 
-The `3.0.0` line promotes this program into the compatibility compiler architecture documented in `docs/architecture/compatibility-compiler-charter.md`. The supporting subsystem docs are `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, `docs/releases/3.0.0-migration-guide.md`, `docs/maintainer/README.md`, and `docs/adr/`.
+The `3.0.0` line promotes this program into the compatibility compiler architecture documented in `docs/architecture/compatibility-compiler-charter.md`. The supporting subsystem docs are `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, `docs/releases/archive/3.0.0-migration-guide.md`, `docs/maintainer/README.md`, and `docs/adr/`.
 
 The long-term data-stage shape should be:
 

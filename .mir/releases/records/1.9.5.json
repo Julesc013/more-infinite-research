@@ -15,5 +15,6 @@
   },
   "assurance_exceptions": [{ "id": "MIR35-1.9.5-TIMEBOXED-PUBLICATION-2026-08-08", "kind": "release-specific-timeboxed-publication", "status": "authorized", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "normal_gates_waived_for_publication_only": true, "generic_policy_changed": false, "automated_target_qualification_accepted": true, "qualification_tier": "lts", "manual_review": "waived-by-maintainer-authorization", "personal_visual_playtest_claim": "none", "package_change_permitted": false, "corrective_release": "1.9.9" }],
   "remaining_obligations": [],
+  "release_notes": "docs/releases/notes/release-notes-1.9.5.md",
   "updated_at": "2026-08-08T15:51:00+10:00"
 }

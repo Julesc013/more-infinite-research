@@ -5,7 +5,7 @@ applies_to: "3.2.5"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-08
 supersedes: ["docs/releases/3.2.4-unified-research-cost-curves.md"]
 superseded_by: []
 ---
@@ -46,6 +46,12 @@ MIR 3.2.5 is the Factorio 2.1 unified research-cost and compatibility release af
 - Unknown external research-cost formulas are preserved at defaults. MIR refuses an explicit override when it cannot prove a safe conversion instead of guessing.
 - Generalized all-stream explanations, a public proof/environment platform, universal support bundles, and broad automatic compatibility generation are outside this patch release.
 - MIR 3.2.5 is for Factorio 2.1. Do not copy it into Factorio 2.0; MIR 2.5.5 is a separate target projection with its own package and qualification.
+
+## Publication and next release
+
+The exact C32 ZIP is published and its downloaded GitHub bytes were verified. Publication used the recorded release-specific time-boxed exception: product qualification, deterministic package identity, maintainer playtest, and the exact Factorio 2.1.13 environment passed, while fresh protected GitHub qualification and a protected seal remain post-publication obligations. The exception does not claim those gates passed and does not change generic release policy.
+
+The package and tag are immutable. Every later MIR 3 correction, including a correction to packaged documentation, routes to `3.2.9`. There will be no `3.2.6`, `3.2.7`, or `3.2.8` release.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity

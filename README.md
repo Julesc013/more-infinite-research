@@ -14,6 +14,24 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
+## Current Releases
+
+The MIR 3 `.5` wave is published on GitHub with exact public-asset verification. Choose the package for your Factorio version:
+
+| Factorio | MIR release | Support line |
+| --- | --- | --- |
+| `2.1` | [`3.2.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.5) | Canonical modern release; Base and optional Space Age |
+| `2.0` | [`2.5.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/2.5.5) | Maintained compatibility projection |
+| `1.1.110` | [`1.9.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.9.5) | Reduced compatibility port |
+| `1.0.0` only | [`1.8.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.5) | Reduced compatibility port; no Factorio 0.18 claim |
+| `0.17.79` | [`1.7.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.7.5) | Historical native-infinite edition |
+| `0.16.51` | [`1.6.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.6.5) | Historical old-science edition |
+| `0.15.40` | [`1.5.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.5.5) | Historical minimal edition |
+| `0.14.23` | [`1.4.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.4.5) | Finite-capability archive edition |
+| `0.13.20` | [`1.3.5`](https://github.com/Julesc013/more-infinite-research/releases/tag/1.3.5) | Finite-capability archive edition |
+
+These `.5` packages are immutable. The next and final MIR 3 stabilization wave is `3.2.9`, `2.5.9`, and the matching `1.x.9` releases. There will be no `.6`, `.7`, or `.8` releases. Planning is active, but no `.9` candidate, source freeze, or package exists yet; see the [unified terminal programme](docs/releases/mir-3-terminal-dot-9-programme.md).
+
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
@@ -64,11 +82,11 @@ more-infinite-research_<version>.zip
 
 The repository has **three permanent branches** on `origin`:
 
-- **`main`**: latest stable release line for **Factorio `2.1`**.
-- **`dev`**: experimental and development branch for the **Factorio `2.1` main line**.
-- **`legacy`**: backport branch for **Factorio `2.0`** players.
+- **`main`**: published **Factorio `2.1`** line rooted at immutable tag `3.2.5`; it also receives synchronized release documentation and qualified promotions.
+- **`dev`**: canonical terminal-planning and development line for `3.2.9`, shared tooling, tests, governance, and target-neutral fixes.
+- **`legacy`**: published **Factorio `2.0`** line at immutable tag `2.5.5`; it advances only through governed `2.5.9` promotion.
 
-Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**. Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**. Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
+Normal development targets **`dev`** first. Lower `.9` releases are deterministic projections from their own immutable `.5` predecessor plus the admitted portable source; they are not commit-by-commit cascades through successively older branches. Published tags and ZIPs never move or rebuild.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
@@ -679,7 +697,11 @@ The validation script checks:
 
 ## Documentation Map
 
-- **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
+- **`todo.md`:** generated Control Plane view of active release and lifecycle authority; do not edit it by hand.
+- **`docs/releases/mir-3-terminal-dot-9-programme.md`:** single planning authority for `3.2.9`, `2.5.9`, and `1.9.9` through `1.3.9`.
+- **`docs/releases/README.md`:** current published-wave matrix, terminal targets, and release-document index.
+- **`docs/releases/notes/README.md`:** current and historical player-facing release-note index.
+- **`docs/releases/mod-portal-page.md`:** current Mod Portal-ready description, version map, features, compatibility model, upgrade guidance, and troubleshooting text.
 - **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
 - **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, no-shim shipped layout, package boundary, and architecture lint targets.
@@ -694,17 +716,9 @@ The validation script checks:
 - **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
-- **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
-- **`docs/releases/notes/release-notes-3.0.5.md`:** current player-facing compatibility changes.
-- **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
-- **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
-- **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/archive/superseded/release-plan-2.1.0.md`:** historical release-gated implementation plan for the Factorio `2.1` feature wave.
-- **`docs/archive/superseded/post-2.0-feature-plan.md`:** historical post-v2.0.0 feature triage and staged implementation archive.
-- **`docs/releases/notes/release-notes-2.1.0.md`:** player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/archive/superseded/`:** superseded plans and reports retained as historical context. `changelog.txt` remains the authoritative past-change ledger.
+- **`docs/releases/archive/`:** completed release plans, candidate reports, publication receipts, and prior Mod Portal copy retained as historical evidence.
+- **`docs/archive/superseded/`:** superseded general plans and reports retained as historical context. `changelog.txt` remains the detailed past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 

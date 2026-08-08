@@ -46,4 +46,4 @@ Nine independent exact-archive scenarios currently pass for available local clos
 
 ## Upgrade
 
-Update normally from 3.0.5. No settings or research reset is required. See the [3.1.0 migration guide](../3.1.0-migration-guide.md) for the exact compatibility boundary.
+Update normally from 3.0.5. No settings or research reset is required. See the [historical archived 3.1.0 migration guide](../archive/3.1.0-migration-guide.md) for the exact compatibility boundary.

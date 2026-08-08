@@ -48,5 +48,6 @@
     "factorio-2.1": "canonical implementation and one public release on dev/main as MIR 3.2.5",
     "factorio-2.0": "continuously project through target adapters and release as MIR 2.5.5 only after exact reconstruction and independent target qualification"
   },
-  "state": "planned"
+  "terminal_disposition": "Implemented and published in the immutable 3.2.5 and 2.5.5 wave; later corrections are owned by CHG-2026-0020.",
+  "state": "implemented"
 }

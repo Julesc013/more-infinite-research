@@ -1,7 +1,7 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.5"
+applies_to: "3.2.9"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
@@ -16,25 +16,35 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.5` |
-| Candidate identity | `C32` |
-| Reserved candidate floor | `C32` |
+| MIR version | `3.2.9` |
+| Candidate identity | `not-assigned` |
+| Reserved candidate floor | `C33` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `a3bfbc4524b52cede425900e775384eb9c1fc4b3` |
-| Package source tree | `a038ba1bcce347c53ee906d466279854c5a8d485` |
-| Package source SHA-256 | `1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D` |
-| Archive | `dist/more-infinite-research_3.2.5.zip` |
-| Archive bytes | `1056249` |
-| Archive entries | `301` |
-| Archive SHA-256 | `AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF` |
-| Package content SHA-256 | `1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D` |
+| State | `planned` |
+| Package source commit | `pending` |
+| Package source tree | `pending` |
+| Package source SHA-256 | `pending` |
+| Archive | `pending` |
+| Archive bytes | `pending` |
+| Archive entries | `pending` |
+| Archive SHA-256 | `pending` |
+| Package content SHA-256 | `pending` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `source-frozen`
+- [ ] `package-built`
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 
-- `C32-TIMEBOXED-PUBLICATION-2026-08-08`:  Disposition: `pending`.
+None.

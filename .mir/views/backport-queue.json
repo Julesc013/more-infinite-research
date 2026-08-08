@@ -1,19 +1,31 @@
 {
   "authority": "mir-generated-backport-queue-v1",
-  "candidate_id": "2.5-P11",
+  "candidate_id": "not-assigned",
   "generated_from": [
-    "path:releases.records/2.5.0.json",
-    "path:releases.backports/2.5.0.json"
+    "path:releases.records/2.5.9.json",
+    ""
   ],
-  "release": "2.5.0",
+  "release": "2.5.9",
   "remaining_obligations": [
-    "protected-qualification-post-publication",
-    "protected-candidate-seal-post-publication",
-    "normal-promotion-admission-reconciliation",
-    "24-hour-stabilization-decision"
+    "reconcile-2.5.5-protected-post-publication-debt",
+    "bind-final-terminal-delta",
+    "materialize-and-qualify-factorio-2.0-projection",
+    "normal-manual-protected-seal-promotion-publication-gates"
   ],
-  "remaining_states": [],
+  "remaining_states": [
+    "source-frozen",
+    "package-built",
+    "focused-qualified",
+    "candidate-qualified",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
   "schema": 1,
-  "state": "publicly-verified",
+  "state": "planned",
   "target": "2.0"
 }

@@ -256,7 +256,11 @@ foreach ($requiredPath in @(
   }
 }
 $probeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\performance-regression-probe\data.lua")
-foreach ($governedVersion in @([string]$taggedTypedRelease.release, [string]$activeTypedRelease.release)) {
+$governedProbeVersions = @([string]$taggedTypedRelease.release)
+if ($activeCandidateHasPackage) {
+  $governedProbeVersions += [string]$activeTypedRelease.release
+}
+foreach ($governedVersion in @($governedProbeVersions | Select-Object -Unique)) {
   if ($probeSource -notmatch ('mir_version\s*==\s*"' + [regex]::Escape($governedVersion) + '"')) {
     throw "Performance probe does not govern exact paired release $governedVersion."
   }

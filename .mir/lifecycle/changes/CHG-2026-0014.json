@@ -35,5 +35,6 @@
     "factorio-2.1": "stage typed settings and ProcessIR after the 3.3.0 fixed point; broad speculative generation remains disabled",
     "factorio-2.0": "project only operators and process classes supported by the 2.0 capability certificate and exact target proof"
   },
-  "state": "planned"
+  "terminal_disposition": "Feature and platform expansion is outside terminal stabilization and is deferred to MIR 4 through CHG-2026-0020.",
+  "state": "closed"
 }

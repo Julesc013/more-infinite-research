@@ -91,7 +91,7 @@ The consistent broad ladders reach 1000% for pipeline extent, +100000% for produ
 
 Advanced portable profiles can use any valid decimal percentage within the setting's safe bounds even when that value is not listed in the dropdown. Use a JSON number in displayed percentage units, such as `123.45` or `-83.25`; invalid or out-of-range values are ignored. The in-game dropdown remains curated for easy selection.
 
-For the exact option list and a count of every checkbox, dropdown, numeric field, and text setting in 3.0.5, see the [3.0.5 settings inventory](../releases/3.0.5-settings-inventory.md).
+For historical context, the exact option list and a count of every checkbox, dropdown, numeric field, and text setting in 3.0.5 remain in the [archived 3.0.5 settings inventory](../releases/archive/3.0.5-settings-inventory.md).
 
 Module productivity discovers final `module` prototypes by their declared tier. Tiers 1, 2, and 3 keep the existing +10%, +5%, and +2% per-level values; tier 4 and later module recipes receive +1% per level. This includes modded module categories without requiring name patterns or a per-mod checkbox.
 

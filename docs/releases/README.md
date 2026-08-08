@@ -1,77 +1,46 @@
 ---
 title: "Releases"
 status: current
-applies_to: "3.0.0+"
+applies_to: "MIR 3 terminal release train"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
 ---
 
 # Releases
 
-Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
+The MIR 3 `.5` wave is published and immutable. The single active planning authority is the [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md). It routes every later MIR 3 correction to the matching `.9` line, prohibits `.6` through `.8`, and hands the completed programme to MIR 4.
 
-MIR 3.2.3 is the immutable published Factorio 2.1 baseline, and MIR 2.5.0 is the immutable published Factorio 2.0 baseline. C31 closed as an unpublished 3.2.4 checkpoint; MIR 3.2.5 is the only planned public Factorio 2.1 convergence release after 3.2.3. `C32` is the reserved monotonic candidate floor, not an active evidence-bearing candidate before source or package freeze.
+Machine-readable release authority lives in `.mir/releases/records/`, with current roles in `.mir/releases/records/current.json` and the wave decision in `.mir/releases/waves/MIR3-Terminal-ChangeSet.json`. Generated dashboards and `todo.md` are views, not independent release state.
 
-The [3.2.5 convergence release](3.2.5-convergence-release.md) owns the release contract. The [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md) owns the wider sequence: 3.2.5, a conditional 2.5.5 projection decision, immutable behavioral baselines, 3.3, and a conditional independently qualified 2.6 projection. The [ultimate convergence audit action register](ultimate-convergence-audit-action-register.md) owns the corrections and open obligations discovered by the final plan audit.
+## Current published wave
 
-Current release authority is machine-readable in `.mir/releases/records/current.json` and the typed records under `.mir/releases/records/`; generated candidate views are not independent release state.
+| Factorio target | Published release | Next planned release | State |
+| --- | --- | --- | --- |
+| `2.1` | [`3.2.5`](notes/release-notes-3.2.5.md) | [`3.2.9`](notes/release-notes-3.2.9.md) | Publicly verified; protected qualification and seal reconciliation remain post-publication debt |
+| `2.0` | [`2.5.5`](notes/release-notes-2.5.5.md) | `2.5.9` | Publicly verified; protected qualification and seal reconciliation remain post-publication debt |
+| `1.1.110` | [`1.9.5`](notes/release-notes-1.9.5.md) | `1.9.9` | Publicly verified |
+| `1.0.0` only | [`1.8.5`](notes/release-notes-1.8.5.md) | `1.8.9` | Publicly verified; no Factorio 0.18 claim |
+| `0.17.79` | [`1.7.5`](notes/release-notes-1.7.5.md) | `1.7.9` | Publicly verified |
+| `0.16.51` | [`1.6.5`](notes/release-notes-1.6.5.md) | `1.6.9` | Publicly verified |
+| `0.15.40` | [`1.5.5`](notes/release-notes-1.5.5.md) | `1.5.9` | Publicly verified |
+| `0.14.23` | [`1.4.5`](notes/release-notes-1.4.5.md) | `1.4.9` | Publicly verified |
+| `0.13.20` | [`1.3.5`](notes/release-notes-1.3.5.md) | `1.3.9` | Publicly verified |
 
-- [3.2.5-to-2.6 convergence programme](3.2.5-to-2.6-convergence-programme.md)
-- [Ultimate convergence audit action register](ultimate-convergence-audit-action-register.md)
-- [3.2.5 convergence release](3.2.5-convergence-release.md)
-- [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
-- [3.2.0 release notes](notes/release-notes-3.2.0.md)
-- [3.0.0 plan](3.0.0-plan.md)
-- [3.0.0 regression baseline](3.0.0-regression-baseline.md)
-- [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)
-- [3.0.0 local library gate summary](3.0.0-local-library-gate-summary.md)
-- [3.0.0 migration guide](3.0.0-migration-guide.md)
-- [3.0.0 release checklist](3.0.0-release-checklist.md)
-- [3.0.0 release notes](notes/release-notes-3.0.0.md)
-- [3.0.0 short release notes](release-notes-3.0.0.md)
-- [3.0.0 validation summary](3.0.0-validation-summary.md)
-- [3.0.0 risk register](3.0.0-risk-register.md)
-- [3.0.5 convergence plan](3.0.5-convergence-plan.md)
-- [3.0.5 convergence review](3.0.5-convergence-review.md)
-- [3.0.5 release checklist](3.0.5-release-checklist.md)
-- [3.0.5 release notes](notes/release-notes-3.0.5.md)
-- [3.0.5 validation summary](3.0.5-validation-summary.md)
-- [2.3.5 backport plan](2.3.5-backport-plan.md)
+The `.5` publication exceptions remain release-specific. They do not claim normal protected qualification, do not create protected seals, and do not weaken the normal `.9` gates.
+
+## Current release documents
+
+- [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md)
 - [Backport wave dashboard](backport-wave-dashboard.md)
-- [3.1.0 plan](3.1.0-plan.md)
-- [3.1.0 release checklist](3.1.0-checklist.md)
-- [3.1.0 release notes](notes/release-notes-3.1.0.md)
-- [3.1.1 release notes](notes/release-notes-3.1.1.md)
-- [3.1.2 release notes](notes/release-notes-3.1.2.md)
-- [3.1.5 candidate notes](notes/release-notes-3.1.5.md)
-- [3.1.5 validation summary](3.1.5-validation-summary.md)
-- [3.1.9 release notes](notes/release-notes-3.1.9.md)
-- [3.1.9 migration guide](3.1.9-migration-guide.md)
-- [3.1.9 release checklist](3.1.9-checklist.md)
-- [3.1.9 validation summary](3.1.9-validation-summary.md)
-- [2.4.9 stability backport](2.4.9-stability-backport.md)
-- [2.4.9 release notes](notes/release-notes-2.4.9.md)
-- [0.x Factorio version metadata correction](0.x-factorio-version-metadata-correction.md)
-- [0.12.0 release notes](notes/release-notes-0.12.0.md)
-- [0.11.0 release notes](notes/release-notes-0.11.0.md)
-- [0.10.0 release notes](notes/release-notes-0.10.0.md)
-- [0.9.0 release notes](notes/release-notes-0.9.0.md)
-- [0.8.0 release notes](notes/release-notes-0.8.0.md)
-- [0.7.0 release notes](notes/release-notes-0.7.0.md)
-- [0.6.0 release notes](notes/release-notes-0.6.0.md)
-- [3.1.9 and 2.4.5 post-release synthesis](3.1.9-post-2.4.5-ring-synthesis.md)
-- [0.17 through 0.6 lower-wave synthesis](lower-wave-0.17-to-0.6-synthesis.md)
-- [Published lines development copy pack](lower-wave-development-copy-pack.md)
-- [3.1.0 migration guide](3.1.0-migration-guide.md)
-- [3.1.0 validation summary](3.1.0-validation-summary.md)
-- [3.1.0 roadmap](3.1.0-roadmap.md)
-- [3.1.0 automatic compiler development summary](3.1.0-automatic-compiler-development-summary.md)
-- [1.6.0 Factorio 0.16 plan](1.6.0-plan.md)
-- [1.5.0 Factorio 0.15 plan](1.5.0-plan.md)
-- [2.2.0 validation record](2.2.0-validation-record.md)
+- [Target-line versioning and backports](../maintainer/backporting.md)
+- [Current Mod Portal page](mod-portal-page.md)
+- [Release-note index](notes/README.md)
+- [MIR 4 offline release authority](../architecture/mir4-offline-release-authority.md)
 
-Historical player-facing release notes are collected in the [release-notes directory](notes/).
+## Historical records
+
+Completed plans, candidate reports, publication receipts, previous Mod Portal copy, and superseded roadmaps live under [`docs/releases/archive/`](archive/). Archived pages are evidence and context only; their replacement is this index or the current page named in their frontmatter.

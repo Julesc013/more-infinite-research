@@ -154,13 +154,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-compiler-charter
-  - path: docs/releases/3.2.0-technology-design-foundations-report.md
+  - path: docs/releases/archive/3.2.0-technology-design-foundations-report.md
     title: "3.2.0 Technology Design Foundations Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/adr/0020-compilation-snapshot-boundary.md
     title: "ADR 0020: Compilation Snapshot Boundary"
     status: current
@@ -217,311 +218,301 @@ docs:
     doc_type: adr
     owner: mir-maintainers
     source_of_truth_for: [compiler-schema-compatibility]
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/archive/3.2.0-release-readiness-report.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-technology-design-hardening-report.md
+  - path: docs/releases/archive/3.2.0-technology-design-hardening-report.md
     title: "3.2.0 Technology Design Hardening Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-approved-delta-report.md
+  - path: docs/releases/archive/3.2.0-approved-delta-report.md
     title: "3.2.0 Approved Delta Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 1370ca88c06061714e2799ae93c425956b6be0fc
     checkpoint_candidate_sha256: A856EA9A5E7B63396B6652C5FEBF47F1DF62D2607FF38D4AF8EF9C6E2C4AEF45
-  - path: docs/releases/3.2.0-compiler-context-ownership-report.md
+  - path: docs/releases/archive/3.2.0-compiler-context-ownership-report.md
     title: "3.2.0 Compiler Context Ownership Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-base-continuation-design-report.md
+  - path: docs/releases/archive/3.2.0-base-continuation-design-report.md
     title: "3.2.0 Base Continuation Design Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-native-owner-patch-design-report.md
+  - path: docs/releases/archive/3.2.0-native-owner-patch-design-report.md
     title: "3.2.0 Native-Owner Patch Design Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-technology-lifecycle-report.md
+  - path: docs/releases/archive/3.2.0-technology-lifecycle-report.md
     title: "3.2.0 Technology Lifecycle Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-policy-operator-corpus-report.md
+  - path: docs/releases/archive/3.2.0-policy-operator-corpus-report.md
     title: "3.2.0 Policy, Operator, And Review Corpus Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: c87199cb8053ceaa838608c1df0849611ba01540
     checkpoint_candidate_sha256: FDC6AFA183AC384A72D1B2C6A5E15E1816C57675D56B4988AE4384E230E1FB78
-  - path: docs/releases/3.2.0-offline-rule-synthesis-report.md
+  - path: docs/releases/archive/3.2.0-offline-rule-synthesis-report.md
     title: "3.2.0 Offline Rule Synthesis Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-mod-interaction-campaign-report.md
+  - path: docs/releases/archive/3.2.0-mod-interaction-campaign-report.md
     title: "3.2.0 Mod Interaction Campaign Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: not-recorded
     checkpoint_candidate_sha256: not-recorded
-  - path: docs/releases/3.2.0-scale-and-order-report.md
+  - path: docs/releases/archive/3.2.0-scale-and-order-report.md
     title: "3.2.0 Scale And Order Invariance Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 3d4ee88f580fecf5bca9b962a22e42dc06ba0e63
     checkpoint_candidate_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
-  - path: docs/releases/3.2.0-ecosystem-qualification-report.md
+  - path: docs/releases/archive/3.2.0-ecosystem-qualification-report.md
     title: "3.2.0 Ecosystem Qualification Report"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-release-readiness-report.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 565e68398315762af653daf2ed6c1d40b93a4136
     checkpoint_candidate_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
-  - path: docs/releases/3.2.0-release-readiness-report.md
+  - path: docs/releases/archive/3.2.0-release-readiness-report.md
     title: "MIR 3.2.0 Release Readiness Report"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.0-release-readiness
-  - path: docs/releases/3.2.0-c7-compiler-fixed-point-report.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.2.0-c7-compiler-fixed-point-report.md
     title: "MIR 3.2.0 C7 Compiler Fixed-Point Report"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.0-c7-fixed-point-implementation
-      - mir-3.2.0-c7-candidate-identity
-    superseded_by: docs/releases/3.2.0-c8-compiler-platform-overhaul.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: b532e91a227cc4b17526edbb1388c7836e0a6dbe
     checkpoint_candidate_sha256: 1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B
-  - path: docs/releases/3.2.0-c8-compiler-platform-overhaul.md
+  - path: docs/releases/archive/3.2.0-c8-compiler-platform-overhaul.md
     title: "MIR 3.2.0 C8 Compiler Platform Overhaul"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.2.0-c9-deterministic-compiler-boundary.md
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.2.0-c9-deterministic-compiler-boundary.md
     title: "MIR 3.2.0 C9 Deterministic Compiler Boundary"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c10-compiler-contract-closure.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 56719eba490874b46c18be94e68ffb71a5ae455b
     checkpoint_candidate_sha256: CC9C18F1EE4C2F7A64E8C45A6090065A6E027F041FADB90E45F4857939239F7E
-  - path: docs/releases/3.2.0-c10-compiler-contract-closure.md
+  - path: docs/releases/archive/3.2.0-c10-compiler-contract-closure.md
     title: "MIR 3.2.0 C10 Compiler Contract Closure"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c11-candidate-seed-correction.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 6f9297bae1aee2e018ae7298e0661e99aa591028
     checkpoint_candidate_sha256: C1B41367811CA9C9E41A5612AAC8B9789B9EBEE1F3C71F7CA5A4440E83871695
-  - path: docs/releases/3.2.0-c11-candidate-seed-correction.md
+  - path: docs/releases/archive/3.2.0-c11-candidate-seed-correction.md
     title: "MIR 3.2.0 C11 Candidate Seed Correction"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c12-optimization-and-default-authority.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: dc4b1e12695dc915666b04caddbabce570942a74
     checkpoint_candidate_sha256: 3AA9155A74CF904ADFE5B5F79F1F130CFFC39047CD4F787C4B57D65338C02FED
-  - path: docs/releases/3.2.0-c12-optimization-and-default-authority.md
+  - path: docs/releases/archive/3.2.0-c12-optimization-and-default-authority.md
     title: "MIR 3.2.0 C12 Optimization And Default Authority"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c13-bounded-catalog-construction.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 829f71566349dd9e8920292014855844e1abc861
     checkpoint_candidate_sha256: 1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC
-  - path: docs/releases/3.2.0-c13-bounded-catalog-construction.md
+  - path: docs/releases/archive/3.2.0-c13-bounded-catalog-construction.md
     title: "MIR 3.2.0 C13 Bounded Catalog Construction"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c14-static-contract-remediation.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: a49f230cbb792d6b807eab88d218a33feb774bd2
     checkpoint_candidate_sha256: 28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837
-  - path: docs/releases/3.2.0-c14-static-contract-remediation.md
+  - path: docs/releases/archive/3.2.0-c14-static-contract-remediation.md
     title: "MIR 3.2.0 C14 Static Contract Remediation"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c15-k2so-science-progression.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: b8e0481830844659bc373c736e9e8245ec45653b
     checkpoint_candidate_sha256: 34C3E1D8D500146798771AE9E89BAA1EAE33DDD58278926105F7627E9EE1B782
-  - path: docs/releases/3.2.0-c15-k2so-science-progression.md
+  - path: docs/releases/archive/3.2.0-c15-k2so-science-progression.md
     title: "MIR 3.2.0 C15 K2SO Science Progression"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c16-performance-correction.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: c3a56e88fa15da7c12db3b0d11c3d4e732935746
     checkpoint_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
-  - path: docs/releases/3.2.0-c15-playtest-guide.md
+  - path: docs/releases/archive/3.2.0-c15-playtest-guide.md
     title: "MIR 3.2.0 C15 In-Game Playtest Guide"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c16-playtest-guide.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: c3a56e88fa15da7c12db3b0d11c3d4e732935746
     checkpoint_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
-  - path: docs/releases/3.2.0-c16-performance-correction.md
+  - path: docs/releases/archive/3.2.0-c16-performance-correction.md
     title: "MIR 3.2.0 C16 Performance Correction"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c17-risk-default-playtest.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
     checkpoint_candidate_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
-  - path: docs/releases/3.2.0-c16-playtest-guide.md
+  - path: docs/releases/archive/3.2.0-c16-playtest-guide.md
     title: "MIR 3.2.0 C16 In-Game Playtest Guide"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c17-risk-default-playtest.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
     checkpoint_candidate_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
-  - path: docs/releases/3.2.0-and-2.5.0-tonight-runbook.md
+  - path: docs/releases/archive/3.2.0-and-2.5.0-tonight-runbook.md
     title: "MIR 3.2.0 and 2.5.0 Release-Night Runbook"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c17-risk-default-playtest.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
     checkpoint_candidate_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
-  - path: docs/releases/3.2.0-c17-risk-default-playtest.md
+  - path: docs/releases/archive/3.2.0-c17-risk-default-playtest.md
     title: "MIR 3.2.0 C17 Risk-Default Playtest Candidate"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c18-space-age-productivity-playtest.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: d301a3a8ba66bb45a24a55e24c51e3779600fd68
     checkpoint_candidate_sha256: 57C6F9CC9807EFE2B01D575A08D3B30ACCA0EBCA836A3B947EF552C6B4BF552D
-  - path: docs/releases/3.2.0-c18-space-age-productivity-playtest.md
+  - path: docs/releases/archive/3.2.0-c18-space-age-productivity-playtest.md
     title: "MIR 3.2.0 C18 Space Age Productivity Playtest Candidate"
-    status: historical-checkpoint
+    status: archived
     audience: maintainer
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c19-release-candidate.md
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: 55a57548316729d89482c96dcecd7c65f26c6103
     checkpoint_candidate_sha256: C3F51041733A79AAE24D3882FC9FF63227A1455C6D63376B2DDE9858DC30520E
-  - path: docs/releases/3.2.0-c19-release-candidate.md
+  - path: docs/releases/archive/3.2.0-c19-release-candidate.md
     title: "MIR 3.2.0 C19 Release Candidate"
-    status: historical-checkpoint
+    status: archived
     audience: release-manager
-    doc_type: how-to
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.0-c19-candidate-scope
-      - mir-3.2.0-c19-release-artifact
-      - mir-3.2.0-c19-in-game-playtest-order
-      - mir-3.2.0-c18-candidate-scope
-      - mir-3.2.0-c18-in-game-playtest-order
-    superseded_by: docs/releases/3.2.0-c20-release-candidate.md
-    checkpoint_source_commit: 62c084dcd6fb5650ac67abcaa50a08ced218b87c
-    checkpoint_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
-  - path: docs/releases/3.2.0-c20-release-candidate.md
-    title: "MIR 3.2.0 C20 Release Candidate"
-    status: current
-    audience: release-manager
-    doc_type: how-to
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.0-c20-candidate-scope
-      - mir-3.2.0-c20-release-artifact
-      - mir-3.2.0-c20-in-game-playtest-order
-      - mir-3.2.0-space-age-productivity-membership
-      - mir-3.2.0-risk-classification-and-warning-contract
-  - path: docs/releases/3.2.0-c15-local-qualification-report.md
-    title: "MIR 3.2.0 C15 Local Qualification Report"
-    status: historical-checkpoint
-    audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-    superseded_by: docs/releases/3.2.0-c16-performance-correction.md
+    superseded_by: docs/releases/README.md
+    checkpoint_source_commit: 62c084dcd6fb5650ac67abcaa50a08ced218b87c
+    checkpoint_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
+  - path: docs/releases/archive/3.2.0-c20-release-candidate.md
+    title: "MIR 3.2.0 C20 Release Candidate"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.2.0-c15-local-qualification-report.md
+    title: "MIR 3.2.0 C15 Local Qualification Report"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
     checkpoint_source_commit: c3a56e88fa15da7c12db3b0d11c3d4e732935746
     checkpoint_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
   - path: docs/architecture/current-architecture-matrix.md
@@ -549,20 +540,20 @@ docs:
     checkpoint_candidate_sha256: not-recorded
   - path: docs/architecture/3.3-2.6-convergence-platform-roadmap.md
     title: "MIR 3.3 And 2.6 Convergence Platform Roadmap"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.3-2.6-semantic-platform-roadmap
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/architecture/mir-extension-protocol-v1.md
     title: "MIR Extension Protocol v1 Roadmap"
-    status: current
+    status: archived
     audience: developer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-extension-protocol-v1-roadmap
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/architecture/control-plane-v5.md
     title: "MIR Control Plane v5"
     status: current
@@ -593,22 +584,20 @@ docs:
       - mir-3.2.4-c31-unpublished-baseline
   - path: docs/releases/3.2.5-convergence-release.md
     title: "MIR 3.2.5 Convergence Release"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.5-convergence-release
-      - mir-3.2.5-release-value-firewall
-      - mir-3.2.5-narrowed-release-scope
+    source_of_truth_for: []
+    superseded_by: docs/releases/notes/release-notes-3.2.5.md
   - path: docs/releases/3.2.5-development-readiness.md
     title: "MIR 3.2.5 Development Readiness"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.5-development-readiness
+    source_of_truth_for: []
+    superseded_by: docs/releases/notes/release-notes-3.2.5.md
   - path: docs/releases/3.2.5-c32-source-freeze.md
     title: "MIR 3.2.5 C32 Source Freeze"
     status: current
@@ -630,23 +619,20 @@ docs:
       - mir-3.2.5-migration
   - path: docs/releases/3.2.5-to-2.6-convergence-programme.md
     title: "MIR 3.2.5 To 2.6 Convergence Programme"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.5-to-2.6-convergence-programme
-      - mir-3.2.5-2.5.5-execution-critical-path
-      - mir-3.3-2.6-programme-opening-gate
-      - mir-3.2.5-narrowed-executable-board
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/releases/ultimate-convergence-audit-action-register.md
     title: "MIR Ultimate Convergence Audit Action Register"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-ultimate-convergence-audit-actions
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/adr/0028-3-2-5-convergence-release.md
     title: "ADR 0028: MIR 3.2.5 Convergence Release"
     status: current
@@ -1441,12 +1427,12 @@ docs:
     source_of_truth_for: []
   - path: docs/maintainer/2.5.0-post-release-stabilization.md
     title: "MIR 2.5.0 Post-Release Stabilization"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-2.5.0-post-release-stabilization
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/maintainer/backporting.md
     title: "Target-Line Versioning And Backports"
     status: current
@@ -1530,13 +1516,12 @@ docs:
       - structured-playtest-intake
   - path: docs/maintainer/ultimate-convergence-follow-up-prompt.md
     title: "Ultimate Convergence Follow-Up Audit Prompt"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-ultimate-convergence-follow-up-prompt
-      - mir-release-train-follow-up-audit
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir-3-terminal-dot-9-programme.md
   - path: docs/maintainer/README.md
     title: "Maintainer Guide"
     status: current
@@ -1807,67 +1792,70 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/2.2.0-validation-record.md
+  - path: docs/releases/archive/2.2.0-validation-record.md
     title: "Test Results"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.0.0-migration-guide.md
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-migration-guide.md
     title: "Migration Guide: 2.x To 3.0"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.0.0-plan.md
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-plan.md
     title: "M.I.R. Roadmap"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-release-plan
-  - path: docs/releases/3.0.0-regression-baseline.md
-    title: "3.0.0 Regression Baseline"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-regression-baseline
-  - path: docs/releases/3.0.0-transition-checkpoint-2.md
-    title: "3.0.0 Transition Checkpoint 2"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-transition-checkpoint-2
-  - path: docs/releases/3.0.0-transition-checkpoint-3.md
-    title: "3.0.0 Transition Checkpoint 3"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-transition-checkpoint-3
-  - path: docs/releases/3.0.0-local-library-gate-summary.md
-    title: "3.0.0 Local Library Gate Summary"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-local-library-gate-summary
-  - path: docs/releases/3.0.0-release-checklist.md
-    title: "3.0.0 Release Checklist"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-regression-baseline.md
+    title: "3.0.0 Regression Baseline"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-transition-checkpoint-2.md
+    title: "3.0.0 Transition Checkpoint 2"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-transition-checkpoint-3.md
+    title: "3.0.0 Transition Checkpoint 3"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-local-library-gate-summary.md
+    title: "3.0.0 Local Library Gate Summary"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-release-checklist.md
+    title: "3.0.0 Release Checklist"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/notes/release-notes-3.0.0.md
     title: "More Infinite Research 3.0.0 Release Notes"
     status: current
@@ -1882,53 +1870,54 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.0.0-validation-summary.md
+  - path: docs/releases/archive/3.0.0-validation-summary.md
     title: "3.0.0 Validation Summary"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - 3.0.0-validation-summary
-  - path: docs/releases/3.0.0-risk-register.md
-    title: "3.0.0 Risk Register"
-    status: draft
-    audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.1.0-roadmap.md
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.0-risk-register.md
+    title: "3.0.0 Risk Register"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-roadmap.md
     title: "MIR 3.1.0 Automatic Compiler Roadmap"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - validation-result-summary
-  - path: docs/releases/3.0.5-convergence-plan.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.5-convergence-plan.md
     title: "MIR 3.0.5 Convergence Plan"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.0.5-release-plan
-  - path: docs/releases/3.0.5-convergence-review.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.5-convergence-review.md
     title: "MIR 3.0.5 Convergence Review"
-    status: current
+    status: archived
     audience: maintainer
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.0.5-convergence-review
-  - path: docs/releases/3.0.5-release-checklist.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.5-release-checklist.md
     title: "MIR 3.0.5 Release Checklist"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.0.5-release-checklist
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/notes/release-notes-3.0.5.md
     title: "MIR 3.0.5 Release Notes"
     status: current
@@ -1937,36 +1926,38 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-release-notes
-  - path: docs/releases/3.0.5-settings-inventory.md
+  - path: docs/releases/archive/3.0.5-settings-inventory.md
     title: "MIR 3.0.5 Settings Inventory"
+    status: archived
+    audience: player
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.0.5-validation-summary.md
+    title: "MIR 3.0.5 Validation Summary"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/mod-portal-page.md
+    title: "More Infinite Research Mod Portal Page"
     status: current
     audience: player
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.0.5-settings-inventory
-  - path: docs/releases/3.0.5-validation-summary.md
-    title: "MIR 3.0.5 Validation Summary"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.0.5-validation-summary
-  - path: docs/releases/mod-portal-page.md
-    title: "More Infinite Research"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for: []
-  - path: docs/releases/2.4.0-roadmap.md
+      - mir-universal-mod-portal-copy
+  - path: docs/releases/archive/2.4.0-roadmap.md
     title: "2.4.0 Roadmap"
-    status: draft
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/README.md
     title: "Releases"
     status: current
@@ -2103,69 +2094,69 @@ docs:
     source_of_truth_for:
       - portable-return-ledger
   - path: docs/releases/backport-wave-dashboard.md
-    title: "Backport Wave Dashboard"
+    title: "MIR 3 Terminal Wave Dashboard"
     status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
-      - backport-wave-status
-  - path: docs/releases/2.3.5-backport-plan.md
+      - mir-3-terminal-wave-dashboard
+  - path: docs/releases/archive/2.3.5-backport-plan.md
     title: "MIR 2.3.5 Backport Plan"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-2.3.5-backport-plan
-  - path: docs/releases/3.1.0-plan.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-plan.md
     title: "MIR 3.1.0 Plan"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-plan
-  - path: docs/releases/3.1.0-automatic-compiler-development-summary.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-automatic-compiler-development-summary.md
     title: "MIR 3.1.0 Automatic Compiler Development Summary"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-automatic-compiler-result
-  - path: docs/releases/3.1.0-checklist.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-checklist.md
     title: "MIR 3.1.0 Release Checklist"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-release-gate
-  - path: docs/releases/3.1.0-characterization.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-characterization.md
     title: "MIR 3.1.0 Baseline Characterization"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-protected-baseline
-  - path: docs/releases/3.1.0-validation-summary.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-validation-summary.md
     title: "MIR 3.1.0 Superseded Candidate Validation Summary"
     status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-validation-result
-  - path: docs/releases/3.1.0-migration-guide.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.0-migration-guide.md
     title: "MIR 3.1.0 Migration Guide"
-    status: current
+    status: archived
     audience: player
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.0-migration
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/notes/release-notes-3.1.0.md
     title: "MIR 3.1.0 Release Notes"
     status: archived
@@ -2198,14 +2189,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.5-release-notes
-  - path: docs/releases/3.1.5-validation-summary.md
+  - path: docs/releases/archive/3.1.5-validation-summary.md
     title: "MIR 3.1.5 Validation Summary"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.5-validation
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/adr/0015-canonical-stream-descriptors.md
     title: "ADR-0015: Canonical Stream Descriptors"
     status: current
@@ -2214,22 +2205,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - canonical-stream-descriptor-contract
-  - path: docs/releases/1.6.0-plan.md
+  - path: docs/releases/archive/1.6.0-plan.md
     title: "MIR 1.6.0 Factorio 0.16 Plan"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-1.6.0-factorio-0.16-plan
-  - path: docs/releases/1.5.0-plan.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/1.5.0-plan.md
     title: "MIR 1.5.0 Factorio 0.15 Plan"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-1.5.0-factorio-0.15-plan
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/adr/0019-target-profile-v2.md
     title: "ADR 0019: TargetProfileV2"
     status: current
@@ -2293,38 +2284,38 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.9-release-notes
-  - path: docs/releases/3.1.9-migration-guide.md
+  - path: docs/releases/archive/3.1.9-migration-guide.md
     title: "MIR 3.1.9 Migration Guide"
-    status: current
+    status: archived
     audience: player
-    doc_type: how-to
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-migration
-  - path: docs/releases/3.1.9-checklist.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.9-checklist.md
     title: "MIR 3.1.9 Release Checklist"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-release-checklist
-  - path: docs/releases/3.1.9-validation-summary.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.9-validation-summary.md
     title: "MIR 3.1.9 Validation Summary"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-validation
-  - path: docs/releases/3.1.9-post-2.4.5-ring-synthesis.md
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.1.9-post-2.4.5-ring-synthesis.md
     title: "MIR 3.1.9 And 2.4.5 Post-Release Ring Synthesis"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-2.4.5-ring-synthesis
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/lower-wave-0.17-to-0.6-synthesis.md
     title: "MIR Lower-Wave 0.17 To 0.6 Release Synthesis"
     status: current
@@ -2405,21 +2396,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-0.6.0-release-notes
-  - path: docs/releases/3.2.0-verification-overhaul.md
+  - path: docs/releases/archive/3.2.0-verification-overhaul.md
     title: "MIR 3.2.0 Persistent Verification Overhaul"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.2.0-verification-contract
-  - path: docs/releases/3.2.0-audit-remediation-report.md
-    title: "MIR 3.2.0 Audit Remediation Report"
-    status: deprecated
-    audience: release-manager
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+    superseded_by: docs/releases/README.md
+  - path: docs/releases/archive/3.2.0-audit-remediation-report.md
+    title: "MIR 3.2.0 Audit Remediation Report"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/3.2.1-emergency-build-trigger.md
     title: "MIR 3.2.1 Emergency Build Trigger"
     status: historical-checkpoint
@@ -2481,15 +2473,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.0-release-notes
-  - path: docs/releases/2.4.9-stability-backport.md
+  - path: docs/releases/archive/2.4.9-stability-backport.md
     title: "MIR 2.4.9 Stability Backport"
-    status: current
+    status: archived
     audience: release-manager
-    doc_type: release-plan
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-2.4.9-stability-backport
-      - mir-2.4.9-release-gates
+    source_of_truth_for: []
+    superseded_by: docs/releases/README.md
   - path: docs/releases/notes/release-notes-2.4.9.md
     title: "MIR 2.4.9 Release Notes"
     status: current
@@ -2506,3 +2497,180 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - MIR4-Offline-Release-Authority
+  - path: docs/releases/mir-3-terminal-dot-9-programme.md
+    title: "MIR 3 Terminal .9 Programme"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3-terminal-dot-9-programme
+      - mir-3-terminal-release-train
+  - path: docs/releases/notes/release-notes-3.2.9.md
+    title: "MIR 3.2.9 Planning Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.9-release-notes
+  - path: docs/releases/notes/release-notes-2.5.5.md
+    title: "MIR 2.5.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.5-release-notes
+  - path: docs/releases/notes/release-notes-1.9.5.md
+    title: "MIR 1.9.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.5-release-notes
+  - path: docs/releases/notes/release-notes-1.8.5.md
+    title: "MIR 1.8.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.5-release-notes
+  - path: docs/releases/notes/release-notes-1.7.5.md
+    title: "MIR 1.7.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.5-release-notes
+  - path: docs/releases/notes/release-notes-1.6.5.md
+    title: "MIR 1.6.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.5-release-notes
+  - path: docs/releases/notes/release-notes-1.5.5.md
+    title: "MIR 1.5.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.5-release-notes
+  - path: docs/releases/notes/release-notes-1.4.5.md
+    title: "MIR 1.4.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.5-release-notes
+  - path: docs/releases/notes/release-notes-1.3.5.md
+    title: "MIR 1.3.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.3.5-release-notes
+  - path: docs/releases/archive/mod-portal-page-old.md
+    title: "Archived Mod Portal Page Before MIR 3.5 Wave"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/README.md
+    title: "Release Archive"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-release-archive-index
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-3.2.5.md
+    title: "MIR 3.2.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-2.5.5.md
+    title: "MIR 2.5.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.9.5.md
+    title: "MIR 1.9.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.8.5.md
+    title: "MIR 1.8.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.7.5.md
+    title: "MIR 1.7.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.6.5.md
+    title: "MIR 1.6.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.5.5.md
+    title: "MIR 1.5.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.4.5.md
+    title: "MIR 1.4.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-description-1.3.5.md
+    title: "MIR 1.3.5 Mod Portal Description"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md
+  - path: docs/releases/archive/mir-3.5-mod-portal-upload-checklist.md
+    title: "MIR 3.5 Mod Portal Upload Checklist"
+    status: archived
+    audience: release-manager
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mod-portal-page.md

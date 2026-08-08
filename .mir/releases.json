@@ -2,119 +2,131 @@
   "authority": "canonical-release-ledger",
   "development": {
     "factorio-2.0": {
-      "archive": "dist/more-infinite-research_2.5.0.zip",
-      "archive_bytes": 1033875,
-      "archive_class": "immutable-publicly-verified-release",
-      "archive_entries": 291,
-      "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
-      "assurance_exception_ids": [
-        "P11-TIMEBOXED-PUBLICATION-2026-08-02"
-      ],
+      "archive": "",
+      "archive_bytes": null,
+      "archive_class": "planning-authority-no-candidate",
+      "archive_entries": null,
+      "archive_sha256": "",
+      "assurance_exception_ids": [],
       "branch": "legacy",
-      "candidate_id": "2.5-P11",
-      "candidate_qualification_evidence": ".mir/evidence/2.5.0-local-automated-qualification.json",
-      "candidate_qualification_sha256": "BC1360B737A225026CFD6F8D517A675FCF43FE25E1D95BFF71C39059C311958E",
-      "development_branch": "legacy",
-      "manual_review": "maintainer-patch-review-approved",
-      "mir_version": "2.5.0",
-      "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
-      "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+      "candidate_floor": "2.5-P13",
+      "candidate_id": "not-assigned",
+      "development_branch": "dev",
+      "manual_review": "pending",
+      "mir_version": "2.5.9",
+      "package_content_sha256": "",
+      "package_source_commit": "",
       "package_source_material": {
-        "file_count": 291,
+        "file_count": null,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685"
+        "source_tree": ""
       },
-      "package_source_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
-      "package_source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685",
+      "package_source_sha256": "",
+      "package_source_tree": "",
       "protected_qualification": "pending",
-      "publication_status": "publicly-verified",
-      "qualification": "publicly-verified",
+      "publication_status": "planned",
+      "qualification": "planned",
       "remaining_obligations": [
-        "protected-qualification-post-publication",
-        "protected-candidate-seal-post-publication",
-        "normal-promotion-admission-reconciliation",
-        "24-hour-stabilization-decision"
+        "reconcile-2.5.5-protected-post-publication-debt",
+        "bind-final-terminal-delta",
+        "materialize-and-qualify-factorio-2.0-projection",
+        "normal-manual-protected-seal-promotion-publication-gates"
       ],
-      "remaining_states": [],
-      "source_anchor": "3.2.3",
-      "status": "2.5-P11-publicly-verified",
-      "tag": "2.5.0",
-      "tag_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "source_anchor": "2.5.5",
+      "status": "not-assigned-planned"
     },
     "factorio-2.1": {
-      "archive": "dist/more-infinite-research_3.2.5.zip",
-      "archive_bytes": 1056249,
-      "archive_class": "immutable-publicly-verified-release",
-      "archive_entries": 301,
-      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
-      "assurance_exception_ids": [
-        "C32-TIMEBOXED-PUBLICATION-2026-08-08"
-      ],
+      "archive": "",
+      "archive_bytes": null,
+      "archive_class": "planning-authority-no-candidate",
+      "archive_entries": null,
+      "archive_sha256": "",
+      "assurance_exception_ids": [],
       "branch": "main",
-      "candidate_floor": "C32",
-      "candidate_id": "C32",
-      "candidate_qualification_evidence": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
-      "candidate_qualification_sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+      "candidate_floor": "C33",
+      "candidate_id": "not-assigned",
       "development_branch": "dev",
-      "manual_review": "maintainer-patch-review-approved",
-      "mir_version": "3.2.5",
-      "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
-      "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+      "manual_review": "pending",
+      "mir_version": "3.2.9",
+      "package_content_sha256": "",
+      "package_source_commit": "",
       "package_source_material": {
-        "file_count": 301,
+        "file_count": null,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485"
+        "source_tree": ""
       },
-      "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
-      "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+      "package_source_sha256": "",
+      "package_source_tree": "",
       "protected_qualification": "pending",
-      "publication_status": "publicly-verified",
-      "qualification": "publicly-verified",
+      "publication_status": "planned",
+      "qualification": "planned",
       "remaining_obligations": [
-        "protected-qualification-post-publication",
-        "protected-seal-and-reconciliation-post-publication",
-        "normal-promotion-admission-reconciliation",
-        "downstream-always-guard-correction",
-        "transport-robustness-correction",
-        "stage-b-public-asset-audit"
+        "freeze-unified-terminal-finding-inventory",
+        "assign-candidate-after-source-freeze",
+        "normal-manual-protected-seal-promotion-publication-gates",
+        "archive-and-mir4-handoff"
       ],
-      "remaining_states": [],
-      "source_anchor": "3.2.3",
-      "status": "C32-publicly-verified",
-      "tag": "3.2.5",
-      "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857"
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "source_anchor": "3.2.5",
+      "status": "not-assigned-planned"
     }
   },
   "generated_from": [
     "path:releases.current",
+    "path:releases.records/3.2.9.json",
+    "path:releases.records/2.5.9.json",
     "path:releases.records/3.2.5.json",
-    "path:releases.records/2.5.0.json",
-    "path:releases.records/3.2.3.json"
+    "path:releases.records/2.5.5.json"
   ],
   "published_baselines": {
     "factorio-2.0": {
-      "archive": "dist/more-infinite-research_2.5.0.zip",
-      "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+      "archive": "dist/more-infinite-research_2.5.5.zip",
+      "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
       "branch": "legacy",
-      "mir_version": "2.5.0",
-      "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
-      "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+      "mir_version": "2.5.5",
+      "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+      "package_source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
       "status": "release-publicly-verified",
-      "tag": "2.5.0",
-      "tag_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
+      "tag": "2.5.5",
+      "tag_commit": "27877275854eb131efeb42672d3676c9c513c85e"
     },
     "factorio-2.1": {
-      "archive": "dist/more-infinite-research_3.2.3.zip",
-      "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+      "archive": "dist/more-infinite-research_3.2.5.zip",
+      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
       "branch": "main",
-      "mir_version": "3.2.3",
-      "package_content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
-      "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+      "mir_version": "3.2.5",
+      "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
       "status": "release-publicly-verified",
-      "tag": "3.2.3",
-      "tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba"
+      "tag": "3.2.5",
+      "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857"
     }
   },
   "rules": {
@@ -125,7 +137,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-07",
+  "updated_at": "2026-08-08",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

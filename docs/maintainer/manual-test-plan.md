@@ -49,7 +49,7 @@ Waivers do not count as passed package review. If an item cannot pass, keep the 
 
 ## Release Use
 
-Use these scenario names in `docs/releases/2.2.0-validation-record.md` so release evidence is comparable across runs.
+Use these scenario names in `docs/releases/archive/2.2.0-validation-record.md` so release evidence is comparable across runs.
 
 For the archived `v2.0.5` pre-manual status, see `docs/archive/superseded/pre-manual-2.0.5-report.md`.
 

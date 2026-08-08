@@ -1,16 +1,18 @@
 ---
 title: "MIR Ultimate Convergence Audit Action Register"
-status: current
+status: archived
 applies_to: "3.2.5, 2.5.x, 3.3.x, 2.6.x"
 audience: maintainer
-doc_type: release-plan
+doc_type: archive
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-08
 supersedes: []
-superseded_by: []
+superseded_by: [docs/releases/mir-3-terminal-dot-9-programme.md]
 ---
 
 # MIR Ultimate Convergence Audit Action Register
+
+> Historical audit register. Open terminal obligations and all later MIR 3 corrections are now synthesized by the [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md).
 
 This register adopts the actionable findings from the 2026-08-04 ultimate convergence audit. It refines the [cross-release convergence programme](3.2.5-to-2.6-convergence-programme.md), the [3.2.5 release contract](3.2.5-convergence-release.md), the [3.3/2.6 platform roadmap](../architecture/3.3-2.6-convergence-platform-roadmap.md), and the [MEP-1 roadmap](../architecture/mir-extension-protocol-v1.md).
 

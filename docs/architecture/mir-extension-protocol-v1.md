@@ -1,16 +1,18 @@
 ---
 title: "MIR Extension Protocol v1 Roadmap"
-status: current
+status: archived
 applies_to: "3.3.x, 2.6.x"
 audience: developer
-doc_type: release-plan
+doc_type: archive
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-08
 supersedes: []
-superseded_by: []
+superseded_by: [docs/releases/mir-3-terminal-dot-9-programme.md]
 ---
 
 # MIR Extension Protocol v1 Roadmap
+
+> Historical design input. MIR 3.3 and 2.6 are no longer active release trains. Any viable extension-protocol requirement must be re-admitted through the MIR 4 handoff after the [terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md); this document authorizes no implementation.
 
 MIR 3.3 and 2.6 must be extendable by installing another mod, not only by editing MIR. MEP-1 is a host-neutral, capability-negotiated, data-first protocol for compatibility, profiles, tuning, declarative providers, proof, presentation, bounded runtime descriptors, and separately governed advanced adapters.
 

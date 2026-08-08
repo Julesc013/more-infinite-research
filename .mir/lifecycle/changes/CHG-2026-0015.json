@@ -39,5 +39,6 @@
     "factorio-2.1": "immutable semantic source for 3.2.5 and later 3.3 releases",
     "factorio-2.0": "conditional 2.5.5 after feasibility and generated 2.6 after frozen 3.3 semantics, each independently qualified"
   },
-  "state": "planned"
+  "terminal_disposition": "The 2.5.5 projection is published. The planned 2.6 projection is superseded by the independently materialized 2.5.9 terminal target under CHG-2026-0020.",
+  "state": "closed"
 }

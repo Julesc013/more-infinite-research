@@ -44,5 +44,6 @@
     "corrective_release": "2.5.9"
   }],
   "remaining_obligations": ["protected-qualification-post-publication", "protected-seal-and-reconciliation-post-publication", "normal-promotion-admission-reconciliation"],
+  "release_notes": "docs/releases/notes/release-notes-2.5.5.md",
   "updated_at": "2026-08-08T15:51:00+10:00"
 }

@@ -1,1 +1,13 @@
+---
+title: "MIR 1.9.5 Mod Portal Description"
+status: archived
+applies_to: "1.9.5"
+audience: release-manager
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-08-08
+supersedes: []
+superseded_by: [docs/releases/mod-portal-page.md]
+---
+
 MIR 1.9.5 is the frozen MIR 3 `.5` projection for Factorio 1.1.110, following MIR 1.9.4. Exact package identity: `9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC`. LTS automated target qualification and the downloaded public-asset load passed; no personal visual playtest is claimed. Later corrections route to 1.9.9.

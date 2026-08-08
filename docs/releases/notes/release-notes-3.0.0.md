@@ -188,7 +188,7 @@ MIR 3.0.0 is not just a folder shuffle. The refactor establishes boundaries that
 
 ### Validation Record
 
-The release evidence is summarized in `docs/releases/3.0.0-validation-summary.md`.
+The release evidence is summarized in `docs/releases/archive/3.0.0-validation-summary.md`.
 
 Recorded results:
 

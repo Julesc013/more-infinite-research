@@ -39,5 +39,6 @@
     "factorio-2.1": "canonical staged 3.3 implementation through shadowed one-authority-at-a-time cutovers",
     "factorio-2.0": "project frozen 3.3 semantics through reviewed adapters and independent 2.6 qualification"
   },
-  "state": "planned"
+  "terminal_disposition": "The MIR 3.3 and 2.6 cutover is superseded. Any still-valid platform work is deferred to the MIR 4 handoff under CHG-2026-0020.",
+  "state": "closed"
 }

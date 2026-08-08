@@ -1,1 +1,13 @@
+---
+title: "MIR 1.7.5 Mod Portal Description"
+status: archived
+applies_to: "1.7.5"
+audience: release-manager
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-08-08
+supersedes: []
+superseded_by: [docs/releases/mod-portal-page.md]
+---
+
 MIR 1.7.5 is the frozen MIR 3 `.5` historical projection for Factorio 0.17.79, following MIR 1.7.1. Exact package identity: `D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A`. Automated historical target qualification and the downloaded public-asset load passed; no personal visual playtest is claimed. Later corrections route to 1.7.9.

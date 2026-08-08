@@ -105,7 +105,7 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
     mir_version = [string]$Release.release
     candidate_id = [string]$Release.candidate_id
     branch = [string]$Release.branch
-    development_branch = if ([string]$Release.target -eq "2.1") { "dev" } else { [string]$Release.branch }
+    development_branch = if ($null -ne $Release.PSObject.Properties["development_branch"]) { [string]$Release.development_branch } elseif ([string]$Release.target -eq "2.1") { "dev" } else { [string]$Release.branch }
     source_anchor = if ($null -ne $Release.PSObject.Properties["source_release"]) { [string]$Release.source_release.tag } else { "3.2.1" }
     archive = [string]$Release.package.archive
     archive_bytes = if ($null -ne $Release.package.PSObject.Properties["bytes"]) { [long]$Release.package.bytes } else { $null }
@@ -121,7 +121,7 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
     }
     archive_sha256 = [string]$Release.package.archive_sha256
     package_content_sha256 = [string]$Release.package.content_sha256
-    archive_class = if ([string]$Release.state -in @("tagged", "published", "publicly-verified")) { "immutable-$($Release.state)-release" } else { "frozen-unreleased-calibration-candidate" }
+    archive_class = if ([string]$Release.state -eq "planned") { "planning-authority-no-candidate" } elseif ([string]$Release.state -in @("tagged", "published", "publicly-verified")) { "immutable-$($Release.state)-release" } else { "frozen-unreleased-candidate" }
     qualification = [string]$Release.state
     publication_status = [string]$Release.state
     status = "$($Release.candidate_id)-$($Release.state)"
@@ -329,23 +329,19 @@ function New-MIRCPTodoLines {
   $lines.Add("")
   $lines.Add("## Canonical execution programme")
   $lines.Add("")
-  $lines.Add("The ordered release train, freeze packet, stop conditions, conditional 2.5.5 projection, and 3.3/2.6 handoff are defined in [MIR 3.2.5 To 2.6 Convergence Programme](docs/releases/3.2.5-to-2.6-convergence-programme.md). The [development readiness record](docs/releases/3.2.5-development-readiness.md) distinguishes implemented development work from open release proof, and the [follow-up audit prompt](docs/maintainer/ultimate-convergence-follow-up-prompt.md) is the worker handoff.")
+  $lines.Add("The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; no .9 implementation begins before the unified finding inventory is frozen.")
   $lines.Add("")
-  $lines.Add("Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.")
+  $lines.Add("Change-record IDs are identities, not execution order. Follow the terminal programme's workstreams and gates.")
   $lines.Add("")
-  $lines.Add("## Immediate convergence gates")
+  $lines.Add("## Terminal .9 programme gates")
   $lines.Add("")
-  $lines.Add("| Gate | Current boundary | Completion proof |")
+  $lines.Add("| Workstream | Current boundary | Completion proof |")
   $lines.Add("| --- | --- | --- |")
-  $lines.Add("| ``325-A1a`` deterministic fan-in | Closed by ``INC-2026-0056`` after PR 45 merged | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and exact latest-head hosted proof closure |")
-  $lines.Add("| ``325-A1b`` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited ``GIT_INDEX_FILE``, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |")
-  $lines.Add("| ``325-B0`` first complete compatibility slice | Closed by ``CHG-2026-0017`` after PR 51 merged | Research-cost default parity traced through disposition, typed proof, bounded support output, exact Factorio 2.0 adapter disposition, 127/127 local admission, and latest-head hosted closure |")
-  $lines.Add("| ``325-B1`` essential research-cost correctness | Terminal after PR 53 | Exact committed-head 128-row local and latest-head hosted proof admits the algebraic/numeric/parser contract, 3.2.3 defaults, ownership dispositions, all transitions, and first/second reload equivalence |")
-  $lines.Add("| ``325-D1`` narrowed freeze packet | Terminal; C32 source frozen | Exact revision-5 lineage, package composition, bounded product/target contracts, environment/privacy/localization/performance/manual authorities, release documents, and the 125/125 committed-head plan were admitted before package construction |")
-  $lines.Add("| ``325-D2`` deterministic candidate package | Terminal; C32 package built | Two builds from frozen source produced exact archive ``AC81CAD1...A11ADF``, content ``1A2A3738...35A7D``, 1,056,249 bytes, and 301 entries |")
-  $lines.Add("| ``325-D3`` candidate qualification | In progress | Full fresh exact-candidate proof, paired performance, manual playtest, protected qualification, seal, and promotion remain distinct gates |")
-  $lines.Add("| Minimum compatibility product | Frozen for 3.2.5 | Factorio 2.1 Base/Space Age and explicit non-authorizing Factorio 2.0 dispositions cover every shipped feature in the narrowed release |")
-  $lines.Add("| Bounded ecosystem matrix | Frozen for candidate qualification | Exact Base, Space Age, maintained ecosystem, owner, overhaul, and negative/conflict rows retain their version/hash locks, claim levels, fixtures, and budgets |")
+  $lines.Add("| ``T9-A`` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |")
+  $lines.Add("| ``T9-B`` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |")
+  $lines.Add("| ``T9-C`` canonical 3.2.9 | Planning only; candidate floor ``C33`` | Admit scope, freeze exact source, assign a candidate, qualify under normal policy, seal, promote, publish, and verify the downloaded Factorio 2.1 asset |")
+  $lines.Add("| ``T9-D`` lower .9 projections | Planning only | Materialize each target independently from its immutable .5 predecessor plus immutable portable .9 source, then prove exact tree, package, transition, engine, tag, and public-asset identity |")
+  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |")
   $lines.Add("")
   $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
   if ($plannedChanges.Count -gt 0) {
@@ -367,9 +363,9 @@ function New-MIRCPTodoLines {
     foreach ($task in $openTasks) { $lines.Add("| $(Format-MIRCPCode $task.id) | $(Format-MIRCPCode $task.kind) | $(Format-MIRCPCode $task.state) | $(@($task.depends_on) -join ', ') |") }
   }
   $lines.Add("")
-  $lines.Add("## Active change and incident records")
+  $lines.Add("## Open retained change and incident records")
   $lines.Add("")
-  $activeChanges = @($Changes | Where-Object { [string]$_.state -ne "closed" } | Sort-Object id)
+  $activeChanges = @($Changes | Where-Object { [string]$_.state -notin @("implemented", "verified", "closed") } | Sort-Object id)
   $activeIncidents = @($Incidents | Where-Object { [string]$_.closure.status -notlike "closed*" } | Sort-Object id)
   if (($activeChanges.Count + $activeIncidents.Count) -eq 0) {
     $lines.Add("No active change or incident records.")
@@ -382,7 +378,11 @@ function New-MIRCPTodoLines {
   $lines.Add("")
   $lines.Add("## Explicit release obligations")
   $lines.Add("")
-  foreach ($obligation in @($Backport.remaining_obligations)) { $lines.Add("- [ ] ``$obligation`` for $(Format-MIRCPCode $Backport.candidate_id)") }
+  foreach ($release in @($Canonical, $Backport)) {
+    foreach ($obligation in @($release.remaining_obligations)) {
+      $lines.Add("- [ ] ``$obligation`` for $(Format-MIRCPCode $release.release)")
+    }
+  }
   return @($lines)
 }
 

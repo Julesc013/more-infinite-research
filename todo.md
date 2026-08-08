@@ -8,39 +8,29 @@ Generated: 2026-08-08
 
 | Release | Candidate | Reserved floor | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.5` | `C32` | `C32` | `publicly-verified` | `complete` |
-| `2.5.0` | `2.5-P11` | `pending` | `publicly-verified` | `complete` |
+| `3.2.9` | `not-assigned` | `C33` | `planned` | `source-frozen` |
+| `2.5.9` | `not-assigned` | `2.5-P13` | `planned` | `source-frozen` |
 
 ## Canonical execution programme
 
-The ordered release train, freeze packet, stop conditions, conditional 2.5.5 projection, and 3.3/2.6 handoff are defined in [MIR 3.2.5 To 2.6 Convergence Programme](docs/releases/3.2.5-to-2.6-convergence-programme.md). The [development readiness record](docs/releases/3.2.5-development-readiness.md) distinguishes implemented development work from open release proof, and the [follow-up audit prompt](docs/maintainer/ultimate-convergence-follow-up-prompt.md) is the worker handoff.
+The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; no .9 implementation begins before the unified finding inventory is frozen.
 
-Change-record IDs are identities, not execution order. Follow the programme's critical path and exit gates.
+Change-record IDs are identities, not execution order. Follow the terminal programme's workstreams and gates.
 
-## Immediate convergence gates
+## Terminal .9 programme gates
 
-| Gate | Current boundary | Completion proof |
+| Workstream | Current boundary | Completion proof |
 | --- | --- | --- |
-| `325-A1a` deterministic fan-in | Closed by `INC-2026-0056` after PR 45 merged | Isolated per-fingerprint artifacts, immutable plan/work/trust receipts for pass and failure, non-authoritative worker pointers, digest and path validation, mixed-plan/order/duplicate regressions, protected content-addressed import, and exact latest-head hosted proof closure |
-| `325-A1b` temporary Git environment isolation | Implemented locally; admission pending | Markdown-format and artifact-cleanup temporary repositories sanitize inherited `GIT_INDEX_FILE`, repository/worktree, common-dir, and object-store variables; run the regression with a decoy alternate index |
-| `325-B0` first complete compatibility slice | Closed by `CHG-2026-0017` after PR 51 merged | Research-cost default parity traced through disposition, typed proof, bounded support output, exact Factorio 2.0 adapter disposition, 127/127 local admission, and latest-head hosted closure |
-| `325-B1` essential research-cost correctness | Terminal after PR 53 | Exact committed-head 128-row local and latest-head hosted proof admits the algebraic/numeric/parser contract, 3.2.3 defaults, ownership dispositions, all transitions, and first/second reload equivalence |
-| `325-D1` narrowed freeze packet | Terminal; C32 source frozen | Exact revision-5 lineage, package composition, bounded product/target contracts, environment/privacy/localization/performance/manual authorities, release documents, and the 125/125 committed-head plan were admitted before package construction |
-| `325-D2` deterministic candidate package | Terminal; C32 package built | Two builds from frozen source produced exact archive `AC81CAD1...A11ADF`, content `1A2A3738...35A7D`, 1,056,249 bytes, and 301 entries |
-| `325-D3` candidate qualification | In progress | Full fresh exact-candidate proof, paired performance, manual playtest, protected qualification, seal, and promotion remain distinct gates |
-| Minimum compatibility product | Frozen for 3.2.5 | Factorio 2.1 Base/Space Age and explicit non-authorizing Factorio 2.0 dispositions cover every shipped feature in the narrowed release |
-| Bounded ecosystem matrix | Frozen for candidate qualification | Exact Base, Space Age, maintained ecosystem, owner, overhaul, and negative/conflict rows retain their version/hash locks, claim levels, fixtures, and budgets |
+| `T9-A` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |
+| `T9-B` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |
+| `T9-C` canonical 3.2.9 | Planning only; candidate floor `C33` | Admit scope, freeze exact source, assign a candidate, qualify under normal policy, seal, promote, publish, and verify the downloaded Factorio 2.1 asset |
+| `T9-D` lower .9 projections | Planning only | Materialize each target independently from its immutable .5 predecessor plus immutable portable .9 source, then prove exact tree, package, transition, engine, tag, and public-asset identity |
+| `T9-E` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |
 
 | Planned change | Package visible | Targets | Completion boundary |
 | --- | --- | --- | --- |
-| `CHG-2026-0005` | `true` | `factorio-2.1`, `factorio-2.0` | Combines the unreleased C31 research-cost work with derived compatibility dispositions, proof assertions, bounded support reporting, profile hardening, and behavior-preserving compiler consolidation. The public upgrade starts at 3.2.3; stable IDs and neutral defaults are preserved. |
-| `CHG-2026-0006` | `true` | `factorio-2.1`, `factorio-2.0` | Introduces MIR Extension Protocol v1 as a host-neutral, capability-negotiated, data-first protocol. MIR 3.3.x and 2.6.x share one semantic protocol while using target-specific discovery transports. The legacy compatibility-pack transport remains supported through the first complete modern and Factorio 2.0 release pair. MIR 3.3.0 stabilizes only compatibility, profile/tuning, proof, presentation, capability-negotiation, and dependency/conflict surfaces; family providers, setting contributions, runtime descriptors, and trusted adapters remain separately capability-gated until qualified. |
-| `CHG-2026-0010` | `false` | `factorio-2.1`, `factorio-2.0` | Represent C32 as a reserved candidate floor while 3.2.5 is planned, assign evidence-bearing candidate_id only at source or package freeze, and model later release facts as append-only events and post-publication qualifications over immutable release identity. |
-| `CHG-2026-0011` | `false` | `factorio-2.0` | Recover retained P11 observations, re-evaluate only sound evidence, complete exact performance and BZ classification, and record append-only post-publication qualification or an independently qualified P12. Published 2.5.0 bytes and publication facts remain immutable. |
-| `CHG-2026-0012` | `true` | `factorio-2.1`, `factorio-2.0` | Evolve current authorities into an acyclic graph, physically separate sealed safety from configurable policy, make every prototype mutation planned, complete explicit CompilerContext and CompilationRun boundaries, and generate versioned runtime state and migration handling. |
 | `CHG-2026-0013` | `false` | `factorio-2.1`, `factorio-2.0` | Evolve Control Plane v5 with CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observations, bounded pure evaluators, exact batching exclusions, explicit freshness, and separated external-mod runner, aggregator, and publisher roles. |
-| `CHG-2026-0014` | `true` | `factorio-2.1`, `factorio-2.0` | Introduce typed setting values and ordered override provenance, then derive ProcessIR from canonical recipe facts for cycle, catalyst, recycling, probability, quality, spoilage, and protected-resource safety before broad complex-overhaul productivity. |
-| `CHG-2026-0015` | `true` | `factorio-2.1`, `factorio-2.0` | Create projection feasibility before candidate authority, generate exact Factorio 2.0 trees from immutable modern semantics plus the latest qualified target baseline, and prove adapter preservation, idempotence, locality, reconstruction, migration, report transport, and target semantic parity. |
+| `CHG-2026-0020` | `true` | `factorio-2.1`, `factorio-2.0`, `factorio-1.1`, `factorio-1.0`, `factorio-0.17`, `factorio-0.16`, `factorio-0.15`, `factorio-0.14`, `factorio-0.13` | Use immutable .5 releases as the only public predecessors; admit only defect correction, stabilization, archival, and MIR 4 handoff work; assign candidate identities only after exact source freeze; preserve stable public identities unless an admitted defect requires a governed migration; independently materialize and qualify every lower target; prohibit .6 through .8; and route feature or platform redesign to MIR 4. |
 
 ## Executable TaskNodes
 
@@ -92,29 +82,12 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 | `upgrade.measurement` | `capture` | `planned` | package.identity, scenario.registry |
 | `verification.context` | `package` | `planned` |  |
 
-## Active change and incident records
+## Open retained change and incident records
 
 | Record | Type | State | Title |
 | --- | --- | --- | --- |
-| `CHG-2026-0001` | `change/tooling` | `implemented` | Establish MIR Control Plane v5 |
-| `CHG-2026-0002` | `change/product` | `implemented` | MIR 3.2.3 platform progression and structural logistics hotfix |
-| `CHG-2026-0003` | `change/release-engineering` | `implemented` | Reconcile published 3.2.3 and 2.5.0 authorities and stabilize P11 |
-| `CHG-2026-0004` | `change/product` | `implemented` | MIR 3.2.5 unified research cost curves |
-| `CHG-2026-0005` | `change/product` | `planned` | MIR 3.2.5 compatibility observability and convergence |
-| `CHG-2026-0006` | `change/product` | `planned` | MIR 3.3 and 2.6 host-neutral extension platform |
-| `CHG-2026-0007` | `change/product` | `implemented` | Correct research-cost transitions, digest layers, and formula bounds |
-| `CHG-2026-0008` | `change/tooling` | `implemented` | Enforce semantic-domain integrity and ownership specificity |
-| `CHG-2026-0009` | `change/tooling` | `implemented` | Make logical path IDs the sole durable path authority |
-| `CHG-2026-0010` | `change/release` | `planned` | Separate candidate reservation from identity and make releases append-only |
-| `CHG-2026-0011` | `change/release` | `planned` | Reconcile P11 protected proof, BZ ambiguity, and stabilization |
-| `CHG-2026-0012` | `change/product` | `planned` | Complete the 3.3 authority DAG, planned mutation, runtime, and migration cutover |
 | `CHG-2026-0013` | `change/tooling` | `planned` | Build proposition-bound Merkle assurance and isolated execution |
-| `CHG-2026-0014` | `change/product` | `planned` | Add typed settings and ProcessIR economy safety |
-| `CHG-2026-0015` | `change/backport` | `planned` | Generate deterministic 2.5.5 and 2.6 target projections |
-| `CHG-2026-0016` | `change/release` | `implemented` | Establish the 3.2.5 release-value firewall and pre-candidate planning authority |
-| `CHG-2026-0017` | `change/release` | `implemented` | Close 325-B0 and narrow the MIR 3.2.5 release contract |
-| `CHG-2026-0018` | `change/product` | `implemented` | Complete essential MIR 3.2.5 research-cost correctness |
-| `CHG-2026-0019` | `change/release` | `implemented` | Prepare the MIR 3.2.5 D1 source-freeze packet |
+| `CHG-2026-0020` | `change/release` | `planned` | Deliver the unified MIR 3 terminal .9 stabilization wave |
 | `INC-2026-0035` | `incident` | `pending-external-issue-close` | Pyanodon casting unlock startup failure |
 | `INC-2026-0041` | `incident` | `pending-release-qualification` | Ice and platform productivity progression preceded Aquilo access |
 | `INC-2026-0042` | `incident` | `pending-release-qualification` | Modded logistics recipes were omitted when names did not match fixed tiers |
@@ -133,7 +106,11 @@ Change-record IDs are identities, not execution order. Follow the programme's cr
 
 ## Explicit release obligations
 
-- [ ] `protected-qualification-post-publication` for `2.5-P11`
-- [ ] `protected-candidate-seal-post-publication` for `2.5-P11`
-- [ ] `normal-promotion-admission-reconciliation` for `2.5-P11`
-- [ ] `24-hour-stabilization-decision` for `2.5-P11`
+- [ ] `freeze-unified-terminal-finding-inventory` for `3.2.9`
+- [ ] `assign-candidate-after-source-freeze` for `3.2.9`
+- [ ] `normal-manual-protected-seal-promotion-publication-gates` for `3.2.9`
+- [ ] `archive-and-mir4-handoff` for `3.2.9`
+- [ ] `reconcile-2.5.5-protected-post-publication-debt` for `2.5.9`
+- [ ] `bind-final-terminal-delta` for `2.5.9`
+- [ ] `materialize-and-qualify-factorio-2.0-projection` for `2.5.9`
+- [ ] `normal-manual-protected-seal-promotion-publication-gates` for `2.5.9`
