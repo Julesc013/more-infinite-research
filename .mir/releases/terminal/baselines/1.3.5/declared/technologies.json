@@ -1,0 +1,2545 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineTechnologyInventoryV1",
+  "release": "1.3.5",
+  "target": "0.13.20",
+  "view": "declared",
+  "observation_capability": "stable-stream-manifest",
+  "fields_observed": [
+    "capability",
+    "family",
+    "migration-policy",
+    "stable-id",
+    "targets"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_1.3.5.zip",
+    "docs/releases/notes/release-notes-1.3.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "mir-prod-air-scrubbing-clean-filter",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "compat_policy:air-scrubbing",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_air_scrubbing_clean_filter-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "clean_filter"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "atan-pollution-filter",
+            "atan-spore-filter"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_ice-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_ice-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "ice"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_ice"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "inserters"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_inserters"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "inventory_capacity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_inventory_capacity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron_sticks-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_iron_sticks-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "iron_sticks"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_iron_sticks"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_iron-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "iron"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_iron"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lab_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_lab_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "lab_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_lab_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_landfill-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_landfill-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "landfill"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_landfill"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lithium-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_lithium-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "lithium"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_lithium"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_low_density_structure-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_low_density_structure-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "low_density_structure"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_low_density_structure"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lubricant_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_lubricant_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "lubricant_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_lubricant_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_mining_drill-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_mining_drill-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "mining_drill"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_mining_drill"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "modules"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_modules"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_molten_metals-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_molten_metals-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "molten_metals"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_molten_metals"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_cracking_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_oil_cracking_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "oil_cracking_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_oil_cracking_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_processing_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_oil_processing_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "oil_processing_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_oil_processing_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_plastic-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_plastic-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "plastic"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_plastic"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_processing_unit-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_processing_unit-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "processing_unit"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_processing_unit"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_oxidizer_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_thruster_oxidizer_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "thruster_oxidizer_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_thruster_oxidizer_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_fuel_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_thruster_fuel_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "thruster_fuel_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_thruster_fuel_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_superconductor-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_superconductor-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "superconductor"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_superconductor"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_supercapacitor-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_supercapacitor-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "supercapacitor"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_supercapacitor"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfuric_acid_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_sulfuric_acid_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "sulfuric_acid_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_sulfuric_acid_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfur-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_sulfur-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "sulfur"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_sulfur"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_holmium-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_holmium-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "holmium"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_holmium"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_spoilage_preservation-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_spoilage_preservation-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "spoilage_preservation"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_spoilage_preservation"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rockets-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_rockets-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "rockets"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_rockets"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_shooting_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_rocket_shooting_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "rocket_shooting_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_rocket_shooting_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_fuel-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_rocket_fuel-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "rocket_fuel"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_rocket_fuel"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_robot_battery-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_robot_battery-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "robot_battery"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_robot_battery"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rails-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_rails-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "rails"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_rails"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_quantum_processor-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_quantum_processor-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "quantum_processor"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_quantum_processor"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "science_pack_productivity"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_science_pack_productivity"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "heavy_ammo"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_heavy_ammo"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_grenades-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_grenades-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "grenades"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_grenades"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_gears-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_gears-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "gears"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_gears"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_carbon-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "carbon"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_carbon"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon_fiber-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_carbon_fiber-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "carbon_fiber"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_carbon_fiber"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cannon_shooting_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_cannon_shooting_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "cannon_shooting_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_cannon_shooting_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "bullets"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_bullets"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_breeding-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_breeding-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "breeding"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_breeding"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bioflux-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_bioflux-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "bioflux"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_bioflux"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cargo_bay_unloading_distance-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_cargo_bay_unloading_distance-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "cargo_bay_unloading_distance"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_cargo_bay_unloading_distance"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "belts"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_belts"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bacteria_cultivation-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_bacteria_cultivation-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "bacteria_cultivation"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_bacteria_cultivation"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_artificial_soil-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_artificial_soil-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "artificial_soil"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_artificial_soil"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_armor_components-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_armor_components-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "armor_components"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_armor_components"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_agricultural_growth_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_agricultural_growth_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "agricultural_growth_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_agricultural_growth_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_advanced_circuit-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_advanced_circuit-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "advanced_circuit"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_advanced_circuit"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prod-atan-ash-separation",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "compat_policy:atan-ash",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_ash_separation-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "ash_separation"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "atan-ash-seperation"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_batteries-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_batteries-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "batteries"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_batteries"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_tungsten-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_tungsten-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "tungsten"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_tungsten"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cargo_landing_pad_count-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_cargo_landing_pad_count-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "cargo_landing_pad_count"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_cargo_landing_pad_count"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_mining_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "character_mining_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_character_mining_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_furnace-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_furnace-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "furnace"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_furnace"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flying_robot_frame-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_flying_robot_frame-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "flying_robot_frame"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_flying_robot_frame"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_flamethrower_shooting_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "flamethrower_shooting_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_flamethrower_shooting_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_explosives-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_explosives-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "explosives"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_explosives"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_engine-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_engine-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "engine"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_engine"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electronic_circuit-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_electronic_circuit-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "electronic_circuit"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_electronic_circuit"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_crafting_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "character_crafting_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_character_crafting_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "electric_shooting_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_electric_shooting_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_energy-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_electric_energy-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "electric_energy"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_electric_energy"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_copper-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "copper"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_copper"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper_cable-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_copper_cable-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "copper_cable"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_copper_cable"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "concrete"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_concrete"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_walking_speed-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "character_walking_speed"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_character_walking_speed"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:direct-effects",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "capability",
+          "value": "native-modifier"
+        },
+        {
+          "name": "family",
+          "value": "character_reach"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_character_reach"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_engine-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_electric_engine-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "electric_engine"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_electric_engine"
+          ]
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_walls-1",
+      "target": "0.13.20",
+      "state": "declared-stable-identity",
+      "origin": "legacy_stream_table:productivity",
+      "observed_release": "1.3.5",
+      "source_evidence": [
+        "prototypes/mir/streams/generated_stream_manifest.json"
+      ],
+      "target_disposition": "target-profile-decides-emission",
+      "mir4_transition_rule": "import-stable-id-and-re-evaluate-target-capability",
+      "attributes": [
+        {
+          "name": "generated_technology",
+          "value": "recipe-prod-research_walls-1"
+        },
+        {
+          "name": "capability",
+          "value": "recipe-productivity"
+        },
+        {
+          "name": "family",
+          "value": "walls"
+        },
+        {
+          "name": "migration_policy",
+          "value": "stable"
+        },
+        {
+          "name": "targets",
+          "value": [
+            "stream:research_walls"
+          ]
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

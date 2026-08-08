@@ -1,0 +1,500 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineCompatibilityInventoryV1",
+  "release": "3.2.5",
+  "target": "2.1",
+  "view": "claimed",
+  "observation_capability": "package-source-claim-authority-or-explicit-historical-omission",
+  "fields_observed": [
+    "behavior",
+    "claim-level",
+    "maturity",
+    "public-text",
+    "scope"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_3.2.5.zip",
+    "docs/releases/notes/release-notes-3.2.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "aai-containers",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "storage content coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks AAI Containers as adjacent storage content; MIR does not create warehouse or container productivity streams."
+        }
+      ]
+    },
+    {
+      "stable_id": "aai-industry",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "mini-overhaul tuning profile"
+        },
+        {
+          "name": "maturity",
+          "value": "observed"
+        },
+        {
+          "name": "behavior",
+          "value": "diagnostic"
+        },
+        {
+          "name": "scope",
+          "value": "single-observation"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks AAI Industry as a mini-overhaul tuning profile; this is not a broad AAI suite support claim."
+        }
+      ]
+    },
+    {
+      "stable_id": "aai-loaders",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "loader crafting productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR covers visible AAI-style loader crafting recipes through belt productivity; it does not change loader throughput, modes, fluids, or compatibility hooks."
+        }
+      ]
+    },
+    {
+      "stable_id": "AdvancedBeltsSA",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "belt-family crafting productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR attaches structurally valid Advanced Belts-style belt, splitter, lane-splitter, and underground-belt crafting recipes to Belt productivity while preserving productivity-ignored returned coolant. AdvancedBeltsSA 2.3.3 itself declares Factorio 2.0 and does not pass Factorio 2.1 final prototype validation."
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-air-scrubbing",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "full family support: clean-filter crafting only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR adds productivity to Air Scrubbing clean pollution and spore filter crafting recipes only; scrubbing, cleaning, recovery, and environmental-removal recipes remain diagnostic-only."
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-ash",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "ash separation productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR adds productivity to ATAN Ash separation only; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes remain outside this stream."
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-nuclear-science",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "science-pack recipe productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR covers visible ATAN-style nuclear science pack recipes when the science pack is an active lab input; atom forge crafting remains outside this claim."
+        }
+      ]
+    },
+    {
+      "stable_id": "big-mining-drill",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "mining drill recipe productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR covers visible Big Mining Drill-style crafting recipes through mining drill productivity; it does not add native mining-yield productivity."
+        }
+      ]
+    },
+    {
+      "stable_id": "equipment-gantry",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "equipment-grid automation coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks Equipment Gantry as adjacent equipment-grid automation content; MIR does not absorb gantry insertion, removal, or item-grid processing behavior."
+        }
+      ]
+    },
+    {
+      "stable_id": "finite_prod_techs",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "load-after finite productivity cap cooperation"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR cooperates with Finite Productivity Technologies 0.1.1+ through its hidden load-after dependency; MIR does not own the finite-level formula."
+        }
+      ]
+    },
+    {
+      "stable_id": "FluidMustFlow",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "pipeline coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "diagnostic"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks Fluid Must Flow with the pipeline extent setting surface; MIR does not recreate duct behavior or fluid logistics."
+        }
+      ]
+    },
+    {
+      "stable_id": "jetpack",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "equipment content coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks Jetpack as adjacent equipment and movement content; MIR does not absorb jetpack movement, fuel, or equipment behavior."
+        }
+      ]
+    },
+    {
+      "stable_id": "modules-t4",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "module recipe productivity by final prototype tier"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR covers Tier 4 Modules recipes through module prototype tiers; it does not rewrite module effects or add dynamic module-effect research."
+        }
+      ]
+    },
+    {
+      "stable_id": "robot_attrition",
+      "target": "2.1",
+      "state": "claimed-at-package-source",
+      "origin": "compatibility-claim-authority",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-as-claim-not-universal-support",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "runtime balance coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "public_text",
+          "value": "MIR load-checks Robot Attrition as adjacent runtime balance content; MIR does not absorb robot crash, attrition, or recovery behavior."
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

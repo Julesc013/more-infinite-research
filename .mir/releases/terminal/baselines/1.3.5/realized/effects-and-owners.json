@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineOwnershipInventoryV1",
+  "release": "1.3.5",
+  "target": "0.13.20",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "realized-effects-and-external-owners",
+      "reason": "Depends on exact active engine and mod graph; full export was not retained.",
+      "static_fallback_source": "prototypes/mir/index/owners.lua"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_1.3.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.3.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [],
+  "omissions": []
+}
