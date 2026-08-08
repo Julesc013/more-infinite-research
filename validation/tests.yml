@@ -238,7 +238,7 @@
       "inputs": [
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
-        ".mir/performance-campaign.json",
+        "performance-campaign",
         ".mir/sanitation-budgets.json",
         "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
@@ -280,7 +280,7 @@
         "mod-closure",
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
-        ".mir/performance-campaign.json",
+        "performance-campaign",
         ".mir/sanitation-budgets.json",
         "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
