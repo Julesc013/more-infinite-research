@@ -47,16 +47,16 @@ A state is an admitted fact, not a mutable job status. Every later transition re
 
 ## Terminal .5 semantic baselines
 
-Queue status: `all-nine-static-captured-realized-probes-pending`. A static capture is not a completed realized-engine baseline.
+Queue status: `complete-all-nine-realized-and-reconciled`. All nine exact-engine semantic baselines are complete and reconciled.
 
 | Predecessor | Terminal release | Target | Identity | Semantic inventory | Manifest |
 | --- | --- | --- | --- | --- | --- |
-| `3.2.5` | `3.2.9` | `2.1` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/3.2.5/baseline-manifest.json` |
-| `2.5.5` | `2.5.9` | `2.0` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/2.5.5/baseline-manifest.json` |
-| `1.9.5` | `1.9.9` | `1.1.110` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.9.5/baseline-manifest.json` |
-| `1.8.5` | `1.8.9` | `1.0.0-only` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.8.5/baseline-manifest.json` |
-| `1.7.5` | `1.7.9` | `0.17.79` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.7.5/baseline-manifest.json` |
-| `1.6.5` | `1.6.9` | `0.16.51` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.6.5/baseline-manifest.json` |
-| `1.5.5` | `1.5.9` | `0.15.40` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.5.5/baseline-manifest.json` |
-| `1.4.5` | `1.4.9` | `0.14.23` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.4.5/baseline-manifest.json` |
-| `1.3.5` | `1.3.9` | `0.13.20` | `locked` | `static-captured-realized-probes-pending` | `.mir/releases/terminal/baselines/1.3.5/baseline-manifest.json` |
+| `3.2.5` | `3.2.9` | `2.1` | `locked` | `complete` | `.mir/releases/terminal/baselines/3.2.5/baseline-manifest.json` |
+| `2.5.5` | `2.5.9` | `2.0` | `locked` | `complete` | `.mir/releases/terminal/baselines/2.5.5/baseline-manifest.json` |
+| `1.9.5` | `1.9.9` | `1.1.110` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.9.5/baseline-manifest.json` |
+| `1.8.5` | `1.8.9` | `1.0.0-only` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.8.5/baseline-manifest.json` |
+| `1.7.5` | `1.7.9` | `0.17.79` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.7.5/baseline-manifest.json` |
+| `1.6.5` | `1.6.9` | `0.16.51` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.6.5/baseline-manifest.json` |
+| `1.5.5` | `1.5.9` | `0.15.40` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.5.5/baseline-manifest.json` |
+| `1.4.5` | `1.4.9` | `0.14.23` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.4.5/baseline-manifest.json` |
+| `1.3.5` | `1.3.9` | `0.13.20` | `locked` | `complete` | `.mir/releases/terminal/baselines/1.3.5/baseline-manifest.json` |

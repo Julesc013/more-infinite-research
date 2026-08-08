@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 3 Terminal `.5` Baseline Capture
 
-All nine immutable `.5` public archives now have deterministic package-excluded static baseline captures. This is a progress boundary, not B1 completion: exact public identities, package composition, declared semantic inventories, retained engine-load evidence, and explicit capability omissions are captured, while full realized prototype, setting-default, and compatibility observation exports remain pending.
+All nine immutable `.5` public archives now have complete, deterministic, package-excluded semantic baselines. Each baseline binds the exact public ZIP and exact target-engine installation, captures declared and realized semantic inventories, classifies every declared/realized/claimed difference, and either records evaluated settings or an independently established engine-capability omission. This closes the B1 baseline-capture gate; it does not close `.5` Mod Portal custody, apply GitHub protections, admit a `.9` product change, freeze `.9` source, or allocate a candidate.
 
 The canonical machine authorities are:
 
@@ -20,24 +20,26 @@ The canonical machine authorities are:
 - `.mir/releases/terminal/MIR3-Dot5-Semantic-MatrixV1.json` for the cross-target feature, technology-ID, setting-ID, migration, and compatibility-claim view;
 - `.mir/releases/terminal/MIR3-Terminal-Baseline-Capture-QueueV1.json` for completion state.
 
-## Calibrated identities
+## Sealed baseline identities
 
-| Release | Baseline root SHA-256 | Deterministic calibration bundle SHA-256 |
-| --- | --- | --- |
-| `3.2.5` | `2C6F1E61D359B8680B6FEA3C4EF8CD9F775E851EFAA7A13D1231036530C17596` | `E3165E789E05385D3F037CE73709BE481AC6F89C1BCFD01AB36EF80196E9CCA6` |
-| `2.5.5` | `7ACE30AB13C5C532863A942A74C3959FED8980A8BA588C381E0591286E8BBE1B` | `31E0AD38897CAAE26B80870C36F3548EBC38F74564DDB91FC5F67609319D18DB` |
-| `1.9.5` | `34BA4397E569A52E40317FC2E75E5CF173B1476706546ED70718D08A7D7F7377` | `6EA05D14B8E93232A275B7D79547F20A54F4B56BAA8FD6B9F1958762AD79CAA5` |
-| `1.8.5` | `5B85A4FB23EB06AD63AC97132CC0C78205E2473304291081FDD554D6B4F576D3` | `2D410ACBDFC736C5E77DC607FC0B526E3A15790D329D82A6268CC4EB4B62E8BE` |
-| `1.7.5` | `59497401C8CF701B08F6927DE428C7C25F8B900F5C0F73D9DD46ADBE572F034F` | `70FCF025F71D8D683D1AA2728C6FA20D6EF61FABF5310BCF2B2BF24958E4DA2E` |
-| `1.6.5` | `3EE468E58F7A507316877E79D9F71C2F6A6FE7213AC375243B4ABD5D4E20B5C6` | `AE612D533E3586FED0B20F83914F8A3828A546DEA053BAD68CB5B146FC760E01` |
-| `1.5.5` | `25E83329D5C9BE664DA0A97D1BDA51C42F358B6B9217D66725AEBD8A81351697` | `DECF3E910360D8AF93B64222D4BC64E4A1AA168F67FD09DD014F04BF61B1C738` |
-| `1.4.5` | `724FD0A4B54AD9D3BBF79C254AAA1499DE2342E263B2C2C1D900E95182958E91` | `EF93D401C794E7F862E5EF4DC57A2C77A8F650FBC489CC25E21118562B1FF709` |
-| `1.3.5` | `369B54B23FA58E3F814113E6830F01372E91856B31A567C58C923CA365F21761` | `FB6EA09DEB429E4ED2A60CF2F4FD613850C79CCF0BB7CF1BA622A56759814282` |
+| Release | Realized technologies / effects / settings | Baseline root SHA-256 | Deterministic bundle SHA-256 |
+| --- | --- | --- | --- |
+| `3.2.5` | `65 / 165 / 66` | `692E071E6057854D090880C6921F17607C3B1BA13587F1846359DC7CED09AB53` | `B8B93128EE68008CC7516882EE1B2172B3BEF07616E9585E8D6F3B0FD8976850` |
+| `2.5.5` | `63 / 161 / 66` | `6B74589F413C010AA4BF7F8B178C07054315169802EC1A12AA19FAECD3316FF6` | `F8D6856DB49C6AA05974583D4EBF5B9EC8AF994CDF2732FC766A66FFC369BEE2` |
+| `1.9.5` | `11 / 15 / 48` | `BF412FF6CA673F039D43B19D4835152D0CC392C6FDEF65D6E898A1FBB2C9F4B6` | `249EEE0E82976F97D415066A3AE358DDA573B4B36BCD688A64416AC9009C78C0` |
+| `1.8.5` | `11 / 15 / 48` | `2193441BFC20C491234EA0A57EDEA64DFDD483EA97471E209DC3578529DCBB2A` | `D829ED59D27CA9432075044F80605045498637AEC98316C0442BC488D8566162` |
+| `1.7.5` | `11 / 15 / 43` | `5966912C8A801EC5CD858E688CFC47E12023C411101F54CAD2BC90F8474CD672` | `BBD448F7503F4FF93165D3404DE071E4BD44FA2F06FB8A89880D08C6027C135C` |
+| `1.6.5` | `10 / 14 / 43` | `2176FE3DD74488153D42A87CDE6FD9C2D248ACFA9D5094E04378020C6AC6E0F5` | `C501A584B660081ABD813EDAAFF6991FD81A833B916A76725DD9913B0D0502AE` |
+| `1.5.5` | `3 / 3 / 43` | `81671E6577CBA23348AA0FDECAD653ED3675182175BF1B3B1413F3E9BF417E5D` | `6312C75046EE7B1FFBF3996F82436BD0F16A9513A25D27DB35BD6B2EC8F2688A` |
+| `1.4.5` | `2 / 2 / omitted` | `C0B7E4A9DE2968D778BB180AF3C93AF43D2ADCBEDF43315738897DACD795A672` | `654D36CD0A12FCDF9BA1F066B055783DCB5363B9B77849FDB17BA87F0DCAFCEF` |
+| `1.3.5` | `2 / 2 / omitted` | `07B8C5AD6525B8AB19F2ACE430FB7C2FC465910957FD5CD5FAF6C3D2EB3FD43A` | `8A0EB72F5439DC2B9560367711A90DBB3E66EA85C071629B09C93071955D653B` |
 
-The bundle hashes describe deterministic calibration artifacts under `build/terminal/baselines/`; they are not published `.5` package identities and do not authorize publication.
+The bundle hashes describe deterministic baseline artifacts under `build/terminal/baselines/`; they are not published `.5` package identities and do not authorize publication.
 
-## Truthful open boundary
+## Realization method and boundary
 
-Each manifest remains `calibration-incomplete`. Across the family, 27 named findings remain open: one realized-prototype export, one evaluated setting-default export, and one claim-matrix realization finding per release. Historical claim authorities that do not exist at the package-source commit are recorded as unavailable; modern claims are never projected backward.
+The observer is a generated, package-excluded mod that depends on the exact frozen MIR ZIP and emits canonical post-final-fixes prototype and evaluated-setting facts. Every observation binds the observer and normalizer hashes, archive and normalized-content hashes, engine executable and installation hashes, official-data tree, target, and semantic digest. Each target was observed twice from isolated state; the tracked evidence was byte-identical across the independent passes.
 
-Do not mark a queue row complete until the exact target engine supplies actual data or an engine-capability omission is independently established, every declared/realized/claimed contradiction is classified, and the final bundle repeats deterministically. No candidate assignment, `.9` source freeze, product edit, or `.5` package rewrite is authorized by this capture.
+Factorio `0.13` and `0.14` do not expose the settings-stage interface used by newer engines, so `1.3.5` and `1.4.5` carry an explicit settings capability omission instead of invented zero-valued observations. Only `3.2.5` has a canonical public compatibility-claim authority at its package-source commit; lower releases explicitly record that omission rather than inheriting modern claims.
+
+All 27 original realization findings are closed and the matrix contains no unresolved baseline findings. The `.5` ZIPs remain unchanged. Portal custody and live GitHub protection application remain external gates, and `.9` implementation still requires a separately admitted, reproduced change record.
