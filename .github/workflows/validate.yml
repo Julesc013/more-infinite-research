@@ -108,7 +108,12 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $candidate = Join-Path $PWD ([string]$plan.candidate)
+          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
+          if ([IO.Path]::IsPathRooted($candidateRelative) -or
+              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
+            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
+          }
+          $candidate = Join-Path $PWD $candidateRelative
           $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
           if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
           New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null
@@ -197,7 +202,12 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          $candidate = Join-Path $PWD ([string]$plan.candidate)
+          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
+          if ([IO.Path]::IsPathRooted($candidateRelative) -or
+              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
+            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
+          }
+          $candidate = Join-Path $PWD $candidateRelative
           $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
           if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
           New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null

@@ -493,6 +493,9 @@ foreach ($requiredWorkflowSnippet in @(
   'mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}',
   'mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}',
   'mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}',
+  '$plan.candidate_descriptor.path',
+  '[IO.Path]::IsPathRooted($candidateRelative)',
+  'Plan candidate descriptor is not a governed repository-relative path',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
@@ -508,6 +511,11 @@ foreach ($requiredWorkflowSnippet in @(
 }
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
+}
+if ($validateWorkflow.Contains('$candidate = Join-Path $PWD ([string]$plan.candidate)') -or
+    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 2 -or
+    @([regex]::Matches($validateWorkflow, '\[IO\.Path\]::IsPathRooted\(\$candidateRelative\)')).Count -ne 2) {
+  throw "Hosted workers and aggregate verification must reconstruct the candidate from the governed repo-relative descriptor path, never the planner checkout's absolute path."
 }
 foreach ($typedStatus in @("upstream-plan-failed", "infrastructure-failed", "worker-artifacts-received")) {
   if (-not $validateWorkflow.Contains($typedStatus)) {
