@@ -54,16 +54,29 @@ if ($LASTEXITCODE -ne 0 -or $tagCommit -ne [string]$packet.lineage.public_predec
     $tagObject -ne [string]$packet.lineage.public_predecessor.tag_object) {
   throw "Public predecessor tag identity is stale."
 }
-foreach ($lineageArchive in @($packet.lineage.public_predecessor, $packet.lineage.superseded_checkpoint)) {
-  $archivePath = Join-Path $repo ([string]$lineageArchive.archive)
-  if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash -ne [string]$lineageArchive.archive_sha256) {
-    throw "Frozen lineage archive is missing or changed: $($lineageArchive.archive)"
-  }
+$predecessorArchive = Join-Path $repo ([string]$packet.lineage.public_predecessor.archive)
+if (-not (Test-Path -LiteralPath $predecessorArchive -PathType Leaf) -or
+    (Get-FileHash -LiteralPath $predecessorArchive -Algorithm SHA256).Hash -ne [string]$packet.lineage.public_predecessor.archive_sha256) {
+  throw "Frozen public-predecessor archive is missing or changed: $($packet.lineage.public_predecessor.archive)"
 }
 $closure = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$packet.lineage.superseded_checkpoint.closure)) | ConvertFrom-Json
 if ([string]$closure.disposition -ne "superseded-unpublished" -or [string]$closure.successor.release -ne "3.2.5") {
   throw "C31 is not preserved as superseded-unpublished lineage."
+}
+$superseded = $packet.lineage.superseded_checkpoint
+$supersededArchive = Join-Path $repo ([string]$superseded.archive)
+$packageLocks = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/control-plane/package-locks.json") | ConvertFrom-Json
+$supersededLock = @($packageLocks.locks | Where-Object { [string]$_.release -eq [string]$superseded.release -and [string]$_.candidate_id -eq [string]$superseded.candidate_id })
+$supersededTree = (& git -C $repo show -s --format=%T ([string]$superseded.package_source_commit)).Trim()
+if ((Test-Path -LiteralPath $supersededArchive -PathType Leaf) -or $supersededLock.Count -ne 1 -or
+    [string]$supersededLock[0].mode -ne "frozen-candidate" -or
+    [string]$supersededLock[0].package_source_commit -ne [string]$superseded.package_source_commit -or
+    [string]$supersededLock[0].package_source_tree -ne [string]$superseded.package_source_tree -or
+    [string]$supersededLock[0].archive_sha256 -ne [string]$superseded.archive_sha256 -or
+    [long]$supersededLock[0].archive_bytes -ne [long]$superseded.bytes -or
+    [int]$supersededLock[0].archive_entries -ne [int]$superseded.entries -or
+    $supersededTree -ne [string]$superseded.package_source_tree) {
+  throw "C31 superseded lineage must remain reconstructable and package-lock authoritative without appearing in active dist."
 }
 
 foreach ($binding in @($packet.product_contract.authorities) + @($packet.qualification_authority.authorities) + @($packet.documentation.authorities)) {
