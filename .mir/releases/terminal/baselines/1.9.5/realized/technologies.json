@@ -4,24 +4,581 @@
   "release": "1.9.5",
   "target": "1.1.110",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
-  "fields_unavailable": [
-    {
-      "field": "complete-realized-technology-prototypes",
-      "reason": "Retained public verification proves load but does not contain a full prototype export.",
-      "static_fallback_source": "prototypes/mir/streams/generated_stream_manifest.json"
-    }
-  ],
+  "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json",
     "dist/more-infinite-research_1.9.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.9.5.md",
     "prototypes/mir/streams/generated_stream_manifest.json"
   ],
-  "items": [],
+  "items": [
+    {
+      "stable_id": "recipe-prod-research_cannon_shooting_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_cannon_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "production-science-pack",
+            "tank",
+            "weapon-shooting-speed-5"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"60*1.5^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_crafting_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "military-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*2^(L-1)\", ingredients = {{\"utility-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_mining_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "military-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*2^(L-1)\", ingredients = {{\"utility-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "military-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*2^(L-1)\", ingredients = {{\"utility-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_walking_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "military-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*2^(L-1)\", ingredients = {{\"utility-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "discharge-defense-equipment",
+            "logistic-science-pack",
+            "military-science-pack",
+            "production-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"60*1.5^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_flamethrower_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "flamethrower",
+            "logistic-science-pack",
+            "military-science-pack",
+            "production-science-pack",
+            "space-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"60*1.5^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"military-science-pack\", 1}, {\"space-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "military-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*1.1^(L-1)\", ingredients = {{\"utility-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lab_productivity-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_lab_productivity-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "production-science-pack",
+            "space-science-pack",
+            "utility-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"1000*1.2^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"military-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"utility-science-pack\", 1}, {\"space-science-pack\", 1}}, time = 120}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_robot_battery-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_robot_battery-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "logistic-science-pack",
+            "production-science-pack",
+            "space-science-pack"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"8000*1.2^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"space-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_shooting_speed-1",
+      "target": "1.1.110",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.9.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_rocket_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "chemical-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "production-science-pack",
+            "rocketry"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count_formula = \"60*1.5^(L-1)\", ingredients = {{\"automation-science-pack\", 1}, {\"logistic-science-pack\", 1}, {\"chemical-science-pack\", 1}, {\"production-science-pack\", 1}, {\"military-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    }
+  ],
   "omissions": []
 }

@@ -27,72 +27,81 @@ function Get-RelativeFileMap([string]$Root) {
 
 $expected = [ordered]@{
   "3.2.5" = [ordered]@{
-    root = "2C6F1E61D359B8680B6FEA3C4EF8CD9F775E851EFAA7A13D1231036530C17596"
-    bundle = "E3165E789E05385D3F037CE73709BE481AC6F89C1BCFD01AB36EF80196E9CCA6"
+    root = "692E071E6057854D090880C6921F17607C3B1BA13587F1846359DC7CED09AB53"
+    bundle = "B8B93128EE68008CC7516882EE1B2172B3BEF07616E9585E8D6F3B0FD8976850"
+    realized_technologies = 65; realized_effects = 165; realized_settings = 66; realized_compatibility = 14
     technologies_minimum = 70
     settings_minimum = 30
     locales_minimum = 400
     compatibility_minimum = 10
   }
   "2.5.5" = [ordered]@{
-    root = "7ACE30AB13C5C532863A942A74C3959FED8980A8BA588C381E0591286E8BBE1B"
-    bundle = "31E0AD38897CAAE26B80870C36F3548EBC38F74564DDB91FC5F67609319D18DB"
+    root = "6B74589F413C010AA4BF7F8B178C07054315169802EC1A12AA19FAECD3316FF6"
+    bundle = "F8D6856DB49C6AA05974583D4EBF5B9EC8AF994CDF2732FC766A66FFC369BEE2"
+    realized_technologies = 63; realized_effects = 161; realized_settings = 66; realized_compatibility = 0
     technologies_minimum = 70
     settings_minimum = 30
     locales_minimum = 400
     compatibility_minimum = 0
   }
   "1.9.5" = [ordered]@{
-    root = "34BA4397E569A52E40317FC2E75E5CF173B1476706546ED70718D08A7D7F7377"
-    bundle = "6EA05D14B8E93232A275B7D79547F20A54F4B56BAA8FD6B9F1958762AD79CAA5"
+    root = "BF412FF6CA673F039D43B19D4835152D0CC392C6FDEF65D6E898A1FBB2C9F4B6"
+    bundle = "249EEE0E82976F97D415066A3AE358DDA573B4B36BCD688A64416AC9009C78C0"
+    realized_technologies = 11; realized_effects = 15; realized_settings = 48; realized_compatibility = 0
     technologies_minimum = 70
     settings_minimum = 30
     locales_minimum = 400
     compatibility_minimum = 0
   }
   "1.8.5" = [ordered]@{
-    root = "5B85A4FB23EB06AD63AC97132CC0C78205E2473304291081FDD554D6B4F576D3"
-    bundle = "2D410ACBDFC736C5E77DC607FC0B526E3A15790D329D82A6268CC4EB4B62E8BE"
+    root = "2193441BFC20C491234EA0A57EDEA64DFDD483EA97471E209DC3578529DCBB2A"
+    bundle = "D829ED59D27CA9432075044F80605045498637AEC98316C0442BC488D8566162"
+    realized_technologies = 11; realized_effects = 15; realized_settings = 48; realized_compatibility = 0
     technologies_minimum = 70
     settings_minimum = 30
     locales_minimum = 400
     compatibility_minimum = 0
   }
   "1.7.5" = [ordered]@{
-    root = "59497401C8CF701B08F6927DE428C7C25F8B900F5C0F73D9DD46ADBE572F034F"
-    bundle = "70FCF025F71D8D683D1AA2728C6FA20D6EF61FABF5310BCF2B2BF24958E4DA2E"
+    root = "5966912C8A801EC5CD858E688CFC47E12023C411101F54CAD2BC90F8474CD672"
+    bundle = "BBD448F7503F4FF93165D3404DE071E4BD44FA2F06FB8A89880D08C6027C135C"
+    realized_technologies = 11; realized_effects = 15; realized_settings = 43; realized_compatibility = 0
     technologies_minimum = 60
     settings_minimum = 20
     locales_minimum = 250
     compatibility_minimum = 0
   }
   "1.6.5" = [ordered]@{
-    root = "3EE468E58F7A507316877E79D9F71C2F6A6FE7213AC375243B4ABD5D4E20B5C6"
-    bundle = "AE612D533E3586FED0B20F83914F8A3828A546DEA053BAD68CB5B146FC760E01"
+    root = "2176FE3DD74488153D42A87CDE6FD9C2D248ACFA9D5094E04378020C6AC6E0F5"
+    bundle = "C501A584B660081ABD813EDAAFF6991FD81A833B916A76725DD9913B0D0502AE"
+    realized_technologies = 10; realized_effects = 14; realized_settings = 43; realized_compatibility = 0
     technologies_minimum = 60
     settings_minimum = 20
     locales_minimum = 250
     compatibility_minimum = 0
   }
   "1.5.5" = [ordered]@{
-    root = "25E83329D5C9BE664DA0A97D1BDA51C42F358B6B9217D66725AEBD8A81351697"
-    bundle = "DECF3E910360D8AF93B64222D4BC64E4A1AA168F67FD09DD014F04BF61B1C738"
+    root = "81671E6577CBA23348AA0FDECAD653ED3675182175BF1B3B1413F3E9BF417E5D"
+    bundle = "6312C75046EE7B1FFBF3996F82436BD0F16A9513A25D27DB35BD6B2EC8F2688A"
+    realized_technologies = 3; realized_effects = 3; realized_settings = 43; realized_compatibility = 0
     technologies_minimum = 60
     settings_minimum = 20
     locales_minimum = 250
     compatibility_minimum = 0
   }
   "1.4.5" = [ordered]@{
-    root = "724FD0A4B54AD9D3BBF79C254AAA1499DE2342E263B2C2C1D900E95182958E91"
-    bundle = "EF93D401C794E7F862E5EF4DC57A2C77A8F650FBC489CC25E21118562B1FF709"
+    root = "C0B7E4A9DE2968D778BB180AF3C93AF43D2ADCBEDF43315738897DACD795A672"
+    bundle = "654D36CD0A12FCDF9BA1F066B055783DCB5363B9B77849FDB17BA87F0DCAFCEF"
+    realized_technologies = 2; realized_effects = 2; realized_settings = 0; realized_compatibility = 0
     technologies_minimum = 60
     settings_minimum = 20
     locales_minimum = 250
     compatibility_minimum = 0
   }
   "1.3.5" = [ordered]@{
-    root = "369B54B23FA58E3F814113E6830F01372E91856B31A567C58C923CA365F21761"
-    bundle = "FB6EA09DEB429E4ED2A60CF2F4FD613850C79CCF0BB7CF1BA622A56759814282"
+    root = "07B8C5AD6525B8AB19F2ACE430FB7C2FC465910957FD5CD5FAF6C3D2EB3FD43A"
+    bundle = "8A0EB72F5439DC2B9560367711A90DBB3E66EA85C071629B09C93071955D653B"
+    realized_technologies = 2; realized_effects = 2; realized_settings = 0; realized_compatibility = 0
     technologies_minimum = 60
     settings_minimum = 20
     locales_minimum = 250
@@ -141,13 +150,14 @@ try {
     $manifestPath = Join-Path $trackedRoot "baseline-manifest.json"
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
     if ([string]$manifest.kind -ne "Mir3TerminalBaselineBundleManifestV1" -or
-        [string]$manifest.completion.state -ne "calibration-incomplete" -or
+        [string]$manifest.capture_tool.version -ne "2" -or
+        [string]$manifest.completion.state -ne "complete" -or
         -not [bool]$manifest.completion.public_identities_reconciled -or
         -not [bool]$manifest.completion.required_files_present -or
         -not [bool]$manifest.completion.exact_engine_observation_passed -or
-        [bool]$manifest.completion.inventories_complete_or_capability_omitted -or
-        [bool]$manifest.completion.contradictions_classified) {
-      throw "$release calibration overclaims completion or omits proven identity/load state."
+        -not [bool]$manifest.completion.inventories_complete_or_capability_omitted -or
+        -not [bool]$manifest.completion.contradictions_classified) {
+      throw "$release realized baseline is not completely reconciled."
     }
     if ([string]$manifest.baseline_root_sha256 -ne [string]$expected[$release].root -or @($manifest.files).Count -ne 26) {
       throw "$release baseline root or manifest file count drifted."
@@ -187,6 +197,20 @@ try {
       throw "$release must record the historical claim-authority omission without projecting modern claims backward."
     }
 
+    $realizedTechnology = Get-Content -Raw -LiteralPath (Join-Path $trackedRoot "realized\technologies.json") | ConvertFrom-Json -Depth 100
+    $realizedEffects = Get-Content -Raw -LiteralPath (Join-Path $trackedRoot "realized\effects-and-owners.json") | ConvertFrom-Json -Depth 100
+    $realizedSettings = Get-Content -Raw -LiteralPath (Join-Path $trackedRoot "realized\settings.json") | ConvertFrom-Json -Depth 100
+    $realizedCompatibility = Get-Content -Raw -LiteralPath (Join-Path $trackedRoot "realized\compatibility-observations.json") | ConvertFrom-Json -Depth 100
+    if (@($realizedTechnology.items).Count -ne [int]$expected[$release].realized_technologies -or
+        @($realizedEffects.items).Count -ne [int]$expected[$release].realized_effects -or
+        @($realizedSettings.items).Count -ne [int]$expected[$release].realized_settings -or
+        @($realizedCompatibility.items).Count -ne [int]$expected[$release].realized_compatibility) {
+      throw "$release exact-engine realized inventory count drifted."
+    }
+    if ($release -in @("1.4.5", "1.3.5") -and @($realizedSettings.explicit_omissions).Count -eq 0) {
+      throw "$release must retain the independently established settings-stage capability omission."
+    }
+
     $generatedOutput = Join-Path $testRoot "output"
     $generatedBuild = Join-Path $testRoot "build"
     & $exporter -Release $release -RepoRoot $RepoRoot -OutputRoot $generatedOutput -BuildRoot $generatedBuild | Out-Host
@@ -212,14 +236,14 @@ try {
   $matrix = Get-Content -Raw -LiteralPath $matrixPath | ConvertFrom-Json -Depth 100
   $releaseOrder = @($expected.Keys)
   if ([string]$matrix.kind -ne "MIR3Dot5SemanticMatrixV1" -or
-      [string]$matrix.status -ne "calibration-incomplete-realized-probes-pending" -or
+      [string]$matrix.status -ne "complete" -or
       (@($matrix.release_order) -join "|") -ne ($releaseOrder -join "|") -or
       @($matrix.releases).Count -ne 9 -or
       -not [bool]$matrix.completion.all_nine_static_inventories_present -or
-      [bool]$matrix.completion.all_nine_realized_engine_inventories_complete -or
-      [bool]$matrix.completion.contradictions_classified -or
-      [bool]$matrix.completion.queue_completion_permitted) {
-    throw "Terminal .5 semantic matrix is incomplete, out of order, or overclaims realized completion."
+      -not [bool]$matrix.completion.all_nine_realized_engine_inventories_complete -or
+      -not [bool]$matrix.completion.contradictions_classified -or
+      -not [bool]$matrix.completion.queue_completion_permitted) {
+    throw "Terminal .5 semantic matrix is incomplete, out of order, or lacks realized reconciliation."
   }
   if ([string]$matrix.generated_by.sha256 -ne (Get-FileHash -LiteralPath (Join-Path $RepoRoot ([string]$matrix.generated_by.path)) -Algorithm SHA256).Hash) {
     throw "Terminal .5 semantic matrix does not bind its exact generator."
@@ -234,7 +258,7 @@ try {
   foreach ($release in $releaseOrder) {
     $rows = @($matrix.releases | Where-Object release -eq $release)
     if ($rows.Count -ne 1 -or [string]$rows[0].baseline_root_sha256 -ne [string]$expected[$release].root -or
-        [string]$rows[0].completion_state -ne "calibration-incomplete") {
+        [string]$rows[0].completion_state -ne "complete") {
       throw "Terminal .5 semantic matrix release binding failed: $release"
     }
   }
@@ -248,7 +272,7 @@ try {
       }
     }
   }
-  if (@($matrix.unresolved_findings).Count -ne 27) { throw "Terminal .5 semantic matrix must carry all 27 calibrated realization findings." }
+  if (@($matrix.unresolved_findings).Count -ne 0) { throw "Terminal .5 semantic matrix must contain no unresolved baseline realization findings." }
 
   $generatedMatrix = Join-Path $testRoot "MIR3-Dot5-Semantic-MatrixV1.json"
   & (Join-Path $RepoRoot "scripts\Export-MIRTerminalBaselineMatrix.ps1") -RepoRoot $RepoRoot -OutputPath $generatedMatrix | Out-Host
@@ -264,4 +288,4 @@ try {
   }
 }
 
-Write-Host "[ok] terminal baseline capture calibration is exact, deterministic, and truthfully incomplete"
+Write-Host "[ok] terminal baseline capture is exact, deterministic, realized, and reconciled"

@@ -4,24 +4,122 @@
   "release": "1.4.5",
   "target": "0.14.23",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
-  "fields_unavailable": [
-    {
-      "field": "complete-realized-technology-prototypes",
-      "reason": "Retained public verification proves load but does not contain a full prototype export.",
-      "static_fallback_source": "prototypes/mir/streams/generated_stream_manifest.json"
-    }
-  ],
+  "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.4.5-engine-observation.json",
     "dist/more-infinite-research_1.4.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.4.5.md",
     "prototypes/mir/streams/generated_stream_manifest.json"
   ],
-  "items": [],
+  "items": [
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1",
+      "target": "0.14.23",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.4.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.4.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "alien-technology",
+            "battery",
+            "discharge-defense-equipment"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count = 60, ingredients = {{\"science-pack-1\", 1}, {\"science-pack-2\", 1}, {\"science-pack-3\", 1}, {\"alien-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_shooting_speed-1",
+      "target": "0.14.23",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.4.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.4.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-prototype-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_name",
+          "value": "recipe-prod-research_rocket_shooting_speed-1"
+        },
+        {
+          "name": "enabled",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "upgrade",
+          "value": "true"
+        },
+        {
+          "name": "max_level",
+          "value": "infinite"
+        },
+        {
+          "name": "prerequisites",
+          "value": [
+            "alien-technology",
+            "battery",
+            "rocketry"
+          ]
+        },
+        {
+          "name": "unit",
+          "value": "{count = 60, ingredients = {{\"science-pack-1\", 1}, {\"science-pack-2\", 1}, {\"science-pack-3\", 1}, {\"alien-science-pack\", 1}}, time = 60}"
+        },
+        {
+          "name": "effects_count",
+          "value": 1
+        }
+      ]
+    }
+  ],
   "omissions": []
 }

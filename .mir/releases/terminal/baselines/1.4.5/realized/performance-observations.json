@@ -4,13 +4,16 @@
   "release": "1.4.5",
   "target": "0.14.23",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
   "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.4.5-engine-observation.json",
     "dist/more-infinite-research_1.4.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.4.5.md",

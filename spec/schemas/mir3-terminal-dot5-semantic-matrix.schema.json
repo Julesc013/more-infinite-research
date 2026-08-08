@@ -8,14 +8,14 @@
   "properties": {
     "schema": { "const": 1 },
     "kind": { "const": "MIR3Dot5SemanticMatrixV1" },
-    "status": { "const": "calibration-incomplete-realized-probes-pending" },
+    "status": { "const": "complete" },
     "generated_by": {
       "type": "object",
       "additionalProperties": false,
       "required": ["path", "version", "sha256"],
       "properties": {
         "path": { "const": "scripts/Export-MIRTerminalBaselineMatrix.ps1" },
-        "version": { "const": "1" },
+        "version": { "const": "2" },
         "sha256": { "$ref": "#/$defs/sha256" }
       }
     },
@@ -47,16 +47,16 @@
         "compatibility_claims": { "$ref": "#/$defs/matrix" }
       }
     },
-    "unresolved_findings": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "unresolved_findings": { "type": "array", "maxItems": 0, "items": { "type": "string" } },
     "completion": {
       "type": "object",
       "additionalProperties": false,
       "required": ["all_nine_static_inventories_present", "all_nine_realized_engine_inventories_complete", "contradictions_classified", "queue_completion_permitted"],
       "properties": {
         "all_nine_static_inventories_present": { "const": true },
-        "all_nine_realized_engine_inventories_complete": { "const": false },
-        "contradictions_classified": { "const": false },
-        "queue_completion_permitted": { "const": false }
+        "all_nine_realized_engine_inventories_complete": { "const": true },
+        "contradictions_classified": { "const": true },
+        "queue_completion_permitted": { "const": true }
       }
     },
     "record_sha256": { "$ref": "#/$defs/sha256", "description": "SHA-256 of canonical UTF-8 LF JSON with record_sha256 omitted." }
@@ -86,7 +86,7 @@
         "content_sha256": { "$ref": "#/$defs/sha256" },
         "baseline_root_sha256": { "$ref": "#/$defs/sha256" },
         "manifest_record_sha256": { "$ref": "#/$defs/sha256" },
-        "completion_state": { "const": "calibration-incomplete" },
+        "completion_state": { "const": "complete" },
         "inventory_counts": { "$ref": "#/$defs/inventoryCounts" }
       }
     },

@@ -4,24 +4,2247 @@
   "release": "1.8.5",
   "target": "1.0.0-only",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
-  "fields_unavailable": [
-    {
-      "field": "realized-setting-prototypes-and-defaults",
-      "reason": "Exact setting-prototype export pending B1 probe.",
-      "static_fallback_source": "prototypes/mir/settings/catalog.lua"
-    }
-  ],
+  "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json",
     "dist/more-infinite-research_1.8.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.8.5.md",
     "prototypes/mir/streams/generated_stream_manifest.json"
   ],
-  "items": [],
+  "items": [
+    {
+      "stable_id": "mir-adjust-vanilla-weapon-speed-techs",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "string-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "only-when-dedicated-tech-enabled"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": [
+            "off",
+            "only-when-dedicated-tech-enabled",
+            "always"
+          ]
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-1-010"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "115"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "200"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "200"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-1"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1.333333333333"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "3.333333333333"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1.5"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1.5"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1.5"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1.5"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-3"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-2"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-debug-generation-report",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "false"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-8-010"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-debug-recipe-matches",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "false"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-8-020"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "15"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0.01"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "4"
+        },
+        {
+          "name": "minimum_value",
+          "value": "1"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "50"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0.01"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0.01"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "double-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "40"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0.01"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "1"
+        },
+        {
+          "name": "minimum_value",
+          "value": "1"
+        },
+        {
+          "name": "maximum_value",
+          "value": "1000000"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-6"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "false"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-0"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-lab-incompatibility-policy",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "string-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "reduce"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": [
+            "reduce",
+            "skip",
+            "engine-default"
+          ]
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-0-030"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "0"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-4"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prefer-this-mod-for-competing-techs",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "bool-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "true"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-0-040"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-braking-force",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-braking-force-base-braking-force-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-inserter-capacity-bonus",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-000-inserter-capacity-bonus-base-inserter-capacity-bonus-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-laser-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "120"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-laser-shooting-speed-base-laser-shooting-speed-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-research-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "120"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-lab-research-speed-base-research-speed-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-weapon-shooting-speed",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "120"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-weapon-shooting-speed-base-weapon-shooting-speed-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time-worker-robots-storage",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "int-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "60"
+        },
+        {
+          "name": "minimum_value",
+          "value": "0"
+        },
+        {
+          "name": "maximum_value",
+          "value": "2147483647"
+        },
+        {
+          "name": "allowed_values",
+          "value": null
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "b-050-worker-robot-cargo-size-base-worker-robots-storage-5"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-science-pack-ingredient-policy",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-on-target",
+      "mir4_transition_rule": "import-realized-setting-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "prototype_type",
+          "value": "string-setting"
+        },
+        {
+          "name": "setting_type",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "configured"
+        },
+        {
+          "name": "minimum_value",
+          "value": null
+        },
+        {
+          "name": "maximum_value",
+          "value": null
+        },
+        {
+          "name": "allowed_values",
+          "value": [
+            "configured",
+            "space",
+            "space-and-promethium",
+            "space-age-progression",
+            "official-progression",
+            "mod-progression",
+            "all-official",
+            "all"
+          ]
+        },
+        {
+          "name": "hidden",
+          "value": null
+        },
+        {
+          "name": "order",
+          "value": "a-0-020"
+        }
+      ]
+    }
+  ],
   "omissions": []
 }

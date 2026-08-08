@@ -14,6 +14,7 @@
   "lock_status": "exact-composite-lock",
   "source_evidence": [
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
-    ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0"
+    ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+    ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
   ]
 }

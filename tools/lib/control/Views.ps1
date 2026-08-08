@@ -313,7 +313,9 @@ function New-MIRCPDashboardLines {
   $lines.Add("")
   $lines.Add("## Terminal .5 semantic baselines")
   $lines.Add("")
-  $lines.Add("Queue status: $(Format-MIRCPCode $BaselineQueue.status). A static capture is not a completed realized-engine baseline.")
+  $completeBaselineRows = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -eq "complete" }).Count
+  $baselineNote = if ($completeBaselineRows -eq 9) { "All nine exact-engine semantic baselines are complete and reconciled." } else { "A static capture is not a completed realized-engine baseline." }
+  $lines.Add("Queue status: $(Format-MIRCPCode $BaselineQueue.status). $baselineNote")
   $lines.Add("")
   $lines.Add("| Predecessor | Terminal release | Target | Identity | Semantic inventory | Manifest |")
   $lines.Add("| --- | --- | --- | --- | --- | --- |")
@@ -362,7 +364,7 @@ function New-MIRCPTodoLines {
   $lines.Add("| --- | --- | --- |")
   $staticBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -in @("static-captured-realized-probes-pending", "complete") }).Count
   $completeBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -eq "complete" }).Count
-  $lines.Add("| ``T9-0`` immutable .5 semantic baselines | $staticBaselineCount/9 static captures; $completeBaselineCount/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |")
+  $lines.Add("| ``T9-0`` immutable .5 semantic baselines | $staticBaselineCount/9 semantic captures; $completeBaselineCount/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |")
   $lines.Add("| ``T9-A`` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |")
   $lines.Add("| ``T9-B`` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |")
   $lines.Add("| ``T9-C`` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |")

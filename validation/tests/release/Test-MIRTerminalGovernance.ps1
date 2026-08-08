@@ -83,15 +83,15 @@ if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { thr
 $baselineQueue = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Baseline-Capture-QueueV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$baselineQueue.kind -ne "MIR3-Terminal-Baseline-Capture-QueueV1" -or @($baselineQueue.rows).Count -ne 9 -or
     (@($baselineQueue.rows.terminal_release) -join "|") -ne ($family -join "|") -or @($baselineQueue.required_semantic_inventory).Count -lt 15 -or
-    [string]$baselineQueue.status -ne "all-nine-static-captured-realized-probes-pending" -or
-    @($baselineQueue.rows | Where-Object { $_.identity_status -ne "locked" -or $_.semantic_inventory_status -ne "static-captured-realized-probes-pending" -or -not $_.baseline_manifest }).Count -ne 0) {
-  throw "Terminal baseline queue must bind nine static captures while truthfully retaining realized-engine work."
+    [string]$baselineQueue.status -ne "complete-all-nine-realized-and-reconciled" -or
+    @($baselineQueue.rows | Where-Object { $_.identity_status -ne "locked" -or $_.semantic_inventory_status -ne "complete" -or -not $_.baseline_manifest }).Count -ne 0) {
+  throw "Terminal baseline queue must bind nine complete exact-engine captures."
 }
 foreach ($row in @($baselineQueue.rows)) {
   $baselineManifestPath = Join-Path $RepoRoot ([string]$row.baseline_manifest)
   $baselineManifest = Get-Content -Raw -LiteralPath $baselineManifestPath | ConvertFrom-Json -Depth 100
-  if ([string]$baselineManifest.release -ne [string]$row.baseline_release -or [string]$baselineManifest.completion.state -ne "calibration-incomplete") {
-    throw "Terminal baseline queue row does not bind its truthfully incomplete manifest: $($row.baseline_release)"
+  if ([string]$baselineManifest.release -ne [string]$row.baseline_release -or [string]$baselineManifest.completion.state -ne "complete") {
+    throw "Terminal baseline queue row does not bind its reconciled manifest: $($row.baseline_release)"
   }
 }
 $portalCustodyPath = Join-Path $RepoRoot ([string]$baselineQueue.source_authorities.mod_portal_custody)
@@ -213,7 +213,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100

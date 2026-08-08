@@ -41,7 +41,7 @@ The programme is active as planning authority only. No `.9` candidate has been a
 
 Factorio `0.18` support is not claimed for `1.8.5` or `1.8.9`. The `1.8.x` maintained line targets Factorio `1.0` only.
 
-Static semantic capture now exists for all nine predecessors and is summarized in the [terminal `.5` baseline capture status](mir-3-terminal-dot5-baseline-capture.md). Every row remains explicitly incomplete until its exact-engine realized inventories and reconciliation findings close; this progress does not admit implementation, source freeze, or candidate allocation.
+Complete deterministic semantic baselines now exist for all nine predecessors and are summarized in the [terminal `.5` baseline capture status](mir-3-terminal-dot5-baseline-capture.md). Exact-engine realized inventories, evaluated settings or explicit capability omissions, compatibility observations, and reconciliation classifications are sealed for every row. This closes baseline capture only; it does not admit implementation, source freeze, or candidate allocation.
 
 ## One intake, nine dispositions
 
@@ -82,7 +82,7 @@ When all admitted `.9` work is terminal, freeze the MIR 3 source, package, migra
 
 ## Release sequence
 
-1. Capture all nine semantic `.5` baselines and maintain every `.5` tag/package unchanged.
+1. Maintain the completed all-nine semantic `.5` baselines and every `.5` tag/package unchanged.
 2. Admit only reproduced bounded changes with complete target dispositions.
 3. Implement portable corrections once on `dev`; keep target adapters explicit.
 4. Materialize all nine shadows and iterate to an accepted cross-target fixed point.

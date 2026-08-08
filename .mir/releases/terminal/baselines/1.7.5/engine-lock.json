@@ -5,14 +5,15 @@
   "target": "0.17.79",
   "engine_version": "0.17.79",
   "executable_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
-  "official_data_sha256": null,
-  "installation_sha256": null,
+  "official_data_sha256": "DD8B3823A45EBF255E5D677F5E5193893BD3AC38E6C164C1A09C503280D54D41",
+  "installation_sha256": "0269B0112915D686BA9CADB17847886B40B3FF81F9F41922396752FB538B857A",
   "official_modules": [
     "base"
   ],
-  "lock_status": "exact-binary-lock-data-digest-not-retained",
+  "lock_status": "exact-composite-lock",
   "source_evidence": [
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
-    "DEC5E26CB007A81DB4F2A8ACC561C60669BF418418A0A26162795EDE1EF2820B"
+    "DEC5E26CB007A81DB4F2A8ACC561C60669BF418418A0A26162795EDE1EF2820B",
+    ".mir/evidence/terminal/baselines/1.7.5-engine-observation.json"
   ]
 }
