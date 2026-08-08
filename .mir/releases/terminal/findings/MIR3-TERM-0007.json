@@ -40,5 +40,8 @@
     "status": "admitted",
     "reason": "The failure is reproduced, bounded to package-excluded text identity, and correctable without changing product source or frozen package bytes."
   },
-  "closure": {"status": "implemented-awaiting-proof", "evidence": null}
+  "closure": {
+    "status": "closed",
+    "evidence": "validation/tests/release/Test-MIRTerminalBaselineCapture.ps1 and Test-MIRTerminalGovernance.ps1 passed canonical CRLF binding, deterministic all-nine regeneration, exact ZIP custody, and complete target dispositions on 2026-08-09"
+  }
 }
