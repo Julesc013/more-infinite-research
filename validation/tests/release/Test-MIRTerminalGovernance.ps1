@@ -204,11 +204,24 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
   }
 }
 
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate")
+$baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
   if ([string]$schema.'x-mir-canonical-path' -ne "spec/schemas/$name.schema.json") { throw "Terminal schema canonical path is invalid: $name" }
+}
+$baselineCommon = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-baseline-inventory-common.schema.json") | ConvertFrom-Json -Depth 100
+if ($baselineCommon.additionalProperties -ne $false -or @($baselineCommon.required).Count -lt 11 -or
+    $baselineCommon.'$defs'.item.additionalProperties -ne $false -or @($baselineCommon.'$defs'.item.required).Count -lt 9 -or
+    $baselineCommon.'$defs'.omission.additionalProperties -ne $false) {
+  throw "Terminal semantic baseline inventory schema is not strict or complete."
+}
+foreach ($name in @($baselineSchemaNames | Where-Object { $_ -match '-(feature|technology|setting|locale|ownership|runtime-profile|migration|compatibility|upgrade|performance)-inventory$' })) {
+  $schema = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\$name.schema.json") | ConvertFrom-Json -Depth 100
+  if ([string]$schema.allOf[0].'$ref' -ne "mir3-terminal-baseline-inventory-common.schema.json" -or [string]$schema.allOf[1].properties.kind.const -notmatch '^MIR3TerminalBaseline.+InventoryV1$') {
+    throw "Terminal semantic baseline child schema does not close over the strict common contract: $name"
+  }
 }
 $digestSchemas = @("mir3-terminal-target-seal", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record")
 foreach ($name in $digestSchemas) {

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineFeatureInventoryV1",
+  "release": "3.2.5",
+  "target": "2.1",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_3.2.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-3.2.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "exact-engine-public-asset-smoke",
+      "target": "2.1",
+      "state": "passed",
+      "origin": "public-asset-verification",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json"
+      ],
+      "target_disposition": "accepted-exact-engine-load-observation",
+      "mir4_transition_rule": "retain-as-terminal-input-not-substitute-for-mir4-proof",
+      "attributes": [
+        {
+          "name": "engine_sha256",
+          "value": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084"
+        },
+        {
+          "name": "smokes",
+          "value": [
+            "base",
+            "space-age"
+          ]
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

@@ -24,6 +24,7 @@
         "tools/lib/assurance/**",
         "validation/tests/tooling/Test-MIRAssurance.ps1",
         "validation/tests/release/Test-MIRTerminalGovernance.ps1",
+        "validation/tests/release/Test-MIRTerminalBaselineCapture.ps1",
         "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
         "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
         "tools/mir.ps1",
