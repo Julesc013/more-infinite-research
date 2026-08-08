@@ -32,7 +32,7 @@ function Assert-MIRFreezeFileBinding {
     [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
   }
   if ($actual -ne [string]$Binding.sha256) {
-    throw "Source-freeze authority hash disagrees with ${Commit}: $relative"
+    throw "Source-freeze authority hash disagrees with ${Commit}: $relative (expected $($Binding.sha256), got $actual)"
   }
 }
 
@@ -49,8 +49,12 @@ if ([int]$packet.schema -ne 1 -or [string]$packet.kind -ne "mir-source-freeze-pa
 
 $sourceCommit = [string]$packet.source.package_source_commit
 if ($sourceCommit -notmatch '^[0-9a-f]{40}$') { throw "Source-freeze package commit is invalid." }
+$authorityCommit = [string]$packet.source.authority_commit
+if ($authorityCommit -notmatch '^[0-9a-f]{40}$') { throw "Source-freeze qualification-authority commit is invalid." }
 & git -C $repo cat-file -e "$sourceCommit^{commit}" 2>$null
 if ($LASTEXITCODE -ne 0) { throw "Source-freeze package commit is unavailable." }
+& git -C $repo cat-file -e "$authorityCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) { throw "Source-freeze qualification-authority commit is unavailable." }
 $sourceTree = (& git -C $repo show -s --format=%T $sourceCommit).Trim()
 if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$packet.source.package_source_tree) {
   throw "Source-freeze package source tree is stale."
@@ -97,10 +101,10 @@ if ((Test-Path -LiteralPath $supersededArchive -PathType Leaf) -or $supersededLo
 }
 
 foreach ($binding in @($packet.product_contract.authorities) + @($packet.qualification_authority.authorities) + @($packet.documentation.authorities)) {
-  Assert-MIRFreezeFileBinding -Binding $binding -Commit $sourceCommit
+  Assert-MIRFreezeFileBinding -Binding $binding -Commit $authorityCommit
 }
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder -Commit $sourceCommit
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation -Commit $sourceCommit
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder -Commit $authorityCommit
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation -Commit $authorityCommit
 if (@($packet.product_contract.factorio_2_0_dispositions).Count -ne 9 -or
     @($packet.product_contract.factorio_2_0_dispositions | Where-Object {
       [string]$_.classification -notin @(
