@@ -585,10 +585,10 @@ function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
 
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
-  $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
+  $canonicalTrustSha256 = Get-MIRAssuranceCanonicalJsonFileHash -Path $canonicalTrustPath
   $decoyTrustPath = Join-Path $repo "validation\domains.yml"
   if (-not (Test-Path -LiteralPath $decoyTrustPath -PathType Leaf) -or
-      (Get-MIRAssuranceSha256 -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
+      (Get-MIRAssuranceCanonicalJsonFileHash -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
     throw "Trust-path collision self-test requires a distinct target-line policy fixture."
   }
   $originalTrustPath = $trustPath
