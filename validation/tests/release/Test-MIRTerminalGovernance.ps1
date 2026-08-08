@@ -149,11 +149,74 @@ if (@($publication.first_public_tag_requires).Count -lt 4 -or $publication.failu
   throw "Terminal family publication policy is incomplete."
 }
 
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate")
+$protection = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-HandoffV1.json") | ConvertFrom-Json -Depth 100
+$dot5Tags = @("refs/tags/3.2.5", "refs/tags/2.5.5", "refs/tags/1.9.5", "refs/tags/1.8.5", "refs/tags/1.7.5", "refs/tags/1.6.5", "refs/tags/1.5.5", "refs/tags/1.4.5", "refs/tags/1.3.5")
+$dot9Tags = @($family | ForEach-Object { "refs/tags/$_" })
+$checkNames = @("branch-policy", "verification-gate")
+if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
+    [string]$protection.status -ne "corrected-ready-for-application-blocked-external-auth" -or
+    [string]$protection.application_receipt.status -ne "not-applied" -or
+    (@($protection.immutable_dot5_tags) -join "|") -ne ($dot5Tags -join "|") -or
+    (@($protection.future_terminal_tags) -join "|") -ne ($dot9Tags -join "|") -or
+    @($protection.observed_required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
+    @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0) {
+  throw "Terminal protection handoff is incomplete, overclaims application, or contradicts promotion topology."
+}
+
+$payloadRoot = Join-Path $RepoRoot ([string]$protection.payload_root)
+$payloadNames = @("dev-integrity.json", "dev-workflow.json", "main-integrity.json", "main-promotion.json", "legacy-integrity.json", "legacy-promotion.json", "dot5-immutable.json", "dot9-immutable.json", "dot9-creation-gate.json", "canary-branch.json", "canary-tag.json")
+$payloads = @{}
+foreach ($name in $payloadNames) {
+  $path = Join-Path $payloadRoot $name
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Terminal protection payload is missing: $name" }
+  $payload = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
+  if ([string]$payload.enforcement -ne "active" -or @($payload.conditions.ref_name.include).Count -eq 0) { throw "Terminal protection payload is inactive or unscoped: $name" }
+  $payloads[$name] = $payload
+}
+foreach ($name in @("dev-integrity.json", "main-integrity.json", "legacy-integrity.json")) {
+  $payload = $payloads[$name]
+  $statusRule = @($payload.rules | Where-Object type -eq "required_status_checks")
+  if (@($payload.bypass_actors).Count -ne 0 -or $statusRule.Count -ne 1 -or
+      (@($statusRule[0].parameters.required_status_checks.context) -join "|") -ne ($checkNames -join "|") -or
+      @($statusRule[0].parameters.required_status_checks | Where-Object { [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
+      @($payload.rules | Where-Object type -eq "deletion").Count -ne 1 -or @($payload.rules | Where-Object type -eq "non_fast_forward").Count -ne 1) {
+    throw "Terminal branch integrity checks are bypassable or incomplete: $name"
+  }
+}
+foreach ($name in @("main-promotion.json", "legacy-promotion.json")) {
+  $payload = $payloads[$name]
+  if ((@($payload.rules.type) -join "|") -ne "update" -or @($payload.bypass_actors).Count -ne 1 -or
+      [int]$payload.bypass_actors[0].actor_id -ne 30209022 -or [string]$payload.bypass_actors[0].bypass_mode -ne "always") {
+    throw "Terminal promotion payload widens the exact actor/update exception: $name"
+  }
+}
+if ((@($payloads["dot5-immutable.json"].conditions.ref_name.include) -join "|") -ne ($dot5Tags -join "|") -or
+    (@($payloads["dot9-immutable.json"].conditions.ref_name.include) -join "|") -ne ($dot9Tags -join "|") -or
+    @($payloads["dot5-immutable.json"].bypass_actors).Count -ne 0 -or @($payloads["dot9-immutable.json"].bypass_actors).Count -ne 0 -or
+    (@($payloads["dot9-creation-gate.json"].rules.type) -join "|") -ne "creation") {
+  throw "Published or future terminal tag lifecycle payloads are incomplete."
+}
+foreach ($name in @("canary-branch.json", "canary-tag.json")) {
+  $includes = @($payloads[$name].conditions.ref_name.include)
+  if ($includes.Count -ne 1 -or [string]$includes[0] -notmatch '^refs/(heads|tags)/canary/mir3-terminal-protection-\*$' -or
+      @($includes | Where-Object { $_ -in @("refs/heads/dev", "refs/heads/main", "refs/heads/legacy") -or $_ -in $dot5Tags -or $_ -in $dot9Tags }).Count -ne 0) {
+    throw "Terminal protection canary is not isolated from real refs: $name"
+  }
+}
+
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate")
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
   if ([string]$schema.'x-mir-canonical-path' -ne "spec/schemas/$name.schema.json") { throw "Terminal schema canonical path is invalid: $name" }
+}
+$digestSchemas = @("mir3-terminal-target-seal", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record")
+foreach ($name in $digestSchemas) {
+  $schema = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\$name.schema.json") | ConvertFrom-Json -Depth 100
+  if ("seal_material_sha256" -notin @($schema.required) -or "record_sha256" -notin @($schema.required) -or "seal_sha256" -in @($schema.required) -or
+      [string]$schema.properties.record_sha256.description -notmatch 'record_sha256 omitted') {
+    throw "Terminal sealed-record digest contract is circular or incomplete: $name"
+  }
 }
 $packageSchemaText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-package-manifest.schema.json")
 $releaseSchemaText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-release-manifest.schema.json")

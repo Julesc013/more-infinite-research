@@ -1,0 +1,1 @@
+{"name":"MIR3 terminal protection canary branch","target":"branch","enforcement":"active","bypass_actors":[],"conditions":{"ref_name":{"include":["refs/heads/canary/mir3-terminal-protection-*"],"exclude":[]}},"rules":[{"type":"update"},{"type":"deletion"},{"type":"non_fast_forward"}]}

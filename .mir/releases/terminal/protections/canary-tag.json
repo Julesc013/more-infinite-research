@@ -1,0 +1,1 @@
+{"name":"MIR3 terminal protection canary tag","target":"tag","enforcement":"active","bypass_actors":[],"conditions":{"ref_name":{"include":["refs/tags/canary/mir3-terminal-protection-*"],"exclude":[]}},"rules":[{"type":"creation"},{"type":"update"},{"type":"deletion"}]}
