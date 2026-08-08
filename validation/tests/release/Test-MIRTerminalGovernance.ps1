@@ -11,7 +11,8 @@ $authorityNames = @(
   "MIR3-Terminal-Candidate-AllocationV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3-Terminal-PublicationPolicyV1",
-  "MIR3-Terminal-EOL-PolicyV1"
+  "MIR3-Terminal-EOL-PolicyV1",
+  "MIR3TerminalFoundationAdmissionV1"
 )
 $authorities = @{}
 foreach ($name in $authorityNames) {
@@ -23,6 +24,54 @@ foreach ($name in $authorityNames) {
 }
 $changeSet = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\MIR3-Terminal-ChangeSet.json") | ConvertFrom-Json -Depth 100
 if ([string]$changeSet.kind -ne "MIR3-Terminal-ChangeSetV1") { throw "Terminal change-set authority is invalid." }
+
+$admission = $authorities["MIR3TerminalFoundationAdmissionV1"]
+if ([string]$admission.status -ne "accepted" -or @($admission.stack).Count -ne 5 -or
+    [string]$admission.foundation.commit -ne [string]$admission.stack[-1].merge_commit -or
+    [string]$admission.dot5_identity_authority.verification -ne "archive-content-bytes-entries-passed-nine-of-nine" -or
+    @($admission.dot5_identity_authority.releases).Count -ne 9 -or
+    [bool]$admission.restack.history_rewritten -or [bool]$admission.restack.force_push_used -or
+    -not [bool]$admission.restack.original_heads_retained_in_ancestry -or [bool]$admission.restack.cumulative_tree_changed -or
+    [bool]$admission.package_boundary.published_zip_mutated -or [bool]$admission.package_boundary.candidate_assigned -or
+    [bool]$admission.package_boundary.source_frozen_for_dot9) {
+  throw "Terminal foundation admission receipt is incomplete or widens authority."
+}
+$foundationTree = (& git -C $RepoRoot rev-parse "$($admission.foundation.commit)^{tree}").Trim()
+if ($LASTEXITCODE -ne 0 -or $foundationTree -ne [string]$admission.foundation.tree) { throw "Foundation commit/tree binding is invalid." }
+$expectedFirstParent = [string]$admission.pre_foundation.commit
+foreach ($row in @($admission.stack)) {
+  & git -C $RepoRoot merge-base --is-ancestor ([string]$row.original_head) ([string]$row.corrected_head)
+  if ($LASTEXITCODE -ne 0) { throw "Original PR head is not retained in corrected ancestry: #$($row.pr)" }
+  $parts = @((& git -C $RepoRoot rev-list --parents -n 1 ([string]$row.merge_commit)).Trim() -split '\s+')
+  if ($LASTEXITCODE -ne 0 -or $parts.Count -ne 3 -or $parts[1] -ne $expectedFirstParent -or $parts[2] -ne [string]$row.corrected_head -or
+      [string]$row.checks -ne "passed" -or [long]$row.mir_run -le 0 -or [long]$row.branch_policy_run -le 0) {
+    throw "Foundation merge/check binding is invalid: #$($row.pr)"
+  }
+  $expectedFirstParent = [string]$row.merge_commit
+}
+if ($expectedFirstParent -ne [string]$admission.foundation.commit) { throw "Foundation merge sequence does not terminate at the admitted commit." }
+if ((Get-FileHash -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.wave_index_sha256 -or
+    (Get-FileHash -LiteralPath (Join-Path $RepoRoot ".mir\distributions.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.distribution_ledger_sha256) {
+  throw "Foundation .5 authority files drifted after admission."
+}
+. (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
+foreach ($identity in @($admission.dot5_identity_authority.releases)) {
+  $row = @($wave.releases | Where-Object version -eq $identity.version)
+  if ($row.Count -ne 1) { throw "Admitted .5 identity is absent from the wave index: $($identity.version)" }
+  $archive = Join-Path $RepoRoot ([string]$row[0].dist)
+  $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
+  try { $entryCount = $zip.Entries.Count } finally { $zip.Dispose() }
+  if ([string]$identity.archive_sha256 -ne [string]$row[0].archive_sha256 -or [string]$identity.content_sha256 -ne [string]$row[0].content_sha256 -or
+      [long]$identity.bytes -ne [long]$row[0].bytes -or [int]$identity.entries -ne [int]$row[0].entries -or
+      (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne [string]$identity.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $archive) -ne [string]$identity.content_sha256 -or
+      (Get-Item -LiteralPath $archive).Length -ne [long]$identity.bytes -or $entryCount -ne [int]$identity.entries) {
+    throw "Immutable .5 admission identity mismatch: $($identity.version)"
+  }
+}
+if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or $programme.implementation_admitted -or $programme.source_frozen) {
