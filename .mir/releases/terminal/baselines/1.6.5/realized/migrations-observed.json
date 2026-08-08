@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineMigrationInventoryV1",
+  "release": "1.6.5",
+  "target": "0.16.51",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "per-migration-runtime-application",
+      "reason": "Package presence is observed; per-save application requires transition fixtures.",
+      "static_fallback_source": "migrations/"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_1.6.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.6.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "migrations/more-infinite-research_2.0.5.json",
+      "target": "0.16.51",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.6.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.6.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-migration-and-watermark",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+        },
+        {
+          "name": "watermark",
+          "value": "more-infinite-research_2.0.5"
+        }
+      ]
+    },
+    {
+      "stable_id": "migrations/more-infinite-research_2.1.0.json",
+      "target": "0.16.51",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.6.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.6.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-migration-and-watermark",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+        },
+        {
+          "name": "watermark",
+          "value": "more-infinite-research_2.1.0"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

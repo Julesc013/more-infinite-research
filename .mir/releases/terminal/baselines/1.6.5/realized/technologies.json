@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineTechnologyInventoryV1",
+  "release": "1.6.5",
+  "target": "0.16.51",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "complete-realized-technology-prototypes",
+      "reason": "Retained public verification proves load but does not contain a full prototype export.",
+      "static_fallback_source": "prototypes/mir/streams/generated_stream_manifest.json"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_1.6.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.6.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [],
+  "omissions": []
+}

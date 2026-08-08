@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineUpgradeInventoryV1",
+  "release": "1.9.5",
+  "target": "1.1.110",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_1.9.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.9.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "1.9.4-to-1.9.5",
+      "target": "1.1.110",
+      "state": "qualified-by-target-campaign",
+      "origin": "release-record",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        ".mir/releases/records/1.9.5.json",
+        "C395A0D1D3B0FAE9EB68013699B3E6BC8309C645493F04511088DB8D9FE757AD"
+      ],
+      "target_disposition": "direct-public-upgrade",
+      "mir4_transition_rule": "import-direct-transition-fixture",
+      "attributes": []
+    }
+  ],
+  "omissions": []
+}

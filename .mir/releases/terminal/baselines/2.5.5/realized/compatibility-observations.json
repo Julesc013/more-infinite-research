@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineCompatibilityInventoryV1",
+  "release": "2.5.5",
+  "target": "2.0",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "complete-active-ecosystem-closure",
+      "reason": "Public base smoke is not a universal compatibility campaign.",
+      "static_fallback_source": "1def5da0d0791149770f84d8bbc4c164c426b7ce:spec/compatibility/claims.json"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_2.5.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-2.5.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [],
+  "omissions": []
+}

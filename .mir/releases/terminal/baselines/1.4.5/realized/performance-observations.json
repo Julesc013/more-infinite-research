@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselinePerformanceInventoryV1",
+  "release": "1.4.5",
+  "target": "0.14.23",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_1.4.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.4.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "performance-baseline",
+      "target": "0.14.23",
+      "state": "not-retained-for-target-tier",
+      "origin": "release-record",
+      "observed_release": "1.4.5",
+      "source_evidence": [
+        ".mir/releases/records/1.4.5.json"
+      ],
+      "target_disposition": "explicit-target-tier-omission",
+      "mir4_transition_rule": "recalibrate-before-mir4-target-release",
+      "attributes": []
+    }
+  ],
+  "omissions": []
+}

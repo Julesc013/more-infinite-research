@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineRuntimeProfileInventoryV1",
+  "release": "1.8.5",
+  "target": "1.0.0-only",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "realized-save-state-values",
+      "reason": "Public load observation did not export player save state.",
+      "static_fallback_source": "prototypes/mir/runtime/state.lua"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_1.8.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.8.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "prototypes/mir/platform/factorio/runtime_state.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706"
+        },
+        {
+          "name": "bytes",
+          "value": 691
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "066043908B013FB218FEB3F964514218A99EEB1522768856B686718899E8E963"
+        },
+        {
+          "name": "bytes",
+          "value": 16028
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "5C87E41DAD5FA476BE1BCE7DED41654DAC02AA873D9DC4800457E89202A6F2C0"
+        },
+        {
+          "name": "bytes",
+          "value": 3788
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "8973E17244AC389253B8CD06C5BBD694771995949767C95A6313D90B729BDBCC"
+        },
+        {
+          "name": "bytes",
+          "value": 4440
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "13C00B21862357F0F5AE6434328F2AA8692326C131858E005F4F2C048CA8D20B"
+        },
+        {
+          "name": "bytes",
+          "value": 4217
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/scripted_techs.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "27B6EC3183F9F36158D214A32C3CEF7C3F9DB70C71FA6A3A7BF4FCEE0903BA1C"
+        },
+        {
+          "name": "bytes",
+          "value": 2534
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/settings_profile.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "3A9252B3D9088E9AB9A552FF218D16D9C39815072E07E64F5AB2D7D641A579C2"
+        },
+        {
+          "name": "bytes",
+          "value": 5393
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/settings_resolver.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "838AA3E1C3B033A4DF86BC0603833B3CCDDBEA5AC2833F2F42A1E218F3A56776"
+        },
+        {
+          "name": "bytes",
+          "value": 1108
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/state.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739"
+        },
+        {
+          "name": "bytes",
+          "value": 367
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/settings/profile_codec.lua",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "66A79FDEDD78A59C75B8DA53367BEF7B489B57BBC6732B9BA85AFF194113CAFC"
+        },
+        {
+          "name": "bytes",
+          "value": 7591
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}
