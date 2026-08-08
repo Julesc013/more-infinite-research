@@ -19,6 +19,17 @@ function Get-Sha256Bytes([byte[]]$Bytes) {
   try { return ([BitConverter]::ToString($sha.ComputeHash($Bytes))).Replace("-", "") } finally { $sha.Dispose() }
 }
 
+function Get-CanonicalTextFileBytes([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path)
+  $text = $text -replace "`r`n", "`n"
+  $text = $text -replace "`r", "`n"
+  return [Text.UTF8Encoding]::new($false).GetBytes($text)
+}
+
+function Get-CanonicalTextFileSha256([string]$Path) {
+  return Get-Sha256Bytes (Get-CanonicalTextFileBytes $Path)
+}
+
 function Get-Sha256Stream([IO.Stream]$Stream) {
   $sha = [Security.Cryptography.SHA256]::Create()
   try { return ([BitConverter]::ToString($sha.ComputeHash($Stream))).Replace("-", "") } finally { $sha.Dispose() }
@@ -319,7 +330,7 @@ $manifestFiles = foreach ($file in @(Get-ChildItem -LiteralPath $releaseOutput -
 $rootMaterial = ($manifestFiles | ForEach-Object { "$($_.path)`0$($_.sha256)`0$($_.bytes)" }) -join "`n"
 $manifestMaterial = [ordered]@{
   schema=1; kind="Mir3TerminalBaselineBundleManifestV1"; release=$Release; target=$script:Target
-  capture_tool=[ordered]@{path="scripts/Export-MIRTerminalBaseline.ps1";version="2";sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash}
+  capture_tool=[ordered]@{path="scripts/Export-MIRTerminalBaseline.ps1";version="2";sha256=(Get-CanonicalTextFileSha256 $PSCommandPath)}
   input_identity_sha256=(Get-Sha256Bytes $identityBytes); baseline_root_sha256=(Get-Sha256Bytes ([Text.UTF8Encoding]::new($false).GetBytes($rootMaterial)))
   files=@($manifestFiles); deterministic_bundle=[ordered]@{algorithm="sorted-path-fixed-time-deflate";builds_required=2;build_location="build/terminal/baselines/$Release"}
   completion=[ordered]@{state="complete";public_identities_reconciled=$true;required_files_present=$true;inventories_complete_or_capability_omitted=$true;exact_engine_observation_passed=$true;contradictions_classified=$true}
