@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "2.5.5",
+  "comparison": "claimed-vs-realized",
+  "status": "findings-open",
+  "agreements": [
+    "public exact-engine load claim supported"
+  ],
+  "contradictions": [],
+  "unresolved_findings": [
+    "BLINE-255-CLAIM-MATRIX-REALIZATION"
+  ]
+}

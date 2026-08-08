@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "1.8.5",
+  "comparison": "declared-vs-realized",
+  "status": "findings-open",
+  "agreements": [
+    "archive identity exact",
+    "exact target engine smoke passed",
+    "packaged locale and migration files reconciled"
+  ],
+  "contradictions": [],
+  "unresolved_findings": [
+    "BLINE-185-REALIZED-PROTOTYPE-EXPORT",
+    "BLINE-185-SETTING-DEFAULT-EXPORT"
+  ]
+}

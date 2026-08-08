@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineIdentityV1",
+  "release": "1.4.5",
+  "target": "0.14.23",
+  "candidate_id": "1.4.5-final",
+  "tag": "1.4.5",
+  "tag_commit": "efa372c95517c0d224828e7362433fcd9eb0a91b",
+  "tag_object": "2bef3cac48c45e6c0bfcea4cfdb03a0efe63d4b0",
+  "source_commit": "4698d9e84adc987453a02a6954690fce26c85c6a",
+  "source_tree": "a93b61ed7ece35e54431f8c4c08b6bcb371d80cd",
+  "first_parent": "fa192796ab274dd590c65b96d0f3f6a0f35cb155",
+  "second_parent": "62fddd86b51db7c0238731815d15ca26a4b45857",
+  "archive_path": "dist/more-infinite-research_1.4.5.zip",
+  "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47",
+  "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4",
+  "bytes": 385987,
+  "entries": 177,
+  "github_release": "https://github.com/Julesc013/more-infinite-research/releases/tag/1.4.5",
+  "mod_portal_state": "not-uploaded-as-of-2026-08-09"
+}

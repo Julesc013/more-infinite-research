@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "1.7.5",
+  "comparison": "unresolved-findings",
+  "status": "findings-open",
+  "agreements": [],
+  "contradictions": [],
+  "unresolved_findings": [
+    "BLINE-175-CLAIM-MATRIX-REALIZATION",
+    "BLINE-175-REALIZED-PROTOTYPE-EXPORT",
+    "BLINE-175-SETTING-DEFAULT-EXPORT"
+  ]
+}

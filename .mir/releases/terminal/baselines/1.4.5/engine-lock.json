@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineEngineLockV1",
+  "release": "1.4.5",
+  "target": "0.14.23",
+  "engine_version": "0.14.23",
+  "executable_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+  "official_data_sha256": null,
+  "installation_sha256": null,
+  "official_modules": [
+    "base"
+  ],
+  "lock_status": "exact-binary-lock-data-digest-not-retained",
+  "source_evidence": [
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "BBE114F656D7B966796291BFB3A8EF324B4323C854555E2DBAA09B731B32D5C7"
+  ]
+}

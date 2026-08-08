@@ -28,6 +28,7 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 | Workstream | Current boundary | Completion proof |
 | --- | --- | --- |
+| `T9-0` immutable .5 semantic baselines | 9/9 static captures; 0/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |
 | `T9-A` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |
 | `T9-B` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |
 | `T9-C` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |

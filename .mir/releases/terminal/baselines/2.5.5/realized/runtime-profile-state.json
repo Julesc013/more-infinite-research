@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineRuntimeProfileInventoryV1",
+  "release": "2.5.5",
+  "target": "2.0",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "fields_observed": [
+    "archive-identity",
+    "exact-engine-load"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "realized-save-state-values",
+      "reason": "Public load observation did not export player save state.",
+      "static_fallback_source": "prototypes/mir/runtime/state.lua"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_2.5.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-2.5.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "prototypes/mir/platform/factorio/runtime_state.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706"
+        },
+        {
+          "name": "bytes",
+          "value": 691
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "F193BF5C5B565DA71A6113AECAD7B5D30D3F4EA013532E438103BA04B4D06E42"
+        },
+        {
+          "name": "bytes",
+          "value": 15498
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "5C87E41DAD5FA476BE1BCE7DED41654DAC02AA873D9DC4800457E89202A6F2C0"
+        },
+        {
+          "name": "bytes",
+          "value": 3788
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "8973E17244AC389253B8CD06C5BBD694771995949767C95A6313D90B729BDBCC"
+        },
+        {
+          "name": "bytes",
+          "value": 4440
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "02466123D13BAA074C238BA3AEC3E4C9E686B0D66D56D408D4501205B3C1713D"
+        },
+        {
+          "name": "bytes",
+          "value": 4332
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/scripted_techs.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "796EEACD4E50D575520EA4DBDE1E1F55E61618858B962DAE588FE6E3AFAC2E8C"
+        },
+        {
+          "name": "bytes",
+          "value": 2536
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/settings_profile.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "03DFCAC8505D043A3BCC35473F0D31206318AD45CE664104F2ADB0CE9B9FFDB4"
+        },
+        {
+          "name": "bytes",
+          "value": 5393
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/settings_resolver.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720"
+        },
+        {
+          "name": "bytes",
+          "value": 1110
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/startup_settings.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "77B04FB969BD146AA0A67FAE37E649435EC627788CB1BD7FD72967C43D7376A0"
+        },
+        {
+          "name": "bytes",
+          "value": 966
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/runtime/state.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739"
+        },
+        {
+          "name": "bytes",
+          "value": 367
+        }
+      ]
+    },
+    {
+      "stable_id": "prototypes/mir/settings/profile_codec.lua",
+      "target": "2.0",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        "dist/more-infinite-research_2.5.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-runtime-or-profile-schema-by-digest",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "66A79FDEDD78A59C75B8DA53367BEF7B489B57BBC6732B9BA85AFF194113CAFC"
+        },
+        {
+          "name": "bytes",
+          "value": 7591
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

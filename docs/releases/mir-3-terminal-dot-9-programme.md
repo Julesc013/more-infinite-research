@@ -5,7 +5,7 @@ applies_to: "3.2.9, 2.5.9, 1.9.9, 1.8.9, 1.7.9, 1.6.9, 1.5.9, 1.4.9, 1.3.9"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-09
 supersedes: [docs/releases/3.2.5-to-2.6-convergence-programme.md, docs/releases/ultimate-convergence-audit-action-register.md, docs/architecture/3.3-2.6-convergence-platform-roadmap.md]
 superseded_by: []
 ---
@@ -40,6 +40,8 @@ The programme is active as planning authority only. No `.9` candidate has been a
 | `1.3.9` | `0.13` | `1.3.5` | `1.3-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
 
 Factorio `0.18` support is not claimed for `1.8.5` or `1.8.9`. The `1.8.x` maintained line targets Factorio `1.0` only.
+
+Static semantic capture now exists for all nine predecessors and is summarized in the [terminal `.5` baseline capture status](mir-3-terminal-dot5-baseline-capture.md). Every row remains explicitly incomplete until its exact-engine realized inventories and reconciliation findings close; this progress does not admit implementation, source freeze, or candidate allocation.
 
 ## One intake, nine dispositions
 
