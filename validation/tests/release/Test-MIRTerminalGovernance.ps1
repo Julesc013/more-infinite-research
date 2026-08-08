@@ -103,7 +103,8 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
 if (($current.planned_releases -join "|") -ne ($family -join "|") -or $current.implementation_admitted -or $current.source_frozen -or
-    $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5") {
+    $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "active-planning-only") {
   throw "Current release roles do not distinguish published .5 from planned .9."
 }
 
