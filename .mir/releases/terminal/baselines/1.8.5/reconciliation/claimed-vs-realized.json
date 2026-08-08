@@ -3,12 +3,11 @@
   "kind": "MIR3TerminalBaselineReconciliationV1",
   "release": "1.8.5",
   "comparison": "claimed-vs-realized",
-  "status": "findings-open",
+  "status": "explained-capability-gaps",
   "agreements": [
-    "public exact-engine load claim supported"
+    "public exact-engine load claim supported",
+    "no package-source canonical public compatibility claims exist and no modern claims were projected backward"
   ],
   "contradictions": [],
-  "unresolved_findings": [
-    "BLINE-185-CLAIM-MATRIX-REALIZATION"
-  ]
+  "unresolved_findings": []
 }

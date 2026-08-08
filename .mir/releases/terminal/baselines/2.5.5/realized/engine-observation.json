@@ -4,13 +4,16 @@
   "release": "2.5.5",
   "target": "2.0",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
   "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/2.5.5-engine-observation.json",
     "dist/more-infinite-research_2.5.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-2.5.5.md",
@@ -18,20 +21,33 @@
   ],
   "items": [
     {
-      "stable_id": "exact-engine-public-asset-smoke",
+      "stable_id": "exact-engine-semantic-observation",
       "target": "2.0",
       "state": "passed",
-      "origin": "public-asset-verification",
+      "origin": "read-only-post-final-fixes-observer",
       "observed_release": "2.5.5",
       "source_evidence": [
+        ".mir/evidence/terminal/baselines/2.5.5-engine-observation.json",
         "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json"
       ],
-      "target_disposition": "accepted-exact-engine-load-observation",
+      "target_disposition": "accepted-exact-engine-semantic-observation",
       "mir4_transition_rule": "retain-as-terminal-input-not-substitute-for-mir4-proof",
       "attributes": [
         {
           "name": "engine_sha256",
           "value": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+        },
+        {
+          "name": "official_data_sha256",
+          "value": "B1C2BC7DF3821BC0F6B180B08824C2E1BE2A1602113E28850FD404A7BB3E5308"
+        },
+        {
+          "name": "installation_sha256",
+          "value": "C54C26A0483D8E94F28167CA29C1EB3F74AC79AB06069C9A6FA7BCAFE04AB721"
+        },
+        {
+          "name": "semantic_observation_sha256",
+          "value": "25B831934E71565B512578B7A9A59857AEDFFEA7915569F6ECCE5A902F27260F"
         },
         {
           "name": "smokes",

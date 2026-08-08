@@ -4,13 +4,16 @@
   "release": "1.5.5",
   "target": "0.15.40",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
   "fields_unavailable": [],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.5.5-engine-observation.json",
     "dist/more-infinite-research_1.5.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.5.5.md",
@@ -18,20 +21,33 @@
   ],
   "items": [
     {
-      "stable_id": "exact-engine-public-asset-smoke",
+      "stable_id": "exact-engine-semantic-observation",
       "target": "0.15.40",
       "state": "passed",
-      "origin": "public-asset-verification",
+      "origin": "read-only-post-final-fixes-observer",
       "observed_release": "1.5.5",
       "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.5.5-engine-observation.json",
         "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json"
       ],
-      "target_disposition": "accepted-exact-engine-load-observation",
+      "target_disposition": "accepted-exact-engine-semantic-observation",
       "mir4_transition_rule": "retain-as-terminal-input-not-substitute-for-mir4-proof",
       "attributes": [
         {
           "name": "engine_sha256",
           "value": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"
+        },
+        {
+          "name": "official_data_sha256",
+          "value": "BE78E6EE38F1F23F756C5CBB1FC2F8CC23451D00DFD85932B771F99A39A207C5"
+        },
+        {
+          "name": "installation_sha256",
+          "value": "9BCB2B9051A8472A9A367E403D6CAB1629E97F96D2EDE3A9D00EEF478C369688"
+        },
+        {
+          "name": "semantic_observation_sha256",
+          "value": "01F80DB9922406738F414F6D63E1DC1474E268984A3F5EC3915D32B6718D09F1"
         },
         {
           "name": "smokes",

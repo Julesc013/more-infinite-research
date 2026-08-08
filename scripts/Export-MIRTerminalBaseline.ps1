@@ -141,6 +141,14 @@ $script:Target = [string]$queueRow.target
 $recordPath = Join-Path $RepoRoot ".mir\releases\records\$Release.json"
 $releaseRecord = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
 $zipPath = Join-Path $RepoRoot ([string]$waveRow.dist)
+$engineObservationPath = Join-Path $RepoRoot ".mir\evidence\terminal\baselines\$Release-engine-observation.json"
+if (-not (Test-Path -LiteralPath $engineObservationPath -PathType Leaf)) { throw "Exact-engine semantic observation is required for $Release." }
+$engineObservation = Get-Content -Raw -LiteralPath $engineObservationPath | ConvertFrom-Json -Depth 100
+if ([string]$engineObservation.release -ne $Release -or [string]$engineObservation.target -ne $script:Target -or
+    [string]$engineObservation.archive_sha256 -ne [string]$waveRow.archive_sha256 -or
+    [string]$engineObservation.executable_sha256 -ne [string]$verifyRow.factorio_executable_sha256) {
+  throw "Exact-engine semantic observation identity mismatch for $Release."
+}
 if ((Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash -ne [string]$waveRow.archive_sha256 -or
     (Get-MIRZipContentFingerprint -Path $zipPath) -ne [string]$waveRow.content_sha256 -or
     (Get-Item -LiteralPath $zipPath).Length -ne [long]$waveRow.bytes) { throw "Frozen ZIP identity mismatch for $Release." }
@@ -172,8 +180,7 @@ try {
   $identityBytes = ConvertTo-CanonicalJsonBytes $identity
   Write-CanonicalJson (Join-Path $releaseOutput "identity.json") $identity
 
-  $qualification = if ($Release -eq "3.2.5") { Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\evidence\3.2.5-c32-candidate-qualification.json") | ConvertFrom-Json -Depth 100 } else { $null }
-  $engineLock = [ordered]@{ schema=1; kind="MIR3TerminalBaselineEngineLockV1"; release=$Release; target=$script:Target; engine_version=[string]$waveRow.factorio; executable_sha256=[string]$verifyRow.factorio_executable_sha256; official_data_sha256=if($qualification){[string]$qualification.environment.official_data.sha256}else{$null}; installation_sha256=if($qualification){[string]$qualification.environment.installation_sha256}else{$null}; official_modules=@($verifyRow.smokes | Sort-Object); lock_status=if($qualification){"exact-composite-lock"}else{"exact-binary-lock-data-digest-not-retained"}; source_evidence=@($verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/'), [string]$waveRow.qualification_root) }
+  $engineLock = [ordered]@{ schema=1; kind="MIR3TerminalBaselineEngineLockV1"; release=$Release; target=$script:Target; engine_version=[string]$waveRow.factorio; executable_sha256=[string]$engineObservation.executable_sha256; official_data_sha256=[string]$engineObservation.official_data_sha256; installation_sha256=[string]$engineObservation.installation_sha256; official_modules=@($verifyRow.smokes | Sort-Object); lock_status="exact-composite-lock"; source_evidence=@($verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/'), [string]$waveRow.qualification_root, $engineObservationPath.Substring($RepoRoot.Length + 1).Replace('\','/')) }
   Write-CanonicalJson (Join-Path $releaseOutput "engine-lock.json") $engineLock
   $composition = [ordered]@{ schema=1; kind="MIR3TerminalBaselinePackageCompositionV1"; release=$Release; root_directory=$rootDirectories[0]; archive_sha256=[string]$waveRow.archive_sha256; content_sha256=[string]$waveRow.content_sha256; bytes=[long]$waveRow.bytes; entries=[int]$waveRow.entries; excluded_surface_assertion="docs-fixtures-scripts-tests-dotmir-dotcodex-github-build-dist-governance-files-absent"; files=@($fileRows) }
   Write-CanonicalJson (Join-Path $releaseOutput "package-composition.json") $composition
@@ -224,6 +231,20 @@ try {
   } else {
     $compatibilityUnavailable += New-Omission "package-source-compatibility-claim-matrix" "The historical package-source commit predates the canonical compatibility claim JSON; no modern claim is projected backward." ([string]$releaseRecord.release_notes)
   }
+  $compatibilityObservationItems = @()
+  $compatibilityObservationUnavailable = @()
+  if ($claims) {
+    $compatibilityObservationItems = foreach ($claim in @($claims.claims | Sort-Object mod)) {
+      New-ItemRow ([string]$claim.mod) "fixture-qualified-at-package-source" "candidate-bound-claim-evidence" @("$($waveRow.package_source):spec/compatibility/claims.json", [string]$waveRow.qualification_root) "claim-evidence-bound" "import-qualified-claim-with-exact-scope" @(
+        (New-Attribute "claim_level" ([string]$claim.claim_level)), (New-Attribute "maturity" ([string]$claim.maturity)),
+        (New-Attribute "behavior" ([string]$claim.behavior)), (New-Attribute "scope" ([string]$claim.scope)),
+        (New-Attribute "fixtures" @($claim.fixtures | ForEach-Object { [string]$_ } | Sort-Object -Unique)),
+        (New-Attribute "tested_factorio" ([string]$claim.tested_factorio))
+      )
+    }
+  } else {
+    $compatibilityObservationUnavailable += New-Omission "package-source-public-compatibility-claims" "The target package source has no canonical public compatibility claim authority; no modern claim is projected backward or requires realization." ([string]$releaseRecord.release_notes)
+  }
   $upgradeItems = @()
   if ($releaseRecord.upgrade) {
     $upgradeItems += New-ItemRow "$($releaseRecord.upgrade.from_version)-to-$($releaseRecord.upgrade.to_version)" "qualified" "release-record" @(".mir/releases/records/$Release.json") "direct-public-upgrade" "import-direct-transition-fixture" @((New-Attribute "fixture" ([string]$releaseRecord.upgrade.fixture)))
@@ -252,29 +273,41 @@ try {
   }
   foreach ($pair in $declared.GetEnumerator()) { Write-CanonicalJson (Join-Path $releaseOutput "declared\$($pair.Key)") $pair.Value }
 
-  $engineObservationItem = New-ItemRow "exact-engine-public-asset-smoke" "passed" "public-asset-verification" @($verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/')) "accepted-exact-engine-load-observation" "retain-as-terminal-input-not-substitute-for-mir4-proof" @((New-Attribute "engine_sha256" ([string]$verifyRow.factorio_executable_sha256)), (New-Attribute "smokes" @($verifyRow.smokes | Sort-Object)))
+  $engineObservationRelative = $engineObservationPath.Substring($RepoRoot.Length + 1).Replace('\','/')
+  $engineObservationItem = New-ItemRow "exact-engine-semantic-observation" "passed" "read-only-post-final-fixes-observer" @($engineObservationRelative, $verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/')) "accepted-exact-engine-semantic-observation" "retain-as-terminal-input-not-substitute-for-mir4-proof" @(
+    (New-Attribute "engine_sha256" ([string]$engineObservation.executable_sha256)),
+    (New-Attribute "official_data_sha256" ([string]$engineObservation.official_data_sha256)),
+    (New-Attribute "installation_sha256" ([string]$engineObservation.installation_sha256)),
+    (New-Attribute "semantic_observation_sha256" ([string]$engineObservation.semantic_observation_sha256)),
+    (New-Attribute "smokes" @($verifyRow.smokes | Sort-Object))
+  )
+  $settingsUnavailable = @()
+  if (@($engineObservation.capability_omissions.field) -contains "setting-prototype-stage") {
+    $settingsUnavailable += New-Omission "setting-prototype-stage" "The exact target engine does not execute the settings-final-fixes observation stage; settings are an explicit engine-capability omission." "declared/settings.json"
+  }
   $realizedSpecs = [ordered]@{
     "engine-observation.json" = @("MIR3TerminalBaselineFeatureInventoryV1", @($engineObservationItem), @())
-    "technologies.json" = @("MIR3TerminalBaselineTechnologyInventoryV1", @(), @((New-Omission "complete-realized-technology-prototypes" "Retained public verification proves load but does not contain a full prototype export." "prototypes/mir/streams/generated_stream_manifest.json")))
-    "effects-and-owners.json" = @("MIR3TerminalBaselineOwnershipInventoryV1", @(), @((New-Omission "realized-effects-and-external-owners" "Depends on exact active engine and mod graph; full export was not retained." "prototypes/mir/index/owners.lua")))
-    "settings.json" = @("MIR3TerminalBaselineSettingInventoryV1", @(), @((New-Omission "realized-setting-prototypes-and-defaults" "Exact setting-prototype export pending B1 probe." "prototypes/mir/settings/catalog.lua")))
+    "technologies.json" = @("MIR3TerminalBaselineTechnologyInventoryV1", @($engineObservation.technologies), @())
+    "effects-and-owners.json" = @("MIR3TerminalBaselineOwnershipInventoryV1", @($engineObservation.effects_and_owners), @())
+    "settings.json" = @("MIR3TerminalBaselineSettingInventoryV1", @($engineObservation.settings), @($settingsUnavailable))
     "locales.json" = @("MIR3TerminalBaselineLocaleInventoryV1", $localeItems, @())
     "runtime-profile-state.json" = @("MIR3TerminalBaselineRuntimeProfileInventoryV1", $runtimeItems, @((New-Omission "realized-save-state-values" "Public load observation did not export player save state." "prototypes/mir/runtime/state.lua")))
     "migrations-observed.json" = @("MIR3TerminalBaselineMigrationInventoryV1", $migrationItems, @((New-Omission "per-migration-runtime-application" "Package presence is observed; per-save application requires transition fixtures." "migrations/")))
-    "compatibility-observations.json" = @("MIR3TerminalBaselineCompatibilityInventoryV1", @(), @((New-Omission "complete-active-ecosystem-closure" "Public base smoke is not a universal compatibility campaign." "$($waveRow.package_source):spec/compatibility/claims.json")))
+    "compatibility-observations.json" = @("MIR3TerminalBaselineCompatibilityInventoryV1", @($compatibilityObservationItems), @($compatibilityObservationUnavailable))
     "upgrade-observations.json" = @("MIR3TerminalBaselineUpgradeInventoryV1", $upgradeItems, @())
     "performance-observations.json" = @("MIR3TerminalBaselinePerformanceInventoryV1", $performanceItems, @())
   }
   foreach ($pair in $realizedSpecs.GetEnumerator()) {
     $spec = $pair.Value
-    $inventory = New-Inventory $spec[0] "realized" "exact-public-asset-evidence-plus-static-package-fallback" @("exact-engine-load","archive-identity") @($spec[2]) @($evidenceBase + @($verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/'))) @($spec[1]) @()
+    $inventory = New-Inventory $spec[0] "realized" "exact-public-asset-read-only-observer-plus-retained-qualified-evidence" @("archive-identity","exact-engine-load","post-data-final-fixes-prototypes","evaluated-setting-defaults-or-explicit-engine-omission") @($spec[2]) @($evidenceBase + @($verificationPath.Substring($RepoRoot.Length + 1).Replace('\','/'), $engineObservationRelative)) @($spec[1]) @()
     Write-CanonicalJson (Join-Path $releaseOutput "realized\$($pair.Key)") $inventory
   }
 
-  $openFindings = @("BLINE-$($Release.Replace('.',''))-REALIZED-PROTOTYPE-EXPORT", "BLINE-$($Release.Replace('.',''))-SETTING-DEFAULT-EXPORT")
-  $declaredVs = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="declared-vs-realized";status="findings-open";agreements=@("archive identity exact","exact target engine smoke passed","packaged locale and migration files reconciled");contradictions=@();unresolved_findings=$openFindings}
-  $claimedVs = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="claimed-vs-realized";status="findings-open";agreements=@("public exact-engine load claim supported");contradictions=@();unresolved_findings=@("BLINE-$($Release.Replace('.',''))-CLAIM-MATRIX-REALIZATION")}
-  $unresolved = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="unresolved-findings";status="findings-open";agreements=@();contradictions=@();unresolved_findings=@($openFindings + "BLINE-$($Release.Replace('.',''))-CLAIM-MATRIX-REALIZATION" | Sort-Object -Unique)}
+  $declaredVs = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="declared-vs-realized";status="reconciled";agreements=@("archive identity exact","exact engine and official-data identities locked","post-data-final-fixes technology and effect inventory captured","setting defaults captured or explicitly capability-omitted","packaged locale and migration files reconciled");contradictions=@();unresolved_findings=@()}
+  $claimStatus = if ($claims) { "reconciled" } else { "explained-capability-gaps" }
+  $claimAgreement = if ($claims) { "all package-source public compatibility claims retain named fixture-qualified evidence" } else { "no package-source canonical public compatibility claims exist and no modern claims were projected backward" }
+  $claimedVs = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="claimed-vs-realized";status=$claimStatus;agreements=@("public exact-engine load claim supported",$claimAgreement);contradictions=@();unresolved_findings=@()}
+  $unresolved = [ordered]@{schema=1;kind="MIR3TerminalBaselineReconciliationV1";release=$Release;comparison="unresolved-findings";status="reconciled";agreements=@("all baseline realization findings closed by exact observation or explicit target-capability disposition");contradictions=@();unresolved_findings=@()}
   Write-CanonicalJson (Join-Path $releaseOutput "reconciliation\declared-vs-realized.json") $declaredVs
   Write-CanonicalJson (Join-Path $releaseOutput "reconciliation\claimed-vs-realized.json") $claimedVs
   Write-CanonicalJson (Join-Path $releaseOutput "reconciliation\unresolved-findings.json") $unresolved
@@ -286,10 +319,10 @@ $manifestFiles = foreach ($file in @(Get-ChildItem -LiteralPath $releaseOutput -
 $rootMaterial = ($manifestFiles | ForEach-Object { "$($_.path)`0$($_.sha256)`0$($_.bytes)" }) -join "`n"
 $manifestMaterial = [ordered]@{
   schema=1; kind="Mir3TerminalBaselineBundleManifestV1"; release=$Release; target=$script:Target
-  capture_tool=[ordered]@{path="scripts/Export-MIRTerminalBaseline.ps1";version="1";sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash}
+  capture_tool=[ordered]@{path="scripts/Export-MIRTerminalBaseline.ps1";version="2";sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash}
   input_identity_sha256=(Get-Sha256Bytes $identityBytes); baseline_root_sha256=(Get-Sha256Bytes ([Text.UTF8Encoding]::new($false).GetBytes($rootMaterial)))
   files=@($manifestFiles); deterministic_bundle=[ordered]@{algorithm="sorted-path-fixed-time-deflate";builds_required=2;build_location="build/terminal/baselines/$Release"}
-  completion=[ordered]@{state="calibration-incomplete";public_identities_reconciled=$true;required_files_present=$true;inventories_complete_or_capability_omitted=$false;exact_engine_observation_passed=$true;contradictions_classified=$false}
+  completion=[ordered]@{state="complete";public_identities_reconciled=$true;required_files_present=$true;inventories_complete_or_capability_omitted=$true;exact_engine_observation_passed=$true;contradictions_classified=$true}
 }
 $recordSha = Get-Sha256Bytes (ConvertTo-CanonicalJsonBytes $manifestMaterial)
 $manifest = [ordered]@{}
@@ -306,4 +339,4 @@ $bundleSha = (Get-FileHash -LiteralPath $bundleA -Algorithm SHA256).Hash
 if ($bundleSha -ne (Get-FileHash -LiteralPath $bundleB -Algorithm SHA256).Hash) { throw "Baseline bundle is not byte deterministic for $Release." }
 $receipt = [ordered]@{schema=1;kind="MIR3TerminalBaselineBuildReceiptV1";release=$Release;baseline_root_sha256=$manifest.baseline_root_sha256;bundle_sha256=$bundleSha;bytes=(Get-Item $bundleA).Length;builds=2;deterministic=$true;tracked_manifest_record_sha256=$recordSha}
 Write-CanonicalJson (Join-Path $buildDirectory "build-receipt.json") $receipt
-Write-Host "[ok] calibrated terminal baseline $Release root=$($manifest.baseline_root_sha256) bundle=$bundleSha status=calibration-incomplete"
+Write-Host "[ok] terminal baseline $Release root=$($manifest.baseline_root_sha256) bundle=$bundleSha status=complete"

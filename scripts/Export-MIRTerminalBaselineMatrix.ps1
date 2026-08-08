@@ -113,13 +113,17 @@ foreach ($definition in $inventoryDefinitions.GetEnumerator()) {
   $matrices[$definition.Key] = @($rows)
 }
 
+if (@($releaseRecords | Where-Object completion_state -ne "complete").Count -ne 0 -or @($unresolved).Count -ne 0) {
+  throw "The all-nine semantic matrix cannot complete while a baseline or finding remains open."
+}
+
 $material = [ordered]@{
   schema = 1
   kind = "MIR3Dot5SemanticMatrixV1"
-  status = "calibration-incomplete-realized-probes-pending"
+  status = "complete"
   generated_by = [ordered]@{
     path = "scripts/Export-MIRTerminalBaselineMatrix.ps1"
-    version = "1"
+    version = "2"
     sha256 = (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
   }
   release_order = $releaseOrder
@@ -128,9 +132,9 @@ $material = [ordered]@{
   unresolved_findings = @($unresolved | Sort-Object -Unique)
   completion = [ordered]@{
     all_nine_static_inventories_present = $true
-    all_nine_realized_engine_inventories_complete = $false
-    contradictions_classified = $false
-    queue_completion_permitted = $false
+    all_nine_realized_engine_inventories_complete = $true
+    contradictions_classified = $true
+    queue_completion_permitted = $true
   }
 }
 $recordSha = Get-Sha256Bytes (ConvertTo-CanonicalJsonBytes $material)

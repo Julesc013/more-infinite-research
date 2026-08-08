@@ -3,15 +3,14 @@
   "kind": "MIR3TerminalBaselineReconciliationV1",
   "release": "1.5.5",
   "comparison": "declared-vs-realized",
-  "status": "findings-open",
+  "status": "reconciled",
   "agreements": [
     "archive identity exact",
-    "exact target engine smoke passed",
+    "exact engine and official-data identities locked",
+    "post-data-final-fixes technology and effect inventory captured",
+    "setting defaults captured or explicitly capability-omitted",
     "packaged locale and migration files reconciled"
   ],
   "contradictions": [],
-  "unresolved_findings": [
-    "BLINE-155-REALIZED-PROTOTYPE-EXPORT",
-    "BLINE-155-SETTING-DEFAULT-EXPORT"
-  ]
+  "unresolved_findings": []
 }

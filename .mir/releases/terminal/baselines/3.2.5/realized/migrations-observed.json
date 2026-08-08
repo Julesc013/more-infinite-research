@@ -4,10 +4,12 @@
   "release": "3.2.5",
   "target": "2.1",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
   "fields_unavailable": [
     {
@@ -17,6 +19,7 @@
     }
   ],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json",
     "dist/more-infinite-research_3.2.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-3.2.5.md",

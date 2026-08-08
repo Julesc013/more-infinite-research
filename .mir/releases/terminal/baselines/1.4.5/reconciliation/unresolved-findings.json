@@ -3,12 +3,10 @@
   "kind": "MIR3TerminalBaselineReconciliationV1",
   "release": "1.4.5",
   "comparison": "unresolved-findings",
-  "status": "findings-open",
-  "agreements": [],
+  "status": "reconciled",
+  "agreements": [
+    "all baseline realization findings closed by exact observation or explicit target-capability disposition"
+  ],
   "contradictions": [],
-  "unresolved_findings": [
-    "BLINE-145-CLAIM-MATRIX-REALIZATION",
-    "BLINE-145-REALIZED-PROTOTYPE-EXPORT",
-    "BLINE-145-SETTING-DEFAULT-EXPORT"
-  ]
+  "unresolved_findings": []
 }

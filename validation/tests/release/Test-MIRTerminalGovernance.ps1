@@ -83,15 +83,15 @@ if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { thr
 $baselineQueue = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Baseline-Capture-QueueV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$baselineQueue.kind -ne "MIR3-Terminal-Baseline-Capture-QueueV1" -or @($baselineQueue.rows).Count -ne 9 -or
     (@($baselineQueue.rows.terminal_release) -join "|") -ne ($family -join "|") -or @($baselineQueue.required_semantic_inventory).Count -lt 15 -or
-    [string]$baselineQueue.status -ne "all-nine-static-captured-realized-probes-pending" -or
-    @($baselineQueue.rows | Where-Object { $_.identity_status -ne "locked" -or $_.semantic_inventory_status -ne "static-captured-realized-probes-pending" -or -not $_.baseline_manifest }).Count -ne 0) {
-  throw "Terminal baseline queue must bind nine static captures while truthfully retaining realized-engine work."
+    [string]$baselineQueue.status -ne "complete-all-nine-realized-and-reconciled" -or
+    @($baselineQueue.rows | Where-Object { $_.identity_status -ne "locked" -or $_.semantic_inventory_status -ne "complete" -or -not $_.baseline_manifest }).Count -ne 0) {
+  throw "Terminal baseline queue must bind nine complete exact-engine captures."
 }
 foreach ($row in @($baselineQueue.rows)) {
   $baselineManifestPath = Join-Path $RepoRoot ([string]$row.baseline_manifest)
   $baselineManifest = Get-Content -Raw -LiteralPath $baselineManifestPath | ConvertFrom-Json -Depth 100
-  if ([string]$baselineManifest.release -ne [string]$row.baseline_release -or [string]$baselineManifest.completion.state -ne "calibration-incomplete") {
-    throw "Terminal baseline queue row does not bind its truthfully incomplete manifest: $($row.baseline_release)"
+  if ([string]$baselineManifest.release -ne [string]$row.baseline_release -or [string]$baselineManifest.completion.state -ne "complete") {
+    throw "Terminal baseline queue row does not bind its reconciled manifest: $($row.baseline_release)"
   }
 }
 $portalCustodyPath = Join-Path $RepoRoot ([string]$baselineQueue.source_authorities.mod_portal_custody)

@@ -4,19 +4,22 @@
   "release": "1.7.5",
   "target": "0.17.79",
   "view": "realized",
-  "observation_capability": "exact-public-asset-evidence-plus-static-package-fallback",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
   "fields_observed": [
     "archive-identity",
-    "exact-engine-load"
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
   ],
   "fields_unavailable": [
     {
-      "field": "complete-active-ecosystem-closure",
-      "reason": "Public base smoke is not a universal compatibility campaign.",
-      "static_fallback_source": "c87818b34ccddb6b0166aeb6aec42887f420e86f:spec/compatibility/claims.json"
+      "field": "package-source-public-compatibility-claims",
+      "reason": "The target package source has no canonical public compatibility claim authority; no modern claim is projected backward or requires realization.",
+      "static_fallback_source": "docs/releases/notes/release-notes-1.7.5.md"
     }
   ],
   "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.7.5-engine-observation.json",
     "dist/more-infinite-research_1.7.5.zip",
     "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
     "docs/releases/notes/release-notes-1.7.5.md",
