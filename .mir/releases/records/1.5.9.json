@@ -3,6 +3,7 @@
   "release": "1.5.9",
   "candidate_id": "not-assigned",
   "candidate_floor": "1.5-P1",
+  "candidate_allocation": {"namespace":"1.5-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "0.15",
   "branch": "tag-only",
   "state": "planned",

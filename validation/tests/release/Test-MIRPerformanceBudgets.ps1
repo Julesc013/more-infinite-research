@@ -152,7 +152,12 @@ $activeCandidate = $releaseLedger.development.'factorio-2.1'
 $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $RepoRoot -Id "releases.records"
 $currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "current.json")) | ConvertFrom-Json
 $activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($activeCandidate.mir_version).json")) | ConvertFrom-Json
-$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($currentRoles.roles.tagged_factorio_2_1).json")) | ConvertFrom-Json
+$campaignBaselineVersion = if ($null -ne $activeTypedRelease.PSObject.Properties["source_release"]) {
+  [string]$activeTypedRelease.source_release.release
+} else {
+  [string]$currentRoles.roles.tagged_factorio_2_1
+}
+$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$campaignBaselineVersion.json")) | ConvertFrom-Json
 $activeCampaignPath = Join-Path $RepoRoot ".mir/performance-campaigns/$($activeCandidate.mir_version)-$($activeCandidate.candidate_id).json"
 $releaseStates = @((Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/control-plane/control-plane.json") | ConvertFrom-Json).release_states)
 $activeStateIndex = [Array]::IndexOf($releaseStates, [string]$activeTypedRelease.state)

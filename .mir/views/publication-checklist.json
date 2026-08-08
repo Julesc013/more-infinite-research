@@ -1,27 +1,185 @@
 {
-  "assurance_exceptions": [],
-  "authority": "mir-generated-publication-checklist-v1",
-  "candidate_floor": "C33",
-  "candidate_id": "not-assigned",
+  "authority": "mir-generated-terminal-family-publication-checklist-v1",
+  "family": [
+    {
+      "candidate_id": "not-assigned",
+      "release": "3.2.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "2.5.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.9.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.8.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.7.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.6.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.5.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.4.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "1.3.9",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    }
+  ],
+  "family_readiness_seal_present": false,
+  "first_public_tag_admitted": false,
   "generated_from": [
     "path:releases.current",
-    "path:releases.records/3.2.9.json"
+    ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
+    "path:releases.records/*.9.json"
   ],
   "publication_admitted": false,
-  "release": "3.2.9",
-  "remaining_states": [
-    "source-frozen",
-    "package-built",
-    "focused-qualified",
-    "candidate-qualified",
-    "manually-accepted",
-    "protected-qualified",
-    "sealed",
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
-  "schema": 1,
-  "state": "planned"
+  "schema": 1
 }

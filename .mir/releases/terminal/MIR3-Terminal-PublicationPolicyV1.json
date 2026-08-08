@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-PublicationPolicyV1",
+  "first_public_tag_requires": ["nine-valid-target-seals", "valid-family-readiness-seal", "unchanged-sealed-archives", "maintainer-publication-authorization"],
+  "tag_policy": {"local_signed_annotated_tags":true,"atomic_ref_push_when_supported":true,"partial_publication_state_otherwise":true,"update_or_delete":false},
+  "github_policy": {"draft_before_publish":true,"upload_existing_sealed_zip":true,"immutable_after_publish":true},
+  "mod_portal_policy": {"same_sealed_zip":true,"redownload_and_reverify":true},
+  "failure_policy": {"rollback_by_deletion":false,"same_byte_resume":true,"rebuild_after_transport_failure":false},
+  "publication_receipts_are_append_only": true,
+  "release_manifest_mutable_after_seal": false
+}

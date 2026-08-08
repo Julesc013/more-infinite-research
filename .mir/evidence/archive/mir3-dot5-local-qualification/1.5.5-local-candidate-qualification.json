@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "release": "1.5.5",
+  "target": "0.15",
+  "status": "locally-qualified-lineage-blocked",
+  "source_commit": "d855a68b88eb6864d537e8149f75ae73f50b0b39",
+  "source_tree": "f3bdb4a3f86cb36d298f06d6773fbd153bc5a329",
+  "candidate": {
+    "path": "build/candidates/1.5.5/final-a/more-infinite-research_1.5.5.zip",
+    "archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD",
+    "content_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778",
+    "bytes": 385548,
+    "entries": 177
+  },
+  "factorio": {
+    "version": "0.15.40",
+    "binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"
+  },
+  "baseline": "1.5.0",
+  "plan_sha256": "8EC3E644E31BAF969D0FD743CB44B60E2DF641889CDC43BD3721F012B990CAAA",
+  "plan_rows": 12,
+  "unknown_paths": 0,
+  "reuse": false,
+  "aggregate": {
+    "status": "passed",
+    "executed": 11,
+    "failed": 0,
+    "subsumed": ["runtime.exact-zip"]
+  },
+  "release_authority": {
+    "tag_created": false,
+    "dist_written": false,
+    "reason": "The immutable 3.2.5 release lineage is not yet available; local target qualification does not authorize a standalone descendant release."
+  }
+}

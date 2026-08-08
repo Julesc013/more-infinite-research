@@ -212,14 +212,22 @@ if ([string]$c31Closure.disposition -ne "superseded-unpublished" -or
   throw "C31 must remain superseded-unpublished in favor of 3.2.5."
 }
 $distributions = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/distributions.json") | ConvertFrom-Json
+$trackedArchives = @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot "dist") -Filter "*.zip" -File)
 if ([int]$distributions.distribution_count -ne @($distributions.distributions).Count -or
-    @($distributions.distributions | Where-Object {
-      [string]$_.version -eq "3.2.4" -and
-      [string]$_.kind -eq "frozen-unreleased-calibration-candidate" -and
-      [string]$_.sha256 -eq "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1"
-    }).Count -ne 1 -or
-    -not (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip") -PathType Leaf)) {
-  throw "The superseded-unpublished C31 archive must remain in exact governed custody without becoming an active release."
+    [int]$distributions.distribution_count -ne $trackedArchives.Count -or
+    @($distributions.distributions | Where-Object { [string]$_.version -eq "3.2.4" }).Count -ne 0 -or
+    (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip") -PathType Leaf)) {
+  throw "The tracked distribution inventory must contain only present root archives; superseded-unpublished C31 is record-authoritative, not an active distribution."
+}
+$packageLocks = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/control-plane/package-locks.json") | ConvertFrom-Json
+$c31Lock = @($packageLocks.locks | Where-Object { [string]$_.release -eq "3.2.4" -and [string]$_.candidate_id -eq "C31" })
+if ($c31Lock.Count -ne 1 -or [string]$c31Lock[0].mode -ne "frozen-candidate" -or
+    [string]$c31Lock[0].package_source_commit -ne [string]$c31Closure.package.source_commit -or
+    [string]$c31Lock[0].package_source_tree -ne [string]$c31Closure.package.source_tree -or
+    [string]$c31Lock[0].archive_sha256 -ne [string]$c31Closure.package.archive_sha256 -or
+    [long]$c31Lock[0].archive_bytes -ne [long]$c31Closure.package.bytes -or
+    [int]$c31Lock[0].archive_entries -ne [int]$c31Closure.package.entries) {
+  throw "Superseded-unpublished C31 must retain matching closure and package-lock identities after leaving the active dist inventory."
 }
 foreach ($expectedStatus in @{
   "325-B2" = "deferred-explicitly"

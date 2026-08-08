@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-ProgrammeV1",
+  "status": "active-planning-only",
+  "implementation_admitted": false,
+  "source_frozen": false,
+  "family": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "execution_order": ["baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication"],
+  "authorities": {
+    "scope_firewall": ".mir/releases/terminal/MIR3-Terminal-ScopeFirewallV1.json",
+    "target_matrix": ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json",
+    "baseline_capture_queue": ".mir/releases/terminal/MIR3-Terminal-Baseline-Capture-QueueV1.json",
+    "incident_reconciliation": ".mir/releases/terminal/MIR3-Terminal-Incident-ReconciliationV1.json",
+    "change_set": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+    "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
+    "publication": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
+    "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json"
+  },
+  "hard_gate": "No source freeze, candidate assignment, target seal, family seal, tag, or publication state may be inferred from this planning authority."
+}
