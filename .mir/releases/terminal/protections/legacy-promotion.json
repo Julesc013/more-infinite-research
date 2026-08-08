@@ -1,0 +1,1 @@
+{"name":"MIR3 terminal legacy promotion actor","target":"branch","enforcement":"active","bypass_actors":[{"actor_id":30209022,"actor_type":"User","bypass_mode":"always"}],"conditions":{"ref_name":{"include":["refs/heads/legacy"],"exclude":[]}},"rules":[{"type":"update"}]}

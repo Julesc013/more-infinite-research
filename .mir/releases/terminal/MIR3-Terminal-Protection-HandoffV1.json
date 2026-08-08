@@ -1,16 +1,29 @@
 {
   "schema": 1,
   "kind": "MIR3-Terminal-Protection-HandoffV1",
-  "status": "specified-not-applied",
-  "reason_not_applied": "The authenticated GitHub connector exposes pull-request and repository-content operations but no repository ruleset or branch-protection write operation; local gh authentication is not usable.",
-  "precondition": "Archive the current rulesets and exact observed required-check contexts before any settings mutation.",
-  "branches": [
-    {"ref":"refs/heads/dev","required_pull_request":true,"minimum_approvals":0,"dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-PR-head-before-activation","role":"terminal-integration"},
-    {"ref":"refs/heads/main","required_pull_request":true,"minimum_approvals":"1-if-independent-maintainer-exists-otherwise-0-with-signed-maintainer-acceptance","dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-release-promotion-head-before-activation","role":"3.2.x-release-line"},
-    {"ref":"refs/heads/legacy","required_pull_request":true,"minimum_approvals":"1-if-independent-maintainer-exists-otherwise-0-with-signed-maintainer-acceptance","dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-dual-parent-promotion-head-before-activation","role":"2.5.x-release-line"}
+  "status": "corrected-ready-for-application-blocked-external-auth",
+  "reason_not_applied": "Local gh authentication cannot administer repository rulesets. Payloads and negative-test procedure are complete, but no repository-setting mutation or verification is claimed.",
+  "repository": "Julesc013/more-infinite-research",
+  "precondition": "Archive current rulesets and branch protections, create disposable canary refs, apply and pass canary negative tests, then apply production payloads and verify returned ruleset state.",
+  "observed_required_checks": [
+    {"context":"branch-policy","integration_id":15368,"app_slug":"github-actions","observed_commit":"bd27b41be3277a5cd92a7d48ededdb95fe77401a","workflow_run":31268931599,"conclusion":"success"},
+    {"context":"verification-gate","integration_id":15368,"app_slug":"github-actions","observed_commit":"bd27b41be3277a5cd92a7d48ededdb95fe77401a","workflow_run":31268931281,"conclusion":"success"}
   ],
-  "terminal_tags": ["refs/tags/3.2.9","refs/tags/2.5.9","refs/tags/1.9.9","refs/tags/1.8.9","refs/tags/1.7.9","refs/tags/1.6.9","refs/tags/1.5.9","refs/tags/1.4.9","refs/tags/1.3.9"],
-  "tag_rules": {"block_update":true,"block_deletion":true,"restrict_creation_to_release_maintainer":true,"require_local_signed_annotated_tag":true,"require_family_readiness_before_first_creation":true},
-  "emergency_bypass": {"permitted":true,"actors":"repository-administrator-only","mode":"pull-request-only","receipt_required":true,"package_change_requires_new_candidate":true},
-  "application_receipt": {"ruleset_snapshot":null,"branch_ruleset_ids":[],"tag_ruleset_id":null,"applied_by":null,"applied_at":null,"verified_at":null}
+  "administrator_actor": {"login":"Julesc013","actor_type":"User","actor_id":30209022,"authority":"observed repository owner; application still requires authenticated ruleset administration"},
+  "branches": [
+    {"ref":"refs/heads/dev","role":"terminal-integration","update_model":"pull-request-only","required_pull_request":true,"minimum_approvals":0,"require_thread_resolution":true,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["dev-integrity.json","dev-workflow.json"]},
+    {"ref":"refs/heads/main","role":"3.2.x-promotion-line","update_model":"exact-fast-forward-promotion-only","required_pull_request":false,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["main-integrity.json","main-promotion.json"]},
+    {"ref":"refs/heads/legacy","role":"2.5.x-dual-parent-promotion-line","update_model":"exact-fast-forward-promotion-only","required_pull_request":false,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["legacy-integrity.json","legacy-promotion.json"]}
+  ],
+  "immutable_dot5_tags": ["refs/tags/3.2.5","refs/tags/2.5.5","refs/tags/1.9.5","refs/tags/1.8.5","refs/tags/1.7.5","refs/tags/1.6.5","refs/tags/1.5.5","refs/tags/1.4.5","refs/tags/1.3.5"],
+  "future_terminal_tags": ["refs/tags/3.2.9","refs/tags/2.5.9","refs/tags/1.9.9","refs/tags/1.8.9","refs/tags/1.7.9","refs/tags/1.6.9","refs/tags/1.5.9","refs/tags/1.4.9","refs/tags/1.3.9"],
+  "tag_lifecycle": {
+    "dot5": "immutable-now-no-bypass",
+    "dot9_precreation": "creation-restricted-to-exact-maintainer-actor-and-governed-family-readiness-receipt; update-and-deletion-non-bypassable",
+    "dot9_postcreation": "create-once refs remain update-and-deletion-non-bypassable; creation-gate is removed after all nine returned refs are verified"
+  },
+  "payload_root": ".mir/releases/terminal/protections",
+  "canary": {"branch_pattern":"refs/heads/canary/mir3-terminal-protection-*","tag_pattern":"refs/tags/canary/mir3-terminal-protection-*","real_release_refs_permitted":false,"payloads":["canary-branch.json","canary-tag.json"]},
+  "emergency_bypass": {"dev":"repository-owner pull-request bypass only for the PR workflow rule; integrity and required-check rules have no bypass","main_legacy":"repository-owner may satisfy only the update restriction; integrity and required-check rules have no bypass","receipt_required":true,"package_change_requires_new_candidate":true},
+  "application_receipt": {"ruleset_snapshot_sha256":null,"branch_protection_snapshot_sha256":null,"canary_ruleset_ids":[],"production_ruleset_ids":[],"applied_by":null,"applied_at":null,"verified_at":null,"negative_tests":[],"status":"not-applied"}
 }
