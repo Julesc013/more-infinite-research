@@ -42,7 +42,7 @@
     "reason": "The conflict is reproduced, bounded to the package-excluded active campaign authority omitted from the prior 2.1.13 rebind, and correctable without changing product source, historical evidence, or frozen package bytes."
   },
   "closure": {
-    "status": "implementation-awaiting-proof",
-    "evidence": null
+    "status": "closed",
+    "evidence": "Fresh paired-balanced no-reuse performance qualification passed on exact Factorio 2.1.13 with immutable 3.2.3 and 3.2.5 archives, five measured runs per package, all ten regression lanes passed, governed evidence digest 9A049FFDE8D88DEF9B447ADDC043EC3879BEDEB33C9BE803256DD6B51C80C28C, unchanged historical 2.1.12 evidence SHA-256 7D43DCA7A23E7FBAF9FAA75550F0D184AA904C07AA3555FF0D95BFACDA01A028, and unchanged C32 archive SHA-256 AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF on 2026-08-09"
   }
 }
