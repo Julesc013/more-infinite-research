@@ -168,10 +168,8 @@ function New-MIRCPLegacyReleaseLedger {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $policy = Get-MIRCPPolicy -RepoRoot $repo
   $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
-  $canonicalRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_canonical"]) { "planned_canonical" } else { "canonical" }
-  $backportRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_backport"]) { "planned_backport" } else { "backport_calibration" }
-  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
-  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$backportRole) -RepoRoot $repo
+  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.canonical) -RepoRoot $repo
+  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
   $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_1) -RepoRoot $repo
   $publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_0) -RepoRoot $repo
   $updated = @($canonical.updated_at, $backport.updated_at, $publishedModern.updated_at, $publishedBackport.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)
