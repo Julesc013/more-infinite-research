@@ -29,6 +29,7 @@
         "tools/mir.ps1",
         "tools/mir_verify/**",
         ".mir/assurance.json",
+        ".mir/releases/terminal/**",
         "validation/tests.yml",
         "validation/domains.yml",
         "validation/trust.json",

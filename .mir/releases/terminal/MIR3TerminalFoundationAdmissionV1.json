@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFoundationAdmissionV1",
+  "status": "accepted",
+  "admitted_at": "2026-08-09T03:03:11.2489380+10:00",
+  "scope": "package-excluded-terminal-foundation",
+  "pre_foundation": {
+    "commit": "391684ffe5822dbadc0b6644d22fd9640ee0ffa8"
+  },
+  "foundation": {
+    "commit": "a022ae7883043f07002a9463baa998cafdadb717",
+    "tree": "a1ee7952fadc6e0de0fe67de035627fab1c99ec0"
+  },
+  "stack": [
+    {"pr":64,"original_head":"d891ae07592a51092fcabc62ed4a5713f27d3075","corrected_head":"003cd10293a48c67a8d1f9a02664c4feee4c1305","merge_commit":"43499a0fdcae15a859ae3bc9a74cf403c72dad12","mir_run":31267473758,"branch_policy_run":31267473750,"emergency_package_run":null,"checks":"passed"},
+    {"pr":65,"original_head":"157564fc9036758d4f77e9d81380a2ce6aa7353d","corrected_head":"0ac8c168b7d6e113fd2472a6ab36ab926b9d2245","merge_commit":"a1a2fbe67973588e86c19ffda5eb189ee126114a","mir_run":31267497535,"branch_policy_run":31267497533,"emergency_package_run":null,"checks":"passed"},
+    {"pr":66,"original_head":"dc9d58221f9b9b82be2e0f994a6332b0229c6322","corrected_head":"beaec47cd5e3acf2de551bb303abb45c04a77c41","merge_commit":"bcaa98f2917898f317a4878fbab63a7e368ba4d5","mir_run":31267886874,"branch_policy_run":31267886877,"emergency_package_run":31267886876,"checks":"passed"},
+    {"pr":67,"original_head":"707b719e37be6d28783cfe32e346d80bdd4db83f","corrected_head":"88abec0c8a1e8272a77ac65336fc6ee86eec3bef","merge_commit":"0e823e48ee2ef93eb01e336899536218bb9c9b64","mir_run":31268019823,"branch_policy_run":31268019784,"emergency_package_run":31268019773,"checks":"passed"},
+    {"pr":68,"original_head":"c0cac6d200b55a8885bc6c0d8015aa49df259a95","corrected_head":"72170e02eca637dfb0082250666c74d12edc9b47","merge_commit":"a022ae7883043f07002a9463baa998cafdadb717","mir_run":31268192827,"branch_policy_run":31268192823,"emergency_package_run":31268192835,"checks":"passed"}
+  ],
+  "restack": {
+    "reason": "The original PR 64 and PR 65 exact-head MIR runs failed because the reviewed 57-archive distribution inventory reconciliation existed only in PR 66.",
+    "method": "Move the identical package-excluded distribution ledger into PR 64, then forward-merge each corrected parent into its child.",
+    "history_rewritten": false,
+    "force_push_used": false,
+    "original_heads_retained_in_ancestry": true,
+    "cumulative_tree_changed": false
+  },
+  "local_validation": {
+    "cumulative_head": "72170e02eca637dfb0082250666c74d12edc9b47",
+    "cumulative_tree": "a1ee7952fadc6e0de0fe67de035627fab1c99ec0",
+    "plan_material_sha256": "02A8E14B4A3CD3532497AA8DFADD6E5CEB032C1CE4A173989B1175945AB75D3F",
+    "required_test_set_sha256": "7E6A5E953B211594263D2119DC8F5DE2A36450A5AECCB255B9E38CEACC518DBC",
+    "static_only": "passed",
+    "deterministic_double_build": "passed",
+    "c32_archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "work_directory_absent": true
+  },
+  "dot5_identity_authority": {
+    "wave_index": "docs/releases/archive/MIR-3.5-WAVE-INDEX.json",
+    "wave_index_sha256": "AC181DD453FF65184E4F103B0274478B14B61F35AAA2BE84CC00043D0F008115",
+    "distribution_ledger_sha256": "21D074FDC4ADF6FCD20282B003F88164616BE72F9EA65EF1488F42C787E8F089",
+    "verification": "archive-content-bytes-entries-passed-nine-of-nine",
+    "releases": [
+      {"version":"3.2.5","archive_sha256":"AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF","content_sha256":"1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D","bytes":1056249,"entries":301},
+      {"version":"2.5.5","archive_sha256":"03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C","content_sha256":"047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154","bytes":1055047,"entries":300},
+      {"version":"1.9.5","archive_sha256":"9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC","content_sha256":"8C8A76EEBFCA52B4A4D401565F08BFD52A285A14837CCC0A65AC689B8F80E9CA","bytes":397597,"entries":174},
+      {"version":"1.8.5","archive_sha256":"10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD","content_sha256":"F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B","bytes":397589,"entries":174},
+      {"version":"1.7.5","archive_sha256":"D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A","content_sha256":"FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D","bytes":385229,"entries":177},
+      {"version":"1.6.5","archive_sha256":"8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB","content_sha256":"C19B2F407912E01E12E1D117180504787C352027B9132476A65D9C9D4F4B8392","bytes":385236,"entries":177},
+      {"version":"1.5.5","archive_sha256":"E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD","content_sha256":"955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778","bytes":385548,"entries":177},
+      {"version":"1.4.5","archive_sha256":"BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47","content_sha256":"35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4","bytes":385987,"entries":177},
+      {"version":"1.3.5","archive_sha256":"78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0","content_sha256":"9E57F57D760D49CF165C66DB3413E2C50D639FA2EC7DB63C44846D001E4EF88A","bytes":386081,"entries":177}
+    ]
+  },
+  "package_boundary": {
+    "intended_package_visible_delta": ["README.md restored to the exact immutable 3.2.5 package source"],
+    "published_zip_mutated": false,
+    "candidate_assigned": false,
+    "source_frozen_for_dot9": false
+  },
+  "open_gates": [
+    {"id":"F1","state":"blocked-external-auth","reason":"Repository protections remain specified-not-applied; local gh authentication is invalid."},
+    {"id":"C0","state":"partial","reason":"Two Mod Portal versions are API-visible with SHA-1 parity; all authenticated redownload/engine receipts and seven uploads remain pending."},
+    {"id":"B0","state":"ready","reason":"Foundation and immutable .5 identities are admitted; semantic capture may begin package-excluded."},
+    {"id":"github-run-attempt-transport","state":"reproduced-debt","reason":"Failed-job rerun 31267559496 attempt 2 requested attempt-suffixed plan artifacts that only successful attempt 1 produced."}
+  ],
+  "next_permitted_work": ["repository-protection-correction-and-application","dot5-public-custody","semantic-baseline-capture"],
+  "prohibited_until_later_gates": ["dot9-product-implementation","shadow-candidate-promotion","source-freeze","candidate-allocation","tagging","publication"]
+}
