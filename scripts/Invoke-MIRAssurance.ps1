@@ -17,7 +17,7 @@ $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
 $outRoot = $artifactRoot
 $evidenceSchema = 4
-$buildReceiptSchema = 2
+$buildReceiptSchema = 3
 $assuranceRunnerVersion = "4"
 
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")

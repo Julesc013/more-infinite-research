@@ -333,11 +333,11 @@ function Invoke-MIRAssuranceSeal {
     candidate_descriptor_sha256=[string]$plan.candidate_descriptor_sha256
     candidate_domain_manifest_sha256=[string]$domainManifest.manifest_sha256
     target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $targetsPath)
-    verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
-    domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
+    verification_profile_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
+    domain_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $domainsPath)
     test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
-    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
+    trust_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
     verification_plan=(Get-MIRAssuranceRepoRelativePath -Path $planSnapshotPath)
     verification_plan_sha256=(Get-MIRAssuranceSha256 -Path $planSnapshotPath)
     plan_material_sha256=[string]$plan.plan_material_sha256
@@ -486,11 +486,11 @@ function Invoke-MIRAssuranceCheckSeal {
     }
   } catch {}
   $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $targetsPath) -eq [string]$seal.target_profile_sha256)
-  $checks.verification_profile_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
-  $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
+  $checks.verification_profile_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
+  $checks.domain_policy_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
   $checks.test_catalog_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
   $checks.validation_harness_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles)) -eq [string]$seal.validation_harness_sha256)
-  $checks.trust_policy_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath)) -eq [string]$seal.trust_policy_sha256)
+  $checks.trust_policy_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath)) -eq [string]$seal.trust_policy_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
   $sourceTree = @(& git -C $repo rev-parse "$([string]$seal.source_commit)^{tree}" 2>$null)
@@ -585,10 +585,10 @@ function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
 
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
-  $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
+  $canonicalTrustSha256 = Get-MIRAssuranceCanonicalJsonFileHash -Path $canonicalTrustPath
   $decoyTrustPath = Join-Path $repo "validation\domains.yml"
   if (-not (Test-Path -LiteralPath $decoyTrustPath -PathType Leaf) -or
-      (Get-MIRAssuranceSha256 -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
+      (Get-MIRAssuranceCanonicalJsonFileHash -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
     throw "Trust-path collision self-test requires a distinct target-line policy fixture."
   }
   $originalTrustPath = $trustPath

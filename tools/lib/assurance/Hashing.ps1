@@ -1,3 +1,87 @@
+Set-Variable -Name MIRAssuranceCanonicalTextDigestPolicyId -Scope Script -Option ReadOnly -Value "utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
+Set-Variable -Name MIRAssuranceCanonicalJsonDigestPolicyId -Scope Script -Option ReadOnly -Value "json-sorted-properties-utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
+
+function Get-MIRAssuranceCanonicalTextDigest {
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+
+  $normalized = $Text
+  if ($normalized.StartsWith([char]0xFEFF)) { $normalized = $normalized.Substring(1) }
+  $normalized = $normalized.Normalize([Text.NormalizationForm]::FormC)
+  $normalized = $normalized.Replace("`r`n", "`n").Replace("`r", "`n")
+  $normalized = $normalized.TrimEnd("`n") + "`n"
+  return [ordered]@{
+    policy_id=$script:MIRAssuranceCanonicalTextDigestPolicyId
+    sha256=(Get-MIRAssuranceTextHash -Text $normalized)
+    normalized_bytes=[Text.UTF8Encoding]::new($false).GetByteCount($normalized)
+  }
+}
+
+function ConvertTo-MIRAssuranceCanonicalJsonValue {
+  param($Value)
+
+  if ($null -eq $Value) { return $null }
+  if ($Value -is [Collections.IDictionary]) {
+    $map = [ordered]@{}
+    foreach ($key in @($Value.Keys | ForEach-Object { [string]$_ } | Sort-Object -CaseSensitive)) {
+      $map[$key] = ConvertTo-MIRAssuranceCanonicalJsonValue -Value $Value[$key]
+    }
+    return $map
+  }
+  if ($Value -is [Management.Automation.PSCustomObject]) {
+    $map = [ordered]@{}
+    foreach ($property in @($Value.PSObject.Properties | Sort-Object Name -CaseSensitive)) {
+      $map[$property.Name] = ConvertTo-MIRAssuranceCanonicalJsonValue -Value $property.Value
+    }
+    return $map
+  }
+  if ($Value -is [Collections.IEnumerable] -and $Value -isnot [string]) {
+    return @($Value | ForEach-Object { ConvertTo-MIRAssuranceCanonicalJsonValue -Value $_ })
+  }
+  if ($Value -is [string]) { return $Value.Normalize([Text.NormalizationForm]::FormC) }
+  return $Value
+}
+
+function Get-MIRAssuranceCanonicalJsonDigest {
+  param([Parameter(Mandatory)]$Value)
+
+  $canonical = ConvertTo-MIRAssuranceCanonicalJsonValue -Value $Value
+  $json = $canonical | ConvertTo-Json -Depth 100 -Compress
+  $textDigest = Get-MIRAssuranceCanonicalTextDigest -Text $json
+  return [ordered]@{
+    policy_id=$script:MIRAssuranceCanonicalJsonDigestPolicyId
+    sha256=[string]$textDigest.sha256
+    normalized_bytes=[int]$textDigest.normalized_bytes
+  }
+}
+
+function Get-MIRAssuranceCanonicalTextFileHash {
+  param([Parameter(Mandatory)][string]$Path)
+  return [string](Get-MIRAssuranceCanonicalTextDigest -Text ([IO.File]::ReadAllText($Path))).sha256
+}
+
+function Get-MIRAssuranceCanonicalJsonFileHash {
+  param([Parameter(Mandatory)][string]$Path)
+  $value = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json -Depth 100
+  return [string](Get-MIRAssuranceCanonicalJsonDigest -Value $value).sha256
+}
+
+function Get-MIRAssuranceGitIndexFingerprint {
+  param([Parameter(Mandatory)][string[]]$Pathspecs)
+
+  $rows = @()
+  foreach ($line in @(& git -C $repo ls-files -s -- @Pathspecs)) {
+    if ($line -match '^\d+\s+([0-9a-fA-F]+)\s+0\t(.+)$') {
+      $rows += "$($Matches[2].Replace('\','/'))`t$($Matches[1].ToLowerInvariant())"
+    }
+  }
+  if ($LASTEXITCODE -ne 0) { throw "Unable to fingerprint the Git index paths: $($Pathspecs -join ', ')" }
+  return [ordered]@{
+    kind="git-index"
+    file_count=$rows.Count
+    sha256=(Get-MIRAssuranceTextHash -Text (($rows | Sort-Object) -join "`n"))
+  }
+}
+
 function Initialize-MIRAssuranceGitIdentityCache {
   if ($null -ne $script:MIRAssuranceGitIndexBlobs) { return }
   $script:MIRAssuranceGitIndexBlobs = @{}
