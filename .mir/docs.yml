@@ -1,6 +1,14 @@
 schema: 1
 
 docs:
+  - path: docs/maintainer/mir3-terminal-repository-protections.md
+    title: "MIR 3 Terminal Repository Protections"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - terminal-repository-protection-handoff
   - path: docs/releases/current-candidate.md
     title: "Current Development Candidate"
     status: current

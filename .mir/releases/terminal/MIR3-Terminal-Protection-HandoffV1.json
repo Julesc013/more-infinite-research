@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-Protection-HandoffV1",
+  "status": "specified-not-applied",
+  "reason_not_applied": "The authenticated GitHub connector exposes pull-request and repository-content operations but no repository ruleset or branch-protection write operation; local gh authentication is not usable.",
+  "precondition": "Archive the current rulesets and exact observed required-check contexts before any settings mutation.",
+  "branches": [
+    {"ref":"refs/heads/dev","required_pull_request":true,"minimum_approvals":0,"dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-PR-head-before-activation","role":"terminal-integration"},
+    {"ref":"refs/heads/main","required_pull_request":true,"minimum_approvals":"1-if-independent-maintainer-exists-otherwise-0-with-signed-maintainer-acceptance","dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-release-promotion-head-before-activation","role":"3.2.x-release-line"},
+    {"ref":"refs/heads/legacy","required_pull_request":true,"minimum_approvals":"1-if-independent-maintainer-exists-otherwise-0-with-signed-maintainer-acceptance","dismiss_stale_reviews":true,"require_thread_resolution":true,"block_force_push":true,"block_deletion":true,"required_checks":"discover-from-successful-dual-parent-promotion-head-before-activation","role":"2.5.x-release-line"}
+  ],
+  "terminal_tags": ["refs/tags/3.2.9","refs/tags/2.5.9","refs/tags/1.9.9","refs/tags/1.8.9","refs/tags/1.7.9","refs/tags/1.6.9","refs/tags/1.5.9","refs/tags/1.4.9","refs/tags/1.3.9"],
+  "tag_rules": {"block_update":true,"block_deletion":true,"restrict_creation_to_release_maintainer":true,"require_local_signed_annotated_tag":true,"require_family_readiness_before_first_creation":true},
+  "emergency_bypass": {"permitted":true,"actors":"repository-administrator-only","mode":"pull-request-only","receipt_required":true,"package_change_requires_new_candidate":true},
+  "application_receipt": {"ruleset_snapshot":null,"branch_ruleset_ids":[],"tag_ruleset_id":null,"applied_by":null,"applied_at":null,"verified_at":null}
+}
