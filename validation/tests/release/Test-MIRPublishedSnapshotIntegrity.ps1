@@ -12,6 +12,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $MirLegacyScriptRoot
 $manifestPath = Join-Path $repoRoot ".mir\target-lines\index.json"
 $distributionManifestPath = Join-Path $repoRoot ".mir\distributions.json"
+. (Join-Path $repoRoot "tools\lib\validation\PackageIdentity.ps1")
 
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
     throw "Published snapshot index not found: $manifestPath"
@@ -43,6 +44,30 @@ try {
     }
 
     $failures = [System.Collections.Generic.List[string]]::new()
+
+    # A published current-line version remains package-source immutable even
+    # when package-excluded release documentation continues on the branch.
+    # This closes the gap where a documentation edit to a package-visible root
+    # (notably README.md) could silently rebuild an already published version.
+    $info = Get-Content -LiteralPath (Join-Path $repoRoot "info.json") -Raw | ConvertFrom-Json
+    $releaseRecordPath = Join-Path $repoRoot ".mir\releases\records\$($info.version).json"
+    if (Test-Path -LiteralPath $releaseRecordPath -PathType Leaf) {
+        $releaseRecord = Get-Content -LiteralPath $releaseRecordPath -Raw | ConvertFrom-Json
+        $immutableStates = @("tagged", "published", "publicly-verified")
+        if ([string]$releaseRecord.state -in $immutableStates) {
+            $actualPackageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repoRoot
+            $expectedPackageSourceSha256 = [string]$releaseRecord.package.source_sha256
+            if ($actualPackageSourceSha256 -ne $expectedPackageSourceSha256) {
+                $failures.Add(
+                    "$($info.version): current package roots changed after publication; " +
+                    "expected $expectedPackageSourceSha256, observed $actualPackageSourceSha256"
+                )
+            }
+            else {
+                Write-Host "PASS $($info.version): current package roots match the immutable published source"
+            }
+        }
+    }
 
     foreach ($entry in $manifest.versions) {
         $snapshotRelative = [string]$entry.snapshot
