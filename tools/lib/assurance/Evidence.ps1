@@ -164,7 +164,7 @@ function Get-MIRAssuranceInputFingerprint {
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($targetLinesTree)) {
         throw "Unable to resolve the staged .mir/target-lines tree for release-history fingerprinting."
       }
-      $inventory = Get-MIRAssurancePatternFingerprint -Patterns @(".mir/distributions.json", "dist/**")
+      $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
       $material = [ordered]@{
         target_lines_tree=$targetLinesTree
         inventory=$inventory
@@ -176,17 +176,17 @@ function Get-MIRAssuranceInputFingerprint {
         sha256=(Get-MIRAssuranceJsonHash -Value $material)
       }
     }
-    "test-catalog" { return [ordered]@{ kind="manifest"; path="validation/tests.yml"; sha256=(Get-MIRAssuranceSha256 -Path $catalogPath) } }
+    "test-catalog" { return [ordered]@{ kind="manifest"; path="validation/tests.yml"; digest_policy=$script:MIRAssuranceCanonicalJsonDigestPolicyId; sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $catalogPath) } }
     "target-profile" {
       return Get-MIRAssurancePatternFingerprint -Patterns @(".mir/targets.json", "tools/lib/validation/TargetProfiles.ps1")
     }
     "verification-profile" {
       $path = Get-MIRAssuranceVerificationProfilePath -Target $Context.target
-      return [ordered]@{ kind="verification-profile"; path=(Get-MIRAssuranceRepoRelativePath -Path $path); sha256=(Get-MIRAssuranceSha256 -Path $path) }
+      return [ordered]@{ kind="verification-profile"; path=(Get-MIRAssuranceRepoRelativePath -Path $path); digest_policy=$script:MIRAssuranceCanonicalJsonDigestPolicyId; sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $path) }
     }
     "selected-scenarios" {
       $selectionHash = Get-MIRAssuranceJsonHash -Value $Plan.impact_selection
-      $registryHash = Get-MIRAssuranceSha256 -Path $scenarioRegistryPath
+      $registryHash = Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath
       return [ordered]@{
         kind="selected-scenarios"
         selection_sha256=$selectionHash
@@ -195,11 +195,11 @@ function Get-MIRAssuranceInputFingerprint {
       }
     }
     "exact-dist-scenarios" {
-      $registryHash = Get-MIRAssuranceSha256 -Path $scenarioRegistryPath
+      $registryHash = Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath
       return [ordered]@{ kind="exact-dist-scenarios"; registry_sha256=$registryHash; selector="smoke"; sha256=(Get-MIRAssuranceTextHash -Text "$registryHash`nsmoke") }
     }
     "required-scenarios" {
-      return [ordered]@{ kind="required-scenarios"; sha256=(Get-MIRAssuranceSha256 -Path $scenarioRegistryPath) }
+      return [ordered]@{ kind="required-scenarios"; sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath) }
     }
     "harness" { return Get-MIRAssuranceScenarioHarnessFingerprint }
     "scenario-harness" { return Get-MIRAssuranceScenarioHarnessFingerprint }
@@ -266,7 +266,7 @@ function Get-MIRAssuranceInputFingerprint {
     "runtime.full" {
       $material = [ordered]@{
         target=[string]$Context.target
-        scenario_registry_sha256=(Get-MIRAssuranceSha256 -Path $scenarioRegistryPath)
+        scenario_registry_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath)
         domain_manifest_sha256=if ($Plan.domain_manifest) { [string]$Plan.domain_manifest.manifest_sha256 } else { "" }
         harness=(Get-MIRAssuranceScenarioHarnessFingerprint).sha256
       }
@@ -381,7 +381,7 @@ function Get-MIRAssuranceProducer {
     runner_identity=if ($env:MIR_TRUSTED_RUNNER) { [string]$env:MIR_TRUSTED_RUNNER } else { "local" }
     trust_class=$trustClass
     verifier_sha256=(Get-MIRAssuranceRunnerHash)
-    policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
+    policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
   }
 }
 
@@ -439,7 +439,7 @@ function Test-MIRAssuranceTrustedProducer {
   if ($repository -ne $current -and -not ($repository -eq "local" -and $current -eq "local")) { return $false }
   if ([string]$Producer.trust_class -ne [string]$Context.trust_class) { return $false }
   if ([string]$Producer.verifier_sha256 -ne (Get-MIRAssuranceRunnerHash)) { return $false }
-  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
+  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
   return $true
 }
 
@@ -467,7 +467,7 @@ function Test-MIRAssuranceReleaseProducer {
     if ([string]$Producer.commit -ne $ExpectedCommit) { return $false }
   } elseif ([string]$Producer.commit -ne $ExpectedCommit) { return $false }
   if ([string]$Producer.verifier_sha256 -ne (Get-MIRAssuranceRunnerHash)) { return $false }
-  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
+  if ([string]$Producer.policy_sha256 -ne (Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))) { return $false }
   return $true
 }
 
@@ -1639,6 +1639,10 @@ function Get-MIRAssurancePlanMaterial {
     source_tree=[string]$Plan.source_tree
     candidate_descriptor_sha256=[string]$Plan.candidate_descriptor.descriptor_sha256
     package_source_sha256=[string]$Plan.package_source_sha256
+    digest_policy_ids=[ordered]@{
+      text=[string]$Plan.digest_policy_ids.text
+      json=[string]$Plan.digest_policy_ids.json
+    }
     catalog_sha256=[string]$Plan.test_catalog_sha256
     validation_harness_sha256=[string]$Plan.validation_harness_sha256
     verification_profile_sha256=[string]$Plan.verification_profile_sha256
@@ -1662,7 +1666,7 @@ function Complete-MIRAssurancePlan {
   $Plan["required_test_set_sha256"] = Get-MIRAssuranceJsonHash -Value $expectedIds
   $Plan["catalog_sha256"] = [string]$Plan.test_catalog_sha256
   $Plan["policy_sha256"] = Get-MIRAssuranceJsonHash -Value ([ordered]@{
-    assurance=(Get-MIRAssuranceSha256 -Path $configPath)
+    assurance=(Get-MIRAssuranceCanonicalJsonFileHash -Path $configPath)
     domains=[string]$Plan.domain_policy_sha256
     profile=[string]$Plan.verification_profile_sha256
     trust=[string]$Plan.trust_policy_sha256
@@ -2147,6 +2151,7 @@ function Get-MIRAssuranceBuildFingerprint {
   $material = [ordered]@{
     schema=$buildReceiptSchema
     target=[string]$Context.target
+    source_tree=(& git -C $repo rev-parse "HEAD^{tree}").Trim()
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1"))
@@ -2181,7 +2186,24 @@ function Invoke-MIRAssuranceBuild {
     return $reused
   }
   Write-Host "[run] candidate build $($fingerprint.input_key)"
-  & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") | Out-Host
+  $candidateFullPath = [IO.Path]::GetFullPath([string]$Context.candidate)
+  $distRoot = [IO.Path]::GetFullPath((Join-Path $repo "dist"))
+  if ($candidateFullPath.StartsWith($distRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Assurance builds may not write through immutable published dist authority: $candidateFullPath"
+  }
+  $recordPath = Join-Path $repo ".mir\releases\records\$($Context.info.version).json"
+  if (Test-Path -LiteralPath $recordPath -PathType Leaf) {
+    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+    if ([string]$record.state -in @("tagged", "published", "publicly-verified")) {
+      $observedSource = Get-MIRAssurancePackageSourceHash
+      if ($observedSource -ne [string]$record.package.source_sha256) {
+        throw "Refusing to build published version $($Context.info.version) from changed package roots: expected $($record.package.source_sha256), observed $observedSource. Restore the governed published source baseline first."
+      }
+    }
+  }
+  $candidateRoot = Split-Path -Parent $candidateFullPath
+  $candidateOutputDir = Get-MIRAssuranceRepoRelativePath -Path $candidateRoot
+  & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $candidateOutputDir | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "Candidate build failed." }
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate was not created: $($Context.candidate)" }
   $receipt = [ordered]@{
@@ -2190,7 +2212,7 @@ function Invoke-MIRAssuranceBuild {
     disposition="executed"
     input_key=[string]$fingerprint.input_key
     target=[string]$Context.target
-    candidate=$Context.candidate
+    candidate=(Get-MIRAssuranceRepoRelativePath -Path $Context.candidate)
     candidate_sha256=(Get-MIRAssuranceSha256 -Path $Context.candidate)
     candidate_content_sha256=(Get-MIRAssuranceZipContentHash -Path $Context.candidate)
     package_source_sha256=[string]$fingerprint.material.package_source_sha256

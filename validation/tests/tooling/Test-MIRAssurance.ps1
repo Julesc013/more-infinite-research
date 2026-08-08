@@ -376,6 +376,31 @@ if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
 . $coreScript
+. (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
+$nfcText = "caf$([char]0x00E9)`npolicy`n"
+$nfdCrLfText = ([char]0xFEFF) + "cafe$([char]0x0301)`r`npolicy`r`n`r`n"
+$nfcDigest = Get-MIRAssuranceCanonicalTextDigest -Text $nfcText
+$nfdDigest = Get-MIRAssuranceCanonicalTextDigest -Text $nfdCrLfText
+if ([string]$nfcDigest.policy_id -ne "utf8-nfc-lf-final-newline-v1" -or
+    [string]$nfcDigest.sha256 -ne [string]$nfdDigest.sha256) {
+  throw "Canonical text identity must bind UTF-8/NFC/LF/stable-final-newline semantics across checkout forms."
+}
+$jsonA = '{"z":2,"a":{"y":1,"x":"caf\u00e9"}}' | ConvertFrom-Json
+$jsonB = "{`r`n  `"a`": {`"x`": `"cafe$([char]0x0301)`", `"y`": 1},`r`n  `"z`": 2`r`n}" | ConvertFrom-Json
+$jsonDigestA = Get-MIRAssuranceCanonicalJsonDigest -Value $jsonA
+$jsonDigestB = Get-MIRAssuranceCanonicalJsonDigest -Value $jsonB
+if ([string]$jsonDigestA.policy_id -ne "json-sorted-properties-utf8-nfc-lf-final-newline-v1" -or
+    [string]$jsonDigestA.sha256 -ne [string]$jsonDigestB.sha256) {
+  throw "Canonical JSON identity must ignore property order, formatting, line endings, and Unicode composition."
+}
+$script:repo = $RepoRoot
+$candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
+$candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
+if ($candidatePath -notmatch "/build/candidates/3\.2\.5/C32/[0-9a-f]{40}/more-infinite-research_3\.2\.5\.zip$" -or
+    $candidatePath -match "/dist/") {
+  throw "Default assurance candidates must be release/allocation/source-tree addressed outside immutable dist."
+}
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
   New-Item -ItemType Directory -Force -Path (Join-Path $externalTreeRoot "data") | Out-Null
@@ -462,9 +487,12 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
-  'Stage exact development candidate for isolated transfer',
-  'path: build/candidate/*.zip',
-  'path: build/candidate',
+  'Resolve content-addressed development candidate',
+  'build/candidates/[0-9]+\.[0-9]+\.[0-9]+/',
+  'path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}',
+  'mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}',
+  'mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}',
+  'mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
@@ -480,6 +508,15 @@ foreach ($requiredWorkflowSnippet in @(
 }
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
+}
+foreach ($typedStatus in @("upstream-plan-failed", "infrastructure-failed", "worker-artifacts-received")) {
+  if (-not $validateWorkflow.Contains($typedStatus)) {
+    throw "Hosted validation workflow does not preserve typed aggregate status: $typedStatus"
+  }
+}
+if ($validateWorkflow -notmatch "needs\.plan\.result == 'success'" -or
+    $validateWorkflow -notmatch "needs\.plan\.result != 'success'") {
+  throw "Hosted validation must not reinterpret an upstream plan failure as missing worker evidence."
 }
 if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
   throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."
@@ -544,6 +581,54 @@ foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/res
   if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
     throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"
   }
+}
+
+$equivalenceRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N"))
+$plannerRoot = Join-Path $equivalenceRoot "planner"
+$workerRoot = Join-Path $equivalenceRoot "worker"
+$pwshPath = (Get-Process -Id $PID).Path
+try {
+  New-Item -ItemType Directory -Force -Path $equivalenceRoot | Out-Null
+  & git -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
+  & git -c core.autocrlf=true clone --quiet --no-hardlinks $RepoRoot $workerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
+
+  foreach ($root in @($plannerRoot, $workerRoot)) {
+    & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
+    if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
+  }
+
+  # A normal planner must not consume mutable worktree bytes from published
+  # dist. Corrupt one worker-root copy after the isolated candidate exists.
+  $dirtyPublicDist = Join-Path $workerRoot "dist\more-infinite-research_3.2.5.zip"
+  $stream = [IO.File]::Open($dirtyPublicDist, [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
+  try { $stream.WriteByte(0) } finally { $stream.Dispose() }
+  if (@(& git -C $workerRoot status --porcelain -- dist).Count -ne 1) {
+    throw "Separate-root regression did not create the intended dirty published-dist decoy."
+  }
+
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json
+  if ($LASTEXITCODE -ne 0) { throw "Planner-root verification plan failed." }
+  & $pwshPath -NoProfile -File (Join-Path $workerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json
+  if ($LASTEXITCODE -ne 0) { throw "Worker-root verification plan reconstruction failed." }
+
+  $plannerPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot "build\results\assurance\verification-plan.json") | ConvertFrom-Json
+  $workerPlan = Get-Content -Raw -LiteralPath (Join-Path $workerRoot "build\results\assurance\verification-plan.json") | ConvertFrom-Json
+  if ([string]$plannerPlan.plan_material_sha256 -ne [string]$workerPlan.plan_material_sha256) {
+    throw "Separate roots produced different canonical plan material."
+  }
+  $plannerFingerprints = @($plannerPlan.tests | Sort-Object id | ForEach-Object { "$($_.id)`t$($_.fingerprint.fingerprint_sha256)" })
+  $workerFingerprints = @($workerPlan.tests | Sort-Object id | ForEach-Object { "$($_.id)`t$($_.fingerprint.fingerprint_sha256)" })
+  if (@(Compare-Object $plannerFingerprints $workerFingerprints).Count -ne 0) {
+    throw "Separate roots produced different exact test fingerprints."
+  }
+  if ([string]$plannerPlan.candidate_descriptor.sha256 -ne [string]$workerPlan.candidate_descriptor.sha256 -or
+      [string]$plannerPlan.candidate_descriptor.content_sha256 -ne [string]$workerPlan.candidate_descriptor.content_sha256) {
+    throw "Separate roots did not preserve exact isolated candidate identity."
+  }
+} finally {
+  if (Test-Path -LiteralPath $equivalenceRoot) { Remove-Item -LiteralPath $equivalenceRoot -Recurse -Force }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."
