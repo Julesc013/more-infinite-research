@@ -168,8 +168,10 @@ function New-MIRCPLegacyReleaseLedger {
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $policy = Get-MIRCPPolicy -RepoRoot $repo
   $pointer = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo
-  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.canonical) -RepoRoot $repo
-  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
+  $canonicalRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_canonical"]) { "planned_canonical" } else { "canonical" }
+  $backportRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_backport"]) { "planned_backport" } else { "backport_calibration" }
+  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
+  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$backportRole) -RepoRoot $repo
   $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_1) -RepoRoot $repo
   $publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_0) -RepoRoot $repo
   $updated = @($canonical.updated_at, $backport.updated_at, $publishedModern.updated_at, $publishedBackport.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)
@@ -458,8 +460,10 @@ function Update-MIRCPViews {
   $incidents = @(Get-MIRCPRecordSet -Kind incidents -RepoRoot $repo)
   $tasks = @(Get-MIRCPRecordSet -Kind tasks -RepoRoot $repo)
   $incidentReconciliation = Read-MIRCPJson -Path ".mir/releases/terminal/MIR3-Terminal-Incident-ReconciliationV1.json" -RepoRoot $repo
-  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.canonical) -RepoRoot $repo
-  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
+  $canonicalRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_canonical"]) { "planned_canonical" } else { "canonical" }
+  $backportRole = if ($null -ne $pointer.roles.PSObject.Properties["planned_backport"]) { "planned_backport" } else { "backport_calibration" }
+  $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
+  $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$backportRole) -RepoRoot $repo
   $terminalReleases = @($pointer.planned_releases | ForEach-Object { Get-MIRCPReleaseByVersion -Release ([string]$_) -RepoRoot $repo })
   $reviewDate = (@($releases.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)[0]).ToString("yyyy-MM-dd")
 
