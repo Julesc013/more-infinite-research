@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "MirLocalCandidateQualificationV1",
+  "status": "target-local-qualified",
+  "generated_at": "2026-08-07T02:30:00Z",
+  "version": "1.9.5",
+  "factorio_target": "1.1",
+  "source": {
+    "qualification_commit": "48dd671e9a2b5ab37d1676fbbd7254ce30c046fb",
+    "qualification_tree": "aa694296eb2da0d3212b68b26c456f67e0caa632",
+    "package_source_commit": "ca194c7765e1375c522996d224a9cb0309bc6c90",
+    "package_source_tree": "b4721ba79b8d627fcfddd46627cf9761a0dd09bd",
+    "baseline_tag": "1.9.4",
+    "portable_source_commit": "1281ac96a3991d0e26cd298c5d40492a47b588f6"
+  },
+  "package": {
+    "path": "build/candidates/1.9.5/a/more-infinite-research_1.9.5.zip",
+    "archive_sha256": "9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC",
+    "content_sha256": "8C8A76EEBFCA52B4A4D401565F08BFD52A285A14837CCC0A65AC689B8F80E9CA",
+    "bytes": 397597,
+    "entries": 174,
+    "deterministic_double_build": "passed",
+    "forbidden_entries": 0
+  },
+  "engine": {
+    "version": "1.1.110.62357",
+    "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+  },
+  "verification": {
+    "plan_path": "build/reports/release/1.9.5/verification-plan.json",
+    "plan_sha256": "746F8D131E2E966128913C971BABA57E003B0E07FE2578B3D72BF9334AEE2B83",
+    "selected_rows": 12,
+    "unknown_paths": 0,
+    "reuse_enabled": false,
+    "result_path": "build/reports/release/1.9.5/verification-result.json",
+    "result_sha256": "DED7F2F6833AA0B7209939B2EC475055BFBD60A8B9D99D343D2038461FD1D6B2",
+    "result": "passed",
+    "evidence_rows": 11,
+    "failed_rows": 0,
+    "exact_zip_disposition": "subsumed-by-passing-runtime.full"
+  },
+  "gates": {
+    "docs": "passed",
+    "runtime_full": "passed",
+    "runtime_exact_zip": "passed",
+    "upgrade_1_9_4_to_1_9_5": "passed",
+    "architecture": "passed",
+    "balance": "passed",
+    "compiler": "passed",
+    "static_full": "passed",
+    "locales": "passed",
+    "package": "passed",
+    "settings": "passed",
+    "tooling": "passed",
+    "factorio_processes_after": 0
+  },
+  "publication": {
+    "tag": "1.9.5",
+    "tag_status": "blocked-pending-immutable-local-3.2.5-source-parent",
+    "dist_status": "withheld-until-outage-seal",
+    "remote_status": "not-attempted-during-outage"
+  }
+}

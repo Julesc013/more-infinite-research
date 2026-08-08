@@ -6,7 +6,7 @@
   "integration": { "strategy": "dual-parent-target-projection-v1", "commit": "c6692980dc9f5a1332a7888da33385a0107ae004", "first_parent": "9d9095c92055aebe557a55a7ab99bb9588fe73fb", "second_parent": "62fddd86b51db7c0238731815d15ca26a4b45857" },
   "proofs": {
     "source_freeze": [{ "kind": "wave-local-qualification-inventory", "path": ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json" }],
-    "candidate_qualification": [{ "kind": "historical-automated-target-qualification", "path": "build/archive/mir-3.5-qualified-projections-blocked-20260807T1048Z/qualification/1.7.5-local-candidate-qualification.json", "sha256": "DEC5E26CB007A81DB4F2A8ACC561C60669BF418418A0A26162795EDE1EF2820B", "result": "passed-12-selected-no-reuse" }],
+    "candidate_qualification": [{ "kind": "historical-automated-target-qualification", "path": ".mir/evidence/archive/mir3-dot5-local-qualification/1.7.5-local-candidate-qualification.json", "sha256": "DEC5E26CB007A81DB4F2A8ACC561C60669BF418418A0A26162795EDE1EF2820B", "result": "passed-12-selected-no-reuse" }],
     "backport_reconstruction": [{ "kind": "deterministic-two-parent-lineage", "path": ".mir/releases/waves/MIR-3.5-Lineage-Finalization.json", "sha256": "EC42486E7F8788CAAF4E1A41782778A8C335A773E6F4D6DBDEFAB96D042BFB1A", "digest_policy": "utf8-lf" }],
     "publication_exception": [{ "kind": "wave-timeboxed-maintainer-decision", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "digest_policy": "utf8-lf" }],
     "tag": [{ "kind": "annotated-tag", "name": "1.7.5", "commit": "c6692980dc9f5a1332a7888da33385a0107ae004", "tag_object": "80fd8d379b1073f4bc9d6d9baff3ffa0316b6d8a" }],

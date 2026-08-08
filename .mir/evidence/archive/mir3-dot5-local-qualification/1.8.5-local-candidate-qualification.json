@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "MirLocalCandidateQualificationV1",
+  "status": "target-local-qualified",
+  "version": "1.8.5",
+  "factorio_target": "1.0",
+  "qualification_commit": "2c70c8e8654f24227fba60f3f9c6cfff5e544b57",
+  "qualification_tree": "a957b4e50da6c428154fc7a4aeb7217613255c73",
+  "package_source_commit": "dd2d3c8924fdb2c6cc4d8ad068b42b31b9d10bcb",
+  "package": {
+    "path": "build/candidates/1.8.5/a/more-infinite-research_1.8.5.zip",
+    "archive_sha256": "10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD",
+    "content_sha256": "F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B",
+    "bytes": 397589,
+    "entries": 174,
+    "deterministic_double_build": "passed"
+  },
+  "engine": {
+    "version": "1.0.0.54889",
+    "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+  },
+  "verification": {
+    "plan_sha256": "BFD411FC4791373A33D974CA778A87AEABB5BBA9461F6390A560B8C27575F1B7",
+    "selected_rows": 12,
+    "unknown_paths": 0,
+    "reuse_enabled": false,
+    "result_sha256": "3A9B59E371A2536C6AF483B24AD116E684244D4BC0E6D88102EEE86BE44C0E9C",
+    "result": "passed",
+    "failed_rows": 0,
+    "upgrade": "1.8.2-to-1.8.5-passed",
+    "factorio_processes_after": 0
+  },
+  "publication": {
+    "tag_status": "blocked-pending-immutable-local-3.2.5-source-parent",
+    "dist_status": "withheld-until-outage-seal",
+    "remote_status": "not-attempted-during-outage"
+  }
+}
