@@ -5,6 +5,9 @@
   "recorded_at": "2026-08-08T23:45:00+10:00",
   "status": "active-intake-no-product-admission",
   "implementation_admitted": false,
+  "finding_records": [
+    ".mir/releases/terminal/findings/MIR3-TERM-0006.json"
+  ],
   "target_wave": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
   "items": [
     {
