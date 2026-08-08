@@ -7,15 +7,32 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
 
 function Assert-MIRFreezeFileBinding {
-  param([Parameter(Mandatory)]$Binding)
+  param([Parameter(Mandatory)]$Binding, [Parameter(Mandatory)][string]$Commit)
   $relative = [string]$Binding.path
-  $path = Join-Path $repo $relative
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-    throw "Source-freeze authority is missing: $relative"
+  $start = [Diagnostics.ProcessStartInfo]::new()
+  $start.FileName = "git"
+  $start.UseShellExecute = $false
+  $start.RedirectStandardOutput = $true
+  $start.RedirectStandardError = $true
+  foreach ($argument in @("-C", $repo, "cat-file", "blob", "${Commit}:$relative")) { [void]$start.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::Start($start)
+  $memory = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($memory)
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Source-freeze authority is absent from ${Commit}: $relative" }
+    $bytes = $memory.ToArray()
+  } finally {
+    $memory.Dispose()
+    $process.Dispose()
   }
-  $actual = Get-MIRFileContentSha256 -Path $path -RelativePath $relative
+  $actual = if (Test-MIRTextFingerprintPath -RelativePath $relative) {
+    (Get-MIRNormalizedTextIdentity -Text ([Text.UTF8Encoding]::new($false).GetString($bytes))).Sha256
+  } else {
+    [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  }
   if ($actual -ne [string]$Binding.sha256) {
-    throw "Source-freeze authority hash changed: $relative"
+    throw "Source-freeze authority hash disagrees with ${Commit}: $relative"
   }
 }
 
@@ -80,10 +97,10 @@ if ((Test-Path -LiteralPath $supersededArchive -PathType Leaf) -or $supersededLo
 }
 
 foreach ($binding in @($packet.product_contract.authorities) + @($packet.qualification_authority.authorities) + @($packet.documentation.authorities)) {
-  Assert-MIRFreezeFileBinding -Binding $binding
+  Assert-MIRFreezeFileBinding -Binding $binding -Commit $sourceCommit
 }
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder -Commit $sourceCommit
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation -Commit $sourceCommit
 if (@($packet.product_contract.factorio_2_0_dispositions).Count -ne 9 -or
     @($packet.product_contract.factorio_2_0_dispositions | Where-Object {
       [string]$_.classification -notin @(
