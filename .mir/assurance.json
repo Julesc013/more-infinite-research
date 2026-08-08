@@ -69,12 +69,12 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|TerminalGovernance))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIRRelease(?:Authority|WorkReconciliation))\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|TerminalGovernance))\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
@@ -84,7 +84,7 @@
     },
     {
       "id": "release-governance",
-      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(?:lifecycle/(?:changes|incidents)|releases/(?:records|reconciliations|freezes|transitions|waves))/", "^\\.mir/control-plane/package-locks\\.json$", "^\\.mir/(portable-return|release-wave)\\.yml$"],
+      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(?:lifecycle/(?:changes|incidents)|releases/(?:records|reconciliations|freezes|transitions|waves|terminal))/", "^\\.mir/control-plane/package-locks\\.json$", "^\\.mir/(portable-return|release-wave)\\.yml$"],
       "tests": ["docs.check", "tooling.self-test", "static.release-history", "static.full", "static.package"]
     },
     {

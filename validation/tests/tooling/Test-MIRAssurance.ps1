@@ -11,6 +11,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot 
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
 & (Join-Path $RepoRoot "validation\tests\tooling\Test-MIRVerificationSchemas.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }
+& (Join-Path $RepoRoot "validation\tests\release\Test-MIRTerminalGovernance.ps1") -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { throw "MIR terminal governance validation failed." }
 
 $config = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\assurance.json") | ConvertFrom-Json
 $impact = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\test-impact.yml") | ConvertFrom-Json

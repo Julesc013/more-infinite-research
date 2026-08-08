@@ -6,10 +6,17 @@ Generated: 2026-08-08
 
 ## Release queue
 
-| Release | Candidate | Reserved floor | State | Next required state |
+| Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.9` | `not-assigned` | `C33` | `planned` | `source-frozen` |
-| `2.5.9` | `not-assigned` | `2.5-P13` | `planned` | `source-frozen` |
+| `3.2.9` | `not-assigned` | `C / 33` | `planned` | `source-frozen` |
+| `2.5.9` | `not-assigned` | `2.5-P / 13` | `planned` | `source-frozen` |
+| `1.9.9` | `not-assigned` | `1.9-P / 1` | `planned` | `source-frozen` |
+| `1.8.9` | `not-assigned` | `1.8-P / 1` | `planned` | `source-frozen` |
+| `1.7.9` | `not-assigned` | `1.7-P / 1` | `planned` | `source-frozen` |
+| `1.6.9` | `not-assigned` | `1.6-P / 1` | `planned` | `source-frozen` |
+| `1.5.9` | `not-assigned` | `1.5-P / 1` | `planned` | `source-frozen` |
+| `1.4.9` | `not-assigned` | `1.4-P / 1` | `planned` | `source-frozen` |
+| `1.3.9` | `not-assigned` | `1.3-P / 1` | `planned` | `source-frozen` |
 
 ## Canonical execution programme
 
@@ -23,13 +30,12 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 | --- | --- | --- |
 | `T9-A` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |
 | `T9-B` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |
-| `T9-C` canonical 3.2.9 | Planning only; candidate floor `C33` | Admit scope, freeze exact source, assign a candidate, qualify under normal policy, seal, promote, publish, and verify the downloaded Factorio 2.1 asset |
-| `T9-D` lower .9 projections | Planning only | Materialize each target independently from its immutable .5 predecessor plus immutable portable .9 source, then prove exact tree, package, transition, engine, tag, and public-asset identity |
+| `T9-C` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |
+| `T9-D` family qualification and seals | Planning only; every candidate unassigned | Freeze after fixed point, allocate candidates, independently qualify and seal all nine, then create one family-readiness seal before any public tag |
 | `T9-E` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |
 
 | Planned change | Package visible | Targets | Completion boundary |
 | --- | --- | --- | --- |
-| `CHG-2026-0013` | `false` | `factorio-2.1`, `factorio-2.0` | Evolve Control Plane v5 with CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observations, bounded pure evaluators, exact batching exclusions, explicit freshness, and separated external-mod runner, aggregator, and publisher roles. |
 | `CHG-2026-0020` | `true` | `factorio-2.1`, `factorio-2.0`, `factorio-1.1`, `factorio-1.0`, `factorio-0.17`, `factorio-0.16`, `factorio-0.15`, `factorio-0.14`, `factorio-0.13` | Use immutable .5 releases as the only public predecessors; admit only defect correction, stabilization, archival, and MIR 4 handoff work; assign candidate identities only after exact source freeze; preserve stable public identities unless an admitted defect requires a governed migration; independently materialize and qualify every lower target; prohibit .6 through .8; and route feature or platform redesign to MIR 4. |
 
 ## Executable TaskNodes
@@ -86,23 +92,19 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 | Record | Type | State | Title |
 | --- | --- | --- | --- |
-| `CHG-2026-0013` | `change/tooling` | `planned` | Build proposition-bound Merkle assurance and isolated execution |
 | `CHG-2026-0020` | `change/release` | `planned` | Deliver the unified MIR 3 terminal .9 stabilization wave |
-| `INC-2026-0035` | `incident` | `pending-external-issue-close` | Pyanodon casting unlock startup failure |
-| `INC-2026-0041` | `incident` | `pending-release-qualification` | Ice and platform productivity progression preceded Aquilo access |
-| `INC-2026-0042` | `incident` | `pending-release-qualification` | Modded logistics recipes were omitted when names did not match fixed tiers |
-| `INC-2026-0045` | `incident` | `pending-complete-c30-release-qualification` | C29 structural fallback ignored the disabled automatic-productivity action |
-| `INC-2026-0046` | `incident` | `c24-calibration-passed-pending-complete-c30-qualification` | New-candidate verification context omitted a Factorio installation lock |
-| `INC-2026-0047` | `incident` | `pending-exact-c30-upgrade-and-complete-qualification` | C30 context selected the stale C24 upgrade transition |
-| `INC-2026-0048` | `incident` | `pending-exact-c30-delta-performance-and-complete-qualification` | C30 qualification had no exact delta or performance campaign authority |
-| `INC-2026-0049` | `incident` | `c24-cutover-accepted-pending-c30-requalification` | Non-calibration release shadow evaluation required a nonexistent v4 baseline |
-| `INC-2026-0052` | `incident` | `pending-exact-protected-c30-dispatch` | Canonical protected workflow had no registered default-branch dispatcher |
-| `INC-2026-0054` | `incident` | `development-runtime-proof-passed-pending-complete-regression-proof` | Runtime research progress conversion loses completed work |
-| `INC-2026-0055` | `incident` | `repair-implemented-pending-hosted-regression-proof` | Generated execution registry uses stale checkout-dependent source hashes |
-| `INC-2026-0057` | `incident` | `local-exact-upgrade-proof-passed-pending-hosted-and-breadth` | Base-continuation cost migration changes stable coefficient semantics |
-| `INC-2026-0058` | `incident` | `local-repair-pending-source-bound-ecosystem-and-breadth-proof` | Release-targeted ecosystem profiles referenced retired scenario paths |
-| `INC-2026-0059` | `incident` | `local-repair-pending-focused-and-hosted-static-proof` | Output-root migration preview required an untracked legacy task directory |
-| `INC-2026-0060` | `incident` | `local-repair-pending-source-bound-ecosystem-and-breadth-proof` | Base-only ecosystem smokes reached Ice productivity science selection |
+| `INC-2026-0035` | `incident` | `published-fix-external-issue-close-pending` | Pyanodon casting unlock startup failure |
+| `INC-2026-0046` | `incident` | `published-dot5-protected-calibration-pending` | New-candidate verification context omitted a Factorio installation lock |
+| `INC-2026-0047` | `incident` | `published-dot5-protected-calibration-pending` | C30 context selected the stale C24 upgrade transition |
+| `INC-2026-0048` | `incident` | `published-dot5-protected-calibration-pending` | C30 qualification had no exact delta or performance campaign authority |
+| `INC-2026-0049` | `incident` | `published-dot5-protected-calibration-pending` | Non-calibration release shadow evaluation required a nonexistent v4 baseline |
+| `INC-2026-0052` | `incident` | `published-dot5-protected-calibration-pending` | Canonical protected workflow had no registered default-branch dispatcher |
+| `INC-2026-0054` | `incident` | `published-dot5-protected-calibration-pending` | Runtime research progress conversion loses completed work |
+| `INC-2026-0055` | `incident` | `published-dot5-hosted-transport-calibration-pending` | Generated execution registry uses stale checkout-dependent source hashes |
+| `INC-2026-0057` | `incident` | `published-dot5-protected-calibration-pending` | Base-continuation cost migration changes stable coefficient semantics |
+| `INC-2026-0058` | `incident` | `published-dot5-ecosystem-calibration-pending` | Release-targeted ecosystem profiles referenced retired scenario paths |
+| `INC-2026-0059` | `incident` | `published-dot5-hosted-transport-calibration-pending` | Output-root migration preview required an untracked legacy task directory |
+| `INC-2026-0060` | `incident` | `published-dot5-ecosystem-calibration-pending` | Base-only ecosystem smokes reached Ice productivity science selection |
 
 ## Explicit release obligations
 
@@ -114,3 +116,31 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 - [ ] `bind-final-terminal-delta` for `2.5.9`
 - [ ] `materialize-and-qualify-factorio-2.0-projection` for `2.5.9`
 - [ ] `normal-manual-protected-seal-promotion-publication-gates` for `2.5.9`
+- [ ] `bind-terminal-delta` for `1.9.9`
+- [ ] `materialize-deterministic-integration` for `1.9.9`
+- [ ] `qualify-factorio-1.1` for `1.9.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.9.9`
+- [ ] `bind-terminal-delta` for `1.8.9`
+- [ ] `materialize-deterministic-integration` for `1.8.9`
+- [ ] `qualify-factorio-1.0-only` for `1.8.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.8.9`
+- [ ] `bind-terminal-delta` for `1.7.9`
+- [ ] `materialize-deterministic-integration` for `1.7.9`
+- [ ] `qualify-factorio-0.17` for `1.7.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.7.9`
+- [ ] `bind-terminal-delta` for `1.6.9`
+- [ ] `materialize-deterministic-integration` for `1.6.9`
+- [ ] `qualify-factorio-0.16` for `1.6.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.6.9`
+- [ ] `bind-terminal-delta` for `1.5.9`
+- [ ] `materialize-deterministic-integration` for `1.5.9`
+- [ ] `qualify-factorio-0.15` for `1.5.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.5.9`
+- [ ] `bind-terminal-delta` for `1.4.9`
+- [ ] `materialize-deterministic-integration` for `1.4.9`
+- [ ] `qualify-factorio-0.14` for `1.4.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.4.9`
+- [ ] `bind-terminal-delta` for `1.3.9`
+- [ ] `materialize-deterministic-integration` for `1.3.9`
+- [ ] `qualify-factorio-0.13` for `1.3.9`
+- [ ] `tag-publish-and-publicly-verify` for `1.3.9`
