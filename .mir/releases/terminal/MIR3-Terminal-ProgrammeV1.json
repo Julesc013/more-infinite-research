@@ -11,6 +11,7 @@
     "target_matrix": ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json",
     "baseline_capture_queue": ".mir/releases/terminal/MIR3-Terminal-Baseline-Capture-QueueV1.json",
     "incident_reconciliation": ".mir/releases/terminal/MIR3-Terminal-Incident-ReconciliationV1.json",
+    "repository_protections": ".mir/releases/terminal/MIR3-Terminal-Protection-HandoffV1.json",
     "change_set": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
     "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
