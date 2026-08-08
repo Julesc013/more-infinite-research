@@ -17,6 +17,17 @@ function Get-Sha256Bytes([byte[]]$Bytes) {
   try { return ([BitConverter]::ToString($sha.ComputeHash($Bytes))).Replace("-", "") } finally { $sha.Dispose() }
 }
 
+function Get-CanonicalTextFileBytes([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path)
+  $text = $text -replace "`r`n", "`n"
+  $text = $text -replace "`r", "`n"
+  return [Text.UTF8Encoding]::new($false).GetBytes($text)
+}
+
+function Get-CanonicalTextFileSha256([string]$Path) {
+  return Get-Sha256Bytes (Get-CanonicalTextFileBytes $Path)
+}
+
 function Write-CanonicalJson([string]$Path, $Value) {
   $parent = Split-Path -Parent $Path
   New-Item -ItemType Directory -Force -Path $parent | Out-Null
@@ -124,7 +135,7 @@ $material = [ordered]@{
   generated_by = [ordered]@{
     path = "scripts/Export-MIRTerminalBaselineMatrix.ps1"
     version = "2"
-    sha256 = (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
+    sha256 = Get-CanonicalTextFileSha256 $PSCommandPath
   }
   release_order = $releaseOrder
   releases = @($releaseRecords)
