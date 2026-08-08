@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0009",
+  "title": "C32 performance campaign retains superseded engine authority",
+  "source_observation": {
+    "observed_at": "2026-08-09T08:18:59+10:00",
+    "environment": "Windows exact C32 full no-reuse post-publication calibration on dev 5509a562 with Factorio 2.1.13",
+    "fact": "The fresh 137-row campaign passed 135 rows, then the performance worker rejected exact Factorio 2.1.13 because the C32 versioned performance campaign still required superseded Factorio 2.1.12 even though the C32 freeze and qualification profile were formally rebound to 2.1.13."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\tools\\mir.ps1 verify run --target 2.1 --candidate dist/more-infinite-research_3.2.5.zip --prior dist/more-infinite-research_3.2.3.zip --factorio <exact-2.1.13> --no-reuse --plan build/results/terminal-325-post-publication-plan-v3.json",
+    "expected": "The exact versioned C32 performance campaign uses the same 2.1.13 engine authority as the active C32 qualification profile and freshly compares immutable 3.2.3 and 3.2.5 archives on that one installation.",
+    "observed": "runtime.performance-regression stopped with 'Performance campaign requires Factorio 2.1.12, found 2.1.13' after 135 fresh rows passed; no performance samples were admitted."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; package-excluded versioned performance campaign authority and its regression guard only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "current-line terminal calibration must bind one internally consistent exact-engine authority"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "independent 2.0 performance campaign must bind its target qualification engine"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS performance authority must not drift from target qualification authority"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS performance authority must not drift from target qualification authority"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical target performance authority is target-local when applicable"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical target performance authority is target-local when applicable"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical target performance authority is target-local when applicable"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite target resource-sanity authority is target-local when applicable"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite target resource-sanity authority is target-local when applicable"}
+  ],
+  "regression_obligations": [
+    "the active versioned performance campaign Factorio version equals the active qualification profile version",
+    "historical root and committed 2.1.12 performance evidence remain unchanged",
+    "a fresh paired C32 performance campaign runs both immutable archives on exact Factorio 2.1.13",
+    "the immutable 3.2.5 package archive remains byte-identical"
+  ],
+  "fixed_point_restart_scope": "current-line performance and aggregate assurance proofs produced after this correction; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The conflict is reproduced, bounded to the package-excluded active campaign authority omitted from the prior 2.1.13 rebind, and correctable without changing product source, historical evidence, or frozen package bytes."
+  },
+  "closure": {
+    "status": "implementation-awaiting-proof",
+    "evidence": null
+  }
+}
