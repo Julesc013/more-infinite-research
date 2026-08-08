@@ -4,6 +4,42 @@ $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path }
 . (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1")
 . (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
+
+$testRoot = Join-Path $RepoRoot "build\results\terminal-engine-observation-test"
+$resolvedBuildRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot "build")).Path.TrimEnd('\') + '\'
+if (Test-Path -LiteralPath $testRoot) {
+  $resolvedTestRoot = (Resolve-Path -LiteralPath $testRoot).Path
+  if (-not $resolvedTestRoot.StartsWith($resolvedBuildRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to replace terminal engine-observation test output outside build/."
+  }
+  Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force
+}
+New-Item -ItemType Directory -Force -Path $testRoot | Out-Null
+$probeSources = @(
+  (Join-Path $RepoRoot "scripts\Export-MIRTerminalEngineObservation.ps1"),
+  (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1")
+)
+try {
+  foreach ($probeSource in $probeSources) {
+    $probePath = Join-Path $testRoot ([IO.Path]::GetFileName($probeSource))
+    $probeText = [IO.File]::ReadAllText($probeSource).Replace("`r`n", "`n").Replace("`r", "`n")
+    [IO.File]::WriteAllText($probePath, $probeText.Replace("`n", "`r`n"), [Text.UTF8Encoding]::new($false))
+    if ((Get-MIRAssuranceCanonicalTextFileHash -Path $probePath) -ne (Get-MIRAssuranceCanonicalTextFileHash -Path $probeSource)) {
+      throw "Terminal engine-observation tool identity is not invariant across LF and CRLF checkouts: $([IO.Path]::GetFileName($probeSource))"
+    }
+    if ((Get-FileHash -LiteralPath $probePath -Algorithm SHA256).Hash -eq (Get-MIRAssuranceCanonicalTextFileHash -Path $probePath)) {
+      throw "Terminal engine-observation line-ending probe did not exercise distinct CRLF physical bytes: $([IO.Path]::GetFileName($probeSource))"
+    }
+  }
+} finally {
+  if (Test-Path -LiteralPath $testRoot) {
+    $resolvedTestRoot = (Resolve-Path -LiteralPath $testRoot).Path
+    if ($resolvedTestRoot.StartsWith($resolvedBuildRoot, [StringComparison]::OrdinalIgnoreCase)) {
+      Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force
+    }
+  }
+}
 
 $dataRaw = [pscustomobject][ordered]@{
   technology = [pscustomobject][ordered]@{
@@ -46,8 +82,8 @@ $evidenceRoot = Join-Path $RepoRoot ".mir\evidence\terminal\baselines"
 if (Test-Path -LiteralPath $evidenceRoot -PathType Container) {
   $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
   $verification = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-PUBLIC-ASSET-VERIFICATION.json") | ConvertFrom-Json -Depth 100
-  $toolSha = (Get-FileHash -LiteralPath (Join-Path $RepoRoot "scripts\Export-MIRTerminalEngineObservation.ps1") -Algorithm SHA256).Hash
-  $normalizerSha = (Get-FileHash -LiteralPath (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1") -Algorithm SHA256).Hash
+  $toolSha = Get-MIRAssuranceCanonicalTextFileHash -Path (Join-Path $RepoRoot "scripts\Export-MIRTerminalEngineObservation.ps1")
+  $normalizerSha = Get-MIRAssuranceCanonicalTextFileHash -Path (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1")
   foreach ($file in @(Get-ChildItem -LiteralPath $evidenceRoot -Filter "*-engine-observation.json" -File | Sort-Object Name)) {
     $observation = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json -Depth 100
     $waveRows = @($wave.releases | Where-Object version -eq $observation.release)

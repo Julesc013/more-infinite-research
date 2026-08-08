@@ -14,6 +14,7 @@ if (-not $WorkRoot) { $WorkRoot = Join-Path $RepoRoot "build\terminal\engine-obs
 
 . (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1")
 . (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 
 function Write-MIRTerminalJson([string]$Path, $Value) {
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
@@ -206,8 +207,8 @@ $record = [ordered]@{
   official_data_sha256=[string]$installation.official_data.sha256;
   installation_sha256=[string]$installation.installation_sha256;
   observer_protocol=1;
-  observer_tool_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash;
-  normalizer_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1") -Algorithm SHA256).Hash;
+  observer_tool_sha256=(Get-MIRAssuranceCanonicalTextFileHash -Path $PSCommandPath);
+  normalizer_sha256=(Get-MIRAssuranceCanonicalTextFileHash -Path (Join-Path $RepoRoot "tools\lib\terminal\TerminalEngineObservation.ps1"));
   semantic_observation_sha256=$semanticSha256; mode="base-only-read-only-observer-after-data-final-fixes";
   technologies=@($inventory.technologies); effects_and_owners=@($inventory.effects_and_owners); settings=@($inventory.settings);
   capability_omissions=@(
