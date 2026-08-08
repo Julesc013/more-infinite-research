@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "CHG-2026-0013",
-  "title": "Build proposition-bound Merkle assurance and isolated execution",
+  "title": "Defer broad proposition-bound assurance architecture to MIR 4",
   "kind": "tooling",
   "package_visible": false,
   "domains_read": [
@@ -23,8 +23,8 @@
     "factorio-2.1",
     "factorio-2.0"
   ],
-  "migration_impact": "Evolve Control Plane v5 with CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observations, bounded pure evaluators, exact batching exclusions, explicit freshness, and separated external-mod runner, aggregator, and publisher roles.",
-  "release_note_impact": "Package-excluded assurance architecture; release documentation must identify reused propositions, fresh work, exact process grouping, isolation, revocation, and final no-reuse gates.",
+  "migration_impact": "MIR 4 deferred. The broad CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observation, evaluator, and runner architecture is outside MIR 3 terminal scope. Only separately recorded minimal terminal release-safety corrections may enter .9.",
+  "release_note_impact": "No MIR 3 package or release-note impact. The terminal programme records the bounded assurance corrections separately and preserves this architecture as MIR 4 work.",
   "test_obligations": [
     "assurance.control-plane",
     "assurance.plan",
@@ -35,8 +35,13 @@
     "ci.workflow"
   ],
   "backport_disposition": {
-    "factorio-2.1": "canonical v5 evolution without a verifier rewrite",
-    "factorio-2.0": "target-local observation and evaluation closures with no reuse of 2.1 runtime proof"
+    "factorio-2.1": "mir4-deferred; no broad architecture implementation in .9",
+    "factorio-2.0": "mir4-deferred; no broad architecture implementation in .9"
   },
-  "state": "planned"
+  "terminal_disposition": {
+    "status": "closed-as-terminal-scope",
+    "replacement": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json#MIR3-TERM-0005",
+    "mir4_handoff_required": true
+  },
+  "state": "closed"
 }

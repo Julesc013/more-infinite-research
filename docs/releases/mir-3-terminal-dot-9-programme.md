@@ -27,17 +27,17 @@ The programme is active as planning authority only. No `.9` candidate has been a
 
 ## Frozen starting point
 
-| `.9` release | Factorio target | Immutable predecessor | Reserved candidate floor | Promotion shape | Current public state |
+| `.9` release | Factorio target | Immutable predecessor | Candidate namespace / minimum next ordinal | Promotion shape | Current public state |
 | --- | --- | --- | --- | --- | --- |
-| `3.2.9` | `2.1` | `3.2.5` / C32 | `C33` | `dev` to fast-forward `main` | `3.2.5` publicly verified; protected debt retained |
-| `2.5.9` | `2.0` | `2.5.5` / `2.5-P12` | `2.5-P13` | deterministic projection to fast-forward `legacy` | `2.5.5` publicly verified; protected debt retained |
-| `1.9.9` | `1.1` | `1.9.5` | `1.9-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.8.9` | `1.0` only | `1.8.5` | `1.8-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.7.9` | `0.17` | `1.7.5` | `1.7-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.6.9` | `0.16` | `1.6.5` | `1.6-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.5.9` | `0.15` | `1.5.5` | `1.5-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.4.9` | `0.14` | `1.4.5` | `1.4-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.3.9` | `0.13` | `1.3.5` | `1.3-P1` | deterministic two-parent tag-only integration | publicly verified |
+| `3.2.9` | `2.1` | `3.2.5` / C32 | `C` / `33` | `dev` to fast-forward `main` | unassigned; `3.2.5` publicly verified with retained debt |
+| `2.5.9` | `2.0` | `2.5.5` / `2.5-P12` | `2.5-P` / `13` | deterministic projection to fast-forward `legacy` | unassigned; `2.5.5` publicly verified with retained debt |
+| `1.9.9` | `1.1` | `1.9.5` | `1.9-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.8.9` | `1.0` only | `1.8.5` | `1.8-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.7.9` | `0.17` | `1.7.5` | `1.7-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.6.9` | `0.16` | `1.6.5` | `1.6-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.5.9` | `0.15` | `1.5.5` | `1.5-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.4.9` | `0.14` | `1.4.5` | `1.4-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.3.9` | `0.13` | `1.3.5` | `1.3-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
 
 Factorio `0.18` support is not claimed for `1.8.5` or `1.8.9`. The `1.8.x` maintained line targets Factorio `1.0` only.
 
@@ -66,13 +66,13 @@ Record post-publication protected qualification for `3.2.5` and `2.5.5` when it 
 
 Collect every open product, package, migration, compatibility, locale, documentation, performance, and assurance finding. Bind each item to affected target lines, a reproducible proposition, migration impact, package visibility, and one of the dispositions above. Documentation-only ideas that alter the packaged README are still package-visible for `.9` planning.
 
-### T9-C: implement and qualify `3.2.9`
+### T9-C: implement the admitted change set and reach the all-nine fixed point
 
-Implement only admitted defect corrections and stabilization work on `dev`. Preserve stable technology, setting, locale, profile, migration, and runtime-state identities unless a named defect requires a governed migration. Freeze one exact C33-or-later candidate, reconstruct its package deterministically, qualify the exact package on the locked Factorio 2.1 environment, obtain normal manual and protected evidence, seal it, fast-forward `main`, publish it, and verify downloaded public bytes.
+Implement only admitted defect corrections and stabilization work on `dev`. Preserve stable technology, setting, locale, profile, migration, and runtime-state identities unless a named defect requires a governed migration. Materialize all nine target shadows and repeat target-tier sweeps until one complete sweep produces no new shared product fix, reusable tooling fix, higher-target-affecting profile fix, package-governance fix, or unexplained semantic drift. Do not freeze source or assign a candidate before the accepted fixed-point receipt exists.
 
-### T9-D: project and qualify the lower `.9` releases
+### T9-D: freeze, assign, qualify, and seal the complete family
 
-After immutable `3.2.9` exists, materialize each lower integration from its exact `.5` predecessor and the immutable portable `.9` source. Require exact target-tree reconstruction, package identity, direct predecessor upgrade or transition proof where applicable, target-engine loads, target-tier qualification, tag integrity, and downloaded public-asset verification. Process targets in descending order: `2.5.9`, `1.9.9`, `1.8.9`, `1.7.9`, `1.6.9`, `1.5.9`, `1.4.9`, then `1.3.9`.
+After fixed-point acceptance, freeze the common source and assign the next monotonic candidate in each namespace. Qualify and seal all nine independently before creating the first public tag. Lower integrations use their exact `.5` predecessor as first parent and the exact frozen `3.2.9` release commit as second parent; that commit need not be publicly tagged while qualification runs. Require exact target-tree reconstruction, package identity, direct predecessor and pre-`.5` upgrade or transition proof, target-engine loads, and target-tier review/seal depth.
 
 ### T9-E: archive MIR 3 and hand off to MIR 4
 
@@ -80,14 +80,14 @@ When all admitted `.9` work is terminal, freeze the MIR 3 source, package, migra
 
 ## Release sequence
 
-1. Maintain the `.5` tags and packages unchanged while package-excluded assurance debt is reconciled.
-2. Freeze the unified finding inventory and target dispositions.
+1. Capture all nine semantic `.5` baselines and maintain every `.5` tag/package unchanged.
+2. Admit only reproduced bounded changes with complete target dispositions.
 3. Implement portable corrections once on `dev`; keep target adapters explicit.
-4. Assign a candidate only after exact source freeze.
-5. Qualify and publish `3.2.9` through the normal release policy.
-6. Materialize, qualify, and publish lower `.9` releases one at a time from immutable parents.
-7. Stop only the affected target when its exact tree, package, transition, binary, tag, or public asset fails.
-8. Freeze the completed terminal wave and open MIR 4 from the handoff packet.
+4. Materialize all nine shadows and iterate to an accepted cross-target fixed point.
+5. Freeze the common source, then allocate—not guess—the next candidate IDs.
+6. Qualify and seal all nine targets; create the family-readiness seal only when every target seal is valid.
+7. Create all local signed annotated tags, then push/publish under the controlled same-byte policy.
+8. Re-download and verify GitHub and Mod Portal bytes, archive the family, and open MIR 4 only through its entry gate.
 
 ## Gates
 

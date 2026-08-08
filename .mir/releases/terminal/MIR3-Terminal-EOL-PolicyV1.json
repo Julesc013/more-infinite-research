@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-EOL-PolicyV1",
+  "mir3_eol_requires": ["nine-publicly-verified-terminal-releases", "terminal-baseline-bundles-sealed", "mir-3-final-index-sealed", "museum-index-complete", "mir3-eol-record-sealed", "minimal-mir4-emergency-lane-proven"],
+  "post_eol": {"mir3_feature_development":false,"published_archive_mutation":false,"security_or_custody_corrections":"new-governed-release-only"},
+  "mir4_numbering": "deferred-to-mir4-adr",
+  "mir4_emergency_lane": ["import-one-terminal-baseline", "apply-one-bounded-correction", "generate-one-target-package", "run-target-local-proof", "seal-locally-offline", "publish-valid-4x-distribution"]
+}

@@ -68,17 +68,18 @@ Do not cascade lower releases from the previously processed lower release. Mater
 1. Reconcile retained `.5` assurance debt without rebuilding a published archive.
 2. Freeze the terminal finding inventory and target dispositions.
 3. Implement admitted portable work on `dev`.
-4. Freeze and qualify the exact `3.2.9` candidate under the normal policy.
-5. Promote `dev` to `main`, tag, publish, download, rehash, and exact-engine smoke the public asset.
-6. Materialize `2.5.9` from tag `2.5.5` plus the immutable portable `3.2.9` source, qualify it on Factorio 2.0, then fast-forward `legacy`.
-7. Materialize `1.9.9` through `1.3.9` independently in descending target order and qualify each on its exact engine.
-8. Archive the completed MIR 3 programme and create the MIR 4 handoff packet.
+4. Materialize all nine target shadows before source freeze and repeat the fixed-point sweep until its convergence checks pass.
+5. Freeze the common source only after the accepted fixed-point receipt; then assign the next candidate in each governed namespace.
+6. Qualify and seal `3.2.9` and every lower target independently before creating any public tag.
+7. Build each lower final integration from its `.5` predecessor plus the exact frozen `3.2.9` release commit. The second parent need not be publicly tagged during qualification.
+8. Create the family-readiness seal, create local signed annotated tags, then push/publish the already sealed family under the controlled same-byte policy.
+9. Download, rehash, and exact-engine smoke every public asset before archiving MIR 3 and creating the MIR 4 handoff packet.
 
 For a lower release integration, require:
 
 ```text
 first parent  = exact target-line .5 predecessor
-second parent = immutable canonical .9 source tag commit
+second parent = exact frozen 3.2.9 release commit (public tag not required during qualification)
 tree          = exact admitted target candidate tree
 ```
 

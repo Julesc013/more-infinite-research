@@ -3,6 +3,7 @@
   "release": "2.5.9",
   "candidate_id": "not-assigned",
   "candidate_floor": "2.5-P13",
+  "candidate_allocation": {"namespace":"2.5-P","predecessor_max_ordinal":12,"minimum_next_ordinal":13,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "2.0",
   "branch": "legacy",
   "development_branch": "dev",
