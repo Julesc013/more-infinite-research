@@ -308,7 +308,7 @@ foreach ($snippet in @("artifactVolumePolicy", "omitted-by-capability", "governe
   }
 }
 $harnessSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
-foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {
+foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", 'Alias("RepoRoot")', "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {
   if ($harnessSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance harness fingerprint does not bind the governed target-era scenario authority '$snippet'."
   }

@@ -1,11 +1,17 @@
 function Get-MIRPerformanceHarnessFiles {
   param(
-    [Parameter(Mandatory)][string]$ExecutionRoot,
-    [Parameter(Mandatory)][string]$TargetAuthorityRoot,
-    [Parameter(Mandatory)][string]$ManualScenariosRelativePath
+    [Parameter(Mandatory)][Alias("RepoRoot")][string]$ExecutionRoot,
+    [string]$TargetAuthorityRoot = "",
+    [string]$ManualScenariosRelativePath = ""
   )
 
   $execution = (Resolve-Path -LiteralPath $ExecutionRoot).Path
+  if ([string]::IsNullOrWhiteSpace($TargetAuthorityRoot)) { $TargetAuthorityRoot = $execution }
+  if ([string]::IsNullOrWhiteSpace($ManualScenariosRelativePath)) {
+    $campaignPath = Join-Path $TargetAuthorityRoot ".mir\performance-campaign.json"
+    if (-not (Test-Path -LiteralPath $campaignPath -PathType Leaf)) { throw "Performance harness campaign authority is absent." }
+    $ManualScenariosRelativePath = [string]((Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json).manual_scenarios)
+  }
   $target = (Resolve-Path -LiteralPath $TargetAuthorityRoot).Path
   $scenarioAuthority = $ManualScenariosRelativePath.Replace("\", "/")
   if ([IO.Path]::IsPathRooted($ManualScenariosRelativePath) -or
@@ -58,9 +64,9 @@ function Get-MIRPerformanceHarnessFiles {
 
 function Get-MIRPerformanceHarnessFingerprint {
   param(
-    [Parameter(Mandatory)][string]$ExecutionRoot,
-    [Parameter(Mandatory)][string]$TargetAuthorityRoot,
-    [Parameter(Mandatory)][string]$ManualScenariosRelativePath
+    [Parameter(Mandatory)][Alias("RepoRoot")][string]$ExecutionRoot,
+    [string]$TargetAuthorityRoot = "",
+    [string]$ManualScenariosRelativePath = ""
   )
 
   $rows = foreach ($entry in Get-MIRPerformanceHarnessFiles -ExecutionRoot $ExecutionRoot -TargetAuthorityRoot $TargetAuthorityRoot -ManualScenariosRelativePath $ManualScenariosRelativePath) {
