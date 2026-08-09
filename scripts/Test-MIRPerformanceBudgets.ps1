@@ -94,6 +94,15 @@ foreach ($requiredPolicySnippet in @(
     throw "Performance policy is missing '$requiredPolicySnippet'."
   }
 }
+$scenarioRegistry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
+foreach ($target in @("2.0", "2.1")) {
+  $graphScenarios = @($scenarioRegistry.targets.$target.scenarios | Where-Object {
+    [string]$_.name -in @("synthetic-scale-graph", "synthetic-scale-graph-random-order")
+  })
+  if ($graphScenarios.Count -ne 2 -or @($graphScenarios | Where-Object { [int]$_.timeout_seconds -ne 900 }).Count -ne 0) {
+    throw "Target $target graph stress scenarios must retain the governed 900-second process timeout."
+  }
+}
 $requiredTelemetryCounters = @(
   "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
   "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
