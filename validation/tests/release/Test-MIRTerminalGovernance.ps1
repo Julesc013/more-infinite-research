@@ -239,7 +239,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -253,6 +253,26 @@ if ($findingSchema.additionalProperties -ne $false -or @($findingSchema.required
     $findingSchema.properties.target_dispositions.items.additionalProperties -ne $false -or
     $findingSchema.properties.admission.additionalProperties -ne $false -or $findingSchema.properties.closure.additionalProperties -ne $false) {
   throw "Terminal finding schema is not strict or all-nine complete."
+}
+$experimentReceiptPath = Join-Path $RepoRoot ".mir\releases\terminal\experiments\MIR3-TERM-0012-a1ceee06.json"
+$experimentReceipt = Get-Content -Raw -LiteralPath $experimentReceiptPath | ConvertFrom-Json -Depth 100
+if ([string]$programme.authorities.experiments -ne ".mir/releases/terminal/experiments" -or
+    [int]$experimentReceipt.schema -ne 1 -or [string]$experimentReceipt.kind -ne "MIR3TerminalExperimentReceiptV1" -or
+    [string]$experimentReceipt.finding -ne "MIR3-TERM-0012" -or [string]$experimentReceipt.authority_class -ne "reproduced-experiment" -or
+    [string]$experimentReceipt.experiment.commit -ne "a1ceee060c4f0abd0a9fdd203564df4e9f081d98" -or
+    [string]$experimentReceipt.experiment.merge_base -ne "1abe07573cde814c3cacf6153b5ae64dee4038ba" -or
+    [int]$experimentReceipt.experiment.dev_ahead -ne 181 -or [int]$experimentReceipt.experiment.experiment_ahead -ne 351 -or
+    $experimentReceipt.integration.merge_allowed -or $experimentReceipt.integration.cherry_pick_allowed -or -not $experimentReceipt.canonical_port.required -or
+    [string]$experimentReceipt.canonical_port.final_evidence_status -ne "diagnostic-only-until-repeated-under-current-canonical-implementation" -or
+    @($experimentReceipt.evidence.archived_artifacts).Count -ne 2) {
+  throw "The divergent 2.5.5 calibration experiment is not correctly bounded as diagnostic-only non-integrable evidence."
+}
+foreach ($artifact in @($experimentReceipt.evidence.archived_artifacts)) {
+  $artifactPath = Join-Path $RepoRoot ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash -ne [string]$artifact.sha256) {
+    throw "Terminal experiment artifact is absent or differs from its archived diagnostic identity: $($artifact.path)"
+  }
 }
 $baselineCommon = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-baseline-inventory-common.schema.json") | ConvertFrom-Json -Depth 100
 if ($baselineCommon.additionalProperties -ne $false -or @($baselineCommon.required).Count -lt 11 -or

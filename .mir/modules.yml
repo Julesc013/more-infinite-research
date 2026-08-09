@@ -870,6 +870,7 @@ validation_tooling:
     - repository-wide validation enumerates tracked and non-ignored untracked governed files and cannot treat ignored control-plane staging clones as repository source
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
     - the historical maintainer-statement manual-review mode is limited to an already publicly verified immutable package, records an after-publication attestation time, forbids invented checklist observations, and can never satisfy a new candidate's pre-seal review gate
+    - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns
