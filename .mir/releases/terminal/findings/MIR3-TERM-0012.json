@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0012",
+  "title": "Factorio performance staging exceeds the conservative Windows path budget",
+  "source_observation": {
+    "observed_at": "2026-08-09T07:23:41+10:00",
+    "environment": "Exact 2.5.5 archive 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C, exact Factorio 2.0.77.84539, fresh no-reuse target calibration on Windows",
+    "fact": "The legacy performance harness placed Factorio write-data beneath a deeply named artifact run. Factorio exited with code 1 during new-map creation with no package, Lua, dependency, or assertion failure. The same immutable baseline and candidate archives passed after only the package-excluded staging path was shortened; the observed deepest temporary locale path was 257 to 259 characters, above the 240-character conservative budget."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Measure-MIRPerformanceRegression.ps1 -Candidate <exact-2.5.5-zip> -PriorRelease <exact-2.5.0-zip> -FactorioBin <exact-Factorio-2.0.77> -ArtifactRoot <deep-normal-assurance-root> -CompatSmokeLaneId medium",
+    "expected": "Every performance execution uses a fresh context-bound compact scratch root whose projected Factorio temporary paths are at or below the conservative 240-character budget, then relocates raw artifacts to the content-addressed evidence root without loss.",
+    "observed": "At a normal deep artifact root, both baseline and candidate could silently exit while creating a map; a short artifact root or bounded compact staging passed the identical load. A fresh 104-row 2.5.5 no-reuse campaign then passed every automated row, including all six paired performance lanes."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; package-excluded Factorio staging-path custody and path-budget proof only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "modern performance execution must remain below the exact engine path budget"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "independent Factorio 2.0 performance proof requires bounded staging"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS runtime and resource proof must stage exact-engine writes safely when applicable"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS runtime and resource proof must stage exact-engine writes safely when applicable"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical runtime proof must use bounded staging when applicable"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical runtime proof must use bounded staging when applicable"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical runtime proof must use bounded staging when applicable"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite-target runtime proof must use bounded staging when applicable"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite-target runtime proof must use bounded staging when applicable"}
+  ],
+  "regression_obligations": [
+    "the projected deepest Factorio temporary path is checked against a 240-character conservative budget before execution",
+    "each performance run uses a compact context-bound scratch root and retains a provenance marker",
+    "raw artifacts are relocated intact to content-addressed evidence custody after execution",
+    "identical baseline and candidate archives pass the exact target-engine performance lanes from the bounded root",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "performance and assurance proofs created by an unbounded staging path; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The failure is reproduced with identical package inputs, is bounded to package-excluded test staging, and is correctable without changing product source or public package bytes."
+  },
+  "closure": {
+    "status": "open",
+    "evidence": null
+  }
+}
