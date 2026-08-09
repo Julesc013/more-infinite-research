@@ -10,6 +10,7 @@ param(
   [string]$LocalModZipDir = "",
   [string]$OutputPath = "",
   [string]$ArtifactRoot = "",
+  [string]$ArtifactCustodyRoot = "",
   [string[]]$ScratchRootCandidates = @(),
   [ValidateRange(1, 9999)][int]$AttemptOrdinal = 1,
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
@@ -46,6 +47,7 @@ $resolvedCampaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) { [IO.Path]:
 $campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
 $performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "build\results\performance"))
 $usesGeneratedArtifactRoot = [string]::IsNullOrWhiteSpace($ArtifactRoot)
+$generatedArtifactCustodyRoot = ""
 if ($usesGeneratedArtifactRoot) {
   $candidateSha256 = Get-MIRPerformanceRawSha256 -Path $Candidate
   $baselineSha256 = Get-MIRPerformanceRawSha256 -Path $PriorRelease
@@ -57,6 +59,13 @@ if ($usesGeneratedArtifactRoot) {
     -PlanFingerprint $planFingerprint -CandidateSha256 $candidateSha256 -BaselineSha256 $baselineSha256 -FactorioBinarySha256 $factorioSha256 `
     -DurableDestination ("build/results/performance-custody/" + $planFingerprint.Substring(0, 16)) -AttemptOrdinal $AttemptOrdinal -ScratchRootCandidates $candidates
   $ArtifactRoot = [string]$staging.path
+  $generatedArtifactCustodyRoot = if ([string]::IsNullOrWhiteSpace($ArtifactCustodyRoot)) {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot ("build\results\performance-custody\" + $planFingerprint.Substring(0, 16))))
+  } elseif ([IO.Path]::IsPathRooted($ArtifactCustodyRoot)) {
+    [IO.Path]::GetFullPath($ArtifactCustodyRoot)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot $ArtifactCustodyRoot))
+  }
   $pathProjection = [pscustomobject]@{conservative_path_budget=$staging.conservative_path_budget;maximum_path_length=$staging.maximum_projected_path_length;maximum_path=$staging.maximum_projected_path}
 } else {
   if (-not [IO.Path]::IsPathRooted($ArtifactRoot)) { $ArtifactRoot = Join-Path $RepoRoot $ArtifactRoot }
@@ -110,6 +119,11 @@ if (-not $?) {
   -ExpectedFactorioVersion $ExpectedFactorioVersion
 if (-not $?) {
   throw "Fresh performance evidence validation failed."
+}
+
+if ($usesGeneratedArtifactRoot) {
+  $relocation = Copy-MIRPerformanceArtifactsVerified -SourceRoot $ArtifactRoot -DestinationRoot $generatedArtifactCustodyRoot
+  Write-Host "[ok] verified performance artifact relocation: $($relocation.destination_root) tree=$($relocation.artifact_tree_sha256)"
 }
 
 if (-not $KeepArtifacts -and (Test-Path -LiteralPath $ArtifactRoot -PathType Container)) {
