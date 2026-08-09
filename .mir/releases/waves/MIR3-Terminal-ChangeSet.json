@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR3-Terminal-ChangeSetV1",
   "id": "MIR3-Terminal-ChangeSet",
-  "recorded_at": "2026-08-08T23:45:00+10:00",
+  "recorded_at": "2026-08-09T10:32:04.4614719Z",
   "status": "active-intake-no-product-admission",
   "implementation_admitted": false,
   "finding_records": [
