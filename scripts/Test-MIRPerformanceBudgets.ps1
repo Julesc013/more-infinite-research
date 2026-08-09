@@ -96,7 +96,7 @@ foreach ($requiredPolicySnippet in @(
 }
 $scenarioRegistry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
 foreach ($target in @("2.0", "2.1")) {
-  $graphScenarios = @($scenarioRegistry.targets.$target.scenarios | Where-Object {
+  $graphScenarios = @($scenarioRegistry.profiles.$target | Where-Object {
     [string]$_.name -in @("synthetic-scale-graph", "synthetic-scale-graph-random-order")
   })
   if ($graphScenarios.Count -ne 2 -or @($graphScenarios | Where-Object { [int]$_.timeout_seconds -ne 900 }).Count -ne 0) {
