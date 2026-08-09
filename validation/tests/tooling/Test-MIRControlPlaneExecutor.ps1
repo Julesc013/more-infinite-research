@@ -92,7 +92,8 @@ $candidateDescriptor = Get-Content -Raw -LiteralPath (Join-Path $context.path "c
 $performanceCampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $candidateDescriptor -RepoRoot $repo
 $performanceAuthority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo $performanceCampaignRelativePath) `
   -Descriptor $candidateDescriptor -TargetProfile $targetProfile -RepoRoot $repo
-if ([string]$performanceAuthority.campaign.candidate.candidate_id -ne "C24" -or
+if ([string]$performanceAuthority.campaign.candidate.candidate_id -ne "C24" -or -not [bool]$performanceAuthority.historical -or
+    [string]$performanceAuthority.campaign.factorio_version -ne "2.1.12" -or [string]$performanceAuthority.campaign.baseline.version -ne "3.2.1" -or
     [string]$performanceAuthority.campaign.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
     @($controlLock.files | Where-Object path -eq $performanceCampaignRelativePath).Count -ne 1) {
   throw "Controller performance authority is not bound to exact versioned C24 campaign."
@@ -112,7 +113,8 @@ $c30Profile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $c30BaseProfile 
 $c30CampaignRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $c30Descriptor -RepoRoot $repo
 $c30Authority = Assert-MIRCPPerformanceCampaignAuthority -Path (Join-Path $repo $c30CampaignRelativePath) `
   -Descriptor $c30Descriptor -TargetProfile $c30Profile -RepoRoot $repo
-if ([string]$c30Authority.campaign.baseline.version -ne "3.2.2" -or
+if (-not [bool]$c30Authority.historical -or [string]$c30Authority.campaign.factorio_version -ne "2.1.12" -or
+    [string]$c30Authority.campaign.baseline.version -ne "3.2.2" -or
     [string]$c30Authority.campaign.candidate.candidate_id -ne "C30") {
   throw "Controller performance authority is not bound to exact versioned C30 campaign."
 }

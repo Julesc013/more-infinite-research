@@ -441,10 +441,25 @@ function Assert-MIRCPPerformanceCampaignAuthority {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $campaign = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $Path) | ConvertFrom-Json
-  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$TargetProfile.upgrade.from_version) -RepoRoot $repo
+  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$campaign.baseline.version) -RepoRoot $repo
+  $currentRoles = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases\records\current.json") | ConvertFrom-Json
+  $currentTargetRelease = if ([string]$Descriptor.target -eq "2.1") {
+    [string]$currentRoles.roles.latest_tagged_factorio_2_1
+  } elseif ([string]$Descriptor.target -eq "2.0") {
+    [string]$currentRoles.roles.latest_tagged_factorio_2_0
+  } else {
+    ""
+  }
+  $historicalCampaign = -not [string]::IsNullOrWhiteSpace($currentTargetRelease) -and [string]$Descriptor.release -ne $currentTargetRelease
+  $factorioVersionMatches = if ($historicalCampaign) {
+    [string]$campaign.factorio_version -match ('^' + [regex]::Escape([string]$Descriptor.target) + '\.\d+$')
+  } else {
+    [string]$campaign.factorio_version -eq [string]$TargetProfile.qualification_factorio_version
+  }
+  $baselineMatchesProfile = $historicalCampaign -or [string]$campaign.baseline.version -eq [string]$TargetProfile.upgrade.from_version
   if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$Descriptor.release -or
       [string]$campaign.factorio_line -ne [string]$Descriptor.target -or
-      [string]$campaign.factorio_version -ne [string]$TargetProfile.qualification_factorio_version -or
+      -not $factorioVersionMatches -or -not $baselineMatchesProfile -or
       [string]$campaign.baseline.version -ne [string]$baseline.release -or
       [string]$campaign.baseline.archive_sha256 -ne [string]$baseline.package.archive_sha256 -or
       [string]$campaign.baseline.package_content_sha256 -ne [string]$baseline.package.content_sha256 -or
@@ -456,7 +471,7 @@ function Assert-MIRCPPerformanceCampaignAuthority {
       [string]$campaign.candidate.package_content_sha256 -ne [string]$Descriptor.content_sha256) {
     throw "Performance campaign does not bind the immutable context candidate, baseline, target, and Factorio version."
   }
-  return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path)}
+  return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path);historical=$historicalCampaign}
 }
 
 function Set-MIRCPCanonicalPerformanceProbeText {
