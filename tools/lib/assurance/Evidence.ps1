@@ -21,6 +21,29 @@ function Get-MIRAssurancePatternFingerprint {
   return $fingerprint
 }
 
+function Get-MIRAssurancePerformanceCampaignFingerprint {
+  param([Parameter(Mandatory)]$Context)
+
+  $ledgerPath = Join-Path $repo ".mir\releases.json"
+  $ledger = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json
+  $targetKey = "factorio-$($Context.target)"
+  $targetProperty = $ledger.development.PSObject.Properties[$targetKey]
+  if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne "canonical-release-ledger" -or $null -eq $targetProperty) {
+    throw "Canonical release ledger has no valid performance campaign authority for $targetKey."
+  }
+  $authority = $targetProperty.Value
+  $release = [string]$authority.mir_version
+  $candidateId = [string]$authority.candidate_id
+  if ($release -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or $candidateId -notmatch '^[A-Za-z0-9][A-Za-z0-9.-]*$') {
+    throw "Active performance campaign release or candidate identity is invalid for $targetKey."
+  }
+  $versionedCampaign = ".mir/performance-campaigns/$release-$candidateId.json"
+  return Get-MIRAssurancePatternFingerprint -Patterns @(
+    ".mir/performance-campaign.json",
+    $versionedCampaign
+  )
+}
+
 function Resolve-MIRAssuranceApprovedDeltaPath {
   param([Parameter(Mandatory)]$VerificationProfile)
   $fromVersion = [string]$VerificationProfile.upgrade.from_version
@@ -184,6 +207,7 @@ function Get-MIRAssuranceInputFingerprint {
       $path = Get-MIRAssuranceVerificationProfilePath -Target $Context.target
       return [ordered]@{ kind="verification-profile"; path=(Get-MIRAssuranceRepoRelativePath -Path $path); digest_policy=$script:MIRAssuranceCanonicalJsonDigestPolicyId; sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $path) }
     }
+    "performance-campaign" { return Get-MIRAssurancePerformanceCampaignFingerprint -Context $Context }
     "selected-scenarios" {
       $selectionHash = Get-MIRAssuranceJsonHash -Value $Plan.impact_selection
       $registryHash = Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath

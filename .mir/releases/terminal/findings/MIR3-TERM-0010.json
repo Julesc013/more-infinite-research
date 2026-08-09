@@ -42,7 +42,7 @@
     "reason": "The unsafe reuse gap is reproduced, bounded to package-excluded input selection, and correctable without changing product source or package bytes."
   },
   "closure": {
-    "status": "implementation-awaiting-proof",
-    "evidence": null
+    "status": "closed",
+    "evidence": "Test-MIRAssurance.ps1 passed an exact mutation regression: unrelated 3.2.4-C31 changes preserved the selected digest while active 3.2.5-C32 changes altered it. Full schema-4 no-reuse plan material 8BD2961C309B80A3CEF8DE6FF2B2AA9FE775B3EBFBC20200F5FA6D8F789C11EF recorded exactly .mir/performance-campaign.json plus .mir/performance-campaigns/3.2.5-C32.json under campaign digest 0CEE147923E8B1334BF3174E360E9C92BDAC64C694DC1F284AA063AD99447712; runtime.performance-regression changed from unsafe fingerprint 132932D91E374E17BB12F5A8E21FF309E09FDDC140BFC7E6752A8426902E7D1B to 6B5BF7C7E1D8F990C4A1F1F07AD9B8927E4D040ABF8E66BDCA5454EB8914EF87 on 2026-08-09"
   }
 }

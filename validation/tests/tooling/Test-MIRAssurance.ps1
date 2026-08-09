@@ -409,20 +409,31 @@ try {
   $unrelatedCampaignPath = Join-Path $versionedCampaignRoot "3.2.4-C31.json"
   [IO.File]::WriteAllText($activeCampaignPath, '{"schema":2,"factorio_version":"2.1.12"}', [Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($unrelatedCampaignPath, '{"schema":2,"factorio_version":"2.1.12"}', [Text.UTF8Encoding]::new($false))
+  & git -C $campaignFingerprintRoot init --quiet
+  & git -C $campaignFingerprintRoot add -- .mir
+  if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the performance campaign fingerprint fixture Git index." }
   $script:repo = $campaignFingerprintRoot
   $script:MIRAssurancePatternFingerprintCache = @{}
   $campaignContext = [pscustomobject]@{target="2.1"}
   $beforeCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
   [IO.File]::WriteAllText($unrelatedCampaignPath, '{"schema":2,"factorio_version":"2.1.13"}', [Text.UTF8Encoding]::new($false))
   $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
   $afterUnrelatedCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
   [IO.File]::WriteAllText($activeCampaignPath, '{"schema":2,"factorio_version":"2.1.13"}', [Text.UTF8Encoding]::new($false))
   $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
   $afterActiveCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
   if (($beforeCampaignFingerprint.patterns -join "|") -ne ".mir/performance-campaign.json|.mir/performance-campaigns/3.2.5-C32.json" -or
       [string]$beforeCampaignFingerprint.sha256 -ne [string]$afterUnrelatedCampaignFingerprint.sha256 -or
       [string]$beforeCampaignFingerprint.sha256 -eq [string]$afterActiveCampaignFingerprint.sha256) {
-    throw "Performance assurance fingerprints must bind the root calibration and exact active versioned campaign, but no unrelated campaign."
+    throw "Performance assurance fingerprints must bind the root calibration and exact active versioned campaign, but no unrelated campaign: patterns=$($beforeCampaignFingerprint.patterns -join '|') before=$($beforeCampaignFingerprint.sha256) unrelated=$($afterUnrelatedCampaignFingerprint.sha256) active=$($afterActiveCampaignFingerprint.sha256)."
   }
 } finally {
   $script:repo = $originalAssuranceRepo
