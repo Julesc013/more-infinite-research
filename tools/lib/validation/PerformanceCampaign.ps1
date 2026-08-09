@@ -175,7 +175,12 @@ function New-MIRPerformanceStagingRoot {
       $rejections.Add("occupied:$root")
       continue
     }
-    [void](New-Item -ItemType Directory -Force -Path $root)
+    try {
+      [void](New-Item -ItemType Directory -Force -Path $root)
+    } catch {
+      $rejections.Add("unavailable:$root")
+      continue
+    }
     $markerPath = Join-Path $root "mir-staging-provenance.json"
     $marker = [ordered]@{
       schema = 1
