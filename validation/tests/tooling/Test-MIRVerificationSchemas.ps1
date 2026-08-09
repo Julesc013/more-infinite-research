@@ -16,7 +16,7 @@ $contracts = [ordered]@{
   "bundle.schema.json" = @("schema", "policy_id", "status", "plan_material_sha256", "capsule_set_sha256", "bundle_sha256")
   "seal.schema.json" = @("schema", "state", "mir_version", "target", "candidate_id", "package_source_commit", "package_source_sha256", "package_source_material", "qualification_source_commit", "qualification_source_tree", "candidate_sha256", "plan_material_sha256", "capsule_set_sha256", "seal_sha256")
   "runtime-performance-evidence.schema.json" = @("schema", "kind", "status", "candidate", "baseline", "factorio", "comparability", "run_policy", "run_order", "lanes", "artifact_volume")
-  "manual-release-attestation.schema.json" = @("schema", "kind", "candidate_sha256", "candidate_content_sha256", "source_commit", "checklist_version", "items", "status", "attestation_sha256")
+  "manual-release-attestation.schema.json" = @("schema", "kind", "candidate_sha256", "candidate_content_sha256", "source_commit", "factorio_version", "factorio_binary_sha256", "reviewer", "status", "attestation_sha256")
   "playtest-report.schema.json" = @("schema", "kind", "created_at", "candidate", "factorio", "environment", "observation", "compiler", "attachments")
   "upgrade-matrix.schema.json" = @("schema", "kind", "status", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows")
   "change-record.schema.json" = @("schema", "id", "title", "kind", "package_visible", "domains_read", "domains_written", "affected_targets", "test_obligations", "state")
@@ -35,6 +35,20 @@ $contracts = [ordered]@{
   "evidence-object.schema.json" = @("schema", "kind", "object_abi", "context_digest", "identity_key", "subject", "producer", "payload", "links")
   "evidence-manifest.schema.json" = @("schema", "authority", "context_digest", "plan_id", "producer", "objects", "task_results", "status")
   "evidence-revocation.schema.json" = @("schema", "authority", "default_disposition", "rules")
+}
+
+$manualAttestationSchema = Get-Content -Raw -LiteralPath (Join-Path $schemaRoot "manual-release-attestation.schema.json") | ConvertFrom-Json
+$manualAttestationModes = @($manualAttestationSchema.oneOf)
+if ($manualAttestationModes.Count -ne 2 -or
+    @($manualAttestationModes[0].required) -notcontains "reviewed_at" -or
+    @($manualAttestationModes[0].required) -notcontains "items" -or
+    @($manualAttestationModes[1].required) -notcontains "attestation_recorded_at" -or
+    @($manualAttestationModes[1].required) -notcontains "statement" -or
+    [string]$manualAttestationModes[1].properties.checklist_version.const -ne "mir-manual-release-review-historical-statement-v1" -or
+    [bool]$manualAttestationModes[1].properties.review_performed_before_publication.const -ne $true -or
+    [bool]$manualAttestationModes[1].properties.review_exact_time_known.const -ne $false -or
+    [bool]$manualAttestationModes[1].properties.attestation_recorded_after_publication.const -ne $true) {
+  throw "Manual review schema must preserve the strict pre-seal checklist and the narrowly historical immutable-release attestation mode."
 }
 
 foreach ($entry in $contracts.GetEnumerator()) {

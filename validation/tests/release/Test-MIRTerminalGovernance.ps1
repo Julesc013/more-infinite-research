@@ -12,7 +12,8 @@ $authorityNames = @(
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3-Terminal-PublicationPolicyV1",
   "MIR3-Terminal-EOL-PolicyV1",
-  "MIR3TerminalFoundationAdmissionV1"
+  "MIR3TerminalFoundationAdmissionV1",
+  "MIR3TerminalAcceleratedClosureDecisionV1"
 )
 $authorities = @{}
 foreach ($name in $authorityNames) {
@@ -157,6 +158,21 @@ $firewall = $authorities["MIR3-Terminal-ScopeFirewallV1"]
 if ($firewall.rules.package_visible_change_without_change_id -or $firewall.rules.source_freeze_without_fixed_point_receipt -or $firewall.rules.public_tag_without_family_readiness_seal -or
     @($firewall.forbidden | Where-Object { $_ -in @("release-.6", "release-.7", "release-.8", "release-.10") }).Count -ne 4) {
   throw "Terminal scope firewall does not enforce release and admission hard stops."
+}
+$acceleratedClosure = $authorities["MIR3TerminalAcceleratedClosureDecisionV1"]
+if ([string]$programme.authorities.accelerated_closure -ne ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json" -or
+    [string]$acceleratedClosure.status -ne "active" -or
+    [string]$acceleratedClosure.ordinary_terminal_intake.status -ne "closes-after-present-characterization-pass" -or
+    @($acceleratedClosure.eligible_for_dot9).Count -ne 4 -or
+    @($acceleratedClosure.not_eligible_after_freeze).Count -lt 5 -or
+    [string]$acceleratedClosure.late_report_disposition.non_blocking -ne "MIR4-intake" -or
+    [string]$acceleratedClosure.late_report_disposition.release_blocking_p0_or_p1 -ne "reopen-affected-dot9-targets-with-new-reproduced-finding" -or
+    $acceleratedClosure.hard_boundaries.dot5_package_mutation_permitted -or
+    $acceleratedClosure.hard_boundaries.dot9_product_implementation_admitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.source_freeze_permitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.candidate_assignment_permitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.mir4_implementation_permitted) {
+  throw "Accelerated closure decision widens terminal scope or fails to close ordinary intake truthfully."
 }
 $fixedPoint = $authorities["MIR3-Terminal-FixedPointPolicyV1"]
 if (($fixedPoint.participants -join "|") -ne ($family -join "|") -or @($fixedPoint.convergence).Count -ne 5 -or -not $fixedPoint.source_freeze_requires_accepted_receipt) {

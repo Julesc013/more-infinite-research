@@ -16,7 +16,8 @@
     "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
     "publication": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
-    "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json"
+    "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
+    "accelerated_closure": ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json"
   },
   "hard_gate": "No source freeze, candidate assignment, target seal, family seal, tag, or publication state may be inferred from this planning authority."
 }
