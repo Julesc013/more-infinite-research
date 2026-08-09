@@ -12,7 +12,8 @@ $authorityNames = @(
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3-Terminal-PublicationPolicyV1",
   "MIR3-Terminal-EOL-PolicyV1",
-  "MIR3TerminalFoundationAdmissionV1"
+  "MIR3TerminalFoundationAdmissionV1",
+  "MIR3TerminalAcceleratedClosureDecisionV1"
 )
 $authorities = @{}
 foreach ($name in $authorityNames) {
@@ -158,6 +159,21 @@ if ($firewall.rules.package_visible_change_without_change_id -or $firewall.rules
     @($firewall.forbidden | Where-Object { $_ -in @("release-.6", "release-.7", "release-.8", "release-.10") }).Count -ne 4) {
   throw "Terminal scope firewall does not enforce release and admission hard stops."
 }
+$acceleratedClosure = $authorities["MIR3TerminalAcceleratedClosureDecisionV1"]
+if ([string]$programme.authorities.accelerated_closure -ne ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json" -or
+    [string]$acceleratedClosure.status -ne "active" -or
+    [string]$acceleratedClosure.ordinary_terminal_intake.status -ne "closes-after-present-characterization-pass" -or
+    @($acceleratedClosure.eligible_for_dot9).Count -ne 4 -or
+    @($acceleratedClosure.not_eligible_after_freeze).Count -lt 5 -or
+    [string]$acceleratedClosure.late_report_disposition.non_blocking -ne "MIR4-intake" -or
+    [string]$acceleratedClosure.late_report_disposition.release_blocking_p0_or_p1 -ne "reopen-affected-dot9-targets-with-new-reproduced-finding" -or
+    $acceleratedClosure.hard_boundaries.dot5_package_mutation_permitted -or
+    $acceleratedClosure.hard_boundaries.dot9_product_implementation_admitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.source_freeze_permitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.candidate_assignment_permitted_by_this_decision -or
+    $acceleratedClosure.hard_boundaries.mir4_implementation_permitted) {
+  throw "Accelerated closure decision widens terminal scope or fails to close ordinary intake truthfully."
+}
 $fixedPoint = $authorities["MIR3-Terminal-FixedPointPolicyV1"]
 if (($fixedPoint.participants -join "|") -ne ($family -join "|") -or @($fixedPoint.convergence).Count -ne 5 -or -not $fixedPoint.source_freeze_requires_accepted_receipt) {
   throw "Terminal fixed-point authority is incomplete."
@@ -223,7 +239,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -237,6 +253,39 @@ if ($findingSchema.additionalProperties -ne $false -or @($findingSchema.required
     $findingSchema.properties.target_dispositions.items.additionalProperties -ne $false -or
     $findingSchema.properties.admission.additionalProperties -ne $false -or $findingSchema.properties.closure.additionalProperties -ne $false) {
   throw "Terminal finding schema is not strict or all-nine complete."
+}
+$experimentReceiptPath = Join-Path $RepoRoot ".mir\releases\terminal\experiments\MIR3-TERM-0012-a1ceee06.json"
+$experimentReceipt = Get-Content -Raw -LiteralPath $experimentReceiptPath | ConvertFrom-Json -Depth 100
+if ([string]$programme.authorities.experiments -ne ".mir/releases/terminal/experiments" -or
+    [int]$experimentReceipt.schema -ne 1 -or [string]$experimentReceipt.kind -ne "MIR3TerminalExperimentReceiptV1" -or
+    [string]$experimentReceipt.finding -ne "MIR3-TERM-0012" -or [string]$experimentReceipt.authority_class -ne "reproduced-experiment" -or
+    [string]$experimentReceipt.experiment.commit -ne "a1ceee060c4f0abd0a9fdd203564df4e9f081d98" -or
+    [string]$experimentReceipt.experiment.merge_base -ne "1abe07573cde814c3cacf6153b5ae64dee4038ba" -or
+    [int]$experimentReceipt.experiment.dev_ahead -ne 181 -or [int]$experimentReceipt.experiment.experiment_ahead -ne 351 -or
+    $experimentReceipt.integration.merge_allowed -or $experimentReceipt.integration.cherry_pick_allowed -or -not $experimentReceipt.canonical_port.required -or
+    [string]$experimentReceipt.canonical_port.final_evidence_status -ne "diagnostic-only-until-repeated-under-current-canonical-implementation" -or
+    @($experimentReceipt.evidence.archived_artifacts).Count -ne 2) {
+  throw "The divergent 2.5.5 calibration experiment is not correctly bounded as diagnostic-only non-integrable evidence."
+}
+foreach ($artifact in @($experimentReceipt.evidence.archived_artifacts)) {
+  $artifactPath = Join-Path $RepoRoot ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash -ne [string]$artifact.sha256) {
+    throw "Terminal experiment artifact is absent or differs from its archived diagnostic identity: $($artifact.path)"
+  }
+}
+$attributes = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".gitattributes")
+if ($attributes -notmatch '(?m)^\.mir/evidence/archive/mir3-term-experiments/\*\*/\*\.json -text\r?$') {
+  throw "Terminal experiment artifacts must retain exact checkout bytes for their raw archived SHA-256 identities."
+}
+$historicalReviewCustodyPath = Join-Path $RepoRoot ".mir\evidence\2.5.5-manual-review-custody.json"
+$historicalReviewCustody = Get-Content -Raw -LiteralPath $historicalReviewCustodyPath | ConvertFrom-Json -Depth 100
+$historicalReviewPath = Join-Path $RepoRoot ([string]$historicalReviewCustody.attestation.path)
+$historicalReviewObjectPath = Join-Path $RepoRoot ([string]$historicalReviewCustody.object.path)
+if ($attributes -notmatch '(?m)^\.mir/evidence/2\.5\.5-manual-review-attestation\.json -text\r?$' -or
+    (Get-FileHash -LiteralPath $historicalReviewPath -Algorithm SHA256).Hash -ne [string]$historicalReviewCustody.attestation.sha256 -or
+    (Get-FileHash -LiteralPath $historicalReviewObjectPath -Algorithm SHA256).Hash -ne [string]$historicalReviewCustody.object.sha256) {
+  throw "Historical 2.5.5 manual-review custody must retain the exact attestation and content-addressed object bytes."
 }
 $baselineCommon = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-baseline-inventory-common.schema.json") | ConvertFrom-Json -Depth 100
 if ($baselineCommon.additionalProperties -ne $false -or @($baselineCommon.required).Count -lt 11 -or
