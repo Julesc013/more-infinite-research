@@ -5,7 +5,7 @@ applies_to: "release-engineering"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-09
 supersedes: []
 superseded_by: []
 ---

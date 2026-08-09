@@ -3,12 +3,18 @@ param(
   [string]$SourceCommit = "",
   [string]$FactorioBin = "",
   [string]$ExpectedFactorioVersion = "2.1.11",
-  [string]$OutputDir = "build\results\interactive-review-current"
+  [string]$OutputDir = "build\results\interactive-review-current",
+  [switch]$HistoricalMaintainerStatement,
+  [string]$Reviewer = "",
+  [string]$MaintainerStatement = "",
+  [string]$HistoricalAttestationPath = "",
+  [string]$HistoricalCustodyPath = ""
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\ReleaseAttestations.ps1")
 
 function Write-MIRReviewJson {
   param(
@@ -29,8 +35,17 @@ $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) {
 } else {
   (Resolve-Path -LiteralPath (Join-Path $repo $CandidateZip)).Path
 }
+$candidatePackageInfo = Get-MIRReleasePackageInfo -Path $candidatePath
 if ([string]::IsNullOrWhiteSpace($SourceCommit)) {
-  $SourceCommit = Get-MIRGitCommit -RepoRoot $repo
+  if ($HistoricalMaintainerStatement) {
+    $historicalReleaseRecordPath = Join-Path $repo ".mir\releases\records\$($candidatePackageInfo.version).json"
+    if (-not (Test-Path -LiteralPath $historicalReleaseRecordPath -PathType Leaf)) {
+      throw "Historical maintainer attestation requires an existing release record: $historicalReleaseRecordPath"
+    }
+    $SourceCommit = [string](Get-Content -Raw -LiteralPath $historicalReleaseRecordPath | ConvertFrom-Json).package.source_commit
+  } else {
+    $SourceCommit = Get-MIRGitCommit -RepoRoot $repo
+  }
 }
 if ($SourceCommit -notmatch '^[0-9a-f]{40}$') {
   throw "SourceCommit must be a full lowercase Git commit ID."
@@ -40,18 +55,20 @@ if ($LASTEXITCODE -ne 0) {
   throw "Source commit is not available locally: $SourceCommit"
 }
 
-$changedPackagePaths = @(& git -C $repo diff --name-only $SourceCommit HEAD -- @(Get-MIRPackageSourceRoots))
-if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
-  throw "Package-visible source differs from the requested source commit: $($changedPackagePaths -join ', ')"
-}
-if (Test-MIRRepositoryGitDirty -RepoRoot $repo) {
-  throw "The repository must be clean before creating an identity-bound interactive review packet."
-}
-
-$packageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $candidateContentSha256 = Get-MIRZipContentFingerprint -Path $candidatePath
-if ($candidateContentSha256 -ne $packageSourceSha256) {
-  throw "Candidate content does not match the clean package-visible source."
+$packageSourceSha256 = ""
+if (-not $HistoricalMaintainerStatement) {
+  $changedPackagePaths = @(& git -C $repo diff --name-only $SourceCommit HEAD -- @(Get-MIRPackageSourceRoots))
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible source differs from the requested source commit: $($changedPackagePaths -join ', ')"
+  }
+  if (Test-MIRRepositoryGitDirty -RepoRoot $repo) {
+    throw "The repository must be clean before creating an identity-bound interactive review packet."
+  }
+  $packageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  if ($candidateContentSha256 -ne $packageSourceSha256) {
+    throw "Candidate content does not match the clean package-visible source."
+  }
 }
 
 $factorio = [ordered]@{
@@ -67,6 +84,138 @@ if (-not [string]::IsNullOrWhiteSpace($FactorioBin)) {
   }
   $factorio.version = Get-MIRFactorioBinaryVersion -Path $factorioPath
   $factorio.binary_sha256 = Get-MIRFileSha256 -Path $factorioPath
+}
+
+if ($HistoricalMaintainerStatement) {
+  if ([string]::IsNullOrWhiteSpace($Reviewer) -or [string]::IsNullOrWhiteSpace($MaintainerStatement)) {
+    throw "Historical maintainer attestation requires -Reviewer and -MaintainerStatement."
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$factorio.version) -or [string]::IsNullOrWhiteSpace([string]$factorio.binary_sha256)) {
+    throw "Historical maintainer attestation requires an exact -FactorioBin."
+  }
+  if (-not ([string]$factorio.version).StartsWith($ExpectedFactorioVersion)) {
+    throw "Historical maintainer attestation Factorio binary does not match $ExpectedFactorioVersion."
+  }
+  $releaseRecordPath = Join-Path $repo ".mir\releases\records\$($candidatePackageInfo.version).json"
+  if (-not (Test-Path -LiteralPath $releaseRecordPath -PathType Leaf)) {
+    throw "Historical maintainer attestation requires a release record for $($candidatePackageInfo.version)."
+  }
+  $releaseRecord = Get-Content -Raw -LiteralPath $releaseRecordPath | ConvertFrom-Json
+  $archiveSha256 = Get-MIRReleaseSha256 -Path $candidatePath
+  if ([string]$releaseRecord.state -ne "publicly-verified" -or
+      [string]$releaseRecord.release -ne [string]$candidatePackageInfo.version -or
+      [string]$releaseRecord.package.archive_sha256 -ne $archiveSha256 -or
+      [string]$releaseRecord.package.content_sha256 -ne $candidateContentSha256 -or
+      [string]$releaseRecord.package.source_commit -ne $SourceCommit -or
+      [long]$releaseRecord.package.bytes -ne (Get-Item -LiteralPath $candidatePath).Length) {
+    throw "Historical maintainer attestation may only bind the exact immutable public release identity."
+  }
+  $artifactPaths = @(
+    "docs/releases/archive/MIR-3.5-WAVE-INDEX.json",
+    ".mir/evidence/MIR-3.5-wave-publication.json",
+    ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json"
+  )
+  $supportingArtifacts = @(
+    foreach ($relativePath in $artifactPaths) {
+      $artifactPath = Join-Path $repo $relativePath
+      if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+        throw "Historical maintainer attestation supporting authority is absent: $relativePath"
+      }
+      [ordered]@{
+        path=$relativePath.Replace("\", "/")
+        sha256=(Get-MIRReleasePortableArtifactSha256 -Path $artifactPath)
+      }
+    }
+  )
+  $attestationPath = if ([string]::IsNullOrWhiteSpace($HistoricalAttestationPath)) {
+    Join-Path $repo ".mir\evidence\$($candidatePackageInfo.version)-manual-review-attestation.json"
+  } elseif ([IO.Path]::IsPathRooted($HistoricalAttestationPath)) {
+    [IO.Path]::GetFullPath($HistoricalAttestationPath)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $repo $HistoricalAttestationPath))
+  }
+  $custodyPath = if ([string]::IsNullOrWhiteSpace($HistoricalCustodyPath)) {
+    Join-Path $repo ".mir\evidence\$($candidatePackageInfo.version)-manual-review-custody.json"
+  } elseif ([IO.Path]::IsPathRooted($HistoricalCustodyPath)) {
+    [IO.Path]::GetFullPath($HistoricalCustodyPath)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $repo $HistoricalCustodyPath))
+  }
+  $attestationRelative = [IO.Path]::GetRelativePath($repo, $attestationPath).Replace("\", "/")
+  $custodyRelative = [IO.Path]::GetRelativePath($repo, $custodyPath).Replace("\", "/")
+  if ($attestationRelative.StartsWith("../") -or $custodyRelative.StartsWith("../")) {
+    throw "Historical attestation and custody paths must remain under the repository evidence authority."
+  }
+  if ((Test-Path -LiteralPath $attestationPath -PathType Leaf) -or (Test-Path -LiteralPath $custodyPath -PathType Leaf)) {
+    throw "Historical attestation or custody destination already exists; never overwrite evidence."
+  }
+  $attestation = [ordered]@{
+    schema = 2
+    kind = "mir-manual-release-review"
+    candidate_sha256 = $archiveSha256
+    candidate_content_sha256 = $candidateContentSha256
+    source_commit = $SourceCommit
+    checklist_version = "mir-manual-release-review-historical-statement-v1"
+    factorio_version = [string]$factorio.version
+    factorio_binary_sha256 = [string]$factorio.binary_sha256
+    reviewer = $Reviewer.Trim()
+    attestation_recorded_at = (Get-Date).ToUniversalTime().ToString("o")
+    review_performed_before_publication = $true
+    review_exact_time_known = $false
+    attestation_recorded_after_publication = $true
+    reviewed_release = [string]$candidatePackageInfo.version
+    statement = $MaintainerStatement.Trim()
+    supporting_artifacts = $supportingArtifacts
+    custody_manifest_path = $custodyRelative
+    status = "passed"
+    attestation_sha256 = $null
+  }
+  $attestationMaterial = ConvertTo-MIRReleaseOrderedMap -Object ([pscustomobject]$attestation)
+  $attestationMaterial.Remove("attestation_sha256")
+  $attestation.attestation_sha256 = Get-MIRReleaseTextSha256 -Text ($attestationMaterial | ConvertTo-Json -Depth 40 -Compress)
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $attestationPath))
+  Write-MIRReviewJson -Path $attestationPath -Value $attestation
+
+  $attestationFileSha256 = Get-MIRReleaseSha256 -Path $attestationPath
+  $objectRelative = ".mir/evidence/objects/sha256/$($attestationFileSha256.Substring(0, 2))/$attestationFileSha256.json"
+  $objectPath = Join-Path $repo $objectRelative
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $objectPath))
+  if (Test-Path -LiteralPath $objectPath -PathType Leaf) {
+    if (-not (Test-MIRReleaseByteIdentity -Expected ([IO.File]::ReadAllBytes($attestationPath)) -Actual ([IO.File]::ReadAllBytes($objectPath)))) {
+      throw "Historical manual attestation content address is occupied by different bytes."
+    }
+  } else {
+    Copy-Item -LiteralPath $attestationPath -Destination $objectPath
+  }
+  $custodyObjectMatches = Test-MIRReleaseByteIdentity -Expected ([IO.File]::ReadAllBytes($attestationPath)) -Actual ([IO.File]::ReadAllBytes($objectPath))
+  if ((Get-MIRReleaseSha256 -Path $objectPath) -ne $attestationFileSha256 -or -not $custodyObjectMatches) {
+    throw "Historical manual attestation content-addressed custody copy is not byte-identical."
+  }
+  $custody = [ordered]@{
+    schema = 1
+    kind = "MIR3HistoricalManualReviewCustodyV1"
+    recorded_at = (Get-Date).ToUniversalTime().ToString("o")
+    retention = "repository-governed-content-addressed-evidence-v1"
+    package = [ordered]@{
+      release=[string]$candidatePackageInfo.version
+      archive_sha256=$archiveSha256
+      content_sha256=$candidateContentSha256
+      source_commit=$SourceCommit
+    }
+    attestation = [ordered]@{
+      path=$attestationRelative
+      sha256=$attestationFileSha256
+      canonical_self_sha256=[string]$attestation.attestation_sha256
+    }
+    object = [ordered]@{
+      path=$objectRelative
+      sha256=$attestationFileSha256
+    }
+  }
+  Write-MIRReviewJson -Path $custodyPath -Value $custody
+  Write-Host "[ok] created historical manual review attestation $attestationRelative"
+  Write-Host "[ok] imported byte-identical custody object $objectRelative"
+  return
 }
 
 $outputRoot = if ([System.IO.Path]::IsPathRooted($OutputDir)) { $OutputDir } else { Join-Path $repo $OutputDir }

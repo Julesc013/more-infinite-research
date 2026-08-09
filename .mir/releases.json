@@ -15,7 +15,7 @@
       "candidate_qualification_evidence": ".mir/evidence/archive/mir3-dot5-local-qualification/2.5.5-local-candidate-qualification.json",
       "candidate_qualification_sha256": "C1395E465638A1452E3C236A51BEDA4A2E6D2F49F4384301C8CDC7A871A827CB",
       "development_branch": "legacy",
-      "manual_review": "pending",
+      "manual_review": "maintainer-patch-review-approved",
       "mir_version": "2.5.5",
       "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
       "package_source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
@@ -123,7 +123,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-08",
+  "updated_at": "2026-08-09",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

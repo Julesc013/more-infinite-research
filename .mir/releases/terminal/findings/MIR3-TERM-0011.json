@@ -43,7 +43,7 @@
     "reason": "The custody defect is reproduced, bounded to package-excluded assurance output handling, and correctable without changing product source or package bytes."
   },
   "closure": {
-    "status": "open",
-    "evidence": null
+    "status": "closed",
+    "evidence": "Regression-first implementation is retained in 656b9d45d8e809db1a5b0c3c4f0819723091cb8c -> b3f4857279a82adc753d9d38119df2fbc41212d1 -> 82a0f453c20bdd8c6ad2881e9054497c51ae0962. Hosted MIR workflow 31291883497 passed at exact head 82a0f453c20bdd8c6ad2881e9054497c51ae0962. The corrected assurance path writes worker-local performance output, captures the exact aggregate as a hashed capsule artifact, and requires seal-time byte-validated promotion; Test-MIRAssurance.ps1 retains the overwrite, capsule-artifact, seal-promotion, historical-evidence-preservation, and immutable-.5-package regressions."
   }
 }
