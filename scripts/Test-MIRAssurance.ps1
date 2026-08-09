@@ -202,6 +202,32 @@ try {
     Remove-Item -LiteralPath $portableHashRoot -Recurse -Force
   }
 }
+
+. (Join-Path $RepoRoot "scripts\validation\SettingsOverrides.ps1")
+$settingsOverrideRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-settings-override-" + [Guid]::NewGuid().ToString("N"))
+try {
+  $settingsOverrideMods = Join-Path $settingsOverrideRoot "mods"
+  $null = New-Item -ItemType Directory -Force -Path $settingsOverrideMods
+  Initialize-MIRSettingsOverrideMod -ModsDir $settingsOverrideMods -FactorioVersion "2.0"
+  Enable-CopiedDiagnostics -ModsDir $settingsOverrideMods
+  $settingsOverrideDir = Join-Path $settingsOverrideMods "mir-validation-settings-overrides_0.1.0"
+  $settingsOverrideInfo = Join-Path $settingsOverrideDir "info.json"
+  $settingsOverrideLua = Join-Path $settingsOverrideDir "settings-updates.lua"
+  if (-not (Test-Path -LiteralPath $settingsOverrideInfo -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $settingsOverrideLua -PathType Leaf)) {
+    throw "Validation settings override fixture must use a versioned Factorio mod directory."
+  }
+  $settingsOverrideMetadata = Get-Content -Raw -LiteralPath $settingsOverrideInfo | ConvertFrom-Json
+  if ([string]$settingsOverrideMetadata.name -ne "mir-validation-settings-overrides" -or
+      [string]$settingsOverrideMetadata.version -ne "0.1.0" -or
+      -not (Get-Content -Raw -LiteralPath $settingsOverrideLua).Contains('override("mir-debug-generation-report", true)')) {
+    throw "Validation settings override fixture identity or diagnostic default is not deterministic."
+  }
+} finally {
+  if (Test-Path -LiteralPath $settingsOverrideRoot) {
+    Remove-Item -LiteralPath $settingsOverrideRoot -Recurse -Force
+  }
+}
 foreach ($target in @("2.0", "2.1")) {
   $profilePath = Join-Path $RepoRoot "validation\profiles\factorio-$target.json"
   $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json

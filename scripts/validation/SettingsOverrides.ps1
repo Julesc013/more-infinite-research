@@ -4,7 +4,11 @@ function Initialize-MIRSettingsOverrideMod {
     [Parameter(Mandatory)][string]$FactorioVersion
   )
 
-  $path = Join-Path $ModsDir "mir-validation-settings-overrides"
+  # Factorio accepts an unversioned development folder, but repeated isolated
+  # headless loads have shown that it may subsequently drop that folder from
+  # mod-list.json.  Use the normal on-disk mod identity so every fresh process
+  # resolves the same fixture deterministically.
+  $path = Join-Path $ModsDir "mir-validation-settings-overrides_0.1.0"
   New-Item -ItemType Directory -Force -Path $path | Out-Null
   @{
     name = "mir-validation-settings-overrides"
@@ -42,7 +46,7 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $overridePath = Join-Path $ModsDir "mir-validation-settings-overrides\settings-updates.lua"
+  $overridePath = Join-Path $ModsDir "mir-validation-settings-overrides_0.1.0\settings-updates.lua"
   if (-not (Test-Path -LiteralPath $overridePath -PathType Leaf)) {
     throw "Unable to find validation settings override fixture."
   }
