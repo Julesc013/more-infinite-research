@@ -274,6 +274,19 @@ foreach ($artifact in @($experimentReceipt.evidence.archived_artifacts)) {
     throw "Terminal experiment artifact is absent or differs from its archived diagnostic identity: $($artifact.path)"
   }
 }
+$attributes = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".gitattributes")
+if ($attributes -notmatch '(?m)^\.mir/evidence/archive/mir3-term-experiments/\*\*/\*\.json -text$') {
+  throw "Terminal experiment artifacts must retain exact checkout bytes for their raw archived SHA-256 identities."
+}
+$historicalReviewCustodyPath = Join-Path $RepoRoot ".mir\evidence\2.5.5-manual-review-custody.json"
+$historicalReviewCustody = Get-Content -Raw -LiteralPath $historicalReviewCustodyPath | ConvertFrom-Json -Depth 100
+$historicalReviewPath = Join-Path $RepoRoot ([string]$historicalReviewCustody.attestation.path)
+$historicalReviewObjectPath = Join-Path $RepoRoot ([string]$historicalReviewCustody.object.path)
+if ($attributes -notmatch '(?m)^\.mir/evidence/2\.5\.5-manual-review-attestation\.json -text$' -or
+    (Get-FileHash -LiteralPath $historicalReviewPath -Algorithm SHA256).Hash -ne [string]$historicalReviewCustody.attestation.sha256 -or
+    (Get-FileHash -LiteralPath $historicalReviewObjectPath -Algorithm SHA256).Hash -ne [string]$historicalReviewCustody.object.sha256) {
+  throw "Historical 2.5.5 manual-review custody must retain the exact attestation and content-addressed object bytes."
+}
 $baselineCommon = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "spec\schemas\mir3-terminal-baseline-inventory-common.schema.json") | ConvertFrom-Json -Depth 100
 if ($baselineCommon.additionalProperties -ne $false -or @($baselineCommon.required).Count -lt 11 -or
     $baselineCommon.'$defs'.item.additionalProperties -ne $false -or @($baselineCommon.'$defs'.item.required).Count -lt 9 -or
