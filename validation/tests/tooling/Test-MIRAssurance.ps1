@@ -242,11 +242,33 @@ if ($performanceTest.Count -ne 1 -or
     [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
     [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
     [string]$performanceTest[0].command -notmatch '-LocalModZipDir\s+<mods>' -or
-    [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>/performance-regression\.json' -or
+    [string]$performanceTest[0].command -match '\.mir/evidence/' -or
     @($performanceTest[0].inputs) -notcontains "mod-closure" -or
     @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
     @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
-  throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
+  throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
+}
+$assuranceEvidenceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+foreach ($requiredPerformanceIsolationSnippet in @(
+  '"<test-output>"=[string]$TestOutput',
+  '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
+  '-Kind "runtime-performance-evidence"'
+)) {
+  if (-not $assuranceEvidenceSource.Contains($requiredPerformanceIsolationSnippet)) {
+    throw "Assurance execution does not isolate and capture fresh performance evidence: $requiredPerformanceIsolationSnippet"
+  }
+}
+foreach ($requiredPerformanceSealSnippet in @(
+  'Get-MIRAssurancePerformanceEvidenceArtifact',
+  'Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force'
+)) {
+  if (-not $releaseAssuranceSource.Contains($requiredPerformanceSealSnippet)) {
+    throw "Release sealing does not promote the exact captured performance artifact: $requiredPerformanceSealSnippet"
+  }
+}
+if ($releaseAssuranceSource.Contains('Join-Path $repo ".mir\evidence\$($Context.info.version)-performance-regression.json"')) {
+  throw "Release sealing still consumes the mutable tracked historical performance-evidence path."
 }
 
 $manualTest = @($catalog.tests | Where-Object { [string]$_.id -eq "manual.release-review" })
