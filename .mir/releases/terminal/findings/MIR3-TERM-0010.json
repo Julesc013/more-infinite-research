@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0010",
+  "title": "Performance assurance fingerprint omits the active versioned campaign",
+  "source_observation": {
+    "observed_at": "2026-08-09T09:29:00+10:00",
+    "environment": "Clean-head schema-4 no-reuse planner comparison across MIR3-TERM-0009 on Windows dev",
+    "fact": "runtime.performance-regression retained fingerprint 132932D91E374E17BB12F5A8E21FF309E09FDDC140BFC7E6752A8426902E7D1B before and after .mir/performance-campaigns/3.2.5-C32.json changed from Factorio 2.1.12 to 2.1.13."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\tools\\mir.ps1 verify plan --target 2.1 --profile full --candidate dist/more-infinite-research_3.2.5.zip --prior dist/more-infinite-research_3.2.3.zip --factorio <exact-2.1.13> --no-reuse --output <plan.json>",
+    "expected": "Changing the exact active versioned performance campaign changes performance.static and runtime.performance-regression input fingerprints; changing an unrelated historical campaign does not.",
+    "observed": "The catalog fingerprinted only the root 3.2.2 calibration file, while the runtime producer selected and overlaid the exact 3.2.5-C32 versioned authority later; the planned runtime fingerprint therefore remained unchanged across the authority correction."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; package-excluded evidence-reuse fingerprint selection only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "current target performance evidence must bind its exact versioned campaign"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "independent target performance evidence must bind its exact versioned campaign"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS resource and performance evidence must bind exact target authority when applicable"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS resource and performance evidence must bind exact target authority when applicable"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical resource evidence must bind exact target authority when applicable"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical resource evidence must bind exact target authority when applicable"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical resource evidence must bind exact target authority when applicable"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite target resource evidence must bind exact target authority when applicable"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite target resource evidence must bind exact target authority when applicable"}
+  ],
+  "regression_obligations": [
+    "performance fingerprints bind the immutable root calibration and exact active versioned campaign",
+    "active versioned campaign changes invalidate reusable performance evidence",
+    "unrelated historical campaign changes do not invalidate the active target performance row",
+    "all other exact input and package bindings remain unchanged"
+  ],
+  "fixed_point_restart_scope": "all performance and aggregate assurance proofs admitted through the corrected fingerprint policy; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The unsafe reuse gap is reproduced, bounded to package-excluded input selection, and correctable without changing product source or package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": "Test-MIRAssurance.ps1 passed an exact mutation regression: unrelated 3.2.4-C31 changes preserved the selected digest while active 3.2.5-C32 changes altered it. Full schema-4 no-reuse plan material 8BD2961C309B80A3CEF8DE6FF2B2AA9FE775B3EBFBC20200F5FA6D8F789C11EF recorded exactly .mir/performance-campaign.json plus .mir/performance-campaigns/3.2.5-C32.json under campaign digest 0CEE147923E8B1334BF3174E360E9C92BDAC64C694DC1F284AA063AD99447712; runtime.performance-regression changed from unsafe fingerprint 132932D91E374E17BB12F5A8E21FF309E09FDDC140BFC7E6752A8426902E7D1B to 6B5BF7C7E1D8F990C4A1F1F07AD9B8927E4D040ABF8E66BDCA5454EB8914EF87 on 2026-08-09"
+  }
+}
