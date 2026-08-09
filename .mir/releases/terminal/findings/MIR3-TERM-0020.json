@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0020",
+  "title": "Performance campaign initialization treated an empty target-era phase lane set as a null phase",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:33:00.0000000Z",
+    "environment": "Exact immutable 2.5.5 archive on trusted Factorio 2.0.77 after all package, engine, and harness preflights",
+    "fact": "The governed 2.0 campaign has no compiler phase lanes. Initialization expanded phaseLanes.probe_phase to a null array entry and used it as an ordered-dictionary key, raising 'Index operation failed; the array index evaluated to null' before the first Factorio lane."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "A governed campaign with no phase lanes runs its ordinary package and compatibility lanes without inventing a null phase; a campaign with phase lanes retains complete phase measurement.",
+    "observed": "The raw campaign capsule was created with zero lanes and the runner terminated before Factorio launch with an array-index error."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; target-era performance aggregation only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "non-empty current phase lanes remain explicitly initialized"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "empty Factorio 2.0 phase-lane sets are valid and remain empty"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "target campaigns may explicitly omit unsupported phase telemetry"}
+  ],
+  "regression_obligations": [
+    "an empty phase_lanes array initializes zero phase sample keys and performs ordinary lane proof",
+    "a non-empty phase_lanes array initializes every declared non-empty phase key",
+    "null phase names are never accepted as a measurement key",
+    "the raw campaign capsule remains valid when a target legitimately omits phase telemetry",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The defect is entirely within verifier aggregation for a valid target-era capability omission; no package source or release bytes are involved."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": "Phase sample initialization now uses only explicit non-empty declared phases; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+  }
+}

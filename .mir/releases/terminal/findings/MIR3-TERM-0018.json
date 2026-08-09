@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0018",
+  "title": "Performance harness fingerprint assumed the current 2.1 scenario authority for a 2.0 campaign",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:18:00.0000000Z",
+    "environment": "Exact immutable 2.5.5 archive on trusted Factorio 2.0.77 after successful package-source and official-data-lock preflight",
+    "fact": "The 2.0 campaign correctly declares validation/scenarios/local-2.0.json, but Get-MIRPerformanceHarnessFingerprint always required validation/scenarios/local-2.1.json. The historical worktree intentionally contains only the target-era scenario authority, so proof stopped before Factorio launch."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "The harness fingerprint includes the repository-relative manual-scenario authority declared by the governed campaign and rejects unsafe or missing authority paths.",
+    "observed": "The runner failed with 'Performance harness authority is absent: validation/scenarios/local-2.1.json'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; target-era performance-harness identity only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "the 2.1 campaign still fingerprints its declared local-2.1 authority"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "the independent 2.0 campaign fingerprints its declared local-2.0 authority"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "future target-era performance campaigns bind their own scenario authority"}
+  ],
+  "regression_obligations": [
+    "a Factorio 2.0 campaign fingerprints validation/scenarios/local-2.0.json",
+    "a Factorio 2.1 campaign fingerprints validation/scenarios/local-2.1.json",
+    "scenario authority paths are repository-relative JSON files and cannot traverse outside the governed worktree",
+    "a missing declared scenario authority fails before Factorio launch",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The failure is solely in the package-excluded harness fingerprint. The correction makes the declared target-era authority explicit and cannot modify package bytes."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": "The harness receives and validates the campaign-declared target-era scenario authority; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+  }
+}

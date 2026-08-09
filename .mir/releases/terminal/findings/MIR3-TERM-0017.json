@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0017",
+  "title": "Performance engine lock assumed a 2.1 official module during an exact 2.0 campaign",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:09:00.0000000Z",
+    "environment": "Exact immutable 2.5.5 archive on trusted Factorio 2.0.77 under compact, provenance-bound staging",
+    "fact": "After the historical package-source authority was accepted, the runner tried to hash data\\recycler even though the governed 2.0 campaign declares only elevated-rails, quality, and space-age. Factorio 2.0.77 does not contain data\\recycler, so proof stopped before Factorio launch."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "The official-data lock consists of core, base, and exactly the official modules declared by the governed campaign; a declared missing module fails before Factorio launch.",
+    "observed": "The runner hard-coded recycler into every lock and failed with 'Performance authority is absent: ...\\data\\recycler'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; exact-engine official-data lock construction only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "lock all and only campaign-declared Factorio 2.1 official modules"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "lock the exact Factorio 2.0 campaign module set without a 2.1 recycler assumption"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "target-era engine locks derive from governed campaign modules"}
+  ],
+  "regression_obligations": [
+    "Factorio 2.0 campaign locks core, base, elevated-rails, quality, and space-age but not recycler",
+    "Factorio 2.1 campaign locks every official module it declares, including recycler when declared",
+    "an unknown or absent declared official module fails before Factorio launch",
+    "the exact engine data-root list and aggregate hash are recorded in the evidence",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The defect is a pre-launch assurance lock error. The correction narrows the lock to the governed engine/module contract and cannot change a package."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": "The runner derives its official-data roots from governed campaign declarations, records them with the lock digest, and rejects declared unavailable modules; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+  }
+}

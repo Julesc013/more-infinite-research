@@ -1,12 +1,19 @@
 function Get-MIRPerformanceHarnessFiles {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)][string]$ExecutionRoot,
+    [Parameter(Mandatory)][string]$TargetAuthorityRoot,
+    [Parameter(Mandatory)][string]$ManualScenariosRelativePath
+  )
 
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $authorities = @(
-    ".mir/performance-budgets.json",
+  $execution = (Resolve-Path -LiteralPath $ExecutionRoot).Path
+  $target = (Resolve-Path -LiteralPath $TargetAuthorityRoot).Path
+  $scenarioAuthority = $ManualScenariosRelativePath.Replace("\", "/")
+  if ([IO.Path]::IsPathRooted($ManualScenariosRelativePath) -or
+      $scenarioAuthority -notmatch '^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.json$') {
+    throw "Performance harness requires a repository-relative scenario authority path."
+  }
+  $executionAuthorities = @(
     ".mir/performance-campaign.json",
-    ".mir/sanitation-budgets.json",
-    "validation/scenarios/local-2.1.json",
     "fixtures/performance-regression-probe",
     "scripts/Invoke-MIRCompatAudit.ps1",
     "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
@@ -18,31 +25,48 @@ function Get-MIRPerformanceHarnessFiles {
     "tools/lib/validation/SettingsOverrides.ps1"
   )
   $files = @()
-  foreach ($relative in $authorities) {
-    $path = Join-Path $repo $relative
+  foreach ($relative in $executionAuthorities) {
+    $path = Join-Path $execution $relative
     if (Test-Path -LiteralPath $path -PathType Leaf) {
-      $files += $relative.Replace("\", "/")
+      $files += [pscustomobject]@{ scope="execution"; relative=$relative.Replace("\", "/"); path=$path }
       continue
     }
     if (Test-Path -LiteralPath $path -PathType Container) {
       $files += @(
         Get-ChildItem -LiteralPath $path -Recurse -File |
-          ForEach-Object { [IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") }
+          ForEach-Object {
+            [pscustomobject]@{
+              scope="execution"
+              relative=[IO.Path]::GetRelativePath($execution, $_.FullName).Replace("\", "/")
+              path=$_.FullName
+            }
+          }
       )
       continue
     }
-    throw "Performance harness authority is absent: $relative"
+    throw "Performance execution-toolchain authority is absent: $relative"
   }
-  return @($files | Sort-Object -Unique)
+  foreach ($relative in @(".mir/performance-budgets.json", ".mir/sanitation-budgets.json", $scenarioAuthority)) {
+    $path = Join-Path $target $relative
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+      throw "Performance target authority is absent: $relative"
+    }
+    $files += [pscustomobject]@{ scope="target"; relative=$relative.Replace("\", "/"); path=$path }
+  }
+  return @($files | Sort-Object scope, relative -Unique)
 }
 
 function Get-MIRPerformanceHarnessFingerprint {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)][string]$ExecutionRoot,
+    [Parameter(Mandatory)][string]$TargetAuthorityRoot,
+    [Parameter(Mandatory)][string]$ManualScenariosRelativePath
+  )
 
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $rows = foreach ($relative in Get-MIRPerformanceHarnessFiles -RepoRoot $repo) {
-    $identity = Get-MIRFileContentIdentity -Path (Join-Path $repo $relative) -RelativePath $relative
-    "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
+  $rows = foreach ($entry in Get-MIRPerformanceHarnessFiles -ExecutionRoot $ExecutionRoot -TargetAuthorityRoot $TargetAuthorityRoot -ManualScenariosRelativePath $ManualScenariosRelativePath) {
+    $qualifiedPath = "$($entry.scope)/$($entry.relative)"
+    $identity = Get-MIRFileContentIdentity -Path $entry.path -RelativePath $qualifiedPath
+    "{0}`t{1}`t{2}" -f $qualifiedPath, $identity.Length, $identity.Sha256
   }
   return Get-MIRStringSha256 -Value ($rows -join "`n")
 }

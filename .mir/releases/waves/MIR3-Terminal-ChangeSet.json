@@ -15,7 +15,14 @@
     ".mir/releases/terminal/findings/MIR3-TERM-0012.json",
     ".mir/releases/terminal/findings/MIR3-TERM-0013.json",
     ".mir/releases/terminal/findings/MIR3-TERM-0014.json",
-    ".mir/releases/terminal/findings/MIR3-TERM-0015.json"
+    ".mir/releases/terminal/findings/MIR3-TERM-0015.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0016.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0017.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0018.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0019.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0020.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0021.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0022.json"
   ],
   "target_wave": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
   "items": [

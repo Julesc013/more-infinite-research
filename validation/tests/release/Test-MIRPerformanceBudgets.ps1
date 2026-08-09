@@ -282,7 +282,7 @@ foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerforma
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
+foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId", "historical target package source", "package-root equivalent", "campaign.candidate.package_source_commit", "declares official module data absent", "official_data_roots", "declaredOfficialModules", "ManualScenariosRelativePath", "manual_scenarios_sha256", "RequiredProbePhases", "RequiresProbeTelemetry", "omitted-by-capability", "ArtifactVolumeLaneIds", 'New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine', 'SanitationBudgetPath = (Join-Path $RepoRoot', 'FactorioLine = [string]$campaign.factorio_line', 'Join-Path $executionRoot')) {
   if ($producerSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
@@ -299,6 +299,18 @@ $helperSource = Get-Content -Raw -LiteralPath $performanceCampaignHelpers
 foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget")) {
   if ($helperSource -notmatch [regex]::Escape($snippet)) {
     throw "Canonical performance staging helper lacks required 0012 behavior '$snippet'."
+  }
+}
+$performanceEvidenceValidatorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\ReleaseAttestations.ps1")
+foreach ($snippet in @("artifactVolumePolicy", "omitted-by-capability", "governed target-era campaign", "artifact_volume_lanes")) {
+  if ($performanceEvidenceValidatorSource -notmatch [regex]::Escape($snippet)) {
+    throw "Runtime performance evidence validation does not honor governed target capabilities '$snippet'."
+  }
+}
+$harnessSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
+foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {
+  if ($harnessSource -notmatch [regex]::Escape($snippet)) {
+    throw "Performance harness fingerprint does not bind the governed target-era scenario authority '$snippet'."
   }
 }
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
