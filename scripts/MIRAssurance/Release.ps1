@@ -160,6 +160,30 @@ function Get-MIRAssuranceSealSourceAuthority {
   }
 }
 
+function Get-MIRAssurancePerformanceEvidenceArtifact {
+  param([Parameter(Mandatory)]$Bundle)
+
+  $capsules = @($Bundle.evidence | Where-Object { [string]$_.test_id -eq "runtime.performance-regression" })
+  if ($capsules.Count -ne 1 -or [string]$capsules[0].status -ne "passed") {
+    throw "The evidence bundle must contain exactly one passing runtime.performance-regression capsule."
+  }
+  $artifacts = @($capsules[0].artifacts | Where-Object { [string]$_.kind -eq "runtime-performance-evidence" })
+  if ($artifacts.Count -ne 1) {
+    throw "The performance capsule must contain exactly one captured runtime-performance-evidence artifact."
+  }
+  $artifact = $artifacts[0]
+  $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Captured runtime performance evidence is absent: $artifactPath"
+  }
+  $item = Get-Item -LiteralPath $artifactPath
+  if ([long]$artifact.bytes -ne [long]$item.Length -or
+      [string]$artifact.sha256 -ne (Get-MIRAssuranceSha256 -Path $artifactPath)) {
+    throw "Captured runtime performance evidence no longer matches its capsule descriptor."
+  }
+  return $artifact
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -199,8 +223,11 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
     throw "Verification plan source tree is not the qualification source tree."
   }
-  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+  $performanceArtifact = Get-MIRAssurancePerformanceEvidenceArtifact -Bundle $bundle
+  $performanceArtifactPath = Resolve-MIRAssurancePath -Path ([string]$performanceArtifact.path)
+  $null = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
+    -Path $performanceArtifactPath `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
@@ -224,6 +251,20 @@ function Invoke-MIRAssuranceSeal {
   $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $qualificationRoot = Join-Path $repo ".mir\evidence\qualifications\$($Context.info.version)-factorio-$($Context.target)"
   New-Item -ItemType Directory -Force -Path $qualificationRoot | Out-Null
+  $performanceEvidencePath = Join-Path $qualificationRoot "performance-regression.json"
+  Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force
+  if ((Get-MIRAssuranceSha256 -Path $performanceEvidencePath) -ne [string]$performanceArtifact.sha256) {
+    throw "Durable performance evidence differs from the exact captured assurance artifact."
+  }
+  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+    -RepoRoot $repo `
+    -Path $performanceEvidencePath `
+    -Candidate $Context.candidate `
+    -PriorRelease $Context.prior_release `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $commit `
+    -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $planSnapshotPath = Join-Path $qualificationRoot "verification-plan.json"
   $bundleSnapshotPath = Join-Path $qualificationRoot "evidence-bundle.json"
   Write-MIRAssuranceAtomicJson -Value $plan -Path $planSnapshotPath
@@ -1109,6 +1150,17 @@ function Invoke-MIRAssuranceSelfTest {
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
+
+  $performanceOutput = Join-Path $repo "artifacts\assurance\self-test\performance-regression.json"
+  $resolvedPerformance = Resolve-MIRAssuranceCommandText `
+    -Command "./scripts/Invoke-MIRPerformanceQualification.ps1 -OutputPath <test-output>" `
+    -Context $Context `
+    -Plan $plan `
+    -TestOutput $performanceOutput
+  if ($resolvedPerformance -match '<test-output>' -or
+      $resolvedPerformance -notmatch [regex]::Escape($performanceOutput)) {
+    throw "Worker-local performance output binding self-test failed."
+  }
 
   Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
 }
