@@ -271,7 +271,7 @@
       "id": "runtime.performance-regression",
       "kind": "runtime-evidence",
       "layer": "F4",
-      "command": "./scripts/Invoke-MIRPerformanceQualification.ps1 -Candidate <candidate> -PriorRelease <prior-release> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -ExpectedBaselineVersion <upgrade-from> -ExpectedFactorioVersion <qualification-factorio-version> -LocalModZipDir <mods> -OutputPath .mir/evidence/<upgrade-to>-performance-regression.json",
+      "command": "./scripts/Invoke-MIRPerformanceQualification.ps1 -Candidate <candidate> -PriorRelease <prior-release> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -ExpectedBaselineVersion <upgrade-from> -ExpectedFactorioVersion <qualification-factorio-version> -LocalModZipDir <mods> -OutputPath <test-output>",
       "requires_factorio": true,
       "inputs": [
         "candidate",

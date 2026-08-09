@@ -217,6 +217,30 @@ function Get-MIRAssuranceSealSourceAuthority {
   }
 }
 
+function Get-MIRAssurancePerformanceEvidenceArtifact {
+  param([Parameter(Mandatory)]$Bundle)
+
+  $capsules = @($Bundle.evidence | Where-Object { [string]$_.test_id -eq "runtime.performance-regression" })
+  if ($capsules.Count -ne 1 -or [string]$capsules[0].status -ne "passed") {
+    throw "The evidence bundle must contain exactly one passing runtime.performance-regression capsule."
+  }
+  $artifacts = @($capsules[0].artifacts | Where-Object { [string]$_.kind -eq "runtime-performance-evidence" })
+  if ($artifacts.Count -ne 1) {
+    throw "The performance capsule must contain exactly one captured runtime-performance-evidence artifact."
+  }
+  $artifact = $artifacts[0]
+  $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Captured runtime performance evidence is absent: $artifactPath"
+  }
+  $item = Get-Item -LiteralPath $artifactPath
+  if ([long]$artifact.bytes -ne [long]$item.Length -or
+      [string]$artifact.sha256 -ne (Get-MIRAssuranceSha256 -Path $artifactPath)) {
+    throw "Captured runtime performance evidence no longer matches its capsule descriptor."
+  }
+  return $artifact
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -256,11 +280,9 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
     throw "Verification plan source tree is not the qualification source tree."
   }
-  $performanceEvidencePath = Join-Path $repo ".mir\evidence\$($Context.info.version)-performance-regression.json"
-  if (-not (Test-Path -LiteralPath $performanceEvidencePath -PathType Leaf)) {
-    throw "Runtime performance evidence is absent: $performanceEvidencePath"
-  }
-  $performanceRecord = Get-Content -Raw -LiteralPath $performanceEvidencePath | ConvertFrom-Json
+  $performanceArtifact = Get-MIRAssurancePerformanceEvidenceArtifact -Bundle $bundle
+  $performanceArtifactPath = Resolve-MIRAssurancePath -Path ([string]$performanceArtifact.path)
+  $performanceRecord = Get-Content -Raw -LiteralPath $performanceArtifactPath | ConvertFrom-Json
   $performanceSourceCommit = Resolve-MIRAssuranceCommit -Commit ([string]$performanceRecord.candidate.source_commit)
   & git -C $repo merge-base --is-ancestor $performanceSourceCommit $commit
   if ($LASTEXITCODE -ne 0) {
@@ -278,9 +300,9 @@ function Invoke-MIRAssuranceSeal {
       [string]$performanceSourceBuild.content_sha256 -ne [string]$sourceAuthority.candidate_identity.content_sha256) {
     throw "Runtime performance evidence source does not reproduce the exact candidate."
   }
-  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+  $null = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
-    -Path $performanceEvidencePath `
+    -Path $performanceArtifactPath `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
@@ -301,9 +323,23 @@ function Invoke-MIRAssuranceSeal {
       $canonicalDevAnchor = [string]$sourceLock.canonical_dev_anchor
     }
   }
-  $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $qualificationRoot = Join-Path $repo ".mir\evidence\qualifications\$($Context.info.version)-factorio-$($Context.target)"
   New-Item -ItemType Directory -Force -Path $qualificationRoot | Out-Null
+  $performanceEvidencePath = Join-Path $qualificationRoot "performance-regression.json"
+  Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force
+  if ((Get-MIRAssuranceSha256 -Path $performanceEvidencePath) -ne [string]$performanceArtifact.sha256) {
+    throw "Durable performance evidence differs from the exact captured assurance artifact."
+  }
+  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+    -RepoRoot $repo `
+    -Path $performanceEvidencePath `
+    -Candidate $Context.candidate `
+    -PriorRelease $Context.prior_release `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $performanceSourceCommit `
+    -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
+  $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $planSnapshotPath = Join-Path $qualificationRoot "verification-plan.json"
   $bundleSnapshotPath = Join-Path $qualificationRoot "evidence-bundle.json"
   Write-MIRAssuranceAtomicJson -Value $plan -Path $planSnapshotPath
