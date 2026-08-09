@@ -1505,7 +1505,8 @@ function Resolve-MIRAssuranceCommandText {
   param(
     [Parameter(Mandatory)][string]$Command,
     [Parameter(Mandatory)]$Context,
-    [Parameter(Mandatory)]$Plan
+    [Parameter(Mandatory)]$Plan,
+    [string]$TestOutput = ""
   )
   $approvedDeltaPath = if ($Command.Contains("<approved-delta-path>")) {
     Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
@@ -1525,6 +1526,7 @@ function Resolve-MIRAssuranceCommandText {
     "<source-commit>"=[string]$Plan.source_commit
     "<package-source-commit>"=[string]$Plan.package_source_commit
     "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
+    "<test-output>"=[string]$TestOutput
   }
   $resolved = $Command
   foreach ($entry in $values.GetEnumerator()) {
@@ -1543,9 +1545,10 @@ function Invoke-MIRAssuranceCommandText {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)]$Plan,
     [Parameter(Mandatory)][string]$StdoutPath,
-    [Parameter(Mandatory)][string]$StderrPath
+    [Parameter(Mandatory)][string]$StderrPath,
+    [string]$TestOutput = ""
   )
-  $resolved = Resolve-MIRAssuranceCommandText -Command $Command -Context $Context -Plan $Plan
+  $resolved = Resolve-MIRAssuranceCommandText -Command $Command -Context $Context -Plan $Plan -TestOutput $TestOutput
   $tokens = [Management.Automation.PSParser]::Tokenize($resolved, [ref]$null) | Where-Object { $_.Type -notin @("Comment", "NewLine") }
   if ($tokens.Count -eq 0) { throw "Empty assurance command." }
   $commandPath = [string]$tokens[0].Content
@@ -1963,6 +1966,7 @@ function Invoke-MIRAssuranceTest {
   $stdoutPath = Join-Path $workRoot "stdout.txt"
   $stderrPath = Join-Path $workRoot "stderr.txt"
   $resultPath = Join-Path $workRoot "result.json"
+  $performanceOutputPath = Join-Path $workRoot "performance-regression.json"
   [IO.File]::WriteAllText($stdoutPath, "", [Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($stderrPath, "", [Text.UTF8Encoding]::new($false))
   try {
@@ -1971,7 +1975,8 @@ function Invoke-MIRAssuranceTest {
       -Context $Context `
       -Plan $Plan `
       -StdoutPath $stdoutPath `
-      -StderrPath $stderrPath
+      -StderrPath $stderrPath `
+      -TestOutput $performanceOutputPath
     $resolvedCommand = [string]$commandResult.resolved_command
     $exitCode = [int]$commandResult.exit_code
     if ($exitCode -ne 0) {
@@ -1984,6 +1989,25 @@ function Invoke-MIRAssuranceTest {
       $scenarioResult = Get-MIRAssuranceScenarioResult -Test $Test -SummaryPath $capturedScenarioSummaryPath
       $assertions = @($scenarioResult.assertions)
       $artifacts = @($scenarioResult.artifacts)
+    } elseif ($id -eq "runtime.performance-regression") {
+      $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+        -RepoRoot $repo `
+        -Path $performanceOutputPath `
+        -Candidate $Context.candidate `
+        -PriorRelease $Context.prior_release `
+        -FactorioBin $Context.factorio `
+        -ExpectedSourceCommit ([string]$Plan.source_commit) `
+        -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+        -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
+      $performanceDescriptor = Get-MIRAssuranceArtifactDescriptor -Path $performanceEvidence.path -Kind "runtime-performance-evidence"
+      $assertions = @(
+        [ordered]@{
+          id="runtime-performance-evidence-validated"
+          status="passed"
+          evidence=[string]$performanceDescriptor.path
+        }
+      )
+      $artifacts = @($performanceDescriptor)
     } else {
       $assertions = @(
         [ordered]@{
