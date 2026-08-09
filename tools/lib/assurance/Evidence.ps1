@@ -1976,7 +1976,7 @@ function Invoke-MIRAssuranceTest {
       -Plan $Plan `
       -StdoutPath $stdoutPath `
       -StderrPath $stderrPath `
-      -TestOutput $workRoot
+      -TestOutput $performanceOutputPath
     $resolvedCommand = [string]$commandResult.resolved_command
     $exitCode = [int]$commandResult.exit_code
     if ($exitCode -ne 0) {

@@ -242,7 +242,7 @@ if ($performanceTest.Count -ne 1 -or
     [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
     [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
     [string]$performanceTest[0].command -notmatch '-LocalModZipDir\s+<mods>' -or
-    [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>/performance-regression\.json' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>(?:\s|$)' -or
     [string]$performanceTest[0].command -match '\.mir/evidence/' -or
     @($performanceTest[0].inputs) -notcontains "mod-closure" -or
     @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
@@ -253,6 +253,7 @@ $assuranceEvidenceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "t
 foreach ($requiredPerformanceIsolationSnippet in @(
   '"<test-output>"=[string]$TestOutput',
   '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
+  '-TestOutput $performanceOutputPath',
   '-Kind "runtime-performance-evidence"'
 )) {
   if (-not $assuranceEvidenceSource.Contains($requiredPerformanceIsolationSnippet)) {
