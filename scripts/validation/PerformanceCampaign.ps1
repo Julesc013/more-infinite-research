@@ -69,6 +69,63 @@ function Get-MIRPerformanceSettingsFingerprint {
   return Get-MIRStringSha256 -Value ($rows -join "`n")
 }
 
+function Get-MIRPerformanceRunDirectoryName {
+  param(
+    [Parameter(Mandatory)][string]$LaneId,
+    [Parameter(Mandatory)][ValidateSet("warmup", "measured", "compat-smoke", "probe-smoke")][string]$Phase,
+    [Parameter(Mandatory)][ValidateRange(1, 99)][int]$Index,
+    [Parameter(Mandatory)][ValidateSet("baseline", "candidate")][string]$PackageLabel
+  )
+
+  if ([string]::IsNullOrWhiteSpace($LaneId)) {
+    throw "Performance run directory requires a non-empty lane ID."
+  }
+  $hasher = [Security.Cryptography.SHA256]::Create()
+  try {
+    $laneHash = [Convert]::ToHexString($hasher.ComputeHash([Text.Encoding]::UTF8.GetBytes($LaneId))).Substring(0, 16).ToLowerInvariant()
+  } finally {
+    $hasher.Dispose()
+  }
+  $phaseToken = @{
+    "warmup" = "w"
+    "measured" = "m"
+    "compat-smoke" = "s"
+    "probe-smoke" = "p"
+  }[$Phase]
+  $packageToken = if ($PackageLabel -eq "baseline") { "b" } else { "c" }
+  return "l-$laneHash-$phaseToken$($Index.ToString('D2'))-$packageToken"
+}
+
+function Get-MIRPerformanceRunPathBudget {
+  param(
+    [Parameter(Mandatory)][string]$RunRoot,
+    [Parameter(Mandatory)][string]$RunDirectoryName
+  )
+
+  $userDataPath = Join-Path $RunRoot (Join-Path $RunDirectoryName "c\runs\u-000000000000")
+  $tempPath = Join-Path $userDataPath "temp\currently-playing\locale\ar\freeplay.cfg"
+  return [pscustomobject]@{
+    maximum_path_length = 240
+    projected_user_data_path = $userDataPath
+    projected_user_data_path_length = $userDataPath.Length
+    projected_temp_path = $tempPath
+    projected_temp_path_length = $tempPath.Length
+  }
+}
+
+function Assert-MIRPerformanceRunPathBudget {
+  param(
+    [Parameter(Mandatory)][string]$RunRoot,
+    [Parameter(Mandatory)][string]$RunDirectoryName
+  )
+
+  $budget = Get-MIRPerformanceRunPathBudget -RunRoot $RunRoot -RunDirectoryName $RunDirectoryName
+  if ($budget.projected_temp_path_length -gt $budget.maximum_path_length) {
+    throw "Performance run path exceeds the Factorio temporary-path budget ($($budget.projected_temp_path_length) > $($budget.maximum_path_length)): $($budget.projected_temp_path)"
+  }
+  return $budget
+}
+
 function Get-MIRPerformanceCounterValue {
   param(
     [Parameter(Mandatory)]$Counters,

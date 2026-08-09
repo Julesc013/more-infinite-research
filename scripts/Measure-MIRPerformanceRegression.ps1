@@ -24,11 +24,6 @@ function Resolve-MIRCampaignPath {
   return [IO.Path]::GetFullPath((Join-Path $RepoRoot $Path))
 }
 
-function Get-MIRCampaignSafeName {
-  param([Parameter(Mandatory)][string]$Value)
-  return ($Value -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
-}
-
 function Get-MIRCampaignTreeSha256 {
   param(
     [Parameter(Mandatory)][string]$Root,
@@ -310,7 +305,7 @@ function Invoke-MIRCompatPerformanceRun {
     [Parameter(Mandatory)][string]$RunRoot
   )
   $compatScript = Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1"
-  $outputDir = Join-Path $RunRoot "compat"
+  $outputDir = Join-Path $RunRoot "c"
   $logPath = Join-Path $RunRoot "compat-audit.log"
   $parameters = @{
     FactorioBin = $script:FactorioPath
@@ -369,8 +364,13 @@ function Invoke-MIRCampaignLaneRun {
     [Parameter(Mandatory)][int]$Index
   )
   $packagePath = if ($PackageLabel -eq "baseline") { $script:PriorPath } else { $script:CandidatePath }
-  $laneSafe = Get-MIRCampaignSafeName -Value ([string]$Lane.id)
-  $runRoot = Join-Path $script:RunRoot ("{0}\{1}-{2:D2}-{3}" -f $laneSafe, $Phase, $Index, $PackageLabel)
+  $runDirectoryName = Get-MIRPerformanceRunDirectoryName `
+    -LaneId ([string]$Lane.id) `
+    -Phase $Phase `
+    -Index $Index `
+    -PackageLabel $PackageLabel
+  $runRoot = Join-Path $script:RunRoot $runDirectoryName
+  $null = Assert-MIRPerformanceRunPathBudget -RunRoot $script:RunRoot -RunDirectoryName $runDirectoryName
   New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
   Write-Host ("[performance] lane={0} phase={1} index={2} package={3} starting" -f $Lane.id, $Phase, $Index, $PackageLabel)
   $result = switch ([string]$Lane.runner) {

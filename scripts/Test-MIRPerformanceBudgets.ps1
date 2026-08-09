@@ -247,6 +247,30 @@ $campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
   throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
 }
+$performanceCampaignHelpers = Join-Path $RepoRoot "scripts\validation\PerformanceCampaign.ps1"
+. $performanceCampaignHelpers
+$compactMeasuredCandidate = Get-MIRPerformanceRunDirectoryName `
+  -LaneId "medium-ecosystem.factorio-total" `
+  -Phase "measured" `
+  -Index 1 `
+  -PackageLabel "candidate"
+$compactMeasuredBaseline = Get-MIRPerformanceRunDirectoryName `
+  -LaneId "medium-ecosystem.factorio-total" `
+  -Phase "measured" `
+  -Index 1 `
+  -PackageLabel "baseline"
+if ($compactMeasuredCandidate -notmatch '^l-[0-9a-f]{16}-m01-c$' -or
+    $compactMeasuredBaseline -notmatch '^l-[0-9a-f]{16}-m01-b$' -or
+    $compactMeasuredCandidate -eq $compactMeasuredBaseline) {
+  throw "Performance runs must use deterministic compact lane/phase/package directory names."
+}
+$pathBudget = Get-MIRPerformanceRunPathBudget `
+  -RunRoot (Join-Path $RepoRoot "artifacts\performance\2.5.0-to-2.5.5-20260809-062129") `
+  -RunDirectoryName $compactMeasuredCandidate
+if ($pathBudget.projected_temp_path_length -gt $pathBudget.maximum_path_length -or
+    $pathBudget.maximum_path_length -ne 240) {
+  throw "Performance run staging must stay below the governed Factorio temporary-path budget."
+}
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
 $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
