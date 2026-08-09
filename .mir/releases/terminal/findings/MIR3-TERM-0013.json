@@ -43,7 +43,7 @@
     "reason": "The evidence-representation gap is reproduced, bounded to post-publication assurance custody, prohibits use for unreleased candidates, and does not alter product source or published package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-pr-admission",
-    "evidence": "The durable attestation .mir/evidence/2.5.5-manual-review-attestation.json passed Test-MIRManualReleaseReview.ps1 against exact archive 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C, content 047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154, source 1def5da0d0791149770f84d8bbc4c164c426b7ce, and Factorio 2.0.77; the governed content-addressed copy is byte-identical."
+    "status": "closed",
+    "evidence": "The durable attestation .mir/evidence/2.5.5-manual-review-attestation.json passed Test-MIRManualReleaseReview.ps1 against exact archive 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C, content 047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154, source 1def5da0d0791149770f84d8bbc4c164c426b7ce, and Factorio 2.0.77; the governed content-addressed copy is byte-identical. Full static validation passed at c2a4494506bc465313b4bd3e95560a19df56c333 after the raw-hash custody path was verified."
   }
 }
