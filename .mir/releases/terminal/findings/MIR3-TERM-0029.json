@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0029",
+  "title": "Fresh assurance campaigns discarded valid completed rows after coordinator interruption",
+  "source_observation": {
+    "observed_at": "2026-08-10T23:29:00.0000000+10:00",
+    "environment": "3.2.5 full no-reuse post-publication calibration from assurance commit a454159f64f392b3c4f89d2538ddbeb2f24586d7, immutable public 3.2.5 and 3.2.3 archives, Factorio 2.1.13, and the explicit 2.1 mod closure.",
+    "fact": "The coordinator was terminated by its one-hour host limit while runtime.performance-regression was active after 136 planned rows had written exact passing capsules. Freshness was bound to a process run ID and attempt, and executor planning ignored same-plan completed rows when --no-reuse was set, so a replacement coordinator would repeat them instead of carrying them forward."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\tools\\mir.ps1 verify run --target 2.1 --profile full --candidate dist\\more-infinite-research_3.2.5.zip --prior dist\\more-infinite-research_3.2.3.zip --factorio <exact-2.1.13> --mods C:\\Projects\\Factorio\\testmods\\2.1 --no-reuse --plan build\\results\\terminal-calibration\\3.2.5-0026-ecosystem-plan.json",
+    "expected": "A durable plan owns fresh campaign identity. A resumed exact plan adopts only completed matching campaign rows and runs only the remaining rows; a planned time budget stops only between rows and reports checkpointed rather than passing.",
+    "observed": "The process ended at the host boundary with a stale performance running marker and no aggregate. Existing passing capsules could satisfy neither the no-reuse executor nor an aggregate tied to a replacement host run."
+  },
+  "severity": "assurance",
+  "visibility": {
+    "package": false,
+    "gameplay": false,
+    "assurance": true
+  },
+  "stable_id_and_migration_impact": "none; verifier campaign coordination and evidence custody only",
+  "affected_targets": [
+    "3.2.9",
+    "2.5.9",
+    "1.9.9",
+    "1.8.9",
+    "1.7.9",
+    "1.6.9",
+    "1.5.9",
+    "1.4.9",
+    "1.3.9"
+  ],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "modern full qualification must survive coordinator and runner replacement without borrowing another campaign"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "maintained independent qualification needs durable exact plan checkpoints"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite qualification uses the same verifier and immutable campaign binding"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite qualification uses the same verifier and immutable campaign binding"}
+  ],
+  "regression_obligations": [
+    "fresh plan materializes an immutable campaign ID and each fresh row binds that campaign plus minimum completion time",
+    "a fresh exact row completed by a replacement local or protected execution attempt is checkpointed rather than re-run",
+    "a row from another plan campaign, source commit, trust context, fingerprint, or pre-plan completion time is rejected",
+    "stale running markers are recovered automatically and live workers are waited for rather than overwritten",
+    "a time-budgeted run stops only between rows, writes checkpointed status, and cannot be mistaken for a passing aggregate",
+    "the aggregate gate accepts only the complete exact fresh campaign and all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "assurance proofs for all nine targets; no product, migration, compatibility, or package-shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The correction changes evidence coordination only. It cannot mutate a package, target semantic projection, migration, or public release identity."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": "Host-timeout observation preserved the 136 completed exact rows and stale runtime.performance-regression marker. The bounded implementation adds plan-owned campaign freshness, checkpoint adoption, stale-worker recovery, and explicit between-row checkpoint budgeting. Exact 3.2.5 and 2.5.5 resumed convergence and independent confirmation remain required before closure."
+  }
+}

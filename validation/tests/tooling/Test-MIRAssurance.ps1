@@ -644,6 +644,8 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
 $assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredIngestionGuard in @(
   'mir-assurance-worker-receipt-v2',
+  'Test-MIRAssuranceFreshCampaignEvidence',
+  'Get-MIRAssuranceCampaignCheckpoint',
   'stale-ignored',
   'ReparsePoint',
   'max_entries_per_artifact',
@@ -653,6 +655,12 @@ foreach ($requiredIngestionGuard in @(
 )) {
   if (-not $assuranceEvidence.Contains($requiredIngestionGuard)) {
     throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
+  }
+}
+$assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "checkpointed"', 'TimeBudgetSeconds')) {
+  if (-not $assuranceEntry.Contains($requiredCheckpointSnippet)) {
+    throw "Assurance checkpoint facade omits required contract: $requiredCheckpointSnippet"
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")

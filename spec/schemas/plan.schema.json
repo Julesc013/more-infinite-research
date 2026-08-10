@@ -19,6 +19,7 @@
     "required_test_set_sha256",
     "policy_sha256",
     "plan_material_sha256",
+    "campaign",
     "tests"
   ],
   "properties": {
@@ -55,6 +56,17 @@
     },
     "required_test_set_sha256": { "$ref": "#/$defs/sha256" },
     "plan_material_sha256": { "$ref": "#/$defs/sha256" },
+    "campaign": {
+      "type": "object",
+      "required": ["schema", "id", "plan_material_sha256", "created_at"],
+      "properties": {
+        "schema": { "const": "mir-assurance-campaign-v1" },
+        "id": { "type": "string", "pattern": "^plan-[0-9a-fA-F]{64}$" },
+        "plan_material_sha256": { "$ref": "#/$defs/sha256" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
     "producer": { "type": "object" },
     "domain_manifest": { "type": "object" },
     "tests": {
