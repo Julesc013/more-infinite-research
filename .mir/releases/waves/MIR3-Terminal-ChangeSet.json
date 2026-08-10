@@ -104,5 +104,57 @@
       "fixed_point_restart_scope": "assurance-only-if-admitted-terminal-slice-changes",
       "closure": {"status":"classified","evidence":".mir/releases/terminal/MIR3-Terminal-ScopeFirewallV1.json"}
     }
+  ],
+  "product_intake": [
+    {
+      "id": "MIR3-TERM-0027",
+      "title": "Krastorio 2 science-tier phase-out does not apply to MIR-generated research",
+      "source_observation": "Maintainer report against the immutable 3.2.5 package. Exact local Krastorio2 2.1.2 runs its final tier-separation pass before MIR; the existing K2SO scenario currently asserts retention of five early/base science packs on research_advanced_circuit.",
+      "reproduction": {"status": "exact-engine-reproduced", "evidence": "Immutable 3.2.5 loaded successfully on Factorio 2.1.13 with exact Krastorio2 2.1.2 and K2SO 2.0.13. campaign-evidence.json SHA-256 CE4AC36D3BBC9174965B4FDE3537C734E76E12FDE6F3FFBB6DDE1DAA42F1605A; load-results.json SHA-256 16FFACDB85F47B95E571F37A6F24EE544ECB4A5BC63AFAD8461C32B3CC237241. The capture records 73 of 76 generated streams retaining at least one automation, logistic, chemical, or military science pack; research_advanced_circuit retains automation, logistic, chemical, production, and electromagnetic packs. Source: Krastorio2_2.1.2/prototypes/final-fixes/enforce-science-tier-separation.lua; validation/scenarios/local-2.1.json#local-2-1-krastorio-spaced-out; build/results/terminal-characterization/k2-2.1.2-attempt-02/"},
+      "severity": "P1",
+      "visibility": {"package": true, "gameplay": true, "assurance": false},
+      "stable_id_and_migration_impact": "Existing generated technology identities remain stable, but any science-ingredient transition must preserve research-progress and direct 3.2.5-to-3.2.9 upgrade semantics.",
+      "affected_targets": ["3.2.9"],
+      "target_dispositions": [
+        {"target": "3.2.9", "disposition": "pending-sol-admission", "reason": "Exact K2 2.1.2/K2SO 2.0.13 behaviour is current-target product compatibility work."},
+        {"target": "2.5.9", "disposition": "not-applicable", "reason": "The observed K2 2.1.2 archive requires Factorio 2.1.7 or later; no 2.0 projection is inferred."},
+        {"target": "1.9.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 1.1."},
+        {"target": "1.8.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 1.0."},
+        {"target": "1.7.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 0.17."},
+        {"target": "1.6.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 0.16."},
+        {"target": "1.5.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 0.15."},
+        {"target": "1.4.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 0.14."},
+        {"target": "1.3.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 0.13."}
+      ],
+      "admission_destination": "Sol-terminal-product-admission",
+      "regression_obligations": ["exact K2/K2SO load capture records generated stream science inputs", "the adopted K2 phase policy has positive and negative fixture coverage", "3.2.5-to-3.2.9 upgrade preserves progress for every affected stable technology", "no broad K2 or K2SO support claim is made without a locked behaviour matrix"],
+      "fixed_point_restart_scope": "3.2.9 current-target shadow and every target whose final Sol disposition is portable; no lower target is presumed affected.",
+      "closure": {"status": "ready-for-sol-admission", "evidence": "Exact immutable-package environment capture; semantic policy remains unselected."}
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "title": "Alternate science-pack recipes can become an arbitrary late MIR prerequisite",
+      "source_observation": "Maintainer report with Cubium. Local Cubium 1.0.30 source unlocks cubic variants of every science recipe from cube-mastery-4; MIR currently collects all science-recipe unlockers, sorts technology names, and selects the first researchable name.",
+      "reproduction": {"status": "source-confirmed-awaiting-exact-engine-capture", "evidence": "Local Cubium 1.0.30 archive #cubium/prototypes/technology.lua; prototypes/mir/capabilities/science_integration/pack_production_reachability.lua. Exact 2.0 reproduction lock: official Cubium 1.0.28, Factorio 2.0, released 2025-07-17T20:54:27.43Z, archive SHA-1 ed180a11e7cfecc7d1f21395b10e0965e89dd494, download path /download/cubium/6879630396b427597bedb7da; authenticated archive acquisition is pending."},
+      "severity": "P1",
+      "visibility": {"package": true, "gameplay": true, "assurance": false},
+      "stable_id_and_migration_impact": "Existing generated technology identities remain stable, but changed prerequisites require a direct-upgrade graph and research-progress review.",
+      "affected_targets": ["3.2.9", "2.5.9"],
+      "target_dispositions": [
+        {"target": "3.2.9", "disposition": "pending-sol-admission", "reason": "The local Cubium 1.0.30 archive is Factorio 2.1 and exposes the exact alternate-route shape."},
+        {"target": "2.5.9", "disposition": "pending-exact-2.0-reproduction", "reason": "Cubium 1.0.28 is an authentic Factorio 2.0 release, but its immutable archive must be acquired and reproduced before projection is admitted."},
+        {"target": "1.9.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.8.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.7.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.6.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.5.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.4.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
+        {"target": "1.3.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."}
+      ],
+      "admission_destination": "Sol-terminal-product-admission-after-exact-2.0-and-fixture-reproduction",
+      "regression_obligations": ["a MIR-owned fixture proves a later alternate route cannot delay an already-reachable science pack", "unmodified Cubium 1.0.28 on exact Factorio 2.0 is captured separately from any 2.1 diagnostic shim", "all retained prerequisite candidates remain researchable and acyclic", "3.2.5-to-3.2.9 and 2.5.5-to-2.5.9 upgrades preserve stable IDs and do not introduce a late alternate-route gate"],
+      "fixed_point_restart_scope": "3.2.9 and, only after exact 2.0 proof, 2.5.9; any later portable semantic decision restarts its explicitly affected shadow projections.",
+      "closure": {"status": "characterization-in-progress", "evidence": null}
+    }
   ]
 }
