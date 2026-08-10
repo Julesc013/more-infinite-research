@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot "PackageIdentity.ps1")
+. (Join-Path $PSScriptRoot "PerformanceCampaign.ps1")
 
 function Get-MIRReleaseSha256 {
   param([Parameter(Mandatory)][string]$Path)
@@ -112,7 +113,8 @@ function Test-MIRRuntimePerformanceEvidence {
     [Parameter(Mandatory)][string]$FactorioBin,
     [Parameter(Mandatory)][string]$ExpectedSourceCommit,
     [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
-    [Parameter(Mandatory)][string]$ExpectedFactorioVersion
+    [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+    [string]$CampaignPath = ""
   )
   $candidatePath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Candidate
   $priorPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $PriorRelease
@@ -129,7 +131,13 @@ function Test-MIRRuntimePerformanceEvidence {
     throw "Runtime performance evidence must use mir-runtime-performance-regression schema 3."
   }
   if ([string]$evidence.status -ne "passed") { throw "Runtime performance evidence is not passed." }
-  $campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
+  $campaignPath = if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
+    Join-Path $RepoRoot ".mir\performance-campaign.json"
+  } elseif ([IO.Path]::IsPathRooted($CampaignPath)) {
+    [IO.Path]::GetFullPath($CampaignPath)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath))
+  }
   if (-not (Test-Path -LiteralPath $campaignPath -PathType Leaf)) { throw "Runtime performance campaign authority is absent." }
   $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
   if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$evidence.candidate.version -or
@@ -185,7 +193,7 @@ function Test-MIRRuntimePerformanceEvidence {
   }
 
   $volumeMeasurements = @($evidence.artifact_volume.measurements)
-  $artifactVolumePolicy = [string]$campaign.artifact_volume_policy
+  $artifactVolumePolicy = Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $campaign
   if ($artifactVolumePolicy -eq "required") {
     if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
         [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {

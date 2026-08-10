@@ -62,6 +62,33 @@ function Get-MIRPerformanceHarnessFiles {
   return @($files | Sort-Object scope, relative -Unique)
 }
 
+function Resolve-MIRPerformanceArtifactVolumePolicy {
+  param([Parameter(Mandatory)]$Campaign)
+
+  $declaredPolicy = [string]$Campaign.artifact_volume_policy
+  if (-not [string]::IsNullOrWhiteSpace($declaredPolicy)) {
+    if ($declaredPolicy -notin @("required", "omitted-by-capability")) {
+      throw "Performance campaign has an unsupported artifact-volume policy: $declaredPolicy"
+    }
+    return $declaredPolicy
+  }
+
+  # Schema-2 current-target campaigns C24 through C32 predate the explicit
+  # policy field, but their complete telemetry authority is unambiguous. Do
+  # not infer a missing policy for any incomplete or target-era campaign.
+  $phaseLaneCount = @(
+    $Campaign.phase_lanes | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.probe_phase) }
+  ).Count
+  $artifactLaneCount = @(
+    $Campaign.artifact_volume_lanes | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }
+  ).Count
+  if ([string]$Campaign.factorio_line -eq "2.1" -and $phaseLaneCount -gt 0 -and $artifactLaneCount -gt 0) {
+    return "required"
+  }
+
+  throw "Performance campaign omits artifact-volume policy without the complete legacy current-target telemetry authority."
+}
+
 function Get-MIRPerformanceHarnessFingerprint {
   param(
     [Parameter(Mandatory)][Alias("RepoRoot")][string]$ExecutionRoot,

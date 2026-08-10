@@ -455,7 +455,8 @@ $script:RequiredProbePhases = @(
     if (-not [string]::IsNullOrWhiteSpace($phase)) { $phase }
   }
 ) | Sort-Object -Unique
-$script:RequiresArtifactVolume = [string]$campaign.artifact_volume_policy -eq "required"
+$artifactVolumePolicy = Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $campaign
+$script:RequiresArtifactVolume = $artifactVolumePolicy -eq "required"
 $script:ArtifactVolumeLaneIds = @(
   foreach ($laneId in @($campaign.artifact_volume_lanes)) {
     $value = [string]$laneId
@@ -463,9 +464,6 @@ $script:ArtifactVolumeLaneIds = @(
   }
 ) | Sort-Object -Unique
 $script:RequiresProbeTelemetry = $script:RequiredProbePhases.Count -gt 0 -or $script:RequiresArtifactVolume
-if (-not $script:RequiresArtifactVolume -and [string]$campaign.artifact_volume_policy -ne "omitted-by-capability") {
-  throw "Performance campaign has an unsupported artifact-volume policy: $($campaign.artifact_volume_policy)."
-}
 if ($script:RequiresArtifactVolume -and $script:ArtifactVolumeLaneIds.Count -eq 0) {
   throw "Performance campaign requires artifact-volume telemetry but declares no artifact-volume lanes."
 }
@@ -805,7 +803,7 @@ $evidence = [ordered]@{
   run_order = $runOrder
   lanes = $laneResults
   artifact_volume = [ordered]@{
-    policy = [string]$campaign.artifact_volume_policy
+    policy = $artifactVolumePolicy
     telemetry_schema = if ($script:RequiresArtifactVolume) { 1 } else { 0 }
     aggregation = if ($script:RequiresArtifactVolume) { "maximum-observed" } else { "omitted-by-capability" }
     measurements = $volumeMeasurements

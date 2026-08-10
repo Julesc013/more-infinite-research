@@ -116,7 +116,8 @@ if (-not $?) {
   -FactorioBin $FactorioBin `
   -ExpectedSourceCommit $ExpectedSourceCommit `
   -ExpectedBaselineVersion $ExpectedBaselineVersion `
-  -ExpectedFactorioVersion $ExpectedFactorioVersion
+  -ExpectedFactorioVersion $ExpectedFactorioVersion `
+  -CampaignPath $CampaignPath
 if (-not $?) {
   throw "Fresh performance evidence validation failed."
 }

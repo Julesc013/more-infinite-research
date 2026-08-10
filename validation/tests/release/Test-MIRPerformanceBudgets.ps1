@@ -296,16 +296,39 @@ foreach ($snippet in @("compact-context-scratch-v1", "conservative_path_budget",
 $performanceCampaignHelpers = Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $helperSource = Get-Content -Raw -LiteralPath $performanceCampaignHelpers
-foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget")) {
+foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget", "Resolve-MIRPerformanceArtifactVolumePolicy", "complete legacy current-target telemetry authority")) {
   if ($helperSource -notmatch [regex]::Escape($snippet)) {
     throw "Canonical performance staging helper lacks required 0012 behavior '$snippet'."
   }
 }
 $performanceEvidenceValidatorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\ReleaseAttestations.ps1")
-foreach ($snippet in @("artifactVolumePolicy", "omitted-by-capability", "governed target-era campaign", "artifact_volume_lanes")) {
+foreach ($snippet in @("artifactVolumePolicy", "Resolve-MIRPerformanceArtifactVolumePolicy", "omitted-by-capability", "governed target-era campaign", "artifact_volume_lanes")) {
   if ($performanceEvidenceValidatorSource -notmatch [regex]::Escape($snippet)) {
     throw "Runtime performance evidence validation does not honor governed target capabilities '$snippet'."
   }
+}
+$runtimePerformanceTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests\release\Test-MIRPerformanceRegression.ps1")
+if ($runtimePerformanceTestSource -notmatch [regex]::Escape('-CampaignPath $CampaignPath') -or
+    $performanceEvidenceValidatorSource -notmatch [regex]::Escape('[string]$CampaignPath = ""')) {
+  throw "Runtime performance verification must receive the exact campaign authority selected by qualification."
+}
+$legacyCurrentCampaign = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-campaigns\3.2.5-C32.json") | ConvertFrom-Json
+if ((Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $legacyCurrentCampaign) -ne "required") {
+  throw "The complete schema-2 C32 current-target campaign must retain required artifact-volume telemetry."
+}
+$incompleteLegacyCampaign = [pscustomobject]@{
+  factorio_line = "2.1"
+  phase_lanes = @([pscustomobject]@{ id = "compiler.snapshot"; probe_phase = "snapshot" })
+  artifact_volume_lanes = @()
+}
+$legacyPolicyRejected = $false
+try {
+  [void](Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $incompleteLegacyCampaign)
+} catch {
+  if ($_.Exception.Message -match "omits artifact-volume policy") { $legacyPolicyRejected = $true } else { throw }
+}
+if (-not $legacyPolicyRejected) {
+  throw "An incomplete policy-less current-target campaign must fail closed."
 }
 $harnessSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
 foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", 'Alias("RepoRoot")', "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {
