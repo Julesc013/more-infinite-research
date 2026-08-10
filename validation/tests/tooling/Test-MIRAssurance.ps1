@@ -221,10 +221,12 @@ $ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ec
 if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
     [string]$ecosystemTest[0].command -notmatch '--candidate-source\s+<package-source-commit>' -or
+    [string]$ecosystemTest[0].command -notmatch '--mods\s+<mods>' -or
     @($ecosystemTest[0].inputs) -notcontains "package-source" -or
+    @($ecosystemTest[0].inputs) -notcontains "mod-lock" -or
     [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
     [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
-  throw "runtime.ecosystem must bind the exact candidate ZIP and package source and must not rebuild distribution bytes."
+  throw "runtime.ecosystem must bind the exact candidate ZIP, package source, and planned mod closure and must not rebuild distribution bytes."
 }
 $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir.ps1")
 foreach ($sourceBindingSnippet in @(
@@ -642,6 +644,8 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
 $assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredIngestionGuard in @(
   'mir-assurance-worker-receipt-v2',
+  'Test-MIRAssuranceFreshCampaignEvidence',
+  'Get-MIRAssuranceCampaignCheckpoint',
   'stale-ignored',
   'ReparsePoint',
   'max_entries_per_artifact',
@@ -651,6 +655,12 @@ foreach ($requiredIngestionGuard in @(
 )) {
   if (-not $assuranceEvidence.Contains($requiredIngestionGuard)) {
     throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
+  }
+}
+$assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "checkpointed"', 'TimeBudgetSeconds')) {
+  if (-not $assuranceEntry.Contains($requiredCheckpointSnippet)) {
+    throw "Assurance checkpoint facade omits required contract: $requiredCheckpointSnippet"
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")

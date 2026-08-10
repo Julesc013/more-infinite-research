@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-10
 supersedes: []
 superseded_by: []
 ---
@@ -45,7 +45,7 @@ Use:
 ./tools/mir.ps1 verify explain --target 2.1 --plan out/verification-plan.json --test <stable-id>
 ```
 
-Each test has one disposition:
+Each planned test has one disposition; execution summaries may additionally show `CHECKPOINT` for an exact fresh row adopted after an interrupted coordinator:
 
 | Disposition | Meaning |
 | --- | --- |
@@ -53,6 +53,7 @@ Each test has one disposition:
 | `WAIT` | A non-expired `running.json` shows another worker owns the same fingerprint |
 | `RUN` | No exact evidence exists or reuse was disabled |
 | `INVALID` | Evidence material exists but is failed, blocked, malformed, untrusted, or digest-mismatched |
+| `CHECKPOINT` | An exact passing row already completed for this immutable fresh campaign and is carried forward without re-execution |
 
 Unknown repository inputs escalate through `.mir/assurance.json`. Unknown packaged paths are included in every scenario dependency set, conservatively invalidating the scenario matrix.
 
@@ -84,6 +85,18 @@ Evidence lives at `build/results/assurance/evidence/<safe-test-id>/<fingerprint>
 
 A schema-4 capsule binds the test ID, target, definition hash, full effective-input map, exact Factorio installation and resolved mod closure when applicable, trust-class-validated producer identity, exit code, structured `mir-test-result-v1`, assertion outcomes, artifact hashes, stdout and stderr hashes, timestamps, duration, and result digest. `passed.json` is only an atomic pointer to an immutable attempt capsule. Corrupt pointers are quarantined. A changed definition, verifier, policy, binary, mod archive, candidate, or other effective input creates a different fingerprint instead of rewriting history.
 
+### Fresh campaign checkpoints
+
+`--no-reuse` means no evidence from another campaign can satisfy the plan; it does not mean completed rows become worthless when a process, runner, or tool session ends. Every fresh plan owns a deterministic campaign identity derived from its immutable plan-material digest and records a minimum completion time. A completed row is resumed only when its full fingerprint, trusted producer, source commit, campaign ID, campaign plan-material digest, and completion time all match the named plan. The aggregate gate independently repeats those checks. An old row, a row from a changed plan, and a row from a different trust or source remain invalid.
+
+Use a deliberate boundary for long local or hosted runs instead of allowing an outer timeout to terminate an active Factorio process:
+
+```powershell
+./tools/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --no-reuse --time-budget-minutes 45 --factorio <factorio.exe>
+```
+
+The command stops only between rows, writes a `status: checkpointed` summary with the next test ID, and exits without treating the campaign as passing. Re-run the exact same command and `--plan`; only missing rows execute while accepted rows show `CHECKPOINT`. `verify gate` stays fail-closed until every plan row is present and valid. A stale `running.json` is automatically discarded after process-incarnation or lease verification, while a live matching worker is waited for rather than duplicated.
+
 ## Worker And Aggregate Gate
 
 Run one planned test with:
@@ -100,7 +113,7 @@ Evaluate the complete plan with:
 ./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output build/results/assurance/evidence-bundle.json
 ```
 
-Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time, run ID, and run attempt rather than inheriting plan-wide freshness only.
+Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time plus immutable campaign and plan-material identities; the operational run ID and attempt remain execution audit data, not a reason to repeat a valid row after recovery.
 
 ## CI
 
