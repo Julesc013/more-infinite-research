@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0019",
+  "title": "Historical performance fingerprints conflated current execution tooling with target-era campaign authorities",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:27:00.0000000Z",
+    "environment": "Exact immutable 2.5.5 archive on trusted Factorio 2.0.77 after target-era source, official-data, and scenario preflight",
+    "fact": "The current performance runner invokes the current canonical compatibility command and libraries, but both its fingerprint and compatibility invocation attempted to use paths from the immutable 2.0 worktree. That worktree intentionally predates tools/commands/compatibility/Invoke-MIRCompatAudit.ps1; its campaign also requires Factorio 2.0 rather than a hard-coded 2.1 line. Proof stopped before Factorio launch."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "The fingerprint and compatibility invocation identify both the current execution-toolchain files actually invoked and the immutable target authorities consumed by the campaign, with distinct provenance scopes and the declared Factorio line.",
+    "observed": "The runner failed with 'Performance harness authority is absent: tools/commands/compatibility/Invoke-MIRCompatAudit.ps1'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; execution-toolchain and target-authority provenance only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "record the current execution toolchain separately from target authorities"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "bind current execution tooling and exact 2.0 campaign authorities without source-tree conflation"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "historical campaign proof requires separate toolchain and target provenance"}
+  ],
+  "regression_obligations": [
+    "the fingerprint and compatibility invocation use every current runner, compatibility-command, and library input as execution scope",
+    "the fingerprint labels the target performance budget and declared manual scenario as target scope",
+    "the declared target scenario path cannot traverse outside its authority root",
+    "a missing current execution authority or target authority fails before Factorio launch with its proper classification",
+    "the evidence records the declared manual-scenario digest",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The correction concerns only provenance construction for the existing verifier. It preserves both current toolchain and immutable target evidence and cannot change public package bytes."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": "The harness fingerprint and compatibility invocation distinguish execution and target scopes, bind the declared Factorio line, include the declared manual-scenario digest, and reject absent inputs; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+  }
+}

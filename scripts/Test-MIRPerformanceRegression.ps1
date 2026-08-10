@@ -6,7 +6,8 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
-  [Parameter(Mandatory)][string]$ExpectedFactorioVersion
+  [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+  [string]$CampaignPath = ""
 )
 
 # MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.

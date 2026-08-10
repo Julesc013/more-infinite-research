@@ -44,7 +44,7 @@
     "reason": "The failure is reproduced, bounded to immutable diagnostic artifact transport, and repairable without changing package source, product semantics, or published package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "PR #80 workflow 31309327519 failed closed at tooling.self-test because the experiment receipt hashes did not match transported artifacts. The retained calibration source files reproduce both receipt hashes, and the content-addressed historical attestation object reproduces its custody hash; c2a4494506bc465313b4bd3e95560a19df56c333 restores those exact bytes, marks each raw-hash evidence path as -text, and adds governance regressions requiring those rules. The next exact-head hosted run must also prove the attribute validator accepts a CRLF checkout of .gitattributes."
+    "status": "closed",
+    "evidence": "PR #80 workflow 31309327519 failed closed at tooling.self-test because the experiment receipt hashes did not match transported artifacts. The retained calibration source files reproduce both receipt hashes, and the content-addressed historical attestation object reproduces its custody hash; c2a4494506bc465313b4bd3e95560a19df56c333 restores those exact bytes, marks each raw-hash evidence path as -text, and adds governance regressions requiring those rules. The CRLF-tolerant attribute validator at f2bfb9fce211f28dfbc70b5db37199721b785660 passed both exact-head MIR aggregates 31311037927 and 31311039681, then the fresh dev aggregate 31311371249 passed at merge commit d03b2a63bcd56cc446da5f5dc2fcf6e5fe286a6f."
   }
 }

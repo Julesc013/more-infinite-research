@@ -6,7 +6,8 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
-  [Parameter(Mandatory)][string]$ExpectedFactorioVersion
+  [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+  [string]$CampaignPath = ""
 )
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
@@ -17,5 +18,6 @@ $ErrorActionPreference = "Stop"
 $result = Test-MIRRuntimePerformanceEvidence -RepoRoot $RepoRoot -Path $Path -Candidate $Candidate `
   -PriorRelease $PriorRelease -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit `
   -ExpectedBaselineVersion $ExpectedBaselineVersion `
-  -ExpectedFactorioVersion $ExpectedFactorioVersion
+  -ExpectedFactorioVersion $ExpectedFactorioVersion `
+  -CampaignPath $CampaignPath
 Write-Host "[ok] MIR runtime performance regression evidence passed: $($result.sha256)"
