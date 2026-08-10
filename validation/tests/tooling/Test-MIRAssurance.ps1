@@ -256,6 +256,7 @@ foreach ($requiredPerformanceIsolationSnippet in @(
   '"<test-output>"=[string]$TestOutput',
   '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
   '-TestOutput $performanceOutputPath',
+  '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
   '-Kind "runtime-performance-evidence"'
 )) {
   if (-not $assuranceEvidenceSource.Contains($requiredPerformanceIsolationSnippet)) {
@@ -440,6 +441,7 @@ try {
   $script:repo = $campaignFingerprintRoot
   $script:MIRAssurancePatternFingerprintCache = @{}
   $campaignContext = [pscustomobject]@{target="2.1"}
+  $resolvedCampaignPath = Resolve-MIRAssurancePerformanceCampaignPath -Context $campaignContext
   $beforeCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
   [IO.File]::WriteAllText($unrelatedCampaignPath, '{"schema":2,"factorio_version":"2.1.13"}', [Text.UTF8Encoding]::new($false))
   $script:MIRAssurancePatternFingerprintCache = @{}
@@ -455,10 +457,11 @@ try {
   $script:MIRAssuranceBlobCache = $null
   $script:MIRAssuranceTreeHashCache = $null
   $afterActiveCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
-  if (($beforeCampaignFingerprint.patterns -join "|") -ne ".mir/performance-campaign.json|.mir/performance-campaigns/3.2.5-C32.json" -or
+  if ($resolvedCampaignPath -ne ".mir/performance-campaigns/3.2.5-C32.json" -or
+      ($beforeCampaignFingerprint.patterns -join "|") -ne ".mir/performance-campaign.json|.mir/performance-campaigns/3.2.5-C32.json" -or
       [string]$beforeCampaignFingerprint.sha256 -ne [string]$afterUnrelatedCampaignFingerprint.sha256 -or
       [string]$beforeCampaignFingerprint.sha256 -eq [string]$afterActiveCampaignFingerprint.sha256) {
-    throw "Performance assurance fingerprints must bind the root calibration and exact active versioned campaign, but no unrelated campaign: patterns=$($beforeCampaignFingerprint.patterns -join '|') before=$($beforeCampaignFingerprint.sha256) unrelated=$($afterUnrelatedCampaignFingerprint.sha256) active=$($afterActiveCampaignFingerprint.sha256)."
+    throw "Performance assurance execution and fingerprints must bind the root calibration and exact active versioned campaign, but no unrelated campaign: resolved=$resolvedCampaignPath patterns=$($beforeCampaignFingerprint.patterns -join '|') before=$($beforeCampaignFingerprint.sha256) unrelated=$($afterUnrelatedCampaignFingerprint.sha256) active=$($afterActiveCampaignFingerprint.sha256)."
   }
 } finally {
   $script:repo = $originalAssuranceRepo

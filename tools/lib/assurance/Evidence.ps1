@@ -21,7 +21,7 @@ function Get-MIRAssurancePatternFingerprint {
   return $fingerprint
 }
 
-function Get-MIRAssurancePerformanceCampaignFingerprint {
+function Resolve-MIRAssurancePerformanceCampaignPath {
   param([Parameter(Mandatory)]$Context)
 
   $ledgerPath = Join-Path $repo ".mir\releases.json"
@@ -37,7 +37,13 @@ function Get-MIRAssurancePerformanceCampaignFingerprint {
   if ($release -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or $candidateId -notmatch '^[A-Za-z0-9][A-Za-z0-9.-]*$') {
     throw "Active performance campaign release or candidate identity is invalid for $targetKey."
   }
-  $versionedCampaign = ".mir/performance-campaigns/$release-$candidateId.json"
+  return ".mir/performance-campaigns/$release-$candidateId.json"
+}
+
+function Get-MIRAssurancePerformanceCampaignFingerprint {
+  param([Parameter(Mandatory)]$Context)
+
+  $versionedCampaign = Resolve-MIRAssurancePerformanceCampaignPath -Context $Context
   return Get-MIRAssurancePatternFingerprint -Patterns @(
     ".mir/performance-campaign.json",
     $versionedCampaign
@@ -2082,7 +2088,8 @@ function Invoke-MIRAssuranceTest {
         -FactorioBin $Context.factorio `
         -ExpectedSourceCommit ([string]$Plan.source_commit) `
         -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
-        -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
+        -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version) `
+        -CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)
       $performanceDescriptor = Get-MIRAssuranceArtifactDescriptor -Path $performanceEvidence.path -Kind "runtime-performance-evidence"
       $assertions = @(
         [ordered]@{
