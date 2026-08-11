@@ -16,12 +16,18 @@
     "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
     "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
   },
+  "upgrade": {
+    "from_version": "3.2.5",
+    "to_version": "3.2.9",
+    "fixture": "assert-upgrade-3-2-5-to-3-2-9"
+  },
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
   "package": {},
   "proofs": {},
   "assurance_exceptions": [],
   "remaining_obligations": [
-    "freeze-unified-terminal-finding-inventory",
+    "complete-product-implementation-and-all-nine-fixed-point",
+    "focused-qualification",
     "assign-candidate-after-source-freeze",
     "normal-manual-protected-seal-promotion-publication-gates",
     "archive-and-mir4-handoff"

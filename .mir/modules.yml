@@ -219,6 +219,7 @@ modules:
     - prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
+    - prototypes/mir/capabilities/science_integration/production_route_policy.lua
     - prototypes/mir/capabilities/science_integration/science_selection_policy.lua
   families:
     - prototypes/mir/families/rules.lua
@@ -309,6 +310,7 @@ modules:
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
     - prototypes/mir/compatibility/policy_authority.lua
+    - prototypes/mir/compatibility/policies/k2_science_phase.lua
     - prototypes/mir/compatibility/overlays/air_scrubbing.lua
     - prototypes/mir/compatibility/overlays/atan_ash.lua
     - prototypes/mir/compatibility/diagnostics/registry.lua
@@ -563,6 +565,7 @@ target_layers:
   compatibility:
     path: prototypes/mir/compatibility
     overlay_path: prototypes/mir/compatibility/overlays
+    policy_path: prototypes/mir/compatibility/policies
     repair_path: prototypes/mir/compatibility/repairs
     may_require:
       - policy
@@ -609,6 +612,7 @@ compiler_context:
     - mod-progression-cache
     - technology-researchability-index
     - pack-production-reachability-cache
+    - science-pack-production-route-selection
     - recipe-unlock-science-cache
     - lab-input-index
     - active-compatibility-packs

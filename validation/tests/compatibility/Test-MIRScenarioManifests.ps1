@@ -77,6 +77,18 @@ foreach ($relativePath in $manifestPaths) {
         }
       }
     }
+    if ($expectedPlan.PSObject.Properties.Name -contains "forbidden_stream_science") {
+      $forbiddenStreamScience = $expectedPlan.forbidden_stream_science
+      foreach ($streamProperty in @($forbiddenStreamScience.PSObject.Properties)) {
+        if ([string]::IsNullOrWhiteSpace([string]$streamProperty.Name)) {
+          throw "$context expected_plan.forbidden_stream_science contains an empty stream name."
+        }
+        $forbiddenPacks = @($streamProperty.Value)
+        if ($forbiddenPacks.Count -eq 0 -or @($forbiddenPacks | Where-Object { [string]::IsNullOrWhiteSpace([string]$_) }).Count -gt 0) {
+          throw "$context expected_plan.forbidden_stream_science.$($streamProperty.Name) must name at least one non-empty science pack."
+        }
+      }
+    }
 
     $timeout = [int](Assert-MIRProperty -Object $scenario -Name "timeout_seconds" -Context $context)
     if ($timeout -lt 1 -or $timeout -gt 3600) { throw "$context timeout_seconds must be between 1 and 3600." }

@@ -154,6 +154,6 @@ if ($canonicalHasPackage -and ($releaseNotes -notmatch 'MIR-CONTROL-PLANE-IDENTI
 Write-Host "[ok] typed release records, transitions, immutable tag, package locks, evidence hashes, and generated release views agree."
 
 $freezePacket = Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json"
-if (Test-Path -LiteralPath $freezePacket -PathType Leaf) {
+if ([string]$info.version -eq "3.2.5" -and (Test-Path -LiteralPath $freezePacket -PathType Leaf)) {
   & (Join-Path $repo "validation/tests/release/Test-MIRSourceFreezePacket.ps1") -RepoRoot $repo
 }

@@ -97,7 +97,8 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `freeze-unified-terminal-finding-inventory` for `3.2.9`
+- [ ] `complete-product-implementation-and-all-nine-fixed-point` for `3.2.9`
+- [ ] `focused-qualification` for `3.2.9`
 - [ ] `assign-candidate-after-source-freeze` for `3.2.9`
 - [ ] `normal-manual-protected-seal-promotion-publication-gates` for `3.2.9`
 - [ ] `archive-and-mir4-handoff` for `3.2.9`

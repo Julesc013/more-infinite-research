@@ -10,6 +10,7 @@ local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.mir.domain.technology.effect_safety_policy")
 local competing_base_extensions = require("prototypes.mir.policy.competing_base_extensions")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
+local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
@@ -594,6 +595,8 @@ local function plan_chain(key)
   local selected_ingredients = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_tech.unit, key))
   local resolved_ingredients, lab_status = science_packs.best_lab_compatible_ingredients(selected_ingredients, key)
   lab_status = lab_status or "full"
+  local science_phase_decision
+  resolved_ingredients, science_phase_decision = planner_science.normalize_ingredients(resolved_ingredients)
   if not resolved_ingredients or #resolved_ingredients == 0 then
     log("[more-infinite-research] Skipping extension for " .. key .. ": no lab-compatible science pack set was found.")
     D.extension(D.extension_fields(key, "skipped", "no_lab_compatible_science", resolved_ingredients, new.prerequisites, desired_effects, lab_status))
@@ -627,6 +630,7 @@ local function plan_chain(key)
     technology_name = new.name,
     technology = new,
     research_cost_model = cost_model,
+    science_phase_policy = science_phase_decision,
     technology_risk = technology_risk.classification(spec.technology_risk),
     diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status),
     gates = accepted_gate_vector(key, new.name)

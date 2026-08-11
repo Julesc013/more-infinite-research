@@ -2,7 +2,7 @@
   "schema": 1,
   "authority": "mir-current-release-roles-v2",
   "roles": {
-    "canonical": "3.2.5",
+    "canonical": "3.2.9",
     "backport_calibration": "2.5.5",
     "planned_canonical": "3.2.9",
     "planned_backport": "2.5.9",

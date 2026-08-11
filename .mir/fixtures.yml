@@ -228,6 +228,8 @@ fixtures:
       - already-enabled-science-pack-recipe-needs-no-unlock
       - disabled-technology-unlocker-exclusion
       - deterministic-multiple-unlocker-selection
+      - later-alternate-route-cannot-delay-existing-science-production
+      - deterministic-earliest-safe-route-selection
       - direct-science-self-lock-exclusion
       - two-pack-science-cycle-exclusion
       - missing-research-mechanism-exclusion
@@ -239,6 +241,24 @@ fixtures:
       - shared-pack-production-reachability-cache
       - isolated-context-science-facade-validation
       - closed-compiler-context-assertion-safety
+
+  k2-science-phase-policy:
+    requires_features: []
+    assertion_path: fixtures/assert-k2-science-phase-policy
+    external_mod_identity: Krastorio2-spaced-out
+    exact_real_campaign: local-2-1-k2so
+    exact_version_envelope:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+    validates:
+      - exact-version-envelope
+      - no-behavior-when-k2-is-absent
+      - no-behavior-outside-the-exact-version-envelope
+      - idempotent-mir-owned-technology-normalization
+      - ingredient-order-shape-and-amount-preservation
+      - nonempty-normalized-ingredient-lists
+      - production-and-utility-basic-card-removal
+      - advanced-space-matter-and-singularity-early-pack-removal
 
   external-technology-cycle:
     requires_features: []
@@ -590,6 +610,33 @@ fixtures:
       - fixture-storage-retention
       - independent-result-row-per-upgrade-archetype
       - exact-3-2-5-development-archive-normal-mod-directory-load
+      - upgraded-save-reload
+
+  upgrade-3-2-5-to-3-2-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-5-to-3-2-9
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.5"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-5-source-archive-for-3-2-9
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention-without-exact-K2-envelope
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
       - upgraded-save-reload
 
   competing-productivity-transaction:

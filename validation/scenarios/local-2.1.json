@@ -344,6 +344,19 @@
               "chemical-science-pack",
               "production-science-pack",
               "electromagnetic-science-pack"
+            ],
+            "research_belts": [
+              "production-science-pack",
+              "space-science-pack"
+            ]
+          },
+          "forbidden_stream_science": {
+            "research_belts": [
+              "kr-basic-tech-card",
+              "automation-science-pack",
+              "logistic-science-pack",
+              "military-science-pack",
+              "chemical-science-pack"
             ]
           }
         },

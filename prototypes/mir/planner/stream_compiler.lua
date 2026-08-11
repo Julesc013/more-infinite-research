@@ -314,7 +314,12 @@ local function plan_stream(key, raw_spec)
     end
   end
 
-  local ingredients, lab_status = planner_science.ingredients_for_stream(key, spec)
+  local ingredients, lab_status, science_phase_decision = planner_science.ingredients_for_stream(key, spec)
+  local science_phase_fields = {
+    science_phase_policy_id = science_phase_decision.policy_id,
+    science_phase_policy_status = science_phase_decision.status,
+    science_phase_removed_packs = table.concat(science_phase_decision.removed_packs or {}, ",")
+  }
   if not ingredients or #ingredients == 0 then
     return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status, nil, {
       science_compatible = {evidence = "science-selector:no-compatible-set", reason = "no_lab_compatible_science"},
@@ -343,11 +348,13 @@ local function plan_stream(key, raw_spec)
       max_level = max_level,
     }
     return plan_row(key, spec, "emit", "direct_effect",
-      D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status), {
+      D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects,
+        lab_status, science_phase_fields), {
         technology_name = technology_name,
         fields = fields,
         direct_effects = true,
-        overlap_effects = direct_effects
+        overlap_effects = direct_effects,
+        science_phase_policy = science_phase_decision
       })
   end
 
@@ -367,9 +374,13 @@ local function plan_stream(key, raw_spec)
     return plan_row(key, spec, "adopt", adoption.operation,
       D.stream_fields(key, spec, "adopted", adoption.operation, ingredients, nil, adopted_effects, lab_status, {
         owners = adoption_owner_name,
-        recipes = owner_policy.recipe_names_from_effects(adopted_effects)
+        recipes = owner_policy.recipe_names_from_effects(adopted_effects),
+        science_phase_policy_id = science_phase_fields.science_phase_policy_id,
+        science_phase_policy_status = science_phase_fields.science_phase_policy_status,
+        science_phase_removed_packs = science_phase_fields.science_phase_removed_packs
       }), {
-        adoption = adoption
+        adoption = adoption,
+        science_phase_policy = science_phase_decision
       })
   end
   local effects = recipe_productivity_planner.effects_from_buckets(key, buckets)
@@ -414,10 +425,12 @@ local function plan_stream(key, raw_spec)
     max_level = max_level,
   }
   return plan_row(key, spec, "emit", "recipe_productivity",
-    D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status), {
+    D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects,
+      lab_status, science_phase_fields), {
       technology_name = technology_name,
       fields = fields,
-      direct_effects = false
+      direct_effects = false,
+      science_phase_policy = science_phase_decision
     })
 end
 

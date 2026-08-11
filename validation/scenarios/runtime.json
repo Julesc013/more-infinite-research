@@ -967,6 +967,34 @@
         ]
       },
       {
+        "name": "k2-science-phase-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-k2-science-phase-policy"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "compatibility",
+          "full",
+          "runtime",
+          "science-prerequisites"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "k2-science-phase-policy-contracts-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "external-technology-cycle",
         "target_profile": "2.1",
         "kind": "runtime",
