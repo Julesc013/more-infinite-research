@@ -123,7 +123,7 @@ if (-not $?) {
 }
 
 if ($usesGeneratedArtifactRoot) {
-  $relocation = Copy-MIRPerformanceArtifactsVerified -SourceRoot $ArtifactRoot -DestinationRoot $generatedArtifactCustodyRoot
+  $relocation = Copy-MIRPerformanceArtifactsVerified -SourceRoot $ArtifactRoot -DestinationRoot $generatedArtifactCustodyRoot -ContentAddressedChild
   Write-Host "[ok] verified performance artifact relocation: $($relocation.destination_root) tree=$($relocation.artifact_tree_sha256)"
 }
 

@@ -276,13 +276,13 @@ function New-MIRPerformanceStagingRoot {
 function Copy-MIRPerformanceArtifactsVerified {
   param(
     [Parameter(Mandatory)][string]$SourceRoot,
-    [Parameter(Mandatory)][string]$DestinationRoot
+    [Parameter(Mandatory)][string]$DestinationRoot,
+    [switch]$ContentAddressedChild
   )
 
   $source = (Resolve-Path -LiteralPath $SourceRoot).Path
   if (-not (Test-Path -LiteralPath $source -PathType Container)) { throw "Performance artifact source is absent: $SourceRoot" }
-  $destination = [IO.Path]::GetFullPath($DestinationRoot)
-  if (Test-Path -LiteralPath $destination) { throw "Performance artifact destination already exists and will not be merged: $destination" }
+  $destinationNamespace = [IO.Path]::GetFullPath($DestinationRoot)
   $sourceInfo = Get-Item -LiteralPath $source -Force
   if (($sourceInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Performance artifact source must not be a reparse point." }
   foreach ($directory in @(Get-ChildItem -LiteralPath $source -Recurse -Force -Directory)) {
@@ -306,6 +306,47 @@ function Copy-MIRPerformanceArtifactsVerified {
     }
     $rows.Add([pscustomobject][ordered]@{relative_path=$relative.Replace("\\", "/"); source_path=$file.FullName; sha256=(Get-MIRPerformanceRawSha256 -Path $file.FullName); bytes=[int64]$file.Length})
   }
+  $rows = @($rows | Sort-Object -Property relative_path)
+  $manifestRows = @($rows | ForEach-Object { "$($_.relative_path)`t$($_.bytes)`t$($_.sha256)" })
+  $artifactTreeSha256 = Get-MIRPerformanceTextSha256 -Value ($manifestRows -join "`n")
+  $destination = if ($ContentAddressedChild) {
+    Join-Path $destinationNamespace $artifactTreeSha256
+  } else {
+    $destinationNamespace
+  }
+  if (Test-Path -LiteralPath $destination) {
+    if (-not $ContentAddressedChild) { throw "Performance artifact destination already exists and will not be merged: $destination" }
+    $destinationInfo = Get-Item -LiteralPath $destination -Force
+    if (-not $destinationInfo.PSIsContainer -or ($destinationInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Content-addressed performance artifact destination is not a safe directory: $destination"
+    }
+    $existingFiles = @(Get-ChildItem -LiteralPath $destination -Recurse -Force -File)
+    if ($existingFiles.Count -ne $rows.Count) {
+      throw "Content-addressed performance artifact destination does not match its tree identity: $destination"
+    }
+    foreach ($row in $rows) {
+      $existingPath = Join-Path $destination ($row.relative_path.Replace("/", [IO.Path]::DirectorySeparatorChar))
+      if (-not (Test-Path -LiteralPath $existingPath -PathType Leaf)) {
+        throw "Content-addressed performance artifact destination is missing $($row.relative_path): $destination"
+      }
+      $existingInfo = Get-Item -LiteralPath $existingPath -Force
+      if (($existingInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+          [int64]$existingInfo.Length -ne [int64]$row.bytes -or
+          (Get-MIRPerformanceRawSha256 -Path $existingPath) -ne [string]$row.sha256) {
+        throw "Content-addressed performance artifact destination changed bytes for $($row.relative_path): $destination"
+      }
+    }
+    return [pscustomobject][ordered]@{
+      source_root = $source
+      destination_root = $destination
+      destination_namespace = $destinationNamespace
+      disposition = "existing-verified"
+      file_count = $rows.Count
+      bytes = [int64](($rows | Measure-Object -Property bytes -Sum).Sum)
+      artifact_tree_sha256 = $artifactTreeSha256
+      artifacts = @($rows | ForEach-Object { [pscustomobject][ordered]@{path=$_.relative_path;bytes=$_.bytes;sha256=$_.sha256} })
+    }
+  }
   $parent = Split-Path -Parent $destination
   [void](New-Item -ItemType Directory -Force -Path $parent)
   $temporary = "$destination.staging-$([guid]::NewGuid().ToString('N'))"
@@ -320,13 +361,14 @@ function Copy-MIRPerformanceArtifactsVerified {
     }
   }
   [IO.Directory]::Move($temporary, $destination)
-  $manifestRows = @($rows | ForEach-Object { "$($_.relative_path)`t$($_.bytes)`t$($_.sha256)" })
   return [pscustomobject][ordered]@{
     source_root = $source
     destination_root = $destination
+    destination_namespace = $destinationNamespace
+    disposition = "copied"
     file_count = $rows.Count
     bytes = [int64](($rows | Measure-Object -Property bytes -Sum).Sum)
-    artifact_tree_sha256 = Get-MIRPerformanceTextSha256 -Value ($manifestRows -join "`n")
+    artifact_tree_sha256 = $artifactTreeSha256
     artifacts = @($rows | ForEach-Object { [pscustomobject][ordered]@{path=$_.relative_path;bytes=$_.bytes;sha256=$_.sha256} })
   }
 }

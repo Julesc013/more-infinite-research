@@ -400,12 +400,34 @@ try {
       (Get-MIRPerformanceRawSha256 -Path $artifact) -ne (Get-MIRPerformanceRawSha256 -Path (Join-Path $relocation.destination_root "raw\performance.log"))) {
     throw "Verified compact-artifact relocation did not retain byte-identical provenance and artifacts."
   }
+  $contentAddressedRoot = Join-Path $stagingTestRoot "content-addressed-artifacts"
+  $contentAddressedFirst = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  $contentAddressedRepeat = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedFirst.disposition -ne "copied" -or
+      [string]$contentAddressedRepeat.disposition -ne "existing-verified" -or
+      [string]$contentAddressedFirst.destination_namespace -ne [IO.Path]::GetFullPath($contentAddressedRoot) -or
+      [string]$contentAddressedFirst.destination_root -ne [string]$contentAddressedRepeat.destination_root -or
+      (Split-Path -Leaf ([string]$contentAddressedFirst.destination_root)) -ne [string]$contentAddressedFirst.artifact_tree_sha256) {
+    throw "Content-addressed performance custody must copy once and then verify the exact immutable artifact tree."
+  }
+  "distinct-performance-artifact" | Set-Content -LiteralPath $artifact -NoNewline -Encoding UTF8
+  $contentAddressedDistinct = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedDistinct.disposition -ne "copied" -or
+      [string]$contentAddressedDistinct.destination_root -eq [string]$contentAddressedFirst.destination_root -or
+      -not (Test-Path -LiteralPath $contentAddressedFirst.destination_root -PathType Container) -or
+      -not (Test-Path -LiteralPath $contentAddressedDistinct.destination_root -PathType Container)) {
+    throw "Distinct independent performance artifact trees must coexist under one stable custody namespace."
+  }
 } finally {
   if (Test-Path -LiteralPath $stagingTestRoot) { Remove-Item -LiteralPath $stagingTestRoot -Recurse -Force }
 }
 $campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
   throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
+}
+$qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
+if ($qualificationSource -notmatch 'Copy-MIRPerformanceArtifactsVerified[\s\S]{0,240}-ContentAddressedChild') {
+  throw "Performance qualification must preserve independent raw artifact trees in content-addressed custody."
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
