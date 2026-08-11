@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Settings-Scope-AuditV1",
+  "status": "complete-no-scope-migrations",
+  "recorded_at": "2026-08-12T02:30:14.6116953+10:00",
+  "scope": "terminal-dot9-current-source-and-all-nine-projections",
+  "source_authorities": [
+    ".mir/settings.yml",
+    "prototypes/mir/settings/catalog.lua",
+    "prototypes/mir/settings/prototype_limits.lua",
+    "prototypes/mir/settings/automatic_compiler_contract.lua",
+    ".mir/releases/terminal/baselines/3.2.5/realized/settings.json"
+  ],
+  "configuration_domains": {
+    "compile": "prototype and technology generation inputs",
+    "map": "shared-save script-owned behavior that is deterministic, reversible, and runtime-recomputable",
+    "player": "presentation, filters, notifications, and local diagnostics only",
+    "policy": "target profiles, safety rules, provider precedence, claim locks, and release policy"
+  },
+  "setting_families": [
+    {
+      "id": "ips-generated-stream-controls",
+      "members": ["ips-enable-*", "ips-cost-base-*", "ips-cost-linear-increment-*", "ips-cost-growth-*", "ips-max-level-*", "ips-research-time-*", "ips-effect-per-level-*"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-stage-read",
+      "mutability": "restart-required",
+      "impact_domains": ["technology-existence", "technology-cost", "technology-max-level", "technology-time", "technology-effects"],
+      "owner": "mir-compiler",
+      "migration": "preserve-released-id-pattern-and-setting-type",
+      "profile_namespace": "compile",
+      "target_requirements": "only-register-when-target-profile-supports-stream",
+      "restart_required": true,
+      "invalidation_closure": ["settings-prototypes", "technology-ir", "package-tree", "qualification"]
+    },
+    {
+      "id": "mir-base-continuation-controls",
+      "members": ["mir-enable-*", "mir-cost-base-*", "mir-cost-linear-increment-*", "mir-cost-growth-*", "mir-max-level-*", "mir-research-time-*", "mir-effect-per-level-*"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-stage-read",
+      "mutability": "restart-required",
+      "impact_domains": ["native-owner-adoption", "technology-cost", "technology-max-level", "technology-time", "technology-effects"],
+      "owner": "mir-compiler",
+      "migration": "preserve-released-id-pattern-and-setting-type",
+      "profile_namespace": "compile",
+      "target_requirements": "only-register-when-target-profile-supports-base-continuation",
+      "restart_required": true,
+      "invalidation_closure": ["settings-prototypes", "technology-ir", "owner-report", "package-tree", "qualification"]
+    },
+    {
+      "id": "science-lab-and-owner-controls",
+      "members": ["ips-require-space-gate", "mir-science-pack-ingredient-policy", "mir-lab-incompatibility-policy", "mir-prefer-this-mod-for-competing-techs", "mir-adjust-vanilla-weapon-speed-techs", "mir-use-installed-space-age-icons", "mir-pipeline-extent-multiplier"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-stage-read",
+      "mutability": "restart-required",
+      "impact_domains": ["science-ingredients", "technology-prerequisites", "lab-compatibility", "ownership", "pipeline-extent", "prototype-icons"],
+      "owner": "mir-compiler",
+      "migration": "preserve-released-id-and-enum-values",
+      "profile_namespace": "compile",
+      "target_requirements": "catalog-declared-positive-capability-requirements",
+      "restart_required": true,
+      "invalidation_closure": ["technology-ir", "compatibility-claims", "package-tree", "qualification"]
+    },
+    {
+      "id": "automatic-compiler-controls",
+      "members": ["mir-automatic-productivity-action", "mir-automatic-create-research", "mir-automatic-require-reviewed-data", "mir-automatic-compiler-mode"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-stage-read",
+      "mutability": "restart-required",
+      "impact_domains": ["compiler-mode", "technology-existence", "ownership-adoption"],
+      "owner": "mir-compiler-policy",
+      "migration": "legacy-mode-remains-hidden-importable-alias",
+      "profile_namespace": "compile",
+      "target_requirements": "automatic-compiler-capability",
+      "restart_required": true,
+      "invalidation_closure": ["technology-ir", "owner-report", "package-tree", "qualification"]
+    },
+    {
+      "id": "prototype-limit-module-and-recycling-controls",
+      "members": ["mir-prototype-productivity-cap", "mir-recycling-return-chance", "mir-productivity-cap-self-recycling-only", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-floor", "mir-prototype-speed-cap", "mir-prototype-quality-cap", "mir-unrestricted-modules", "mir-prototype-positive-power-floor"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-final-fixes-read",
+      "mutability": "restart-required",
+      "impact_domains": ["recipe-maximum-productivity", "recycling-prototypes", "module-permissions", "prototype-receiver-limits", "prototype-energy-use"],
+      "owner": "mir-prototype-emission",
+      "migration": "preserve-released-id-enum-and-engine-default-neutrality",
+      "profile_namespace": "compile",
+      "target_requirements": "target-profile-prototype-capability",
+      "restart_required": true,
+      "invalidation_closure": ["prototype-ir", "effective-owner-report", "package-tree", "qualification"]
+    },
+    {
+      "id": "compile-diagnostics",
+      "members": ["mir-debug-generation-report", "mir-debug-recipe-matches", "mir-debug-scripted-effects"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-or-control-stage-read",
+      "mutability": "restart-required",
+      "impact_domains": ["diagnostic-output"],
+      "owner": "mir-diagnostics",
+      "migration": "retain-startup-ids;runtime-global-successor-deferred-to-mir4",
+      "profile_namespace": "compile",
+      "target_requirements": "diagnostics-supported",
+      "restart_required": true,
+      "invalidation_closure": ["diagnostic-output", "runtime-smoke-if-scripted-effects-active"]
+    },
+    {
+      "id": "mir-settings-profile-import",
+      "members": ["mir-settings-profile-import"],
+      "scope": "startup",
+      "phase": "settings-registration-and-data-stage-effective-read",
+      "mutability": "restart-required",
+      "impact_domains": ["effective-compile-profile"],
+      "owner": "mir-profile-codec",
+      "migration": "retain-MIRSET1-flat-payload-and-ignore-unsupported-values-safely",
+      "profile_namespace": "compile",
+      "target_requirements": "profile-codec-supported",
+      "restart_required": true,
+      "invalidation_closure": ["all-effective-setting-consumers", "package-tree", "qualification"]
+    }
+  ],
+  "stage_read_validation": {
+    "startup_reads_outside_permitted_stages": 0,
+    "runtime_global_settings_registered": 0,
+    "runtime_per_user_settings_registered": 0,
+    "released_setting_type_changes": 0,
+    "new_dot9_runtime_setting_admitted": false
+  },
+  "profile_contract": {
+    "current_codec": "MIRSET1",
+    "schema_change_admitted": false,
+    "unknown_ids_preserved_and_ignored_when_unsupported": true,
+    "mir4_required_namespaces": ["compile", "map", "player", "policy"]
+  },
+  "decision": "retain-all-existing-generation-cap-module-recycling-compiler-and-profile-controls-as-startup"
+}

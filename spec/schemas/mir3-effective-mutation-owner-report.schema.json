@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-effective-mutation-owner-report.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-effective-mutation-owner-report.schema.json",
+  "title": "MIR 3 effective mutation owner report",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "scanner", "rules", "surfaces", "closure"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-Effective-Mutation-Owner-ReportV1"},
+    "status": {"const": "static-owner-surface-complete-final-values-await-exact-combinations"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "scanner": {"const": "scripts/Export-MIRModMutationSurface.ps1"},
+    "rules": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string"}},
+    "surfaces": {"type": "array", "minItems": 9, "items": {"type": "object", "required": ["surface", "prototype_set", "active_owners", "load_order", "input_values", "final_value", "mir_action", "claim_envelope", "evidence_state"], "properties": {"surface": {"type": "string"}, "prototype_set": {"type": "string"}, "active_owners": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}, "load_order": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "input_values": {"type": "string"}, "final_value": {"type": "string"}, "mir_action": {"enum": ["preserve", "apply", "skip", "conflict", "report"]}, "claim_envelope": {"type": "string"}, "evidence_state": {"type": "string"}}, "additionalProperties": false}},
+    "closure": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

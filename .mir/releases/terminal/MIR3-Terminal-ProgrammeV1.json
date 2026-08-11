@@ -18,6 +18,13 @@
     "publication": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
     "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
     "accelerated_closure": ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json",
+    "successor_bootstrap": ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+    "settings_scope_audit": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+    "mod_portal_compatibility_census": ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json",
+    "mod_interaction_matrix": ".mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json",
+    "compatibility_claims": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "effective_mutation_owner_report": ".mir/releases/terminal/MIR3-Effective-Mutation-Owner-ReportV1.json",
+    "dot5_mod_portal_custody_recheck": ".mir/evidence/MIR-3.5-mod-portal-custody-recheck-2026-08-12.json",
     "experiments": ".mir/releases/terminal/experiments"
   },
   "hard_gate": "No source freeze, candidate assignment, target seal, family seal, tag, or publication state may be inferred from this planning authority."
