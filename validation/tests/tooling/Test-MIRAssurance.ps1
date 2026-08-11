@@ -42,7 +42,7 @@ $releaseHistoryClassificationCases = [ordered]@{
   ".mir/control-plane/package-locks.json" = "release-governance"
   ".mir/releases/transitions/3.2.5-c32-source-frozen.json" = "release-governance"
   ".mir/releases/transitions/3.2.5-c32-package-built.json" = "release-governance"
-  ".mir/target-lines/index.json" = "release-evidence"
+  ".mir/releases/sources/published-source-locks.json" = "release-evidence"
   ".mir/target-lines/2.4.9/info.json" = "release-evidence"
   ".mir/evidence/2.4.9/publication.json" = "release-evidence"
   ".mir/releases/deltas/2.4.5-to-2.4.9.json" = "release-evidence"
@@ -119,7 +119,7 @@ $releaseHistoryTest = @($catalog.tests | Where-Object { [string]$_.id -eq "stati
 if ($releaseHistoryTest.Count -ne 1 -or
     [string]$releaseHistoryTest[0].command -ne "./validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1 -Index" -or
     @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
-  throw "static.release-history must bind the staged release-history fingerprint and run indexed snapshot integrity."
+  throw "static.release-history must bind the staged release-history fingerprint and run compact source-lock integrity."
 }
 foreach ($profileName in @("fast", "development-breadth", "full", "backport")) {
   if (@($config.profiles.$profileName) -notcontains "static.release-history") {
@@ -306,19 +306,25 @@ foreach ($target in @("2.0", "2.1")) {
     throw "Verification profile is not bound to the canonical domain policy: $profilePath"
   }
 }
-$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
+$publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -notin @(
-      "planned|not-assigned", "source-frozen|C32", "package-built|C32",
-      "focused-qualified|C32", "candidate-qualified|C32", "manually-accepted|C32",
-      "protected-qualified|C32", "sealed|C32", "promoted|C32", "tagged|C32",
-      "published|C32", "publicly-verified|C32"
-    ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
+      "planned|not-assigned", "source-frozen|C33", "package-built|C33",
+      "focused-qualified|C33", "candidate-qualified|C33", "manually-accepted|C33",
+      "protected-qualified|C33", "sealed|C33", "promoted|C33", "tagged|C33",
+      "published|C33", "publicly-verified|C33"
+    ) -or [string]$currentRelease.candidate_floor -ne "C33" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current planned 3.2.9 upgrade authority."
+}
+if ([string]$publishedRelease.state -ne "publicly-verified" -or
+    [string]$publishedRelease.candidate_id -ne "C32" -or
+    [string]$publishedRelease.package.archive_sha256 -ne "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF") {
+  throw "The immutable 3.2.5 public release authority changed while advancing the 3.2.9 upgrade profile."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
@@ -347,6 +353,26 @@ foreach ($requiredCostText in @(
 )) {
   if (-not $upgradeDataFinal.Contains($requiredCostText)) {
     throw "3.2.5 upgrade fixture is missing cost-transition contract: $requiredCostText"
+  }
+}
+
+$terminalUpgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-5-to-3-2-9"
+$terminalUpgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $terminalUpgradeFixtureRoot "settings.lua")
+$terminalUpgradeControl = Get-Content -Raw -LiteralPath (Join-Path $terminalUpgradeFixtureRoot "control.lua")
+foreach ($archetype in @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")) {
+  if (-not $terminalUpgradeSettings.Contains(('"' + $archetype + '"')) -or
+      -not $terminalUpgradeControl.Contains(('[' + '"' + $archetype + '"' + ']'))) {
+    throw "3.2.9 upgrade fixture does not bind archetype $archetype."
+  }
+}
+foreach ($requiredUpgradeText in @(
+  'script.active_mods["more-infinite-research"] ~= "3.2.5"',
+  'script.active_mods["more-infinite-research"] ~= "3.2.9"',
+  'game.server_save("mir-329-upgraded")',
+  '3.2.9 upgraded save reload proof complete'
+)) {
+  if (-not $terminalUpgradeControl.Contains($requiredUpgradeText)) {
+    throw "3.2.9 upgrade fixture is missing governed runtime contract: $requiredUpgradeText"
   }
 }
 
@@ -471,9 +497,9 @@ try {
 $candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
-if ($candidatePath -notmatch "/build/candidates/3\.2\.5/C32/[0-9a-f]{40}/more-infinite-research_3\.2\.5\.zip$" -or
+if ($candidatePath -notmatch "/build/candidates/3\.2\.9/unassigned/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
     $candidatePath -match "/dist/") {
-  throw "Default assurance candidates must be release/allocation/source-tree addressed outside immutable dist."
+  throw "Default pre-freeze assurance candidates must be release/unassigned/source-tree addressed outside immutable dist."
 }
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
@@ -679,6 +705,9 @@ $workerRoot = Join-Path $equivalenceRoot "worker"
 $pwshPath = (Get-Process -Id $PID).Path
 try {
   New-Item -ItemType Directory -Force -Path $equivalenceRoot | Out-Null
+  $stagedPatchPath = Join-Path $equivalenceRoot "staged-index.patch"
+  & git -C $RepoRoot diff --cached --binary --full-index --output=$stagedPatchPath
+  if ($LASTEXITCODE -ne 0) { throw "Unable to capture the exact staged tree for separate-root equivalence." }
   $sourceGitRoot = Join-Path $RepoRoot ".git"
   & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
@@ -686,6 +715,10 @@ try {
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {
+    if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
+      & git -C $root apply --index --whitespace=nowarn $stagedPatchPath
+      if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $root" }
+    }
     & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
     if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
   }

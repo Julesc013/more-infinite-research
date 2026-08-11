@@ -185,22 +185,20 @@ function Get-MIRAssuranceInputFingerprint {
       return [ordered]@{ kind="repository"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
     }
     "release-history" {
-      $rootTree = (& git -C $repo write-tree).Trim()
-      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($rootTree)) {
-        throw "Unable to materialize the staged repository tree for release-history fingerprinting."
-      }
-      $targetLinesTree = (& git -C $repo rev-parse "$rootTree`:.mir/target-lines" 2>$null).Trim()
-      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($targetLinesTree)) {
-        throw "Unable to resolve the staged .mir/target-lines tree for release-history fingerprinting."
+      $sourceLock = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
+        ".mir/releases/sources/published-source-locks.json"
+      )
+      if ([int]$sourceLock.file_count -ne 1) {
+        throw "Unable to resolve the staged compact source-lock authority for release-history fingerprinting."
       }
       $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
       $material = [ordered]@{
-        target_lines_tree=$targetLinesTree
+        source_lock=$sourceLock
         inventory=$inventory
       }
       return [ordered]@{
         kind="release-history"
-        target_lines_tree=$targetLinesTree
+        source_lock=$sourceLock
         inventory=$inventory
         sha256=(Get-MIRAssuranceJsonHash -Value $material)
       }
