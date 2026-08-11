@@ -9,12 +9,9 @@
     "candidate_sha256",
     "candidate_content_sha256",
     "source_commit",
-    "checklist_version",
     "factorio_version",
     "factorio_binary_sha256",
     "reviewer",
-    "reviewed_at",
-    "items",
     "status",
     "attestation_sha256"
   ],
@@ -23,12 +20,29 @@
     "kind": { "const": "mir-manual-release-review" },
     "candidate_sha256": { "$ref": "#/$defs/sha256" },
     "candidate_content_sha256": { "$ref": "#/$defs/sha256" },
-    "source_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{40}$", "description": "Immutable package-source commit whose exact candidate bytes were reviewed." },
-    "checklist_version": { "const": "mir-manual-release-review-v1" },
+    "source_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{40}$" },
+    "checklist_version": {
+      "enum": [
+        "mir-manual-release-review-v1",
+        "mir-manual-release-review-historical-statement-v1"
+      ]
+    },
     "factorio_version": { "type": "string", "minLength": 1 },
     "factorio_binary_sha256": { "$ref": "#/$defs/sha256" },
     "reviewer": { "type": "string", "minLength": 1 },
     "reviewed_at": { "type": "string", "format": "date-time" },
+    "attestation_recorded_at": { "type": "string", "format": "date-time" },
+    "review_performed_before_publication": { "type": "boolean" },
+    "review_exact_time_known": { "type": "boolean" },
+    "attestation_recorded_after_publication": { "type": "boolean" },
+    "reviewed_release": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "statement": { "type": "string", "minLength": 1 },
+    "supporting_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "custody_manifest_path": { "type": "string", "minLength": 1 },
     "items": {
       "type": "array",
       "minItems": 6,
@@ -37,6 +51,36 @@
     "status": { "const": "passed" },
     "attestation_sha256": { "$ref": "#/$defs/sha256" }
   },
+  "oneOf": [
+    {
+      "title": "Observed pre-seal checklist review",
+      "required": ["checklist_version", "reviewed_at", "items"],
+      "properties": {
+        "checklist_version": { "const": "mir-manual-release-review-v1" }
+      }
+    },
+    {
+      "title": "Post-publication attestation of an explicitly stated historical maintainer review",
+      "required": [
+        "checklist_version",
+        "attestation_recorded_at",
+        "review_performed_before_publication",
+        "review_exact_time_known",
+        "attestation_recorded_after_publication",
+        "reviewed_release",
+        "statement",
+        "supporting_artifacts",
+        "custody_manifest_path"
+      ],
+      "properties": {
+        "checklist_version": { "const": "mir-manual-release-review-historical-statement-v1" },
+        "review_performed_before_publication": { "const": true },
+        "review_exact_time_known": { "const": false },
+        "attestation_recorded_after_publication": { "const": true }
+      },
+      "not": { "required": ["reviewed_at", "items"] }
+    }
+  ],
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
     "artifact": {

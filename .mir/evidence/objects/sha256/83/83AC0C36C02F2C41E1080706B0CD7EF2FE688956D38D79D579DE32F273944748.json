@@ -1,0 +1,34 @@
+{
+  "schema": 2,
+  "kind": "mir-manual-release-review",
+  "candidate_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+  "candidate_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+  "source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
+  "checklist_version": "mir-manual-release-review-historical-statement-v1",
+  "factorio_version": "2.0.77",
+  "factorio_binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "reviewer": "Julesc013",
+  "attestation_recorded_at": "2026-08-09T10:08:12.6070721Z",
+  "review_performed_before_publication": true,
+  "review_exact_time_known": false,
+  "attestation_recorded_after_publication": true,
+  "reviewed_release": "2.5.5",
+  "statement": "The maintainer confirms that they playtested MIR 2.5.5, found it acceptable, and authorized its release on that basis.",
+  "supporting_artifacts": [
+    {
+      "path": "docs/releases/archive/MIR-3.5-WAVE-INDEX.json",
+      "sha256": "B667C6FD65248854F9153F5BE71C3FB76C727E408733D8CDAAA68A1528CBC1EA"
+    },
+    {
+      "path": ".mir/evidence/MIR-3.5-wave-publication.json",
+      "sha256": "0FE62C34DF863B0C8BEB0D9FBC67C3ED422CE2E6788C9D365A9FF1C7540FF12D"
+    },
+    {
+      "path": ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json",
+      "sha256": "C434F994FC02E5CAFBABD8E7AA496935BB3C0FC618BB95FCA0CE4F2D083696FE"
+    }
+  ],
+  "custody_manifest_path": ".mir/evidence/2.5.5-manual-review-custody.json",
+  "status": "passed",
+  "attestation_sha256": "34692BC2108BDDC0188A1F101E78468121443DA7706CBEBDDE59F08D399D64DB"
+}

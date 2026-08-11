@@ -738,15 +738,15 @@ function Invoke-MIRAssuranceSelfTest {
       throw 'P11 target-scoped candidate identity self-test failed.'
     }
     $manualReviewCommand = Resolve-MIRAssuranceCommandText `
-      -Command './scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedFactorioVersion <qualification-factorio-version>' `
+      -Command './scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <source-commit> -ExpectedFactorioVersion <qualification-factorio-version>' `
       -Context $Context `
       -Plan ([pscustomobject]@{baseline='2.4.9';source_commit=$qualificationCommit})
     if ($manualReviewCommand -match '<[^>]+>' -or
-        $manualReviewCommand -notmatch [regex]::Escape("-ExpectedSourceCommit '$([string]$authority.package_source_commit)'") -or
+        $manualReviewCommand -notmatch [regex]::Escape("-ExpectedSourceCommit '$qualificationCommit'") -or
         $manualReviewCommand -notmatch [regex]::Escape("-Candidate '$([string]$Context.candidate)'") -or
         $manualReviewCommand -notmatch [regex]::Escape("-FactorioBin '$([string]$Context.factorio)'") -or
         $manualReviewCommand -notmatch [regex]::Escape("-ExpectedFactorioVersion '$([string]$Context.verification_profile.qualification_factorio_version)'")) {
-      throw 'P11 manual-review command did not bind the exact target-scoped package-source authority.'
+      throw 'P11 manual-review command did not bind the exact qualification-source authority.'
     }
     $null = Assert-MIRReleaseEvidenceSourceAuthority `
       -RepoRoot $repo `

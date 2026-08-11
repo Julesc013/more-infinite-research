@@ -180,10 +180,12 @@ if ($performanceTest.Count -ne 1 -or
 
 $manualTest = @($catalog.tests | Where-Object { [string]$_.id -eq "manual.release-review" })
 if ($manualTest.Count -ne 1 -or
-    [string]$manualTest[0].command -notmatch '-ExpectedSourceCommit\s+<package-source-commit>' -or
+    [string]$manualTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
     @($manualTest[0].inputs) -notcontains "manual-review-attestation" -or
+    @($manualTest[0].inputs) -notcontains ".mir/evidence/2.5.5-manual-review-custody.json" -or
+    @($manualTest[0].inputs) -notcontains ".mir/evidence/MIR-3.5-wave-publication.json" -or
     @($manualTest[0].inputs | Where-Object { [string]$_ -match 'manual-review-attestation\.json' }).Count -ne 0) {
-  throw "manual.release-review must bind the package-source commit and dynamically fingerprint the exact versioned attestation."
+  throw "manual.release-review must bind the qualification source while fingerprinting the exact attestation and historical custody authorities."
 }
 . (Join-Path $RepoRoot "scripts\validation\ReleaseAttestations.ps1")
 $portableHashRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-portable-hash-" + [Guid]::NewGuid().ToString("N"))
