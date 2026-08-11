@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.9
+Date: 2026-08-12
+
+  Bugfixes:
+
+    - Chose the earliest safe science route so later alternatives cannot delay already-producible packs.
+    - Normalized MIR-owned technology science cards after the K2 phase pass for exact K2 2.1.2 and K2SO 2.0.13.
+
+  Compatibility:
+
+    - Preserved stable technology IDs, research progress, lab-valid ingredients, and the earlier K2SO load-order repair.
+    - Kept the K2 science-phase correction inactive when the exact admitted K2/K2SO envelope is absent.
+    - Added generic alternate-route regression coverage without claiming unmodified Cubium support on Factorio 2.1.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.2.5
 Date: 2026-08-04
 

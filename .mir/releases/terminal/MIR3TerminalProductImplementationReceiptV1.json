@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProductImplementationReceiptV1",
+  "status": "canonical-2.1-implementation-proved-lower-projection-pending",
+  "recorded_at": "2026-08-12T06:20:00+10:00",
+  "admission_authority": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+  "source_authority": {
+    "admitted_dev_commit": "c32bb8228bf684b15e2ea54e60eb497d4afc9145",
+    "implementation_commit": "d67bfe8a6def73f22b06aac52f87fc87e476f2de",
+    "exact_scenario_authority_commit": "1f9aa3fba65cc2e5d0fa3b6287db6295bd49b08b",
+    "evidence_source_commit": "09c425bd8440991009a13dc2859f650d3306e5df",
+    "evidence_source_commit_tree": "e4bf26bb0e88ffd4ff45a3f07e1ea7a90291d37e",
+    "package_roots_unchanged_from_scenario_authority_to_evidence_source": true,
+    "package_roots_unchanged_from_implementation_to_evidence_source": true
+  },
+  "development_package": {
+    "version": "3.2.9",
+    "candidate_id": null,
+    "source_frozen": false,
+    "source_tree_used_for_archive": "5977ba90648be6e72c6a03d4b777ae1494bbde55",
+    "archive": "build/candidates/3.2.9/unassigned/5977ba90648be6e72c6a03d4b777ae1494bbde55/more-infinite-research_3.2.9.zip",
+    "archive_sha256": "AE5D1D4966C4D4CCEC43D8D575BCCABB11FBE21F94A2C4D3623EC5A7252C74B2",
+    "normalized_content_sha256": "5549C4430C8D27F0001C8DFE39889B27BC271FFC14D1CE95A7B40FC90AABF271",
+    "package_source_sha256": "5549C4430C8D27F0001C8DFE39889B27BC271FFC14D1CE95A7B40FC90AABF271",
+    "bytes": 1059661,
+    "entries": 303,
+    "byte_identical_rebuild_from_evidence_source_tree": true
+  },
+  "regression_first_proof": {
+    "alternate_route_red": {
+      "artifact": "build/results/validation/scenario_2.1_generated-prerequisite-safety.red.json",
+      "sha256": "D2BB17382BCDDD323903FE4E63C22B1485FAEC50B957546D4AA10A4C020D6824",
+      "status": "failed-as-required-before-implementation",
+      "failure_invariant": "later alternate route delayed science behind mir-fixture-00-late-route-unlocker"
+    },
+    "alternate_route_green": {
+      "artifact": "build/results/validation/scenario_2.1_generated-prerequisite-safety.product.json",
+      "sha256": "A00BA89F1291FAB3C1095A0F4FC1B12264F82DED6D34BFC5B6E4E88E953ED828",
+      "status": "passed",
+      "policy": "SciencePackProductionRoutePolicyV1"
+    },
+    "k2_policy_green": {
+      "artifact": "build/results/validation/scenario_2.1_k2-science-phase-policy.json",
+      "sha256": "91E8FFB2874DE54ED464E4722740E3A2700115A4EFBE7E23A46DD9D31B5F5DDD",
+      "status": "passed",
+      "policy": "K2SciencePhasePolicyV1"
+    }
+  },
+  "exact_k2_campaign": {
+    "artifact_root": "build/results/terminal-product/k2-science-phase-exact-attempt-03",
+    "campaign_evidence_sha256": "4025B1DD15637FB480421FFE18F3038F459D805084C7540C69457915D68EA7E5",
+    "dependency_lock_sha256": "1F0C9B5778723ABADD6FD04F7E7E210ABDB268A4E15552F6027D544A9CB8D647",
+    "load_results_sha256": "877C1D82F880D1C626A3FCD2A2CE3A2CDB78CEBD696E06EFE6839C1665B18E22",
+    "compat_report_sha256": "8548AF901E0601093551EA16BB24A15CDC4914EE0DDC0774C6E597321668E56F",
+    "factorio": {
+      "version": "2.1.13.87164",
+      "binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084"
+    },
+    "exact_envelope": {
+      "Krastorio2": {
+        "version": "2.1.2",
+        "archive_sha256": "89989E60784EA3E94345289E063C64ABFCE5F35693DB7B9A69D656A163620F43"
+      },
+      "Krastorio2-spaced-out": {
+        "version": "2.0.13",
+        "archive_sha256": "A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242"
+      }
+    },
+    "result": "passed",
+    "dependency_failures": 0,
+    "audit_rows": 5559,
+    "sanitation_failures": 0,
+    "required_science_contract": "passed",
+    "forbidden_early_science_contract": "passed"
+  },
+  "direct_upgrade_proof": {
+    "artifact": "build/results/terminal-product/3.2.9-upgrade-proof.json",
+    "sha256": "F4982CFCE9F49F3DFD1DE6EEDE895CC603A38301B7712FB66A275106A203077D",
+    "status": "passed",
+    "factorio_version": "2.1.13.87164",
+    "factorio_binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+    "baseline": {
+      "version": "3.2.5",
+      "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF"
+    },
+    "candidate": {
+      "version": "3.2.9",
+      "archive_sha256": "AE5D1D4966C4D4CCEC43D8D575BCCABB11FBE21F94A2C4D3623EC5A7252C74B2"
+    },
+    "archetypes": [
+      {"id":"base-default","status":"passed","result_sha256":"58DC5FBD1AEC3AD8EC3E1DDD171ECA6009840833E73982B4C3E6DE873CC32729"},
+      {"id":"space-age-native-owner","status":"passed","result_sha256":"8B47524B9823F63941970DFB76618A40DB8377CA5A70447ECF27407D3070F12B"},
+      {"id":"automatic-family-creation","status":"passed","result_sha256":"533C6C572E31162D1ADCCBE4A93846C116B4AE3C15C00B064151FC3050C59CDC"},
+      {"id":"base-continuations","status":"passed","result_sha256":"F9F74144BBACEEF91C6415E5AFA3A6B0855C850F8A43D2E64A586EE5DBCDB0E9"},
+      {"id":"mod-set-configuration-change","status":"passed","result_sha256":"0ACE0DA521B80E516D3D59816095CF6CDD1174BBEF281C961A7ABFABBC5D54E3"}
+    ],
+    "assertions": [
+      "stable-technology-identities",
+      "technology-level-retained",
+      "current-research-retained",
+      "fractional-research-progress-retained",
+      "fixture-storage-retained",
+      "exact-candidate-normal-mod-directory-load",
+      "upgraded-save-reload-passed",
+      "upgraded-save-second-reload-passed",
+      "automatic-family-retained",
+      "base-continuations-retained",
+      "source-only-mod-removed",
+      "removed-recipe-target-sanitized"
+    ]
+  },
+  "finding_dispositions": [
+    {
+      "id": "MIR3-TERM-0027",
+      "state": "implemented-exact-envelope-runtime-and-upgrade-passed-awaiting-fixed-point-confirmation",
+      "implemented_target": "3.2.9",
+      "claim_boundary": "exact admitted K2/K2SO envelope only"
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "state": "implemented-2.1-fixture-and-upgrade-passed-awaiting-2.0-projection",
+      "implemented_target": "3.2.9",
+      "pending_target": "2.5.9",
+      "claim_boundary": "generic 2.1 route correctness only; direct Cubium 2.0 acquisition and unmodified proof remain pending; no direct Cubium 2.1 claim"
+    }
+  ],
+  "immutable_boundaries": {
+    "dot5_package_bytes_changed": false,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "all_nine_fixed_point_accepted": false,
+    "tagging_or_publication_permitted": false,
+    "assurance_architecture_reopened": false
+  },
+  "next_required_work": [
+    "repair and verify compact release-history source-lock authority",
+    "project SciencePackProductionRoutePolicyV1 and its generic fixture to 2.5.9",
+    "prove direct 2.5.5-to-2.5.9 upgrade behavior",
+    "materialize all nine terminal shadows",
+    "complete convergence and independent confirmation fixed points before source freeze"
+  ]
+}

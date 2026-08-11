@@ -5,7 +5,7 @@ applies_to: "3.2.9"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-12
 supersedes: []
 superseded_by: []
 ---
@@ -22,7 +22,7 @@ There will be no MIR 3.2.6, 3.2.7, or 3.2.8 releases. The detailed cross-target 
 
 The admitted implementation now contains `SciencePackProductionRoutePolicyV1`, which evaluates alternate recipes as independent production routes and selects the deterministic earliest safe route before technology names can break a tie. A Factorio 2.1 fixture proves that adding a lexically earlier but downstream route does not delay an already-reachable science pack.
 
-The implementation also contains exact-version-gated `K2SciencePhasePolicyV1` for Krastorio 2 `2.1.2` with K2SO `2.0.13`. The policy normalizes only MIR-owned stream and base-continuation technologies after lab-compatible science selection, preserves technology IDs and ingredient shapes, and does nothing when the exact envelope is absent. Focused fixture proof is complete; exact K2SO campaign and direct-upgrade proof remain required before this becomes a release claim.
+The implementation also contains exact-version-gated `K2SciencePhasePolicyV1` for Krastorio 2 `2.1.2` with K2SO `2.0.13`. The policy normalizes only MIR-owned stream and base-continuation technologies after lab-compatible science selection, preserves technology IDs and ingredient shapes, and does nothing when the exact envelope is absent. Focused fixture proof, an exact K2/K2SO campaign, and the direct 3.2.5-to-3.2.9 five-archetype upgrade proof are complete. Lower-target projection and the all-nine fixed point remain pending, so this is still not a public release claim.
 
 Direct unmodified Cubium 1.0.28 proof on Factorio 2.0 remains pending authenticated archive acquisition. No unmodified Cubium 2.1 support claim is made while that upstream release cannot load on Factorio 2.1 without a diagnostic shim.
 

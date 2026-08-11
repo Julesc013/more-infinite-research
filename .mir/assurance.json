@@ -99,7 +99,7 @@
     },
     {
       "id": "release-evidence",
-      "patterns": ["^\\.mir/(evidence|target-lines|releases/deltas)/", "^approved-delta/", "^dist/"],
+      "patterns": ["^\\.mir/(evidence|target-lines|releases/(deltas|sources))/", "^approved-delta/", "^dist/"],
       "tests": ["tooling.self-test", "static.release-history", "static.full", "static.package"]
     }
   ],

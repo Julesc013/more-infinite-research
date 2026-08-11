@@ -5,7 +5,7 @@ applies_to: "3.2.5, 2.5.5, 3.3, 2.6"
 audience: maintainer
 doc_type: adr
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-08-12
 supersedes: []
 superseded_by: []
 ---
@@ -32,6 +32,8 @@ The public maintainer interface is `tools/mir.ps1`. Old command paths forward to
 Release deltas move from `.mir/releases/deltas/` to `.mir/releases/deltas/`. Approval becomes record state. Historical text is not rewritten.
 
 Historical source copies are replaced by per-version source locks only after two independent exact materializations reproduce paths, Git modes, blobs, file counts, logical bytes, and supported package identities.
+
+The MIR 3 terminal checkout now implements that replacement. `.mir/releases/sources/published-source-locks.json` binds each exact tag, commit, root tree, file count, logical byte count, and distribution identity. The release-history gate independently resolves the former staged snapshot subtree retained at its immutable parent commit and the corresponding release tag/commit tree. Exact tree equality proves path, Git-mode, and blob equality without retaining 17 duplicate working-tree copies. The retirement commit remains in ordinary history, and offline Git-bundle custody remains explicitly pending until the terminal EOL archive and restore rehearsal.
 
 ## Alternatives
 
