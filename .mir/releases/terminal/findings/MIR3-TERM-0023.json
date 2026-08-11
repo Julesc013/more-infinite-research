@@ -43,7 +43,7 @@
     "reason": "The defect is a parameter-name compatibility regression in package-excluded verification tooling. The correction preserves current callers and cannot affect package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The harness accepts the established RepoRoot alias and derives current target defaults only when explicit historical roots are absent; control-plane, exact 2.0, exact 2.1, and hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

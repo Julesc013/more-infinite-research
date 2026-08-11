@@ -43,7 +43,7 @@
     "reason": "The defect is entirely within verifier aggregation for a valid target-era capability omission; no package source or release bytes are involved."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Phase sample initialization now uses only explicit non-empty declared phases; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

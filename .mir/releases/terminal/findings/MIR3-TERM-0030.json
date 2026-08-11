@@ -57,7 +57,7 @@
     "reason": "The correction changes ignored raw-evidence custody only and cannot mutate package bytes or target semantics."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Regression coverage now requires content-addressed child custody, exact idempotent adoption, and distinct-tree coexistence. Fresh exact 3.2.5 and 2.5.5 convergence plus confirmation gates remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

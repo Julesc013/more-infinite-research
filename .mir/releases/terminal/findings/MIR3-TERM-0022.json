@@ -43,7 +43,7 @@
     "reason": "This is a missing argument to an existing verifier command. Binding the immutable target policy strengthens evidence and cannot modify package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Compatibility performance passes the exact target sanitation authority and fingerprints it in target scope; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

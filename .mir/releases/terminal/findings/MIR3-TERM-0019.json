@@ -44,7 +44,7 @@
     "reason": "The correction concerns only provenance construction for the existing verifier. It preserves both current toolchain and immutable target evidence and cannot change public package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The harness fingerprint and compatibility invocation distinguish execution and target scopes, bind the declared Factorio line, include the declared manual-scenario digest, and reject absent inputs; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

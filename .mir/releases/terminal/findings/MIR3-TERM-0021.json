@@ -45,7 +45,7 @@
     "reason": "The correction aligns the verifier with the already-governed target capability contract; it does not suppress any required Factorio load, compatibility, or package proof and cannot modify package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Producer and validator now enforce phase and artifact-volume telemetry only when the governed campaign requires it; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

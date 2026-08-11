@@ -58,7 +58,7 @@
     "reason": "The correction changes evidence coordination only. It cannot mutate a package, target semantic projection, migration, or public release identity."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Host-timeout observation preserved the 136 completed exact rows and stale runtime.performance-regression marker. The bounded implementation adds plan-owned campaign freshness, checkpoint adoption, stale-worker recovery, and explicit between-row checkpoint budgeting. Exact 3.2.5 and 2.5.5 resumed convergence and independent confirmation remain required before closure."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

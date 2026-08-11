@@ -13,6 +13,7 @@ $authorityNames = @(
   "MIR3-Terminal-PublicationPolicyV1",
   "MIR3-Terminal-EOL-PolicyV1",
   "MIR3TerminalFoundationAdmissionV1",
+  "MIR3TerminalAssuranceCalibrationReceiptV1",
   "MIR3TerminalAcceleratedClosureDecisionV1"
 )
 $authorities = @{}
@@ -25,6 +26,7 @@ foreach ($name in $authorityNames) {
 }
 $changeSet = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\MIR3-Terminal-ChangeSet.json") | ConvertFrom-Json -Depth 100
 if ([string]$changeSet.kind -ne "MIR3-Terminal-ChangeSetV1") { throw "Terminal change-set authority is invalid." }
+$findingRecords = @{}
 foreach ($findingRecordPath in @($changeSet.finding_records)) {
   $finding = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$findingRecordPath)) | ConvertFrom-Json -Depth 100
   if ([string]$finding.kind -ne "MIR3TerminalFindingV1" -or [string]$finding.id -notmatch '^MIR3-TERM-[0-9]{4}$' -or
@@ -34,8 +36,10 @@ foreach ($findingRecordPath in @($changeSet.finding_records)) {
       [bool]$finding.visibility.package -or [bool]$finding.visibility.gameplay -or -not [bool]$finding.visibility.assurance) {
     throw "Terminal finding is incomplete, not all-nine-disposed, or widens package authority: $findingRecordPath"
   }
+  $findingRecords[[string]$finding.id] = $finding
 }
 
+$foundationPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalFoundationAdmissionV1.json"
 $admission = $authorities["MIR3TerminalFoundationAdmissionV1"]
 if ([string]$admission.status -ne "accepted" -or @($admission.stack).Count -ne 5 -or
     [string]$admission.foundation.commit -ne [string]$admission.stack[-1].merge_commit -or
@@ -81,6 +85,95 @@ foreach ($identity in @($admission.dot5_identity_authority.releases)) {
       (Get-Item -LiteralPath $archive).Length -ne [long]$identity.bytes -or $entryCount -ne [int]$identity.entries) {
     throw "Immutable .5 admission identity mismatch: $($identity.version)"
   }
+}
+
+$calibrationReceiptPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalAssuranceCalibrationReceiptV1.json"
+$calibrationReceiptSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-assurance-calibration-receipt.schema.json"
+$calibration = $authorities["MIR3TerminalAssuranceCalibrationReceiptV1"]
+if (-not ((Get-Content -Raw -LiteralPath $calibrationReceiptPath) | Test-Json -SchemaFile $calibrationReceiptSchemaPath) -or
+    [string]$calibration.status -ne "accepted" -or [string]$calibration.scope -ne "package-excluded-terminal-assurance-calibration" -or
+    [string]$calibration.assurance_freeze.status -ne "frozen" -or [int]$calibration.closure.unresolved_release_blocking_assurance_findings -ne 0 -or
+    [bool]$calibration.closure.package_bytes_changed -or [bool]$calibration.closure.candidate_assigned -or [bool]$calibration.closure.source_frozen) {
+  throw "Terminal assurance calibration receipt is invalid, incomplete, or widens release authority."
+}
+$currentAssuranceTree = (& git -C $RepoRoot rev-parse "$($calibration.source_authorities.current.commit)^{tree}").Trim()
+if ($LASTEXITCODE -ne 0 -or $currentAssuranceTree -ne [string]$calibration.source_authorities.current.tree -or
+    [string]$calibration.source_authorities.current.commit -ne "838d67a21364da6f669411ae64b360de67febaa5" -or
+    [string]$calibration.source_authorities.historical_projection.commit -ne "bc9d63c3b665145abd7f1ccccff8a3a908e8bd0d" -or
+    [string]$calibration.source_authorities.historical_projection.tree -ne "2ec5ff49f9cfb7efb4301f768f8bb203e6731eb2") {
+  throw "Terminal assurance calibration source commit/tree binding is invalid."
+}
+$expectedCalibrationPrs = @(83, 84, 85)
+$hostedChecks = @($calibration.source_authorities.hosted_exact_head_checks)
+if (($hostedChecks.pr -join "|") -ne ($expectedCalibrationPrs -join "|") -or @($hostedChecks | Where-Object {
+      [string]$_.status -ne "passed" -or [long]$_.mir_run -le 0 -or [long]$_.branch_policy_run -le 0
+    }).Count -ne 0) {
+  throw "Terminal assurance calibration does not bind the exact hosted implementation heads."
+}
+$calibrationTargets = @($calibration.calibration_targets)
+if (($calibrationTargets.release -join "|") -ne "3.2.5|2.5.5" -or
+    (@($calibrationTargets[0].rerun_test_ids).Count -ne 137) -or (@($calibrationTargets[1].rerun_test_ids).Count -ne 104)) {
+  throw "Terminal assurance calibration does not bind the exact two target catalogs."
+}
+$totalRerunRows = 0
+foreach ($targetCalibration in $calibrationTargets) {
+  $rerunIds = @($targetCalibration.rerun_test_ids)
+  if (@($rerunIds | Sort-Object -Unique).Count -ne $rerunIds.Count -or
+      "runtime.ecosystem" -notin $rerunIds -or "runtime.performance-regression" -notin $rerunIds -or "manual.release-review" -notin $rerunIds -or
+      (@($targetCalibration.campaigns).role -join "|") -ne "convergence|independent-confirmation") {
+    throw "Terminal assurance calibration rerun inventory is incomplete: $($targetCalibration.release)"
+  }
+  $planMaterials = @($targetCalibration.campaigns.plan_material_sha256 | Sort-Object -Unique)
+  $testSets = @($targetCalibration.campaigns.required_test_set_sha256 | Sort-Object -Unique)
+  $capsuleSets = @($targetCalibration.campaigns.capsule_set_sha256 | Sort-Object -Unique)
+  $bundles = @($targetCalibration.campaigns.bundle_sha256 | Sort-Object -Unique)
+  $performanceTrees = @($targetCalibration.campaigns.performance_custody.artifact_tree_sha256 | Sort-Object -Unique)
+  if ($planMaterials.Count -ne 1 -or $testSets.Count -ne 1 -or $capsuleSets.Count -ne 2 -or $bundles.Count -ne 2 -or $performanceTrees.Count -ne 2) {
+    throw "Convergence and independent confirmation are not a stable-plan, distinct-evidence pair: $($targetCalibration.release)"
+  }
+  foreach ($campaign in @($targetCalibration.campaigns)) {
+    if ([int]$campaign.counts.planned -ne $rerunIds.Count -or [int]$campaign.counts.executed -ne $rerunIds.Count -or
+        [int]$campaign.counts.checkpoint_adopted -ne 0 -or [int]$campaign.counts.ordinary_reused -ne 0 -or
+        [int]$campaign.counts.failed -ne 0 -or [int]$campaign.counts.incomplete -ne 0 -or [int]$campaign.counts.unexpected -ne 0 -or
+        [string]$campaign.counts.rerun_scope -ne "all-planned-rows") {
+      throw "Terminal assurance campaign execution ledger is not exact and fresh: $($targetCalibration.release)/$($campaign.role)"
+    }
+    $totalRerunRows += [int]$campaign.counts.executed
+  }
+}
+if ($totalRerunRows -ne 482 -or [int]$calibration.resumability.final_campaign_rows_rerun -ne 482 -or
+    [int]$calibration.resumability.final_campaign_checkpoint_adoptions -ne 0 -or [string]$calibration.resumability.status -ne "passed") {
+  throw "Terminal resumability calibration row accounting is invalid."
+}
+$attestationPath = Join-Path $RepoRoot ([string]$calibration.historical_manual_review.path)
+$attestationObjectPath = Join-Path $RepoRoot ([string]$calibration.historical_manual_review.content_addressed_object)
+if ((Get-FileHash -LiteralPath $attestationPath -Algorithm SHA256).Hash -ne [string]$calibration.historical_manual_review.raw_sha256 -or
+    (Get-FileHash -LiteralPath $attestationObjectPath -Algorithm SHA256).Hash -ne [string]$calibration.historical_manual_review.raw_sha256) {
+  throw "Historical manual-review attestation lost its byte-identical custody binding."
+}
+if ((Get-FileHash -LiteralPath $foundationPath -Algorithm SHA256).Hash -ne [string]$calibration.all_nine_dot5_identity.authority_sha256 -or
+    @($calibration.all_nine_dot5_identity.releases).Count -ne 9) {
+  throw "Terminal calibration lost the admitted all-nine immutable .5 identity authority."
+}
+foreach ($identity in @($calibration.all_nine_dot5_identity.releases)) {
+  $admittedIdentity = @($admission.dot5_identity_authority.releases | Where-Object version -eq $identity.version)
+  if ($admittedIdentity.Count -ne 1 -or [string]$identity.archive_sha256 -ne [string]$admittedIdentity[0].archive_sha256 -or
+      [string]$identity.content_sha256 -ne [string]$admittedIdentity[0].content_sha256 -or [long]$identity.bytes -ne [long]$admittedIdentity[0].bytes) {
+    throw "Terminal calibration .5 identity differs from foundation admission: $($identity.version)"
+  }
+}
+$calibrationFindingIds = @($calibration.finding_closures.id)
+foreach ($finding in @($findingRecords.Values | Where-Object severity -eq "assurance")) {
+  if ([string]$finding.closure.status -ne "closed") { throw "Release-blocking assurance finding remains unresolved: $($finding.id)" }
+  if ([string]$finding.id -in @("MIR3-TERM-0012", "MIR3-TERM-0015", "MIR3-TERM-0016", "MIR3-TERM-0017", "MIR3-TERM-0018", "MIR3-TERM-0019", "MIR3-TERM-0020", "MIR3-TERM-0021", "MIR3-TERM-0022", "MIR3-TERM-0023", "MIR3-TERM-0024", "MIR3-TERM-0025", "MIR3-TERM-0026", "MIR3-TERM-0029", "MIR3-TERM-0030") -and
+      ([string]$finding.id -notin $calibrationFindingIds -or [string]$finding.closure.evidence -ne ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json")) {
+    throw "Assurance finding closure is not bound to the calibration receipt: $($finding.id)"
+  }
+}
+$legacyCalibrationItem = @($changeSet.items | Where-Object id -eq "MIR3-TERM-0003")
+if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].closure.status -ne "closed" -or
+    [string]$legacyCalibrationItem[0].closure.evidence -ne ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json") {
+  throw "Legacy terminal calibration debt remains unresolved."
 }
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
@@ -239,7 +332,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100

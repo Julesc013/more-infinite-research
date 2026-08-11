@@ -1,0 +1,708 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalAssuranceCalibrationReceiptV1",
+  "status": "accepted",
+  "issued_at": "2026-08-11T14:37:45.1559471Z",
+  "scope": "package-excluded-terminal-assurance-calibration",
+  "source_authorities": {
+    "current": {
+      "branch": "dev",
+      "commit": "838d67a21364da6f669411ae64b360de67febaa5",
+      "tree": "fbe2d280986620efbd4db7d56c166e8016dbabc8",
+      "role": "current-assurance-implementation"
+    },
+    "historical_projection": {
+      "branch": "codex/mir3-term-0011-2.5.5-calibration",
+      "commit": "bc9d63c3b665145abd7f1ccccff8a3a908e8bd0d",
+      "tree": "2ec5ff49f9cfb7efb4301f768f8bb203e6731eb2",
+      "role": "historical-2.5.5-calibration-projection"
+    },
+    "hosted_exact_head_checks": [
+      {
+        "pr": 83,
+        "head": "6da83f31f1b380c9c62c70ebea16e05ec75c4519",
+        "merge_commit": "5fc273728c1f3a29cd1a267c3674f3fbcd751743",
+        "mir_run": 31406073439,
+        "branch_policy_run": 31406073205,
+        "status": "passed"
+      },
+      {
+        "pr": 84,
+        "head": "f8645e701a72577a7dd7e55c5c899fc111226794",
+        "merge_commit": "32fba8fd8247ecf9660ebdcdb7f96aa8d6003de2",
+        "mir_run": 31422328265,
+        "branch_policy_run": 31422328279,
+        "status": "passed"
+      },
+      {
+        "pr": 85,
+        "head": "5a0f0e39543faeedd68e958ce67bbde4df416f77",
+        "merge_commit": "838d67a21364da6f669411ae64b360de67febaa5",
+        "mir_run": 31445735561,
+        "branch_policy_run": 31445735570,
+        "status": "passed"
+      }
+    ]
+  },
+  "finding_closures": [
+    {
+      "id": "MIR3-TERM-0003",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0012",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0015",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0016",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0017",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0018",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0019",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0020",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0021",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0022",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0023",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0024",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0025",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0026",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0029",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    },
+    {
+      "id": "MIR3-TERM-0030",
+      "status": "closed",
+      "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+    }
+  ],
+  "calibration_targets": [
+    {
+      "release": "3.2.5",
+      "factorio_line": "2.1",
+      "source": {
+        "commit": "838d67a21364da6f669411ae64b360de67febaa5",
+        "tree": "fbe2d280986620efbd4db7d56c166e8016dbabc8",
+        "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3"
+      },
+      "candidate": {
+        "version": "3.2.5",
+        "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+        "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+        "bytes": 1056249,
+        "entries": 301
+      },
+      "prior_release": {
+        "version": "3.2.3",
+        "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+        "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+        "bytes": 1034824,
+        "entries": 292
+      },
+      "engine": {
+        "version": "2.1.13",
+        "binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+        "binary_bytes": 49009104,
+        "official_data_sha256": "11C677CA4A308362BD681CA966BE13241741CE6E7429CC2CD7F3A53EFA67E703",
+        "official_data_files": 17308,
+        "installation_sha256": "5F026A28175FAED6434A2A231F6AB529732E1A6641BA76437422A8E8388DA2B9"
+      },
+      "mod_closure": {
+        "mod_count": 616,
+        "closure_sha256": "272E4F1467E9727D7AFBEB9366D078DEE43C3B515DCCF52F061FE95EBC43B60D",
+        "lock_sha256": "6093A5BC4EE65BC706137078054F3A6633772B8486AD4EC835A03DCD96260E28",
+        "runtime_set_sha256": "5A7EA270B70FD2E1B84C3626D1E957E875ADCB3182C2C0A899FD2F0CA8BC52C7"
+      },
+      "rerun_test_ids": [
+        "docs.check",
+        "manual.release-review",
+        "performance.static",
+        "release.approved-delta",
+        "runtime.ecosystem",
+        "runtime.performance-regression",
+        "runtime.upgrade",
+        "scenario/2.1/aai-loader-belt-productivity",
+        "scenario/2.1/air-scrubbing-clean-filter",
+        "scenario/2.1/all-official-pack-policy",
+        "scenario/2.1/all-pack-policy",
+        "scenario/2.1/approved-delta-automatic-family-controls",
+        "scenario/2.1/approved-delta-base",
+        "scenario/2.1/approved-delta-base-continuations",
+        "scenario/2.1/approved-delta-compat-atan",
+        "scenario/2.1/approved-delta-compat-space-age-galore",
+        "scenario/2.1/approved-delta-native-owner-adoption",
+        "scenario/2.1/approved-delta-space-age",
+        "scenario/2.1/atan-ash-separation",
+        "scenario/2.1/atan-nuclear-science-productivity",
+        "scenario/2.1/base-cargo-space-age-gate",
+        "scenario/2.1/base-competitor-rollback",
+        "scenario/2.1/base-effect-setting-retention",
+        "scenario/2.1/base-extension-boundary-policy",
+        "scenario/2.1/base-fluid-productivity",
+        "scenario/2.1/base-generation-integrity",
+        "scenario/2.1/base-generation-integrity-inserter-enabled",
+        "scenario/2.1/base-installed-space-age-icon-assets",
+        "scenario/2.1/base-research-cost-linear",
+        "scenario/2.1/base-scripted-candidates-enabled",
+        "scenario/2.1/base-space-promethium-pack-policy",
+        "scenario/2.1/base-stream-research-cost-hybrid",
+        "scenario/2.1/better-bot-battery-owner-skip",
+        "scenario/2.1/big-mining-drill-productivity",
+        "scenario/2.1/capability-negative-cases",
+        "scenario/2.1/character-inventory-merged-effects",
+        "scenario/2.1/checkbox-disabled-default-on-features",
+        "scenario/2.1/checkbox-enabled-default-off-features",
+        "scenario/2.1/combination-atan-ash-big-mining-drill",
+        "scenario/2.1/combination-space-age-big-mining-drill",
+        "scenario/2.1/compiler-contracts",
+        "scenario/2.1/effect-scaling-mixed-tier",
+        "scenario/2.1/end-game-prerequisite-gate",
+        "scenario/2.1/external-technology-cycle",
+        "scenario/2.1/generated-prerequisite-safety",
+        "scenario/2.1/lab-policy-engine-default",
+        "scenario/2.1/lab-productivity-owner-skip",
+        "scenario/2.1/mod-progression-pack-policy",
+        "scenario/2.1/official-progression-pack-policy",
+        "scenario/2.1/omega-drill-productivity",
+        "scenario/2.1/package-zip-base",
+        "scenario/2.1/package-zip-space-age",
+        "scenario/2.1/pipeline-extent-multiplier",
+        "scenario/2.1/pipeline-extent-multiplier-50",
+        "scenario/2.1/prototype-limit-overrides-base",
+        "scenario/2.1/prototype-limit-overrides-space-age",
+        "scenario/2.1/prototype-limit-scope-engine-unchanged-baseline",
+        "scenario/2.1/prototype-limit-scope-inert-at-fixed-threshold",
+        "scenario/2.1/prototype-limit-scope-inert-at-matched-threshold",
+        "scenario/2.1/prototype-limit-self-recycling-and-unrestricted-modules",
+        "scenario/2.1/py-postprocessing-stale-unlock",
+        "scenario/2.1/recipe-cap-diagnostics",
+        "scenario/2.1/reduce-policy",
+        "scenario/2.1/rigor-late-recipe-removal",
+        "scenario/2.1/scaled-known-productivity-competitor",
+        "scenario/2.1/scaled-weapon-overlap",
+        "scenario/2.1/semantic-family-attach",
+        "scenario/2.1/semantic-family-exact-pack",
+        "scenario/2.1/semantic-family-generate",
+        "scenario/2.1/semantic-family-off",
+        "scenario/2.1/semantic-family-report",
+        "scenario/2.1/settings-profile-roundtrip",
+        "scenario/2.1/skip-policy",
+        "scenario/2.1/space-age-cargo-logistics-shape",
+        "scenario/2.1/space-age-cargo-pad-enabled",
+        "scenario/2.1/space-age-duplicate-cargo-diagnostics",
+        "scenario/2.1/space-age-fluid-productivity",
+        "scenario/2.1/space-age-galore-effect-ownership",
+        "scenario/2.1/space-age-generation-integrity",
+        "scenario/2.1/space-age-generation-integrity-inserter-enabled",
+        "scenario/2.1/space-age-native-owner-settings-combined",
+        "scenario/2.1/space-age-native-owner-settings-config-change",
+        "scenario/2.1/space-age-native-owner-settings-cost-base",
+        "scenario/2.1/space-age-native-owner-settings-cost-growth",
+        "scenario/2.1/space-age-native-owner-settings-cost-linear",
+        "scenario/2.1/space-age-native-owner-settings-default",
+        "scenario/2.1/space-age-native-owner-settings-disabled",
+        "scenario/2.1/space-age-native-owner-settings-effect",
+        "scenario/2.1/space-age-native-owner-settings-fixed-default",
+        "scenario/2.1/space-age-native-owner-settings-fixed-override",
+        "scenario/2.1/space-age-native-owner-settings-linear-default",
+        "scenario/2.1/space-age-native-owner-settings-linear-override",
+        "scenario/2.1/space-age-native-owner-settings-max-level",
+        "scenario/2.1/space-age-native-owner-settings-research-time",
+        "scenario/2.1/space-age-native-owner-settings-unrecognized-default",
+        "scenario/2.1/space-age-native-owner-settings-unrecognized-override",
+        "scenario/2.1/space-age-plates-n-circuit-productivity-blocked-owner",
+        "scenario/2.1/space-age-plates-n-circuit-productivity-change-mismatch",
+        "scenario/2.1/space-age-plates-n-circuit-productivity-compat",
+        "scenario/2.1/space-age-plates-n-circuit-productivity-partial-coverage",
+        "scenario/2.1/space-age-progression-pack-policy",
+        "scenario/2.1/space-age-scripted-candidates-disabled",
+        "scenario/2.1/space-age-scripted-candidates-enabled",
+        "scenario/2.1/space-age-scripted-runtime-disable-restoration",
+        "scenario/2.1/space-age-scripted-runtime-lifecycle",
+        "scenario/2.1/space-age-scripted-runtime-reenable",
+        "scenario/2.1/space-age-space-pack-policy",
+        "scenario/2.1/space-age-space-promethium-pack-policy",
+        "scenario/2.1/space-age-vanilla-family-adoption",
+        "scenario/2.1/space-age-vanilla-family-adoption-config-change",
+        "scenario/2.1/space-age-vanilla-family-exact-owner",
+        "scenario/2.1/space-age-vanilla-family-mixed-owner",
+        "scenario/2.1/space-age-vanilla-family-owner-prepatched",
+        "scenario/2.1/space-exploration-recipe-removal",
+        "scenario/2.1/space-pack-policy",
+        "scenario/2.1/synthetic-scale-graph",
+        "scenario/2.1/synthetic-scale-graph-random-order",
+        "scenario/2.1/synthetic-scale-recipes",
+        "scenario/2.1/synthetic-scale-recipes-random-order",
+        "scenario/2.1/technology-prerequisite-rewire",
+        "scenario/2.1/weapon-overlap-always-coverage-absent",
+        "scenario/2.1/weapon-overlap-always-coverage-present",
+        "scenario/2.1/weapon-overlap-conditional-coverage-absent",
+        "scenario/2.1/weapon-overlap-conditional-coverage-present",
+        "scenario/2.1/weapon-overlap-conditional-external-owner",
+        "scenario/2.1/weapon-overlap-off-coverage-absent",
+        "scenario/2.1/weapon-overlap-off-coverage-present",
+        "static.architecture",
+        "static.balance",
+        "static.compiler",
+        "static.full",
+        "static.locales",
+        "static.museum",
+        "static.package",
+        "static.release-history",
+        "static.settings",
+        "tooling.self-test"
+      ],
+      "campaigns": [
+        {
+          "role": "convergence",
+          "status": "passed",
+          "generated_at": "08/11/2026 00:57:44",
+          "completed_at": "08/11/2026 02:47:37",
+          "campaign_id": "plan-62999fad123199608a4a859e78fda0bfd6a467599089b98f1c9c83ef2700f235",
+          "plan_material_sha256": "62999FAD123199608A4A859E78FDA0BFD6A467599089B98F1C9C83EF2700F235",
+          "required_test_set_sha256": "2052EFE35AE67203BA738694DA0DA7056E506E18AE567EE84A925793EFF65FC5",
+          "plan_file": {
+            "logical_path": "build/results/terminal-calibration/3.2.5-convergence-838d67a2-plan.json",
+            "raw_sha256": "F67C0351C2356422B3DCDD9554F1F71C1EDF322DF6296F9D9373142EE3006AC4"
+          },
+          "result_gate_file": {
+            "logical_path": "build/results/terminal-calibration/3.2.5-convergence-838d67a2-gate.json",
+            "raw_sha256": "F5F15EB324AF52DD6CE0A308D82ECC3A66D43081F8721BF6FC882035FB988BFF"
+          },
+          "gate_plan_sha256": "8859AAB7690423E30D994EC64321C72CD7DFE9B39A3EFA26AF0FD381F01A4992",
+          "capsule_set_sha256": "0ECAD074D4FDA691453B163B0046387ECCC1637543B27B7069AFAD733B8AE4EE",
+          "bundle_sha256": "5129150C615C072DA309581835AC16C1B1A26C37CF216C6314E997B9EDBE9B20",
+          "counts": {
+            "planned": 137,
+            "executed": 137,
+            "checkpoint_adopted": 0,
+            "ordinary_reused": 0,
+            "waited": 0,
+            "invalid": 0,
+            "failed": 0,
+            "incomplete": 0,
+            "unexpected": 0,
+            "rerun_scope": "all-planned-rows"
+          },
+          "performance_custody": {
+            "namespace": "D8FA3B39BA20BFAE",
+            "artifact_tree_sha256": "E55DC6790BFF48A66F5C7FFA9C5D2E459239C0217937276D21BFCBB40952AEE4"
+          }
+        },
+        {
+          "role": "independent-confirmation",
+          "status": "passed",
+          "generated_at": "08/11/2026 02:48:43",
+          "completed_at": "08/11/2026 04:38:51",
+          "campaign_id": "plan-62999fad123199608a4a859e78fda0bfd6a467599089b98f1c9c83ef2700f235",
+          "plan_material_sha256": "62999FAD123199608A4A859E78FDA0BFD6A467599089B98F1C9C83EF2700F235",
+          "required_test_set_sha256": "2052EFE35AE67203BA738694DA0DA7056E506E18AE567EE84A925793EFF65FC5",
+          "plan_file": {
+            "logical_path": "build/results/terminal-calibration/3.2.5-confirmation-838d67a2-plan.json",
+            "raw_sha256": "0F8B03764EF5A321CD4770DEC60222D21127FF20B9CC52C54A31982BA36C6C2A"
+          },
+          "result_gate_file": {
+            "logical_path": "build/results/terminal-calibration/3.2.5-confirmation-838d67a2-gate.json",
+            "raw_sha256": "86086DB9F31DADD32CFBA3EA7C79519EF28D62D8FA3D71980007629326B49E1C"
+          },
+          "gate_plan_sha256": "D8FA0841A4CB460746C03C54B27DF38AAE76425C906CC60516A3992F422C8B04",
+          "capsule_set_sha256": "25E8B2F727B95BF41495C3679002EA61D4FFD8A4D2AEB1D011B4371899D5B0C1",
+          "bundle_sha256": "C44F3A0CB17B22B210950EC0CAABBC2D21BF725AB8FDFC1BE5777D2C5CFBB7C9",
+          "counts": {
+            "planned": 137,
+            "executed": 137,
+            "checkpoint_adopted": 0,
+            "ordinary_reused": 0,
+            "waited": 0,
+            "invalid": 0,
+            "failed": 0,
+            "incomplete": 0,
+            "unexpected": 0,
+            "rerun_scope": "all-planned-rows"
+          },
+          "performance_custody": {
+            "namespace": "D8FA3B39BA20BFAE",
+            "artifact_tree_sha256": "B6C2ABC6F2DA74277EC777FA34284A15C2DADE7C8B9D05BE9C29473097355D5E"
+          }
+        }
+      ]
+    },
+    {
+      "release": "2.5.5",
+      "factorio_line": "2.0",
+      "source": {
+        "commit": "bc9d63c3b665145abd7f1ccccff8a3a908e8bd0d",
+        "tree": "2ec5ff49f9cfb7efb4301f768f8bb203e6731eb2",
+        "package_source_commit": null
+      },
+      "candidate": {
+        "version": "2.5.5",
+        "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+        "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+        "bytes": 1055047,
+        "entries": 300
+      },
+      "prior_release": {
+        "version": "2.5.0",
+        "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+        "content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+        "bytes": 1033875,
+        "entries": 291
+      },
+      "engine": {
+        "version": "2.0.77",
+        "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "binary_bytes": 43530192,
+        "official_data_sha256": "B1C2BC7DF3821BC0F6B180B08824C2E1BE2A1602113E28850FD404A7BB3E5308",
+        "official_data_files": 16562,
+        "installation_sha256": "280497FC5535381D0941206E15BEE15F23D1426C467D3D151899775C855F47FE"
+      },
+      "mod_closure": {
+        "mod_count": 370,
+        "closure_sha256": "D1BC82B3B36046250D9C1CF129422F87EA5F70994B97DD430B7AA412D11B4D14",
+        "lock_sha256": "DB28D1E29938A56E71904E14E36FA201658022B1460AD8491CEFF25DE290D11B",
+        "runtime_set_sha256": "176596E3F809C6854F4D7A81712A2618690E7E76EA8A172E4709B9ED58879D94"
+      },
+      "rerun_test_ids": [
+        "docs.check",
+        "manual.release-review",
+        "performance.static",
+        "release.approved-delta",
+        "runtime.ecosystem",
+        "runtime.performance-regression",
+        "runtime.upgrade",
+        "scenario/2.0/aai-loader-belt-productivity",
+        "scenario/2.0/air-scrubbing-clean-filter",
+        "scenario/2.0/all-official-pack-policy",
+        "scenario/2.0/all-pack-policy",
+        "scenario/2.0/approved-delta-automatic-family-controls",
+        "scenario/2.0/approved-delta-base",
+        "scenario/2.0/approved-delta-base-continuations",
+        "scenario/2.0/approved-delta-compat-atan",
+        "scenario/2.0/approved-delta-compat-space-age-galore",
+        "scenario/2.0/approved-delta-native-owner-adoption",
+        "scenario/2.0/approved-delta-space-age",
+        "scenario/2.0/atan-ash-separation",
+        "scenario/2.0/atan-nuclear-science-productivity",
+        "scenario/2.0/base-competitor-rollback",
+        "scenario/2.0/base-effect-setting-retention",
+        "scenario/2.0/base-extension-boundary-policy",
+        "scenario/2.0/base-fluid-productivity",
+        "scenario/2.0/base-generation-integrity",
+        "scenario/2.0/base-generation-integrity-inserter-enabled",
+        "scenario/2.0/base-installed-space-age-icon-assets",
+        "scenario/2.0/base-scripted-candidates-enabled",
+        "scenario/2.0/base-space-promethium-pack-policy",
+        "scenario/2.0/better-bot-battery-owner-skip",
+        "scenario/2.0/big-mining-drill-productivity",
+        "scenario/2.0/capability-negative-cases",
+        "scenario/2.0/character-inventory-merged-effects",
+        "scenario/2.0/checkbox-disabled-default-on-features",
+        "scenario/2.0/checkbox-enabled-default-off-features",
+        "scenario/2.0/combination-atan-ash-big-mining-drill",
+        "scenario/2.0/combination-space-age-big-mining-drill",
+        "scenario/2.0/compiler-contracts",
+        "scenario/2.0/effect-scaling-mixed-tier",
+        "scenario/2.0/end-game-prerequisite-gate",
+        "scenario/2.0/external-technology-cycle",
+        "scenario/2.0/generated-prerequisite-safety",
+        "scenario/2.0/lab-policy-engine-default",
+        "scenario/2.0/lab-productivity-owner-skip",
+        "scenario/2.0/mod-progression-pack-policy",
+        "scenario/2.0/official-progression-pack-policy",
+        "scenario/2.0/omega-drill-productivity",
+        "scenario/2.0/package-zip-base",
+        "scenario/2.0/package-zip-space-age",
+        "scenario/2.0/pipeline-extent-multiplier",
+        "scenario/2.0/pipeline-extent-multiplier-50",
+        "scenario/2.0/prototype-limit-overrides-base",
+        "scenario/2.0/prototype-limit-overrides-space-age",
+        "scenario/2.0/prototype-limit-scope-engine-unchanged-baseline",
+        "scenario/2.0/prototype-limit-scope-inert-at-fixed-threshold",
+        "scenario/2.0/prototype-limit-scope-inert-at-matched-threshold",
+        "scenario/2.0/prototype-limit-self-recycling-and-unrestricted-modules",
+        "scenario/2.0/py-postprocessing-stale-unlock",
+        "scenario/2.0/recipe-cap-diagnostics",
+        "scenario/2.0/reduce-policy",
+        "scenario/2.0/rigor-late-recipe-removal",
+        "scenario/2.0/scaled-known-productivity-competitor",
+        "scenario/2.0/scaled-weapon-overlap",
+        "scenario/2.0/settings-profile-roundtrip",
+        "scenario/2.0/skip-policy",
+        "scenario/2.0/space-age-fluid-productivity",
+        "scenario/2.0/space-age-galore-effect-ownership",
+        "scenario/2.0/space-age-generation-integrity",
+        "scenario/2.0/space-age-generation-integrity-inserter-enabled",
+        "scenario/2.0/space-age-plates-n-circuit-productivity-blocked-owner",
+        "scenario/2.0/space-age-plates-n-circuit-productivity-change-mismatch",
+        "scenario/2.0/space-age-plates-n-circuit-productivity-partial-coverage",
+        "scenario/2.0/space-age-progression-pack-policy",
+        "scenario/2.0/space-age-scripted-candidates-disabled",
+        "scenario/2.0/space-age-scripted-candidates-enabled",
+        "scenario/2.0/space-age-scripted-runtime-disable-restoration",
+        "scenario/2.0/space-age-scripted-runtime-lifecycle",
+        "scenario/2.0/space-age-scripted-runtime-reenable",
+        "scenario/2.0/space-age-space-pack-policy",
+        "scenario/2.0/space-age-space-promethium-pack-policy",
+        "scenario/2.0/space-exploration-recipe-removal",
+        "scenario/2.0/space-pack-policy",
+        "scenario/2.0/synthetic-scale-graph",
+        "scenario/2.0/synthetic-scale-graph-random-order",
+        "scenario/2.0/synthetic-scale-recipes",
+        "scenario/2.0/synthetic-scale-recipes-random-order",
+        "scenario/2.0/technology-prerequisite-rewire",
+        "scenario/2.0/weapon-overlap-always-coverage-absent",
+        "scenario/2.0/weapon-overlap-always-coverage-present",
+        "scenario/2.0/weapon-overlap-conditional-coverage-absent",
+        "scenario/2.0/weapon-overlap-conditional-coverage-present",
+        "scenario/2.0/weapon-overlap-conditional-external-owner",
+        "scenario/2.0/weapon-overlap-off-coverage-absent",
+        "scenario/2.0/weapon-overlap-off-coverage-present",
+        "static.architecture",
+        "static.balance",
+        "static.compiler",
+        "static.full",
+        "static.locales",
+        "static.museum",
+        "static.package",
+        "static.release-history",
+        "static.settings",
+        "tooling.self-test"
+      ],
+      "campaigns": [
+        {
+          "role": "convergence",
+          "status": "passed",
+          "generated_at": "08/11/2026 12:20:09",
+          "completed_at": "08/11/2026 13:20:23",
+          "campaign_id": "plan-585f87c944f37af7dd6b6ef1d4a5f963f8b49286b7f1df8b62d8619425ee3f9b",
+          "plan_material_sha256": "585F87C944F37AF7DD6B6EF1D4A5F963F8B49286B7F1DF8B62D8619425EE3F9B",
+          "required_test_set_sha256": "56535B16E7FA259A43CFAE0CA9A5BDB33276858ED10D3EDDF32615E885059510",
+          "plan_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-convergence-bc9d63c3-plan.json",
+            "raw_sha256": "DA7F64CF547CFAD3736FC6D82B9967371C412202CA38D1F6386D0DD6BF9B8EF6"
+          },
+          "execution_summary_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-convergence-bc9d63c3-verify.json",
+            "raw_sha256": "D497F6CA77D2902C325E143670826808B1618FF41C7C5644E4168889B2C9AF79"
+          },
+          "result_gate_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-convergence-bc9d63c3-gate.json",
+            "raw_sha256": "EFE3655D76E6A0751EF471C48F45E525C45C626E95E40FC770F08A9AB45BF736"
+          },
+          "gate_plan_sha256": "742958E2DC73D315C866C7A2AF780EE13361EAD2EBA30AF10BB76912F2A1AE14",
+          "capsule_set_sha256": "ACA4D7982BB9C1F6EB57FF22B30983512C5CC695A451D8E016BBB961652C94E0",
+          "bundle_sha256": "6F11D1F4B8D7408564037ABAFB675AAB7236AC01519D7DD00001527D4DB2B86C",
+          "counts": {
+            "planned": 104,
+            "executed": 104,
+            "checkpoint_adopted": 0,
+            "ordinary_reused": 0,
+            "waited": 0,
+            "invalid": 0,
+            "failed": 0,
+            "incomplete": 0,
+            "unexpected": 0,
+            "rerun_scope": "all-planned-rows"
+          },
+          "performance_custody": {
+            "namespace": "94477A7CDDDB3C48",
+            "artifact_tree_sha256": "F680DE1E7D4540D844016CBE8DAEF968280FAF16D6E9FAF911F241BE1A103297"
+          }
+        },
+        {
+          "role": "independent-confirmation",
+          "status": "passed",
+          "generated_at": "08/11/2026 13:20:45",
+          "completed_at": "08/11/2026 14:23:20",
+          "campaign_id": "plan-585f87c944f37af7dd6b6ef1d4a5f963f8b49286b7f1df8b62d8619425ee3f9b",
+          "plan_material_sha256": "585F87C944F37AF7DD6B6EF1D4A5F963F8B49286B7F1DF8B62D8619425EE3F9B",
+          "required_test_set_sha256": "56535B16E7FA259A43CFAE0CA9A5BDB33276858ED10D3EDDF32615E885059510",
+          "plan_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-confirmation-bc9d63c3-plan.json",
+            "raw_sha256": "05A2454452D1ED318ACBC4DC8630FC4F9298EC78AFBE7B03D9B932B75184C48A"
+          },
+          "execution_summary_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-confirmation-bc9d63c3-verify.json",
+            "raw_sha256": "4368F99250D48446CF42260D0CEDA5E314FA9C2035557C1282F7FBA6ECF2284A"
+          },
+          "result_gate_file": {
+            "logical_path": "historical-worktree/build/results/terminal-calibration/2.5.5-confirmation-bc9d63c3-gate.json",
+            "raw_sha256": "E63DFEC60F85334FDC3BDB319B7980510DBE6E49F9250C9E0618C54BFB0599D8"
+          },
+          "gate_plan_sha256": "4D515E5C79D877C94D68A337E21838E3DB6233152E71F654F97F2F29A6DBDAF7",
+          "capsule_set_sha256": "E348F5D6D1F8C5DC05C203F878AF66734B6EBC29C246E56EF617BD50B476C644",
+          "bundle_sha256": "C4FF5BFDAA938524FB05828AB41DA4B254697237A0A499873EA927DB48FBA6A6",
+          "counts": {
+            "planned": 104,
+            "executed": 104,
+            "checkpoint_adopted": 0,
+            "ordinary_reused": 0,
+            "waited": 0,
+            "invalid": 0,
+            "failed": 0,
+            "incomplete": 0,
+            "unexpected": 0,
+            "rerun_scope": "all-planned-rows"
+          },
+          "performance_custody": {
+            "namespace": "94477A7CDDDB3C48",
+            "artifact_tree_sha256": "0D4B0C740C9C3120C63D4DBC159ACC3959CF5BC7E7247C6CCD0B01740B785EAD"
+          }
+        }
+      ]
+    }
+  ],
+  "historical_manual_review": {
+    "path": ".mir/evidence/2.5.5-manual-review-attestation.json",
+    "raw_sha256": "83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748",
+    "canonical_self_sha256": "34692BC2108BDDC0188A1F101E78468121443DA7706CBEBDDE59F08D399D64DB",
+    "content_addressed_object": ".mir/evidence/objects/sha256/83/83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748.json",
+    "custody_manifest": ".mir/evidence/2.5.5-manual-review-custody.json",
+    "status": "accepted-historical-statement"
+  },
+  "resumability": {
+    "campaign_identity": "plan-material-sha256",
+    "cross_campaign_adoption": "rejected",
+    "checkpoint_contract": "same-plan-completed-rows-only",
+    "final_campaign_checkpoint_adoptions": 0,
+    "final_campaign_rows_rerun": 482,
+    "status": "passed"
+  },
+  "all_nine_dot5_identity": {
+    "authority": ".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json",
+    "authority_sha256": "86BC4127EA35438AD1E1E6F34149F08ED0C8619C32E44A2B1570D371D720298F",
+    "verification": "archive-content-bytes-entries-passed-nine-of-nine",
+    "releases": [
+      {
+        "version": "3.2.5",
+        "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+        "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+        "bytes": 1056249,
+        "entries": 301
+      },
+      {
+        "version": "2.5.5",
+        "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+        "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+        "bytes": 1055047,
+        "entries": 300
+      },
+      {
+        "version": "1.9.5",
+        "archive_sha256": "9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC",
+        "content_sha256": "8C8A76EEBFCA52B4A4D401565F08BFD52A285A14837CCC0A65AC689B8F80E9CA",
+        "bytes": 397597,
+        "entries": 174
+      },
+      {
+        "version": "1.8.5",
+        "archive_sha256": "10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD",
+        "content_sha256": "F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B",
+        "bytes": 397589,
+        "entries": 174
+      },
+      {
+        "version": "1.7.5",
+        "archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A",
+        "content_sha256": "FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D",
+        "bytes": 385229,
+        "entries": 177
+      },
+      {
+        "version": "1.6.5",
+        "archive_sha256": "8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB",
+        "content_sha256": "C19B2F407912E01E12E1D117180504787C352027B9132476A65D9C9D4F4B8392",
+        "bytes": 385236,
+        "entries": 177
+      },
+      {
+        "version": "1.5.5",
+        "archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD",
+        "content_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778",
+        "bytes": 385548,
+        "entries": 177
+      },
+      {
+        "version": "1.4.5",
+        "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47",
+        "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4",
+        "bytes": 385987,
+        "entries": 177
+      },
+      {
+        "version": "1.3.5",
+        "archive_sha256": "78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0",
+        "content_sha256": "9E57F57D760D49CF165C66DB3413E2C50D639FA2EC7DB63C44846D001E4EF88A",
+        "bytes": 386081,
+        "entries": 177
+      }
+    ]
+  },
+  "assurance_freeze": {
+    "status": "frozen",
+    "permitted_reopen_reasons": [
+      "false-pass-or-false-failure",
+      "lost-evidence",
+      "unsafe-cross-campaign-adoption",
+      "nondeterministic-seal"
+    ]
+  },
+  "closure": {
+    "unresolved_release_blocking_assurance_findings": 0,
+    "package_bytes_changed": false,
+    "candidate_assigned": false,
+    "source_frozen": false,
+    "result": "assurance-calibration-complete"
+  }
+}

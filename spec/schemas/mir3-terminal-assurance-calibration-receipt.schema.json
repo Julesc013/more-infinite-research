@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-assurance-calibration-receipt.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-assurance-calibration-receipt.schema.json",
+  "title": "MIR 3 terminal assurance calibration receipt",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "issued_at",
+    "scope",
+    "source_authorities",
+    "finding_closures",
+    "calibration_targets",
+    "historical_manual_review",
+    "resumability",
+    "all_nine_dot5_identity",
+    "assurance_freeze",
+    "closure"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalAssuranceCalibrationReceiptV1"},
+    "status": {"const": "accepted"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "package-excluded-terminal-assurance-calibration"},
+    "source_authorities": {
+      "type": "object",
+      "required": ["current", "historical_projection", "hosted_exact_head_checks"],
+      "properties": {
+        "current": {"$ref": "#/$defs/sourceAuthority"},
+        "historical_projection": {"$ref": "#/$defs/sourceAuthority"},
+        "hosted_exact_head_checks": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["pr", "head", "merge_commit", "mir_run", "branch_policy_run", "status"],
+            "properties": {
+              "pr": {"type": "integer", "minimum": 1},
+              "head": {"$ref": "#/$defs/gitObject"},
+              "merge_commit": {"$ref": "#/$defs/gitObject"},
+              "mir_run": {"type": "integer", "minimum": 1},
+              "branch_policy_run": {"type": "integer", "minimum": 1},
+              "status": {"const": "passed"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "finding_closures": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "evidence"],
+        "properties": {
+          "id": {"pattern": "^MIR3-TERM-[0-9]{4}$"},
+          "status": {"const": "closed"},
+          "evidence": {"const": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "calibration_targets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/calibrationTarget"}
+    },
+    "historical_manual_review": {
+      "type": "object",
+      "required": ["path", "raw_sha256", "canonical_self_sha256", "content_addressed_object", "custody_manifest", "status"],
+      "properties": {
+        "path": {"const": ".mir/evidence/2.5.5-manual-review-attestation.json"},
+        "raw_sha256": {"$ref": "#/$defs/sha256"},
+        "canonical_self_sha256": {"$ref": "#/$defs/sha256"},
+        "content_addressed_object": {"type": "string", "minLength": 1},
+        "custody_manifest": {"type": "string", "minLength": 1},
+        "status": {"const": "accepted-historical-statement"}
+      },
+      "additionalProperties": false
+    },
+    "resumability": {
+      "type": "object",
+      "required": ["campaign_identity", "cross_campaign_adoption", "checkpoint_contract", "final_campaign_checkpoint_adoptions", "final_campaign_rows_rerun", "status"],
+      "properties": {
+        "campaign_identity": {"const": "plan-material-sha256"},
+        "cross_campaign_adoption": {"const": "rejected"},
+        "checkpoint_contract": {"const": "same-plan-completed-rows-only"},
+        "final_campaign_checkpoint_adoptions": {"const": 0},
+        "final_campaign_rows_rerun": {"const": 482},
+        "status": {"const": "passed"}
+      },
+      "additionalProperties": false
+    },
+    "all_nine_dot5_identity": {
+      "type": "object",
+      "required": ["authority", "authority_sha256", "verification", "releases"],
+      "properties": {
+        "authority": {"const": ".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"},
+        "authority_sha256": {"$ref": "#/$defs/sha256"},
+        "verification": {"const": "archive-content-bytes-entries-passed-nine-of-nine"},
+        "releases": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"$ref": "#/$defs/packageIdentity"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "assurance_freeze": {
+      "type": "object",
+      "required": ["status", "permitted_reopen_reasons"],
+      "properties": {
+        "status": {"const": "frozen"},
+        "permitted_reopen_reasons": {
+          "const": ["false-pass-or-false-failure", "lost-evidence", "unsafe-cross-campaign-adoption", "nondeterministic-seal"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "closure": {
+      "type": "object",
+      "required": ["unresolved_release_blocking_assurance_findings", "package_bytes_changed", "candidate_assigned", "source_frozen", "result"],
+      "properties": {
+        "unresolved_release_blocking_assurance_findings": {"const": 0},
+        "package_bytes_changed": {"const": false},
+        "candidate_assigned": {"const": false},
+        "source_frozen": {"const": false},
+        "result": {"const": "assurance-calibration-complete"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "sourceAuthority": {
+      "type": "object",
+      "required": ["branch", "commit", "tree", "role"],
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"},
+        "role": {"enum": ["current-assurance-implementation", "historical-2.5.5-calibration-projection"]}
+      },
+      "additionalProperties": false
+    },
+    "packageIdentity": {
+      "type": "object",
+      "required": ["version", "archive_sha256", "content_sha256", "bytes"],
+      "properties": {
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "fileSeal": {
+      "type": "object",
+      "required": ["logical_path", "raw_sha256"],
+      "properties": {
+        "logical_path": {"type": "string", "minLength": 1},
+        "raw_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "engineIdentity": {
+      "type": "object",
+      "required": ["version", "binary_sha256", "binary_bytes", "official_data_sha256", "official_data_files", "installation_sha256"],
+      "properties": {
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_bytes": {"type": "integer", "minimum": 1},
+        "official_data_sha256": {"$ref": "#/$defs/sha256"},
+        "official_data_files": {"type": "integer", "minimum": 1},
+        "installation_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "campaign": {
+      "type": "object",
+      "required": ["role", "status", "generated_at", "completed_at", "campaign_id", "plan_material_sha256", "required_test_set_sha256", "plan_file", "result_gate_file", "gate_plan_sha256", "capsule_set_sha256", "bundle_sha256", "counts", "performance_custody"],
+      "properties": {
+        "role": {"enum": ["convergence", "independent-confirmation"]},
+        "status": {"const": "passed"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "campaign_id": {"type": "string", "pattern": "^plan-[a-f0-9]{64}$"},
+        "plan_material_sha256": {"$ref": "#/$defs/sha256"},
+        "required_test_set_sha256": {"$ref": "#/$defs/sha256"},
+        "plan_file": {"$ref": "#/$defs/fileSeal"},
+        "execution_summary_file": {"$ref": "#/$defs/fileSeal"},
+        "result_gate_file": {"$ref": "#/$defs/fileSeal"},
+        "gate_plan_sha256": {"$ref": "#/$defs/sha256"},
+        "capsule_set_sha256": {"$ref": "#/$defs/sha256"},
+        "bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "counts": {
+          "type": "object",
+          "required": ["planned", "executed", "checkpoint_adopted", "ordinary_reused", "waited", "invalid", "failed", "incomplete", "unexpected", "rerun_scope"],
+          "properties": {
+            "planned": {"type": "integer", "minimum": 1},
+            "executed": {"type": "integer", "minimum": 1},
+            "checkpoint_adopted": {"type": "integer", "minimum": 0},
+            "ordinary_reused": {"const": 0},
+            "waited": {"const": 0},
+            "invalid": {"const": 0},
+            "failed": {"const": 0},
+            "incomplete": {"const": 0},
+            "unexpected": {"const": 0},
+            "rerun_scope": {"const": "all-planned-rows"}
+          },
+          "additionalProperties": false
+        },
+        "performance_custody": {
+          "type": "object",
+          "required": ["namespace", "artifact_tree_sha256"],
+          "properties": {
+            "namespace": {"type": "string", "pattern": "^[A-F0-9]{16}$"},
+            "artifact_tree_sha256": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "calibrationTarget": {
+      "type": "object",
+      "required": ["release", "factorio_line", "source", "candidate", "prior_release", "engine", "mod_closure", "rerun_test_ids", "campaigns"],
+      "properties": {
+        "release": {"enum": ["3.2.5", "2.5.5"]},
+        "factorio_line": {"enum": ["2.1", "2.0"]},
+        "source": {
+          "type": "object",
+          "required": ["commit", "tree", "package_source_commit"],
+          "properties": {
+            "commit": {"$ref": "#/$defs/gitObject"},
+            "tree": {"$ref": "#/$defs/gitObject"},
+            "package_source_commit": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"}
+          },
+          "additionalProperties": false
+        },
+        "candidate": {"$ref": "#/$defs/packageIdentity"},
+        "prior_release": {"$ref": "#/$defs/packageIdentity"},
+        "engine": {"$ref": "#/$defs/engineIdentity"},
+        "mod_closure": {
+          "type": "object",
+          "required": ["mod_count", "closure_sha256", "lock_sha256", "runtime_set_sha256"],
+          "properties": {
+            "mod_count": {"type": "integer", "minimum": 1},
+            "closure_sha256": {"$ref": "#/$defs/sha256"},
+            "lock_sha256": {"$ref": "#/$defs/sha256"},
+            "runtime_set_sha256": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        },
+        "rerun_test_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "campaigns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/campaign"}
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
