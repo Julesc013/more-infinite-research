@@ -1,1 +1,0 @@
--- Runtime-only upgrade fixture.

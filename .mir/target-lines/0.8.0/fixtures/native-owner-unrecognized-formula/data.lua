@@ -1,1 +1,0 @@
--- The owner patch is intentionally applied during data-updates.
