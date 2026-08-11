@@ -246,7 +246,7 @@ fixtures:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy
     external_mod_identity: Krastorio2-spaced-out
-    exact_real_campaign: local-2-1-k2so
+    exact_real_campaign: local-2-1-krastorio-spaced-out
     exact_version_envelope:
       Krastorio2: "2.1.2"
       Krastorio2-spaced-out: "2.0.13"
