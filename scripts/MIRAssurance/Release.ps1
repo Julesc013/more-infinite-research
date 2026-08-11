@@ -902,41 +902,66 @@ function Invoke-MIRAssuranceSelfTest {
 
   $freshnessProducer = Get-MIRAssuranceProducer
   $freshnessGeneratedAt = (Get-Date).ToUniversalTime().ToString("o")
+  $freshnessPlanMaterial = Get-MIRAssuranceTextHash -Text "freshness-plan-$([guid]::NewGuid().ToString('N'))"
   $freshnessTest = [pscustomobject][ordered]@{
     id="self-test.freshness"
+    fingerprint=[pscustomobject]$fingerprint
     force_fresh=$true
     minimum_completed_at=$freshnessGeneratedAt
-    required_run_id=[string]$freshnessProducer.run_id
-    required_run_attempt=[string]$freshnessProducer.run_attempt
+    required_campaign_id="plan-$($freshnessPlanMaterial.ToLowerInvariant())"
+    required_campaign_plan_material_sha256=$freshnessPlanMaterial
   }
   $freshnessPlan = [pscustomobject][ordered]@{
     producer=$freshnessProducer
     source_commit=[string]$freshnessProducer.commit
     generated_at=$freshnessGeneratedAt
+    plan_material_sha256=$freshnessPlanMaterial
+    campaign=[pscustomobject][ordered]@{
+      schema="mir-assurance-campaign-v1"
+      id=[string]$freshnessTest.required_campaign_id
+      plan_material_sha256=$freshnessPlanMaterial
+      created_at=$freshnessGeneratedAt
+    }
     reuse_enabled=$false
     rerun_tests=@()
     tests=@($freshnessTest)
   }
   $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
-  $freshnessTest.required_run_id = "tampered-run"
+  $freshnessTest.required_campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'tampered-campaign').ToLowerInvariant())"
   $tamperedFreshnessRejected = $false
   try {
     $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
   } catch { $tamperedFreshnessRejected = $true }
   if (-not $tamperedFreshnessRejected) {
-    throw "Tampered fresh-evidence run binding was accepted."
+    throw "Tampered fresh-evidence campaign binding was accepted."
   }
   if ([string]$Context.trust_class -eq "untrusted-local") {
-    $freshnessTest.required_run_id = "local-plan-$([guid]::NewGuid().ToString('N'))"
+    $freshnessTest.required_campaign_id = [string]$freshnessPlan.campaign.id
     $boundProducer = Get-MIRAssuranceEvidenceProducer -Test $freshnessTest -Plan $freshnessPlan -Context $Context
-    if ([string]$boundProducer.run_id -ne [string]$freshnessTest.required_run_id -or
-        [string]$boundProducer.run_attempt -ne [string]$freshnessTest.required_run_attempt) {
+    if ([string]$boundProducer.campaign_id -ne [string]$freshnessTest.required_campaign_id -or
+        [string]$boundProducer.campaign_plan_material_sha256 -ne [string]$freshnessTest.required_campaign_plan_material_sha256) {
       throw "A local worker did not adopt the plan-owned fresh-evidence identity."
     }
     if ($boundProducer.Contains("Count") -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.verifier_sha256) -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.policy_sha256)) {
       throw "A local worker serialized a dictionary wrapper instead of the producer attestation."
+    }
+
+    $checkpointCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+    $checkpointCapsule.producer = $boundProducer
+    $checkpointCapsule.completed_at = (Get-Date).ToUniversalTime().ToString("o")
+    $checkpointCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $checkpointCapsule
+    $null = Write-MIRAssuranceAttempt -Capsule $checkpointCapsule
+    $checkpoint = Get-MIRAssuranceCampaignCheckpoint -Test $freshnessTest -Plan $freshnessPlan -Context $Context
+    if ($null -eq $checkpoint -or [string]$checkpoint.disposition -ne "CHECKPOINT") {
+      throw "An exact completed campaign row was not checkpointed for a resumed coordinator."
+    }
+    $wrongCampaignCapsule = ($checkpointCapsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
+    $wrongCampaignCapsule.producer.campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'wrong-campaign').ToLowerInvariant())"
+    $wrongCampaignCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $wrongCampaignCapsule
+    if (Test-MIRAssuranceFreshCampaignEvidence -Capsule $wrongCampaignCapsule -Test $freshnessTest -Plan $freshnessPlan) {
+      throw "A fresh checkpoint from another plan campaign was accepted."
     }
   }
 
@@ -1130,6 +1155,17 @@ function Invoke-MIRAssuranceSelfTest {
       [string]$preflightPlanResults[0].test_id -ne [string]$preflightTest.id -or
       [string]$preflightPlanResults[0].message -notmatch "requires --factorio") {
     throw "Assurance plan execution discarded a preflight failure."
+  }
+  $checkpointExecution = [ordered]@{}
+  $checkpointResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($preflightTest)}) `
+    -Context ([pscustomobject][ordered]@{factorio=""}) `
+    -TimeBudgetSeconds 0 `
+    -ExecutionState $checkpointExecution)
+  if ([string]$checkpointExecution.status -ne "checkpointed" -or
+      [string]$checkpointExecution.next_test_id -ne [string]$preflightTest.id -or
+      $checkpointResults.Count -ne 0) {
+    throw "A planned time budget did not checkpoint before dispatching the next row."
   }
 
   $truncatedPlanRejected = $false

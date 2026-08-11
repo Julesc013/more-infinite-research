@@ -196,7 +196,8 @@ function Test-MIRRuntimePerformanceEvidence {
     [Parameter(Mandatory)][string]$FactorioBin,
     [Parameter(Mandatory)][string]$ExpectedSourceCommit,
     [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
-    [Parameter(Mandatory)][string]$ExpectedFactorioVersion
+    [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+    [string]$CampaignPath = ".mir\performance-campaign.json"
   )
   $candidatePath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Candidate
   $priorPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $PriorRelease
@@ -213,6 +214,17 @@ function Test-MIRRuntimePerformanceEvidence {
     throw "Runtime performance evidence must use mir-runtime-performance-regression schema 3."
   }
   if ([string]$evidence.status -ne "passed") { throw "Runtime performance evidence is not passed." }
+  $campaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) {
+    [IO.Path]::GetFullPath($CampaignPath)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath))
+  }
+  if (-not (Test-Path -LiteralPath $campaignPath -PathType Leaf)) { throw "Runtime performance campaign authority is absent." }
+  $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
+  if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$evidence.candidate.version -or
+      [string]$campaign.factorio_version -notlike "$ExpectedFactorioVersion*") {
+    throw "Runtime performance evidence does not bind a coherent governed target-era campaign."
+  }
   $candidateSha = Get-MIRReleaseSha256 -Path $candidatePath
   $candidateContentSha = Get-MIRReleaseArchiveContentSha256 -Path $candidatePath
   if ([string]$evidence.candidate.archive_sha256 -ne $candidateSha -or

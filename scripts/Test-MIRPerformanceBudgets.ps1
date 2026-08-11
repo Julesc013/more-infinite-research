@@ -201,7 +201,10 @@ foreach ($requiredPath in @(
   }
 }
 $qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
-foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion")) {
+foreach ($snippet in @(
+  "Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit",
+  "ExpectedFactorioVersion", "CampaignPath", "New-MIRPerformanceStagingRoot", "AttemptOrdinal"
+)) {
   if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
     throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
   }
@@ -270,6 +273,42 @@ $pathBudget = Get-MIRPerformanceRunPathBudget `
 if ($pathBudget.projected_temp_path_length -gt $pathBudget.maximum_path_length -or
     $pathBudget.maximum_path_length -ne 240) {
   throw "Performance run staging must stay below the governed Factorio temporary-path budget."
+}
+$stagingTestRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-performance-custody-test-" + [guid]::NewGuid().ToString("N"))
+try {
+  $sourceRoot = Join-Path $stagingTestRoot "source"
+  $contentAddressedRoot = Join-Path $stagingTestRoot "custody"
+  [void](New-Item -ItemType Directory -Force -Path (Join-Path $sourceRoot "raw"))
+  $artifact = Join-Path $sourceRoot "raw\performance.log"
+  "byte-identical-performance-artifact" | Set-Content -LiteralPath $artifact -NoNewline -Encoding UTF8
+  $contentAddressedFirst = Copy-MIRPerformanceArtifactsVerified -SourceRoot $sourceRoot -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  $contentAddressedRepeat = Copy-MIRPerformanceArtifactsVerified -SourceRoot $sourceRoot -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedFirst.disposition -ne "copied" -or
+      [string]$contentAddressedRepeat.disposition -ne "existing-verified" -or
+      [string]$contentAddressedFirst.destination_namespace -ne [IO.Path]::GetFullPath($contentAddressedRoot) -or
+      [string]$contentAddressedFirst.destination_root -ne [string]$contentAddressedRepeat.destination_root -or
+      (Split-Path -Leaf ([string]$contentAddressedFirst.destination_root)) -ne [string]$contentAddressedFirst.artifact_tree_sha256) {
+    throw "Content-addressed performance custody must copy once and then verify the exact immutable artifact tree."
+  }
+  "distinct-performance-artifact" | Set-Content -LiteralPath $artifact -NoNewline -Encoding UTF8
+  $contentAddressedDistinct = Copy-MIRPerformanceArtifactsVerified -SourceRoot $sourceRoot -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedDistinct.disposition -ne "copied" -or
+      [string]$contentAddressedDistinct.destination_root -eq [string]$contentAddressedFirst.destination_root -or
+      -not (Test-Path -LiteralPath $contentAddressedFirst.destination_root -PathType Container) -or
+      -not (Test-Path -LiteralPath $contentAddressedDistinct.destination_root -PathType Container)) {
+    throw "Distinct independent performance artifact trees must coexist under one stable custody namespace."
+  }
+} finally {
+  if (Test-Path -LiteralPath $stagingTestRoot) { Remove-Item -LiteralPath $stagingTestRoot -Recurse -Force }
+}
+if ($qualificationSource -notmatch 'Copy-MIRPerformanceArtifactsVerified[\s\S]{0,240}-ContentAddressedChild') {
+  throw "Performance qualification must preserve independent raw artifact trees in content-addressed custody."
+}
+$runtimePerformanceTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Test-MIRPerformanceRegression.ps1")
+$performanceEvidenceValidatorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\validation\ReleaseAttestations.ps1")
+if ($runtimePerformanceTestSource -notmatch [regex]::Escape('-CampaignPath $CampaignPath') -or
+    $performanceEvidenceValidatorSource -notmatch [regex]::Escape('[string]$CampaignPath = ".mir\performance-campaign.json"')) {
+  throw "Performance producer and verifier must bind the exact campaign authority."
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")

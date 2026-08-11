@@ -353,7 +353,7 @@
       "id": "runtime.ecosystem",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
+      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --mods <mods> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
       "requires_factorio": true,
       "inputs": [
         "candidate",
