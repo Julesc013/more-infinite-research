@@ -14,9 +14,11 @@ superseded_by: []
 
 This is the single planning authority for the final MIR 3 stabilization wave. It joins the current Factorio 2.1 line, the maintained Factorio 2.0 line, and every qualified historical target into one correction programme without turning the target ladder into a waterfall.
 
-The programme is active as planning authority only. No `.9` candidate has been assigned, no `.9` source has been frozen, and no `.9` package has been built. MIR 4 implementation is not admitted by this record.
+The programme has admitted its smallest defensible product set. Implementation is now authorized for two reproduced terminal findings, but no `.9` candidate has been assigned, no `.9` source has been frozen, and no `.9` package has been built. MIR 4 package-visible implementation is not admitted by this record.
 
 Terminal assurance calibration is complete and frozen. The current product-intake pass has frozen a bounded Mod Portal Tier A selection, classified every prequalification claim without widening it, recorded effective mutation-owner surfaces, and completed the settings-scope audit without changing any released setting type. The successor bootstrap remains package-excluded shadow work: MIR 3 source and the bounded materializer continue to own `.9` release bytes until MIR 3 EOL and exact successor equivalence.
+
+Ordinary product intake is closed by `MIR3TerminalProductAdmissionBundleV1`. The accepted set is deliberately limited to K2 science phasing on the exact 2.1 envelope and generic alternate science-route selection on the 2.1 and 2.0 targets. Direct Cubium claims remain independently gated: 2.1 is upstream-blocked and 2.0 awaits authenticated acquisition of the exact 1.0.28 archive. Late nonblocking work routes to MIR 4; only a reproduced release-blocking P0/P1 may reopen its explicitly affected `.9` targets.
 
 ## Decision
 
@@ -69,6 +71,8 @@ Record post-publication protected qualification for `3.2.5` and `2.5.5` when it 
 ### T9-B: freeze the terminal finding inventory
 
 Collect every open product, package, migration, compatibility, locale, documentation, performance, and assurance finding. Bind each item to affected target lines, a reproducible proposition, migration impact, package visibility, and one of the dispositions above. Documentation-only ideas that alter the packaged README are still package-visible for `.9` planning.
+
+This workstream is complete. `MIR3-FINAL-DEFECT-INDEX` assigns a terminal disposition to all five repository issues, all 26 lifecycle incidents, and all 30 terminal finding IDs. The bounded engine-gap audit admitted no additional product defect. `MIR3-TERM-0027` and `MIR3-TERM-0028` are the only product findings admitted for implementation; their `fixed-in-dot9` index state is a sealed destination, while their separate completion state remains `admitted-pending-implementation` until regression and upgrade proof pass.
 
 ### T9-C: implement the admitted change set and reach the all-nine fixed point
 

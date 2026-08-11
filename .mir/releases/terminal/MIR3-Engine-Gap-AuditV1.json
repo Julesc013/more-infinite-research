@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Engine-Gap-AuditV1",
+  "status": "complete-no-additional-reproduced-dot9-defect",
+  "recorded_at": "2026-08-12T04:00:00+10:00",
+  "rule": "Only a reproduced MIR 3 defect may enter the terminal product set; platform generalization without a reproducer remains MIR 4 work.",
+  "surfaces": [
+    {
+      "id": "general-item-research-ingredients",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "Research packs are resolved through the target-aware general item prototype lookup, constrained by actual lab inputs, and exercised with a target-shaped item/tool science-pack fixture.",
+      "evidence": ["prototypes/mir/platform/factorio/prototype_lookup.lua", "prototypes/mir/capabilities/science_integration/pack_registry.lua", "fixtures/item-science-pack", ".mir/fixtures.yml"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "recipe-category-sets",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "RecipeFactV2 retains normalized category sets; the exact Factorio 2.1 repair converts category plus additional_categories into categories before facts are captured.",
+      "evidence": ["prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua", "prototypes/mir/index/recipe_facts.lua", "docs/reference/schemas/recipe-fact-v2.md"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "probability-and-catalyst-semantics",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "Declared and effective independent/shared probability, ranges, extra-count, catalyst, and productivity exclusions are retained; unsafe automatic generation fails closed.",
+      "evidence": ["prototypes/mir/index/recipe_facts.lua", "prototypes/mir/domain/facts/recipe_semantics.lua", "fixtures/capability-negative-cases", "docs/reference/schemas/recipe-fact-v2.md"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "quality-aware-products",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "Quality-aware effect identities and target contracts preserve quality targets; missing quality targets are pruned while valid targets remain.",
+      "evidence": ["prototypes/mir/domain/effects/generated_target_contracts.lua", "fixtures/assert-generation-integrity", ".mir/fixtures.yml#technology-effect-targets"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "recycling-safety-versus-throughput",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "Recycling, self-return, and positive-loop safety are hard gates distinct from optional generated-recycler throughput controls; visible recycling recipes are not rewritten.",
+      "evidence": ["prototypes/mir/policy/productivity_cap_scope.lua", "prototypes/mir/pipeline/prototype_limits.lua", "fixtures/assert-prototype-limits", "docs/reference/settings.md"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "multi-level-trigger-prohibition",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "Existing trigger technologies may participate in graph reachability, but MIR-generated multi-level technologies are unit/count-formula designs and never copy research_trigger.",
+      "evidence": ["prototypes/mir/capabilities/science_integration/technology_researchability.lua", "prototypes/mir/domain/technology/technology_design.lua", "fixtures/assert-compiler-contracts"],
+      "dot9_admission": "none"
+    },
+    {
+      "id": "late-mutation-detection",
+      "classification": "covered-no-reproduced-dot9-defect",
+      "current_contract": "MIR captures finalized data-stage facts, sanitizes exact reviewed dangling references, and checks planned graph/live-prototype parity against later mutation.",
+      "evidence": ["prototypes/mir/stage/data_final_fixes.lua", "prototypes/mir/stage/data_final_fixes_steps.lua", "fixtures/rigor-late-recipe-removal", "fixtures/pypostprocessing-stale-unlock", "fixtures/assert-compiler-contracts"],
+      "dot9_admission": "none"
+    }
+  ],
+  "summary": {"surfaces": 7, "additional_reproduced_dot9_defects": 0, "mir4_platform_topics_preserved": 7},
+  "boundary": "The audit does not broaden public compatibility claims and does not substitute static inspection for exact load, upgrade, or interactive qualification."
+}

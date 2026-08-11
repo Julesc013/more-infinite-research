@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProductAdmissionBundleV1",
+  "status": "accepted-implementation-admitted-source-unfrozen",
+  "admitted_at": "2026-08-12T04:00:00+10:00",
+  "scope": "smallest-defensible-mir3-dot9-product-set",
+  "input_authorities": {
+    "finding_inventory": ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json",
+    "change_set": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+    "engine_gap_audit": ".mir/releases/terminal/MIR3-Engine-Gap-AuditV1.json",
+    "compatibility_census": ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json",
+    "compatibility_claims": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "interaction_matrix": ".mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json",
+    "owner_report": ".mir/releases/terminal/MIR3-Effective-Mutation-Owner-ReportV1.json",
+    "settings_audit": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+    "assurance_receipt": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json",
+    "successor_firewall": ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json"
+  },
+  "accepted_findings": [
+    {
+      "id": "MIR3-TERM-0027",
+      "title": "Krastorio 2 science-tier phase-out does not apply to MIR-generated research",
+      "implementation_contract": "K2SciencePhasePolicyV1",
+      "affected_targets": ["3.2.9"],
+      "exact_envelope": {"factorio":"2.1.13","Krastorio2":"2.1.2","Krastorio2-spaced-out":"2.0.13"},
+      "required_properties": ["MIR-owned-technologies-only", "idempotent", "no-effect-without-exact-K2-envelope", "stable-technology-ids", "non-empty-lab-valid-ingredients", "preserve-upgrade-progress", "preserve-K2SO-load-order-repair"],
+      "stable_id_and_migration_impact": "No technology ID change and no migration identity allocation; direct 3.2.5-to-3.2.9 upgrade proof must preserve progress across changed ingredient sets.",
+      "required_regressions": ["exact K2/K2SO positive envelope", "K2-absent negative case", "wrong-version fail-closed case", "idempotence", "no-empty-ingredients", "lab compatibility", "stable IDs", "3.2.5-to-3.2.9 upgrade progress"],
+      "fixed_point_scope": ["3.2.9"]
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "title": "Alternate science-pack recipes can become an arbitrary late MIR prerequisite",
+      "implementation_contract": "SciencePackProductionRoutePolicyV1",
+      "affected_targets": ["3.2.9", "2.5.9"],
+      "generic_invariant": "Adding a strictly later alternate route for an already-producible science pack must never delay MIR-generated research behind that alternate route.",
+      "route_fields": ["recipe", "initial", "unlockers", "prerequisite_closure", "science_burden", "reachability", "progression_key", "provenance"],
+      "selection_order": ["initial-route", "reject-disabled-cyclic-unreachable", "graph-dominating-or-earlier", "lower-science-burden", "smaller-prerequisite-closure", "lower-documented-depth-cost", "technology-name-final-tie-break"],
+      "stable_id_and_migration_impact": "No technology ID change and no migration identity allocation; changed prerequisites require direct upgrade graph and progress proof on each implemented target.",
+      "required_regressions": ["MIR-owned Factorio 2.1 alternate-route fixture", "MIR-owned Factorio 2.0 alternate-route fixture", "later-route monotonicity", "disabled-cycle-and-self-lock rejection", "stable IDs", "3.2.5-to-3.2.9 upgrade", "2.5.5-to-2.5.9 upgrade"],
+      "fixed_point_scope": ["3.2.9", "2.5.9"]
+    }
+  ],
+  "rejected_or_deferred": [
+    {"id":"MIR3-TERM-0004","disposition":"rejected-with-reason","reason":"A topic inventory without a reproducer cannot admit product work."},
+    {"id":"MIR3-TERM-0005-broad-platform","disposition":"mir4-deferred","reason":"The broad semantic/control-plane/repository redesign remains behind the successor firewall."},
+    {"id":"engine-gap-audit-additional-product-work","disposition":"not-reproduced","reason":"All seven bounded surfaces have existing fail-closed or target-aware contracts and no additional MIR3 reproducer."},
+    {"id":"cubium-2.1-direct-support","disposition":"upstream-blocked","reason":"Unmodified Cubium 1.0.30 cannot load on Factorio 2.1.13 because upstream uses obsolete AmbientSound::planet."},
+    {"id":"cubium-2.0-direct-support","disposition":"support-claim-narrowed","reason":"Exact Cubium 1.0.28 authenticated acquisition and direct 2.0 proof remain pending; generic 2.0 fixture proof cannot substitute."},
+    {"id":"broader-K2-version-support","disposition":"support-claim-narrowed","reason":"No behavior outside the exact admitted K2/K2SO envelope is inferred."}
+  ],
+  "all_nine_dispositions": [
+    {"release":"3.2.9","findings":["MIR3-TERM-0027","MIR3-TERM-0028"],"projection":"canonical-2.1-implementation"},
+    {"release":"2.5.9","findings":["MIR3-TERM-0028"],"projection":"target-aware-2.0-adapter-and-generic-fixture; no direct Cubium claim"},
+    {"release":"1.9.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.8.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.7.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.6.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.5.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.4.9","findings":[],"projection":"no-product-delta"},
+    {"release":"1.3.9","findings":[],"projection":"no-product-delta"}
+  ],
+  "claim_changes_required": ["K2 exact envelope may advance from KNOWN_CONFLICT only after exact requalification", "generic route correctness may be claimed from target-local fixtures", "Cubium 2.0 and 2.1 direct claims remain unqualified/upstream-blocked until their independent gates pass"],
+  "documentation_obligations": ["release notes", "compatibility matrix", "known limitations", "upgrade guide", "target feature and omission matrices", "MIR3-to-MIR4 terminal handoff"],
+  "ordinary_intake": {"closed":true,"late_release_blocking_p0_or_p1":"reopen-only-explicitly-affected-targets-with-reproduced-finding","late_nonblocking":"MIR4-intake"},
+  "boundaries": {
+    "implementation_admitted": true,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "dot5_package_mutation_permitted": false,
+    "assurance_reopened": false,
+    "mir4_package_visible_implementation_permitted": false,
+    "tagging_or_publication_permitted": false
+  },
+  "next_required_state": "PRODUCT_IMPLEMENTATION_COMPLETE"
+}

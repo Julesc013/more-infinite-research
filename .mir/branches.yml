@@ -989,7 +989,7 @@ release_artifacts:
   terminal_release_programme:
     authority: docs/releases/mir-3-terminal-dot-9-programme.md
     machine_record: .mir/releases/waves/MIR3-Terminal-ChangeSet.json
-    implementation_admitted: false
+    implementation_admitted: true
     prohibited_intermediate_versions:
       - .6
       - .7
