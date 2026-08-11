@@ -43,7 +43,7 @@
     "reason": "The failure is solely in the package-excluded harness fingerprint. The correction makes the declared target-era authority explicit and cannot modify package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The harness receives and validates the campaign-declared target-era scenario authority; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

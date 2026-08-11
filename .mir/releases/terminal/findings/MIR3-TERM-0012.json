@@ -43,7 +43,7 @@
     "reason": "The failure is reproduced with identical package inputs, is bounded to package-excluded test staging, and is correctable without changing product source or public package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Regression-first canonical implementation adds pre-launch 240-character projection, compact context-bound provenance roots, collision rejection, byte-verified artifact relocation, and deep-root/concurrent-attempt regressions in tools/lib/validation/PerformanceCampaign.ps1 and Test-MIRPerformanceBudgets.ps1. The focused manifest regression passed locally; immutable-context control-plane proof, exact 3.2.5 and 2.5.5 engine performance lanes, and hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

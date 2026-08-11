@@ -43,7 +43,7 @@
     "reason": "The defect is reproduced in package-excluded control-plane authority comparison and the correction preserves—not broadens—historical engine and baseline locks."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The repaired authority validator accepts C24/C30 only through their own immutable target-line engine and baseline records; the full clean-tree control-plane executor regression and hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

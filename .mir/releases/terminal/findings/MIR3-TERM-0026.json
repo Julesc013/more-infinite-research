@@ -57,7 +57,7 @@
     "reason": "The correction only forwards an already-fingerprinted external test input and cannot affect package bytes, target semantics, migrations, or public releases."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "3.2.5 failed convergence summary AA5FC59D417280D7307B98B71C5B63D3F365E223DFEC232852E6706B9E014762; exact blocked ecosystem capsule 25BDEC6DCCA7288F45C82656D9CF675339DA626B429710BECC7E7F93FE1377D5. Test-MIRAssurance.ps1 first failed on the missing --mods <mods> contract and then passed after the bounded catalog repair; fresh exact 3.2.5 and 2.5.5 proof remains required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

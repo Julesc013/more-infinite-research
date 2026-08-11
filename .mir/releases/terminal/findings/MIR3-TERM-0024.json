@@ -43,7 +43,7 @@
     "reason": "The correction restores a complete historical assurance authority without changing package material, migration, target semantics, or public bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "Shared resolution permits only complete legacy current-target telemetry and fails closed otherwise; focused regression, exact 2.1 and 2.0 proof, hosted exact-head proof, and all-nine package preservation remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

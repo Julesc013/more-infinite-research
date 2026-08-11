@@ -43,7 +43,7 @@
     "reason": "The failure is reproduced before Factorio launch, is limited to immutable historical source authority interpretation, and is correctable without modifying package source or public package bytes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The canonical runner now accepts only package-root-equivalent immutable historical sources when strict current-branch ancestry is unavailable; focused regression, exact Factorio 2.0.77 performance proof, and hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

@@ -38,5 +38,5 @@
   "regression_obligations": ["qualification forwards explicit CampaignPath to validation", "outer assurance post-execution validation resolves and forwards the exact active versioned CampaignPath", "performance fingerprinting and execution share one canonical active-campaign resolver", "legacy wrapper preserves CampaignPath", "validator resolves the supplied campaign relative to its declared repository", "all published .5 archive and normalized-content identities remain unchanged"],
   "fixed_point_restart_scope": "performance assurance proofs only; no package shadow restart",
   "admission": {"class": "NO_PACKAGE_CHANGE", "status": "admitted", "reason": "The correction aligns verifier authority routing with already-generated evidence and cannot affect package bytes."},
-  "closure": {"status": "implemented-awaiting-proof", "evidence": "The qualification script and outer assurance executor now resolve the same exact active versioned campaign authority. Fresh exact 3.2.5 output must validate against C32, relocate byte-identically, and be followed by exact 2.0 plus hosted proof."}
+  "closure": {"status": "closed", "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"}
 }

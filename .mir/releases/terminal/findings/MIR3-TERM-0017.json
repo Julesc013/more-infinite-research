@@ -43,7 +43,7 @@
     "reason": "The defect is a pre-launch assurance lock error. The correction narrows the lock to the governed engine/module contract and cannot change a package."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": "The runner derives its official-data roots from governed campaign declarations, records them with the lock digest, and rejects declared unavailable modules; exact 2.0 and 2.1 performance proofs plus hosted exact-head proof remain required."
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
   }
 }

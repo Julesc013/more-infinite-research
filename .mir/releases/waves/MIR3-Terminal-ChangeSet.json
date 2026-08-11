@@ -45,7 +45,7 @@
       "admission_destination": "foundation-pr-a",
       "regression_obligations": ["published-current-source-fingerprint-guard", "exact-c32-double-build"],
       "fixed_point_restart_scope": "none-package-restoration-only",
-      "closure": {"status":"implemented-awaiting-pr-admission","evidence":".mir/releases/reconciliations/MIR3Dot5PostReleaseSourceBaselineRestorationV1.json"}
+      "closure": {"status":"closed","evidence":".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"}
     },
     {
       "id": "MIR3-TERM-0002",
@@ -60,7 +60,7 @@
       "admission_destination": "foundation-pr-b",
       "regression_obligations": ["separate-root-plan-equivalence", "dirty-dist-plan-independence", "typed-upstream-and-transport-status"],
       "fixed_point_restart_scope": "all-target-assurance-proofs-produced-after-change",
-      "closure": {"status":"implemented-awaiting-pr-admission","evidence":"validation/tests/tooling/Test-MIRAssurance.ps1"}
+      "closure": {"status":"closed","evidence":".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"}
     },
     {
       "id": "MIR3-TERM-0003",
@@ -75,7 +75,7 @@
       "admission_destination": "terminal-calibration-queue",
       "regression_obligations": ["no-dot5-package-mutation", "normal-dot9-protected-process"],
       "fixed_point_restart_scope": "only-targets-affected-by-admitted-finding",
-      "closure": {"status":"open","evidence":null}
+      "closure": {"status":"closed","evidence":".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"}
     },
     {
       "id": "MIR3-TERM-0004",
