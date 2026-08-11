@@ -2522,6 +2522,9 @@ docs:
     source_of_truth_for:
       - mir-3-terminal-dot-9-programme
       - mir-3-terminal-release-train
+      - mir-3-terminal-product-intake
+      - mir-3-terminal-settings-scope-audit
+      - mir-3-successor-bootstrap-firewall
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Planning Notes"
     status: draft

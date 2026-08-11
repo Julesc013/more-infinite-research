@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-dot5-mod-portal-custody-recheck.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-dot5-mod-portal-custody-recheck.schema.json",
+  "title": "MIR 3 .5 Mod Portal custody recheck",
+  "type": "object",
+  "required": ["schema", "kind", "status", "observed_at", "prior_authority", "identity_authority", "observations", "summary", "hard_boundary"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3Dot5ModPortalCustodyRecheckV1"},
+    "status": {"const": "partial-six-api-visible-sha1-matched-redownload-pending-three-not-uploaded"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "prior_authority": {"const": ".mir/evidence/MIR-3.5-mod-portal-custody.json"},
+    "identity_authority": {"const": ".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"},
+    "observations": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"type": "object", "required": ["version", "target", "portal_state", "portal_sha1", "frozen_archive_sha1", "frozen_archive_sha256", "bytes", "entries", "authenticated_redownload", "exact_engine_smoke"], "properties": {"version": {"type": "string"}, "target": {"type": "string"}, "portal_state": {"enum": ["api-visible", "not-uploaded"]}, "portal_sha1": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"}, "frozen_archive_sha1": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "frozen_archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}, "bytes": {"type": "integer", "minimum": 1}, "entries": {"type": "integer", "minimum": 1}, "authenticated_redownload": {"type": "string"}, "exact_engine_smoke": {"type": "string"}}, "additionalProperties": false}},
+    "summary": {"type": "object", "required": ["api_visible", "sha1_matches_frozen", "not_uploaded", "authenticated_redownloads_complete", "package_bytes_changed"], "properties": {"api_visible": {"const": 6}, "sha1_matches_frozen": {"const": 6}, "not_uploaded": {"const": 3}, "authenticated_redownloads_complete": {"const": 0}, "package_bytes_changed": {"const": false}}, "additionalProperties": false},
+    "hard_boundary": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

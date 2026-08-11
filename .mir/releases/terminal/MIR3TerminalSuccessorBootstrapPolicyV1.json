@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalSuccessorBootstrapPolicyV1",
+  "status": "active-package-excluded",
+  "recorded_at": "2026-08-12T02:30:14.6116953+10:00",
+  "scope": "mir3-dot9-successor-bootstrap-firewall",
+  "production_plane": {
+    "authority": "current-mir3-source-and-bounded-materializer",
+    "release_bytes_may_be_changed_by_successor_work": false,
+    "cutover_before_mir3_eol": false
+  },
+  "successor_plane": {
+    "authority": "package-excluded-shadow-only",
+    "may_import_terminal_authorities": true,
+    "may_generate_comparison_trees": true,
+    "may_publish_version_4": false
+  },
+  "terminal_import_authorities": [
+    "semantic",
+    "target",
+    "transition",
+    "distribution"
+  ],
+  "permitted_before_eol": [
+    "package-excluded-projection-interfaces",
+    "terminal-baseline-importer-schemas-and-tests",
+    "equivalence-tooling",
+    "resumable-execution-kernel",
+    "stable-id-alias-tombstone-and-migration-registries",
+    "package-and-release-ir-sidecars",
+    "final-mir4-adrs",
+    "archive-and-restore-tooling"
+  ],
+  "shadow_only_before_eol": [
+    "SemanticIR",
+    "target-compiler",
+    "final-repository-layout",
+    "new-package-generation-authority"
+  ],
+  "forbidden_before_eol": [
+    "public-mir4-api-or-sdk",
+    "extension-protocol-release",
+    "ProcessIR-platform",
+    "new-mir4-gameplay-families",
+    "deletion-of-mir3-reconstruction-machinery",
+    "version-4-public-package-or-tag",
+    "package-visible-mir4-source-in-terminal-release-authority"
+  ],
+  "equivalence_dimensions": [
+    "technology-and-stable-id-inventories",
+    "settings-and-defaults",
+    "owners-aliases-and-tombstones",
+    "features-and-omissions",
+    "migration-contracts",
+    "locale",
+    "package-composition",
+    "engine-behavior"
+  ],
+  "cutover_gate": {
+    "requires_mir3_eol_seal": true,
+    "requires_exact_equivalence": true,
+    "mir4_shadow_completion_blocks_dot9": false
+  }
+}

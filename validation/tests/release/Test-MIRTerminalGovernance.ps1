@@ -14,7 +14,13 @@ $authorityNames = @(
   "MIR3-Terminal-EOL-PolicyV1",
   "MIR3TerminalFoundationAdmissionV1",
   "MIR3TerminalAssuranceCalibrationReceiptV1",
-  "MIR3TerminalAcceleratedClosureDecisionV1"
+  "MIR3TerminalAcceleratedClosureDecisionV1",
+  "MIR3TerminalSuccessorBootstrapPolicyV1",
+  "MIR3-Settings-Scope-AuditV1",
+  "MIR3-ModPortal-Compatibility-CensusV1",
+  "MIR3-Mod-Interaction-MatrixV1",
+  "MIR3-Compatibility-ClaimsV1",
+  "MIR3-Effective-Mutation-Owner-ReportV1"
 )
 $authorities = @{}
 foreach ($name in $authorityNames) {
@@ -210,6 +216,91 @@ if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or $programme.im
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
 
+$productIntakeSchemaByKind = @{
+  "MIR3TerminalSuccessorBootstrapPolicyV1" = "mir3-terminal-successor-bootstrap-policy"
+  "MIR3-Settings-Scope-AuditV1" = "mir3-settings-scope-audit"
+  "MIR3-ModPortal-Compatibility-CensusV1" = "mir3-mod-portal-compatibility-census"
+  "MIR3-Mod-Interaction-MatrixV1" = "mir3-mod-interaction-matrix"
+  "MIR3-Compatibility-ClaimsV1" = "mir3-compatibility-claims"
+  "MIR3-Effective-Mutation-Owner-ReportV1" = "mir3-effective-mutation-owner-report"
+}
+foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
+  $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
+  $schemaPath = Join-Path $RepoRoot "spec\schemas\$($productIntakeSchemaByKind[$kind]).schema.json"
+  if (-not ((Get-Content -Raw -LiteralPath $authorityPath) | Test-Json -SchemaFile $schemaPath)) {
+    throw "Terminal product-intake authority does not match its strict schema: $kind"
+  }
+}
+
+$successorBootstrap = $authorities["MIR3TerminalSuccessorBootstrapPolicyV1"]
+if ([string]$programme.authorities.successor_bootstrap -ne ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json" -or
+    [string]$successorBootstrap.status -ne "active-package-excluded" -or
+    [bool]$successorBootstrap.production_plane.release_bytes_may_be_changed_by_successor_work -or
+    [bool]$successorBootstrap.production_plane.cutover_before_mir3_eol -or
+    [bool]$successorBootstrap.successor_plane.may_publish_version_4 -or
+    [bool]$successorBootstrap.cutover_gate.mir4_shadow_completion_blocks_dot9 -or
+    @($successorBootstrap.terminal_import_authorities).Count -ne 4) {
+  throw "Successor bootstrap policy widens pre-EOL authority or package visibility."
+}
+
+$settingsAudit = $authorities["MIR3-Settings-Scope-AuditV1"]
+if ([string]$programme.authorities.settings_scope_audit -ne ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json" -or
+    @($settingsAudit.setting_families).Count -ne 7 -or
+    @($settingsAudit.setting_families | Where-Object { $_.scope -ne "startup" -or -not $_.restart_required -or $_.profile_namespace -ne "compile" }).Count -ne 0 -or
+    [int]$settingsAudit.stage_read_validation.runtime_global_settings_registered -ne 0 -or
+    [int]$settingsAudit.stage_read_validation.runtime_per_user_settings_registered -ne 0 -or
+    [int]$settingsAudit.stage_read_validation.released_setting_type_changes -ne 0 -or
+    [bool]$settingsAudit.stage_read_validation.new_dot9_runtime_setting_admitted -or
+    [string]$settingsAudit.profile_contract.current_codec -ne "MIRSET1" -or [bool]$settingsAudit.profile_contract.schema_change_admitted) {
+  throw "Terminal settings-scope audit changes a released scope, admits an unjustified runtime control, or loses MIRSET1."
+}
+
+$census = $authorities["MIR3-ModPortal-Compatibility-CensusV1"]
+$expectedTierA = @("Krastorio2", "Krastorio2-spaced-out", "cubium", "productivity-through-science", "ProductivityResearchForEveryone", "ProductivityResearchForEveryoneFG", "ExpandedProductivityResearch", "crafting-efficiency-2", "remove-productivity-cap", "modified-productivity-cap", "UnlimitedProductivityFork", "fair-unlimited-productivity", "science-not-invited", "ScienceCostTweakerM", "productivity-technology-limit", "finite_prod_techs")
+if ([string]$programme.authorities.mod_portal_compatibility_census -ne ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json" -or
+    (@($census.tier_a.name) -join "|") -ne ($expectedTierA -join "|") -or @($census.tier_a.releases).Count -ne 28 -or
+    [int]$census.api.rows_scanned.'2.1' -ne 3367 -or [int]$census.api.rows_scanned.'2.0' -ne 9338 -or
+    @($census.supplemental_exact_archive_locks).Count -ne 3 -or [bool]$census.archive_policy.authenticated_download_completed_for_current_census -or
+    [bool]$census.archive_policy.'local_exact_sha1_match_is_runtime-proof' -or [bool]$census.archive_policy.modified_or_shim_archive_may_support_public_claim) {
+  throw "Terminal Mod Portal census is incomplete, unbounded, or promotes local/static evidence into a runtime claim."
+}
+foreach ($release in @($census.tier_a.releases | Where-Object { $null -ne $_.local_sha256 })) {
+  if ([string]$release.archive_state -notmatch '^local-exact-portal-sha1-match') {
+    throw "A local Tier A archive digest is not explicitly bound as an exact portal SHA-1 match: $($release.version)"
+  }
+}
+
+$claims = $authorities["MIR3-Compatibility-ClaimsV1"]
+$claimLevels = @($claims.levels)
+$claimDimensions = @($claims.dimensions)
+$publicClaims = @($claims.claims | Where-Object public_claim_allowed)
+$k2Claims = @($claims.claims | Where-Object id -eq "tier-a-k2-k2so-2.1-finding-envelope")
+$cubium21Claims = @($claims.claims | Where-Object id -eq "tier-a-cubium-2.1")
+if ([string]$programme.authorities.compatibility_claims -ne ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json" -or
+    @($claims.claims).Count -lt 16 -or @($claims.claims | Where-Object { $_.level -notin $claimLevels }).Count -ne 0 -or
+    @($claims.claims | Where-Object { @($_.dimension_status.PSObject.Properties.Name).Count -ne $claimDimensions.Count }).Count -ne 0 -or
+    $publicClaims.Count -ne 1 -or [string]$publicClaims[0].id -ne "tier-a-finite-prod-techs-0.1.1-narrow" -or
+    $k2Claims.Count -ne 1 -or [string]$k2Claims[0].level -ne "KNOWN_CONFLICT" -or
+    $cubium21Claims.Count -ne 1 -or [string]$cubium21Claims[0].level -ne "UPSTREAM_BLOCKED") {
+  throw "Terminal compatibility claim classification is dimensionless, overbroad, or promotes unqualified evidence."
+}
+
+$interactionMatrix = $authorities["MIR3-Mod-Interaction-MatrixV1"]
+if ([string]$programme.authorities.mod_interaction_matrix -ne ".mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json" -or
+    @($interactionMatrix.rows).Count -ne 16 -or @($interactionMatrix.rows | Where-Object { @($_.shared_surfaces).Count -eq 0 -or -not $_.required_campaign }).Count -ne 0) {
+  throw "Terminal Mod Portal interaction matrix omits an overlap classification or qualification campaign."
+}
+
+$ownerReport = $authorities["MIR3-Effective-Mutation-Owner-ReportV1"]
+$ownerActions = @("preserve", "apply", "skip", "conflict", "report")
+$ownerScannerPath = Join-Path $RepoRoot ([string]$ownerReport.scanner)
+if ([string]$programme.authorities.effective_mutation_owner_report -ne ".mir/releases/terminal/MIR3-Effective-Mutation-Owner-ReportV1.json" -or
+    @($ownerReport.surfaces).Count -ne 9 -or @($ownerReport.surfaces | Where-Object { $_.mir_action -notin $ownerActions }).Count -ne 0 -or
+    -not (Test-Path -LiteralPath $ownerScannerPath -PathType Leaf) -or
+    (Get-Content -Raw -LiteralPath $ownerScannerPath) -notmatch 'compatibility_claim\s*=\s*"none"') {
+  throw "Terminal effective mutation-owner report is incomplete or its scanner overclaims compatibility."
+}
+
 $baselineQueue = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Baseline-Capture-QueueV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$baselineQueue.kind -ne "MIR3-Terminal-Baseline-Capture-QueueV1" -or @($baselineQueue.rows).Count -ne 9 -or
     (@($baselineQueue.rows.terminal_release) -join "|") -ne ($family -join "|") -or @($baselineQueue.required_semantic_inventory).Count -lt 15 -or
@@ -237,6 +328,25 @@ if ([string]$portalCustody.kind -ne "MIR3Dot5ModPortalCustodyV1" -or
     [bool]$portalCustody.download_attempt.artifact_created -or [bool]$portalCustody.download_attempt.admitted_as_byte_evidence -or
     [bool]$portalCustody.identity_policy.published_package_mutation_permitted) {
   throw "The .5 Mod Portal custody authority must preserve the observed two-visible/seven-absent state without claiming byte verification."
+}
+$portalRecheckPath = Join-Path $RepoRoot ([string]$programme.authorities.dot5_mod_portal_custody_recheck)
+$portalRecheckSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-dot5-mod-portal-custody-recheck.schema.json"
+$portalRecheck = Get-Content -Raw -LiteralPath $portalRecheckPath | ConvertFrom-Json -Depth 100
+if (-not ((Get-Content -Raw -LiteralPath $portalRecheckPath) | Test-Json -SchemaFile $portalRecheckSchemaPath) -or
+    [string]$portalRecheck.prior_authority -ne [string]$baselineQueue.source_authorities.mod_portal_custody -or
+    (@($portalRecheck.observations.version) -join "|") -ne ($dot5Family -join "|") -or
+    @($portalRecheck.observations | Where-Object portal_state -eq "api-visible").Count -ne 6 -or
+    @($portalRecheck.observations | Where-Object portal_state -eq "not-uploaded").Count -ne 3 -or
+    @($portalRecheck.observations | Where-Object { $_.portal_state -eq "api-visible" -and $_.portal_sha1 -ne $_.frozen_archive_sha1 }).Count -ne 0 -or
+    [int]$portalRecheck.summary.authenticated_redownloads_complete -ne 0 -or [bool]$portalRecheck.summary.package_bytes_changed) {
+  throw "The append-only .5 Mod Portal custody recheck overclaims bytes, loses the historical record, or disagrees with the live six/three observation."
+}
+foreach ($identity in @($admission.dot5_identity_authority.releases)) {
+  $recheckIdentity = @($portalRecheck.observations | Where-Object version -eq $identity.version)
+  if ($recheckIdentity.Count -ne 1 -or [string]$recheckIdentity[0].frozen_archive_sha256 -ne [string]$identity.archive_sha256 -or
+      [long]$recheckIdentity[0].bytes -ne [long]$identity.bytes -or [int]$recheckIdentity[0].entries -ne [int]$identity.entries) {
+    throw "Mod Portal custody recheck differs from the immutable foundation identity: $($identity.version)"
+  }
 }
 $incidentReconciliation = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Incident-ReconciliationV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$incidentReconciliation.kind -ne "MIR3-Terminal-Incident-ReconciliationV1" -or $incidentReconciliation.rules.history_mutation_permitted -or
@@ -358,7 +468,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100

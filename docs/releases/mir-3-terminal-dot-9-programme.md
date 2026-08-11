@@ -16,6 +16,8 @@ This is the single planning authority for the final MIR 3 stabilization wave. It
 
 The programme is active as planning authority only. No `.9` candidate has been assigned, no `.9` source has been frozen, and no `.9` package has been built. MIR 4 implementation is not admitted by this record.
 
+Terminal assurance calibration is complete and frozen. The current product-intake pass has frozen a bounded Mod Portal Tier A selection, classified every prequalification claim without widening it, recorded effective mutation-owner surfaces, and completed the settings-scope audit without changing any released setting type. The successor bootstrap remains package-excluded shadow work: MIR 3 source and the bounded materializer continue to own `.9` release bytes until MIR 3 EOL and exact successor equivalence.
+
 ## Decision
 
 - The published `.5` packages remain immutable.
