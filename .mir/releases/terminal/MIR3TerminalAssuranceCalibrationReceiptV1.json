@@ -306,8 +306,8 @@
         {
           "role": "convergence",
           "status": "passed",
-          "generated_at": "08/11/2026 00:57:44",
-          "completed_at": "08/11/2026 02:47:37",
+          "generated_at": "2026-08-11T00:57:44.1041587Z",
+          "completed_at": "2026-08-11T02:47:37.7857363Z",
           "campaign_id": "plan-62999fad123199608a4a859e78fda0bfd6a467599089b98f1c9c83ef2700f235",
           "plan_material_sha256": "62999FAD123199608A4A859E78FDA0BFD6A467599089B98F1C9C83EF2700F235",
           "required_test_set_sha256": "2052EFE35AE67203BA738694DA0DA7056E506E18AE567EE84A925793EFF65FC5",
@@ -342,8 +342,8 @@
         {
           "role": "independent-confirmation",
           "status": "passed",
-          "generated_at": "08/11/2026 02:48:43",
-          "completed_at": "08/11/2026 04:38:51",
+          "generated_at": "2026-08-11T02:48:43.7937169Z",
+          "completed_at": "2026-08-11T04:38:51.4660507Z",
           "campaign_id": "plan-62999fad123199608a4a859e78fda0bfd6a467599089b98f1c9c83ef2700f235",
           "plan_material_sha256": "62999FAD123199608A4A859E78FDA0BFD6A467599089B98F1C9C83EF2700F235",
           "required_test_set_sha256": "2052EFE35AE67203BA738694DA0DA7056E506E18AE567EE84A925793EFF65FC5",
@@ -523,8 +523,8 @@
         {
           "role": "convergence",
           "status": "passed",
-          "generated_at": "08/11/2026 12:20:09",
-          "completed_at": "08/11/2026 13:20:23",
+          "generated_at": "2026-08-11T12:20:09.1792832Z",
+          "completed_at": "2026-08-11T13:20:23.0984675Z",
           "campaign_id": "plan-585f87c944f37af7dd6b6ef1d4a5f963f8b49286b7f1df8b62d8619425ee3f9b",
           "plan_material_sha256": "585F87C944F37AF7DD6B6EF1D4A5F963F8B49286B7F1DF8B62D8619425EE3F9B",
           "required_test_set_sha256": "56535B16E7FA259A43CFAE0CA9A5BDB33276858ED10D3EDDF32615E885059510",
@@ -563,8 +563,8 @@
         {
           "role": "independent-confirmation",
           "status": "passed",
-          "generated_at": "08/11/2026 13:20:45",
-          "completed_at": "08/11/2026 14:23:20",
+          "generated_at": "2026-08-11T13:20:45.5540487Z",
+          "completed_at": "2026-08-11T14:23:20.5783155Z",
           "campaign_id": "plan-585f87c944f37af7dd6b6ef1d4a5f963f8b49286b7f1df8b62d8619425ee3f9b",
           "plan_material_sha256": "585F87C944F37AF7DD6B6EF1D4A5F963F8B49286B7F1DF8B62D8619425EE3F9B",
           "required_test_set_sha256": "56535B16E7FA259A43CFAE0CA9A5BDB33276858ED10D3EDDF32615E885059510",

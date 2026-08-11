@@ -89,7 +89,28 @@ foreach ($identity in @($admission.dot5_identity_authority.releases)) {
 
 $calibrationReceiptPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalAssuranceCalibrationReceiptV1.json"
 $calibrationReceiptSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-assurance-calibration-receipt.schema.json"
-$calibration = $authorities["MIR3TerminalAssuranceCalibrationReceiptV1"]
+$calibration = Get-Content -Raw -LiteralPath $calibrationReceiptPath | ConvertFrom-Json -Depth 100 -DateKind String
+$calibrationSchema = Get-Content -Raw -LiteralPath $calibrationReceiptSchemaPath | ConvertFrom-Json -Depth 100
+if ("entries" -notin @($calibrationSchema.'$defs'.packageIdentity.required)) {
+  throw "Terminal calibration package identity schema must require entry counts."
+}
+function Test-MIRRfc3339Timestamp {
+  param([Parameter(Mandatory)][string]$Value)
+
+  $rfc3339Pattern = '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$'
+  if ($Value -notmatch $rfc3339Pattern) { return $false }
+
+  $parsed = [DateTimeOffset]::MinValue
+  return [DateTimeOffset]::TryParse(
+    $Value,
+    [Globalization.CultureInfo]::InvariantCulture,
+    [Globalization.DateTimeStyles]::RoundtripKind,
+    [ref]$parsed
+  )
+}
+if (Test-MIRRfc3339Timestamp -Value "08/11/2026 00:57:44") {
+  throw "Culture-dependent terminal calibration timestamps must be rejected."
+}
 if (-not ((Get-Content -Raw -LiteralPath $calibrationReceiptPath) | Test-Json -SchemaFile $calibrationReceiptSchemaPath) -or
     [string]$calibration.status -ne "accepted" -or [string]$calibration.scope -ne "package-excluded-terminal-assurance-calibration" -or
     [string]$calibration.assurance_freeze.status -ne "frozen" -or [int]$calibration.closure.unresolved_release_blocking_assurance_findings -ne 0 -or
@@ -132,7 +153,11 @@ foreach ($targetCalibration in $calibrationTargets) {
     throw "Convergence and independent confirmation are not a stable-plan, distinct-evidence pair: $($targetCalibration.release)"
   }
   foreach ($campaign in @($targetCalibration.campaigns)) {
-    if ([int]$campaign.counts.planned -ne $rerunIds.Count -or [int]$campaign.counts.executed -ne $rerunIds.Count -or
+    if (-not (Test-MIRRfc3339Timestamp -Value ([string]$campaign.generated_at)) -or
+        -not (Test-MIRRfc3339Timestamp -Value ([string]$campaign.completed_at)) -or
+        [DateTimeOffset]::Parse([string]$campaign.completed_at, [Globalization.CultureInfo]::InvariantCulture) -lt
+          [DateTimeOffset]::Parse([string]$campaign.generated_at, [Globalization.CultureInfo]::InvariantCulture) -or
+        [int]$campaign.counts.planned -ne $rerunIds.Count -or [int]$campaign.counts.executed -ne $rerunIds.Count -or
         [int]$campaign.counts.checkpoint_adopted -ne 0 -or [int]$campaign.counts.ordinary_reused -ne 0 -or
         [int]$campaign.counts.failed -ne 0 -or [int]$campaign.counts.incomplete -ne 0 -or [int]$campaign.counts.unexpected -ne 0 -or
         [string]$campaign.counts.rerun_scope -ne "all-planned-rows") {
@@ -158,7 +183,8 @@ if ((Get-FileHash -LiteralPath $foundationPath -Algorithm SHA256).Hash -ne [stri
 foreach ($identity in @($calibration.all_nine_dot5_identity.releases)) {
   $admittedIdentity = @($admission.dot5_identity_authority.releases | Where-Object version -eq $identity.version)
   if ($admittedIdentity.Count -ne 1 -or [string]$identity.archive_sha256 -ne [string]$admittedIdentity[0].archive_sha256 -or
-      [string]$identity.content_sha256 -ne [string]$admittedIdentity[0].content_sha256 -or [long]$identity.bytes -ne [long]$admittedIdentity[0].bytes) {
+      [string]$identity.content_sha256 -ne [string]$admittedIdentity[0].content_sha256 -or [long]$identity.bytes -ne [long]$admittedIdentity[0].bytes -or
+      [int]$identity.entries -ne [int]$admittedIdentity[0].entries) {
     throw "Terminal calibration .5 identity differs from foundation admission: $($identity.version)"
   }
 }
