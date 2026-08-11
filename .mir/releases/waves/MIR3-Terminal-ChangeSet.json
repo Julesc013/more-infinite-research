@@ -3,8 +3,8 @@
   "kind": "MIR3-Terminal-ChangeSetV1",
   "id": "MIR3-Terminal-ChangeSet",
   "recorded_at": "2026-08-09T12:09:00.0000000Z",
-  "status": "active-intake-no-product-admission",
-  "implementation_admitted": false,
+  "status": "product-set-admitted-ordinary-intake-closed",
+  "implementation_admitted": true,
   "finding_records": [
     ".mir/releases/terminal/findings/MIR3-TERM-0006.json",
     ".mir/releases/terminal/findings/MIR3-TERM-0007.json",
@@ -90,7 +90,7 @@
       "admission_destination": "none-until-reproduced",
       "regression_obligations": ["reproducer", "bounded-regression", "all-target-dispositions"],
       "fixed_point_restart_scope": "must-be-declared-before-implementation",
-      "closure": {"status":"intake-placeholder-not-admitted","evidence":null}
+      "closure": {"status":"classified-intake-closed","evidence":".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json"}
     },
     {
       "id": "MIR3-TERM-0005",
@@ -119,7 +119,7 @@
       "stable_id_and_migration_impact": "Existing generated technology identities remain stable, but any science-ingredient transition must preserve research-progress and direct 3.2.5-to-3.2.9 upgrade semantics.",
       "affected_targets": ["3.2.9"],
       "target_dispositions": [
-        {"target": "3.2.9", "disposition": "pending-sol-admission", "reason": "Exact K2 2.1.2/K2SO 2.0.13 behaviour is current-target product compatibility work."},
+        {"target": "3.2.9", "disposition": "target-local", "reason": "Exact K2 2.1.2/K2SO 2.0.13 behaviour is admitted current-target product compatibility work."},
         {"target": "2.5.9", "disposition": "not-applicable", "reason": "The observed K2 2.1.2 archive requires Factorio 2.1.7 or later; no 2.0 projection is inferred."},
         {"target": "1.9.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 1.1."},
         {"target": "1.8.9", "disposition": "not-applicable", "reason": "The reported exact K2/K2SO environment is outside Factorio 1.0."},
@@ -132,7 +132,7 @@
       "admission_destination": "Sol-terminal-product-admission",
       "regression_obligations": ["exact K2/K2SO load capture records generated stream science inputs", "the adopted K2 phase policy has positive and negative fixture coverage", "3.2.5-to-3.2.9 upgrade preserves progress for every affected stable technology", "no broad K2 or K2SO support claim is made without a locked behaviour matrix"],
       "fixed_point_restart_scope": "3.2.9 current-target shadow and every target whose final Sol disposition is portable; no lower target is presumed affected.",
-      "closure": {"status": "ready-for-sol-admission", "evidence": "Exact immutable-package environment capture; semantic policy remains unselected."}
+      "closure": {"status": "admitted-pending-implementation", "evidence": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"}
     },
     {
       "id": "MIR3-TERM-0028",
@@ -144,8 +144,8 @@
       "stable_id_and_migration_impact": "Existing generated technology identities remain stable, but changed prerequisites require a direct-upgrade graph and research-progress review.",
       "affected_targets": ["3.2.9", "2.5.9"],
       "target_dispositions": [
-        {"target": "3.2.9", "disposition": "pending-sol-admission", "reason": "The local Cubium 1.0.30 archive is Factorio 2.1 and exposes the exact alternate-route shape."},
-        {"target": "2.5.9", "disposition": "pending-exact-2.0-reproduction", "reason": "Cubium 1.0.28 is an authentic Factorio 2.0 release, but its immutable archive must be acquired and reproduced before projection is admitted."},
+        {"target": "3.2.9", "disposition": "portable-with-adapter", "reason": "The generic alternate-route invariant is admitted for a MIR-owned Factorio 2.1 fixture; direct unmodified Cubium 2.1 support remains upstream-blocked."},
+        {"target": "2.5.9", "disposition": "portable-with-adapter", "reason": "The generic route policy is admitted for a MIR-owned Factorio 2.0 fixture; direct Cubium 1.0.28 support remains unqualified pending authenticated acquisition and separate proof."},
         {"target": "1.9.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
         {"target": "1.8.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
         {"target": "1.7.9", "disposition": "not-applicable", "reason": "Cubium requires Factorio 2.0 plus Space Age."},
@@ -157,7 +157,7 @@
       "admission_destination": "Sol-terminal-product-admission-after-exact-2.0-and-fixture-reproduction",
       "regression_obligations": ["a MIR-owned fixture proves a later alternate route cannot delay an already-reachable science pack", "unmodified Cubium 1.0.28 on exact Factorio 2.0 is captured separately from any 2.1 diagnostic shim", "all retained prerequisite candidates remain researchable and acyclic", "3.2.5-to-3.2.9 and 2.5.5-to-2.5.9 upgrades preserve stable IDs and do not introduce a late alternate-route gate"],
       "fixed_point_restart_scope": "3.2.9 and, only after exact 2.0 proof, 2.5.9; any later portable semantic decision restarts its explicitly affected shadow projections.",
-      "closure": {"status": "characterization-in-progress", "evidence": null}
+      "closure": {"status": "admitted-pending-implementation", "evidence": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"}
     }
   ]
 }

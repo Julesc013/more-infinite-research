@@ -94,18 +94,6 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 | Record | Type | State | Title |
 | --- | --- | --- | --- |
 | `CHG-2026-0020` | `change/release` | `planned` | Deliver the unified MIR 3 terminal .9 stabilization wave |
-| `INC-2026-0035` | `incident` | `published-fix-external-issue-close-pending` | Pyanodon casting unlock startup failure |
-| `INC-2026-0046` | `incident` | `published-dot5-protected-calibration-pending` | New-candidate verification context omitted a Factorio installation lock |
-| `INC-2026-0047` | `incident` | `published-dot5-protected-calibration-pending` | C30 context selected the stale C24 upgrade transition |
-| `INC-2026-0048` | `incident` | `published-dot5-protected-calibration-pending` | C30 qualification had no exact delta or performance campaign authority |
-| `INC-2026-0049` | `incident` | `published-dot5-protected-calibration-pending` | Non-calibration release shadow evaluation required a nonexistent v4 baseline |
-| `INC-2026-0052` | `incident` | `published-dot5-protected-calibration-pending` | Canonical protected workflow had no registered default-branch dispatcher |
-| `INC-2026-0054` | `incident` | `published-dot5-protected-calibration-pending` | Runtime research progress conversion loses completed work |
-| `INC-2026-0055` | `incident` | `published-dot5-hosted-transport-calibration-pending` | Generated execution registry uses stale checkout-dependent source hashes |
-| `INC-2026-0057` | `incident` | `published-dot5-protected-calibration-pending` | Base-continuation cost migration changes stable coefficient semantics |
-| `INC-2026-0058` | `incident` | `published-dot5-ecosystem-calibration-pending` | Release-targeted ecosystem profiles referenced retired scenario paths |
-| `INC-2026-0059` | `incident` | `published-dot5-hosted-transport-calibration-pending` | Output-root migration preview required an untracked legacy task directory |
-| `INC-2026-0060` | `incident` | `published-dot5-ecosystem-calibration-pending` | Base-only ecosystem smokes reached Ice productivity science selection |
 
 ## Explicit release obligations
 

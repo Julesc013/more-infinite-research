@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-final-defect-index.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-final-defect-index.schema.json",
+  "title": "MIR 3 final defect index",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "scope", "state_semantics", "allowed_states", "source_inventory", "dispositions", "summary", "hard_boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-FINAL-DEFECT-INDEX"},
+    "status": {"const": "terminal-dispositions-complete-implementation-pending"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "scope": {"type": "string", "minLength": 1},
+    "state_semantics": {"type": "string", "minLength": 1},
+    "allowed_states": {"const": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
+    "source_inventory": {
+      "type": "object",
+      "required": ["github_issues", "lifecycle_incidents", "terminal_findings"],
+      "properties": {
+        "github_issues": {"type":"object","required":["query","count","ids","open_at_recording"],"properties":{"query":{"type":"string","minLength":1},"count":{"const":5},"ids":{"const":["GH-3","GH-4","GH-5","GH-24","GH-35"]},"open_at_recording":{"const":0}},"additionalProperties":false},
+        "lifecycle_incidents": {"type":"object","required":["authority","count","first","last"],"properties":{"authority":{"const":".mir/lifecycle/incidents"},"count":{"const":26},"first":{"const":"INC-2026-0035"},"last":{"const":"INC-2026-0060"}},"additionalProperties":false},
+        "terminal_findings": {"type":"object","required":["authority","strict_records","count","first","last"],"properties":{"authority":{"const":".mir/releases/waves/MIR3-Terminal-ChangeSet.json"},"strict_records":{"const":".mir/releases/terminal/findings"},"count":{"const":30},"first":{"const":"MIR3-TERM-0001"},"last":{"const":"MIR3-TERM-0030"}},"additionalProperties":false}
+      },
+      "additionalProperties": false
+    },
+    "dispositions": {
+      "type": "array",
+      "minItems": 61,
+      "maxItems": 61,
+      "items": {
+        "type": "object",
+        "required": ["source_kind", "source_id", "source_ref", "state", "completion", "evidence"],
+        "properties": {
+          "source_kind": {"enum": ["github-issue", "lifecycle-incident", "terminal-finding"]},
+          "source_id": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
+          "completion": {"enum": ["historical-verified", "admitted-pending-implementation", "not-a-product-fix"]},
+          "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["rows", "github_issues", "lifecycle_incidents", "terminal_findings", "fixed_in_dot9", "admitted_pending_implementation", "open_repository_issues", "unclassified"],
+      "properties": {"rows":{"const":61},"github_issues":{"const":5},"lifecycle_incidents":{"const":26},"terminal_findings":{"const":30},"fixed_in_dot9":{"const":2},"admitted_pending_implementation":{"const":2},"open_repository_issues":{"const":0},"unclassified":{"const":0}},
+      "additionalProperties": false
+    },
+    "hard_boundaries": {
+      "type": "object",
+      "required": ["ordinary_intake_closed", "late_release_blocking_p0_or_p1_may_reopen_affected_targets", "late_nonblocking_work_routes_to_mir4", "source_frozen", "candidate_assigned", "dot5_package_mutation_permitted"],
+      "properties": {"ordinary_intake_closed":{"const":true},"late_release_blocking_p0_or_p1_may_reopen_affected_targets":{"const":true},"late_nonblocking_work_routes_to_mir4":{"const":true},"source_frozen":{"const":false},"candidate_assigned":{"const":false},"dot5_package_mutation_permitted":{"const":false}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

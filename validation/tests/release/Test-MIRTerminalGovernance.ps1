@@ -20,7 +20,10 @@ $authorityNames = @(
   "MIR3-ModPortal-Compatibility-CensusV1",
   "MIR3-Mod-Interaction-MatrixV1",
   "MIR3-Compatibility-ClaimsV1",
-  "MIR3-Effective-Mutation-Owner-ReportV1"
+  "MIR3-Effective-Mutation-Owner-ReportV1",
+  "MIR3-FINAL-DEFECT-INDEX",
+  "MIR3-Engine-Gap-AuditV1",
+  "MIR3TerminalProductAdmissionBundleV1"
 )
 $authorities = @{}
 foreach ($name in $authorityNames) {
@@ -210,8 +213,9 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
-if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or $programme.implementation_admitted -or $programme.source_frozen) {
-  throw "Terminal programme must bind the exact unimplemented, unfrozen nine-release family."
+if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or $programme.source_frozen -or
+    [string]$programme.status -ne "implementation-admitted-source-unfrozen") {
+  throw "Terminal programme must bind the exact implementation-admitted, source-unfrozen nine-release family."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -223,6 +227,9 @@ $productIntakeSchemaByKind = @{
   "MIR3-Mod-Interaction-MatrixV1" = "mir3-mod-interaction-matrix"
   "MIR3-Compatibility-ClaimsV1" = "mir3-compatibility-claims"
   "MIR3-Effective-Mutation-Owner-ReportV1" = "mir3-effective-mutation-owner-report"
+  "MIR3-FINAL-DEFECT-INDEX" = "mir3-final-defect-index"
+  "MIR3-Engine-Gap-AuditV1" = "mir3-engine-gap-audit"
+  "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -301,6 +308,45 @@ if ([string]$programme.authorities.effective_mutation_owner_report -ne ".mir/rel
   throw "Terminal effective mutation-owner report is incomplete or its scanner overclaims compatibility."
 }
 
+$defectIndex = $authorities["MIR3-FINAL-DEFECT-INDEX"]
+$expectedFindingIds = @(1..30 | ForEach-Object { "MIR3-TERM-{0:D4}" -f $_ })
+$expectedIncidentIds = @(35..60 | ForEach-Object { "INC-2026-{0:D4}" -f $_ })
+$expectedIssueIds = @("GH-3", "GH-4", "GH-5", "GH-24", "GH-35")
+$indexedFindingIds = @($defectIndex.dispositions | Where-Object source_kind -eq "terminal-finding" | ForEach-Object source_id)
+$indexedIncidentIds = @($defectIndex.dispositions | Where-Object source_kind -eq "lifecycle-incident" | ForEach-Object source_id)
+$indexedIssueIds = @($defectIndex.dispositions | Where-Object source_kind -eq "github-issue" | ForEach-Object source_id)
+if ([string]$programme.authorities.final_defect_index -ne ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json" -or
+    @($defectIndex.dispositions).Count -ne 61 -or (@(Compare-Object $expectedFindingIds $indexedFindingIds)).Count -ne 0 -or
+    (@(Compare-Object $expectedIncidentIds $indexedIncidentIds)).Count -ne 0 -or (@(Compare-Object $expectedIssueIds $indexedIssueIds)).Count -ne 0 -or
+    @($defectIndex.dispositions | Group-Object source_id | Where-Object Count -ne 1).Count -ne 0 -or
+    @($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").Count -ne 2 -or
+    (@($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").source_id -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or
+    [int]$defectIndex.summary.unclassified -ne 0 -or -not [bool]$defectIndex.hard_boundaries.ordinary_intake_closed -or
+    [bool]$defectIndex.hard_boundaries.source_frozen -or [bool]$defectIndex.hard_boundaries.candidate_assigned) {
+  throw "Final defect index loses a repository issue, lifecycle incident, terminal finding, or pre-freeze boundary."
+}
+
+$engineGapAudit = $authorities["MIR3-Engine-Gap-AuditV1"]
+$expectedEngineGapIds = @("general-item-research-ingredients", "recipe-category-sets", "probability-and-catalyst-semantics", "quality-aware-products", "recycling-safety-versus-throughput", "multi-level-trigger-prohibition", "late-mutation-detection")
+if ([string]$programme.authorities.engine_gap_audit -ne ".mir/releases/terminal/MIR3-Engine-Gap-AuditV1.json" -or
+    (@($engineGapAudit.surfaces.id) -join "|") -ne ($expectedEngineGapIds -join "|") -or
+    @($engineGapAudit.surfaces | Where-Object { $_.classification -ne "covered-no-reproduced-dot9-defect" -or $_.dot9_admission -ne "none" -or @($_.evidence).Count -lt 2 }).Count -ne 0 -or
+    [int]$engineGapAudit.summary.additional_reproduced_dot9_defects -ne 0) {
+  throw "Bounded engine-gap audit is incomplete or invents an unreproduced MIR 3 defect."
+}
+
+$productAdmission = $authorities["MIR3TerminalProductAdmissionBundleV1"]
+$acceptedFindingIds = @($productAdmission.accepted_findings.id)
+if ([string]$programme.authorities.product_admission -ne ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json" -or
+    ($acceptedFindingIds -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or @($productAdmission.all_nine_dispositions).Count -ne 9 -or
+    (@($productAdmission.all_nine_dispositions.release) -join "|") -ne ($family -join "|") -or
+    -not [bool]$productAdmission.ordinary_intake.closed -or -not [bool]$productAdmission.boundaries.implementation_admitted -or
+    [bool]$productAdmission.boundaries.source_frozen -or [bool]$productAdmission.boundaries.candidate_assigned -or
+    [bool]$productAdmission.boundaries.dot5_package_mutation_permitted -or [bool]$productAdmission.boundaries.assurance_reopened -or
+    [bool]$productAdmission.boundaries.mir4_package_visible_implementation_permitted -or [bool]$productAdmission.boundaries.tagging_or_publication_permitted) {
+  throw "Terminal product admission is broad, unclassified, or crosses a freeze/publication boundary."
+}
+
 $baselineQueue = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Baseline-Capture-QueueV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$baselineQueue.kind -ne "MIR3-Terminal-Baseline-Capture-QueueV1" -or @($baselineQueue.rows).Count -ne 9 -or
     (@($baselineQueue.rows.terminal_release) -join "|") -ne ($family -join "|") -or @($baselineQueue.required_semantic_inventory).Count -lt 15 -or
@@ -350,8 +396,9 @@ foreach ($identity in @($admission.dot5_identity_authority.releases)) {
 }
 $incidentReconciliation = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Incident-ReconciliationV1.json") | ConvertFrom-Json -Depth 100
 if ([string]$incidentReconciliation.kind -ne "MIR3-Terminal-Incident-ReconciliationV1" -or $incidentReconciliation.rules.history_mutation_permitted -or
-    $incidentReconciliation.rules.dot5_package_mutation_permitted -or @($incidentReconciliation.items | Where-Object terminal_state -eq "retained-assurance-debt").Count -lt 2) {
-  throw "Terminal incident reconciliation must preserve history, .5 bytes, and assurance debt."
+    $incidentReconciliation.rules.dot5_package_mutation_permitted -or @($incidentReconciliation.items).Count -ne 15 -or
+    @($incidentReconciliation.items | Where-Object terminal_state -ne "closed").Count -ne 0) {
+  throw "Terminal incident reconciliation must preserve history and .5 bytes while closing calibrated assurance debt."
 }
 
 $allocation = $authorities["MIR3-Terminal-Candidate-AllocationV1"]
@@ -381,7 +428,10 @@ foreach ($item in @($changeSet.items)) {
   foreach ($field in $changeFields) { if ($null -eq $item.PSObject.Properties[$field]) { throw "Terminal change $($item.id) omits $field." } }
   if (@($item.target_dispositions).Count -eq 0) { throw "Terminal change $($item.id) has no target disposition." }
 }
-if ($changeSet.implementation_admitted) { throw "A topic inventory must not admit terminal product implementation." }
+if (-not $changeSet.implementation_admitted -or [string]$changeSet.status -ne "product-set-admitted-ordinary-intake-closed" -or
+    (@($changeSet.product_intake | Where-Object { $_.id -in @("MIR3-TERM-0027", "MIR3-TERM-0028") -and $_.closure.status -eq "admitted-pending-implementation" })).Count -ne 2) {
+  throw "Terminal change set must admit exactly the sealed product intake while leaving implementation proof pending."
+}
 
 $firewall = $authorities["MIR3-Terminal-ScopeFirewallV1"]
 if ($firewall.rules.package_visible_change_without_change_id -or $firewall.rules.source_freeze_without_fixed_point_receipt -or $firewall.rules.public_tag_without_family_readiness_seal -or
@@ -468,7 +518,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -546,11 +596,11 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
     $museum.artificial_dot9_versions_permitted -or @($museum.targets).Count -ne 7) { throw "0.18 or museum custody policy is invalid." }
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
-if (($current.planned_releases -join "|") -ne ($family -join "|") -or $current.implementation_admitted -or $current.source_frozen -or
+if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or $current.source_frozen -or
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.5" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "active-planning-only") {
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "implementation-admitted-source-unfrozen") {
   throw "Current release roles do not distinguish published .5 from planned .9."
 }
 
