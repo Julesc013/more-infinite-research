@@ -247,6 +247,8 @@ fixtures:
       - already-enabled-science-pack-recipe-needs-no-unlock
       - disabled-technology-unlocker-exclusion
       - deterministic-multiple-unlocker-selection
+      - later-alternate-route-cannot-delay-existing-science-production
+      - deterministic-earliest-safe-route-selection
       - direct-science-self-lock-exclusion
       - two-pack-science-cycle-exclusion
       - missing-research-mechanism-exclusion
@@ -479,6 +481,34 @@ fixtures:
       - removed-recipe-target-sanitation
       - independent-result-row-per-upgrade-archetype
       - exact-2-5-5-candidate-normal-mod-directory-load
+
+  upgrade-2-5-5-to-2-5-9:
+    requires_features: [recipe_productivity]
+    targets: ["2.0"]
+    assertion_path: fixtures/assert-upgrade-2-5-5-to-2-5-9
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.5"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-2-5-5-source-archive-for-2-5-9
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - upgraded-save-reload
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]

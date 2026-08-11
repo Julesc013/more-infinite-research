@@ -2279,3 +2279,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.5.5-release-notes
+  - path: docs/releases/notes/release-notes-2.5.9.md
+    title: "MIR 2.5.9 Planning Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.9-release-notes

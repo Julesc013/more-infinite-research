@@ -757,3 +757,7 @@ The design rule is:
 MIR 3.0 is not a refactor into more folders.
 MIR 3.0 is a refactor into enforceable boundaries.
 ```
+
+## Science-pack production routes
+
+`prototypes/mir/capabilities/science_integration/production_route_policy.lua` owns `SciencePackProductionRoutePolicyV1`. It treats alternate science-pack recipes as an OR set, rejects unreachable routes, removes graph-dominated and strictly heavier science-burden routes, and compares deterministic progression facts before using technology and recipe names as final tie-breaks. `pack_production_reachability.lua` derives route facts and caches the selected route in CompilerContext without mutating prototypes.

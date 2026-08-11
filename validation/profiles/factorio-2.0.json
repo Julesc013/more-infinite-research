@@ -9,8 +9,8 @@
   "trusted_repository": "self",
   "qualification_factorio_version": "2.0",
   "upgrade": {
-    "from_version": "2.5.0",
-    "to_version": "2.5.5",
-    "fixture": "assert-upgrade-2-5-0-to-2-5-5"
+    "from_version": "2.5.5",
+    "to_version": "2.5.9",
+    "fixture": "assert-upgrade-2-5-5-to-2-5-9"
   }
 }

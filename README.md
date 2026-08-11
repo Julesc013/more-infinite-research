@@ -8,9 +8,9 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the maintained `2.5.5` compiler backport.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the maintained `2.5.9` compiler backport.
 
-MIR `2.5.5` projects the MIR 3.2.5 research-cost contract through the Factorio 2.0 capability profile: science packs remain `tool` prototypes, unsupported `mod-data` emission and productivity-family adoption are compiled out, bounded research-cost support is reported through the target log adapter, Factorio 2.1-only modifiers are omitted, and every runtime claim is requalified on the 2.0 binary and mod line.
+MIR `2.5.9` preserves the MIR 3.2.5 research-cost contract and adds deterministic earliest-safe selection across alternate science-pack production routes. It retains the Factorio 2.0 capability profile: science packs remain `tool` prototypes, unsupported `mod-data` emission and productivity-family adoption are compiled out, bounded research-cost support is reported through the target log adapter, Factorio 2.1-only modifiers are omitted, and every runtime claim is requalified on the 2.0 binary and mod line.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
