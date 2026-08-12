@@ -227,6 +227,8 @@ fixtures:
       - exact-single-reviewed-external-sanitation-row
       - zero-additional-unreviewed-prunes
       - final-unlock-recipe-target-integrity
+      - full-sanitation-ledger-when-mod-data-supported
+      - target-native-no-mod-data-transport-when-unsupported
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal

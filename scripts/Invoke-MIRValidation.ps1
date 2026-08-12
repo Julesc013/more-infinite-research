@@ -4003,6 +4003,8 @@ Invoke-RuntimeScenario -ScenarioName "py-postprocessing-stale-unlock" -EnabledFi
   "pypostprocessing",
   "mir-fixture-assert-py-postprocessing-stale-unlock"
 )
+Assert-LogContains -Expected "[mir-fixture] Py late stale-unlock reconstruction complete" -Context "Py late stale-unlock reproduction"
+Assert-LogContains -Expected "[mir-fixture] Py stale-unlock sanitation proof complete" -Context "Py stale-unlock target-native proof"
 Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixtureNames @(
   "mir-fixture-rigor-late-recipe-removal"
 )
