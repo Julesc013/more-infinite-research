@@ -547,6 +547,32 @@ function Set-MIRTerminalUpgradeFixtures {
   return @($manifestPath, ".mir/fixtures.yml") + @($generatedAuthorities)
 }
 
+function Set-MIRTerminalReleaseNoteRegistry {
+  param([Parameter(Mandatory)]$Target)
+  $path = Join-Path $TargetRoot ".mir/docs.yml"
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no documentation registry: $path" }
+  $relativeNote = "docs/releases/notes/release-notes-$Release.md"
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $startMarker = "# MIR3-TERMINAL-RELEASE-NOTE release=$Release"
+  $endMarker = "# MIR3-TERMINAL-RELEASE-NOTE-END release=$Release"
+  $blockPattern = '(?ms)^' + [regex]::Escape($startMarker) + '.*?^' + [regex]::Escape($endMarker) + '\n?'
+  $text = [regex]::Replace($text, $blockPattern, '').TrimEnd()
+  $block = @"
+$startMarker
+  - path: $relativeNote
+    title: "MIR $Release Terminal Shadow Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-$($Release.Replace('.', '-'))-terminal-shadow-notes
+$endMarker
+"@.TrimEnd()
+  Assert-OrWriteMIRText -Path $path -Text ($text + "`n`n" + $block + "`n")
+  return @(".mir/docs.yml")
+}
+
 $profiles = Get-Content -Raw -LiteralPath $ProfilesPath | ConvertFrom-Json -Depth 100
 if ([int]$profiles.schema -ne 1 -or [string]$profiles.kind -ne "MIR3TerminalShadowProjectionProfilesV1") {
   throw "Terminal shadow projection profile authority is invalid."
@@ -570,6 +596,7 @@ Set-MIRPerformanceTransition -Target $target
 Set-MIRTerminalShadowAssuranceProfile
 $terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
 $terminalUpgradeFixtureAuthorities = @(Set-MIRTerminalUpgradeFixtures -Target $target)
+$terminalDocumentationAuthorities = @(Set-MIRTerminalReleaseNoteRegistry -Target $target)
 
 $infoPath = Join-Path $TargetRoot "info.json"
 if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { throw "Target shadow has no info.json: $TargetRoot" }
@@ -684,7 +711,7 @@ $transitionPlan = [ordered]@{
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  ) + @($terminalLegacyProbeAuthorities) + @($terminalUpgradeFixtureAuthorities)
+  ) + @($terminalLegacyProbeAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"

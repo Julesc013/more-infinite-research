@@ -85,6 +85,9 @@ try {
     $fixturesText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/fixtures.yml") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($fixturesText)) { throw "Unable to read exact predecessor fixture registry for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/fixtures.yml"), $fixturesText + "`n", [Text.UTF8Encoding]::new($false))
+    $docsText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/docs.yml") -join "`n"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($docsText)) { throw "Unable to read exact predecessor documentation registry for $($row.release)." }
+    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/docs.yml"), $docsText + "`n", [Text.UTF8Encoding]::new($false))
     [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot "scripts"))
     $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
@@ -114,6 +117,7 @@ try {
     $assurance = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/assurance.json") | ConvertFrom-Json -Depth 100
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
+    $docsRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/docs.yml")
     if ([string]$info.version -ne [string]$row.release -or [string]$info.factorio_version -ne [string]$row.factorio_line -or
         [string]$record.release -ne [string]$row.release -or [string]$package.release -ne [string]$row.release -or
         [string]$qualification.release -ne [string]$row.release -or [string]$transition.release -ne [string]$row.release -or
@@ -123,7 +127,8 @@ try {
         ($shadowProfile -join '|') -ne 'tooling.self-test|static.balance|static.museum|runtime.full|runtime.exact-zip' -or
         $shadowProfile -contains 'runtime.upgrade' -or $shadowProfile -contains 'runtime.ecosystem' -or
         $releaseGovernance.Count -ne 1 -or
-        @($releaseGovernance[0].patterns | Where-Object { [string]$_ -eq '^\.mir/releases/(records/|terminal/shadows/)' }).Count -ne 1) {
+        @($releaseGovernance[0].patterns | Where-Object { [string]$_ -eq '^\.mir/releases/(records/|terminal/shadows/)' }).Count -ne 1 -or
+        -not $docsRegistry.Contains("  - path: docs/releases/notes/release-notes-$([string]$row.release).md")) {
       throw "Terminal projection did not align every release-local authority for $($row.release)."
     }
     foreach ($overlay in @($row.assurance_overlays)) {
