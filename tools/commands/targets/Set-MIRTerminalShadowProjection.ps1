@@ -436,6 +436,80 @@ function Assert-OrWriteMIRText {
   Write-MIRUtf8NoBom -Path $Path -Text $expected
 }
 
+function Set-MIRTerminalLegacyUpgradeHarness {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.release -ne "1.6.9") { return @() }
+  if ([string]$Target.exact_engine -ne "0.16.51" -or
+      [string]$Target.target_adapter -ne "factorio-0.16-target-native-no-product-delta") {
+    throw "The 1.6.9 headless upgrade harness policy is outside its exact target envelope."
+  }
+
+  $relativePath = "scripts/Test-MIRUpgrade.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "The 1.6.9 target-native upgrade harness is missing: $path"
+  }
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $benchmarkBlock = @'
+$loadArgs = @(
+  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  "--benchmark", $save, "--benchmark-ticks", "1"
+)
+if ([int]$factorioVersionInfo.FileMajorPart -gt 0) {
+  $loadArgs += @("--benchmark-runs", "1", "--benchmark-sanitize")
+}
+$loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+$loadText = Get-Content -Raw -LiteralPath $log
+if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
+  throw "MIR $ToVersion upgrade proof marker is missing."
+}
+'@.Trim()
+  $headlessBlock = @'
+# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD
+$loadArgs = @(
+  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  "--start-server", $save, "--until-tick", "1"
+)
+$loadTimedOutAfterMarkerWindow = $false
+try {
+  $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs -TimeoutMs 30000
+} catch {
+  if ($_.Exception.Message -like "Factorio runtime validation timed out*") {
+    $loadTimedOutAfterMarkerWindow = $true
+    $loadExitCode = 0
+  } else {
+    throw
+  }
+}
+$loadText = Get-Content -Raw -LiteralPath $log
+$proofMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete"
+if ($loadText.Contains($proofMarker)) {
+  # Factorio 0.16 may continue into server transport after the exact
+  # configuration-change assertion. The marker closes the mod load gate.
+  $loadExitCode = 0
+}
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+if (-not $loadText.Contains($proofMarker)) {
+  if ($loadTimedOutAfterMarkerWindow) {
+    throw "MIR $ToVersion upgrade load reached the 0.16 headless-server marker window without producing the proof marker."
+  }
+  throw "MIR $ToVersion upgrade proof marker is missing."
+}
+'@.Trim()
+  $marker = "# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD"
+  if ($text.Contains($benchmarkBlock)) {
+    $text = $text.Replace($benchmarkBlock, $headlessBlock)
+  } elseif (-not $text.Contains($marker)) {
+    throw "The 1.6.9 target-native upgrade harness layout changed before headless projection."
+  }
+  if (-not $text.Contains($headlessBlock) -or $text.Contains('"--benchmark", $save')) {
+    throw "The 1.6.9 upgrade harness does not exclusively use the bounded headless load path."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
 function Set-MIRTerminalUpgradeFixtures {
   param([Parameter(Mandatory)]$Target)
   if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
@@ -632,6 +706,7 @@ Set-MIRAssuranceOverlays -Target $target
 Set-MIRPerformanceTransition -Target $target
 Set-MIRTerminalShadowAssuranceProfile
 $terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
+$terminalLegacyUpgradeHarnessAuthorities = @(Set-MIRTerminalLegacyUpgradeHarness -Target $target)
 $terminalUpgradeFixtureAuthorities = @(Set-MIRTerminalUpgradeFixtures -Target $target)
 $terminalDocumentationAuthorities = @(Set-MIRTerminalReleaseNoteRegistry -Target $target)
 $terminalBackportLockAuthorities = @(Set-MIRTerminalBackportSourceLock -Target $target)
@@ -749,7 +824,7 @@ $transitionPlan = [ordered]@{
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  ) + @($terminalLegacyProbeAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
+  ) + @($terminalLegacyProbeAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"

@@ -93,6 +93,9 @@ try {
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
+      $upgradeHarnessText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Test-MIRUpgrade.ps1") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upgradeHarnessText)) { throw "Unable to read exact predecessor upgrade harness for $($row.release)." }
+      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1"), $upgradeHarnessText + "`n", [Text.UTF8Encoding]::new($false))
       $backportLockText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/backport-source-lock.json") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($backportLockText)) { throw "Unable to read exact predecessor backport source lock for $($row.release)." }
       [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/backport-source-lock.json"), $backportLockText + "`n", [Text.UTF8Encoding]::new($false))
@@ -168,6 +171,7 @@ try {
       $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
       $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
       $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      $upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1")
       $backportLock = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
       $featureClassification = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ([string]$backportLock.feature_classification)) | ConvertFrom-Json -Depth 100
       if ([string]$upgradeManifest.release -ne [string]$row.release -or
@@ -176,6 +180,10 @@ try {
           [string]$qualification.exact_engine_sha256 -ne [string]$row.exact_engine_sha256 -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
+          ([string]$row.release -eq "1.6.9" -and
+            (-not $upgradeHarness.Contains("# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD") -or
+             -not $upgradeHarness.Contains('"--start-server", $save, "--until-tick", "1"') -or
+             $upgradeHarness.Contains('"--benchmark", $save'))) -or
           [string]$backportLock.mir_version -ne [string]$row.release -or
           [string]$backportLock.release_notes -ne "docs/releases/notes/release-notes-$([string]$row.release).md" -or
           [string]$featureClassification.mir_version -ne [string]$row.release -or
