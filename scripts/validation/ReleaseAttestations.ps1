@@ -76,13 +76,56 @@ function Get-MIRReleaseCandidateAuthority {
     throw "Canonical release authority is absent for $targetKey."
   }
   $authority = $property.Value
-  if ([string]$authority.mir_version -ne [string]$CandidateInfo.version -or
-      [string]$authority.package_source_commit -notmatch '^[0-9a-f]{40}$' -or
-      [string]$authority.archive_sha256 -notmatch '^[0-9A-F]{64}$' -or
-      [string]$authority.package_content_sha256 -notmatch '^[0-9A-F]{64}$') {
-    throw 'Canonical release authority does not describe the candidate package.'
+  $canonicalMatches = [string]$authority.mir_version -eq [string]$CandidateInfo.version -and
+      [string]$authority.package_source_commit -match '^[0-9a-f]{40}$' -and
+      [long]$authority.archive_bytes -gt 0 -and [int]$authority.archive_entries -gt 0 -and
+      [string]$authority.archive_sha256 -match '^[0-9A-F]{64}$' -and
+      [string]$authority.package_content_sha256 -match '^[0-9A-F]{64}$'
+  if ($canonicalMatches) { return $authority }
+
+  $version = [string]$CandidateInfo.version
+  $shadowRoot = Join-Path $RepoRoot ".mir\releases\terminal\shadows\$version"
+  $contextPath = Join-Path $shadowRoot 'qualification-context.json'
+  $manifestPath = Join-Path $shadowRoot 'package-manifest.json'
+  $transitionPath = Join-Path $shadowRoot 'transition-plan.json'
+  foreach ($requiredPath in @($contextPath, $manifestPath, $transitionPath)) {
+    if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+      throw 'Canonical release authority does not describe the candidate package.'
+    }
   }
-  return $authority
+  $context = Get-Content -Raw -LiteralPath $contextPath | ConvertFrom-Json
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+  $transition = Get-Content -Raw -LiteralPath $transitionPath | ConvertFrom-Json
+  $shadowAuthorities = @(
+    $context.performance_transition.development_package,
+    $manifest.source.performance_transition.development_package,
+    $transition.immutable_inputs.performance_transition.development_package
+  )
+  if ([string]$context.release -ne $version -or [string]$context.target -ne [string]$CandidateInfo.factorio_version -or
+      [string]$context.phase -ne 'shadow-convergence' -or $null -ne $context.candidate_id -or
+      [string]$manifest.release -ne $version -or [string]$manifest.target -ne [string]$CandidateInfo.factorio_version -or
+      [bool]$manifest.source_frozen -or $null -ne $manifest.candidate_id -or
+      [string]$transition.release -ne $version -or [string]$transition.target -ne [string]$CandidateInfo.factorio_version -or
+      [bool]$transition.source_frozen -or $null -ne $transition.candidate_id -or $shadowAuthorities.Count -ne 3) {
+    throw 'Terminal shadow authority is not an unfrozen, candidate-unassigned convergence identity.'
+  }
+  $shadowAuthority = $shadowAuthorities[0]
+  foreach ($candidateAuthority in $shadowAuthorities) {
+    foreach ($field in @('version', 'package_source_commit', 'package_source_sha256', 'archive_bytes', 'archive_entries', 'archive_sha256', 'package_content_sha256')) {
+      if ([string]$candidateAuthority.$field -ne [string]$shadowAuthority.$field) {
+        throw "Terminal shadow package authority differs across generated records: $field"
+      }
+    }
+  }
+  if ([string]$shadowAuthority.version -ne $version -or
+      [string]$shadowAuthority.package_source_commit -notmatch '^[0-9a-f]{40}$' -or
+      [string]$shadowAuthority.package_source_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [long]$shadowAuthority.archive_bytes -le 0 -or [int]$shadowAuthority.archive_entries -le 0 -or
+      [string]$shadowAuthority.archive_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [string]$shadowAuthority.package_content_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw 'Terminal shadow package authority is incomplete.'
+  }
+  return $shadowAuthority
 }
 
 function Test-MIRReleasePackageRootsEqual {
@@ -124,7 +167,8 @@ function Assert-MIRReleaseEvidenceSourceAuthority {
   $candidateContentSha = Get-MIRReleaseArchiveContentSha256 -Path $CandidatePath
   if ($candidateSha -ne [string]$authority.archive_sha256 -or
       $candidateContentSha -ne [string]$authority.package_content_sha256 -or
-      (Get-Item -LiteralPath $CandidatePath).Length -ne [long]$authority.archive_bytes) {
+      (Get-Item -LiteralPath $CandidatePath).Length -ne [long]$authority.archive_bytes -or
+      (Get-MIRReleaseArchiveEntryCount -Path $CandidatePath) -ne [int]$authority.archive_entries) {
     throw 'Candidate bytes do not match canonical release authority.'
   }
   return [pscustomobject][ordered]@{
@@ -150,6 +194,14 @@ function Get-MIRReleasePackageInfo {
 function Get-MIRReleaseArchiveContentSha256 {
   param([Parameter(Mandatory)][string]$Path)
   return Get-MIRZipContentFingerprint -Path $Path
+}
+
+function Get-MIRReleaseArchiveEntryCount {
+  param([Parameter(Mandatory)][string]$Path)
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+  try { return @($archive.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
+  finally { $archive.Dispose() }
 }
 
 function Get-MIRReleasePercentile {

@@ -127,6 +127,8 @@
         "version": "2.5.9",
         "package_source_commit": "990e0135aed25b9306bf282eb086685c8b63f782",
         "package_source_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
+        "archive_bytes": 1057099,
+        "archive_entries": 301,
         "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
         "package_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"
       },
