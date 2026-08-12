@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-shadow-projection-profiles.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json",
+  "title": "MIR3TerminalShadowProjectionProfilesV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "portable_source", "targets"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalShadowProjectionProfilesV1"},
+    "status": {"const": "active-source-unfrozen-candidates-unassigned"},
+    "portable_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release", "authority_commit", "authority_tree", "product_admission", "product_implementation"],
+      "properties": {
+        "release": {"const": "3.2.9"},
+        "authority_commit": {"pattern": "^[0-9a-f]{40}$"},
+        "authority_tree": {"pattern": "^[0-9a-f]{40}$"},
+        "product_admission": {"type": "string", "minLength": 1},
+        "product_implementation": {"type": "string", "minLength": 1}
+      }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["release", "factorio_line", "exact_engine", "support_tier", "promotion_branch", "shadow_branch", "baseline", "pre_dot5", "objective", "public_contract_change", "target_adapter", "target_profile", "product_findings", "product_disposition", "upgrade_rows", "mir4_successor_target"],
+        "properties": {
+          "release": {"pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+          "factorio_line": {"pattern": "^[0-9]+\\.[0-9]+$"},
+          "exact_engine": {"type": "string", "minLength": 1},
+          "support_tier": {"enum": ["current", "maintained", "lts", "historical", "finite"]},
+          "promotion_branch": {"type": "string", "minLength": 1},
+          "shadow_branch": {"pattern": "^candidate/[0-9]+\\.[0-9]+\\.9-projection$"},
+          "baseline": {"$ref": "#/$defs/inputRelease"},
+          "pre_dot5": {"$ref": "#/$defs/inputRelease"},
+          "objective": {"enum": ["cost-compatibility-observability-convergence", "target-port-behavioral-subset"]},
+          "public_contract_change": {"const": "patch-compatible"},
+          "target_adapter": {"type": "string", "minLength": 1},
+          "target_profile": {"type": "string", "minLength": 1},
+          "product_findings": {"type": "array", "uniqueItems": true, "items": {"pattern": "^MIR3-TERM-[0-9]{4}$"}},
+          "product_disposition": {"type": "string", "minLength": 1},
+          "upgrade_rows": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "mir4_successor_target": {"pattern": "^factorio-[0-9]+\\.[0-9]+$"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "inputRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release", "tag", "commit"],
+      "properties": {
+        "release": {"pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "tag": {"pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "commit": {"pattern": "^[0-9a-f]{40}$"}
+      }
+    }
+  }
+}

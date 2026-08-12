@@ -3,6 +3,9 @@ param([string]$RepoRoot = "")
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path }
 
+& (Join-Path $RepoRoot "validation/tests/release/Test-MIRTerminalShadowProjection.ps1") -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation failed." }
+
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $authorityNames = @(
   "MIR3-Terminal-ProgrammeV1",
@@ -518,7 +521,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100

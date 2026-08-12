@@ -61,6 +61,7 @@
     {"pattern": "scripts/Invoke-MIRValidation.ps1", "module": "validation-harness", "writes": ["assurance.harness"]},
     {"pattern": "tools/commands/compatibility/New-MIRFactorioLineTestAdapter.ps1", "module": "validation-harness", "writes": ["assurance.harness", "scenario.catalog"]},
     {"pattern": "scripts/Materialize-MIRBackport.ps1", "module": "backport-materializer", "writes": ["assurance.harness", "product.package", "transition.upgrade"]},
+    {"pattern": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1", "module": "terminal-shadow-materializer", "writes": ["release.authority", "release.presentation", "product.metadata"]},
     {"pattern": "scripts/Test-MIR*.ps1", "module": "legacy-test-wrappers", "writes": ["assurance.static"]},
     {"pattern": "scripts/Update-MIR*.ps1", "module": "generated-authority-tools", "writes": ["assurance.static", "docs.generated"]},
     {"pattern": ".github/workflows/**", "module": "ci", "writes": ["ci.workflow"]},
