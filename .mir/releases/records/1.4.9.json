@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "release": "1.4.9",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "1.4-P1",
+  "candidate_allocation": {
+    "namespace": "1.4-P",
+    "predecessor_max_ordinal": 0,
+    "minimum_next_ordinal": 1,
+    "assigned_id": null,
+    "assignment_condition": "accepted-family-fixed-point-and-source-freeze"
+  },
+  "target": "0.14",
+  "branch": "tag-only",
+  "state": "planned",
+  "source_release": {
+    "release": "1.4.5",
+    "tag": "1.4.5",
+    "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47",
+    "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4"
+  },
+  "portable_source_release": "3.2.9",
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "package": {},
+  "proofs": {},
+  "assurance_exceptions": [],
+  "remaining_obligations": [
+    "bind-terminal-delta",
+    "materialize-deterministic-integration",
+    "qualify-factorio-0.14",
+    "tag-publish-and-publicly-verify"
+  ],
+  "incident_ids": [],
+  "updated_at": "2026-08-08T18:00:00+10:00"
+}
