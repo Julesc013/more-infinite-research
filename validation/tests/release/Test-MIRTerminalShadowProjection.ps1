@@ -108,7 +108,20 @@ try {
       foreach ($file in @($overlay.files)) {
         $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$file.path))).Trim()
         $transitionOutput = @($row.performance_transition.output_blobs | Where-Object { [string]$_.path -eq [string]$file.path })
-        $expectedBlob = if ($transitionOutput.Count -eq 1) { [string]$transitionOutput[0].blob } else { [string]$file.blob }
+        $orderedOverlayOutputs = @(
+          foreach ($orderedOverlay in @($row.assurance_overlays)) {
+            foreach ($orderedFile in @($orderedOverlay.files)) {
+              if ([string]$orderedFile.path -eq [string]$file.path) { $orderedFile }
+            }
+          }
+        )
+        $expectedBlob = if ($transitionOutput.Count -eq 1) {
+          [string]$transitionOutput[0].blob
+        } elseif ($orderedOverlayOutputs.Count -gt 0) {
+          [string]$orderedOverlayOutputs[-1].blob
+        } else {
+          [string]$file.blob
+        }
         if ($materializedBlob -ne $expectedBlob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
       }
     }
@@ -119,6 +132,20 @@ try {
       }
     }
     if ([string]$row.release -eq "2.5.9") {
+      $developmentAuthorities = @(
+        $package.source.performance_transition.development_package,
+        $qualification.performance_transition.development_package,
+        $transition.immutable_inputs.performance_transition.development_package
+      )
+      foreach ($developmentAuthority in $developmentAuthorities) {
+        if ([string]$developmentAuthority.version -ne "2.5.9" -or
+            [long]$developmentAuthority.archive_bytes -ne 1057099 -or
+            [int]$developmentAuthority.archive_entries -ne 301 -or
+            [string]$developmentAuthority.archive_sha256 -ne "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2" -or
+            [string]$developmentAuthority.package_content_sha256 -ne "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E") {
+          throw "The 2.5.9 generated shadow authorities do not bind exact development bytes and entries."
+        }
+      }
       $targetCatalog = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "validation/tests.yml") | ConvertFrom-Json -Depth 100
       $ecosystemTest = @($targetCatalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
       if ($ecosystemTest.Count -ne 1 -or

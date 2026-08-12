@@ -98,8 +98,21 @@ function Set-MIRAssuranceOverlays {
       if (-not $destination.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Terminal assurance overlay escapes the target root: $path" }
       if ($Check) {
         if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
+        $orderedOverlayOutputs = @(
+          foreach ($orderedOverlay in @($Target.assurance_overlays)) {
+            foreach ($orderedFile in @($orderedOverlay.files)) {
+              if (([string]$orderedFile.path).Replace("\", "/") -eq $path) { $orderedFile }
+            }
+          }
+        )
         $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
-        $expectedBlob = if ($transitionOutput.Count -eq 1) { [string]$transitionOutput[0].blob } else { [string]$file.blob }
+        $expectedBlob = if ($transitionOutput.Count -eq 1) {
+          [string]$transitionOutput[0].blob
+        } elseif ($orderedOverlayOutputs.Count -gt 0) {
+          [string]$orderedOverlayOutputs[-1].blob
+        } else {
+          [string]$file.blob
+        }
         $targetBlob = (& git hash-object --no-filters -- $destination 2>$null)
         if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
       } else {

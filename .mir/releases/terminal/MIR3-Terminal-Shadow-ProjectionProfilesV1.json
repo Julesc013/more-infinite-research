@@ -69,6 +69,27 @@
             {"path":"fixtures/compat-matrix/expected-scenarios.json","blob":"0be1cb4fbb10317b7039bd75c23d94a30e665a1a"},
             {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"f5a0388bd7184269796f2af3507f98b083391bf3"}
           ]
+        },
+        {
+          "id": "factorio-2.0-terminal-shadow-qualification-v1",
+          "commit": "98182f4aa303d7f48339b5e3cf50e56f4dbeb53c",
+          "reason": "Carry the exact target-native approved delta, independent shadow release authority, dual predecessor upgrade proof, AdvancedBeltsSA qualification, and unfrozen performance evidence authority for the 2.5.9 convergence shadow.",
+          "files": [
+            {"path":".mir/fixtures.yml","blob":"eb772db1763d70b1ac874f70aa1971e8e0e78be7"},
+            {"path":"approved-delta/2.5.5-to-2.5.9.json","blob":"6068db2e6f0936423f48ab0ca04f6f62dc7a3339"},
+            {"path":"fixtures/assert-upgrade-2-5-5-to-2-5-9/control.lua","blob":"9ca7365446fc75e186131689afc865d2e01bc72c"},
+            {"path":"fixtures/assert-upgrade-2-5-5-to-2-5-9/info.json","blob":"a5498cd3dff31a55864e832bf1a2683b74ca307b"},
+            {"path":"scripts/Export-MIRApprovedDelta.ps1","blob":"e8bbff1231a9b131c924106cbf943586b480e8b4"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"8f0c43ed9018f6ccadac0c987f8a240602b5c7e4"},
+            {"path":"scripts/Test-MIRAdvancedBeltsSA.ps1","blob":"8d8fae39bf2d6b7748a3c142947a651f78410ff2"},
+            {"path":"scripts/Test-MIRApprovedDelta.ps1","blob":"5417968619c2ee761d41f70fee6fceea7665aa03"},
+            {"path":"scripts/Test-MIRAssurance.ps1","blob":"332c56d627b12d8fe710d4c0e94b97e41fcc1320"},
+            {"path":"scripts/Test-MIRBackportSourceLock.ps1","blob":"bbb74c75296b101c3bb2f2f88347979b761ef975"},
+            {"path":"scripts/Test-MIRReleaseAuthority.ps1","blob":"3c2fd3697d0aa9527be6c2f58a9aad6e5cd5b2e2"},
+            {"path":"scripts/Test-MIRUpgradeMatrix.ps1","blob":"5bf2c5f311c695e5c8655b2e99baa132994400ef"},
+            {"path":"scripts/validation/ReleaseAttestations.ps1","blob":"9728d12d1f400768dc8f58a21c5a3a02bc4cfe24"},
+            {"path":"validation/tests.yml","blob":"ce026d07d60edd1a239d707891f5a50b3e5f1fa1"}
+          ]
         }
       ],
       "performance_transition": {
@@ -82,7 +103,7 @@
           {"path":"scripts/Test-MIRPerformanceBudgets.ps1","commit":"f4b0475861770b848cc48f57cf37fe8bac5e1f64","blob":"f5a0388bd7184269796f2af3507f98b083391bf3"}
         ],
         "baseline": {"version":"2.5.5","archive_sha256":"03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C","package_content_sha256":"047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"},
-        "development_package": {"version":"2.5.9","package_source_commit":"990e0135aed25b9306bf282eb086685c8b63f782","package_source_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E","archive_sha256":"3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2","package_content_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"},
+        "development_package": {"version":"2.5.9","package_source_commit":"990e0135aed25b9306bf282eb086685c8b63f782","package_source_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E","archive_bytes":1057099,"archive_entries":301,"archive_sha256":"3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2","package_content_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"},
         "output_blobs": [
           {"path":".mir/performance.yml","blob":"cc9421b6ee5d65d129c59f92044befdd0a0c90da"},
           {"path":".mir/performance-budgets.json","blob":"9e32ff8ad2e0070efeb7327238fb158c8ab89c1a"},
