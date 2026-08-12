@@ -16,7 +16,7 @@
   },
   "target": "0.13",
   "version": "1.3.5",
-  "mir_version": "1.3.5",
+  "mir_version": "1.3.9",
   "target_profile_sha256": "58F618AEAF405506CD36E4C9538E23FFD54CA65E3744E455EDC8FE73ECE77AC1",
   "canonical_feature_matrix_sha256": "FD882872A6EF19AA29F3CDDA75F2C79EBD2D448395FE000485C8D0700AE6DDC6",
   "portable_modules": {
@@ -166,8 +166,8 @@
       "target_result": "native owners absent in Factorio 0.13"
     }
   },
-  "feature_classification": ".mir/evidence/lower-wave/1.3.0-feature-classification.json",
-  "release_notes": "docs/releases/release-notes-1.3.0.md",
-  "validation_summary": ".mir/evidence/1.3.0-qualification-summary.json",
-  "candidate_seal": ".mir/evidence/1.3.0-candidate-seal.json"
+  "feature_classification": ".mir/releases/terminal/shadows/1.3.9/feature-classification.json",
+  "release_notes": "docs/releases/notes/release-notes-1.3.9.md",
+  "validation_summary": "build/reports/release/1.3.9/shadow-qualification.json",
+  "candidate_seal": "build/reports/release/1.3.9/candidate-unassigned.json"
 }
