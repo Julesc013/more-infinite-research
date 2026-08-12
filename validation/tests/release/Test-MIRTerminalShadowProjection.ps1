@@ -179,7 +179,8 @@ try {
           [string]$backportLock.mir_version -ne [string]$row.release -or
           [string]$backportLock.release_notes -ne "docs/releases/notes/release-notes-$([string]$row.release).md" -or
           [string]$featureClassification.mir_version -ne [string]$row.release -or
-          [string]$featureClassification.canonical_dev_anchor -ne [string]$backportLock.canonical_dev_anchor) {
+          [string]$featureClassification.canonical_dev_anchor -ne [string]$backportLock.canonical_dev_anchor -or
+          -not (Get-Content -Raw -LiteralPath (Join-Path $targetRoot "docs/releases/notes/release-notes-$([string]$row.release).md")).Contains([string]$backportLock.canonical_dev_anchor)) {
         throw "Terminal projection did not bind both target-native upgrade rows for $($row.release)."
       }
       foreach ($upgradeRow in @($upgradeManifest.rows)) {

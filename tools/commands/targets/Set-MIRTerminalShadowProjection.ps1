@@ -752,10 +752,16 @@ Assert-OrWriteMIRJson -Path (Join-Path $projectionRoot "transition-plan.json") -
 
 $marker = "<!-- MIR3-TERMINAL-SHADOW release=$Release target=$([string]$target.factorio_line) baseline=$([string]$target.baseline.release) pre-dot5=$([string]$target.pre_dot5.release) candidate=unassigned source-frozen=false -->"
 $notesPath = Join-Path $TargetRoot "docs/releases/notes/release-notes-$Release.md"
+$sourceLockLine = ""
+if ([string]$target.support_tier -in @("lts", "historical", "finite")) {
+  $shadowSourceLock = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
+  $sourceLockLine = "- Historical canonical development anchor: $([string]$shadowSourceLock.canonical_dev_anchor)"
+}
 if ($Check) {
   if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Terminal release notes are missing for $Release." }
   $notes = (Get-Content -Raw -LiteralPath $notesPath).Replace("`r`n", "`n").Replace("`r", "`n")
-  if (-not $notes.StartsWith("---`n") -or -not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release)) {
+  if (-not $notes.StartsWith("---`n") -or -not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release) -or
+      ($sourceLockLine -and -not $notes.Contains($sourceLockLine))) {
     throw "Terminal release-note identity or front matter is stale for $Release."
   }
   $frontMatterEnd = $notes.IndexOf("`n---`n", 4)
@@ -798,6 +804,10 @@ This is an unfrozen target-native MIR 3 terminal shadow for Factorio $([string]$
 - Product disposition: $([string]$target.product_disposition)
 - Required upgrades: $(@($target.upgrade_rows) -join ", ")
 "@
+  }
+  if ($sourceLockLine) {
+    $notes = [regex]::Replace($notes, '(?m)^- Historical canonical development anchor: [0-9a-f]{40}\n?', '')
+    $notes = $notes.TrimEnd() + "`n`n$sourceLockLine`n"
   }
   Write-MIRUtf8NoBom -Path $notesPath -Text ($notes.TrimEnd() + "`n")
 }
