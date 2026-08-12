@@ -68,7 +68,7 @@
         "development_package": {"version":"2.5.9","package_source_commit":"990e0135aed25b9306bf282eb086685c8b63f782","package_source_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E","archive_sha256":"3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2","package_content_sha256":"4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"},
         "output_blobs": [
           {"path":".mir/performance.yml","blob":"cc9421b6ee5d65d129c59f92044befdd0a0c90da"},
-          {"path":".mir/performance-budgets.json","blob":"7085a8d999a71f3ab1203a24d3ab2e4946fdc813"},
+          {"path":".mir/performance-budgets.json","blob":"9e32ff8ad2e0070efeb7327238fb158c8ab89c1a"},
           {"path":".mir/performance-campaign.json","blob":"242ce63c5ae404d7d0b814505dedfc0998d3f87a"},
           {"path":"fixtures/performance-regression-probe/data.lua","blob":"09e03ac1a357e006ca4d356bc86f9cb9bb5f1f75"},
           {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"b9dde5812848c25d1740213ae2505a2069c81a46"}

@@ -136,9 +136,9 @@ function Set-MIRPerformanceTransition {
     Write-MIRUtf8NoBom -Path $policyPath -Text ($policy.TrimEnd() + "`n")
 
     $budgetsPath = Join-Path $TargetRoot ".mir/performance-budgets.json"
-    $budgets = Get-Content -Raw -LiteralPath $budgetsPath | ConvertFrom-Json -Depth 100
-    $budgets.release = $Release
-    Write-MIRUtf8NoBom -Path $budgetsPath -Text (ConvertTo-MIRStableJson -Value $budgets)
+    $budgetsText = (Get-Content -Raw -LiteralPath $budgetsPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $budgetsText = $budgetsText.Replace('  "release": "2.5.5",', '  "release": "2.5.9",')
+    Write-MIRUtf8NoBom -Path $budgetsPath -Text ($budgetsText.TrimEnd() + "`n")
 
     $campaignPath = Join-Path $TargetRoot ".mir/performance-campaign.json"
     $campaignText = (Get-Content -Raw -LiteralPath $campaignPath).Replace("`r`n", "`n").Replace("`r", "`n")
