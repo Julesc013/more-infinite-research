@@ -32,6 +32,83 @@ function Get-MIRZipFileCount {
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
+$info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'info.json') | ConvertFrom-Json
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.9') {
+  # The terminal shadow is a deterministic projection from its own explicit
+  # package-source authority.  Preserve and verify the immutable 2.5.5 lock,
+  # but do not invent a linear Git ancestry between independent projections.
+  if ([int]$lock.schema -ne 5 -or [int]$lock.projection_schema -ne 4 -or
+      [string]$lock.mir_version -ne '2.5.5' -or [string]$lock.candidate_id -ne '2.5-P12' -or
+      [string]$lock.target -ne '2.0' -or
+      [string]$lock.projection.package_source_commit -ne '689940f436b004cf4e5981f1944ddb04eaa17367' -or
+      [string]$lock.projection.package_source_tree -ne '512f6d74d67f99526211247e7ede09b8619f7f3f' -or
+      [string]$lock.projection.package_source_sha256 -ne '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154' -or
+      [string]$lock.candidate.archive_sha256 -ne '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C' -or
+      [string]$lock.candidate.content_sha256 -ne '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154') {
+    throw 'The terminal shadow does not retain the exact immutable 2.5.5 source lock.'
+  }
+  foreach ($row in @(
+    @{Name='baseline.commit'; Commit=[string]$lock.baseline.commit},
+    @{Name='portable_source.commit'; Commit=[string]$lock.portable_source.commit},
+    @{Name='projection.package_source_commit'; Commit=[string]$lock.projection.package_source_commit}
+  )) { Assert-MIRCommit -Name $row.Name -Commit $row.Commit }
+  $baselineRef = (& git -C $RepoRoot rev-list -n 1 ([string]$lock.baseline.reference)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $baselineRef -ne [string]$lock.baseline.commit) {
+    throw 'The immutable 2.5.0 reference no longer resolves to the locked baseline.'
+  }
+  $projectionTree = (& git -C $RepoRoot show -s --format=%T ([string]$lock.projection.package_source_commit)).Trim()
+  if ($LASTEXITCODE -ne 0 -or $projectionTree -ne [string]$lock.projection.package_source_tree) {
+    throw 'The immutable 2.5.5 package-source tree differs from its retained lock.'
+  }
+
+  . (Join-Path $RepoRoot 'scripts\validation\PackageIdentity.ps1')
+  . (Join-Path $RepoRoot 'scripts\validation\TargetProfiles.ps1')
+  $lockedArchive = Join-Path $RepoRoot ([string]$lock.candidate.archive)
+  if (-not (Test-Path -LiteralPath $lockedArchive -PathType Leaf)) {
+    $commonGitDir = (& git -C $RepoRoot rev-parse --path-format=absolute --git-common-dir).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($commonGitDir)) {
+      throw 'Unable to resolve the main-worktree custody path for immutable 2.5.5.'
+    }
+    $mainWorktree = Split-Path -Parent $commonGitDir
+    $lockedArchive = Join-Path $mainWorktree 'dist\more-infinite-research_2.5.5.zip'
+  }
+  if (-not (Test-Path -LiteralPath $lockedArchive -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $lockedArchive) -ne [string]$lock.candidate.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $lockedArchive) -ne [string]$lock.candidate.content_sha256 -or
+      (Get-Item -LiteralPath $lockedArchive).Length -ne [long]$lock.candidate.bytes -or
+      (Get-MIRZipFileCount -Path $lockedArchive) -ne [int]$lock.candidate.entries) {
+    throw 'The immutable 2.5.5 archive differs from its retained source lock.'
+  }
+  $profile = Get-MIRTargetProfile -RepoRoot $RepoRoot -FactorioVersion '2.0'
+  if ((Get-MIRTargetProfileFingerprint -Profile $profile) -ne [string]$lock.target_profile_sha256) {
+    throw 'The Factorio 2.0 target profile drifted from the immutable 2.5.5 lock.'
+  }
+
+  $manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\releases\terminal\shadows\2.5.9\package-manifest.json') | ConvertFrom-Json -Depth 100
+  $development = $manifest.source.performance_transition.development_package
+  $shadowSourceCommit = [string]$development.package_source_commit
+  if ([int]$manifest.schema -ne 1 -or [string]$manifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
+      [string]$manifest.release -ne '2.5.9' -or [string]$manifest.target -ne '2.0' -or
+      $manifest.source_frozen -ne $false -or $null -ne $manifest.candidate_id -or
+      [string]$manifest.source.immutable_dot5_predecessor.commit -ne '27877275854eb131efeb42672d3676c9c513c85e' -or
+      $shadowSourceCommit -ne '990e0135aed25b9306bf282eb086685c8b63f782' -or
+      [string]$development.package_source_sha256 -ne '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E' -or
+      [string]$development.archive_sha256 -ne '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2') {
+    throw 'The 2.5.9 shadow manifest does not bind its exact independent package-source authority.'
+  }
+  Assert-MIRCommit -Name '2.5.9 shadow package source' -Commit $shadowSourceCommit
+  Assert-MIRAncestor -Name '2.5.9 shadow package source' -Commit $shadowSourceCommit
+  $roots = @(Get-MIRPackageSourceRoots)
+  & git -C $RepoRoot diff --quiet $shadowSourceCommit HEAD -- @roots
+  if ($LASTEXITCODE -ne 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot)) {
+    throw 'Qualification work changed package roots after the exact 2.5.9 shadow source.'
+  }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot) -ne [string]$development.package_source_sha256) {
+    throw 'Current package roots do not reproduce the exact 2.5.9 shadow source.'
+  }
+  Write-Host '[ok] MIR 2.5.9 preserves the immutable 2.5.5 source lock and binds an explicit independent shadow lineage.'
+  return
+}
 if ([int]$lock.schema -eq 5) {
   if ([int]$lock.projection_schema -ne 4 -or [string]$lock.mir_version -ne "2.5.5" -or
       [string]$lock.candidate_id -ne "2.5-P12" -or [string]$lock.target -ne "2.0") {
@@ -109,7 +186,6 @@ if ([int]$lock.schema -eq 5) {
   & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
   if ($LASTEXITCODE -ne 0) { throw "Generated target-profile Lua is stale." }
 
-  $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
   if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
     throw "The 2.5.5 source lock disagrees with info.json."
   }
@@ -250,7 +326,6 @@ if ($profileHash -ne [string]$lock.target_profile_sha256) { throw "Target profil
 & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
 if ($LASTEXITCODE -ne 0) { throw "Generated target-profile Lua is stale." }
 
-$info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
 if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
   throw "Source-lock target identity disagrees with info.json."
 }
