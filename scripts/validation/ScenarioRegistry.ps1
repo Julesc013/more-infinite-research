@@ -172,6 +172,12 @@ function ConvertTo-MIRScenarioParameterValue {
   param([AllowNull()]$Value)
 
   if ($null -eq $Value) { return $null }
+  if ($Value -is [string] -or $Value -is [bool] -or
+      $Value -is [byte] -or $Value -is [int16] -or $Value -is [int32] -or
+      $Value -is [int64] -or $Value -is [single] -or $Value -is [double] -or
+      $Value -is [decimal]) {
+    return $Value
+  }
   if ($Value -is [pscustomobject]) {
     $result = @{}
     foreach ($property in $Value.PSObject.Properties) {
