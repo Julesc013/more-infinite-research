@@ -118,6 +118,23 @@ try {
         if ($materializedBlob -ne [string]$output.blob) { throw "Terminal projection did not materialize exact performance transition output $($row.performance_transition.id): $($output.path)" }
       }
     }
+    if ([string]$row.release -eq "2.5.9") {
+      $targetCatalog = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "validation/tests.yml") | ConvertFrom-Json -Depth 100
+      $ecosystemTest = @($targetCatalog.tests | Where-Object { [string]$_.id -eq "runtime.ecosystem" })
+      if ($ecosystemTest.Count -ne 1 -or
+          [string]$ecosystemTest[0].command -notmatch '^\./scripts/mir\.ps1\s' -or
+          [string]$ecosystemTest[0].command -notmatch '--mods\s+<mods>' -or
+          @($ecosystemTest[0].inputs) -notcontains "mod-lock") {
+        throw "The 2.5.9 assurance projection must forward the exact planned mod closure into its target-native ecosystem gate."
+      }
+      $performanceTest = @($targetCatalog.tests | Where-Object { [string]$_.id -eq "runtime.performance-regression" })
+      if ($performanceTest.Count -ne 1 -or
+          [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>(?:\s|$)' -or
+          [string]$performanceTest[0].command -match '-OutputPath\s+\.mir/evidence/' -or
+          @($performanceTest[0].inputs) -notcontains "mod-closure") {
+        throw "The 2.5.9 assurance projection must keep performance evidence content-addressed and bind the exact mod closure."
+      }
+    }
   }
 
   $tamperedRoot = Join-Path $testRoot "2.5.9"

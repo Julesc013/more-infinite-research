@@ -45,6 +45,23 @@
       "target_profile": "factorio-2.0",
       "assurance_overlays": [
         {
+          "id": "factorio-2.0-resumable-assurance-v1",
+          "commit": "3d0a0204eb1bf72e766f87ac05941d89f4c10a39",
+          "reason": "Carry the coherent Factorio 2.0 resumable-assurance backport, including content-addressed performance output and forwarding the exact planned mod closure into the ecosystem gate.",
+          "files": [
+            {"path":"scripts/Invoke-MIRAssurance.ps1","blob":"37c54dab1c3368dc8421dc5e7d5c4a25051c3f67"},
+            {"path":"scripts/Invoke-MIRPerformanceQualification.ps1","blob":"d88787e303a3e26bb6e0d8e245e8056912871481"},
+            {"path":"scripts/MIRAssurance/Evidence.ps1","blob":"7a18c64c9376e334ac94fd7e4c961e83034526ac"},
+            {"path":"scripts/MIRAssurance/Release.ps1","blob":"a50da596cd4477d2760453f5b094b315a30e1136"},
+            {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"4b53aa1d239ec09295a8f60f0f39ece2f7cde582"},
+            {"path":"scripts/Test-MIRPerformanceRegression.ps1","blob":"ddca4b5acc88d8b96a962c0f0b7b31daee91c3cd"},
+            {"path":"scripts/validation/PerformanceCampaign.ps1","blob":"6dba8bafda2a6017b329b268fa5dd5bb416c12ea"},
+            {"path":"scripts/validation/ReleaseAttestations.ps1","blob":"f9961b9af252e288a9c0c435e51841ec6546373c"},
+            {"path":"validation/tests.yml","blob":"59aee78920ee8fab9a8d0164401e954bcea852bc"},
+            {"path":"verification/schema/plan.schema.json","blob":"d6a27d4e1c357b0b39207e710fdbfeb75eb9da44"}
+          ]
+        },
+        {
           "id": "factorio-2.0-graph-process-ceiling-v1",
           "commit": "f4b0475861770b848cc48f57cf37fe8bac5e1f64",
           "reason": "Carry the frozen assurance correction that separates the 900-second process-kill ceiling from the 600-second graph performance budget.",
