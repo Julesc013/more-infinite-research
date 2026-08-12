@@ -4,9 +4,11 @@
   "release": "2.5.9",
   "target": "2.0",
   "exact_engine": "2.0.77",
+  "exact_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
   "support_tier": "maintained",
   "target_profile": "factorio-2.0",
   "target_adapter": "factorio-2.0-science-route-policy",
+  "assurance_profile": "terminal-shadow-convergence",
   "assurance_overlays": [
     {
       "id": "factorio-2.0-resumable-assurance-v1",
@@ -245,6 +247,7 @@
     "2.5.5-to-2.5.9",
     "2.5.0-to-2.5.9"
   ],
+  "upgrade_fixture_manifest": null,
   "package_manifest": ".mir/releases/terminal/shadows/2.5.9/package-manifest.json",
   "release_record": ".mir/releases/records/2.5.9.json",
   "release_notes": "docs/releases/notes/release-notes-2.5.9.md",

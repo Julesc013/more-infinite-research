@@ -252,11 +252,13 @@
   "generated_authorities": [
     "info.json",
     ".mir/convergence.yml",
+    ".mir/assurance.json",
     ".mir/releases/records/2.5.9.json",
     ".mir/releases/terminal/shadows/2.5.9/package-manifest.json",
     ".mir/releases/terminal/shadows/2.5.9/qualification-context.json",
     "docs/releases/notes/release-notes-2.5.9.md",
-    "changelog.txt"
+    "changelog.txt",
+    ".mir/docs.yml"
   ],
   "product_findings": [
     "MIR3-TERM-0028"
