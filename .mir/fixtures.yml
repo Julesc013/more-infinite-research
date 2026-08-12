@@ -105,3 +105,23 @@ fixtures:
     validates:
       - mining-drill-recipe-candidates
       - effect-count
+
+# MIR3-TERMINAL-UPGRADE-FIXTURES release=1.7.9
+  terminal-upgrade-1-7-5-to-1-7-9:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-7-5-to-1-7-9
+    validates:
+      - exact-1.7.5-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-1.7.9-development-archive-load
+
+  terminal-upgrade-1-7-1-to-1-7-9:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-7-1-to-1-7-9
+    validates:
+      - exact-1.7.1-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-1.7.9-development-archive-load
+# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=1.7.9
