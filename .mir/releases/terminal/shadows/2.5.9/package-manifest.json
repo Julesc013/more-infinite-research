@@ -173,6 +173,33 @@
             "blob": "c9fcbdb6c3a260ef692eb7af143541ee97148159"
           }
         ]
+      },
+      {
+        "id": "factorio-2.0-scenario-authority-parity-v1",
+        "commit": "613485bbe14073c31634bccffff795b0c20833e8",
+        "reason": "Carry the frozen-assurance false-pass and false-failure correction that makes target-native runtime fixtures and settings match the full-record scenario authority, proves deterministic diagnostics loaded, and statically rejects later invocation drift.",
+        "files": [
+          {
+            "path": "fixtures/compat-matrix/expected-scenarios.json",
+            "blob": "7866b5b698b8ed5c447c5a27e38d22824562c620"
+          },
+          {
+            "path": "scripts/Invoke-MIRValidation.ps1",
+            "blob": "52bb7275468965b1d7061640f3941209aaaefbd7"
+          },
+          {
+            "path": "scripts/Sync-MIRRuntimeScenarioAuthority.ps1",
+            "blob": "40478d3c46be206672bc0e0d753af63b776decbd"
+          },
+          {
+            "path": "scripts/validation/ScenarioRegistry.ps1",
+            "blob": "478d9b5dc24a4c7c7807f0adf967214011b2f6b4"
+          },
+          {
+            "path": "scripts/validation/SettingsOverrides.ps1",
+            "blob": "b24088c2d4a0073b4ded314b9eac40eae5f102f9"
+          }
+        ]
       }
     ],
     "performance_transition": {
