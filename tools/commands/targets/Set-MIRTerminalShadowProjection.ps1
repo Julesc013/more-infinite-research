@@ -261,14 +261,38 @@ $marker = "<!-- MIR3-TERMINAL-SHADOW release=$Release target=$([string]$target.f
 $notesPath = Join-Path $TargetRoot "docs/releases/notes/release-notes-$Release.md"
 if ($Check) {
   if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Terminal release notes are missing for $Release." }
-  $notes = Get-Content -Raw -LiteralPath $notesPath
-  if (-not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release)) { throw "Terminal release-note identity is stale for $Release." }
+  $notes = (Get-Content -Raw -LiteralPath $notesPath).Replace("`r`n", "`n").Replace("`r", "`n")
+  if (-not $notes.StartsWith("---`n") -or -not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release)) {
+    throw "Terminal release-note identity or front matter is stale for $Release."
+  }
+  $frontMatterEnd = $notes.IndexOf("`n---`n", 4)
+  if ($frontMatterEnd -lt 0 -or $notes.IndexOf($marker) -lt ($frontMatterEnd + 5)) {
+    throw "Terminal release-note marker must follow YAML front matter for $Release."
+  }
 } else {
   if (Test-Path -LiteralPath $notesPath -PathType Leaf) {
     $notes = (Get-Content -Raw -LiteralPath $notesPath).Replace("`r`n", "`n").Replace("`r", "`n")
-    if (-not $notes.Contains($marker)) { $notes = $marker + "`n`n" + $notes.TrimStart() }
+    $notes = [regex]::Replace($notes, '(?m)^<!-- MIR3-TERMINAL-SHADOW[^\n]*-->\n*', '')
+    $notes = $notes.TrimStart()
+    if (-not $notes.StartsWith("---`n")) { throw "Existing terminal release notes require YAML front matter for $Release." }
+    $frontMatterEnd = $notes.IndexOf("`n---`n", 4)
+    if ($frontMatterEnd -lt 0) { throw "Existing terminal release-note front matter is unterminated for $Release." }
+    $afterFrontMatter = $frontMatterEnd + 5
+    $notes = $notes.Substring(0, $afterFrontMatter).TrimEnd() + "`n`n" + $marker + "`n`n" + $notes.Substring($afterFrontMatter).TrimStart()
   } else {
     $notes = @"
+---
+title: "MIR $Release Terminal Shadow Notes"
+status: draft
+applies_to: "$Release"
+audience: player
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-08-12
+supersedes: []
+superseded_by: []
+---
+
 $marker
 
 # MIR $Release terminal shadow
