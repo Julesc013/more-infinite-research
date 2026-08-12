@@ -149,6 +149,21 @@
             "blob": "ce026d07d60edd1a239d707891f5a50b3e5f1fa1"
           }
         ]
+      },
+      {
+        "id": "factorio-2.0-terminal-shadow-performance-authority-v1",
+        "commit": "85598cb326502e6707c1d9d1101dfd42aab56978",
+        "reason": "Carry the assurance-only resolver that accepts the exact three-way unfrozen shadow package authority while rejecting any campaign/package disagreement.",
+        "files": [
+          {
+            "path": "scripts/MIRAssurance/Evidence.ps1",
+            "blob": "57b48621037919e7f3e11ff5f5c6ecd97582d004"
+          },
+          {
+            "path": "scripts/MIRAssurance/Release.ps1",
+            "blob": "490a5cf3bc9f43508c28de6a885e7ba7482808a0"
+          }
+        ]
       }
     ],
     "performance_transition": {
