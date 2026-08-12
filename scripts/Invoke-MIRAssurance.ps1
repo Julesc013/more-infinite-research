@@ -21,6 +21,35 @@ $assuranceRunnerVersion = "2"
 . (Join-Path $PSScriptRoot "MIRAssurance\Evidence.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Release.ps1")
 
+function Get-MIRAssuranceFactorioVersion {
+  param([Parameter(Mandatory)][string]$Path)
+  $item = Get-Item -LiteralPath $Path
+  $version = [string]$item.VersionInfo.FileVersion
+  if ([string]::IsNullOrWhiteSpace($version)) { $version = [string]$item.VersionInfo.ProductVersion }
+  if ([string]::IsNullOrWhiteSpace($version)) {
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = $Path
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    [void]$start.ArgumentList.Add("--version")
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $start
+    try {
+      [void]$process.Start()
+      $versionText = $process.StandardOutput.ReadToEnd() + "`n" + $process.StandardError.ReadToEnd()
+      $process.WaitForExit()
+      if ($process.ExitCode -eq 0 -and $versionText -match '(?m)^Version:\s+([0-9]+(?:\.[0-9]+)+)') { $version = $Matches[1] }
+    } finally { $process.Dispose() }
+  }
+  if ([string]::IsNullOrWhiteSpace($version)) {
+    $observedSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()
+    if ($observedSha256 -eq "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966") { $version = "0.16.51" }
+  }
+  if ([string]::IsNullOrWhiteSpace($version)) { $version = "unknown" }
+  return $version.Trim()
+}
+
 function Show-MIRAssuranceHelp {
   Write-Host @"
 MIR assurance
@@ -47,7 +76,7 @@ switch ($command) {
   "doctor" {
     $gitVersion = (& git --version).Trim()
     $factorioExists = $context.factorio -and (Test-Path -LiteralPath $context.factorio -PathType Leaf)
-    $factorioVersion = if ($factorioExists) { [string](Get-Item -LiteralPath $context.factorio).VersionInfo.FileVersion } else { "not-provided" }
+    $factorioVersion = if ($factorioExists) { Get-MIRAssuranceFactorioVersion -Path $context.factorio } else { "not-provided" }
     $factorioMatchesTarget = if ($factorioExists) { $factorioVersion -match ("^" + [regex]::Escape([string]$context.target) + "\.") } else { $true }
     if (-not $factorioMatchesTarget) { throw "Factorio binary version '$factorioVersion' does not match target '$($context.target)'." }
     $result = [ordered]@{
@@ -168,4 +197,3 @@ switch ($command) {
   "self-test" { Invoke-MIRAssuranceSelfTest -Context $context }
   default { throw "Unknown assurance command: $command" }
 }
-

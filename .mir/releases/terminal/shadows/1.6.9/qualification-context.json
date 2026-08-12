@@ -4,9 +4,11 @@
   "release": "1.6.9",
   "target": "0.16",
   "exact_engine": "0.16.51",
+  "exact_engine_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
   "support_tier": "historical",
   "target_profile": "terminal-factorio-0.16.51",
   "target_adapter": "factorio-0.16-target-native-no-product-delta",
+  "assurance_profile": "terminal-shadow-convergence",
   "assurance_overlays": [],
   "performance_transition": null,
   "baseline": {
@@ -23,6 +25,7 @@
     "1.6.5-to-1.6.9",
     "1.6.0-to-1.6.9"
   ],
+  "upgrade_fixture_manifest": ".mir/releases/terminal/shadows/1.6.9/upgrade-fixtures.json",
   "package_manifest": ".mir/releases/terminal/shadows/1.6.9/package-manifest.json",
   "release_record": ".mir/releases/records/1.6.9.json",
   "release_notes": "docs/releases/notes/release-notes-1.6.9.md",
