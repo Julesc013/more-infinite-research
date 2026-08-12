@@ -11,7 +11,7 @@ release:
   portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
   target_profile: "factorio-2.0"
   target_adapter: "factorio-2.0-science-route-policy"
-  target_assurance_overlays: "factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64"
+  target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
   terminal_shadow_status: source-unfrozen-candidate-unassigned
