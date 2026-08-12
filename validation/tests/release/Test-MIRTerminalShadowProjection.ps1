@@ -187,11 +187,18 @@ try {
         $fixturePath = Join-Path $targetRoot ([string]$upgradeRow.generated_fixture)
         $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixturePath "info.json") | ConvertFrom-Json
         $fixtureControl = Get-Content -Raw -LiteralPath (Join-Path $fixturePath "control.lua")
+        $fixtureSettingsPath = Join-Path $fixturePath "settings-updates.lua"
+        $fixtureSettings = if (Test-Path -LiteralPath $fixtureSettingsPath -PathType Leaf) {
+          Get-Content -Raw -LiteralPath $fixtureSettingsPath
+        } else {
+          ""
+        }
         $fromVersion = [string]$upgradeRow.from.release
         if ([string]$fixtureInfo.name -notmatch ([regex]::Escape($fromVersion.Replace('.', '-')) + '-to-' + [regex]::Escape(([string]$row.release).Replace('.', '-'))) -or
             @($fixtureInfo.dependencies | Where-Object { [string]$_ -eq "more-infinite-research >= $fromVersion" }).Count -ne 1 -or
             -not $fixtureControl.Contains("local from_version = `"$fromVersion`"") -or
             -not $fixtureControl.Contains("local to_version = `"$([string]$row.release)`"") -or
+            ($fixtureSettings -and -not $fixtureSettings.Contains($fromVersion)) -or
             -not $fixtureRegistry.Contains("assertion_path: $([string]$upgradeRow.generated_fixture)")) {
           throw "Terminal upgrade fixture is stale or unregistered: $($upgradeRow.id)"
         }

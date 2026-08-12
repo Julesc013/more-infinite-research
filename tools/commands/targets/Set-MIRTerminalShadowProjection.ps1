@@ -481,6 +481,11 @@ function Set-MIRTerminalUpgradeFixtures {
     $control = $control.Replace("$preDot5Version to $baselineVersion", "$fromVersion to $Release")
     $control = $control.Replace("$preDot5Version upgrade source proof", "$fromVersion upgrade source proof")
     $control = $control.Replace("mir-$preDot5Version-save", "mir-$fromVersion-save")
+    $settingsUpdates = if ($hasSettingsUpdates) {
+      $sourceSettingsUpdates.Replace($preDot5Version, $fromVersion)
+    } else {
+      ""
+    }
     foreach ($requiredMarker in @(
       "local from_version = `"$fromVersion`"",
       "local to_version = `"$Release`"",
@@ -494,7 +499,10 @@ function Set-MIRTerminalUpgradeFixtures {
     Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/control.lua") -Text $control
     Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/data.lua") -Text $sourceData
     if ($hasSettingsUpdates) {
-      Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/settings-updates.lua") -Text $sourceSettingsUpdates
+      if (-not $settingsUpdates.Contains($fromVersion)) {
+        throw "Generated terminal upgrade settings override lacks source version $fromVersion."
+      }
+      Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/settings-updates.lua") -Text $settingsUpdates
     }
 
     $rows += [ordered]@{
