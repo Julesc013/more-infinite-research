@@ -529,6 +529,10 @@ Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
   & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "runtime scenario authority matches target-native invocations" {
+  & (Join-Path $repo "scripts\Sync-MIRRuntimeScenarioAuthority.ps1") -RepoRoot $repo -Check
+}
+
 Invoke-RepoCheck "ecosystem campaigns declare exact sanitation budgets" {
   & (Join-Path $repo "scripts\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
 }
@@ -2756,7 +2760,10 @@ function Clear-FactorioLog {
 }
 
 function Assert-RuntimeLogHealthy {
-  param([string]$ScenarioName)
+  param(
+    [string]$ScenarioName,
+    [switch]$RequireDiagnostics
+  )
   Write-Host "[info] Factorio log path: $FactorioLog"
   if (-not (Test-Path -LiteralPath $FactorioLog)) {
     throw "Factorio log not found after $ScenarioName runtime validation: $FactorioLog"
@@ -2766,6 +2773,15 @@ function Assert-RuntimeLogHealthy {
   if ($fatalMarkers) {
     $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
     throw "Factorio runtime validation log contains fatal error markers after $ScenarioName."
+  }
+
+  if ($RequireDiagnostics) {
+    if (-not (Select-String -LiteralPath $FactorioLog -Pattern "Loading mod settings mir-validation-settings-overrides" -SimpleMatch -Quiet)) {
+      throw "Factorio runtime validation did not load the deterministic settings-override mod after $ScenarioName."
+    }
+    if (-not (Select-String -LiteralPath $FactorioLog -Pattern "[more-infinite-research] Generation report start" -SimpleMatch -Quiet)) {
+      throw "Factorio runtime validation did not emit the required MIR generation report after $ScenarioName."
+    }
   }
 }
 
@@ -2820,6 +2836,24 @@ function Invoke-RuntimeScenario {
     -ScenarioName $ScenarioName `
     -Kind "runtime" `
     -EnableSpaceAge:$EnableSpaceAge
+  $invocationAuthority = [ordered]@{
+    ScenarioName = $ScenarioName
+    EnabledFixtureNames = @($EnabledFixtureNames)
+  }
+  foreach ($parameterName in @(
+    "EnabledStreamKeys", "EnabledBaseExtensionKeys", "DisabledStreamKeys", "DisabledBaseExtensionKeys",
+    "EffectPerLevelOverrides", "BaseEffectPerLevelOverrides", "BaseMaxLevelOverrides", "StartupSettingOverrides",
+    "NativeOwnerSettingsProfile", "LabPolicySkip", "LabPolicyEngineDefault", "SciencePackIngredientPolicy",
+    "WeaponSpeedAdjustmentMode", "PipelineExtentMultiplier", "PrototypeProductivityCap", "PrototypeEfficiencyCap",
+    "PrototypePollutionCap", "PrototypeSpeedCap", "PrototypeSpeedFloor", "PrototypeQualityCap",
+    "RecyclingReturnChance", "PrototypePositivePowerFloor", "ProductivityCapSelfRecyclingOnly",
+    "UnrestrictedModules", "RequireSpaceGate", "UseInstalledSpaceAgeIcons", "ScriptedDiagnostics", "EnableSpaceAge"
+  )) {
+    if ($PSBoundParameters.ContainsKey($parameterName)) {
+      $invocationAuthority[$parameterName] = $PSBoundParameters[$parameterName]
+    }
+  }
+  Assert-MIRScenarioInvocationMatchesDeclaration -Declaration $declaration -Invocation $invocationAuthority
   $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "runtime" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
   try {
@@ -2878,7 +2912,7 @@ function Invoke-RuntimeScenario {
       throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName -RequireDiagnostics
     Complete-MIRValidationScenario -Record $resultRecord -Status "passed" -AssertionsExecuted @($declaration.assertions).Count
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
@@ -2951,7 +2985,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
       throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial" -RequireDiagnostics
 
     $changedScenario = Initialize-RuntimeScenario `
       -ScenarioName "$ScenarioName-changed" `
@@ -2986,7 +3020,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
       throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed" -RequireDiagnostics
     Complete-MIRValidationScenario -Record $resultRecord -Status "passed" -AssertionsExecuted @($declaration.assertions).Count
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
@@ -3401,9 +3435,12 @@ if ($selectionActive -and -not $checkpointActive) {
         $parameters = @{
           ScenarioName = $declaration.name
           EnabledFixtureNames = @($declaration.fixtures)
-          EnableSpaceAge = ($declaration.surface -eq "space-age")
         }
-        foreach ($property in $declaration.settings.PSObject.Properties) { $parameters[$property.Name] = $property.Value }
+        if ($declaration.surface -eq "space-age") { $parameters.EnableSpaceAge = $true }
+        foreach ($property in $declaration.settings.PSObject.Properties) {
+          $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
+          $parameters[$parameterName] = $property.Value
+        }
         $scenarioState = Initialize-RuntimeScenario @parameters
         $scenarioRoot = Split-Path -Parent $scenarioState.SavePath
         $workerData = Join-Path $scenarioRoot "userdata"
@@ -3462,6 +3499,12 @@ if ($selectionActive -and -not $checkpointActive) {
             if (-not (Test-Path -LiteralPath $task.Log)) { throw "Parallel validation log is missing: $($task.Log)" }
             $fatal = Select-String -LiteralPath $task.Log -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
             if ($fatal) { throw "Parallel validation log contains fatal markers: $($task.Declaration.name)" }
+            if (-not (Select-String -LiteralPath $task.Log -Pattern "Loading mod settings mir-validation-settings-overrides" -SimpleMatch -Quiet)) {
+              throw "Parallel validation scenario $($task.Declaration.name) did not load the deterministic settings-override mod."
+            }
+            if (-not (Select-String -LiteralPath $task.Log -Pattern "[more-infinite-research] Generation report start" -SimpleMatch -Quiet)) {
+              throw "Parallel validation scenario $($task.Declaration.name) did not emit the required MIR generation report."
+            }
             Complete-MIRValidationScenario -Record $task.Record -Status "passed" -AssertionsExecuted @($task.Declaration.assertions).Count
           }
         }
@@ -3475,10 +3518,11 @@ if ($selectionActive -and -not $checkpointActive) {
         $parameters = @{
           ScenarioName = $declaration.name
           EnabledFixtureNames = @($declaration.fixtures)
-          EnableSpaceAge = ($declaration.surface -eq "space-age")
         }
+        if ($declaration.surface -eq "space-age") { $parameters.EnableSpaceAge = $true }
         foreach ($property in $declaration.settings.PSObject.Properties) {
-          $parameters[$property.Name] = $property.Value
+          $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
+          $parameters[$parameterName] = $property.Value
         }
         Invoke-RuntimeScenario @parameters
         if ($declaration.name -eq "space-age-generation-integrity") {
@@ -4520,7 +4564,8 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
       EnableSpaceAge = $true
     }
     foreach ($property in $declaration.settings.PSObject.Properties) {
-      $parameters[$property.Name] = $property.Value
+      $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
+      $parameters[$parameterName] = $property.Value
     }
     Invoke-RuntimeScenario @parameters
   }

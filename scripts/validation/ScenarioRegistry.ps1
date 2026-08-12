@@ -77,6 +77,97 @@ function Get-MIRExpectedScenarioNames {
   @($Registry.records | ForEach-Object { [string]$_.name })
 }
 
+function ConvertTo-MIRScenarioCanonicalText {
+  param([AllowNull()]$Value)
+
+  if ($null -eq $Value) { return "null" }
+  if ($Value -is [Management.Automation.SwitchParameter]) {
+    return $(if ([bool]$Value) { "true" } else { "false" })
+  }
+  if ($Value -is [bool]) { return $(if ($Value) { "true" } else { "false" }) }
+  if ($Value -is [string]) { return ($Value | ConvertTo-Json -Compress) }
+  if ($Value -is [byte] -or $Value -is [int16] -or $Value -is [int32] -or
+      $Value -is [int64] -or $Value -is [single] -or $Value -is [double] -or
+      $Value -is [decimal]) {
+    return [string]::Format([Globalization.CultureInfo]::InvariantCulture, "{0}", $Value)
+  }
+  if ($Value -is [Collections.IDictionary]) {
+    $rows = foreach ($key in @($Value.Keys | ForEach-Object { [string]$_ } | Sort-Object)) {
+      (ConvertTo-MIRScenarioCanonicalText -Value $key) + ":" +
+        (ConvertTo-MIRScenarioCanonicalText -Value $Value[$key])
+    }
+    return "{" + ($rows -join ",") + "}"
+  }
+  if ($Value -is [pscustomobject]) {
+    $rows = foreach ($property in @($Value.PSObject.Properties | Sort-Object Name)) {
+      (ConvertTo-MIRScenarioCanonicalText -Value ([string]$property.Name)) + ":" +
+        (ConvertTo-MIRScenarioCanonicalText -Value $property.Value)
+    }
+    return "{" + ($rows -join ",") + "}"
+  }
+  if ($Value -is [Collections.IEnumerable]) {
+    $rows = foreach ($item in @($Value)) { ConvertTo-MIRScenarioCanonicalText -Value $item }
+    return "[" + ($rows -join ",") + "]"
+  }
+  throw "Scenario environment contains unsupported value type '$($Value.GetType().FullName)'."
+}
+
+function Assert-MIRScenarioInvocationMatchesDeclaration {
+  param(
+    [Parameter(Mandatory)]$Declaration,
+    [Parameter(Mandatory)][Collections.IDictionary]$Invocation
+  )
+
+  $scenarioName = [string]$Declaration.name
+  $actualFixtures = @($Invocation["EnabledFixtureNames"] | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $expectedFixtures = @($Declaration.fixtures | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  if (($actualFixtures -join "`n") -cne ($expectedFixtures -join "`n")) {
+    throw "Scenario '$scenarioName' invocation fixtures differ from its full-record authority. Expected [$($expectedFixtures -join ', ')]; actual [$($actualFixtures -join ', ')]."
+  }
+
+  $actualSpaceAge = $Invocation.Contains("EnableSpaceAge") -and [bool]$Invocation["EnableSpaceAge"]
+  $expectedSpaceAge = [string]$Declaration.surface -eq "space-age"
+  if ($actualSpaceAge -ne $expectedSpaceAge) {
+    throw "Scenario '$scenarioName' invocation surface differs from its full-record authority. Expected Space Age=$expectedSpaceAge; actual=$actualSpaceAge."
+  }
+
+  $aliases = [ordered]@{
+    enabled_base_extensions = "EnabledBaseExtensionKeys"
+    enabled_streams = "EnabledStreamKeys"
+    disabled_base_extensions = "DisabledBaseExtensionKeys"
+    disabled_streams = "DisabledStreamKeys"
+  }
+  $ignored = @("ScenarioName", "EnabledFixtureNames", "EnableSpaceAge")
+  $actualSettings = [ordered]@{}
+  foreach ($key in @($Invocation.Keys | ForEach-Object { [string]$_ } | Sort-Object)) {
+    if ($key -in $ignored) { continue }
+    $actualSettings[$key] = $Invocation[$key]
+  }
+  $expectedSettings = [ordered]@{}
+  foreach ($property in @($Declaration.settings.PSObject.Properties | Sort-Object Name)) {
+    $settingName = [string]$property.Name
+    $canonicalName = if ($aliases.Contains($settingName)) { [string]$aliases[$settingName] } else { $settingName }
+    $expectedSettings[$canonicalName] = $property.Value
+  }
+  $actualText = ConvertTo-MIRScenarioCanonicalText -Value $actualSettings
+  $expectedText = ConvertTo-MIRScenarioCanonicalText -Value $expectedSettings
+  if ($actualText -cne $expectedText) {
+    throw "Scenario '$scenarioName' invocation settings differ from its full-record authority. Expected $expectedText; actual $actualText."
+  }
+}
+
+function Resolve-MIRScenarioSettingParameterName {
+  param([Parameter(Mandatory)][string]$Name)
+
+  switch ($Name) {
+    "enabled_base_extensions" { "EnabledBaseExtensionKeys" }
+    "enabled_streams" { "EnabledStreamKeys" }
+    "disabled_base_extensions" { "DisabledBaseExtensionKeys" }
+    "disabled_streams" { "DisabledStreamKeys" }
+    default { $Name }
+  }
+}
+
 function Select-MIRScenarioRegistryForTargetCapabilities {
   param(
     [Parameter(Mandatory)]$Registry,

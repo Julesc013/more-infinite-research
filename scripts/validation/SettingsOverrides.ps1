@@ -6,7 +6,7 @@ function Initialize-MIRSettingsOverrideMod {
 
   $path = Join-Path $ModsDir "mir-validation-settings-overrides"
   New-Item -ItemType Directory -Force -Path $path | Out-Null
-  @{
+  [ordered]@{
     name = "mir-validation-settings-overrides"
     version = "0.1.0"
     title = "MIR Validation Settings Overrides"
