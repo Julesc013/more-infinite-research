@@ -372,8 +372,20 @@ function Get-MIRAssuranceFactorioVersion {
   $version = [string]$item.VersionInfo.FileVersion
   if ([string]::IsNullOrWhiteSpace($version)) { $version = [string]$item.VersionInfo.ProductVersion }
   if ([string]::IsNullOrWhiteSpace($version)) {
-    $versionLine = @(& $Path --version 2>&1 | Where-Object { [string]$_ -match '^Version:\s+([0-9]+(?:\.[0-9]+)+)' } | Select-Object -First 1)
-    if ($versionLine.Count -eq 1 -and [string]$versionLine[0] -match '^Version:\s+([0-9]+(?:\.[0-9]+)+)') { $version = $Matches[1] }
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = $Path
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    [void]$start.ArgumentList.Add("--version")
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $start
+    try {
+      [void]$process.Start()
+      $versionText = $process.StandardOutput.ReadToEnd() + "`n" + $process.StandardError.ReadToEnd()
+      $process.WaitForExit()
+      if ($process.ExitCode -eq 0 -and $versionText -match '(?m)^Version:\s+([0-9]+(?:\.[0-9]+)+)') { $version = $Matches[1] }
+    } finally { $process.Dispose() }
   }
   if ([string]::IsNullOrWhiteSpace($version)) { $version = "unknown" }
   return $version.Trim()
@@ -386,7 +398,7 @@ function Get-MIRAssuranceFactorioVersion {
     $text = $text.Replace($insertMarker, $functionText + "`n`n" + $insertMarker)
   }
   if ($text.Contains($oldLine)) { $text = $text.Replace($oldLine, $newLine) }
-  if (-not $text.Contains($newLine) -or -not $text.Contains("& `$Path --version")) {
+  if (-not $text.Contains($newLine) -or -not $text.Contains('[void]$start.ArgumentList.Add("--version")')) {
     throw "Target assurance entry point lacks the bounded legacy Factorio version probe."
   }
   Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")

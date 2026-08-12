@@ -152,7 +152,7 @@ try {
           (@($upgradeManifest.rows.id) -join '|') -ne (@($row.upgrade_rows) -join '|') -or
           [string]$qualification.upgrade_fixture_manifest -ne ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json" -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
-          -not $assuranceEntryPoint.Contains('& $Path --version')) {
+          -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")')) {
         throw "Terminal projection did not bind both target-native upgrade rows for $($row.release)."
       }
       foreach ($upgradeRow in @($upgradeManifest.rows)) {
