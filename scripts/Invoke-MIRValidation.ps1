@@ -541,7 +541,13 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
-if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.5") {
+if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.9') {
+  Invoke-RepoCheck 'the normalized 2.5.5 to 2.5.9 shadow delta is complete' {
+    $shadowDelta = Join-Path $repo 'approved-delta\2.5.5-to-2.5.9.json'
+    & (Join-Path $repo 'scripts\Test-MIRApprovedDelta.ps1') -Path $shadowDelta -ValidateStructureOnly
+  }
+}
+elseif ($isLegacyFactorio20 -and [string]$repoInfo.version -eq "2.5.5") {
   Invoke-RepoCheck "the normalized 2.5.0 to 2.5.5 approved delta is complete or explicitly pending" {
     $backportDelta = Join-Path $repo "approved-delta\2.5.0-to-2.5.5.json"
     $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
