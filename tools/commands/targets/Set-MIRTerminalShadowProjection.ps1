@@ -113,7 +113,10 @@ function Set-MIRAssuranceOverlays {
         } else {
           [string]$file.blob
         }
-        $targetBlob = (& git hash-object --no-filters -- $destination 2>$null)
+        # Worktree checkouts may apply the repository's text normalization (for
+        # example, CRLF on Windows).  Compare the clean-filtered worktree value
+        # with the immutable Git blob rather than hashing platform bytes.
+        $targetBlob = (& git -C $SourceRepoRoot hash-object --path=$path -- $destination 2>$null)
         if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
       } else {
         Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
