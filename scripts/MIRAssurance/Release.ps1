@@ -592,6 +592,16 @@ function Invoke-MIRAssuranceSelfTest {
   if (-not $tamperedShadowRejected) {
     throw 'A terminal shadow performance campaign with divergent package authority was accepted.'
   }
+  if ([string]$Context.target -eq '2.0' -and [string]$Context.info.version -eq '2.5.9') {
+    $shadowReviewCommand = Resolve-MIRAssuranceCommandText `
+      -Command './scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -ExpectedSourceCommit <package-source-commit>' `
+      -Context $Context `
+      -Plan ([pscustomobject]@{baseline='2.5.5';source_commit=((& git -C $repo rev-parse HEAD).Trim())})
+    if ($shadowReviewCommand -match '<[^>]+>' -or
+        $shadowReviewCommand -notmatch [regex]::Escape("-ExpectedSourceCommit '990e0135aed25b9306bf282eb086685c8b63f782'")) {
+      throw 'The terminal shadow manual-review command did not resolve the exact package-source commit.'
+    }
+  }
 
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
   $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath

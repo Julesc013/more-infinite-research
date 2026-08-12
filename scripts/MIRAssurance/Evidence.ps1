@@ -922,7 +922,8 @@ function Resolve-MIRAssuranceCommandText {
     }
   }
   if ($resolved.Contains("<package-source-commit>")) {
-    $releaseAuthority = Get-MIRAssuranceReleaseCandidateAuthority -Context $Context
+    $candidateInfo = Get-MIRReleasePackageInfo -Path $Context.candidate
+    $releaseAuthority = Get-MIRReleaseCandidateAuthority -RepoRoot $repo -CandidateInfo $candidateInfo
     $packageSourceCommit = [string]$releaseAuthority.package_source_commit
     if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
       throw "Command requires <package-source-commit>, but the target-scoped release authority has no valid package-source commit."
