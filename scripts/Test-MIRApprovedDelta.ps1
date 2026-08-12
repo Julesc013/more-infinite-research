@@ -136,6 +136,130 @@ function Test-MIRDeltaSteelTechnology {
 if ($artifact.schema -ne 1 -or $artifact.kind -ne "mir-approved-delta") {
   throw "Approved-delta artifact must use schema 1 and kind mir-approved-delta."
 }
+$isMIR259Factorio20Delta = $artifact.baseline.version -eq '2.5.5' -and
+  $artifact.current.version -eq '2.5.9' -and $artifact.current.factorio_version -eq '2.0'
+if ($isMIR259Factorio20Delta) {
+  $expectedBaseline = [ordered]@{
+    archive = '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C'
+    content = '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154'
+    commit = '27877275854eb131efeb42672d3676c9c513c85e'
+  }
+  $expectedCurrent = [ordered]@{
+    archive = '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2'
+    content = '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E'
+    commit = '990e0135aed25b9306bf282eb086685c8b63f782'
+  }
+  if ([string]$artifact.baseline.factorio_version -ne '2.0' -or
+      [string]$artifact.baseline.archive_sha256 -ne $expectedBaseline.archive -or
+      [string]$artifact.baseline.package_content_sha256 -ne $expectedBaseline.content -or
+      [string]$artifact.baseline.source_commit -ne $expectedBaseline.commit) {
+    throw 'Approved-delta baseline does not bind the exact immutable 2.5.5 predecessor.'
+  }
+  if ([string]$artifact.current.archive_sha256 -ne $expectedCurrent.archive -or
+      [string]$artifact.current.package_content_sha256 -ne $expectedCurrent.content -or
+      [string]$artifact.current.source_commit -ne $expectedCurrent.commit -or
+      [string]$artifact.current.package_source_commit -ne $expectedCurrent.commit) {
+    throw 'Approved-delta current side does not bind the exact 2.5.9 development shadow.'
+  }
+
+  $shadowManifestPath = Join-Path $repo '.mir\releases\terminal\shadows\2.5.9\package-manifest.json'
+  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+  $shadowPerformance = $shadowManifest.source.performance_transition
+  $shadowDevelopment = $shadowPerformance.development_package
+  $shadowBaseline = $shadowPerformance.baseline
+  if ([int]$shadowManifest.schema -ne 1 -or [string]$shadowManifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
+      [string]$shadowManifest.release -ne '2.5.9' -or [string]$shadowManifest.target -ne '2.0' -or
+      $shadowManifest.source_frozen -ne $false -or $null -ne $shadowManifest.candidate_id -or
+      [string]$shadowPerformance.phase -ne 'shadow-convergence' -or
+      [string]$shadowManifest.source.immutable_dot5_predecessor.commit -ne $expectedBaseline.commit -or
+      [string]$shadowBaseline.version -ne '2.5.5' -or [string]$shadowBaseline.archive_sha256 -ne $expectedBaseline.archive -or
+      [string]$shadowBaseline.package_content_sha256 -ne $expectedBaseline.content -or
+      [string]$shadowDevelopment.version -ne '2.5.9' -or
+      [string]$shadowDevelopment.package_source_commit -ne $expectedCurrent.commit -or
+      [string]$shadowDevelopment.package_source_sha256 -ne $expectedCurrent.content -or
+      [string]$shadowDevelopment.archive_sha256 -ne $expectedCurrent.archive -or
+      [string]$shadowDevelopment.package_content_sha256 -ne $expectedCurrent.content) {
+    throw 'Approved-delta identities differ from the unfrozen, candidate-unassigned 2.5.9 shadow authority.'
+  }
+
+  $qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
+  if ($qualificationSourceCommit -ne 'cc81828755ce4974383df3ca9505b46349a60f6a' -or
+      [string]$artifact.exporter.producer_sha256 -ne '6E06589EE44BD58E463CF65B25BCA9EFE65B9B23D4F75D3FB566B45BD7C4F072' -or
+      [string]$artifact.exporter.factorio_binary_version -ne '2.0.77.84539') {
+    throw 'Approved-delta final producer, qualification source, or Factorio 2.0.77 identity drifted.'
+  }
+
+  if (-not $ValidateStructureOnly) {
+    $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
+    if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw "Approved-delta shadow package is absent: $candidatePath" }
+    if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) { throw 'Approved-delta exact-shadow validation requires -ExpectedSourceCommit.' }
+    $currentCommit = Get-MIRGitCommit -RepoRoot $repo
+    if ($currentCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+      throw 'Approved-delta exact-shadow validation requires clean package source at ExpectedSourceCommit.'
+    }
+    & git -C $repo merge-base --is-ancestor $expectedCurrent.commit $qualificationSourceCommit
+    if ($LASTEXITCODE -ne 0) { throw 'Approved-delta package source is not an ancestor of its qualification source.' }
+    & git -C $repo merge-base --is-ancestor $qualificationSourceCommit $ExpectedSourceCommit
+    if ($LASTEXITCODE -ne 0) { throw 'Approved-delta qualification source is not an ancestor of ExpectedSourceCommit.' }
+    [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
+    & git -C $repo diff --quiet $expectedCurrent.commit $ExpectedSourceCommit -- @packageRoots
+    if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after the 2.5.9 development package authority.' }
+    $candidateSha = Get-MIRFileSha256 -Path $candidatePath
+    $candidateContentSha = Get-MIRZipContentFingerprint -Path $candidatePath
+    if ($candidateSha -ne $expectedCurrent.archive -or $candidateContentSha -ne $expectedCurrent.content -or
+        $candidateContentSha -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
+      throw 'Approved-delta does not bind the exact current 2.5.9 shadow bytes and package source.'
+    }
+  }
+
+  $expectedScenarios = [ordered]@{
+    'approved-delta-automatic-family-controls' = @('E8ECD4B589455543D8D3CC32DE91878E5CAAFD9747FA620CB1DB3556FFC3CC87','CBB6FAADB5C07A4BA906AE75BA6BEE019C50D0EF42EB25CD960A730C16B2333B',54)
+    'approved-delta-base' = @('F98AE058611C83C90F89DD1EAFCECC85B4287134967840ECDC273C4DA6E92206','CF273E168B9783617F8CA90A88AABC205158BA4D0873012ADEC587BD9F779B71',54)
+    'approved-delta-base-continuations' = @('F98AE058611C83C90F89DD1EAFCECC85B4287134967840ECDC273C4DA6E92206','CF273E168B9783617F8CA90A88AABC205158BA4D0873012ADEC587BD9F779B71',54)
+    'approved-delta-compat-atan' = @('EA8C875D1897E0CDC92E7A3D1723E002B438250D5A453B4A39F5B34F1BE699A7','E6D49DB2408515A2D7D6EDA183ADC389BE497EB2FF22834D0093EB58ADB9A5AC',54)
+    'approved-delta-compat-space-age-galore' = @('E6D3F1B7C8BDA9A7D1C9B99B49850A04B160DAF4F8EA0FCD33E5A99BBD9D8F76','7D9BB2CF71F9A3E0E5CAB4465C007BD8250DB8C4B228678CDB46F98C02BCF169',69)
+    'approved-delta-native-owner-adoption' = @('32B8D0503DC85872CA87FAFB41DCAD799F69EDA0898309E0FA4D1E5461953442','900888C15C34BE464B809C7994B24567448602E8B1D48E1B616FA795E80A744B',74)
+    'approved-delta-space-age' = @('E727F32358FC5EF1F6BB2A4F04B70FD1E5A5D5014FC07C52CA45FA6F6D12A4D0','AE5833D0A8D66EA0923CB6B8A9275586463F893B067FDB77D83BCC8BDEFA1D11',69)
+  }
+  if ((@($artifact.scenario_evidence.scenario | Sort-Object) -join '|') -ne (@($expectedScenarios.Keys | Sort-Object) -join '|')) {
+    throw 'Approved-delta scenario coverage differs from the exact seven-scenario 2.5.9 matrix.'
+  }
+  foreach ($scenario in @($artifact.scenario_evidence)) {
+    $expected = $expectedScenarios[[string]$scenario.scenario]
+    if ([string]$scenario.baseline_fingerprint -ne $expected[0] -or
+        [string]$scenario.current_fingerprint -ne $expected[1] -or
+        [int]$scenario.baseline_technology_count -ne $expected[2] -or
+        [int]$scenario.current_technology_count -ne $expected[2] -or
+        [int]$scenario.difference_count -ne 1 -or [int]$scenario.technology_difference_count -ne 0) {
+      throw "Approved-delta exact 2.5.9 scenario authority drifted: $($scenario.scenario)"
+    }
+  }
+
+  $differences = @($artifact.differences)
+  foreach ($difference in $differences) {
+    foreach ($required in @('field','before','after','reason','intentional','migration_impact','required_evidence')) {
+      if (@($difference.PSObject.Properties.Name) -notcontains $required) { throw "Approved-delta row lacks ${required}: $($difference.field)" }
+    }
+    if ($difference.intentional -ne $true -or [string]::IsNullOrWhiteSpace([string]$difference.reason) -or
+        [string]::IsNullOrWhiteSpace([string]$difference.migration_impact) -or @($difference.required_evidence).Count -eq 0) {
+      throw "Approved-delta row is not completely approved: $($difference.field)"
+    }
+  }
+  if ($differences.Count -ne 10 -or [int]$artifact.summary.difference_count -ne 10 -or
+      [int]$artifact.summary.intentional_count -ne 10 -or [int]$artifact.summary.unapproved_count -ne 0 -or
+      [string]$artifact.summary.status -ne 'approved') {
+    throw 'Approved-delta summary differs from the exact reviewed 2.5.5 to 2.5.9 shadow transition.'
+  }
+  $rowsSha = Get-MIRStringSha256 -Value (Get-MIRDeltaCanonicalJson -Value $differences)
+  $fieldsSha = Get-MIRStringSha256 -Value (@($differences.field) -join "`n")
+  if ($rowsSha -ne '57E74B20945704F265CD2256C564084A9FCAA2B5E2C1948219151DD64048E242' -or
+      $fieldsSha -ne '62F804A185163A9CD0F0FB4D1FA910692833B1594D20AAF42B9FA314C0FDEEF1') {
+    throw 'Approved-delta exact 2.5.9 reviewed rows or identity-only field set drifted.'
+  }
+  $binding = if ($ValidateStructureOnly) { 'governed shadow evidence' } else { 'the exact current development shadow' }
+  Write-Host "[ok] MIR 2.5.9 approved delta binds $binding, fourteen exact Factorio 2.0.77 loads, and ten identity-only differences with zero technology changes."
+  return
+}
 $isMIR255Factorio20Delta = $artifact.baseline.version -eq '2.5.0' -and
   $artifact.current.version -eq '2.5.5' -and $artifact.current.factorio_version -eq '2.0'
 if ($isMIR255Factorio20Delta) {

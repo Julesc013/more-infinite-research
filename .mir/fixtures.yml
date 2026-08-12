@@ -805,6 +805,24 @@ fixtures:
       - unchanged-package-roots-through-qualification
       - zero-unreviewed-normalized-differences
 
+  approved-delta-2.5.5-to-2.5.9:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/2.5.5-to-2.5.9.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C
+    validates:
+      - exact-factorio-2.0.77-fourteen-load-delta
+      - exact-immutable-2.5.5-predecessor
+      - unfrozen-candidate-unassigned-2.5.9-shadow
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
+      - seven-scenario-technology-prerequisite-setting-registry-parity
+      - zero-technology-differences
+      - ten-identity-only-differences
+      - zero-unreviewed-normalized-differences
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts
