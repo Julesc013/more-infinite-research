@@ -252,6 +252,16 @@ try {
           @($performanceTest[0].inputs) -notcontains "mod-closure") {
         throw "The 2.5.9 assurance projection must keep performance evidence content-addressed and bind the exact mod closure."
       }
+      $validationFacade = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1")
+      foreach ($requiredPolicy in @(
+        '$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"',
+        '$resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)',
+        'function Remove-MIRGeneratedValidationUserData {'
+      )) {
+        if (-not $validationFacade.Contains($requiredPolicy)) {
+          throw "The 2.5.9 assurance projection does not preserve bounded repository-local validation userdata: $requiredPolicy"
+        }
+      }
     }
   }
 
