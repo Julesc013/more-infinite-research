@@ -147,6 +147,21 @@
           "blob": "490a5cf3bc9f43508c28de6a885e7ba7482808a0"
         }
       ]
+    },
+    {
+      "id": "factorio-2.0-terminal-shadow-review-authority-v1",
+      "commit": "0568025c6776470eb96fa0f597be656af406076c",
+      "reason": "Carry the assurance-only manual-review command resolver that binds the unfrozen shadow package source before enforcing the human attestation gate.",
+      "files": [
+        {
+          "path": "scripts/MIRAssurance/Evidence.ps1",
+          "blob": "d533f01ee7b020c92e767e1155d4e14292d2b421"
+        },
+        {
+          "path": "scripts/MIRAssurance/Release.ps1",
+          "blob": "b80cf44135e2856064f60f9f26562e331d5a6afe"
+        }
+      ]
     }
   ],
   "performance_transition": {
