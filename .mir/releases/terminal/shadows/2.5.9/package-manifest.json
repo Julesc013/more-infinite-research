@@ -208,6 +208,29 @@
             "blob": "795b56aba357e7ff97b11399ece2aad371f72ee2"
           }
         ]
+      },
+      {
+        "id": "factorio-2.0-py-proof-transport-v1",
+        "commit": "e2bd416e6a38805f221a719f119de22c2a79d516",
+        "reason": "Carry the frozen-assurance false-failure correction that proves Py's late stale unlock was reconstructed, retains full sanitation-ledger assertions where mod-data exists, and uses exact target-native graph, order, marker, and no-mod-data assertions on Factorio 2.0.",
+        "files": [
+          {
+            "path": ".mir/fixtures.yml",
+            "blob": "fd5c2fbacd246f492c5b9a024f98dd143de602c6"
+          },
+          {
+            "path": "fixtures/assert-py-postprocessing-stale-unlock/data-final-fixes.lua",
+            "blob": "b4ad99b34e5473dfa54a2b7139d58f621aae83d5"
+          },
+          {
+            "path": "fixtures/pypostprocessing-stale-unlock/data-final-fixes.lua",
+            "blob": "5f483f0fd9da08ae8a1fc8d9bbb8684645b16483"
+          },
+          {
+            "path": "scripts/Invoke-MIRValidation.ps1",
+            "blob": "5bf1f47a5e573c7f507f0e6f548edd3223c4f8a3"
+          }
+        ]
       }
     ],
     "performance_transition": {
