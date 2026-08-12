@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowTransitionPlanV1",
+  "release": "1.7.9",
+  "target": "0.17",
+  "state": "materialized-source-unfrozen-candidate-unassigned",
+  "shadow_branch": "candidate/1.7.9-projection",
+  "promotion_branch": "tag-only",
+  "immutable_inputs": {
+    "baseline": {
+      "release": "1.7.5",
+      "tag": "1.7.5",
+      "commit": "c6692980dc9f5a1332a7888da33385a0107ae004"
+    },
+    "pre_dot5": {
+      "release": "1.7.1",
+      "tag": "1.7.1",
+      "commit": "9d9095c92055aebe557a55a7ab99bb9588fe73fb"
+    },
+    "portable_source": {
+      "release": "3.2.9",
+      "authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
+      "authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+      "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json"
+    },
+    "assurance_overlays": [],
+    "performance_transition": null
+  },
+  "generated_authorities": [
+    "info.json",
+    ".mir/convergence.yml",
+    ".mir/releases/records/1.7.9.json",
+    ".mir/releases/terminal/shadows/1.7.9/package-manifest.json",
+    ".mir/releases/terminal/shadows/1.7.9/qualification-context.json",
+    "docs/releases/notes/release-notes-1.7.9.md",
+    "changelog.txt"
+  ],
+  "product_findings": [],
+  "product_disposition": "no-product-delta",
+  "receipt_after_proof": ".mir/releases/terminal/shadows/1.7.9/transition-receipt.json",
+  "source_frozen": false,
+  "candidate_id": null
+}
