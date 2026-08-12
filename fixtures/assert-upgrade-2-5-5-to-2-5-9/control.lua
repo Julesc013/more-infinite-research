@@ -21,7 +21,7 @@ local profile = profiles[archetype]
 if not profile then error("unknown MIR upgrade archetype " .. tostring(archetype)) end
 
 local function fail(message)
-  error("MIR 2.5.5 to 2.5.9 " .. archetype .. " upgrade validation failed: " .. message)
+  error("MIR terminal 2.5.x to 2.5.9 " .. archetype .. " upgrade validation failed: " .. message)
 end
 
 local function technology()
@@ -53,7 +53,10 @@ local function has_recipe_effect(technology_value, recipe_name)
 end
 
 script.on_init(function()
-  if script.active_mods["more-infinite-research"] ~= "2.5.5" then fail("source save did not use MIR 2.5.5") end
+  local source_version = script.active_mods["more-infinite-research"]
+  if source_version ~= "2.5.5" and source_version ~= "2.5.0" then
+    fail("source save did not use governed MIR 2.5.5 or 2.5.0")
+  end
   if profile.requires_space_age and not script.active_mods["space-age"] then fail("Space Age was not active") end
   if archetype == "base-default" and script.active_mods["space-age"] then fail("Space Age was unexpectedly active") end
   if profile.source_only_mod and not script.active_mods[profile.source_only_mod] then fail("source-only mod was not active") end
@@ -75,15 +78,17 @@ script.on_init(function()
     research_progress = force.research_progress,
     research_unit_count = tech.research_unit_count,
     science = science_names(tech),
-    source_version = "2.5.5"
+    source_version = source_version
   }
-  log("[mir-fixture] 2.5.5 upgrade source proof complete archetype=" .. archetype)
+  log("[mir-fixture] " .. source_version .. " upgrade source proof complete archetype=" .. archetype)
 end)
 
 script.on_configuration_changed(function()
   if script.active_mods["more-infinite-research"] ~= "2.5.9" then fail("upgraded save did not use MIR 2.5.9") end
   local state = storage.mir_upgrade_fixture
-  if not state or state.source_version ~= "2.5.5" then fail("fixture storage did not survive upgrade") end
+  if not state or (state.source_version ~= "2.5.5" and state.source_version ~= "2.5.0") then
+    fail("fixture storage did not survive governed source upgrade")
+  end
   if state.archetype ~= archetype or state.technology ~= profile.technology then fail("stable identity changed") end
 
   local force = game.forces.player
@@ -106,7 +111,7 @@ script.on_configuration_changed(function()
   end
 
   state.upgrade_complete = true
-  log("[mir-fixture] 2.5.5 to 2.5.9 upgrade proof complete archetype=" .. archetype)
+  log("[mir-fixture] " .. state.source_version .. " to 2.5.9 upgrade proof complete archetype=" .. archetype)
 end)
 
 script.on_event(defines.events.on_tick, function()

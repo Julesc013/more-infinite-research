@@ -230,7 +230,7 @@
       "id": "runtime.advanced-belts-sa",
       "kind": "runtime-evidence",
       "layer": "F4",
-      "command": "./scripts/Test-MIRAdvancedBeltsSA.ps1 -Candidate <candidate> -FactorioBin <factorio> -LocalModZipDir <mods> -ExpectedSourceCommit <source-commit> -OutputPath artifacts/assurance/2.5.0-advanced-belts-sa.json",
+      "command": "./scripts/Test-MIRAdvancedBeltsSA.ps1 -Candidate <candidate> -FactorioBin <factorio> -LocalModZipDir <mods> -ExpectedSourceCommit <source-commit> -OutputPath artifacts/assurance/<upgrade-to>-advanced-belts-sa.json",
       "requires_factorio": true,
       "inputs": [
         "candidate",

@@ -1,10 +1,10 @@
 [CmdletBinding()]
 param(
-  [string]$Candidate = "dist\more-infinite-research_2.5.0.zip",
+  [string]$Candidate = "dist\more-infinite-research_2.5.9.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$LocalModZipDir = "C:\Projects\Factorio\testmods_2.0",
   [string]$ExpectedSourceCommit = "",
-  [string]$OutputPath = "artifacts\assurance\2.5.0-advanced-belts-sa.json",
+  [string]$OutputPath = "artifacts\assurance\2.5.9-advanced-belts-sa.json",
   [int]$TimeoutSeconds = 300
 )
 
@@ -35,13 +35,42 @@ $candidatePath = Resolve-MIRLocalPath -Path $Candidate
 $factorioPath = Resolve-MIRLocalPath -Path $FactorioBin
 $modLibraryPath = Resolve-MIRLocalPath -Path $LocalModZipDir
 $outputFile = Resolve-MIRLocalPath -Path $OutputPath
-$authority = (Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json).development."factorio-2.0"
-if ([string]$authority.candidate_id -ne "2.5-P11") { throw "AdvancedBeltsSA qualification requires active candidate 2.5-P11." }
+if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) { throw "Candidate is missing: $candidatePath" }
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$candidateZip = [IO.Compression.ZipFile]::OpenRead($candidatePath)
+try {
+  $infoEntry = @($candidateZip.Entries | Where-Object { $_.FullName -match '^[^/]+/info\.json$' })
+  if ($infoEntry.Count -ne 1) { throw "Candidate must contain exactly one top-level mod info.json." }
+  $reader = [IO.StreamReader]::new($infoEntry[0].Open())
+  try { $candidateInfo = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+} finally {
+  $candidateZip.Dispose()
+}
+$release = [string]$candidateInfo.version
+$candidateId = $null
+if ($release -eq "2.5.9") {
+  $shadowContextPath = Join-Path $repo ".mir\releases\terminal\shadows\2.5.9\qualification-context.json"
+  if (-not (Test-Path -LiteralPath $shadowContextPath -PathType Leaf)) { throw "2.5.9 shadow qualification context is missing." }
+  $shadowContext = Get-Content -Raw -LiteralPath $shadowContextPath | ConvertFrom-Json
+  if ([string]$shadowContext.release -ne "2.5.9" -or [string]$shadowContext.target -ne "2.0" -or
+      [string]$shadowContext.phase -ne "shadow-convergence" -or $null -ne $shadowContext.candidate_id) {
+    throw "AdvancedBeltsSA qualification requires the unfrozen candidate-unassigned 2.5.9 shadow context."
+  }
+  $authority = $shadowContext.performance_transition.development_package
+} elseif ($release -eq "2.5.0") {
+  $authority = (Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json).development."factorio-2.0"
+  if ([string]$authority.mir_version -ne "2.5.0" -or [string]$authority.candidate_id -ne "2.5-P11") {
+    throw "Historical AdvancedBeltsSA qualification requires active 2.5-P11 authority."
+  }
+  $candidateId = [string]$authority.candidate_id
+} else {
+  throw "AdvancedBeltsSA qualification supports only governed MIR 2.5.0 or 2.5.9 packages; found $release."
+}
 
-$candidateHash = Assert-MIRExactSha256 -Path $candidatePath -Expected ([string]$authority.archive_sha256) -Label "P11 candidate"
+$candidateHash = Assert-MIRExactSha256 -Path $candidatePath -Expected ([string]$authority.archive_sha256) -Label "$release package"
 $candidateContentHash = Get-MIRZipContentFingerprint -Path $candidatePath
 if ($candidateContentHash -ne [string]$authority.package_content_sha256) {
-  throw "P11 candidate content fingerprint mismatch: $candidateContentHash"
+  throw "$release package content fingerprint mismatch: $candidateContentHash"
 }
 
 $qualificationCommit = (& git -C $repo rev-parse HEAD).Trim()
@@ -70,7 +99,8 @@ if (-not (Test-Path -LiteralPath $assertionFixture -PathType Container)) {
 }
 
 $artifactsRoot = [IO.Path]::GetFullPath((Join-Path $repo "artifacts"))
-$runRoot = [IO.Path]::GetFullPath((Join-Path $artifactsRoot "advanced-belts-sa\p10"))
+$releaseSlug = $release.Replace('.', '-')
+$runRoot = [IO.Path]::GetFullPath((Join-Path $artifactsRoot "advanced-belts-sa\$releaseSlug"))
 if (-not $runRoot.StartsWith($artifactsRoot.TrimEnd("\") + "\", [StringComparison]::OrdinalIgnoreCase)) {
   throw "Refusing to use an AdvancedBeltsSA run root outside artifacts."
 }
@@ -116,7 +146,7 @@ disable-blueprint-storage=true
 "@
 Set-Content -LiteralPath $configPath -Value $configText -Encoding UTF8
 
-$savePath = Join-Path $runRoot "advanced-belts-sa-p10.zip"
+$savePath = Join-Path $runRoot "advanced-belts-sa-$releaseSlug.zip"
 $arguments = @(
   "--config", $configPath,
   "--no-log-rotation",
@@ -142,8 +172,8 @@ $evidence = [ordered]@{
   schema = 1
   kind = "mir-advanced-belts-sa-native-qualification"
   status = "passed"
-  release = "2.5.0"
-  candidate_id = "2.5-P11"
+  release = $release
+  candidate_id = $candidateId
   candidate = [ordered]@{
     path = [IO.Path]::GetRelativePath($repo, $candidatePath).Replace("\", "/")
     archive_sha256 = $candidateHash
@@ -174,5 +204,5 @@ $evidence = [ordered]@{
 $outputParent = Split-Path -Parent $outputFile
 New-Item -ItemType Directory -Force -Path $outputParent | Out-Null
 $evidence | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $outputFile -Encoding UTF8
-Write-Host "[ok] Exact P11 AdvancedBeltsSA 2.3.3 native Factorio 2.0.77 qualification passed."
+Write-Host "[ok] Exact MIR $release AdvancedBeltsSA 2.3.3 native Factorio 2.0.77 qualification passed."
 Write-Host "[ok] Evidence: $outputFile"

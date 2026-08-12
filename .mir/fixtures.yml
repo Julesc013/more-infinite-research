@@ -490,6 +490,7 @@ fixtures:
       - fixtures/upgrade-modset-source
     harness: scripts/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.5"
+    additional_source_versions: ["2.5.0"]
     target_candidate: not-assigned
     archetypes:
       - base-default
@@ -499,6 +500,7 @@ fixtures:
       - mod-set-configuration-change
     validates:
       - exact-2-5-5-source-archive-for-2-5-9
+      - exact-2-5-0-source-archive-for-2-5-9
       - stable-generated-technology-identities
       - technology-level-retention
       - current-research-and-completed-work-retention
