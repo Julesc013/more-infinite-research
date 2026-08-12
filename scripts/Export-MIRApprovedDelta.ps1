@@ -176,7 +176,11 @@ function Invoke-ApprovedDeltaScenario {
     [Parameter(Mandatory)][string]$Scenario,
     [Parameter(Mandatory)][string]$RawOutputPath
   )
-  $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-approved-delta-" + [guid]::NewGuid().ToString("N"))
+  # Keep the engine's write-data root inside the governed evidence tree.  Some
+  # Windows hosts deny Factorio access to the caller's user-temp saves path,
+  # which otherwise produces a false runtime failure before mod loading.
+  $tempRoot = Join-Path $evidenceDirectory ("runs\" + [guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
   $logPath = Join-Path $tempRoot "factorio-current.log"
   $summaryPath = Join-Path $tempRoot "validation-summary.json"
   & (Join-Path $repo "scripts\Invoke-MIRValidation.ps1") `
