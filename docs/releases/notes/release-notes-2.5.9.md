@@ -1,3 +1,5 @@
+<!-- MIR3-TERMINAL-SHADOW release=2.5.9 target=2.0 baseline=2.5.5 pre-dot5=2.5.0 candidate=unassigned source-frozen=false -->
+
 ---
 title: "MIR 2.5.9 Planning Notes"
 status: draft

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowQualificationContextV1",
+  "release": "2.5.9",
+  "target": "2.0",
+  "exact_engine": "2.0.77",
+  "support_tier": "maintained",
+  "target_profile": "factorio-2.0",
+  "target_adapter": "factorio-2.0-science-route-policy",
+  "baseline": {
+    "release": "2.5.5",
+    "tag": "2.5.5",
+    "commit": "27877275854eb131efeb42672d3676c9c513c85e"
+  },
+  "pre_dot5": {
+    "release": "2.5.0",
+    "tag": "2.5.0",
+    "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
+  },
+  "upgrade_rows": [
+    "2.5.5-to-2.5.9",
+    "2.5.0-to-2.5.9"
+  ],
+  "package_manifest": ".mir/releases/terminal/shadows/2.5.9/package-manifest.json",
+  "release_record": ".mir/releases/records/2.5.9.json",
+  "release_notes": "docs/releases/notes/release-notes-2.5.9.md",
+  "phase": "shadow-convergence",
+  "candidate_id": null
+}

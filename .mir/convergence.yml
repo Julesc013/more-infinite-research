@@ -6,8 +6,14 @@ release:
   factorio_version: "2.0"
   baseline_commit: 27877275854eb131efeb42672d3676c9c513c85e
   baseline_tag: "2.5.5"
+  pre_dot5_public_predecessor: "2.5.0"
+  portable_source_release: "3.2.9"
+  portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
+  target_profile: "factorio-2.0"
+  target_adapter: "factorio-2.0-science-route-policy"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944

@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowTransitionPlanV1",
+  "release": "2.5.9",
+  "target": "2.0",
+  "state": "materialized-source-unfrozen-candidate-unassigned",
+  "shadow_branch": "candidate/2.5.9-projection",
+  "promotion_branch": "legacy",
+  "immutable_inputs": {
+    "baseline": {
+      "release": "2.5.5",
+      "tag": "2.5.5",
+      "commit": "27877275854eb131efeb42672d3676c9c513c85e"
+    },
+    "pre_dot5": {
+      "release": "2.5.0",
+      "tag": "2.5.0",
+      "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
+    },
+    "portable_source": {
+      "release": "3.2.9",
+      "authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
+      "authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+      "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json"
+    }
+  },
+  "generated_authorities": [
+    "info.json",
+    ".mir/convergence.yml",
+    ".mir/releases/records/2.5.9.json",
+    ".mir/releases/terminal/shadows/2.5.9/package-manifest.json",
+    ".mir/releases/terminal/shadows/2.5.9/qualification-context.json",
+    "docs/releases/notes/release-notes-2.5.9.md",
+    "changelog.txt"
+  ],
+  "product_findings": [
+    "MIR3-TERM-0028"
+  ],
+  "product_disposition": "project-generic-route-policy-no-direct-cubium-claim",
+  "receipt_after_proof": ".mir/releases/terminal/shadows/2.5.9/transition-receipt.json",
+  "source_frozen": false,
+  "candidate_id": null
+}

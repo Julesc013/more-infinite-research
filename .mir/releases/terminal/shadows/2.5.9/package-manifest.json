@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalPackageManifestV1",
+  "release": "2.5.9",
+  "target": "2.0",
+  "source": {
+    "portable_release": "3.2.9",
+    "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
+    "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+    "immutable_dot5_predecessor": {
+      "release": "2.5.5",
+      "tag": "2.5.5",
+      "commit": "27877275854eb131efeb42672d3676c9c513c85e"
+    },
+    "pre_dot5_public_predecessor": {
+      "release": "2.5.0",
+      "tag": "2.5.0",
+      "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793"
+    }
+  },
+  "semantic_roots": [
+    ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+    ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    ".mir/releases/terminal/baselines/2.5.5"
+  ],
+  "inventories": {
+    "baseline": ".mir/releases/terminal/baselines/2.5.5",
+    "product_findings": [
+      "MIR3-TERM-0028"
+    ],
+    "product_disposition": "project-generic-route-policy-no-direct-cubium-claim"
+  },
+  "schemas": [
+    "spec/schemas/mir3-terminal-package-manifest.schema.json",
+    "spec/schemas/mir3-terminal-release-manifest.schema.json"
+  ],
+  "migration_watermark": {
+    "predecessor": "2.5.5",
+    "stable_identifiers": "preserve",
+    "new_identity_allocation": "forbidden-without-admitted-target-delta"
+  },
+  "toolchain": {
+    "projection_profiles": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+    "projection_command": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+    "target_adapter": "factorio-2.0-science-route-policy"
+  },
+  "mir4_successor_target": "factorio-2.0",
+  "upgrade_obligation": [
+    "2.5.5-to-2.5.9",
+    "2.5.0-to-2.5.9"
+  ],
+  "source_frozen": false,
+  "candidate_id": null
+}
