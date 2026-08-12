@@ -1,0 +1,29 @@
+schema: 1
+
+release:
+  version: "1.6.9"
+  branch: candidate/1.6.9-projection
+  factorio_version: "0.16"
+  baseline_commit: da298d36cd41b6874e51eae31252cebd079872ad
+  baseline_tag: "1.6.5"
+  pre_dot5_public_predecessor: "1.6.0"
+  portable_source_release: "3.2.9"
+  portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
+  target_profile: "terminal-factorio-0.16.51"
+  target_adapter: "factorio-0.16-target-native-no-product-delta"
+  target_assurance_overlays: "none"
+  objective: target-port-behavioral-subset
+  public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
+
+terminal_projection:
+  product_disposition: no-product-delta
+  candidate_id: null
+  source_frozen: false
+
+release_gates:
+  - exact-target-engine-load
+  - direct-dot5-upgrade
+  - direct-pre-dot5-upgrade
+  - deterministic-package
+  - complete-structured-validation-summary
