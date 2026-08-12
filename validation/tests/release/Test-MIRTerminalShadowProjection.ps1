@@ -50,6 +50,16 @@ foreach ($row in @($profiles.targets)) {
       throw "Terminal projection input tag moved: $($input.tag)"
     }
   }
+  foreach ($overlay in @($row.assurance_overlays)) {
+    if ((& git -C $RepoRoot rev-parse "$([string]$overlay.commit)^{commit}").Trim() -ne [string]$overlay.commit) {
+      throw "Terminal assurance overlay commit is unavailable for $($row.release): $($overlay.id)"
+    }
+    foreach ($file in @($overlay.files)) {
+      if ((& git -C $RepoRoot rev-parse "$([string]$overlay.commit):$([string]$file.path)").Trim() -ne [string]$file.blob) {
+        throw "Terminal assurance overlay blob is unavailable for $($row.release): $($file.path)"
+      }
+    }
+  }
 }
 
 $testRoot = Join-Path $RepoRoot ("build/tests/terminal-shadow-projection/" + [guid]::NewGuid().ToString("N"))
@@ -88,6 +98,12 @@ try {
         $convergence -notmatch ('(?m)^  version: "' + [regex]::Escape([string]$row.release) + '"$') -or
         $convergence -notmatch ('(?m)^  baseline_commit: ' + [regex]::Escape([string]$row.baseline.commit) + '$')) {
       throw "Terminal projection did not align every release-local authority for $($row.release)."
+    }
+    foreach ($overlay in @($row.assurance_overlays)) {
+      foreach ($file in @($overlay.files)) {
+        $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$file.path))).Trim()
+        if ($materializedBlob -ne [string]$file.blob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
+      }
     }
   }
 

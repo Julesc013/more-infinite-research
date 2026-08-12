@@ -52,8 +52,64 @@ function Get-MIRGitTree {
   return ([string]$value).Trim()
 }
 
+function Get-MIRGitBlob {
+  param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path)
+  $value = (& git -C $SourceRepoRoot rev-parse "${Commit}:$Path" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or @($value).Count -ne 1) { throw "Terminal assurance overlay path is unavailable: ${Commit}:$Path" }
+  return ([string]$value).Trim()
+}
+
+function Write-MIRGitBlob {
+  param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Destination)
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination))
+  $start = [Diagnostics.ProcessStartInfo]::new()
+  $start.FileName = "git"
+  $start.UseShellExecute = $false
+  $start.RedirectStandardOutput = $true
+  $start.RedirectStandardError = $true
+  foreach ($argument in @("-C", $SourceRepoRoot, "cat-file", "blob", "${Commit}:$Path")) { [void]$start.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $start
+  [void]$process.Start()
+  $memory = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($memory)
+    $errorText = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Unable to materialize terminal assurance overlay ${Commit}:$Path. $errorText" }
+    [IO.File]::WriteAllBytes($Destination, $memory.ToArray())
+  } finally {
+    $memory.Dispose()
+    $process.Dispose()
+  }
+}
+
+function Set-MIRAssuranceOverlays {
+  param([Parameter(Mandatory)]$Target)
+  $targetPrefix = $TargetRoot.TrimEnd([char[]]@([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)) + [IO.Path]::DirectorySeparatorChar
+  foreach ($overlay in @($Target.assurance_overlays)) {
+    $commit = Get-MIRGitCommit -Ref ([string]$overlay.commit)
+    if ($commit -ne [string]$overlay.commit) { throw "Terminal assurance overlay commit changed: $($overlay.id)" }
+    foreach ($file in @($overlay.files)) {
+      $path = ([string]$file.path).Replace("\", "/")
+      $observedBlob = Get-MIRGitBlob -Commit $commit -Path $path
+      if ($observedBlob -ne [string]$file.blob) { throw "Terminal assurance overlay blob changed: $($overlay.id) $path" }
+      $destination = [IO.Path]::GetFullPath((Join-Path $TargetRoot $path))
+      if (-not $destination.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Terminal assurance overlay escapes the target root: $path" }
+      if ($Check) {
+        if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
+        $targetBlob = (& git hash-object --no-filters -- $destination 2>$null)
+        if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne [string]$file.blob) { throw "Terminal assurance overlay file is stale: $path" }
+      } else {
+        Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
+      }
+    }
+  }
+}
+
 function Get-MIRConvergenceReleaseBlock {
   param([Parameter(Mandatory)]$Target, [Parameter(Mandatory)]$PortableSource)
+  $assuranceOverlaySummary = if (@($Target.assurance_overlays).Count -eq 0) { "none" } else { @($Target.assurance_overlays | ForEach-Object { "$([string]$_.id)@$([string]$_.commit)" }) -join "," }
   return @"
 release:
   version: "$([string]$Target.release)"
@@ -66,6 +122,7 @@ release:
   portable_source_commit: $([string]$PortableSource.authority_commit)
   target_profile: "$([string]$Target.target_profile)"
   target_adapter: "$([string]$Target.target_adapter)"
+  target_assurance_overlays: "$assuranceOverlaySummary"
   objective: $([string]$Target.objective)
   public_contract_change: $([string]$Target.public_contract_change)
   terminal_shadow_status: source-unfrozen-candidate-unassigned
@@ -75,6 +132,7 @@ release:
 function Set-MIRConvergenceAuthority {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Target, [Parameter(Mandatory)]$PortableSource)
   $expected = Get-MIRConvergenceReleaseBlock -Target $Target -PortableSource $PortableSource
+  $assuranceOverlaySummary = if (@($Target.assurance_overlays).Count -eq 0) { "none" } else { @($Target.assurance_overlays | ForEach-Object { "$([string]$_.id)@$([string]$_.commit)" }) -join "," }
   if ($Check) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Terminal convergence authority is missing: $Path" }
     $text = Get-Content -Raw -LiteralPath $Path
@@ -89,6 +147,7 @@ function Set-MIRConvergenceAuthority {
       "  portable_source_commit: $([string]$PortableSource.authority_commit)",
       "  target_profile: `"$([string]$Target.target_profile)`"",
       "  target_adapter: `"$([string]$Target.target_adapter)`"",
+      "  target_assurance_overlays: `"$assuranceOverlaySummary`"",
       "  terminal_shadow_status: source-unfrozen-candidate-unassigned"
     )) {
       if (-not $text.Contains($line)) { throw "Terminal convergence authority is stale for ${Release}: $line" }
@@ -143,6 +202,8 @@ if ((Get-MIRGitCommit -Ref ([string]$profiles.portable_source.authority_commit))
   throw "Portable terminal source authority changed."
 }
 
+Set-MIRAssuranceOverlays -Target $target
+
 $infoPath = Join-Path $TargetRoot "info.json"
 if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { throw "Target shadow has no info.json: $TargetRoot" }
 $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -Depth 100
@@ -177,6 +238,7 @@ $packageManifest = [ordered]@{
     portable_release = [string]$profiles.portable_source.release
     portable_authority_commit = [string]$profiles.portable_source.authority_commit
     portable_authority_tree = [string]$profiles.portable_source.authority_tree
+    target_assurance_overlays = @($target.assurance_overlays)
     immutable_dot5_predecessor = $target.baseline
     pre_dot5_public_predecessor = $target.pre_dot5
   }
@@ -220,6 +282,7 @@ $qualificationContext = [ordered]@{
   support_tier = [string]$target.support_tier
   target_profile = [string]$target.target_profile
   target_adapter = [string]$target.target_adapter
+  assurance_overlays = @($target.assurance_overlays)
   baseline = $target.baseline
   pre_dot5 = $target.pre_dot5
   upgrade_rows = @($target.upgrade_rows)
@@ -239,7 +302,7 @@ $transitionPlan = [ordered]@{
   state = "materialized-source-unfrozen-candidate-unassigned"
   shadow_branch = [string]$target.shadow_branch
   promotion_branch = [string]$target.promotion_branch
-  immutable_inputs = [ordered]@{baseline=$target.baseline;pre_dot5=$target.pre_dot5;portable_source=$profiles.portable_source}
+  immutable_inputs = [ordered]@{baseline=$target.baseline;pre_dot5=$target.pre_dot5;portable_source=$profiles.portable_source;assurance_overlays=@($target.assurance_overlays)}
   generated_authorities = @(
     "info.json",
     ".mir/convergence.yml",

@@ -780,6 +780,8 @@ MIR 3.0 is a refactor into enforceable boundaries.
 
 ## Science-pack production routes
 
+Terminal shadow projection treats product source and assurance source as separate inputs. Product behavior comes only from the admitted portable source and target adapter. A target assurance overlay must bind an immutable commit and the exact Git blob for every observer or verification file it projects; the materializer copies those bytes, and check mode rejects missing or changed content. Assurance overlays cannot mutate packaged prototypes or admit product behavior.
+
 `prototypes/mir/capabilities/science_integration/production_route_policy.lua` owns `SciencePackProductionRoutePolicyV1`. It treats alternate science-pack recipes as an OR set, rejects unreachable routes, removes graph-dominated and strictly heavier science-burden routes, and compares deterministic progression facts before using technology and recipe names as final tie-breaks. `pack_production_reachability.lua` derives route facts and caches the selected route in CompilerContext without mutating prototypes.
 
 `prototypes/mir/compatibility/policies/k2_science_phase.lua` owns `K2SciencePhasePolicyV1` for the exact admitted Krastorio 2 `2.1.2` plus K2SO `2.0.13` envelope. It is a pure, idempotent ingredient-list normalization policy consumed by stream and base-continuation planning after lab compatibility is resolved. It preserves stable technology identities and ingredient shapes, fails closed outside the exact envelope, and never invokes or mutates K2's private finalization code.
