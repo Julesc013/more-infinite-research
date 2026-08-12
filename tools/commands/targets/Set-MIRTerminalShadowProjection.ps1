@@ -181,7 +181,8 @@ release_gates:
   - complete-structured-validation-summary
 "@.TrimStart("`n")
   }
-  Write-MIRUtf8NoBom -Path $Path -Text ($prefix.TrimEnd() + "`n`n" + $expected.TrimEnd() + "`n`n" + $suffix.TrimStart() + "`n")
+  $normalizedSuffix = $suffix.Trim([char[]]@("`r", "`n"))
+  Write-MIRUtf8NoBom -Path $Path -Text ($prefix.TrimEnd() + "`n`n" + $expected.TrimEnd() + "`n`n" + $normalizedSuffix + "`n")
 }
 
 $profiles = Get-Content -Raw -LiteralPath $ProfilesPath | ConvertFrom-Json -Depth 100

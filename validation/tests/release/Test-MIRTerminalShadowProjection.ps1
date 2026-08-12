@@ -82,6 +82,11 @@ try {
 
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection materialization failed for $($row.release)." }
+    $firstConvergenceHash = (Get-FileHash -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml") -Algorithm SHA256).Hash
+    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
+    if ($LASTEXITCODE -ne 0 -or (Get-FileHash -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml") -Algorithm SHA256).Hash -ne $firstConvergenceHash) {
+      throw "Terminal projection materialization is not idempotent for $($row.release)."
+    }
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot -Check
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection check failed for $($row.release)." }
 
