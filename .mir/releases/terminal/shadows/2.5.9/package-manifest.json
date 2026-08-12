@@ -7,6 +7,88 @@
     "portable_release": "3.2.9",
     "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
     "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+    "target_assurance_overlays": [
+      {
+        "id": "factorio-2.0-graph-process-ceiling-v1",
+        "commit": "f4b0475861770b848cc48f57cf37fe8bac5e1f64",
+        "reason": "Carry the frozen assurance correction that separates the 900-second process-kill ceiling from the 600-second graph performance budget.",
+        "files": [
+          {
+            "path": "fixtures/compat-matrix/expected-scenarios.json",
+            "blob": "0be1cb4fbb10317b7039bd75c23d94a30e665a1a"
+          },
+          {
+            "path": "scripts/Test-MIRPerformanceBudgets.ps1",
+            "blob": "f5a0388bd7184269796f2af3507f98b083391bf3"
+          }
+        ]
+      }
+    ],
+    "performance_transition": {
+      "id": "factorio-2.0-terminal-shadow-performance-v1",
+      "phase": "shadow-convergence",
+      "source_files": [
+        {
+          "path": ".mir/performance.yml",
+          "commit": "27877275854eb131efeb42672d3676c9c513c85e",
+          "blob": "478852e6120ac8516b2825fabab77d2b3f155054"
+        },
+        {
+          "path": ".mir/performance-budgets.json",
+          "commit": "27877275854eb131efeb42672d3676c9c513c85e",
+          "blob": "6bc05e163606d8b66b8f263fff4c0e5379f2fb54"
+        },
+        {
+          "path": ".mir/performance-campaign.json",
+          "commit": "27877275854eb131efeb42672d3676c9c513c85e",
+          "blob": "e497232adb0482e8e9797bc890615234a9c3ac7d"
+        },
+        {
+          "path": "fixtures/performance-regression-probe/data.lua",
+          "commit": "27877275854eb131efeb42672d3676c9c513c85e",
+          "blob": "70b79aa80cc6ec402e18e6d2ef64aa92e2a4d149"
+        },
+        {
+          "path": "scripts/Test-MIRPerformanceBudgets.ps1",
+          "commit": "f4b0475861770b848cc48f57cf37fe8bac5e1f64",
+          "blob": "f5a0388bd7184269796f2af3507f98b083391bf3"
+        }
+      ],
+      "baseline": {
+        "version": "2.5.5",
+        "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+        "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"
+      },
+      "development_package": {
+        "version": "2.5.9",
+        "package_source_commit": "990e0135aed25b9306bf282eb086685c8b63f782",
+        "package_source_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
+        "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
+        "package_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"
+      },
+      "output_blobs": [
+        {
+          "path": ".mir/performance.yml",
+          "blob": "cc9421b6ee5d65d129c59f92044befdd0a0c90da"
+        },
+        {
+          "path": ".mir/performance-budgets.json",
+          "blob": "9e32ff8ad2e0070efeb7327238fb158c8ab89c1a"
+        },
+        {
+          "path": ".mir/performance-campaign.json",
+          "blob": "242ce63c5ae404d7d0b814505dedfc0998d3f87a"
+        },
+        {
+          "path": "fixtures/performance-regression-probe/data.lua",
+          "blob": "09e03ac1a357e006ca4d356bc86f9cb9bb5f1f75"
+        },
+        {
+          "path": "scripts/Test-MIRPerformanceBudgets.ps1",
+          "blob": "b9dde5812848c25d1740213ae2505a2069c81a46"
+        }
+      ]
+    },
     "immutable_dot5_predecessor": {
       "release": "2.5.5",
       "tag": "2.5.5",

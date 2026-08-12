@@ -2570,7 +2570,7 @@
         ],
         "settings": {},
         "source_mode": "exact-package",
-        "timeout_seconds": 120,
+        "timeout_seconds": 900,
         "tags": [
           "base",
           "full",
