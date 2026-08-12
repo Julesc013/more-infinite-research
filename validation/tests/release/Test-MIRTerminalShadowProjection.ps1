@@ -74,8 +74,19 @@ try {
     $changelogText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):changelog.txt" 2>$null) -join "`n"
     [IO.File]::WriteAllText((Join-Path $targetRoot "changelog.txt"), $changelogText + "`n", [Text.UTF8Encoding]::new($false))
 
+    [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot ".mir"))
+    $assuranceText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/assurance.json") -join "`n"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceText)) { throw "Unable to read exact predecessor assurance profile for $($row.release)." }
+    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/assurance.json"), $assuranceText + "`n", [Text.UTF8Encoding]::new($false))
+    $fixturesText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/fixtures.yml") -join "`n"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($fixturesText)) { throw "Unable to read exact predecessor fixture registry for $($row.release)." }
+    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/fixtures.yml"), $fixturesText + "`n", [Text.UTF8Encoding]::new($false))
+    [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot "scripts"))
+    $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
+    [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
+
     if ([string]$row.release -eq "2.5.9") {
-      [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot ".mir"))
       $convergenceText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/convergence.yml") -join "`n"
       [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/convergence.yml"), $convergenceText + "`n", [Text.UTF8Encoding]::new($false))
     }
@@ -96,12 +107,19 @@ try {
     $qualification = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/releases/terminal/shadows/$([string]$row.release)/qualification-context.json") | ConvertFrom-Json -Depth 100
     $transition = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/releases/terminal/shadows/$([string]$row.release)/transition-plan.json") | ConvertFrom-Json -Depth 100
     $convergence = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml")
+    $assurance = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/assurance.json") | ConvertFrom-Json -Depth 100
+    $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
+    $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
     if ([string]$info.version -ne [string]$row.release -or [string]$info.factorio_version -ne [string]$row.factorio_line -or
         [string]$record.release -ne [string]$row.release -or [string]$package.release -ne [string]$row.release -or
         [string]$qualification.release -ne [string]$row.release -or [string]$transition.release -ne [string]$row.release -or
         $convergence -notmatch '(?m)^schema: 1$' -or
         $convergence -notmatch ('(?m)^  version: "' + [regex]::Escape([string]$row.release) + '"$') -or
-        $convergence -notmatch ('(?m)^  baseline_commit: ' + [regex]::Escape([string]$row.baseline.commit) + '$')) {
+        $convergence -notmatch ('(?m)^  baseline_commit: ' + [regex]::Escape([string]$row.baseline.commit) + '$') -or
+        ($shadowProfile -join '|') -ne 'tooling.self-test|static.balance|static.museum|runtime.full|runtime.exact-zip' -or
+        $shadowProfile -contains 'runtime.upgrade' -or $shadowProfile -contains 'runtime.ecosystem' -or
+        $releaseGovernance.Count -ne 1 -or
+        @($releaseGovernance[0].patterns | Where-Object { [string]$_ -eq '^\.mir/releases/(records/|terminal/shadows/)' }).Count -ne 1) {
       throw "Terminal projection did not align every release-local authority for $($row.release)."
     }
     foreach ($overlay in @($row.assurance_overlays)) {
@@ -123,6 +141,32 @@ try {
           [string]$file.blob
         }
         if ($materializedBlob -ne $expectedBlob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
+      }
+    }
+    if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
+      $upgradeManifestPath = Join-Path $targetRoot ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json"
+      $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
+      $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
+      $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      if ([string]$upgradeManifest.release -ne [string]$row.release -or
+          (@($upgradeManifest.rows.id) -join '|') -ne (@($row.upgrade_rows) -join '|') -or
+          [string]$qualification.upgrade_fixture_manifest -ne ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json" -or
+          -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
+          -not $assuranceEntryPoint.Contains('& $Path --version')) {
+        throw "Terminal projection did not bind both target-native upgrade rows for $($row.release)."
+      }
+      foreach ($upgradeRow in @($upgradeManifest.rows)) {
+        $fixturePath = Join-Path $targetRoot ([string]$upgradeRow.generated_fixture)
+        $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixturePath "info.json") | ConvertFrom-Json
+        $fixtureControl = Get-Content -Raw -LiteralPath (Join-Path $fixturePath "control.lua")
+        $fromVersion = [string]$upgradeRow.from.release
+        if ([string]$fixtureInfo.name -notmatch ([regex]::Escape($fromVersion.Replace('.', '-')) + '-to-' + [regex]::Escape(([string]$row.release).Replace('.', '-'))) -or
+            @($fixtureInfo.dependencies | Where-Object { [string]$_ -eq "more-infinite-research >= $fromVersion" }).Count -ne 1 -or
+            -not $fixtureControl.Contains("local from_version = `"$fromVersion`"") -or
+            -not $fixtureControl.Contains("local to_version = `"$([string]$row.release)`"") -or
+            -not $fixtureRegistry.Contains("assertion_path: $([string]$upgradeRow.generated_fixture)")) {
+          throw "Terminal upgrade fixture is stale or unregistered: $($upgradeRow.id)"
+        }
       }
     }
     if ($null -ne $row.performance_transition) {
