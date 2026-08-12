@@ -11,7 +11,7 @@ release:
   portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
   target_profile: "factorio-2.0"
   target_adapter: "factorio-2.0-science-route-policy"
-  target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64,factorio-2.0-terminal-shadow-qualification-v1@98182f4aa303d7f48339b5e3cf50e56f4dbeb53c,factorio-2.0-terminal-shadow-performance-authority-v1@85598cb326502e6707c1d9d1101dfd42aab56978,factorio-2.0-terminal-shadow-review-authority-v1@0568025c6776470eb96fa0f597be656af406076c,factorio-2.0-validation-userdata-v1@02af30d18db2988a6b1ba724fb56a22317a18474,factorio-2.0-scenario-authority-parity-v1@178fce0dabd73b622ec56455104ee46a2fba2aab"
+  target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64,factorio-2.0-terminal-shadow-qualification-v1@98182f4aa303d7f48339b5e3cf50e56f4dbeb53c,factorio-2.0-terminal-shadow-performance-authority-v1@85598cb326502e6707c1d9d1101dfd42aab56978,factorio-2.0-terminal-shadow-review-authority-v1@0568025c6776470eb96fa0f597be656af406076c,factorio-2.0-validation-userdata-v1@02af30d18db2988a6b1ba724fb56a22317a18474,factorio-2.0-scenario-authority-parity-v1@aed09fccfbb1ae223777e8108e83efa0395c9fd9"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
   terminal_shadow_status: source-unfrozen-candidate-unassigned
