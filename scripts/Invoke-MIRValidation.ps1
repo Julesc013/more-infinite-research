@@ -2462,7 +2462,7 @@ $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
   $generatedUserDataRoot = Join-Path $repo "build\validation-userdata"
   New-Item -ItemType Directory -Force -Path $generatedUserDataRoot | Out-Null
-  $UserDataDir = Join-Path $generatedUserDataRoot ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
+  $UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
 $validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
@@ -2608,7 +2608,7 @@ function Initialize-RuntimeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  $scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)
   if (Test-Path -LiteralPath $scenarioRoot) {
     $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
     if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -2623,7 +2623,9 @@ function Initialize-RuntimeScenario {
   if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath -PathType Leaf)) {
     throw "Validation package zip is unavailable for runtime scenario $ScenarioName."
   }
-  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath))
+  $packageDestination = Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)
+  Assert-MIRFactorioPathBudget -Path $packageDestination -Context "Validation package archive path"
+  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination $packageDestination
 
   $allFixtureInfos = @(Get-FixtureInfos)
   $fixtureInfos = foreach ($fixtureName in @($EnabledFixtureNames | Sort-Object -Unique)) {
@@ -3337,7 +3339,7 @@ function Invoke-PackageZipSmokeScenario {
       throw "Validation package zip is unavailable for packaged zip smoke."
     }
 
-  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  $scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)
   if (Test-Path -LiteralPath $scenarioRoot) {
     $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
     if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -3348,7 +3350,9 @@ function Invoke-PackageZipSmokeScenario {
 
   $modsDir = Join-Path $scenarioRoot "mods"
   New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
-  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath))
+  $packageDestination = Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)
+  Assert-MIRFactorioPathBudget -Path $packageDestination -Context "Packaged smoke archive path"
+  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination $packageDestination
 
   $mods = @(
     @{ name = "base"; enabled = $true },

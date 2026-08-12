@@ -47,6 +47,7 @@ function Complete-MIRSettingsOverrideMod {
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $archiveRoot = "mir-validation-settings-overrides_0.1.0"
   $finalPath = Join-Path $ModsDir "mir-validation-settings-overrides_0.1.0.zip"
+  Assert-MIRFactorioPathBudget -Path $finalPath -Context "Validation settings override archive path"
   $temporaryPath = Join-Path $ModsDir (".mir-validation-settings-overrides-{0}.zip" -f [guid]::NewGuid().ToString("N"))
   try {
     $archive = [IO.Compression.ZipFile]::Open(
