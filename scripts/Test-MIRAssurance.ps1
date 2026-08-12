@@ -171,7 +171,7 @@ if ($performanceTest.Count -ne 1 -or
     [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
     [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
     [string]$performanceTest[0].command -notmatch '-LocalModZipDir\s+<mods>' -or
-    [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>(?:\s|$)' -or
     @($performanceTest[0].inputs) -notcontains "mod-closure" -or
     @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
     @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
