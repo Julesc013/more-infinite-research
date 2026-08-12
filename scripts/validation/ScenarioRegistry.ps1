@@ -168,6 +168,24 @@ function Resolve-MIRScenarioSettingParameterName {
   }
 }
 
+function ConvertTo-MIRScenarioParameterValue {
+  param([AllowNull()]$Value)
+
+  if ($null -eq $Value) { return $null }
+  if ($Value -is [pscustomobject]) {
+    $result = @{}
+    foreach ($property in $Value.PSObject.Properties) {
+      $result[[string]$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
+    }
+    return $result
+  }
+  if ($Value -is [Collections.IEnumerable] -and $Value -isnot [string] -and
+      $Value -isnot [Collections.IDictionary]) {
+    return ,@($Value | ForEach-Object { ConvertTo-MIRScenarioParameterValue -Value $_ })
+  }
+  return $Value
+}
+
 function Select-MIRScenarioRegistryForTargetCapabilities {
   param(
     [Parameter(Mandatory)]$Registry,

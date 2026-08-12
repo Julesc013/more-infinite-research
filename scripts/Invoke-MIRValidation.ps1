@@ -3439,7 +3439,7 @@ if ($selectionActive -and -not $checkpointActive) {
         if ($declaration.surface -eq "space-age") { $parameters.EnableSpaceAge = $true }
         foreach ($property in $declaration.settings.PSObject.Properties) {
           $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
-          $parameters[$parameterName] = $property.Value
+          $parameters[$parameterName] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
         }
         $scenarioState = Initialize-RuntimeScenario @parameters
         $scenarioRoot = Split-Path -Parent $scenarioState.SavePath
@@ -3522,7 +3522,7 @@ if ($selectionActive -and -not $checkpointActive) {
         if ($declaration.surface -eq "space-age") { $parameters.EnableSpaceAge = $true }
         foreach ($property in $declaration.settings.PSObject.Properties) {
           $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
-          $parameters[$parameterName] = $property.Value
+          $parameters[$parameterName] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
         }
         Invoke-RuntimeScenario @parameters
         if ($declaration.name -eq "space-age-generation-integrity") {
@@ -4565,7 +4565,7 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
     }
     foreach ($property in $declaration.settings.PSObject.Properties) {
       $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
-      $parameters[$parameterName] = $property.Value
+      $parameters[$parameterName] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
     }
     Invoke-RuntimeScenario @parameters
   }
