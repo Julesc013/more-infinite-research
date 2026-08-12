@@ -50,9 +50,9 @@ foreach ($row in @($profiles.targets)) {
       throw "Terminal projection input tag moved: $($input.tag)"
     }
   }
-  if ([string]$row.support_tier -in @("lts", "historical", "finite") -and
+  if ([string]$row.support_tier -in @("maintained", "lts", "historical", "finite") -and
       [string]$row.exact_engine_sha256 -notmatch '^[0-9A-F]{64}$') {
-    throw "Lower terminal projection lacks an exact engine SHA-256 for $($row.release)."
+    throw "Maintained or lower terminal projection lacks an exact engine SHA-256 for $($row.release)."
   }
   foreach ($overlay in @($row.assurance_overlays)) {
     if ((& git -C $RepoRoot rev-parse "$([string]$overlay.commit)^{commit}").Trim() -ne [string]$overlay.commit) {
@@ -132,6 +132,10 @@ try {
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
     $docsRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/docs.yml")
+    $releaseNoteRegistryCount = [regex]::Matches(
+      $docsRegistry,
+      ('(?m)^\s*- path: ' + [regex]::Escape("docs/releases/notes/release-notes-$([string]$row.release).md") + '$')
+    ).Count
     if ([string]$info.version -ne [string]$row.release -or [string]$info.factorio_version -ne [string]$row.factorio_line -or
         [string]$record.release -ne [string]$row.release -or [string]$package.release -ne [string]$row.release -or
         [string]$qualification.release -ne [string]$row.release -or [string]$transition.release -ne [string]$row.release -or
@@ -142,7 +146,7 @@ try {
         $shadowProfile -contains 'runtime.upgrade' -or $shadowProfile -contains 'runtime.ecosystem' -or
         $releaseGovernance.Count -ne 1 -or
         @($releaseGovernance[0].patterns | Where-Object { [string]$_ -eq '^\.mir/releases/(records/|terminal/shadows/)' }).Count -ne 1 -or
-        -not $docsRegistry.Contains("  - path: docs/releases/notes/release-notes-$([string]$row.release).md")) {
+        $releaseNoteRegistryCount -ne 1) {
       throw "Terminal projection did not align every release-local authority for $($row.release)."
     }
     foreach ($overlay in @($row.assurance_overlays)) {

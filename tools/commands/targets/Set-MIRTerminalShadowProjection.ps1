@@ -651,7 +651,12 @@ $startMarker
       - mir-$($Release.Replace('.', '-'))-terminal-shadow-notes
 $endMarker
 "@.TrimEnd()
-  Assert-OrWriteMIRText -Path $path -Text ($text + "`n`n" + $block + "`n")
+  $expected = if ($text -match ('(?m)^\s*- path: ' + [regex]::Escape($relativeNote) + '$')) {
+    $text.TrimEnd() + "`n"
+  } else {
+    $text + "`n`n" + $block + "`n"
+  }
+  Assert-OrWriteMIRText -Path $path -Text $expected
   return @(".mir/docs.yml")
 }
 

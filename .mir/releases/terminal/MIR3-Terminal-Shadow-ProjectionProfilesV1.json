@@ -34,6 +34,7 @@
       "release": "2.5.9",
       "factorio_line": "2.0",
       "exact_engine": "2.0.77",
+      "exact_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
       "support_tier": "maintained",
       "promotion_branch": "legacy",
       "shadow_branch": "candidate/2.5.9-projection",
