@@ -29,7 +29,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["release", "factorio_line", "exact_engine", "support_tier", "promotion_branch", "shadow_branch", "baseline", "pre_dot5", "objective", "public_contract_change", "target_adapter", "target_profile", "assurance_overlays", "product_findings", "product_disposition", "upgrade_rows", "mir4_successor_target"],
+        "required": ["release", "factorio_line", "exact_engine", "support_tier", "promotion_branch", "shadow_branch", "baseline", "pre_dot5", "objective", "public_contract_change", "target_adapter", "target_profile", "assurance_overlays", "performance_transition", "product_findings", "product_disposition", "upgrade_rows", "mir4_successor_target"],
         "properties": {
           "release": {"pattern": "^[0-9]+\\.[0-9]+\\.9$"},
           "factorio_line": {"pattern": "^[0-9]+\\.[0-9]+$"},
@@ -71,6 +71,35 @@
               }
             }
           },
+          "performance_transition": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "phase", "source_files", "baseline", "development_package", "output_blobs"],
+                "properties": {
+                  "id": {"pattern": "^[a-z0-9][a-z0-9.-]+$"},
+                  "phase": {"const": "shadow-convergence"},
+                  "source_files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/gitFile"}},
+                  "baseline": {"$ref": "#/$defs/packageIdentity"},
+                  "development_package": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["version", "package_source_commit", "package_source_sha256", "archive_sha256", "package_content_sha256"],
+                    "properties": {
+                      "version": {"pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+                      "package_source_commit": {"pattern": "^[0-9a-f]{40}$"},
+                      "package_source_sha256": {"pattern": "^[0-9A-F]{64}$"},
+                      "archive_sha256": {"pattern": "^[0-9A-F]{64}$"},
+                      "package_content_sha256": {"pattern": "^[0-9A-F]{64}$"}
+                    }
+                  },
+                  "output_blobs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/pathBlob"}}
+                }
+              }
+            ]
+          },
           "product_findings": {"type": "array", "uniqueItems": true, "items": {"pattern": "^MIR3-TERM-[0-9]{4}$"}},
           "product_disposition": {"type": "string", "minLength": 1},
           "upgrade_rows": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
@@ -80,6 +109,35 @@
     }
   },
   "$defs": {
+    "pathBlob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "blob"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "pattern": "^(?![A-Za-z]:|/|.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "blob": {"pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "gitFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "commit", "blob"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "pattern": "^(?![A-Za-z]:|/|.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "commit": {"pattern": "^[0-9a-f]{40}$"},
+        "blob": {"pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "packageIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "archive_sha256", "package_content_sha256"],
+      "properties": {
+        "version": {"pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "archive_sha256": {"pattern": "^[0-9A-F]{64}$"},
+        "package_content_sha256": {"pattern": "^[0-9A-F]{64}$"}
+      }
+    },
     "inputRelease": {
       "type": "object",
       "additionalProperties": false,

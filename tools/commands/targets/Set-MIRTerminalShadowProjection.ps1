@@ -98,12 +98,111 @@ function Set-MIRAssuranceOverlays {
       if (-not $destination.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Terminal assurance overlay escapes the target root: $path" }
       if ($Check) {
         if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
+        $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
+        $expectedBlob = if ($transitionOutput.Count -eq 1) { [string]$transitionOutput[0].blob } else { [string]$file.blob }
         $targetBlob = (& git hash-object --no-filters -- $destination 2>$null)
-        if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne [string]$file.blob) { throw "Terminal assurance overlay file is stale: $path" }
+        if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
       } else {
         Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
       }
     }
+  }
+}
+
+function Set-MIRPerformanceTransition {
+  param([Parameter(Mandatory)]$Target)
+  $transition = $Target.performance_transition
+  if ($null -eq $transition) { return }
+  if ([string]$transition.phase -ne "shadow-convergence" -or [string]$transition.development_package.version -ne [string]$Target.release) {
+    throw "Terminal performance transition identity is invalid for $Release."
+  }
+  foreach ($file in @($transition.source_files)) {
+    $commit = Get-MIRGitCommit -Ref ([string]$file.commit)
+    if ($commit -ne [string]$file.commit -or (Get-MIRGitBlob -Commit $commit -Path ([string]$file.path)) -ne [string]$file.blob) {
+      throw "Terminal performance transition source changed: $($file.path)"
+    }
+    if (-not $Check) {
+      Write-MIRGitBlob -Commit $commit -Path ([string]$file.path) -Destination (Join-Path $TargetRoot ([string]$file.path))
+    }
+  }
+  if (-not $Check) {
+
+    $policyPath = Join-Path $TargetRoot ".mir/performance.yml"
+    $policy = (Get-Content -Raw -LiteralPath $policyPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $policy = $policy.Replace("release: $([string]$Target.baseline.release)", "release: $Release")
+    $policy = $policy.Replace("accepted_evidence: build/reports/release/$([string]$Target.baseline.release)/performance-regression.json", "accepted_evidence: pending-source-freeze-candidate-performance")
+    $policy = $policy.Replace("  - Release regression evidence uses the published 2.5.0 archive and the exact 2.5.5 P12 candidate on one Factorio 2.0.77 installation.", "  - Shadow convergence uses the immutable published 2.5.5 archive and the exact current 2.5.9 development archive on one Factorio 2.0.77 installation; final acceptance requires the later assigned candidate.")
+    $policy = $policy.Replace('  qualified_baseline: "2.5.0"', '  qualified_baseline: "2.5.5"')
+    Write-MIRUtf8NoBom -Path $policyPath -Text ($policy.TrimEnd() + "`n")
+
+    $budgetsPath = Join-Path $TargetRoot ".mir/performance-budgets.json"
+    $budgets = Get-Content -Raw -LiteralPath $budgetsPath | ConvertFrom-Json -Depth 100
+    $budgets.release = $Release
+    Write-MIRUtf8NoBom -Path $budgetsPath -Text (ConvertTo-MIRStableJson -Value $budgets)
+
+    $campaignPath = Join-Path $TargetRoot ".mir/performance-campaign.json"
+    $campaignText = (Get-Content -Raw -LiteralPath $campaignPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $campaignText = $campaignText.Replace('  "schema": 2,' + "`n" + '  "release": "2.5.5",', '  "schema": 2,' + "`n" + '  "phase": "shadow-convergence",' + "`n" + '  "release": "2.5.9",')
+    $campaignText = $campaignText.Replace('    "version": "2.5.0",' + "`n" + '    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",' + "`n" + '    "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1"', '    "version": "2.5.5",' + "`n" + '    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",' + "`n" + '    "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"')
+    $oldCandidate = '    "candidate_id": "2.5-P12",' + "`n" + '    "version": "2.5.5",' + "`n" + '    "package_source_commit": "689940f436b004cf4e5981f1944ddb04eaa17367",' + "`n" + '    "package_source_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",' + "`n" + '    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",' + "`n" + '    "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"'
+    $development = $transition.development_package
+    $newCandidate = '    "state": "development-shadow-unfrozen",' + "`n" + '    "candidate_id": null,' + "`n" + "    `"version`": `"$([string]$development.version)`"," + "`n" + "    `"package_source_commit`": `"$([string]$development.package_source_commit)`"," + "`n" + "    `"package_source_sha256`": `"$([string]$development.package_source_sha256)`"," + "`n" + "    `"archive_sha256`": `"$([string]$development.archive_sha256)`"," + "`n" + "    `"package_content_sha256`": `"$([string]$development.package_content_sha256)`""
+    $campaignText = $campaignText.Replace($oldCandidate, $newCandidate)
+    Write-MIRUtf8NoBom -Path $campaignPath -Text ($campaignText.TrimEnd() + "`n")
+
+    $probePath = Join-Path $TargetRoot "fixtures/performance-regression-probe/data.lua"
+    $probe = (Get-Content -Raw -LiteralPath $probePath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $probe = $probe.Replace('mir_version ~= "2.5.5" then', 'mir_version ~= "2.5.5" and mir_version ~= "2.5.9" then')
+    Write-MIRUtf8NoBom -Path $probePath -Text ($probe.TrimEnd() + "`n")
+
+    $testPath = Join-Path $TargetRoot "scripts/Test-MIRPerformanceBudgets.ps1"
+    $test = (Get-Content -Raw -LiteralPath $testPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $candidateGate = @'
+if ($null -eq $activeCandidate -or
+    [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+    [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+    [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+    [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+    [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+    [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+  throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
+}
+'@
+    $shadowGate = @'
+$shadowManifestPath = Join-Path $RepoRoot ".mir\releases\terminal\shadows\$([string]$campaign.release)\package-manifest.json"
+$isShadowConvergence = [string]$campaign.phase -eq "shadow-convergence"
+if ($isShadowConvergence) {
+  if (-not (Test-Path -LiteralPath $shadowManifestPath -PathType Leaf)) { throw "Shadow performance campaign lacks a terminal package manifest." }
+  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+  $candidateArchive = Join-Path $RepoRoot "dist\more-infinite-research_$([string]$campaign.release).zip"
+  . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+  if ($null -ne $campaign.candidate.candidate_id -or [string]$campaign.candidate.state -ne "development-shadow-unfrozen" -or
+      [bool]$shadowManifest.source_frozen -or $null -ne $shadowManifest.candidate_id -or
+      [string]$campaign.candidate.version -ne [string]$shadowManifest.release -or
+      -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf) -or
+      [string]$campaign.candidate.archive_sha256 -ne (Get-MIRFileSha256 -Path $candidateArchive) -or
+      [string]$campaign.candidate.package_content_sha256 -ne (Get-MIRZipContentFingerprint -Path $candidateArchive)) {
+    throw "Shadow performance campaign must bind exact development bytes without allocating a candidate."
+  }
+} elseif ($null -eq $activeCandidate -or
+          [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+          [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+          [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+          [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+          [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+          [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+  throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
+}
+'@
+    if (-not $test.Contains($candidateGate.Trim())) { throw "Terminal performance validator source boundary changed." }
+    $test = $test.Replace($candidateGate.Trim(), $shadowGate.Trim())
+    Write-MIRUtf8NoBom -Path $testPath -Text ($test.TrimEnd() + "`n")
+  }
+
+  foreach ($output in @($transition.output_blobs)) {
+    $path = Join-Path $TargetRoot ([string]$output.path)
+    $blob = (& git hash-object --no-filters -- $path 2>$null)
+    if ($LASTEXITCODE -ne 0 -or ([string]$blob).Trim() -ne [string]$output.blob) { throw "Terminal performance transition output is stale: $($output.path)" }
   }
 }
 
@@ -204,6 +303,7 @@ if ((Get-MIRGitCommit -Ref ([string]$profiles.portable_source.authority_commit))
 }
 
 Set-MIRAssuranceOverlays -Target $target
+Set-MIRPerformanceTransition -Target $target
 
 $infoPath = Join-Path $TargetRoot "info.json"
 if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { throw "Target shadow has no info.json: $TargetRoot" }
@@ -240,6 +340,7 @@ $packageManifest = [ordered]@{
     portable_authority_commit = [string]$profiles.portable_source.authority_commit
     portable_authority_tree = [string]$profiles.portable_source.authority_tree
     target_assurance_overlays = @($target.assurance_overlays)
+    performance_transition = $target.performance_transition
     immutable_dot5_predecessor = $target.baseline
     pre_dot5_public_predecessor = $target.pre_dot5
   }
@@ -284,6 +385,7 @@ $qualificationContext = [ordered]@{
   target_profile = [string]$target.target_profile
   target_adapter = [string]$target.target_adapter
   assurance_overlays = @($target.assurance_overlays)
+  performance_transition = $target.performance_transition
   baseline = $target.baseline
   pre_dot5 = $target.pre_dot5
   upgrade_rows = @($target.upgrade_rows)
@@ -303,7 +405,7 @@ $transitionPlan = [ordered]@{
   state = "materialized-source-unfrozen-candidate-unassigned"
   shadow_branch = [string]$target.shadow_branch
   promotion_branch = [string]$target.promotion_branch
-  immutable_inputs = [ordered]@{baseline=$target.baseline;pre_dot5=$target.pre_dot5;portable_source=$profiles.portable_source;assurance_overlays=@($target.assurance_overlays)}
+  immutable_inputs = [ordered]@{baseline=$target.baseline;pre_dot5=$target.pre_dot5;portable_source=$profiles.portable_source;assurance_overlays=@($target.assurance_overlays);performance_transition=$target.performance_transition}
   generated_authorities = @(
     "info.json",
     ".mir/convergence.yml",

@@ -107,7 +107,15 @@ try {
     foreach ($overlay in @($row.assurance_overlays)) {
       foreach ($file in @($overlay.files)) {
         $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$file.path))).Trim()
-        if ($materializedBlob -ne [string]$file.blob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
+        $transitionOutput = @($row.performance_transition.output_blobs | Where-Object { [string]$_.path -eq [string]$file.path })
+        $expectedBlob = if ($transitionOutput.Count -eq 1) { [string]$transitionOutput[0].blob } else { [string]$file.blob }
+        if ($materializedBlob -ne $expectedBlob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
+      }
+    }
+    if ($null -ne $row.performance_transition) {
+      foreach ($output in @($row.performance_transition.output_blobs)) {
+        $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$output.path))).Trim()
+        if ($materializedBlob -ne [string]$output.blob) { throw "Terminal projection did not materialize exact performance transition output $($row.performance_transition.id): $($output.path)" }
       }
     }
   }
