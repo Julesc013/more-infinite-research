@@ -573,6 +573,35 @@ $endMarker
   return @(".mir/docs.yml")
 }
 
+function Set-MIRTerminalBackportSourceLock {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+  $lockPath = Join-Path $TargetRoot ".mir/backport-source-lock.json"
+  if (-not (Test-Path -LiteralPath $lockPath -PathType Leaf)) { throw "Lower target shadow lacks a backport source lock: $lockPath" }
+  $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json -Depth 100
+  if ([int]$lock.schema -ne 1 -or [string]$lock.mir_version -notin @([string]$Target.baseline.release, $Release)) {
+    throw "Lower target source lock is not an immutable predecessor or current terminal projection."
+  }
+  $originalFeaturePath = [string]$lock.feature_classification
+  $featurePath = ".mir/releases/terminal/shadows/$Release/feature-classification.json"
+  $sourceFeaturePath = Join-Path $TargetRoot $originalFeaturePath
+  if ([string]$lock.mir_version -eq $Release -and (Test-Path -LiteralPath (Join-Path $TargetRoot $featurePath) -PathType Leaf)) {
+    $sourceFeaturePath = Join-Path $TargetRoot $featurePath
+  }
+  if (-not (Test-Path -LiteralPath $sourceFeaturePath -PathType Leaf)) { throw "Lower target source-lock feature classification is missing: $sourceFeaturePath" }
+  $feature = Get-Content -Raw -LiteralPath $sourceFeaturePath | ConvertFrom-Json -Depth 100
+  $feature.mir_version = $Release
+  Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot $featurePath) -Value $feature
+
+  $lock.mir_version = $Release
+  $lock.feature_classification = $featurePath
+  $lock.release_notes = "docs/releases/notes/release-notes-$Release.md"
+  $lock.validation_summary = "build/reports/release/$Release/shadow-qualification.json"
+  $lock.candidate_seal = "build/reports/release/$Release/candidate-unassigned.json"
+  Assert-OrWriteMIRJson -Path $lockPath -Value $lock
+  return @(".mir/backport-source-lock.json", $featurePath)
+}
+
 $profiles = Get-Content -Raw -LiteralPath $ProfilesPath | ConvertFrom-Json -Depth 100
 if ([int]$profiles.schema -ne 1 -or [string]$profiles.kind -ne "MIR3TerminalShadowProjectionProfilesV1") {
   throw "Terminal shadow projection profile authority is invalid."
@@ -597,6 +626,7 @@ Set-MIRTerminalShadowAssuranceProfile
 $terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
 $terminalUpgradeFixtureAuthorities = @(Set-MIRTerminalUpgradeFixtures -Target $target)
 $terminalDocumentationAuthorities = @(Set-MIRTerminalReleaseNoteRegistry -Target $target)
+$terminalBackportLockAuthorities = @(Set-MIRTerminalBackportSourceLock -Target $target)
 
 $infoPath = Join-Path $TargetRoot "info.json"
 if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { throw "Target shadow has no info.json: $TargetRoot" }
@@ -711,7 +741,7 @@ $transitionPlan = [ordered]@{
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  ) + @($terminalLegacyProbeAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities)
+  ) + @($terminalLegacyProbeAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"
@@ -764,6 +794,7 @@ This is an unfrozen target-native MIR 3 terminal shadow for Factorio $([string]$
 
 - Immutable predecessor: $([string]$target.baseline.release) at $([string]$target.baseline.commit)
 - Portable source authority: $([string]$profiles.portable_source.release) at $([string]$profiles.portable_source.authority_commit)
+- Historical target anchor: $([string]$target.baseline.release) source-lock ancestry remains bound by .mir/backport-source-lock.json
 - Product disposition: $([string]$target.product_disposition)
 - Required upgrades: $(@($target.upgrade_rows) -join ", ")
 "@

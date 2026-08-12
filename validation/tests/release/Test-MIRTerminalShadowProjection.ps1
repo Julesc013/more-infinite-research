@@ -92,6 +92,17 @@ try {
     $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
+    if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
+      $backportLockText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/backport-source-lock.json") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($backportLockText)) { throw "Unable to read exact predecessor backport source lock for $($row.release)." }
+      [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/backport-source-lock.json"), $backportLockText + "`n", [Text.UTF8Encoding]::new($false))
+      $backportLock = $backportLockText | ConvertFrom-Json -Depth 100
+      $featureText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):$([string]$backportLock.feature_classification)") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($featureText)) { throw "Unable to read exact predecessor feature classification for $($row.release)." }
+      $featureDestination = Join-Path $targetRoot ([string]$backportLock.feature_classification)
+      [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $featureDestination))
+      [IO.File]::WriteAllText($featureDestination, $featureText + "`n", [Text.UTF8Encoding]::new($false))
+    }
 
     if ([string]$row.release -eq "2.5.9") {
       $convergenceText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/convergence.yml") -join "`n"
@@ -157,12 +168,18 @@ try {
       $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
       $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
       $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      $backportLock = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
+      $featureClassification = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ([string]$backportLock.feature_classification)) | ConvertFrom-Json -Depth 100
       if ([string]$upgradeManifest.release -ne [string]$row.release -or
           (@($upgradeManifest.rows.id) -join '|') -ne (@($row.upgrade_rows) -join '|') -or
           [string]$qualification.upgrade_fixture_manifest -ne ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json" -or
           [string]$qualification.exact_engine_sha256 -ne [string]$row.exact_engine_sha256 -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
-          -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")')) {
+          -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
+          [string]$backportLock.mir_version -ne [string]$row.release -or
+          [string]$backportLock.release_notes -ne "docs/releases/notes/release-notes-$([string]$row.release).md" -or
+          [string]$featureClassification.mir_version -ne [string]$row.release -or
+          [string]$featureClassification.canonical_dev_anchor -ne [string]$backportLock.canonical_dev_anchor) {
         throw "Terminal projection did not bind both target-native upgrade rows for $($row.release)."
       }
       foreach ($upgradeRow in @($upgradeManifest.rows)) {
