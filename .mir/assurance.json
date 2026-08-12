@@ -2,82 +2,237 @@
   "schema": 1,
   "default_target": "2.1",
   "profiles": {
-    "edit": ["static.architecture", "static.compiler"],
-    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
+    "edit": [
+      "static.architecture",
+      "static.compiler"
+    ],
+    "fast": [
+      "tooling.self-test",
+      "static.architecture",
+      "static.compiler",
+      "static.settings",
+      "static.balance",
+      "static.museum",
+      "static.package"
+    ],
     "auto": [],
-    "locale": ["static.locales", "runtime.exact-zip"],
-    "balance": ["static.balance", "runtime.affected"],
-    "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
-    "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "full": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
-    "backport": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
-    "promotion-check": ["seal.verify"]
+    "locale": [
+      "static.locales",
+      "runtime.exact-zip"
+    ],
+    "balance": [
+      "static.balance",
+      "runtime.affected"
+    ],
+    "refactor-equivalence": [
+      "static.compiler",
+      "static.package",
+      "runtime.exact-zip"
+    ],
+    "hotfix": [
+      "static.full",
+      "runtime.affected",
+      "runtime.exact-zip"
+    ],
+    "targeted": [
+      "static.full",
+      "runtime.affected",
+      "runtime.exact-zip"
+    ],
+    "full": [
+      "tooling.self-test",
+      "static.balance",
+      "static.museum",
+      "runtime.full",
+      "runtime.exact-zip",
+      "runtime.upgrade",
+      "runtime.ecosystem"
+    ],
+    "backport": [
+      "tooling.self-test",
+      "static.balance",
+      "static.museum",
+      "runtime.full",
+      "runtime.exact-zip",
+      "runtime.upgrade",
+      "runtime.ecosystem"
+    ],
+    "promotion-check": [
+      "seal.verify"
+    ],
+    "terminal-shadow-convergence": [
+      "tooling.self-test",
+      "static.balance",
+      "static.museum",
+      "runtime.full",
+      "runtime.exact-zip"
+    ]
   },
   "classes": [
     {
       "id": "runtime-or-migration",
-      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$"],
-      "tests": ["static.full", "runtime.full", "runtime.upgrade"]
+      "patterns": [
+        "^control\\.lua$",
+        "^migrations/",
+        "^prototypes/mir/runtime/",
+        "^prototypes/mir/stage/control\\.lua$"
+      ],
+      "tests": [
+        "static.full",
+        "runtime.full",
+        "runtime.upgrade"
+      ]
     },
     {
       "id": "settings",
-      "patterns": ["^settings", "^prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
-      "tests": ["static.settings", "static.locales", "static.compiler", "runtime.affected", "runtime.upgrade", "runtime.exact-zip"]
+      "patterns": [
+        "^settings",
+        "^prototypes/mir/settings/",
+        "^\\.mir/settings\\.yml$"
+      ],
+      "tests": [
+        "static.settings",
+        "static.locales",
+        "static.compiler",
+        "runtime.affected",
+        "runtime.upgrade",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities)\\.yml$"],
-      "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
+      "patterns": [
+        "^data",
+        "^prototypes/",
+        "^\\.mir/(modules|streams|compatibility|capabilities)\\.yml$"
+      ],
+      "tests": [
+        "static.compiler",
+        "static.architecture",
+        "static.package",
+        "runtime.affected",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "balance",
-      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
-      "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
+      "patterns": [
+        "^prototypes/mir/planner/costs\\.lua$",
+        "^prototypes/streams/",
+        "^prototypes/mir/domain/native_owner/",
+        "^prototypes/mir/planner/native_owner_binding\\.lua$",
+        "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$",
+        "^\\.mir/native-owner-cost-models\\.json$",
+        "^\\.mir/performance-budgets\\.json$"
+      ],
+      "tests": [
+        "static.balance",
+        "static.compiler",
+        "runtime.affected",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "locale",
-      "patterns": ["^locale/"],
-      "tests": ["static.locales", "static.package", "runtime.exact-zip"]
+      "patterns": [
+        "^locale/"
+      ],
+      "tests": [
+        "static.locales",
+        "static.package",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "metadata-dependencies",
-      "patterns": ["^info\\.json$"],
-      "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
+      "patterns": [
+        "^info\\.json$"
+      ],
+      "tests": [
+        "static.package",
+        "runtime.full",
+        "runtime.upgrade",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "packaged-non-runtime",
-      "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
-      "tests": ["static.package", "runtime.exact-zip"]
+      "patterns": [
+        "^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"
+      ],
+      "tests": [
+        "static.package",
+        "runtime.exact-zip"
+      ]
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/(assurance\\.json|test)", "^\\.github/workflows/"],
-      "tests": ["tooling.self-test", "static.full", "runtime.affected"]
+      "patterns": [
+        "^scripts/",
+        "^fixtures/",
+        "^\\.mir/(assurance\\.json|test)",
+        "^\\.github/workflows/"
+      ],
+      "tests": [
+        "tooling.self-test",
+        "static.full",
+        "runtime.affected"
+      ]
     },
     {
       "id": "release-governance",
-      "patterns": ["^\\.mir/(backport-source-lock\\.json|branches\\.yml|convergence\\.yml|docs\\.yml|fixtures\\.yml|release-wave\\.yml)$", "^\\.mir/evidence/[^/]+-feature-classification\\.json$"],
-      "tests": ["docs.check", "tooling.self-test", "static.full"]
+      "patterns": [
+        "^\\.mir/(backport-source-lock\\.json|branches\\.yml|convergence\\.yml|docs\\.yml|fixtures\\.yml|release-wave\\.yml)$",
+        "^\\.mir/evidence/[^/]+-feature-classification\\.json$",
+        "^\\.mir/releases/(records/|terminal/shadows/)"
+      ],
+      "tests": [
+        "docs.check",
+        "tooling.self-test",
+        "static.full"
+      ]
     },
     {
       "id": "museum-tooling",
-      "patterns": ["^\\.mir/museum-targets\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
-      "tests": ["static.museum"]
+      "patterns": [
+        "^\\.mir/museum-targets\\.json$",
+        "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)",
+        "^scripts/Museum/"
+      ],
+      "tests": [
+        "static.museum"
+      ]
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
-      "tests": ["docs.check"]
+      "patterns": [
+        "^docs/",
+        "^CONTRIBUTING\\.md$",
+        "^todo\\.md$",
+        "^AGENTS\\.md$"
+      ],
+      "tests": [
+        "docs.check"
+      ]
     },
     {
       "id": "release-evidence",
-      "patterns": ["^\\.mir/evidence/(?![^/]+-feature-classification\\.json$)", "^dist/"],
-      "tests": ["seal.verify"]
+      "patterns": [
+        "^\\.mir/evidence/(?![^/]+-feature-classification\\.json$)",
+        "^dist/"
+      ],
+      "tests": [
+        "seal.verify"
+      ]
     }
   ],
   "unknown_policy": {
-    "tests": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
+    "tests": [
+      "static.full",
+      "runtime.full",
+      "runtime.upgrade",
+      "runtime.ecosystem"
+    ],
     "reason": "Unclassified inputs conservatively invalidate the full target gate."
   },
   "fingerprints": {

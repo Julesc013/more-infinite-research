@@ -1608,3 +1608,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-1.8.5-local-candidate
+
+# MIR3-TERMINAL-RELEASE-NOTE release=1.8.9
+  - path: docs/releases/notes/release-notes-1.8.9.md
+    title: "MIR 1.8.9 Terminal Shadow Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1-8-9-terminal-shadow-notes
+# MIR3-TERMINAL-RELEASE-NOTE-END release=1.8.9
