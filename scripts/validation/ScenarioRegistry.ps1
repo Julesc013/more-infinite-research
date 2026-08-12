@@ -156,6 +156,47 @@ function Assert-MIRScenarioInvocationMatchesDeclaration {
   }
 }
 
+function Assert-MIRConfigurationChangeInvocationMatchesDeclaration {
+  param(
+    [Parameter(Mandatory)]$Declaration,
+    [Parameter(Mandatory)][Collections.IDictionary]$Invocation
+  )
+
+  $scenarioName = [string]$Declaration.name
+  $actualFixtures = @(
+    @($Invocation["InitialFixtureNames"]) + @($Invocation["ChangedFixtureNames"]) |
+      Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+      ForEach-Object { [string]$_ } |
+      Sort-Object -Unique
+  )
+  $expectedFixtures = @($Declaration.fixtures | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  if (($actualFixtures -join "`n") -cne ($expectedFixtures -join "`n")) {
+    throw "Configuration-change scenario '$scenarioName' fixtures differ from its full-record authority. Expected [$($expectedFixtures -join ', ')]; actual [$($actualFixtures -join ', ')]."
+  }
+
+  $actualSpaceAge = $Invocation.Contains("EnableSpaceAge") -and [bool]$Invocation["EnableSpaceAge"]
+  $expectedSpaceAge = [string]$Declaration.surface -eq "space-age"
+  if ($actualSpaceAge -ne $expectedSpaceAge) {
+    throw "Configuration-change scenario '$scenarioName' surface differs from its full-record authority. Expected Space Age=$expectedSpaceAge; actual=$actualSpaceAge."
+  }
+
+  $ignored = @("ScenarioName", "EnableSpaceAge")
+  $actualSettings = [ordered]@{}
+  foreach ($key in @($Invocation.Keys | ForEach-Object { [string]$_ } | Sort-Object)) {
+    if ($key -in $ignored) { continue }
+    $actualSettings[$key] = $Invocation[$key]
+  }
+  $expectedSettings = [ordered]@{}
+  foreach ($property in @($Declaration.settings.PSObject.Properties | Sort-Object Name)) {
+    $expectedSettings[[string]$property.Name] = $property.Value
+  }
+  $actualText = ConvertTo-MIRScenarioCanonicalText -Value $actualSettings
+  $expectedText = ConvertTo-MIRScenarioCanonicalText -Value $expectedSettings
+  if ($actualText -cne $expectedText) {
+    throw "Configuration-change scenario '$scenarioName' settings differ from its full-record authority. Expected $expectedText; actual $actualText."
+  }
+}
+
 function Resolve-MIRScenarioSettingParameterName {
   param([Parameter(Mandatory)][string]$Name)
 

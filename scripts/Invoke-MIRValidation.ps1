@@ -2557,6 +2557,7 @@ function Get-FixtureInfos {
     $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name
+      Version = $info.version
       Path = $fixture.FullName
     }
   }
@@ -2624,9 +2625,23 @@ function Initialize-RuntimeScenario {
   }
   Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath))
 
-  $fixtureInfos = Get-FixtureInfos
+  $allFixtureInfos = @(Get-FixtureInfos)
+  $fixtureInfos = foreach ($fixtureName in @($EnabledFixtureNames | Sort-Object -Unique)) {
+    $matches = @($allFixtureInfos | Where-Object Name -eq $fixtureName)
+    if ($matches.Count -eq 0) {
+      throw "Validation scenario references missing fixture mod: $fixtureName"
+    }
+    if ($matches.Count -ne 1) {
+      throw "Validation scenario fixture identity is ambiguous: $fixtureName"
+    }
+    $matches[0]
+  }
   foreach ($fixtureInfo in $fixtureInfos) {
-    Copy-MIRModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
+    Publish-MIRModDirectoryArchive `
+      -Source $fixtureInfo.Path `
+      -Name $fixtureInfo.Name `
+      -Version $fixtureInfo.Version `
+      -ModsDir $modsDir | Out-Null
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
@@ -2730,14 +2745,10 @@ function Initialize-RuntimeScenario {
     @{ name = "more-infinite-research"; enabled = $true }
     @{ name = "mir-validation-settings-overrides"; enabled = $true }
   )
-  $enabledFixtures = @{}
-  foreach ($fixtureName in $EnabledFixtureNames) {
-    $enabledFixtures[$fixtureName] = $true
-  }
   foreach ($fixtureName in @($fixtureNames | Sort-Object)) {
     $mods += @{
       name = $fixtureName
-      enabled = $enabledFixtures.ContainsKey($fixtureName)
+      enabled = $true
     }
   }
 
@@ -2950,6 +2961,25 @@ function Invoke-RuntimeConfigurationChangeScenario {
     -ScenarioName $ScenarioName `
     -Kind "configuration-change" `
     -EnableSpaceAge:$EnableSpaceAge
+  $invocationAuthority = [ordered]@{
+    ScenarioName = $ScenarioName
+    InitialFixtureNames = @($InitialFixtureNames)
+    ChangedFixtureNames = @($ChangedFixtureNames)
+  }
+  foreach ($parameterName in @(
+    "EnabledStreamKeys", "InitialEnabledStreamKeys", "ChangedEnabledStreamKeys",
+    "InitialDisabledStreamKeys", "ChangedDisabledStreamKeys", "EffectPerLevelOverrides",
+    "InitialStartupSettingOverrides", "ChangedStartupSettingOverrides",
+    "InitialNativeOwnerSettingsProfile", "ChangedNativeOwnerSettingsProfile",
+    "ScriptedDiagnostics", "EnableSpaceAge"
+  )) {
+    if ($PSBoundParameters.ContainsKey($parameterName)) {
+      $invocationAuthority[$parameterName] = $PSBoundParameters[$parameterName]
+    }
+  }
+  Assert-MIRConfigurationChangeInvocationMatchesDeclaration `
+    -Declaration $declaration `
+    -Invocation $invocationAuthority
   $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "configuration-change" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
   try {

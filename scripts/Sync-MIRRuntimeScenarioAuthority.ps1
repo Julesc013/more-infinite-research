@@ -100,6 +100,59 @@ foreach ($call in $calls) {
   }
 }
 
+$configurationFunctionAst = @($ast.FindAll({
+  param($node)
+  $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    $node.Name -eq "Invoke-RuntimeConfigurationChangeScenario"
+}, $true))
+if ($configurationFunctionAst.Count -ne 1) {
+  throw "Expected exactly one Invoke-RuntimeConfigurationChangeScenario definition; found $($configurationFunctionAst.Count)."
+}
+$configurationParameterNames = [ordered]@{}
+foreach ($parameter in $configurationFunctionAst[0].Body.ParamBlock.Parameters) {
+  $name = [string]$parameter.Name.VariablePath.UserPath
+  $configurationParameterNames[$name.ToLowerInvariant()] = $name
+}
+$configurationInvocations = [ordered]@{}
+$configurationCalls = @($ast.FindAll({
+  param($node)
+  $node -is [Management.Automation.Language.CommandAst] -and
+    $node.GetCommandName() -eq "Invoke-RuntimeConfigurationChangeScenario"
+}, $true))
+foreach ($call in $configurationCalls) {
+  $bound = [ordered]@{}
+  $isStatic = $true
+  $elements = @($call.CommandElements)
+  for ($index = 1; $index -lt $elements.Count; $index++) {
+    $element = $elements[$index]
+    if ($element -isnot [Management.Automation.Language.CommandParameterAst]) {
+      $isStatic = $false
+      break
+    }
+    $lookup = $element.ParameterName.ToLowerInvariant()
+    if (-not $configurationParameterNames.Contains($lookup)) {
+      $isStatic = $false
+      break
+    }
+    $name = [string]$configurationParameterNames[$lookup]
+    if (($index + 1) -lt $elements.Count -and
+        $elements[$index + 1] -isnot [Management.Automation.Language.CommandParameterAst]) {
+      try {
+        $bound[$name] = $elements[$index + 1].SafeGetValue()
+      } catch {
+        $isStatic = $false
+        break
+      }
+      $index++
+    } else {
+      $bound[$name] = $true
+    }
+  }
+  if ($isStatic -and $bound.Contains("ScenarioName")) {
+    $configurationInvocations[[string]$bound["ScenarioName"]] = $bound
+  }
+}
+
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 if ([int]$manifest.schema -ne 3) { throw "Expected scenario authority schema 3." }
 $records = @($manifest.profiles.($factorioVersion))
@@ -116,6 +169,12 @@ $expectedLiteralOnly = @(
 $literalOnly = @($literalInvocations.Keys | Where-Object { $_ -notin $runtimeNames } | Sort-Object)
 if (($literalOnly -join "`n") -cne ($expectedLiteralOnly -join "`n")) {
   throw "Unexpected literal-only runtime calls for target $factorioVersion. Expected [$($expectedLiteralOnly -join ', ')]; actual [$($literalOnly -join ', ')]."
+}
+
+$configurationNames = @($records | Where-Object kind -eq "configuration-change" | ForEach-Object { [string]$_.name } | Sort-Object)
+$literalConfigurationNames = @($configurationInvocations.Keys | Sort-Object)
+if (($literalConfigurationNames -join "`n") -cne ($configurationNames -join "`n")) {
+  throw "Configuration-change calls differ from target $factorioVersion authority. Expected [$($configurationNames -join ', ')]; actual [$($literalConfigurationNames -join ', ')]."
 }
 $expectedDynamic = @(
   "space-age-native-owner-settings-combined",
@@ -141,8 +200,29 @@ if (($dynamicNames -join "`n") -cne ($expectedDynamic -join "`n")) {
 }
 
 $matched = 0
+$matchedConfiguration = 0
 $preservedDynamic = 0
 foreach ($record in $records) {
+  if ([string]$record.kind -eq "configuration-change") {
+    $scenarioName = [string]$record.name
+    $invocation = $configurationInvocations[$scenarioName]
+    $record.fixtures = @(
+      @($invocation["InitialFixtureNames"]) + @($invocation["ChangedFixtureNames"]) |
+        Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+        ForEach-Object { [string]$_ } |
+        Sort-Object -Unique
+    )
+    $settings = [ordered]@{}
+    foreach ($parameterName in $configurationParameterNames.Values) {
+      if ($parameterName -in @("ScenarioName", "EnableSpaceAge")) { continue }
+      if ($invocation.Contains($parameterName)) {
+        $settings[$parameterName] = ConvertTo-AuthorityValue -Value $invocation[$parameterName]
+      }
+    }
+    $record.settings = $settings
+    $matchedConfiguration++
+    continue
+  }
   if ([string]$record.kind -ne "runtime") { continue }
   $scenarioName = [string]$record.name
   if (-not $literalInvocations.Contains($scenarioName)) {
@@ -168,9 +248,9 @@ if ($Check) {
   if ($actual -cne $expected) {
     throw "Runtime scenario authority differs from the static target-native runner. Run scripts/Sync-MIRRuntimeScenarioAuthority.ps1."
   }
-  Write-Host "[ok] Runtime scenario authority matches $matched static calls; $preservedDynamic manifest-driven calls remain authoritative."
+  Write-Host "[ok] Runtime scenario authority matches $matched static calls and $matchedConfiguration configuration-change calls; $preservedDynamic manifest-driven calls remain authoritative."
   return
 }
 
 [IO.File]::WriteAllText($manifestPath, $expected, [Text.UTF8Encoding]::new($false))
-Write-Host "[write] Synchronized $matched static runtime scenarios; preserved $preservedDynamic manifest-driven runtime scenarios."
+Write-Host "[write] Synchronized $matched static runtime scenarios and $matchedConfiguration configuration-change scenarios; preserved $preservedDynamic manifest-driven runtime scenarios."

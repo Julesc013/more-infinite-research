@@ -1913,8 +1913,25 @@
           "productivity_family_adoption",
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-native-owner-progress",
+          "mir-fixture-assert-native-owner-settings",
+          "mir-fixture-native-owner-settings-source"
+        ],
+        "settings": {
+          "InitialFixtureNames": [
+            "mir-fixture-native-owner-settings-source",
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-assert-native-owner-progress"
+          ],
+          "ChangedFixtureNames": [
+            "mir-fixture-native-owner-settings-source",
+            "mir-fixture-assert-native-owner-settings",
+            "mir-fixture-assert-native-owner-progress"
+          ],
+          "InitialNativeOwnerSettingsProfile": "default",
+          "ChangedNativeOwnerSettingsProfile": "combined"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2452,8 +2469,27 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "InitialFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "ChangedFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "InitialEnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "ChangedDisabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2476,8 +2512,24 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "InitialFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "ChangedFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "EnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2500,8 +2552,27 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "InitialFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "ChangedFixtureNames": [
+            "mir-fixture-assert-scripted-runtime-lifecycle"
+          ],
+          "ChangedEnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "InitialDisabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2609,8 +2680,14 @@
           "productivity_family_adoption",
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-vanilla-family-adoption-recipes"
+        ],
+        "settings": {
+          "ChangedFixtureNames": [
+            "mir-fixture-vanilla-family-adoption-recipes"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
