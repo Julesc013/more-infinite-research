@@ -50,6 +50,10 @@ foreach ($row in @($profiles.targets)) {
       throw "Terminal projection input tag moved: $($input.tag)"
     }
   }
+  if ([string]$row.support_tier -in @("lts", "historical", "finite") -and
+      [string]$row.exact_engine_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw "Lower terminal projection lacks an exact engine SHA-256 for $($row.release)."
+  }
   foreach ($overlay in @($row.assurance_overlays)) {
     if ((& git -C $RepoRoot rev-parse "$([string]$overlay.commit)^{commit}").Trim() -ne [string]$overlay.commit) {
       throw "Terminal assurance overlay commit is unavailable for $($row.release): $($overlay.id)"
@@ -151,6 +155,7 @@ try {
       if ([string]$upgradeManifest.release -ne [string]$row.release -or
           (@($upgradeManifest.rows.id) -join '|') -ne (@($row.upgrade_rows) -join '|') -or
           [string]$qualification.upgrade_fixture_manifest -ne ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json" -or
+          [string]$qualification.exact_engine_sha256 -ne [string]$row.exact_engine_sha256 -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")')) {
         throw "Terminal projection did not bind both target-native upgrade rows for $($row.release)."

@@ -358,6 +358,10 @@ function Set-MIRTerminalShadowAssuranceProfile {
 function Set-MIRTerminalLegacyFactorioVersionProbe {
   param([Parameter(Mandatory)]$Target)
   if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+  if ([string]::IsNullOrWhiteSpace([string]$Target.exact_engine_sha256) -or
+      [string]$Target.exact_engine_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw "Lower terminal target lacks an exact engine SHA-256: $Release"
+  }
 
   $relativePath = "scripts/Invoke-MIRAssurance.ps1"
   $path = Join-Path $TargetRoot $relativePath
@@ -387,12 +391,22 @@ function Get-MIRAssuranceFactorioVersion {
       if ($process.ExitCode -eq 0 -and $versionText -match '(?m)^Version:\s+([0-9]+(?:\.[0-9]+)+)') { $version = $Matches[1] }
     } finally { $process.Dispose() }
   }
+  if ([string]::IsNullOrWhiteSpace($version)) {
+    $observedSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()
+    if ($observedSha256 -eq "__MIR_EXACT_ENGINE_SHA256__") { $version = "__MIR_EXACT_ENGINE_VERSION__" }
+  }
   if ([string]::IsNullOrWhiteSpace($version)) { $version = "unknown" }
   return $version.Trim()
 }
 '@.Trim()
+  $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_SHA256__", [string]$Target.exact_engine_sha256)
+  $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_VERSION__", ([string]$Target.exact_engine).Replace("-only", ""))
   $functionMarker = "function Get-MIRAssuranceFactorioVersion {"
-  if (-not $text.Contains($functionMarker)) {
+  if ($text.Contains($functionMarker)) {
+    $functionPattern = '(?ms)^function Get-MIRAssuranceFactorioVersion \{.*?^\}\n\n(?=function Show-MIRAssuranceHelp \{)'
+    if (-not [regex]::IsMatch($text, $functionPattern)) { throw "Existing generated Factorio version probe layout changed." }
+    $text = [regex]::Replace($text, $functionPattern, $functionText + "`n`n", 1)
+  } else {
     $insertMarker = "function Show-MIRAssuranceHelp {"
     if (-not $text.Contains($insertMarker)) { throw "Target assurance entry-point layout changed before the Factorio version probe." }
     $text = $text.Replace($insertMarker, $functionText + "`n`n" + $insertMarker)
@@ -633,6 +647,7 @@ $qualificationContext = [ordered]@{
   release = [string]$target.release
   target = [string]$target.factorio_line
   exact_engine = [string]$target.exact_engine
+  exact_engine_sha256 = [string]$target.exact_engine_sha256
   support_tier = [string]$target.support_tier
   target_profile = [string]$target.target_profile
   target_adapter = [string]$target.target_adapter
