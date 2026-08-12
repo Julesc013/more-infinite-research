@@ -714,6 +714,32 @@ function Get-DifferenceDisposition {
     $mir255Disposition = Get-MIR255DifferenceDisposition -Path $Path -Before $Before -After $After
     if ($null -ne $mir255Disposition) { return $mir255Disposition }
   }
+  if ($script:IsFactorio20TerminalShadowDelta) {
+    $evidence = @(
+      "exact 2.5.5 to 2.5.9 runtime delta",
+      "MIR3TerminalProductAdmissionBundleV1",
+      "2.5.9 shadow package manifest"
+    )
+    if ($Path -eq 'package.version' -and [string]$Before -eq '2.5.5' -and [string]$After -eq '2.5.9') {
+      return [ordered]@{ reason='The package version advances from immutable 2.5.5 to the unfrozen 2.5.9 terminal shadow.'; intentional=$true; migration_impact='Factorio performs the governed direct package upgrade; candidate allocation remains forbidden at this phase.'; required_evidence=$evidence }
+    }
+    if ($Path -eq 'package.archive_sha256' -and
+        [string]$Before -eq '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C' -and
+        [string]$After -eq '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2') {
+      return [ordered]@{ reason='The archive identity advances from immutable 2.5.5 to the exact current 2.5.9 development shadow.'; intentional=$true; migration_impact='Development package custody changes; all semantic differences remain independently classified.'; required_evidence=$evidence }
+    }
+    if ($Path -eq 'package.package_content_sha256' -and
+        [string]$Before -eq '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154' -and
+        [string]$After -eq '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E') {
+      return [ordered]@{ reason='The normalized package identity advances to the exact current 2.5.9 development shadow.'; intentional=$true; migration_impact='Package content changes only within the admitted target projection; every observed semantic row remains independently classified.'; required_evidence=$evidence }
+    }
+    return [ordered]@{
+      reason = "Unreviewed 2.5.9 terminal-shadow normalized difference."
+      intentional = $false
+      migration_impact = "Unknown until independently classified against the admitted route-policy delta."
+      required_evidence = @("maintainer classification", "exact 2.5.5 to 2.5.9 runtime delta", "generated-prerequisite-safety")
+    }
+  }
   if ($script:IsFactorio20BackportDelta -and (Test-ExactP11PlatformSettingAddition -Path $Path -Before $Before -After $After)) {
     return [ordered]@{
       reason = "P11 carries the exact governed Platform Productivity setting surface in every target-2.0 delta environment."
@@ -989,6 +1015,8 @@ $script:IsFactorio20BackportDelta = $baselineContract.version -eq '2.4.9' -and
   $currentContract.version -eq '2.5.0' -and $currentContract.factorio_version -eq '2.0'
 $script:IsFactorio20DotFiveReleaseDelta = $baselineContract.version -eq '2.5.0' -and
   $currentContract.version -eq '2.5.5' -and $currentContract.factorio_version -eq '2.0'
+$script:IsFactorio20TerminalShadowDelta = $baselineContract.version -eq '2.5.5' -and
+  $currentContract.version -eq '2.5.9' -and $currentContract.factorio_version -eq '2.0'
 $targetAuthorityKey = "factorio-$($currentContract.factorio_version)"
 $releaseAuthority = $releaseLedger.development.$targetAuthorityKey
 $baselineAuthority = $releaseLedger.published_baselines.$targetAuthorityKey
@@ -1002,6 +1030,39 @@ if ($script:IsFactorio20DotFiveReleaseDelta) {
     tag_commit = $baselineTagCommit
     archive_sha256 = $baselineContract.archive_sha256
     package_content_sha256 = $baselineContract.package_content_sha256
+  }
+}
+if ($script:IsFactorio20TerminalShadowDelta) {
+  $shadowManifestPath = Join-Path $repo '.mir\releases\terminal\shadows\2.5.9\package-manifest.json'
+  if (-not (Test-Path -LiteralPath $shadowManifestPath -PathType Leaf)) {
+    throw 'Approved-delta export requires the governed 2.5.9 shadow package manifest.'
+  }
+  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+  $shadowPerformance = $shadowManifest.source.performance_transition
+  $shadowDevelopment = $shadowPerformance.development_package
+  $shadowBaseline = $shadowPerformance.baseline
+  if ([int]$shadowManifest.schema -ne 1 -or [string]$shadowManifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
+      [string]$shadowManifest.release -ne '2.5.9' -or [string]$shadowManifest.target -ne '2.0' -or
+      $shadowManifest.source_frozen -ne $false -or $null -ne $shadowManifest.candidate_id -or
+      [string]$shadowPerformance.phase -ne 'shadow-convergence' -or
+      [string]$shadowDevelopment.version -ne '2.5.9' -or [string]$shadowBaseline.version -ne '2.5.5' -or
+      [string]$shadowManifest.source.immutable_dot5_predecessor.commit -ne '27877275854eb131efeb42672d3676c9c513c85e') {
+    throw 'Approved-delta 2.5.9 authority is not an unfrozen, candidate-unassigned projection of immutable 2.5.5.'
+  }
+  $releaseAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.9'
+    candidate_id = $null
+    phase = 'shadow-convergence'
+    package_source_commit = [string]$shadowDevelopment.package_source_commit
+    package_source_sha256 = [string]$shadowDevelopment.package_source_sha256
+    archive_sha256 = [string]$shadowDevelopment.archive_sha256
+    package_content_sha256 = [string]$shadowDevelopment.package_content_sha256
+  }
+  $baselineAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.5'
+    tag_commit = [string]$shadowManifest.source.immutable_dot5_predecessor.commit
+    archive_sha256 = [string]$shadowBaseline.archive_sha256
+    package_content_sha256 = [string]$shadowBaseline.package_content_sha256
   }
 }
 if ($null -eq $releaseAuthority -or $null -eq $baselineAuthority) {
