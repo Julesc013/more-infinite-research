@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalPackageManifestV1",
+  "release": "1.9.9",
+  "target": "1.1",
+  "source": {
+    "portable_release": "3.2.9",
+    "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
+    "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+    "target_assurance_overlays": [],
+    "performance_transition": null,
+    "immutable_dot5_predecessor": {
+      "release": "1.9.5",
+      "tag": "1.9.5",
+      "commit": "67036cb43e3e4814626e5abf5ce5df17a6f765f7"
+    },
+    "pre_dot5_public_predecessor": {
+      "release": "1.9.4",
+      "tag": "1.9.4",
+      "commit": "426d6d48c6578a786ea7de0f224282baff9d342b"
+    }
+  },
+  "semantic_roots": [
+    ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+    ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    ".mir/releases/terminal/baselines/1.9.5"
+  ],
+  "inventories": {
+    "baseline": ".mir/releases/terminal/baselines/1.9.5",
+    "product_findings": [],
+    "product_disposition": "no-product-delta"
+  },
+  "schemas": [
+    "spec/schemas/mir3-terminal-package-manifest.schema.json",
+    "spec/schemas/mir3-terminal-release-manifest.schema.json"
+  ],
+  "migration_watermark": {
+    "predecessor": "1.9.5",
+    "stable_identifiers": "preserve",
+    "new_identity_allocation": "forbidden-without-admitted-target-delta"
+  },
+  "toolchain": {
+    "projection_profiles": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+    "projection_command": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+    "target_adapter": "factorio-1.1-target-native-no-product-delta"
+  },
+  "mir4_successor_target": "factorio-1.1",
+  "upgrade_obligation": [
+    "1.9.5-to-1.9.9",
+    "1.9.4-to-1.9.9"
+  ],
+  "source_frozen": false,
+  "candidate_id": null
+}
