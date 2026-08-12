@@ -20,3 +20,5 @@ This is an unfrozen target-native MIR 3 terminal shadow for Factorio 0.15. Its c
 - Portable source authority: 3.2.9 at f4d978050baf1ad24b463b67a955472435b1983f
 - Product disposition: no-product-delta
 - Required upgrades: 1.5.5-to-1.5.9, 1.5.0-to-1.5.9
+
+- Historical canonical development anchor: dc5bfa99249af6c9508201a4c4667063bc8e021c

@@ -4,9 +4,11 @@
   "release": "1.5.9",
   "target": "0.15",
   "exact_engine": "0.15.40",
+  "exact_engine_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
   "support_tier": "historical",
   "target_profile": "terminal-factorio-0.15.40",
   "target_adapter": "factorio-0.15-target-native-no-product-delta",
+  "assurance_profile": "terminal-shadow-convergence",
   "assurance_overlays": [],
   "performance_transition": null,
   "baseline": {
@@ -23,6 +25,7 @@
     "1.5.5-to-1.5.9",
     "1.5.0-to-1.5.9"
   ],
+  "upgrade_fixture_manifest": ".mir/releases/terminal/shadows/1.5.9/upgrade-fixtures.json",
   "package_manifest": ".mir/releases/terminal/shadows/1.5.9/package-manifest.json",
   "release_record": ".mir/releases/records/1.5.9.json",
   "release_notes": "docs/releases/notes/release-notes-1.5.9.md",
