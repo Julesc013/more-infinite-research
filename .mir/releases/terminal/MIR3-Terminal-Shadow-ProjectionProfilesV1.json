@@ -112,10 +112,10 @@
         },
         {
           "id": "factorio-2.0-validation-userdata-v1",
-          "commit": "2a27929fc51db75cc339f7b197931426bef8b5fa",
+          "commit": "02af30d18db2988a6b1ba724fb56a22317a18474",
           "reason": "Carry the frozen-assurance false-failure correction that runs generated Factorio userdata under a bounded repository build root instead of the inaccessible OS temporary directory.",
           "files": [
-            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"daa333a4f692c92d8d9f6314174aa91202df6df3"}
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"c9fcbdb6c3a260ef692eb7af143541ee97148159"}
           ]
         }
       ],
