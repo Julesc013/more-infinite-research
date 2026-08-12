@@ -21,21 +21,48 @@ function Get-MIRAssurancePatternFingerprint {
   return $fingerprint
 }
 
+function Assert-MIRAssurancePerformanceCampaignAuthority {
+  param(
+    [Parameter(Mandatory)]$Campaign,
+    [Parameter(Mandatory)]$Authority,
+    [Parameter(Mandatory)]$Context
+  )
+
+  $authorityVersion = if ($null -ne $Authority.PSObject.Properties['version']) {
+    [string]$Authority.version
+  } else {
+    [string]$Authority.mir_version
+  }
+  $targetKey = "factorio-$([string]$Context.target)"
+  if ([int]$Campaign.schema -ne 2 -or
+      [string]$Campaign.release -ne $authorityVersion -or
+      [string]$Campaign.release -ne [string]$Context.info.version -or
+      [string]$Campaign.factorio_line -ne [string]$Context.target -or
+      [string]$Campaign.candidate.version -ne $authorityVersion -or
+      [string]$Campaign.candidate.candidate_id -ne [string]$Authority.candidate_id) {
+    throw "Root performance campaign does not match the exact active $targetKey release authority."
+  }
+  foreach ($field in @('package_source_commit', 'package_source_sha256', 'archive_sha256', 'package_content_sha256')) {
+    if ([string]$Campaign.candidate.$field -ne [string]$Authority.$field) {
+      throw "Root performance campaign differs from the exact active $targetKey package authority: $field"
+    }
+  }
+  $isShadow = [string]$Campaign.phase -eq 'shadow-convergence'
+  if ($isShadow -and ([string]$Campaign.candidate.state -ne 'development-shadow-unfrozen' -or
+      $null -ne $Campaign.candidate.candidate_id -or $null -ne $Authority.candidate_id)) {
+    throw "Root performance campaign does not preserve the unfrozen, candidate-unassigned $targetKey shadow boundary."
+  }
+  return $true
+}
+
 function Resolve-MIRAssurancePerformanceCampaignPath {
   param([Parameter(Mandatory)]$Context)
 
-  $ledger = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases.json") | ConvertFrom-Json
-  $targetKey = "factorio-$([string]$Context.target)"
-  $authorityProperty = $ledger.development.PSObject.Properties[$targetKey]
-  if ($null -eq $authorityProperty) { throw "Canonical release ledger has no active performance authority for $targetKey." }
-  $authority = $authorityProperty.Value
   $relativePath = ".mir/performance-campaign.json"
   $campaign = Get-Content -Raw -LiteralPath (Join-Path $repo $relativePath) | ConvertFrom-Json
-  if ([string]$campaign.release -ne [string]$authority.mir_version -or
-      [string]$campaign.factorio_line -ne [string]$Context.target -or
-      [string]$campaign.candidate.candidate_id -ne [string]$authority.candidate_id) {
-    throw "Root performance campaign does not match the exact active $targetKey release authority."
-  }
+  $candidateInfo = Get-MIRReleasePackageInfo -Path $Context.candidate
+  $authority = Get-MIRReleaseCandidateAuthority -RepoRoot $repo -CandidateInfo $candidateInfo
+  $null = Assert-MIRAssurancePerformanceCampaignAuthority -Campaign $campaign -Authority $authority -Context $Context
   return $relativePath
 }
 

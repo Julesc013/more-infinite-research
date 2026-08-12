@@ -553,6 +553,46 @@ function Invoke-MIRAssuranceSelfTest {
     }
   }
 
+  $shadowContext = [pscustomobject]@{
+    target = '2.0'
+    info = [pscustomobject]@{version='2.5.9'}
+  }
+  $shadowAuthority = [pscustomobject]@{
+    version='2.5.9'
+    candidate_id=$null
+    package_source_commit=('a' * 40)
+    package_source_sha256=('B' * 64)
+    archive_sha256=('C' * 64)
+    package_content_sha256=('D' * 64)
+  }
+  $shadowCampaign = [pscustomobject]@{
+    schema=2
+    phase='shadow-convergence'
+    release='2.5.9'
+    factorio_line='2.0'
+    candidate=[pscustomobject]@{
+      state='development-shadow-unfrozen'
+      candidate_id=$null
+      version='2.5.9'
+      package_source_commit=('a' * 40)
+      package_source_sha256=('B' * 64)
+      archive_sha256=('C' * 64)
+      package_content_sha256=('D' * 64)
+    }
+  }
+  $null = Assert-MIRAssurancePerformanceCampaignAuthority -Campaign $shadowCampaign -Authority $shadowAuthority -Context $shadowContext
+  $tamperedShadowCampaign = ($shadowCampaign | ConvertTo-Json -Depth 10) | ConvertFrom-Json
+  $tamperedShadowCampaign.candidate.archive_sha256 = 'E' * 64
+  $tamperedShadowRejected = $false
+  try {
+    $null = Assert-MIRAssurancePerformanceCampaignAuthority -Campaign $tamperedShadowCampaign -Authority $shadowAuthority -Context $shadowContext
+  } catch {
+    $tamperedShadowRejected = $true
+  }
+  if (-not $tamperedShadowRejected) {
+    throw 'A terminal shadow performance campaign with divergent package authority was accepted.'
+  }
+
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
   $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
   $decoyTrustPath = Join-Path $repo "validation\domains.yml"
