@@ -116,17 +116,34 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
+# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD
 $loadArgs = @(
   "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
-  "--benchmark", $save, "--benchmark-ticks", "1"
+  "--start-server", $save, "--until-tick", "1"
 )
-if ([int]$factorioVersionInfo.FileMajorPart -gt 0) {
-  $loadArgs += @("--benchmark-runs", "1", "--benchmark-sanitize")
+$loadTimedOutAfterMarkerWindow = $false
+try {
+  $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs -TimeoutMs 30000
+} catch {
+  if ($_.Exception.Message -like "Factorio runtime validation timed out*") {
+    $loadTimedOutAfterMarkerWindow = $true
+    $loadExitCode = 0
+  } else {
+    throw
+  }
 }
-$loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
-if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
+$proofMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete"
+if ($loadText.Contains($proofMarker)) {
+  # Factorio 0.16 may continue into server transport after the exact
+  # configuration-change assertion. The marker closes the mod load gate.
+  $loadExitCode = 0
+}
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+if (-not $loadText.Contains($proofMarker)) {
+  if ($loadTimedOutAfterMarkerWindow) {
+    throw "MIR $ToVersion upgrade load reached the 0.16 headless-server marker window without producing the proof marker."
+  }
   throw "MIR $ToVersion upgrade proof marker is missing."
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
