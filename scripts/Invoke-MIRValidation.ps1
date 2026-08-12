@@ -2456,10 +2456,23 @@ if (-not $ScenarioWorker) {
 
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
-  $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
+  $generatedUserDataRoot = Join-Path $repo "build\validation-userdata"
+  New-Item -ItemType Directory -Force -Path $generatedUserDataRoot | Out-Null
+  $UserDataDir = Join-Path $generatedUserDataRoot ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
 $validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
+
+function Remove-MIRGeneratedValidationUserData {
+  if (-not $usesGeneratedUserDataDir -or -not (Test-Path -LiteralPath $validationRoot)) { return }
+  $resolvedGeneratedRoot = (Resolve-Path -LiteralPath $generatedUserDataRoot).Path.TrimEnd("\") + "\"
+  $resolvedValidationRoot = (Resolve-Path -LiteralPath $validationRoot).Path
+  if (-not $resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to remove generated validation userdata outside its build root: $resolvedValidationRoot"
+  }
+  Remove-Item -LiteralPath $resolvedValidationRoot -Recurse -Force
+}
+
 $factorioBinResolved = (Resolve-Path -LiteralPath $FactorioBin).Path
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorioBinResolved))
 $factorioReadData = Join-Path $factorioRoot "data"
@@ -3550,9 +3563,7 @@ if ($selectionActive -and -not $checkpointActive) {
     }
     }
     Complete-MIRValidationRun
-    if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
-      Remove-Item -LiteralPath $validationRoot -Recurse -Force
-    }
+    Remove-MIRGeneratedValidationUserData
     Write-Host "[ok] Selected validation completed."
     $global:LASTEXITCODE = 0
     return
@@ -3646,9 +3657,7 @@ if ($isReducedLegacyLine) {
   Invoke-WeaponSpeedPolicyMatrix -Context "$reducedLineLabel weapon shooting speed policy"
 
   Complete-MIRValidationRun
-  if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
-    Remove-Item -LiteralPath $validationRoot -Recurse -Force
-  }
+  Remove-MIRGeneratedValidationUserData
 
   Write-Host "[ok] Validation completed."
   $global:LASTEXITCODE = 0
@@ -4694,12 +4703,8 @@ if (-not $isFactorio21Line) {
   Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
 }
 
-if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
-  Complete-MIRValidationRun
-  Remove-Item -LiteralPath $validationRoot -Recurse -Force
-} else {
-  Complete-MIRValidationRun
-}
+Complete-MIRValidationRun
+Remove-MIRGeneratedValidationUserData
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0
