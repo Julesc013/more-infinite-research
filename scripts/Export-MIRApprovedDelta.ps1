@@ -737,6 +737,26 @@ function Get-DifferenceDisposition {
         [string]$After -eq '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E') {
       return [ordered]@{ reason='The normalized package identity advances to the exact current 2.5.9 development shadow.'; intentional=$true; migration_impact='Package content changes only within the admitted target projection; every observed semantic row remains independently classified.'; required_evidence=$evidence }
     }
+    $terminalScenarios = @(
+      'approved-delta-automatic-family-controls',
+      'approved-delta-base',
+      'approved-delta-base-continuations',
+      'approved-delta-compat-atan',
+      'approved-delta-compat-space-age-galore',
+      'approved-delta-native-owner-adoption',
+      'approved-delta-space-age'
+    )
+    foreach ($scenario in $terminalScenarios) {
+      if ($Path -eq "scenarios.$scenario.active_mods.more-infinite-research" -and
+          [string]$Before -eq '2.5.5' -and [string]$After -eq '2.5.9') {
+        return [ordered]@{
+          reason = 'The exact scenario reports the governed MIR package version transition and no normalized semantic change.'
+          intentional = $true
+          migration_impact = 'Mod identity advances to 2.5.9; the scenario technology, prerequisite, setting, registry, and mod-data projections remain byte-equivalent after normalization.'
+          required_evidence = @('fourteen exact Factorio 2.0.77 loads', 'zero technology differences', '2.5.9 shadow package manifest')
+        }
+      }
+    }
     return [ordered]@{
       reason = "Unreviewed 2.5.9 terminal-shadow normalized difference."
       intentional = $false
