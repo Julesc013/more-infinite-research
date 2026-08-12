@@ -2719,6 +2719,8 @@ function Initialize-RuntimeScenario {
   }
   Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $nativeOwnerOverrides
 
+  Complete-MIRSettingsOverrideMod -ModsDir $modsDir
+
   $mods = @(
     @{ name = "base"; enabled = $true },
     @{ name = "elevated-rails"; enabled = [bool]$EnableSpaceAge },
