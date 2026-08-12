@@ -176,12 +176,12 @@
       },
       {
         "id": "factorio-2.0-scenario-authority-parity-v1",
-        "commit": "ee69a41c552f14e4097c4f03ac39c1540b33d2e0",
-        "reason": "Carry the frozen-assurance false-pass and false-failure correction that makes target-native runtime fixtures and settings match the full-record scenario authority, proves deterministic diagnostics loaded, publishes the generated settings override as a complete atomic archive, and statically rejects later invocation drift.",
+        "commit": "d2304dfc2bcd3d1fcb8aa362e83a97fb627e9522",
+        "reason": "Carry the frozen-assurance false-pass and false-failure correction that makes target-native runtime and configuration-change fixtures and settings match the full-record scenario authority, proves deterministic diagnostics loaded, publishes enabled fixtures and the generated settings override as complete atomic archives, and statically rejects later invocation drift.",
         "files": [
           {
             "path": "fixtures/compat-matrix/expected-scenarios.json",
-            "blob": "7866b5b698b8ed5c447c5a27e38d22824562c620"
+            "blob": "8bc12b834a9de55767c4bcb02f7f7e4bd682dece"
           },
           {
             "path": "fixtures/assert-prototype-limits/data.lua",
@@ -189,15 +189,19 @@
           },
           {
             "path": "scripts/Invoke-MIRValidation.ps1",
-            "blob": "17c20b28117a7dae0f5fcbc60a9989f37bddf257"
+            "blob": "d922db6fdf6fd4f25c63b7816633ceb7f56c1943"
           },
           {
             "path": "scripts/Sync-MIRRuntimeScenarioAuthority.ps1",
-            "blob": "40478d3c46be206672bc0e0d753af63b776decbd"
+            "blob": "9e8339d94964cc5fca81fca0dbd391d148f58d83"
+          },
+          {
+            "path": "scripts/validation/FactorioProcess.ps1",
+            "blob": "438bbf46a4826ae8de4ac5edd9370b9df56d8b94"
           },
           {
             "path": "scripts/validation/ScenarioRegistry.ps1",
-            "blob": "87d6c944accc8cd8d049609d5bd1068736e85d70"
+            "blob": "a7e7ad42347afa21ab84314db6b165cab548a318"
           },
           {
             "path": "scripts/validation/SettingsOverrides.ps1",
