@@ -4,9 +4,11 @@
   "release": "1.4.9",
   "target": "0.14",
   "exact_engine": "0.14.23",
+  "exact_engine_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
   "support_tier": "finite",
   "target_profile": "terminal-factorio-0.14.23-finite",
   "target_adapter": "factorio-0.14-finite-target-native-no-product-delta",
+  "assurance_profile": "terminal-shadow-convergence",
   "assurance_overlays": [],
   "performance_transition": null,
   "baseline": {
@@ -23,6 +25,7 @@
     "1.4.5-to-1.4.9",
     "1.4.0-to-1.4.9"
   ],
+  "upgrade_fixture_manifest": ".mir/releases/terminal/shadows/1.4.9/upgrade-fixtures.json",
   "package_manifest": ".mir/releases/terminal/shadows/1.4.9/package-manifest.json",
   "release_record": ".mir/releases/records/1.4.9.json",
   "release_notes": "docs/releases/notes/release-notes-1.4.9.md",

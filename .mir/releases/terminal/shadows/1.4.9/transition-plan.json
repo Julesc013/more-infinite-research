@@ -30,11 +30,20 @@
   "generated_authorities": [
     "info.json",
     ".mir/convergence.yml",
+    ".mir/assurance.json",
     ".mir/releases/records/1.4.9.json",
     ".mir/releases/terminal/shadows/1.4.9/package-manifest.json",
     ".mir/releases/terminal/shadows/1.4.9/qualification-context.json",
     "docs/releases/notes/release-notes-1.4.9.md",
-    "changelog.txt"
+    "changelog.txt",
+    "scripts/Invoke-MIRAssurance.ps1",
+    ".mir/releases/terminal/shadows/1.4.9/upgrade-fixtures.json",
+    ".mir/fixtures.yml",
+    "fixtures/assert-upgrade-1-4-5-to-1-4-9",
+    "fixtures/assert-upgrade-1-4-0-to-1-4-9",
+    ".mir/docs.yml",
+    ".mir/backport-source-lock.json",
+    ".mir/releases/terminal/shadows/1.4.9/feature-classification.json"
   ],
   "product_findings": [],
   "product_disposition": "no-product-delta-finite-graph",
