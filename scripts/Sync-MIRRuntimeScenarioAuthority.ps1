@@ -162,8 +162,8 @@ foreach ($record in $records) {
   $matched++
 }
 
-$expected = ($manifest | ConvertTo-Json -Depth 100) + [Environment]::NewLine
-$actual = Get-Content -Raw -LiteralPath $manifestPath
+$expected = (($manifest | ConvertTo-Json -Depth 100).Replace("`r`n", "`n").Replace("`r", "`n")) + "`n"
+$actual = (Get-Content -Raw -LiteralPath $manifestPath).Replace("`r`n", "`n").Replace("`r", "`n")
 if ($Check) {
   if ($actual -cne $expected) {
     throw "Runtime scenario authority differs from the static target-native runner. Run scripts/Sync-MIRRuntimeScenarioAuthority.ps1."
