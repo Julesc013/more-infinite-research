@@ -46,7 +46,11 @@ foreach ($requiredPolicy in @(
   '$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"',
   '$resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)',
   '$root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
-  'Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log")'
+  'Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log")',
+  '$save = Join-Path $root "source.zip"',
+  'Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"',
+  '"assert-upgrade-3-2-3-to-3-2-9"',
+  'Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"'
 )) {
   if (-not $upgradeHarness.Contains($requiredPolicy)) {
     throw "Upgrade harness does not preserve repository-local bounded Factorio userdata: $requiredPolicy"

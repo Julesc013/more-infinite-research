@@ -205,7 +205,8 @@ if ($Archetype) {
   Set-Content -LiteralPath $settingsPath -Value $updatedSettingsText -Encoding UTF8
 }
 
-$save = Join-Path $root "mir-$FromVersion-$artifactSlug-save.zip"
+$save = Join-Path $root "source.zip"
+Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
@@ -247,10 +248,12 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-2-to-3-2-3",
   "assert-upgrade-3-2-3-to-3-2-4",
   "assert-upgrade-3-2-3-to-3-2-5",
+  "assert-upgrade-3-2-3-to-3-2-9",
   "assert-upgrade-3-2-5-to-3-2-9"
 )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
+Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"
 $governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 $loadArgs = if ($requiresReloadProof) {
   @(
