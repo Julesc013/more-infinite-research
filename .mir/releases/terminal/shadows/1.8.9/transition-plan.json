@@ -37,6 +37,8 @@
     "docs/releases/notes/release-notes-1.8.9.md",
     "changelog.txt",
     "scripts/Invoke-MIRAssurance.ps1",
+    "scripts/Invoke-MIRAssurance.ps1",
+    "scripts/Invoke-MIRValidation.ps1",
     ".mir/releases/terminal/shadows/1.8.9/upgrade-fixtures.json",
     ".mir/fixtures.yml",
     "fixtures/assert-upgrade-1-8-5-to-1-8-9",
