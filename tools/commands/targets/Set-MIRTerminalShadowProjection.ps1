@@ -283,12 +283,45 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
     $conditionalCheckoutWithBuild = ConvertTo-MIRCanonicalText -Text $conditionalCheckoutWithBuild
     $text = $text.Replace($conditionalCheckout, $conditionalCheckoutWithBuild.TrimEnd())
   }
+
+  $workerBuild = @'
+      - name: Build deterministic terminal shadow archive
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+'@.TrimEnd()
+  $workerBuild = ConvertTo-MIRCanonicalText -Text $workerBuild
+  $workerBuildWithPredecessor = $workerBuild + @'
+
+      - name: Reconstruct immutable 2.5.5 archive
+        if: ${{ matrix.test_id == 'static.release-history' }}
+        shell: pwsh
+        run: |
+          $lock = Get-Content -Raw -LiteralPath .mir/backport-source-lock.json | ConvertFrom-Json
+          $sourceRoot = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source'
+          $sourceArchive = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source.zip'
+          if (Test-Path -LiteralPath $sourceRoot) { Remove-Item -LiteralPath $sourceRoot -Recurse -Force }
+          if (Test-Path -LiteralPath $sourceArchive) { Remove-Item -LiteralPath $sourceArchive -Force }
+          git archive --format=zip "--output=$sourceArchive" ([string]$lock.projection.package_source_commit)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to export immutable 2.5.5 package source.' }
+          Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
+          & (Join-Path $sourceRoot 'scripts/Build-MIRPackage.ps1') -OutputDir dist
+          Copy-Item -LiteralPath (Join-Path $sourceRoot 'dist/more-infinite-research_2.5.5.zip') -Destination dist -Force
+'@
+  $workerBuildWithPredecessor = ConvertTo-MIRCanonicalText -Text $workerBuildWithPredecessor
+  if (-not $text.Contains("Reconstruct immutable 2.5.5 archive")) {
+    if (-not $text.Contains($workerBuild)) {
+      throw "Maintained target hosted workflow has no worker archive-build step."
+    }
+    $text = $text.Replace($workerBuild, $workerBuildWithPredecessor.TrimEnd())
+  }
   foreach ($required in @(
     "--target $([string]$Target.factorio_line)",
     "--candidate '$archive'",
     '$work = @($plan.work)',
     'test_id = "reuse-only"',
-    "Build deterministic terminal shadow archive"
+    "Build deterministic terminal shadow archive",
+    "Reconstruct immutable 2.5.5 archive"
   )) {
     if (-not $text.Contains($required)) { throw "Maintained target hosted workflow projection is incomplete: $required" }
   }
