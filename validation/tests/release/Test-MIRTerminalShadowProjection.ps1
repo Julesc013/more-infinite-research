@@ -76,11 +76,13 @@ if (@($publishedOverlayIds | Select-Object -Unique).Count -ne $publishedOverlayI
   throw "Terminal shadow source publication assigns an assurance overlay more than once."
 }
 if ([int]$productReconciliation.schema -ne 1 -or
-    [string]$productReconciliation.status -ne "both-admitted-target-implementations-shadow-proved-fixed-point-pending" -or
+    [string]$productReconciliation.status -ne "late-p0-implemented-on-both-affected-targets-fixed-point-pending" -or
     [string]$productReconciliation.prior_receipt.raw_sha256 -ne (Get-FileHash -LiteralPath (Join-Path $RepoRoot ([string]$productReconciliation.prior_receipt.path)) -Algorithm SHA256).Hash -or
     [string]$productReconciliation.current_3_2_9_shadow.package.archive_sha256 -ne "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3" -or
     [string]$productReconciliation.current_2_5_9_shadow.package.archive_sha256 -ne "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2" -or
-    (@($productReconciliation.finding_dispositions.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or
+    (@($productReconciliation.finding_dispositions.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
+    (@($productReconciliation.late_p0_amendment.development_packages.archive_sha256) -join "|") -ne "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20|B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35" -or
+    (@($productReconciliation.late_p0_amendment.supersedes_current_shadow_identity_for) -join "|") -ne "3.2.9|2.5.9" -or
     [bool]$productReconciliation.immutable_boundaries.dot5_package_bytes_changed -or
     [bool]$productReconciliation.immutable_boundaries.source_frozen -or
     [bool]$productReconciliation.immutable_boundaries.candidate_assigned -or
@@ -393,17 +395,20 @@ try {
       }
     }
     if ([string]$row.release -eq "2.5.9") {
+      $expectedDevelopment = $row.performance_transition.development_package
       $developmentAuthorities = @(
         $package.source.performance_transition.development_package,
         $qualification.performance_transition.development_package,
         $transition.immutable_inputs.performance_transition.development_package
       )
       foreach ($developmentAuthority in $developmentAuthorities) {
-        if ([string]$developmentAuthority.version -ne "2.5.9" -or
-            [long]$developmentAuthority.archive_bytes -ne 1057099 -or
-            [int]$developmentAuthority.archive_entries -ne 301 -or
-            [string]$developmentAuthority.archive_sha256 -ne "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2" -or
-            [string]$developmentAuthority.package_content_sha256 -ne "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E") {
+        if ([string]$developmentAuthority.version -ne [string]$expectedDevelopment.version -or
+            [string]$developmentAuthority.package_source_commit -ne [string]$expectedDevelopment.package_source_commit -or
+            [string]$developmentAuthority.package_source_sha256 -ne [string]$expectedDevelopment.package_source_sha256 -or
+            [long]$developmentAuthority.archive_bytes -ne [long]$expectedDevelopment.archive_bytes -or
+            [int]$developmentAuthority.archive_entries -ne [int]$expectedDevelopment.archive_entries -or
+            [string]$developmentAuthority.archive_sha256 -ne [string]$expectedDevelopment.archive_sha256 -or
+            [string]$developmentAuthority.package_content_sha256 -ne [string]$expectedDevelopment.package_content_sha256) {
           throw "The 2.5.9 generated shadow authorities do not bind exact development bytes and entries."
         }
       }

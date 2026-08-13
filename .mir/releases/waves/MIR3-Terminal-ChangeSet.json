@@ -28,7 +28,8 @@
     ".mir/releases/terminal/findings/MIR3-TERM-0025.json",
     ".mir/releases/terminal/findings/MIR3-TERM-0026.json",
     ".mir/releases/terminal/findings/MIR3-TERM-0029.json",
-    ".mir/releases/terminal/findings/MIR3-TERM-0030.json"
+    ".mir/releases/terminal/findings/MIR3-TERM-0030.json",
+    ".mir/releases/terminal/findings/MIR3-TERM-0031.json"
   ],
   "target_wave": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
   "items": [
@@ -170,10 +171,10 @@
       "severity": "P0",
       "visibility": {"package": true, "gameplay": true, "assurance": false},
       "stable_id_and_migration_impact": "Existing generated technology IDs must remain stable. The losing combined-plan claim must be removed before graph qualification; retained operations must receive refreshed TechnologyDesign and fingerprint authority, and an emptied base continuation must be omitted without deleting the dedicated stream.",
-      "affected_targets": ["3.2.9", "2.5.9-pending-exact-applicability"],
+      "affected_targets": ["3.2.9", "2.5.9"],
       "target_dispositions": [
         {"target": "3.2.9", "disposition": "late-p0-admitted", "reason": "Exact immutable 3.2.5 reproduction on the supported Factorio 2.1.13 engine proves a package-load blocker inside the advertised modern compatibility envelope."},
-        {"target": "2.5.9", "disposition": "pending-exact-applicability", "reason": "The ownership invariant is portable compiler policy, but exact Factorio 2.0 applicability and target-adapter proof must be established before admission."},
+        {"target": "2.5.9", "disposition": "portable-with-adapter", "reason": "Exact Factorio 2.0.77 and Space Exploration 0.7.57 reproduce the immutable 2.5.5 crash; the target-native 2.5.9 compiler contract and exact closure load pass after the generic correction."},
         {"target": "1.9.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 1.1 target."},
         {"target": "1.8.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 1.0 target."},
         {"target": "1.7.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.17 target."},
@@ -195,8 +196,8 @@
       ],
       "fixed_point_restart_scope": "3.2.9 convergence and clean-root confirmation plus 2.5.9 only if exact 2.0 applicability is established; already accepted lower-target confirmation remains valid unless its dependency closure changes.",
       "closure": {
-        "status": "implemented-exact-2.1-proof-awaiting-exact-head-2.0-applicability-and-fixed-point",
-        "evidence": "Regression-first compiler-contract red summary SHA-256 B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB and green summary SHA-256 B13B1D4ECE9F321894F59B7B1D3385BC0E77CA123F03CD8C3A3B555F954CD310. The corrected development archive SHA-256 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 loads the exact 18-archive reporter-relevant closure (log SHA-256 CCFD2205FB260B517FAE3CC8B4632AB8F7F3DC13F8B6BF701D65B432C998E2E3) and the minimized Space Exploration 0.7.61-only closure (log SHA-256 A9929CDA6BA99DA85063429819E1BF8D5FDD3AEED49B84F2B2858F59FE326EC9). The reporter supplied no exact versions or settings for the other enabled rows, so this evidence does not overclaim a byte-exact full 100-mod reproduction. Exact 2.0 target applicability remains pending."
+        "status": "implemented-exact-2.1-and-2.0-proof-awaiting-exact-head-and-fixed-point",
+        "evidence": "Regression-first compiler-contract red summary SHA-256 B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB and green summary SHA-256 B13B1D4ECE9F321894F59B7B1D3385BC0E77CA123F03CD8C3A3B555F954CD310. The corrected 3.2.9 development archive SHA-256 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 loads the exact reporter-relevant and minimized 2.1 closures. Exact Factorio 2.0.77 with Space Exploration 0.7.57 reproduces immutable 2.5.5 (log SHA-256 32B41B372261B411F8C3B2075533ECBDAB0138B939E5342ECFF83C1BB72466BB); corrected 2.5.9 archive SHA-256 B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35 passes the target-native compiler contract and the same external closure (log SHA-256 090308C315CAC93FF9569D9DDC88A54388CC38E637C9DA67D9F5B34C888871CB). The reporter supplied no exact versions or settings for the other enabled rows, so this evidence does not overclaim a byte-exact full 100-mod reproduction."
       }
     }
   ]

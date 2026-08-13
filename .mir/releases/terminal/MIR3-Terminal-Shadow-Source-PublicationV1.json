@@ -20,14 +20,15 @@
     {
       "id": "factorio-2.0-shadow-source",
       "ref": "refs/heads/candidate/2.5.9-projection",
-      "head_commit": "560f7b7e2759f309af4516015bdd4c848375171a",
-      "head_tree": "a35e984ea4a24eb3e79a407b777df35347063e91",
+      "head_commit": "e10cb9fc9d1055291ad8d9c45800b29b46cbcdd0",
+      "head_tree": "42f51453b82fff83e88d535fe8e303580a2ad89e",
       "overlay_ids": [
         "factorio-2.0-terminal-shadow-qualification-v1",
         "factorio-2.0-terminal-shadow-performance-authority-v1",
         "factorio-2.0-terminal-shadow-review-authority-v1",
         "factorio-2.0-scenario-authority-parity-v1",
-        "factorio-2.0-py-proof-transport-v1"
+        "factorio-2.0-py-proof-transport-v1",
+        "factorio-2.0-combined-effect-ownership-v1"
       ]
     },
     {

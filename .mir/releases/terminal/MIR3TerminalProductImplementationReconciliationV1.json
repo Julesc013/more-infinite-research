@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR3TerminalProductImplementationReconciliationV1",
-  "status": "both-admitted-target-implementations-shadow-proved-fixed-point-pending",
+  "status": "late-p0-implemented-on-both-affected-targets-fixed-point-pending",
   "recorded_at": "2026-08-13T17:53:41.8730995+10:00",
   "prior_receipt": {
     "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
@@ -105,8 +105,51 @@
       "state": "implemented-on-both-admitted-targets-and-shadow-convergence-passed-awaiting-independent-confirmation",
       "targets": ["3.2.9", "2.5.9"],
       "claim_boundary": "generic route correctness; no unproved direct Cubium claim"
+    },
+    {
+      "id": "MIR3-TERM-0031",
+      "state": "implemented-and-exact-2.1-and-2.0-regressions-passed-awaiting-hosted-head-and-revised-fixed-point",
+      "targets": ["3.2.9", "2.5.9"],
+      "claim_boundary": "generic combined-plan ownership plus exact proved Space Exploration closures; the reporter's other enabled mods have no supplied exact version or settings authority"
     }
   ],
+  "late_p0_amendment": {
+    "finding": "MIR3-TERM-0031",
+    "recorded_at": "2026-08-13T22:05:00+10:00",
+    "supersedes_current_shadow_identity_for": ["3.2.9", "2.5.9"],
+    "reporter_input": {
+      "mod_list_sha256": "E5C99BD9A7C0B28F061C2D6F0F50371ACE3508A447805921183C605F56E65AC4",
+      "rows": 221,
+      "enabled": 100,
+      "custody_receipt_sha256": "AD4ABF42852532159346D398DE19246B0F7D1BBB4FA665C646606F9CD3EA7C4B",
+      "claim_boundary": "The input contains names and enabled states only; local archive versions or settings are not attributed to the reporter."
+    },
+    "implementation": {
+      "contract": "CombinedCompilationPlanEffectOwnershipV1",
+      "policy": "adopted owners outrank emitted streams; emitted streams outrank base continuations; same-operation duplicates remain fatal",
+      "modern_source_commit": "5496896914666158ad4056026819528395861540",
+      "modern_source_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
+      "maintained_source_commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+      "maintained_source_tree": "5eab3dffa365a01c504a95ae918d3210d61bb47f",
+      "maintained_projection_head": "e10cb9fc9d1055291ad8d9c45800b29b46cbcdd0",
+      "maintained_projection_tree": "42f51453b82fff83e88d535fe8e303580a2ad89e"
+    },
+    "development_packages": [
+      {"version":"3.2.9","archive_sha256":"0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20","normalized_content_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","package_source_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","bytes":1061572,"entries":303,"candidate_id":null,"source_frozen":false},
+      {"version":"2.5.9","archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","normalized_content_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","package_source_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","bytes":1058800,"entries":301,"candidate_id":null,"source_frozen":false}
+    ],
+    "proof": {
+      "regression_first_red_sha256": "B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB",
+      "modern_exact_head_compiler_contract_sha256": "10934600C56F638A52F177690E5D63CBE0B67A0882E5572907DDCF48D207054D",
+      "modern_minimal_space_exploration_log_sha256": "A9929CDA6BA99DA85063429819E1BF8D5FDD3AEED49B84F2B2858F59FE326EC9",
+      "modern_reporter_relevant_closure_log_sha256": "CCFD2205FB260B517FAE3CC8B4632AB8F7F3DC13F8B6BF701D65B432C998E2E3",
+      "maintained_immutable_failure_log_sha256": "32B41B372261B411F8C3B2075533ECBDAB0138B939E5342ECFF83C1BB72466BB",
+      "maintained_compiler_contract_sha256": "0E6E7BD90EBF5B393687A726BF2F9513369B7ACEB7F16503A9854E2B6ECCFA63",
+      "maintained_corrected_space_exploration_log_sha256": "090308C315CAC93FF9569D9DDC88A54388CC38E637C9DA67D9F5B34C888871CB",
+      "exact_2_0_envelope": {"factorio":"2.0.77.84539","factorio_binary_sha256":"D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B","space_exploration":"0.7.57","external_archive_count":17,"portal_sha1_verified":17}
+    },
+    "remaining_gates": ["exact-head hosted checks", "affected-target convergence", "affected-target clean-root confirmation", "revised all-nine fixed-point receipt", "both affected direct-upgrade rows in final candidate qualification"]
+  },
   "immutable_boundaries": {
     "dot5_package_bytes_changed": false,
     "source_frozen": false,

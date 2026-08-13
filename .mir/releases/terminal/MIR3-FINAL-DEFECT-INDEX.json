@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "kind": "MIR3-FINAL-DEFECT-INDEX",
-  "status": "terminal-dispositions-complete-implementation-pending",
-  "recorded_at": "2026-08-12T04:00:00+10:00",
-  "scope": "all-repository-github-issues-lifecycle-incidents-and-terminal-findings-observed-before-ordinary-intake-close",
+  "status": "terminal-dispositions-complete-fixed-point-pending",
+  "recorded_at": "2026-08-13T22:05:00+10:00",
+  "scope": "all-repository-github-issues-lifecycle-incidents-and-terminal-findings-observed through the admitted late-P0 amendment",
   "state_semantics": "state is the sealed terminal destination; completion separately prevents fixed-in-dot9 from being read as implemented before verification",
   "allowed_states": [
     "fixed-in-dot9",
@@ -18,7 +18,7 @@
   "source_inventory": {
     "github_issues": {"query": "repo:Julesc013/more-infinite-research is:issue", "count": 5, "ids": ["GH-3", "GH-4", "GH-5", "GH-24", "GH-35"], "open_at_recording": 0},
     "lifecycle_incidents": {"authority": ".mir/lifecycle/incidents", "count": 26, "first": "INC-2026-0035", "last": "INC-2026-0060"},
-    "terminal_findings": {"authority": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json", "strict_records": ".mir/releases/terminal/findings", "count": 30, "first": "MIR3-TERM-0001", "last": "MIR3-TERM-0030"}
+    "terminal_findings": {"authority": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json", "strict_records": ".mir/releases/terminal/findings", "count": 31, "first": "MIR3-TERM-0001", "last": "MIR3-TERM-0031"}
   },
   "dispositions": [
     {"source_kind":"github-issue","source_id":"GH-3","source_ref":"https://github.com/Julesc013/more-infinite-research/issues/3","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["commits f31f690 and c9529d1","vanilla locale and icon runtime fixtures"]},
@@ -80,18 +80,20 @@
     {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0024","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0024.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]},
     {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0025","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0025.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]},
     {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0026","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0026.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]},
-    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0027","source_ref":".mir/releases/waves/MIR3-Terminal-ChangeSet.json","state":"fixed-in-dot9","completion":"admitted-pending-implementation","evidence":["exact 3.2.5 Factorio 2.1.13 K2 2.1.2 K2SO 2.0.13 capture","MIR3TerminalProductAdmissionBundleV1"]},
-    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0028","source_ref":".mir/releases/waves/MIR3-Terminal-ChangeSet.json","state":"fixed-in-dot9","completion":"admitted-pending-implementation","evidence":["source-confirmed alternate-route collapse","MIR3TerminalProductAdmissionBundleV1"]},
+    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0027","source_ref":".mir/releases/waves/MIR3-Terminal-ChangeSet.json","state":"fixed-in-dot9","completion":"implemented-awaiting-fixed-point","evidence":["exact 3.2.5 Factorio 2.1.13 K2 2.1.2 K2SO 2.0.13 capture","MIR3TerminalProductImplementationReconciliationV1"]},
+    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0028","source_ref":".mir/releases/waves/MIR3-Terminal-ChangeSet.json","state":"fixed-in-dot9","completion":"implemented-awaiting-fixed-point","evidence":["exact generic 2.1 and 2.0 route-policy fixtures","MIR3TerminalProductImplementationReconciliationV1"]},
     {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0029","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0029.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]},
-    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0030","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0030.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]}
+    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0030","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0030.json","state":"already-fixed-regression-retained","completion":"historical-verified","evidence":["MIR3TerminalAssuranceCalibrationReceiptV1"]},
+    {"source_kind":"terminal-finding","source_id":"MIR3-TERM-0031","source_ref":".mir/releases/terminal/findings/MIR3-TERM-0031.json","state":"fixed-in-dot9","completion":"implemented-awaiting-fixed-point","evidence":["exact Factorio 2.1.13 and 2.0.77 Space Exploration reproductions","MIR-owned combined-plan compiler-contract regression","MIR3TerminalProductImplementationReconciliationV1"]}
   ],
   "summary": {
-    "rows": 61,
+    "rows": 62,
     "github_issues": 5,
     "lifecycle_incidents": 26,
-    "terminal_findings": 30,
-    "fixed_in_dot9": 2,
-    "admitted_pending_implementation": 2,
+    "terminal_findings": 31,
+    "fixed_in_dot9": 3,
+    "admitted_pending_implementation": 0,
+    "implemented_awaiting_fixed_point": 3,
     "open_repository_issues": 0,
     "unclassified": 0
   },

@@ -43,10 +43,16 @@ foreach ($findingRecordPath in @($changeSet.finding_records)) {
   $finding = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$findingRecordPath)) | ConvertFrom-Json -Depth 100
   if ([string]$finding.kind -ne "MIR3TerminalFindingV1" -or [string]$finding.id -notmatch '^MIR3-TERM-[0-9]{4}$' -or
       [string]$finding.reproducer.status -ne "reproduced" -or @($finding.target_dispositions).Count -ne 9 -or
-      (@($finding.target_dispositions.target) -join "|") -ne ($family -join "|") -or
-      [string]$finding.admission.class -ne "NO_PACKAGE_CHANGE" -or [string]$finding.admission.status -ne "admitted" -or
-      [bool]$finding.visibility.package -or [bool]$finding.visibility.gameplay -or -not [bool]$finding.visibility.assurance) {
-    throw "Terminal finding is incomplete, not all-nine-disposed, or widens package authority: $findingRecordPath"
+      (@($finding.target_dispositions.target) -join "|") -ne ($family -join "|") -or [string]$finding.admission.status -ne "admitted") {
+    throw "Terminal finding is incomplete, not all-nine-disposed, or not admitted: $findingRecordPath"
+  }
+  if ([string]$finding.admission.class -eq "NO_PACKAGE_CHANGE" -and
+      ([bool]$finding.visibility.package -or [bool]$finding.visibility.gameplay -or -not [bool]$finding.visibility.assurance)) {
+    throw "Package-excluded assurance finding widens package authority: $findingRecordPath"
+  }
+  if ([string]$finding.admission.class -eq "DOT9_REQUIRED" -and
+      (-not [bool]$finding.visibility.package -or -not [bool]$finding.visibility.gameplay -or [bool]$finding.visibility.assurance)) {
+    throw "Required product finding does not declare its package/gameplay boundary: $findingRecordPath"
   }
   $findingRecords[[string]$finding.id] = $finding
 }
@@ -312,18 +318,18 @@ if ([string]$programme.authorities.effective_mutation_owner_report -ne ".mir/rel
 }
 
 $defectIndex = $authorities["MIR3-FINAL-DEFECT-INDEX"]
-$expectedFindingIds = @(1..30 | ForEach-Object { "MIR3-TERM-{0:D4}" -f $_ })
+$expectedFindingIds = @(1..31 | ForEach-Object { "MIR3-TERM-{0:D4}" -f $_ })
 $expectedIncidentIds = @(35..60 | ForEach-Object { "INC-2026-{0:D4}" -f $_ })
 $expectedIssueIds = @("GH-3", "GH-4", "GH-5", "GH-24", "GH-35")
 $indexedFindingIds = @($defectIndex.dispositions | Where-Object source_kind -eq "terminal-finding" | ForEach-Object source_id)
 $indexedIncidentIds = @($defectIndex.dispositions | Where-Object source_kind -eq "lifecycle-incident" | ForEach-Object source_id)
 $indexedIssueIds = @($defectIndex.dispositions | Where-Object source_kind -eq "github-issue" | ForEach-Object source_id)
 if ([string]$programme.authorities.final_defect_index -ne ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json" -or
-    @($defectIndex.dispositions).Count -ne 61 -or (@(Compare-Object $expectedFindingIds $indexedFindingIds)).Count -ne 0 -or
+    @($defectIndex.dispositions).Count -ne 62 -or (@(Compare-Object $expectedFindingIds $indexedFindingIds)).Count -ne 0 -or
     (@(Compare-Object $expectedIncidentIds $indexedIncidentIds)).Count -ne 0 -or (@(Compare-Object $expectedIssueIds $indexedIssueIds)).Count -ne 0 -or
     @($defectIndex.dispositions | Group-Object source_id | Where-Object Count -ne 1).Count -ne 0 -or
-    @($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").Count -ne 2 -or
-    (@($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").source_id -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or
+    @($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").Count -ne 0 -or
+    (@($defectIndex.dispositions | Where-Object completion -eq "implemented-awaiting-fixed-point").source_id -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
     [int]$defectIndex.summary.unclassified -ne 0 -or -not [bool]$defectIndex.hard_boundaries.ordinary_intake_closed -or
     [bool]$defectIndex.hard_boundaries.source_frozen -or [bool]$defectIndex.hard_boundaries.candidate_assigned) {
   throw "Final defect index loses a repository issue, lifecycle incident, terminal finding, or pre-freeze boundary."
@@ -341,7 +347,7 @@ if ([string]$programme.authorities.engine_gap_audit -ne ".mir/releases/terminal/
 $productAdmission = $authorities["MIR3TerminalProductAdmissionBundleV1"]
 $acceptedFindingIds = @($productAdmission.accepted_findings.id)
 if ([string]$programme.authorities.product_admission -ne ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json" -or
-    ($acceptedFindingIds -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or @($productAdmission.all_nine_dispositions).Count -ne 9 -or
+    ($acceptedFindingIds -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or @($productAdmission.all_nine_dispositions).Count -ne 9 -or
     (@($productAdmission.all_nine_dispositions.release) -join "|") -ne ($family -join "|") -or
     -not [bool]$productAdmission.ordinary_intake.closed -or -not [bool]$productAdmission.boundaries.implementation_admitted -or
     [bool]$productAdmission.boundaries.source_frozen -or [bool]$productAdmission.boundaries.candidate_assigned -or
@@ -431,9 +437,10 @@ foreach ($item in @($changeSet.items)) {
   foreach ($field in $changeFields) { if ($null -eq $item.PSObject.Properties[$field]) { throw "Terminal change $($item.id) omits $field." } }
   if (@($item.target_dispositions).Count -eq 0) { throw "Terminal change $($item.id) has no target disposition." }
 }
-if (-not $changeSet.implementation_admitted -or [string]$changeSet.status -ne "product-set-admitted-ordinary-intake-closed" -or
-    (@($changeSet.product_intake | Where-Object { $_.id -in @("MIR3-TERM-0027", "MIR3-TERM-0028") -and $_.closure.status -eq "admitted-pending-implementation" })).Count -ne 2) {
-  throw "Terminal change set must admit exactly the sealed product intake while leaving implementation proof pending."
+if (-not $changeSet.implementation_admitted -or [string]$changeSet.status -ne "product-set-admitted-ordinary-intake-closed-late-p0-implemented-awaiting-exact-head-and-fixed-point" -or
+    (@($changeSet.product_intake.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
+    (@($changeSet.product_intake | Where-Object { $_.id -eq "MIR3-TERM-0031" -and $_.closure.status -eq "implemented-exact-2.1-and-2.0-proof-awaiting-exact-head-and-fixed-point" })).Count -ne 1) {
+  throw "Terminal change set must preserve the sealed intake plus the exact late-P0 amendment without crossing fixed point."
 }
 
 $firewall = $authorities["MIR3-Terminal-ScopeFirewallV1"]
