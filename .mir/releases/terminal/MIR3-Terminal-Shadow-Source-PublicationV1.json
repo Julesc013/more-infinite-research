@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowSourcePublicationV1",
+  "status": "published-shadow-source-history",
+  "repository": "Julesc013/more-infinite-research",
+  "source_frozen": false,
+  "candidate_id": null,
+  "transport": "full-git-history-v1",
+  "refs": [
+    {
+      "id": "factorio-2.0-assurance-source",
+      "ref": "refs/heads/codex/mir3-terminal-source-2.5-assurance",
+      "head_commit": "bc9d63c3b665145abd7f1ccccff8a3a908e8bd0d",
+      "head_tree": "2ec5ff49f9cfb7efb4301f768f8bb203e6731eb2",
+      "overlay_ids": [
+        "factorio-2.0-resumable-assurance-v1",
+        "factorio-2.0-graph-process-ceiling-v1"
+      ]
+    },
+    {
+      "id": "factorio-2.0-shadow-source",
+      "ref": "refs/heads/candidate/2.5.9-projection",
+      "head_commit": "560f7b7e2759f309af4516015bdd4c848375171a",
+      "head_tree": "a35e984ea4a24eb3e79a407b777df35347063e91",
+      "overlay_ids": [
+        "factorio-2.0-terminal-shadow-qualification-v1",
+        "factorio-2.0-terminal-shadow-performance-authority-v1",
+        "factorio-2.0-terminal-shadow-review-authority-v1",
+        "factorio-2.0-scenario-authority-parity-v1",
+        "factorio-2.0-py-proof-transport-v1"
+      ]
+    },
+    {
+      "id": "factorio-2.0-validation-userdata-source",
+      "ref": "refs/heads/codex/mir3-terminal-source-2.5-userdata",
+      "head_commit": "02af30d18db2988a6b1ba724fb56a22317a18474",
+      "head_tree": "6aba531cd21c61be5104780547a46dfa2fd4c9d0",
+      "overlay_ids": [
+        "factorio-2.0-validation-userdata-v1"
+      ]
+    }
+  ]
+}

@@ -753,6 +753,12 @@ validation_tooling:
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
     terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
     terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
+    terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
+    terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
+    terminal_product_implementation_reconciliation: .mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json
+    terminal_product_implementation_reconciliation_schema: spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json
+    terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
+    terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
@@ -761,6 +767,7 @@ validation_tooling:
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
     target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
+    runtime_scenario_authority_generator: tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1

@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProductImplementationReconciliationV1",
+  "status": "both-admitted-target-implementations-shadow-proved-fixed-point-pending",
+  "recorded_at": "2026-08-13T17:53:41.8730995+10:00",
+  "prior_receipt": {
+    "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    "raw_sha256": "FBA1633457D628F2B0B092513B278CD663C6D29BCABFB612E13033ABFC75A321",
+    "disposition": "retained-immutable-development-evidence"
+  },
+  "current_3_2_9_shadow": {
+    "source_commit": "a124492b2e6ac02e64560261f64e6e0f2ffc91f3",
+    "source_tree": "576ff1627e321cc64340123dda87f8c3e04d3db1",
+    "package": {
+      "version": "3.2.9",
+      "archive_sha256": "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3",
+      "normalized_content_sha256": "074655F6EBA215D04CE812BBB772171D75C132CB4F3281E8B9E1B28116CA8CC2",
+      "package_source_sha256": "074655F6EBA215D04CE812BBB772171D75C132CB4F3281E8B9E1B28116CA8CC2",
+      "bytes": 1059871,
+      "entries": 303,
+      "candidate_id": null,
+      "source_frozen": false
+    },
+    "convergence": {
+      "status": "passed",
+      "plan": {
+        "path": "artifacts/terminal-shadow/3.2.9/convergence-plan-a124492b-mods.json",
+        "raw_sha256": "8CDC8BFDB2EBEA7EA2A060DF6194C24F204D602C2D43B6577913EB266B1C72C9"
+      },
+      "result": {
+        "path": "artifacts/terminal-shadow/3.2.9/convergence-result-a124492b-mods-resumed.json",
+        "raw_sha256": "9D278A5AD2A30141D0182EC78B7C746C1D4C19A95D393DE0E9589E16D27F9B6E",
+        "planned": 127,
+        "executed_in_final_resume": 13,
+        "exact_same_plan_adopted": 114,
+        "failed": 0,
+        "incomplete": 0,
+        "unexpected": 0
+      },
+      "bundle": {
+        "path": "artifacts/terminal-shadow/3.2.9/convergence-bundle-a124492b-mods.json",
+        "raw_sha256": "A557BCC7FD5E99E277C05F0F544CF65FF977C082589224A4887A65A808B6A122"
+      },
+      "direct_3_2_5_upgrade": "passed-five-archetypes-in-runtime-upgrade-capsule",
+      "direct_3_2_3_upgrade": {
+        "status": "passed-five-archetypes",
+        "path": "artifacts/assurance/3.2.3-to-3.2.9-upgrade-proof-direct.json",
+        "raw_sha256": "375A60EA3891B1DD9C0781BDD548350B1A4A7AB528F7F1D7D81C5DAAFA68F0A0"
+      }
+    }
+  },
+  "superseded_3_2_9_development_archive": {
+    "archive_sha256": "AE5D1D4966C4D4CCEC43D8D575BCCABB11FBE21F94A2C4D3623EC5A7252C74B2",
+    "normalized_content_sha256": "5549C4430C8D27F0001C8DFE39889B27BC271FFC14D1CE95A7B40FC90AABF271",
+    "bytes": 1059661,
+    "entries": 303,
+    "disposition": "superseded-development-evidence-not-a-candidate",
+    "replacement_delta": {
+      "intended_surface": "terminal-changelog-release-presentation",
+      "changed_entries": [
+        "more-infinite-research_3.2.9/changelog.txt"
+      ],
+      "old_entry_sha256": "8507FC845FD134EC97F8BA72D9D07AF3EEED875F5239DD00168CB6C511269C52",
+      "new_entry_sha256": "6BF6BBCE746872AF9C34E53896D37E68E611582EB2259932A6882A52AAF9043F"
+    }
+  },
+  "current_2_5_9_shadow": {
+    "source_commit": "560f7b7e2759f309af4516015bdd4c848375171a",
+    "source_tree": "a35e984ea4a24eb3e79a407b777df35347063e91",
+    "transition_receipt": {
+      "path": ".mir/releases/terminal/shadows/2.5.9/transition-receipt.json",
+      "raw_sha256": "96A947C22DCE6CB25ED92BBB061F857ED2386CD67090CC48C8674D8D21B6ED9E"
+    },
+    "package": {
+      "version": "2.5.9",
+      "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
+      "normalized_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
+      "package_source_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
+      "bytes": 1057099,
+      "entries": 301,
+      "candidate_id": null,
+      "source_frozen": false
+    },
+    "convergence": {
+      "status": "passed",
+      "planned": 90,
+      "executed": 89,
+      "checkpoint_adopted": 1,
+      "ordinary_reused": 0,
+      "failed": 0,
+      "incomplete": 0,
+      "unexpected": 0,
+      "both_upgrade_paths": "passed-five-archetypes-each"
+    }
+  },
+  "finding_dispositions": [
+    {
+      "id": "MIR3-TERM-0027",
+      "state": "implemented-and-shadow-convergence-passed-awaiting-independent-confirmation",
+      "targets": ["3.2.9"],
+      "claim_boundary": "exact admitted K2/K2SO envelope only"
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "state": "implemented-on-both-admitted-targets-and-shadow-convergence-passed-awaiting-independent-confirmation",
+      "targets": ["3.2.9", "2.5.9"],
+      "claim_boundary": "generic route correctness; no unproved direct Cubium claim"
+    }
+  ],
+  "immutable_boundaries": {
+    "dot5_package_bytes_changed": false,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "all_nine_fixed_point_accepted": false,
+    "tagging_or_publication_permitted": false
+  }
+}

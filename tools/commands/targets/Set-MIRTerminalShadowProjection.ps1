@@ -14,10 +14,15 @@ $SourceRepoRoot = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 $TargetRoot = (Resolve-Path -LiteralPath $TargetRoot).Path
 if (-not [IO.Path]::IsPathRooted($ProfilesPath)) { $ProfilesPath = Join-Path $SourceRepoRoot $ProfilesPath }
 
+function ConvertTo-MIRCanonicalText {
+  param([Parameter(Mandatory)][string]$Text)
+  return $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+}
+
 function Write-MIRUtf8NoBom {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Text)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path))
-  [IO.File]::WriteAllText($Path, $Text, [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($Path, (ConvertTo-MIRCanonicalText -Text $Text), [Text.UTF8Encoding]::new($false))
 }
 
 function ConvertTo-MIRStableJson {
@@ -59,6 +64,21 @@ function Get-MIRGitBlob {
   return ([string]$value).Trim()
 }
 
+function Get-MIRGitText {
+  param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path)
+  $value = @(& git -C $SourceRepoRoot show "${Commit}:$Path" 2>$null)
+  if ($LASTEXITCODE -ne 0) { throw "Terminal projection text is unavailable: ${Commit}:$Path" }
+  return (($value -join "`n").TrimEnd() + "`n")
+}
+
+function Test-MIRGitBlob {
+  param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path)
+  & git -C $SourceRepoRoot cat-file -e "${Commit}:$Path" 2>$null
+  $exists = $LASTEXITCODE -eq 0
+  $global:LASTEXITCODE = 0
+  return $exists
+}
+
 function Write-MIRGitBlob {
   param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Destination)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination))
@@ -96,14 +116,38 @@ function Set-MIRAssuranceOverlays {
       if ($observedBlob -ne [string]$file.blob) { throw "Terminal assurance overlay blob changed: $($overlay.id) $path" }
       $destination = [IO.Path]::GetFullPath((Join-Path $TargetRoot $path))
       if (-not $destination.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Terminal assurance overlay escapes the target root: $path" }
+      $orderedOverlayOutputs = @(
+        foreach ($orderedOverlay in @($Target.assurance_overlays)) {
+          foreach ($orderedFile in @($orderedOverlay.files)) {
+            if (([string]$orderedFile.path).Replace("\", "/") -eq $path) { $orderedFile }
+          }
+        }
+      )
+      $finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob
       if ($Check) {
         if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
         $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
-        $expectedBlob = if ($transitionOutput.Count -eq 1) { [string]$transitionOutput[0].blob } else { [string]$file.blob }
-        $targetBlob = (& git hash-object --no-filters -- $destination 2>$null)
+        $expectedBlob = if ($transitionOutput.Count -eq 1) {
+          [string]$transitionOutput[0].blob
+        } elseif ($orderedOverlayOutputs.Count -gt 0) {
+          $finalOverlayBlob
+        } else {
+          [string]$file.blob
+        }
+        # Worktree checkouts may apply the repository's text normalization (for
+        # example, CRLF on Windows).  Compare the clean-filtered worktree value
+        # with the immutable Git blob rather than hashing platform bytes.
+        $targetBlob = (& git -C $SourceRepoRoot hash-object --path=$path -- $destination 2>$null)
         if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
-      } else {
-        Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
+      } elseif ([string]$file.blob -eq $finalOverlayBlob) {
+        $existingBlob = if (Test-Path -LiteralPath $destination -PathType Leaf) {
+          ([string](& git -C $SourceRepoRoot hash-object --no-filters -- $destination 2>$null)).Trim()
+        } else {
+          ""
+        }
+        if ($existingBlob -ne $finalOverlayBlob) {
+          Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
+        }
       }
     }
   }
@@ -194,6 +238,8 @@ if ($isShadowConvergence) {
   throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
 }
 '@
+    $candidateGate = ConvertTo-MIRCanonicalText -Text $candidateGate
+    $shadowGate = ConvertTo-MIRCanonicalText -Text $shadowGate
     if (-not $test.Contains($candidateGate.Trim())) { throw "Terminal performance validator source boundary changed." }
     $test = $test.Replace($candidateGate.Trim(), $shadowGate.Trim())
     Write-MIRUtf8NoBom -Path $testPath -Text ($test.TrimEnd() + "`n")
@@ -230,7 +276,7 @@ release:
 
 function Set-MIRConvergenceAuthority {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Target, [Parameter(Mandatory)]$PortableSource)
-  $expected = Get-MIRConvergenceReleaseBlock -Target $Target -PortableSource $PortableSource
+  $expected = (Get-MIRConvergenceReleaseBlock -Target $Target -PortableSource $PortableSource).Replace("`r`n", "`n").Replace("`r", "`n")
   $assuranceOverlaySummary = if (@($Target.assurance_overlays).Count -eq 0) { "none" } else { @($Target.assurance_overlays | ForEach-Object { "$([string]$_.id)@$([string]$_.commit)" }) -join "," }
   if ($Check) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Terminal convergence authority is missing: $Path" }
@@ -280,8 +326,517 @@ release_gates:
   - complete-structured-validation-summary
 "@.TrimStart("`n")
   }
-  $normalizedSuffix = $suffix.Trim([char[]]@("`r", "`n"))
-  Write-MIRUtf8NoBom -Path $Path -Text ($prefix.TrimEnd() + "`n`n" + $expected.TrimEnd() + "`n`n" + $normalizedSuffix + "`n")
+  $normalizedPrefix = $prefix.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd()
+  $normalizedSuffix = $suffix.Replace("`r`n", "`n").Replace("`r", "`n").Trim([char[]]@("`r", "`n"))
+  Write-MIRUtf8NoBom -Path $Path -Text ($normalizedPrefix + "`n`n" + $expected.TrimEnd() + "`n`n" + $normalizedSuffix + "`n")
+}
+
+function Set-MIRTerminalShadowAssuranceProfile {
+  $path = Join-Path $TargetRoot ".mir/assurance.json"
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "Target shadow has no assurance profile authority: $path"
+  }
+
+  $config = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
+  if ([int]$config.schema -ne 1) { throw "Target shadow assurance profile schema must be 1." }
+
+  $profileName = "terminal-shadow-convergence"
+  $requiredTests = @(
+    "tooling.self-test",
+    "static.balance",
+    "static.museum",
+    "runtime.full",
+    "runtime.exact-zip"
+  )
+  $profileProperty = $config.profiles.PSObject.Properties[$profileName]
+  if ($null -eq $profileProperty) {
+    $config.profiles | Add-Member -NotePropertyName $profileName -NotePropertyValue $requiredTests
+  } else {
+    $profileProperty.Value = $requiredTests
+  }
+
+  $releaseGovernance = @($config.classes | Where-Object { [string]$_.id -eq "release-governance" })
+  if ($releaseGovernance.Count -ne 1) { throw "Target assurance policy must contain one release-governance class." }
+  $shadowAuthorityPattern = '^\.mir/releases/(records/|terminal/shadows/)'
+  if (@($releaseGovernance[0].patterns | Where-Object { [string]$_ -eq $shadowAuthorityPattern }).Count -eq 0) {
+    $releaseGovernance[0].patterns = @($releaseGovernance[0].patterns) + $shadowAuthorityPattern
+  }
+
+  $expected = ConvertTo-MIRStableJson -Value $config
+  if ($Check) {
+    $actual = ConvertTo-MIRStableJson -Value (Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100)
+    if ($actual -cne $expected) { throw "Terminal shadow assurance profile authority is stale: $path" }
+    return
+  }
+  Write-MIRUtf8NoBom -Path $path -Text $expected
+}
+
+function Set-MIRTerminalLegacyFactorioVersionProbe {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+  if ([string]::IsNullOrWhiteSpace([string]$Target.exact_engine_sha256) -or
+      [string]$Target.exact_engine_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw "Lower terminal target lacks an exact engine SHA-256: $Release"
+  }
+
+  $relativePath = "scripts/Invoke-MIRAssurance.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no assurance entry point: $path" }
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $oldLine = '    $factorioVersion = if ($factorioExists) { [string](Get-Item -LiteralPath $context.factorio).VersionInfo.FileVersion } else { "not-provided" }'
+  $newLine = '    $factorioVersion = if ($factorioExists) { Get-MIRAssuranceFactorioVersion -Path $context.factorio } else { "not-provided" }'
+  $functionText = @'
+function Get-MIRAssuranceFactorioVersion {
+  param([Parameter(Mandatory)][string]$Path)
+  $item = Get-Item -LiteralPath $Path
+  $version = [string]$item.VersionInfo.FileVersion
+  if ([string]::IsNullOrWhiteSpace($version)) { $version = [string]$item.VersionInfo.ProductVersion }
+  if ([string]::IsNullOrWhiteSpace($version)) {
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = $Path
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    [void]$start.ArgumentList.Add("--version")
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $start
+    try {
+      [void]$process.Start()
+      $versionText = $process.StandardOutput.ReadToEnd() + "`n" + $process.StandardError.ReadToEnd()
+      $process.WaitForExit()
+      if ($process.ExitCode -eq 0 -and $versionText -match '(?m)^Version:\s+([0-9]+(?:\.[0-9]+)+)') { $version = $Matches[1] }
+    } finally { $process.Dispose() }
+  }
+  if ([string]::IsNullOrWhiteSpace($version)) {
+    $observedSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()
+    if ($observedSha256 -eq "__MIR_EXACT_ENGINE_SHA256__") { $version = "__MIR_EXACT_ENGINE_VERSION__" }
+  }
+  if ([string]::IsNullOrWhiteSpace($version)) { $version = "unknown" }
+  return $version.Trim()
+}
+'@.Trim()
+  $functionText = ConvertTo-MIRCanonicalText -Text $functionText
+  $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_SHA256__", [string]$Target.exact_engine_sha256)
+  $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_VERSION__", ([string]$Target.exact_engine).Replace("-only", ""))
+  $functionMarker = "function Get-MIRAssuranceFactorioVersion {"
+  if ($text.Contains($functionMarker)) {
+    $functionPattern = '(?ms)^function Get-MIRAssuranceFactorioVersion \{.*?^\}\n\n(?=function Show-MIRAssuranceHelp \{)'
+    if (-not [regex]::IsMatch($text, $functionPattern)) { throw "Existing generated Factorio version probe layout changed." }
+    $text = [regex]::Replace($text, $functionPattern, $functionText + "`n`n", 1)
+  } else {
+    $insertMarker = "function Show-MIRAssuranceHelp {"
+    if (-not $text.Contains($insertMarker)) { throw "Target assurance entry-point layout changed before the Factorio version probe." }
+    $text = $text.Replace($insertMarker, $functionText + "`n`n" + $insertMarker)
+  }
+  if ($text.Contains($oldLine)) { $text = $text.Replace($oldLine, $newLine) }
+  if (-not $text.Contains($newLine) -or -not $text.Contains('[void]$start.ArgumentList.Add("--version")')) {
+    throw "Target assurance entry point lacks the bounded legacy Factorio version probe."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
+function Get-MIRVersionSlug {
+  param([Parameter(Mandatory)][string]$Version)
+  return $Version.Replace(".", "-")
+}
+
+function Assert-OrWriteMIRText {
+  param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Text)
+  $expected = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  if ($Check) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Generated terminal shadow text is missing: $Path" }
+    $actual = (Get-Content -Raw -LiteralPath $Path).Replace("`r`n", "`n").Replace("`r", "`n")
+    if ($actual -cne $expected) { throw "Generated terminal shadow text is stale: $Path" }
+    return
+  }
+  Write-MIRUtf8NoBom -Path $Path -Text $expected
+}
+
+function Set-MIRTerminalLegacyUpgradeHarness {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.release -ne "1.6.9") { return @() }
+  if ([string]$Target.exact_engine -ne "0.16.51" -or
+      [string]$Target.target_adapter -ne "factorio-0.16-target-native-no-product-delta") {
+    throw "The 1.6.9 headless upgrade harness policy is outside its exact target envelope."
+  }
+
+  $relativePath = "scripts/Test-MIRUpgrade.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "The 1.6.9 target-native upgrade harness is missing: $path"
+  }
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $benchmarkBlock = @'
+$loadArgs = @(
+  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  "--benchmark", $save, "--benchmark-ticks", "1"
+)
+if ([int]$factorioVersionInfo.FileMajorPart -gt 0) {
+  $loadArgs += @("--benchmark-runs", "1", "--benchmark-sanitize")
+}
+$loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+$loadText = Get-Content -Raw -LiteralPath $log
+if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
+  throw "MIR $ToVersion upgrade proof marker is missing."
+}
+'@.Trim()
+  $headlessBlock = @'
+# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD
+$loadArgs = @(
+  "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+  "--start-server", $save, "--until-tick", "1"
+)
+$loadTimedOutAfterMarkerWindow = $false
+try {
+  $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs -TimeoutMs 30000
+} catch {
+  if ($_.Exception.Message -like "Factorio runtime validation timed out*") {
+    $loadTimedOutAfterMarkerWindow = $true
+    $loadExitCode = 0
+  } else {
+    throw
+  }
+}
+$loadText = Get-Content -Raw -LiteralPath $log
+$proofMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete"
+if ($loadText.Contains($proofMarker)) {
+  # Factorio 0.16 may continue into server transport after the exact
+  # configuration-change assertion. The marker closes the mod load gate.
+  $loadExitCode = 0
+}
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+if (-not $loadText.Contains($proofMarker)) {
+  if ($loadTimedOutAfterMarkerWindow) {
+    throw "MIR $ToVersion upgrade load reached the 0.16 headless-server marker window without producing the proof marker."
+  }
+  throw "MIR $ToVersion upgrade proof marker is missing."
+}
+'@.Trim()
+  $benchmarkBlock = ConvertTo-MIRCanonicalText -Text $benchmarkBlock
+  $headlessBlock = ConvertTo-MIRCanonicalText -Text $headlessBlock
+  $marker = "# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD"
+  if ($text.Contains($benchmarkBlock)) {
+    $text = $text.Replace($benchmarkBlock, $headlessBlock)
+  } elseif (-not $text.Contains($marker)) {
+    throw "The 1.6.9 target-native upgrade harness layout changed before headless projection."
+  }
+  if (-not $text.Contains($headlessBlock) -or $text.Contains('"--benchmark", $save')) {
+    throw "The 1.6.9 upgrade harness does not exclusively use the bounded headless load path."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
+function Set-MIRTerminalUpgradeFixtures {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -eq "current") {
+    if ($Release -ne "3.2.9") {
+      throw "Current-tier terminal upgrade fixture projection is not defined for $Release."
+    }
+
+    $baselineVersion = [string]$Target.baseline.release
+    $preDot5Version = [string]$Target.pre_dot5.release
+    $sourceFixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $baselineVersion)"
+    $sourceFixtureRoot = "fixtures/$sourceFixtureName"
+    $sourceCommit = [string]$Target.baseline.commit
+    $sourceFiles = @("info.json", "control.lua", "data.lua", "data-final-fixes.lua", "settings.lua", "settings-updates.lua")
+    foreach ($requiredPath in $sourceFiles) {
+      if (-not (Test-MIRGitBlob -Commit $sourceCommit -Path "$sourceFixtureRoot/$requiredPath")) {
+        throw "Immutable predecessor lacks the current-tier direct-upgrade fixture input: $sourceFixtureRoot/$requiredPath"
+      }
+    }
+
+    $fixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $fixtureRoot = "fixtures/$fixtureName"
+    foreach ($sourceFile in $sourceFiles) {
+      $destination = Join-Path $TargetRoot "$fixtureRoot/$sourceFile"
+      if ($sourceFile -eq "info.json") {
+        $info = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile" | ConvertFrom-Json -Depth 100
+        $info.name = "mir-fixture-$fixtureName"
+        $info.title = "MIR Fixture - Assert $preDot5Version to $Release Upgrade"
+        Assert-OrWriteMIRJson -Path $destination -Value $info
+        continue
+      }
+      $text = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile"
+      $text = $text.Replace($sourceFixtureName, $fixtureName)
+      $text = $text.Replace($baselineVersion, $Release)
+      if ($sourceFile -eq "control.lua") {
+        $baselineSaveName = "mir-$($baselineVersion.Replace('.', ''))-upgraded"
+        $releaseSaveName = "mir-$($Release.Replace('.', ''))-upgraded"
+        $text = $text.Replace($baselineSaveName, $releaseSaveName)
+      }
+      Assert-OrWriteMIRText -Path $destination -Text ($text.TrimEnd() + "`n")
+    }
+
+    $control = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot "$fixtureRoot/control.lua")
+    $fixtureData = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot "$fixtureRoot/data.lua")
+    if (-not $fixtureData.Contains($fixtureName) -or $fixtureData.Contains($sourceFixtureName)) {
+      throw "Generated current-tier direct-upgrade fixture retains a stale compatibility-pack applicability identity."
+    }
+    foreach ($requiredMarker in @(
+      "script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"",
+      "script.active_mods[`"more-infinite-research`"] ~= `"$Release`"",
+      "[mir-fixture] $preDot5Version upgrade source proof complete",
+      "[mir-fixture] $preDot5Version to $Release upgrade proof complete",
+      "game.server_save(`"mir-$($Release.Replace('.', ''))-upgraded`")"
+    )) {
+      if (-not $control.Contains($requiredMarker)) {
+        throw "Generated current-tier direct-upgrade fixture lacks marker: $requiredMarker"
+      }
+    }
+
+    $rows = @(
+      [ordered]@{
+        id = "$baselineVersion-to-$Release"
+        from = $Target.baseline
+        to_release = $Release
+        exact_engine = [string]$Target.exact_engine
+        source_fixture = [ordered]@{
+          path = "fixtures/assert-upgrade-$(Get-MIRVersionSlug -Version $baselineVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+          commit = [string]$profiles.portable_source.authority_commit
+        }
+        generated_fixture = "fixtures/assert-upgrade-$(Get-MIRVersionSlug -Version $baselineVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+        proof_path = "build/reports/release/$Release/$baselineVersion-to-$Release-upgrade-proof.json"
+        status = "planned-unfrozen-candidate-unassigned"
+      },
+      [ordered]@{
+        id = "$preDot5Version-to-$Release"
+        from = $Target.pre_dot5
+        to_release = $Release
+        exact_engine = [string]$Target.exact_engine
+        source_fixture = [ordered]@{path=$sourceFixtureRoot;commit=$sourceCommit}
+        generated_fixture = $fixtureRoot
+        proof_path = "build/reports/release/$Release/$preDot5Version-to-$Release-upgrade-proof.json"
+        status = "planned-unfrozen-candidate-unassigned"
+      }
+    )
+    if ((@($rows.id) -join "|") -cne (@($Target.upgrade_rows) -join "|")) {
+      throw "Current-tier generated upgrade rows differ from the terminal target matrix."
+    }
+
+    $manifest = [ordered]@{
+      schema = 1
+      kind = "MIR3TerminalShadowUpgradeFixturesV1"
+      release = $Release
+      target = [string]$Target.factorio_line
+      phase = "shadow-convergence"
+      rows = $rows
+      source_frozen = $false
+      candidate_id = $null
+    }
+    $manifestPath = ".mir/releases/terminal/shadows/$Release/upgrade-fixtures.json"
+    Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot $manifestPath) -Value $manifest
+
+    $registryPath = Join-Path $TargetRoot ".mir/fixtures.yml"
+    $registry = (Get-Content -Raw -LiteralPath $registryPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $startMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES release=$Release"
+    $endMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=$Release"
+    $blockPattern = '(?ms)^' + [regex]::Escape($startMarker) + '.*?^' + [regex]::Escape($endMarker) + '\n?'
+    $registry = [regex]::Replace($registry, $blockPattern, '').TrimEnd()
+    $registryKey = "terminal-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $block = @"
+$startMarker
+  ${registryKey}:
+    requires_features: [recipe_productivity]
+    assertion_path: $fixtureRoot
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "$preDot5Version"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-$preDot5Version-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-$Release-development-archive-load
+$endMarker
+"@.TrimEnd()
+    Assert-OrWriteMIRText -Path $registryPath -Text ($registry + "`n`n$block`n")
+    return @($manifestPath, ".mir/fixtures.yml", $fixtureRoot)
+  }
+  if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+
+  $baselineVersion = [string]$Target.baseline.release
+  $preDot5Version = [string]$Target.pre_dot5.release
+  $sourceFixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $baselineVersion)"
+  $sourceFixtureRoot = "fixtures/$sourceFixtureName"
+  $sourceCommit = [string]$Target.baseline.commit
+  foreach ($requiredPath in @("info.json", "control.lua", "data.lua")) {
+    if (-not (Test-MIRGitBlob -Commit $sourceCommit -Path "$sourceFixtureRoot/$requiredPath")) {
+      throw "Immutable predecessor lacks the target-native upgrade fixture input: $sourceFixtureRoot/$requiredPath"
+    }
+  }
+
+  $sourceInfo = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/info.json" | ConvertFrom-Json -Depth 100
+  $sourceControl = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/control.lua"
+  $sourceData = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/data.lua"
+  $hasSettingsUpdates = Test-MIRGitBlob -Commit $sourceCommit -Path "$sourceFixtureRoot/settings-updates.lua"
+  $sourceSettingsUpdates = if ($hasSettingsUpdates) { Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/settings-updates.lua" } else { "" }
+  $rows = @()
+  $registryBlocks = @()
+  $generatedAuthorities = @()
+
+  foreach ($fromVersion in @($baselineVersion, $preDot5Version)) {
+    $rowId = "$fromVersion-to-$Release"
+    if (@($Target.upgrade_rows | Where-Object { [string]$_ -eq $rowId }).Count -ne 1) {
+      throw "Terminal upgrade row $rowId is absent or duplicated for $Release."
+    }
+    $fixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $fromVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $fixtureRoot = "fixtures/$fixtureName"
+    $info = $sourceInfo | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+    $info.name = "mir-fixture-$fixtureName"
+    $info.title = "MIR Fixture - Assert $fromVersion to $Release Retention"
+    $info.dependencies = @($info.dependencies | ForEach-Object {
+      $dependency = [string]$_
+      if ($dependency -match '^more-infinite-research\s') { "more-infinite-research >= $fromVersion" } else { $dependency }
+    })
+
+    $control = $sourceControl
+    $control = $control.Replace("local from_version = `"$preDot5Version`"", "local from_version = `"$fromVersion`"")
+    $control = $control.Replace("local to_version = `"$baselineVersion`"", "local to_version = `"$Release`"")
+    $control = $control.Replace("$preDot5Version to $baselineVersion", "$fromVersion to $Release")
+    $control = $control.Replace("$preDot5Version upgrade source proof", "$fromVersion upgrade source proof")
+    $control = $control.Replace("mir-$preDot5Version-save", "mir-$fromVersion-save")
+    $settingsUpdates = if ($hasSettingsUpdates) {
+      $sourceSettingsUpdates.Replace($preDot5Version, $fromVersion)
+    } else {
+      ""
+    }
+    foreach ($requiredMarker in @(
+      "local from_version = `"$fromVersion`"",
+      "local to_version = `"$Release`"",
+      "[mir-fixture] $fromVersion upgrade source proof complete",
+      "[mir-fixture] $fromVersion to $Release upgrade proof complete"
+    )) {
+      if (-not $control.Contains($requiredMarker)) { throw "Generated terminal upgrade fixture lacks marker: $requiredMarker" }
+    }
+
+    Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot "$fixtureRoot/info.json") -Value $info
+    Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/control.lua") -Text $control
+    Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/data.lua") -Text $sourceData
+    if ($hasSettingsUpdates) {
+      if (-not $settingsUpdates.Contains($fromVersion)) {
+        throw "Generated terminal upgrade settings override lacks source version $fromVersion."
+      }
+      Assert-OrWriteMIRText -Path (Join-Path $TargetRoot "$fixtureRoot/settings-updates.lua") -Text $settingsUpdates
+    }
+
+    $rows += [ordered]@{
+      id = $rowId
+      from = if ($fromVersion -eq $baselineVersion) { $Target.baseline } else { $Target.pre_dot5 }
+      to_release = $Release
+      exact_engine = [string]$Target.exact_engine
+      source_fixture = [ordered]@{path=$sourceFixtureRoot;commit=$sourceCommit}
+      generated_fixture = $fixtureRoot
+      proof_path = "build/reports/release/$Release/$rowId-upgrade-proof.json"
+      status = "planned-unfrozen-candidate-unassigned"
+    }
+    $registryKey = "terminal-upgrade-$(Get-MIRVersionSlug -Version $fromVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $registryBlocks += @"
+  ${registryKey}:
+    requires_features: []
+    assertion_path: $fixtureRoot
+    validates:
+      - exact-$fromVersion-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-$Release-development-archive-load
+"@.TrimEnd()
+    $generatedAuthorities += $fixtureRoot
+  }
+
+  $manifest = [ordered]@{
+    schema = 1
+    kind = "MIR3TerminalShadowUpgradeFixturesV1"
+    release = $Release
+    target = [string]$Target.factorio_line
+    phase = "shadow-convergence"
+    rows = $rows
+    source_frozen = $false
+    candidate_id = $null
+  }
+  $manifestPath = ".mir/releases/terminal/shadows/$Release/upgrade-fixtures.json"
+  Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot $manifestPath) -Value $manifest
+
+  $registryPath = Join-Path $TargetRoot ".mir/fixtures.yml"
+  if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) { throw "Target shadow has no fixture registry: $registryPath" }
+  $registry = (Get-Content -Raw -LiteralPath $registryPath).Replace("`r`n", "`n").Replace("`r", "`n")
+  $startMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES release=$Release"
+  $endMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=$Release"
+  $blockPattern = '(?ms)^' + [regex]::Escape($startMarker) + '.*?^' + [regex]::Escape($endMarker) + '\n?'
+  $registry = [regex]::Replace($registry, $blockPattern, '').TrimEnd()
+  $expectedRegistry = $registry + "`n`n$startMarker`n" + ($registryBlocks -join "`n`n") + "`n$endMarker`n"
+  Assert-OrWriteMIRText -Path $registryPath -Text $expectedRegistry
+
+  return @($manifestPath, ".mir/fixtures.yml") + @($generatedAuthorities)
+}
+
+function Set-MIRTerminalReleaseNoteRegistry {
+  param([Parameter(Mandatory)]$Target)
+  $path = Join-Path $TargetRoot ".mir/docs.yml"
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no documentation registry: $path" }
+  $relativeNote = "docs/releases/notes/release-notes-$Release.md"
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $startMarker = "# MIR3-TERMINAL-RELEASE-NOTE release=$Release"
+  $endMarker = "# MIR3-TERMINAL-RELEASE-NOTE-END release=$Release"
+  $blockPattern = '(?ms)^' + [regex]::Escape($startMarker) + '.*?^' + [regex]::Escape($endMarker) + '\n?'
+  $text = [regex]::Replace($text, $blockPattern, '').TrimEnd()
+  $block = @"
+$startMarker
+  - path: $relativeNote
+    title: "MIR $Release Terminal Shadow Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-$($Release.Replace('.', '-'))-terminal-shadow-notes
+$endMarker
+"@.TrimEnd()
+  $expected = if ($text -match ('(?m)^\s*- path: ' + [regex]::Escape($relativeNote) + '$')) {
+    $text.TrimEnd() + "`n"
+  } else {
+    $text + "`n`n" + $block + "`n"
+  }
+  Assert-OrWriteMIRText -Path $path -Text $expected
+  return @(".mir/docs.yml")
+}
+
+function Set-MIRTerminalBackportSourceLock {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+  $lockPath = Join-Path $TargetRoot ".mir/backport-source-lock.json"
+  if (-not (Test-Path -LiteralPath $lockPath -PathType Leaf)) { throw "Lower target shadow lacks a backport source lock: $lockPath" }
+  $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json -Depth 100
+  if ([int]$lock.schema -ne 1 -or [string]$lock.mir_version -notin @([string]$Target.baseline.release, $Release)) {
+    throw "Lower target source lock is not an immutable predecessor or current terminal projection."
+  }
+  $originalFeaturePath = [string]$lock.feature_classification
+  $featurePath = ".mir/releases/terminal/shadows/$Release/feature-classification.json"
+  $sourceFeaturePath = Join-Path $TargetRoot $originalFeaturePath
+  if ([string]$lock.mir_version -eq $Release -and (Test-Path -LiteralPath (Join-Path $TargetRoot $featurePath) -PathType Leaf)) {
+    $sourceFeaturePath = Join-Path $TargetRoot $featurePath
+  }
+  if (-not (Test-Path -LiteralPath $sourceFeaturePath -PathType Leaf)) { throw "Lower target source-lock feature classification is missing: $sourceFeaturePath" }
+  $feature = Get-Content -Raw -LiteralPath $sourceFeaturePath | ConvertFrom-Json -Depth 100
+  $feature.mir_version = $Release
+  Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot $featurePath) -Value $feature
+
+  $lock.mir_version = $Release
+  $lock.feature_classification = $featurePath
+  $lock.release_notes = "docs/releases/notes/release-notes-$Release.md"
+  $lock.validation_summary = "build/reports/release/$Release/shadow-qualification.json"
+  $lock.candidate_seal = "build/reports/release/$Release/candidate-unassigned.json"
+  Assert-OrWriteMIRJson -Path $lockPath -Value $lock
+  return @(".mir/backport-source-lock.json", $featurePath)
 }
 
 $profiles = Get-Content -Raw -LiteralPath $ProfilesPath | ConvertFrom-Json -Depth 100
@@ -304,6 +859,12 @@ if ((Get-MIRGitCommit -Ref ([string]$profiles.portable_source.authority_commit))
 
 Set-MIRAssuranceOverlays -Target $target
 Set-MIRPerformanceTransition -Target $target
+Set-MIRTerminalShadowAssuranceProfile
+$terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
+$terminalLegacyUpgradeHarnessAuthorities = @(Set-MIRTerminalLegacyUpgradeHarness -Target $target)
+$terminalUpgradeFixtureAuthorities = @(Set-MIRTerminalUpgradeFixtures -Target $target)
+$terminalDocumentationAuthorities = @(Set-MIRTerminalReleaseNoteRegistry -Target $target)
+$terminalBackportLockAuthorities = @(Set-MIRTerminalBackportSourceLock -Target $target)
 
 $infoPath = Join-Path $TargetRoot "info.json"
 if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { throw "Target shadow has no info.json: $TargetRoot" }
@@ -381,14 +942,17 @@ $qualificationContext = [ordered]@{
   release = [string]$target.release
   target = [string]$target.factorio_line
   exact_engine = [string]$target.exact_engine
+  exact_engine_sha256 = [string]$target.exact_engine_sha256
   support_tier = [string]$target.support_tier
   target_profile = [string]$target.target_profile
   target_adapter = [string]$target.target_adapter
+  assurance_profile = "terminal-shadow-convergence"
   assurance_overlays = @($target.assurance_overlays)
   performance_transition = $target.performance_transition
   baseline = $target.baseline
   pre_dot5 = $target.pre_dot5
   upgrade_rows = @($target.upgrade_rows)
+  upgrade_fixture_manifest = if ($terminalUpgradeFixtureAuthorities.Count -gt 0) { ".mir/releases/terminal/shadows/$Release/upgrade-fixtures.json" } else { $null }
   package_manifest = ".mir/releases/terminal/shadows/$Release/package-manifest.json"
   release_record = ".mir/releases/records/$Release.json"
   release_notes = "docs/releases/notes/release-notes-$Release.md"
@@ -409,12 +973,13 @@ $transitionPlan = [ordered]@{
   generated_authorities = @(
     "info.json",
     ".mir/convergence.yml",
+    ".mir/assurance.json",
     ".mir/releases/records/$Release.json",
     ".mir/releases/terminal/shadows/$Release/package-manifest.json",
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  )
+  ) + @($terminalLegacyProbeAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"
@@ -425,10 +990,16 @@ Assert-OrWriteMIRJson -Path (Join-Path $projectionRoot "transition-plan.json") -
 
 $marker = "<!-- MIR3-TERMINAL-SHADOW release=$Release target=$([string]$target.factorio_line) baseline=$([string]$target.baseline.release) pre-dot5=$([string]$target.pre_dot5.release) candidate=unassigned source-frozen=false -->"
 $notesPath = Join-Path $TargetRoot "docs/releases/notes/release-notes-$Release.md"
+$sourceLockLine = ""
+if ([string]$target.support_tier -in @("lts", "historical", "finite")) {
+  $shadowSourceLock = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
+  $sourceLockLine = "- Historical canonical development anchor: $([string]$shadowSourceLock.canonical_dev_anchor)"
+}
 if ($Check) {
   if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Terminal release notes are missing for $Release." }
   $notes = (Get-Content -Raw -LiteralPath $notesPath).Replace("`r`n", "`n").Replace("`r", "`n")
-  if (-not $notes.StartsWith("---`n") -or -not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release)) {
+  if (-not $notes.StartsWith("---`n") -or -not $notes.Contains($marker) -or $notes -notmatch [regex]::Escape($Release) -or
+      ($sourceLockLine -and -not $notes.Contains($sourceLockLine))) {
     throw "Terminal release-note identity or front matter is stale for $Release."
   }
   $frontMatterEnd = $notes.IndexOf("`n---`n", 4)
@@ -467,9 +1038,14 @@ This is an unfrozen target-native MIR 3 terminal shadow for Factorio $([string]$
 
 - Immutable predecessor: $([string]$target.baseline.release) at $([string]$target.baseline.commit)
 - Portable source authority: $([string]$profiles.portable_source.release) at $([string]$profiles.portable_source.authority_commit)
+- Historical target anchor: $([string]$target.baseline.release) source-lock ancestry remains bound by .mir/backport-source-lock.json
 - Product disposition: $([string]$target.product_disposition)
 - Required upgrades: $(@($target.upgrade_rows) -join ", ")
 "@
+  }
+  if ($sourceLockLine) {
+    $notes = [regex]::Replace($notes, '(?m)^- Historical canonical development anchor: [0-9a-f]{40}\n?', '')
+    $notes = $notes.TrimEnd() + "`n`n$sourceLockLine`n"
   }
   Write-MIRUtf8NoBom -Path $notesPath -Text ($notes.TrimEnd() + "`n")
 }
