@@ -21,11 +21,11 @@ function Test-MIRTerminalDetachedHeadEquivalent {
   )
   $replacement = switch ($RelativePath) {
     "scripts/Invoke-MIRAssurance.ps1" {
-      @{safe='      branch=([string](& git -C $repo branch --show-current)).Trim()'; unsafe='      branch=(& git -C $repo branch --show-current).Trim()'}
+      @{safe='      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'; unsafe='      branch=(& git -C $repo branch --show-current).Trim()'}
       break
     }
     { $_ -in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1") } {
-      @{safe='  $branch = ([string](& git -C $repo branch --show-current)).Trim()'; unsafe='  $branch = (& git -C $repo branch --show-current).Trim()'}
+      @{safe='  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'; unsafe='  $branch = (& git -C $repo branch --show-current).Trim()'}
       break
     }
     default { return $false }
@@ -339,8 +339,10 @@ try {
           [string]$qualification.exact_engine_sha256 -ne [string]$row.exact_engine_sha256 -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
-          -not $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
-          -not $assuranceReleaseLibrary.Contains('$branch = ([string](& git -C $repo branch --show-current)).Trim()') -or
+          -not $assuranceEntryPoint.Contains('branch=(@(& git -C $repo branch --show-current) -join "").Trim()') -or
+          $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
+          -not $assuranceReleaseLibrary.Contains('$branch = (@(& git -C $repo branch --show-current) -join "").Trim()') -or
+          $assuranceReleaseLibrary.Contains('$branch = ([string](& git -C $repo branch --show-current)).Trim()') -or
           $assuranceReleaseLibrary.Contains('$branch = (& git -C $repo branch --show-current).Trim()') -or
           -not $validationEntryPoint.Contains('$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"') -or
           -not $validationEntryPoint.Contains('function Remove-MIRGeneratedValidationUserData {') -or

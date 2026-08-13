@@ -95,14 +95,14 @@ function Test-MIRTerminalDetachedHeadEquivalent {
   $replacement = switch ($RelativePath) {
     "scripts/Invoke-MIRAssurance.ps1" {
       @{
-        safe = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+        safe = '      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'
         unsafe = '      branch=(& git -C $repo branch --show-current).Trim()'
       }
       break
     }
     { $_ -in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1") } {
       @{
-        safe = '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+        safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
         unsafe = '  $branch = (& git -C $repo branch --show-current).Trim()'
       }
       break
@@ -484,20 +484,29 @@ function Set-MIRTerminalDetachedHeadInventory {
     [ordered]@{
       relative_path = "scripts/Invoke-MIRAssurance.ps1"
       required = $true
-      unsafe = '      branch=(& git -C $repo branch --show-current).Trim()'
-      safe = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+      unsafe = @(
+        '      branch=(& git -C $repo branch --show-current).Trim()',
+        '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'
     },
     [ordered]@{
       relative_path = "scripts/MIRAssurance/Release.ps1"
       required = $false
-      unsafe = '  $branch = (& git -C $repo branch --show-current).Trim()'
-      safe = '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      unsafe = @(
+        '  $branch = (& git -C $repo branch --show-current).Trim()',
+        '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
     },
     [ordered]@{
       relative_path = "tools/lib/assurance/Release.ps1"
       required = $false
-      unsafe = '  $branch = (& git -C $repo branch --show-current).Trim()'
-      safe = '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      unsafe = @(
+        '  $branch = (& git -C $repo branch --show-current).Trim()',
+        '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
     }
   )
   foreach ($policy in $policies) {
@@ -508,8 +517,10 @@ function Set-MIRTerminalDetachedHeadInventory {
       continue
     }
     $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
-    if ($text.Contains([string]$policy.unsafe)) {
-      $text = $text.Replace([string]$policy.unsafe, [string]$policy.safe)
+    foreach ($unsafe in @($policy.unsafe)) {
+      if ($text.Contains([string]$unsafe)) {
+        $text = $text.Replace([string]$unsafe, [string]$policy.safe)
+      }
     }
     if (-not $text.Contains([string]$policy.safe)) {
       throw "Target assurance authority does not safely represent a detached HEAD: $relativePath"
