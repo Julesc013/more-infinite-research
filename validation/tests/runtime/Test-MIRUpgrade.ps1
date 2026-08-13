@@ -97,8 +97,10 @@ function Copy-MIRUpgradeLogEvidence {
         $line `
           -replace '(?i)[A-Z]:\\Program Files\\Steam\\steamapps\\common\\Factorio', '<factorio-install>' `
           -replace '(?i)[A-Z]:/Program Files/Steam/steamapps/common/Factorio', '<factorio-install>' `
-          -replace '(?i)[A-Z]:\\Users\\[^\\]+\\AppData\\Local\\Temp\\mir-upgrade-[^\\\s"]+', '<temp-upgrade-root>' `
-          -replace '(?i)[A-Z]:/Users/[^/]+/AppData/Local/Temp/mir-upgrade-[^/\s"]+', '<temp-upgrade-root>'
+          -replace '(?i)[A-Z]:\\[^\s"]*\\build\\validation-upgrades\\u-[0-9a-f]+', '<upgrade-root>' `
+          -replace '(?i)[A-Z]:/[^\s"]*/build/validation-upgrades/u-[0-9a-f]+', '<upgrade-root>' `
+          -replace '(?i)[A-Z]:\\Users\\[^\\]+\\AppData\\Local\\Temp\\mir-upgrade-[^\\\s"]+', '<upgrade-root>' `
+          -replace '(?i)[A-Z]:/Users/[^/]+/AppData/Local/Temp/mir-upgrade-[^/\s"]+', '<upgrade-root>'
       }
   )
   $normalized | Set-Content -LiteralPath $Destination -Encoding UTF8
@@ -143,8 +145,15 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else 
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
-$upgradeSlug = (($FromVersion + "-to-" + $ToVersion + "-" + $artifactSlug) -replace '[^0-9A-Za-z.-]', '-')
-$root = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-upgrade-$upgradeSlug-" + [guid]::NewGuid().ToString("N"))
+$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"
+New-Item -ItemType Directory -Force -Path $generatedUpgradeRoot | Out-Null
+$resolvedRepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path.TrimEnd("\") + "\"
+$resolvedUpgradeRoot = (Resolve-Path -LiteralPath $generatedUpgradeRoot).Path
+if (-not $resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)) {
+  throw "Generated upgrade root escapes the repository: $resolvedUpgradeRoot"
+}
+$root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
+Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log") -Context "Upgrade Factorio log path"
 $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
 $saves = Join-Path $userdata "saves"
@@ -196,7 +205,8 @@ if ($Archetype) {
   Set-Content -LiteralPath $settingsPath -Value $updatedSettingsText -Encoding UTF8
 }
 
-$save = Join-Path $root "mir-$FromVersion-$artifactSlug-save.zip"
+$save = Join-Path $root "source.zip"
+Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
@@ -238,10 +248,12 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-2-to-3-2-3",
   "assert-upgrade-3-2-3-to-3-2-4",
   "assert-upgrade-3-2-3-to-3-2-5",
+  "assert-upgrade-3-2-3-to-3-2-9",
   "assert-upgrade-3-2-5-to-3-2-9"
 )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"
+Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"
 $governedUpgradeMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 $loadArgs = if ($requiresReloadProof) {
   @(

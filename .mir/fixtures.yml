@@ -1172,3 +1172,25 @@ fixtures:
       - single-technology-coverage-scan
       - complete-recipe-accounting
       - chunked-full-index-fingerprint
+
+# MIR3-TERMINAL-UPGRADE-FIXTURES release=3.2.9
+  terminal-upgrade-3-2-3-to-3-2-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-9
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.3"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3.2.3-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-3.2.9-development-archive-load
+# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=3.2.9

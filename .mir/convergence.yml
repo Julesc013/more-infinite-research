@@ -11,7 +11,7 @@ release:
   portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
   target_profile: "factorio-2.1"
   target_adapter: "canonical-factorio-2.1"
-  target_assurance_overlays: "factorio-2.1-validation-userdata-v1@2a27929fc51db75cc339f7b197931426bef8b5fa,factorio-2.1-scenario-authority-parity-v1@38eaa3f9ad6c295113537d9c3fa6f5db636f20e2"
+  target_assurance_overlays: "factorio-2.1-validation-userdata-v1@2a27929fc51db75cc339f7b197931426bef8b5fa,factorio-2.1-scenario-authority-parity-v1@38eaa3f9ad6c295113537d9c3fa6f5db636f20e2,factorio-2.1-upgrade-userdata-v2@76fa21a08d3907ee74fd5aaf13741e5c3b8ea17b"
   objective: cost-compatibility-observability-convergence
   public_contract_change: patch-compatible
   terminal_shadow_status: source-unfrozen-candidate-unassigned

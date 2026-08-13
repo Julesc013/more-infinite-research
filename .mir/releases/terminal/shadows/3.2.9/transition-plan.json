@@ -78,6 +78,21 @@
             "blob": "f9e8c06c3892fc6e52b2094f2271bcbd6289f101"
           }
         ]
+      },
+      {
+        "id": "factorio-2.1-upgrade-userdata-v2",
+        "commit": "76fa21a08d3907ee74fd5aaf13741e5c3b8ea17b",
+        "reason": "Carry the frozen-assurance false-failure correction that runs direct-upgrade Factorio userdata under compact repository build and save paths, requires direct 3.2.3 to 3.2.9 reload proof, and preserves deterministic path-normalized logs.",
+        "files": [
+          {
+            "path": "validation/tests/runtime/Test-MIRUpgrade.ps1",
+            "blob": "02b223f90e587d59183fcc48169a968278fae40b"
+          },
+          {
+            "path": "validation/tests/tooling/Test-MIRValidationResults.ps1",
+            "blob": "2257fd3fe4f8bf6a3d9deff5b469901fc7c79ace"
+          }
+        ]
       }
     ],
     "performance_transition": null
@@ -91,6 +106,9 @@
     ".mir/releases/terminal/shadows/3.2.9/qualification-context.json",
     "docs/releases/notes/release-notes-3.2.9.md",
     "changelog.txt",
+    ".mir/releases/terminal/shadows/3.2.9/upgrade-fixtures.json",
+    ".mir/fixtures.yml",
+    "fixtures/assert-upgrade-3-2-3-to-3-2-9",
     ".mir/docs.yml"
   ],
   "product_findings": [
