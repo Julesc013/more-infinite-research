@@ -22,7 +22,17 @@ function ConvertTo-MIRCanonicalText {
 function Write-MIRUtf8NoBom {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Text)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path))
-  [IO.File]::WriteAllText($Path, (ConvertTo-MIRCanonicalText -Text $Text), [Text.UTF8Encoding]::new($false))
+  $canonicalText = ConvertTo-MIRCanonicalText -Text $Text
+  $encoding = [Text.UTF8Encoding]::new($false)
+  for ($attempt = 1; $attempt -le 20; $attempt++) {
+    try {
+      [IO.File]::WriteAllText($Path, $canonicalText, $encoding)
+      return
+    } catch [IO.IOException] {
+      if ($attempt -ge 20) { throw }
+      Start-Sleep -Milliseconds ([Math]::Min(50 * $attempt, 500))
+    }
+  }
 }
 
 function ConvertTo-MIRStableJson {
