@@ -39,6 +39,17 @@
       "stable_id_and_migration_impact": "No technology ID change and no migration identity allocation; changed prerequisites require direct upgrade graph and progress proof on each implemented target.",
       "required_regressions": ["MIR-owned Factorio 2.1 alternate-route fixture", "MIR-owned Factorio 2.0 alternate-route fixture", "later-route monotonicity", "disabled-cycle-and-self-lock rejection", "stable IDs", "3.2.5-to-3.2.9 upgrade", "2.5.5-to-2.5.9 upgrade"],
       "fixed_point_scope": ["3.2.9", "2.5.9"]
+    },
+    {
+      "id": "MIR3-TERM-0031",
+      "title": "Combined compilation plan can assign one direct effect to both a dedicated stream and a base continuation",
+      "implementation_contract": "CombinedCompilationPlanEffectOwnershipV1",
+      "affected_targets": ["3.2.9", "2.5.9"],
+      "generic_invariant": "Every direct-effect identity in the combined compilation plan has one deterministic effective owner before strict final validation, except only explicitly documented identity-scoped overlaps.",
+      "required_properties": ["combined-operation-vector", "adopted-owner-before-stream-before-base-ranking", "same-operation-duplicates-remain-fatal", "partial-base-redesign-and-refingerprint", "empty-base-omission", "stable-technology-ids", "identity-scoped-documented-overlap-only"],
+      "stable_id_and_migration_impact": "No technology ID or migration identity change; losing base claims are removed before graph qualification and any retained base continuation receives refreshed design and fingerprint authority.",
+      "required_regressions": ["MIR-owned Tesla direct-effect collision", "partial base continuation retains unique effects", "empty base continuation is omitted", "same-operation duplicate remains fatal", "exact Factorio 2.1 Space Exploration load", "exact Factorio 2.0 Space Exploration load", "3.2.5-to-3.2.9 upgrade", "2.5.5-to-2.5.9 upgrade"],
+      "fixed_point_scope": ["3.2.9", "2.5.9"]
     }
   ],
   "rejected_or_deferred": [
@@ -50,8 +61,8 @@
     {"id":"broader-K2-version-support","disposition":"support-claim-narrowed","reason":"No behavior outside the exact admitted K2/K2SO envelope is inferred."}
   ],
   "all_nine_dispositions": [
-    {"release":"3.2.9","findings":["MIR3-TERM-0027","MIR3-TERM-0028"],"projection":"canonical-2.1-implementation"},
-    {"release":"2.5.9","findings":["MIR3-TERM-0028"],"projection":"target-aware-2.0-adapter-and-generic-fixture; no direct Cubium claim"},
+    {"release":"3.2.9","findings":["MIR3-TERM-0027","MIR3-TERM-0028","MIR3-TERM-0031"],"projection":"canonical-2.1-implementation"},
+    {"release":"2.5.9","findings":["MIR3-TERM-0028","MIR3-TERM-0031"],"projection":"target-aware-2.0-adapters-and-generic-fixtures; no direct Cubium claim"},
     {"release":"1.9.9","findings":[],"projection":"no-product-delta"},
     {"release":"1.8.9","findings":[],"projection":"no-product-delta"},
     {"release":"1.7.9","findings":[],"projection":"no-product-delta"},
