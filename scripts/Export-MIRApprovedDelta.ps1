@@ -729,12 +729,12 @@ function Get-DifferenceDisposition {
     }
     if ($Path -eq 'package.archive_sha256' -and
         [string]$Before -eq '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C' -and
-        [string]$After -eq '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2') {
+        [string]$After -eq [string]$script:TerminalShadowArchiveSha256) {
       return [ordered]@{ reason='The archive identity advances from immutable 2.5.5 to the exact current 2.5.9 development shadow.'; intentional=$true; migration_impact='Development package custody changes; all semantic differences remain independently classified.'; required_evidence=$evidence }
     }
     if ($Path -eq 'package.package_content_sha256' -and
         [string]$Before -eq '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154' -and
-        [string]$After -eq '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E') {
+        [string]$After -eq [string]$script:TerminalShadowContentSha256) {
       return [ordered]@{ reason='The normalized package identity advances to the exact current 2.5.9 development shadow.'; intentional=$true; migration_impact='Package content changes only within the admitted target projection; every observed semantic row remains independently classified.'; required_evidence=$evidence }
     }
     $terminalScenarios = @(
@@ -1065,6 +1065,8 @@ if ($script:IsFactorio20TerminalShadowDelta) {
   $shadowPerformance = $shadowManifest.source.performance_transition
   $shadowDevelopment = $shadowPerformance.development_package
   $shadowBaseline = $shadowPerformance.baseline
+  $script:TerminalShadowArchiveSha256 = [string]$shadowDevelopment.archive_sha256
+  $script:TerminalShadowContentSha256 = [string]$shadowDevelopment.package_content_sha256
   if ([int]$shadowManifest.schema -ne 1 -or [string]$shadowManifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
       [string]$shadowManifest.release -ne '2.5.9' -or [string]$shadowManifest.target -ne '2.0' -or
       $shadowManifest.source_frozen -ne $false -or $null -ne $shadowManifest.candidate_id -or
