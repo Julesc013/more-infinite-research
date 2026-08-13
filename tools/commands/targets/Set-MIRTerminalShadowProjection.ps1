@@ -512,6 +512,126 @@ if (-not $loadText.Contains($proofMarker)) {
 
 function Set-MIRTerminalUpgradeFixtures {
   param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -eq "current") {
+    if ($Release -ne "3.2.9") {
+      throw "Current-tier terminal upgrade fixture projection is not defined for $Release."
+    }
+
+    $baselineVersion = [string]$Target.baseline.release
+    $preDot5Version = [string]$Target.pre_dot5.release
+    $sourceFixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $baselineVersion)"
+    $sourceFixtureRoot = "fixtures/$sourceFixtureName"
+    $sourceCommit = [string]$Target.baseline.commit
+    $sourceFiles = @("info.json", "control.lua", "data.lua", "data-final-fixes.lua", "settings.lua", "settings-updates.lua")
+    foreach ($requiredPath in $sourceFiles) {
+      if (-not (Test-MIRGitBlob -Commit $sourceCommit -Path "$sourceFixtureRoot/$requiredPath")) {
+        throw "Immutable predecessor lacks the current-tier direct-upgrade fixture input: $sourceFixtureRoot/$requiredPath"
+      }
+    }
+
+    $fixtureName = "assert-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $fixtureRoot = "fixtures/$fixtureName"
+    foreach ($sourceFile in $sourceFiles) {
+      $destination = Join-Path $TargetRoot "$fixtureRoot/$sourceFile"
+      if ($sourceFile -eq "info.json") {
+        $info = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile" | ConvertFrom-Json -Depth 100
+        $info.name = "mir-fixture-$fixtureName"
+        $info.title = "MIR Fixture - Assert $preDot5Version to $Release Upgrade"
+        Assert-OrWriteMIRJson -Path $destination -Value $info
+        continue
+      }
+      $text = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile"
+      $text = $text.Replace($baselineVersion, $Release)
+      Assert-OrWriteMIRText -Path $destination -Text ($text.TrimEnd() + "`n")
+    }
+
+    $control = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot "$fixtureRoot/control.lua")
+    foreach ($requiredMarker in @(
+      "script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"",
+      "script.active_mods[`"more-infinite-research`"] ~= `"$Release`"",
+      "[mir-fixture] $preDot5Version upgrade source proof complete",
+      "[mir-fixture] $preDot5Version to $Release upgrade proof complete"
+    )) {
+      if (-not $control.Contains($requiredMarker)) {
+        throw "Generated current-tier direct-upgrade fixture lacks marker: $requiredMarker"
+      }
+    }
+
+    $rows = @(
+      [ordered]@{
+        id = "$baselineVersion-to-$Release"
+        from = $Target.baseline
+        to_release = $Release
+        exact_engine = [string]$Target.exact_engine
+        source_fixture = [ordered]@{
+          path = "fixtures/assert-upgrade-$(Get-MIRVersionSlug -Version $baselineVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+          commit = [string]$profiles.portable_source.authority_commit
+        }
+        generated_fixture = "fixtures/assert-upgrade-$(Get-MIRVersionSlug -Version $baselineVersion)-to-$(Get-MIRVersionSlug -Version $Release)"
+        proof_path = "build/reports/release/$Release/$baselineVersion-to-$Release-upgrade-proof.json"
+        status = "planned-unfrozen-candidate-unassigned"
+      },
+      [ordered]@{
+        id = "$preDot5Version-to-$Release"
+        from = $Target.pre_dot5
+        to_release = $Release
+        exact_engine = [string]$Target.exact_engine
+        source_fixture = [ordered]@{path=$sourceFixtureRoot;commit=$sourceCommit}
+        generated_fixture = $fixtureRoot
+        proof_path = "build/reports/release/$Release/$preDot5Version-to-$Release-upgrade-proof.json"
+        status = "planned-unfrozen-candidate-unassigned"
+      }
+    )
+    if ((@($rows.id) -join "|") -cne (@($Target.upgrade_rows) -join "|")) {
+      throw "Current-tier generated upgrade rows differ from the terminal target matrix."
+    }
+
+    $manifest = [ordered]@{
+      schema = 1
+      kind = "MIR3TerminalShadowUpgradeFixturesV1"
+      release = $Release
+      target = [string]$Target.factorio_line
+      phase = "shadow-convergence"
+      rows = $rows
+      source_frozen = $false
+      candidate_id = $null
+    }
+    $manifestPath = ".mir/releases/terminal/shadows/$Release/upgrade-fixtures.json"
+    Assert-OrWriteMIRJson -Path (Join-Path $TargetRoot $manifestPath) -Value $manifest
+
+    $registryPath = Join-Path $TargetRoot ".mir/fixtures.yml"
+    $registry = (Get-Content -Raw -LiteralPath $registryPath).Replace("`r`n", "`n").Replace("`r", "`n")
+    $startMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES release=$Release"
+    $endMarker = "# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=$Release"
+    $blockPattern = '(?ms)^' + [regex]::Escape($startMarker) + '.*?^' + [regex]::Escape($endMarker) + '\n?'
+    $registry = [regex]::Replace($registry, $blockPattern, '').TrimEnd()
+    $registryKey = "terminal-upgrade-$(Get-MIRVersionSlug -Version $preDot5Version)-to-$(Get-MIRVersionSlug -Version $Release)"
+    $block = @"
+$startMarker
+  ${registryKey}:
+    requires_features: [recipe_productivity]
+    assertion_path: $fixtureRoot
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "$preDot5Version"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-$preDot5Version-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-$Release-development-archive-load
+$endMarker
+"@.TrimEnd()
+    Assert-OrWriteMIRText -Path $registryPath -Text ($registry + "`n`n$block`n")
+    return @($manifestPath, ".mir/fixtures.yml", $fixtureRoot)
+  }
   if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
 
   $baselineVersion = [string]$Target.baseline.release

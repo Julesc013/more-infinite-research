@@ -216,6 +216,37 @@ try {
         }
       }
     }
+    if ([string]$row.support_tier -eq "current") {
+      $upgradeManifestPath = Join-Path $targetRoot ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json"
+      $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
+      $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
+      if ((@($upgradeManifest.rows.id) -join '|') -cne (@($row.upgrade_rows) -join '|') -or
+          [string]$qualification.upgrade_fixture_manifest -ne ".mir/releases/terminal/shadows/$([string]$row.release)/upgrade-fixtures.json") {
+        throw "Current-tier projection did not bind both upgrade rows for $($row.release)."
+      }
+      $preDot5Row = @($upgradeManifest.rows | Where-Object { [string]$_.from.release -eq [string]$row.pre_dot5.release })
+      if ($preDot5Row.Count -ne 1 -or
+          [string]$preDot5Row[0].source_fixture.commit -ne [string]$row.baseline.commit -or
+          [string]$preDot5Row[0].source_fixture.path -ne "fixtures/assert-upgrade-3-2-3-to-3-2-5") {
+        throw "Current-tier direct pre-.5 fixture does not retain immutable predecessor custody."
+      }
+      $fixtureRoot = Join-Path $targetRoot ([string]$preDot5Row[0].generated_fixture)
+      foreach ($requiredFixtureFile in @("info.json", "control.lua", "data.lua", "data-final-fixes.lua", "settings.lua", "settings-updates.lua")) {
+        if (-not (Test-Path -LiteralPath (Join-Path $fixtureRoot $requiredFixtureFile) -PathType Leaf)) {
+          throw "Current-tier direct pre-.5 fixture is incomplete: $requiredFixtureFile"
+        }
+      }
+      $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "info.json") | ConvertFrom-Json
+      $fixtureControl = Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "control.lua")
+      $preDot5Version = [string]$row.pre_dot5.release
+      if (@($fixtureInfo.dependencies | Where-Object { [string]$_ -eq "more-infinite-research >= $preDot5Version" }).Count -ne 1 -or
+          -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"") -or
+          -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$([string]$row.release)`"") -or
+          -not $fixtureControl.Contains("[mir-fixture] $preDot5Version to $([string]$row.release) upgrade proof complete") -or
+          -not $fixtureRegistry.Contains("assertion_path: $([string]$preDot5Row[0].generated_fixture)")) {
+        throw "Current-tier direct pre-.5 upgrade fixture is stale or unregistered."
+      }
+    }
     if ($null -ne $row.performance_transition) {
       foreach ($output in @($row.performance_transition.output_blobs)) {
         $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$output.path))).Trim()

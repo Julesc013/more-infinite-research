@@ -41,6 +41,18 @@ if (-not $settingsOverrides.Contains('function Complete-MIRSettingsOverrideMod {
   throw "Settings override tooling does not publish its generated mod atomically."
 }
 
+$upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests\runtime\Test-MIRUpgrade.ps1")
+foreach ($requiredPolicy in @(
+  '$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"',
+  '$resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)',
+  '$root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
+  'Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log")'
+)) {
+  if (-not $upgradeHarness.Contains($requiredPolicy)) {
+    throw "Upgrade harness does not preserve repository-local bounded Factorio userdata: $requiredPolicy"
+  }
+}
+
 $registry = Import-MIRScenarioRegistry `
   -Path (Join-Path $RepoRoot "validation\scenarios\runtime.json") `
   -TargetProfile "2.1"
