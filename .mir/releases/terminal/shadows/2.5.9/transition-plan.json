@@ -397,6 +397,8 @@
     ".mir/releases/terminal/shadows/2.5.9/qualification-context.json",
     "docs/releases/notes/release-notes-2.5.9.md",
     "changelog.txt",
+    "scripts/Test-MIRAssurance.ps1",
+    ".github/workflows/validate.yml",
     "scripts/Invoke-MIRAssurance.ps1",
     "scripts/MIRAssurance/Release.ps1",
     ".mir/docs.yml"

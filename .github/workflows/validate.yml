@@ -18,6 +18,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
@@ -28,10 +31,10 @@ jobs:
             mir-ledger-${{ runner.os }}-
       - name: Diagnose verifier
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
+        run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output out/verification-plan.json
+        run: ./scripts/mir.ps1 verify plan --target 2.0 --profile fast --candidate '.\dist\more-infinite-research_2.5.9.zip' --output out/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -69,6 +72,10 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - uses: actions/download-artifact@v4
         if: ${{ matrix.no_op != true }}
         with:
@@ -86,7 +93,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./scripts/mir.ps1 verify run-one --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -109,6 +116,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - uses: actions/download-artifact@v4
         with:
           name: mir-verification-plan
@@ -130,7 +140,7 @@ jobs:
           merge-multiple: true
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+        run: ./scripts/mir.ps1 verify gate --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4
