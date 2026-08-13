@@ -36,7 +36,7 @@ data:extend({
     ] = {
       schema = 2,
       id = "mir-upgrade-automatic-family",
-      applicability = {mods = {{id = "mir-fixture-assert-upgrade-3-2-3-to-3-2-5", version = "= 0.1.0"}}},
+      applicability = {mods = {{id = "mir-fixture-assert-upgrade-3-2-3-to-3-2-9", version = "= 0.1.0"}}},
       aliases = {},
       exact = {includes = {}, excludes = {}},
       family_hints = {},
