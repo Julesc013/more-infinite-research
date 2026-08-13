@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json",
+  "title": "MIR3TerminalShadowKernelBranchReceiptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "repository", "branch", "base_dev", "source_snapshot", "kernel", "latest_hosted_failure_and_repair", "targets", "unresolved"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalShadowKernelBranchReceiptV1"},
+    "status": {"const": "kernel-ready-for-pr-all-nine-convergence-evidence-present-confirmation-pending"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "repository": {"const": "Julesc013/more-infinite-research"},
+    "branch": {"const": "codex/mir3-terminal-shadow-generator"},
+    "base_dev": {"$ref": "#/$defs/gitIdentity"},
+    "source_snapshot": {
+      "allOf": [{"$ref": "#/$defs/gitIdentity"}],
+      "type": "object",
+      "required": ["commit", "tree", "commits_ahead", "commits_behind"],
+      "properties": {
+        "commit": {"pattern": "^[0-9a-f]{40}$"}, "tree": {"pattern": "^[0-9a-f]{40}$"},
+        "commits_ahead": {"type": "integer", "minimum": 1}, "commits_behind": {"const": 0}
+      }
+    },
+    "kernel": {"type": "object"},
+    "latest_hosted_failure_and_repair": {"type": "object"},
+    "targets": {
+      "type": "array", "minItems": 9, "maxItems": 9, "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["release", "source_commit", "source_tree", "source_ref_state", "engine", "archive_sha256", "content_sha256", "bytes", "entries", "convergence", "upgrades", "confirmation"],
+        "properties": {
+          "release": {"pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+          "source_commit": {"pattern": "^[0-9a-f]{40}$"}, "source_tree": {"pattern": "^[0-9a-f]{40}$"},
+          "source_ref_state": {"enum": ["published", "local-only"]}, "engine": {"type": "string", "minLength": 1},
+          "archive_sha256": {"pattern": "^[0-9A-F]{64}$"}, "content_sha256": {"pattern": "^[0-9A-F]{64}$"},
+          "bytes": {"type": "integer", "minimum": 1}, "entries": {"type": "integer", "minimum": 1},
+          "convergence": {"type": "object"}, "upgrades": {"type": "array", "minItems": 2, "maxItems": 2},
+          "confirmation": {"const": "pending"}
+        }
+      }
+    },
+    "unresolved": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "gitIdentity": {
+      "type": "object", "required": ["commit", "tree"],
+      "properties": {"commit": {"pattern": "^[0-9a-f]{40}$"}, "tree": {"pattern": "^[0-9a-f]{40}$"}}
+    }
+  }
+}

@@ -5,6 +5,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScrip
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 $profilesPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json"
 $sourcePublicationPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json"
+$productReconciliationPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+$branchReceiptPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json"
 $matrixPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"
 $admissionPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"
 $commandPath = Join-Path $RepoRoot "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1"
@@ -24,6 +26,8 @@ foreach ($requiredIdempotencePolicy in @(
 
 $profiles = Get-Content -Raw -LiteralPath $profilesPath | ConvertFrom-Json -Depth 100
 $sourcePublication = Get-Content -Raw -LiteralPath $sourcePublicationPath | ConvertFrom-Json -Depth 100
+$productReconciliation = Get-Content -Raw -LiteralPath $productReconciliationPath | ConvertFrom-Json -Depth 100
+$branchReceipt = Get-Content -Raw -LiteralPath $branchReceiptPath | ConvertFrom-Json -Depth 100
 $matrix = Get-Content -Raw -LiteralPath $matrixPath | ConvertFrom-Json -Depth 100
 $admission = Get-Content -Raw -LiteralPath $admissionPath | ConvertFrom-Json -Depth 100
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
@@ -70,6 +74,29 @@ foreach ($sourceRef in @($sourcePublication.refs)) {
 }
 if (@($publishedOverlayIds | Select-Object -Unique).Count -ne $publishedOverlayIds.Count) {
   throw "Terminal shadow source publication assigns an assurance overlay more than once."
+}
+if ([int]$productReconciliation.schema -ne 1 -or
+    [string]$productReconciliation.status -ne "both-admitted-target-implementations-shadow-proved-fixed-point-pending" -or
+    [string]$productReconciliation.prior_receipt.raw_sha256 -ne (Get-FileHash -LiteralPath (Join-Path $RepoRoot ([string]$productReconciliation.prior_receipt.path)) -Algorithm SHA256).Hash -or
+    [string]$productReconciliation.current_3_2_9_shadow.package.archive_sha256 -ne "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3" -or
+    [string]$productReconciliation.current_2_5_9_shadow.package.archive_sha256 -ne "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2" -or
+    (@($productReconciliation.finding_dispositions.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028" -or
+    [bool]$productReconciliation.immutable_boundaries.dot5_package_bytes_changed -or
+    [bool]$productReconciliation.immutable_boundaries.source_frozen -or
+    [bool]$productReconciliation.immutable_boundaries.candidate_assigned -or
+    [bool]$productReconciliation.immutable_boundaries.all_nine_fixed_point_accepted -or
+    [bool]$productReconciliation.immutable_boundaries.tagging_or_publication_permitted) {
+  throw "Terminal product implementation reconciliation is stale or overclaims fixed-point state."
+}
+if ([int]$branchReceipt.schema -ne 1 -or
+    [string]$branchReceipt.status -ne "kernel-ready-for-pr-all-nine-convergence-evidence-present-confirmation-pending" -or
+    [string]$branchReceipt.source_snapshot.commit -ne "3bc84321394d6e7d817ca885d1d63df925eee902" -or
+    (& git -C $RepoRoot rev-parse "$([string]$branchReceipt.source_snapshot.commit)^{tree}").Trim() -ne [string]$branchReceipt.source_snapshot.tree -or
+    [int]$branchReceipt.source_snapshot.commits_behind -ne 0 -or @($branchReceipt.targets).Count -ne 9 -or
+    (@($branchReceipt.targets.release) -join "|") -ne ($family -join "|") -or
+    @($branchReceipt.targets | Where-Object { [string]$_.convergence.status -ne "passed" -or [string]$_.confirmation -ne "pending" }).Count -ne 0 -or
+    [bool]$branchReceipt.kernel.source_frozen -or [bool]$branchReceipt.kernel.candidate_ids_assigned) {
+  throw "Terminal shadow kernel branch receipt is stale, incomplete, or overclaims confirmation/freeze state."
 }
 $approvedDeltaFixture = Get-Content -Raw -LiteralPath $approvedDeltaFixturePath
 if ($approvedDeltaFixture -notmatch 'mods\["more-infinite-research"\]\s*==\s*"2\.5\.9"' -or
