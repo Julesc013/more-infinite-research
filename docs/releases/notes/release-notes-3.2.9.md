@@ -10,6 +10,8 @@ supersedes: []
 superseded_by: []
 ---
 
+<!-- MIR3-TERMINAL-SHADOW release=3.2.9 target=2.1 baseline=3.2.5 pre-dot5=3.2.3 candidate=unassigned source-frozen=false -->
+
 # MIR 3.2.9 Planning Notes
 
 MIR 3.2.9 is the planned final MIR 3 release for Factorio 2.1. These are planning notes, not released changes or a compatibility claim.

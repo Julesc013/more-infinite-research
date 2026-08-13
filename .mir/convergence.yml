@@ -2,12 +2,19 @@ schema: 1
 
 release:
   version: "3.2.9"
-  branch: dev
+  branch: candidate/3.2.9-projection
   factorio_version: "2.1"
-  baseline_commit: 1abe07573cde814c3cacf6153b5ae64dee4038ba
-  baseline_tag: "3.2.3"
+  baseline_commit: 62fddd86b51db7c0238731815d15ca26a4b45857
+  baseline_tag: "3.2.5"
+  pre_dot5_public_predecessor: "3.2.3"
+  portable_source_release: "3.2.9"
+  portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
+  target_profile: "factorio-2.1"
+  target_adapter: "canonical-factorio-2.1"
+  target_assurance_overlays: "none"
   objective: cost-compatibility-observability-convergence
   public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944

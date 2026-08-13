@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalPackageManifestV1",
+  "release": "3.2.9",
+  "target": "2.1",
+  "source": {
+    "portable_release": "3.2.9",
+    "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
+    "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+    "target_assurance_overlays": [],
+    "performance_transition": null,
+    "immutable_dot5_predecessor": {
+      "release": "3.2.5",
+      "tag": "3.2.5",
+      "commit": "62fddd86b51db7c0238731815d15ca26a4b45857"
+    },
+    "pre_dot5_public_predecessor": {
+      "release": "3.2.3",
+      "tag": "3.2.3",
+      "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba"
+    }
+  },
+  "semantic_roots": [
+    ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+    ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    ".mir/releases/terminal/baselines/3.2.5"
+  ],
+  "inventories": {
+    "baseline": ".mir/releases/terminal/baselines/3.2.5",
+    "product_findings": [
+      "MIR3-TERM-0027",
+      "MIR3-TERM-0028"
+    ],
+    "product_disposition": "canonical-2.1-implementation"
+  },
+  "schemas": [
+    "spec/schemas/mir3-terminal-package-manifest.schema.json",
+    "spec/schemas/mir3-terminal-release-manifest.schema.json"
+  ],
+  "migration_watermark": {
+    "predecessor": "3.2.5",
+    "stable_identifiers": "preserve",
+    "new_identity_allocation": "forbidden-without-admitted-target-delta"
+  },
+  "toolchain": {
+    "projection_profiles": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+    "projection_command": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+    "target_adapter": "canonical-factorio-2.1"
+  },
+  "mir4_successor_target": "factorio-2.1",
+  "upgrade_obligation": [
+    "3.2.5-to-3.2.9",
+    "3.2.3-to-3.2.9"
+  ],
+  "source_frozen": false,
+  "candidate_id": null
+}
