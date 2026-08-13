@@ -260,7 +260,7 @@ function Invoke-MIRAssuranceSeal {
     throw "Release seals may only be created by the protected-release workflow, environment, ref, and runner."
   }
   $commit = (& git -C $repo rev-parse HEAD).Trim()
-  $branch = ([string](& git -C $repo branch --show-current)).Trim()
+  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   $nonGeneratedStatus = @($status | Where-Object {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }

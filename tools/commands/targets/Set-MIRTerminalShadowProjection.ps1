@@ -86,6 +86,33 @@ function Test-MIRGitBlob {
   return $exists
 }
 
+function Test-MIRTerminalDetachedHeadEquivalent {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$ActualText,
+    [Parameter(Mandatory)][string]$ExpectedText
+  )
+  $replacement = switch ($RelativePath) {
+    "scripts/Invoke-MIRAssurance.ps1" {
+      @{
+        safe = '      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'
+        unsafe = '      branch=(& git -C $repo branch --show-current).Trim()'
+      }
+      break
+    }
+    { $_ -in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1") } {
+      @{
+        safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
+        unsafe = '  $branch = (& git -C $repo branch --show-current).Trim()'
+      }
+      break
+    }
+    default { return $false }
+  }
+  return $ActualText.Contains([string]$replacement.safe) -and
+    $ActualText.Replace([string]$replacement.safe, [string]$replacement.unsafe) -ceq $ExpectedText
+}
+
 function Write-MIRGitBlob {
   param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Destination)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination))
@@ -147,12 +174,9 @@ function Set-MIRAssuranceOverlays {
         $targetBlob = (& git -C $SourceRepoRoot hash-object --path=$path -- $destination 2>$null)
         if ($LASTEXITCODE -ne 0) { throw "Terminal assurance overlay file is stale: $path" }
         if (([string]$targetBlob).Trim() -ne $expectedBlob) {
-          $unsafeDetachedHead = '      branch=(& git -C $repo branch --show-current).Trim()'
-          $safeDetachedHead = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
           $expectedText = ConvertTo-MIRCanonicalText -Text (Get-MIRGitObjectText -Object $expectedBlob)
           $actualText = ConvertTo-MIRCanonicalText -Text (Get-Content -Raw -LiteralPath $destination)
-          if ($path -ne "scripts/Invoke-MIRAssurance.ps1" -or
-              $actualText.Replace($safeDetachedHead, $unsafeDetachedHead) -cne $expectedText) {
+          if (-not (Test-MIRTerminalDetachedHeadEquivalent -RelativePath $path -ActualText $actualText -ExpectedText $expectedText)) {
             throw "Terminal assurance overlay file is stale: $path"
           }
         }
@@ -455,19 +479,56 @@ function Get-MIRAssuranceFactorioVersion {
 }
 
 function Set-MIRTerminalDetachedHeadInventory {
-  $relativePath = "scripts/Invoke-MIRAssurance.ps1"
-  $path = Join-Path $TargetRoot $relativePath
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no assurance entry point: $path" }
-
-  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
-  $unsafe = '      branch=(& git -C $repo branch --show-current).Trim()'
-  $safe = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
-  if ($text.Contains($unsafe)) { $text = $text.Replace($unsafe, $safe) }
-  if (-not $text.Contains($safe)) {
-    throw "Target assurance inventory does not safely represent a detached HEAD."
+  $authorities = @()
+  $policies = @(
+    [ordered]@{
+      relative_path = "scripts/Invoke-MIRAssurance.ps1"
+      required = $true
+      unsafe = @(
+        '      branch=(& git -C $repo branch --show-current).Trim()',
+        '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'
+    },
+    [ordered]@{
+      relative_path = "scripts/MIRAssurance/Release.ps1"
+      required = $false
+      unsafe = @(
+        '  $branch = (& git -C $repo branch --show-current).Trim()',
+        '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
+    },
+    [ordered]@{
+      relative_path = "tools/lib/assurance/Release.ps1"
+      required = $false
+      unsafe = @(
+        '  $branch = (& git -C $repo branch --show-current).Trim()',
+        '  $branch = ([string](& git -C $repo branch --show-current)).Trim()'
+      )
+      safe = '  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()'
+    }
+  )
+  foreach ($policy in $policies) {
+    $relativePath = [string]$policy.relative_path
+    $path = Join-Path $TargetRoot $relativePath
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+      if ([bool]$policy.required) { throw "Target shadow has no assurance entry point: $path" }
+      continue
+    }
+    $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+    foreach ($unsafe in @($policy.unsafe)) {
+      if ($text.Contains([string]$unsafe)) {
+        $text = $text.Replace([string]$unsafe, [string]$policy.safe)
+      }
+    }
+    if (-not $text.Contains([string]$policy.safe)) {
+      throw "Target assurance authority does not safely represent a detached HEAD: $relativePath"
+    }
+    Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+    $authorities += $relativePath
   }
-  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
-  return @($relativePath)
+  return @($authorities)
 }
 
 function Set-MIRTerminalLegacyValidationUserData {
