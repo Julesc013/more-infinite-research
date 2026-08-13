@@ -33,6 +33,21 @@
             {"path":"scripts/Invoke-MIRValidation.ps1","blob":"daa333a4f692c92d8d9f6314174aa91202df6df3"},
             {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"5f68f1d3bc144730dd6a8d4bcff321b12c79e4fe"}
           ]
+        },
+        {
+          "id": "factorio-2.1-scenario-authority-parity-v1",
+          "commit": "38eaa3f9ad6c295113537d9c3fa6f5db636f20e2",
+          "reason": "Carry the frozen-assurance false-pass and false-failure correction that binds target-native runtime and configuration-change fixtures and settings to scenario authority, requires deterministic diagnostics, atomically publishes enabled validation mods, and enforces conservative Factorio path budgets.",
+          "files": [
+            {"path":".mir/modules.yml","blob":"febb4e019a20fbd0bc75902f26b8dc02119856ab"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"a43abb13af64801f5666a1fd40274135f2e9198a"},
+            {"path":"tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1","blob":"10115e9c01cbce89e7bd4e6f9041c08e68404b19"},
+            {"path":"tools/lib/validation/FactorioProcess.ps1","blob":"9c76e9ae502af3ee0a27cfae464bc16e3bda8530"},
+            {"path":"tools/lib/validation/ScenarioRegistry.ps1","blob":"19bf83861b35ef7e62bc4c39ce21e64eda142418"},
+            {"path":"tools/lib/validation/SettingsOverrides.ps1","blob":"30ed31304e93b9ebb7d8c84360c10f7d5170a22e"},
+            {"path":"validation/scenarios/runtime.json","blob":"d07a4d6ba0ce826b59820077f49d273efca94200"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"f9e8c06c3892fc6e52b2094f2271bcbd6289f101"}
+          ]
         }
       ],
       "performance_transition": null,
