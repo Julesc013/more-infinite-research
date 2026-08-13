@@ -315,13 +315,71 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
     }
     $text = $text.Replace($workerBuild, $workerBuildWithPredecessor.TrimEnd())
   }
+
+  $mergeWorkerEvidence = @'
+      - name: Merge worker evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-evidence-*
+          path: artifacts/assurance/evidence
+          merge-multiple: true
+'@.TrimEnd()
+  $mergeWorkerEvidence = ConvertTo-MIRCanonicalText -Text $mergeWorkerEvidence
+  $importWorkerEvidence = @'
+      - name: Download isolated worker evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-evidence-*
+          path: artifacts/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $workerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/worker-evidence'))
+          $ledgerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/evidence'))
+          New-Item -ItemType Directory -Force -Path $ledgerRoot | Out-Null
+          foreach ($row in @($plan.work)) {
+            $safeTestId = [string]$row.safe_test_id
+            $fingerprint = [string]$row.fingerprint
+            if ($safeTestId -notmatch '^[A-Za-z0-9._-]+$' -or $fingerprint -notmatch '^[A-Fa-f0-9]{64}$') {
+              throw "Unsafe planned worker identity: $safeTestId / $fingerprint"
+            }
+            $artifactRoot = [IO.Path]::GetFullPath((Join-Path $workerRoot "mir-evidence-$safeTestId"))
+            $source = [IO.Path]::GetFullPath((Join-Path $artifactRoot (Join-Path $safeTestId $fingerprint)))
+            $destinationParent = [IO.Path]::GetFullPath((Join-Path $ledgerRoot $safeTestId))
+            $destination = [IO.Path]::GetFullPath((Join-Path $destinationParent $fingerprint))
+            if (-not $source.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+                -not $destination.StartsWith($ledgerRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+              throw "Planned worker evidence escaped its bounded root: $safeTestId"
+            }
+            if (-not (Test-Path -LiteralPath $source -PathType Container)) {
+              throw "Exact worker evidence is missing: $source"
+            }
+            New-Item -ItemType Directory -Force -Path $destinationParent | Out-Null
+            if (Test-Path -LiteralPath $destination) {
+              Remove-Item -LiteralPath $destination -Recurse -Force
+            }
+            Copy-Item -LiteralPath $source -Destination $destination -Recurse
+          }
+'@.TrimEnd()
+  $importWorkerEvidence = ConvertTo-MIRCanonicalText -Text $importWorkerEvidence
+  if (-not $text.Contains("Import exact worker evidence deterministically")) {
+    if (-not $text.Contains($mergeWorkerEvidence)) {
+      throw "Maintained target hosted workflow has no worker evidence merge step."
+    }
+    $text = $text.Replace($mergeWorkerEvidence, $importWorkerEvidence)
+  }
   foreach ($required in @(
     "--target $([string]$Target.factorio_line)",
     "--candidate '$archive'",
     '$work = @($plan.work)',
     'test_id = "reuse-only"',
     "Build deterministic terminal shadow archive",
-    "Reconstruct immutable 2.5.5 archive"
+    "Reconstruct immutable 2.5.5 archive",
+    "Import exact worker evidence deterministically",
+    "Exact worker evidence is missing"
   )) {
     if (-not $text.Contains($required)) { throw "Maintained target hosted workflow projection is incomplete: $required" }
   }

@@ -363,6 +363,15 @@ try {
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
     $docsRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/docs.yml")
+    if ([string]$row.support_tier -eq "maintained" -and
+        (-not $hostedValidation.Contains("Download isolated worker evidence") -or
+         -not $hostedValidation.Contains("Import exact worker evidence deterministically") -or
+         -not $hostedValidation.Contains("artifacts/assurance/worker-evidence") -or
+         -not $hostedValidation.Contains('foreach ($row in @($plan.work))') -or
+         -not $hostedValidation.Contains("Exact worker evidence is missing") -or
+         $hostedValidation.Contains("merge-multiple: true"))) {
+      throw "Maintained terminal projection does not replace stale cached terminal markers with exact planned worker evidence."
+    }
     foreach ($releaseLibraryPath in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1")) {
       $releaseLibraryFullPath = Join-Path $targetRoot $releaseLibraryPath
       if (-not (Test-Path -LiteralPath $releaseLibraryFullPath -PathType Leaf)) { continue }
