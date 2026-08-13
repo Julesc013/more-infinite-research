@@ -19,10 +19,10 @@
     },
     "portable_source": {
       "release": "3.2.9",
-      "authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
-      "authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+      "authority_commit": "5496896914666158ad4056026819528395861540",
+      "authority_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
       "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
-      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json"
+      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
     },
     "assurance_overlays": [],
     "performance_transition": null
@@ -38,6 +38,7 @@
     "changelog.txt",
     "scripts/Invoke-MIRAssurance.ps1",
     "scripts/Invoke-MIRAssurance.ps1",
+    "scripts/MIRAssurance/Release.ps1",
     "scripts/Invoke-MIRValidation.ps1",
     ".mir/releases/terminal/shadows/1.4.9/upgrade-fixtures.json",
     ".mir/fixtures.yml",

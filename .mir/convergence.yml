@@ -8,7 +8,7 @@ release:
   baseline_tag: "1.4.5"
   pre_dot5_public_predecessor: "1.4.0"
   portable_source_release: "3.2.9"
-  portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
+  portable_source_commit: 5496896914666158ad4056026819528395861540
   target_profile: "terminal-factorio-0.14.23-finite"
   target_adapter: "factorio-0.14-finite-target-native-no-product-delta"
   target_assurance_overlays: "none"
