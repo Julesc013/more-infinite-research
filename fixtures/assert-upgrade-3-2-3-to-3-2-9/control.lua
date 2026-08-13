@@ -223,7 +223,7 @@ script.on_event(defines.events.on_tick, function(event)
   local state = storage.mir_upgrade_fixture
   if state and state.upgrade_complete and not state.server_save_requested then
     state.server_save_requested = true
-    game.server_save("mir-325-upgraded")
+    game.server_save("mir-329-upgraded")
     log("[mir-fixture] governed upgraded save requested tick=" .. event.tick)
   end
 end)
