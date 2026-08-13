@@ -99,7 +99,7 @@ switch ($command) {
     $result = [ordered]@{
       schema=2
       head=(& git -C $repo rev-parse HEAD).Trim()
-      branch=(& git -C $repo branch --show-current).Trim()
+      branch=([string](& git -C $repo branch --show-current)).Trim()
       tags=@(& git -C $repo tag --list --sort=refname)
       worktree_status=@(& git -C $repo status --short)
       distributions=$zips

@@ -186,6 +186,9 @@ try {
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
+      $validationEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRValidation.ps1") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($validationEntryPointText)) { throw "Unable to read exact predecessor validation entry point for $($row.release)." }
+      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1"), $validationEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
       $upgradeHarnessText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Test-MIRUpgrade.ps1") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upgradeHarnessText)) { throw "Unable to read exact predecessor upgrade harness for $($row.release)." }
       [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1"), $upgradeHarnessText + "`n", [Text.UTF8Encoding]::new($false))
@@ -283,7 +286,17 @@ try {
         } else {
           [string]$file.blob
         }
-        if ($materializedBlob -ne $expectedBlob) { throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)" }
+        if ($materializedBlob -ne $expectedBlob) {
+          $materializedPath = Join-Path $targetRoot ([string]$file.path)
+          $materializedText = (Get-Content -Raw -LiteralPath $materializedPath).Replace("`r`n", "`n").Replace("`r", "`n")
+          $expectedText = ((@(& git -C $RepoRoot cat-file blob $expectedBlob) -join "`n").TrimEnd() + "`n")
+          $safeDetachedHead = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+          $unsafeDetachedHead = '      branch=(& git -C $repo branch --show-current).Trim()'
+          if ([string]$file.path -ne "scripts/Invoke-MIRAssurance.ps1" -or
+              $materializedText.Replace($safeDetachedHead, $unsafeDetachedHead) -cne $expectedText) {
+            throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)"
+          }
+        }
       }
     }
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
@@ -291,6 +304,7 @@ try {
       $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
       $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
       $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      $validationEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1")
       $upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1")
       $backportLock = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
       $featureClassification = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ([string]$backportLock.feature_classification)) | ConvertFrom-Json -Depth 100
@@ -300,6 +314,10 @@ try {
           [string]$qualification.exact_engine_sha256 -ne [string]$row.exact_engine_sha256 -or
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
+          -not $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
+          -not $validationEntryPoint.Contains('$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"') -or
+          -not $validationEntryPoint.Contains('function Remove-MIRGeneratedValidationUserData {') -or
+          $validationEntryPoint.Contains('[System.IO.Path]::GetTempPath()') -or
           ([string]$row.release -eq "1.6.9" -and
             (-not $upgradeHarness.Contains("# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD") -or
              -not $upgradeHarness.Contains('"--start-server", $save, "--until-tick", "1"') -or
