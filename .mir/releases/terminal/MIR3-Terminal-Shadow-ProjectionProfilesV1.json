@@ -50,12 +50,12 @@
           ]
         },
         {
-          "id": "factorio-2.1-upgrade-userdata-v1",
-          "commit": "0b3192ccd24d09a27c42d6ad02cdef064c72dbdf",
-          "reason": "Carry the frozen-assurance false-failure correction that runs direct-upgrade Factorio userdata under a compact repository build root and preserves deterministic path-normalized logs.",
+          "id": "factorio-2.1-upgrade-userdata-v2",
+          "commit": "76fa21a08d3907ee74fd5aaf13741e5c3b8ea17b",
+          "reason": "Carry the frozen-assurance false-failure correction that runs direct-upgrade Factorio userdata under compact repository build and save paths, requires direct 3.2.3 to 3.2.9 reload proof, and preserves deterministic path-normalized logs.",
           "files": [
-            {"path":"validation/tests/runtime/Test-MIRUpgrade.ps1","blob":"fa15b7feb86592fa21eab8cb14f7c29a73cac0bd"},
-            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"3ad7cb2e46fa2fac2806b2ed58089f28c9ecaad6"}
+            {"path":"validation/tests/runtime/Test-MIRUpgrade.ps1","blob":"02b223f90e587d59183fcc48169a968278fae40b"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"2257fd3fe4f8bf6a3d9deff5b469901fc7c79ace"}
           ]
         }
       ],

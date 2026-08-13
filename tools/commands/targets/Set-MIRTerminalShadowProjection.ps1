@@ -111,20 +111,21 @@ function Set-MIRAssuranceOverlays {
       if ($observedBlob -ne [string]$file.blob) { throw "Terminal assurance overlay blob changed: $($overlay.id) $path" }
       $destination = [IO.Path]::GetFullPath((Join-Path $TargetRoot $path))
       if (-not $destination.StartsWith($targetPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw "Terminal assurance overlay escapes the target root: $path" }
+      $orderedOverlayOutputs = @(
+        foreach ($orderedOverlay in @($Target.assurance_overlays)) {
+          foreach ($orderedFile in @($orderedOverlay.files)) {
+            if (([string]$orderedFile.path).Replace("\", "/") -eq $path) { $orderedFile }
+          }
+        }
+      )
+      $finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob
       if ($Check) {
         if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
-        $orderedOverlayOutputs = @(
-          foreach ($orderedOverlay in @($Target.assurance_overlays)) {
-            foreach ($orderedFile in @($orderedOverlay.files)) {
-              if (([string]$orderedFile.path).Replace("\", "/") -eq $path) { $orderedFile }
-            }
-          }
-        )
         $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
         $expectedBlob = if ($transitionOutput.Count -eq 1) {
           [string]$transitionOutput[0].blob
         } elseif ($orderedOverlayOutputs.Count -gt 0) {
-          [string]$orderedOverlayOutputs[-1].blob
+          $finalOverlayBlob
         } else {
           [string]$file.blob
         }
@@ -133,8 +134,15 @@ function Set-MIRAssuranceOverlays {
         # with the immutable Git blob rather than hashing platform bytes.
         $targetBlob = (& git -C $SourceRepoRoot hash-object --path=$path -- $destination 2>$null)
         if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
-      } else {
-        Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
+      } elseif ([string]$file.blob -eq $finalOverlayBlob) {
+        $existingBlob = if (Test-Path -LiteralPath $destination -PathType Leaf) {
+          ([string](& git -C $SourceRepoRoot hash-object --no-filters -- $destination 2>$null)).Trim()
+        } else {
+          ""
+        }
+        if ($existingBlob -ne $finalOverlayBlob) {
+          Write-MIRGitBlob -Commit $commit -Path $path -Destination $destination
+        }
       }
     }
   }

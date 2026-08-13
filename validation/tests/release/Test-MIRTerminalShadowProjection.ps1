@@ -8,6 +8,18 @@ $matrixPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Target-M
 $admissionPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"
 $commandPath = Join-Path $RepoRoot "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1"
 $approvedDeltaFixturePath = Join-Path $RepoRoot "fixtures/export-approved-delta/data-final-fixes.lua"
+$materializerText = Get-Content -Raw -LiteralPath $commandPath
+
+foreach ($requiredIdempotencePolicy in @(
+  '$finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob',
+  '} elseif ([string]$file.blob -eq $finalOverlayBlob) {',
+  'hash-object --no-filters -- $destination',
+  'if ($existingBlob -ne $finalOverlayBlob) {'
+)) {
+  if (-not $materializerText.Contains($requiredIdempotencePolicy)) {
+    throw "Terminal projection materializer does not preserve idempotent final-overlay writes: $requiredIdempotencePolicy"
+  }
+}
 
 $profiles = Get-Content -Raw -LiteralPath $profilesPath | ConvertFrom-Json -Depth 100
 $matrix = Get-Content -Raw -LiteralPath $matrixPath | ConvertFrom-Json -Depth 100
