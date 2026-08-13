@@ -5,8 +5,8 @@
   "target": "1.1",
   "source": {
     "portable_release": "3.2.9",
-    "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
-    "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+    "portable_authority_commit": "5496896914666158ad4056026819528395861540",
+    "portable_authority_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
     "target_assurance_overlays": [],
     "performance_transition": null,
     "immutable_dot5_predecessor": {
@@ -22,7 +22,7 @@
   },
   "semantic_roots": [
     ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
-    ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
     ".mir/releases/terminal/baselines/1.9.5"
   ],
   "inventories": {
