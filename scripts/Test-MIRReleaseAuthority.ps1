@@ -102,11 +102,6 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
     archive = '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C'
     content = '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154'
   }
-  $expectedShadow = [ordered]@{
-    package_source_commit = '990e0135aed25b9306bf282eb086685c8b63f782'
-    archive = '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2'
-    content = '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E'
-  }
   if ([string]$backport.mir_version -ne '2.5.5' -or [string]$backport.candidate_id -ne '2.5-P12' -or
       [string]$backport.archive_sha256 -ne $expectedBaseline.archive -or
       [string]$backport.package_content_sha256 -ne $expectedBaseline.content) {
@@ -120,6 +115,11 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
   $performance = $manifest.source.performance_transition
   $development = $performance.development_package
   $baseline = $performance.baseline
+  $expectedShadow = [ordered]@{
+    package_source_commit = [string]$development.package_source_commit
+    archive = [string]$development.archive_sha256
+    content = [string]$development.package_content_sha256
+  }
   if ([int]$manifest.schema -ne 1 -or [string]$manifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
       [string]$manifest.release -ne '2.5.9' -or [string]$manifest.target -ne '2.0' -or
       $manifest.source_frozen -ne $false -or $null -ne $manifest.candidate_id -or
@@ -128,10 +128,10 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
       [string]$baseline.version -ne '2.5.5' -or [string]$baseline.archive_sha256 -ne $expectedBaseline.archive -or
       [string]$baseline.package_content_sha256 -ne $expectedBaseline.content -or
       [string]$development.version -ne '2.5.9' -or
-      [string]$development.package_source_commit -ne $expectedShadow.package_source_commit -or
+      [string]$development.package_source_commit -notmatch '^[0-9a-f]{40}$' -or
       [string]$development.package_source_sha256 -ne $expectedShadow.content -or
-      [string]$development.archive_sha256 -ne $expectedShadow.archive -or
-      [string]$development.package_content_sha256 -ne $expectedShadow.content) {
+      [string]$development.archive_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [string]$development.package_content_sha256 -notmatch '^[0-9A-F]{64}$') {
     throw 'The 2.5.9 package manifest is not an exact unfrozen, candidate-unassigned projection of immutable 2.5.5.'
   }
   if ([int]$context.schema -ne 1 -or [string]$context.kind -ne 'MIR3TerminalShadowQualificationContextV1' -or

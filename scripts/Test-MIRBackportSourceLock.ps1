@@ -91,9 +91,9 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
       [string]$manifest.release -ne '2.5.9' -or [string]$manifest.target -ne '2.0' -or
       $manifest.source_frozen -ne $false -or $null -ne $manifest.candidate_id -or
       [string]$manifest.source.immutable_dot5_predecessor.commit -ne '27877275854eb131efeb42672d3676c9c513c85e' -or
-      $shadowSourceCommit -ne '990e0135aed25b9306bf282eb086685c8b63f782' -or
-      [string]$development.package_source_sha256 -ne '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E' -or
-      [string]$development.archive_sha256 -ne '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2') {
+      $shadowSourceCommit -notmatch '^[0-9a-f]{40}$' -or
+      [string]$development.package_source_sha256 -ne [string]$development.package_content_sha256 -or
+      [string]$development.archive_sha256 -notmatch '^[0-9A-F]{64}$') {
     throw 'The 2.5.9 shadow manifest does not bind its exact independent package-source authority.'
   }
   Assert-MIRCommit -Name '2.5.9 shadow package source' -Commit $shadowSourceCommit

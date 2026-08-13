@@ -19,10 +19,10 @@
     },
     "portable_source": {
       "release": "3.2.9",
-      "authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
-      "authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
+      "authority_commit": "5496896914666158ad4056026819528395861540",
+      "authority_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
       "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
-      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json"
+      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
     },
     "assurance_overlays": [
       {
@@ -248,6 +248,45 @@
             "blob": "5bf1f47a5e573c7f507f0e6f548edd3223c4f8a3"
           }
         ]
+      },
+      {
+        "id": "factorio-2.0-combined-effect-ownership-v1",
+        "commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+        "reason": "Carry the admitted target-native MIR3-TERM-0031 product correction and compiler-contract proof after exact Factorio 2.0 applicability was established.",
+        "files": [
+          {
+            "path": ".mir/compiler-contract-coverage.yml",
+            "blob": "44f176edb66a286f28cbb4eda71fb6b04646cfb5"
+          },
+          {
+            "path": ".mir/fixtures.yml",
+            "blob": "755709b42719e905a31e25c6983ddc5a0ce2e4fc"
+          },
+          {
+            "path": ".mir/modules.yml",
+            "blob": "3fda364b87bee1b56500dad4ff609ee3de05c2bc"
+          },
+          {
+            "path": "docs/architecture/module-boundaries.md",
+            "blob": "46d40e3c741495e9daa395416c2fb5eb08aa56bb"
+          },
+          {
+            "path": "fixtures/assert-compiler-contracts/data.lua",
+            "blob": "22011c0a6f853cdcd5ea5960964ee726a646817a"
+          },
+          {
+            "path": "fixtures/assert-compiler-contracts/data-final-fixes.lua",
+            "blob": "843e7ec88357a9a0677009831457ec1e157f47d9"
+          },
+          {
+            "path": "prototypes/mir/planner/compilation_plan.lua",
+            "blob": "39cf0530f9e50cf8000310e627dbb16c2ea416cc"
+          },
+          {
+            "path": "prototypes/mir/planner/effect_ownership.lua",
+            "blob": "1221ea178241e8f5ee432c045fd1cc55fcd1a6db"
+          }
+        ]
       }
     ],
     "performance_transition": {
@@ -287,12 +326,12 @@
       },
       "development_package": {
         "version": "2.5.9",
-        "package_source_commit": "990e0135aed25b9306bf282eb086685c8b63f782",
-        "package_source_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
-        "archive_bytes": 1057099,
+        "package_source_commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+        "package_source_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+        "archive_bytes": 1058800,
         "archive_entries": 301,
-        "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
-        "package_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"
+        "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+        "package_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"
       },
       "output_blobs": [
         {
@@ -305,7 +344,7 @@
         },
         {
           "path": ".mir/performance-campaign.json",
-          "blob": "242ce63c5ae404d7d0b814505dedfc0998d3f87a"
+          "blob": "eaffc8081a31e9f9615ec9230313a9ca93b00279"
         },
         {
           "path": "fixtures/performance-regression-probe/data.lua",
@@ -331,7 +370,8 @@
     ".mir/docs.yml"
   ],
   "product_findings": [
-    "MIR3-TERM-0028"
+    "MIR3-TERM-0028",
+    "MIR3-TERM-0031"
   ],
   "product_disposition": "project-generic-route-policy-no-direct-cubium-claim",
   "receipt_after_proof": ".mir/releases/terminal/shadows/2.5.9/transition-receipt.json",
