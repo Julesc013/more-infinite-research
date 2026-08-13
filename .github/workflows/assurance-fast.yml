@@ -1,8 +1,6 @@
-name: MIR Verify
+name: MIR Terminal Shadow Verify (manual alias)
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -15,21 +13,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Diagnose assurance environment
+      - name: Build deterministic terminal shadow archive
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
-      - name: Materialize change-aware verification plan
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+      - name: Diagnose target-native assurance environment
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output artifacts/assurance/plan.json
+        run: .\scripts\Invoke-MIRAssurance.ps1 doctor --target '1.0' --candidate '.\dist\more-infinite-research_1.8.9.zip' --json
+      - name: Materialize target-native verification plan
+        shell: pwsh
+        run: .\scripts\Invoke-MIRAssurance.ps1 plan --target '1.0' --candidate '.\dist\more-infinite-research_1.8.9.zip' --profile fast --output artifacts/assurance/plan.json
       - name: Validate planner and evidence invalidation
         shell: pwsh
-        run: ./scripts/Test-MIRAssurance.ps1
-      - name: Run static gate
+        run: .\scripts\Test-MIRAssurance.ps1
+      - name: Run target-native static gate
         shell: pwsh
-        run: ./scripts/Invoke-MIRValidation.ps1 -StaticOnly
+        run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
       - name: Upload verification plan
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mir-verification-plan
+          name: mir-terminal-shadow-verification-plan
           path: artifacts/assurance/plan.json
+          if-no-files-found: warn
