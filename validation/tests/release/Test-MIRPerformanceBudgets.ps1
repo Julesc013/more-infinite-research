@@ -352,7 +352,7 @@ if ($producerSource -notmatch '\[int\]\$scenarios\[0\]\.exit_code\s+-ne\s+0' -or
     $producerSource -notmatch '\[int\]\$scenarios\[0\]\.dependency_failure_count\s+-ne\s+0') {
   throw "Performance campaign must still require successful Factorio execution and an exact dependency closure for both packages."
 }
-$stagingTestRoot = Join-Path $RepoRoot ("build\t\p-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
+$stagingTestRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-p-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 try {
   $stagingCampaign = [pscustomobject]@{
     lanes = @(
