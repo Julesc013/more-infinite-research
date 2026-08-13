@@ -3,7 +3,7 @@
   "kind": "MIR3-Terminal-ChangeSetV1",
   "id": "MIR3-Terminal-ChangeSet",
   "recorded_at": "2026-08-09T12:09:00.0000000Z",
-  "status": "product-set-admitted-ordinary-intake-closed",
+  "status": "product-set-admitted-ordinary-intake-closed-late-p0-implemented-awaiting-exact-head-and-fixed-point",
   "implementation_admitted": true,
   "finding_records": [
     ".mir/releases/terminal/findings/MIR3-TERM-0006.json",
@@ -158,6 +158,46 @@
       "regression_obligations": ["a MIR-owned fixture proves a later alternate route cannot delay an already-reachable science pack", "unmodified Cubium 1.0.28 on exact Factorio 2.0 is captured separately from any 2.1 diagnostic shim", "all retained prerequisite candidates remain researchable and acyclic", "3.2.5-to-3.2.9 and 2.5.5-to-2.5.9 upgrades preserve stable IDs and do not introduce a late alternate-route gate"],
       "fixed_point_restart_scope": "3.2.9 and, only after exact 2.0 proof, 2.5.9; any later portable semantic decision restarts its explicitly affected shadow projections.",
       "closure": {"status": "admitted-pending-implementation", "evidence": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"}
+    },
+    {
+      "id": "MIR3-TERM-0031",
+      "title": "Combined compilation plan can assign one direct effect to both a dedicated stream and a base continuation",
+      "source_observation": "A reporter supplied a 221-row mod-list with 100 enabled entries. The immutable 3.2.5 package fails to load when finalized external weapon technologies add gun-speed/tesla while MIR plans both its dedicated electric-shooting-speed stream and the weapon-shooting-speed base continuation.",
+      "reproduction": {
+        "status": "exact-engine-reproduced",
+        "evidence": "Reporter mod-list SHA-256 E5C99BD9A7C0B28F061C2D6F0F50371ACE3508A447805921183C605F56E65AC4. Immutable 3.2.5 archive SHA-256 AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF. Exact Factorio 2.1.13 binary SHA-256 CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084. Portal-resolved 18-archive Space Exploration plus sei-tesla-turret-2 closure lock SHA-256 69AA6C1214AE1D9E2E8B3A629A2A8AF94B81269D994799C05193B624EE582CC7; every archive matched its portal SHA-1. Dedicated userdata result SHA-256 3CA717ED4AD1664F32C99CF02E3B23146E898693D8B3E9AA6B342B7AAC73A134 and full log SHA-256 488C12075B3BA510960DEF070491505B633DDD4352E916363FAE70C18CE86B54 reproduce: CompilationPlan contains duplicate direct-effect identity: type=gun-speed;ammo_category=tesla. Source minimization shows Space Exploration 0.7.61 copies laser gun-speed effects to tesla; K2, AmmoGroup, and reporter-only unrelated mods are not required for the collision."
+      },
+      "severity": "P0",
+      "visibility": {"package": true, "gameplay": true, "assurance": false},
+      "stable_id_and_migration_impact": "Existing generated technology IDs must remain stable. The losing combined-plan claim must be removed before graph qualification; retained operations must receive refreshed TechnologyDesign and fingerprint authority, and an emptied base continuation must be omitted without deleting the dedicated stream.",
+      "affected_targets": ["3.2.9", "2.5.9-pending-exact-applicability"],
+      "target_dispositions": [
+        {"target": "3.2.9", "disposition": "late-p0-admitted", "reason": "Exact immutable 3.2.5 reproduction on the supported Factorio 2.1.13 engine proves a package-load blocker inside the advertised modern compatibility envelope."},
+        {"target": "2.5.9", "disposition": "pending-exact-applicability", "reason": "The ownership invariant is portable compiler policy, but exact Factorio 2.0 applicability and target-adapter proof must be established before admission."},
+        {"target": "1.9.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 1.1 target."},
+        {"target": "1.8.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 1.0 target."},
+        {"target": "1.7.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.17 target."},
+        {"target": "1.6.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.16 target."},
+        {"target": "1.5.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.15 target."},
+        {"target": "1.4.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.14 target."},
+        {"target": "1.3.9", "disposition": "not-applicable", "reason": "The reported combined compiler and Space Exploration 0.7.61 environment is outside the Factorio 0.13 target."}
+      ],
+      "admission_destination": "late-p0-terminal-product-amendment",
+      "regression_obligations": [
+        "a MIR-owned regression collides a dedicated direct-effect stream with a generated base continuation without naming a third-party mod",
+        "ownership resolution covers streams, adopted owners, automatic streams, and base continuations before strict final validation",
+        "the losing claim is removed deterministically and the affected TechnologyDesign and fingerprints are refreshed",
+        "a base continuation that loses every effect is cleanly omitted while partial losers retain unique effects",
+        "the strict duplicate direct-effect validator remains enabled",
+        "the exact minimal closure and full reporter environment load after correction",
+        "3.2.5-to-3.2.9 upgrades preserve stable IDs, current research, and fractional progress",
+        "exact Factorio 2.0 applicability is proved or rejected without inference"
+      ],
+      "fixed_point_restart_scope": "3.2.9 convergence and clean-root confirmation plus 2.5.9 only if exact 2.0 applicability is established; already accepted lower-target confirmation remains valid unless its dependency closure changes.",
+      "closure": {
+        "status": "implemented-exact-2.1-proof-awaiting-exact-head-2.0-applicability-and-fixed-point",
+        "evidence": "Regression-first compiler-contract red summary SHA-256 B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB and green summary SHA-256 B13B1D4ECE9F321894F59B7B1D3385BC0E77CA123F03CD8C3A3B555F954CD310. The corrected development archive SHA-256 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 loads the exact 18-archive reporter-relevant closure (log SHA-256 CCFD2205FB260B517FAE3CC8B4632AB8F7F3DC13F8B6BF701D65B432C998E2E3) and the minimized Space Exploration 0.7.61-only closure (log SHA-256 A9929CDA6BA99DA85063429819E1BF8D5FDD3AEED49B84F2B2858F59FE326EC9). The reporter supplied no exact versions or settings for the other enabled rows, so this evidence does not overclaim a byte-exact full 100-mod reproduction. Exact 2.0 target applicability remains pending."
+      }
     }
   ]
 }
