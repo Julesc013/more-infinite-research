@@ -15,23 +15,24 @@
     "allowed_states": {"const": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
     "source_inventory": {
       "type": "object",
-      "required": ["github_issues", "lifecycle_incidents", "terminal_findings"],
+      "required": ["github_issues", "lifecycle_incidents", "terminal_findings", "mod_portal_discussions"],
       "properties": {
         "github_issues": {"type":"object","required":["query","count","ids","open_at_recording"],"properties":{"query":{"type":"string","minLength":1},"count":{"const":5},"ids":{"const":["GH-3","GH-4","GH-5","GH-24","GH-35"]},"open_at_recording":{"const":0}},"additionalProperties":false},
         "lifecycle_incidents": {"type":"object","required":["authority","count","first","last"],"properties":{"authority":{"const":".mir/lifecycle/incidents"},"count":{"const":26},"first":{"const":"INC-2026-0035"},"last":{"const":"INC-2026-0060"}},"additionalProperties":false},
-        "terminal_findings": {"type":"object","required":["authority","strict_records","count","first","last"],"properties":{"authority":{"const":".mir/releases/waves/MIR3-Terminal-ChangeSet.json"},"strict_records":{"const":".mir/releases/terminal/findings"},"count":{"const":31},"first":{"const":"MIR3-TERM-0001"},"last":{"const":"MIR3-TERM-0031"}},"additionalProperties":false}
+        "terminal_findings": {"type":"object","required":["authority","strict_records","count","first","last"],"properties":{"authority":{"const":".mir/releases/waves/MIR3-Terminal-ChangeSet.json"},"strict_records":{"const":".mir/releases/terminal/findings"},"count":{"const":31},"first":{"const":"MIR3-TERM-0001"},"last":{"const":"MIR3-TERM-0031"}},"additionalProperties":false},
+        "mod_portal_discussions": {"type":"object","required":["authority","count","first","last"],"properties":{"authority":{"const":".mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json"},"count":{"const":24},"first":{"const":"68f8e983f3937755388bce07"},"last":{"const":"6a7cc4ed6d4d8ec344e3cc66"}},"additionalProperties":false}
       },
       "additionalProperties": false
     },
     "dispositions": {
       "type": "array",
-      "minItems": 62,
-      "maxItems": 62,
+      "minItems": 86,
+      "maxItems": 86,
       "items": {
         "type": "object",
         "required": ["source_kind", "source_id", "source_ref", "state", "completion", "evidence"],
         "properties": {
-          "source_kind": {"enum": ["github-issue", "lifecycle-incident", "terminal-finding"]},
+          "source_kind": {"enum": ["github-issue", "lifecycle-incident", "terminal-finding", "mod-portal-discussion"]},
           "source_id": {"type": "string", "minLength": 1},
           "source_ref": {"type": "string", "minLength": 1},
           "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
@@ -43,8 +44,8 @@
     },
     "summary": {
       "type": "object",
-      "required": ["rows", "github_issues", "lifecycle_incidents", "terminal_findings", "fixed_in_dot9", "admitted_pending_implementation", "implemented_awaiting_fixed_point", "open_repository_issues", "unclassified"],
-      "properties": {"rows":{"const":62},"github_issues":{"const":5},"lifecycle_incidents":{"const":26},"terminal_findings":{"const":31},"fixed_in_dot9":{"const":3},"admitted_pending_implementation":{"const":0},"implemented_awaiting_fixed_point":{"const":3},"open_repository_issues":{"const":0},"unclassified":{"const":0}},
+      "required": ["rows", "github_issues", "lifecycle_incidents", "terminal_findings", "mod_portal_discussions", "fixed_in_dot9", "admitted_pending_implementation", "implemented_awaiting_fixed_point", "open_repository_issues", "unclassified"],
+      "properties": {"rows":{"const":86},"github_issues":{"const":5},"lifecycle_incidents":{"const":26},"terminal_findings":{"const":31},"mod_portal_discussions":{"const":24},"fixed_in_dot9":{"const":7},"admitted_pending_implementation":{"const":0},"implemented_awaiting_fixed_point":{"const":7},"open_repository_issues":{"const":0},"unclassified":{"const":0}},
       "additionalProperties": false
     },
     "hard_boundaries": {
