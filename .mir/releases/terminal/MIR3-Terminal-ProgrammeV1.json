@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR3-Terminal-ProgrammeV1",
-  "status": "implementation-admitted-source-unfrozen",
+  "status": "fixed-point-accepted-ready-for-source-freeze",
   "implementation_admitted": true,
   "source_frozen": false,
   "family": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
@@ -15,6 +15,7 @@
     "change_set": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
     "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
+    "fixed_point_receipt": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
     "publication": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
     "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
     "accelerated_closure": ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json",
@@ -31,5 +32,5 @@
     "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
     "experiments": ".mir/releases/terminal/experiments"
   },
-  "hard_gate": "No source freeze, candidate assignment, target seal, family seal, tag, or publication state may be inferred from this planning authority."
+  "hard_gate": "The accepted fixed-point receipt permits the separate source-freeze transition only; candidate assignment, target seal, family seal, tag, and publication state remain forbidden until their own authorities pass."
 }

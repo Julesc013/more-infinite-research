@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFixedPointReceiptV1",
+  "status": "accepted",
+  "accepted_at": "2026-08-14T09:06:50.9248494+10:00",
+  "iteration": "post-MIR3-TERM-0031-revised-fixed-point-v1",
+  "participants": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "dev_input_authority": {
+    "commit": "d4802933b994843275efe26a23400b6fe549ad18",
+    "tree": "67e9f2fc38481a6862afb39efe3d03c9efd010d5",
+    "role": "pre-receipt-fixed-point-input-authority"
+  },
+  "authority_roots": [
+    {"path":".mir/releases/waves/MIR3-Terminal-ChangeSet.json","canonical_text_sha256":"816FA26DDFC61FBDA09F29A224429F63771B77578D326C1C18D64F3211AF85A4"},
+    {"path":".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json","canonical_text_sha256":"DD683F8AF324B96D7E034B4325E36DAD184002880070E9B78733C8BEC6A6217C"},
+    {"path":".mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json","canonical_text_sha256":"267D1CF750F04A5BDA9B903EC18F26EF6FD21B8EC69C224B92FD42947A4D03F7"},
+    {"path":".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json","canonical_text_sha256":"4F65C2739B095CDC3451C1DD76638779DF0B7D51FA126E6BF2A1C123B74E7A30"},
+    {"path":".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json","canonical_text_sha256":"5ABB1BDBEB3EA668DD6D8AB7747FB2767F4FE87ACC8202FA50F3146B16CF28A8"},
+    {"path":".mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json","canonical_text_sha256":"133F1254219D71782F71352377616FC5CD7B07EF8861F314A6EB0C43C8B49818"},
+    {"path":".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json","canonical_text_sha256":"B52B4B2100ADBF9DF39FB3426EB4C5B8D5A405540B72EE973A1DDBEAE01EF559"},
+    {"path":".mir/releases/terminal/findings/MIR3-TERM-0031.json","canonical_text_sha256":"A3C7233DFEDD440ABC850D40E75F76D6A90EBB08EF925D3504B46CEE49704842"},
+    {"path":".mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json","canonical_text_sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}
+  ],
+  "shadow_trees": [
+    {
+      "release": "3.2.9",
+      "engine": {"version":"2.1.13","sha256":"CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084"},
+      "source": {"ref":"candidate/3.2.9-projection","commit":"e91f407a6d6df44f5633b89620ce9c24702816eb","tree":"2a44a79b6a8c036a6046501c64a32eb64d10fae5","remote_exact":true},
+      "package": {"archive_sha256":"0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20","content_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","bytes":1061572,"entries":303,"identity_verification":"archive-content-bytes-entries-passed"},
+      "convergence": {"status":"passed","planned":127,"executed":3,"exact_plan_adopted":124,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"C443459E9A321FB7D8894AAD86E3882961F0932ED35F1347971ECFB405C8B049"},{"kind":"result","sha256":"E0918BC55502368C9B356AD64A8F41ECB31268082547EEEA0CB5F683D37FA122"},{"kind":"bundle","sha256":"8A2797F3FB82B4BE606C5360F377E3CD04E93D76199474C98707599B2D1043DB"}]},
+      "confirmation": {"status":"passed","planned":127,"executed":127,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B"},{"kind":"result","sha256":"D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28"},{"kind":"bundle","sha256":"1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"}]},
+      "upgrades": [{"id":"3.2.5-to-3.2.9","status":"passed"},{"id":"3.2.3-to-3.2.9","status":"passed"}]
+    },
+    {
+      "release": "2.5.9",
+      "engine": {"version":"2.0.77","sha256":"D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+      "source": {"ref":"candidate/2.5.9-projection","commit":"ce1f8fa07b454a9d82d2e736ea1cf1bba769dcc6","tree":"45a3487a28847736d3e25f9a13294cef6c23e5b3","remote_exact":true},
+      "package": {"archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","content_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","bytes":1058800,"entries":301,"identity_verification":"archive-content-bytes-entries-passed"},
+      "convergence": {"status":"passed","planned":90,"executed":90,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"6F81B33BFDA411FBA98876B6E329C913BF74FA086BBF0048B78CF09302BED66B"},{"kind":"result","sha256":"FC2516D6195929753631A32F596EC491E48B44FD14CDAF73F90AFED67474D7EC"},{"kind":"bundle","sha256":"24642089935650ACBEB641B9BCAB929FB9D2F4FC68858C5E12CD1CC75EDA0C34"}]},
+      "confirmation": {"status":"passed","planned":90,"executed":90,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994"},{"kind":"result","sha256":"16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349"},{"kind":"bundle","sha256":"F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F"}]},
+      "upgrades": [{"id":"2.5.5-to-2.5.9","status":"passed"},{"id":"2.5.0-to-2.5.9","status":"passed"}]
+    },
+    {
+      "release": "1.9.9",
+      "engine": {"version":"1.1.110","sha256":"B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"},
+      "source": {"ref":"candidate/1.9.9-projection","commit":"22e85c8cfcf6fd6f9d4e9332c54a2f1e93be5a8a","tree":"cd8704581f5cd8f8da6238fd76f2b0c5ee7e56ff","remote_exact":true},
+      "package": {"archive_sha256":"E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843","content_sha256":"3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064","bytes":397677,"entries":174,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"869ACEA9188BFE7FEF6EFEEDD166F748F9101B5642B88C04AD8ACEA12C1A0CF4"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"9CB74D390919E2E5358872D41FFF12760B2A5F51A804CA3FC3080E40EC9FDCA4"},{"kind":"result","sha256":"3548ADB754EFDEE3603A374DE09DEAA82B3106C4019192EC0FB12A4544D96C2D"}]},
+      "upgrades": [{"id":"1.9.5-to-1.9.9","status":"passed"},{"id":"1.9.4-to-1.9.9","status":"passed"}]
+    },
+    {
+      "release": "1.8.9",
+      "engine": {"version":"1.0.0-only","sha256":"99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"},
+      "source": {"ref":"candidate/1.8.9-projection","commit":"9f8a2aac4692de116ce3d45978eef2066375e5ed","tree":"2d5599b1c31fbc5b35bce69ce651159d0877e7a4","remote_exact":true},
+      "package": {"archive_sha256":"F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A","content_sha256":"7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E","bytes":397678,"entries":174,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"F8675562CBF0E170F54D65EAB36F3C41269C5ABA2BB18BE7CEEC52D8AFEA3B6D"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"2CA7F4A8915850A2FF339614B2335167E81168735BAB349E4DA5B61BB76C437C"},{"kind":"result","sha256":"0CEEC323D07D4EDE1FCD4A31733E2FE01355DB868138DB662DDCA431C4525462"}]},
+      "upgrades": [{"id":"1.8.5-to-1.8.9","status":"passed"},{"id":"1.8.2-to-1.8.9","status":"passed"}]
+    },
+    {
+      "release": "1.7.9",
+      "engine": {"version":"0.17.79","sha256":"E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"},
+      "source": {"ref":"candidate/1.7.9-projection","commit":"1236ab47c373588d7dcfb9d79351a1c554292d08","tree":"7b430b8cabd5555f43cdae9136bc141ca866b084","remote_exact":true},
+      "package": {"archive_sha256":"B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C","content_sha256":"3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014","bytes":385310,"entries":177,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"172651B9B56FB7B9F5A8EB3ECD9D17F83AF655406B5C9BE1CEB188D0320227E3"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"73160E5FB5BB2FBE9C0FC044AB1D6A1A9805A8EF3188F70027D38EFB1C2550E8"},{"kind":"result","sha256":"127D25128D6B074A45EFB8DDD515DBEE56C20CE74926A1F91B26B6F91FBE05C5"}]},
+      "upgrades": [{"id":"1.7.5-to-1.7.9","status":"passed"},{"id":"1.7.1-to-1.7.9","status":"passed"}]
+    },
+    {
+      "release": "1.6.9",
+      "engine": {"version":"0.16.51","sha256":"ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"},
+      "source": {"ref":"candidate/1.6.9-projection","commit":"83e78ccd701e82970263b65c59fc4ab6c357a433","tree":"30f2eab0ac7624d14f4630e76aaff79e2d81b92f","remote_exact":true},
+      "package": {"archive_sha256":"928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84","content_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493","bytes":385315,"entries":177,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"3D3DABE2FC21E6F96E007770A648BE74D09A7A2EB5FFC82524E68F7B46A259A1"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"BCD7540C35D10A23E11F2E503778623C6DC243A54AA62C7BB55DDB96ABDC0B53"},{"kind":"result","sha256":"8318B464488EA2DF76940709AEB6CE7E2C7C3EE26E0C47DA9A3AFB9C5B73F61C"}]},
+      "upgrades": [{"id":"1.6.5-to-1.6.9","status":"passed"},{"id":"1.6.0-to-1.6.9","status":"passed"}]
+    },
+    {
+      "release": "1.5.9",
+      "engine": {"version":"0.15.40","sha256":"A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"},
+      "source": {"ref":"candidate/1.5.9-projection","commit":"07c42e24c50f9a667686ee48a426b0c9ca19b444","tree":"cdefcdc2f3bf74b806759374335b669746204912","remote_exact":true},
+      "package": {"archive_sha256":"85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E","content_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED","bytes":385629,"entries":177,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"2D18D9DB3438427058C29145F368BB1C519B6811CFB677E19F81FBCFB8A84831"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"6E5898C86D7A3E4A3860C72C0B6F36973DF1566EAFA457234C0BD684F2ED8777"},{"kind":"result","sha256":"9B1A2D55426FA57C03DA5561FC541188BD7E796C7D769DB9FABD7FA5807E7EEF"}]},
+      "upgrades": [{"id":"1.5.5-to-1.5.9","status":"passed"},{"id":"1.5.0-to-1.5.9","status":"passed"}]
+    },
+    {
+      "release": "1.4.9",
+      "engine": {"version":"0.14.23","sha256":"A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"},
+      "source": {"ref":"candidate/1.4.9-projection","commit":"7422532a819cda510f884e22367dbe667f830f62","tree":"5a6e392711394c72ea1b7f0d1da508082b0812b2","remote_exact":true},
+      "package": {"archive_sha256":"1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872","content_sha256":"26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA","bytes":386070,"entries":177,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"72CAE5EF1E88E2D6832D34C1645802F796FC4604C23F56120EB529CCEAED0180"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"8C293CB5A3DF69A64BBA085DE3585BC5DCF2028AB13B16115F0E11B527338EE0"},{"kind":"result","sha256":"364833D47274304A7CBD44DA8D439F821A40AAF455AA63459F1F5FC060861511"}]},
+      "upgrades": [{"id":"1.4.5-to-1.4.9","status":"passed"},{"id":"1.4.0-to-1.4.9","status":"passed"}]
+    },
+    {
+      "release": "1.3.9",
+      "engine": {"version":"0.13.20","sha256":"F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856"},
+      "source": {"ref":"candidate/1.3.9-projection","commit":"85b03303f0c94573db8cba7fdddaadabfa5bdf8b","tree":"0aa837a71c7d8ebac4ca0d73c9c96bc06ce3fddf","remote_exact":true},
+      "package": {"archive_sha256":"CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A","content_sha256":"AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B","bytes":386160,"entries":177,"identity_verification":"archive-content-bytes-entries-rechecked-2026-08-14"},
+      "convergence": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"result","sha256":"3B8A9358CE4E8F48B231FE8CD713D8377A2B6744811FBF036F152D54DE33B990"},{"kind":"summary-receipt-canonical-text","sha256":"14B3FE57D916DAFF61EEFF9D595B01F1EC043388C0C17C11891F241479A9D51C"}]},
+      "confirmation": {"status":"passed","planned":4,"executed":4,"exact_plan_adopted":0,"ordinary_reused":0,"failed":0,"evidence":[{"kind":"plan","sha256":"40E7012DA1A62E4BAA93AC6EA852D70C1D925818573DD47DCD7086EED5323917"},{"kind":"result","sha256":"3F95C75735B4AC278C0354C57E760520D32CECB58642A8C82057103A3B6253FA"}]},
+      "upgrades": [{"id":"1.3.5-to-1.3.9","status":"passed"},{"id":"1.3.0-to-1.3.9","status":"passed"}]
+    }
+  ],
+  "findings": {
+    "admitted_product_findings": [
+      {"id":"MIR3-TERM-0027","status":"implemented-fixed-point-accepted-awaiting-final-candidate-qualification","targets":["3.2.9"]},
+      {"id":"MIR3-TERM-0028","status":"implemented-fixed-point-accepted-awaiting-final-candidate-qualification","targets":["3.2.9","2.5.9"]},
+      {"id":"MIR3-TERM-0031","status":"implemented-fixed-point-accepted-awaiting-final-candidate-qualification","targets":["3.2.9","2.5.9"]}
+    ],
+    "new_portable_return_findings": 0,
+    "unresolved_release_blocking_findings": 0,
+    "ordinary_product_intake_closed": true
+  },
+  "convergence_checks": {
+    "zero_new_shared_product_fixes": true,
+    "zero_new_reusable_tooling_fixes": true,
+    "zero_target_profile_fixes_affecting_higher_targets": true,
+    "zero_package_governance_fixes": true,
+    "zero_unexplained_semantic_drift": true
+  },
+  "evidence_reuse_boundary": {
+    "affected_targets_restarted_after_MIR3_TERM_0031": ["3.2.9", "2.5.9"],
+    "retained_targets_with_unchanged_dependency_closure": ["1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+    "all_confirmation_campaigns_independent": true,
+    "mutable_job_status_used_as_evidence": false
+  },
+  "acceptance": {
+    "fixed_point": "accepted",
+    "next_state": "ready-for-separate-source-freeze-transition",
+    "source_freeze_performed": false,
+    "candidates_assigned": false,
+    "final_qualification_performed": false,
+    "tagging_or_publication_permitted": false
+  },
+  "immutable_boundaries": {
+    "dot5_package_bytes_changed": false,
+    "history_rewritten": false,
+    "force_push_used": false,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "terminal_tag_created": false
+  }
+}

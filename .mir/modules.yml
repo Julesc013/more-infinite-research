@@ -763,6 +763,8 @@ validation_tooling:
     terminal_mod_portal_discussion_reconciliation_schema: spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json
     terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
     terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
+    terminal_fixed_point_receipt: .mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json
+    terminal_fixed_point_receipt_schema: spec/schemas/mir3-terminal-fixed-point-receipt.schema.json
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1

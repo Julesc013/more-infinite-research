@@ -1,1 +1,93 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://mir.example/schemas/mir3-terminal-fixed-point-receipt.schema.json","x-mir-canonical-path":"spec/schemas/mir3-terminal-fixed-point-receipt.schema.json","title":"Mir3TerminalFixedPointReceiptV1","type":"object","required":["schema","kind","iteration","participants","shadow_trees","findings","convergence_checks","status"],"properties":{"schema":{"const":1},"kind":{"const":"Mir3TerminalFixedPointReceiptV1"},"status":{"enum":["accepted","rejected"]}},"additionalProperties":true}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-fixed-point-receipt.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-fixed-point-receipt.schema.json",
+  "title": "MIR3TerminalFixedPointReceiptV1",
+  "type": "object",
+  "required": ["schema", "kind", "status", "accepted_at", "iteration", "participants", "dev_input_authority", "authority_roots", "shadow_trees", "findings", "convergence_checks", "evidence_reuse_boundary", "acceptance", "immutable_boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalFixedPointReceiptV1"},
+    "status": {"const": "accepted"},
+    "accepted_at": {"type": "string", "format": "date-time"},
+    "iteration": {"const": "post-MIR3-TERM-0031-revised-fixed-point-v1"},
+    "participants": {"type": "array", "prefixItems": [{"const":"3.2.9"},{"const":"2.5.9"},{"const":"1.9.9"},{"const":"1.8.9"},{"const":"1.7.9"},{"const":"1.6.9"},{"const":"1.5.9"},{"const":"1.4.9"},{"const":"1.3.9"}], "items": false, "minItems": 9, "maxItems": 9},
+    "dev_input_authority": {"$ref": "#/$defs/sourceAuthority"},
+    "authority_roots": {"type":"array","minItems":9,"items":{"$ref":"#/$defs/hashReference"}},
+    "shadow_trees": {"type":"array","minItems":9,"maxItems":9,"items":{"$ref":"#/$defs/target"}},
+    "findings": {
+      "type":"object",
+      "required":["admitted_product_findings","new_portable_return_findings","unresolved_release_blocking_findings","ordinary_product_intake_closed"],
+      "properties": {
+        "admitted_product_findings":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"object","required":["id","status","targets"],"properties":{"id":{"enum":["MIR3-TERM-0027","MIR3-TERM-0028","MIR3-TERM-0031"]},"status":{"const":"implemented-fixed-point-accepted-awaiting-final-candidate-qualification"},"targets":{"type":"array","minItems":1,"items":{"type":"string"}}},"additionalProperties":false}},
+        "new_portable_return_findings":{"const":0},
+        "unresolved_release_blocking_findings":{"const":0},
+        "ordinary_product_intake_closed":{"const":true}
+      },
+      "additionalProperties":false
+    },
+    "convergence_checks": {
+      "type":"object",
+      "required":["zero_new_shared_product_fixes","zero_new_reusable_tooling_fixes","zero_target_profile_fixes_affecting_higher_targets","zero_package_governance_fixes","zero_unexplained_semantic_drift"],
+      "properties": {
+        "zero_new_shared_product_fixes":{"const":true},
+        "zero_new_reusable_tooling_fixes":{"const":true},
+        "zero_target_profile_fixes_affecting_higher_targets":{"const":true},
+        "zero_package_governance_fixes":{"const":true},
+        "zero_unexplained_semantic_drift":{"const":true}
+      },
+      "additionalProperties":false
+    },
+    "evidence_reuse_boundary": {
+      "type":"object",
+      "required":["affected_targets_restarted_after_MIR3_TERM_0031","retained_targets_with_unchanged_dependency_closure","all_confirmation_campaigns_independent","mutable_job_status_used_as_evidence"],
+      "properties": {
+        "affected_targets_restarted_after_MIR3_TERM_0031":{"type":"array","prefixItems":[{"const":"3.2.9"},{"const":"2.5.9"}],"items":false},
+        "retained_targets_with_unchanged_dependency_closure":{"type":"array","minItems":7,"maxItems":7,"uniqueItems":true,"items":{"enum":["1.9.9","1.8.9","1.7.9","1.6.9","1.5.9","1.4.9","1.3.9"]}},
+        "all_confirmation_campaigns_independent":{"const":true},
+        "mutable_job_status_used_as_evidence":{"const":false}
+      },
+      "additionalProperties":false
+    },
+    "acceptance": {
+      "type":"object",
+      "required":["fixed_point","next_state","source_freeze_performed","candidates_assigned","final_qualification_performed","tagging_or_publication_permitted"],
+      "properties": {
+        "fixed_point":{"const":"accepted"},
+        "next_state":{"const":"ready-for-separate-source-freeze-transition"},
+        "source_freeze_performed":{"const":false},
+        "candidates_assigned":{"const":false},
+        "final_qualification_performed":{"const":false},
+        "tagging_or_publication_permitted":{"const":false}
+      },
+      "additionalProperties":false
+    },
+    "immutable_boundaries": {
+      "type":"object",
+      "required":["dot5_package_bytes_changed","history_rewritten","force_push_used","source_frozen","candidate_assigned","terminal_tag_created"],
+      "properties": {
+        "dot5_package_bytes_changed":{"const":false},
+        "history_rewritten":{"const":false},
+        "force_push_used":{"const":false},
+        "source_frozen":{"const":false},
+        "candidate_assigned":{"const":false},
+        "terminal_tag_created":{"const":false}
+      },
+      "additionalProperties":false
+    }
+  },
+  "$defs": {
+    "sha256":{"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "gitObject":{"type":"string","pattern":"^[a-f0-9]{40}$"},
+    "hashReference":{"type":"object","required":["path","canonical_text_sha256"],"properties":{"path":{"type":"string","minLength":1},"canonical_text_sha256":{"$ref":"#/$defs/sha256"}},"additionalProperties":false},
+    "sourceAuthority":{"type":"object","required":["commit","tree","role"],"properties":{"commit":{"$ref":"#/$defs/gitObject"},"tree":{"$ref":"#/$defs/gitObject"},"role":{"const":"pre-receipt-fixed-point-input-authority"}},"additionalProperties":false},
+    "engine":{"type":"object","required":["version","sha256"],"properties":{"version":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/sha256"}},"additionalProperties":false},
+    "source":{"type":"object","required":["ref","commit","tree","remote_exact"],"properties":{"ref":{"type":"string","pattern":"^candidate/[0-9]+\\.[0-9]+\\.9-projection$"},"commit":{"$ref":"#/$defs/gitObject"},"tree":{"$ref":"#/$defs/gitObject"},"remote_exact":{"const":true}},"additionalProperties":false},
+    "package":{"type":"object","required":["archive_sha256","content_sha256","bytes","entries","identity_verification"],"properties":{"archive_sha256":{"$ref":"#/$defs/sha256"},"content_sha256":{"$ref":"#/$defs/sha256"},"bytes":{"type":"integer","minimum":1},"entries":{"type":"integer","minimum":1},"identity_verification":{"type":"string","pattern":"^archive-content-bytes-entries-(passed|rechecked-2026-08-14)$"}},"additionalProperties":false},
+    "evidence":{"type":"object","required":["kind","sha256"],"properties":{"kind":{"enum":["plan","result","bundle","summary-receipt-canonical-text"]},"sha256":{"$ref":"#/$defs/sha256"}},"additionalProperties":false},
+    "campaign":{"type":"object","required":["status","planned","executed","exact_plan_adopted","ordinary_reused","failed","evidence"],"properties":{"status":{"const":"passed"},"planned":{"type":"integer","minimum":1},"executed":{"type":"integer","minimum":1},"exact_plan_adopted":{"type":"integer","minimum":0},"ordinary_reused":{"const":0},"failed":{"const":0},"evidence":{"type":"array","minItems":2,"items":{"$ref":"#/$defs/evidence"}}},"additionalProperties":false},
+    "upgrade":{"type":"object","required":["id","status"],"properties":{"id":{"type":"string","pattern":"^[0-9]+\\.[0-9]+\\.[0-9]+-to-[0-9]+\\.[0-9]+\\.9$"},"status":{"const":"passed"}},"additionalProperties":false},
+    "target":{"type":"object","required":["release","engine","source","package","convergence","confirmation","upgrades"],"properties":{"release":{"type":"string","pattern":"^[0-9]+\\.[0-9]+\\.9$"},"engine":{"$ref":"#/$defs/engine"},"source":{"$ref":"#/$defs/source"},"package":{"$ref":"#/$defs/package"},"convergence":{"$ref":"#/$defs/campaign"},"confirmation":{"$ref":"#/$defs/campaign"},"upgrades":{"type":"array","minItems":2,"maxItems":2,"items":{"$ref":"#/$defs/upgrade"}}},"additionalProperties":false}
+  },
+  "additionalProperties": false
+}

@@ -49,7 +49,7 @@
     "reason": "A reproducible package-load failure lies inside both current and maintained advertised support envelopes."
   },
   "closure": {
-    "status": "implemented-awaiting-proof",
-    "evidence": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+    "status": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+    "evidence": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"
   }
 }

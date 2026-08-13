@@ -159,19 +159,23 @@ if (@($publishedOverlayIds | Select-Object -Unique).Count -ne $publishedOverlayI
   throw "Terminal shadow source publication assigns an assurance overlay more than once."
 }
 if ([int]$productReconciliation.schema -ne 1 -or
-    [string]$productReconciliation.status -ne "late-p0-implemented-on-both-affected-targets-fixed-point-pending" -or
+    [string]$productReconciliation.status -ne "late-p0-fixed-point-accepted-ready-for-source-freeze" -or
     [string]$productReconciliation.prior_receipt.raw_sha256 -ne (Get-FileHash -LiteralPath (Join-Path $RepoRoot ([string]$productReconciliation.prior_receipt.path)) -Algorithm SHA256).Hash -or
-    [string]$productReconciliation.current_3_2_9_shadow.package.archive_sha256 -ne "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3" -or
-    [string]$productReconciliation.current_2_5_9_shadow.package.archive_sha256 -ne "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2" -or
+    [string]$productReconciliation.current_3_2_9_shadow.package.archive_sha256 -ne "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20" -or
+    [string]$productReconciliation.current_2_5_9_shadow.package.archive_sha256 -ne "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35" -or
+    [string]$productReconciliation.current_3_2_9_shadow.convergence.independent_confirmation.status -ne "passed" -or
+    [int]$productReconciliation.current_3_2_9_shadow.convergence.independent_confirmation.executed -ne 127 -or
+    [string]$productReconciliation.current_2_5_9_shadow.independent_confirmation.status -ne "passed" -or
+    [int]$productReconciliation.current_2_5_9_shadow.independent_confirmation.executed -ne 90 -or
     (@($productReconciliation.finding_dispositions.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
     (@($productReconciliation.late_p0_amendment.development_packages.archive_sha256) -join "|") -ne "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20|B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35" -or
     (@($productReconciliation.late_p0_amendment.supersedes_current_shadow_identity_for) -join "|") -ne "3.2.9|2.5.9" -or
     [bool]$productReconciliation.immutable_boundaries.dot5_package_bytes_changed -or
     [bool]$productReconciliation.immutable_boundaries.source_frozen -or
     [bool]$productReconciliation.immutable_boundaries.candidate_assigned -or
-    [bool]$productReconciliation.immutable_boundaries.all_nine_fixed_point_accepted -or
+    -not [bool]$productReconciliation.immutable_boundaries.all_nine_fixed_point_accepted -or
     [bool]$productReconciliation.immutable_boundaries.tagging_or_publication_permitted) {
-  throw "Terminal product implementation reconciliation is stale or overclaims fixed-point state."
+  throw "Terminal product implementation reconciliation is stale, lacks accepted proof, or crosses the source-freeze boundary."
 }
 if ([int]$branchReceipt.schema -ne 1 -or
     [string]$branchReceipt.status -ne "kernel-ready-for-pr-all-nine-convergence-evidence-present-confirmation-pending" -or

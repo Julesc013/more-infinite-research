@@ -13,6 +13,7 @@ $authorityNames = @(
   "MIR3-Terminal-Target-MatrixV1",
   "MIR3-Terminal-Candidate-AllocationV1",
   "MIR3-Terminal-FixedPointPolicyV1",
+  "MIR3TerminalFixedPointReceiptV1",
   "MIR3-Terminal-PublicationPolicyV1",
   "MIR3-Terminal-EOL-PolicyV1",
   "MIR3TerminalFoundationAdmissionV1",
@@ -224,8 +225,8 @@ if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work 
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or $programme.source_frozen -or
-    [string]$programme.status -ne "implementation-admitted-source-unfrozen") {
-  throw "Terminal programme must bind the exact implementation-admitted, source-unfrozen nine-release family."
+    [string]$programme.status -ne "fixed-point-accepted-ready-for-source-freeze") {
+  throw "Terminal programme must bind the exact fixed-point-accepted, source-unfrozen nine-release family."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -241,6 +242,7 @@ $productIntakeSchemaByKind = @{
   "MIR3-FINAL-DEFECT-INDEX" = "mir3-final-defect-index"
   "MIR3-Engine-Gap-AuditV1" = "mir3-engine-gap-audit"
   "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
+  "MIR3TerminalFixedPointReceiptV1" = "mir3-terminal-fixed-point-receipt"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -358,8 +360,8 @@ if ([string]$programme.authorities.final_defect_index -ne ".mir/releases/termina
     (@(Compare-Object $expectedDiscussionIds $indexedDiscussionIds)).Count -ne 0 -or
     @($defectIndex.dispositions | Group-Object source_id | Where-Object Count -ne 1).Count -ne 0 -or
     @($defectIndex.dispositions | Where-Object completion -eq "admitted-pending-implementation").Count -ne 0 -or
-    (@($defectIndex.dispositions | Where-Object { $_.source_kind -eq "terminal-finding" -and $_.completion -eq "implemented-awaiting-fixed-point" }).source_id -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
-    (@(Compare-Object $expectedPortalImplementedIds @($defectIndex.dispositions | Where-Object { $_.source_kind -eq "mod-portal-discussion" -and $_.completion -eq "implemented-awaiting-fixed-point" } | ForEach-Object source_id))).Count -ne 0 -or
+    (@($defectIndex.dispositions | Where-Object { $_.source_kind -eq "terminal-finding" -and $_.completion -eq "implemented-fixed-point-accepted-awaiting-final-candidate-qualification" }).source_id -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
+    (@(Compare-Object $expectedPortalImplementedIds @($defectIndex.dispositions | Where-Object { $_.source_kind -eq "mod-portal-discussion" -and $_.completion -eq "implemented-fixed-point-accepted-awaiting-final-candidate-qualification" } | ForEach-Object source_id))).Count -ne 0 -or
     [int]$defectIndex.summary.unclassified -ne 0 -or -not [bool]$defectIndex.hard_boundaries.ordinary_intake_closed -or
     [bool]$defectIndex.hard_boundaries.source_frozen -or [bool]$defectIndex.hard_boundaries.candidate_assigned) {
   throw "Final defect index loses a repository issue, lifecycle incident, terminal finding, Mod Portal discussion, or pre-freeze boundary."
@@ -467,10 +469,10 @@ foreach ($item in @($changeSet.items)) {
   foreach ($field in $changeFields) { if ($null -eq $item.PSObject.Properties[$field]) { throw "Terminal change $($item.id) omits $field." } }
   if (@($item.target_dispositions).Count -eq 0) { throw "Terminal change $($item.id) has no target disposition." }
 }
-if (-not $changeSet.implementation_admitted -or [string]$changeSet.status -ne "product-set-admitted-ordinary-intake-closed-late-p0-implemented-awaiting-exact-head-and-fixed-point" -or
+if (-not $changeSet.implementation_admitted -or [string]$changeSet.status -ne "product-set-admitted-ordinary-intake-closed-fixed-point-accepted-ready-for-source-freeze" -or
     (@($changeSet.product_intake.id) -join "|") -ne "MIR3-TERM-0027|MIR3-TERM-0028|MIR3-TERM-0031" -or
-    (@($changeSet.product_intake | Where-Object { $_.id -eq "MIR3-TERM-0031" -and $_.closure.status -eq "implemented-exact-2.1-and-2.0-proof-awaiting-exact-head-and-fixed-point" })).Count -ne 1) {
-  throw "Terminal change set must preserve the sealed intake plus the exact late-P0 amendment without crossing fixed point."
+    @($changeSet.product_intake | Where-Object { $_.closure.status -ne "implemented-fixed-point-accepted-awaiting-final-candidate-qualification" }).Count -ne 0) {
+  throw "Terminal change set must preserve the sealed intake and accepted fixed-point boundary without crossing source freeze."
 }
 
 $firewall = $authorities["MIR3-Terminal-ScopeFirewallV1"]
@@ -496,6 +498,62 @@ if ([string]$programme.authorities.accelerated_closure -ne ".mir/releases/termin
 $fixedPoint = $authorities["MIR3-Terminal-FixedPointPolicyV1"]
 if (($fixedPoint.participants -join "|") -ne ($family -join "|") -or @($fixedPoint.convergence).Count -ne 5 -or -not $fixedPoint.source_freeze_requires_accepted_receipt) {
   throw "Terminal fixed-point authority is incomplete."
+}
+$fixedPointReceipt = $authorities["MIR3TerminalFixedPointReceiptV1"]
+if ([string]$programme.authorities.fixed_point_receipt -ne ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json" -or
+    [string]$fixedPointReceipt.status -ne "accepted" -or
+    (@($fixedPointReceipt.participants) -join "|") -ne ($family -join "|") -or
+    (@($fixedPointReceipt.shadow_trees.release) -join "|") -ne ($family -join "|") -or
+    @($fixedPointReceipt.shadow_trees).Count -ne 9 -or @($fixedPointReceipt.shadow_trees.upgrades).Count -ne 18 -or
+    @($fixedPointReceipt.shadow_trees | Where-Object { [string]$_.convergence.status -ne "passed" -or [int]$_.convergence.failed -ne 0 -or [string]$_.confirmation.status -ne "passed" -or [int]$_.confirmation.failed -ne 0 }).Count -ne 0 -or
+    @($fixedPointReceipt.shadow_trees.upgrades | Where-Object status -ne "passed").Count -ne 0 -or
+    [int]$fixedPointReceipt.findings.new_portable_return_findings -ne 0 -or
+    [int]$fixedPointReceipt.findings.unresolved_release_blocking_findings -ne 0 -or
+    -not [bool]$fixedPointReceipt.findings.ordinary_product_intake_closed -or
+    @($fixedPointReceipt.convergence_checks.PSObject.Properties | Where-Object { -not [bool]$_.Value }).Count -ne 0 -or
+    -not [bool]$fixedPointReceipt.evidence_reuse_boundary.all_confirmation_campaigns_independent -or
+    [bool]$fixedPointReceipt.evidence_reuse_boundary.mutable_job_status_used_as_evidence -or
+    [string]$fixedPointReceipt.acceptance.fixed_point -ne "accepted" -or
+    [bool]$fixedPointReceipt.acceptance.source_freeze_performed -or [bool]$fixedPointReceipt.acceptance.candidates_assigned -or
+    [bool]$fixedPointReceipt.acceptance.final_qualification_performed -or [bool]$fixedPointReceipt.acceptance.tagging_or_publication_permitted -or
+    [bool]$fixedPointReceipt.immutable_boundaries.dot5_package_bytes_changed -or [bool]$fixedPointReceipt.immutable_boundaries.history_rewritten -or
+    [bool]$fixedPointReceipt.immutable_boundaries.force_push_used -or [bool]$fixedPointReceipt.immutable_boundaries.source_frozen -or
+    [bool]$fixedPointReceipt.immutable_boundaries.candidate_assigned -or [bool]$fixedPointReceipt.immutable_boundaries.terminal_tag_created) {
+  throw "Terminal fixed-point receipt is incomplete, non-converged, or crosses a later release boundary."
+}
+$fixedPointInputTree = (& git -C $RepoRoot rev-parse "$($fixedPointReceipt.dev_input_authority.commit)^{tree}").Trim()
+if ($LASTEXITCODE -ne 0 -or $fixedPointInputTree -ne [string]$fixedPointReceipt.dev_input_authority.tree) {
+  throw "Terminal fixed-point receipt lost its pre-receipt dev commit/tree binding."
+}
+foreach ($root in @($fixedPointReceipt.authority_roots)) {
+  $rootPath = Join-Path $RepoRoot ([string]$root.path)
+  if (-not (Test-Path -LiteralPath $rootPath -PathType Leaf)) {
+    throw "Terminal fixed-point receipt authority root drifted: $($root.path)"
+  }
+  $rootText = [IO.File]::ReadAllText($rootPath).Replace("`r`n", "`n").Replace("`r", "`n")
+  $rootHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($rootText)))
+  if ($rootHash -ne [string]$root.canonical_text_sha256) { throw "Terminal fixed-point receipt authority root drifted: $($root.path)" }
+}
+$expectedFixedPointPackages = @{
+  "3.2.9" = "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20"
+  "2.5.9" = "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35"
+  "1.9.9" = "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843"
+  "1.8.9" = "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A"
+  "1.7.9" = "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C"
+  "1.6.9" = "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84"
+  "1.5.9" = "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E"
+  "1.4.9" = "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872"
+  "1.3.9" = "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A"
+}
+$projectionProfiles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Shadow-ProjectionProfilesV1.json") | ConvertFrom-Json -Depth 100
+foreach ($target in @($fixedPointReceipt.shadow_trees)) {
+  $profile = @($projectionProfiles.targets | Where-Object release -eq ([string]$target.release))
+  if ($profile.Count -ne 1 -or [string]$target.engine.version -ne [string]$profile[0].exact_engine -or
+      [string]$target.engine.sha256 -ne [string]$profile[0].exact_engine_sha256 -or
+      [string]$target.package.archive_sha256 -ne [string]$expectedFixedPointPackages[[string]$target.release] -or
+      -not [bool]$target.source.remote_exact) {
+    throw "Terminal fixed-point target authority is inconsistent: $($target.release)"
+  }
 }
 $publication = $authorities["MIR3-Terminal-PublicationPolicyV1"]
 if (@($publication.first_public_tag_requires).Count -lt 4 -or $publication.failure_policy.rollback_by_deletion -or -not $publication.failure_policy.same_byte_resume) {
@@ -640,7 +698,7 @@ if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $curr
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "implementation-admitted-source-unfrozen") {
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "fixed-point-accepted-ready-for-source-freeze") {
   throw "Current release roles do not distinguish published .5 from planned .9."
 }
 

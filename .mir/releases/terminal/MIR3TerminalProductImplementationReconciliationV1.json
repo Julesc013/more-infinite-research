@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR3TerminalProductImplementationReconciliationV1",
-  "status": "late-p0-implemented-on-both-affected-targets-fixed-point-pending",
+  "status": "late-p0-fixed-point-accepted-ready-for-source-freeze",
   "recorded_at": "2026-08-13T17:53:41.8730995+10:00",
   "prior_receipt": {
     "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
@@ -9,14 +9,14 @@
     "disposition": "retained-immutable-development-evidence"
   },
   "current_3_2_9_shadow": {
-    "source_commit": "a124492b2e6ac02e64560261f64e6e0f2ffc91f3",
-    "source_tree": "576ff1627e321cc64340123dda87f8c3e04d3db1",
+    "source_commit": "e91f407a6d6df44f5633b89620ce9c24702816eb",
+    "source_tree": "2a44a79b6a8c036a6046501c64a32eb64d10fae5",
     "package": {
       "version": "3.2.9",
-      "archive_sha256": "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3",
-      "normalized_content_sha256": "074655F6EBA215D04CE812BBB772171D75C132CB4F3281E8B9E1B28116CA8CC2",
-      "package_source_sha256": "074655F6EBA215D04CE812BBB772171D75C132CB4F3281E8B9E1B28116CA8CC2",
-      "bytes": 1059871,
+      "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+      "normalized_content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "bytes": 1061572,
       "entries": 303,
       "candidate_id": null,
       "source_frozen": false
@@ -24,29 +24,30 @@
     "convergence": {
       "status": "passed",
       "plan": {
-        "path": "artifacts/terminal-shadow/3.2.9/convergence-plan-a124492b-mods.json",
-        "raw_sha256": "8CDC8BFDB2EBEA7EA2A060DF6194C24F204D602C2D43B6577913EB266B1C72C9"
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-plan.json",
+        "raw_sha256": "C443459E9A321FB7D8894AAD86E3882961F0932ED35F1347971ECFB405C8B049"
       },
       "result": {
-        "path": "artifacts/terminal-shadow/3.2.9/convergence-result-a124492b-mods-resumed.json",
-        "raw_sha256": "9D278A5AD2A30141D0182EC78B7C746C1D4C19A95D393DE0E9589E16D27F9B6E",
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-result.json",
+        "raw_sha256": "E0918BC55502368C9B356AD64A8F41ECB31268082547EEEA0CB5F683D37FA122",
         "planned": 127,
-        "executed_in_final_resume": 13,
-        "exact_same_plan_adopted": 114,
+        "executed_in_final_resume": 3,
+        "exact_same_plan_adopted": 124,
         "failed": 0,
         "incomplete": 0,
         "unexpected": 0
       },
       "bundle": {
-        "path": "artifacts/terminal-shadow/3.2.9/convergence-bundle-a124492b-mods.json",
-        "raw_sha256": "A557BCC7FD5E99E277C05F0F544CF65FF977C082589224A4887A65A808B6A122"
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-evidence-bundle.json",
+        "raw_sha256": "8A2797F3FB82B4BE606C5360F377E3CD04E93D76199474C98707599B2D1043DB"
       },
       "direct_3_2_5_upgrade": "passed-five-archetypes-in-runtime-upgrade-capsule",
       "direct_3_2_3_upgrade": {
         "status": "passed-five-archetypes",
         "path": "artifacts/assurance/3.2.3-to-3.2.9-upgrade-proof-direct.json",
         "raw_sha256": "375A60EA3891B1DD9C0781BDD548350B1A4A7AB528F7F1D7D81C5DAAFA68F0A0"
-      }
+      },
+      "independent_confirmation": {"status":"passed","planned":127,"executed":127,"ordinary_reused":0,"checkpoint_adopted":0,"failed":0,"plan_sha256":"2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B","result_sha256":"D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28","bundle_sha256":"1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"}
     }
   },
   "superseded_3_2_9_development_archive": {
@@ -65,18 +66,18 @@
     }
   },
   "current_2_5_9_shadow": {
-    "source_commit": "560f7b7e2759f309af4516015bdd4c848375171a",
-    "source_tree": "a35e984ea4a24eb3e79a407b777df35347063e91",
+    "source_commit": "ce1f8fa07b454a9d82d2e736ea1cf1bba769dcc6",
+    "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
     "transition_receipt": {
       "path": ".mir/releases/terminal/shadows/2.5.9/transition-receipt.json",
       "raw_sha256": "96A947C22DCE6CB25ED92BBB061F857ED2386CD67090CC48C8674D8D21B6ED9E"
     },
     "package": {
       "version": "2.5.9",
-      "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
-      "normalized_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
-      "package_source_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
-      "bytes": 1057099,
+      "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "normalized_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "package_source_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "bytes": 1058800,
       "entries": 301,
       "candidate_id": null,
       "source_frozen": false
@@ -84,31 +85,35 @@
     "convergence": {
       "status": "passed",
       "planned": 90,
-      "executed": 89,
-      "checkpoint_adopted": 1,
+      "executed": 90,
+      "checkpoint_adopted": 0,
       "ordinary_reused": 0,
       "failed": 0,
       "incomplete": 0,
       "unexpected": 0,
-      "both_upgrade_paths": "passed-five-archetypes-each"
-    }
+      "both_upgrade_paths": "passed-five-archetypes-each",
+      "plan_sha256": "6F81B33BFDA411FBA98876B6E329C913BF74FA086BBF0048B78CF09302BED66B",
+      "result_sha256": "FC2516D6195929753631A32F596EC491E48B44FD14CDAF73F90AFED67474D7EC",
+      "bundle_sha256": "24642089935650ACBEB641B9BCAB929FB9D2F4FC68858C5E12CD1CC75EDA0C34"
+    },
+    "independent_confirmation": {"status":"passed","planned":90,"executed":90,"ordinary_reused":0,"checkpoint_adopted":0,"failed":0,"plan_sha256":"22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994","result_sha256":"16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349","bundle_sha256":"F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F","exact_head_hosted_run":31751551520}
   },
   "finding_dispositions": [
     {
       "id": "MIR3-TERM-0027",
-      "state": "implemented-and-shadow-convergence-passed-awaiting-independent-confirmation",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
       "targets": ["3.2.9"],
       "claim_boundary": "exact admitted K2/K2SO envelope only"
     },
     {
       "id": "MIR3-TERM-0028",
-      "state": "implemented-on-both-admitted-targets-and-shadow-convergence-passed-awaiting-independent-confirmation",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
       "targets": ["3.2.9", "2.5.9"],
       "claim_boundary": "generic route correctness; no unproved direct Cubium claim"
     },
     {
       "id": "MIR3-TERM-0031",
-      "state": "implemented-and-exact-2.1-and-2.0-regressions-passed-awaiting-hosted-head-and-revised-fixed-point",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
       "targets": ["3.2.9", "2.5.9"],
       "claim_boundary": "generic combined-plan ownership plus exact proved Space Exploration closures; the reporter's other enabled mods have no supplied exact version or settings authority"
     }
@@ -148,13 +153,13 @@
       "maintained_corrected_space_exploration_log_sha256": "090308C315CAC93FF9569D9DDC88A54388CC38E637C9DA67D9F5B34C888871CB",
       "exact_2_0_envelope": {"factorio":"2.0.77.84539","factorio_binary_sha256":"D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B","space_exploration":"0.7.57","external_archive_count":17,"portal_sha1_verified":17}
     },
-    "remaining_gates": ["exact-head hosted checks", "affected-target convergence", "affected-target clean-root confirmation", "revised all-nine fixed-point receipt", "both affected direct-upgrade rows in final candidate qualification"]
+    "remaining_gates": ["source freeze", "candidate allocation", "both affected direct-upgrade rows in final candidate qualification"]
   },
   "immutable_boundaries": {
     "dot5_package_bytes_changed": false,
     "source_frozen": false,
     "candidate_assigned": false,
-    "all_nine_fixed_point_accepted": false,
+    "all_nine_fixed_point_accepted": true,
     "tagging_or_publication_permitted": false
   }
 }
