@@ -3,7 +3,7 @@
   "kind": "MIR3-Terminal-ChangeSetV1",
   "id": "MIR3-Terminal-ChangeSet",
   "recorded_at": "2026-08-09T12:09:00.0000000Z",
-  "status": "product-set-admitted-ordinary-intake-closed-late-p0-implemented-awaiting-exact-head-and-fixed-point",
+  "status": "product-set-admitted-ordinary-intake-closed-fixed-point-accepted-ready-for-source-freeze",
   "implementation_admitted": true,
   "finding_records": [
     ".mir/releases/terminal/findings/MIR3-TERM-0006.json",
@@ -133,7 +133,7 @@
       "admission_destination": "Sol-terminal-product-admission",
       "regression_obligations": ["exact K2/K2SO load capture records generated stream science inputs", "the adopted K2 phase policy has positive and negative fixture coverage", "3.2.5-to-3.2.9 upgrade preserves progress for every affected stable technology", "no broad K2 or K2SO support claim is made without a locked behaviour matrix"],
       "fixed_point_restart_scope": "3.2.9 current-target shadow and every target whose final Sol disposition is portable; no lower target is presumed affected.",
-      "closure": {"status": "admitted-pending-implementation", "evidence": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"}
+      "closure": {"status": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "evidence": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"}
     },
     {
       "id": "MIR3-TERM-0028",
@@ -158,7 +158,7 @@
       "admission_destination": "Sol-terminal-product-admission-after-exact-2.0-and-fixture-reproduction",
       "regression_obligations": ["a MIR-owned fixture proves a later alternate route cannot delay an already-reachable science pack", "unmodified Cubium 1.0.28 on exact Factorio 2.0 is captured separately from any 2.1 diagnostic shim", "all retained prerequisite candidates remain researchable and acyclic", "3.2.5-to-3.2.9 and 2.5.5-to-2.5.9 upgrades preserve stable IDs and do not introduce a late alternate-route gate"],
       "fixed_point_restart_scope": "3.2.9 and, only after exact 2.0 proof, 2.5.9; any later portable semantic decision restarts its explicitly affected shadow projections.",
-      "closure": {"status": "admitted-pending-implementation", "evidence": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"}
+      "closure": {"status": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "evidence": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"}
     },
     {
       "id": "MIR3-TERM-0031",
@@ -196,8 +196,8 @@
       ],
       "fixed_point_restart_scope": "3.2.9 convergence and clean-root confirmation plus 2.5.9 only if exact 2.0 applicability is established; already accepted lower-target confirmation remains valid unless its dependency closure changes.",
       "closure": {
-        "status": "implemented-exact-2.1-and-2.0-proof-awaiting-exact-head-and-fixed-point",
-        "evidence": "Regression-first compiler-contract red summary SHA-256 B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB and green summary SHA-256 B13B1D4ECE9F321894F59B7B1D3385BC0E77CA123F03CD8C3A3B555F954CD310. The corrected 3.2.9 development archive SHA-256 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 loads the exact reporter-relevant and minimized 2.1 closures. Exact Factorio 2.0.77 with Space Exploration 0.7.57 reproduces immutable 2.5.5 (log SHA-256 32B41B372261B411F8C3B2075533ECBDAB0138B939E5342ECFF83C1BB72466BB); corrected 2.5.9 archive SHA-256 B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35 passes the target-native compiler contract and the same external closure (log SHA-256 090308C315CAC93FF9569D9DDC88A54388CC38E637C9DA67D9F5B34C888871CB). The reporter supplied no exact versions or settings for the other enabled rows, so this evidence does not overclaim a byte-exact full 100-mod reproduction."
+        "status": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+        "evidence": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json binds the corrected 3.2.9 archive 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 and corrected 2.5.9 archive B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35 to distinct passing convergence and independent-confirmation campaigns. The reporter supplied no exact versions or settings for the other enabled rows, so the evidence does not overclaim a byte-exact full 100-mod reproduction."
       }
     }
   ]

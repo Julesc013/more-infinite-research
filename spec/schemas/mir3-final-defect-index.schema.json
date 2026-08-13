@@ -8,7 +8,7 @@
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR3-FINAL-DEFECT-INDEX"},
-    "status": {"const": "terminal-dispositions-complete-fixed-point-pending"},
+    "status": {"const": "terminal-dispositions-complete-fixed-point-accepted"},
     "recorded_at": {"type": "string", "format": "date-time"},
     "scope": {"type": "string", "minLength": 1},
     "state_semantics": {"type": "string", "minLength": 1},
@@ -36,7 +36,7 @@
           "source_id": {"type": "string", "minLength": 1},
           "source_ref": {"type": "string", "minLength": 1},
           "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
-          "completion": {"enum": ["historical-verified", "admitted-pending-implementation", "implemented-awaiting-fixed-point", "not-a-product-fix"]},
+          "completion": {"enum": ["historical-verified", "admitted-pending-implementation", "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "not-a-product-fix"]},
           "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
         },
         "additionalProperties": false
@@ -44,8 +44,8 @@
     },
     "summary": {
       "type": "object",
-      "required": ["rows", "github_issues", "lifecycle_incidents", "terminal_findings", "mod_portal_discussions", "fixed_in_dot9", "admitted_pending_implementation", "implemented_awaiting_fixed_point", "open_repository_issues", "unclassified"],
-      "properties": {"rows":{"const":86},"github_issues":{"const":5},"lifecycle_incidents":{"const":26},"terminal_findings":{"const":31},"mod_portal_discussions":{"const":24},"fixed_in_dot9":{"const":7},"admitted_pending_implementation":{"const":0},"implemented_awaiting_fixed_point":{"const":7},"open_repository_issues":{"const":0},"unclassified":{"const":0}},
+      "required": ["rows", "github_issues", "lifecycle_incidents", "terminal_findings", "mod_portal_discussions", "fixed_in_dot9", "admitted_pending_implementation", "implemented_fixed_point_accepted_awaiting_final_candidate_qualification", "open_repository_issues", "unclassified"],
+      "properties": {"rows":{"const":86},"github_issues":{"const":5},"lifecycle_incidents":{"const":26},"terminal_findings":{"const":31},"mod_portal_discussions":{"const":24},"fixed_in_dot9":{"const":7},"admitted_pending_implementation":{"const":0},"implemented_fixed_point_accepted_awaiting_final_candidate_qualification":{"const":7},"open_repository_issues":{"const":0},"unclassified":{"const":0}},
       "additionalProperties": false
     },
     "hard_boundaries": {

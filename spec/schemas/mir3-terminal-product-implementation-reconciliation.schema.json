@@ -9,7 +9,7 @@
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR3TerminalProductImplementationReconciliationV1"},
-    "status": {"const": "late-p0-implemented-on-both-affected-targets-fixed-point-pending"},
+    "status": {"const": "late-p0-fixed-point-accepted-ready-for-source-freeze"},
     "recorded_at": {"type": "string", "format": "date-time"},
     "prior_receipt": {"type": "object"},
     "current_3_2_9_shadow": {"type": "object"},
@@ -25,7 +25,7 @@
         "dot5_package_bytes_changed": {"const": false},
         "source_frozen": {"const": false},
         "candidate_assigned": {"const": false},
-        "all_nine_fixed_point_accepted": {"const": false},
+        "all_nine_fixed_point_accepted": {"const": true},
         "tagging_or_publication_permitted": {"const": false}
       }
     }

@@ -8,7 +8,7 @@
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR3-ModPortal-Discussion-ReconciliationV1"},
-    "status": {"const": "all-public-threads-terminally-disposed-fixed-point-pending"},
+    "status": {"const": "all-public-threads-terminally-disposed-fixed-point-accepted"},
     "observed_at": {"type": "string", "format": "date-time"},
     "scope": {"const": "every-public-discussion-visible-on-the-more-infinite-research-mod-portal-index"},
     "public_index": {
@@ -39,7 +39,7 @@
           "title": {"type": "string", "minLength": 1},
           "source_class": {"enum": ["bug-report", "feature-request", "compatibility-request", "mixed-thread", "contribution-request"]},
           "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
-          "completion": {"enum": ["historical-verified", "implemented-awaiting-fixed-point", "not-a-product-fix"]},
+          "completion": {"enum": ["historical-verified", "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "not-a-product-fix"]},
           "linked_authorities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
           "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
           "rationale": {"type": "string", "minLength": 1},
