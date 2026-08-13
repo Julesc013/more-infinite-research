@@ -208,11 +208,16 @@ try {
     $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
+    foreach ($releaseLibraryPath in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1")) {
+      & git -C $RepoRoot cat-file -e "$([string]$row.baseline.tag):$releaseLibraryPath" 2>$null
+      if ($LASTEXITCODE -ne 0) { continue }
+      $releaseLibraryText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):$releaseLibraryPath") -join "`n"
+      if ([string]::IsNullOrWhiteSpace($releaseLibraryText)) { throw "Unable to read exact predecessor assurance release library for $($row.release): $releaseLibraryPath" }
+      $releaseLibraryDestination = Join-Path $targetRoot $releaseLibraryPath
+      [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $releaseLibraryDestination))
+      [IO.File]::WriteAllText($releaseLibraryDestination, $releaseLibraryText + "`n", [Text.UTF8Encoding]::new($false))
+    }
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
-      [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot "scripts/MIRAssurance"))
-      $releaseLibraryText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/MIRAssurance/Release.ps1") -join "`n"
-      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseLibraryText)) { throw "Unable to read exact predecessor assurance release library for $($row.release)." }
-      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/MIRAssurance/Release.ps1"), $releaseLibraryText + "`n", [Text.UTF8Encoding]::new($false))
       $validationEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRValidation.ps1") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($validationEntryPointText)) { throw "Unable to read exact predecessor validation entry point for $($row.release)." }
       [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1"), $validationEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
@@ -278,6 +283,17 @@ try {
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
     $docsRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/docs.yml")
+    foreach ($releaseLibraryPath in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1")) {
+      $releaseLibraryFullPath = Join-Path $targetRoot $releaseLibraryPath
+      if (-not (Test-Path -LiteralPath $releaseLibraryFullPath -PathType Leaf)) { continue }
+      $releaseLibrarySource = Get-Content -Raw -LiteralPath $releaseLibraryFullPath
+      if ($releaseLibrarySource.Contains('branch --show-current') -and
+          (-not $releaseLibrarySource.Contains('(@(& git -C $repo branch --show-current) -join "").Trim()') -or
+           $releaseLibrarySource.Contains('([string](& git -C $repo branch --show-current)).Trim()') -or
+           $releaseLibrarySource.Contains('(& git -C $repo branch --show-current).Trim()'))) {
+        throw "Terminal projection left a detached-HEAD-unsafe release authority for $($row.release): $releaseLibraryPath"
+      }
+    }
     $releaseNoteRegistryCount = [regex]::Matches(
       $docsRegistry,
       ('(?m)^\s*- path: ' + [regex]::Escape("docs/releases/notes/release-notes-$([string]$row.release).md") + '$')
