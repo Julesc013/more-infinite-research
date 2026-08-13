@@ -720,7 +720,10 @@ try {
   $stagedPatchPath = Join-Path $equivalenceRoot "staged-index.patch"
   & git -C $RepoRoot diff --cached --binary --full-index --output=$stagedPatchPath
   if ($LASTEXITCODE -ne 0) { throw "Unable to capture the exact staged tree for separate-root equivalence." }
-  $sourceGitRoot = Join-Path $RepoRoot ".git"
+  $sourceGitRoot = (& git -c "safe.directory=$RepoRoot" -C $RepoRoot rev-parse --absolute-git-dir).Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceGitRoot)) {
+    throw "Unable to resolve the source repository Git directory for separate-root equivalence."
+  }
   & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
   & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --no-hardlinks $RepoRoot $workerRoot
