@@ -13,6 +13,27 @@ $commandPath = Join-Path $RepoRoot "tools/commands/targets/Set-MIRTerminalShadow
 $approvedDeltaFixturePath = Join-Path $RepoRoot "fixtures/export-approved-delta/data-final-fixes.lua"
 $materializerText = Get-Content -Raw -LiteralPath $commandPath
 
+function Test-MIRTerminalDetachedHeadEquivalent {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$ActualText,
+    [Parameter(Mandatory)][string]$ExpectedText
+  )
+  $replacement = switch ($RelativePath) {
+    "scripts/Invoke-MIRAssurance.ps1" {
+      @{safe='      branch=([string](& git -C $repo branch --show-current)).Trim()'; unsafe='      branch=(& git -C $repo branch --show-current).Trim()'}
+      break
+    }
+    { $_ -in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1") } {
+      @{safe='  $branch = ([string](& git -C $repo branch --show-current)).Trim()'; unsafe='  $branch = (& git -C $repo branch --show-current).Trim()'}
+      break
+    }
+    default { return $false }
+  }
+  return $ActualText.Contains([string]$replacement.safe) -and
+    $ActualText.Replace([string]$replacement.safe, [string]$replacement.unsafe) -ceq $ExpectedText
+}
+
 foreach ($requiredIdempotencePolicy in @(
   '$finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob',
   '} elseif ([string]$file.blob -eq $finalOverlayBlob) {',
@@ -188,6 +209,10 @@ try {
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
+      [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot "scripts/MIRAssurance"))
+      $releaseLibraryText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/MIRAssurance/Release.ps1") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseLibraryText)) { throw "Unable to read exact predecessor assurance release library for $($row.release)." }
+      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/MIRAssurance/Release.ps1"), $releaseLibraryText + "`n", [Text.UTF8Encoding]::new($false))
       $validationEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRValidation.ps1") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($validationEntryPointText)) { throw "Unable to read exact predecessor validation entry point for $($row.release)." }
       [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1"), $validationEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
@@ -292,10 +317,7 @@ try {
           $materializedPath = Join-Path $targetRoot ([string]$file.path)
           $materializedText = (Get-Content -Raw -LiteralPath $materializedPath).Replace("`r`n", "`n").Replace("`r", "`n")
           $expectedText = ((@(& git -C $RepoRoot cat-file blob $expectedBlob) -join "`n").TrimEnd() + "`n")
-          $safeDetachedHead = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
-          $unsafeDetachedHead = '      branch=(& git -C $repo branch --show-current).Trim()'
-          if ([string]$file.path -ne "scripts/Invoke-MIRAssurance.ps1" -or
-              $materializedText.Replace($safeDetachedHead, $unsafeDetachedHead) -cne $expectedText) {
+          if (-not (Test-MIRTerminalDetachedHeadEquivalent -RelativePath ([string]$file.path) -ActualText $materializedText -ExpectedText $expectedText)) {
             throw "Terminal projection did not materialize exact assurance overlay $($overlay.id): $($file.path)"
           }
         }
@@ -306,6 +328,7 @@ try {
       $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
       $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
       $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      $assuranceReleaseLibrary = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/MIRAssurance/Release.ps1")
       $validationEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1")
       $upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1")
       $backportLock = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/backport-source-lock.json") | ConvertFrom-Json -Depth 100
@@ -317,6 +340,8 @@ try {
           -not $assuranceEntryPoint.Contains('function Get-MIRAssuranceFactorioVersion {') -or
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
           -not $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
+          -not $assuranceReleaseLibrary.Contains('$branch = ([string](& git -C $repo branch --show-current)).Trim()') -or
+          $assuranceReleaseLibrary.Contains('$branch = (& git -C $repo branch --show-current).Trim()') -or
           -not $validationEntryPoint.Contains('$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"') -or
           -not $validationEntryPoint.Contains('function Remove-MIRGeneratedValidationUserData {') -or
           $validationEntryPoint.Contains('[System.IO.Path]::GetTempPath()') -or
