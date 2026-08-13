@@ -13,7 +13,8 @@
     {
       "release": "3.2.9",
       "factorio_line": "2.1",
-      "exact_engine": "newest-exact-available-2.1-at-source-freeze",
+      "exact_engine": "2.1.13",
+      "exact_engine_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
       "support_tier": "current",
       "promotion_branch": "main",
       "shadow_branch": "candidate/3.2.9-projection",
@@ -23,7 +24,17 @@
       "public_contract_change": "patch-compatible",
       "target_adapter": "canonical-factorio-2.1",
       "target_profile": "factorio-2.1",
-      "assurance_overlays": [],
+      "assurance_overlays": [
+        {
+          "id": "factorio-2.1-validation-userdata-v1",
+          "commit": "2a27929fc51db75cc339f7b197931426bef8b5fa",
+          "reason": "Carry the package-excluded validation correction that keeps generated Factorio userdata inside the repository build root, verifies the resolved cleanup target remains bounded, and preserves explicitly supplied userdata.",
+          "files": [
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"daa333a4f692c92d8d9f6314174aa91202df6df3"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"5f68f1d3bc144730dd6a8d4bcff321b12c79e4fe"}
+          ]
+        }
+      ],
       "performance_transition": null,
       "product_findings": ["MIR3-TERM-0027", "MIR3-TERM-0028"],
       "product_disposition": "canonical-2.1-implementation",
