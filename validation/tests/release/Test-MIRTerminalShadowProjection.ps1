@@ -255,6 +255,7 @@ try {
           -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"") -or
           -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$([string]$row.release)`"") -or
           -not $fixtureControl.Contains("[mir-fixture] $preDot5Version to $([string]$row.release) upgrade proof complete") -or
+          -not $fixtureControl.Contains("game.server_save(`"mir-$(([string]$row.release).Replace('.', ''))-upgraded`")") -or
           -not $fixtureRegistry.Contains("assertion_path: $([string]$preDot5Row[0].generated_fixture)")) {
         throw "Current-tier direct pre-.5 upgrade fixture is stale or unregistered."
       }

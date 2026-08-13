@@ -550,6 +550,11 @@ function Set-MIRTerminalUpgradeFixtures {
       }
       $text = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile"
       $text = $text.Replace($baselineVersion, $Release)
+      if ($sourceFile -eq "control.lua") {
+        $baselineSaveName = "mir-$($baselineVersion.Replace('.', ''))-upgraded"
+        $releaseSaveName = "mir-$($Release.Replace('.', ''))-upgraded"
+        $text = $text.Replace($baselineSaveName, $releaseSaveName)
+      }
       Assert-OrWriteMIRText -Path $destination -Text ($text.TrimEnd() + "`n")
     }
 
@@ -558,7 +563,8 @@ function Set-MIRTerminalUpgradeFixtures {
       "script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"",
       "script.active_mods[`"more-infinite-research`"] ~= `"$Release`"",
       "[mir-fixture] $preDot5Version upgrade source proof complete",
-      "[mir-fixture] $preDot5Version to $Release upgrade proof complete"
+      "[mir-fixture] $preDot5Version to $Release upgrade proof complete",
+      "game.server_save(`"mir-$($Release.Replace('.', ''))-upgraded`")"
     )) {
       if (-not $control.Contains($requiredMarker)) {
         throw "Generated current-tier direct-upgrade fixture lacks marker: $requiredMarker"
