@@ -82,7 +82,7 @@
   "diagnostic_code_namespaces": ["MIR-AUTO", "MIR-PROVIDER"],
   "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
   "mutation_sentinels": [
-    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority", "native-owner-patch-design-authority"
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "combined-operation-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority", "native-owner-patch-design-authority"
   ],
   "promotion_trust_classes": [
     "fixture-only", "local-user", "external-mod-author", "mir-reviewed", "protected-release"
