@@ -106,6 +106,7 @@
     ".mir/releases/terminal/shadows/3.2.9/qualification-context.json",
     "docs/releases/notes/release-notes-3.2.9.md",
     "changelog.txt",
+    "scripts/Invoke-MIRAssurance.ps1",
     ".mir/releases/terminal/shadows/3.2.9/upgrade-fixtures.json",
     ".mir/fixtures.yml",
     "fixtures/assert-upgrade-3-2-3-to-3-2-9",
