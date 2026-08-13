@@ -14,10 +14,15 @@ $SourceRepoRoot = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 $TargetRoot = (Resolve-Path -LiteralPath $TargetRoot).Path
 if (-not [IO.Path]::IsPathRooted($ProfilesPath)) { $ProfilesPath = Join-Path $SourceRepoRoot $ProfilesPath }
 
+function ConvertTo-MIRCanonicalText {
+  param([Parameter(Mandatory)][string]$Text)
+  return $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+}
+
 function Write-MIRUtf8NoBom {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Text)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path))
-  [IO.File]::WriteAllText($Path, $Text, [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($Path, (ConvertTo-MIRCanonicalText -Text $Text), [Text.UTF8Encoding]::new($false))
 }
 
 function ConvertTo-MIRStableJson {
@@ -233,6 +238,8 @@ if ($isShadowConvergence) {
   throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
 }
 '@
+    $candidateGate = ConvertTo-MIRCanonicalText -Text $candidateGate
+    $shadowGate = ConvertTo-MIRCanonicalText -Text $shadowGate
     if (-not $test.Contains($candidateGate.Trim())) { throw "Terminal performance validator source boundary changed." }
     $test = $test.Replace($candidateGate.Trim(), $shadowGate.Trim())
     Write-MIRUtf8NoBom -Path $testPath -Text ($test.TrimEnd() + "`n")
@@ -269,7 +276,7 @@ release:
 
 function Set-MIRConvergenceAuthority {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Target, [Parameter(Mandatory)]$PortableSource)
-  $expected = Get-MIRConvergenceReleaseBlock -Target $Target -PortableSource $PortableSource
+  $expected = (Get-MIRConvergenceReleaseBlock -Target $Target -PortableSource $PortableSource).Replace("`r`n", "`n").Replace("`r", "`n")
   $assuranceOverlaySummary = if (@($Target.assurance_overlays).Count -eq 0) { "none" } else { @($Target.assurance_overlays | ForEach-Object { "$([string]$_.id)@$([string]$_.commit)" }) -join "," }
   if ($Check) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Terminal convergence authority is missing: $Path" }
@@ -319,8 +326,9 @@ release_gates:
   - complete-structured-validation-summary
 "@.TrimStart("`n")
   }
-  $normalizedSuffix = $suffix.Trim([char[]]@("`r", "`n"))
-  Write-MIRUtf8NoBom -Path $Path -Text ($prefix.TrimEnd() + "`n`n" + $expected.TrimEnd() + "`n`n" + $normalizedSuffix + "`n")
+  $normalizedPrefix = $prefix.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd()
+  $normalizedSuffix = $suffix.Replace("`r`n", "`n").Replace("`r", "`n").Trim([char[]]@("`r", "`n"))
+  Write-MIRUtf8NoBom -Path $Path -Text ($normalizedPrefix + "`n`n" + $expected.TrimEnd() + "`n`n" + $normalizedSuffix + "`n")
 }
 
 function Set-MIRTerminalShadowAssuranceProfile {
@@ -407,6 +415,7 @@ function Get-MIRAssuranceFactorioVersion {
   return $version.Trim()
 }
 '@.Trim()
+  $functionText = ConvertTo-MIRCanonicalText -Text $functionText
   $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_SHA256__", [string]$Target.exact_engine_sha256)
   $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_VERSION__", ([string]$Target.exact_engine).Replace("-only", ""))
   $functionMarker = "function Get-MIRAssuranceFactorioVersion {"
@@ -505,6 +514,8 @@ if (-not $loadText.Contains($proofMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing."
 }
 '@.Trim()
+  $benchmarkBlock = ConvertTo-MIRCanonicalText -Text $benchmarkBlock
+  $headlessBlock = ConvertTo-MIRCanonicalText -Text $headlessBlock
   $marker = "# MIR3-TERMINAL-0.16-HEADLESS-UPGRADE-LOAD"
   if ($text.Contains($benchmarkBlock)) {
     $text = $text.Replace($benchmarkBlock, $headlessBlock)

@@ -207,9 +207,32 @@ try {
 
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection materialization failed for $($row.release)." }
-    $firstConvergenceHash = (Get-FileHash -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml") -Algorithm SHA256).Hash
+    $convergencePath = Join-Path $targetRoot ".mir/convergence.yml"
+    $firstConvergenceText = [IO.File]::ReadAllText($convergencePath)
+    if ($firstConvergenceText.Contains("`r")) {
+      throw "Terminal projection materialization did not write canonical LF authority for $($row.release)."
+    }
+    $firstConvergenceHash = (Get-FileHash -LiteralPath $convergencePath -Algorithm SHA256).Hash
+    $firstProjectionState = @(
+      Get-ChildItem -LiteralPath $targetRoot -Recurse -File |
+        Sort-Object FullName |
+        ForEach-Object {
+          $relativePath = $_.FullName.Substring($targetRoot.Length).TrimStart([char[]]@("\", "/")).Replace("\", "/")
+          "$relativePath|$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)"
+        }
+    ) -join "`n"
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
-    if ($LASTEXITCODE -ne 0 -or (Get-FileHash -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml") -Algorithm SHA256).Hash -ne $firstConvergenceHash) {
+    $secondProjectionState = @(
+      Get-ChildItem -LiteralPath $targetRoot -Recurse -File |
+        Sort-Object FullName |
+        ForEach-Object {
+          $relativePath = $_.FullName.Substring($targetRoot.Length).TrimStart([char[]]@("\", "/")).Replace("\", "/")
+          "$relativePath|$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)"
+        }
+    ) -join "`n"
+    if ($LASTEXITCODE -ne 0 -or
+        (Get-FileHash -LiteralPath $convergencePath -Algorithm SHA256).Hash -ne $firstConvergenceHash -or
+        $secondProjectionState -cne $firstProjectionState) {
       throw "Terminal projection materialization is not idempotent for $($row.release)."
     }
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot -Check
