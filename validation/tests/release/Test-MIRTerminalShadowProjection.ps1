@@ -4,6 +4,7 @@ $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path }
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 $profilesPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json"
+$sourcePublicationPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json"
 $matrixPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"
 $admissionPath = Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"
 $commandPath = Join-Path $RepoRoot "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1"
@@ -22,6 +23,7 @@ foreach ($requiredIdempotencePolicy in @(
 }
 
 $profiles = Get-Content -Raw -LiteralPath $profilesPath | ConvertFrom-Json -Depth 100
+$sourcePublication = Get-Content -Raw -LiteralPath $sourcePublicationPath | ConvertFrom-Json -Depth 100
 $matrix = Get-Content -Raw -LiteralPath $matrixPath | ConvertFrom-Json -Depth 100
 $admission = Get-Content -Raw -LiteralPath $admissionPath | ConvertFrom-Json -Depth 100
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
@@ -34,6 +36,40 @@ if ([string]$profiles.portable_source.release -ne "3.2.9" -or
     (& git -C $RepoRoot rev-parse "$([string]$profiles.portable_source.authority_commit)^{commit}").Trim() -ne [string]$profiles.portable_source.authority_commit -or
     (& git -C $RepoRoot rev-parse "$([string]$profiles.portable_source.authority_commit)^{tree}").Trim() -ne [string]$profiles.portable_source.authority_tree) {
   throw "Terminal shadow portable source is not an immutable repository authority."
+}
+if ([int]$sourcePublication.schema -ne 1 -or
+    [string]$sourcePublication.kind -ne "MIR3TerminalShadowSourcePublicationV1" -or
+    [string]$sourcePublication.status -ne "published-shadow-source-history" -or
+    [string]$sourcePublication.repository -ne "Julesc013/more-infinite-research" -or
+    [bool]$sourcePublication.source_frozen -or $null -ne $sourcePublication.candidate_id -or
+    [string]$sourcePublication.transport -ne "full-git-history-v1" -or
+    @($sourcePublication.refs).Count -ne 3) {
+  throw "Terminal shadow source publication authority is incomplete or overclaims freeze/candidate state."
+}
+
+$publishedOverlayIds = @()
+foreach ($sourceRef in @($sourcePublication.refs)) {
+  $headCommit = [string]$sourceRef.head_commit
+  $headTree = [string]$sourceRef.head_tree
+  if ((& git -C $RepoRoot rev-parse "$headCommit^{commit}" 2>$null).Trim() -ne $headCommit -or
+      (& git -C $RepoRoot rev-parse "$headCommit^{tree}" 2>$null).Trim() -ne $headTree) {
+    throw "Terminal shadow source publication head is unavailable or changed: $($sourceRef.id)"
+  }
+  $branchName = ([string]$sourceRef.ref).Substring("refs/heads/".Length)
+  $publishedHead = @(
+    [string]$sourceRef.ref,
+    "refs/remotes/origin/$branchName"
+  ) | ForEach-Object {
+    $resolved = @(& git -C $RepoRoot rev-parse --verify "$_^{commit}" 2>$null)
+    if ($LASTEXITCODE -eq 0 -and $resolved.Count -eq 1) { [string]$resolved[0].Trim() }
+  } | Where-Object { $_ -eq $headCommit } | Select-Object -First 1
+  if ([string]::IsNullOrWhiteSpace([string]$publishedHead)) {
+    throw "Terminal shadow source ref is not present at its recorded head: $($sourceRef.ref)"
+  }
+  $publishedOverlayIds += @($sourceRef.overlay_ids | ForEach-Object { [string]$_ })
+}
+if (@($publishedOverlayIds | Select-Object -Unique).Count -ne $publishedOverlayIds.Count) {
+  throw "Terminal shadow source publication assigns an assurance overlay more than once."
 }
 $approvedDeltaFixture = Get-Content -Raw -LiteralPath $approvedDeltaFixturePath
 if ($approvedDeltaFixture -notmatch 'mods\["more-infinite-research"\]\s*==\s*"2\.5\.9"' -or
@@ -75,7 +111,25 @@ foreach ($row in @($profiles.targets)) {
         throw "Terminal assurance overlay blob is unavailable for $($row.release): $($file.path)"
       }
     }
+    if ([string]$row.release -eq "2.5.9") {
+      $publicationRef = @($sourcePublication.refs | Where-Object { @($_.overlay_ids) -contains [string]$overlay.id })
+      if ($publicationRef.Count -ne 1) {
+        throw "Terminal assurance overlay lacks one published source ref: $($overlay.id)"
+      }
+      & git -C $RepoRoot merge-base --is-ancestor ([string]$overlay.commit) ([string]$publicationRef[0].head_commit)
+      if ($LASTEXITCODE -ne 0) {
+        throw "Published terminal source ref does not contain assurance overlay $($overlay.id)."
+      }
+    }
   }
+}
+
+$maintainedOverlayIds = @(
+  @($profiles.targets | Where-Object release -eq "2.5.9")[0].assurance_overlays |
+    ForEach-Object { [string]$_.id }
+)
+if ((@($publishedOverlayIds | Sort-Object) -join "|") -ne (@($maintainedOverlayIds | Sort-Object) -join "|")) {
+  throw "Terminal shadow source publication does not cover the exact maintained overlay set."
 }
 
 $testRoot = Join-Path $RepoRoot ("build/tests/terminal-shadow-projection/" + [guid]::NewGuid().ToString("N"))

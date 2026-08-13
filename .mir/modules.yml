@@ -753,6 +753,8 @@ validation_tooling:
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
     terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
     terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
+    terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
+    terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
