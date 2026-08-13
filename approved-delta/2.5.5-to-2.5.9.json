@@ -11,16 +11,16 @@
   "current": {
     "version": "2.5.9",
     "factorio_version": "2.0",
-    "source_commit": "990e0135aed25b9306bf282eb086685c8b63f782",
-    "package_source_commit": "990e0135aed25b9306bf282eb086685c8b63f782",
-    "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
-    "package_content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E"
+    "source_commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+    "package_source_commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+    "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+    "package_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
     "script": "scripts/Export-MIRApprovedDelta.ps1",
-    "qualification_source_commit": "cc81828755ce4974383df3ca9505b46349a60f6a",
-    "producer_sha256": "6E06589EE44BD58E463CF65B25BCA9EFE65B9B23D4F75D3FB566B45BD7C4F072",
+    "qualification_source_commit": "9189a95e910548ee260e4fb8db62346613fd547a",
+    "producer_sha256": "50CC5B6BA7B1C8E3B2066A10CCBD94ABE41B43CCB21FA77FF4F4E01AC42E0C84",
     "factorio_binary_version": "2.0.77.84539",
     "scenarios": [
       "approved-delta-automatic-family-controls",
@@ -101,7 +101,7 @@
     {
       "field": "package.archive_sha256",
       "before": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
-      "after": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2",
+      "after": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
       "reason": "The archive identity advances from immutable 2.5.5 to the exact current 2.5.9 development shadow.",
       "intentional": true,
       "migration_impact": "Development package custody changes; all semantic differences remain independently classified.",
@@ -114,7 +114,7 @@
     {
       "field": "package.package_content_sha256",
       "before": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
-      "after": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E",
+      "after": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
       "reason": "The normalized package identity advances to the exact current 2.5.9 development shadow.",
       "intentional": true,
       "migration_impact": "Package content changes only within the admitted target projection; every observed semantic row remains independently classified.",

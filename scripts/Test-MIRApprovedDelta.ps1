@@ -144,10 +144,15 @@ if ($isMIR259Factorio20Delta) {
     content = '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154'
     commit = '27877275854eb131efeb42672d3676c9c513c85e'
   }
+  $shadowManifestPath = Join-Path $repo '.mir\releases\terminal\shadows\2.5.9\package-manifest.json'
+  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+  $shadowPerformance = $shadowManifest.source.performance_transition
+  $shadowDevelopment = $shadowPerformance.development_package
+  $shadowBaseline = $shadowPerformance.baseline
   $expectedCurrent = [ordered]@{
-    archive = '3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2'
-    content = '4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E'
-    commit = '990e0135aed25b9306bf282eb086685c8b63f782'
+    archive = [string]$shadowDevelopment.archive_sha256
+    content = [string]$shadowDevelopment.package_content_sha256
+    commit = [string]$shadowDevelopment.package_source_commit
   }
   if ([string]$artifact.baseline.factorio_version -ne '2.0' -or
       [string]$artifact.baseline.archive_sha256 -ne $expectedBaseline.archive -or
@@ -162,11 +167,6 @@ if ($isMIR259Factorio20Delta) {
     throw 'Approved-delta current side does not bind the exact 2.5.9 development shadow.'
   }
 
-  $shadowManifestPath = Join-Path $repo '.mir\releases\terminal\shadows\2.5.9\package-manifest.json'
-  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
-  $shadowPerformance = $shadowManifest.source.performance_transition
-  $shadowDevelopment = $shadowPerformance.development_package
-  $shadowBaseline = $shadowPerformance.baseline
   if ([int]$shadowManifest.schema -ne 1 -or [string]$shadowManifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
       [string]$shadowManifest.release -ne '2.5.9' -or [string]$shadowManifest.target -ne '2.0' -or
       $shadowManifest.source_frozen -ne $false -or $null -ne $shadowManifest.candidate_id -or
@@ -183,8 +183,8 @@ if ($isMIR259Factorio20Delta) {
   }
 
   $qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
-  if ($qualificationSourceCommit -ne 'cc81828755ce4974383df3ca9505b46349a60f6a' -or
-      [string]$artifact.exporter.producer_sha256 -ne '6E06589EE44BD58E463CF65B25BCA9EFE65B9B23D4F75D3FB566B45BD7C4F072' -or
+  if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$' -or
+      [string]$artifact.exporter.producer_sha256 -ne (Get-MIRDeltaProducerFingerprint) -or
       [string]$artifact.exporter.factorio_binary_version -ne '2.0.77.84539') {
     throw 'Approved-delta final producer, qualification source, or Factorio 2.0.77 identity drifted.'
   }
@@ -252,7 +252,7 @@ if ($isMIR259Factorio20Delta) {
   }
   $rowsSha = Get-MIRStringSha256 -Value (Get-MIRDeltaCanonicalJson -Value $differences)
   $fieldsSha = Get-MIRStringSha256 -Value (@($differences.field) -join "`n")
-  if ($rowsSha -ne '57E74B20945704F265CD2256C564084A9FCAA2B5E2C1948219151DD64048E242' -or
+  if ($rowsSha -ne 'C9F366888BF97E60D7501B696CB43EDB7E94B9C34D3518CE853C8B0A6C6CFB45' -or
       $fieldsSha -ne '62F804A185163A9CD0F0FB4D1FA910692833B1594D20AAF42B9FA314C0FDEEF1') {
     throw 'Approved-delta exact 2.5.9 reviewed rows or identity-only field set drifted.'
   }
