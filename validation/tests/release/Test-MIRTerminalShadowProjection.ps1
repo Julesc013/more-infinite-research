@@ -250,12 +250,16 @@ try {
       }
       $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "info.json") | ConvertFrom-Json
       $fixtureControl = Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "control.lua")
+      $fixtureData = Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "data.lua")
       $preDot5Version = [string]$row.pre_dot5.release
+      $generatedFixtureName = Split-Path -Leaf ([string]$preDot5Row[0].generated_fixture)
+      $sourceFixtureName = Split-Path -Leaf ([string]$preDot5Row[0].source_fixture.path)
       if (@($fixtureInfo.dependencies | Where-Object { [string]$_ -eq "more-infinite-research >= $preDot5Version" }).Count -ne 1 -or
           -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"") -or
           -not $fixtureControl.Contains("script.active_mods[`"more-infinite-research`"] ~= `"$([string]$row.release)`"") -or
           -not $fixtureControl.Contains("[mir-fixture] $preDot5Version to $([string]$row.release) upgrade proof complete") -or
           -not $fixtureControl.Contains("game.server_save(`"mir-$(([string]$row.release).Replace('.', ''))-upgraded`")") -or
+          -not $fixtureData.Contains($generatedFixtureName) -or $fixtureData.Contains($sourceFixtureName) -or
           -not $fixtureRegistry.Contains("assertion_path: $([string]$preDot5Row[0].generated_fixture)")) {
         throw "Current-tier direct pre-.5 upgrade fixture is stale or unregistered."
       }

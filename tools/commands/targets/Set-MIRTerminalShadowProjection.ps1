@@ -549,6 +549,7 @@ function Set-MIRTerminalUpgradeFixtures {
         continue
       }
       $text = Get-MIRGitText -Commit $sourceCommit -Path "$sourceFixtureRoot/$sourceFile"
+      $text = $text.Replace($sourceFixtureName, $fixtureName)
       $text = $text.Replace($baselineVersion, $Release)
       if ($sourceFile -eq "control.lua") {
         $baselineSaveName = "mir-$($baselineVersion.Replace('.', ''))-upgraded"
@@ -559,6 +560,10 @@ function Set-MIRTerminalUpgradeFixtures {
     }
 
     $control = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot "$fixtureRoot/control.lua")
+    $fixtureData = Get-Content -Raw -LiteralPath (Join-Path $TargetRoot "$fixtureRoot/data.lua")
+    if (-not $fixtureData.Contains($fixtureName) -or $fixtureData.Contains($sourceFixtureName)) {
+      throw "Generated current-tier direct-upgrade fixture retains a stale compatibility-pack applicability identity."
+    }
     foreach ($requiredMarker in @(
       "script.active_mods[`"more-infinite-research`"] ~= `"$preDot5Version`"",
       "script.active_mods[`"more-infinite-research`"] ~= `"$Release`"",
