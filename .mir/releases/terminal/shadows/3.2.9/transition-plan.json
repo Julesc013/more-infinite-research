@@ -24,7 +24,23 @@
       "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
       "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json"
     },
-    "assurance_overlays": [],
+    "assurance_overlays": [
+      {
+        "id": "factorio-2.1-validation-userdata-v1",
+        "commit": "2a27929fc51db75cc339f7b197931426bef8b5fa",
+        "reason": "Carry the package-excluded validation correction that keeps generated Factorio userdata inside the repository build root, verifies the resolved cleanup target remains bounded, and preserves explicitly supplied userdata.",
+        "files": [
+          {
+            "path": "scripts/Invoke-MIRValidation.ps1",
+            "blob": "daa333a4f692c92d8d9f6314174aa91202df6df3"
+          },
+          {
+            "path": "validation/tests/tooling/Test-MIRValidationResults.ps1",
+            "blob": "5f68f1d3bc144730dd6a8d4bcff321b12c79e4fe"
+          }
+        ]
+      }
+    ],
     "performance_transition": null
   },
   "generated_authorities": [

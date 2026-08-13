@@ -11,7 +11,7 @@ release:
   portable_source_commit: f4d978050baf1ad24b463b67a955472435b1983f
   target_profile: "factorio-2.1"
   target_adapter: "canonical-factorio-2.1"
-  target_assurance_overlays: "none"
+  target_assurance_overlays: "factorio-2.1-validation-userdata-v1@2a27929fc51db75cc339f7b197931426bef8b5fa"
   objective: cost-compatibility-observability-convergence
   public_contract_change: patch-compatible
   terminal_shadow_status: source-unfrozen-candidate-unassigned

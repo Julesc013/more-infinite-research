@@ -7,7 +7,23 @@
     "portable_release": "3.2.9",
     "portable_authority_commit": "f4d978050baf1ad24b463b67a955472435b1983f",
     "portable_authority_tree": "50847a21a74b40a8de836c1ae3293de832cce59e",
-    "target_assurance_overlays": [],
+    "target_assurance_overlays": [
+      {
+        "id": "factorio-2.1-validation-userdata-v1",
+        "commit": "2a27929fc51db75cc339f7b197931426bef8b5fa",
+        "reason": "Carry the package-excluded validation correction that keeps generated Factorio userdata inside the repository build root, verifies the resolved cleanup target remains bounded, and preserves explicitly supplied userdata.",
+        "files": [
+          {
+            "path": "scripts/Invoke-MIRValidation.ps1",
+            "blob": "daa333a4f692c92d8d9f6314174aa91202df6df3"
+          },
+          {
+            "path": "validation/tests/tooling/Test-MIRValidationResults.ps1",
+            "blob": "5f68f1d3bc144730dd6a8d4bcff321b12c79e4fe"
+          }
+        ]
+      }
+    ],
     "performance_transition": null,
     "immutable_dot5_predecessor": {
       "release": "3.2.5",
