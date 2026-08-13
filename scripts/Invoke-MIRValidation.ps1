@@ -550,6 +550,10 @@ Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
   & (Join-Path $repo "validation\tests\compatibility\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "runtime scenario authority matches target-native invocations" {
+  & (Join-Path $repo "tools\commands\targets\Sync-MIRRuntimeScenarioAuthority.ps1") -RepoRoot $repo -Check
+}
+
 Invoke-RepoCheck "ecosystem campaigns declare exact sanitation budgets" {
   & (Join-Path $repo "validation\tests\release\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
 }
@@ -2439,7 +2443,7 @@ $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
   $generatedUserDataRoot = Join-Path $repo "build\validation-userdata"
   New-Item -ItemType Directory -Force -Path $generatedUserDataRoot | Out-Null
-  $UserDataDir = Join-Path $generatedUserDataRoot ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
+  $UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
 $validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
@@ -2533,6 +2537,7 @@ function Get-FixtureInfos {
     $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name
+      Version = $info.version
       Path = $fixture.FullName
     }
   }
@@ -2583,7 +2588,7 @@ function Initialize-RuntimeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  $scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)
   if (Test-Path -LiteralPath $scenarioRoot) {
     $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
     if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -2598,11 +2603,27 @@ function Initialize-RuntimeScenario {
   if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath -PathType Leaf)) {
     throw "Validation package zip is unavailable for runtime scenario $ScenarioName."
   }
-  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath))
+  $packageDestination = Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)
+  Assert-MIRFactorioPathBudget -Path $packageDestination -Context "Validation package archive path"
+  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination $packageDestination
 
-  $fixtureInfos = Get-FixtureInfos
+  $allFixtureInfos = @(Get-FixtureInfos)
+  $fixtureInfos = foreach ($fixtureName in @($EnabledFixtureNames | Sort-Object -Unique)) {
+    $matches = @($allFixtureInfos | Where-Object Name -eq $fixtureName)
+    if ($matches.Count -eq 0) {
+      throw "Validation scenario references missing fixture mod: $fixtureName"
+    }
+    if ($matches.Count -ne 1) {
+      throw "Validation scenario fixture identity is ambiguous: $fixtureName"
+    }
+    $matches[0]
+  }
   foreach ($fixtureInfo in $fixtureInfos) {
-    Copy-MIRModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
+    Publish-MIRModDirectoryArchive `
+      -Source $fixtureInfo.Path `
+      -Name $fixtureInfo.Name `
+      -Version $fixtureInfo.Version `
+      -ModsDir $modsDir | Out-Null
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
@@ -2696,6 +2717,7 @@ function Initialize-RuntimeScenario {
     $nativeOwnerOverrides[$name] = $StartupSettingOverrides[$name]
   }
   Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $nativeOwnerOverrides
+  Complete-MIRSettingsOverrideMod -ModsDir $modsDir
 
   $mods = @(
     @{ name = "base"; enabled = $true },
@@ -2724,6 +2746,7 @@ function Initialize-RuntimeScenario {
     Name = $ScenarioName
     ModsDir = $modsDir
     SavePath = Join-Path $scenarioRoot "mir-validation.zip"
+    EnabledFixtureNames = @($EnabledFixtureNames)
   }
 }
 
@@ -2738,7 +2761,10 @@ function Clear-FactorioLog {
 }
 
 function Assert-RuntimeLogHealthy {
-  param([string]$ScenarioName)
+  param(
+    [string]$ScenarioName,
+    [switch]$RequireDiagnostics
+  )
   Write-Host "[info] Factorio log path: $FactorioLog"
   if (-not (Test-Path -LiteralPath $FactorioLog)) {
     throw "Factorio log not found after $ScenarioName runtime validation: $FactorioLog"
@@ -2748,6 +2774,14 @@ function Assert-RuntimeLogHealthy {
   if ($fatalMarkers) {
     $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
     throw "Factorio runtime validation log contains fatal error markers after $ScenarioName."
+  }
+  if ($RequireDiagnostics) {
+    if (-not (Select-String -LiteralPath $FactorioLog -Pattern "Loading mod settings mir-validation-settings-overrides" -SimpleMatch -Quiet)) {
+      throw "Factorio runtime validation did not load the deterministic settings-override mod after $ScenarioName."
+    }
+    if (-not (Select-String -LiteralPath $FactorioLog -Pattern "[more-infinite-research] Generation report start" -SimpleMatch -Quiet)) {
+      throw "Factorio runtime validation did not emit the required MIR generation report after $ScenarioName."
+    }
   }
 }
 
@@ -2860,7 +2894,7 @@ function Invoke-RuntimeScenario {
       throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName -RequireDiagnostics
     Complete-MIRValidationScenario -Record $resultRecord -Status "passed" -AssertionsExecuted @($declaration.assertions).Count
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
@@ -2933,7 +2967,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
       throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial" -RequireDiagnostics
 
     $changedScenario = Initialize-RuntimeScenario `
       -ScenarioName "$ScenarioName-changed" `
@@ -2968,7 +3002,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
       throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
     }
 
-    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed" -RequireDiagnostics
     Complete-MIRValidationScenario -Record $resultRecord -Status "passed" -AssertionsExecuted @($declaration.assertions).Count
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
@@ -3285,7 +3319,7 @@ function Invoke-PackageZipSmokeScenario {
       throw "Validation package zip is unavailable for packaged zip smoke."
     }
 
-  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  $scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)
   if (Test-Path -LiteralPath $scenarioRoot) {
     $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
     if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -3296,7 +3330,9 @@ function Invoke-PackageZipSmokeScenario {
 
   $modsDir = Join-Path $scenarioRoot "mods"
   New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
-  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath))
+  $packageDestination = Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)
+  Assert-MIRFactorioPathBudget -Path $packageDestination -Context "Packaged smoke archive path"
+  Copy-MIRFileWithHardlinkFallback -Source $script:ValidationPackageZipPath -Destination $packageDestination
 
   $mods = @(
     @{ name = "base"; enabled = $true },
@@ -3478,6 +3514,12 @@ if ($selectionActive -and -not $checkpointActive) {
             if (-not (Test-Path -LiteralPath $task.Log)) { throw "Parallel validation log is missing: $($task.Log)" }
             $fatal = Select-String -LiteralPath $task.Log -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
             if ($fatal) { throw "Parallel validation log contains fatal markers: $($task.Declaration.name)" }
+            if (-not (Select-String -LiteralPath $task.Log -Pattern "Loading mod settings mir-validation-settings-overrides" -SimpleMatch -Quiet)) {
+              throw "Parallel validation scenario $($task.Declaration.name) did not load the deterministic settings-override mod."
+            }
+            if (-not (Select-String -LiteralPath $task.Log -Pattern "[more-infinite-research] Generation report start" -SimpleMatch -Quiet)) {
+              throw "Parallel validation scenario $($task.Declaration.name) did not emit the required MIR generation report."
+            }
             Complete-MIRValidationScenario -Record $task.Record -Status "passed" -AssertionsExecuted @($task.Declaration.assertions).Count
           }
         }
@@ -3494,7 +3536,8 @@ if ($selectionActive -and -not $checkpointActive) {
           EnableSpaceAge = ($declaration.surface -eq "space-age")
         }
         foreach ($property in $declaration.settings.PSObject.Properties) {
-          $parameters[$property.Name] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
+          $parameterName = Resolve-MIRScenarioSettingParameterName -Name ([string]$property.Name)
+          $parameters[$parameterName] = ConvertTo-MIRScenarioParameterValue -Value $property.Value
         }
         Invoke-RuntimeScenario @parameters
         if ($declaration.name -eq "space-age-generation-integrity") {

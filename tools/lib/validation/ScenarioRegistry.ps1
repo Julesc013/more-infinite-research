@@ -77,6 +77,18 @@ function Get-MIRExpectedScenarioNames {
   @($Registry.records | ForEach-Object { [string]$_.name })
 }
 
+function Resolve-MIRScenarioSettingParameterName {
+  param([Parameter(Mandatory)][string]$Name)
+
+  switch ($Name) {
+    "enabled_base_extensions" { "EnabledBaseExtensionKeys" }
+    "enabled_streams" { "EnabledStreamKeys" }
+    "disabled_base_extensions" { "DisabledBaseExtensionKeys" }
+    "disabled_streams" { "DisabledStreamKeys" }
+    default { $Name }
+  }
+}
+
 function Resolve-MIRScenarioDeclaration {
   param(
     [Parameter(Mandatory)]$Registry,

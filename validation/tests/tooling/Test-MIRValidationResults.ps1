@@ -15,12 +15,30 @@ $ErrorActionPreference = "Stop"
 $validationFacade = Get-Content -Raw -LiteralPath $validationFacadePath
 foreach ($requiredPolicy in @(
   '$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"',
+  '$UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
+  '$scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)',
   '$resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)',
   'function Remove-MIRGeneratedValidationUserData {'
 )) {
   if (-not $validationFacade.Contains($requiredPolicy)) {
     throw "Validation facade does not preserve repository-local, bounded generated-userdata policy: $requiredPolicy"
   }
+}
+
+$factorioProcess = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
+foreach ($requiredPolicy in @(
+  'function Get-MIRCompactScenarioPathSegment {',
+  'function Assert-MIRFactorioPathBudget {',
+  'function Publish-MIRModDirectoryArchive {'
+)) {
+  if (-not $factorioProcess.Contains($requiredPolicy)) {
+    throw "Factorio process tooling does not preserve bounded atomic validation paths: $requiredPolicy"
+  }
+}
+
+$settingsOverrides = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\SettingsOverrides.ps1")
+if (-not $settingsOverrides.Contains('function Complete-MIRSettingsOverrideMod {')) {
+  throw "Settings override tooling does not publish its generated mod atomically."
 }
 
 $registry = Import-MIRScenarioRegistry `
