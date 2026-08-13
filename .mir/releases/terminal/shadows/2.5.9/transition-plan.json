@@ -327,6 +327,7 @@
     ".mir/releases/terminal/shadows/2.5.9/qualification-context.json",
     "docs/releases/notes/release-notes-2.5.9.md",
     "changelog.txt",
+    "scripts/Invoke-MIRAssurance.ps1",
     ".mir/docs.yml"
   ],
   "product_findings": [
