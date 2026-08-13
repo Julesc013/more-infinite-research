@@ -1,0 +1,383 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowProjectionProfilesV1",
+  "status": "active-source-unfrozen-candidates-unassigned",
+  "portable_source": {
+    "release": "3.2.9",
+    "authority_commit": "5496896914666158ad4056026819528395861540",
+    "authority_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
+    "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+    "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+  },
+  "targets": [
+    {
+      "release": "3.2.9",
+      "factorio_line": "2.1",
+      "exact_engine": "2.1.13",
+      "exact_engine_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+      "support_tier": "current",
+      "promotion_branch": "main",
+      "shadow_branch": "candidate/3.2.9-projection",
+      "baseline": {"release":"3.2.5","tag":"3.2.5","commit":"62fddd86b51db7c0238731815d15ca26a4b45857"},
+      "pre_dot5": {"release":"3.2.3","tag":"3.2.3","commit":"1abe07573cde814c3cacf6153b5ae64dee4038ba"},
+      "objective": "cost-compatibility-observability-convergence",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "canonical-factorio-2.1",
+      "target_profile": "factorio-2.1",
+      "assurance_overlays": [
+        {
+          "id": "factorio-2.1-validation-userdata-v1",
+          "commit": "2a27929fc51db75cc339f7b197931426bef8b5fa",
+          "reason": "Carry the package-excluded validation correction that keeps generated Factorio userdata inside the repository build root, verifies the resolved cleanup target remains bounded, and preserves explicitly supplied userdata.",
+          "files": [
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"daa333a4f692c92d8d9f6314174aa91202df6df3"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"5f68f1d3bc144730dd6a8d4bcff321b12c79e4fe"}
+          ]
+        },
+        {
+          "id": "factorio-2.1-scenario-authority-parity-v1",
+          "commit": "38eaa3f9ad6c295113537d9c3fa6f5db636f20e2",
+          "reason": "Carry the frozen-assurance false-pass and false-failure correction that binds target-native runtime and configuration-change fixtures and settings to scenario authority, requires deterministic diagnostics, atomically publishes enabled validation mods, and enforces conservative Factorio path budgets.",
+          "files": [
+            {"path":".mir/modules.yml","blob":"febb4e019a20fbd0bc75902f26b8dc02119856ab"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"a43abb13af64801f5666a1fd40274135f2e9198a"},
+            {"path":"tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1","blob":"10115e9c01cbce89e7bd4e6f9041c08e68404b19"},
+            {"path":"tools/lib/validation/FactorioProcess.ps1","blob":"9c76e9ae502af3ee0a27cfae464bc16e3bda8530"},
+            {"path":"tools/lib/validation/ScenarioRegistry.ps1","blob":"19bf83861b35ef7e62bc4c39ce21e64eda142418"},
+            {"path":"tools/lib/validation/SettingsOverrides.ps1","blob":"30ed31304e93b9ebb7d8c84360c10f7d5170a22e"},
+            {"path":"validation/scenarios/runtime.json","blob":"d07a4d6ba0ce826b59820077f49d273efca94200"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"f9e8c06c3892fc6e52b2094f2271bcbd6289f101"}
+          ]
+        },
+        {
+          "id": "factorio-2.1-upgrade-userdata-v2",
+          "commit": "76fa21a08d3907ee74fd5aaf13741e5c3b8ea17b",
+          "reason": "Carry the frozen-assurance false-failure correction that runs direct-upgrade Factorio userdata under compact repository build and save paths, requires direct 3.2.3 to 3.2.9 reload proof, and preserves deterministic path-normalized logs.",
+          "files": [
+            {"path":"validation/tests/runtime/Test-MIRUpgrade.ps1","blob":"02b223f90e587d59183fcc48169a968278fae40b"},
+            {"path":"validation/tests/tooling/Test-MIRValidationResults.ps1","blob":"2257fd3fe4f8bf6a3d9deff5b469901fc7c79ace"}
+          ]
+        }
+      ],
+      "performance_transition": null,
+      "product_findings": ["MIR3-TERM-0027", "MIR3-TERM-0028", "MIR3-TERM-0031"],
+      "product_disposition": "canonical-2.1-implementation",
+      "upgrade_rows": ["3.2.5-to-3.2.9", "3.2.3-to-3.2.9"],
+      "mir4_successor_target": "factorio-2.1"
+    },
+    {
+      "release": "2.5.9",
+      "factorio_line": "2.0",
+      "exact_engine": "2.0.77",
+      "exact_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "support_tier": "maintained",
+      "promotion_branch": "legacy",
+      "shadow_branch": "candidate/2.5.9-projection",
+      "baseline": {"release":"2.5.5","tag":"2.5.5","commit":"27877275854eb131efeb42672d3676c9c513c85e"},
+      "pre_dot5": {"release":"2.5.0","tag":"2.5.0","commit":"bea21b068fb38dc26479b619454e50d5b4cf4793"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-2.0-science-route-policy",
+      "target_profile": "factorio-2.0",
+      "assurance_overlays": [
+        {
+          "id": "factorio-2.0-resumable-assurance-v1",
+          "commit": "3d0a0204eb1bf72e766f87ac05941d89f4c10a39",
+          "reason": "Carry the coherent Factorio 2.0 resumable-assurance backport, including content-addressed performance output and forwarding the exact planned mod closure into the ecosystem gate.",
+          "files": [
+            {"path":"scripts/Invoke-MIRAssurance.ps1","blob":"37c54dab1c3368dc8421dc5e7d5c4a25051c3f67"},
+            {"path":"scripts/Invoke-MIRPerformanceQualification.ps1","blob":"d88787e303a3e26bb6e0d8e245e8056912871481"},
+            {"path":"scripts/MIRAssurance/Evidence.ps1","blob":"7a18c64c9376e334ac94fd7e4c961e83034526ac"},
+            {"path":"scripts/MIRAssurance/Release.ps1","blob":"a50da596cd4477d2760453f5b094b315a30e1136"},
+            {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"4b53aa1d239ec09295a8f60f0f39ece2f7cde582"},
+            {"path":"scripts/Test-MIRPerformanceRegression.ps1","blob":"ddca4b5acc88d8b96a962c0f0b7b31daee91c3cd"},
+            {"path":"scripts/validation/PerformanceCampaign.ps1","blob":"6dba8bafda2a6017b329b268fa5dd5bb416c12ea"},
+            {"path":"scripts/validation/ReleaseAttestations.ps1","blob":"f9961b9af252e288a9c0c435e51841ec6546373c"},
+            {"path":"validation/tests.yml","blob":"59aee78920ee8fab9a8d0164401e954bcea852bc"},
+            {"path":"verification/schema/plan.schema.json","blob":"d6a27d4e1c357b0b39207e710fdbfeb75eb9da44"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-graph-process-ceiling-v1",
+          "commit": "f4b0475861770b848cc48f57cf37fe8bac5e1f64",
+          "reason": "Carry the frozen assurance correction that separates the 900-second process-kill ceiling from the 600-second graph performance budget.",
+          "files": [
+            {"path":"fixtures/compat-matrix/expected-scenarios.json","blob":"0be1cb4fbb10317b7039bd75c23d94a30e665a1a"},
+            {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"f5a0388bd7184269796f2af3507f98b083391bf3"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-terminal-shadow-qualification-v1",
+          "commit": "98182f4aa303d7f48339b5e3cf50e56f4dbeb53c",
+          "reason": "Carry the exact target-native approved delta, independent shadow release authority, dual predecessor upgrade proof, AdvancedBeltsSA qualification, and unfrozen performance evidence authority for the 2.5.9 convergence shadow.",
+          "files": [
+            {"path":".mir/fixtures.yml","blob":"eb772db1763d70b1ac874f70aa1971e8e0e78be7"},
+            {"path":"approved-delta/2.5.5-to-2.5.9.json","blob":"6068db2e6f0936423f48ab0ca04f6f62dc7a3339"},
+            {"path":"fixtures/assert-upgrade-2-5-5-to-2-5-9/control.lua","blob":"9ca7365446fc75e186131689afc865d2e01bc72c"},
+            {"path":"fixtures/assert-upgrade-2-5-5-to-2-5-9/info.json","blob":"a5498cd3dff31a55864e832bf1a2683b74ca307b"},
+            {"path":"scripts/Export-MIRApprovedDelta.ps1","blob":"e8bbff1231a9b131c924106cbf943586b480e8b4"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"8f0c43ed9018f6ccadac0c987f8a240602b5c7e4"},
+            {"path":"scripts/Test-MIRAdvancedBeltsSA.ps1","blob":"8d8fae39bf2d6b7748a3c142947a651f78410ff2"},
+            {"path":"scripts/Test-MIRApprovedDelta.ps1","blob":"5417968619c2ee761d41f70fee6fceea7665aa03"},
+            {"path":"scripts/Test-MIRAssurance.ps1","blob":"332c56d627b12d8fe710d4c0e94b97e41fcc1320"},
+            {"path":"scripts/Test-MIRBackportSourceLock.ps1","blob":"bbb74c75296b101c3bb2f2f88347979b761ef975"},
+            {"path":"scripts/Test-MIRReleaseAuthority.ps1","blob":"3c2fd3697d0aa9527be6c2f58a9aad6e5cd5b2e2"},
+            {"path":"scripts/Test-MIRUpgradeMatrix.ps1","blob":"5bf2c5f311c695e5c8655b2e99baa132994400ef"},
+            {"path":"scripts/validation/ReleaseAttestations.ps1","blob":"9728d12d1f400768dc8f58a21c5a3a02bc4cfe24"},
+            {"path":"validation/tests.yml","blob":"ce026d07d60edd1a239d707891f5a50b3e5f1fa1"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-terminal-shadow-performance-authority-v1",
+          "commit": "85598cb326502e6707c1d9d1101dfd42aab56978",
+          "reason": "Carry the assurance-only resolver that accepts the exact three-way unfrozen shadow package authority while rejecting any campaign/package disagreement.",
+          "files": [
+            {"path":"scripts/MIRAssurance/Evidence.ps1","blob":"57b48621037919e7f3e11ff5f5c6ecd97582d004"},
+            {"path":"scripts/MIRAssurance/Release.ps1","blob":"490a5cf3bc9f43508c28de6a885e7ba7482808a0"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-terminal-shadow-review-authority-v1",
+          "commit": "0568025c6776470eb96fa0f597be656af406076c",
+          "reason": "Carry the assurance-only manual-review command resolver that binds the unfrozen shadow package source before enforcing the human attestation gate.",
+          "files": [
+            {"path":"scripts/MIRAssurance/Evidence.ps1","blob":"d533f01ee7b020c92e767e1155d4e14292d2b421"},
+            {"path":"scripts/MIRAssurance/Release.ps1","blob":"b80cf44135e2856064f60f9f26562e331d5a6afe"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-validation-userdata-v1",
+          "commit": "02af30d18db2988a6b1ba724fb56a22317a18474",
+          "reason": "Carry the frozen-assurance false-failure correction that runs generated Factorio userdata under a bounded repository build root instead of the inaccessible OS temporary directory.",
+          "files": [
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"c9fcbdb6c3a260ef692eb7af143541ee97148159"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-scenario-authority-parity-v1",
+          "commit": "49daec6d9ce1f20861ca73d28bfe584333433125",
+          "reason": "Carry the frozen-assurance false-pass and false-failure correction that makes target-native runtime and configuration-change fixtures and settings match the full-record scenario authority, proves deterministic diagnostics loaded, publishes enabled fixtures and the generated settings override as complete atomic archives under an enforced conservative Factorio path budget, and statically rejects later invocation drift.",
+          "files": [
+            {"path":"fixtures/compat-matrix/expected-scenarios.json","blob":"8bc12b834a9de55767c4bcb02f7f7e4bd682dece"},
+            {"path":"fixtures/assert-prototype-limits/data.lua","blob":"fc222ef3ebec5d40ced9542514eeda67d1778c44"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"1904aa38f2b3de12459c50c708073691cbc54b3a"},
+            {"path":"scripts/Sync-MIRRuntimeScenarioAuthority.ps1","blob":"9e8339d94964cc5fca81fca0dbd391d148f58d83"},
+            {"path":"scripts/validation/FactorioProcess.ps1","blob":"9c76e9ae502af3ee0a27cfae464bc16e3bda8530"},
+            {"path":"scripts/validation/ScenarioRegistry.ps1","blob":"a7e7ad42347afa21ab84314db6b165cab548a318"},
+            {"path":"scripts/validation/SettingsOverrides.ps1","blob":"795b56aba357e7ff97b11399ece2aad371f72ee2"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-py-proof-transport-v1",
+          "commit": "e2bd416e6a38805f221a719f119de22c2a79d516",
+          "reason": "Carry the frozen-assurance false-failure correction that proves Py's late stale unlock was reconstructed, retains full sanitation-ledger assertions where mod-data exists, and uses exact target-native graph, order, marker, and no-mod-data assertions on Factorio 2.0.",
+          "files": [
+            {"path":".mir/fixtures.yml","blob":"fd5c2fbacd246f492c5b9a024f98dd143de602c6"},
+            {"path":"fixtures/assert-py-postprocessing-stale-unlock/data-final-fixes.lua","blob":"b4ad99b34e5473dfa54a2b7139d58f621aae83d5"},
+            {"path":"fixtures/pypostprocessing-stale-unlock/data-final-fixes.lua","blob":"5f483f0fd9da08ae8a1fc8d9bbb8684645b16483"},
+            {"path":"scripts/Invoke-MIRValidation.ps1","blob":"5bf1f47a5e573c7f507f0e6f548edd3223c4f8a3"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-combined-effect-ownership-v1",
+          "commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+          "reason": "Carry the admitted target-native MIR3-TERM-0031 product correction and compiler-contract proof after exact Factorio 2.0 applicability was established.",
+          "files": [
+            {"path":".mir/compiler-contract-coverage.yml","blob":"44f176edb66a286f28cbb4eda71fb6b04646cfb5"},
+            {"path":".mir/fixtures.yml","blob":"755709b42719e905a31e25c6983ddc5a0ce2e4fc"},
+            {"path":".mir/modules.yml","blob":"3fda364b87bee1b56500dad4ff609ee3de05c2bc"},
+            {"path":"docs/architecture/module-boundaries.md","blob":"46d40e3c741495e9daa395416c2fb5eb08aa56bb"},
+            {"path":"fixtures/assert-compiler-contracts/data.lua","blob":"22011c0a6f853cdcd5ea5960964ee726a646817a"},
+            {"path":"fixtures/assert-compiler-contracts/data-final-fixes.lua","blob":"843e7ec88357a9a0677009831457ec1e157f47d9"},
+            {"path":"prototypes/mir/planner/compilation_plan.lua","blob":"39cf0530f9e50cf8000310e627dbb16c2ea416cc"},
+            {"path":"prototypes/mir/planner/effect_ownership.lua","blob":"1221ea178241e8f5ee432c045fd1cc55fcd1a6db"}
+          ]
+        },
+        {
+          "id": "factorio-2.0-late-p0-authority-reconciliation-v1",
+          "commit": "bde8eda3b3ccc59bfe50016a3729531d6dbed44f",
+          "reason": "Preserve the final maintained-target late-P0 package, approved-delta, source-lock, release-authority, and self-test reconciliation after the target-native product overlay is applied.",
+          "files": [
+            {"path":"approved-delta/2.5.5-to-2.5.9.json","blob":"d77904a76643ecfaeea373ff82fee2b1db429fc4"},
+            {"path":"scripts/Export-MIRApprovedDelta.ps1","blob":"75d407034c0824c0d1775fbb7a96c7e42665c899"},
+            {"path":"scripts/MIRAssurance/Release.ps1","blob":"5f5bcded42b9303d9efab462d27757a2a15d62ec"},
+            {"path":"scripts/Test-MIRApprovedDelta.ps1","blob":"845132dbd90ffbee13b09a1ce4402a3154bd8bad"},
+            {"path":"scripts/Test-MIRBackportSourceLock.ps1","blob":"27d56d52ddcd3c962d26222921989c7c65c76926"},
+            {"path":"scripts/Test-MIRReleaseAuthority.ps1","blob":"a86f910d7c4e1457cba1cb2fd969fce783688757"}
+          ]
+        }
+      ],
+      "performance_transition": {
+        "id": "factorio-2.0-terminal-shadow-performance-v1",
+        "phase": "shadow-convergence",
+        "source_files": [
+          {"path":".mir/performance.yml","commit":"27877275854eb131efeb42672d3676c9c513c85e","blob":"478852e6120ac8516b2825fabab77d2b3f155054"},
+          {"path":".mir/performance-budgets.json","commit":"27877275854eb131efeb42672d3676c9c513c85e","blob":"6bc05e163606d8b66b8f263fff4c0e5379f2fb54"},
+          {"path":".mir/performance-campaign.json","commit":"27877275854eb131efeb42672d3676c9c513c85e","blob":"e497232adb0482e8e9797bc890615234a9c3ac7d"},
+          {"path":"fixtures/performance-regression-probe/data.lua","commit":"27877275854eb131efeb42672d3676c9c513c85e","blob":"70b79aa80cc6ec402e18e6d2ef64aa92e2a4d149"},
+          {"path":"scripts/Test-MIRPerformanceBudgets.ps1","commit":"f4b0475861770b848cc48f57cf37fe8bac5e1f64","blob":"f5a0388bd7184269796f2af3507f98b083391bf3"}
+        ],
+        "baseline": {"version":"2.5.5","archive_sha256":"03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C","package_content_sha256":"047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154"},
+        "development_package": {"version":"2.5.9","package_source_commit":"ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b","package_source_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","archive_bytes":1058800,"archive_entries":301,"archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","package_content_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"},
+        "output_blobs": [
+          {"path":".mir/performance.yml","blob":"cc9421b6ee5d65d129c59f92044befdd0a0c90da"},
+          {"path":".mir/performance-budgets.json","blob":"9e32ff8ad2e0070efeb7327238fb158c8ab89c1a"},
+          {"path":".mir/performance-campaign.json","blob":"eaffc8081a31e9f9615ec9230313a9ca93b00279"},
+          {"path":"fixtures/performance-regression-probe/data.lua","blob":"09e03ac1a357e006ca4d356bc86f9cb9bb5f1f75"},
+          {"path":"scripts/Test-MIRPerformanceBudgets.ps1","blob":"b9dde5812848c25d1740213ae2505a2069c81a46"}
+        ]
+      },
+      "product_findings": ["MIR3-TERM-0028", "MIR3-TERM-0031"],
+      "product_disposition": "project-generic-route-policy-no-direct-cubium-claim",
+      "upgrade_rows": ["2.5.5-to-2.5.9", "2.5.0-to-2.5.9"],
+      "mir4_successor_target": "factorio-2.0"
+    },
+    {
+      "release": "1.9.9",
+      "factorio_line": "1.1",
+      "exact_engine": "1.1.110",
+      "exact_engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "support_tier": "lts",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.9.9-projection",
+      "baseline": {"release":"1.9.5","tag":"1.9.5","commit":"67036cb43e3e4814626e5abf5ce5df17a6f765f7"},
+      "pre_dot5": {"release":"1.9.4","tag":"1.9.4","commit":"426d6d48c6578a786ea7de0f224282baff9d342b"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-1.1-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-1.1.110",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta",
+      "upgrade_rows": ["1.9.5-to-1.9.9", "1.9.4-to-1.9.9"],
+      "mir4_successor_target": "factorio-1.1"
+    },
+    {
+      "release": "1.8.9",
+      "factorio_line": "1.0",
+      "exact_engine": "1.0.0-only",
+      "exact_engine_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+      "support_tier": "lts",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.8.9-projection",
+      "baseline": {"release":"1.8.5","tag":"1.8.5","commit":"2fa5b6fc1f86fe2a17779628efcbf83ffb033aed"},
+      "pre_dot5": {"release":"1.8.2","tag":"1.8.2","commit":"0a192c27674a6b13847e2f5e1b2b530e62419ee8"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-1.0-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-1.0.0",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta-factorio-1.0-only",
+      "upgrade_rows": ["1.8.5-to-1.8.9", "1.8.2-to-1.8.9"],
+      "mir4_successor_target": "factorio-1.0"
+    },
+    {
+      "release": "1.7.9",
+      "factorio_line": "0.17",
+      "exact_engine": "0.17.79",
+      "exact_engine_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+      "support_tier": "historical",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.7.9-projection",
+      "baseline": {"release":"1.7.5","tag":"1.7.5","commit":"c6692980dc9f5a1332a7888da33385a0107ae004"},
+      "pre_dot5": {"release":"1.7.1","tag":"1.7.1","commit":"9d9095c92055aebe557a55a7ab99bb9588fe73fb"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-0.17-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-0.17.79",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta",
+      "upgrade_rows": ["1.7.5-to-1.7.9", "1.7.1-to-1.7.9"],
+      "mir4_successor_target": "factorio-0.17"
+    },
+    {
+      "release": "1.6.9",
+      "factorio_line": "0.16",
+      "exact_engine": "0.16.51",
+      "exact_engine_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+      "support_tier": "historical",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.6.9-projection",
+      "baseline": {"release":"1.6.5","tag":"1.6.5","commit":"da298d36cd41b6874e51eae31252cebd079872ad"},
+      "pre_dot5": {"release":"1.6.0","tag":"1.6.0","commit":"a48509ed1dfbae8eba4b3dc7a701065063c12d5f"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-0.16-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-0.16.51",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta",
+      "upgrade_rows": ["1.6.5-to-1.6.9", "1.6.0-to-1.6.9"],
+      "mir4_successor_target": "factorio-0.16"
+    },
+    {
+      "release": "1.5.9",
+      "factorio_line": "0.15",
+      "exact_engine": "0.15.40",
+      "exact_engine_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+      "support_tier": "historical",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.5.9-projection",
+      "baseline": {"release":"1.5.5","tag":"1.5.5","commit":"2486bebf1909b6af1b0e99fce9e2d327e670a1c6"},
+      "pre_dot5": {"release":"1.5.0","tag":"1.5.0","commit":"c2b526fd6dde81be7703daef53b075a1fd773e09"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-0.15-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-0.15.40",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta",
+      "upgrade_rows": ["1.5.5-to-1.5.9", "1.5.0-to-1.5.9"],
+      "mir4_successor_target": "factorio-0.15"
+    },
+    {
+      "release": "1.4.9",
+      "factorio_line": "0.14",
+      "exact_engine": "0.14.23",
+      "exact_engine_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+      "support_tier": "finite",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.4.9-projection",
+      "baseline": {"release":"1.4.5","tag":"1.4.5","commit":"efa372c95517c0d224828e7362433fcd9eb0a91b"},
+      "pre_dot5": {"release":"1.4.0","tag":"1.4.0","commit":"fa192796ab274dd590c65b96d0f3f6a0f35cb155"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-0.14-finite-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-0.14.23-finite",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta-finite-graph",
+      "upgrade_rows": ["1.4.5-to-1.4.9", "1.4.0-to-1.4.9"],
+      "mir4_successor_target": "factorio-0.14"
+    },
+    {
+      "release": "1.3.9",
+      "factorio_line": "0.13",
+      "exact_engine": "0.13.20",
+      "exact_engine_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+      "support_tier": "finite",
+      "promotion_branch": "tag-only",
+      "shadow_branch": "candidate/1.3.9-projection",
+      "baseline": {"release":"1.3.5","tag":"1.3.5","commit":"7293cad3801d1c02f4a5d577fc20a425cced0b0e"},
+      "pre_dot5": {"release":"1.3.0","tag":"1.3.0","commit":"a33b99c1f39e1e779986a12a558a79ea97e69239"},
+      "objective": "target-port-behavioral-subset",
+      "public_contract_change": "patch-compatible",
+      "target_adapter": "factorio-0.13-finite-target-native-no-product-delta",
+      "target_profile": "terminal-factorio-0.13.20-finite",
+      "assurance_overlays": [],
+      "performance_transition": null,
+      "product_findings": [],
+      "product_disposition": "no-product-delta-finite-graph",
+      "upgrade_rows": ["1.3.5-to-1.3.9", "1.3.0-to-1.3.9"],
+      "mir4_successor_target": "factorio-0.13"
+    }
+  ]
+}

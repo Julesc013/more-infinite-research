@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0031",
+  "title": "Combined compilation plan can assign one direct effect to both a dedicated stream and a base continuation",
+  "source_observation": {
+    "observed_at": "2026-08-13T17:00:00+10:00",
+    "environment": "Reporter mod-list custody SHA-256 E5C99BD9A7C0B28F061C2D6F0F50371ACE3508A447805921183C605F56E65AC4; exact Factorio 2.1.13 and 2.0.77 reproductions against immutable 3.2.5 and 2.5.5 packages with portal-verified Space Exploration closures.",
+    "fact": "Space Exploration copies laser gun-speed effects to the Tesla ammo category. MIR then planned that identity in both its dedicated electric-shooting-speed stream and the generated weapon-shooting-speed base continuation, causing the strict combined-plan duplicate validator to abort package loading."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": "Run immutable 3.2.5 or 2.5.5 with the exact portal-locked Space Exploration closure and create a save through a dedicated userdata root.",
+    "expected": "One deterministic owner supplies type=gun-speed;ammo_category=tesla and the final duplicate validator remains strict.",
+    "observed": "Immutable 3.2.5 and 2.5.5 abort with CompilationPlan contains duplicate direct-effect identity: type=gun-speed;ammo_category=tesla."
+  },
+  "severity": "P0",
+  "visibility": {
+    "package": true,
+    "gameplay": true,
+    "assurance": false
+  },
+  "stable_id_and_migration_impact": "No technology or migration identity changes. The combined plan removes only the losing effect claim, refreshes a partially retained base continuation's TechnologyDesign and fingerprints, and omits an emptied base continuation.",
+  "affected_targets": ["3.2.9", "2.5.9"],
+  "target_dispositions": [
+    {"target":"3.2.9","disposition":"portable","reason":"Exact Factorio 2.1.13 reproduction and corrected Space Exploration loads establish the generic combined-plan policy on the canonical implementation."},
+    {"target":"2.5.9","disposition":"portable-with-adapter","reason":"Exact Factorio 2.0.77 with Space Exploration 0.7.57 reproduces immutable 2.5.5 and passes with the target-native 2.5.9 projection."},
+    {"target":"1.9.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 1.1."},
+    {"target":"1.8.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 1.0."},
+    {"target":"1.7.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 0.17."},
+    {"target":"1.6.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 0.16."},
+    {"target":"1.5.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 0.15."},
+    {"target":"1.4.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 0.14."},
+    {"target":"1.3.9","disposition":"not-applicable","reason":"The reported combined compiler and exact Space Exploration environments are outside Factorio 0.13."}
+  ],
+  "regression_obligations": [
+    "a MIR-owned fixture collides a dedicated direct-effect stream with a generated base continuation without naming a third-party mod",
+    "ownership resolution covers the complete combined operation vector before strict final validation",
+    "partial losing base continuations retain unique effects and receive refreshed design and fingerprint authority",
+    "empty losing base continuations become non-materializing rejected candidates",
+    "same-operation duplicate direct effects remain fatal",
+    "exact Factorio 2.1 and 2.0 Space Exploration closures load after correction",
+    "affected 3.2.9 and 2.5.9 shadows re-enter convergence and clean-root confirmation"
+  ],
+  "fixed_point_restart_scope": "Restart 3.2.9 and 2.5.9 convergence and independent confirmation only; retain accepted lower-target evidence because their package and dependency closures do not change.",
+  "admission": {
+    "class": "DOT9_REQUIRED",
+    "status": "admitted",
+    "reason": "A reproducible package-load failure lies inside both current and maintained advertised support envelopes."
+  },
+  "closure": {
+    "status": "implemented-awaiting-proof",
+    "evidence": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+  }
+}

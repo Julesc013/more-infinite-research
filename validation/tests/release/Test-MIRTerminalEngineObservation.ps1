@@ -7,6 +7,7 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../
 . (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 
 $testRoot = Join-Path $RepoRoot "build\results\terminal-engine-observation-test"
+$null = New-Item -ItemType Directory -Force -Path (Join-Path $RepoRoot "build")
 $resolvedBuildRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot "build")).Path.TrimEnd('\') + '\'
 if (Test-Path -LiteralPath $testRoot) {
   $resolvedTestRoot = (Resolve-Path -LiteralPath $testRoot).Path

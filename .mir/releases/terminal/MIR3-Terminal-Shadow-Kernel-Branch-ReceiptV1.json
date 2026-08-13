@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowKernelBranchReceiptV1",
+  "status": "kernel-ready-for-pr-all-nine-convergence-evidence-present-confirmation-pending",
+  "recorded_at": "2026-08-13T17:53:41.8730995+10:00",
+  "repository": "Julesc013/more-infinite-research",
+  "branch": "codex/mir3-terminal-shadow-generator",
+  "base_dev": {
+    "commit": "53822596f3ed0dc3def75d6b8deccb9010a9b8d3",
+    "tree": "29738e0721b59c442f06bb231cdee4291176268a"
+  },
+  "source_snapshot": {
+    "commit": "3bc84321394d6e7d817ca885d1d63df925eee902",
+    "tree": "27a333eadfc6f0be2f276de2e8145847f4a196cc",
+    "commits_ahead": 36,
+    "commits_behind": 0
+  },
+  "kernel": {
+    "projection_profiles": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+    "projection_command": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+    "source_publication": ".mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json",
+    "targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+    "source_frozen": false,
+    "candidate_ids_assigned": false
+  },
+  "latest_hosted_failure_and_repair": {
+    "failed_run": "31669696119",
+    "failed_head": "bda316bbf54b43147260411b255ae68884a23362",
+    "failed_test": "tooling.self-test",
+    "artifact_id": "9169246984",
+    "artifact_sha256": "58BC778417991AAE8399372DCF073078DE93A4B229BCC5921C1C4C7C97EBCF88",
+    "root_cause": "assurance-overlay-source-commits-were-local-only-and-unavailable-to-a-full-github-checkout",
+    "repair_commit": "3bc84321394d6e7d817ca885d1d63df925eee902",
+    "clean_remote_lf_projection_regression": "passed-all-nine",
+    "focused_tooling_self_test": "passed",
+    "static_architecture": "passed",
+    "development_archive_sha256": "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3",
+    "dot5_bytes_changed": false,
+    "new_exact_head_hosted_status": "pending-at-receipt"
+  },
+  "targets": [
+    {
+      "release": "3.2.9", "source_commit": "a124492b2e6ac02e64560261f64e6e0f2ffc91f3", "source_tree": "576ff1627e321cc64340123dda87f8c3e04d3db1", "source_ref_state": "local-only",
+      "engine": "2.1.13", "archive_sha256": "A9C808D4E8D2B18651AADACB83F293CB1F58A8ACEAF17769E99DD354B14333E3", "content_sha256": "074655F6EBA215D04CE812BBB772171D75C132CB4F3281E8B9E1B28116CA8CC2", "bytes": 1059871, "entries": 303,
+      "convergence": {"status": "passed", "result_sha256": "9D278A5AD2A30141D0182EC78B7C746C1D4C19A95D393DE0E9589E16D27F9B6E", "planned": 127, "executed": 13, "reused": 114, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["3.2.5-to-3.2.9:passed", "3.2.3-to-3.2.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "2.5.9", "source_commit": "560f7b7e2759f309af4516015bdd4c848375171a", "source_tree": "a35e984ea4a24eb3e79a407b777df35347063e91", "source_ref_state": "published",
+      "engine": "2.0.77", "archive_sha256": "3EA775054F35BBBB6B2DE925E519CF7E06DD9B6C34D6DCC4A074191AF0E0A8B2", "content_sha256": "4D1FA997DB6F485ED9F6D295FDDF32F68A3B436BB17FDABFEE9CC4972860E59E", "bytes": 1057099, "entries": 301,
+      "convergence": {"status": "passed", "result_sha256": "EF9980127B101CDCC91CF8D50CB6C53CD6748F64241C089B59DBAA0DBCAF5A41", "planned": 90, "executed": 89, "reused": 0, "checkpoint_adopted": 1, "failed": 0},
+      "upgrades": ["2.5.5-to-2.5.9:passed", "2.5.0-to-2.5.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.9.9", "source_commit": "c1e4f0994767ddc01c9732b17baf4a8bef8b8db1", "source_tree": "e56638d9feac821f5ef7dede912e42ee28da6a9c", "source_ref_state": "local-only",
+      "engine": "1.1.110", "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843", "content_sha256": "5199AF5BE2C6391C1E0F6C565122EC6CC969CBA0EF27FCC2AA6B6BB8A71FE986", "bytes": 397677, "entries": 174,
+      "convergence": {"status": "passed", "result_sha256": "869ACEA9188BFE7FEF6EFEEDD166F748F9101B5642B88C04AD8ACEA12C1A0CF4", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.9.5-to-1.9.9:passed", "1.9.4-to-1.9.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.8.9", "source_commit": "bb92e03d0878be59abda3ac0705a2920ab693264", "source_tree": "d83c24e260e5fef09d9245ab9d9fcc70c0b481c5", "source_ref_state": "local-only",
+      "engine": "1.0.0-only", "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A", "content_sha256": "70F3A50E70E41DFDBF2FDD41EE65CD099A7FFE7444FDA56E2EFDC5DC0394CE64", "bytes": 397678, "entries": 174,
+      "convergence": {"status": "passed", "result_sha256": "F8675562CBF0E170F54D65EAB36F3C41269C5ABA2BB18BE7CEEC52D8AFEA3B6D", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.8.5-to-1.8.9:passed", "1.8.2-to-1.8.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.7.9", "source_commit": "39d575fc29978cc6e74eeb94532b4a523c7f773c", "source_tree": "dd24efb0b7249ba353a4d5e2f8ec17a19facce5b", "source_ref_state": "local-only",
+      "engine": "0.17.79", "archive_sha256": "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C", "content_sha256": "7912188DDBD8B077A2303158A2B9B1B0E56795D661871C03A81ABB9831E19076", "bytes": 385310, "entries": 177,
+      "convergence": {"status": "passed", "result_sha256": "172651B9B56FB7B9F5A8EB3ECD9D17F83AF655406B5C9BE1CEB188D0320227E3", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.7.5-to-1.7.9:passed", "1.7.1-to-1.7.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.6.9", "source_commit": "19350b81838b865c8bde6b1244b7b7c58cd43e97", "source_tree": "2225663e963c401142fc1b43be24d42e975127cf", "source_ref_state": "local-only",
+      "engine": "0.16.51", "archive_sha256": "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84", "content_sha256": "9B10F110B6D7125C5B0A51AEC4C29825153B74C9B3B8DABA521CEB11791FD169", "bytes": 385315, "entries": 177,
+      "convergence": {"status": "passed", "result_sha256": "3D3DABE2FC21E6F96E007770A648BE74D09A7A2EB5FFC82524E68F7B46A259A1", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.6.5-to-1.6.9:passed", "1.6.0-to-1.6.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.5.9", "source_commit": "8331d7b7bf5d1005d50841f215b46461d212df85", "source_tree": "5e5ddeb77c3065936d65d167b9f1dc340a9d55b0", "source_ref_state": "local-only",
+      "engine": "0.15.40", "archive_sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E", "content_sha256": "220EB02FE290D4DA2722E29FDA4829297A2311C8734D2E1CE79DF11602DD1674", "bytes": 385629, "entries": 177,
+      "convergence": {"status": "passed", "result_sha256": "2D18D9DB3438427058C29145F368BB1C519B6811CFB677E19F81FBCFB8A84831", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.5.5-to-1.5.9:passed", "1.5.0-to-1.5.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.4.9", "source_commit": "112974a84982efd628bf24a6cf5bf2fbc29a2e66", "source_tree": "5822c6154b89371cc7fab25b820b25be0adb0d3b", "source_ref_state": "local-only",
+      "engine": "0.14.23", "archive_sha256": "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872", "content_sha256": "38C938714368757018122183837A8C5182FA8F44C27239125EECED5637AA7335", "bytes": 386070, "entries": 177,
+      "convergence": {"status": "passed", "result_sha256": "72CAE5EF1E88E2D6832D34C1645802F796FC4604C23F56120EB529CCEAED0180", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.4.5-to-1.4.9:passed", "1.4.0-to-1.4.9:passed"], "confirmation": "pending"
+    },
+    {
+      "release": "1.3.9", "source_commit": "1f316d61ae5576d28fd220e48ef266c1db738de4", "source_tree": "754d0b0b354c3d33d6e19238de4317e7323ff0e1", "source_ref_state": "local-only",
+      "engine": "0.13.20", "archive_sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A", "content_sha256": "CD1C71CDB9BEA4612066F0C845ABC11AD65D6FACAAF497C6DEEE8927132A1A72", "bytes": 386160, "entries": 177,
+      "convergence": {"status": "passed", "result_sha256": "3B8A9358CE4E8F48B231FE8CD713D8377A2B6744811FBF036F152D54DE33B990", "planned": 4, "executed": 4, "reused": 0, "checkpoint_adopted": 0, "failed": 0},
+      "upgrades": ["1.3.5-to-1.3.9:passed", "1.3.0-to-1.3.9:passed"], "confirmation": "pending"
+    }
+  ],
+  "unresolved": [
+    "new exact-head hosted workflow must pass",
+    "branch PR must merge into dev with fresh post-merge validation",
+    "local-only shadow heads and retained evidence must be durably published before worktree deletion",
+    "all nine shadows must be reconstructed from the merged immutable input set",
+    "unchanged-input independent confirmation and the family fixed-point receipt are pending",
+    "source freeze, candidate allocation, final qualification, review, seals, tags, publication, archive and EOL are forbidden until their gates pass"
+  ]
+}

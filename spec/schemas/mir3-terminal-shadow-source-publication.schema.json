@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-shadow-source-publication.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-shadow-source-publication.schema.json",
+  "title": "MIR3TerminalShadowSourcePublicationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "repository", "source_frozen", "candidate_id", "transport", "refs"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalShadowSourcePublicationV1"},
+    "status": {"const": "published-shadow-source-history"},
+    "repository": {"const": "Julesc013/more-infinite-research"},
+    "source_frozen": {"const": false},
+    "candidate_id": {"type": "null"},
+    "transport": {"const": "full-git-history-v1"},
+    "refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "ref", "head_commit", "head_tree", "overlay_ids"],
+        "properties": {
+          "id": {"pattern": "^[a-z0-9][a-z0-9.-]+$"},
+          "ref": {"pattern": "^refs/heads/[A-Za-z0-9._/-]+$"},
+          "head_commit": {"pattern": "^[0-9a-f]{40}$"},
+          "head_tree": {"pattern": "^[0-9a-f]{40}$"},
+          "overlay_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"pattern": "^[a-z0-9][a-z0-9.-]+$"}
+          }
+        }
+      }
+    }
+  }
+}

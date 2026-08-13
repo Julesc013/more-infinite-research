@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-product-implementation-reconciliation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json",
+  "title": "MIR3TerminalProductImplementationReconciliationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "prior_receipt", "current_3_2_9_shadow", "superseded_3_2_9_development_archive", "current_2_5_9_shadow", "finding_dispositions", "late_p0_amendment", "immutable_boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalProductImplementationReconciliationV1"},
+    "status": {"const": "late-p0-implemented-on-both-affected-targets-fixed-point-pending"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "prior_receipt": {"type": "object"},
+    "current_3_2_9_shadow": {"type": "object"},
+    "superseded_3_2_9_development_archive": {"type": "object"},
+    "current_2_5_9_shadow": {"type": "object"},
+    "finding_dispositions": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true},
+    "late_p0_amendment": {"type": "object"},
+    "immutable_boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dot5_package_bytes_changed", "source_frozen", "candidate_assigned", "all_nine_fixed_point_accepted", "tagging_or_publication_permitted"],
+      "properties": {
+        "dot5_package_bytes_changed": {"const": false},
+        "source_frozen": {"const": false},
+        "candidate_assigned": {"const": false},
+        "all_nine_fixed_point_accepted": {"const": false},
+        "tagging_or_publication_permitted": {"const": false}
+      }
+    }
+  }
+}

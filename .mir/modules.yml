@@ -356,6 +356,8 @@ mutation_commands:
     - catalog candidates share the exact trusted semantic identity and typed subjects from their TechnologyDesign and diagnostic alternatives reuse unchanged subject and prototype fingerprints while recomputing changed design and qualification identities
     - TechnologyDesign and SafetyQualification fingerprints bind each immutable gate through its exact status evaluator pass state and evidence fingerprint rather than serializing the complete evidence tree again
     - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records
+    - combined CompilationPlan ownership resolves cross-operation direct-effect identities after stream and base-continuation plans join; adopted owners outrank emitted streams and emitted streams outrank base continuations, while same-operation duplicates remain strict validation failures
+    - a base continuation that loses some effects is re-designed and re-fingerprinted from its retained vector, while one that loses every effect becomes a non-materializing rejected candidate
     - each complete effect-safety pass captures one immutable target inventory and shares it across every technology and effect check
     - effect target membership indexes are private weak-key caches derived from immutable inventory values and never enter fingerprints or public artifacts
     - output sanitation and generated effect assertions share the same freshly captured target inventory
@@ -753,6 +755,14 @@ validation_tooling:
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
     terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
     terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
+    terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
+    terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
+    terminal_product_implementation_reconciliation: .mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json
+    terminal_product_implementation_reconciliation_schema: spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json
+    terminal_mod_portal_discussion_reconciliation: .mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json
+    terminal_mod_portal_discussion_reconciliation_schema: spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json
+    terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
+    terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1

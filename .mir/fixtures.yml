@@ -930,6 +930,10 @@ fixtures:
       - partial-loser-retains-unique-effects
       - insertion-order-independent-effect-ownership
       - compilation-plan-cross-collision
+      - combined-plan-direct-effect-ownership
+      - partial-base-continuation-loser-retains-unique-effects
+      - empty-base-continuation-loser-is-omitted
+      - strict-combined-duplicate-validator-retained
       - output-effect-value-parity
       - base-extension-output-parity
       - base-continuation-technology-design-authority

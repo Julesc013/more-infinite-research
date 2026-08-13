@@ -19,6 +19,12 @@
       "tags": []
     },
     {
+      "pattern": ".mir/modules.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/views/**",
       "groups": [],
       "scenarios": [],

@@ -121,6 +121,18 @@ if ($releaseHistoryTest.Count -ne 1 -or
     @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
   throw "static.release-history must bind the staged release-history fingerprint and run compact source-lock integrity."
 }
+
+$assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+$assuranceReleaseLibrary = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+foreach ($source in @($assuranceEntryPoint, $assuranceReleaseLibrary)) {
+  if (-not $source.Contains('(@(& git -C $repo branch --show-current) -join "").Trim()') -or
+      $source.Contains('([string](& git -C $repo branch --show-current)).Trim()')) {
+    throw "Assurance inventory must represent detached HEAD as an empty branch without dereferencing null."
+  }
+}
+if ((@() -join "").Trim() -ne "") {
+  throw "Detached-HEAD branch normalization must produce empty optional metadata."
+}
 foreach ($profileName in @("fast", "development-breadth", "full", "backport")) {
   if (@($config.profiles.$profileName) -notcontains "static.release-history") {
     throw "The $profileName assurance profile must include static.release-history."

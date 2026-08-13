@@ -237,9 +237,9 @@
       "id": "assurance-tooling",
       "patterns": [
         "^scripts/Invoke-MIRAssurance\\.ps1$",
-        "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)",
+        "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|targets|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)",
         "^spec/schemas/",
-        "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|TerminalGovernance))\\.ps1$",
+        "^validation/tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$",
         "^validation/tests\\.yml$",
         "^\\.mir/(assurance|test-impact)\\.(json|yml)$",
         "^\\.mir/control/(?:aliases|paths)\\.yml$",
@@ -258,7 +258,7 @@
       "patterns": [
         "^scripts/(?!Invoke-MIRAssurance\\.ps1$)",
         "^fixtures/",
-        "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|TerminalGovernance))\\.ps1$)",
+        "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIR(?:Assurance|VerificationSchemas)|release/Test-MIR(?:Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$)",
         "^verification/",
         "^tools/mir_verify/",
         "^\\.mir/(fixtures|test-catalog|targets|performance)",
