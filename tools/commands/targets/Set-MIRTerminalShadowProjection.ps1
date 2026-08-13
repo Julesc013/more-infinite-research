@@ -256,12 +256,14 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
         with:
           fetch-depth: 0
 '@.TrimEnd()
+  $checkout = ConvertTo-MIRCanonicalText -Text $checkout
   $checkoutWithBuild = $checkout + @'
 
       - name: Build deterministic terminal shadow archive
         shell: pwsh
         run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
 '@
+  $checkoutWithBuild = ConvertTo-MIRCanonicalText -Text $checkoutWithBuild
   if (-not $text.Contains("Build deterministic terminal shadow archive")) {
     $text = $text.Replace($checkout, $checkoutWithBuild.TrimEnd())
     $conditionalCheckout = @'
@@ -270,6 +272,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
         with:
           fetch-depth: 0
 '@.TrimEnd()
+    $conditionalCheckout = ConvertTo-MIRCanonicalText -Text $conditionalCheckout
     $conditionalCheckoutWithBuild = $conditionalCheckout + @'
 
       - name: Build deterministic terminal shadow archive
@@ -277,6 +280,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
         shell: pwsh
         run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
 '@
+    $conditionalCheckoutWithBuild = ConvertTo-MIRCanonicalText -Text $conditionalCheckoutWithBuild
     $text = $text.Replace($conditionalCheckout, $conditionalCheckoutWithBuild.TrimEnd())
   }
   foreach ($required in @(
