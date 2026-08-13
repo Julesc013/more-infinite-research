@@ -34,7 +34,41 @@ function Test-MIRTerminalDetachedHeadEquivalent {
     $ActualText.Replace([string]$replacement.safe, [string]$replacement.unsafe) -ceq $ExpectedText
 }
 
+function Write-MIRTerminalProjectionTestText {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$Text
+  )
+
+  $encoding = [Text.UTF8Encoding]::new($false)
+  for ($attempt = 1; $attempt -le 20; $attempt++) {
+    try {
+      [IO.File]::WriteAllText($Path, $Text, $encoding)
+      return
+    } catch [IO.IOException] {
+      if ($attempt -ge 20) { throw }
+      Start-Sleep -Milliseconds ([Math]::Min(50 * $attempt, 500))
+    }
+  }
+}
+
+function Remove-MIRTerminalProjectionTestRoot {
+  param([Parameter(Mandatory)][string]$Path)
+
+  for ($attempt = 1; $attempt -le 20; $attempt++) {
+    try {
+      Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+      return
+    } catch {
+      if ($attempt -ge 20) { throw }
+      Start-Sleep -Milliseconds ([Math]::Min(50 * $attempt, 500))
+    }
+  }
+}
+
 foreach ($requiredIdempotencePolicy in @(
+  'for ($attempt = 1; $attempt -le 20; $attempt++) {',
+  'catch [IO.IOException] {',
   '$finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob',
   '} elseif ([string]$file.blob -eq $finalOverlayBlob) {',
   'hash-object --no-filters -- $destination',
@@ -189,25 +223,25 @@ try {
     [void](New-Item -ItemType Directory -Force -Path $targetRoot)
     $infoText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):info.json") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($infoText)) { throw "Unable to read exact predecessor metadata for $($row.release)." }
-    [IO.File]::WriteAllText((Join-Path $targetRoot "info.json"), $infoText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "info.json") -Text ($infoText + "`n")
 
     $changelogText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):changelog.txt" 2>$null) -join "`n"
-    [IO.File]::WriteAllText((Join-Path $targetRoot "changelog.txt"), $changelogText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "changelog.txt") -Text ($changelogText + "`n")
 
     [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot ".mir"))
     $assuranceText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/assurance.json") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceText)) { throw "Unable to read exact predecessor assurance profile for $($row.release)." }
-    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/assurance.json"), $assuranceText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/assurance.json") -Text ($assuranceText + "`n")
     $fixturesText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/fixtures.yml") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($fixturesText)) { throw "Unable to read exact predecessor fixture registry for $($row.release)." }
-    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/fixtures.yml"), $fixturesText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/fixtures.yml") -Text ($fixturesText + "`n")
     $docsText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/docs.yml") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($docsText)) { throw "Unable to read exact predecessor documentation registry for $($row.release)." }
-    [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/docs.yml"), $docsText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/docs.yml") -Text ($docsText + "`n")
     [void](New-Item -ItemType Directory -Force -Path (Join-Path $targetRoot "scripts"))
     $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
-    [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1"), $assuranceEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1") -Text ($assuranceEntryPointText + "`n")
     foreach ($releaseLibraryPath in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1")) {
       & git -C $RepoRoot cat-file -e "$([string]$row.baseline.tag):$releaseLibraryPath" 2>$null
       if ($LASTEXITCODE -ne 0) { continue }
@@ -215,29 +249,29 @@ try {
       if ([string]::IsNullOrWhiteSpace($releaseLibraryText)) { throw "Unable to read exact predecessor assurance release library for $($row.release): $releaseLibraryPath" }
       $releaseLibraryDestination = Join-Path $targetRoot $releaseLibraryPath
       [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $releaseLibraryDestination))
-      [IO.File]::WriteAllText($releaseLibraryDestination, $releaseLibraryText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path $releaseLibraryDestination -Text ($releaseLibraryText + "`n")
     }
     if ([string]$row.support_tier -in @("lts", "historical", "finite")) {
       $validationEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRValidation.ps1") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($validationEntryPointText)) { throw "Unable to read exact predecessor validation entry point for $($row.release)." }
-      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1"), $validationEntryPointText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1") -Text ($validationEntryPointText + "`n")
       $upgradeHarnessText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Test-MIRUpgrade.ps1") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upgradeHarnessText)) { throw "Unable to read exact predecessor upgrade harness for $($row.release)." }
-      [IO.File]::WriteAllText((Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1"), $upgradeHarnessText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1") -Text ($upgradeHarnessText + "`n")
       $backportLockText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/backport-source-lock.json") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($backportLockText)) { throw "Unable to read exact predecessor backport source lock for $($row.release)." }
-      [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/backport-source-lock.json"), $backportLockText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/backport-source-lock.json") -Text ($backportLockText + "`n")
       $backportLock = $backportLockText | ConvertFrom-Json -Depth 100
       $featureText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):$([string]$backportLock.feature_classification)") -join "`n"
       if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($featureText)) { throw "Unable to read exact predecessor feature classification for $($row.release)." }
       $featureDestination = Join-Path $targetRoot ([string]$backportLock.feature_classification)
       [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $featureDestination))
-      [IO.File]::WriteAllText($featureDestination, $featureText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path $featureDestination -Text ($featureText + "`n")
     }
 
     if ([string]$row.release -eq "2.5.9") {
       $convergenceText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.mir/convergence.yml") -join "`n"
-      [IO.File]::WriteAllText((Join-Path $targetRoot ".mir/convergence.yml"), $convergenceText + "`n", [Text.UTF8Encoding]::new($false))
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/convergence.yml") -Text ($convergenceText + "`n")
     }
 
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
@@ -486,12 +520,12 @@ try {
   $tamperedRoot = Join-Path $testRoot "2.5.9"
   $tamperedPath = Join-Path $tamperedRoot ".mir/convergence.yml"
   $tampered = (Get-Content -Raw -LiteralPath $tamperedPath).Replace('  version: "2.5.9"', '  version: "2.5.5"')
-  [IO.File]::WriteAllText($tamperedPath, $tampered, [Text.UTF8Encoding]::new($false))
+  Write-MIRTerminalProjectionTestText -Path $tamperedPath -Text $tampered
   $rejected = $false
   try { & $commandPath -Release "2.5.9" -TargetRoot $tamperedRoot -SourceRepoRoot $RepoRoot -Check } catch { $rejected = $true }
   if (-not $rejected) { throw "Terminal projection check accepted stale 2.5.5 convergence identity in a 2.5.9 shadow." }
 } finally {
-  if (Test-Path -LiteralPath $testRoot -PathType Container) { Remove-Item -LiteralPath $testRoot -Recurse -Force }
+  if (Test-Path -LiteralPath $testRoot -PathType Container) { Remove-MIRTerminalProjectionTestRoot -Path $testRoot }
 }
 
 Write-Host "[ok] exact predecessor inputs and the portable terminal source produce consistent release authority for all nine shadows."
