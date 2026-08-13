@@ -761,6 +761,7 @@ validation_tooling:
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
     target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
+    runtime_scenario_authority_generator: tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1
