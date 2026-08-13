@@ -19,6 +19,29 @@ function Test-MIRTerminalDetachedHeadEquivalent {
     [Parameter(Mandatory)][string]$ActualText,
     [Parameter(Mandatory)][string]$ExpectedText
   )
+  if ($RelativePath -eq "scripts/Test-MIRAssurance.ps1") {
+    $reconstructed = $ActualText
+    foreach ($pair in @(
+      @(
+        '& (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test',
+        'if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }'
+      ),
+      @(
+        '& (Join-Path $RepoRoot "scripts\Test-MIRVerificationSchemas.ps1") -RepoRoot $RepoRoot',
+        'if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }'
+      )
+    )) {
+      if ($ExpectedText.Contains([string]$pair[1]) -and -not $reconstructed.Contains([string]$pair[1])) {
+        $reconstructed = $reconstructed.Replace([string]$pair[0], [string]$pair[0] + "`n" + [string]$pair[1])
+      }
+    }
+    $safeInventoryGate = 'if (-not $inventoryText.Contains(''"schema": 2'')) {'
+    $unsafeInventoryGate = 'if ($LASTEXITCODE -ne 0 -or -not $inventoryText.Contains(''"schema": 2'')) {'
+    if ($ExpectedText.Contains($unsafeInventoryGate) -and $reconstructed.Contains($safeInventoryGate)) {
+      $reconstructed = $reconstructed.Replace($safeInventoryGate, $unsafeInventoryGate)
+    }
+    return $reconstructed -ceq $ExpectedText
+  }
   $replacement = switch ($RelativePath) {
     "scripts/Invoke-MIRAssurance.ps1" {
       @{safe='      branch=(@(& git -C $repo branch --show-current) -join "").Trim()'; unsafe='      branch=(& git -C $repo branch --show-current).Trim()'}
@@ -41,6 +64,7 @@ function Write-MIRTerminalProjectionTestText {
   )
 
   $encoding = [Text.UTF8Encoding]::new($false)
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path))
   for ($attempt = 1; $attempt -le 20; $attempt++) {
     try {
       [IO.File]::WriteAllText($Path, $Text, $encoding)
@@ -115,15 +139,19 @@ foreach ($sourceRef in @($sourcePublication.refs)) {
     throw "Terminal shadow source publication head is unavailable or changed: $($sourceRef.id)"
   }
   $branchName = ([string]$sourceRef.ref).Substring("refs/heads/".Length)
-  $publishedHead = @(
+  $publishedTips = @(
     [string]$sourceRef.ref,
     "refs/remotes/origin/$branchName"
   ) | ForEach-Object {
     $resolved = @(& git -C $RepoRoot rev-parse --verify "$_^{commit}" 2>$null)
     if ($LASTEXITCODE -eq 0 -and $resolved.Count -eq 1) { [string]$resolved[0].Trim() }
-  } | Where-Object { $_ -eq $headCommit } | Select-Object -First 1
-  if ([string]::IsNullOrWhiteSpace([string]$publishedHead)) {
-    throw "Terminal shadow source ref is not present at its recorded head: $($sourceRef.ref)"
+  } | Select-Object -Unique
+  $reachableTip = @($publishedTips | Where-Object {
+    & git -C $RepoRoot merge-base --is-ancestor $headCommit $_ 2>$null
+    $LASTEXITCODE -eq 0
+  } | Select-Object -First 1)
+  if ($reachableTip.Count -ne 1) {
+    throw "Terminal shadow source ref no longer contains its recorded immutable head: $($sourceRef.ref)"
   }
   $publishedOverlayIds += @($sourceRef.overlay_ids | ForEach-Object { [string]$_ })
 }
@@ -242,6 +270,19 @@ try {
     $assuranceEntryPointText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Invoke-MIRAssurance.ps1") -join "`n"
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceEntryPointText)) { throw "Unable to read exact predecessor assurance entry point for $($row.release)." }
     Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1") -Text ($assuranceEntryPointText + "`n")
+    $assuranceSelfTestText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):scripts/Test-MIRAssurance.ps1") -join "`n"
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($assuranceSelfTestText)) { throw "Unable to read exact predecessor assurance self-test wrapper for $($row.release)." }
+    Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot "scripts/Test-MIRAssurance.ps1") -Text ($assuranceSelfTestText + "`n")
+    if ([string]$row.support_tier -ne "current") {
+      $validateWorkflowText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.github/workflows/validate.yml") -join "`n"
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($validateWorkflowText)) { throw "Unable to read exact predecessor hosted validation workflow for $($row.release)." }
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".github/workflows/validate.yml") -Text ($validateWorkflowText + "`n")
+    }
+    & git -C $RepoRoot cat-file -e "$([string]$row.baseline.tag):.github/workflows/assurance-fast.yml" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      $assuranceFastWorkflowText = @(& git -C $RepoRoot show "$([string]$row.baseline.tag):.github/workflows/assurance-fast.yml") -join "`n"
+      Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".github/workflows/assurance-fast.yml") -Text ($assuranceFastWorkflowText + "`n")
+    }
     foreach ($releaseLibraryPath in @("scripts/MIRAssurance/Release.ps1", "tools/lib/assurance/Release.ps1")) {
       & git -C $RepoRoot cat-file -e "$([string]$row.baseline.tag):$releaseLibraryPath" 2>$null
       if ($LASTEXITCODE -ne 0) { continue }
@@ -314,6 +355,11 @@ try {
     $transition = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/releases/terminal/shadows/$([string]$row.release)/transition-plan.json") | ConvertFrom-Json -Depth 100
     $convergence = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/convergence.yml")
     $assurance = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/assurance.json") | ConvertFrom-Json -Depth 100
+    $assuranceSelfTest = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Test-MIRAssurance.ps1")
+    $hostedValidation = if ([string]$row.support_tier -ne "current") {
+      Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".github/workflows/validate.yml")
+    } else { "" }
+    $hostedTargetPattern = '--target\s+[''"]?' + [regex]::Escape([string]$row.factorio_line) + '[''"]?(?:\s|$)'
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
     $docsRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/docs.yml")
@@ -338,6 +384,13 @@ try {
         $convergence -notmatch '(?m)^schema: 1$' -or
         $convergence -notmatch ('(?m)^  version: "' + [regex]::Escape([string]$row.release) + '"$') -or
         $convergence -notmatch ('(?m)^  baseline_commit: ' + [regex]::Escape([string]$row.baseline.commit) + '$') -or
+        ([string]$row.support_tier -ne "current" -and
+          ($assuranceSelfTest.Contains('throw "MIR assurance self-test failed."') -or
+           $hostedValidation -notmatch $hostedTargetPattern -or
+           -not $hostedValidation.Contains("more-infinite-research_$([string]$row.release).zip") -or
+           -not $hostedValidation.Contains('.\scripts\Build-MIRPackage.ps1 -OutputDir dist') -or
+           @($transition.generated_authorities | Where-Object { [string]$_ -eq "scripts/Test-MIRAssurance.ps1" }).Count -ne 1 -or
+           @($transition.generated_authorities | Where-Object { [string]$_ -eq ".github/workflows/validate.yml" }).Count -ne 1)) -or
         ($shadowProfile -join '|') -ne 'tooling.self-test|static.balance|static.museum|runtime.full|runtime.exact-zip' -or
         $shadowProfile -contains 'runtime.upgrade' -or $shadowProfile -contains 'runtime.ecosystem' -or
         $releaseGovernance.Count -ne 1 -or
@@ -378,6 +431,7 @@ try {
       $upgradeManifest = Get-Content -Raw -LiteralPath $upgradeManifestPath | ConvertFrom-Json -Depth 100
       $fixtureRegistry = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/fixtures.yml")
       $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRAssurance.ps1")
+      $assuranceFastWorkflow = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".github/workflows/assurance-fast.yml")
       $assuranceReleaseLibrary = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/MIRAssurance/Release.ps1")
       $validationEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Invoke-MIRValidation.ps1")
       $upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "scripts/Test-MIRUpgrade.ps1")
@@ -391,6 +445,10 @@ try {
           -not $assuranceEntryPoint.Contains('[void]$start.ArgumentList.Add("--version")') -or
           -not $assuranceEntryPoint.Contains('branch=(@(& git -C $repo branch --show-current) -join "").Trim()') -or
           $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
+          -not $assuranceFastWorkflow.Contains('workflow_dispatch:') -or
+          $assuranceFastWorkflow.Contains("`n  push:") -or
+          -not $assuranceFastWorkflow.Contains("--target '$([string]$row.factorio_line)'") -or
+          @($transition.generated_authorities | Where-Object { [string]$_ -eq ".github/workflows/assurance-fast.yml" }).Count -ne 1 -or
           -not $assuranceReleaseLibrary.Contains('$branch = (@(& git -C $repo branch --show-current) -join "").Trim()') -or
           $assuranceReleaseLibrary.Contains('$branch = ([string](& git -C $repo branch --show-current)).Trim()') -or
           $assuranceReleaseLibrary.Contains('$branch = (& git -C $repo branch --show-current).Trim()') -or

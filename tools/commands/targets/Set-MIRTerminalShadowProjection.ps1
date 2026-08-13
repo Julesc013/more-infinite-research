@@ -102,6 +102,25 @@ function Test-MIRTerminalDetachedHeadEquivalent {
     [Parameter(Mandatory)][string]$ActualText,
     [Parameter(Mandatory)][string]$ExpectedText
   )
+  if ($RelativePath -eq "scripts/Test-MIRAssurance.ps1") {
+    $reconstructed = $ActualText
+    $selfTestInvocation = '& (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test'
+    $selfTestExitCheck = 'if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }'
+    if ($ExpectedText.Contains($selfTestExitCheck) -and -not $reconstructed.Contains($selfTestExitCheck)) {
+      $reconstructed = $reconstructed.Replace($selfTestInvocation, $selfTestInvocation + "`n" + $selfTestExitCheck)
+    }
+    $schemaInvocation = '& (Join-Path $RepoRoot "scripts\Test-MIRVerificationSchemas.ps1") -RepoRoot $RepoRoot'
+    $schemaExitCheck = 'if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }'
+    if ($ExpectedText.Contains($schemaExitCheck) -and -not $reconstructed.Contains($schemaExitCheck)) {
+      $reconstructed = $reconstructed.Replace($schemaInvocation, $schemaInvocation + "`n" + $schemaExitCheck)
+    }
+    $safeInventoryGate = 'if (-not $inventoryText.Contains(''"schema": 2'')) {'
+    $unsafeInventoryGate = 'if ($LASTEXITCODE -ne 0 -or -not $inventoryText.Contains(''"schema": 2'')) {'
+    if ($ExpectedText.Contains($unsafeInventoryGate) -and $reconstructed.Contains($safeInventoryGate)) {
+      $reconstructed = $reconstructed.Replace($safeInventoryGate, $unsafeInventoryGate)
+    }
+    return $reconstructed -ceq $ExpectedText
+  }
   $replacement = switch ($RelativePath) {
     "scripts/Invoke-MIRAssurance.ps1" {
       @{
@@ -121,6 +140,176 @@ function Test-MIRTerminalDetachedHeadEquivalent {
   }
   return $ActualText.Contains([string]$replacement.safe) -and
     $ActualText.Replace([string]$replacement.safe, [string]$replacement.unsafe) -ceq $ExpectedText
+}
+
+function Set-MIRTerminalAssuranceSelfTestWrapper {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -eq "current") { return @() }
+
+  $relativePath = "scripts/Test-MIRAssurance.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "Target shadow has no assurance self-test wrapper: $path"
+  }
+
+  $text = ConvertTo-MIRCanonicalText -Text (Get-Content -Raw -LiteralPath $path)
+  foreach ($staleNativeExitGate in @(
+    'if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }',
+    'if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }'
+  )) {
+    $text = $text.Replace($staleNativeExitGate + "`n", "")
+  }
+  $text = $text.Replace(
+    'if ($LASTEXITCODE -ne 0 -or -not $inventoryText.Contains(''"schema": 2'')) {',
+    'if (-not $inventoryText.Contains(''"schema": 2'')) {'
+  )
+  if (-not $text.Contains('& (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test') -or
+      $text.Contains('throw "MIR assurance self-test failed."')) {
+    throw "Target assurance self-test wrapper did not adopt PowerShell-native failure propagation."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
+function Get-MIRTerminalShadowHostedWorkflowText {
+  param(
+    [Parameter(Mandatory)]$Target,
+    [Parameter(Mandatory)][string]$Name,
+    [switch]$DispatchOnly
+  )
+  $trigger = if ($DispatchOnly) {
+@'
+on:
+  workflow_dispatch:
+'@
+  } else {
+@'
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+'@
+  }
+  $archive = ".\dist\more-infinite-research_$([string]$Target.release).zip"
+  return @"
+name: $Name
+
+$($trigger.TrimEnd())
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+      - name: Diagnose target-native assurance environment
+        shell: pwsh
+        run: .\scripts\Invoke-MIRAssurance.ps1 doctor --target '$([string]$Target.factorio_line)' --candidate '$archive' --json
+      - name: Materialize target-native verification plan
+        shell: pwsh
+        run: .\scripts\Invoke-MIRAssurance.ps1 plan --target '$([string]$Target.factorio_line)' --candidate '$archive' --profile fast --output artifacts/assurance/plan.json
+      - name: Validate planner and evidence invalidation
+        shell: pwsh
+        run: .\scripts\Test-MIRAssurance.ps1
+      - name: Run target-native static gate
+        shell: pwsh
+        run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+      - name: Upload verification plan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-terminal-shadow-verification-plan
+          path: artifacts/assurance/plan.json
+          if-no-files-found: warn
+"@
+}
+
+function Get-MIRTerminalMaintainedHostedWorkflowText {
+  param([Parameter(Mandatory)]$Target)
+  $path = Join-Path $TargetRoot ".github/workflows/validate.yml"
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "Maintained target shadow has no hosted validation workflow: $path"
+  }
+  $text = ConvertTo-MIRCanonicalText -Text (Get-Content -Raw -LiteralPath $path)
+  if (-not $text.Contains('$work = @($plan.work)')) {
+    $targetSafeDirectory = $TargetRoot.Replace("\", "/")
+    $targetHead = @(& git -c "safe.directory=$targetSafeDirectory" -C $TargetRoot rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $targetHead.Count -ne 1) {
+      throw "Maintained target hosted workflow lost its matrix source authority."
+    }
+    $text = ConvertTo-MIRCanonicalText -Text (Get-MIRGitText -Commit ([string]$targetHead[0]) -Path ".github/workflows/validate.yml")
+  }
+  $archive = ".\dist\more-infinite-research_$([string]$Target.release).zip"
+  $text = $text.Replace("--target 2.1", "--target $([string]$Target.factorio_line)")
+  $text = $text.Replace("--profile fast --output", "--profile fast --candidate '$archive' --output")
+  $text = $text.Replace("--target $([string]$Target.factorio_line) --plan", "--target $([string]$Target.factorio_line) --candidate '$archive' --plan")
+
+  $checkout = @'
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+'@.TrimEnd()
+  $checkoutWithBuild = $checkout + @'
+
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+'@
+  if (-not $text.Contains("Build deterministic terminal shadow archive")) {
+    $text = $text.Replace($checkout, $checkoutWithBuild.TrimEnd())
+    $conditionalCheckout = @'
+      - uses: actions/checkout@v4
+        if: ${{ matrix.no_op != true }}
+        with:
+          fetch-depth: 0
+'@.TrimEnd()
+    $conditionalCheckoutWithBuild = $conditionalCheckout + @'
+
+      - name: Build deterministic terminal shadow archive
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+'@
+    $text = $text.Replace($conditionalCheckout, $conditionalCheckoutWithBuild.TrimEnd())
+  }
+  foreach ($required in @(
+    "--target $([string]$Target.factorio_line)",
+    "--candidate '$archive'",
+    '$work = @($plan.work)',
+    'test_id = "reuse-only"',
+    "Build deterministic terminal shadow archive"
+  )) {
+    if (-not $text.Contains($required)) { throw "Maintained target hosted workflow projection is incomplete: $required" }
+  }
+  return ($text.TrimEnd() + "`n")
+}
+
+function Set-MIRTerminalShadowHostedWorkflows {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -eq "current") { return @() }
+
+  $validatePath = Join-Path $TargetRoot ".github/workflows/validate.yml"
+  $validateText = if ([string]$Target.support_tier -eq "maintained") {
+    Get-MIRTerminalMaintainedHostedWorkflowText -Target $Target
+  } else {
+    Get-MIRTerminalShadowHostedWorkflowText -Target $Target -Name "MIR Terminal Shadow Verify"
+  }
+  Assert-OrWriteMIRText -Path $validatePath -Text $validateText
+  $authorities = @(".github/workflows/validate.yml")
+
+  $fastPath = Join-Path $TargetRoot ".github/workflows/assurance-fast.yml"
+  if (Test-Path -LiteralPath $fastPath -PathType Leaf) {
+    Assert-OrWriteMIRText -Path $fastPath -Text (Get-MIRTerminalShadowHostedWorkflowText -Target $Target -Name "MIR Terminal Shadow Verify (manual alias)" -DispatchOnly)
+    $authorities += ".github/workflows/assurance-fast.yml"
+  }
+  return @($authorities)
 }
 
 function Write-MIRGitBlob {
@@ -1031,6 +1220,8 @@ if ((Get-MIRGitCommit -Ref ([string]$profiles.portable_source.authority_commit))
 Set-MIRAssuranceOverlays -Target $target
 Set-MIRPerformanceTransition -Target $target
 Set-MIRTerminalShadowAssuranceProfile
+$terminalAssuranceSelfTestAuthorities = @(Set-MIRTerminalAssuranceSelfTestWrapper -Target $target)
+$terminalHostedWorkflowAuthorities = @(Set-MIRTerminalShadowHostedWorkflows -Target $target)
 $terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
 $terminalDetachedHeadAuthorities = @(Set-MIRTerminalDetachedHeadInventory)
 $terminalLegacyValidationAuthorities = @(Set-MIRTerminalLegacyValidationUserData -Target $target)
@@ -1152,7 +1343,7 @@ $transitionPlan = [ordered]@{
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  ) + @($terminalLegacyProbeAuthorities) + @($terminalDetachedHeadAuthorities) + @($terminalLegacyValidationAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
+  ) + @($terminalAssuranceSelfTestAuthorities) + @($terminalHostedWorkflowAuthorities) + @($terminalLegacyProbeAuthorities) + @($terminalDetachedHeadAuthorities) + @($terminalLegacyValidationAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"
