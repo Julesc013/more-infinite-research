@@ -270,6 +270,37 @@
             "blob": "1221ea178241e8f5ee432c045fd1cc55fcd1a6db"
           }
         ]
+      },
+      {
+        "id": "factorio-2.0-late-p0-authority-reconciliation-v1",
+        "commit": "bde8eda3b3ccc59bfe50016a3729531d6dbed44f",
+        "reason": "Preserve the final maintained-target late-P0 package, approved-delta, source-lock, release-authority, and self-test reconciliation after the target-native product overlay is applied.",
+        "files": [
+          {
+            "path": "approved-delta/2.5.5-to-2.5.9.json",
+            "blob": "d77904a76643ecfaeea373ff82fee2b1db429fc4"
+          },
+          {
+            "path": "scripts/Export-MIRApprovedDelta.ps1",
+            "blob": "75d407034c0824c0d1775fbb7a96c7e42665c899"
+          },
+          {
+            "path": "scripts/MIRAssurance/Release.ps1",
+            "blob": "5f5bcded42b9303d9efab462d27757a2a15d62ec"
+          },
+          {
+            "path": "scripts/Test-MIRApprovedDelta.ps1",
+            "blob": "845132dbd90ffbee13b09a1ce4402a3154bd8bad"
+          },
+          {
+            "path": "scripts/Test-MIRBackportSourceLock.ps1",
+            "blob": "27d56d52ddcd3c962d26222921989c7c65c76926"
+          },
+          {
+            "path": "scripts/Test-MIRReleaseAuthority.ps1",
+            "blob": "a86f910d7c4e1457cba1cb2fd969fce783688757"
+          }
+        ]
       }
     ],
     "performance_transition": {
