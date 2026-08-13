@@ -517,6 +517,12 @@ function Set-MIRTerminalDetachedHeadInventory {
       continue
     }
     $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+    if (-not $text.Contains('branch --show-current')) {
+      if ([bool]$policy.required) {
+        throw "Target assurance authority has no branch inventory: $relativePath"
+      }
+      continue
+    }
     foreach ($unsafe in @($policy.unsafe)) {
       if ($text.Contains([string]$unsafe)) {
         $text = $text.Replace([string]$unsafe, [string]$policy.safe)
