@@ -759,6 +759,8 @@ validation_tooling:
     terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
     terminal_product_implementation_reconciliation: .mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json
     terminal_product_implementation_reconciliation_schema: spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json
+    terminal_mod_portal_discussion_reconciliation: .mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json
+    terminal_mod_portal_discussion_reconciliation_schema: spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json
     terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
     terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
