@@ -124,6 +124,7 @@ $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archiv
 $baselineRoot = Join-Path $RepoRoot ".mir\releases\terminal\baselines"
 $exporter = Join-Path $RepoRoot "scripts\Export-MIRTerminalBaseline.ps1"
 $testRoot = Join-Path $RepoRoot "build\results\terminal-baseline-capture-test"
+$null = New-Item -ItemType Directory -Force -Path (Join-Path $RepoRoot "build")
 $resolvedBuildRoot = (Resolve-Path -LiteralPath (Join-Path $RepoRoot "build")).Path.TrimEnd('\') + '\'
 
 if (Test-Path -LiteralPath $testRoot) {
