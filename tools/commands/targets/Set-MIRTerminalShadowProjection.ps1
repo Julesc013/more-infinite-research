@@ -71,6 +71,13 @@ function Get-MIRGitText {
   return (($value -join "`n").TrimEnd() + "`n")
 }
 
+function Get-MIRGitObjectText {
+  param([Parameter(Mandatory)][string]$Object)
+  $value = @(& git -C $SourceRepoRoot cat-file blob $Object 2>$null)
+  if ($LASTEXITCODE -ne 0) { throw "Terminal projection Git object is unavailable: $Object" }
+  return (($value -join "`n").TrimEnd() + "`n")
+}
+
 function Test-MIRGitBlob {
   param([Parameter(Mandatory)][string]$Commit, [Parameter(Mandatory)][string]$Path)
   & git -C $SourceRepoRoot cat-file -e "${Commit}:$Path" 2>$null
@@ -138,7 +145,17 @@ function Set-MIRAssuranceOverlays {
         # example, CRLF on Windows).  Compare the clean-filtered worktree value
         # with the immutable Git blob rather than hashing platform bytes.
         $targetBlob = (& git -C $SourceRepoRoot hash-object --path=$path -- $destination 2>$null)
-        if ($LASTEXITCODE -ne 0 -or ([string]$targetBlob).Trim() -ne $expectedBlob) { throw "Terminal assurance overlay file is stale: $path" }
+        if ($LASTEXITCODE -ne 0) { throw "Terminal assurance overlay file is stale: $path" }
+        if (([string]$targetBlob).Trim() -ne $expectedBlob) {
+          $unsafeDetachedHead = '      branch=(& git -C $repo branch --show-current).Trim()'
+          $safeDetachedHead = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+          $expectedText = ConvertTo-MIRCanonicalText -Text (Get-MIRGitObjectText -Object $expectedBlob)
+          $actualText = ConvertTo-MIRCanonicalText -Text (Get-Content -Raw -LiteralPath $destination)
+          if ($path -ne "scripts/Invoke-MIRAssurance.ps1" -or
+              $actualText.Replace($safeDetachedHead, $unsafeDetachedHead) -cne $expectedText) {
+            throw "Terminal assurance overlay file is stale: $path"
+          }
+        }
       } elseif ([string]$file.blob -eq $finalOverlayBlob) {
         $existingBlob = if (Test-Path -LiteralPath $destination -PathType Leaf) {
           ([string](& git -C $SourceRepoRoot hash-object --no-filters -- $destination 2>$null)).Trim()
@@ -414,6 +431,7 @@ function Get-MIRAssuranceFactorioVersion {
   if ([string]::IsNullOrWhiteSpace($version)) { $version = "unknown" }
   return $version.Trim()
 }
+
 '@.Trim()
   $functionText = ConvertTo-MIRCanonicalText -Text $functionText
   $functionText = $functionText.Replace("__MIR_EXACT_ENGINE_SHA256__", [string]$Target.exact_engine_sha256)
@@ -431,6 +449,82 @@ function Get-MIRAssuranceFactorioVersion {
   if ($text.Contains($oldLine)) { $text = $text.Replace($oldLine, $newLine) }
   if (-not $text.Contains($newLine) -or -not $text.Contains('[void]$start.ArgumentList.Add("--version")')) {
     throw "Target assurance entry point lacks the bounded legacy Factorio version probe."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
+function Set-MIRTerminalDetachedHeadInventory {
+  $relativePath = "scripts/Invoke-MIRAssurance.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no assurance entry point: $path" }
+
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $unsafe = '      branch=(& git -C $repo branch --show-current).Trim()'
+  $safe = '      branch=([string](& git -C $repo branch --show-current)).Trim()'
+  if ($text.Contains($unsafe)) { $text = $text.Replace($unsafe, $safe) }
+  if (-not $text.Contains($safe)) {
+    throw "Target assurance inventory does not safely represent a detached HEAD."
+  }
+  Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
+  return @($relativePath)
+}
+
+function Set-MIRTerminalLegacyValidationUserData {
+  param([Parameter(Mandatory)]$Target)
+  if ([string]$Target.support_tier -notin @("lts", "historical", "finite")) { return @() }
+
+  $relativePath = "scripts/Invoke-MIRValidation.ps1"
+  $path = Join-Path $TargetRoot $relativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Target shadow has no validation entry point: $path" }
+  $text = (Get-Content -Raw -LiteralPath $path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $oldSetup = @'
+$usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
+if ($usesGeneratedUserDataDir) {
+  $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
+}
+$validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
+$validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
+'@.Trim()
+  $newSetup = @'
+$usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
+if ($usesGeneratedUserDataDir) {
+  $generatedUserDataRoot = Join-Path $repo "build\validation-userdata"
+  New-Item -ItemType Directory -Force -Path $generatedUserDataRoot | Out-Null
+  $UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
+}
+$validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
+$validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
+
+function Remove-MIRGeneratedValidationUserData {
+  if (-not $usesGeneratedUserDataDir -or -not (Test-Path -LiteralPath $validationRoot)) { return }
+  $resolvedGeneratedRoot = (Resolve-Path -LiteralPath $generatedUserDataRoot).Path.TrimEnd("\") + "\"
+  $resolvedValidationRoot = (Resolve-Path -LiteralPath $validationRoot).Path
+  if (-not $resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to remove generated validation userdata outside its build root: $resolvedValidationRoot"
+  }
+  Remove-Item -LiteralPath $resolvedValidationRoot -Recurse -Force
+}
+'@.Trim()
+  $oldSetup = ConvertTo-MIRCanonicalText -Text $oldSetup
+  $newSetup = ConvertTo-MIRCanonicalText -Text $newSetup
+  if ($text.Contains($oldSetup)) { $text = $text.Replace($oldSetup, $newSetup) }
+  if (-not $text.Contains('function Remove-MIRGeneratedValidationUserData {') -or
+      -not $text.Contains('$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"')) {
+    throw "Target validation entry point lacks bounded generated userdata."
+  }
+
+  $cleanupPattern = '(?m)^(\s*)if \(\$usesGeneratedUserDataDir -and \(Test-Path -LiteralPath \$validationRoot\)\) \{\n\1  Remove-Item -LiteralPath \$validationRoot -Recurse -Force\n\1\}'
+  $text = [regex]::Replace($text, $cleanupPattern, {
+    param($match)
+    return $match.Groups[1].Value + 'Remove-MIRGeneratedValidationUserData'
+  })
+  if ($text.Contains('Remove-Item -LiteralPath $validationRoot -Recurse -Force') -and
+      ([regex]::Matches($text, 'Remove-Item -LiteralPath \$validationRoot -Recurse -Force').Count -ne 1)) {
+    throw "Target validation entry point retains an unbounded generated-userdata cleanup."
+  }
+  if ([regex]::Matches($text, '(?m)^\s*Remove-MIRGeneratedValidationUserData$').Count -lt 2) {
+    throw "Target validation entry point does not route every completion path through bounded cleanup."
   }
   Assert-OrWriteMIRText -Path $path -Text ($text.TrimEnd() + "`n")
   return @($relativePath)
@@ -861,6 +955,8 @@ Set-MIRAssuranceOverlays -Target $target
 Set-MIRPerformanceTransition -Target $target
 Set-MIRTerminalShadowAssuranceProfile
 $terminalLegacyProbeAuthorities = @(Set-MIRTerminalLegacyFactorioVersionProbe -Target $target)
+$terminalDetachedHeadAuthorities = @(Set-MIRTerminalDetachedHeadInventory)
+$terminalLegacyValidationAuthorities = @(Set-MIRTerminalLegacyValidationUserData -Target $target)
 $terminalLegacyUpgradeHarnessAuthorities = @(Set-MIRTerminalLegacyUpgradeHarness -Target $target)
 $terminalUpgradeFixtureAuthorities = @(Set-MIRTerminalUpgradeFixtures -Target $target)
 $terminalDocumentationAuthorities = @(Set-MIRTerminalReleaseNoteRegistry -Target $target)
@@ -979,7 +1075,7 @@ $transitionPlan = [ordered]@{
     ".mir/releases/terminal/shadows/$Release/qualification-context.json",
     "docs/releases/notes/release-notes-$Release.md",
     "changelog.txt"
-  ) + @($terminalLegacyProbeAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
+  ) + @($terminalLegacyProbeAuthorities) + @($terminalDetachedHeadAuthorities) + @($terminalLegacyValidationAuthorities) + @($terminalLegacyUpgradeHarnessAuthorities) + @($terminalUpgradeFixtureAuthorities) + @($terminalDocumentationAuthorities) + @($terminalBackportLockAuthorities)
   product_findings = @($target.product_findings)
   product_disposition = [string]$target.product_disposition
   receipt_after_proof = ".mir/releases/terminal/shadows/$Release/transition-receipt.json"
