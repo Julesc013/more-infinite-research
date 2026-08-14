@@ -497,13 +497,29 @@ if (-not ((Get-Content -Raw -LiteralPath $reconstructionPath) | Test-Json -Schem
 }
 $canonicalCandidate = @($allocation.allocations | Where-Object release -eq "3.2.9")
 if ($canonicalCandidate.Count -ne 1) { throw "The canonical terminal candidate allocation is missing." }
+$packageLockAuthority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\control-plane\package-locks.json") | ConvertFrom-Json -Depth 100
+if ([int]$packageLockAuthority.schema -ne 1 -or [string]$packageLockAuthority.authority -ne "mir-control-plane-v5-package-locks") {
+  throw "The package-lock authority is invalid."
+}
 foreach ($release in $family) {
   $row = @($allocation.allocations | Where-Object release -eq $release)
   $reconstructed = @($reconstruction.targets | Where-Object release -eq $release)
+  $packageLock = @($packageLockAuthority.locks | Where-Object release -eq $release)
   $recordPath = Join-Path $RepoRoot ".mir\releases\records\$release.json"
   $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
   $targetFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json") | ConvertFrom-Json -Depth 100
-  if ($row.Count -ne 1 -or $reconstructed.Count -ne 1 -or [string]$record.state -ne "package-built" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+  if ($row.Count -ne 1 -or $reconstructed.Count -ne 1 -or $packageLock.Count -ne 1 -or
+      [string]$packageLock[0].target -ne [string]$record.target -or
+      [string]$packageLock[0].candidate_id -ne [string]$row[0].assigned_id -or
+      [string]$packageLock[0].package_source_commit -ne [string]$row[0].package_source_commit -or
+      [string]$packageLock[0].package_source_tree -ne [string]$row[0].package_source_tree -or
+      [string]$packageLock[0].package_source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$packageLock[0].archive -ne [string]$reconstructed[0].dist_path -or
+      [string]$packageLock[0].archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [long]$packageLock[0].archive_bytes -ne [long]$row[0].bytes -or
+      [int]$packageLock[0].archive_entries -ne [int]$row[0].entries -or
+      [string]$packageLock[0].mode -ne "frozen-terminal-candidate-awaiting-manual-approval" -or
+      [string]$record.state -ne "package-built" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
       [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
       [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
       [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
