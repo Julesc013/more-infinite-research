@@ -4,6 +4,7 @@ local lab_compatibility = require("prototypes.mir.capabilities.science_integrati
 local recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local technology_researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
 local pack_production_reachability = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
+local production_route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
 local science_selection_policy = require("prototypes.mir.capabilities.science_integration.science_selection_policy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
@@ -13,6 +14,7 @@ local S = {
   recipe_unlock_facts = recipe_unlock_facts,
   technology_researchability = technology_researchability,
   pack_production_reachability = pack_production_reachability,
+  production_route_policy = production_route_policy,
   science_selection_policy = science_selection_policy
 }
 
@@ -27,6 +29,10 @@ function S.ensure_services(context)
       pack_production_reachability.pack_production_status)
     context:set_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack",
       pack_production_reachability.prereq_tech_for_science_pack)
+  end
+  if not context:has_service(SERVICE_PREFIX .. "production_route_for_pack") then
+    context:set_service(SERVICE_PREFIX .. "production_route_for_pack",
+      pack_production_reachability.production_route_for_pack)
   end
   return context
 end
@@ -57,6 +63,7 @@ S.pack_list_for_extension = science_selection_policy.pack_list_for_extension
 S.pack_production_status = ready(pack_production_reachability.pack_production_status)
 S.researchable_unlockers_for_recipe = ready(pack_production_reachability.researchable_unlockers_for_recipe)
 S.prereq_tech_for_science_pack = ready(pack_production_reachability.prereq_tech_for_science_pack)
+S.production_route_for_pack = ready(pack_production_reachability.production_route_for_pack)
 
 S.technology_researchability_reason = ready(technology_researchability.technology_researchability_reason)
 S.technology_is_researchable = ready(technology_researchability.technology_is_researchable)

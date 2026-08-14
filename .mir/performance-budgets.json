@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "release": "2.5.5",
+  "release": "2.5.9",
   "factorio_line": "2.0",
   "compiler_stage_budgets": [
     { "id": "recipe-risk-facts", "phase": "recipe_risk_facts", "max_seconds": 0.5 },

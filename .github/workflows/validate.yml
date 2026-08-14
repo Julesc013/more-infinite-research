@@ -18,6 +18,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
@@ -28,10 +31,10 @@ jobs:
             mir-ledger-${{ runner.os }}-
       - name: Diagnose verifier
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
+        run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output out/verification-plan.json
+        run: ./scripts/mir.ps1 verify plan --target 2.0 --profile fast --candidate '.\dist\more-infinite-research_2.5.9.zip' --output out/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -69,6 +72,24 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+      - name: Reconstruct immutable 2.5.5 archive
+        if: ${{ matrix.test_id == 'static.release-history' }}
+        shell: pwsh
+        run: |
+          $lock = Get-Content -Raw -LiteralPath .mir/backport-source-lock.json | ConvertFrom-Json
+          $sourceRoot = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source'
+          $sourceArchive = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source.zip'
+          if (Test-Path -LiteralPath $sourceRoot) { Remove-Item -LiteralPath $sourceRoot -Recurse -Force }
+          if (Test-Path -LiteralPath $sourceArchive) { Remove-Item -LiteralPath $sourceArchive -Force }
+          git archive --format=zip "--output=$sourceArchive" ([string]$lock.projection.package_source_commit)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to export immutable 2.5.5 package source.' }
+          Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
+          & (Join-Path $sourceRoot 'scripts/Build-MIRPackage.ps1') -OutputDir dist
+          Copy-Item -LiteralPath (Join-Path $sourceRoot 'dist/more-infinite-research_2.5.5.zip') -Destination dist -Force
       - uses: actions/download-artifact@v4
         if: ${{ matrix.no_op != true }}
         with:
@@ -86,7 +107,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./scripts/mir.ps1 verify run-one --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -109,6 +130,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - uses: actions/download-artifact@v4
         with:
           name: mir-verification-plan
@@ -121,16 +145,45 @@ jobs:
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
-      - name: Merge worker evidence
+      - name: Download isolated worker evidence
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: mir-evidence-*
-          path: artifacts/assurance/evidence
-          merge-multiple: true
+          path: artifacts/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $workerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/worker-evidence'))
+          $ledgerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/evidence'))
+          New-Item -ItemType Directory -Force -Path $ledgerRoot | Out-Null
+          foreach ($row in @($plan.work)) {
+            $safeTestId = [string]$row.safe_test_id
+            $fingerprint = [string]$row.fingerprint
+            if ($safeTestId -notmatch '^[A-Za-z0-9._-]+$' -or $fingerprint -notmatch '^[A-Fa-f0-9]{64}$') {
+              throw "Unsafe planned worker identity: $safeTestId / $fingerprint"
+            }
+            $artifactRoot = [IO.Path]::GetFullPath((Join-Path $workerRoot "mir-evidence-$safeTestId"))
+            $source = [IO.Path]::GetFullPath((Join-Path $artifactRoot (Join-Path $safeTestId $fingerprint)))
+            $destinationParent = [IO.Path]::GetFullPath((Join-Path $ledgerRoot $safeTestId))
+            $destination = [IO.Path]::GetFullPath((Join-Path $destinationParent $fingerprint))
+            if (-not $source.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+                -not $destination.StartsWith($ledgerRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+              throw "Planned worker evidence escaped its bounded root: $safeTestId"
+            }
+            if (-not (Test-Path -LiteralPath $source -PathType Container)) {
+              throw "Exact worker evidence is missing: $source"
+            }
+            New-Item -ItemType Directory -Force -Path $destinationParent | Out-Null
+            if (Test-Path -LiteralPath $destination) {
+              Remove-Item -LiteralPath $destination -Recurse -Force
+            }
+            Copy-Item -LiteralPath $source -Destination $destination -Recurse
+          }
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+        run: ./scripts/mir.ps1 verify gate --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4

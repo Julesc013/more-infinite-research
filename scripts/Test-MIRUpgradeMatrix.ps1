@@ -25,7 +25,7 @@ $cases = @(
 
 $rows = @()
 foreach ($case in $cases) {
-  $rowOutput = Join-Path $outputParent "$ToVersion-upgrade-$($case.id).json"
+  $rowOutput = Join-Path $outputParent "$FromVersion-to-$ToVersion-upgrade-$($case.id).json"
   $arguments = @{
     RepoRoot = $RepoRoot
     FactorioBin = $FactorioBin

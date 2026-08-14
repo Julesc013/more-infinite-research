@@ -96,6 +96,91 @@ if ([string]$info.factorio_version -eq "2.0" -and [string]$info.version -eq "2.5
   Write-Host "[ok] MIR 2.5.5 P12 candidate authority is exact, unsealed, package-frozen, and pending outage qualification."
   return
 }
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.9') {
+  $expectedBaseline = [ordered]@{
+    commit = '27877275854eb131efeb42672d3676c9c513c85e'
+    archive = '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C'
+    content = '047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154'
+  }
+  if ([string]$backport.mir_version -ne '2.5.5' -or [string]$backport.candidate_id -ne '2.5-P12' -or
+      [string]$backport.archive_sha256 -ne $expectedBaseline.archive -or
+      [string]$backport.package_content_sha256 -ne $expectedBaseline.content) {
+    throw 'The canonical Factorio 2.0 ledger must retain the exact immutable 2.5.5 predecessor during shadow convergence.'
+  }
+
+  $manifest = Read-MIRText '.mir/releases/terminal/shadows/2.5.9/package-manifest.json' | ConvertFrom-Json -Depth 100
+  $context = Read-MIRText '.mir/releases/terminal/shadows/2.5.9/qualification-context.json' | ConvertFrom-Json -Depth 100
+  $transition = Read-MIRText '.mir/releases/terminal/shadows/2.5.9/transition-plan.json' | ConvertFrom-Json -Depth 100
+  $record = Read-MIRText '.mir/releases/records/2.5.9.json' | ConvertFrom-Json -Depth 100
+  $performance = $manifest.source.performance_transition
+  $development = $performance.development_package
+  $baseline = $performance.baseline
+  $expectedShadow = [ordered]@{
+    package_source_commit = [string]$development.package_source_commit
+    archive = [string]$development.archive_sha256
+    content = [string]$development.package_content_sha256
+  }
+  if ([int]$manifest.schema -ne 1 -or [string]$manifest.kind -ne 'Mir3TerminalPackageManifestV1' -or
+      [string]$manifest.release -ne '2.5.9' -or [string]$manifest.target -ne '2.0' -or
+      $manifest.source_frozen -ne $false -or $null -ne $manifest.candidate_id -or
+      [string]$performance.phase -ne 'shadow-convergence' -or
+      [string]$manifest.source.immutable_dot5_predecessor.commit -ne $expectedBaseline.commit -or
+      [string]$baseline.version -ne '2.5.5' -or [string]$baseline.archive_sha256 -ne $expectedBaseline.archive -or
+      [string]$baseline.package_content_sha256 -ne $expectedBaseline.content -or
+      [string]$development.version -ne '2.5.9' -or
+      [string]$development.package_source_commit -notmatch '^[0-9a-f]{40}$' -or
+      [string]$development.package_source_sha256 -ne $expectedShadow.content -or
+      [string]$development.archive_sha256 -notmatch '^[0-9A-F]{64}$' -or
+      [string]$development.package_content_sha256 -notmatch '^[0-9A-F]{64}$') {
+    throw 'The 2.5.9 package manifest is not an exact unfrozen, candidate-unassigned projection of immutable 2.5.5.'
+  }
+  if ([int]$context.schema -ne 1 -or [string]$context.kind -ne 'MIR3TerminalShadowQualificationContextV1' -or
+      [string]$context.release -ne '2.5.9' -or [string]$context.target -ne '2.0' -or
+      [string]$context.exact_engine -ne '2.0.77' -or [string]$context.support_tier -ne 'maintained' -or
+      [string]$context.phase -ne 'shadow-convergence' -or $null -ne $context.candidate_id -or
+      (@($context.upgrade_rows | Sort-Object) -join '|') -ne '2.5.0-to-2.5.9|2.5.5-to-2.5.9') {
+    throw 'The 2.5.9 qualification context does not bind the maintained exact-engine shadow and both required upgrades.'
+  }
+  if ([int]$transition.schema -ne 1 -or [string]$transition.kind -ne 'MIR3TerminalShadowTransitionPlanV1' -or
+      [string]$transition.release -ne '2.5.9' -or [string]$transition.target -ne '2.0' -or
+      [string]$transition.state -ne 'materialized-source-unfrozen-candidate-unassigned' -or
+      [string]$transition.shadow_branch -ne 'candidate/2.5.9-projection' -or
+      [string]$transition.immutable_inputs.baseline.commit -ne $expectedBaseline.commit -or
+      $transition.source_frozen -ne $false -or $null -ne $transition.candidate_id) {
+    throw 'The 2.5.9 transition plan does not preserve the unfrozen, candidate-unassigned shadow boundary.'
+  }
+  if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.9' -or
+      [string]$record.target -ne '2.0' -or [string]$record.state -ne 'planned' -or
+      [string]$record.candidate_id -ne 'not-assigned' -or $null -ne $record.candidate_allocation.assigned_id -or
+      [int]$record.candidate_allocation.minimum_next_ordinal -ne 13 -or
+      [string]$record.source_release.tag_commit -ne $expectedBaseline.commit -or
+      [string]$record.source_release.archive_sha256 -ne $expectedBaseline.archive -or
+      [string]$record.source_release.content_sha256 -ne $expectedBaseline.content) {
+    throw 'The 2.5.9 release record must remain planned with candidate P13 or later unassigned until fixed point and freeze.'
+  }
+
+  . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
+  & git -C $repo cat-file -e "$($expectedShadow.package_source_commit)^{commit}"
+  if ($LASTEXITCODE -ne 0) { throw 'The 2.5.9 development package-source commit is unavailable.' }
+  & git -C $repo merge-base --is-ancestor $expectedShadow.package_source_commit HEAD
+  if ($LASTEXITCODE -ne 0) { throw 'The 2.5.9 development package source is not an ancestor of qualification HEAD.' }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $packageChanges = @(& git -C $repo diff --name-only $expectedShadow.package_source_commit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -gt 0) {
+    throw "Package-visible paths changed after the 2.5.9 development package source: $($packageChanges -join ', ')"
+  }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne $expectedShadow.content) {
+    throw 'Current package roots do not reproduce the exact 2.5.9 development identity.'
+  }
+  $shadowArchive = Join-Path $repo 'dist\more-infinite-research_2.5.9.zip'
+  if (-not (Test-Path -LiteralPath $shadowArchive -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $shadowArchive) -ne $expectedShadow.archive -or
+      (Get-MIRZipContentFingerprint -Path $shadowArchive) -ne $expectedShadow.content) {
+    throw 'The exact 2.5.9 development shadow archive is absent or differs from governed authority.'
+  }
+  Write-Host '[ok] MIR 2.5.9 release authority is an exact unfrozen, candidate-unassigned shadow of immutable 2.5.5.'
+  return
+}
 if ([string]$info.factorio_version -eq "2.0") {
   if ([string]$info.version -ne "2.5.0" -or [string]$backport.mir_version -ne "2.5.0" -or
       [string]$backport.branch -ne "tmp/2.0" -or [string]$backport.candidate_id -notmatch '^2\.5-P[0-9]+$' -or

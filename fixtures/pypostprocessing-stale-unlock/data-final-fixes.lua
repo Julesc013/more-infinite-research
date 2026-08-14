@@ -7,3 +7,10 @@ if #technology.effects ~= 2 then
 end
 
 table.insert(technology.effects, 2, {type = "unlock-recipe", recipe = "casting-gear"})
+
+local reconstructed = technology.effects[2]
+if #technology.effects ~= 3 or not reconstructed
+  or reconstructed.type ~= "unlock-recipe" or reconstructed.recipe ~= "casting-gear" then
+  error("MIR Py ordering fixture did not reconstruct the late stale casting-gear unlock")
+end
+log("[mir-fixture] Py late stale-unlock reconstruction complete")

@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local technology_effects = require("prototypes.mir.integrity.technology_effects")
+local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
@@ -84,14 +85,6 @@ local function derive_stream_row(source_row)
   row.gates = shallow_copy(source_row.gates)
   if source_row.fields then row.fields = shallow_copy(source_row.fields) end
   return row
-end
-
-local function copy_operation_without_design(source_operation)
-  local operation = {}
-  for key, value in pairs(source_operation) do
-    if key ~= "technology_design" then operation[key] = deepcopy(value) end
-  end
-  return operation
 end
 
 local function copy_operation_with_design_view(source_operation)
@@ -447,6 +440,10 @@ local function apply_weapon_overlap_policy(operation, stream_operations, stream_
   if operation.key ~= "weapon-shooting-speed" then return operation end
   if mode == "off" then
     operation.planned_policy = "weapon-speed-overlap-retained"
+    operation.planned_overlap_identities = {
+      [generation_plan.effect_identity({type = "gun-speed", ammo_category = "rocket"})] = true,
+      [generation_plan.effect_identity({type = "gun-speed", ammo_category = "cannon-shell"})] = true
+    }
     return operation
   end
   local strip = {}
@@ -507,8 +504,8 @@ local function validate_operations(operations)
       local identity = generation_plan.effect_identity(effect)
       if identity ~= "" then
         if effects[identity] then
-          if operation.planned_policy == "weapon-speed-overlap-retained"
-            or effects[identity].planned_policy == "weapon-speed-overlap-retained" then
+          if (operation.planned_overlap_identities or {})[identity] == true
+            or (effects[identity].planned_overlap_identities or {})[identity] == true then
             table.insert(planned_overlaps, {
               identity = identity,
               owners = {effects[identity].technology_name, operation.technology_name},
@@ -563,7 +560,9 @@ local function compilation_operation_material(operation)
     technology_name = operation.technology_name,
     technology = operation.technology,
     registry = operation.registry,
-    planned_policy = operation.planned_policy
+    planned_policy = operation.planned_policy,
+    planned_overlap_identities = operation.planned_overlap_identities,
+    effect_ownership = operation.effect_ownership
   }
 end
 
@@ -650,15 +649,43 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_operations = {}
   for index, operation in ipairs(operations) do stream_operations[index] = operation end
   local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan, target_inventory)
-  local finalized_base = {}
   for _, operation in ipairs(normalized_base) do
     local normalized = apply_weapon_overlap_policy(
       operation, stream_operations, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
     normalized = normalized_base_operation(normalized)
-    table.insert(finalized_base, normalized)
-    table.insert(operations, copy_operation_without_design(normalized))
+    table.insert(operations, copy_operation_with_design_view(normalized))
   end
-  normalized_base = finalized_base
+  local combined_ownership, ownership_omissions
+  operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations)
+  normalized_base = {}
+  for _, operation in ipairs(operations) do
+    if operation.operation == "emit_base_extension" then table.insert(normalized_base, operation) end
+  end
+  for _, operation in ipairs(ownership_omissions or {}) do
+    base_effect_integrity.skipped_base_extension_count =
+      base_effect_integrity.skipped_base_extension_count + 1
+    table.insert(base_effect_integrity.rejected_candidates, {
+      schema = 1,
+      candidate_id = "base-continuation/" .. tostring(operation.key),
+      key = operation.key,
+      technology_name = operation.technology_name,
+      manifest_id = operation.manifest_id,
+      action = "reject",
+      reason = "covered_by_planned_operation",
+      gates = operation.gates,
+      technology_design = operation.technology_design,
+      design_fingerprint = operation.technology_design.design_fingerprint,
+      effect_ownership = operation.effect_ownership,
+      candidate_fingerprint = fingerprint.of({
+        key = operation.key,
+        technology_name = operation.technology_name,
+        reason = "covered_by_planned_operation",
+        design_fingerprint = operation.technology_design.design_fingerprint,
+        gates = operation.gates,
+        effect_ownership = operation.effect_ownership
+      })
+    })
+  end
   validate_operations(operations)
   local graph_summary = technology_graph.validate_operations(operations)
   stream_artifact = apply_graph_decisions(stream_artifact, graph_summary)
@@ -698,6 +725,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     base_extension_operations = normalized_base,
     validation_summary = validation_summary
   }
+  validation_summary.effect_ownership = combined_ownership
   artifact.compilation_fingerprint = fingerprint.of(compilation_material(artifact))
   local base_candidates_by_id = {}
   for _, candidate in ipairs(planned_base_candidates) do base_candidates_by_id[candidate.candidate_id] = candidate end

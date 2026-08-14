@@ -1,13 +1,20 @@
 schema: 1
 
 release:
-  version: "2.5.5"
-  branch: candidate/2.5.5-projection
+  version: "2.5.9"
+  branch: candidate/2.5.9-projection
   factorio_version: "2.0"
-  baseline_commit: bea21b068fb38dc26479b619454e50d5b4cf4793
-  baseline_tag: "2.5.0"
+  baseline_commit: 27877275854eb131efeb42672d3676c9c513c85e
+  baseline_tag: "2.5.5"
+  pre_dot5_public_predecessor: "2.5.0"
+  portable_source_release: "3.2.9"
+  portable_source_commit: 5496896914666158ad4056026819528395861540
+  target_profile: "factorio-2.0"
+  target_adapter: "factorio-2.0-science-route-policy"
+  target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64,factorio-2.0-terminal-shadow-qualification-v1@98182f4aa303d7f48339b5e3cf50e56f4dbeb53c,factorio-2.0-terminal-shadow-performance-authority-v1@85598cb326502e6707c1d9d1101dfd42aab56978,factorio-2.0-terminal-shadow-review-authority-v1@0568025c6776470eb96fa0f597be656af406076c,factorio-2.0-validation-userdata-v1@02af30d18db2988a6b1ba724fb56a22317a18474,factorio-2.0-scenario-authority-parity-v1@49daec6d9ce1f20861ca73d28bfe584333433125,factorio-2.0-py-proof-transport-v1@e2bd416e6a38805f221a719f119de22c2a79d516,factorio-2.0-combined-effect-ownership-v1@ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b,factorio-2.0-late-p0-authority-reconciliation-v1@bde8eda3b3ccc59bfe50016a3729531d6dbed44f"
   objective: target-port-behavioral-subset
-  public_contract_change: minor-compatible
+  public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944

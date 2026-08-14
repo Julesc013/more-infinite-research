@@ -227,6 +227,8 @@ fixtures:
       - exact-single-reviewed-external-sanitation-row
       - zero-additional-unreviewed-prunes
       - final-unlock-recipe-target-integrity
+      - full-sanitation-ledger-when-mod-data-supported
+      - target-native-no-mod-data-transport-when-unsupported
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
@@ -247,6 +249,8 @@ fixtures:
       - already-enabled-science-pack-recipe-needs-no-unlock
       - disabled-technology-unlocker-exclusion
       - deterministic-multiple-unlocker-selection
+      - later-alternate-route-cannot-delay-existing-science-production
+      - deterministic-earliest-safe-route-selection
       - direct-science-self-lock-exclusion
       - two-pack-science-cycle-exclusion
       - missing-research-mechanism-exclusion
@@ -479,6 +483,36 @@ fixtures:
       - removed-recipe-target-sanitation
       - independent-result-row-per-upgrade-archetype
       - exact-2-5-5-candidate-normal-mod-directory-load
+
+  upgrade-2-5-5-to-2-5-9:
+    requires_features: [recipe_productivity]
+    targets: ["2.0"]
+    assertion_path: fixtures/assert-upgrade-2-5-5-to-2-5-9
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.5"
+    additional_source_versions: ["2.5.0"]
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-2-5-5-source-archive-for-2-5-9
+      - exact-2-5-0-source-archive-for-2-5-9
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - upgraded-save-reload
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
@@ -775,6 +809,24 @@ fixtures:
       - unchanged-package-roots-through-qualification
       - zero-unreviewed-normalized-differences
 
+  approved-delta-2.5.5-to-2.5.9:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/2.5.5-to-2.5.9.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C
+    validates:
+      - exact-factorio-2.0.77-fourteen-load-delta
+      - exact-immutable-2.5.5-predecessor
+      - unfrozen-candidate-unassigned-2.5.9-shadow
+      - package-source-and-qualification-source-separation
+      - unchanged-package-roots-through-qualification
+      - seven-scenario-technology-prerequisite-setting-registry-parity
+      - zero-technology-differences
+      - ten-identity-only-differences
+      - zero-unreviewed-normalized-differences
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts
@@ -802,6 +854,10 @@ fixtures:
       - partial-loser-retains-unique-effects
       - insertion-order-independent-effect-ownership
       - compilation-plan-cross-collision
+      - combined-plan-direct-effect-ownership
+      - partial-base-continuation-loser-retains-unique-effects
+      - empty-base-continuation-loser-is-omitted
+      - strict-combined-duplicate-validator-retained
       - output-effect-value-parity
       - base-extension-output-parity
       - base-continuation-technology-design-authority

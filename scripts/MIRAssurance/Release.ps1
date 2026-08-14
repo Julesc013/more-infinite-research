@@ -160,6 +160,30 @@ function Get-MIRAssuranceSealSourceAuthority {
   }
 }
 
+function Get-MIRAssurancePerformanceEvidenceArtifact {
+  param([Parameter(Mandatory)]$Bundle)
+
+  $capsules = @($Bundle.evidence | Where-Object { [string]$_.test_id -eq "runtime.performance-regression" })
+  if ($capsules.Count -ne 1 -or [string]$capsules[0].status -ne "passed") {
+    throw "The evidence bundle must contain exactly one passing runtime.performance-regression capsule."
+  }
+  $artifacts = @($capsules[0].artifacts | Where-Object { [string]$_.kind -eq "runtime-performance-evidence" })
+  if ($artifacts.Count -ne 1) {
+    throw "The performance capsule must contain exactly one captured runtime-performance-evidence artifact."
+  }
+  $artifact = $artifacts[0]
+  $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Captured runtime performance evidence is absent: $artifactPath"
+  }
+  $item = Get-Item -LiteralPath $artifactPath
+  if ([long]$artifact.bytes -ne [long]$item.Length -or
+      [string]$artifact.sha256 -ne (Get-MIRAssuranceSha256 -Path $artifactPath)) {
+    throw "Captured runtime performance evidence no longer matches its capsule descriptor."
+  }
+  return $artifact
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -179,7 +203,7 @@ function Invoke-MIRAssuranceSeal {
     throw "Release seals may only be created by the protected-release workflow, environment, ref, and runner."
   }
   $commit = (& git -C $repo rev-parse HEAD).Trim()
-  $branch = (& git -C $repo branch --show-current).Trim()
+  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   $nonGeneratedStatus = @($status | Where-Object {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }
@@ -199,8 +223,11 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
     throw "Verification plan source tree is not the qualification source tree."
   }
-  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+  $performanceArtifact = Get-MIRAssurancePerformanceEvidenceArtifact -Bundle $bundle
+  $performanceArtifactPath = Resolve-MIRAssurancePath -Path ([string]$performanceArtifact.path)
+  $null = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
+    -Path $performanceArtifactPath `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
@@ -224,6 +251,20 @@ function Invoke-MIRAssuranceSeal {
   $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $qualificationRoot = Join-Path $repo ".mir\evidence\qualifications\$($Context.info.version)-factorio-$($Context.target)"
   New-Item -ItemType Directory -Force -Path $qualificationRoot | Out-Null
+  $performanceEvidencePath = Join-Path $qualificationRoot "performance-regression.json"
+  Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force
+  if ((Get-MIRAssuranceSha256 -Path $performanceEvidencePath) -ne [string]$performanceArtifact.sha256) {
+    throw "Durable performance evidence differs from the exact captured assurance artifact."
+  }
+  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+    -RepoRoot $repo `
+    -Path $performanceEvidencePath `
+    -Candidate $Context.candidate `
+    -PriorRelease $Context.prior_release `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $commit `
+    -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $planSnapshotPath = Join-Path $qualificationRoot "verification-plan.json"
   $bundleSnapshotPath = Join-Path $qualificationRoot "evidence-bundle.json"
   Write-MIRAssuranceAtomicJson -Value $plan -Path $planSnapshotPath
@@ -509,6 +550,62 @@ function Invoke-MIRAssuranceSelfTest {
   foreach ($candidateId in @('C0', 'C01', 'c16', '2-P1', '2.5P6', '2.5-P0', '2.5-P01', 'P6')) {
     if (Test-MIRAssuranceCandidateId -CandidateId $candidateId) {
       throw "Invalid release candidate ID was accepted: $candidateId"
+    }
+  }
+
+  $shadowContext = [pscustomobject]@{
+    target = '2.0'
+    info = [pscustomobject]@{version='2.5.9'}
+  }
+  $shadowAuthority = [pscustomobject]@{
+    version='2.5.9'
+    candidate_id=$null
+    package_source_commit=('a' * 40)
+    package_source_sha256=('B' * 64)
+    archive_sha256=('C' * 64)
+    package_content_sha256=('D' * 64)
+  }
+  $shadowCampaign = [pscustomobject]@{
+    schema=2
+    phase='shadow-convergence'
+    release='2.5.9'
+    factorio_line='2.0'
+    candidate=[pscustomobject]@{
+      state='development-shadow-unfrozen'
+      candidate_id=$null
+      version='2.5.9'
+      package_source_commit=('a' * 40)
+      package_source_sha256=('B' * 64)
+      archive_sha256=('C' * 64)
+      package_content_sha256=('D' * 64)
+    }
+  }
+  $null = Assert-MIRAssurancePerformanceCampaignAuthority -Campaign $shadowCampaign -Authority $shadowAuthority -Context $shadowContext
+  $tamperedShadowCampaign = ($shadowCampaign | ConvertTo-Json -Depth 10) | ConvertFrom-Json
+  $tamperedShadowCampaign.candidate.archive_sha256 = 'E' * 64
+  $tamperedShadowRejected = $false
+  try {
+    $null = Assert-MIRAssurancePerformanceCampaignAuthority -Campaign $tamperedShadowCampaign -Authority $shadowAuthority -Context $shadowContext
+  } catch {
+    $tamperedShadowRejected = $true
+  }
+  if (-not $tamperedShadowRejected) {
+    throw 'A terminal shadow performance campaign with divergent package authority was accepted.'
+  }
+  if ([string]$Context.target -eq '2.0' -and [string]$Context.info.version -eq '2.5.9') {
+    $shadowManifestPath = Join-Path $repo '.mir\releases\terminal\shadows\2.5.9\package-manifest.json'
+    $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+    $expectedShadowSourceCommit = [string]$shadowManifest.source.performance_transition.development_package.package_source_commit
+    if ($expectedShadowSourceCommit -notmatch '^[0-9a-f]{40}$') {
+      throw 'The terminal shadow package manifest does not bind an exact package-source commit.'
+    }
+    $shadowReviewCommand = Resolve-MIRAssuranceCommandText `
+      -Command './scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -ExpectedSourceCommit <package-source-commit>' `
+      -Context $Context `
+      -Plan ([pscustomobject]@{baseline='2.5.5';source_commit=((& git -C $repo rev-parse HEAD).Trim())})
+    if ($shadowReviewCommand -match '<[^>]+>' -or
+        $shadowReviewCommand -notmatch [regex]::Escape("-ExpectedSourceCommit '$expectedShadowSourceCommit'")) {
+      throw 'The terminal shadow manual-review command did not resolve the exact package-source commit.'
     }
   }
 
@@ -861,41 +958,66 @@ function Invoke-MIRAssuranceSelfTest {
 
   $freshnessProducer = Get-MIRAssuranceProducer
   $freshnessGeneratedAt = (Get-Date).ToUniversalTime().ToString("o")
+  $freshnessPlanMaterial = Get-MIRAssuranceTextHash -Text "freshness-plan-$([guid]::NewGuid().ToString('N'))"
   $freshnessTest = [pscustomobject][ordered]@{
     id="self-test.freshness"
+    fingerprint=[pscustomobject]$fingerprint
     force_fresh=$true
     minimum_completed_at=$freshnessGeneratedAt
-    required_run_id=[string]$freshnessProducer.run_id
-    required_run_attempt=[string]$freshnessProducer.run_attempt
+    required_campaign_id="plan-$($freshnessPlanMaterial.ToLowerInvariant())"
+    required_campaign_plan_material_sha256=$freshnessPlanMaterial
   }
   $freshnessPlan = [pscustomobject][ordered]@{
     producer=$freshnessProducer
     source_commit=[string]$freshnessProducer.commit
     generated_at=$freshnessGeneratedAt
+    plan_material_sha256=$freshnessPlanMaterial
+    campaign=[pscustomobject][ordered]@{
+      schema="mir-assurance-campaign-v1"
+      id=[string]$freshnessTest.required_campaign_id
+      plan_material_sha256=$freshnessPlanMaterial
+      created_at=$freshnessGeneratedAt
+    }
     reuse_enabled=$false
     rerun_tests=@()
     tests=@($freshnessTest)
   }
   $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
-  $freshnessTest.required_run_id = "tampered-run"
+  $freshnessTest.required_campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'tampered-campaign').ToLowerInvariant())"
   $tamperedFreshnessRejected = $false
   try {
     $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
   } catch { $tamperedFreshnessRejected = $true }
   if (-not $tamperedFreshnessRejected) {
-    throw "Tampered fresh-evidence run binding was accepted."
+    throw "Tampered fresh-evidence campaign binding was accepted."
   }
   if ([string]$Context.trust_class -eq "untrusted-local") {
-    $freshnessTest.required_run_id = "local-plan-$([guid]::NewGuid().ToString('N'))"
+    $freshnessTest.required_campaign_id = [string]$freshnessPlan.campaign.id
     $boundProducer = Get-MIRAssuranceEvidenceProducer -Test $freshnessTest -Plan $freshnessPlan -Context $Context
-    if ([string]$boundProducer.run_id -ne [string]$freshnessTest.required_run_id -or
-        [string]$boundProducer.run_attempt -ne [string]$freshnessTest.required_run_attempt) {
+    if ([string]$boundProducer.campaign_id -ne [string]$freshnessTest.required_campaign_id -or
+        [string]$boundProducer.campaign_plan_material_sha256 -ne [string]$freshnessTest.required_campaign_plan_material_sha256) {
       throw "A local worker did not adopt the plan-owned fresh-evidence identity."
     }
     if ($boundProducer.Contains("Count") -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.verifier_sha256) -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.policy_sha256)) {
       throw "A local worker serialized a dictionary wrapper instead of the producer attestation."
+    }
+
+    $checkpointCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+    $checkpointCapsule.producer = $boundProducer
+    $checkpointCapsule.completed_at = (Get-Date).ToUniversalTime().ToString("o")
+    $checkpointCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $checkpointCapsule
+    $null = Write-MIRAssuranceAttempt -Capsule $checkpointCapsule
+    $checkpoint = Get-MIRAssuranceCampaignCheckpoint -Test $freshnessTest -Plan $freshnessPlan -Context $Context
+    if ($null -eq $checkpoint -or [string]$checkpoint.disposition -ne "CHECKPOINT") {
+      throw "An exact completed campaign row was not checkpointed for a resumed coordinator."
+    }
+    $wrongCampaignCapsule = ($checkpointCapsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
+    $wrongCampaignCapsule.producer.campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'wrong-campaign').ToLowerInvariant())"
+    $wrongCampaignCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $wrongCampaignCapsule
+    if (Test-MIRAssuranceFreshCampaignEvidence -Capsule $wrongCampaignCapsule -Test $freshnessTest -Plan $freshnessPlan) {
+      throw "A fresh checkpoint from another plan campaign was accepted."
     }
   }
 
@@ -1090,6 +1212,17 @@ function Invoke-MIRAssuranceSelfTest {
       [string]$preflightPlanResults[0].message -notmatch "requires --factorio") {
     throw "Assurance plan execution discarded a preflight failure."
   }
+  $checkpointExecution = [ordered]@{}
+  $checkpointResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($preflightTest)}) `
+    -Context ([pscustomobject][ordered]@{factorio=""}) `
+    -TimeBudgetSeconds 0 `
+    -ExecutionState $checkpointExecution)
+  if ([string]$checkpointExecution.status -ne "checkpointed" -or
+      [string]$checkpointExecution.next_test_id -ne [string]$preflightTest.id -or
+      $checkpointResults.Count -ne 0) {
+    throw "A planned time budget did not checkpoint before dispatching the next row."
+  }
 
   $truncatedPlanRejected = $false
   $truncatedPlan = [pscustomobject][ordered]@{
@@ -1109,6 +1242,17 @@ function Invoke-MIRAssuranceSelfTest {
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
+
+  $performanceOutput = Join-Path $repo "artifacts\assurance\self-test\performance-regression.json"
+  $resolvedPerformance = Resolve-MIRAssuranceCommandText `
+    -Command "./scripts/Invoke-MIRPerformanceQualification.ps1 -OutputPath <test-output>" `
+    -Context $Context `
+    -Plan $plan `
+    -TestOutput $performanceOutput
+  if ($resolvedPerformance -match '<test-output>' -or
+      $resolvedPerformance -notmatch [regex]::Escape($performanceOutput)) {
+    throw "Worker-local performance output binding self-test failed."
+  }
 
   Write-Host "[ok] MIR assurance classifier, plan closure, structured evidence, lease ownership, trust, freshness binding, blocking, and version-only reuse tests passed."
 }

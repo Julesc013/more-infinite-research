@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.9
+Date: 2026-08-12
+
+  Bugfixes:
+
+    - Prevented a later alternate recipe for an existing science pack from delaying generated research behind that route.
+
+  Compatibility:
+
+    - Added deterministic earliest-safe science production route selection for Factorio 2.0.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.5.5
 Date: 2026-08-07
 

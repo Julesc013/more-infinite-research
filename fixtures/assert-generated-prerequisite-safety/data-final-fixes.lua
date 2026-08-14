@@ -36,6 +36,27 @@ if fixture_prerequisite ~= "mir-fixture-custom-unlocker-a" then
   fail("deterministic unlock selection chose " .. tostring(fixture_prerequisite) .. ".")
 end
 
+local alternate_status, alternate_prerequisite = science.pack_production_status(
+  "mir-fixture-alternate-route-science-pack")
+if alternate_status ~= "research" then
+  fail("alternate-route fixture science should be researchable, got " .. tostring(alternate_status) .. ".")
+end
+if alternate_prerequisite ~= "mir-fixture-z-early-route-unlocker" then
+  fail("a later alternate route delayed science behind " .. tostring(alternate_prerequisite) .. ".")
+end
+local alternate_route = science.production_route_for_pack("mir-fixture-alternate-route-science-pack")
+if not alternate_route or alternate_route.recipe ~= "mir-fixture-alternate-route-early" then
+  fail("alternate-route provenance did not retain the earliest safe recipe.")
+end
+if alternate_route.provenance.selection_policy ~= "SciencePackProductionRoutePolicyV1" then
+  fail("alternate-route provenance did not bind SciencePackProductionRoutePolicyV1.")
+end
+alternate_route.recipe = "tampered-by-fixture"
+if science.production_route_for_pack("mir-fixture-alternate-route-science-pack").recipe
+    ~= "mir-fixture-alternate-route-early" then
+  fail("alternate-route cache escaped its defensive-copy boundary.")
+end
+
 for _, unreachable_pack in ipairs({
   "mir-fixture-self-lock-science-pack",
   "mir-fixture-cycle-science-pack-a",

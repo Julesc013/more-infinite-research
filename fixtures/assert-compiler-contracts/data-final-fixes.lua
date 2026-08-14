@@ -1017,6 +1017,93 @@ expect_error("CompilationPlan cross collision", "technology-name collision", fun
   }})
 end)
 
+do
+(function()
+local combined_tesla_row = emitted_row(
+  "research_electric_shooting_speed",
+  "mir-combined-tesla-speed"
+)
+combined_tesla_row.fields.effects = {
+  {type = "gun-speed", ammo_category = "tesla", modifier = 0.2}
+}
+combined_tesla_row.technology_design = technology_design.from_generation_row(combined_tesla_row)
+local combined_tesla_stream_plan = generation_plan.new()
+combined_tesla_stream_plan:add(combined_tesla_row)
+combined_tesla_stream_plan:finalize()
+
+local function combined_base_operation(name, effects)
+  return {
+    operation = "emit_base_extension",
+    key = "weapon-shooting-speed",
+    manifest_id = "base-continuation/" .. name,
+    base_technology_name = "weapon-shooting-speed-6",
+    technology_name = name,
+    technology = {
+      type = "technology",
+      name = name,
+      effects = effects,
+      prerequisites = {"automation"},
+      unit = {
+        ingredients = {{"automation-science-pack", 1}},
+        count_formula = "1",
+        time = 1
+      },
+      max_level = "infinite",
+      upgrade = true
+    }
+  }
+end
+
+local combined_partial_plan = focused_contracts.finalize_compilation(combined_tesla_stream_plan, {
+  combined_base_operation("mir-combined-weapon-speed-partial", {
+    {type = "gun-speed", ammo_category = "tesla", modifier = 0.1},
+    {type = "gun-speed", ammo_category = "laser", modifier = 0.1}
+  })
+})
+local combined_stream_operation, combined_base_operation_result
+for _, operation in ipairs(combined_partial_plan.operations or {}) do
+  if operation.technology_name == "mir-combined-tesla-speed" then
+    combined_stream_operation = operation
+  elseif operation.technology_name == "mir-combined-weapon-speed-partial" then
+    combined_base_operation_result = operation
+  end
+end
+if not combined_stream_operation
+  or #combined_stream_operation.technology.effects ~= 1
+  or combined_stream_operation.technology.effects[1].ammo_category ~= "tesla"
+  or not combined_base_operation_result
+  or #combined_base_operation_result.technology.effects ~= 1
+  or combined_base_operation_result.technology.effects[1].ammo_category ~= "laser"
+  or #combined_base_operation_result.technology_design.design.effects.value ~= 1
+  or combined_base_operation_result.technology_design.design.effects.value[1].ammo_category ~= "laser"
+  or not combined_base_operation_result.effect_ownership
+  or #combined_base_operation_result.effect_ownership.lost ~= 1 then
+  fail("combined-plan ownership did not preserve the dedicated Tesla stream and the base continuation's unique effect")
+end
+
+local combined_empty_plan = focused_contracts.finalize_compilation(combined_tesla_stream_plan, {
+  combined_base_operation("mir-combined-weapon-speed-empty", {
+    {type = "gun-speed", ammo_category = "tesla", modifier = 0.1}
+  })
+})
+if #combined_empty_plan.operations ~= 1
+  or combined_empty_plan.operations[1].technology_name ~= "mir-combined-tesla-speed"
+  or combined_empty_plan.validation_summary.effect_ownership.omitted_operation_count ~= 1
+  or combined_empty_plan.validation_summary.effect_ownership.conflict_count ~= 1 then
+  fail("combined-plan ownership did not cleanly omit an emptied base continuation")
+end
+
+expect_error("strict combined duplicate validator", "duplicate direct-effect identity", function()
+  focused_contracts.finalize_compilation(generation_plan.new():finalize(), {
+    combined_base_operation("mir-combined-within-owner-duplicate", {
+      {type = "gun-speed", ammo_category = "tesla", modifier = 0.1},
+      {type = "gun-speed", ammo_category = "tesla", modifier = 0.2}
+    })
+  })
+end)
+end)()
+end
+
 local partial_sanitation_row = emitted_row(
   "partial-effect-sanitation-stream",
   "partial-effect-sanitation-tech",

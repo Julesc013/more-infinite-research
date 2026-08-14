@@ -94,6 +94,15 @@ foreach ($requiredPolicySnippet in @(
     throw "Performance policy is missing '$requiredPolicySnippet'."
   }
 }
+$scenarioRegistry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") | ConvertFrom-Json
+foreach ($target in @("2.0", "2.1")) {
+  $graphScenarios = @($scenarioRegistry.profiles.$target | Where-Object {
+    [string]$_.name -in @("synthetic-scale-graph", "synthetic-scale-graph-random-order")
+  })
+  if ($graphScenarios.Count -ne 2 -or @($graphScenarios | Where-Object { [int]$_.timeout_seconds -ne 900 }).Count -ne 0) {
+    throw "Target $target graph stress scenarios must retain the governed 900-second process timeout."
+  }
+}
 $requiredTelemetryCounters = @(
   "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
   "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
@@ -159,13 +168,28 @@ $releaseLedgerPath = Join-Path $RepoRoot ".mir\releases.json"
 $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
 $targetKey = "factorio-$([string]$campaign.factorio_line)"
 $activeCandidate = $releaseLedger.development.PSObject.Properties[$targetKey].Value
-if ($null -eq $activeCandidate -or
-    [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
-    [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
-    [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
-    [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
-    [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
-    [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
+$shadowManifestPath = Join-Path $RepoRoot ".mir\releases\terminal\shadows\$([string]$campaign.release)\package-manifest.json"
+$isShadowConvergence = [string]$campaign.phase -eq "shadow-convergence"
+if ($isShadowConvergence) {
+  if (-not (Test-Path -LiteralPath $shadowManifestPath -PathType Leaf)) { throw "Shadow performance campaign lacks a terminal package manifest." }
+  $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
+  $candidateArchive = Join-Path $RepoRoot "dist\more-infinite-research_$([string]$campaign.release).zip"
+  . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+  if ($null -ne $campaign.candidate.candidate_id -or [string]$campaign.candidate.state -ne "development-shadow-unfrozen" -or
+      [bool]$shadowManifest.source_frozen -or $null -ne $shadowManifest.candidate_id -or
+      [string]$campaign.candidate.version -ne [string]$shadowManifest.release -or
+      -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf) -or
+      [string]$campaign.candidate.archive_sha256 -ne (Get-MIRFileSha256 -Path $candidateArchive) -or
+      [string]$campaign.candidate.package_content_sha256 -ne (Get-MIRZipContentFingerprint -Path $candidateArchive)) {
+    throw "Shadow performance campaign must bind exact development bytes without allocating a candidate."
+  }
+} elseif ($null -eq $activeCandidate -or
+          [string]$campaign.candidate.candidate_id -ne [string]$activeCandidate.candidate_id -or
+          [string]$campaign.candidate.version -ne [string]$activeCandidate.mir_version -or
+          [string]$campaign.candidate.package_source_commit -ne [string]$activeCandidate.package_source_commit -or
+          [string]$campaign.candidate.package_source_sha256 -ne [string]$activeCandidate.package_source_sha256 -or
+          [string]$campaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
+          [string]$campaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
   throw "Performance campaign candidate authority differs from the active $targetKey release candidate."
 }
 if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
