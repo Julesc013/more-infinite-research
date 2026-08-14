@@ -7,7 +7,6 @@
   ],
   "release": "2.5.9",
   "remaining_obligations": [
-    "triple-reconstruct-exact-candidate",
     "focused-qualification",
     "candidate-qualification",
     "complete-exact-hash-manual-review",
@@ -15,7 +14,6 @@
     "promote-tag-publish-and-publicly-verify"
   ],
   "remaining_states": [
-    "package-built",
     "focused-qualified",
     "candidate-qualified",
     "manually-accepted",
@@ -27,6 +25,6 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "source-frozen",
+  "state": "package-built",
   "target": "2.0"
 }

@@ -8,15 +8,15 @@ Generated: 2026-08-14
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.9` | `C33` | `C / 33` | `source-frozen` | `package-built` |
-| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `source-frozen` | `package-built` |
-| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `source-frozen` | `package-built` |
-| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `source-frozen` | `package-built` |
-| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `source-frozen` | `package-built` |
-| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `source-frozen` | `package-built` |
-| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `source-frozen` | `package-built` |
-| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `source-frozen` | `package-built` |
-| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `source-frozen` | `package-built` |
+| `3.2.9` | `C33` | `C / 33` | `package-built` | `focused-qualified` |
+| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `package-built` | `focused-qualified` |
+| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `package-built` | `focused-qualified` |
+| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `package-built` | `focused-qualified` |
+| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `package-built` | `focused-qualified` |
+| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `package-built` | `focused-qualified` |
+| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `package-built` | `focused-qualified` |
+| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `package-built` | `focused-qualified` |
+| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `package-built` | `focused-qualified` |
 
 ## Canonical execution programme
 
@@ -97,56 +97,47 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `triple-reconstruct-exact-candidate` for `3.2.9`
 - [ ] `focused-qualification` for `3.2.9`
 - [ ] `candidate-qualification` for `3.2.9`
 - [ ] `complete-exact-hash-manual-review` for `3.2.9`
 - [ ] `target-and-family-seal` for `3.2.9`
 - [ ] `promote-tag-publish-and-publicly-verify` for `3.2.9`
 - [ ] `archive-and-mir4-handoff` for `3.2.9`
-- [ ] `triple-reconstruct-exact-candidate` for `2.5.9`
 - [ ] `focused-qualification` for `2.5.9`
 - [ ] `candidate-qualification` for `2.5.9`
 - [ ] `complete-exact-hash-manual-review` for `2.5.9`
 - [ ] `target-and-family-seal` for `2.5.9`
 - [ ] `promote-tag-publish-and-publicly-verify` for `2.5.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.9.9`
 - [ ] `focused-qualification` for `1.9.9`
 - [ ] `candidate-qualification` for `1.9.9`
 - [ ] `complete-exact-hash-manual-review` for `1.9.9`
 - [ ] `target-and-family-seal` for `1.9.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.9.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.8.9`
 - [ ] `focused-qualification` for `1.8.9`
 - [ ] `candidate-qualification` for `1.8.9`
 - [ ] `complete-exact-hash-manual-review` for `1.8.9`
 - [ ] `target-and-family-seal` for `1.8.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.8.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.7.9`
 - [ ] `focused-qualification` for `1.7.9`
 - [ ] `candidate-qualification` for `1.7.9`
 - [ ] `complete-exact-hash-manual-review` for `1.7.9`
 - [ ] `target-and-family-seal` for `1.7.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.7.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.6.9`
 - [ ] `focused-qualification` for `1.6.9`
 - [ ] `candidate-qualification` for `1.6.9`
 - [ ] `complete-exact-hash-manual-review` for `1.6.9`
 - [ ] `target-and-family-seal` for `1.6.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.6.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.5.9`
 - [ ] `focused-qualification` for `1.5.9`
 - [ ] `candidate-qualification` for `1.5.9`
 - [ ] `complete-exact-hash-manual-review` for `1.5.9`
 - [ ] `target-and-family-seal` for `1.5.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.5.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.4.9`
 - [ ] `focused-qualification` for `1.4.9`
 - [ ] `candidate-qualification` for `1.4.9`
 - [ ] `complete-exact-hash-manual-review` for `1.4.9`
 - [ ] `target-and-family-seal` for `1.4.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.4.9`
-- [ ] `triple-reconstruct-exact-candidate` for `1.3.9`
 - [ ] `focused-qualification` for `1.3.9`
 - [ ] `candidate-qualification` for `1.3.9`
 - [ ] `complete-exact-hash-manual-review` for `1.3.9`

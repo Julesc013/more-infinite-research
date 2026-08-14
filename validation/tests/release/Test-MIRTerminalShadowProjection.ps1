@@ -203,7 +203,7 @@ foreach ($row in @($profiles.targets)) {
       (@($matrixRow[0].upgrade_rows) -join "|") -ne (@($row.upgrade_rows) -join "|") -or
       [string]$record.release -ne [string]$row.release -or [string]$record.target -ne [string]$row.factorio_line -or
       [string]$record.source_release.release -ne [string]$row.baseline.release -or
-      [string]$record.state -ne "source-frozen" -or [string]$record.candidate_id -ne [string]$record.candidate_allocation.assigned_id) {
+      [string]$record.state -ne "package-built" -or [string]$record.candidate_id -ne [string]$record.candidate_allocation.assigned_id) {
     throw "Terminal target, admission, release record, and projection profile disagree for $($row.release)."
   }
   if ((@($admissionRow[0].findings) -join "|") -ne (@($row.product_findings) -join "|")) {

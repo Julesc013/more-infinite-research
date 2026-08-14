@@ -14,6 +14,7 @@ $authorityNames = @(
   "MIR3-Terminal-ScopeFirewallV1",
   "MIR3-Terminal-Target-MatrixV1",
   "MIR3-Terminal-Candidate-AllocationV1",
+  "MIR3TerminalCandidateReconstructionReceiptV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3TerminalFixedPointReceiptV1",
   "MIR3TerminalSourceFreezeV1",
@@ -88,9 +89,14 @@ foreach ($row in @($admission.stack)) {
   $expectedFirstParent = [string]$row.merge_commit
 }
 if ($expectedFirstParent -ne [string]$admission.foundation.commit) { throw "Foundation merge sequence does not terminate at the admitted commit." }
-if ((Get-FileHash -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.wave_index_sha256 -or
-    (Get-FileHash -LiteralPath (Join-Path $RepoRoot ".mir\distributions.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.distribution_ledger_sha256) {
+if ((Get-FileHash -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.wave_index_sha256) {
   throw "Foundation .5 authority files drifted after admission."
+}
+$foundationDistributionLedger = @(& git -C $RepoRoot show "$($admission.foundation.commit):.mir/distributions.json")
+$foundationDistributionLedgerBytes = [Text.Encoding]::UTF8.GetBytes(($foundationDistributionLedger -join "`r`n") + "`r`n")
+$foundationDistributionLedgerHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($foundationDistributionLedgerBytes))
+if ($LASTEXITCODE -ne 0 -or $foundationDistributionLedgerHash -ne [string]$admission.dot5_identity_authority.distribution_ledger_sha256) {
+  throw "Foundation .5 distribution authority is not preserved at the admitted commit."
 }
 . (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -228,8 +234,8 @@ if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work 
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
-    [string]$programme.status -ne "candidates-allocated-ready-for-reconstruction") {
-  throw "Terminal programme must bind the exact fixed-point-accepted, source-frozen, candidate-allocated nine-release family."
+    [string]$programme.status -ne "candidates-reconstructed-ready-for-automated-qualification") {
+  throw "Terminal programme must bind the exact fixed-point-accepted, source-frozen, reconstructed nine-candidate family."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -246,6 +252,7 @@ $productIntakeSchemaByKind = @{
   "MIR3-Engine-Gap-AuditV1" = "mir3-engine-gap-audit"
   "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
   "MIR3TerminalFixedPointReceiptV1" = "mir3-terminal-fixed-point-receipt"
+  "MIR3TerminalCandidateReconstructionReceiptV1" = "mir3-terminal-candidate-reconstruction"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -467,14 +474,36 @@ $expectedCandidates = @{
   "3.2.9" = "C33"; "2.5.9" = "2.5-P13"; "1.9.9" = "1.9-P1"; "1.8.9" = "1.8-P1"; "1.7.9" = "1.7-P1"
   "1.6.9" = "1.6-P1"; "1.5.9" = "1.5-P1"; "1.4.9" = "1.4-P1"; "1.3.9" = "1.3-P1"
 }
+$reconstruction = $authorities["MIR3TerminalCandidateReconstructionReceiptV1"]
+$reconstructionPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalCandidateReconstructionReceiptV1.json"
+$reconstructionSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-candidate-reconstruction.schema.json"
+if (-not ((Get-Content -Raw -LiteralPath $reconstructionPath) | Test-Json -SchemaFile $reconstructionSchemaPath) -or
+    [string]$programme.authorities.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
+    [string]$reconstruction.status -ne "passed-ready-for-automated-qualification" -or
+    [string]$reconstruction.source_authorities.allocation -ne ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json" -or
+    (Get-FileHash -LiteralPath $allocationPath -Algorithm SHA256).Hash -ne [string]$reconstruction.source_authorities.allocation_raw_sha256 -or
+    [string]$reconstruction.source_authorities.allocation_merge.commit -ne "e2399afb117a641fa66c4043de41586dd15b7a67" -or
+    [string]$reconstruction.source_authorities.allocation_merge.tree -ne "d423e957e281371fb8ea69660b5f44f00588edc8" -or
+    [string]$reconstruction.source_authorities.post_merge_runs.result -ne "passed" -or
+    [int]$reconstruction.summary.targets -ne 9 -or [int]$reconstruction.summary.attempts -ne 27 -or
+    [int]$reconstruction.summary.passed -ne 27 -or [int]$reconstruction.summary.failed -ne 0 -or
+    [int]$reconstruction.summary.identity_mismatches -ne 0 -or [int]$reconstruction.summary.forbidden_package_entries -ne 0 -or
+    @($reconstruction.targets).Count -ne 9 -or (@($reconstruction.targets.release) -join "|") -ne ($family -join "|") -or
+    [bool]$reconstruction.boundaries.automated_qualification_complete -or [bool]$reconstruction.boundaries.manual_review_complete -or
+    [bool]$reconstruction.boundaries.target_seals_created -or [bool]$reconstruction.boundaries.family_seal_created -or
+    [bool]$reconstruction.boundaries.tags_created -or [bool]$reconstruction.boundaries.publication_permitted -or
+    [bool]$reconstruction.boundaries.dot5_package_bytes_changed) {
+  throw "Terminal candidate reconstruction receipt is incomplete, malformed, or crosses a later gate."
+}
 $canonicalCandidate = @($allocation.allocations | Where-Object release -eq "3.2.9")
 if ($canonicalCandidate.Count -ne 1) { throw "The canonical terminal candidate allocation is missing." }
 foreach ($release in $family) {
   $row = @($allocation.allocations | Where-Object release -eq $release)
+  $reconstructed = @($reconstruction.targets | Where-Object release -eq $release)
   $recordPath = Join-Path $RepoRoot ".mir\releases\records\$release.json"
   $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
   $targetFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json") | ConvertFrom-Json -Depth 100
-  if ($row.Count -ne 1 -or [string]$record.state -ne "source-frozen" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+  if ($row.Count -ne 1 -or $reconstructed.Count -ne 1 -or [string]$record.state -ne "package-built" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
       [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
       [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
       [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
@@ -483,10 +512,42 @@ foreach ($release in $family) {
       [string]$record.package.source_commit -ne [string]$row[0].package_source_commit -or
       [string]$record.package.source_tree -ne [string]$row[0].package_source_tree -or
       [string]$record.package.source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$record.package.archive -ne [string]$reconstructed[0].dist_path -or
+      [string]$record.package.archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$record.package.content_sha256 -ne [string]$row[0].content_sha256 -or
+      [long]$record.package.bytes -ne [long]$row[0].bytes -or [int]$record.package.entries -ne [int]$row[0].entries -or
+      [string]$record.proofs.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
+      [string]$reconstructed[0].candidate -ne [string]$row[0].assigned_id -or
+      [string]$reconstructed[0].candidate_commit -ne [string]$row[0].candidate_commit -or
+      [string]$reconstructed[0].candidate_tree -ne [string]$row[0].candidate_tree -or
+      [string]$reconstructed[0].package_source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$reconstructed[0].archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$reconstructed[0].content_sha256 -ne [string]$row[0].content_sha256 -or
+      [long]$reconstructed[0].bytes -ne [long]$row[0].bytes -or [int]$reconstructed[0].entries -ne [int]$row[0].entries -or
+      (@($reconstructed[0].attempts) -join "|") -ne "A|B|C" -or [int]$reconstructed[0].clean_detached_roots -ne 3 -or
+      -not [bool]$reconstructed[0].identities_equal -or
       [string]$row[0].archive_sha256 -ne [string]$targetFreeze.package.archive_sha256 -or
       [string]$row[0].content_sha256 -ne [string]$targetFreeze.package.content_sha256 -or
       [long]$row[0].bytes -ne [long]$targetFreeze.package.bytes -or [int]$row[0].entries -ne [int]$targetFreeze.package.entries) {
     throw "Terminal release/candidate authority disagrees for $release."
+  }
+  $candidateArchive = Join-Path $RepoRoot ([string]$reconstructed[0].dist_path)
+  if (-not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) { throw "Reconstructed candidate archive is missing: $release" }
+  $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidateArchive)
+  try {
+    $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) })
+    $forbiddenEntries = @($candidateEntries | Where-Object {
+      $_.FullName -match '/(docs|fixtures|scripts|tests|\.mir|\.codex|\.github|build|dist)/' -or
+      $_.FullName -match '/(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$'
+    })
+  } finally {
+    $candidateZip.Dispose()
+  }
+  if ((Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash -ne [string]$row[0].archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $candidateArchive) -ne [string]$row[0].content_sha256 -or
+      (Get-Item -LiteralPath $candidateArchive).Length -ne [long]$row[0].bytes -or
+      $candidateEntries.Count -ne [int]$row[0].entries -or $forbiddenEntries.Count -ne 0) {
+    throw "Reconstructed candidate archive identity or composition differs from authority: $release"
   }
   $candidateTree = (& git -C $RepoRoot rev-parse "$($row[0].candidate_commit)^{tree}").Trim()
   $candidateParents = @((& git -C $RepoRoot rev-list --parents -n 1 ([string]$row[0].candidate_commit)).Trim() -split '\s+')
@@ -876,8 +937,8 @@ if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $curr
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "candidates-allocated-ready-for-reconstruction") {
-  throw "Current release roles do not distinguish published .5 from source-frozen, candidate-assigned .9."
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "candidates-reconstructed-ready-for-automated-qualification") {
+  throw "Current release roles do not distinguish published .5 from reconstructed, unqualified .9 candidates."
 }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json

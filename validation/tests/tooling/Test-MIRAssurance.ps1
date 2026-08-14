@@ -754,7 +754,9 @@ try {
   $dirtyPublicDist = Join-Path $workerRoot "dist\more-infinite-research_3.2.5.zip"
   $stream = [IO.File]::Open($dirtyPublicDist, [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
   try { $stream.WriteByte(0) } finally { $stream.Dispose() }
-  if (@(& git -C $workerRoot status --porcelain -- dist).Count -ne 1) {
+  $dirtyPublishedDistPaths = @(& git -C $workerRoot diff --name-only -- dist)
+  if ($dirtyPublishedDistPaths.Count -ne 1 -or
+      [string]$dirtyPublishedDistPaths[0] -ne "dist/more-infinite-research_3.2.5.zip") {
     throw "Separate-root regression did not create the intended dirty published-dist decoy."
   }
 

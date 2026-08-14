@@ -42,11 +42,11 @@
       "tag_commit": "27877275854eb131efeb42672d3676c9c513c85e"
     },
     "factorio-2.1": {
-      "archive": "",
-      "archive_bytes": null,
+      "archive": "dist/more-infinite-research_3.2.9.zip",
+      "archive_bytes": 1061572,
       "archive_class": "frozen-unreleased-candidate",
-      "archive_entries": null,
-      "archive_sha256": "",
+      "archive_entries": 303,
+      "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
       "assurance_exception_ids": [],
       "branch": "main",
       "candidate_floor": "C33",
@@ -54,10 +54,10 @@
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.9",
-      "package_content_sha256": "",
+      "package_content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
       "package_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
       "package_source_material": {
-        "file_count": null,
+        "file_count": 303,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
         "source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa"
@@ -65,10 +65,9 @@
       "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
       "package_source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa",
       "protected_qualification": "pending",
-      "publication_status": "source-frozen",
-      "qualification": "source-frozen",
+      "publication_status": "package-built",
+      "qualification": "package-built",
       "remaining_obligations": [
-        "triple-reconstruct-exact-candidate",
         "focused-qualification",
         "candidate-qualification",
         "complete-exact-hash-manual-review",
@@ -77,7 +76,6 @@
         "archive-and-mir4-handoff"
       ],
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -89,7 +87,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.5",
-      "status": "C33-source-frozen"
+      "status": "C33-package-built"
     }
   },
   "generated_from": [

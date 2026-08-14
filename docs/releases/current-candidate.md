@@ -24,19 +24,18 @@ superseded_by: []
 | Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `source-frozen` |
+| State | `package-built` |
 | Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
 | Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
-| Archive | `pending` |
-| Archive bytes | `pending` |
-| Archive entries | `pending` |
-| Archive SHA-256 | `pending` |
-| Package content SHA-256 | `pending` |
+| Archive | `dist/more-infinite-research_3.2.9.zip` |
+| Archive bytes | `1061572` |
+| Archive entries | `303` |
+| Archive SHA-256 | `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20` |
+| Package content SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
 
 ## Remaining state transitions
 
-- [ ] `package-built`
 - [ ] `focused-qualified`
 - [ ] `candidate-qualified`
 - [ ] `manually-accepted`
