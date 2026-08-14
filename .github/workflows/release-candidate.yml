@@ -169,7 +169,7 @@ jobs:
             throw "Prior exact-dist evidence was invalidated by controller changes: $($disallowedControllerPaths -join ', ')"
           }
           $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
-          $releaseRecord = Get-Content -Raw -LiteralPath (Join-Path $candidate ".mir/releases/records/$version.json") | ConvertFrom-Json
+          $releaseRecord = Get-Content -Raw -LiteralPath (Join-Path $controller ".mir/releases/records/$version.json") | ConvertFrom-Json
           $summary = Get-Content -Raw -LiteralPath $priorSummaryPath | ConvertFrom-Json
           if ([string]$summary.status -ne 'passed' -or
               [string]$summary.mir_version -ne $version -or
