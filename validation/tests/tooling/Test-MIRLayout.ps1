@@ -494,7 +494,7 @@ foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoo
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
   Where-Object Name -ne "Test-MIRLayout.ps1")
-if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 68) {
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 69) {
   throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
 }
 foreach ($wrapper in $legacyTestWrappers) {

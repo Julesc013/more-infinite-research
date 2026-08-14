@@ -24,6 +24,8 @@
         "tools/lib/assurance/**",
         "validation/tests/tooling/Test-MIRAssurance.ps1",
         "validation/tests/release/Test-MIRTerminalGovernance.ps1",
+        "validation/tests/release/Test-MIRGitHubAdministration.ps1",
+        "tools/commands/release/Test-MIRGitHubAdministration.ps1",
         "validation/tests/release/Test-MIRTerminalShadowProjection.ps1",
         "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
         "fixtures/export-approved-delta/data-final-fixes.lua",

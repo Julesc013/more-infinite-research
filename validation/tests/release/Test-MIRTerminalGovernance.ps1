@@ -5,6 +5,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../
 
 & (Join-Path $RepoRoot "validation/tests/release/Test-MIRTerminalShadowProjection.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation failed." }
+& (Join-Path $RepoRoot "validation/tests/release/Test-MIRGitHubAdministration.ps1") -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { throw "MIR GitHub administration preflight validation failed." }
 
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $authorityNames = @(
