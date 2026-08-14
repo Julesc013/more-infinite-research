@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowTransitionPlanV1",
+  "release": "1.9.9",
+  "target": "1.1",
+  "state": "materialized-source-unfrozen-candidate-unassigned",
+  "shadow_branch": "candidate/1.9.9-projection",
+  "promotion_branch": "tag-only",
+  "immutable_inputs": {
+    "baseline": {
+      "release": "1.9.5",
+      "tag": "1.9.5",
+      "commit": "67036cb43e3e4814626e5abf5ce5df17a6f765f7"
+    },
+    "pre_dot5": {
+      "release": "1.9.4",
+      "tag": "1.9.4",
+      "commit": "426d6d48c6578a786ea7de0f224282baff9d342b"
+    },
+    "portable_source": {
+      "release": "3.2.9",
+      "authority_commit": "5496896914666158ad4056026819528395861540",
+      "authority_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
+      "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+      "product_implementation": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+    },
+    "assurance_overlays": [],
+    "performance_transition": null
+  },
+  "generated_authorities": [
+    "info.json",
+    ".mir/convergence.yml",
+    ".mir/assurance.json",
+    ".mir/releases/records/1.9.9.json",
+    ".mir/releases/terminal/shadows/1.9.9/package-manifest.json",
+    ".mir/releases/terminal/shadows/1.9.9/qualification-context.json",
+    "docs/releases/notes/release-notes-1.9.9.md",
+    "changelog.txt",
+    "scripts/Test-MIRAssurance.ps1",
+    ".github/workflows/validate.yml",
+    ".github/workflows/assurance-fast.yml",
+    "scripts/Invoke-MIRAssurance.ps1",
+    "scripts/Invoke-MIRAssurance.ps1",
+    "scripts/MIRAssurance/Release.ps1",
+    "scripts/Invoke-MIRValidation.ps1",
+    ".mir/releases/terminal/shadows/1.9.9/upgrade-fixtures.json",
+    ".mir/fixtures.yml",
+    "fixtures/assert-upgrade-1-9-5-to-1-9-9",
+    "fixtures/assert-upgrade-1-9-4-to-1-9-9",
+    ".mir/docs.yml",
+    ".mir/backport-source-lock.json",
+    ".mir/releases/terminal/shadows/1.9.9/feature-classification.json"
+  ],
+  "product_findings": [],
+  "product_disposition": "no-product-delta",
+  "receipt_after_proof": ".mir/releases/terminal/shadows/1.9.9/transition-receipt.json",
+  "source_frozen": false,
+  "candidate_id": null
+}
