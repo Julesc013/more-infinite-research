@@ -19,40 +19,68 @@ jobs:
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out immutable release controller
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          path: controller
+
+      - name: Check out exact candidate source
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
+          path: candidate
 
       - name: Verify immutable source identity
         shell: pwsh
         run: |
-          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
+          if ((git -C candidate rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
             throw 'Checked-out source does not match candidate_sha.'
           }
-          if (git status --porcelain --untracked-files=all) {
+          if (git -C candidate status --porcelain --untracked-files=all) {
             throw 'Release-candidate checkout is not clean.'
+          }
+          if (git -C controller status --porcelain --untracked-files=all) {
+            throw 'Release-controller checkout is not clean.'
           }
 
       - name: Build and verify exact archive
+        id: package
         shell: pwsh
         run: |
-          ./tools/commands/package/Build-MIRPackage.ps1
-          $info = Get-Content info.json -Raw | ConvertFrom-Json
-          $archive = "dist/more-infinite-research_$($info.version).zip"
-          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash
-          if ($actual -ne '${{ inputs.archive_sha256 }}') {
-            throw "Archive SHA mismatch: expected ${{ inputs.archive_sha256 }}, got $actual"
+          Push-Location candidate
+          try {
+            ./tools/commands/package/Build-MIRPackage.ps1
+            $info = Get-Content info.json -Raw | ConvertFrom-Json
+          } finally {
+            Pop-Location
           }
+          $candidateArchive = "candidate/dist/more-infinite-research_$($info.version).zip"
+          $controllerArchive = "controller/dist/more-infinite-research_$($info.version).zip"
+          foreach ($archive in @($candidateArchive, $controllerArchive)) {
+            if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) {
+              throw "Required exact candidate archive is absent: $archive"
+            }
+            $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+            if ($actual -ne '${{ inputs.archive_sha256 }}') {
+              throw "Archive SHA mismatch for ${archive}: expected ${{ inputs.archive_sha256 }}, got $actual"
+            }
+          }
+          "candidate_archive=$($candidateArchive.Replace('\', '/'))" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "controller_archive=$($controllerArchive.Replace('\', '/'))" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Run complete exact-dist validation
         shell: pwsh
+        working-directory: controller
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN
 
       - name: Run strict targeted compatibility gate
         shell: pwsh
+        working-directory: controller
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./tools/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull
@@ -64,7 +92,8 @@ jobs:
           include-hidden-files: true
           name: release-candidate-${{ inputs.candidate_sha }}
           path: |
-            dist/*.zip
-            build/results/validation/*.json
-            build/results/release-gate/**
+            ${{ steps.package.outputs.candidate_archive }}
+            ${{ steps.package.outputs.controller_archive }}
+            controller/build/results/validation/*.json
+            controller/build/results/release-gate/**
           if-no-files-found: error
