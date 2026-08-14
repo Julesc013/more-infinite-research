@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-source-freeze.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-source-freeze.schema.json",
+  "title": "MIR 3 terminal family source freeze",
+  "type": "object",
+  "required": ["schema", "kind", "status", "frozen_at", "family", "fixed_point", "repository_protection", "common_source", "authority_roots", "targets", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalSourceFreezeV1"},
+    "status": {"const": "source-frozen-candidates-unassigned"},
+    "frozen_at": {"type": "string", "format": "date-time"},
+    "family": {"type": "array", "minItems": 9, "maxItems": 9, "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"}},
+    "fixed_point": {"$ref": "#/$defs/authority"},
+    "repository_protection": {"$ref": "#/$defs/authority"},
+    "common_source": {
+      "type": "object",
+      "required": ["commit", "tree", "package_source_sha256", "package_file_count", "development_archive"],
+      "properties": {
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"},
+        "package_file_count": {"type": "integer", "minimum": 1},
+        "development_archive": {"$ref": "#/$defs/packageIdentity"}
+      },
+      "additionalProperties": false
+    },
+    "authority_roots": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/authority"}},
+    "targets": {"type": "array", "minItems": 9, "maxItems": 9, "uniqueItems": true, "items": {"type": "string"}},
+    "boundaries": {
+      "type": "object",
+      "required": ["candidate_ids_assigned", "candidate_packages_built", "final_qualification_complete", "manual_review_complete", "tags_created", "publication_permitted", "dot5_package_bytes_changed"],
+      "properties": {
+        "candidate_ids_assigned": {"const": false},
+        "candidate_packages_built": {"const": false},
+        "final_qualification_complete": {"const": false},
+        "manual_review_complete": {"const": false},
+        "tags_created": {"const": false},
+        "publication_permitted": {"const": false},
+        "dot5_package_bytes_changed": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "authority": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}},
+      "additionalProperties": false
+    },
+    "packageIdentity": {
+      "type": "object",
+      "required": ["archive_sha256", "content_sha256", "bytes", "entries"],
+      "properties": {
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

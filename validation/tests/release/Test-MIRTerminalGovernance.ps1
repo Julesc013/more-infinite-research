@@ -16,6 +16,7 @@ $authorityNames = @(
   "MIR3-Terminal-Candidate-AllocationV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3TerminalFixedPointReceiptV1",
+  "MIR3TerminalSourceFreezeV1",
   "MIR3-Terminal-PublicationPolicyV1",
   "MIR3-Terminal-EOL-PolicyV1",
   "MIR3TerminalFoundationAdmissionV1",
@@ -226,9 +227,9 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
-if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or $programme.source_frozen -or
-    [string]$programme.status -ne "fixed-point-accepted-ready-for-source-freeze") {
-  throw "Terminal programme must bind the exact fixed-point-accepted, source-unfrozen nine-release family."
+if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
+    [string]$programme.status -ne "source-frozen-ready-for-candidate-allocation") {
+  throw "Terminal programme must bind the exact fixed-point-accepted, source-frozen nine-release family."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -527,6 +528,64 @@ $fixedPointInputTree = (& git -C $RepoRoot rev-parse "$($fixedPointReceipt.dev_i
 if ($LASTEXITCODE -ne 0 -or $fixedPointInputTree -ne [string]$fixedPointReceipt.dev_input_authority.tree) {
   throw "Terminal fixed-point receipt lost its pre-receipt dev commit/tree binding."
 }
+$sourceFreeze = $authorities["MIR3TerminalSourceFreezeV1"]
+$sourceFreezePath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalSourceFreezeV1.json"
+$sourceFreezeSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-source-freeze.schema.json"
+$targetFreezeSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-target-source-freeze.schema.json"
+if (-not ((Get-Content -Raw -LiteralPath $sourceFreezePath) | Test-Json -SchemaFile $sourceFreezeSchemaPath) -or
+    [string]$programme.authorities.source_freeze -ne ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json" -or
+    [string]$sourceFreeze.status -ne "source-frozen-candidates-unassigned" -or
+    (@($sourceFreeze.family) -join "|") -ne ($family -join "|") -or @($sourceFreeze.targets).Count -ne 9 -or
+    [bool]$sourceFreeze.boundaries.candidate_ids_assigned -or [bool]$sourceFreeze.boundaries.candidate_packages_built -or
+    [bool]$sourceFreeze.boundaries.final_qualification_complete -or [bool]$sourceFreeze.boundaries.manual_review_complete -or
+    [bool]$sourceFreeze.boundaries.tags_created -or [bool]$sourceFreeze.boundaries.publication_permitted -or
+    [bool]$sourceFreeze.boundaries.dot5_package_bytes_changed) {
+  throw "Terminal family source-freeze authority is invalid or crosses a later gate."
+}
+foreach ($binding in @($sourceFreeze.fixed_point, $sourceFreeze.repository_protection) + @($sourceFreeze.authority_roots)) {
+  $bindingPath = Join-Path $RepoRoot ([string]$binding.path)
+  if (-not (Test-Path -LiteralPath $bindingPath -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $bindingPath -Algorithm SHA256).Hash -ne [string]$binding.sha256) {
+    throw "Terminal source-freeze authority root drifted: $($binding.path)"
+  }
+}
+$commonTree = (& git -C $RepoRoot rev-parse "$($sourceFreeze.common_source.commit)^{tree}").Trim()
+if ($LASTEXITCODE -ne 0 -or $commonTree -ne [string]$sourceFreeze.common_source.tree -or
+    [string]$sourceFreeze.common_source.package_source_sha256 -ne "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25" -or
+    [int]$sourceFreeze.common_source.package_file_count -ne 303) {
+  throw "Terminal common source freeze lost its commit, tree, or package-material binding."
+}
+foreach ($release in $family) {
+  $targetPath = Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json"
+  if (-not ((Get-Content -Raw -LiteralPath $targetPath) | Test-Json -SchemaFile $targetFreezeSchemaPath)) {
+    throw "Terminal target source-freeze packet does not match its strict schema: $release"
+  }
+  $targetFreeze = Get-Content -Raw -LiteralPath $targetPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $fixedRow = @($fixedPointReceipt.shadow_trees | Where-Object release -eq $release)
+  $profileRow = @((Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Shadow-ProjectionProfilesV1.json") | ConvertFrom-Json -Depth 100).targets | Where-Object release -eq $release)
+  if ($fixedRow.Count -ne 1 -or $profileRow.Count -ne 1 -or [string]$targetFreeze.status -ne "source-frozen-candidate-unassigned" -or
+      $null -ne $targetFreeze.candidate_id -or [string]$targetFreeze.common_source_commit -ne [string]$sourceFreeze.common_source.commit -or
+      [string]$targetFreeze.shadow_source.commit -ne [string]$fixedRow[0].source.commit -or [string]$targetFreeze.shadow_source.tree -ne [string]$fixedRow[0].source.tree -or
+      [string]$targetFreeze.package.archive_sha256 -ne [string]$fixedRow[0].package.archive_sha256 -or
+      [string]$targetFreeze.package.content_sha256 -ne [string]$fixedRow[0].package.content_sha256 -or
+      [long]$targetFreeze.package.bytes -ne [long]$fixedRow[0].package.bytes -or [int]$targetFreeze.package.entries -ne [int]$fixedRow[0].package.entries -or
+      [string]$targetFreeze.engine.version -ne [string]$profileRow[0].exact_engine -or [string]$targetFreeze.engine.binary_sha256 -ne [string]$profileRow[0].exact_engine_sha256 -or
+      [string]$targetFreeze.profile -ne [string]$profileRow[0].target_profile -or [string]$targetFreeze.adapter -ne [string]$profileRow[0].target_adapter -or
+      (@($targetFreeze.upgrade_rows) -join "|") -ne (@($profileRow[0].upgrade_rows) -join "|") -or
+      [bool]$targetFreeze.boundaries.candidate_assigned -or [bool]$targetFreeze.boundaries.candidate_built -or
+      [bool]$targetFreeze.boundaries.manual_review_complete -or [bool]$targetFreeze.boundaries.sealed -or
+      [bool]$targetFreeze.boundaries.tagged -or [bool]$targetFreeze.boundaries.published) {
+    throw "Terminal target source-freeze packet disagrees with fixed-point/profile authority: $release"
+  }
+  if ((& git -C $RepoRoot rev-parse "$($targetFreeze.shadow_source.commit)^{tree}").Trim() -ne [string]$targetFreeze.shadow_source.tree) {
+    throw "Terminal target source-freeze commit/tree binding is invalid: $release"
+  }
+  foreach ($predecessor in @($targetFreeze.predecessors)) {
+    if ((& git -C $RepoRoot rev-parse "$($predecessor.tag)^{commit}").Trim() -ne [string]$predecessor.commit) {
+      throw "Terminal target source-freeze predecessor tag moved: $release/$($predecessor.role)"
+    }
+  }
+}
 foreach ($root in @($fixedPointReceipt.authority_roots)) {
   $rootPath = Join-Path $RepoRoot ([string]$root.path)
   if (-not (Test-Path -LiteralPath $rootPath -PathType Leaf)) {
@@ -748,12 +807,12 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
     $museum.artificial_dot9_versions_permitted -or @($museum.targets).Count -ne 7) { throw "0.18 or museum custody policy is invalid." }
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
-if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or $current.source_frozen -or
+if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or -not $current.source_frozen -or
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "fixed-point-accepted-ready-for-source-freeze") {
-  throw "Current release roles do not distinguish published .5 from planned .9."
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "source-frozen-ready-for-candidate-allocation") {
+  throw "Current release roles do not distinguish published .5 from source-frozen, candidate-unassigned .9."
 }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json

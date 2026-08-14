@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "kind": "MIR3-Terminal-ProgrammeV1",
-  "status": "fixed-point-accepted-ready-for-source-freeze",
+  "status": "source-frozen-ready-for-candidate-allocation",
   "implementation_admitted": true,
-  "source_frozen": false,
+  "source_frozen": true,
   "family": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
   "execution_order": ["baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication"],
   "authorities": {
@@ -16,6 +16,7 @@
     "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
     "fixed_point_receipt": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "source_freeze": ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json",
     "publication": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
     "eol": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
     "accelerated_closure": ".mir/releases/terminal/MIR3TerminalAcceleratedClosureDecisionV1.json",
@@ -32,5 +33,5 @@
     "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
     "experiments": ".mir/releases/terminal/experiments"
   },
-  "hard_gate": "The accepted fixed-point receipt permits the separate source-freeze transition only; candidate assignment, target seal, family seal, tag, and publication state remain forbidden until their own authorities pass."
+  "hard_gate": "The accepted fixed-point receipt and applied repository protections admit the recorded family and target source freeze. Candidate assignment, target seal, family seal, tag, and publication state remain forbidden until their own authorities pass."
 }

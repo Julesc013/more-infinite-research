@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalSourceFreezeV1",
+  "status": "source-frozen-candidates-unassigned",
+  "frozen_at": "2026-08-14T17:22:05.6046282+10:00",
+  "family": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "fixed_point": {"path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json", "sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"},
+  "repository_protection": {"path": ".mir/releases/terminal/MIR3-Terminal-Protection-HandoffV1.json", "sha256": "2874CCA202026C9A5FB73FA3F6470F0E49FFC567BBC9FDAF811DCCF6C8865E86"},
+  "common_source": {
+    "commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+    "tree": "10ab16096578a8070851d26c5e812fb215b6aafa",
+    "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+    "package_file_count": 303,
+    "development_archive": {"archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20", "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25", "bytes": 1061572, "entries": 303}
+  },
+  "authority_roots": [
+    {"path": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json", "sha256": "B0A51244CFD429E7BF9298D6557B64A045B3F9CFBB749FF1C80D2A4DF4267B05"},
+    {"path": ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json", "sha256": "40798320044B5F0EEA001FFFE0C4D73939E138CCC50E0ED619BEEC9B6ACD6C50"},
+    {"path": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json", "sha256": "01A44EE9001CBE2B70543B09CD2DEB71D058C6DAF66E0A181AC9E45CFB87ADF8"},
+    {"path": ".mir/targets.json", "sha256": "C5A9E97F1C2D2641AA850F08051259EC13220A186CF4510F82D0369526BA7625"},
+    {"path": ".mir/assurance.json", "sha256": "390CC62DAEE57EE29ECF4CD08D67FB58785EFFB4FB17E18298EC7BF6802579A9"},
+    {"path": "validation/tests.yml", "sha256": "ACA91F30D0A6EAE948701E6E40A96AB7BDB4127423E249777B03CACB490E6413"},
+    {"path": "validation/domains.yml", "sha256": "58AF55D55ECDEFCEA08873FECB638B049E390853C85F5074912F8D4AEE4448B4"},
+    {"path": "validation/trust.json", "sha256": "AFAE47443B3705CBC39C2851E069BE00DF62136424666DA5124FD1455A8AEE41"},
+    {"path": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1", "sha256": "A3A675912E70D6BEFF9C3B519620A1FE9D49AA04B08EDF3BEC0B9DF8DD7B3BEF"},
+    {"path": "tools/commands/package/Build-MIRPackage.ps1", "sha256": "9498D0F9AABEF3991D9C2499083F7B91ADCB651EB2E81041B6E451E17879D0CA"},
+    {"path": "tools/lib/validation/PackageIdentity.ps1", "sha256": "4ECBFFA099BF323F4E95C9965DBA118DDB9409847D293DB452697670D4F87CAB"},
+    {"path": "spec/schemas/mir3-terminal-fixed-point-receipt.schema.json", "sha256": "008CEA6B884F2CBE2A0AC89D5E39C03D07EB98C51F324DDBCCC38835BEDE1F97"}
+  ],
+  "targets": [
+    ".mir/releases/terminal/freezes/3.2.9.json", ".mir/releases/terminal/freezes/2.5.9.json", ".mir/releases/terminal/freezes/1.9.9.json",
+    ".mir/releases/terminal/freezes/1.8.9.json", ".mir/releases/terminal/freezes/1.7.9.json", ".mir/releases/terminal/freezes/1.6.9.json",
+    ".mir/releases/terminal/freezes/1.5.9.json", ".mir/releases/terminal/freezes/1.4.9.json", ".mir/releases/terminal/freezes/1.3.9.json"
+  ],
+  "boundaries": {"candidate_ids_assigned": false, "candidate_packages_built": false, "final_qualification_complete": false, "manual_review_complete": false, "tags_created": false, "publication_permitted": false, "dot5_package_bytes_changed": false}
+}
