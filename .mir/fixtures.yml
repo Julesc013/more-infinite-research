@@ -1146,13 +1146,14 @@ fixtures:
       - published-compiler-telemetry-with-isolated-stress-context
       - shallow-acyclic-factorio-engine-graph
       - 100000-in-memory-compiler-technologies
-      - 100000-in-memory-compiler-effects
+      - 100000-in-memory-minimal-graph-authority-operations
       - 100000-in-memory-compiler-graph-edges
       - 25000-node-in-memory-strongly-connected-component
       - 1000-small-in-memory-strongly-connected-components
       - deterministic-randomized-insertion-order
       - operation-set-output-invariance-excludes-environment-identity
       - bounded-64-node-scc-diagnostics
+      - explicit-post-stress-lua-heap-reclamation
       - 900-second-portable-graph-stress-budget
       - high-family-candidate-fanout
       - single-recipe-fact-scan
