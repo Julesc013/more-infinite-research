@@ -613,9 +613,12 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'Checked-out controller does not match the workflow source commit.',
   'Archive SHA mismatch for ${archive}',
   'Run complete exact-dist validation',
+  '-CandidateZip $candidateArchive',
   'Run strict targeted compatibility gate',
   'MIRProtectedReleaseCandidateRunV1',
-  'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}'
+  'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}',
+  "runtime-evidence",
+  'runtime_evidence = $runtimeEvidenceRows'
 )) {
   if (-not $releaseCandidateWorkflow.Contains($requiredReleaseCandidateSnippet)) {
     throw "Protected release-candidate workflow omits its offline exact-root contract: $requiredReleaseCandidateSnippet"

@@ -101,8 +101,19 @@ jobs:
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
-          Push-Location '${{ steps.roots.outputs.controller }}'
-          try { ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN } finally { Pop-Location }
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
+          if ($actual -ne '${{ inputs.archive_sha256 }}') {
+            throw "Exact validation archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          }
+          Push-Location $controller
+          try {
+            ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN -CandidateZip $candidateArchive
+          } finally {
+            Pop-Location
+          }
 
       - name: Run strict targeted compatibility gate
         shell: pwsh
@@ -142,12 +153,44 @@ jobs:
               Copy-Item -LiteralPath $source -Destination $destination -Recurse
             }
           }
+          $runtimeEvidenceRoot = Join-Path $evidenceRoot 'runtime-evidence'
+          $summaryPath = Join-Path $controller 'build/results/validation/factorio-2.1-summary.json'
+          if (Test-Path -LiteralPath $summaryPath -PathType Leaf) {
+            $controllerRoot = [IO.Path]::GetFullPath($controller).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+            $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+            $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+            foreach ($scenario in @($summary.scenarios)) {
+              foreach ($evidencePath in @($scenario.evidence_paths)) {
+                if ([string]::IsNullOrWhiteSpace([string]$evidencePath) -or -not [IO.Path]::IsPathRooted([string]$evidencePath)) { continue }
+                $resolvedEvidence = [IO.Path]::GetFullPath([string]$evidencePath)
+                if (-not $resolvedEvidence.StartsWith($controllerRoot, [StringComparison]::OrdinalIgnoreCase) -or
+                    -not (Test-Path -LiteralPath $resolvedEvidence -PathType Leaf) -or
+                    [IO.Path]::GetExtension($resolvedEvidence) -ne '.log' -or
+                    -not $seen.Add($resolvedEvidence)) { continue }
+                $relativeEvidence = [IO.Path]::GetRelativePath($controller, $resolvedEvidence)
+                $destination = Join-Path $runtimeEvidenceRoot $relativeEvidence
+                New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+                Copy-Item -LiteralPath $resolvedEvidence -Destination $destination
+              }
+            }
+          }
           $archiveRows = @(
             Get-ChildItem -LiteralPath $evidenceRoot -Recurse -Filter '*.zip' -File | Sort-Object FullName | ForEach-Object {
               [ordered]@{
                 path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
                 bytes = $_.Length
                 sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+              }
+            }
+          )
+          $runtimeEvidenceRows = @(
+            if (Test-Path -LiteralPath $runtimeEvidenceRoot) {
+              Get-ChildItem -LiteralPath $runtimeEvidenceRoot -Recurse -File | Sort-Object FullName | ForEach-Object {
+                [ordered]@{
+                  path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
+                  bytes = $_.Length
+                  sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+                }
               }
             }
           )
@@ -161,6 +204,7 @@ jobs:
             candidate_commit = '${{ inputs.candidate_sha }}'
             expected_archive_sha256 = '${{ inputs.archive_sha256 }}'
             archives = $archiveRows
+            runtime_evidence = $runtimeEvidenceRows
             retained_at = [DateTime]::UtcNow.ToString('o')
           }
           [IO.File]::WriteAllText(
