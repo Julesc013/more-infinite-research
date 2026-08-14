@@ -10,6 +10,7 @@ param(
   [switch]$UseCachedDownloads,
   [string]$ModCacheDir = (Join-Path $PSScriptRoot "..\..\..\build\compat-mod-cache"),
   [string]$OutputDir = (Join-Path $PSScriptRoot "..\..\..\build\results\compat-audit"),
+  [string]$RuntimeRoot = $env:MIR_COMPAT_RUNTIME_ROOT,
   [int]$MaxCandidates = 50,
   [int]$CatalogPages = 0,
   [string]$FromLockfile,
@@ -85,6 +86,82 @@ function New-MIRDirectory {
     New-Item -ItemType Directory -Path $Path | Out-Null
   }
   return (Resolve-Path -LiteralPath $Path).Path
+}
+
+function New-MIRCompatRuntimeCampaignRoot {
+  param([string]$RequestedRoot = "")
+
+  $baseCandidate = if ([string]::IsNullOrWhiteSpace($RequestedRoot)) {
+    Join-Path $repo.Path "build\compat-runtime"
+  } else {
+    $RequestedRoot
+  }
+  $baseRoot = New-MIRDirectory -Path ([IO.Path]::GetFullPath($baseCandidate))
+  $campaignRoot = New-MIRDirectory -Path (Join-Path $baseRoot ("r-" + [guid]::NewGuid().ToString("N").Substring(0, 12)))
+
+  # Factorio 2.1 still loses Lua modules when a Windows runtime path crosses the
+  # legacy MAX_PATH boundary. Keep headroom for MIR's longest current module and
+  # for diagnostics or fixture suffixes added by a compatibility scenario.
+  $maximumRuntimePathLength = 240
+  $pathBudgetProbe = Join-Path $campaignRoot "u-000000000000\mods\more-infinite-research\prototypes\mir\capabilities\science_integration\pack_production_reachability.lua"
+  if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT -and $pathBudgetProbe.Length -gt $maximumRuntimePathLength) {
+    Remove-Item -LiteralPath $campaignRoot -Force
+    throw "Compatibility runtime root exceeds the $maximumRuntimePathLength-character Windows path budget. Set MIR_COMPAT_RUNTIME_ROOT or -RuntimeRoot to a shorter directory. Probe: $pathBudgetProbe"
+  }
+
+  return [pscustomobject]@{
+    base = $baseRoot
+    path = $campaignRoot
+    maximum_path_length = $maximumRuntimePathLength
+    probe_path_length = $pathBudgetProbe.Length
+  }
+}
+
+function Move-MIRCompatScenarioEvidence {
+  param(
+    [Parameter(Mandatory)][string]$UserDataDir,
+    [Parameter(Mandatory)][string]$EvidenceRoot,
+    [Parameter(Mandatory)]$Result
+  )
+
+  $resolvedUserData = (Resolve-Path -LiteralPath $UserDataDir).Path
+  $resolvedEvidenceRoot = New-MIRDirectory -Path $EvidenceRoot
+  $retainedUserData = Join-Path $resolvedEvidenceRoot (Split-Path -Leaf $resolvedUserData)
+  if (Test-Path -LiteralPath $retainedUserData) {
+    throw "Compatibility evidence destination already exists: $retainedUserData"
+  }
+
+  Move-Item -LiteralPath $resolvedUserData -Destination $retainedUserData
+  $sourcePrefix = $resolvedUserData.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  foreach ($propertyName in @("save", "stdout", "stderr")) {
+    $sourcePath = [string]$Result.$propertyName
+    if ([string]::IsNullOrWhiteSpace($sourcePath)) { continue }
+    if (-not $sourcePath.StartsWith($sourcePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+      throw "Compatibility result path '$sourcePath' is outside its runtime user-data root '$resolvedUserData'."
+    }
+    $relativePath = $sourcePath.Substring($sourcePrefix.Length)
+    $Result.$propertyName = Join-Path $retainedUserData $relativePath
+  }
+
+  return $Result
+}
+
+function Remove-MIRCompatRuntimeCampaignRootIfEmpty {
+  param([Parameter(Mandatory)]$Campaign)
+
+  if (-not (Test-Path -LiteralPath $Campaign.path -PathType Container)) { return }
+  $resolvedCampaign = (Resolve-Path -LiteralPath $Campaign.path).Path
+  $resolvedBase = (Resolve-Path -LiteralPath $Campaign.base).Path
+  $expectedPrefix = $resolvedBase.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  if (-not $resolvedCampaign.StartsWith($expectedPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $resolvedCampaign) -notmatch '^r-[0-9a-f]{12}$') {
+    throw "Refusing to clean an unrecognized compatibility runtime campaign root: $resolvedCampaign"
+  }
+  if (@(Get-ChildItem -LiteralPath $resolvedCampaign -Force).Count -eq 0) {
+    Remove-Item -LiteralPath $resolvedCampaign -Force
+  } else {
+    Write-Warning "Compatibility runtime evidence could not be transferred completely; preserving $resolvedCampaign"
+  }
 }
 
 function Read-MIRJsonFile {
@@ -955,7 +1032,7 @@ function Invoke-MIRScenarioLoad {
     return
   }
 
-  $userData = New-MIRCompatUserDataDir -Root $runRoot
+  $userData = New-MIRCompatUserDataDir -Root $runtimeRunRoot
   $modsDir = Join-Path $userData "mods"
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
   Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine
@@ -968,6 +1045,7 @@ function Invoke-MIRScenarioLoad {
 
   $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
+  $result = Move-MIRCompatScenarioEvidence -UserDataDir $userData -EvidenceRoot $retainedRunRoot -Result $result
   $expectedPlan = Get-MIRObjectProperty -Object $Scenario -Name "expected_plan" -Default ([pscustomobject]@{})
   $requiredStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "required_stream_science" -Default ([pscustomobject]@{})
   $forbiddenStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "forbidden_stream_science" -Default ([pscustomobject]@{})
@@ -1377,29 +1455,35 @@ if ($RunLoadTests) {
     throw "Load tests require -FactorioBin or FACTORIO_BIN."
   }
 
-  $runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
+  $runtimeCampaign = New-MIRCompatRuntimeCampaignRoot -RequestedRoot $RuntimeRoot
+  $runtimeRunRoot = $runtimeCampaign.path
+  $retainedRunRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
   $loadResultsPath = Join-Path $resolvedOutputDir "load-results.json"
   $manualResultsPath = Join-Path $resolvedOutputDir "manual-results.json"
   $scenarioList = @($selectedScenarios)
-  for ($scenarioIndex = 0; $scenarioIndex -lt $scenarioList.Count; $scenarioIndex++) {
-    $scenario = $scenarioList[$scenarioIndex]
-    $displayIndex = $scenarioIndex + 1
-    $rootMods = @($scenario.root_mods) -join ","
-    $resolvedCount = @($scenario.resolved_mods).Count
-    $officialMods = @($scenario.official_mods) -join ","
-    $dependencyFailureCount = @($scenario.dependency_failures).Count
-    Write-Host ("[compat-audit] load {0}/{1} starting scenario={2} type={3} roots={4} resolved={5} official={6} dependency_failures={7}" -f $displayIndex, $scenarioList.Count, $scenario.name, $scenario.type, $rootMods, $resolvedCount, $officialMods, $dependencyFailureCount)
-    $scenarioStarted = Get-Date
-    $result = Invoke-MIRScenarioLoad -Scenario $scenario
-    $results += $result
-    $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
-    $manualResults = @($results | Where-Object { $_.type -in @("manual", "generated_local") })
-    if ($manualResults.Count -gt 0) {
-      $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
+  try {
+    for ($scenarioIndex = 0; $scenarioIndex -lt $scenarioList.Count; $scenarioIndex++) {
+      $scenario = $scenarioList[$scenarioIndex]
+      $displayIndex = $scenarioIndex + 1
+      $rootMods = @($scenario.root_mods) -join ","
+      $resolvedCount = @($scenario.resolved_mods).Count
+      $officialMods = @($scenario.official_mods) -join ","
+      $dependencyFailureCount = @($scenario.dependency_failures).Count
+      Write-Host ("[compat-audit] load {0}/{1} starting scenario={2} type={3} roots={4} resolved={5} official={6} dependency_failures={7}" -f $displayIndex, $scenarioList.Count, $scenario.name, $scenario.type, $rootMods, $resolvedCount, $officialMods, $dependencyFailureCount)
+      $scenarioStarted = Get-Date
+      $result = Invoke-MIRScenarioLoad -Scenario $scenario
+      $results += $result
+      $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
+      $manualResults = @($results | Where-Object { $_.type -in @("manual", "generated_local") })
+      if ($manualResults.Count -gt 0) {
+        $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
+      }
+      $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
+      Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
+      if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
     }
-    $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
-    Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
-    if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
+  } finally {
+    Remove-MIRCompatRuntimeCampaignRootIfEmpty -Campaign $runtimeCampaign
   }
   $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
   $manualResults = @($results | Where-Object { $_.type -in @("manual", "generated_local") })
