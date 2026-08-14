@@ -45,6 +45,47 @@ foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
   }
 }
 
+$syntheticGraphFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-synthetic-scale-graph\data-final-fixes.lua")
+$stressStart = $syntheticGraphFixture.IndexOf('local stress_operations = {}', [StringComparison]::Ordinal)
+$stressEnd = $syntheticGraphFixture.IndexOf('local stress = compiler_context.with_active(', [StringComparison]::Ordinal)
+if ($stressStart -lt 0 -or $stressEnd -le $stressStart) {
+  throw "Synthetic graph fixture does not preserve a bounded, inspectable stress-operation block."
+}
+$stressOperationBlock = $syntheticGraphFixture.Substring($stressStart, $stressEnd - $stressStart)
+foreach ($requiredGraphAuthority in @(
+  'local STRESS_TOTAL = 100000',
+  'local STRESS_LARGE_SCC = 25000',
+  'operation = "emit_base_extension"',
+  'technology_name = name',
+  'prerequisites = {string.format('
+)) {
+  if (-not $syntheticGraphFixture.Contains($requiredGraphAuthority, [StringComparison]::Ordinal)) {
+    throw "Synthetic graph fixture lost required 100000-scale graph authority: $requiredGraphAuthority"
+  }
+}
+foreach ($redundantPayloadPattern in @(
+  '(?m)^\s+key = name,?$',
+  '(?m)^\s+name = name,?$',
+  '(?m)^\s+effects = ',
+  '(?m)^\s+unit = ',
+  '(?m)^\s+max_level = '
+)) {
+  if ($stressOperationBlock -match $redundantPayloadPattern) {
+    throw "Synthetic graph stress operations must not duplicate non-graph prototype payload: $redundantPayloadPattern"
+  }
+}
+foreach ($requiredReclamation in @(
+  'stress_operations = nil',
+  'stress_components = nil',
+  'large_component = nil',
+  'stress = nil',
+  'collectgarbage("collect")'
+)) {
+  if (-not $syntheticGraphFixture.Contains($requiredReclamation, [StringComparison]::Ordinal)) {
+    throw "Synthetic graph fixture must reclaim its completed in-memory stress graph before prototype conversion: $requiredReclamation"
+  }
+}
+
 $factorioProcess = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
 foreach ($requiredPolicy in @(
   'function Get-MIRCompactScenarioPathSegment {',
