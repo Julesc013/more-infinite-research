@@ -38,6 +38,15 @@ if ($validationFacade -notmatch [regex]::Escape('Assert-LogContains -Expected "s
   throw "A scripted stream disabled during the data stage must prove the runtime handler safely observes its omitted technology."
 }
 
+$k2ScenarioInvocation = @'
+Invoke-RuntimeScenario -ScenarioName "k2-science-phase-policy" -EnabledFixtureNames @(
+  "mir-fixture-assert-k2-science-phase-policy"
+)
+'@
+if (-not $validationFacade.Contains($k2ScenarioInvocation.Trim(), [StringComparison]::Ordinal)) {
+  throw "The manifest-required K2 science-phase policy scenario must be invoked by the complete validation facade."
+}
+
 foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
   $currentSignature = 'schema=3|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
   if (-not $validationFacade.Contains($currentSignature, [StringComparison]::Ordinal)) {

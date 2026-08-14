@@ -3976,6 +3976,10 @@ Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFix
   "mir-fixture-assert-generated-prerequisite-safety"
 ) -SciencePackIngredientPolicy "all"
 
+Invoke-RuntimeScenario -ScenarioName "k2-science-phase-policy" -EnabledFixtureNames @(
+  "mir-fixture-assert-k2-science-phase-policy"
+)
+
 Invoke-RuntimeScenario -ScenarioName "external-technology-cycle" -EnabledFixtureNames @(
   "mir-fixture-external-technology-cycle"
 )
