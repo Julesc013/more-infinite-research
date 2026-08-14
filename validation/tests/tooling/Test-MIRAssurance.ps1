@@ -605,6 +605,26 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
   throw "Protected qualification must transfer the exact context candidate rather than select an arbitrary distribution glob."
 }
 
+$releaseCandidateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\release-candidate.yml")
+foreach ($requiredReleaseCandidateSnippet in @(
+  'local_authority_repo:',
+  'git clone --quiet --shared --no-checkout',
+  'git -C $authority cat-file -e',
+  'Checked-out controller does not match the workflow source commit.',
+  'Archive SHA mismatch for ${archive}',
+  'Run complete exact-dist validation',
+  'Run strict targeted compatibility gate',
+  'MIRProtectedReleaseCandidateRunV1',
+  'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}'
+)) {
+  if (-not $releaseCandidateWorkflow.Contains($requiredReleaseCandidateSnippet)) {
+    throw "Protected release-candidate workflow omits its offline exact-root contract: $requiredReleaseCandidateSnippet"
+  }
+}
+if ($releaseCandidateWorkflow -match '(?m)^\s*uses:\s*actions/(checkout|upload-artifact)@') {
+  throw "The self-hosted release-candidate lane must not depend on remote checkout or artifact actions."
+}
+
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
   'Resolve content-addressed development candidate',
