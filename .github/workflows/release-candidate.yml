@@ -17,6 +17,10 @@ on:
         description: "Self-hosted runner path to the already-synced local Git authority"
         required: true
         default: 'C:\Projects\Factorio\more-infinite-research'
+      resume_exact_dist_evidence_run:
+        description: "Prior protected run-attempt whose passing exact-dist evidence may be admitted"
+        required: false
+        default: ""
 
 jobs:
   exact-candidate:
@@ -97,6 +101,7 @@ jobs:
           }
 
       - name: Run complete exact-dist validation
+        if: ${{ inputs.resume_exact_dist_evidence_run == '' }}
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
@@ -115,13 +120,94 @@ jobs:
             Pop-Location
           }
 
+      - name: Admit prior passing exact-dist evidence
+        if: ${{ inputs.resume_exact_dist_evidence_run != '' }}
+        shell: pwsh
+        run: |
+          $authority = '${{ steps.roots.outputs.authority }}'
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $candidate = '${{ steps.roots.outputs.candidate }}'
+          $priorRun = '${{ inputs.resume_exact_dist_evidence_run }}'
+          if ($priorRun -notmatch '^\d+-\d+$') {
+            throw "Prior protected run-attempt must use the run_id-run_attempt form, got: $priorRun"
+          }
+          $priorRoot = Join-Path $authority "build/results/protected-release-candidate/$priorRun"
+          $priorReceiptPath = Join-Path $priorRoot 'receipt.json'
+          $priorSummaryPath = Join-Path $priorRoot 'build/results/validation/factorio-2.1-summary.json'
+          foreach ($requiredPath in @($priorReceiptPath, $priorSummaryPath)) {
+            if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+              throw "Prior protected evidence is incomplete: $requiredPath"
+            }
+          }
+          $priorReceipt = Get-Content -Raw -LiteralPath $priorReceiptPath | ConvertFrom-Json
+          if ([string]$priorReceipt.kind -ne 'MIRProtectedReleaseCandidateRunV1' -or
+              [string]$priorReceipt.candidate_commit -ne '${{ inputs.candidate_sha }}' -or
+              [string]$priorReceipt.expected_archive_sha256 -ne '${{ inputs.archive_sha256 }}') {
+            throw 'Prior protected receipt does not bind the requested candidate commit and archive.'
+          }
+          $priorArchives = @($priorReceipt.archives)
+          if ($priorArchives.Count -ne 2 -or
+              @($priorArchives | Where-Object { [string]$_.sha256 -ne '${{ inputs.archive_sha256 }}' }).Count -ne 0) {
+            throw 'Prior protected receipt does not contain both exact candidate archives.'
+          }
+          $priorController = [string]$priorReceipt.controller_commit
+          if ($priorController -notmatch '^[0-9a-f]{40}$') {
+            throw "Prior protected receipt has an invalid controller commit: $priorController"
+          }
+          git -C $authority merge-base --is-ancestor $priorController '${{ github.sha }}'
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Prior exact-dist controller is not an ancestor of the current controller.'
+          }
+          $allowedControllerPaths = @(
+            '.github/workflows/release-candidate.yml',
+            'validation/tests/tooling/Test-MIRAssurance.ps1'
+          )
+          $controllerDelta = @(git -C $authority diff --name-only "$priorController..${{ github.sha }}" --)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect the controller delta for evidence admission.' }
+          $disallowedControllerPaths = @($controllerDelta | Where-Object { $_ -notin $allowedControllerPaths })
+          if ($disallowedControllerPaths.Count -ne 0) {
+            throw "Prior exact-dist evidence was invalidated by controller changes: $($disallowedControllerPaths -join ', ')"
+          }
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
+          $releaseRecord = Get-Content -Raw -LiteralPath (Join-Path $candidate ".mir/releases/records/$version.json") | ConvertFrom-Json
+          $summary = Get-Content -Raw -LiteralPath $priorSummaryPath | ConvertFrom-Json
+          if ([string]$summary.status -ne 'passed' -or
+              [string]$summary.mir_version -ne $version -or
+              [string]$summary.package_source_sha256 -ne [string]$releaseRecord.package.content_sha256 -or
+              @($summary.expected_scenarios).Count -ne 124 -or
+              @($summary.scenarios).Count -ne 124 -or
+              @($summary.scenarios | Where-Object { [string]$_.status -ne 'passed' }).Count -ne 0) {
+            throw 'Prior exact-dist summary is not the complete passing 124-scenario candidate result.'
+          }
+          $resultsRoot = Join-Path $controller 'build/results'
+          New-Item -ItemType Directory -Force -Path $resultsRoot | Out-Null
+          Copy-Item -LiteralPath (Split-Path -Parent $priorSummaryPath) -Destination $resultsRoot -Recurse
+          "Admitted exact-dist evidence from protected run ``$priorRun`` after candidate and controller-delta verification." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
       - name: Run strict targeted compatibility gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
-          Push-Location '${{ steps.roots.outputs.controller }}'
-          try { ./tools/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull } finally { Pop-Location }
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
+          if ($actual -ne '${{ inputs.archive_sha256 }}') {
+            throw "Targeted-gate archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          }
+          Push-Location $controller
+          try {
+            ./tools/mir.ps1 release gate `
+              --profile '${{ inputs.release_profile }}' `
+              --candidate $candidateArchive `
+              --candidate-source '${{ inputs.candidate_sha }}' `
+              --output 'build/results/release-gate' `
+              --no-git-pull
+          } finally {
+            Pop-Location
+          }
 
       - name: Retain exact candidate evidence in local authority
         if: always()
@@ -203,6 +289,7 @@ jobs:
             controller_commit = '${{ github.sha }}'
             candidate_commit = '${{ inputs.candidate_sha }}'
             expected_archive_sha256 = '${{ inputs.archive_sha256 }}'
+            resumed_exact_dist_evidence_run = '${{ inputs.resume_exact_dist_evidence_run }}'
             archives = $archiveRows
             runtime_evidence = $runtimeEvidenceRows
             retained_at = [DateTime]::UtcNow.ToString('o')
