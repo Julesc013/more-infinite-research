@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "release": "2.5.9",
-  "candidate_id": "not-assigned",
+  "candidate_id": "2.5-P13",
   "candidate_floor": "2.5-P13",
-  "candidate_allocation": {"namespace":"2.5-P","predecessor_max_ordinal":12,"minimum_next_ordinal":13,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
+  "candidate_allocation": {"namespace":"2.5-P","predecessor_max_ordinal":12,"minimum_next_ordinal":13,"assigned_id":"2.5-P13","assigned_at":"2026-08-14T18:05:46+10:00","candidate_ref":"refs/heads/candidate/2.5.9-2.5-P13","candidate_commit":"89719eb8ea5c938b6a0e9d816e6324d4d59b87bb","assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "2.0",
   "branch": "legacy",
   "development_branch": "dev",
-  "state": "planned",
+  "state": "source-frozen",
   "source_release": {
     "release": "2.5.5",
     "tag": "2.5.5",
@@ -18,15 +18,17 @@
   },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
-  "package": {},
-  "proofs": {},
+  "package": {"source_commit":"89719eb8ea5c938b6a0e9d816e6324d4d59b87bb","source_tree":"45a3487a28847736d3e25f9a13294cef6c23e5b3","source_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"},
+  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/2.5.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
   "assurance_exceptions": [],
   "remaining_obligations": [
-    "reconcile-2.5.5-protected-post-publication-debt",
-    "bind-final-terminal-delta",
-    "materialize-and-qualify-factorio-2.0-projection",
-    "normal-manual-protected-seal-promotion-publication-gates"
+    "triple-reconstruct-exact-candidate",
+    "focused-qualification",
+    "candidate-qualification",
+    "complete-exact-hash-manual-review",
+    "target-and-family-seal",
+    "promote-tag-publish-and-publicly-verify"
   ],
   "incident_ids": [],
-  "updated_at": "2026-08-08T18:00:00+10:00"
+  "updated_at": "2026-08-14T18:05:46+10:00"
 }

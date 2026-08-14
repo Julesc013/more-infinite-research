@@ -1,19 +1,20 @@
 {
   "authority": "mir-generated-backport-queue-v1",
-  "candidate_id": "not-assigned",
+  "candidate_id": "2.5-P13",
   "generated_from": [
     "path:releases.records/2.5.9.json",
     ""
   ],
   "release": "2.5.9",
   "remaining_obligations": [
-    "reconcile-2.5.5-protected-post-publication-debt",
-    "bind-final-terminal-delta",
-    "materialize-and-qualify-factorio-2.0-projection",
-    "normal-manual-protected-seal-promotion-publication-gates"
+    "triple-reconstruct-exact-candidate",
+    "focused-qualification",
+    "candidate-qualification",
+    "complete-exact-hash-manual-review",
+    "target-and-family-seal",
+    "promote-tag-publish-and-publicly-verify"
   ],
   "remaining_states": [
-    "source-frozen",
     "package-built",
     "focused-qualified",
     "candidate-qualified",
@@ -26,6 +27,6 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "planned",
+  "state": "source-frozen",
   "target": "2.0"
 }

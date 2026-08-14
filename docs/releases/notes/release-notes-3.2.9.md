@@ -33,9 +33,9 @@ Direct unmodified Cubium 1.0.28 proof on Factorio 2.0 remains pending authentica
 
 | Field | Value |
 | --- | --- |
-| State | `planned` |
-| Candidate | `not-assigned` |
-| Package source commit | `pending` |
+| State | `source-frozen` |
+| Candidate | `C33` |
+| Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Archive SHA-256 | `pending` |
 | Content SHA-256 | `pending` |
 | Tag | `pending` |

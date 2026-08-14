@@ -513,11 +513,13 @@ try {
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
 $candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/$([string]$candidateInfo.version).json") | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
-if ($candidatePath -notmatch "/build/candidates/3\.2\.9/unassigned/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
+$candidatePathIdentity = if ([string]$candidateRelease.state -eq "planned") { "unassigned" } else { [regex]::Escape([string]$candidateRelease.candidate_id) }
+if ($candidatePath -notmatch "/build/candidates/3\.2\.9/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
     $candidatePath -match "/dist/") {
-  throw "Default pre-freeze assurance candidates must be release/unassigned/source-tree addressed outside immutable dist."
+  throw "Default assurance candidates must be release/candidate/source-tree addressed outside immutable dist."
 }
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {

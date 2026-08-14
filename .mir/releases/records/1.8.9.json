@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "release": "1.8.9",
-  "candidate_id": "not-assigned",
+  "candidate_id": "1.8-P1",
   "candidate_floor": "1.8-P1",
-  "candidate_allocation": {"namespace":"1.8-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
+  "candidate_allocation": {"namespace":"1.8-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":"1.8-P1","assigned_at":"2026-08-14T18:05:46+10:00","candidate_ref":"refs/heads/candidate/1.8.9-1.8-P1","candidate_commit":"8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309","assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "1.0",
   "branch": "tag-only",
-  "state": "planned",
+  "state": "source-frozen",
   "source_release": { "release": "1.8.5", "tag": "1.8.5", "archive_sha256": "10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD", "content_sha256": "F950BD20495A00577AA0984300B94F2C01982FE42766BC8906539B509679AB1B" },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
-  "package": {},
-  "proofs": {},
+  "package": {"source_commit":"8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309","source_tree":"2d5599b1c31fbc5b35bce69ce651159d0877e7a4","source_sha256":"7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E"},
+  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.8.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
   "assurance_exceptions": [],
-  "remaining_obligations": ["bind-terminal-delta", "materialize-deterministic-integration", "qualify-factorio-1.0-only", "tag-publish-and-publicly-verify"],
+  "remaining_obligations": ["triple-reconstruct-exact-candidate", "focused-qualification", "candidate-qualification", "complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
   "incident_ids": [],
-  "updated_at": "2026-08-08T18:00:00+10:00"
+  "updated_at": "2026-08-14T18:05:46+10:00"
 }
