@@ -160,6 +160,9 @@ jobs:
           }
           $allowedControllerPaths = @(
             '.github/workflows/release-candidate.yml',
+            'scripts/Invoke-MIRCompatAudit.ps1',
+            'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1',
+            'validation/tests/release/Test-MIRPerformanceBudgets.ps1',
             'validation/tests/tooling/Test-MIRAssurance.ps1'
           )
           $controllerDelta = @(git -C $authority diff --name-only "$priorController..${{ github.sha }}" --)
