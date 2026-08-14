@@ -47,27 +47,27 @@
     {
       "role": "product-implementation-reconciliation",
       "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
-      "raw_sha256": "22ADEB099C7268ABEC6DFBDA94E9F8C70309AB5CA35E1683885BE0DDEA998A27"
+      "canonical_text_sha256": "4F65C2739B095CDC3451C1DD76638779DF0B7D51FA126E6BF2A1C123B74E7A30"
     },
     {
       "role": "all-nine-fixed-point",
       "path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
-      "raw_sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"
+      "canonical_text_sha256": "6A8C39B9C3677EACDF9C965E83C2113B836957B9F29DA0ACD4143F9C841A9EA1"
     },
     {
       "role": "candidate-allocation",
       "path": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
-      "raw_sha256": "622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010"
+      "canonical_text_sha256": "A672B62BFCAC76A718B3AA11D48939E03CAFCD14BC7A878D0BE9715B4D58DFCA"
     },
     {
       "role": "candidate-reconstruction",
       "path": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
-      "raw_sha256": "5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"
+      "canonical_text_sha256": "11F45C3F0B3AFF392B1F8391B56BC52F687D42510D28BF7364F33A47FF6E651F"
     },
     {
       "role": "automated-qualification",
       "path": ".mir/releases/terminal/qualifications/3.2.9.json",
-      "raw_sha256": "54C36F6FE48D32189723FE9720DFA0E825E0DE4E83194F3ADFAC1E455DB5098C"
+      "canonical_text_sha256": "54C36F6FE48D32189723FE9720DFA0E825E0DE4E83194F3ADFAC1E455DB5098C"
     }
   ],
   "scenario_evidence": {

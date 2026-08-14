@@ -18,6 +18,27 @@ function Get-MIRCPReleaseByVersion {
   return Read-MIRCPJson -Path "path:releases.records/$Release.json" -RepoRoot $RepoRoot
 }
 
+function Get-MIRCPAuthoredDate {
+  param([Parameter(Mandatory)][string]$Timestamp)
+  if ($Timestamp -notmatch '^(?<date>\d{4}-\d{2}-\d{2})T') {
+    throw "Release timestamp is not an RFC 3339 date-time: $Timestamp"
+  }
+  return [string]$Matches.date
+}
+
+function Get-MIRCPReleaseAuthoredDate {
+  param(
+    [Parameter(Mandatory)][string]$Release,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $relative = Resolve-MIRCPPathId -Id "releases.records" -Suffix "$Release.json" -RepoRoot $repo
+  $path = Join-Path $repo $relative
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Release record is absent: $Release" }
+  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -DateKind String
+  return Get-MIRCPAuthoredDate -Timestamp ([string]$record.updated_at)
+}
+
 function Get-MIRCPArrayProperty {
   param(
     [Parameter(Mandatory)]$Object,
@@ -172,7 +193,9 @@ function New-MIRCPLegacyReleaseLedger {
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
   $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_1) -RepoRoot $repo
   $publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_0) -RepoRoot $repo
-  $updated = @($canonical.updated_at, $backport.updated_at, $publishedModern.updated_at, $publishedBackport.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)
+  $updated = @($canonical, $backport, $publishedModern, $publishedBackport | ForEach-Object {
+    Get-MIRCPReleaseAuthoredDate -Release ([string]$_.release) -RepoRoot $repo
+  } | Sort-Object -Descending | Select-Object -First 1)
   return [pscustomobject][ordered]@{
     schema = 1
     authority = "canonical-release-ledger"
@@ -183,7 +206,7 @@ function New-MIRCPLegacyReleaseLedger {
       "path:releases.records/$($publishedModern.release).json",
       "path:releases.records/$($publishedBackport.release).json"
     ) | Select-Object -Unique
-    updated_at = ([datetimeoffset]$updated[0]).ToString("yyyy-MM-dd")
+    updated_at = [string]$updated[0]
     published_baselines = [pscustomobject][ordered]@{
       "factorio-2.1" = ConvertTo-MIRCPLegacyPublishedRelease -Release $publishedModern
       "factorio-2.0" = ConvertTo-MIRCPLegacyPublishedRelease -Release $publishedBackport
@@ -482,7 +505,9 @@ function Update-MIRCPViews {
   $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$backportRole) -RepoRoot $repo
   $terminalReleases = @($pointer.planned_releases | ForEach-Object { Get-MIRCPReleaseByVersion -Release ([string]$_) -RepoRoot $repo })
-  $reviewDate = (@($releases.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)[0]).ToString("yyyy-MM-dd")
+  $reviewDate = [string]@($releases | ForEach-Object {
+    Get-MIRCPReleaseAuthoredDate -Release ([string]$_.release) -RepoRoot $repo
+  } | Sort-Object -Descending | Select-Object -First 1)[0]
 
   Write-MIRCPJson -Path "path:releases.ledger" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.current_candidate) -Lines (New-MIRCPCurrentCandidateLines -Release $canonical -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check

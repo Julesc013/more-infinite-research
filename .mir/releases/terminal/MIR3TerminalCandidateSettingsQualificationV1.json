@@ -5,12 +5,12 @@
   "recorded_at": "2026-08-15T07:45:00+10:00",
   "family": ["3.2.9","2.5.9","1.9.9","1.8.9","1.7.9","1.6.9","1.5.9","1.4.9","1.3.9"],
   "source_authorities": {
-    "settings_scope_audit": {"path":".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json","raw_sha256":"62D067B4AE2FA853EE716CA527C7214C7D7E4EB8FA691AE6972F1BB3EA46C7AC"},
-    "fixed_point": {"path":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","raw_sha256":"C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"},
-    "candidate_reconstruction": {"path":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json","raw_sha256":"5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"},
-    "candidate_allocation": {"path":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","raw_sha256":"622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010"},
-    "target_matrix": {"path":".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json","raw_sha256":"40798320044B5F0EEA001FFFE0C4D73939E138CCC50E0ED619BEEC9B6ACD6C50"},
-    "foundation_identity": {"path":".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json","raw_sha256":"86BC4127EA35438AD1E1E6F34149F08ED0C8619C32E44A2B1570D371D720298F"}
+    "settings_scope_audit": {"path":".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json","canonical_text_sha256":"62D067B4AE2FA853EE716CA527C7214C7D7E4EB8FA691AE6972F1BB3EA46C7AC"},
+    "fixed_point": {"path":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","canonical_text_sha256":"6A8C39B9C3677EACDF9C965E83C2113B836957B9F29DA0ACD4143F9C841A9EA1"},
+    "candidate_reconstruction": {"path":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json","canonical_text_sha256":"11F45C3F0B3AFF392B1F8391B56BC52F687D42510D28BF7364F33A47FF6E651F"},
+    "candidate_allocation": {"path":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","canonical_text_sha256":"A672B62BFCAC76A718B3AA11D48939E03CAFCD14BC7A878D0BE9715B4D58DFCA"},
+    "target_matrix": {"path":".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json","canonical_text_sha256":"3D5CFEDAB0067A0698B0EEC94F3FA0EBAD647DD2EE169B0C7547A92804D8B1B1"},
+    "foundation_identity": {"path":".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json","canonical_text_sha256":"574E6A5CE0D591F17F8DFA667F84A209117AEC04531BE7A5A2F54B3F79E0D9E5"}
   },
   "static_inventory": {
     "method": "compare version-root-normalized ZIP entries whose relative path contains settings plus all locale CFG entries; compare path sets and exact entry text against each immutable .5 predecessor",

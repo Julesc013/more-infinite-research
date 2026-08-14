@@ -78,6 +78,11 @@ try {
   }
 }
 
+if ((Get-MIRCPAuthoredDate -Timestamp "2026-08-15T00:30:00+10:00") -ne "2026-08-15" -or
+    (Get-MIRCPAuthoredDate -Timestamp "2026-08-14T14:30:00Z") -ne "2026-08-14") {
+  throw "Control-plane authored dates depend on the runner time zone."
+}
+
 $workerImportRoot = Join-Path $repo ("build/results/control-plane-worker-import-test/" + [guid]::NewGuid().ToString("N"))
 try {
   $workerRoot = Join-Path $workerImportRoot "workers"

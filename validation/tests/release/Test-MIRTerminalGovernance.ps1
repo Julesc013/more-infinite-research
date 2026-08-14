@@ -124,6 +124,12 @@ function Get-MIRTerminalZipTextEntries {
   }
   return $entries
 }
+function Get-MIRTerminalCanonicalTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
+}
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
   $row = @($wave.releases | Where-Object version -eq $identity.version)
@@ -541,7 +547,7 @@ foreach ($name in @($settingsAuthorityPaths.Keys)) {
   $binding = $settingsQualification.source_authorities.$name
   $authorityPath = Join-Path $RepoRoot $settingsAuthorityPaths[$name]
   if ([string]$binding.path -ne $settingsAuthorityPaths[$name] -or
-      (Get-FileHash -LiteralPath $authorityPath -Algorithm SHA256).Hash -ne [string]$binding.raw_sha256) {
+      (Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($authorityPath))) -ne [string]$binding.canonical_text_sha256) {
     throw "Terminal candidate settings qualification authority drifted: $name"
   }
 }
@@ -552,7 +558,7 @@ if (-not ((Get-Content -Raw -LiteralPath $reconstructionPath) | Test-Json -Schem
     [string]$programme.authorities.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
     [string]$reconstruction.status -ne "passed-ready-for-automated-qualification" -or
     [string]$reconstruction.source_authorities.allocation -ne ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json" -or
-    (Get-FileHash -LiteralPath $allocationPath -Algorithm SHA256).Hash -ne [string]$reconstruction.source_authorities.allocation_raw_sha256 -or
+    (Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($allocationPath))) -ne [string]$reconstruction.source_authorities.allocation_canonical_text_sha256 -or
     [string]$reconstruction.source_authorities.allocation_merge.commit -ne "e2399afb117a641fa66c4043de41586dd15b7a67" -or
     [string]$reconstruction.source_authorities.allocation_merge.tree -ne "d423e957e281371fb8ea69660b5f44f00588edc8" -or
     [string]$reconstruction.source_authorities.post_merge_runs.result -ne "passed" -or
@@ -820,12 +826,6 @@ if (-not ((Get-Content -Raw -LiteralPath $sourceFreezePath) | Test-Json -SchemaF
     [bool]$sourceFreeze.boundaries.tags_created -or [bool]$sourceFreeze.boundaries.publication_permitted -or
     [bool]$sourceFreeze.boundaries.dot5_package_bytes_changed) {
   throw "Terminal family source-freeze authority is invalid or crosses a later gate."
-}
-function Get-MIRTerminalCanonicalTextSha256 {
-  param([Parameter(Mandatory)][string]$Text)
-
-  $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
-  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
 }
 if ((Get-MIRTerminalCanonicalTextSha256 -Text "authority`nrow`n") -ne
     (Get-MIRTerminalCanonicalTextSha256 -Text "authority`r`nrow`r`n")) {

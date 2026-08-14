@@ -76,7 +76,7 @@ if ($activeVersion -eq "3.2.9") {
     }
     $boundPath = Join-Path $repo $relative
     if (-not (Test-Path -LiteralPath $boundPath -PathType Leaf) -or
-        (Get-FileHash -LiteralPath $boundPath -Algorithm SHA256).Hash -ne [string]$binding.raw_sha256) {
+        (Get-MIRCPPortableTextSha256 -Path $boundPath) -ne [string]$binding.canonical_text_sha256) {
       throw "MIR 3.2.9 approved-delta authority drifted: $role"
     }
     $authorityByRole[$role] = Get-Content -Raw -LiteralPath $boundPath | ConvertFrom-Json -Depth 100
