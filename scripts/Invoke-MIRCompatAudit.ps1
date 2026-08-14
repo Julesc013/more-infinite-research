@@ -10,6 +10,7 @@ param(
   [switch]$UseCachedDownloads,
   [string]$ModCacheDir = (Join-Path $PSScriptRoot "..\build\compat-mod-cache"),
   [string]$OutputDir = (Join-Path $PSScriptRoot "..\build\results\compat-audit"),
+  [string]$RuntimeRoot = $env:MIR_COMPAT_RUNTIME_ROOT,
   [int]$MaxCandidates = 50,
   [int]$CatalogPages = 0,
   [string]$FromLockfile,
