@@ -8,7 +8,7 @@ function Invoke-MIRAssuranceSeal {
   $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
   if ([string]$summary.status -ne "passed") { throw "Qualification summary is not passing." }
   $commit = (& git -C $repo rev-parse HEAD).Trim()
-  $branch = (& git -C $repo branch --show-current).Trim()
+  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   if ($status.Count -ne 0) { throw "Refusing to seal a dirty source tree. Commit the exact candidate and tracked qualification summary first." }
   $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
