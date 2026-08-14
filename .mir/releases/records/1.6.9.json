@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "release": "1.6.9",
-  "candidate_id": "not-assigned",
+  "candidate_id": "1.6-P1",
   "candidate_floor": "1.6-P1",
-  "candidate_allocation": {"namespace":"1.6-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
+  "candidate_allocation": {"namespace":"1.6-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":"1.6-P1","assigned_at":"2026-08-14T18:05:46+10:00","candidate_ref":"refs/heads/candidate/1.6.9-1.6-P1","candidate_commit":"595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d","assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "0.16",
   "branch": "tag-only",
-  "state": "planned",
+  "state": "source-frozen",
   "source_release": { "release": "1.6.5", "tag": "1.6.5", "archive_sha256": "8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB", "content_sha256": "C19B2F407912E01E12E1D117180504787C352027B9132476A65D9C9D4F4B8392" },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
-  "package": {},
-  "proofs": {},
+  "package": {"source_commit":"595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d","source_tree":"30f2eab0ac7624d14f4630e76aaff79e2d81b92f","source_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493"},
+  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.6.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
   "assurance_exceptions": [],
-  "remaining_obligations": ["bind-terminal-delta", "materialize-deterministic-integration", "qualify-factorio-0.16", "tag-publish-and-publicly-verify"],
+  "remaining_obligations": ["triple-reconstruct-exact-candidate", "focused-qualification", "candidate-qualification", "complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
   "incident_ids": [],
-  "updated_at": "2026-08-08T18:00:00+10:00"
+  "updated_at": "2026-08-14T18:05:46+10:00"
 }

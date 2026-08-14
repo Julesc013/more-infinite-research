@@ -44,38 +44,39 @@
     "factorio-2.1": {
       "archive": "",
       "archive_bytes": null,
-      "archive_class": "planning-authority-no-candidate",
+      "archive_class": "frozen-unreleased-candidate",
       "archive_entries": null,
       "archive_sha256": "",
       "assurance_exception_ids": [],
       "branch": "main",
       "candidate_floor": "C33",
-      "candidate_id": "not-assigned",
+      "candidate_id": "C33",
       "development_branch": "dev",
       "manual_review": "pending",
       "mir_version": "3.2.9",
       "package_content_sha256": "",
-      "package_source_commit": "",
+      "package_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
       "package_source_material": {
         "file_count": null,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": ""
+        "source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa"
       },
-      "package_source_sha256": "",
-      "package_source_tree": "",
+      "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "package_source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa",
       "protected_qualification": "pending",
-      "publication_status": "planned",
-      "qualification": "planned",
+      "publication_status": "source-frozen",
+      "qualification": "source-frozen",
       "remaining_obligations": [
-        "complete-product-implementation-and-all-nine-fixed-point",
+        "triple-reconstruct-exact-candidate",
         "focused-qualification",
-        "assign-candidate-after-source-freeze",
-        "normal-manual-protected-seal-promotion-publication-gates",
+        "candidate-qualification",
+        "complete-exact-hash-manual-review",
+        "target-and-family-seal",
+        "promote-tag-publish-and-publicly-verify",
         "archive-and-mir4-handoff"
       ],
       "remaining_states": [
-        "source-frozen",
         "package-built",
         "focused-qualified",
         "candidate-qualified",
@@ -88,7 +89,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.5",
-      "status": "not-assigned-planned"
+      "status": "C33-source-frozen"
     }
   },
   "generated_from": [
@@ -129,7 +130,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-09",
+  "updated_at": "2026-08-14",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

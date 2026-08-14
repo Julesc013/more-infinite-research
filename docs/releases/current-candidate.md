@@ -5,7 +5,7 @@ applies_to: "3.2.9"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-14
 supersedes: []
 superseded_by: []
 ---
@@ -17,17 +17,17 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.9` |
-| Candidate identity | `not-assigned` |
+| Candidate identity | `C33` |
 | Candidate namespace | `C` |
 | Predecessor maximum ordinal | `32` |
 | Minimum next ordinal | `33` |
 | Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `planned` |
-| Package source commit | `pending` |
-| Package source tree | `pending` |
-| Package source SHA-256 | `pending` |
+| State | `source-frozen` |
+| Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
+| Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
+| Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
 | Archive | `pending` |
 | Archive bytes | `pending` |
 | Archive entries | `pending` |
@@ -36,7 +36,6 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `source-frozen`
 - [ ] `package-built`
 - [ ] `focused-qualified`
 - [ ] `candidate-qualified`

@@ -203,7 +203,7 @@ foreach ($row in @($profiles.targets)) {
       (@($matrixRow[0].upgrade_rows) -join "|") -ne (@($row.upgrade_rows) -join "|") -or
       [string]$record.release -ne [string]$row.release -or [string]$record.target -ne [string]$row.factorio_line -or
       [string]$record.source_release.release -ne [string]$row.baseline.release -or
-      [string]$record.state -ne "planned" -or [string]$record.candidate_id -ne "not-assigned") {
+      [string]$record.state -ne "source-frozen" -or [string]$record.candidate_id -ne [string]$record.candidate_allocation.assigned_id) {
     throw "Terminal target, admission, release record, and projection profile disagree for $($row.release)."
   }
   if ((@($admissionRow[0].findings) -join "|") -ne (@($row.product_findings) -join "|")) {
@@ -249,6 +249,10 @@ if ((@($publishedOverlayIds | Sort-Object) -join "|") -ne (@($maintainedOverlayI
 }
 
 $testRoot = Join-Path $RepoRoot ("build/tests/terminal-shadow-projection/" + [guid]::NewGuid().ToString("N"))
+$materializerSourceRoot = Join-Path $testRoot "frozen-source"
+$sourceFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json") | ConvertFrom-Json -Depth 100
+& git -C $RepoRoot worktree add --detach $materializerSourceRoot ([string]$sourceFreeze.common_source.commit)
+if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the frozen pre-allocation source for projection regression tests." }
 try {
   foreach ($row in @($profiles.targets)) {
     $targetRoot = Join-Path $testRoot ([string]$row.release)
@@ -319,7 +323,7 @@ try {
       Write-MIRTerminalProjectionTestText -Path (Join-Path $targetRoot ".mir/convergence.yml") -Text ($convergenceText + "`n")
     }
 
-    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
+    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $materializerSourceRoot
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection materialization failed for $($row.release)." }
     $convergencePath = Join-Path $targetRoot ".mir/convergence.yml"
     $firstConvergenceText = [IO.File]::ReadAllText($convergencePath)
@@ -335,7 +339,7 @@ try {
           "$relativePath|$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)"
         }
     ) -join "`n"
-    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot
+    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $materializerSourceRoot
     $secondProjectionState = @(
       Get-ChildItem -LiteralPath $targetRoot -Recurse -File |
         Sort-Object FullName |
@@ -349,7 +353,7 @@ try {
         $secondProjectionState -cne $firstProjectionState) {
       throw "Terminal projection materialization is not idempotent for $($row.release)."
     }
-    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $RepoRoot -Check
+    & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $materializerSourceRoot -Check
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection check failed for $($row.release)." }
 
     $info = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "info.json") | ConvertFrom-Json
@@ -593,9 +597,10 @@ try {
   $tampered = (Get-Content -Raw -LiteralPath $tamperedPath).Replace('  version: "2.5.9"', '  version: "2.5.5"')
   Write-MIRTerminalProjectionTestText -Path $tamperedPath -Text $tampered
   $rejected = $false
-  try { & $commandPath -Release "2.5.9" -TargetRoot $tamperedRoot -SourceRepoRoot $RepoRoot -Check } catch { $rejected = $true }
+  try { & $commandPath -Release "2.5.9" -TargetRoot $tamperedRoot -SourceRepoRoot $materializerSourceRoot -Check } catch { $rejected = $true }
   if (-not $rejected) { throw "Terminal projection check accepted stale 2.5.5 convergence identity in a 2.5.9 shadow." }
 } finally {
+  & git -C $RepoRoot worktree remove --force $materializerSourceRoot 2>$null
   if (Test-Path -LiteralPath $testRoot -PathType Container) { Remove-MIRTerminalProjectionTestRoot -Path $testRoot }
 }
 

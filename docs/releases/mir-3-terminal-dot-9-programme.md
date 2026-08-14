@@ -80,7 +80,7 @@ Implement only admitted defect corrections and stabilization work on `dev`. Pres
 
 ### T9-D: freeze, assign, qualify, and seal the complete family
 
-After fixed-point acceptance, freeze the common source and assign the next monotonic candidate in each namespace. Qualify and seal all nine independently before creating the first public tag. Lower integrations use their exact `.5` predecessor as first parent and the exact frozen `3.2.9` release commit as second parent; that commit need not be publicly tagged while qualification runs. Require exact target-tree reconstruction, package identity, direct predecessor and pre-`.5` upgrade or transition proof, target-engine loads, and target-tier review/seal depth.
+The common source is frozen and the first monotonic terminal candidates are assigned: `C33`, `2.5-P13`, and `1.9-P1` through `1.3-P1`. Qualify and seal all nine independently before creating the first public tag. Lower integrations use their exact `.5` predecessor as first parent and exact `C33` commit `a60230a0695d2dd8fd1e727744614e746cda0bd8` as second parent; that commit remains untagged while qualification runs. Require triple exact target-tree reconstruction, package identity, direct predecessor and pre-`.5` upgrade or transition proof, target-engine loads, and target-tier review/seal depth.
 
 ### T9-E: archive MIR 3 and hand off to MIR 4
 
