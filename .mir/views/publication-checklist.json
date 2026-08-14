@@ -5,7 +5,6 @@
       "candidate_id": "C33",
       "release": "3.2.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -16,14 +15,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "2.5-P13",
       "release": "2.5.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -34,14 +32,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.9-P1",
       "release": "1.9.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -52,14 +49,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.8-P1",
       "release": "1.8.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -70,14 +66,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.7-P1",
       "release": "1.7.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -88,14 +83,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.6-P1",
       "release": "1.6.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -106,14 +100,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.5-P1",
       "release": "1.5.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -124,14 +117,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.4-P1",
       "release": "1.4.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -142,14 +134,13 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     },
     {
       "candidate_id": "1.3-P1",
       "release": "1.3.9",
       "remaining_states": [
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "manually-accepted",
@@ -160,7 +151,7 @@
         "published",
         "publicly-verified"
       ],
-      "state": "source-frozen",
+      "state": "package-built",
       "target_seal_present": false
     }
   ],

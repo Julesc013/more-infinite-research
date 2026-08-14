@@ -6,14 +6,14 @@
   "candidate_allocation": {"namespace":"1.5-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":"1.5-P1","assigned_at":"2026-08-14T18:05:46+10:00","candidate_ref":"refs/heads/candidate/1.5.9-1.5-P1","candidate_commit":"8098510acc3530321a2dc32b8d2292aa814bb9c3","assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "0.15",
   "branch": "tag-only",
-  "state": "source-frozen",
+  "state": "package-built",
   "source_release": { "release": "1.5.5", "tag": "1.5.5", "archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD", "content_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778" },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
-  "package": {"source_commit":"8098510acc3530321a2dc32b8d2292aa814bb9c3","source_tree":"cdefcdc2f3bf74b806759374335b669746204912","source_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED"},
-  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.5.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
+  "package": {"source_commit":"8098510acc3530321a2dc32b8d2292aa814bb9c3","source_tree":"cdefcdc2f3bf74b806759374335b669746204912","source_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED","archive":"dist/more-infinite-research_1.5.9.zip","archive_sha256":"85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E","content_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED","bytes":385629,"entries":177},
+  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.5.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","candidate_reconstruction":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json"},
   "assurance_exceptions": [],
-  "remaining_obligations": ["triple-reconstruct-exact-candidate", "focused-qualification", "candidate-qualification", "complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
+  "remaining_obligations": ["focused-qualification", "candidate-qualification", "complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
   "incident_ids": [],
-  "updated_at": "2026-08-14T18:05:46+10:00"
+  "updated_at": "2026-08-14T19:05:57+10:00"
 }
