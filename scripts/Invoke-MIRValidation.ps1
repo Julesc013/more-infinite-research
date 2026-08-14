@@ -1892,10 +1892,22 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
 
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
-  $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
+  $generatedUserDataRoot = Join-Path $repo "build\validation-userdata"
+  New-Item -ItemType Directory -Force -Path $generatedUserDataRoot | Out-Null
+  $UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
 $validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
+
+function Remove-MIRGeneratedValidationUserData {
+  if (-not $usesGeneratedUserDataDir -or -not (Test-Path -LiteralPath $validationRoot)) { return }
+  $resolvedGeneratedRoot = (Resolve-Path -LiteralPath $generatedUserDataRoot).Path.TrimEnd("\") + "\"
+  $resolvedValidationRoot = (Resolve-Path -LiteralPath $validationRoot).Path
+  if (-not $resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to remove generated validation userdata outside its build root: $resolvedValidationRoot"
+  }
+  Remove-Item -LiteralPath $resolvedValidationRoot -Recurse -Force
+}
 $factorioBinResolved = (Resolve-Path -LiteralPath $FactorioBin).Path
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorioBinResolved))
 $factorioReadData = Join-Path $factorioRoot "data"
@@ -3072,9 +3084,7 @@ if ($isReducedLegacyLine) {
     Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
   }
 
-  if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
-    Remove-Item -LiteralPath $validationRoot -Recurse -Force
-  }
+  Remove-MIRGeneratedValidationUserData
 
   Write-Host "[ok] Validation completed."
   $global:LASTEXITCODE = 0
@@ -3746,9 +3756,7 @@ if (-not $isFactorio21Line) {
   Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
 }
 
-if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
-  Remove-Item -LiteralPath $validationRoot -Recurse -Force
-}
+Remove-MIRGeneratedValidationUserData
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0

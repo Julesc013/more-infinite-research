@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowUpgradeFixturesV1",
+  "release": "1.6.9",
+  "target": "0.16",
+  "phase": "shadow-convergence",
+  "rows": [
+    {
+      "id": "1.6.5-to-1.6.9",
+      "from": {
+        "release": "1.6.5",
+        "tag": "1.6.5",
+        "commit": "da298d36cd41b6874e51eae31252cebd079872ad"
+      },
+      "to_release": "1.6.9",
+      "exact_engine": "0.16.51",
+      "source_fixture": {
+        "path": "fixtures/assert-upgrade-1-6-0-to-1-6-5",
+        "commit": "da298d36cd41b6874e51eae31252cebd079872ad"
+      },
+      "generated_fixture": "fixtures/assert-upgrade-1-6-5-to-1-6-9",
+      "proof_path": "build/reports/release/1.6.9/1.6.5-to-1.6.9-upgrade-proof.json",
+      "status": "planned-unfrozen-candidate-unassigned"
+    },
+    {
+      "id": "1.6.0-to-1.6.9",
+      "from": {
+        "release": "1.6.0",
+        "tag": "1.6.0",
+        "commit": "a48509ed1dfbae8eba4b3dc7a701065063c12d5f"
+      },
+      "to_release": "1.6.9",
+      "exact_engine": "0.16.51",
+      "source_fixture": {
+        "path": "fixtures/assert-upgrade-1-6-0-to-1-6-5",
+        "commit": "da298d36cd41b6874e51eae31252cebd079872ad"
+      },
+      "generated_fixture": "fixtures/assert-upgrade-1-6-0-to-1-6-9",
+      "proof_path": "build/reports/release/1.6.9/1.6.0-to-1.6.9-upgrade-proof.json",
+      "status": "planned-unfrozen-candidate-unassigned"
+    }
+  ],
+  "source_frozen": false,
+  "candidate_id": null
+}

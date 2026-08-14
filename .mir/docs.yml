@@ -1624,3 +1624,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-1.6.0-lower-wave-dossier
+
+# MIR3-TERMINAL-RELEASE-NOTE release=1.6.9
+  - path: docs/releases/notes/release-notes-1.6.9.md
+    title: "MIR 1.6.9 Terminal Shadow Notes"
+    status: draft
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1-6-9-terminal-shadow-notes
+# MIR3-TERMINAL-RELEASE-NOTE-END release=1.6.9
