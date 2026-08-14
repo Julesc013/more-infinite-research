@@ -615,6 +615,7 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'resume_exact_dist_evidence_run:',
   'Admit prior passing exact-dist evidence',
   'Prior exact-dist evidence was invalidated by controller changes',
+  'Join-Path $controller ".mir/releases/records/$version.json"',
   "'.github/workflows/release-candidate.yml'",
   "'validation/tests/tooling/Test-MIRAssurance.ps1'",
   "@(`$summary.expected_scenarios).Count -ne 124",
