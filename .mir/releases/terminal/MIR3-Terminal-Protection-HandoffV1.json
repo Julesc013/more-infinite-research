@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "kind": "MIR3-Terminal-Protection-HandoffV1",
-  "status": "corrected-ready-for-application-blocked-external-auth",
-  "reason_not_applied": "Local gh authentication cannot administer repository rulesets. Payloads and negative-test procedure are complete, but no repository-setting mutation or verification is claimed.",
+  "status": "applied-and-verified",
+  "application_result": "Nine production rulesets are active at the governed definitions. Disposable branch and tag canaries rejected all six mutation classes, direct and force dev updates were rejected, and all canary rulesets and refs were removed.",
   "repository": "Julesc013/more-infinite-research",
   "precondition": "Archive current rulesets and branch protections, create disposable canary refs, apply and pass canary negative tests, then apply production payloads and verify returned ruleset state.",
   "observed_required_checks": [
@@ -25,5 +25,29 @@
   "payload_root": ".mir/releases/terminal/protections",
   "canary": {"branch_pattern":"refs/heads/canary/mir3-terminal-protection-*","tag_pattern":"refs/tags/canary/mir3-terminal-protection-*","real_release_refs_permitted":false,"payloads":["canary-branch.json","canary-tag.json"]},
   "emergency_bypass": {"dev":"repository-owner pull-request bypass only for the PR workflow rule; integrity and required-check rules have no bypass","main_legacy":"repository-owner may satisfy only the update restriction; integrity and required-check rules have no bypass","receipt_required":true,"package_change_requires_new_candidate":true},
-  "application_receipt": {"ruleset_snapshot_sha256":null,"branch_protection_snapshot_sha256":null,"canary_ruleset_ids":[],"production_ruleset_ids":[],"applied_by":null,"applied_at":null,"verified_at":null,"negative_tests":[],"status":"not-applied"}
+  "application_receipt": {
+    "path": ".mir/evidence/terminal-protections/2026-08-14/application-receipt.json",
+    "sha256": "C8A6F4003F31D133BD111510FB7D64AC79E19EE48C167D8CC9414E3F28847877",
+    "evidence_manifest_path": ".mir/evidence/terminal-protections/2026-08-14/artifact-manifest.json",
+    "evidence_manifest_sha256": "76887308475F0F4A93F5862ADF87E4AA93804F96885564CF2FA4B59140C0B466",
+    "ruleset_snapshot_before_sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+    "ruleset_snapshot_after_sha256": "6C344081638BCCDE01B83B7D3EF2CA81C4B26CC94F87444EFDB25DFB3925485C",
+    "branch_protection_snapshot_sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+    "canary_ruleset_ids": [20833388, 20833389],
+    "production_ruleset_ids": [20833400, 20833401, 20833404, 20833406, 20833407, 20833408, 20833409, 20833410, 20833412],
+    "applied_by": {"login":"Julesc013","actor_id":30209022},
+    "applied_at": "2026-08-14T06:05:32.8261753Z",
+    "verified_at": "2026-08-14T06:07:59.6939367Z",
+    "negative_tests": [
+      "branch-fast-forward-update-rejected",
+      "branch-non-fast-forward-update-rejected",
+      "branch-deletion-rejected",
+      "tag-creation-rejected",
+      "tag-update-rejected",
+      "tag-deletion-rejected",
+      "dev-direct-same-sha-rejected",
+      "dev-force-same-sha-rejected"
+    ],
+    "status": "applied-and-verified"
+  }
 }

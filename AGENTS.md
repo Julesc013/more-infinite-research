@@ -22,6 +22,7 @@ More Infinite Research is a Factorio mod. The 3.x direction is a modular compati
 - Every public compatibility claim needs fixture or named load-check evidence.
 - Update `.mir/` manifests when docs, capabilities, streams, compatibility claims, fixtures, branch policy, module boundaries, or agent routing change.
 - Before running tests, materialize or inspect the MIR verification plan and run only its required work unless a broader profile or `--no-reuse` was explicitly requested. Reuse evidence only for an exact trusted fingerprint; adopt a matching in-progress worker instead of cancelling it or starting duplicate work; never substitute mutable job status for the aggregate evidence gate.
+- In Codex sessions, treat `gh` failures from the `codexsandboxoffline` Windows identity or blocked outbound sockets as sandbox-context failures, not evidence that the maintainer's GitHub token is invalid. Retry GitHub operations in the approved machine/network context and ask for reauthentication only if `gh auth status` fails there.
 
 ## Validation
 

@@ -73,6 +73,7 @@ $assuranceToolingClassificationCases = @(
   "scripts/Invoke-MIRAssurance.ps1",
   "tools/mir.ps1",
   "tools/commands/control/Invoke-MIRControlPlaneWork.ps1",
+  "tools/commands/release/Test-MIRGitHubAdministration.ps1",
   "tools/lib/assurance/Evidence.ps1",
   "tools/lib/control/Evidence.ps1",
   "tools/lib/control/Planner.ps1",
@@ -80,6 +81,8 @@ $assuranceToolingClassificationCases = @(
   ".mir/control-plane/approved-delta-policies.json",
   "tools/maintenance/Move-MIRValidationDefinitions.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
+  "validation/tests/tooling/Test-MIRLayout.ps1",
+  "validation/tests/release/Test-MIRGitHubAdministration.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
 )
@@ -165,6 +168,7 @@ foreach ($requiredStaticRoutingPath in @(
   ".github/workflows/assurance-*.yml",
   ".github/workflows/control-plane-v5.yml",
   "tools/commands/control/**",
+  "tools/commands/release/**",
   "tools/lib/control/Evidence.ps1",
   "tools/mir.ps1",
   "tools/lib/control/Views.ps1",
@@ -172,7 +176,9 @@ foreach ($requiredStaticRoutingPath in @(
   "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
   "validation/tests/package/Test-MIRArtifactCleanup.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
+  "validation/tests/tooling/Test-MIRLayout.ps1",
   "validation/tests/tooling/Test-MIRControlPlane.ps1",
+  "validation/tests/release/Test-MIRGitHubAdministration.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1"
 )) {
   $matchingRules = @($impact.paths | Where-Object { [string]$_.pattern -eq $requiredStaticRoutingPath })
@@ -724,9 +730,12 @@ try {
   if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceGitRoot)) {
     throw "Unable to resolve the source repository Git directory for separate-root equivalence."
   }
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --no-hardlinks $RepoRoot $plannerRoot
+  # The roots need independent indexes and working trees for LF/CRLF proof, not
+  # duplicate copies of the immutable repository object store. Sharing objects
+  # prevents this regression from becoming a disk-capacity false failure.
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --shared $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --no-hardlinks $RepoRoot $workerRoot
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --shared $RepoRoot $workerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {

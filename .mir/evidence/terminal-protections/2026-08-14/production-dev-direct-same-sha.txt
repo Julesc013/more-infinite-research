@@ -1,0 +1,6 @@
+gh: Repository rule violations found
+
+Changes must be made through a pull request.
+
+ (HTTP 422)
+{"message":"Repository rule violations found\n\nChanges must be made through a pull request.\n\n","documentation_url":"https://docs.github.com/rest/git/refs#update-a-reference","status":"422"}

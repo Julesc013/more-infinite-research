@@ -1,0 +1,6 @@
+gh: Repository rule violations found
+
+Cannot delete this branch
+
+ (HTTP 422)
+{"message":"Repository rule violations found\n\nCannot delete this branch\n\n","documentation_url":"https://docs.github.com/rest/git/refs#delete-a-reference","status":"422"}

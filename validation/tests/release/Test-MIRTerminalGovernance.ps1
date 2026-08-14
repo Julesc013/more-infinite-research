@@ -5,6 +5,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../
 
 & (Join-Path $RepoRoot "validation/tests/release/Test-MIRTerminalShadowProjection.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation failed." }
+& (Join-Path $RepoRoot "validation/tests/release/Test-MIRGitHubAdministration.ps1") -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { throw "MIR GitHub administration preflight validation failed." }
 
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $authorityNames = @(
@@ -565,13 +567,65 @@ $dot5Tags = @("refs/tags/3.2.5", "refs/tags/2.5.5", "refs/tags/1.9.5", "refs/tag
 $dot9Tags = @($family | ForEach-Object { "refs/tags/$_" })
 $checkNames = @("branch-policy", "verification-gate")
 if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
-    [string]$protection.status -ne "corrected-ready-for-application-blocked-external-auth" -or
-    [string]$protection.application_receipt.status -ne "not-applied" -or
+    [string]$protection.status -ne "applied-and-verified" -or
+    [string]$protection.application_receipt.status -ne "applied-and-verified" -or
+    @($protection.application_receipt.canary_ruleset_ids).Count -ne 2 -or
+    @($protection.application_receipt.production_ruleset_ids).Count -ne 9 -or
+    @($protection.application_receipt.production_ruleset_ids | Sort-Object -Unique).Count -ne 9 -or
+    [string]$protection.application_receipt.applied_by.login -ne "Julesc013" -or
+    [int]$protection.application_receipt.applied_by.actor_id -ne 30209022 -or
+    @($protection.application_receipt.negative_tests).Count -lt 8 -or
     (@($protection.immutable_dot5_tags) -join "|") -ne ($dot5Tags -join "|") -or
     (@($protection.future_terminal_tags) -join "|") -ne ($dot9Tags -join "|") -or
     @($protection.observed_required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
     @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0) {
   throw "Terminal protection handoff is incomplete, overclaims application, or contradicts promotion topology."
+}
+foreach ($field in @("applied_at", "verified_at")) {
+  try { $null = [DateTimeOffset]::Parse([string]$protection.application_receipt.$field, [Globalization.CultureInfo]::InvariantCulture) }
+  catch { throw "Terminal protection application receipt has a noncanonical $field timestamp." }
+}
+$protectionReceiptRelative = ([string]$protection.application_receipt.path).Replace("\", "/")
+$protectionManifestRelative = ([string]$protection.application_receipt.evidence_manifest_path).Replace("\", "/")
+foreach ($relative in @($protectionReceiptRelative, $protectionManifestRelative)) {
+  if ([IO.Path]::IsPathRooted($relative) -or $relative.Contains("..") -or $relative.Contains(":")) {
+    throw "Terminal protection evidence path is not portable: $relative"
+  }
+}
+$protectionReceiptPath = Join-Path $RepoRoot $protectionReceiptRelative
+$protectionManifestPath = Join-Path $RepoRoot $protectionManifestRelative
+if (-not (Test-Path -LiteralPath $protectionReceiptPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $protectionManifestPath -PathType Leaf) -or
+    (Get-FileHash -LiteralPath $protectionReceiptPath -Algorithm SHA256).Hash -ne [string]$protection.application_receipt.sha256 -or
+    (Get-FileHash -LiteralPath $protectionManifestPath -Algorithm SHA256).Hash -ne [string]$protection.application_receipt.evidence_manifest_sha256) {
+  throw "Terminal protection application receipt or evidence manifest is absent or stale."
+}
+$protectionApplication = Get-Content -Raw -LiteralPath $protectionReceiptPath | ConvertFrom-Json -Depth 100
+$protectionEvidence = Get-Content -Raw -LiteralPath $protectionManifestPath | ConvertFrom-Json -Depth 100
+if ([string]$protectionApplication.kind -ne "MIR3TerminalProtectionApplicationReceiptV1" -or
+    [string]$protectionApplication.status -ne "applied-and-verified" -or
+    [string]$protectionApplication.repository -ne [string]$protection.repository -or
+    @($protectionApplication.production_rulesets).Count -ne 9 -or
+    @($protectionApplication.production_rulesets | Where-Object enforcement -ne "active").Count -ne 0 -or
+    (@($protectionApplication.production_rulesets.id) -join "|") -ne (@($protection.application_receipt.production_ruleset_ids) -join "|") -or
+    @($protectionApplication.required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
+    -not [bool]$protectionApplication.canary.rulesets_removed -or -not [bool]$protectionApplication.canary.refs_removed -or
+    @($protectionApplication.canary.negative_tests | Where-Object result -ne "rejected-http-422").Count -ne 0 -or
+    [string]$protectionEvidence.kind -ne "MIR3TerminalProtectionEvidenceManifestV1" -or
+    @($protectionEvidence.artifacts).Count -lt 20) {
+  throw "Terminal protection application evidence does not bind the exact live applied state."
+}
+foreach ($artifact in @($protectionEvidence.artifacts)) {
+  $relative = ([string]$artifact.path).Replace("\", "/")
+  if ([IO.Path]::IsPathRooted($relative) -or $relative.Contains("..") -or $relative.Contains(":")) {
+    throw "Terminal protection artifact path is not portable: $relative"
+  }
+  $artifactPath = Join-Path $RepoRoot $relative
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash -ne [string]$artifact.sha256 -or
+      (Get-Item -LiteralPath $artifactPath).Length -ne [long]$artifact.bytes) {
+    throw "Terminal protection artifact is absent or stale: $relative"
+  }
 }
 
 $payloadRoot = Join-Path $RepoRoot ([string]$protection.payload_root)

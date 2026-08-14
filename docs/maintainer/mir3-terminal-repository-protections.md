@@ -5,14 +5,28 @@ applies_to: "MIR 3 terminal programme"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-14
 supersedes: []
 superseded_by: []
 ---
 
 # MIR 3 Terminal Repository Protections
 
-This runbook applies the package-excluded authority in `.mir/releases/terminal/MIR3-Terminal-Protection-HandoffV1.json`. Its current status is `corrected-ready-for-application-blocked-external-auth`. Do not claim repository protections until the authority contains returned production ruleset IDs, immutable snapshots, an authenticated actor, timestamps, and passing negative tests.
+This runbook applies and verifies the package-excluded authority in `.mir/releases/terminal/MIR3-Terminal-Protection-HandoffV1.json`. Its current status is `applied-and-verified`. The authority binds returned production ruleset IDs, immutable snapshots, the authenticated actor, timestamps, and passing negative tests.
+
+## Administration preflight
+
+Run the canonical preflight in the exact shell that will perform a GitHub administration operation:
+
+```powershell
+.\tools\commands\release\Test-MIRGitHubAdministration.ps1 `
+  -Repository Julesc013/more-infinite-research `
+  -OutputPath build/results/github-administration/preflight.json
+```
+
+The preflight checks `gh auth status`, the authenticated login, repository administration permission, and the live ruleset inventory. It records only the presence of `GH_TOKEN`, `GITHUB_TOKEN`, `GH_CONFIG_DIR`, and `USERPROFILE`; it never records their values. A successful current-shell authentication probe is conclusive for that shell. Do not request another login because a sandbox identity or another connector cannot reach GitHub.
+
+On failure, use the receipt classification: HTTP 401 is authentication, HTTP 403 is authorization or permission, and HTTP 422 is payload or API validation. A missing HTTP status remains a command or execution-context failure and is not automatically an authentication failure.
 
 ## Branch model
 
@@ -36,10 +50,10 @@ Rulesets do not prove signatures, seals, or family readiness. Those remain relea
 
 ## Snapshot and canary
 
-Authenticate `gh` as an actor able to administer repository rulesets, then create the output directory and snapshot the unmodified settings:
+Run the administration preflight, then create the output directory and snapshot the unmodified settings:
 
 ```powershell
-gh auth status -h github.com
+.\tools\commands\release\Test-MIRGitHubAdministration.ps1
 New-Item -ItemType Directory -Force build/results/terminal-protections | Out-Null
 gh api repos/Julesc013/more-infinite-research/rulesets --paginate | Set-Content build/results/terminal-protections/rulesets-before.json
 gh api repos/Julesc013/more-infinite-research/branches/dev/protection | Set-Content build/results/terminal-protections/dev-before.json

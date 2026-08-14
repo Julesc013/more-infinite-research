@@ -9,6 +9,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - terminal-repository-protection-handoff
+      - github-administration-preflight
   - path: docs/releases/mir-3-terminal-dot5-baseline-capture.md
     title: "MIR 3 Terminal .5 Baseline Capture"
     status: current
