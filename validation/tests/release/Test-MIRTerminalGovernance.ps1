@@ -542,12 +542,23 @@ if (-not ((Get-Content -Raw -LiteralPath $sourceFreezePath) | Test-Json -SchemaF
     [bool]$sourceFreeze.boundaries.dot5_package_bytes_changed) {
   throw "Terminal family source-freeze authority is invalid or crosses a later gate."
 }
+function Get-MIRTerminalCanonicalTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
+}
+if ((Get-MIRTerminalCanonicalTextSha256 -Text "authority`nrow`n") -ne
+    (Get-MIRTerminalCanonicalTextSha256 -Text "authority`r`nrow`r`n")) {
+  throw "Terminal source-freeze text digest is not invariant across LF and CRLF checkouts."
+}
 foreach ($binding in @($sourceFreeze.fixed_point, $sourceFreeze.repository_protection) + @($sourceFreeze.authority_roots)) {
   $bindingPath = Join-Path $RepoRoot ([string]$binding.path)
-  if (-not (Test-Path -LiteralPath $bindingPath -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $bindingPath -Algorithm SHA256).Hash -ne [string]$binding.sha256) {
+  if (-not (Test-Path -LiteralPath $bindingPath -PathType Leaf)) {
     throw "Terminal source-freeze authority root drifted: $($binding.path)"
   }
+  $bindingHash = Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($bindingPath))
+  if ($bindingHash -ne [string]$binding.canonical_text_sha256) { throw "Terminal source-freeze authority root drifted: $($binding.path)" }
 }
 $commonTree = (& git -C $RepoRoot rev-parse "$($sourceFreeze.common_source.commit)^{tree}").Trim()
 if ($LASTEXITCODE -ne 0 -or $commonTree -ne [string]$sourceFreeze.common_source.tree -or

@@ -47,8 +47,8 @@
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "authority": {
       "type": "object",
-      "required": ["path", "sha256"],
-      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}},
+      "required": ["path", "canonical_text_sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "canonical_text_sha256": {"$ref": "#/$defs/sha256"}},
       "additionalProperties": false
     },
     "packageIdentity": {
