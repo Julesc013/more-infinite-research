@@ -626,6 +626,7 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'Run complete exact-dist validation',
   '-CandidateZip $candidateArchive',
   'Run strict targeted compatibility gate',
+  'MIR_COMPAT_RUNTIME_ROOT: ''C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}''',
   "--candidate `$candidateArchive",
   '--candidate-source ''${{ inputs.candidate_sha }}''',
   "--output 'build/results/release-gate'",

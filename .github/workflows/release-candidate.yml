@@ -192,6 +192,7 @@ jobs:
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_COMPAT_RUNTIME_ROOT: 'C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}'
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
           $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
