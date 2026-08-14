@@ -25,6 +25,26 @@ foreach ($requiredPolicy in @(
   }
 }
 
+$atanScenarioOffset = $validationFacade.IndexOf('Invoke-RuntimeScenario -ScenarioName "atan-ash-separation"', [StringComparison]::Ordinal)
+$atanTileRiskOffset = $validationFacade.IndexOf('$atanAshTileRisk = Get-DiagnosticReportLineContaining', [StringComparison]::Ordinal)
+$atanSinkRiskOffset = $validationFacade.IndexOf('$atanAshSinkRisk = Get-DiagnosticReportLineContaining', [StringComparison]::Ordinal)
+$nextScenarioOffset = $validationFacade.IndexOf('Invoke-RuntimeScenario -ScenarioName "combination-atan-ash-big-mining-drill"', [StringComparison]::Ordinal)
+if ($atanScenarioOffset -lt 0 -or $atanTileRiskOffset -le $atanScenarioOffset -or $atanSinkRiskOffset -le $atanTileRiskOffset -or
+    $nextScenarioOffset -le $atanSinkRiskOffset) {
+  throw "ATAN runtime diagnostics must be asserted while the ATAN scenario still owns the shared Factorio log."
+}
+
+if ($validationFacade -notmatch [regex]::Escape('Assert-LogContains -Expected "spoilage preservation skipped: missing technology" -Context "Data-stage-disabled scripted spoilage runtime scenario"')) {
+  throw "A scripted stream disabled during the data stage must prove the runtime handler safely observes its omitted technology."
+}
+
+foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
+  $currentSignature = 'schema=3|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
+  if (-not $validationFacade.Contains($currentSignature, [StringComparison]::Ordinal)) {
+    throw "Native-owner configuration-change validation must assert the current schema-3 cost-bound signature for $nativeOwnerStream."
+  }
+}
+
 $factorioProcess = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
 foreach ($requiredPolicy in @(
   'function Get-MIRCompactScenarioPathSegment {',
