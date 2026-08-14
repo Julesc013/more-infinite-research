@@ -47,6 +47,17 @@ if (-not $validationFacade.Contains($k2ScenarioInvocation.Trim(), [StringCompari
   throw "The manifest-required K2 science-phase policy scenario must be invoked by the complete validation facade."
 }
 
+$runtimeAuthoritySync = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\targets\Sync-MIRRuntimeScenarioAuthority.ps1")
+$expectedDynamicStart = $runtimeAuthoritySync.IndexOf('$expectedDynamic = @(', [StringComparison]::Ordinal)
+$expectedDynamicEnd = $runtimeAuthoritySync.IndexOf("`n)", $expectedDynamicStart, [StringComparison]::Ordinal)
+if ($expectedDynamicStart -lt 0 -or $expectedDynamicEnd -le $expectedDynamicStart) {
+  throw "Runtime scenario authority synchronizer does not expose its bounded manifest-driven scenario list."
+}
+$expectedDynamicBlock = $runtimeAuthoritySync.Substring($expectedDynamicStart, $expectedDynamicEnd - $expectedDynamicStart)
+if ($expectedDynamicBlock.Contains('"k2-science-phase-policy"', [StringComparison]::Ordinal)) {
+  throw "The directly invoked K2 science-phase policy scenario must not remain classified as manifest-driven."
+}
+
 foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
   $currentSignature = 'schema=3|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
   if (-not $validationFacade.Contains($currentSignature, [StringComparison]::Ordinal)) {
