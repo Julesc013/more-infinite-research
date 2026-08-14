@@ -1,17 +1,39 @@
-name: Validate
+name: MIR Terminal Shadow Verify
 
 on:
   push:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  static:
+  verify:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Static validation and package checks
+      - name: Build deterministic terminal shadow archive
+        shell: pwsh
+        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
+      - name: Diagnose target-native assurance environment
+        shell: pwsh
+        run: .\scripts\Invoke-MIRAssurance.ps1 doctor --target '0.15' --candidate '.\dist\more-infinite-research_1.5.9.zip' --json
+      - name: Materialize target-native verification plan
+        shell: pwsh
+        run: .\scripts\Invoke-MIRAssurance.ps1 plan --target '0.15' --candidate '.\dist\more-infinite-research_1.5.9.zip' --profile fast --output artifacts/assurance/plan.json
+      - name: Validate planner and evidence invalidation
+        shell: pwsh
+        run: .\scripts\Test-MIRAssurance.ps1
+      - name: Run target-native static gate
         shell: pwsh
         run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+      - name: Upload verification plan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mir-terminal-shadow-verification-plan
+          path: artifacts/assurance/plan.json
+          if-no-files-found: warn
