@@ -135,7 +135,7 @@ if ([string]$packet.status -eq "prepared") {
   if ([string]$packet.candidate_id -ne "C32" -or [string]$release.candidate_id -ne "C32" -or
       [string]$release.state -notin @(
         "source-frozen", "package-built", "focused-qualified", "candidate-qualified",
-        "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged",
+        "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged",
         "published", "publicly-verified"
       )) {
     throw "An admitted D1 packet must bind exact candidate C32 and a valid post-planning state."

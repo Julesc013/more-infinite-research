@@ -7,15 +7,11 @@
   ],
   "release": "2.5.9",
   "remaining_obligations": [
-    "focused-qualification",
-    "candidate-qualification",
     "complete-exact-hash-manual-review",
     "target-and-family-seal",
     "promote-tag-publish-and-publicly-verify"
   ],
   "remaining_states": [
-    "focused-qualified",
-    "candidate-qualified",
     "manually-accepted",
     "protected-qualified",
     "sealed",
@@ -25,6 +21,6 @@
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "package-built",
+  "state": "automated-qualified-awaiting-human-review",
   "target": "2.0"
 }

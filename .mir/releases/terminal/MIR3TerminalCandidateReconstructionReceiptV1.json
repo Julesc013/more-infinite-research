@@ -8,7 +8,7 @@
   },
   "source_authorities": {
     "allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
-    "allocation_raw_sha256": "622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010",
+    "allocation_canonical_text_sha256": "A672B62BFCAC76A718B3AA11D48939E03CAFCD14BC7A878D0BE9715B4D58DFCA",
     "allocation_merge": {
       "commit": "e2399afb117a641fa66c4043de41586dd15b7a67",
       "tree": "d423e957e281371fb8ea69660b5f44f00588edc8"

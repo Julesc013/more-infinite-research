@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR3-Terminal-ProgrammeV1",
-  "status": "candidates-reconstructed-ready-for-automated-qualification",
+  "status": "family-ready-for-human-review",
   "implementation_admitted": true,
   "source_frozen": true,
   "family": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
@@ -15,6 +15,8 @@
     "change_set": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
     "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
     "candidate_reconstruction": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+    "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "target_qualifications": ".mir/releases/terminal/qualifications",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
     "fixed_point_receipt": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
     "source_freeze": ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json",
@@ -34,5 +36,5 @@
     "product_admission": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
     "experiments": ".mir/releases/terminal/experiments"
   },
-  "hard_gate": "The accepted fixed point, applied protections, source freeze, exact candidate allocation, and three-root package reconstruction admit automated qualification. Manual acceptance, target seals, family seal, tags, and publication remain forbidden until their own authorities pass."
+  "hard_gate": "All nine frozen candidates are automatically qualified and exact-hash review packets may be presented to the maintainer. Manual acceptance, target seals, family seal, tags, and publication remain forbidden until explicit candidate-by-candidate human approval is durably recorded."
 }

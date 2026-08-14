@@ -19,10 +19,10 @@
     },
     "source_authorities": {
       "type": "object",
-      "required": ["allocation", "allocation_raw_sha256", "allocation_merge", "post_merge_runs"],
+      "required": ["allocation", "allocation_canonical_text_sha256", "allocation_merge", "post_merge_runs"],
       "properties": {
         "allocation": {"const": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
-        "allocation_raw_sha256": {"$ref": "#/$defs/sha256"},
+        "allocation_canonical_text_sha256": {"$ref": "#/$defs/sha256"},
         "allocation_merge": {
           "type": "object",
           "required": ["commit", "tree"],

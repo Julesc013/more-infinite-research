@@ -6,14 +6,14 @@
   "candidate_allocation": {"namespace":"1.6-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":"1.6-P1","assigned_at":"2026-08-14T18:05:46+10:00","candidate_ref":"refs/heads/candidate/1.6.9-1.6-P1","candidate_commit":"595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d","assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
   "target": "0.16",
   "branch": "tag-only",
-  "state": "package-built",
+  "state": "automated-qualified-awaiting-human-review",
   "source_release": { "release": "1.6.5", "tag": "1.6.5", "archive_sha256": "8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB", "content_sha256": "C19B2F407912E01E12E1D117180504787C352027B9132476A65D9C9D4F4B8392" },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
   "package": {"source_commit":"595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d","source_tree":"30f2eab0ac7624d14f4630e76aaff79e2d81b92f","source_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493","archive":"dist/more-infinite-research_1.6.9.zip","archive_sha256":"928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84","content_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493","bytes":385315,"entries":177},
-  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.6.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","candidate_reconstruction":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json"},
+  "proofs": {"fixed_point":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","source_freeze":".mir/releases/terminal/freezes/1.6.9.json","candidate_allocation":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","candidate_reconstruction":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json","candidate_settings_qualification":".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json","automated_qualification":".mir/releases/terminal/qualifications/1.6.9.json"},
   "assurance_exceptions": [],
-  "remaining_obligations": ["focused-qualification", "candidate-qualification", "complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
+  "remaining_obligations": ["complete-exact-hash-manual-review", "target-and-family-seal", "tag-publish-and-publicly-verify"],
   "incident_ids": [],
-  "updated_at": "2026-08-14T19:05:57+10:00"
+  "updated_at": "2026-08-15T08:10:14+10:00"
 }
