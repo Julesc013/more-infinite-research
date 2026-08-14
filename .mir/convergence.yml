@@ -1,13 +1,20 @@
 schema: 1
 
 release:
-  version: "1.8.5"
-  branch: candidate/1.8.5-projection
+  version: "1.8.9"
+  branch: candidate/1.8.9-projection
   factorio_version: "1.0"
-  baseline_commit: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
-  baseline_tag: "3.1.9"
+  baseline_commit: 2fa5b6fc1f86fe2a17779628efcbf83ffb033aed
+  baseline_tag: "1.8.5"
+  pre_dot5_public_predecessor: "1.8.2"
+  portable_source_release: "3.2.9"
+  portable_source_commit: 5496896914666158ad4056026819528395861540
+  target_profile: "terminal-factorio-1.0.0"
+  target_adapter: "factorio-1.0-target-native-no-product-delta"
+  target_assurance_overlays: "none"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944

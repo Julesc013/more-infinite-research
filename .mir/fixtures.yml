@@ -571,3 +571,23 @@ fixtures:
       - single-recipe-fact-scan
       - single-technology-coverage-scan
       - complete-recipe-accounting
+
+# MIR3-TERMINAL-UPGRADE-FIXTURES release=1.8.9
+  terminal-upgrade-1-8-5-to-1-8-9:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-8-5-to-1-8-9
+    validates:
+      - exact-1.8.5-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-1.8.9-development-archive-load
+
+  terminal-upgrade-1-8-2-to-1-8-9:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-8-2-to-1-8-9
+    validates:
+      - exact-1.8.2-source-archive
+      - stable-identifier-retention
+      - research-and-runtime-state-retention
+      - exact-1.8.9-development-archive-load
+# MIR3-TERMINAL-UPGRADE-FIXTURES-END release=1.8.9

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowUpgradeFixturesV1",
+  "release": "1.8.9",
+  "target": "1.0",
+  "phase": "shadow-convergence",
+  "rows": [
+    {
+      "id": "1.8.5-to-1.8.9",
+      "from": {
+        "release": "1.8.5",
+        "tag": "1.8.5",
+        "commit": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed"
+      },
+      "to_release": "1.8.9",
+      "exact_engine": "1.0.0-only",
+      "source_fixture": {
+        "path": "fixtures/assert-upgrade-1-8-2-to-1-8-5",
+        "commit": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed"
+      },
+      "generated_fixture": "fixtures/assert-upgrade-1-8-5-to-1-8-9",
+      "proof_path": "build/reports/release/1.8.9/1.8.5-to-1.8.9-upgrade-proof.json",
+      "status": "planned-unfrozen-candidate-unassigned"
+    },
+    {
+      "id": "1.8.2-to-1.8.9",
+      "from": {
+        "release": "1.8.2",
+        "tag": "1.8.2",
+        "commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8"
+      },
+      "to_release": "1.8.9",
+      "exact_engine": "1.0.0-only",
+      "source_fixture": {
+        "path": "fixtures/assert-upgrade-1-8-2-to-1-8-5",
+        "commit": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed"
+      },
+      "generated_fixture": "fixtures/assert-upgrade-1-8-2-to-1-8-9",
+      "proof_path": "build/reports/release/1.8.9/1.8.2-to-1.8.9-upgrade-proof.json",
+      "status": "planned-unfrozen-candidate-unassigned"
+    }
+  ],
+  "source_frozen": false,
+  "candidate_id": null
+}
