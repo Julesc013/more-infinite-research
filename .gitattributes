@@ -3,3 +3,4 @@
 .mir/evidence/**/*-attestation.json text eol=lf
 .mir/evidence/archive/mir3-term-experiments/**/*.json -text
 .mir/evidence/2.5.5-manual-review-attestation.json -text
+.mir/evidence/terminal-protections/**/* -text -diff

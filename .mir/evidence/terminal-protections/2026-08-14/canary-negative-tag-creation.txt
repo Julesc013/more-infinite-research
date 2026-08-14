@@ -1,0 +1,2 @@
+gh: Reference update failed (HTTP 422)
+{"message":"Reference update failed","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}

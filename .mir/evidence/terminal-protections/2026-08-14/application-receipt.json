@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProtectionApplicationReceiptV1",
+  "status": "applied-and-verified",
+  "repository": "Julesc013/more-infinite-research",
+  "administrator": {
+    "login": "Julesc013",
+    "actor_type": "User",
+    "actor_id": 30209022,
+    "repository_admin": true,
+    "credential_source": "windows-keyring",
+    "machine_credentials_changed": false
+  },
+  "authority": {
+    "dev_commit": "8d17bcb313a2425ddb7607317bf46a2cee71af4a",
+    "dev_tree": "a5f2d1d23b6cedb4eb2acef9f40a4aafa8d2fd43",
+    "payload_root": ".mir/releases/terminal/protections"
+  },
+  "timestamps": {
+    "captured_at": "2026-08-14T06:03:23.6224166Z",
+    "applied_at": "2026-08-14T06:05:32.8261753Z",
+    "verified_at": "2026-08-14T06:07:59.6939367Z"
+  },
+  "before": {
+    "rulesets": {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/rulesets-before.json",
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "observed_count": 0
+    },
+    "branch_protection": [
+      {
+        "branch": "dev",
+        "path": ".mir/evidence/terminal-protections/2026-08-14/dev-before.txt",
+        "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+        "http_status": 404
+      },
+      {
+        "branch": "main",
+        "path": ".mir/evidence/terminal-protections/2026-08-14/main-before.txt",
+        "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+        "http_status": 404
+      },
+      {
+        "branch": "legacy",
+        "path": ".mir/evidence/terminal-protections/2026-08-14/legacy-before.txt",
+        "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+        "http_status": 404
+      }
+    ]
+  },
+  "canary": {
+    "ruleset_ids": [20833388, 20833389],
+    "negative_tests": [
+      {
+        "id": "branch-fast-forward-update",
+        "result": "rejected-http-422",
+        "sha256": "0B718A29BB6DA5B9585212693AF0D4C18EBA8A8E5FC63F9A79C8D4CA90D759CB"
+      },
+      {
+        "id": "branch-non-fast-forward-update",
+        "result": "rejected-http-422",
+        "sha256": "EC4A0B204ADC49920AB060F1876E51196BC5C5179F1C7B11DC3460B4E09A6482"
+      },
+      {
+        "id": "branch-deletion",
+        "result": "rejected-http-422",
+        "sha256": "269192A9427AC879290DCE25753F301D68331D9BF03B9C7231E4A4AF2AF4F3CE"
+      },
+      {
+        "id": "tag-creation",
+        "result": "rejected-http-422",
+        "sha256": "CFCB4F72799C8E17EE4F76848E3A4FCE61BBC06D8C26E221EB4029CC873A4373"
+      },
+      {
+        "id": "tag-update",
+        "result": "rejected-http-422",
+        "sha256": "0B718A29BB6DA5B9585212693AF0D4C18EBA8A8E5FC63F9A79C8D4CA90D759CB"
+      },
+      {
+        "id": "tag-deletion",
+        "result": "rejected-http-422",
+        "sha256": "A93D8B883F304D6AD2C5EAFCA3878093B2BFFEF2B6139AE69BB164E4AB995FD8"
+      }
+    ],
+    "rulesets_removed": true,
+    "refs_removed": true
+  },
+  "production_rulesets": [
+    {"payload":"dot5-immutable.json","name":"MIR3 published dot5 immutable tags","id":20833400,"target":"tag","enforcement":"active"},
+    {"payload":"dot9-immutable.json","name":"MIR3 terminal dot9 immutable tags","id":20833401,"target":"tag","enforcement":"active"},
+    {"payload":"dot9-creation-gate.json","name":"MIR3 terminal dot9 creation gate","id":20833404,"target":"tag","enforcement":"active"},
+    {"payload":"dev-integrity.json","name":"MIR3 terminal dev integrity","id":20833406,"target":"branch","enforcement":"active"},
+    {"payload":"dev-workflow.json","name":"MIR3 terminal dev pull request workflow","id":20833407,"target":"branch","enforcement":"active"},
+    {"payload":"main-integrity.json","name":"MIR3 terminal main integrity","id":20833408,"target":"branch","enforcement":"active"},
+    {"payload":"main-promotion.json","name":"MIR3 terminal main promotion actor","id":20833409,"target":"branch","enforcement":"active"},
+    {"payload":"legacy-integrity.json","name":"MIR3 terminal legacy integrity","id":20833410,"target":"branch","enforcement":"active"},
+    {"payload":"legacy-promotion.json","name":"MIR3 terminal legacy promotion actor","id":20833412,"target":"branch","enforcement":"active"}
+  ],
+  "required_checks": [
+    {"context":"branch-policy","integration_id":15368},
+    {"context":"verification-gate","integration_id":15368}
+  ],
+  "production_verification": {
+    "live_ruleset_count": 9,
+    "exact_governed_payload_subset": true,
+    "dev_direct_same_sha": "rejected-http-422-pull-request-required",
+    "dev_force_same_sha": "rejected-http-422-pull-request-required",
+    "dot5_same_object_probe": "accepted-no-op-ref-unchanged-no-mutation-claim",
+    "dev_commit_unchanged": true,
+    "dot5_tag_object_unchanged": true,
+    "effective_dev_rules": ["deletion", "non_fast_forward", "required_status_checks", "pull_request"],
+    "effective_main_rules": ["deletion", "non_fast_forward", "required_status_checks", "update"],
+    "effective_legacy_rules": ["deletion", "non_fast_forward", "required_status_checks", "update"]
+  },
+  "evidence_manifest": {
+    "path": ".mir/evidence/terminal-protections/2026-08-14/artifact-manifest.json",
+    "sha256": "76887308475F0F4A93F5862ADF87E4AA93804F96885564CF2FA4B59140C0B466",
+    "artifact_count": 28
+  }
+}

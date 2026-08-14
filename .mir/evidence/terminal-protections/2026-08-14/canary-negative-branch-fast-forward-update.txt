@@ -1,0 +1,6 @@
+gh: Repository rule violations found
+
+Cannot update this protected ref.
+
+ (HTTP 422)
+{"message":"Repository rule violations found\n\nCannot update this protected ref.\n\n","documentation_url":"https://docs.github.com/rest/git/refs#update-a-reference","status":"422"}
