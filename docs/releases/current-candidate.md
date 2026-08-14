@@ -5,7 +5,7 @@ applies_to: "3.2.9"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
@@ -24,7 +24,7 @@ superseded_by: []
 | Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `package-built` |
+| State | `automated-qualified-awaiting-human-review` |
 | Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
 | Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
@@ -36,8 +36,6 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `focused-qualified`
-- [ ] `candidate-qualified`
 - [ ] `manually-accepted`
 - [ ] `protected-qualified`
 - [ ] `sealed`

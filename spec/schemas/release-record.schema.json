@@ -28,7 +28,7 @@
     "target": {"type": "string", "minLength": 1},
     "branch": {"type": "string", "minLength": 1},
     "development_branch": {"type": "string", "minLength": 1},
-    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
+    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
     "package": {
       "type": "object",
       "properties": {
@@ -92,7 +92,7 @@
       "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256"]}}}
     },
     {
-      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
+      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
       "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries"]}}}
     }
   ],

@@ -5,7 +5,7 @@ applies_to: "release-engineering"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
@@ -18,29 +18,29 @@ superseded_by: []
 
 | Release | Candidate | Namespace / minimum next ordinal | Target | Branch | Historical state | Effective status | Exceptions |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `3.2.9` | `C33` | `C / 33` | `2.1` | `main` | `package-built` | `package-built` | 0 |
+| `3.2.9` | `C33` | `C / 33` | `2.1` | `main` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `3.2.5` | `C32` | `C32` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.4` | `C31` | `pending` | `2.1` | `dev` | `package-built` | `superseded-unpublished` | 0 |
 | `3.2.3` | `C30` | `pending` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.2` | `C24` | `pending` | `2.1` | `main` | `tagged` | `tagged` | 1 |
 | `3.2.1` | `C21` | `pending` | `2.1` | `main` | `published` | `published` | 1 |
-| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `2.0` | `legacy` | `package-built` | `package-built` | 0 |
+| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `2.0` | `legacy` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `2.5.5` | `2.5-P12` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
 | `2.5.0` | `2.5-P11` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
 | `2.4.9` | `2.4.9-final` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `1.1` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `1.1` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.9.5` | `1.9.5-final` | `pending` | `1.1` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `1.0` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `1.0` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.8.5` | `1.8.5-final` | `pending` | `1.0` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `0.17` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `0.17` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.7.5` | `1.7.5-final` | `pending` | `0.17` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `0.16` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `0.16` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.6.5` | `1.6.5-final` | `pending` | `0.16` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `0.15` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `0.15` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.5.5` | `1.5.5-final` | `pending` | `0.15` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `0.14` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `0.14` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.4.5` | `1.4.5-final` | `pending` | `0.14` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
-| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `0.13` | `tag-only` | `package-built` | `package-built` | 0 |
+| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `0.13` | `tag-only` | `automated-qualified-awaiting-human-review` | `automated-qualified-awaiting-human-review` | 0 |
 | `1.3.5` | `1.3.5-final` | `pending` | `0.13` | `tag-only` | `publicly-verified` | `publicly-verified` | 1 |
 
 A state is an admitted fact, not a mutable job status. Every later transition requires its own immutable proof record.

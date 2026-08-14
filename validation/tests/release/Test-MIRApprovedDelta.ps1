@@ -18,6 +18,7 @@ $activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.j
 $defaultDeltaByVersion = @{
   "3.2.2" = ".mir\releases\deltas\3.2.1-to-3.2.2.json"
   "3.2.5" = ".mir\releases\deltas\3.2.3-to-3.2.5.json"
+  "3.2.9" = ".mir\releases\deltas\3.2.5-to-3.2.9.json"
 }
 $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
 $activeReleasePath = Join-Path $repo (Join-Path $releaseRecordRoot "$activeVersion.json")
@@ -57,6 +58,97 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Approved-delta artifact is absent: $artifactPath"
 }
 $artifact = Get-Content -Raw -LiteralPath $artifactPath | ConvertFrom-Json
+
+if ($activeVersion -eq "3.2.9") {
+  if ([int]$artifact.schema -ne 1 -or [string]$artifact.kind -ne "mir3-terminal-approved-delta" -or
+      [string]$artifact.status -ne "approved" -or [string]$artifact.transition.from_version -ne "3.2.5" -or
+      [string]$artifact.transition.to_version -ne "3.2.9" -or [string]$artifact.transition.candidate_id -ne "C33") {
+    throw "MIR 3.2.9 approved delta must use the exact terminal transition authority."
+  }
+
+  $authorityByRole = @{}
+  foreach ($binding in @($artifact.authority_bindings)) {
+    $role = [string]$binding.role
+    $relative = [string]$binding.path
+    if ([string]::IsNullOrWhiteSpace($role) -or $authorityByRole.ContainsKey($role) -or
+        $relative -notmatch '^\.mir/releases/terminal/[A-Za-z0-9./_-]+\.json$') {
+      throw "MIR 3.2.9 approved delta contains an unsafe or duplicate authority binding."
+    }
+    $boundPath = Join-Path $repo $relative
+    if (-not (Test-Path -LiteralPath $boundPath -PathType Leaf) -or
+        (Get-FileHash -LiteralPath $boundPath -Algorithm SHA256).Hash -ne [string]$binding.raw_sha256) {
+      throw "MIR 3.2.9 approved-delta authority drifted: $role"
+    }
+    $authorityByRole[$role] = Get-Content -Raw -LiteralPath $boundPath | ConvertFrom-Json -Depth 100
+  }
+  $expectedRoles = @("product-implementation-reconciliation", "all-nine-fixed-point", "candidate-allocation", "candidate-reconstruction", "automated-qualification")
+  if (@(Compare-Object $expectedRoles @($authorityByRole.Keys)).Count -ne 0) {
+    throw "MIR 3.2.9 approved delta does not bind the exact terminal authority set."
+  }
+
+  $reconciliation = $authorityByRole["product-implementation-reconciliation"]
+  $fixedPoint = $authorityByRole["all-nine-fixed-point"]
+  $allocation = $authorityByRole["candidate-allocation"]
+  $reconstruction = $authorityByRole["candidate-reconstruction"]
+  $qualification = $authorityByRole["automated-qualification"]
+  $fixedRow = @($fixedPoint.shadow_trees | Where-Object release -eq "3.2.9")
+  $allocationRow = @($allocation.allocations | Where-Object release -eq "3.2.9")
+  $reconstructionRow = @($reconstruction.targets | Where-Object release -eq "3.2.9")
+  $reconciliationFindings = @($reconciliation.finding_dispositions | ForEach-Object { [string]$_.id } | Sort-Object)
+  $fixedFindings = @($fixedPoint.findings.admitted_product_findings | ForEach-Object { [string]$_.id } | Sort-Object)
+  $artifactFindings = @($artifact.admitted_changes | ForEach-Object { [string]$_.id } | Sort-Object)
+  $expectedFindings = @("MIR3-TERM-0027", "MIR3-TERM-0028", "MIR3-TERM-0031")
+  $expectedScenarios = @(
+    "approved-delta-automatic-family-controls",
+    "approved-delta-base",
+    "approved-delta-base-continuations",
+    "approved-delta-compat-atan",
+    "approved-delta-compat-space-age-galore",
+    "approved-delta-native-owner-adoption",
+    "approved-delta-space-age"
+  )
+  $actualScenarios = @($artifact.scenario_evidence.scenarios | ForEach-Object { [string]$_.name } | Sort-Object)
+  $protectedEvidence = @($qualification.results | Where-Object id -eq "protected-exact-dist-admission")
+  $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+    throw "MIR 3.2.9 approved-delta candidate is absent: $candidatePath"
+  }
+  $candidateIdentity = Get-MIRCPZipPackageObservation -Path $candidatePath
+
+  $bindings = @(
+    [pscustomobject]@{ id="release-record-proof"; passed=([string]$activeRelease.proofs.approved_delta -eq ".mir/releases/deltas/3.2.5-to-3.2.9.json") },
+    [pscustomobject]@{ id="baseline"; passed=([string]$artifact.baseline.version -eq [string]$activeRelease.source_release.release -and [string]$artifact.baseline.archive_sha256 -eq [string]$activeRelease.source_release.archive_sha256 -and [string]$artifact.baseline.content_sha256 -eq [string]$activeRelease.source_release.content_sha256) },
+    [pscustomobject]@{ id="candidate-record"; passed=([string]$artifact.candidate.version -eq [string]$activeRelease.release -and [string]$artifact.candidate.candidate_id -eq [string]$activeRelease.candidate_id -and [string]$artifact.candidate.package_source_commit -eq [string]$activeRelease.package.source_commit -and [string]$artifact.candidate.package_source_tree -eq [string]$activeRelease.package.source_tree -and [string]$artifact.candidate.package_source_sha256 -eq [string]$activeRelease.package.source_sha256 -and [string]$artifact.candidate.archive_sha256 -eq [string]$activeRelease.package.archive_sha256 -and [string]$artifact.candidate.content_sha256 -eq [string]$activeRelease.package.content_sha256 -and [long]$artifact.candidate.bytes -eq [long]$activeRelease.package.bytes -and [int]$artifact.candidate.entries -eq [int]$activeRelease.package.entries) },
+    [pscustomobject]@{ id="candidate-bytes"; passed=([string]$candidateIdentity.archive_sha256 -eq [string]$artifact.candidate.archive_sha256 -and [string]$candidateIdentity.content_sha256 -eq [string]$artifact.candidate.content_sha256 -and [long]$candidateIdentity.bytes -eq [long]$artifact.candidate.bytes -and [int]$candidateIdentity.entries -eq [int]$artifact.candidate.entries) },
+    [pscustomobject]@{ id="findings"; passed=((@($expectedFindings | Sort-Object) -join "|") -eq ($artifactFindings -join "|") -and ($artifactFindings -join "|") -eq ($reconciliationFindings -join "|") -and ($artifactFindings -join "|") -eq ($fixedFindings -join "|")) },
+    [pscustomobject]@{ id="fixed-point"; passed=([string]$fixedPoint.status -eq "accepted" -and [string]$fixedPoint.acceptance.fixed_point -eq "accepted" -and [int]$fixedPoint.findings.unresolved_release_blocking_findings -eq 0 -and [int]$fixedPoint.findings.new_portable_return_findings -eq 0 -and $fixedRow.Count -eq 1 -and [string]$fixedRow[0].package.archive_sha256 -eq [string]$artifact.candidate.archive_sha256 -and [string]$fixedRow[0].package.content_sha256 -eq [string]$artifact.candidate.content_sha256) },
+    [pscustomobject]@{ id="allocation"; passed=($allocationRow.Count -eq 1 -and [string]$allocationRow[0].assigned_id -eq "C33" -and [string]$allocationRow[0].candidate_commit -eq [string]$artifact.candidate.candidate_commit -and [string]$allocationRow[0].candidate_tree -eq [string]$artifact.candidate.candidate_tree -and [string]$allocationRow[0].archive_sha256 -eq [string]$artifact.candidate.archive_sha256) },
+    [pscustomobject]@{ id="reconstruction"; passed=($reconstructionRow.Count -eq 1 -and [string]$reconstruction.status -eq "passed-ready-for-automated-qualification" -and [bool]$reconstructionRow[0].identities_equal -and (@($reconstructionRow[0].attempts) -join "|") -eq "A|B|C" -and [string]$reconstructionRow[0].archive_sha256 -eq [string]$artifact.candidate.archive_sha256) },
+    [pscustomobject]@{ id="qualification"; passed=([string]$qualification.status -eq "passed-automated-awaiting-human-review" -and [string]$qualification.candidate_id -eq "C33" -and [string]$qualification.archive_sha256 -eq [string]$artifact.candidate.archive_sha256 -and $protectedEvidence.Count -eq 1 -and [string]$protectedEvidence[0].status -eq "passed" -and @($protectedEvidence[0].evidence) -contains "protected-run:31843457458" -and @($protectedEvidence[0].evidence) -contains "protected-summary-sha256:1E84067E12C77C419A1D5611C66E3A8377B533270CD4E4DA043A5582DE92D979" -and @($protectedEvidence[0].evidence) -contains "scenarios-passed:124-of-124") },
+    [pscustomobject]@{ id="scenario-matrix"; passed=((@($expectedScenarios | Sort-Object) -join "|") -eq ($actualScenarios -join "|") -and @($artifact.scenario_evidence.scenarios | Where-Object status -ne "passed").Count -eq 0 -and [int64]$artifact.scenario_evidence.protected_run -eq 31843457458 -and [string]$artifact.scenario_evidence.controller_commit -eq "a8408c3c8650335719bf77543d7c57c8e9195d65" -and [string]$artifact.scenario_evidence.factorio_version -eq "2.1.13" -and [string]$artifact.scenario_evidence.summary_sha256 -eq "1E84067E12C77C419A1D5611C66E3A8377B533270CD4E4DA043A5582DE92D979" -and [int]$artifact.scenario_evidence.planned -eq 124 -and [int]$artifact.scenario_evidence.passed -eq 124 -and [int]$artifact.scenario_evidence.failed -eq 0) },
+    [pscustomobject]@{ id="evaluation"; passed=([string]$artifact.evaluation.status -eq "approved" -and [int]$artifact.evaluation.unapproved_count -eq 0 -and [int]$artifact.evaluation.unresolved_release_blocking_findings -eq 0 -and [int]$artifact.evaluation.new_portable_return_findings -eq 0 -and [string]$artifact.evaluation.fixed_point -eq "accepted" -and -not [bool]$artifact.boundaries.dot5_package_bytes_changed -and -not [bool]$artifact.boundaries.candidate_bytes_changed -and -not [bool]$artifact.boundaries.manual_review_complete -and -not [bool]$artifact.boundaries.tags_created -and -not [bool]$artifact.boundaries.publication_permitted) }
+  )
+  $failedBindings = @($bindings | Where-Object { -not [bool]$_.passed })
+  if ($failedBindings.Count -gt 0) {
+    throw "MIR 3.2.9 terminal approved delta failed exact bindings: $(@($failedBindings.id) -join ', ')."
+  }
+  if (-not $ValidateStructureOnly) {
+    if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) {
+      throw "Approved-delta exact-candidate validation requires -ExpectedSourceCommit."
+    }
+    $currentCommit = Get-MIRGitCommit -RepoRoot $repo
+    if ($currentCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+      throw "Approved-delta exact-candidate validation requires the clean qualification source at ExpectedSourceCommit."
+    }
+    & git -C $repo merge-base --is-ancestor ([string]$artifact.candidate.package_source_commit) $ExpectedSourceCommit
+    if ($LASTEXITCODE -ne 0) { throw "Approved-delta package source is not an ancestor of the qualification source." }
+    [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
+    & git -C $repo diff --quiet ([string]$artifact.candidate.package_source_commit) $ExpectedSourceCommit -- @packageRoots
+    if ($LASTEXITCODE -ne 0) { throw "Package-visible source changed after the terminal approved-delta authority." }
+  }
+  Write-Host "[ok] MIR 3.2.9 terminal approved delta binds exact C33 bytes, three admitted findings, seven protected scenarios, and zero unapproved rows."
+  exit 0
+}
 
 if ($activeVersion -eq "3.2.5") {
   if ([int]$artifact.schema -ne 1 -or [string]$artifact.kind -ne "mir-control-plane-v5-approved-patch-delta") {

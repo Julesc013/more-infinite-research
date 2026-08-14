@@ -26,6 +26,7 @@ planned
 → package-built
 → focused-qualified
 → candidate-qualified
+→ automated-qualified-awaiting-human-review
 → manually-accepted
 → protected-qualified
 → sealed

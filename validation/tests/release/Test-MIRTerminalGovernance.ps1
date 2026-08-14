@@ -15,6 +15,7 @@ $authorityNames = @(
   "MIR3-Terminal-Target-MatrixV1",
   "MIR3-Terminal-Candidate-AllocationV1",
   "MIR3TerminalCandidateReconstructionReceiptV1",
+  "MIR3TerminalCandidateSettingsQualificationV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3TerminalFixedPointReceiptV1",
   "MIR3TerminalSourceFreezeV1",
@@ -100,6 +101,29 @@ if ($LASTEXITCODE -ne 0 -or $foundationDistributionLedgerHash -ne [string]$admis
 }
 . (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Get-MIRTerminalZipTextEntries {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][ValidateSet("settings", "locale")][string]$Kind
+  )
+
+  $entries = @{}
+  $zip = [IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    foreach ($entry in @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) })) {
+      $separator = $entry.FullName.IndexOf("/")
+      if ($separator -lt 0) { continue }
+      $relative = $entry.FullName.Substring($separator + 1)
+      $selected = if ($Kind -eq "settings") { $relative -match '(?i)settings' } else { $relative -match '^locale/.+\.cfg$' }
+      if (-not $selected) { continue }
+      $reader = [IO.StreamReader]::new($entry.Open())
+      try { $entries[$relative] = $reader.ReadToEnd() } finally { $reader.Dispose() }
+    }
+  } finally {
+    $zip.Dispose()
+  }
+  return $entries
+}
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
   $row = @($wave.releases | Where-Object version -eq $identity.version)
@@ -234,8 +258,8 @@ if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work 
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
-    [string]$programme.status -ne "candidates-reconstructed-ready-for-automated-qualification") {
-  throw "Terminal programme must bind the exact fixed-point-accepted, source-frozen, reconstructed nine-candidate family."
+    [string]$programme.status -ne "family-ready-for-human-review") {
+  throw "Terminal programme must bind the exact automated-qualified nine-candidate family awaiting human review."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -253,6 +277,7 @@ $productIntakeSchemaByKind = @{
   "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
   "MIR3TerminalFixedPointReceiptV1" = "mir3-terminal-fixed-point-receipt"
   "MIR3TerminalCandidateReconstructionReceiptV1" = "mir3-terminal-candidate-reconstruction"
+  "MIR3TerminalCandidateSettingsQualificationV1" = "mir3-terminal-candidate-settings-qualification"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -474,6 +499,52 @@ $expectedCandidates = @{
   "3.2.9" = "C33"; "2.5.9" = "2.5-P13"; "1.9.9" = "1.9-P1"; "1.8.9" = "1.8-P1"; "1.7.9" = "1.7-P1"
   "1.6.9" = "1.6-P1"; "1.5.9" = "1.5-P1"; "1.4.9" = "1.4-P1"; "1.3.9" = "1.3-P1"
 }
+$settingsQualification = $authorities["MIR3TerminalCandidateSettingsQualificationV1"]
+$settingsQualificationPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalCandidateSettingsQualificationV1.json"
+if ([string]$programme.authorities.candidate_settings_qualification -ne ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json" -or
+    [string]$programme.authorities.target_qualifications -ne ".mir/releases/terminal/qualifications" -or
+    [string]$settingsQualification.status -ne "passed-automated-awaiting-human-review" -or
+    (@($settingsQualification.family) -join "|") -ne ($family -join "|") -or
+    [int]$settingsQualification.static_inventory.setting_path_deltas -ne 0 -or
+    [int]$settingsQualification.static_inventory.setting_content_deltas -ne 0 -or
+    [int]$settingsQualification.static_inventory.settings_locale_deltas -ne 0 -or
+    @($settingsQualification.static_inventory.targets).Count -ne 9 -or
+    @($settingsQualification.target_dispositions).Count -ne 9 -or
+    [int]$settingsQualification.boundaries.settings_scope_migrations -ne 0 -or
+    [int]$settingsQualification.boundaries.runtime_settings_added -ne 0 -or
+    [bool]$settingsQualification.boundaries.profile_codec_changed -or
+    [bool]$settingsQualification.boundaries.candidate_bytes_changed -or
+    [string]$settingsQualification.behavioural_matrix.current.release -ne "3.2.9" -or
+    [string]$settingsQualification.behavioural_matrix.current.target -ne "2.1" -or
+    [string]$settingsQualification.behavioural_matrix.current.status -ne "passed" -or
+    [int]$settingsQualification.behavioural_matrix.current.fresh_rows -ne 127 -or
+    [int]$settingsQualification.behavioural_matrix.current.failed_rows -ne 0 -or
+    [string]$settingsQualification.behavioural_matrix.maintained.release -ne "2.5.9" -or
+    [string]$settingsQualification.behavioural_matrix.maintained.target -ne "2.0" -or
+    [string]$settingsQualification.behavioural_matrix.maintained.status -ne "passed" -or
+    [int]$settingsQualification.behavioural_matrix.maintained.fresh_rows -ne 90 -or
+    [int]$settingsQualification.behavioural_matrix.maintained.failed_rows -ne 0 -or
+    [bool]$settingsQualification.boundaries.manual_review_complete -or
+    [bool]$settingsQualification.boundaries.tags_created -or
+    [bool]$settingsQualification.boundaries.publication_permitted) {
+  throw "Terminal candidate settings qualification is incomplete or crosses the human-review boundary."
+}
+$settingsAuthorityPaths = @{
+  settings_scope_audit = ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"
+  fixed_point = ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"
+  candidate_reconstruction = ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json"
+  candidate_allocation = ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"
+  target_matrix = ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"
+  foundation_identity = ".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"
+}
+foreach ($name in @($settingsAuthorityPaths.Keys)) {
+  $binding = $settingsQualification.source_authorities.$name
+  $authorityPath = Join-Path $RepoRoot $settingsAuthorityPaths[$name]
+  if ([string]$binding.path -ne $settingsAuthorityPaths[$name] -or
+      (Get-FileHash -LiteralPath $authorityPath -Algorithm SHA256).Hash -ne [string]$binding.raw_sha256) {
+    throw "Terminal candidate settings qualification authority drifted: $name"
+  }
+}
 $reconstruction = $authorities["MIR3TerminalCandidateReconstructionReceiptV1"]
 $reconstructionPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalCandidateReconstructionReceiptV1.json"
 $reconstructionSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-candidate-reconstruction.schema.json"
@@ -497,6 +568,7 @@ if (-not ((Get-Content -Raw -LiteralPath $reconstructionPath) | Test-Json -Schem
 }
 $canonicalCandidate = @($allocation.allocations | Where-Object release -eq "3.2.9")
 if ($canonicalCandidate.Count -ne 1) { throw "The canonical terminal candidate allocation is missing." }
+$matrix = $authorities["MIR3-Terminal-Target-MatrixV1"]
 $packageLockAuthority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\control-plane\package-locks.json") | ConvertFrom-Json -Depth 100
 if ([int]$packageLockAuthority.schema -ne 1 -or [string]$packageLockAuthority.authority -ne "mir-control-plane-v5-package-locks") {
   throw "The package-lock authority is invalid."
@@ -507,7 +579,11 @@ foreach ($release in $family) {
   $packageLock = @($packageLockAuthority.locks | Where-Object release -eq $release)
   $recordPath = Join-Path $RepoRoot ".mir\releases\records\$release.json"
   $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
+  $qualificationPath = Join-Path $RepoRoot ".mir\releases\terminal\qualifications\$release.json"
+  $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json -Depth 100
   $targetFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json") | ConvertFrom-Json -Depth 100
+  $matrixTarget = @($matrix.targets | Where-Object release -eq $release)
+  $dot5Identity = @($admission.dot5_identity_authority.releases | Where-Object version -eq ([string]$matrixTarget[0].immutable_dot5_predecessor))
   if ($row.Count -ne 1 -or $reconstructed.Count -ne 1 -or $packageLock.Count -ne 1 -or
       [string]$packageLock[0].target -ne [string]$record.target -or
       [string]$packageLock[0].candidate_id -ne [string]$row[0].assigned_id -or
@@ -519,7 +595,7 @@ foreach ($release in $family) {
       [long]$packageLock[0].archive_bytes -ne [long]$row[0].bytes -or
       [int]$packageLock[0].archive_entries -ne [int]$row[0].entries -or
       [string]$packageLock[0].mode -ne "frozen-terminal-candidate-awaiting-manual-approval" -or
-      [string]$record.state -ne "package-built" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+      [string]$record.state -ne "automated-qualified-awaiting-human-review" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
       [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
       [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
       [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
@@ -533,6 +609,9 @@ foreach ($release in $family) {
       [string]$record.package.content_sha256 -ne [string]$row[0].content_sha256 -or
       [long]$record.package.bytes -ne [long]$row[0].bytes -or [int]$record.package.entries -ne [int]$row[0].entries -or
       [string]$record.proofs.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
+      [string]$record.proofs.candidate_settings_qualification -ne ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json" -or
+      [string]$record.proofs.automated_qualification -ne ".mir/releases/terminal/qualifications/$release.json" -or
+      ($release -eq "3.2.9" -and [string]$record.proofs.approved_delta -ne ".mir/releases/deltas/3.2.5-to-3.2.9.json") -or
       [string]$reconstructed[0].candidate -ne [string]$row[0].assigned_id -or
       [string]$reconstructed[0].candidate_commit -ne [string]$row[0].candidate_commit -or
       [string]$reconstructed[0].candidate_tree -ne [string]$row[0].candidate_tree -or
@@ -547,8 +626,77 @@ foreach ($release in $family) {
       [long]$row[0].bytes -ne [long]$targetFreeze.package.bytes -or [int]$row[0].entries -ne [int]$targetFreeze.package.entries) {
     throw "Terminal release/candidate authority disagrees for $release."
   }
+  if (-not ((Get-Content -Raw -LiteralPath $qualificationPath) | Test-Json -SchemaFile (Join-Path $RepoRoot "spec\schemas\mir3-terminal-qualification-record.schema.json")) -or
+      [string]$qualification.release -ne $release -or $matrixTarget.Count -ne 1 -or
+      [string]$qualification.target -ne [string]$matrixTarget[0].target -or
+      [string]$qualification.support_tier -ne [string]$matrixTarget[0].support_tier -or
+      [string]$qualification.candidate_id -ne [string]$row[0].assigned_id -or
+      [string]$qualification.candidate_commit -ne [string]$row[0].candidate_commit -or
+      [string]$qualification.source_tree -ne [string]$row[0].candidate_tree -or
+      [string]$qualification.archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$qualification.content_sha256 -ne [string]$row[0].content_sha256 -or
+      [string]$qualification.status -ne "passed-automated-awaiting-human-review" -or
+      @($qualification.results | Where-Object status -ne "passed").Count -ne 0 -or
+      -not [bool]$qualification.manual_review.required -or
+      [string]$qualification.manual_review.status -ne "pending-maintainer-approval" -or
+      -not [bool]$qualification.manual_review.candidate_hash_bound) {
+    throw "Terminal automated qualification is absent, malformed, or not candidate-bound: $release"
+  }
+  $requiredChecks = @($qualification.required_checks)
+  $resultIds = @($qualification.results.id)
+  $expectedQualificationChecks = @(
+    "source-and-archive-identity",
+    "deterministic-triple-reconstruction",
+    "exact-engine-load",
+    "immutable-dot5-upgrade",
+    "pre-dot5-upgrade",
+    "clean-root-independent-confirmation",
+    "candidate-settings-contract"
+  )
+  if ([string]$qualification.support_tier -eq "current") {
+    $expectedQualificationChecks += @("protected-exact-dist-admission", "current-targeted-compatibility", "candidate-ecosystem-and-performance")
+  } elseif ([string]$qualification.support_tier -eq "maintained") {
+    $expectedQualificationChecks += @("maintained-targeted-compatibility", "candidate-ecosystem-and-performance")
+  }
+  if (@(Compare-Object $requiredChecks $resultIds).Count -ne 0 -or
+      @(Compare-Object $expectedQualificationChecks $requiredChecks).Count -ne 0 -or
+      @($requiredChecks | Select-Object -Unique).Count -ne $requiredChecks.Count -or
+      @($resultIds | Select-Object -Unique).Count -ne $resultIds.Count) {
+    throw "Terminal automated qualification check/result closure is incomplete or duplicated: $release"
+  }
+  $settingsTarget = @($settingsQualification.static_inventory.targets | Where-Object release -eq $release)
+  $settingsDisposition = @($settingsQualification.target_dispositions | Where-Object release -eq $release)
+  $dot5WaveRow = @($wave.releases | Where-Object version -eq ([string]$matrixTarget[0].immutable_dot5_predecessor))
+  if ($settingsTarget.Count -ne 1 -or $settingsDisposition.Count -ne 1 -or $dot5Identity.Count -ne 1 -or
+      [string]$settingsTarget[0].candidate_archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$settingsTarget[0].predecessor -ne [string]$matrixTarget[0].immutable_dot5_predecessor -or
+      [string]$settingsTarget[0].predecessor_archive_sha256 -ne [string]$dot5Identity[0].archive_sha256 -or
+      [int]$settingsTarget[0].settings_path_delta -ne 0 -or
+      [int]$settingsTarget[0].settings_content_delta -ne 0 -or
+      [int]$settingsTarget[0].settings_locale_delta -ne 0 -or
+      [string]$settingsDisposition[0].target -ne [string]$matrixTarget[0].target -or
+      [string]$settingsDisposition[0].status -ne "passed" -or [string]::IsNullOrWhiteSpace([string]$settingsDisposition[0].basis)) {
+    throw "Terminal candidate settings evidence is absent or drifted: $release"
+  }
   $candidateArchive = Join-Path $RepoRoot ([string]$reconstructed[0].dist_path)
   if (-not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) { throw "Reconstructed candidate archive is missing: $release" }
+  if ($dot5WaveRow.Count -ne 1) { throw "Immutable .5 settings predecessor is missing from the wave index: $release" }
+  $predecessorArchive = Join-Path $RepoRoot ([string]$dot5WaveRow[0].dist)
+  foreach ($kind in @("settings", "locale")) {
+    $candidateText = Get-MIRTerminalZipTextEntries -Path $candidateArchive -Kind $kind
+    $predecessorText = Get-MIRTerminalZipTextEntries -Path $predecessorArchive -Kind $kind
+    if (@(Compare-Object @($candidateText.Keys) @($predecessorText.Keys)).Count -ne 0 -or
+        @($candidateText.Keys | Where-Object { $candidateText[$_] -cne $predecessorText[$_] }).Count -ne 0) {
+      throw "Terminal candidate $kind surface differs from its immutable .5 predecessor: $release"
+    }
+  }
+  if ($candidateText.Count -ne [int]$settingsTarget[0].locale_entries) {
+    throw "Terminal candidate locale entry count differs from settings qualification: $release"
+  }
+  $candidateSettings = Get-MIRTerminalZipTextEntries -Path $candidateArchive -Kind settings
+  if ($candidateSettings.Count -ne [int]$settingsTarget[0].settings_entries) {
+    throw "Terminal candidate settings entry count differs from settings qualification: $release"
+  }
   $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidateArchive)
   try {
     $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) })
@@ -871,7 +1019,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-candidate-settings-qualification", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -953,8 +1101,8 @@ if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $curr
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "candidates-reconstructed-ready-for-automated-qualification") {
-  throw "Current release roles do not distinguish published .5 from reconstructed, unqualified .9 candidates."
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "family-ready-for-human-review") {
+  throw "Current release roles do not distinguish published .5 from automated-qualified .9 candidates awaiting human review."
 }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json

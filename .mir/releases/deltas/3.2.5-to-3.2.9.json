@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "kind": "mir3-terminal-approved-delta",
+  "status": "approved",
+  "recorded_at": "2026-08-15T08:45:00+10:00",
+  "transition": {
+    "from_version": "3.2.5",
+    "to_version": "3.2.9",
+    "candidate_id": "C33"
+  },
+  "baseline": {
+    "version": "3.2.5",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D"
+  },
+  "candidate": {
+    "version": "3.2.9",
+    "candidate_id": "C33",
+    "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+    "candidate_tree": "f423b351249f5f8d2a6164054f42ae166d8d066e",
+    "package_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+    "package_source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa",
+    "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+    "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+    "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+    "bytes": 1061572,
+    "entries": 303
+  },
+  "admitted_changes": [
+    {
+      "id": "MIR3-TERM-0027",
+      "targets": ["3.2.9"],
+      "policy": "K2SciencePhasePolicyV1"
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "targets": ["3.2.9", "2.5.9"],
+      "policy": "SciencePackProductionRoutePolicyV1"
+    },
+    {
+      "id": "MIR3-TERM-0031",
+      "targets": ["3.2.9", "2.5.9"],
+      "policy": "CombinedCompilationPlanEffectOwnershipV1"
+    }
+  ],
+  "authority_bindings": [
+    {
+      "role": "product-implementation-reconciliation",
+      "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "raw_sha256": "22ADEB099C7268ABEC6DFBDA94E9F8C70309AB5CA35E1683885BE0DDEA998A27"
+    },
+    {
+      "role": "all-nine-fixed-point",
+      "path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "raw_sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"
+    },
+    {
+      "role": "candidate-allocation",
+      "path": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+      "raw_sha256": "622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010"
+    },
+    {
+      "role": "candidate-reconstruction",
+      "path": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+      "raw_sha256": "5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"
+    },
+    {
+      "role": "automated-qualification",
+      "path": ".mir/releases/terminal/qualifications/3.2.9.json",
+      "raw_sha256": "54C36F6FE48D32189723FE9720DFA0E825E0DE4E83194F3ADFAC1E455DB5098C"
+    }
+  ],
+  "scenario_evidence": {
+    "protected_run": 31843457458,
+    "controller_commit": "a8408c3c8650335719bf77543d7c57c8e9195d65",
+    "factorio_version": "2.1.13",
+    "summary_sha256": "1E84067E12C77C419A1D5611C66E3A8377B533270CD4E4DA043A5582DE92D979",
+    "planned": 124,
+    "passed": 124,
+    "failed": 0,
+    "scenarios": [
+      {"name": "approved-delta-automatic-family-controls", "status": "passed"},
+      {"name": "approved-delta-base", "status": "passed"},
+      {"name": "approved-delta-base-continuations", "status": "passed"},
+      {"name": "approved-delta-compat-atan", "status": "passed"},
+      {"name": "approved-delta-compat-space-age-galore", "status": "passed"},
+      {"name": "approved-delta-native-owner-adoption", "status": "passed"},
+      {"name": "approved-delta-space-age", "status": "passed"}
+    ]
+  },
+  "evaluation": {
+    "status": "approved",
+    "unapproved_count": 0,
+    "unresolved_release_blocking_findings": 0,
+    "new_portable_return_findings": 0,
+    "fixed_point": "accepted",
+    "automated_qualification": "passed-awaiting-human-review"
+  },
+  "boundaries": {
+    "dot5_package_bytes_changed": false,
+    "candidate_bytes_changed": false,
+    "manual_review_complete": false,
+    "tags_created": false,
+    "publication_permitted": false
+  }
+}

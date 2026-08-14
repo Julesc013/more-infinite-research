@@ -331,6 +331,7 @@ $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$c
 if ($currentReleaseBoundary -notin @(
       "planned|not-assigned", "source-frozen|C33", "package-built|C33",
       "focused-qualified|C33", "candidate-qualified|C33", "manually-accepted|C33",
+      "automated-qualified-awaiting-human-review|C33",
       "protected-qualified|C33", "sealed|C33", "promoted|C33", "tagged|C33",
       "published|C33", "publicly-verified|C33"
     ) -or [string]$currentRelease.candidate_floor -ne "C33" -or

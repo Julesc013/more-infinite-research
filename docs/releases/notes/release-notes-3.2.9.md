@@ -33,7 +33,7 @@ Direct unmodified Cubium 1.0.28 proof on Factorio 2.0 remains pending authentica
 
 | Field | Value |
 | --- | --- |
-| State | `package-built` |
+| State | `automated-qualified-awaiting-human-review` |
 | Candidate | `C33` |
 | Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Archive SHA-256 | `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20` |

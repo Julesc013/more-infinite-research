@@ -80,7 +80,7 @@ switch ($Obligation) {
     foreach ($row in $rows) { $proofs.Add((Assert-ProofFile -Proof $row)) }
   }
   default {
-    $stateOrder = @("planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified")
+    $stateOrder = @("planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified")
     $requiredState = @{promotion="promoted";tag="tagged";publication="published";"public-byte"="publicly-verified"}[$Obligation]
     if ([Array]::IndexOf($stateOrder, [string]$release.state) -lt [Array]::IndexOf($stateOrder, $requiredState)) {
       throw "Release $($release.release) is $($release.state); $Obligation requires $requiredState."
