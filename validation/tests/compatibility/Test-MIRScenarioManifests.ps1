@@ -116,4 +116,24 @@ foreach ($profileRelativePath in $profileScenarioPaths.Keys) {
   }
 }
 
+$canonicalLocalModRoots = [ordered]@{
+  "2.1" = "C:\Projects\Factorio\testmods\2.1"
+  "2.0" = "C:\Projects\Factorio\testmods\2.0"
+}
+foreach ($profileFile in @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot "fixtures\run-profiles") -Filter "*.json" -File)) {
+  $profile = Get-Content -Raw -LiteralPath $profileFile.FullName | ConvertFrom-Json
+  $factorioLine = [string]$profile.factorio_line
+  if (-not $canonicalLocalModRoots.Contains($factorioLine)) { continue }
+  $expectedRoot = [string]$canonicalLocalModRoots[$factorioLine]
+  $declaredRoots = @()
+  if ($profile.PSObject.Properties.Name -contains "local_mod_dir") { $declaredRoots += [string]$profile.local_mod_dir }
+  if ($profile.PSObject.Properties.Name -contains "local_mod_zip_dirs") { $declaredRoots += @($profile.local_mod_zip_dirs | ForEach-Object { [string]$_ }) }
+  if ($profile.PSObject.Properties.Name -contains "local_mod_library_dirs") { $declaredRoots += @($profile.local_mod_library_dirs | ForEach-Object { [string]$_ }) }
+  foreach ($declaredRoot in @($declaredRoots | Sort-Object -Unique)) {
+    if ($declaredRoot -cne $expectedRoot) {
+      throw "$($profileFile.Name) must use canonical Factorio $factorioLine local archive root $expectedRoot; found $declaredRoot."
+    }
+  }
+}
+
 Write-Host "[ok] MIR scenario schema 2 manifests and run profiles bind canonical targets, setup, roots, settings, expected plans, timeouts, and claim levels."
