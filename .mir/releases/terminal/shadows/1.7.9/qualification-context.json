@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalShadowQualificationContextV1",
+  "release": "1.7.9",
+  "target": "0.17",
+  "exact_engine": "0.17.79",
+  "exact_engine_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+  "support_tier": "historical",
+  "target_profile": "terminal-factorio-0.17.79",
+  "target_adapter": "factorio-0.17-target-native-no-product-delta",
+  "assurance_profile": "terminal-shadow-convergence",
+  "assurance_overlays": [],
+  "performance_transition": null,
+  "baseline": {
+    "release": "1.7.5",
+    "tag": "1.7.5",
+    "commit": "c6692980dc9f5a1332a7888da33385a0107ae004"
+  },
+  "pre_dot5": {
+    "release": "1.7.1",
+    "tag": "1.7.1",
+    "commit": "9d9095c92055aebe557a55a7ab99bb9588fe73fb"
+  },
+  "upgrade_rows": [
+    "1.7.5-to-1.7.9",
+    "1.7.1-to-1.7.9"
+  ],
+  "upgrade_fixture_manifest": ".mir/releases/terminal/shadows/1.7.9/upgrade-fixtures.json",
+  "package_manifest": ".mir/releases/terminal/shadows/1.7.9/package-manifest.json",
+  "release_record": ".mir/releases/records/1.7.9.json",
+  "release_notes": "docs/releases/notes/release-notes-1.7.9.md",
+  "phase": "shadow-convergence",
+  "candidate_id": null
+}

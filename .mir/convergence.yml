@@ -1,0 +1,29 @@
+schema: 1
+
+release:
+  version: "1.7.9"
+  branch: candidate/1.7.9-projection
+  factorio_version: "0.17"
+  baseline_commit: c6692980dc9f5a1332a7888da33385a0107ae004
+  baseline_tag: "1.7.5"
+  pre_dot5_public_predecessor: "1.7.1"
+  portable_source_release: "3.2.9"
+  portable_source_commit: 5496896914666158ad4056026819528395861540
+  target_profile: "terminal-factorio-0.17.79"
+  target_adapter: "factorio-0.17-target-native-no-product-delta"
+  target_assurance_overlays: "none"
+  objective: target-port-behavioral-subset
+  public_contract_change: patch-compatible
+  terminal_shadow_status: source-unfrozen-candidate-unassigned
+
+terminal_projection:
+  product_disposition: no-product-delta
+  candidate_id: null
+  source_frozen: false
+
+release_gates:
+  - exact-target-engine-load
+  - direct-dot5-upgrade
+  - direct-pre-dot5-upgrade
+  - deterministic-package
+  - complete-structured-validation-summary

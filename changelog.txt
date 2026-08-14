@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.9
+Date: 2026-08-12
+
+  Changes:
+
+    - Materialized the governed MIR 3 terminal target shadow from immutable 1.7.5 inputs.
+
+  Compatibility:
+
+    - Applied target disposition: no-product-delta.
+---------------------------------------------------------------------------------------------------
 Version: 1.7.5
 Date: 2026-08-07
 
