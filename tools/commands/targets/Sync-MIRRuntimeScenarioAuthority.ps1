@@ -133,7 +133,6 @@ if (($literalConfigurationNames -join "`n") -cne ($configurationNames -join "`n"
 }
 
 $expectedDynamic = @(
-  "k2-science-phase-policy",
   "space-age-native-owner-settings-combined",
   "space-age-native-owner-settings-cost-base",
   "space-age-native-owner-settings-cost-growth",
