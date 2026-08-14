@@ -1,0 +1,12 @@
+{
+  "schema": 1, "kind": "MIR3TerminalTargetSourceFreezeV1", "status": "source-frozen-candidate-unassigned",
+  "release": "3.2.9", "target": "2.1", "support_tier": "current", "candidate_floor": "C33", "candidate_id": null,
+  "frozen_at": "2026-08-14T17:22:05.6046282+10:00", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+  "shadow_source": {"ref": "candidate/3.2.9-projection", "commit": "e91f407a6d6df44f5633b89620ce9c24702816eb", "tree": "2a44a79b6a8c036a6046501c64a32eb64d10fae5"},
+  "engine": {"version": "2.1.13", "binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084"},
+  "profile": "factorio-2.1", "adapter": "canonical-factorio-2.1",
+  "predecessors": [{"role": "dot5", "release": "3.2.5", "tag": "3.2.5", "commit": "62fddd86b51db7c0238731815d15ca26a4b45857"}, {"role": "pre-dot5", "release": "3.2.3", "tag": "3.2.3", "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba"}],
+  "package": {"archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20", "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25", "bytes": 1061572, "entries": 303},
+  "upgrade_rows": ["3.2.5-to-3.2.9", "3.2.3-to-3.2.9"],
+  "boundaries": {"candidate_assigned": false, "candidate_built": false, "manual_review_complete": false, "sealed": false, "tagged": false, "published": false}
+}

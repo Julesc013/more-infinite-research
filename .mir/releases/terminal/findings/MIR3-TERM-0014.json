@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0014",
+  "title": "Terminal diagnostic and historical-attestation evidence lost raw byte identities during Git transport",
+  "source_observation": {
+    "observed_at": "2026-08-09T11:06:42.1185476Z",
+    "environment": "Hosted Windows verification of PR #80, run 31309327519, against MIR3TerminalExperimentReceiptV1",
+    "fact": "The durable archive copies of the two calibration plans and the governed 2.5.5 historical manual-review attestation were treated as text. Their stored or checked-out bytes differed from the exact source artifacts, so governance and manual-review custody checks correctly rejected their receipt hashes. The retained calibration worktree and the content-addressed attestation object reproduce the recorded SHA-256 identities exactly."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\validation\\tests\\release\\Test-MIRTerminalGovernance.ps1 -RepoRoot <checkout-containing-text-treated-experiment-plans>",
+    "expected": "Archived diagnostic plans and raw-hash historical attestation evidence retain the exact source bytes named by their governed receipts across Git index, checkout, and hosted verification.",
+    "observed": "The received plan files did not match 0DF6A6BC2E20C01C6002DF78A8D84C4BBEDD5D765BA08CD246981DDA51466E0F and 18B42CD7FAF2D2D2A5B9B52A8451BF97B11148D780BB1E30E64C974FD6C89357 until restored from the retained calibration worktree; the attestation path did not match its custody hash 83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748 until restored from its content-addressed object."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; diagnostic and historical-review evidence byte preservation and Git transport only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "modern release evidence must preserve archived diagnostic bytes"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "Factorio 2.0 assurance evidence must preserve archived diagnostic bytes"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS custody policy is shared"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS custody policy is shared"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical custody policy is shared"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical custody policy is shared"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical custody policy is shared"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite-target custody policy is shared"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite-target custody policy is shared"}
+  ],
+  "regression_obligations": [
+    "the archived experiment receipt verifies both exact source plan SHA-256 identities",
+    "Git attributes prohibit text conversion for archived MIR3 terminal experiment JSON and the raw-hash historical 2.5.5 manual attestation",
+    "terminal governance fails if that byte-preservation rule is removed",
+    "the retained calibration worktree and durable archive copies are byte-identical",
+    "the historical 2.5.5 manual attestation and its content-addressed object are byte-identical",
+    "all .5 package archive and content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "archived-diagnostic custody and assurance aggregate verification only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The failure is reproduced, bounded to immutable diagnostic artifact transport, and repairable without changing package source, product semantics, or published package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": "PR #80 workflow 31309327519 failed closed at tooling.self-test because the experiment receipt hashes did not match transported artifacts. The retained calibration source files reproduce both receipt hashes, and the content-addressed historical attestation object reproduces its custody hash; c2a4494506bc465313b4bd3e95560a19df56c333 restores those exact bytes, marks each raw-hash evidence path as -text, and adds governance regressions requiring those rules. The CRLF-tolerant attribute validator at f2bfb9fce211f28dfbc70b5db37199721b785660 passed both exact-head MIR aggregates 31311037927 and 31311039681, then the fresh dev aggregate 31311371249 passed at merge commit d03b2a63bcd56cc446da5f5dc2fcf6e5fe286a6f."
+  }
+}

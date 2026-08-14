@@ -1,7 +1,7 @@
 /build/
+/dist/playtest/
 /tmp/
+/temp/
 /artifacts/
 /out/
-/dist/playtest/
-/.mir/museum-installations.local.json
 /.mir/local/

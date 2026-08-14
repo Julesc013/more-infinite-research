@@ -11,6 +11,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot 
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
 & (Join-Path $RepoRoot "validation\tests\tooling\Test-MIRVerificationSchemas.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }
+& (Join-Path $RepoRoot "validation\tests\release\Test-MIRTerminalGovernance.ps1") -RepoRoot $RepoRoot
+if ($LASTEXITCODE -ne 0) { throw "MIR terminal governance validation failed." }
 
 $config = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\assurance.json") | ConvertFrom-Json
 $impact = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\test-impact.yml") | ConvertFrom-Json
@@ -40,7 +42,7 @@ $releaseHistoryClassificationCases = [ordered]@{
   ".mir/control-plane/package-locks.json" = "release-governance"
   ".mir/releases/transitions/3.2.5-c32-source-frozen.json" = "release-governance"
   ".mir/releases/transitions/3.2.5-c32-package-built.json" = "release-governance"
-  ".mir/target-lines/index.json" = "release-evidence"
+  ".mir/releases/sources/published-source-locks.json" = "release-evidence"
   ".mir/target-lines/2.4.9/info.json" = "release-evidence"
   ".mir/evidence/2.4.9/publication.json" = "release-evidence"
   ".mir/releases/deltas/2.4.5-to-2.4.9.json" = "release-evidence"
@@ -71,6 +73,7 @@ $assuranceToolingClassificationCases = @(
   "scripts/Invoke-MIRAssurance.ps1",
   "tools/mir.ps1",
   "tools/commands/control/Invoke-MIRControlPlaneWork.ps1",
+  "tools/commands/release/Test-MIRGitHubAdministration.ps1",
   "tools/lib/assurance/Evidence.ps1",
   "tools/lib/control/Evidence.ps1",
   "tools/lib/control/Planner.ps1",
@@ -78,6 +81,8 @@ $assuranceToolingClassificationCases = @(
   ".mir/control-plane/approved-delta-policies.json",
   "tools/maintenance/Move-MIRValidationDefinitions.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
+  "validation/tests/tooling/Test-MIRLayout.ps1",
+  "validation/tests/release/Test-MIRGitHubAdministration.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1",
   "validation/tests.yml"
 )
@@ -117,7 +122,19 @@ $releaseHistoryTest = @($catalog.tests | Where-Object { [string]$_.id -eq "stati
 if ($releaseHistoryTest.Count -ne 1 -or
     [string]$releaseHistoryTest[0].command -ne "./validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1 -Index" -or
     @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
-  throw "static.release-history must bind the staged release-history fingerprint and run indexed snapshot integrity."
+  throw "static.release-history must bind the staged release-history fingerprint and run compact source-lock integrity."
+}
+
+$assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+$assuranceReleaseLibrary = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+foreach ($source in @($assuranceEntryPoint, $assuranceReleaseLibrary)) {
+  if (-not $source.Contains('(@(& git -C $repo branch --show-current) -join "").Trim()') -or
+      $source.Contains('([string](& git -C $repo branch --show-current)).Trim()')) {
+    throw "Assurance inventory must represent detached HEAD as an empty branch without dereferencing null."
+  }
+}
+if ((@() -join "").Trim() -ne "") {
+  throw "Detached-HEAD branch normalization must produce empty optional metadata."
 }
 foreach ($profileName in @("fast", "development-breadth", "full", "backport")) {
   if (@($config.profiles.$profileName) -notcontains "static.release-history") {
@@ -151,6 +168,7 @@ foreach ($requiredStaticRoutingPath in @(
   ".github/workflows/assurance-*.yml",
   ".github/workflows/control-plane-v5.yml",
   "tools/commands/control/**",
+  "tools/commands/release/**",
   "tools/lib/control/Evidence.ps1",
   "tools/mir.ps1",
   "tools/lib/control/Views.ps1",
@@ -158,7 +176,9 @@ foreach ($requiredStaticRoutingPath in @(
   "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
   "validation/tests/package/Test-MIRArtifactCleanup.ps1",
   "validation/tests/tooling/Test-MIRAssurance.ps1",
+  "validation/tests/tooling/Test-MIRLayout.ps1",
   "validation/tests/tooling/Test-MIRControlPlane.ps1",
+  "validation/tests/release/Test-MIRGitHubAdministration.ps1",
   "validation/tests/release/Test-MIRReleaseAuthority.ps1"
 )) {
   $matchingRules = @($impact.paths | Where-Object { [string]$_.pattern -eq $requiredStaticRoutingPath })
@@ -219,10 +239,12 @@ $ecosystemTest = @($catalog.tests | Where-Object { [string]$_.id -eq "runtime.ec
 if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--candidate\s+<candidate>' -or
     [string]$ecosystemTest[0].command -notmatch '--candidate-source\s+<package-source-commit>' -or
+    [string]$ecosystemTest[0].command -notmatch '--mods\s+<mods>' -or
     @($ecosystemTest[0].inputs) -notcontains "package-source" -or
+    @($ecosystemTest[0].inputs) -notcontains "mod-lock" -or
     [string]$ecosystemTest[0].command -notmatch '--skip-build(?:\s|$)' -or
     [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
-  throw "runtime.ecosystem must bind the exact candidate ZIP and package source and must not rebuild distribution bytes."
+  throw "runtime.ecosystem must bind the exact candidate ZIP, package source, and planned mod closure and must not rebuild distribution bytes."
 }
 $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir.ps1")
 foreach ($sourceBindingSnippet in @(
@@ -240,11 +262,35 @@ if ($performanceTest.Count -ne 1 -or
     [string]$performanceTest[0].command -notmatch 'Invoke-MIRPerformanceQualification\.ps1' -or
     [string]$performanceTest[0].command -notmatch '-ExpectedSourceCommit\s+<source-commit>' -or
     [string]$performanceTest[0].command -notmatch '-LocalModZipDir\s+<mods>' -or
-    [string]$performanceTest[0].command -notmatch '-OutputPath\s+\.mir/evidence/<upgrade-to>-performance-regression\.json' -or
+    [string]$performanceTest[0].command -notmatch '-OutputPath\s+<test-output>(?:\s|$)' -or
+    [string]$performanceTest[0].command -match '\.mir/evidence/' -or
     @($performanceTest[0].inputs) -notcontains "mod-closure" -or
     @($performanceTest[0].inputs) -notcontains "scripts/Invoke-MIRPerformanceQualification.ps1" -or
     @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
-  throw "runtime.performance-regression must produce and validate fresh evidence without fingerprinting its mutable output as an input."
+  throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
+}
+$assuranceEvidenceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+foreach ($requiredPerformanceIsolationSnippet in @(
+  '"<test-output>"=[string]$TestOutput',
+  '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
+  '-TestOutput $performanceOutputPath',
+  '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
+  '-Kind "runtime-performance-evidence"'
+)) {
+  if (-not $assuranceEvidenceSource.Contains($requiredPerformanceIsolationSnippet)) {
+    throw "Assurance execution does not isolate and capture fresh performance evidence: $requiredPerformanceIsolationSnippet"
+  }
+}
+foreach ($requiredPerformanceSealSnippet in @(
+  'Get-MIRAssurancePerformanceEvidenceArtifact',
+  'Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force'
+)) {
+  if (-not $releaseAssuranceSource.Contains($requiredPerformanceSealSnippet)) {
+    throw "Release sealing does not promote the exact captured performance artifact: $requiredPerformanceSealSnippet"
+  }
+}
+if ($releaseAssuranceSource.Contains('Join-Path $repo ".mir\evidence\$($Context.info.version)-performance-regression.json"')) {
+  throw "Release sealing still consumes the mutable tracked historical performance-evidence path."
 }
 
 $manualTest = @($catalog.tests | Where-Object { [string]$_.id -eq "manual.release-review" })
@@ -278,19 +324,25 @@ foreach ($target in @("2.0", "2.1")) {
     throw "Verification profile is not bound to the canonical domain policy: $profilePath"
   }
 }
-$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
+$publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -notin @(
-      "planned|not-assigned", "source-frozen|C32", "package-built|C32",
-      "focused-qualified|C32", "candidate-qualified|C32", "manually-accepted|C32",
-      "protected-qualified|C32", "sealed|C32", "promoted|C32", "tagged|C32",
-      "published|C32", "publicly-verified|C32"
-    ) -or [string]$currentRelease.candidate_floor -ne "C32" -or
+      "planned|not-assigned", "source-frozen|C33", "package-built|C33",
+      "focused-qualified|C33", "candidate-qualified|C33", "manually-accepted|C33",
+      "protected-qualified|C33", "sealed|C33", "promoted|C33", "tagged|C33",
+      "published|C33", "publicly-verified|C33"
+    ) -or [string]$currentRelease.candidate_floor -ne "C33" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current 3.2.5 public upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current planned 3.2.9 upgrade authority."
+}
+if ([string]$publishedRelease.state -ne "publicly-verified" -or
+    [string]$publishedRelease.candidate_id -ne "C32" -or
+    [string]$publishedRelease.package.archive_sha256 -ne "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF") {
+  throw "The immutable 3.2.5 public release authority changed while advancing the 3.2.9 upgrade profile."
 }
 $upgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-3-to-3-2-5"
 $upgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $upgradeFixtureRoot "settings.lua")
@@ -319,6 +371,26 @@ foreach ($requiredCostText in @(
 )) {
   if (-not $upgradeDataFinal.Contains($requiredCostText)) {
     throw "3.2.5 upgrade fixture is missing cost-transition contract: $requiredCostText"
+  }
+}
+
+$terminalUpgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-5-to-3-2-9"
+$terminalUpgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $terminalUpgradeFixtureRoot "settings.lua")
+$terminalUpgradeControl = Get-Content -Raw -LiteralPath (Join-Path $terminalUpgradeFixtureRoot "control.lua")
+foreach ($archetype in @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")) {
+  if (-not $terminalUpgradeSettings.Contains(('"' + $archetype + '"')) -or
+      -not $terminalUpgradeControl.Contains(('[' + '"' + $archetype + '"' + ']'))) {
+    throw "3.2.9 upgrade fixture does not bind archetype $archetype."
+  }
+}
+foreach ($requiredUpgradeText in @(
+  'script.active_mods["more-infinite-research"] ~= "3.2.5"',
+  'script.active_mods["more-infinite-research"] ~= "3.2.9"',
+  'game.server_save("mir-329-upgraded")',
+  '3.2.9 upgraded save reload proof complete'
+)) {
+  if (-not $terminalUpgradeControl.Contains($requiredUpgradeText)) {
+    throw "3.2.9 upgrade fixture is missing governed runtime contract: $requiredUpgradeText"
   }
 }
 
@@ -376,6 +448,77 @@ if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
 . $coreScript
+. (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
+$nfcText = "caf$([char]0x00E9)`npolicy`n"
+$nfdCrLfText = ([char]0xFEFF) + "cafe$([char]0x0301)`r`npolicy`r`n`r`n"
+$nfcDigest = Get-MIRAssuranceCanonicalTextDigest -Text $nfcText
+$nfdDigest = Get-MIRAssuranceCanonicalTextDigest -Text $nfdCrLfText
+if ([string]$nfcDigest.policy_id -ne "utf8-nfc-lf-final-newline-v1" -or
+    [string]$nfcDigest.sha256 -ne [string]$nfdDigest.sha256) {
+  throw "Canonical text identity must bind UTF-8/NFC/LF/stable-final-newline semantics across checkout forms."
+}
+$jsonA = '{"z":2,"a":{"y":1,"x":"caf\u00e9"}}' | ConvertFrom-Json
+$jsonB = "{`r`n  `"a`": {`"x`": `"cafe$([char]0x0301)`", `"y`": 1},`r`n  `"z`": 2`r`n}" | ConvertFrom-Json
+$jsonDigestA = Get-MIRAssuranceCanonicalJsonDigest -Value $jsonA
+$jsonDigestB = Get-MIRAssuranceCanonicalJsonDigest -Value $jsonB
+if ([string]$jsonDigestA.policy_id -ne "json-sorted-properties-utf8-nfc-lf-final-newline-v1" -or
+    [string]$jsonDigestA.sha256 -ne [string]$jsonDigestB.sha256) {
+  throw "Canonical JSON identity must ignore property order, formatting, line endings, and Unicode composition."
+}
+$script:repo = $RepoRoot
+. (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+$campaignFingerprintRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-performance-campaign-" + [guid]::NewGuid().ToString("N"))
+$originalAssuranceRepo = $script:repo
+try {
+  $campaignRoot = Join-Path $campaignFingerprintRoot ".mir"
+  $versionedCampaignRoot = Join-Path $campaignRoot "performance-campaigns"
+  New-Item -ItemType Directory -Force -Path $versionedCampaignRoot | Out-Null
+  [IO.File]::WriteAllText((Join-Path $campaignRoot "releases.json"), '{"schema":1,"authority":"canonical-release-ledger","development":{"factorio-2.1":{"mir_version":"3.2.5","candidate_id":"C32"}}}', [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $campaignRoot "performance-campaign.json"), '{"schema":2,"release":"3.2.2"}', [Text.UTF8Encoding]::new($false))
+  $activeCampaignPath = Join-Path $versionedCampaignRoot "3.2.5-C32.json"
+  $unrelatedCampaignPath = Join-Path $versionedCampaignRoot "3.2.4-C31.json"
+  [IO.File]::WriteAllText($activeCampaignPath, '{"schema":2,"factorio_version":"2.1.12"}', [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($unrelatedCampaignPath, '{"schema":2,"factorio_version":"2.1.12"}', [Text.UTF8Encoding]::new($false))
+  & git -C $campaignFingerprintRoot init --quiet
+  & git -C $campaignFingerprintRoot add -- .mir
+  if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the performance campaign fingerprint fixture Git index." }
+  $script:repo = $campaignFingerprintRoot
+  $script:MIRAssurancePatternFingerprintCache = @{}
+  $campaignContext = [pscustomobject]@{target="2.1"}
+  $resolvedCampaignPath = Resolve-MIRAssurancePerformanceCampaignPath -Context $campaignContext
+  $beforeCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
+  [IO.File]::WriteAllText($unrelatedCampaignPath, '{"schema":2,"factorio_version":"2.1.13"}', [Text.UTF8Encoding]::new($false))
+  $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
+  $afterUnrelatedCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
+  [IO.File]::WriteAllText($activeCampaignPath, '{"schema":2,"factorio_version":"2.1.13"}', [Text.UTF8Encoding]::new($false))
+  $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
+  $afterActiveCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
+  if ($resolvedCampaignPath -ne ".mir/performance-campaigns/3.2.5-C32.json" -or
+      ($beforeCampaignFingerprint.patterns -join "|") -ne ".mir/performance-campaign.json|.mir/performance-campaigns/3.2.5-C32.json" -or
+      [string]$beforeCampaignFingerprint.sha256 -ne [string]$afterUnrelatedCampaignFingerprint.sha256 -or
+      [string]$beforeCampaignFingerprint.sha256 -eq [string]$afterActiveCampaignFingerprint.sha256) {
+    throw "Performance assurance execution and fingerprints must bind the root calibration and exact active versioned campaign, but no unrelated campaign: resolved=$resolvedCampaignPath patterns=$($beforeCampaignFingerprint.patterns -join '|') before=$($beforeCampaignFingerprint.sha256) unrelated=$($afterUnrelatedCampaignFingerprint.sha256) active=$($afterActiveCampaignFingerprint.sha256)."
+  }
+} finally {
+  $script:repo = $originalAssuranceRepo
+  $script:MIRAssurancePatternFingerprintCache = @{}
+  if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
+}
+$candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
+$candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
+if ($candidatePath -notmatch "/build/candidates/3\.2\.9/unassigned/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
+    $candidatePath -match "/dist/") {
+  throw "Default pre-freeze assurance candidates must be release/unassigned/source-tree addressed outside immutable dist."
+}
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
   New-Item -ItemType Directory -Force -Path (Join-Path $externalTreeRoot "data") | Out-Null
@@ -462,9 +605,15 @@ if ($wrapper -match 'dist/\*\.zip' -or $workflow -match 'dist/\*\.zip') {
 
 $validateWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\validate.yml")
 foreach ($requiredWorkflowSnippet in @(
-  'Stage exact development candidate for isolated transfer',
-  'path: build/candidate/*.zip',
-  'path: build/candidate',
+  'Resolve content-addressed development candidate',
+  'build/candidates/[0-9]+\.[0-9]+\.[0-9]+/',
+  'path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}',
+  'mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}',
+  'mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}',
+  'mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}',
+  '$plan.candidate_descriptor.path',
+  '[IO.Path]::IsPathRooted($candidateRelative)',
+  'Plan candidate descriptor is not a governed repository-relative path',
   '--candidate $env:MIR_DEVELOPMENT_CANDIDATE',
   '$work = @($plan.work)',
   'if ($work.Count -eq 0)',
@@ -480,6 +629,20 @@ foreach ($requiredWorkflowSnippet in @(
 }
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
+}
+if ($validateWorkflow.Contains('$candidate = Join-Path $PWD ([string]$plan.candidate)') -or
+    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 2 -or
+    @([regex]::Matches($validateWorkflow, '\[IO\.Path\]::IsPathRooted\(\$candidateRelative\)')).Count -ne 2) {
+  throw "Hosted workers and aggregate verification must reconstruct the candidate from the governed repo-relative descriptor path, never the planner checkout's absolute path."
+}
+foreach ($typedStatus in @("upstream-plan-failed", "infrastructure-failed", "worker-artifacts-received")) {
+  if (-not $validateWorkflow.Contains($typedStatus)) {
+    throw "Hosted validation workflow does not preserve typed aggregate status: $typedStatus"
+  }
+}
+if ($validateWorkflow -notmatch "needs\.plan\.result == 'success'" -or
+    $validateWorkflow -notmatch "needs\.plan\.result != 'success'") {
+  throw "Hosted validation must not reinterpret an upstream plan failure as missing worker evidence."
 }
 if ($validateWorkflow -match '(?m)^\s+path:\s+dist(?:/\*\.zip)?\s*$') {
   throw "Hosted validation workers must not materialize the active development candidate in immutable historical dist authority."
@@ -528,6 +691,8 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
 $assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredIngestionGuard in @(
   'mir-assurance-worker-receipt-v2',
+  'Test-MIRAssuranceFreshCampaignEvidence',
+  'Get-MIRAssuranceCampaignCheckpoint',
   'stale-ignored',
   'ReparsePoint',
   'max_entries_per_artifact',
@@ -539,11 +704,79 @@ foreach ($requiredIngestionGuard in @(
     throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
   }
 }
+$assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "checkpointed"', 'TimeBudgetSeconds')) {
+  if (-not $assuranceEntry.Contains($requiredCheckpointSnippet)) {
+    throw "Assurance checkpoint facade omits required contract: $requiredCheckpointSnippet"
+  }
+}
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
 foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/results/*')) {
   if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
     throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"
   }
+}
+
+$equivalenceRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-clean-root-equivalence-" + [guid]::NewGuid().ToString("N"))
+$plannerRoot = Join-Path $equivalenceRoot "planner"
+$workerRoot = Join-Path $equivalenceRoot "worker"
+$pwshPath = (Get-Process -Id $PID).Path
+try {
+  New-Item -ItemType Directory -Force -Path $equivalenceRoot | Out-Null
+  $stagedPatchPath = Join-Path $equivalenceRoot "staged-index.patch"
+  & git -C $RepoRoot diff --cached --binary --full-index --output=$stagedPatchPath
+  if ($LASTEXITCODE -ne 0) { throw "Unable to capture the exact staged tree for separate-root equivalence." }
+  $sourceGitRoot = (& git -c "safe.directory=$RepoRoot" -C $RepoRoot rev-parse --absolute-git-dir).Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceGitRoot)) {
+    throw "Unable to resolve the source repository Git directory for separate-root equivalence."
+  }
+  # The roots need independent indexes and working trees for LF/CRLF proof, not
+  # duplicate copies of the immutable repository object store. Sharing objects
+  # prevents this regression from becoming a disk-capacity false failure.
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --shared $RepoRoot $plannerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --shared $RepoRoot $workerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
+
+  foreach ($root in @($plannerRoot, $workerRoot)) {
+    if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
+      & git -C $root apply --index --whitespace=nowarn $stagedPatchPath
+      if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $root" }
+    }
+    & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
+    if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
+  }
+
+  # A normal planner must not consume mutable worktree bytes from published
+  # dist. Corrupt one worker-root copy after the isolated candidate exists.
+  $dirtyPublicDist = Join-Path $workerRoot "dist\more-infinite-research_3.2.5.zip"
+  $stream = [IO.File]::Open($dirtyPublicDist, [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
+  try { $stream.WriteByte(0) } finally { $stream.Dispose() }
+  if (@(& git -C $workerRoot status --porcelain -- dist).Count -ne 1) {
+    throw "Separate-root regression did not create the intended dirty published-dist decoy."
+  }
+
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json
+  if ($LASTEXITCODE -ne 0) { throw "Planner-root verification plan failed." }
+  & $pwshPath -NoProfile -File (Join-Path $workerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json
+  if ($LASTEXITCODE -ne 0) { throw "Worker-root verification plan reconstruction failed." }
+
+  $plannerPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot "build\results\assurance\verification-plan.json") | ConvertFrom-Json
+  $workerPlan = Get-Content -Raw -LiteralPath (Join-Path $workerRoot "build\results\assurance\verification-plan.json") | ConvertFrom-Json
+  if ([string]$plannerPlan.plan_material_sha256 -ne [string]$workerPlan.plan_material_sha256) {
+    throw "Separate roots produced different canonical plan material."
+  }
+  $plannerFingerprints = @($plannerPlan.tests | Sort-Object id | ForEach-Object { "$($_.id)`t$($_.fingerprint.fingerprint_sha256)" })
+  $workerFingerprints = @($workerPlan.tests | Sort-Object id | ForEach-Object { "$($_.id)`t$($_.fingerprint.fingerprint_sha256)" })
+  if (@(Compare-Object $plannerFingerprints $workerFingerprints).Count -ne 0) {
+    throw "Separate roots produced different exact test fingerprints."
+  }
+  if ([string]$plannerPlan.candidate_descriptor.sha256 -ne [string]$workerPlan.candidate_descriptor.sha256 -or
+      [string]$plannerPlan.candidate_descriptor.content_sha256 -ne [string]$workerPlan.candidate_descriptor.content_sha256) {
+    throw "Separate roots did not preserve exact isolated candidate identity."
+  }
+} finally {
+  if (Test-Path -LiteralPath $equivalenceRoot) { Remove-Item -LiteralPath $equivalenceRoot -Recurse -Force }
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

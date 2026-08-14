@@ -1,6 +1,23 @@
 schema: 1
 
 docs:
+  - path: docs/maintainer/mir3-terminal-repository-protections.md
+    title: "MIR 3 Terminal Repository Protections"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - terminal-repository-protection-handoff
+      - github-administration-preflight
+  - path: docs/releases/mir-3-terminal-dot5-baseline-capture.md
+    title: "MIR 3 Terminal .5 Baseline Capture"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - terminal-dot5-semantic-baseline-capture-status
   - path: docs/releases/current-candidate.md
     title: "Current Development Candidate"
     status: current
@@ -2506,6 +2523,12 @@ docs:
     source_of_truth_for:
       - mir-3-terminal-dot-9-programme
       - mir-3-terminal-release-train
+      - mir-3-terminal-product-intake
+      - mir-3-terminal-settings-scope-audit
+      - mir-3-successor-bootstrap-firewall
+      - mir-3-final-defect-index
+      - mir-3-terminal-product-admission
+      - mir-3-mod-portal-discussion-reconciliation
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Planning Notes"
     status: draft

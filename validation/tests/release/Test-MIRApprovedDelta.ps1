@@ -19,15 +19,6 @@ $defaultDeltaByVersion = @{
   "3.2.2" = ".mir\releases\deltas\3.2.1-to-3.2.2.json"
   "3.2.5" = ".mir\releases\deltas\3.2.3-to-3.2.5.json"
 }
-if ([string]::IsNullOrWhiteSpace($Path)) {
-  if (-not $defaultDeltaByVersion.ContainsKey($activeVersion)) {
-    throw "No default approved-delta artifact is registered for MIR $activeVersion."
-  }
-  $Path = [string]$defaultDeltaByVersion[$activeVersion]
-}
-if ([string]::IsNullOrWhiteSpace($Candidate)) {
-  $Candidate = "dist\more-infinite-research_$activeVersion.zip"
-}
 $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
 $activeReleasePath = Join-Path $repo (Join-Path $releaseRecordRoot "$activeVersion.json")
 if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
@@ -40,6 +31,15 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
     Write-Host "[ok] active candidate is pre-qualification; approved-delta evidence remains explicitly pending."
     exit 0
   }
+}
+if ([string]::IsNullOrWhiteSpace($Path)) {
+  if (-not $defaultDeltaByVersion.ContainsKey($activeVersion)) {
+    throw "No default approved-delta artifact is registered for MIR $activeVersion."
+  }
+  $Path = [string]$defaultDeltaByVersion[$activeVersion]
+}
+if ([string]::IsNullOrWhiteSpace($Candidate)) {
+  $Candidate = "dist\more-infinite-research_$activeVersion.zip"
 }
 if ($activeVersion -eq "3.2.2") {
   $arguments = @{

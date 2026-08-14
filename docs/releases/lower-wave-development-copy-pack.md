@@ -5,16 +5,16 @@ applies_to: "dev after the 2.4.9 publication return"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-12
 supersedes: []
 superseded_by: []
 ---
 
 # MIR Published Lines Development Copy Pack
 
-The `dev` branch is the consolidated development checkout for the completed publication campaigns through MIR 2.4.9. It contains the current Factorio 2.1 implementation, all portable fixes returned by the target lines, every published distribution, complete source snapshots for every published campaign line, the aggregate feature matrix, qualification evidence, tests, notes, changelog, and the current TODO.
+The `dev` branch is the consolidated development checkout for the completed publication campaigns through MIR 2.4.9. It contains the current Factorio 2.1 implementation, all portable fixes returned by the target lines, every published distribution, compact exact source locks for every published campaign line, the aggregate feature matrix, qualification evidence, tests, notes, changelog, and the current TODO.
 
-The repository root remains the only active implementation. Historical source is intentionally stored under `.mir/target-lines/` so it can be copied or inspected without letting old Factorio APIs, metadata, settings, or feature cuts mutate the modern package.
+The repository root remains the only active implementation. Historical source is reconstructed from immutable tags and commits named by `.mir/releases/sources/published-source-locks.json`; the retired materialized copies remain recoverable from ordinary Git history but are no longer duplicated in the active checkout.
 
 ## What To Copy Or Use
 
@@ -23,8 +23,8 @@ The repository root remains the only active implementation. Historical source is
 | Current mod code and data | repository root | Continue Factorio 2.1 development and build the current mod. |
 | Exact published ZIPs | `dist/more-infinite-research_<version>.zip` | Install or redistribute the already-sealed release bytes. |
 | Complete root distribution inventory | `.mir/distributions.json` | Verify every root ZIP by path, size, SHA-256, kind, and source ref. |
-| Complete source for a published line | `.mir/target-lines/<version>/` | Copy target-specific code, data, tests, scripts, docs, notes, and evidence. |
-| Snapshot identities | `.mir/target-lines/index.json` | Verify tag commit, Git tree, file count, byte count, and distribution hash. |
+| Complete source for a published line | exact tag/commit in `.mir/releases/sources/published-source-locks.json` | Materialize target-specific code, data, tests, scripts, docs, notes, and evidence from immutable Git history. |
+| Source identities | `.mir/releases/sources/published-source-locks.json` | Verify tag, commit, Git tree, file count, byte count, retired-snapshot equivalence, and distribution hash. |
 | Full release truth | `.mir/evidence/lower-wave/final-release-ledger.json` | Inspect source locks, binaries, qualification, seals, publication, and remaining gates. |
 | 1.1 and 1.0 ring truth | `.mir/evidence/ring-1.1-1.0/final-release-ledger.json` | Inspect Factorio 1.1 and 1.0 qualification and publication. |
 | Cross-target feature truth | `.mir/evidence/lower-wave/aggregate-feature-matrix.json` | Compare all 12 lower targets across 18 feature classes. |
@@ -34,15 +34,15 @@ The repository root remains the only active implementation. Historical source is
 | Player-facing history | `changelog.txt` | Use the consolidated Factorio-format changelog. |
 | Current and historical work list | `todo.md` and `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md` | Use current work truth or audit the pre-consolidation plan. |
 
-Do not overlay an entire historical snapshot onto the repository root. Copy only the target-specific material you intend to study or reuse. The snapshot directories are runtime-inert development archives and must stay excluded from release ZIPs.
+Do not overlay an entire historical source materialization onto the repository root. Reconstruct into a disposable worktree and copy only the target-specific material you intend to study or reuse. Source-lock authorities and all `.mir` control records stay excluded from release ZIPs.
 
-## Published Distributions And Source Snapshots
+## Published Distributions And Source Locks
 
 The tracked `dist/` directory contains 45 ZIPs: 44 immutable tagged releases plus the clearly classified MIR 3.2.0 development candidate. The exact machine-readable inventory is `.mir/distributions.json`; nonexistent or superseded 1.9.5, 2.4.1, and 2.5.0 candidates are not root distribution entries.
 
 The complete tracked version inventory is 0.6.0, 0.7.0, 0.8.0, 0.9.0, 0.10.0, 0.11.0, 0.12.0; 1.0.0, 1.1.0, 1.1.5, 1.2.0, 1.2.5, 1.2.9, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.9.2, 1.9.3, 1.9.4; 2.0.0, 2.0.5, 2.1.0, 2.1.5, 2.2.0, 2.3.0, 2.3.5, 2.4.0, 2.4.5, 2.4.9; and 3.0.0, 3.0.5, 3.1.0, 3.1.1, 3.1.2, 3.1.5, 3.1.9, and the 3.2.0 development candidate.
 
-Every row below is a final campaign version with both an exact ZIP in `dist/` and a complete tagged source tree in `.mir/target-lines/<version>/`.
+Every row below is a final campaign version with both an exact ZIP in `dist/` and a compact lock to its complete tagged source tree.
 
 | MIR | Factorio | Runtime proof | Tagged source commit | Distribution SHA-256 |
 | --- | --- | --- | --- | --- |
@@ -130,7 +130,7 @@ The release synthesis documents explain decisions and limitations rather than du
 
 ## Validation Boundary
 
-The source snapshots are complete tag exports, but they are not active validator inputs. Static validation deliberately excludes `.mir/target-lines/` from modern package asset ownership checks while continuing to enforce the active root. Snapshot integrity is separately proved by comparing each staged snapshot Git tree to its published tag root tree, hashing all 45 tracked root archives against `.mir/distributions.json`, and binding the 17 final campaign archives to `.mir/target-lines/index.json`.
+The compact source locks are control-plane inputs, not active product source. Static validation compares each exact release tag/commit root tree with its independently retained former snapshot subtree in immutable Git history, verifies canonical Git blob counts and logical bytes, hashes every tracked root archive against `.mir/distributions.json`, and binds the 17 final campaign archives to `.mir/releases/sources/published-source-locks.json`. The active checkout intentionally contains no `.mir/target-lines/` tree. Offline Git-bundle custody and its restore rehearsal remain a terminal EOL gate rather than an already-completed claim.
 
 The 2026-07-15 consolidation gate passed Markdown formatting, docs and governance manifests, architecture boundaries, settings visibility, locale checks, all 78 active PowerShell scripts, scenario manifests, deterministic planner tools, schema and contract coverage, package identity invariance, policy and claim lints, the 70 stable plus 2 predeclared golden identities, changelog format, package construction, and forbidden-entry hygiene. Two independent builds produced development-package SHA-256 `7105D01F3C0847FD6641728BDDE93FA90DC8D723945B89C7E30AB051109B50F5`.
 

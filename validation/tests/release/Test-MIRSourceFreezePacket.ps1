@@ -7,15 +7,32 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
 
 function Assert-MIRFreezeFileBinding {
-  param([Parameter(Mandatory)]$Binding)
+  param([Parameter(Mandatory)]$Binding, [Parameter(Mandatory)][string]$Commit)
   $relative = [string]$Binding.path
-  $path = Join-Path $repo $relative
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-    throw "Source-freeze authority is missing: $relative"
+  $start = [Diagnostics.ProcessStartInfo]::new()
+  $start.FileName = "git"
+  $start.UseShellExecute = $false
+  $start.RedirectStandardOutput = $true
+  $start.RedirectStandardError = $true
+  foreach ($argument in @("-C", $repo, "cat-file", "blob", "${Commit}:$relative")) { [void]$start.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::Start($start)
+  $memory = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($memory)
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Source-freeze authority is absent from ${Commit}: $relative" }
+    $bytes = $memory.ToArray()
+  } finally {
+    $memory.Dispose()
+    $process.Dispose()
   }
-  $actual = Get-MIRFileContentSha256 -Path $path -RelativePath $relative
+  $actual = if (Test-MIRTextFingerprintPath -RelativePath $relative) {
+    (Get-MIRNormalizedTextIdentity -Text ([Text.UTF8Encoding]::new($false).GetString($bytes))).Sha256
+  } else {
+    [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  }
   if ($actual -ne [string]$Binding.sha256) {
-    throw "Source-freeze authority hash changed: $relative"
+    throw "Source-freeze authority hash disagrees with ${Commit}: $relative (expected $($Binding.sha256), got $actual)"
   }
 }
 
@@ -32,8 +49,12 @@ if ([int]$packet.schema -ne 1 -or [string]$packet.kind -ne "mir-source-freeze-pa
 
 $sourceCommit = [string]$packet.source.package_source_commit
 if ($sourceCommit -notmatch '^[0-9a-f]{40}$') { throw "Source-freeze package commit is invalid." }
+$authorityCommit = [string]$packet.source.authority_commit
+if ($authorityCommit -notmatch '^[0-9a-f]{40}$') { throw "Source-freeze qualification-authority commit is invalid." }
 & git -C $repo cat-file -e "$sourceCommit^{commit}" 2>$null
 if ($LASTEXITCODE -ne 0) { throw "Source-freeze package commit is unavailable." }
+& git -C $repo cat-file -e "$authorityCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) { throw "Source-freeze qualification-authority commit is unavailable." }
 $sourceTree = (& git -C $repo show -s --format=%T $sourceCommit).Trim()
 if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$packet.source.package_source_tree) {
   throw "Source-freeze package source tree is stale."
@@ -54,23 +75,36 @@ if ($LASTEXITCODE -ne 0 -or $tagCommit -ne [string]$packet.lineage.public_predec
     $tagObject -ne [string]$packet.lineage.public_predecessor.tag_object) {
   throw "Public predecessor tag identity is stale."
 }
-foreach ($lineageArchive in @($packet.lineage.public_predecessor, $packet.lineage.superseded_checkpoint)) {
-  $archivePath = Join-Path $repo ([string]$lineageArchive.archive)
-  if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash -ne [string]$lineageArchive.archive_sha256) {
-    throw "Frozen lineage archive is missing or changed: $($lineageArchive.archive)"
-  }
+$predecessorArchive = Join-Path $repo ([string]$packet.lineage.public_predecessor.archive)
+if (-not (Test-Path -LiteralPath $predecessorArchive -PathType Leaf) -or
+    (Get-FileHash -LiteralPath $predecessorArchive -Algorithm SHA256).Hash -ne [string]$packet.lineage.public_predecessor.archive_sha256) {
+  throw "Frozen public-predecessor archive is missing or changed: $($packet.lineage.public_predecessor.archive)"
 }
 $closure = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$packet.lineage.superseded_checkpoint.closure)) | ConvertFrom-Json
 if ([string]$closure.disposition -ne "superseded-unpublished" -or [string]$closure.successor.release -ne "3.2.5") {
   throw "C31 is not preserved as superseded-unpublished lineage."
 }
+$superseded = $packet.lineage.superseded_checkpoint
+$supersededArchive = Join-Path $repo ([string]$superseded.archive)
+$packageLocks = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/control-plane/package-locks.json") | ConvertFrom-Json
+$supersededLock = @($packageLocks.locks | Where-Object { [string]$_.release -eq [string]$superseded.release -and [string]$_.candidate_id -eq [string]$superseded.candidate_id })
+$supersededTree = (& git -C $repo show -s --format=%T ([string]$superseded.package_source_commit)).Trim()
+if ((Test-Path -LiteralPath $supersededArchive -PathType Leaf) -or $supersededLock.Count -ne 1 -or
+    [string]$supersededLock[0].mode -ne "frozen-candidate" -or
+    [string]$supersededLock[0].package_source_commit -ne [string]$superseded.package_source_commit -or
+    [string]$supersededLock[0].package_source_tree -ne [string]$superseded.package_source_tree -or
+    [string]$supersededLock[0].archive_sha256 -ne [string]$superseded.archive_sha256 -or
+    [long]$supersededLock[0].archive_bytes -ne [long]$superseded.bytes -or
+    [int]$supersededLock[0].archive_entries -ne [int]$superseded.entries -or
+    $supersededTree -ne [string]$superseded.package_source_tree) {
+  throw "C31 superseded lineage must remain reconstructable and package-lock authoritative without appearing in active dist."
+}
 
 foreach ($binding in @($packet.product_contract.authorities) + @($packet.qualification_authority.authorities) + @($packet.documentation.authorities)) {
-  Assert-MIRFreezeFileBinding -Binding $binding
+  Assert-MIRFreezeFileBinding -Binding $binding -Commit $authorityCommit
 }
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder
-Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.builder -Commit $authorityCommit
+Assert-MIRFreezeFileBinding -Binding $packet.package_contract.identity_implementation -Commit $authorityCommit
 if (@($packet.product_contract.factorio_2_0_dispositions).Count -ne 9 -or
     @($packet.product_contract.factorio_2_0_dispositions | Where-Object {
       [string]$_.classification -notin @(

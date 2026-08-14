@@ -970,6 +970,7 @@ function Invoke-MIRScenarioLoad {
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
   $expectedPlan = Get-MIRObjectProperty -Object $Scenario -Name "expected_plan" -Default ([pscustomobject]@{})
   $requiredStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "required_stream_science" -Default ([pscustomobject]@{})
+  $forbiddenStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "forbidden_stream_science" -Default ([pscustomobject]@{})
   $scienceAssertions = @(
     foreach ($requiredStream in @($requiredStreamScience.PSObject.Properties)) {
       $streamName = [string]$requiredStream.Name
@@ -996,7 +997,34 @@ function Invoke-MIRScenarioLoad {
       }
     }
   )
-  $scienceContractPassed = @($scienceAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
+  $forbiddenScienceAssertions = @(
+    foreach ($forbiddenStream in @($forbiddenStreamScience.PSObject.Properties)) {
+      $streamName = [string]$forbiddenStream.Name
+      $forbiddenPacks = @($forbiddenStream.Value | ForEach-Object { [string]$_ })
+      $streamRows = @($result.audit_rows | Where-Object {
+        [string]$_.kind -eq "stream" -and
+        [string]$_.key -eq $streamName -and
+        [string]$_.status -eq "generated"
+      })
+      $observedPacks = @(
+        $streamRows |
+          ForEach-Object { @([string]$_.science -split ",") } |
+          Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } |
+          Sort-Object -Unique
+      )
+      $presentForbiddenPacks = @($forbiddenPacks | Where-Object { $_ -in $observedPacks })
+      [pscustomobject]@{
+        stream = $streamName
+        forbidden_packs = $forbiddenPacks
+        observed_packs = $observedPacks
+        matching_generated_rows = $streamRows.Count
+        present_forbidden_packs = $presentForbiddenPacks
+        passed = ($streamRows.Count -gt 0 -and $presentForbiddenPacks.Count -eq 0)
+      }
+    }
+  )
+  $allScienceAssertions = @($scienceAssertions) + @($forbiddenScienceAssertions)
+  $scienceContractPassed = @($allScienceAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -1020,6 +1048,7 @@ function Invoke-MIRScenarioLoad {
     sanitation_rows = @($result.sanitation_rows)
     science_contract_passed = $scienceContractPassed
     science_assertions = $scienceAssertions
+    forbidden_science_assertions = $forbiddenScienceAssertions
   }
 }
 

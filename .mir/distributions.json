@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-05",
-  "distribution_count": 50,
+  "generated_at": "2026-08-08",
+  "distribution_count": 57,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -394,21 +394,21 @@
       "kind": "tagged-published-public-identities-verified",
       "source_ref": "3.2.3"
     },
-    {
-      "version": "3.2.4",
-      "path": "dist/more-infinite-research_3.2.4.zip",
-      "bytes": 1048419,
-      "sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
-      "kind": "frozen-unreleased-calibration-candidate",
-      "source_ref": "088e8a2758a63873addd22f32b3e83aaf24d03b4"
-    },
+    {"version":"1.3.5","path":"dist/more-infinite-research_1.3.5.zip","bytes":386081,"sha256":"78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0","kind":"tagged-publicly-verified","source_ref":"1.3.5"},
+    {"version":"1.4.5","path":"dist/more-infinite-research_1.4.5.zip","bytes":385987,"sha256":"BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47","kind":"tagged-publicly-verified","source_ref":"1.4.5"},
+    {"version":"1.5.5","path":"dist/more-infinite-research_1.5.5.zip","bytes":385548,"sha256":"E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD","kind":"tagged-publicly-verified","source_ref":"1.5.5"},
+    {"version":"1.6.5","path":"dist/more-infinite-research_1.6.5.zip","bytes":385236,"sha256":"8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB","kind":"tagged-publicly-verified","source_ref":"1.6.5"},
+    {"version":"1.7.5","path":"dist/more-infinite-research_1.7.5.zip","bytes":385229,"sha256":"D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A","kind":"tagged-publicly-verified","source_ref":"1.7.5"},
+    {"version":"1.8.5","path":"dist/more-infinite-research_1.8.5.zip","bytes":397589,"sha256":"10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD","kind":"tagged-publicly-verified","source_ref":"1.8.5"},
+    {"version":"1.9.5","path":"dist/more-infinite-research_1.9.5.zip","bytes":397597,"sha256":"9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC","kind":"tagged-publicly-verified","source_ref":"1.9.5"},
+    {"version":"2.5.5","path":"dist/more-infinite-research_2.5.5.zip","bytes":1055047,"sha256":"03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C","kind":"tagged-publicly-verified","source_ref":"2.5.5"},
     {
       "version": "3.2.5",
       "path": "dist/more-infinite-research_3.2.5.zip",
       "bytes": 1056249,
       "sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
-      "kind": "frozen-unreleased-release-candidate",
-      "source_ref": "a3bfbc4524b52cede425900e775384eb9c1fc4b3"
+      "kind": "tagged-publicly-verified",
+      "source_ref": "3.2.5"
     }
   ]
 }

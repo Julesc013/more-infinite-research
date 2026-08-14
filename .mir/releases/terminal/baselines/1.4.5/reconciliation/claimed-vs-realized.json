@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "1.4.5",
+  "comparison": "claimed-vs-realized",
+  "status": "explained-capability-gaps",
+  "agreements": [
+    "public exact-engine load claim supported",
+    "no package-source canonical public compatibility claims exist and no modern claims were projected backward"
+  ],
+  "contradictions": [],
+  "unresolved_findings": []
+}

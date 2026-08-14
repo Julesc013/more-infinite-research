@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot "PackageIdentity.ps1")
+. (Join-Path $PSScriptRoot "PerformanceCampaign.ps1")
 
 function Get-MIRReleaseSha256 {
   param([Parameter(Mandatory)][string]$Path)
@@ -23,6 +24,18 @@ function Get-MIRReleasePortableArtifactSha256 {
   $text = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8)
   $normalized = ($text -replace "`r`n", "`n") -replace "`r", "`n"
   return Get-MIRReleaseTextSha256 -Text $normalized
+}
+
+function Test-MIRReleaseByteIdentity {
+  param(
+    [Parameter(Mandatory)][byte[]]$Expected,
+    [Parameter(Mandatory)][byte[]]$Actual
+  )
+  if ($Expected.Length -ne $Actual.Length) { return $false }
+  for ($index = 0; $index -lt $Expected.Length; $index++) {
+    if ($Expected[$index] -ne $Actual[$index]) { return $false }
+  }
+  return $true
 }
 
 function ConvertTo-MIRReleaseOrderedMap {
@@ -100,7 +113,8 @@ function Test-MIRRuntimePerformanceEvidence {
     [Parameter(Mandatory)][string]$FactorioBin,
     [Parameter(Mandatory)][string]$ExpectedSourceCommit,
     [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
-    [Parameter(Mandatory)][string]$ExpectedFactorioVersion
+    [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
+    [string]$CampaignPath = ""
   )
   $candidatePath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $Candidate
   $priorPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $PriorRelease
@@ -117,6 +131,19 @@ function Test-MIRRuntimePerformanceEvidence {
     throw "Runtime performance evidence must use mir-runtime-performance-regression schema 3."
   }
   if ([string]$evidence.status -ne "passed") { throw "Runtime performance evidence is not passed." }
+  $campaignPath = if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
+    Join-Path $RepoRoot ".mir\performance-campaign.json"
+  } elseif ([IO.Path]::IsPathRooted($CampaignPath)) {
+    [IO.Path]::GetFullPath($CampaignPath)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath))
+  }
+  if (-not (Test-Path -LiteralPath $campaignPath -PathType Leaf)) { throw "Runtime performance campaign authority is absent." }
+  $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
+  if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$evidence.candidate.version -or
+      [string]$campaign.factorio_version -notlike "$ExpectedFactorioVersion*") {
+    throw "Runtime performance evidence does not bind a coherent governed target-era campaign."
+  }
   $candidateSha = Get-MIRReleaseSha256 -Path $candidatePath
   $candidateContentSha = Get-MIRReleaseArchiveContentSha256 -Path $candidatePath
   if ([string]$evidence.candidate.archive_sha256 -ne $candidateSha -or
@@ -165,45 +192,67 @@ function Test-MIRRuntimePerformanceEvidence {
     }
   }
 
-  if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
-      [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
-    throw "Runtime performance evidence lacks the governed artifact-volume aggregation."
-  }
   $volumeMeasurements = @($evidence.artifact_volume.measurements)
-  $volumeSurfaces = @($volumeMeasurements | ForEach-Object { [string]$_.surface })
-  $actualVolumeSurfaces = (@($volumeSurfaces | Sort-Object) -join "`n")
-  $expectedVolumeSurfaces = (@("diagnostics-off", "diagnostics-on") | Sort-Object) -join "`n"
-  if ($actualVolumeSurfaces -ne $expectedVolumeSurfaces -or
-      @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
-    throw "Runtime performance evidence must contain exactly diagnostics-off and diagnostics-on artifact-volume measurements."
-  }
-  $performancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance.yml")
-  $counterBlock = [regex]::Match($performancePolicy, '(?ms)required_counters:\s*(?<block>.*?)\s+required_phases:')
-  if (-not $counterBlock.Success) { throw "Performance policy does not expose its required telemetry counter block." }
-  $requiredVolumeCounters = @([regex]::Matches($counterBlock.Groups['block'].Value, '(?m)^\s*-\s+(?<name>[a-z0-9_-]+)\s*$') | ForEach-Object { $_.Groups['name'].Value })
-  foreach ($measurement in $volumeMeasurements) {
-    $fingerprints = @($measurement.telemetry_fingerprints | ForEach-Object { [string]$_ })
-    if ([int]$measurement.measured_runs -lt $minimumRuns -or $fingerprints.Count -ne [int]$measurement.measured_runs -or
-        @($fingerprints | Where-Object { $_ -notmatch '^[0-9A-Fa-f]{64}$' }).Count -gt 0) {
-      throw "Artifact-volume measurement '$($measurement.surface)' does not bind every measured candidate run."
+  $artifactVolumePolicy = Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $campaign
+  if ($artifactVolumePolicy -eq "required") {
+    if ([int]$evidence.artifact_volume.telemetry_schema -ne 1 -or
+        [string]$evidence.artifact_volume.aggregation -ne "maximum-observed") {
+      throw "Runtime performance evidence lacks the governed artifact-volume aggregation."
     }
-    $counterNames = @($measurement.counters.PSObject.Properties.Name)
-    foreach ($counterName in $requiredVolumeCounters) {
-      if ($counterNames -notcontains $counterName -or [long]$measurement.counters.$counterName -lt 0) {
-        throw "Artifact-volume measurement '$($measurement.surface)' lacks governed counter '$counterName'."
+    $surfaceByLane = @{
+      "diagnostics-off.factorio-total" = "diagnostics-off"
+      "diagnostics-on.factorio-total" = "diagnostics-on"
+    }
+    $expectedVolumeSurfaces = @(
+      foreach ($laneId in @($campaign.artifact_volume_lanes)) {
+        $surface = $surfaceByLane[[string]$laneId]
+        if ([string]::IsNullOrWhiteSpace([string]$surface)) { throw "Runtime performance campaign has an unsupported artifact-volume lane: $laneId" }
+        [string]$surface
+      }
+    ) | Sort-Object -Unique
+    $volumeSurfaces = @($volumeMeasurements | ForEach-Object { [string]$_.surface })
+    if ((@($volumeSurfaces | Sort-Object) -join "`n") -ne ($expectedVolumeSurfaces -join "`n") -or
+        @($volumeSurfaces | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+      throw "Runtime performance evidence does not contain the governed artifact-volume measurements."
+    }
+    $performancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance.yml")
+    $counterBlock = [regex]::Match($performancePolicy, '(?ms)required_counters:\s*(?<block>.*?)\s+required_phases:')
+    if (-not $counterBlock.Success) { throw "Performance policy does not expose its required telemetry counter block." }
+    $requiredVolumeCounters = @([regex]::Matches($counterBlock.Groups['block'].Value, '(?m)^\s*-\s+(?<name>[a-z0-9_-]+)\s*$') | ForEach-Object { $_.Groups['name'].Value })
+    foreach ($measurement in $volumeMeasurements) {
+      $fingerprints = @($measurement.telemetry_fingerprints | ForEach-Object { [string]$_ })
+      if ([int]$measurement.measured_runs -lt $minimumRuns -or $fingerprints.Count -ne [int]$measurement.measured_runs -or
+          @($fingerprints | Where-Object { $_ -notmatch '^[0-9A-Fa-f]{64}$' }).Count -gt 0) {
+        throw "Artifact-volume measurement '$($measurement.surface)' does not bind every measured candidate run."
+      }
+      $counterNames = @($measurement.counters.PSObject.Properties.Name)
+      foreach ($counterName in $requiredVolumeCounters) {
+        if ($counterNames -notcontains $counterName -or [long]$measurement.counters.$counterName -lt 0) {
+          throw "Artifact-volume measurement '$($measurement.surface)' lacks governed counter '$counterName'."
+        }
       }
     }
+  } elseif ($artifactVolumePolicy -eq "omitted-by-capability") {
+    if ([int]$evidence.artifact_volume.telemetry_schema -ne 0 -or
+        [string]$evidence.artifact_volume.aggregation -ne "omitted-by-capability" -or
+        $volumeMeasurements.Count -ne 0) {
+      throw "Runtime performance evidence does not honor the governed omitted-by-capability artifact-volume policy."
+    }
+  } else {
+    throw "Runtime performance campaign has an unsupported artifact-volume policy: $artifactVolumePolicy"
   }
 
   $budgetPath = Join-Path $RepoRoot ".mir\performance-budgets.json"
   $budgetManifest = Get-Content -Raw -LiteralPath $budgetPath | ConvertFrom-Json
   if ([int]$budgetManifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
-  foreach ($measurement in $volumeMeasurements) {
-    foreach ($bound in @($budgetManifest.compiler_counter_bounds)) {
-      $counter = [string]$bound.counter
-      $property = $measurement.counters.PSObject.Properties[$counter]
-      if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
-        throw "Artifact-volume measurement '$($measurement.surface)' exceeds or omits compiler budget '$counter'."
+  if ($artifactVolumePolicy -eq "required") {
+    foreach ($measurement in $volumeMeasurements) {
+      foreach ($bound in @($budgetManifest.compiler_counter_bounds)) {
+        $counter = [string]$bound.counter
+        $property = $measurement.counters.PSObject.Properties[$counter]
+        if ($null -eq $property -or [long]$property.Value -gt [long]$bound.maximum) {
+          throw "Artifact-volume measurement '$($measurement.surface)' exceeds or omits compiler budget '$counter'."
+        }
       }
     }
   }
@@ -268,7 +317,7 @@ function Test-MIRManualReleaseAttestation {
   if (-not (Test-Path -LiteralPath $attestationPath -PathType Leaf)) { throw "Manual release attestation is absent: $attestationPath" }
   $attestation = Get-Content -Raw -LiteralPath $attestationPath | ConvertFrom-Json
   if ([int]$attestation.schema -ne 2 -or [string]$attestation.kind -ne "mir-manual-release-review" -or
-      [string]$attestation.status -ne "passed" -or [string]$attestation.checklist_version -ne "mir-manual-release-review-v1") {
+      [string]$attestation.status -ne "passed") {
     throw "Manual release attestation is not a passing schema-2 package review."
   }
   if ([string]$attestation.candidate_sha256 -ne (Get-MIRReleaseSha256 -Path $candidatePath) -or
@@ -282,39 +331,115 @@ function Test-MIRManualReleaseAttestation {
       [string]$attestation.factorio_binary_sha256 -ne (Get-MIRReleaseSha256 -Path $FactorioBin)) {
     throw "Manual release attestation is not bound to the exact qualified Factorio $ExpectedFactorioVersion binary."
   }
-  if ([string]::IsNullOrWhiteSpace([string]$attestation.reviewer) -or
-      [string]::IsNullOrWhiteSpace([string]$attestation.reviewed_at)) {
-    throw "Manual release attestation lacks reviewer identity or review time."
+  if ([string]::IsNullOrWhiteSpace([string]$attestation.reviewer)) {
+    throw "Manual release attestation lacks reviewer identity."
   }
-  if ($attestation.reviewed_at -is [DateTime]) {
-    $null = [DateTimeOffset]([DateTime]$attestation.reviewed_at)
-  } else {
-    $null = [DateTimeOffset]::Parse([string]$attestation.reviewed_at, [Globalization.CultureInfo]::InvariantCulture)
-  }
-  $expectedItems = @(
-    "technology-tree-visual", "icon-visual", "locale-fit-and-truncation",
-    "settings-ux", "save-ui", "human-balance", "configuration-change-give-item-safety"
-  )
-  $items = @($attestation.items)
-  if ((@($items.id | Sort-Object) -join "`n") -ne (@($expectedItems | Sort-Object) -join "`n")) {
-    throw "Manual release attestation does not contain the exact pre-seal package checklist."
-  }
-  foreach ($item in $items) {
-    if ([string]$item.status -ne "passed" -or [string]::IsNullOrWhiteSpace([string]$item.notes) -or
-        @($item.artifacts).Count -eq 0) {
-      throw "Manual release checklist item is incomplete: $($item.id)"
+
+  $attestationMode = [string]$attestation.checklist_version
+  if ($attestationMode -eq "mir-manual-release-review-v1") {
+    if ([string]::IsNullOrWhiteSpace([string]$attestation.reviewed_at)) {
+      throw "Manual release attestation lacks review time."
     }
-    foreach ($artifact in @($item.artifacts)) {
+    if ($attestation.reviewed_at -is [DateTime]) {
+      $null = [DateTimeOffset]([DateTime]$attestation.reviewed_at)
+    } else {
+      $null = [DateTimeOffset]::Parse([string]$attestation.reviewed_at, [Globalization.CultureInfo]::InvariantCulture)
+    }
+    $expectedItems = @(
+      "technology-tree-visual", "icon-visual", "locale-fit-and-truncation",
+      "settings-ux", "save-ui", "human-balance", "configuration-change-give-item-safety"
+    )
+    $items = @($attestation.items)
+    if ((@($items.id | Sort-Object) -join "`n") -ne (@($expectedItems | Sort-Object) -join "`n")) {
+      throw "Manual release attestation does not contain the exact pre-seal package checklist."
+    }
+    foreach ($item in $items) {
+      if ([string]$item.status -ne "passed" -or [string]::IsNullOrWhiteSpace([string]$item.notes) -or
+          @($item.artifacts).Count -eq 0) {
+        throw "Manual release checklist item is incomplete: $($item.id)"
+      }
+      foreach ($artifact in @($item.artifacts)) {
+        $relative = ([string]$artifact.path).Replace("\", "/")
+        if ([IO.Path]::IsPathRooted($relative) -or $relative.Contains("..") -or $relative.Contains(":")) {
+          throw "Manual review artifact path is not portable: $relative"
+        }
+        $artifactPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $relative
+        if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+            [string]$artifact.sha256 -ne (Get-MIRReleasePortableArtifactSha256 -Path $artifactPath)) {
+          throw "Manual review artifact is absent or has the wrong hash: $relative"
+        }
+      }
+    }
+  } elseif ($attestationMode -eq "mir-manual-release-review-historical-statement-v1") {
+    $hasObservedItems = $null -ne $attestation.PSObject.Properties["items"]
+    $hasObservedReviewTime = $null -ne $attestation.PSObject.Properties["reviewed_at"]
+    if ([bool]$attestation.review_performed_before_publication -ne $true -or
+        [bool]$attestation.review_exact_time_known -ne $false -or
+        [bool]$attestation.attestation_recorded_after_publication -ne $true -or
+        [string]$attestation.reviewed_release -ne [string]$candidateInfo.version -or
+        [string]::IsNullOrWhiteSpace([string]$attestation.statement) -or
+        [string]::IsNullOrWhiteSpace([string]$attestation.attestation_recorded_at) -or
+        $hasObservedItems -or $hasObservedReviewTime) {
+      throw "Historical manual attestation does not preserve its no-invented-observations timing contract."
+    }
+    try { $null = [DateTimeOffset]::Parse([string]$attestation.attestation_recorded_at, [Globalization.CultureInfo]::InvariantCulture) }
+    catch { throw "Historical manual attestation has an invalid attestation-recorded time." }
+    $releaseRecordPath = Join-Path $RepoRoot ".mir\releases\records\$($candidateInfo.version).json"
+    if (-not (Test-Path -LiteralPath $releaseRecordPath -PathType Leaf)) { throw "Historical manual attestation has no release record authority." }
+    $releaseRecord = Get-Content -Raw -LiteralPath $releaseRecordPath | ConvertFrom-Json
+    if ([string]$releaseRecord.state -ne "publicly-verified" -or [string]$releaseRecord.release -ne [string]$candidateInfo.version -or
+        [string]$releaseRecord.package.archive_sha256 -ne (Get-MIRReleaseSha256 -Path $candidatePath) -or
+        [string]$releaseRecord.package.content_sha256 -ne (Get-MIRReleaseArchiveContentSha256 -Path $candidatePath) -or
+        [string]$releaseRecord.package.source_commit -ne $ExpectedSourceCommit) {
+      throw "Historical manual attestation may only bind an already-public immutable release identity."
+    }
+    foreach ($artifact in @($attestation.supporting_artifacts)) {
       $relative = ([string]$artifact.path).Replace("\", "/")
       if ([IO.Path]::IsPathRooted($relative) -or $relative.Contains("..") -or $relative.Contains(":")) {
-        throw "Manual review artifact path is not portable: $relative"
+        throw "Historical manual review artifact path is not portable: $relative"
       }
       $artifactPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $relative
       if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
           [string]$artifact.sha256 -ne (Get-MIRReleasePortableArtifactSha256 -Path $artifactPath)) {
-        throw "Manual review artifact is absent or has the wrong hash: $relative"
+        throw "Historical manual review artifact is absent or has the wrong hash: $relative"
       }
     }
+    $custodyRelative = ([string]$attestation.custody_manifest_path).Replace("\", "/")
+    if ([IO.Path]::IsPathRooted($custodyRelative) -or $custodyRelative.Contains("..") -or $custodyRelative.Contains(":")) {
+      throw "Historical manual review custody path is not portable."
+    }
+    $custodyPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $custodyRelative
+    if (-not (Test-Path -LiteralPath $custodyPath -PathType Leaf)) { throw "Historical manual review custody manifest is absent." }
+    $custody = Get-Content -Raw -LiteralPath $custodyPath | ConvertFrom-Json
+    $attestationRelative = [IO.Path]::GetRelativePath($RepoRoot, $attestationPath).Replace("\", "/")
+    if ([int]$custody.schema -ne 1 -or [string]$custody.kind -ne "MIR3HistoricalManualReviewCustodyV1" -or
+        [string]$custody.retention -ne "repository-governed-content-addressed-evidence-v1" -or
+        [string]$custody.package.release -ne [string]$candidateInfo.version -or
+        [string]$custody.package.archive_sha256 -ne (Get-MIRReleaseSha256 -Path $candidatePath) -or
+        [string]$custody.package.content_sha256 -ne (Get-MIRReleaseArchiveContentSha256 -Path $candidatePath) -or
+        [string]$custody.package.source_commit -ne $ExpectedSourceCommit -or
+        [string]$custody.attestation.path -ne $attestationRelative -or
+        [string]$custody.attestation.sha256 -ne (Get-MIRReleaseSha256 -Path $attestationPath) -or
+        [string]$custody.attestation.canonical_self_sha256 -ne [string]$attestation.attestation_sha256 -or
+        [string]::IsNullOrWhiteSpace([string]$custody.object.path) -or
+        [string]$custody.object.sha256 -ne (Get-MIRReleaseSha256 -Path $attestationPath)) {
+      throw "Historical manual review custody manifest does not bind the exact attestation bytes."
+    }
+    $objectRelative = ([string]$custody.object.path).Replace("\", "/")
+    if ([IO.Path]::IsPathRooted($objectRelative) -or $objectRelative.Contains("..") -or $objectRelative.Contains(":")) {
+      throw "Historical manual review custody object path is not portable."
+    }
+    $expectedObjectRelative = ".mir/evidence/objects/sha256/$($custody.attestation.sha256.Substring(0, 2))/$($custody.attestation.sha256).json"
+    if ($objectRelative -ne $expectedObjectRelative) { throw "Historical manual review custody object is not content-addressed by its attestation bytes." }
+    $objectPath = Resolve-MIRReleasePath -RepoRoot $RepoRoot -Path $objectRelative
+    $attestationBytes = [IO.File]::ReadAllBytes($attestationPath)
+    $objectBytes = if (Test-Path -LiteralPath $objectPath -PathType Leaf) { [IO.File]::ReadAllBytes($objectPath) } else { $null }
+    if ($null -eq $objectBytes -or (Get-MIRReleaseSha256 -Path $objectPath) -ne [string]$custody.object.sha256 -or
+        -not (Test-MIRReleaseByteIdentity -Expected $attestationBytes -Actual $objectBytes)) {
+      throw "Historical manual review custody object does not retain byte-identical attestation evidence."
+    }
+  } else {
+    throw "Manual release attestation has an unsupported checklist mode: $attestationMode"
   }
   $material = ConvertTo-MIRReleaseOrderedMap -Object $attestation
   $material.Remove("attestation_sha256")

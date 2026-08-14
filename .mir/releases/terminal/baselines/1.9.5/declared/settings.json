@@ -1,0 +1,924 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineSettingInventoryV1",
+  "release": "1.9.5",
+  "target": "1.1.110",
+  "view": "declared",
+  "observation_capability": "packaged-locale-and-source",
+  "fields_observed": [
+    "scope",
+    "stable-id"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "evaluated-default-value",
+      "reason": "Requires exact engine setting-prototype observation.",
+      "static_fallback_source": "prototypes/mir/settings/catalog.lua"
+    }
+  ],
+  "source_evidence": [
+    "dist/more-infinite-research_1.9.5.zip",
+    "docs/releases/notes/release-notes-1.9.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "ips-cost-base-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-lab-incompatibility-policy",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-max-level",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-pipeline-extent-multiplier",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prefer-this-mod-for-competing-techs",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-productivity-cap-self-recycling-only",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-efficiency-cap",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-pollution-cap",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-enable-base-tech",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-positive-power-floor",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-quality-cap",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-speed-cap",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-speed-floor",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-recycling-return-chance",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-research-time",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-science-pack-ingredient-policy",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-settings-profile-import",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-prototype-productivity-cap",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-unrestricted-modules",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-effect-per-level",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-debug-recipe-matches",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-cost-growth-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-cost-linear-increment-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-effect-per-level-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-enable-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-max-level-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-require-space-gate",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "ips-research-time-stream",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-debug-scripted-effects",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-adjust-vanilla-weapon-speed-techs",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-automatic-create-research",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-automatic-productivity-action",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-automatic-require-reviewed-data",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-base",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-growth",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-cost-linear-increment",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-debug-generation-report",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-automatic-compiler-mode",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    },
+    {
+      "stable_id": "mir-use-installed-space-age-icons",
+      "target": "1.1.110",
+      "state": "declared-id-default-observation-pending",
+      "origin": "packaged-settings-and-locale",
+      "observed_release": "1.9.5",
+      "source_evidence": [
+        "locale/en/more-infinite-research.cfg",
+        "prototypes/mir/settings/catalog.lua"
+      ],
+      "target_disposition": "retain-only-if-target-profile-registers",
+      "mir4_transition_rule": "import-setting-id-default-scope-and-visibility",
+      "attributes": [
+        {
+          "name": "scope",
+          "value": "startup"
+        },
+        {
+          "name": "default_value",
+          "value": "requires-exact-setting-prototype-observation"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

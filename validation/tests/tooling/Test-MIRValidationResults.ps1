@@ -5,11 +5,57 @@ param(
 # Keep the former scripts/ base explicit while tooling internals complete L5.
 $MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
 $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
+$validationFacadePath = Join-Path $MirRepoRoot "scripts\Invoke-MIRValidation.ps1"
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "tools\lib\validation\ScenarioGroups.ps1")
 . (Join-Path $RepoRoot "tools\lib\validation\ResultAggregation.ps1")
 . (Join-Path $RepoRoot "tools\lib\validation\ScenarioRegistry.ps1")
+
+$validationFacade = Get-Content -Raw -LiteralPath $validationFacadePath
+foreach ($requiredPolicy in @(
+  '$generatedUserDataRoot = Join-Path $repo "build\validation-userdata"',
+  '$UserDataDir = Join-Path $generatedUserDataRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
+  '$scenarioRoot = Join-Path $validationRoot (Get-MIRCompactScenarioPathSegment -ScenarioName $ScenarioName)',
+  '$resolvedValidationRoot.StartsWith($resolvedGeneratedRoot, [System.StringComparison]::OrdinalIgnoreCase)',
+  'function Remove-MIRGeneratedValidationUserData {'
+)) {
+  if (-not $validationFacade.Contains($requiredPolicy)) {
+    throw "Validation facade does not preserve repository-local, bounded generated-userdata policy: $requiredPolicy"
+  }
+}
+
+$factorioProcess = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
+foreach ($requiredPolicy in @(
+  'function Get-MIRCompactScenarioPathSegment {',
+  'function Assert-MIRFactorioPathBudget {',
+  'function Publish-MIRModDirectoryArchive {'
+)) {
+  if (-not $factorioProcess.Contains($requiredPolicy)) {
+    throw "Factorio process tooling does not preserve bounded atomic validation paths: $requiredPolicy"
+  }
+}
+
+$settingsOverrides = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\SettingsOverrides.ps1")
+if (-not $settingsOverrides.Contains('function Complete-MIRSettingsOverrideMod {')) {
+  throw "Settings override tooling does not publish its generated mod atomically."
+}
+
+$upgradeHarness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests\runtime\Test-MIRUpgrade.ps1")
+foreach ($requiredPolicy in @(
+  '$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"',
+  '$resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)',
+  '$root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))',
+  'Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log")',
+  '$save = Join-Path $root "source.zip"',
+  'Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"',
+  '"assert-upgrade-3-2-3-to-3-2-9"',
+  'Assert-MIRFactorioPathBudget -Path $governedUpgradedSave -Context "Upgrade governed-save path"'
+)) {
+  if (-not $upgradeHarness.Contains($requiredPolicy)) {
+    throw "Upgrade harness does not preserve repository-local bounded Factorio userdata: $requiredPolicy"
+  }
+}
 
 $registry = Import-MIRScenarioRegistry `
   -Path (Join-Path $RepoRoot "validation\scenarios\runtime.json") `

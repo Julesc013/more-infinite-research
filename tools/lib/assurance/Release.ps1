@@ -217,6 +217,30 @@ function Get-MIRAssuranceSealSourceAuthority {
   }
 }
 
+function Get-MIRAssurancePerformanceEvidenceArtifact {
+  param([Parameter(Mandatory)]$Bundle)
+
+  $capsules = @($Bundle.evidence | Where-Object { [string]$_.test_id -eq "runtime.performance-regression" })
+  if ($capsules.Count -ne 1 -or [string]$capsules[0].status -ne "passed") {
+    throw "The evidence bundle must contain exactly one passing runtime.performance-regression capsule."
+  }
+  $artifacts = @($capsules[0].artifacts | Where-Object { [string]$_.kind -eq "runtime-performance-evidence" })
+  if ($artifacts.Count -ne 1) {
+    throw "The performance capsule must contain exactly one captured runtime-performance-evidence artifact."
+  }
+  $artifact = $artifacts[0]
+  $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Captured runtime performance evidence is absent: $artifactPath"
+  }
+  $item = Get-Item -LiteralPath $artifactPath
+  if ([long]$artifact.bytes -ne [long]$item.Length -or
+      [string]$artifact.sha256 -ne (Get-MIRAssuranceSha256 -Path $artifactPath)) {
+    throw "Captured runtime performance evidence no longer matches its capsule descriptor."
+  }
+  return $artifact
+}
+
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate does not exist: $($Context.candidate)" }
@@ -236,7 +260,7 @@ function Invoke-MIRAssuranceSeal {
     throw "Release seals may only be created by the protected-release workflow, environment, ref, and runner."
   }
   $commit = (& git -C $repo rev-parse HEAD).Trim()
-  $branch = (& git -C $repo branch --show-current).Trim()
+  $branch = (@(& git -C $repo branch --show-current) -join "").Trim()
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   $nonGeneratedStatus = @($status | Where-Object {
     $path = if ($_.Length -ge 4) { $_.Substring(3).Replace("\", "/") } else { [string]$_ }
@@ -256,11 +280,9 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.source_tree -ne [string]$sourceAuthority.qualification_source_tree) {
     throw "Verification plan source tree is not the qualification source tree."
   }
-  $performanceEvidencePath = Join-Path $repo ".mir\evidence\$($Context.info.version)-performance-regression.json"
-  if (-not (Test-Path -LiteralPath $performanceEvidencePath -PathType Leaf)) {
-    throw "Runtime performance evidence is absent: $performanceEvidencePath"
-  }
-  $performanceRecord = Get-Content -Raw -LiteralPath $performanceEvidencePath | ConvertFrom-Json
+  $performanceArtifact = Get-MIRAssurancePerformanceEvidenceArtifact -Bundle $bundle
+  $performanceArtifactPath = Resolve-MIRAssurancePath -Path ([string]$performanceArtifact.path)
+  $performanceRecord = Get-Content -Raw -LiteralPath $performanceArtifactPath | ConvertFrom-Json
   $performanceSourceCommit = Resolve-MIRAssuranceCommit -Commit ([string]$performanceRecord.candidate.source_commit)
   & git -C $repo merge-base --is-ancestor $performanceSourceCommit $commit
   if ($LASTEXITCODE -ne 0) {
@@ -278,9 +300,9 @@ function Invoke-MIRAssuranceSeal {
       [string]$performanceSourceBuild.content_sha256 -ne [string]$sourceAuthority.candidate_identity.content_sha256) {
     throw "Runtime performance evidence source does not reproduce the exact candidate."
   }
-  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+  $null = Test-MIRRuntimePerformanceEvidence `
     -RepoRoot $repo `
-    -Path $performanceEvidencePath `
+    -Path $performanceArtifactPath `
     -Candidate $Context.candidate `
     -PriorRelease $Context.prior_release `
     -FactorioBin $Context.factorio `
@@ -301,9 +323,23 @@ function Invoke-MIRAssuranceSeal {
       $canonicalDevAnchor = [string]$sourceLock.canonical_dev_anchor
     }
   }
-  $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $qualificationRoot = Join-Path $repo ".mir\evidence\qualifications\$($Context.info.version)-factorio-$($Context.target)"
   New-Item -ItemType Directory -Force -Path $qualificationRoot | Out-Null
+  $performanceEvidencePath = Join-Path $qualificationRoot "performance-regression.json"
+  Copy-Item -LiteralPath $performanceArtifactPath -Destination $performanceEvidencePath -Force
+  if ((Get-MIRAssuranceSha256 -Path $performanceEvidencePath) -ne [string]$performanceArtifact.sha256) {
+    throw "Durable performance evidence differs from the exact captured assurance artifact."
+  }
+  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+    -RepoRoot $repo `
+    -Path $performanceEvidencePath `
+    -Candidate $Context.candidate `
+    -PriorRelease $Context.prior_release `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $performanceSourceCommit `
+    -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
+  $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $planSnapshotPath = Join-Path $qualificationRoot "verification-plan.json"
   $bundleSnapshotPath = Join-Path $qualificationRoot "evidence-bundle.json"
   Write-MIRAssuranceAtomicJson -Value $plan -Path $planSnapshotPath
@@ -333,11 +369,11 @@ function Invoke-MIRAssuranceSeal {
     candidate_descriptor_sha256=[string]$plan.candidate_descriptor_sha256
     candidate_domain_manifest_sha256=[string]$domainManifest.manifest_sha256
     target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $targetsPath)
-    verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
-    domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
+    verification_profile_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
+    domain_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $domainsPath)
     test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
-    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
+    trust_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
     verification_plan=(Get-MIRAssuranceRepoRelativePath -Path $planSnapshotPath)
     verification_plan_sha256=(Get-MIRAssuranceSha256 -Path $planSnapshotPath)
     plan_material_sha256=[string]$plan.plan_material_sha256
@@ -486,11 +522,11 @@ function Invoke-MIRAssuranceCheckSeal {
     }
   } catch {}
   $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $targetsPath) -eq [string]$seal.target_profile_sha256)
-  $checks.verification_profile_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
-  $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
+  $checks.verification_profile_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
+  $checks.domain_policy_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
   $checks.test_catalog_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
   $checks.validation_harness_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles)) -eq [string]$seal.validation_harness_sha256)
-  $checks.trust_policy_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath)) -eq [string]$seal.trust_policy_sha256)
+  $checks.trust_policy_sha256=((Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath)) -eq [string]$seal.trust_policy_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
   $sourceTree = @(& git -C $repo rev-parse "$([string]$seal.source_commit)^{tree}" 2>$null)
@@ -585,10 +621,10 @@ function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
 
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
-  $canonicalTrustSha256 = Get-MIRAssuranceSha256 -Path $canonicalTrustPath
+  $canonicalTrustSha256 = Get-MIRAssuranceCanonicalJsonFileHash -Path $canonicalTrustPath
   $decoyTrustPath = Join-Path $repo "validation\domains.yml"
   if (-not (Test-Path -LiteralPath $decoyTrustPath -PathType Leaf) -or
-      (Get-MIRAssuranceSha256 -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
+      (Get-MIRAssuranceCanonicalJsonFileHash -Path $decoyTrustPath) -eq $canonicalTrustSha256) {
     throw "Trust-path collision self-test requires a distinct target-line policy fixture."
   }
   $originalTrustPath = $trustPath
@@ -1277,41 +1313,68 @@ function Invoke-MIRAssuranceSelfTest {
 
   $freshnessProducer = Get-MIRAssuranceProducer
   $freshnessGeneratedAt = (Get-Date).ToUniversalTime().ToString("o")
+  $freshnessPlanMaterial = Get-MIRAssuranceTextHash -Text "freshness-plan-$([guid]::NewGuid().ToString('N'))"
   $freshnessTest = [pscustomobject][ordered]@{
     id="self-test.freshness"
+    fingerprint=[pscustomobject]$fingerprint
     force_fresh=$true
     minimum_completed_at=$freshnessGeneratedAt
-    required_run_id=[string]$freshnessProducer.run_id
-    required_run_attempt=[string]$freshnessProducer.run_attempt
+    required_campaign_id="plan-$($freshnessPlanMaterial.ToLowerInvariant())"
+    required_campaign_plan_material_sha256=$freshnessPlanMaterial
   }
   $freshnessPlan = [pscustomobject][ordered]@{
     producer=$freshnessProducer
     source_commit=[string]$freshnessProducer.commit
     generated_at=$freshnessGeneratedAt
+    plan_material_sha256=$freshnessPlanMaterial
+    campaign=[pscustomobject][ordered]@{
+      schema="mir-assurance-campaign-v1"
+      id=[string]$freshnessTest.required_campaign_id
+      plan_material_sha256=$freshnessPlanMaterial
+      created_at=$freshnessGeneratedAt
+    }
     reuse_enabled=$false
     rerun_tests=@()
     tests=@($freshnessTest)
   }
   $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
-  $freshnessTest.required_run_id = "tampered-run"
+  $freshnessTest.required_campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'tampered-campaign').ToLowerInvariant())"
   $tamperedFreshnessRejected = $false
   try {
     $null = Assert-MIRAssurancePlanFreshnessBinding -Plan $freshnessPlan -Context $Context
   } catch { $tamperedFreshnessRejected = $true }
   if (-not $tamperedFreshnessRejected) {
-    throw "Tampered fresh-evidence run binding was accepted."
+    throw "Tampered fresh-evidence campaign binding was accepted."
   }
   if ([string]$Context.trust_class -eq "untrusted-local") {
-    $freshnessTest.required_run_id = "local-plan-$([guid]::NewGuid().ToString('N'))"
+    $freshnessTest.required_campaign_id = [string]$freshnessPlan.campaign.id
     $boundProducer = Get-MIRAssuranceEvidenceProducer -Test $freshnessTest -Plan $freshnessPlan -Context $Context
-    if ([string]$boundProducer.run_id -ne [string]$freshnessTest.required_run_id -or
-        [string]$boundProducer.run_attempt -ne [string]$freshnessTest.required_run_attempt) {
+    if ([string]$boundProducer.campaign_id -ne [string]$freshnessTest.required_campaign_id -or
+        [string]$boundProducer.campaign_plan_material_sha256 -ne [string]$freshnessTest.required_campaign_plan_material_sha256) {
       throw "A local worker did not adopt the plan-owned fresh-evidence identity."
     }
     if ($boundProducer.Contains("Count") -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.verifier_sha256) -or
         [string]::IsNullOrWhiteSpace([string]$boundProducer.policy_sha256)) {
       throw "A local worker serialized a dictionary wrapper instead of the producer attestation."
+    }
+
+    # Regression: an exact row completed before a coordinator timeout is
+    # checkpointed by a replacement process; a different plan is rejected.
+    $checkpointCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+    $checkpointCapsule.producer = $boundProducer
+    $checkpointCapsule.completed_at = (Get-Date).ToUniversalTime().ToString("o")
+    $checkpointCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $checkpointCapsule
+    $null = Write-MIRAssuranceAttempt -Capsule $checkpointCapsule
+    $checkpoint = Get-MIRAssuranceCampaignCheckpoint -Test $freshnessTest -Plan $freshnessPlan -Context $Context
+    if ($null -eq $checkpoint -or [string]$checkpoint.disposition -ne "CHECKPOINT") {
+      throw "An exact completed campaign row was not checkpointed for a resumed coordinator."
+    }
+    $wrongCampaignCapsule = ($checkpointCapsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json
+    $wrongCampaignCapsule.producer.campaign_id = "plan-$((Get-MIRAssuranceTextHash -Text 'wrong-campaign').ToLowerInvariant())"
+    $wrongCampaignCapsule.result_digest = Get-MIRAssuranceCapsuleDigest -Capsule $wrongCampaignCapsule
+    if (Test-MIRAssuranceFreshCampaignEvidence -Capsule $wrongCampaignCapsule -Test $freshnessTest -Plan $freshnessPlan) {
+      throw "A fresh checkpoint from another plan campaign was accepted."
     }
   }
 
@@ -1505,6 +1568,17 @@ function Invoke-MIRAssuranceSelfTest {
       [string]$preflightPlanResults[0].test_id -ne [string]$preflightTest.id -or
       [string]$preflightPlanResults[0].message -notmatch "requires --factorio") {
     throw "Assurance plan execution discarded a preflight failure."
+  }
+  $checkpointExecution = [ordered]@{}
+  $checkpointResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($preflightTest)}) `
+    -Context ([pscustomobject][ordered]@{factorio=""}) `
+    -TimeBudgetSeconds 0 `
+    -ExecutionState $checkpointExecution)
+  if ([string]$checkpointExecution.status -ne "checkpointed" -or
+      [string]$checkpointExecution.next_test_id -ne [string]$preflightTest.id -or
+      $checkpointResults.Count -ne 0) {
+    throw "A planned time budget did not checkpoint before dispatching the next row."
   }
 
   $truncatedPlanRejected = $false

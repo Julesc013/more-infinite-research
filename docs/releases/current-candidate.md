@@ -5,7 +5,7 @@ applies_to: "3.2.9"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-09
 supersedes: []
 superseded_by: []
 ---
@@ -18,7 +18,10 @@ superseded_by: []
 | --- | --- |
 | MIR version | `3.2.9` |
 | Candidate identity | `not-assigned` |
-| Reserved candidate floor | `C33` |
+| Candidate namespace | `C` |
+| Predecessor maximum ordinal | `32` |
+| Minimum next ordinal | `33` |
+| Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
 | State | `planned` |

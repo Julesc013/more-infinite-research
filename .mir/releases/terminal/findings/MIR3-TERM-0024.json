@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0024",
+  "title": "Explicit artifact-volume policy compatibility rejected complete legacy 2.1 calibration campaigns",
+  "source_observation": {
+    "observed_at": "2026-08-09T16:30:56.700947Z",
+    "environment": "Exact immutable 3.2.5 and 3.2.3 packages on Factorio 2.1.13, active 0012 assurance branch",
+    "fact": "The new target-capability policy reader rejected the established schema-2 C32 campaign before Factorio launch because C24-C32 express complete 2.1 telemetry through phase and artifact-volume lanes but predate the explicit artifact_volume_policy field."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -RepoRoot . -Candidate .\\dist\\more-infinite-research_3.2.5.zip -PriorRelease .\\dist\\more-infinite-research_3.2.3.zip -FactorioBin <trusted-2.1.13> -ExpectedSourceCommit a3bfbc4524b52cede425900e775384eb9c1fc4b3 -ExpectedBaselineVersion 3.2.3 -ExpectedFactorioVersion 2.1.13 -CampaignPath .\\.mir\\performance-campaigns\\3.2.5-C32.json",
+    "expected": "A complete historical schema-2 Factorio 2.1 campaign retains required artifact-volume telemetry and proceeds to exact package proof.",
+    "observed": "The producer stopped before Factorio with 'Performance campaign has an unsupported artifact-volume policy: .'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; verifier policy-schema compatibility only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "complete historical 2.1 telemetry authority defaults only to required, never omitted"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "explicit target-era omitted-by-capability policy remains authoritative"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "incomplete policy-less campaigns fail closed"}
+  ],
+  "regression_obligations": [
+    "schema-2 C24-C32 campaigns with complete 2.1 phase and artifact-volume lanes resolve to required telemetry",
+    "an incomplete policy-less campaign fails before process launch",
+    "an explicit omitted-by-capability target policy remains exact",
+    "runtime evidence validation and production use the same policy resolver",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "current and historical performance assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The correction restores a complete historical assurance authority without changing package material, migration, target semantics, or public bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

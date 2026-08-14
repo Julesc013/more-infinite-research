@@ -105,6 +105,7 @@ function Get-MIRAssuranceRepositoryFiles {
         $_ -and
         $_ -notlike ".mir/target-lines/*" -and
         $_ -notlike ".mir/evidence/*" -and
+        $_ -notlike "dist/*" -and
         $_ -notlike "build/results/*" -and
         $_ -notlike "build/*"
       } |
@@ -360,6 +361,29 @@ function Resolve-MIRAssurancePath {
   return Join-Path $repo $Path
 }
 
+function Get-MIRAssuranceDevelopmentCandidatePath {
+  param(
+    [Parameter(Mandatory)]$Info,
+    [Parameter(Mandatory)][string]$SourceTree
+  )
+
+  if ($SourceTree -notmatch '^[0-9a-f]{40}$') { throw "Development candidate source tree is invalid: $SourceTree" }
+  $release = [string]$Info.version
+  if ($release -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') { throw "Development candidate release is invalid: $release" }
+  $allocation = "unassigned"
+  $recordPath = Join-Path $repo ".mir\releases\records\$release.json"
+  if (Test-Path -LiteralPath $recordPath -PathType Leaf) {
+    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+    $candidateId = [string]$record.candidate_id
+    if ($candidateId -and $candidateId -ne "not-assigned") { $allocation = $candidateId }
+  }
+  if ($allocation -notmatch '^(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$') {
+    throw "Development candidate allocation is invalid: $allocation"
+  }
+  $archiveName = "$($Info.name)_$release.zip"
+  return Join-Path $repo "build\candidates\$release\$allocation\$SourceTree\$archiveName"
+}
+
 function Get-MIRAssuranceCanonicalTrustPolicyPath {
   $repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
   return Join-Path $repositoryRoot "validation\trust.json"
@@ -370,7 +394,10 @@ function Get-MIRAssuranceContext {
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
   $target = Get-MIRAssuranceOption -Name "--target" -Default ([string]$config.default_target)
-  $candidate = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--candidate" -Default (Join-Path $repo "dist\$($info.name)_$($info.version).zip"))
+  $sourceTree = @(& git -C $repo rev-parse "HEAD^{tree}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $sourceTree.Count -ne 1) { throw "Unable to resolve the development source tree." }
+  $defaultCandidate = Get-MIRAssuranceDevelopmentCandidatePath -Info $info -SourceTree ([string]$sourceTree[0])
+  $candidate = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--candidate" -Default $defaultCandidate)
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")
@@ -462,7 +489,12 @@ function Get-MIRAssuranceChangedPaths {
       $paths += $value
     }
   }
-  return @($paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Where-Object { $_ } | Sort-Object -Unique)
+  return @(
+    $paths |
+      ForEach-Object { ([string]$_).Replace("\", "/") } |
+      Where-Object { $_ -and $_ -notlike "dist/*" -and $_ -notlike "build/*" } |
+      Sort-Object -Unique
+  )
 }
 
 function Get-MIRAssuranceClassification {
@@ -607,11 +639,15 @@ function Get-MIRAssurancePlan {
     package_source_commit=[string]$releaseAuthority.package_source_commit
     candidate_descriptor=(Get-MIRAssuranceCandidateDescriptor -Context $Context)
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
-    test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
+    digest_policy_ids=[ordered]@{
+      text=$script:MIRAssuranceCanonicalTextDigestPolicyId
+      json=$script:MIRAssuranceCanonicalJsonDigestPolicyId
+    }
+    test_catalog_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
-    verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
-    domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
-    trust_policy_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
+    verification_profile_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
+    domain_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $domainsPath)
+    trust_policy_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path (Get-MIRAssuranceCanonicalTrustPolicyPath))
     producer=(Get-MIRAssuranceProducer)
   }
   Write-MIRAssuranceTiming -Label "plan-inputs" -Stopwatch $timing

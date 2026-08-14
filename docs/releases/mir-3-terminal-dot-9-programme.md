@@ -5,7 +5,7 @@ applies_to: "3.2.9, 2.5.9, 1.9.9, 1.8.9, 1.7.9, 1.6.9, 1.5.9, 1.4.9, 1.3.9"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-09
 supersedes: [docs/releases/3.2.5-to-2.6-convergence-programme.md, docs/releases/ultimate-convergence-audit-action-register.md, docs/architecture/3.3-2.6-convergence-platform-roadmap.md]
 superseded_by: []
 ---
@@ -14,7 +14,11 @@ superseded_by: []
 
 This is the single planning authority for the final MIR 3 stabilization wave. It joins the current Factorio 2.1 line, the maintained Factorio 2.0 line, and every qualified historical target into one correction programme without turning the target ladder into a waterfall.
 
-The programme is active as planning authority only. No `.9` candidate has been assigned, no `.9` source has been frozen, and no `.9` package has been built. MIR 4 implementation is not admitted by this record.
+The programme has admitted and implemented its smallest defensible product set, including the later reproduced combined direct-effect ownership failure. The accepted all-nine fixed point and verified repository protections now bind the family source freeze. No `.9` candidate has been assigned and no final `.9` candidate package has been built. MIR 4 package-visible implementation is not admitted by this record.
+
+Terminal assurance calibration is complete and frozen. The current product-intake pass has frozen a bounded Mod Portal Tier A selection, classified every prequalification claim without widening it, recorded effective mutation-owner surfaces, and completed the settings-scope audit without changing any released setting type. The successor bootstrap remains package-excluded shadow work: MIR 3 source and the bounded materializer continue to own `.9` release bytes until MIR 3 EOL and exact successor equivalence.
+
+Ordinary product intake is closed by `MIR3TerminalProductAdmissionBundleV1`. The accepted set is deliberately limited to K2 science phasing on the exact 2.1 envelope and generic alternate science-route selection on the 2.1 and 2.0 targets. Direct Cubium claims remain independently gated: 2.1 is upstream-blocked and 2.0 awaits authenticated acquisition of the exact 1.0.28 archive. Late nonblocking work routes to MIR 4; only a reproduced release-blocking P0/P1 may reopen its explicitly affected `.9` targets.
 
 ## Decision
 
@@ -27,19 +31,21 @@ The programme is active as planning authority only. No `.9` candidate has been a
 
 ## Frozen starting point
 
-| `.9` release | Factorio target | Immutable predecessor | Reserved candidate floor | Promotion shape | Current public state |
+| `.9` release | Factorio target | Immutable predecessor | Candidate namespace / minimum next ordinal | Promotion shape | Current public state |
 | --- | --- | --- | --- | --- | --- |
-| `3.2.9` | `2.1` | `3.2.5` / C32 | `C33` | `dev` to fast-forward `main` | `3.2.5` publicly verified; protected debt retained |
-| `2.5.9` | `2.0` | `2.5.5` / `2.5-P12` | `2.5-P13` | deterministic projection to fast-forward `legacy` | `2.5.5` publicly verified; protected debt retained |
-| `1.9.9` | `1.1` | `1.9.5` | `1.9-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.8.9` | `1.0` only | `1.8.5` | `1.8-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.7.9` | `0.17` | `1.7.5` | `1.7-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.6.9` | `0.16` | `1.6.5` | `1.6-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.5.9` | `0.15` | `1.5.5` | `1.5-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.4.9` | `0.14` | `1.4.5` | `1.4-P1` | deterministic two-parent tag-only integration | publicly verified |
-| `1.3.9` | `0.13` | `1.3.5` | `1.3-P1` | deterministic two-parent tag-only integration | publicly verified |
+| `3.2.9` | `2.1` | `3.2.5` / C32 | `C` / `33` | `dev` to fast-forward `main` | unassigned; `3.2.5` publicly verified with retained debt |
+| `2.5.9` | `2.0` | `2.5.5` / `2.5-P12` | `2.5-P` / `13` | deterministic projection to fast-forward `legacy` | unassigned; `2.5.5` publicly verified with retained debt |
+| `1.9.9` | `1.1` | `1.9.5` | `1.9-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.8.9` | `1.0` only | `1.8.5` | `1.8-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.7.9` | `0.17` | `1.7.5` | `1.7-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.6.9` | `0.16` | `1.6.5` | `1.6-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.5.9` | `0.15` | `1.5.5` | `1.5-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.4.9` | `0.14` | `1.4.5` | `1.4-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
+| `1.3.9` | `0.13` | `1.3.5` | `1.3-P` / `1` | deterministic two-parent tag-only integration | unassigned; predecessor publicly verified |
 
 Factorio `0.18` support is not claimed for `1.8.5` or `1.8.9`. The `1.8.x` maintained line targets Factorio `1.0` only.
+
+Complete deterministic semantic baselines now exist for all nine predecessors and are summarized in the [terminal `.5` baseline capture status](mir-3-terminal-dot5-baseline-capture.md). Exact-engine realized inventories, evaluated settings or explicit capability omissions, compatibility observations, and reconciliation classifications are sealed for every row. This closes baseline capture only; it does not admit implementation, source freeze, or candidate allocation.
 
 ## One intake, nine dispositions
 
@@ -66,13 +72,15 @@ Record post-publication protected qualification for `3.2.5` and `2.5.5` when it 
 
 Collect every open product, package, migration, compatibility, locale, documentation, performance, and assurance finding. Bind each item to affected target lines, a reproducible proposition, migration impact, package visibility, and one of the dispositions above. Documentation-only ideas that alter the packaged README are still package-visible for `.9` planning.
 
-### T9-C: implement and qualify `3.2.9`
+This workstream is complete. `MIR3-FINAL-DEFECT-INDEX` assigns a terminal disposition to all five repository issues, all 26 lifecycle incidents, all 31 terminal finding IDs, and all 24 public Mod Portal discussions observed in `MIR3-ModPortal-Discussion-ReconciliationV1`. The bounded engine-gap audit admitted no additional product defect. `MIR3-TERM-0027`, `MIR3-TERM-0028`, and the reproduced late-P0 `MIR3-TERM-0031` are the only product findings admitted for implementation; all three are implemented on their affected targets and remain `implemented-awaiting-fixed-point` until revised convergence, independent confirmation, and upgrade proof pass. Portal feature requests and broad compatibility requests do not enlarge this product set: they retain exact historical evidence, narrow public claims, receive a reasoned rejection, or route behind the MIR 4 firewall.
 
-Implement only admitted defect corrections and stabilization work on `dev`. Preserve stable technology, setting, locale, profile, migration, and runtime-state identities unless a named defect requires a governed migration. Freeze one exact C33-or-later candidate, reconstruct its package deterministically, qualify the exact package on the locked Factorio 2.1 environment, obtain normal manual and protected evidence, seal it, fast-forward `main`, publish it, and verify downloaded public bytes.
+### T9-C: implement the admitted change set and reach the all-nine fixed point
 
-### T9-D: project and qualify the lower `.9` releases
+Implement only admitted defect corrections and stabilization work on `dev`. Preserve stable technology, setting, locale, profile, migration, and runtime-state identities unless a named defect requires a governed migration. Materialize all nine target shadows and repeat target-tier sweeps until one complete sweep produces no new shared product fix, reusable tooling fix, higher-target-affecting profile fix, package-governance fix, or unexplained semantic drift. Do not freeze source or assign a candidate before the accepted fixed-point receipt exists.
 
-After immutable `3.2.9` exists, materialize each lower integration from its exact `.5` predecessor and the immutable portable `.9` source. Require exact target-tree reconstruction, package identity, direct predecessor upgrade or transition proof where applicable, target-engine loads, target-tier qualification, tag integrity, and downloaded public-asset verification. Process targets in descending order: `2.5.9`, `1.9.9`, `1.8.9`, `1.7.9`, `1.6.9`, `1.5.9`, `1.4.9`, then `1.3.9`.
+### T9-D: freeze, assign, qualify, and seal the complete family
+
+After fixed-point acceptance, freeze the common source and assign the next monotonic candidate in each namespace. Qualify and seal all nine independently before creating the first public tag. Lower integrations use their exact `.5` predecessor as first parent and the exact frozen `3.2.9` release commit as second parent; that commit need not be publicly tagged while qualification runs. Require exact target-tree reconstruction, package identity, direct predecessor and pre-`.5` upgrade or transition proof, target-engine loads, and target-tier review/seal depth.
 
 ### T9-E: archive MIR 3 and hand off to MIR 4
 
@@ -80,14 +88,14 @@ When all admitted `.9` work is terminal, freeze the MIR 3 source, package, migra
 
 ## Release sequence
 
-1. Maintain the `.5` tags and packages unchanged while package-excluded assurance debt is reconciled.
-2. Freeze the unified finding inventory and target dispositions.
+1. Maintain the completed all-nine semantic `.5` baselines and every `.5` tag/package unchanged.
+2. Admit only reproduced bounded changes with complete target dispositions.
 3. Implement portable corrections once on `dev`; keep target adapters explicit.
-4. Assign a candidate only after exact source freeze.
-5. Qualify and publish `3.2.9` through the normal release policy.
-6. Materialize, qualify, and publish lower `.9` releases one at a time from immutable parents.
-7. Stop only the affected target when its exact tree, package, transition, binary, tag, or public asset fails.
-8. Freeze the completed terminal wave and open MIR 4 from the handoff packet.
+4. Materialize all nine shadows and iterate to an accepted cross-target fixed point.
+5. Freeze the common source, then allocate—not guess—the next candidate IDs.
+6. Qualify and seal all nine targets; create the family-readiness seal only when every target seal is valid.
+7. Create all local signed annotated tags, then push/publish under the controlled same-byte policy.
+8. Re-download and verify GitHub and Mod Portal bytes, archive the family, and open MIR 4 only through its entry gate.
 
 ## Gates
 

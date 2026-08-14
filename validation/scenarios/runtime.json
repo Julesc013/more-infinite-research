@@ -11,7 +11,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-aai-loaders",
+          "mir-fixture-assert-aai-loader-belt-productivity"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -36,7 +39,11 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-air-scrubbing",
+          "mir-fixture-assert-air-scrubbing-clean-filter",
+          "mir-fixture-assert-hidden-setting-readability"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -61,8 +68,12 @@
         "group": "official-science",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-item-science-pack"
+        ],
+        "settings": {
+          "SciencePackIngredientPolicy": "all-official"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -86,8 +97,12 @@
         "group": "official-science",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-item-science-pack"
+        ],
+        "settings": {
+          "SciencePackIngredientPolicy": "all"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -110,15 +125,23 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-export-approved-delta"
+          "mir-fixture-export-approved-delta",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["approved-delta", "base", "full", "local-mod-library", "runtime"],
+        "tags": [
+          "approved-delta",
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -133,12 +156,22 @@
         "kind": "runtime",
         "group": "base-load",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-export-approved-delta"],
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-export-approved-delta"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["approved-delta", "base", "base-load", "full", "runtime"],
+        "tags": [
+          "approved-delta",
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -154,11 +187,23 @@
         "group": "base-load",
         "surface": "base",
         "required_features": [],
-        "fixtures": ["mir-fixture-export-approved-delta"],
-        "settings": {"enabled_base_extensions": ["inserter-capacity-bonus"]},
+        "fixtures": [
+          "mir-fixture-export-approved-delta"
+        ],
+        "settings": {
+          "EnabledBaseExtensionKeys": [
+            "inserter-capacity-bonus"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["approved-delta", "base", "base-load", "full", "runtime"],
+        "tags": [
+          "approved-delta",
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -173,15 +218,23 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-space-age-galore-overlap",
-          "mir-fixture-export-approved-delta"
+          "mir-fixture-export-approved-delta",
+          "mir-fixture-space-age-galore-overlap"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["approved-delta", "full", "local-mod-library", "runtime", "space-age"],
+        "tags": [
+          "approved-delta",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -196,7 +249,9 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
           "mir-fixture-atan-nuclear-science",
           "mir-fixture-export-approved-delta"
@@ -204,7 +259,13 @@
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["approved-delta", "base", "full", "local-mod-library", "runtime"],
+        "tags": [
+          "approved-delta",
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -219,15 +280,22 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-vanilla-family-adoption-recipes",
-          "mir-fixture-export-approved-delta"
+          "mir-fixture-export-approved-delta",
+          "mir-fixture-vanilla-family-adoption-recipes"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["approved-delta", "full", "runtime", "space-age"],
+        "tags": [
+          "approved-delta",
+          "full",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -242,12 +310,21 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-export-approved-delta"],
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-export-approved-delta"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["approved-delta", "full", "runtime", "space-age"],
+        "tags": [
+          "approved-delta",
+          "full",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -263,7 +340,11 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-atan-ash-separation",
+          "mir-fixture-assert-hidden-setting-readability",
+          "mir-fixture-atan-ash"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -290,7 +371,11 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-atan-nuclear-science-productivity",
+          "mir-fixture-assert-hidden-setting-readability",
+          "mir-fixture-atan-nuclear-science"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -373,8 +458,15 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "BaseEffectPerLevelOverrides": {
+            "research-speed": 120,
+            "worker-robots-storage": 2
+          }
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -398,20 +490,34 @@
         "group": "base",
         "surface": "base",
         "required_features": [],
-        "fixtures": ["mir-fixture-assert-base-research-cost"],
+        "fixtures": [
+          "mir-fixture-assert-base-research-cost"
+        ],
         "settings": {
-          "EnabledBaseExtensionKeys": ["worker-robots-storage"],
+          "EnabledBaseExtensionKeys": [
+            "worker-robots-storage"
+          ],
           "StartupSettingOverrides": {
             "mir-cost-base-worker-robots-storage": 1000,
-            "mir-cost-linear-increment-worker-robots-storage": 250,
-            "mir-cost-growth-worker-robots-storage": 1
+            "mir-cost-growth-worker-robots-storage": 1,
+            "mir-cost-linear-increment-worker-robots-storage": 250
           }
         },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "research-cost", "runtime"],
+        "tags": [
+          "base",
+          "full",
+          "research-cost",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "base-research-cost-linear", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "base-research-cost-linear",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "base-stream-research-cost-hybrid",
@@ -420,20 +526,34 @@
         "group": "base",
         "surface": "base",
         "required_features": [],
-        "fixtures": ["mir-fixture-assert-stream-research-cost"],
+        "fixtures": [
+          "mir-fixture-assert-stream-research-cost"
+        ],
         "settings": {
-          "EnabledStreamKeys": ["research_gears"],
+          "EnabledStreamKeys": [
+            "research_gears"
+          ],
           "StartupSettingOverrides": {
             "ips-cost-base-research_gears": 1000,
-            "ips-cost-linear-increment-research_gears": 250,
-            "ips-cost-growth-research_gears": 1.5
+            "ips-cost-growth-research_gears": 1.5,
+            "ips-cost-linear-increment-research_gears": 250
           }
         },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "research-cost", "runtime"],
+        "tags": [
+          "base",
+          "full",
+          "research-cost",
+          "runtime"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "stream-research-cost-hybrid", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "stream-research-cost-hybrid",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "base-extension-boundary-policy",
@@ -442,8 +562,14 @@
         "group": "base-load",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-base-extension-boundary",
+          "mir-fixture-finite-base-extension-level",
+          "mir-fixture-item-science-pack"
+        ],
+        "settings": {
+          "SciencePackIngredientPolicy": "all"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -469,7 +595,9 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-fluid-productivity"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -527,8 +655,14 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "EnabledBaseExtensionKeys": [
+            "inserter-capacity-bonus"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -552,8 +686,12 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "UseInstalledSpaceAgeIcons": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -578,7 +716,12 @@
         "surface": "base",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "EnabledStreamKeys": [
+            "research_spoilage_preservation",
+            "research_agricultural_growth_speed"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -603,7 +746,9 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "space-and-promethium"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -628,7 +773,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-better-bot-battery-skip",
+          "mir-fixture-better-bot-battery-owner"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -655,7 +803,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-big-mining-drill-productivity",
+          "mir-fixture-big-mining-drill"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -681,8 +832,8 @@
         "surface": "base",
         "required_features": [],
         "fixtures": [
-          "mir-fixture-capability-negative-cases",
-          "mir-fixture-assert-capability-negative-cases"
+          "mir-fixture-assert-capability-negative-cases",
+          "mir-fixture-capability-negative-cases"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -734,7 +885,15 @@
         "surface": "base",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "DisabledStreamKeys": [
+            "research_gears",
+            "research_character_reach"
+          ],
+          "DisabledBaseExtensionKeys": [
+            "research-speed"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -759,7 +918,11 @@
         "surface": "base",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "EnabledBaseExtensionKeys": [
+            "inserter-capacity-bonus"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -782,18 +945,27 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-atan-ash",
-          "mir-fixture-assert-hidden-setting-readability",
           "mir-fixture-assert-atan-ash-separation",
-          "mir-fixture-big-mining-drill",
-          "mir-fixture-assert-big-mining-drill-productivity"
+          "mir-fixture-assert-big-mining-drill-productivity",
+          "mir-fixture-assert-hidden-setting-readability",
+          "mir-fixture-atan-ash",
+          "mir-fixture-big-mining-drill"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "combination", "full", "local-mod-library", "runtime", "smoke"],
+        "tags": [
+          "base",
+          "combination",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "smoke"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -808,15 +980,24 @@
         "kind": "runtime",
         "group": "automatic-compiler",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-big-mining-drill",
-          "mir-fixture-assert-big-mining-drill-productivity"
+          "mir-fixture-assert-big-mining-drill-productivity",
+          "mir-fixture-big-mining-drill"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["automatic-compiler", "combination", "full", "runtime", "smoke", "space-age"],
+        "tags": [
+          "automatic-compiler",
+          "combination",
+          "full",
+          "runtime",
+          "smoke",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -835,9 +1016,7 @@
         "fixtures": [
           "mir-fixture-assert-compiler-contracts"
         ],
-        "settings": {
-          "mir-debug-generation-report": true
-        },
+        "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -862,8 +1041,14 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "EffectPerLevelOverrides": {
+            "research_furnace": 40
+          }
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -920,7 +1105,9 @@
           "recipe_productivity"
         ],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "RequireSpaceGate": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -949,7 +1136,9 @@
         "fixtures": [
           "mir-fixture-assert-generated-prerequisite-safety"
         ],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "all"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -962,6 +1151,34 @@
         "assertions": [
           {
             "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "k2-science-phase-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-k2-science-phase-policy"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "compatibility",
+          "full",
+          "runtime",
+          "science-prerequisites"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "k2-science-phase-policy-contracts-pass",
             "type": "factorio-load-and-assertion-fixtures-pass"
           }
         ]
@@ -1001,8 +1218,14 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-custom-lab",
+          "mir-fixture-item-science-pack",
+          "mir-fixture-late-recipe"
+        ],
+        "settings": {
+          "LabPolicyEngineDefault": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1028,7 +1251,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-lab-productivity-owner-skip",
+          "mir-fixture-lab-productivity-owner"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1053,8 +1279,12 @@
         "group": "official-science",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-item-science-pack"
+        ],
+        "settings": {
+          "SciencePackIngredientPolicy": "mod-progression"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1079,7 +1309,9 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "official-progression"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -1104,7 +1336,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-omega-drill-productivity",
+          "mir-fixture-omega-drill"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1206,8 +1441,12 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-pipeline-extent"
+        ],
+        "settings": {
+          "PipelineExtentMultiplier": 10
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1231,8 +1470,12 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-pipeline-extent"
+        ],
+        "settings": {
+          "PipelineExtentMultiplier": 0.5
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1256,8 +1499,19 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-750",
+          "PrototypeEfficiencyCap": "saving-25",
+          "PrototypePollutionCap": "saving-25",
+          "PrototypeSpeedCap": "bonus-25000",
+          "PrototypeSpeedFloor": "saving-25",
+          "PrototypeQualityCap": "bonus-25",
+          "RecyclingReturnChance": "percent-0-1",
+          "PrototypePositivePowerFloor": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1281,8 +1535,18 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-25000",
+          "PrototypeEfficiencyCap": "saving-99",
+          "PrototypePollutionCap": "saving-99",
+          "PrototypeSpeedCap": "bonus-2500",
+          "PrototypeSpeedFloor": "saving-9999",
+          "PrototypeQualityCap": "bonus-2500",
+          "RecyclingReturnChance": "match-productivity-cap"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -1305,8 +1569,13 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-500",
+          "ProductivityCapSelfRecyclingOnly": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1330,8 +1599,14 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-400",
+          "RecyclingReturnChance": "percent-20",
+          "ProductivityCapSelfRecyclingOnly": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1355,8 +1630,14 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-25000",
+          "RecyclingReturnChance": "match-productivity-cap",
+          "ProductivityCapSelfRecyclingOnly": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1380,8 +1661,15 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-prototype-limits"
+        ],
+        "settings": {
+          "PrototypeProductivityCap": "percent-1000",
+          "RecyclingReturnChance": "percent-10",
+          "ProductivityCapSelfRecyclingOnly": true,
+          "UnrestrictedModules": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1407,7 +1695,9 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-recipe-cap-diagnostics"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1432,7 +1722,12 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-science-pack-productivity",
+          "mir-fixture-custom-lab",
+          "mir-fixture-item-science-pack",
+          "mir-fixture-late-recipe"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1459,7 +1754,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-py-postprocessing-stale-unlock",
+          "pypostprocessing"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1487,7 +1785,9 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-rigor-late-recipe-removal"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1514,7 +1814,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-final-recipe-effect-integrity",
+          "space-exploration"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1566,8 +1869,18 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-plates-n-circuit-productivity",
+          "mir-fixture-plates-n-circuit-productivity"
+        ],
+        "settings": {
+          "EffectPerLevelOverrides": {
+            "research_advanced_circuit": 20,
+            "research_copper": 20,
+            "research_electronic_circuit": 20,
+            "research_iron": 20
+          }
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -1590,8 +1903,16 @@
         "group": "weapon-overlap",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "EffectPerLevelOverrides": {
+            "research_cannon_shooting_speed": 20,
+            "research_rocket_shooting_speed": 20
+          },
+          "WeaponSpeedAdjustmentMode": "only-when-dedicated-tech-enabled"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1618,8 +1939,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-assert-semantic-family-attach"
+          "mir-fixture-assert-semantic-family-attach",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -1649,8 +1970,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-assert-semantic-family-exact-pack"
+          "mir-fixture-assert-semantic-family-exact-pack",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -1680,8 +2001,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-assert-semantic-family-generate"
+          "mir-fixture-assert-semantic-family-generate",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -1711,8 +2032,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-assert-semantic-family-off"
+          "mir-fixture-assert-semantic-family-off",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -1742,8 +2063,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-semantic-family-attach",
-          "mir-fixture-assert-semantic-family-report"
+          "mir-fixture-assert-semantic-family-report",
+          "mir-fixture-semantic-family-attach"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -1770,7 +2091,9 @@
         "group": "settings-codec",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-settings-profile-roundtrip"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
@@ -1795,8 +2118,15 @@
         "group": "local-mod-library",
         "surface": "base",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-lab-skip-policy",
+          "mir-fixture-custom-lab",
+          "mir-fixture-item-science-pack",
+          "mir-fixture-late-recipe"
+        ],
+        "settings": {
+          "LabPolicySkip": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -1820,7 +2150,9 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-cargo-logistics"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1868,7 +2200,10 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-cargo-logistics",
+          "mir-fixture-duplicate-cargo-tech"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1894,7 +2229,9 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-fluid-productivity"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1920,7 +2257,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity",
+          "mir-fixture-assert-hidden-setting-readability"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1947,8 +2287,14 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "EnabledBaseExtensionKeys": [
+            "inserter-capacity-bonus"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -1973,7 +2319,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-plates-n-circuit-productivity-blocked",
+          "mir-fixture-plates-n-circuit-productivity-blocked"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1999,7 +2348,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
+          "mir-fixture-plates-n-circuit-productivity-change-mismatch"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -2026,8 +2378,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-plates-n-circuit-productivity",
-          "mir-fixture-assert-plates-n-circuit-productivity"
+          "mir-fixture-assert-plates-n-circuit-productivity",
+          "mir-fixture-plates-n-circuit-productivity"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2054,8 +2406,14 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity"
+        ],
+        "settings": {
+          "DisabledStreamKeys": [
+            "research_copper"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2079,7 +2437,9 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "space-age-progression"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2103,7 +2463,12 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "DisabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2126,8 +2491,20 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity"
+        ],
+        "settings": {
+          "EnabledStreamKeys": [
+            "research_spoilage_preservation",
+            "research_agricultural_growth_speed"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_agricultural_growth_speed": 2,
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2150,8 +2527,21 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "InitialEnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "ChangedDisabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2174,8 +2564,18 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "EnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2198,8 +2598,21 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": [],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-scripted-runtime-lifecycle"
+        ],
+        "settings": {
+          "ChangedEnabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "InitialDisabledStreamKeys": [
+            "research_spoilage_preservation"
+          ],
+          "EffectPerLevelOverrides": {
+            "research_spoilage_preservation": 2
+          },
+          "ScriptedDiagnostics": true
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
         "tags": [
@@ -2223,7 +2636,9 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "space"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2247,7 +2662,9 @@
         "surface": "space-age",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "space-and-promethium"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -2273,8 +2690,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-vanilla-family-adoption-recipes",
-          "mir-fixture-assert-vanilla-family-adoption"
+          "mir-fixture-assert-vanilla-family-adoption",
+          "mir-fixture-vanilla-family-adoption-recipes"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2298,14 +2715,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "default"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "default"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-default-preservation", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-default-preservation",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-disabled",
@@ -2313,14 +2747,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "disabled"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "disabled"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-disabled-no-touch", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-disabled-no-touch",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-cost-base",
@@ -2328,14 +2779,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "cost-base"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "cost-base"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-cost-base-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-cost-base-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-cost-growth",
@@ -2343,14 +2811,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "cost-growth"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "cost-growth"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-cost-growth-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-cost-growth-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-cost-linear",
@@ -2358,14 +2843,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "cost-linear"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "cost-linear"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-cost-linear-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-cost-linear-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-fixed-default",
@@ -2373,14 +2875,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-fixed-count", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "default"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-fixed-count",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "default"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-fixed-count-default-preserved", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-fixed-count-default-preserved",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-fixed-override",
@@ -2388,14 +2908,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-fixed-count", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "cost-linear"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-fixed-count",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "cost-linear"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-fixed-count-canonical-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-fixed-count-canonical-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-linear-default",
@@ -2403,14 +2941,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-linear-formula", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "default"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-linear-formula",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "default"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-linear-formula-default-preserved", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-linear-formula-default-preserved",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-linear-override",
@@ -2418,14 +2974,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-linear-formula", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "cost-linear"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-linear-formula",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "cost-linear"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-linear-formula-canonical-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-linear-formula-canonical-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-research-time",
@@ -2433,14 +3007,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "research-time"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "research-time"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-research-time-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-research-time-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-max-level",
@@ -2448,14 +3039,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "max-level"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "max-level"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-max-level-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-max-level-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-effect",
@@ -2463,14 +3071,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "effect"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "effect"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-effect-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-effect-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-combined",
@@ -2478,14 +3103,31 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "combined"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "combined"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-combined-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-combined-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-unrecognized-default",
@@ -2493,14 +3135,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "unrecognized-default"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-unrecognized-formula",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "unrecognized-default"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-unrecognized-default-preserved", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-unrecognized-default-preserved",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-unrecognized-override",
@@ -2508,14 +3168,32 @@
         "kind": "runtime",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
-        "settings": {"NativeOwnerSettingsProfile": "unrecognized-override"},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-native-owner-unrecognized-formula",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "unrecognized-override"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
-        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "native-owner-unsafe-cost-override-rejected", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "native-owner-unsafe-cost-override-rejected",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "space-age-native-owner-settings-config-change",
@@ -2523,18 +3201,44 @@
         "kind": "configuration-change",
         "group": "space-age",
         "surface": "space-age",
-        "required_features": ["recipe_productivity"],
-        "fixtures": [],
-        "settings": {},
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-native-owner-progress",
+          "mir-fixture-assert-native-owner-settings",
+          "mir-fixture-native-owner-settings-source"
+        ],
+        "settings": {
+          "InitialNativeOwnerSettingsProfile": "default",
+          "ChangedNativeOwnerSettingsProfile": "combined"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 300,
-        "tags": ["configuration-change", "full", "native-owner-settings", "space-age"],
+        "tags": [
+          "configuration-change",
+          "full",
+          "native-owner-settings",
+          "space-age"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
-          {"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"},
-          {"id": "native-owner-current-research-work-preserved", "type": "factorio-load-and-assertion-fixtures-pass"},
-          {"id": "native-owner-sixteen-row-cost-transition-matrix", "type": "factorio-load-and-assertion-fixtures-pass"},
-          {"id": "native-owner-unsafe-cost-transition-refused", "type": "factorio-load-and-assertion-fixtures-pass"}
+          {
+            "id": "native-owner-settings-signature-reset",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-current-research-work-preserved",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-sixteen-row-cost-transition-matrix",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-unsafe-cost-transition-refused",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
         ]
       },
       {
@@ -2546,7 +3250,9 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-vanilla-family-adoption-recipes"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 300,
@@ -2573,8 +3279,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-vanilla-family-exact-owner",
-          "mir-fixture-assert-vanilla-family-exact-owner"
+          "mir-fixture-assert-vanilla-family-exact-owner",
+          "mir-fixture-vanilla-family-exact-owner"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2602,8 +3308,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-vanilla-family-mixed-owner",
-          "mir-fixture-assert-vanilla-family-mixed-owner"
+          "mir-fixture-assert-vanilla-family-mixed-owner",
+          "mir-fixture-vanilla-family-mixed-owner"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2631,8 +3337,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-vanilla-family-owner-prepatched",
-          "mir-fixture-assert-vanilla-family-owner-prepatched"
+          "mir-fixture-assert-vanilla-family-owner-prepatched",
+          "mir-fixture-vanilla-family-owner-prepatched"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2658,7 +3364,9 @@
         "surface": "base",
         "required_features": [],
         "fixtures": [],
-        "settings": {},
+        "settings": {
+          "SciencePackIngredientPolicy": "space"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [
@@ -2710,8 +3418,8 @@
           "recipe_productivity"
         ],
         "fixtures": [
-          "mir-fixture-synthetic-scale-graph",
-          "mir-fixture-assert-synthetic-scale-graph"
+          "mir-fixture-assert-synthetic-scale-graph",
+          "mir-fixture-synthetic-scale-graph"
         ],
         "settings": {},
         "source_mode": "exact-package",
@@ -2736,16 +3444,25 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
+          "mir-fixture-assert-synthetic-scale-graph",
           "mir-fixture-synthetic-scale-graph",
-          "mir-fixture-synthetic-scale-random-order",
-          "mir-fixture-assert-synthetic-scale-graph"
+          "mir-fixture-synthetic-scale-random-order"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 900,
-        "tags": ["base", "full", "local-mod-library", "randomized-order", "runtime", "scale"],
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "randomized-order",
+          "runtime",
+          "scale"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -2760,15 +3477,23 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-synthetic-scale-recipes",
-          "mir-fixture-assert-synthetic-scale-recipes"
+          "mir-fixture-assert-synthetic-scale-recipes",
+          "mir-fixture-synthetic-scale-recipes"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 600,
-        "tags": ["base", "full", "local-mod-library", "runtime", "scale"],
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "scale"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -2783,16 +3508,25 @@
         "kind": "runtime",
         "group": "local-mod-library",
         "surface": "base",
-        "required_features": ["recipe_productivity"],
+        "required_features": [
+          "recipe_productivity"
+        ],
         "fixtures": [
-          "mir-fixture-synthetic-scale-recipes",
+          "mir-fixture-assert-synthetic-scale-recipes",
           "mir-fixture-synthetic-scale-random-order",
-          "mir-fixture-assert-synthetic-scale-recipes"
+          "mir-fixture-synthetic-scale-recipes"
         ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 600,
-        "tags": ["base", "full", "local-mod-library", "randomized-order", "runtime", "scale"],
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "randomized-order",
+          "runtime",
+          "scale"
+        ],
         "isolation": "fresh-data-stage",
         "assertions": [
           {
@@ -2964,8 +3698,13 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety",
+          "mir-fixture-weapon-speed-external-owner"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "only-when-dedicated-tech-enabled"
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 120,
         "tags": [

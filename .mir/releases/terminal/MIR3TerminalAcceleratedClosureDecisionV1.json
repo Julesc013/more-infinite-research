@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalAcceleratedClosureDecisionV1",
+  "status": "active",
+  "recorded_at": "2026-08-09T10:08:12.7017966Z",
+  "purpose": "Close ordinary terminal product intake after the present characterization pass while preserving truthfully reproduced release-blocking work.",
+  "ordinary_terminal_intake": {
+    "status": "closes-after-present-characterization-pass",
+    "decision_authority": "maintainer-explicit-accelerated-terminal-closure"
+  },
+  "eligible_for_dot9": [
+    "already-known-findings",
+    "currently-reproduced-findings",
+    "defects-discovered-by-terminal-qualification",
+    "release-blocking-p0-or-p1-failures"
+  ],
+  "not_eligible_after_freeze": [
+    "speculative-improvements",
+    "new-feature-requests",
+    "balance-preferences",
+    "broad-compatibility-expansion",
+    "architectural-redesign",
+    "non-critical-late-reports"
+  ],
+  "late_report_disposition": {
+    "non_blocking": "MIR4-intake",
+    "release_blocking_p0_or_p1": "reopen-affected-dot9-targets-with-new-reproduced-finding"
+  },
+  "hard_boundaries": {
+    "dot5_package_mutation_permitted": false,
+    "dot9_product_implementation_admitted_by_this_decision": false,
+    "source_freeze_permitted_by_this_decision": false,
+    "candidate_assignment_permitted_by_this_decision": false,
+    "mir4_implementation_permitted": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselinePerformanceInventoryV1",
+  "release": "3.2.5",
+  "target": "2.1",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json",
+    "dist/more-infinite-research_3.2.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-3.2.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "paired-performance-regression",
+      "target": "2.1",
+      "state": "evidence-bound",
+      "origin": "release-record",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-performance-regression.json"
+      ],
+      "target_disposition": "target-tier-baseline",
+      "mir4_transition_rule": "import-budget-and-measurement-separately",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "D249D32480E128150428C3789AB27612B5D845510810A4A06BA357DD43120239"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

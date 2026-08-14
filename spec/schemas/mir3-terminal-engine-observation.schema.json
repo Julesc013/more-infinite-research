@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-engine-observation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-engine-observation.schema.json",
+  "title": "MIR3TerminalEngineObservationV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "release",
+    "target",
+    "archive_sha256",
+    "executable_sha256",
+    "official_data_file_count",
+    "official_data_sha256",
+    "installation_sha256",
+    "observer_protocol",
+    "observer_tool_sha256",
+    "normalizer_sha256",
+    "semantic_observation_sha256",
+    "mode",
+    "technologies",
+    "effects_and_owners",
+    "settings",
+    "capability_omissions"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalEngineObservationV1"},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.5$"},
+    "target": {"type": "string", "minLength": 1},
+    "archive_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "executable_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "official_data_file_count": {"type": "integer", "minimum": 1},
+    "official_data_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "installation_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "observer_protocol": {"const": 1},
+    "observer_tool_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "normalizer_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "semantic_observation_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "mode": {"const": "base-only-read-only-observer-after-data-final-fixes"},
+    "technologies": {"type": "array", "items": {"$ref": "mir3-terminal-baseline-inventory-common.schema.json#/$defs/item"}},
+    "effects_and_owners": {"type": "array", "items": {"$ref": "mir3-terminal-baseline-inventory-common.schema.json#/$defs/item"}},
+    "settings": {"type": "array", "items": {"$ref": "mir3-terminal-baseline-inventory-common.schema.json#/$defs/item"}},
+    "capability_omissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "reason"],
+        "properties": {
+          "field": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

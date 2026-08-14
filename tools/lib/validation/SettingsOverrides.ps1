@@ -30,6 +30,62 @@ function Enable-CopiedDiagnostics {
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-generation-report" -ValueLiteral "true"
 }
 
+function Complete-MIRSettingsOverrideMod {
+  param([Parameter(Mandatory)][string]$ModsDir)
+
+  $sourcePath = Join-Path $ModsDir "mir-validation-settings-overrides"
+  $infoPath = Join-Path $sourcePath "info.json"
+  $settingsPath = Join-Path $sourcePath "settings-updates.lua"
+  if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
+    throw "Generated validation settings override is incomplete before publication."
+  }
+
+  Add-Type -AssemblyName System.IO.Compression
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archiveRoot = "mir-validation-settings-overrides_0.1.0"
+  $finalPath = Join-Path $ModsDir "$archiveRoot.zip"
+  Assert-MIRFactorioPathBudget -Path $finalPath -Context "Validation settings override archive path"
+  $temporaryPath = Join-Path $ModsDir (".mir-validation-settings-overrides-{0}.zip" -f [guid]::NewGuid().ToString("N"))
+  try {
+    $archive = [IO.Compression.ZipFile]::Open($temporaryPath, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+      foreach ($name in @("info.json", "settings-updates.lua")) {
+        $entry = $archive.CreateEntry("$archiveRoot/$name", [IO.Compression.CompressionLevel]::Optimal)
+        $entry.LastWriteTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+        $inputStream = [IO.File]::OpenRead((Join-Path $sourcePath $name))
+        $outputStream = $entry.Open()
+        try {
+          $inputStream.CopyTo($outputStream)
+        } finally {
+          $outputStream.Dispose()
+          $inputStream.Dispose()
+        }
+      }
+    } finally {
+      $archive.Dispose()
+    }
+    $archive = [IO.Compression.ZipFile]::OpenRead($temporaryPath)
+    try {
+      $entries = @($archive.Entries | ForEach-Object { [string]$_.FullName } | Sort-Object)
+      if (($entries -join "`n") -cne "$archiveRoot/info.json`n$archiveRoot/settings-updates.lua") {
+        throw "Generated validation settings override archive has unexpected entries: $($entries -join ', ')."
+      }
+    } finally {
+      $archive.Dispose()
+    }
+    Move-Item -LiteralPath $temporaryPath -Destination $finalPath -Force
+    Remove-Item -LiteralPath $sourcePath -Recurse -Force
+  } finally {
+    if (Test-Path -LiteralPath $temporaryPath -PathType Leaf) {
+      Remove-Item -LiteralPath $temporaryPath -Force
+    }
+  }
+  if (-not (Test-Path -LiteralPath $finalPath -PathType Leaf)) {
+    throw "Generated validation settings override archive was not published."
+  }
+}
+
 function Enable-CopiedScriptedDiagnostics {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-scripted-effects" -ValueLiteral "true"

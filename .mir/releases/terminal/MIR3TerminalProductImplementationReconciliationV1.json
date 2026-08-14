@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProductImplementationReconciliationV1",
+  "status": "late-p0-fixed-point-accepted-ready-for-source-freeze",
+  "recorded_at": "2026-08-13T17:53:41.8730995+10:00",
+  "prior_receipt": {
+    "path": ".mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json",
+    "raw_sha256": "FBA1633457D628F2B0B092513B278CD663C6D29BCABFB612E13033ABFC75A321",
+    "disposition": "retained-immutable-development-evidence"
+  },
+  "current_3_2_9_shadow": {
+    "source_commit": "e91f407a6d6df44f5633b89620ce9c24702816eb",
+    "source_tree": "2a44a79b6a8c036a6046501c64a32eb64d10fae5",
+    "package": {
+      "version": "3.2.9",
+      "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+      "normalized_content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "bytes": 1061572,
+      "entries": 303,
+      "candidate_id": null,
+      "source_frozen": false
+    },
+    "convergence": {
+      "status": "passed",
+      "plan": {
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-plan.json",
+        "raw_sha256": "C443459E9A321FB7D8894AAD86E3882961F0932ED35F1347971ECFB405C8B049"
+      },
+      "result": {
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-result.json",
+        "raw_sha256": "E0918BC55502368C9B356AD64A8F41ECB31268082547EEEA0CB5F683D37FA122",
+        "planned": 127,
+        "executed_in_final_resume": 3,
+        "exact_same_plan_adopted": 124,
+        "failed": 0,
+        "incomplete": 0,
+        "unexpected": 0
+      },
+      "bundle": {
+        "path": "build/worktrees/3.2.9-shadow/build/results/terminal-fixed-point/revised-v5-convergence-evidence-bundle.json",
+        "raw_sha256": "8A2797F3FB82B4BE606C5360F377E3CD04E93D76199474C98707599B2D1043DB"
+      },
+      "direct_3_2_5_upgrade": "passed-five-archetypes-in-runtime-upgrade-capsule",
+      "direct_3_2_3_upgrade": {
+        "status": "passed-five-archetypes",
+        "path": "artifacts/assurance/3.2.3-to-3.2.9-upgrade-proof-direct.json",
+        "raw_sha256": "375A60EA3891B1DD9C0781BDD548350B1A4A7AB528F7F1D7D81C5DAAFA68F0A0"
+      },
+      "independent_confirmation": {"status":"passed","planned":127,"executed":127,"ordinary_reused":0,"checkpoint_adopted":0,"failed":0,"plan_sha256":"2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B","result_sha256":"D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28","bundle_sha256":"1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"}
+    }
+  },
+  "superseded_3_2_9_development_archive": {
+    "archive_sha256": "AE5D1D4966C4D4CCEC43D8D575BCCABB11FBE21F94A2C4D3623EC5A7252C74B2",
+    "normalized_content_sha256": "5549C4430C8D27F0001C8DFE39889B27BC271FFC14D1CE95A7B40FC90AABF271",
+    "bytes": 1059661,
+    "entries": 303,
+    "disposition": "superseded-development-evidence-not-a-candidate",
+    "replacement_delta": {
+      "intended_surface": "terminal-changelog-release-presentation",
+      "changed_entries": [
+        "more-infinite-research_3.2.9/changelog.txt"
+      ],
+      "old_entry_sha256": "8507FC845FD134EC97F8BA72D9D07AF3EEED875F5239DD00168CB6C511269C52",
+      "new_entry_sha256": "6BF6BBCE746872AF9C34E53896D37E68E611582EB2259932A6882A52AAF9043F"
+    }
+  },
+  "current_2_5_9_shadow": {
+    "source_commit": "ce1f8fa07b454a9d82d2e736ea1cf1bba769dcc6",
+    "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+    "transition_receipt": {
+      "path": ".mir/releases/terminal/shadows/2.5.9/transition-receipt.json",
+      "raw_sha256": "96A947C22DCE6CB25ED92BBB061F857ED2386CD67090CC48C8674D8D21B6ED9E"
+    },
+    "package": {
+      "version": "2.5.9",
+      "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "normalized_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "package_source_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "bytes": 1058800,
+      "entries": 301,
+      "candidate_id": null,
+      "source_frozen": false
+    },
+    "convergence": {
+      "status": "passed",
+      "planned": 90,
+      "executed": 90,
+      "checkpoint_adopted": 0,
+      "ordinary_reused": 0,
+      "failed": 0,
+      "incomplete": 0,
+      "unexpected": 0,
+      "both_upgrade_paths": "passed-five-archetypes-each",
+      "plan_sha256": "6F81B33BFDA411FBA98876B6E329C913BF74FA086BBF0048B78CF09302BED66B",
+      "result_sha256": "FC2516D6195929753631A32F596EC491E48B44FD14CDAF73F90AFED67474D7EC",
+      "bundle_sha256": "24642089935650ACBEB641B9BCAB929FB9D2F4FC68858C5E12CD1CC75EDA0C34"
+    },
+    "independent_confirmation": {"status":"passed","planned":90,"executed":90,"ordinary_reused":0,"checkpoint_adopted":0,"failed":0,"plan_sha256":"22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994","result_sha256":"16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349","bundle_sha256":"F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F","exact_head_hosted_run":31751551520}
+  },
+  "finding_dispositions": [
+    {
+      "id": "MIR3-TERM-0027",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
+      "targets": ["3.2.9"],
+      "claim_boundary": "exact admitted K2/K2SO envelope only"
+    },
+    {
+      "id": "MIR3-TERM-0028",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
+      "targets": ["3.2.9", "2.5.9"],
+      "claim_boundary": "generic route correctness; no unproved direct Cubium claim"
+    },
+    {
+      "id": "MIR3-TERM-0031",
+      "state": "fixed-point-accepted-awaiting-frozen-candidate-qualification",
+      "targets": ["3.2.9", "2.5.9"],
+      "claim_boundary": "generic combined-plan ownership plus exact proved Space Exploration closures; the reporter's other enabled mods have no supplied exact version or settings authority"
+    }
+  ],
+  "late_p0_amendment": {
+    "finding": "MIR3-TERM-0031",
+    "recorded_at": "2026-08-13T22:05:00+10:00",
+    "supersedes_current_shadow_identity_for": ["3.2.9", "2.5.9"],
+    "reporter_input": {
+      "mod_list_sha256": "E5C99BD9A7C0B28F061C2D6F0F50371ACE3508A447805921183C605F56E65AC4",
+      "rows": 221,
+      "enabled": 100,
+      "custody_receipt_sha256": "AD4ABF42852532159346D398DE19246B0F7D1BBB4FA665C646606F9CD3EA7C4B",
+      "claim_boundary": "The input contains names and enabled states only; local archive versions or settings are not attributed to the reporter."
+    },
+    "implementation": {
+      "contract": "CombinedCompilationPlanEffectOwnershipV1",
+      "policy": "adopted owners outrank emitted streams; emitted streams outrank base continuations; same-operation duplicates remain fatal",
+      "modern_source_commit": "5496896914666158ad4056026819528395861540",
+      "modern_source_tree": "b5ee3d31d133cbc7b50db96967aea4ded38e3a92",
+      "maintained_source_commit": "ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b",
+      "maintained_source_tree": "5eab3dffa365a01c504a95ae918d3210d61bb47f",
+      "maintained_projection_head": "e10cb9fc9d1055291ad8d9c45800b29b46cbcdd0",
+      "maintained_projection_tree": "42f51453b82fff83e88d535fe8e303580a2ad89e"
+    },
+    "development_packages": [
+      {"version":"3.2.9","archive_sha256":"0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20","normalized_content_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","package_source_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","bytes":1061572,"entries":303,"candidate_id":null,"source_frozen":false},
+      {"version":"2.5.9","archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","normalized_content_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","package_source_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","bytes":1058800,"entries":301,"candidate_id":null,"source_frozen":false}
+    ],
+    "proof": {
+      "regression_first_red_sha256": "B652043B6A42B72FD0E331A46342596A7E60154A424C8F9BC055064B9F934EAB",
+      "modern_exact_head_compiler_contract_sha256": "10934600C56F638A52F177690E5D63CBE0B67A0882E5572907DDCF48D207054D",
+      "modern_minimal_space_exploration_log_sha256": "A9929CDA6BA99DA85063429819E1BF8D5FDD3AEED49B84F2B2858F59FE326EC9",
+      "modern_reporter_relevant_closure_log_sha256": "CCFD2205FB260B517FAE3CC8B4632AB8F7F3DC13F8B6BF701D65B432C998E2E3",
+      "maintained_immutable_failure_log_sha256": "32B41B372261B411F8C3B2075533ECBDAB0138B939E5342ECFF83C1BB72466BB",
+      "maintained_compiler_contract_sha256": "0E6E7BD90EBF5B393687A726BF2F9513369B7ACEB7F16503A9854E2B6ECCFA63",
+      "maintained_corrected_space_exploration_log_sha256": "090308C315CAC93FF9569D9DDC88A54388CC38E637C9DA67D9F5B34C888871CB",
+      "exact_2_0_envelope": {"factorio":"2.0.77.84539","factorio_binary_sha256":"D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B","space_exploration":"0.7.57","external_archive_count":17,"portal_sha1_verified":17}
+    },
+    "remaining_gates": ["source freeze", "candidate allocation", "both affected direct-upgrade rows in final candidate qualification"]
+  },
+  "immutable_boundaries": {
+    "dot5_package_bytes_changed": false,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "all_nine_fixed_point_accepted": true,
+    "tagging_or_publication_permitted": false
+  }
+}

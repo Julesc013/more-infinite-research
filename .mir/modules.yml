@@ -219,6 +219,7 @@ modules:
     - prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
+    - prototypes/mir/capabilities/science_integration/production_route_policy.lua
     - prototypes/mir/capabilities/science_integration/science_selection_policy.lua
   families:
     - prototypes/mir/families/rules.lua
@@ -309,6 +310,7 @@ modules:
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
     - prototypes/mir/compatibility/policy_authority.lua
+    - prototypes/mir/compatibility/policies/k2_science_phase.lua
     - prototypes/mir/compatibility/overlays/air_scrubbing.lua
     - prototypes/mir/compatibility/overlays/atan_ash.lua
     - prototypes/mir/compatibility/diagnostics/registry.lua
@@ -354,6 +356,8 @@ mutation_commands:
     - catalog candidates share the exact trusted semantic identity and typed subjects from their TechnologyDesign and diagnostic alternatives reuse unchanged subject and prototype fingerprints while recomputing changed design and qualification identities
     - TechnologyDesign and SafetyQualification fingerprints bind each immutable gate through its exact status evaluator pass state and evidence fingerprint rather than serializing the complete evidence tree again
     - effect ownership resolution copies mutable row data while preserving private authority for exact immutable gate records
+    - combined CompilationPlan ownership resolves cross-operation direct-effect identities after stream and base-continuation plans join; adopted owners outrank emitted streams and emitted streams outrank base continuations, while same-operation duplicates remain strict validation failures
+    - a base continuation that loses some effects is re-designed and re-fingerprinted from its retained vector, while one that loses every effect becomes a non-materializing rejected candidate
     - each complete effect-safety pass captures one immutable target inventory and shares it across every technology and effect check
     - effect target membership indexes are private weak-key caches derived from immutable inventory values and never enter fingerprints or public artifacts
     - output sanitation and generated effect assertions share the same freshly captured target inventory
@@ -563,6 +567,7 @@ target_layers:
   compatibility:
     path: prototypes/mir/compatibility
     overlay_path: prototypes/mir/compatibility/overlays
+    policy_path: prototypes/mir/compatibility/policies
     repair_path: prototypes/mir/compatibility/repairs
     may_require:
       - policy
@@ -609,6 +614,7 @@ compiler_context:
     - mod-progression-cache
     - technology-researchability-index
     - pack-production-reachability-cache
+    - science-pack-production-route-selection
     - recipe-unlock-science-cache
     - lab-input-index
     - active-compatibility-packs
@@ -747,12 +753,27 @@ validation_tooling:
     backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
     backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
+    terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
+    terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
+    terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
+    terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
+    terminal_product_implementation_reconciliation: .mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json
+    terminal_product_implementation_reconciliation_schema: spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json
+    terminal_mod_portal_discussion_reconciliation: .mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json
+    terminal_mod_portal_discussion_reconciliation_schema: spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json
+    terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
+    terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
+    terminal_fixed_point_receipt: .mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json
+    terminal_fixed_point_receipt_schema: spec/schemas/mir3-terminal-fixed-point-receipt.schema.json
+    terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
+    terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
     package_builder: tools/commands/package/Build-MIRPackage.ps1
     package_composition: tools/commands/package/Measure-MIRPackageComposition.ps1
     package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
     target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
+    runtime_scenario_authority_generator: tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1
     scenario_groups: tools/lib/validation/ScenarioGroups.ps1
     structured_evidence: tools/lib/validation/ResultAggregation.ps1
     factorio_process: tools/lib/validation/FactorioProcess.ps1
@@ -869,6 +890,9 @@ validation_tooling:
     - the registered assurance-full workflow path delegates every exact protected input to the reusable canonical Control Plane v5 workflow on the selected ref
     - repository-wide validation enumerates tracked and non-ignored untracked governed files and cannot treat ignored control-plane staging clones as repository source
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
+    - the historical maintainer-statement manual-review mode is limited to an already publicly verified immutable package, records an after-publication attestation time, forbids invented checklist observations, and can never satisfy a new candidate's pre-seal review gate
+    - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
+    - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns

@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot "../validation/PerformanceCampaign.ps1")
+
 function Get-MIRCPContextExecutionState {
   param([Parameter(Mandatory)][string]$ContextPath, [string]$RepoRoot = "")
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
@@ -439,10 +441,25 @@ function Assert-MIRCPPerformanceCampaignAuthority {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $campaign = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $Path) | ConvertFrom-Json
-  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$TargetProfile.upgrade.from_version) -RepoRoot $repo
+  $baseline = Get-MIRCPReleaseByVersion -Release ([string]$campaign.baseline.version) -RepoRoot $repo
+  $currentRoles = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\releases\records\current.json") | ConvertFrom-Json
+  $currentTargetRelease = if ([string]$Descriptor.target -eq "2.1") {
+    [string]$currentRoles.roles.latest_tagged_factorio_2_1
+  } elseif ([string]$Descriptor.target -eq "2.0") {
+    [string]$currentRoles.roles.latest_tagged_factorio_2_0
+  } else {
+    ""
+  }
+  $historicalCampaign = -not [string]::IsNullOrWhiteSpace($currentTargetRelease) -and [string]$Descriptor.release -ne $currentTargetRelease
+  $factorioVersionMatches = if ($historicalCampaign) {
+    [string]$campaign.factorio_version -match ('^' + [regex]::Escape([string]$Descriptor.target) + '\.\d+$')
+  } else {
+    [string]$campaign.factorio_version -eq [string]$TargetProfile.qualification_factorio_version
+  }
+  $baselineMatchesProfile = $historicalCampaign -or [string]$campaign.baseline.version -eq [string]$TargetProfile.upgrade.from_version
   if ([int]$campaign.schema -ne 2 -or [string]$campaign.release -ne [string]$Descriptor.release -or
       [string]$campaign.factorio_line -ne [string]$Descriptor.target -or
-      [string]$campaign.factorio_version -ne [string]$TargetProfile.qualification_factorio_version -or
+      -not $factorioVersionMatches -or -not $baselineMatchesProfile -or
       [string]$campaign.baseline.version -ne [string]$baseline.release -or
       [string]$campaign.baseline.archive_sha256 -ne [string]$baseline.package.archive_sha256 -or
       [string]$campaign.baseline.package_content_sha256 -ne [string]$baseline.package.content_sha256 -or
@@ -454,7 +471,7 @@ function Assert-MIRCPPerformanceCampaignAuthority {
       [string]$campaign.candidate.package_content_sha256 -ne [string]$Descriptor.content_sha256) {
     throw "Performance campaign does not bind the immutable context candidate, baseline, target, and Factorio version."
   }
-  return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path)}
+  return [pscustomobject][ordered]@{campaign=$campaign;sha256=(Get-MIRCPSha256File -Path (Resolve-Path -LiteralPath $Path).Path);historical=$historicalCampaign}
 }
 
 function Set-MIRCPCanonicalPerformanceProbeText {
@@ -661,11 +678,9 @@ function Move-MIRCPPerformanceArtifacts {
   if (Test-Path -LiteralPath $Destination) {
     throw "Performance artifact destination already exists and will not be merged: $Destination"
   }
-  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination))
-  Move-Item -LiteralPath ([string]$ExecutionRoot.path) -Destination $Destination
-  if (Test-Path -LiteralPath ([string]$ExecutionRoot.path)) {
-    throw "Compact performance execution root still exists after artifact relocation."
-  }
+  $verified = Copy-MIRPerformanceArtifactsVerified -SourceRoot ([string]$ExecutionRoot.path) -DestinationRoot $Destination
+  Remove-Item -LiteralPath ([string]$ExecutionRoot.path) -Recurse -Force
+  if (Test-Path -LiteralPath ([string]$ExecutionRoot.path)) { throw "Compact performance execution root still exists after verified artifact relocation." }
   $markerPath = Join-Path $Destination "control-plane-execution-root.json"
   if (-not (Test-Path -LiteralPath $markerPath -PathType Leaf)) {
     throw "Relocated performance artifacts lack their execution-root binding marker."
@@ -675,15 +690,16 @@ function Move-MIRCPPerformanceArtifacts {
       [string]$marker.strategy -ne [string]$ExecutionRoot.strategy) {
     throw "Relocated performance artifacts do not bind the expected context and staging strategy."
   }
-  $files = @(Get-ChildItem -LiteralPath $Destination -Recurse -File)
   return [pscustomobject][ordered]@{
     path = $Destination
     strategy = [string]$marker.strategy
     context_id = [string]$marker.context_id
     conservative_path_budget = [int]$marker.conservative_path_budget
     maximum_factorio_path_length = [int]$marker.maximum_factorio_path_length
-    file_count = $files.Count
-    bytes = [int64](($files | Measure-Object -Property Length -Sum).Sum)
+    file_count = [int]$verified.file_count
+    bytes = [int64]$verified.bytes
+    artifact_tree_sha256 = [string]$verified.artifact_tree_sha256
+    artifacts = @($verified.artifacts)
   }
 }
 
@@ -781,6 +797,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     maximum_factorio_path_length = [int]$relocation.maximum_factorio_path_length
     raw_artifact_file_count = [int]$relocation.file_count
     raw_artifact_bytes = [int64]$relocation.bytes
+    raw_artifact_tree_sha256 = [string]$relocation.artifact_tree_sha256
     campaign_authority_sha256 = [string]$overlay.authority_sha256
     overlay_manifest_sha256 = [string]$overlay.manifest_sha256
     canonical_probe_sha256 = [string]$overlay.canonical_probe.sha256
@@ -797,7 +814,7 @@ function Invoke-MIRCPPerformanceMeasurement {
     artifact_status = [string]$evidence.status
   }
   return Write-MIRCPSpecializedTaskEvidence -State $state -PlanRow $row[0] -ObservationKind engine-realization -Status $status `
-    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;overlay_manifest_sha256=[string]$overlay.manifest_sha256;harness_sha256=[string]$overlay.harness_sha256;execution_root_strategy=[string]$facts.execution_root_strategy;conservative_path_budget=[int]$facts.conservative_path_budget;maximum_factorio_path_length=[int]$facts.maximum_factorio_path_length;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
+    -EnvironmentMaterial ([pscustomobject][ordered]@{task=[string]$row[0].effective_input_sha256;factorio=$factorio;prior_archive_sha256=$priorSha256;source_commit=[string]$source.commit;campaign_authority_sha256=[string]$overlay.authority_sha256;overlay_manifest_sha256=[string]$overlay.manifest_sha256;harness_sha256=[string]$overlay.harness_sha256;execution_root_strategy=[string]$facts.execution_root_strategy;conservative_path_budget=[int]$facts.conservative_path_budget;maximum_factorio_path_length=[int]$facts.maximum_factorio_path_length;raw_artifact_tree_sha256=[string]$facts.raw_artifact_tree_sha256;third_party_closure_sha256=[string]$facts.third_party_closure_sha256}) `
     -Facts $facts -ArtifactPath $outputPath -ArtifactKind "runtime-performance-evidence" -TrustClass $TrustClass -EvidenceRoot $EvidenceRoot -RepoRoot $repo
 }
 

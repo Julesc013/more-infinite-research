@@ -10,8 +10,8 @@
   "qualification_factorio_version": "2.1.13",
   "minimum_factorio_version": "2.1.8",
   "upgrade": {
-    "from_version": "3.2.3",
-    "to_version": "3.2.5",
-    "fixture": "assert-upgrade-3-2-3-to-3-2-5"
+    "from_version": "3.2.5",
+    "to_version": "3.2.9",
+    "fixture": "assert-upgrade-3-2-5-to-3-2-9"
   }
 }

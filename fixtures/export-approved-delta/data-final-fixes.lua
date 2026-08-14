@@ -164,6 +164,32 @@ if finalized_artifacts then
       }
     end
   end
+elseif mods and (mods["more-infinite-research"] == "2.4.9"
+    or mods["more-infinite-research"] == "2.5.5"
+    or mods["more-infinite-research"] == "2.5.9") then
+  -- The frozen 2.4.9 registry and the 2.5.x no-mod-data target adapter have no
+  -- finalized public compiler artifact here. Reconstruct the exact comparison
+  -- projection from stable technology names instead of reopening compiler state.
+  -- The terminal 2.5.9 route-policy projection does not change this registry
+  -- ownership contract.
+  local base_continuations = {
+    ["braking-force-8"] = "braking-force",
+    ["inserter-capacity-bonus-8"] = "inserter-capacity-bonus",
+    ["laser-shooting-speed-8"] = "laser-shooting-speed",
+    ["research-speed-7"] = "research-speed",
+    ["weapon-shooting-speed-7"] = "weapon-shooting-speed",
+    ["worker-robots-storage-4"] = "worker-robots-storage"
+  }
+  for name, _ in pairs(data.raw.technology or {}) do
+    local stream_key = string.match(name, "^recipe%-prod%-(.+)%-1$")
+    if stream_key then
+      technology_names[name] = true
+      registry_rows[name] = {name = name, kind = "stream", key = stream_key}
+    elseif base_continuations[name] then
+      technology_names[name] = true
+      registry_rows[name] = {name = name, kind = "base_extension", key = base_continuations[name]}
+    end
+  end
 elseif mods and mods["more-infinite-research"] == "3.1.9" then
   -- The frozen 3.1.9 baseline predates finalized compiler artifacts and its
   -- registry is not context-scoped. This exact-version adapter exists only to

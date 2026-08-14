@@ -4,6 +4,9 @@ local initial_pack_name = "mir-fixture-initial-science-pack"
 local self_lock_pack_name = "mir-fixture-self-lock-science-pack"
 local cycle_pack_a_name = "mir-fixture-cycle-science-pack-a"
 local cycle_pack_b_name = "mir-fixture-cycle-science-pack-b"
+local alternate_route_pack_name = "mir-fixture-alternate-route-science-pack"
+local alternate_route_early_recipe_name = "mir-fixture-alternate-route-early"
+local alternate_route_late_recipe_name = "mir-fixture-alternate-route-late"
 
 local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
 
@@ -59,6 +62,10 @@ end
 local self_lock_pack, self_lock_recipe = pack_and_recipe(self_lock_pack_name)
 local cycle_pack_a, cycle_recipe_a = pack_and_recipe(cycle_pack_a_name)
 local cycle_pack_b, cycle_recipe_b = pack_and_recipe(cycle_pack_b_name)
+local alternate_route_pack, alternate_route_early_recipe = pack_and_recipe(alternate_route_pack_name)
+alternate_route_early_recipe.name = alternate_route_early_recipe_name
+local alternate_route_late_recipe = table.deepcopy(alternate_route_early_recipe)
+alternate_route_late_recipe.name = alternate_route_late_recipe_name
 
 local function unlocker(name, enabled, unlocked_recipe, ingredients)
   return {
@@ -96,8 +103,17 @@ data:extend({
   cycle_recipe_b,
   unlocker("mir-fixture-cycle-unlocker-a", true, cycle_pack_a_name, {{cycle_pack_b_name, 1}}),
   unlocker("mir-fixture-cycle-unlocker-b", true, cycle_pack_b_name, {{cycle_pack_a_name, 1}}),
+  alternate_route_pack,
+  alternate_route_early_recipe,
+  alternate_route_late_recipe,
+  unlocker("mir-fixture-z-early-route-unlocker", true, alternate_route_early_recipe_name),
+  unlocker("mir-fixture-00-late-route-unlocker", true, alternate_route_late_recipe_name),
   unlocker("mir-fixture-no-research-mechanism-unlocker", true, recipe_name)
 })
+
+data.raw.technology["mir-fixture-00-late-route-unlocker"].prerequisites = {
+  "mir-fixture-z-early-route-unlocker"
+}
 
 for _, lab in pairs(data.raw.lab or {}) do
   lab.inputs = lab.inputs or {}
@@ -106,4 +122,5 @@ for _, lab in pairs(data.raw.lab or {}) do
   table.insert(lab.inputs, self_lock_pack_name)
   table.insert(lab.inputs, cycle_pack_a_name)
   table.insert(lab.inputs, cycle_pack_b_name)
+  table.insert(lab.inputs, alternate_route_pack_name)
 end

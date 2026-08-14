@@ -2,52 +2,44 @@
   "authority": "canonical-release-ledger",
   "development": {
     "factorio-2.0": {
-      "archive": "",
-      "archive_bytes": null,
-      "archive_class": "planning-authority-no-candidate",
-      "archive_entries": null,
-      "archive_sha256": "",
-      "assurance_exception_ids": [],
+      "archive": "dist/more-infinite-research_2.5.5.zip",
+      "archive_bytes": 1055047,
+      "archive_class": "immutable-publicly-verified-release",
+      "archive_entries": 300,
+      "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+      "assurance_exception_ids": [
+        "MIR35-2.5.5-TIMEBOXED-PUBLICATION-2026-08-08"
+      ],
       "branch": "legacy",
-      "candidate_floor": "2.5-P13",
-      "candidate_id": "not-assigned",
-      "development_branch": "dev",
-      "manual_review": "pending",
-      "mir_version": "2.5.9",
-      "package_content_sha256": "",
-      "package_source_commit": "",
+      "candidate_id": "2.5-P12",
+      "candidate_qualification_evidence": ".mir/evidence/archive/mir3-dot5-local-qualification/2.5.5-local-candidate-qualification.json",
+      "candidate_qualification_sha256": "C1395E465638A1452E3C236A51BEDA4A2E6D2F49F4384301C8CDC7A871A827CB",
+      "development_branch": "legacy",
+      "manual_review": "maintainer-patch-review-approved",
+      "mir_version": "2.5.5",
+      "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+      "package_source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
       "package_source_material": {
-        "file_count": null,
+        "file_count": 300,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": ""
+        "source_tree": "723201b02bdf8707f40fa7fbfcf83e738934fd69"
       },
-      "package_source_sha256": "",
-      "package_source_tree": "",
+      "package_source_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+      "package_source_tree": "723201b02bdf8707f40fa7fbfcf83e738934fd69",
       "protected_qualification": "pending",
-      "publication_status": "planned",
-      "qualification": "planned",
+      "publication_status": "publicly-verified",
+      "qualification": "publicly-verified",
       "remaining_obligations": [
-        "reconcile-2.5.5-protected-post-publication-debt",
-        "bind-final-terminal-delta",
-        "materialize-and-qualify-factorio-2.0-projection",
-        "normal-manual-protected-seal-promotion-publication-gates"
+        "protected-qualification-post-publication",
+        "protected-seal-and-reconciliation-post-publication",
+        "normal-promotion-admission-reconciliation"
       ],
-      "remaining_states": [
-        "source-frozen",
-        "package-built",
-        "focused-qualified",
-        "candidate-qualified",
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
-      "source_anchor": "2.5.5",
-      "status": "not-assigned-planned"
+      "remaining_states": [],
+      "source_anchor": "3.2.5",
+      "status": "2.5-P12-publicly-verified",
+      "tag": "2.5.5",
+      "tag_commit": "27877275854eb131efeb42672d3676c9c513c85e"
     },
     "factorio-2.1": {
       "archive": "",
@@ -76,7 +68,8 @@
       "publication_status": "planned",
       "qualification": "planned",
       "remaining_obligations": [
-        "freeze-unified-terminal-finding-inventory",
+        "complete-product-implementation-and-all-nine-fixed-point",
+        "focused-qualification",
         "assign-candidate-after-source-freeze",
         "normal-manual-protected-seal-promotion-publication-gates",
         "archive-and-mir4-handoff"
@@ -101,9 +94,8 @@
   "generated_from": [
     "path:releases.current",
     "path:releases.records/3.2.9.json",
-    "path:releases.records/2.5.9.json",
-    "path:releases.records/3.2.5.json",
-    "path:releases.records/2.5.5.json"
+    "path:releases.records/2.5.5.json",
+    "path:releases.records/3.2.5.json"
   ],
   "published_baselines": {
     "factorio-2.0": {
@@ -137,7 +129,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-08",
+  "updated_at": "2026-08-09",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

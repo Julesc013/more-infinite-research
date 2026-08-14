@@ -54,6 +54,29 @@ generated_policy_authority:
     - hard prototype safety remains non-overridable
     - public claims remain separately governed and evidence-bound
 
+science_phase_policies:
+  - id: K2SciencePhasePolicyV1
+    implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
+    applicability:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+    scope: MIR-owned generated stream and base-continuation technologies only
+    application_stage: planner-after-lab-compatibility-before-technology-design
+    behavior:
+      production_or_utility: remove-kr-basic-tech-card
+      advanced_space_matter_or_singularity: remove-basic-automation-logistic-military-chemical
+    invariants:
+      - no behavior outside the exact admitted version envelope
+      - stable technology IDs
+      - idempotent ingredient normalization
+      - preserve ingredient order shapes and amounts
+      - never emit an empty or lab-invalid ingredient list
+      - never invoke private K2 finalization code
+    fixture: fixtures/assert-k2-science-phase-policy
+    exact_real_campaign: local-2-1-krastorio-spaced-out
+    admission_status: implemented-awaiting-exact-runtime-proof
+    public_claim: none-until-exact-runtime-proof
+
 mod_interactions:
   policy: .mir/mod-interaction-policy.json
   support_capsules: .mir/compatibility-capsules.json

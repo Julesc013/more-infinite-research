@@ -152,7 +152,12 @@ $activeCandidate = $releaseLedger.development.'factorio-2.1'
 $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $RepoRoot -Id "releases.records"
 $currentRoles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "current.json")) | ConvertFrom-Json
 $activeTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($activeCandidate.mir_version).json")) | ConvertFrom-Json
-$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$($currentRoles.roles.tagged_factorio_2_1).json")) | ConvertFrom-Json
+$campaignBaselineVersion = if ($null -ne $activeTypedRelease.PSObject.Properties["source_release"]) {
+  [string]$activeTypedRelease.source_release.release
+} else {
+  [string]$currentRoles.roles.tagged_factorio_2_1
+}
+$taggedTypedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot (Join-Path $releaseRecordRoot "$campaignBaselineVersion.json")) | ConvertFrom-Json
 $activeCampaignPath = Join-Path $RepoRoot ".mir/performance-campaigns/$($activeCandidate.mir_version)-$($activeCandidate.candidate_id).json"
 $releaseStates = @((Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/control-plane/control-plane.json") | ConvertFrom-Json).release_states)
 $activeStateIndex = [Array]::IndexOf($releaseStates, [string]$activeTypedRelease.state)
@@ -172,6 +177,8 @@ if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
     throw "Pre-package active candidate must not publish a mutable or identity-empty performance campaign authority."
   }
   $activeCampaign = Get-Content -Raw -LiteralPath $activeCampaignPath | ConvertFrom-Json
+  $activeProfilePath = Join-Path $RepoRoot "validation/profiles/factorio-2.1.json"
+  $activeProfile = Get-Content -Raw -LiteralPath $activeProfilePath | ConvertFrom-Json
   if ([int]$activeCampaign.schema -ne 2 -or
       [string]$activeCampaign.release -ne [string]$activeTypedRelease.release -or
       [string]$activeCampaign.factorio_line -ne [string]$activeTypedRelease.target -or
@@ -185,6 +192,9 @@ if (-not (Test-Path -LiteralPath $activeCampaignPath -PathType Leaf)) {
       [string]$activeCampaign.candidate.archive_sha256 -ne [string]$activeCandidate.archive_sha256 -or
       [string]$activeCampaign.candidate.package_content_sha256 -ne [string]$activeCandidate.package_content_sha256) {
     throw "Versioned performance campaign does not bind the exact active candidate and tagged baseline."
+  }
+  if ([string]$activeCampaign.factorio_version -ne [string]$activeProfile.qualification_factorio_version) {
+    throw "Versioned performance campaign Factorio version does not match the active qualification profile."
   }
   $activeManualScenarios = [string]$activeCampaign.manual_scenarios
   $activeManualScenariosPath = Join-Path $RepoRoot $activeManualScenarios
@@ -266,13 +276,13 @@ foreach ($governedVersion in @($governedProbeVersions | Select-Object -Unique)) 
   }
 }
 $qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
-foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion", "performance-campaigns", "CampaignPath", "conservative Factorio path budget", "maximumFactorioPathLength", "mirp-", "exact governed scratch parent")) {
+foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerformanceRegression.ps1", "ExpectedSourceCommit", "ExpectedFactorioVersion", "performance-campaigns", "CampaignPath", "conservative Factorio path budget", "New-MIRPerformanceStagingRoot", "Get-MIRPerformancePathBudgetProjection", "assurance-infrastructure-path-budget", "ScratchRootCandidates", "AttemptOrdinal")) {
   if ($qualificationSource -notmatch [regex]::Escape($snippet)) {
     throw "Fresh performance qualification lacks required producer/verifier behavior '$snippet'."
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId")) {
+foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId", "historical target package source", "package-root equivalent", "campaign.candidate.package_source_commit", "declares official module data absent", "official_data_roots", "declaredOfficialModules", "ManualScenariosRelativePath", "manual_scenarios_sha256", "RequiredProbePhases", "RequiresProbeTelemetry", "omitted-by-capability", "ArtifactVolumeLaneIds", 'New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine', 'SanitationBudgetPath = (Join-Path $RepoRoot', 'FactorioLine = [string]$campaign.factorio_line', 'Join-Path $executionRoot')) {
   if ($producerSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
@@ -285,6 +295,47 @@ foreach ($snippet in @("compact-context-scratch-v1", "conservative_path_budget",
 }
 $performanceCampaignHelpers = Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
+$helperSource = Get-Content -Raw -LiteralPath $performanceCampaignHelpers
+foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget", "Resolve-MIRPerformanceArtifactVolumePolicy", "complete legacy current-target telemetry authority")) {
+  if ($helperSource -notmatch [regex]::Escape($snippet)) {
+    throw "Canonical performance staging helper lacks required 0012 behavior '$snippet'."
+  }
+}
+$performanceEvidenceValidatorSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\ReleaseAttestations.ps1")
+foreach ($snippet in @("artifactVolumePolicy", "Resolve-MIRPerformanceArtifactVolumePolicy", "omitted-by-capability", "governed target-era campaign", "artifact_volume_lanes")) {
+  if ($performanceEvidenceValidatorSource -notmatch [regex]::Escape($snippet)) {
+    throw "Runtime performance evidence validation does not honor governed target capabilities '$snippet'."
+  }
+}
+$runtimePerformanceTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests\release\Test-MIRPerformanceRegression.ps1")
+if ($runtimePerformanceTestSource -notmatch [regex]::Escape('-CampaignPath $CampaignPath') -or
+    $performanceEvidenceValidatorSource -notmatch [regex]::Escape('[string]$CampaignPath = ""')) {
+  throw "Runtime performance verification must receive the exact campaign authority selected by qualification."
+}
+$legacyCurrentCampaign = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-campaigns\3.2.5-C32.json") | ConvertFrom-Json
+if ((Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $legacyCurrentCampaign) -ne "required") {
+  throw "The complete schema-2 C32 current-target campaign must retain required artifact-volume telemetry."
+}
+$incompleteLegacyCampaign = [pscustomobject]@{
+  factorio_line = "2.1"
+  phase_lanes = @([pscustomobject]@{ id = "compiler.snapshot"; probe_phase = "snapshot" })
+  artifact_volume_lanes = @()
+}
+$legacyPolicyRejected = $false
+try {
+  [void](Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $incompleteLegacyCampaign)
+} catch {
+  if ($_.Exception.Message -match "omits artifact-volume policy") { $legacyPolicyRejected = $true } else { throw }
+}
+if (-not $legacyPolicyRejected) {
+  throw "An incomplete policy-less current-target campaign must fail closed."
+}
+$harnessSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
+foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", 'Alias("RepoRoot")', "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {
+  if ($harnessSource -notmatch [regex]::Escape($snippet)) {
+    throw "Performance harness fingerprint does not bind the governed target-era scenario authority '$snippet'."
+  }
+}
 $orderedCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "bounded"
 $jsonCounter = Get-MIRPerformanceCounterValue -Counters ('{"bounded":12}' | ConvertFrom-Json) -Name "bounded"
 $missingCounter = Get-MIRPerformanceCounterValue -Counters ([ordered]@{bounded=12}) -Name "missing"
@@ -301,9 +352,82 @@ if ($producerSource -notmatch '\[int\]\$scenarios\[0\]\.exit_code\s+-ne\s+0' -or
     $producerSource -notmatch '\[int\]\$scenarios\[0\]\.dependency_failure_count\s+-ne\s+0') {
   throw "Performance campaign must still require successful Factorio execution and an exact dependency closure for both packages."
 }
+$stagingTestRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-p-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
+try {
+  $stagingCampaign = [pscustomobject]@{
+    lanes = @(
+      [pscustomobject]@{id="base.factorio-total";runner="exact-package-load"},
+      [pscustomobject]@{id="medium-ecosystem.factorio-total";runner="compat-audit"}
+    )
+  }
+  $deepRoot = Join-Path $stagingTestRoot ("deep-" + ("x" * 230))
+  $deepProjection = Get-MIRPerformancePathBudgetProjection -Campaign $stagingCampaign -ScratchRoot $deepRoot
+  if ([int]$deepProjection.maximum_path_length -le [int]$deepProjection.conservative_path_budget) {
+    throw "Performance path preflight did not project a deep checkout beyond the conservative budget."
+  }
+  $preflightRejected = $false
+  try {
+    [void](New-MIRPerformanceStagingRoot -Campaign $stagingCampaign -TargetCode "f20" -TestId "path-budget-self-test" `
+      -PlanFingerprint ("A" * 64) -CandidateSha256 ("B" * 64) -BaselineSha256 ("C" * 64) -FactorioBinarySha256 ("D" * 64) `
+      -DurableDestination "build/results/performance-custody/self-test" -ScratchRootCandidates @($deepRoot))
+  } catch {
+    if ($_.Exception.Message -match "assurance-infrastructure-path-budget") { $preflightRejected = $true } else { throw }
+  }
+  if (-not $preflightRejected) { throw "Performance path preflight did not reject the over-budget root before launch." }
+  $staging = New-MIRPerformanceStagingRoot -Campaign $stagingCampaign -TargetCode "f20" -TestId "path-budget-self-test" `
+    -PlanFingerprint ("A" * 64) -CandidateSha256 ("B" * 64) -BaselineSha256 ("C" * 64) -FactorioBinarySha256 ("D" * 64) `
+    -DurableDestination "build/results/performance-custody/self-test" -ScratchRootCandidates @($stagingTestRoot)
+  $provenance = Get-Content -Raw -LiteralPath $staging.marker_path | ConvertFrom-Json
+  if ([int]$staging.maximum_projected_path_length -gt [int]$staging.conservative_path_budget -or
+      [string]$staging.strategy -ne "compact-context-scratch-v2" -or [string]$provenance.plan_fingerprint -ne ("A" * 64) -or
+      [string]$provenance.durable_destination -ne "build/results/performance-custody/self-test") {
+    throw "Compact staging root does not bind the preflight budget and provenance context."
+  }
+  $collisionRejected = $false
+  try {
+    [void](New-MIRPerformanceStagingRoot -Campaign $stagingCampaign -TargetCode "f20" -TestId "path-budget-self-test" `
+      -PlanFingerprint ("A" * 64) -CandidateSha256 ("B" * 64) -BaselineSha256 ("C" * 64) -FactorioBinarySha256 ("D" * 64) `
+      -DurableDestination "build/results/performance-custody/self-test" -ScratchRootCandidates @($stagingTestRoot))
+  } catch {
+    if ($_.Exception.Message -match "occupied") { $collisionRejected = $true } else { throw }
+  }
+  if (-not $collisionRejected) { throw "Concurrent compact staging attempts may collide." }
+  $artifact = Join-Path $staging.path "raw\performance.log"
+  [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $artifact))
+  "byte-identical-performance-artifact" | Set-Content -LiteralPath $artifact -NoNewline -Encoding UTF8
+  $relocation = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot (Join-Path $stagingTestRoot "durable-artifacts")
+  if ([int]$relocation.file_count -lt 2 -or -not (Test-Path -LiteralPath (Join-Path $relocation.destination_root "mir-staging-provenance.json") -PathType Leaf) -or
+      (Get-MIRPerformanceRawSha256 -Path $artifact) -ne (Get-MIRPerformanceRawSha256 -Path (Join-Path $relocation.destination_root "raw\performance.log"))) {
+    throw "Verified compact-artifact relocation did not retain byte-identical provenance and artifacts."
+  }
+  $contentAddressedRoot = Join-Path $stagingTestRoot "content-addressed-artifacts"
+  $contentAddressedFirst = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  $contentAddressedRepeat = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedFirst.disposition -ne "copied" -or
+      [string]$contentAddressedRepeat.disposition -ne "existing-verified" -or
+      [string]$contentAddressedFirst.destination_namespace -ne [IO.Path]::GetFullPath($contentAddressedRoot) -or
+      [string]$contentAddressedFirst.destination_root -ne [string]$contentAddressedRepeat.destination_root -or
+      (Split-Path -Leaf ([string]$contentAddressedFirst.destination_root)) -ne [string]$contentAddressedFirst.artifact_tree_sha256) {
+    throw "Content-addressed performance custody must copy once and then verify the exact immutable artifact tree."
+  }
+  "distinct-performance-artifact" | Set-Content -LiteralPath $artifact -NoNewline -Encoding UTF8
+  $contentAddressedDistinct = Copy-MIRPerformanceArtifactsVerified -SourceRoot $staging.path -DestinationRoot $contentAddressedRoot -ContentAddressedChild
+  if ([string]$contentAddressedDistinct.disposition -ne "copied" -or
+      [string]$contentAddressedDistinct.destination_root -eq [string]$contentAddressedFirst.destination_root -or
+      -not (Test-Path -LiteralPath $contentAddressedFirst.destination_root -PathType Container) -or
+      -not (Test-Path -LiteralPath $contentAddressedDistinct.destination_root -PathType Container)) {
+    throw "Distinct independent performance artifact trees must coexist under one stable custody namespace."
+  }
+} finally {
+  if (Test-Path -LiteralPath $stagingTestRoot) { Remove-Item -LiteralPath $stagingTestRoot -Recurse -Force }
+}
 $campaignFingerprintSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
 if ($campaignFingerprintSource -notmatch [regex]::Escape('.mir/sanitation-budgets.json')) {
   throw "Performance harness fingerprint must bind the ecosystem sanitation budget authority."
+}
+$qualificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRPerformanceQualification.ps1")
+if ($qualificationSource -notmatch 'Copy-MIRPerformanceArtifactsVerified[\s\S]{0,240}-ContentAddressedChild') {
+  throw "Performance qualification must preserve independent raw artifact trees in content-addressed custody."
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")

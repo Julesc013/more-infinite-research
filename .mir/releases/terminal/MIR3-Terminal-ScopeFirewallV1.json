@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-ScopeFirewallV1",
+  "permitted": ["confirmed-product-fix", "confirmed-compatibility-fix", "confirmed-migration-or-state-fix", "exact-engine-hardening", "stable-id-alias-or-tombstone-closure", "performance-correction", "locale-correction", "documentation-correction", "privacy-or-diagnostic-correction", "package-or-assurance-hardening", "archive-or-handoff-metadata"],
+  "forbidden": ["mir4-repository-reset", "target-compiler-platform", "extension-protocol", "sdk-or-public-api", "process-ir", "generalized-policy-rewrite", "speculative-feature-expansion", "release-.6", "release-.7", "release-.8", "release-.10"],
+  "rules": {"unrecorded_target_only_fix":false,"package_visible_change_without_change_id":false,"source_freeze_without_fixed_point_receipt":false,"public_tag_without_family_readiness_seal":false,"package_mutation_after_candidate_freeze":false,"mir4_implementation_inside_dot9":false},
+  "chg_2026_0013": {
+    "terminal_slice": ["clean-root-equivalence", "canonical-policy-hashing", "typed-failure-propagation", "release-safety-guards"],
+    "mir4_deferred": ["general-merkle-control-plane-redesign", "general-evaluator-framework", "runner-aggregator-publisher-platform-split", "cross-product-batching-platform"]
+  }
+}

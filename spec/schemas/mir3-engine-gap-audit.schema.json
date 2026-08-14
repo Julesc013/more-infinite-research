@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-engine-gap-audit.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-engine-gap-audit.schema.json",
+  "title": "MIR 3 bounded engine-gap audit",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "rule", "surfaces", "summary", "boundary"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-Engine-Gap-AuditV1"},
+    "status": {"const": "complete-no-additional-reproduced-dot9-defect"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "rule": {"type": "string", "minLength": 1},
+    "surfaces": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "required": ["id", "classification", "current_contract", "evidence", "dot9_admission"],
+        "properties": {
+          "id": {"enum": ["general-item-research-ingredients", "recipe-category-sets", "probability-and-catalyst-semantics", "quality-aware-products", "recycling-safety-versus-throughput", "multi-level-trigger-prohibition", "late-mutation-detection"]},
+          "classification": {"const": "covered-no-reproduced-dot9-defect"},
+          "current_contract": {"type": "string", "minLength": 1},
+          "evidence": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "dot9_admission": {"const": "none"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {"type":"object","required":["surfaces","additional_reproduced_dot9_defects","mir4_platform_topics_preserved"],"properties":{"surfaces":{"const":7},"additional_reproduced_dot9_defects":{"const":0},"mir4_platform_topics_preserved":{"const":7}},"additionalProperties":false},
+    "boundary": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

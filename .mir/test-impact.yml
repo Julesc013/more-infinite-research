@@ -19,6 +19,12 @@
       "tags": []
     },
     {
+      "pattern": ".mir/modules.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/views/**",
       "groups": [],
       "scenarios": [],
@@ -121,6 +127,12 @@
       "tags": []
     },
     {
+      "pattern": "tools/commands/release/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Evidence.ps1",
       "groups": [],
       "scenarios": [],
@@ -151,6 +163,12 @@
       "tags": []
     },
     {
+      "pattern": "validation/tests/tooling/Test-MIRLayout.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "validation/tests/tooling/Test-MIRControlPlane.ps1",
       "groups": [],
       "scenarios": [],
@@ -170,6 +188,12 @@
     },
     {
       "pattern": "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIRGitHubAdministration.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []

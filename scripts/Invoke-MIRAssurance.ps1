@@ -17,7 +17,7 @@ $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
 $outRoot = $artifactRoot
 $evidenceSchema = 4
-$buildReceiptSchema = 2
+$buildReceiptSchema = 3
 $assuranceRunnerVersion = "4"
 
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")
@@ -39,11 +39,26 @@ Common options:
   --profile <name> --factorio <path> --prior <zip> --seal <path>
   --plan <json> --test <stable-id> --fingerprint <sha256>
   --output <json> --json --rerun <test-id> --no-reuse
+  --time-budget-minutes <positive-integer>
 
 Reuse is enabled by default. The planner emits REUSE, WAIT, RUN, or INVALID for
 each stable test instance. Passing evidence is reused only when its exact effective
 input fingerprint and result digest still match trusted producer policy.
+
+Fresh campaigns are plan-owned and checkpointed.  A time budget stops only between
+rows, writes status=checkpointed, and preserves exact completed row capsules for a
+later invocation of the same --plan.  checkpointed is never a passing gate.
 "@
+}
+
+function Get-MIRAssuranceTimeBudgetSeconds {
+  $text = Get-MIRAssuranceOption -Name "--time-budget-minutes"
+  if ([string]::IsNullOrWhiteSpace($text)) { return -1 }
+  $minutes = 0
+  if (-not [int]::TryParse($text, [ref]$minutes) -or $minutes -le 0 -or $minutes -gt 1440) {
+    throw "--time-budget-minutes must be a positive integer no greater than 1440."
+  }
+  return $minutes * 60
 }
 
 $context = Get-MIRAssuranceContext
@@ -84,7 +99,7 @@ switch ($command) {
     $result = [ordered]@{
       schema=2
       head=(& git -C $repo rev-parse HEAD).Trim()
-      branch=(& git -C $repo branch --show-current).Trim()
+      branch=(@(& git -C $repo branch --show-current) -join "").Trim()
       tags=@(& git -C $repo tag --list --sort=refname)
       worktree_status=@(& git -C $repo status --short)
       distributions=$zips
@@ -135,9 +150,10 @@ switch ($command) {
   }
   "verify" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context
-    $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context
+    $execution = [ordered]@{}
+    $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context -TimeBudgetSeconds (Get-MIRAssuranceTimeBudgetSeconds) -ExecutionState $execution
     $counts = Get-MIRAssuranceResultCounts -Results $results -ExpectedTotal @($plan.tests).Count
-    $status = if ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
+    $status = if ([string]$execution.status -eq "checkpointed") { "checkpointed" } elseif ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
     $summary = [ordered]@{
       schema=2
       status=$status
@@ -146,10 +162,11 @@ switch ($command) {
       plan=$plan
       counts=$counts
       evidence=$results
+      execution=$execution
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
     Write-MIRAssuranceJson -Value $summary -DefaultPath "build/results/assurance/verify-summary.json"
-    if ($status -ne "passed") { throw "Assurance verification failed." }
+    if ($status -eq "failed") { throw "Assurance verification failed." }
   }
   "import-workers" {
     $plan = Get-MIRAssurancePlanFromOption -Context $context -RequirePlan
@@ -177,13 +194,14 @@ switch ($command) {
     $profile = Get-MIRAssuranceOption -Name "--profile" -Default "full"
     if (-not (Get-MIRAssuranceOption -Name "--profile")) { $script:Args += @("--profile", $profile) }
     $plan = Get-MIRAssurancePlan -Context $context
-    $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context
+    $execution = [ordered]@{}
+    $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context -TimeBudgetSeconds (Get-MIRAssuranceTimeBudgetSeconds) -ExecutionState $execution
     $counts = Get-MIRAssuranceResultCounts -Results $results -ExpectedTotal @($plan.tests).Count
-    $status = if ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
+    $status = if ([string]$execution.status -eq "checkpointed") { "checkpointed" } elseif ($counts.failed -eq 0 -and $counts.incomplete -eq 0 -and $counts.unexpected -eq 0) { "passed" } else { "failed" }
     $summary = [ordered]@{
       schema=2
       status=$status
-      state=if ($status -eq "passed") { "RUNTIME-QUALIFIED" } else { "BUILT" }
+      state=if ($status -eq "passed") { "RUNTIME-QUALIFIED" } elseif ($status -eq "checkpointed") { "CHECKPOINTED" } else { "BUILT" }
       release_status="NOT RELEASED"
       target=$context.target
       version=[string]$context.info.version
@@ -192,10 +210,11 @@ switch ($command) {
       plan=$plan
       counts=$counts
       evidence=$results
+      execution=$execution
       completed_at=(Get-Date).ToUniversalTime().ToString("o")
     }
     Write-MIRAssuranceJson -Value $summary -DefaultPath "build/results/assurance/qualification-summary.json"
-    if ($status -ne "passed") { throw "Assurance qualification failed." }
+    if ($status -eq "failed") { throw "Assurance qualification failed." }
   }
   "seal" { Invoke-MIRAssuranceSeal -Context $context }
   "check-seal" { Invoke-MIRAssuranceCheckSeal -Context $context }
