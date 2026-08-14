@@ -14,7 +14,7 @@ superseded_by: []
 
 This is the single planning authority for the final MIR 3 stabilization wave. It joins the current Factorio 2.1 line, the maintained Factorio 2.0 line, and every qualified historical target into one correction programme without turning the target ladder into a waterfall.
 
-The programme has admitted its smallest defensible product set. Implementation is now authorized for two reproduced terminal findings, but no `.9` candidate has been assigned, no `.9` source has been frozen, and no `.9` package has been built. MIR 4 package-visible implementation is not admitted by this record.
+The programme has admitted and implemented its smallest defensible product set, including the later reproduced combined direct-effect ownership failure. The accepted all-nine fixed point and verified repository protections now bind the family source freeze. No `.9` candidate has been assigned and no final `.9` candidate package has been built. MIR 4 package-visible implementation is not admitted by this record.
 
 Terminal assurance calibration is complete and frozen. The current product-intake pass has frozen a bounded Mod Portal Tier A selection, classified every prequalification claim without widening it, recorded effective mutation-owner surfaces, and completed the settings-scope audit without changing any released setting type. The successor bootstrap remains package-excluded shadow work: MIR 3 source and the bounded materializer continue to own `.9` release bytes until MIR 3 EOL and exact successor equivalence.
 

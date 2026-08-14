@@ -1,0 +1,12 @@
+{
+  "schema": 1, "kind": "MIR3TerminalTargetSourceFreezeV1", "status": "source-frozen-candidate-unassigned",
+  "release": "1.5.9", "target": "0.15", "support_tier": "historical", "candidate_floor": "1.5-P1", "candidate_id": null,
+  "frozen_at": "2026-08-14T17:22:05.6046282+10:00", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+  "shadow_source": {"ref": "candidate/1.5.9-projection", "commit": "07c42e24c50f9a667686ee48a426b0c9ca19b444", "tree": "cdefcdc2f3bf74b806759374335b669746204912"},
+  "engine": {"version": "0.15.40", "binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"},
+  "profile": "terminal-factorio-0.15.40", "adapter": "factorio-0.15-target-native-no-product-delta",
+  "predecessors": [{"role": "dot5", "release": "1.5.5", "tag": "1.5.5", "commit": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6"}, {"role": "pre-dot5", "release": "1.5.0", "tag": "1.5.0", "commit": "c2b526fd6dde81be7703daef53b075a1fd773e09"}],
+  "package": {"archive_sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E", "content_sha256": "C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED", "bytes": 385629, "entries": 177},
+  "upgrade_rows": ["1.5.5-to-1.5.9", "1.5.0-to-1.5.9"],
+  "boundaries": {"candidate_assigned": false, "candidate_built": false, "manual_review_complete": false, "sealed": false, "tagged": false, "published": false}
+}
