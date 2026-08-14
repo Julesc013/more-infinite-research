@@ -146,6 +146,10 @@ golden_plans:
 fixture_roots:
   synthetic: fixtures
   run_profiles: fixtures/run-profiles
+  local_archive_libraries:
+    factorio_2_1: 'C:\Projects\Factorio\testmods\2.1'
+    factorio_2_0: 'C:\Projects\Factorio\testmods\2.0'
+    factorio_1_1: 'C:\Projects\Factorio\testmods\1.1'
 
 real_mod_gates:
   factorio-2.1-crucible-rigor:
