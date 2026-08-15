@@ -24,7 +24,7 @@ superseded_by: []
 | Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `sealed` |
+| State | `publicly-verified` |
 | Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
 | Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
@@ -36,10 +36,7 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `promoted`
-- [ ] `tagged`
-- [ ] `published`
-- [ ] `publicly-verified`
+None.
 
 ## Assurance exceptions
 

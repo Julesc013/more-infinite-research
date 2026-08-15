@@ -8,15 +8,15 @@ Generated: 2026-08-15
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.9` | `C33` | `C / 33` | `sealed` | `promoted` |
-| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `sealed` | `promoted` |
-| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `sealed` | `promoted` |
-| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `sealed` | `promoted` |
-| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `sealed` | `promoted` |
-| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `sealed` | `promoted` |
-| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `sealed` | `promoted` |
-| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `sealed` | `promoted` |
-| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `sealed` | `promoted` |
+| `3.2.9` | `C33` | `C / 33` | `publicly-verified` | `complete` |
+| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `publicly-verified` | `complete` |
+| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `publicly-verified` | `complete` |
+| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `publicly-verified` | `complete` |
+| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `publicly-verified` | `complete` |
+| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `publicly-verified` | `complete` |
+| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `publicly-verified` | `complete` |
+| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `publicly-verified` | `complete` |
+| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `publicly-verified` | `complete` |
 
 ## Canonical execution programme
 
@@ -33,7 +33,7 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 | `T9-B` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |
 | `T9-C` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |
 | `T9-D` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |
-| `T9-E` MIR 3 archive and MIR 4 handoff | GitHub publication in progress; Mod Portal manual upload pending | Verify public bytes and exact-engine smokes, complete terminal indexes, then hand sealed baselines to MIR 4 |
+| `T9-E` MIR 3 archive and MIR 4 handoff | GitHub publication verified; Mod Portal manual upload pending | Upload and verify the same sealed bytes on Mod Portal, complete terminal indexes, then hand sealed baselines to MIR 4 |
 
 | Planned change | Package visible | Targets | Completion boundary |
 | --- | --- | --- | --- |
@@ -97,21 +97,21 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `promote-tag-publish-and-publicly-verify` for `3.2.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `3.2.9`
 - [ ] `archive-and-mir4-handoff` for `3.2.9`
-- [ ] `promote-tag-publish-and-publicly-verify` for `2.5.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `2.5.9`
 - [ ] `archive-and-mir4-handoff` for `2.5.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.9.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.9.9`
 - [ ] `archive-and-mir4-handoff` for `1.9.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.8.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.8.9`
 - [ ] `archive-and-mir4-handoff` for `1.8.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.7.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.7.9`
 - [ ] `archive-and-mir4-handoff` for `1.7.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.6.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.6.9`
 - [ ] `archive-and-mir4-handoff` for `1.6.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.5.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.5.9`
 - [ ] `archive-and-mir4-handoff` for `1.5.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.4.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.4.9`
 - [ ] `archive-and-mir4-handoff` for `1.4.9`
-- [ ] `tag-publish-and-publicly-verify` for `1.3.9`
+- [ ] `mod-portal-publish-and-publicly-verify` for `1.3.9`
 - [ ] `archive-and-mir4-handoff` for `1.3.9`

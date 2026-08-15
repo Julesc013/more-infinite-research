@@ -38,12 +38,14 @@
       "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
       "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
       "path": ".mir/releases/terminal/reviews/1.4.9.json",
-      "sha256": "20D6FD5D213AD1E370A94F48EF70E57BB1A428526D86D09353159B0E316A65C3"
+      "sha256": "20D6FD5D213AD1E370A94F48EF70E57BB1A428526D86D09353159B0E316A65C3",
+      "digest_policy": "utf8-lf"
     },
     "package_manifest": ".mir/releases/terminal/manifests/1.4.9-package.json",
     "release_manifest": ".mir/releases/terminal/manifests/1.4.9-release.json",
     "source_freeze": ".mir/releases/terminal/freezes/1.4.9.json",
-    "target_seal": ".mir/releases/terminal/seals/1.4.9.json"
+    "target_seal": ".mir/releases/terminal/seals/1.4.9.json",
+    "tag": {"kind":"annotated-tag","name":"1.4.9","commit":"8f75fa45d52a55650e74423a99f04a0252db429b","tag_object":"7b816e19a6007a6eb89f2519cc3722ab500c8ad4"}
   },
   "release": "1.4.9",
   "release_notes": "docs/releases/notes/release-notes-1.4.9.md",

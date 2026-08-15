@@ -392,7 +392,7 @@ function New-MIRCPTodoLines {
   $lines.Add("| ``T9-B`` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |")
   $lines.Add("| ``T9-C`` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |")
   $lines.Add("| ``T9-D`` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |")
-  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication in progress; Mod Portal manual upload pending | Verify public bytes and exact-engine smokes, complete terminal indexes, then hand sealed baselines to MIR 4 |")
+  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication verified; Mod Portal manual upload pending | Upload and verify the same sealed bytes on Mod Portal, complete terminal indexes, then hand sealed baselines to MIR 4 |")
   $lines.Add("")
   $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
   if ($plannedChanges.Count -gt 0) {
