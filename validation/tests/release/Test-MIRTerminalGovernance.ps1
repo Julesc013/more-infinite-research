@@ -31,8 +31,12 @@ foreach ($snippet in @(
   "terminal_release:",
   "terminal_candidate_sha:",
   "checks: write",
+  "statuses: write",
   "Test-MIR3TerminalPromotionCandidate.ps1",
   "name: 'terminal-promotion-verification'",
+  "github.rest.repos.createCommitStatus",
+  "context: 'terminal-promotion-verification'",
+  "state: passed ? 'success' : 'failure'",
   "head_sha: sha",
   "if (!passed) core.setFailed"
 )) {
