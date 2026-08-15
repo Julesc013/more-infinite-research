@@ -85,7 +85,7 @@ jobs:
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: 'verification-gate',
+              name: 'terminal-promotion-verification',
               head_sha: sha,
               status: 'completed',
               conclusion: passed ? 'success' : 'failure',
