@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProtectionRequiredContextApplicationReceiptV1",
+  "status": "applied-and-verified",
+  "repository": "Julesc013/more-infinite-research",
+  "amendment": ".mir/releases/terminal/MIR3-Terminal-Protection-RequiredContext-AmendmentV1.json",
+  "controller_commit": "92ba00191fc511af6aa9445c8aa267e97d1cc8e5",
+  "administrator": {"login":"Julesc013","actor_id":30209022,"repository_admin":true,"credential_source":"windows-keyring","machine_credentials_changed":false},
+  "application": [
+    {
+      "branch": "main",
+      "ruleset_id": 20833408,
+      "ruleset_name": "MIR3 terminal main integrity",
+      "updated_at": "2026-08-15T16:34:16.661+10:00",
+      "required_checks": [
+        {"context":"branch-policy","integration_id":15368},
+        {"context":"terminal-promotion-verification","integration_id":15368}
+      ]
+    },
+    {
+      "branch": "legacy",
+      "ruleset_id": 20833410,
+      "ruleset_name": "MIR3 terminal legacy integrity",
+      "updated_at": "2026-08-15T16:34:17.494+10:00",
+      "required_checks": [
+        {"context":"branch-policy","integration_id":15368},
+        {"context":"terminal-promotion-verification","integration_id":15368}
+      ]
+    }
+  ],
+  "live_invariants": {
+    "enforcement": "active",
+    "strict_required_status_checks_policy": true,
+    "required_check_count_per_branch": 2,
+    "integrity_bypass_actors_per_branch": 0,
+    "current_user_can_bypass": "never",
+    "deletion_protection": true,
+    "non_fast_forward_protection": true,
+    "promotion_actor_rulesets_unchanged": true,
+    "dev_rulesets_unchanged": true,
+    "frozen_candidate_bytes_unchanged": true,
+    "historical_check_evidence_unchanged": true
+  },
+  "candidate_verification": [
+    {
+      "release": "3.2.9",
+      "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+      "controller_run": 31869789498,
+      "controller_job": 94976536543,
+      "branch_policy_check_run": 94970176522,
+      "promotion_check_run": 94976570950,
+      "conclusion": "success"
+    },
+    {
+      "release": "2.5.9",
+      "candidate_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+      "controller_run": 31869790704,
+      "controller_job": 94976539035,
+      "branch_policy_check_run": 94970181467,
+      "promotion_check_run": 94976585698,
+      "conclusion": "success"
+    }
+  ],
+  "verified_at": "2026-08-15T16:35:10+10:00"
+}

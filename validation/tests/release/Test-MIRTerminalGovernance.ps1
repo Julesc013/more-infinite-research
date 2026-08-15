@@ -959,6 +959,8 @@ $devCheckNames = @("branch-policy", "verification-gate")
 $promotionCheckNames = @("branch-policy", "terminal-promotion-verification")
 $contextAmendmentPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-RequiredContext-AmendmentV1.json"
 $contextAmendment = Get-Content -Raw -LiteralPath $contextAmendmentPath | ConvertFrom-Json -Depth 100
+$contextApplicationPath = Join-Path $RepoRoot ([string]$contextAmendment.application_receipt)
+$contextApplication = Get-Content -Raw -LiteralPath $contextApplicationPath | ConvertFrom-Json -Depth 100
 if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     [string]$protection.status -ne "applied-and-verified" -or
     [string]$protection.application_receipt.status -ne "applied-and-verified" -or
@@ -988,7 +990,35 @@ if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     -not [bool]$contextAmendment.invariants.promotion_actor_restriction_unchanged -or
     -not [bool]$contextAmendment.invariants.dev_required_checks_unchanged -or
     -not [bool]$contextAmendment.invariants.frozen_candidate_bytes_unchanged -or
-    -not [bool]$contextAmendment.invariants.historical_check_evidence_unchanged) {
+    -not [bool]$contextAmendment.invariants.historical_check_evidence_unchanged -or
+    [string]$contextApplication.kind -ne "MIR3TerminalProtectionRequiredContextApplicationReceiptV1" -or
+    [string]$contextApplication.status -ne "applied-and-verified" -or
+    [string]$contextApplication.repository -ne [string]$contextAmendment.repository -or
+    [string]$contextApplication.controller_commit -ne "92ba00191fc511af6aa9445c8aa267e97d1cc8e5" -or
+    (@($contextApplication.application.ruleset_id) -join "|") -ne "20833408|20833410" -or
+    @($contextApplication.application | Where-Object {
+      [string]$_.ruleset_name -notmatch '^MIR3 terminal (main|legacy) integrity$' -or
+      (@($_.required_checks.context) -join "|") -ne ($promotionCheckNames -join "|") -or
+      @($_.required_checks | Where-Object { [int]$_.integration_id -ne 15368 }).Count -ne 0
+    }).Count -ne 0 -or
+    [string]$contextApplication.live_invariants.enforcement -ne "active" -or
+    -not [bool]$contextApplication.live_invariants.strict_required_status_checks_policy -or
+    [int]$contextApplication.live_invariants.required_check_count_per_branch -ne 2 -or
+    [int]$contextApplication.live_invariants.integrity_bypass_actors_per_branch -ne 0 -or
+    [string]$contextApplication.live_invariants.current_user_can_bypass -ne "never" -or
+    -not [bool]$contextApplication.live_invariants.deletion_protection -or
+    -not [bool]$contextApplication.live_invariants.non_fast_forward_protection -or
+    -not [bool]$contextApplication.live_invariants.promotion_actor_rulesets_unchanged -or
+    -not [bool]$contextApplication.live_invariants.dev_rulesets_unchanged -or
+    -not [bool]$contextApplication.live_invariants.frozen_candidate_bytes_unchanged -or
+    -not [bool]$contextApplication.live_invariants.historical_check_evidence_unchanged -or
+    @($contextApplication.candidate_verification).Count -ne 2 -or
+    @($contextApplication.candidate_verification | Where-Object {
+      [string]$_.release -notin @("3.2.9", "2.5.9") -or
+      [string]$_.conclusion -ne "success" -or
+      [long]$_.controller_run -le 0 -or [long]$_.controller_job -le 0 -or
+      [long]$_.branch_policy_check_run -le 0 -or [long]$_.promotion_check_run -le 0
+    }).Count -ne 0) {
   throw "Terminal protection handoff is incomplete, overclaims application, or contradicts promotion topology."
 }
 foreach ($field in @("applied_at", "verified_at")) {
