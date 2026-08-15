@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-terminal-normalized-snapshot.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-terminal-normalized-snapshot.schema.json",
+  "title": "MIR 4 terminal normalized import snapshot",
+  "type": "object",
+  "required": ["schema", "kind", "status", "semantic_authority", "release", "target", "successor_target", "source_identity", "distribution", "engine", "predecessors", "foundation", "inventories", "capability_omissions", "compatibility_import", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4TerminalNormalizedSnapshotV1"},
+    "status": {"const": "importable-pre-eol-public-custody-pending"},
+    "semantic_authority": {"const": false},
+    "release": {"type": "string"},
+    "target": {"type": "string"},
+    "successor_target": {"type": "string"},
+    "source_identity": {"type": "object"},
+    "distribution": {"type": "object"},
+    "engine": {"type": "object"},
+    "predecessors": {"type": "array", "minItems": 2, "maxItems": 2},
+    "foundation": {"type": "object"},
+    "inventories": {"type": "object"},
+    "capability_omissions": {"type": "array"},
+    "compatibility_import": {"type": "object"},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": false
+}

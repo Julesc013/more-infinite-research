@@ -133,6 +133,48 @@
       "tags": []
     },
     {
+      "pattern": ".mir/releases/waves/mir4-r0/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/baselines/*.9/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/closures/*.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/*MIR*TerminalBaseline*.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir4-*.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Evidence.ps1",
       "groups": [],
       "scenarios": [],

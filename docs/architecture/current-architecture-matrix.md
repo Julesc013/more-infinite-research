@@ -1,18 +1,19 @@
 ---
-title: "Current MIR Compiler Architecture Matrix"
-status: current
-applies_to: "3.2.5-dev"
+title: "Frozen MIR 3 Compiler Architecture Matrix"
+status: archived
+applies_to: "MIR3 terminal family"
 audience: maintainer
-doc_type: reference
+doc_type: archive
 owner: mir-maintainers
 last_reviewed: 2026-08-04
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/architecture/mir4-r0-bootstrap.md
 ---
 
-# Current MIR Compiler Architecture Matrix
+# Frozen MIR 3 Compiler Architecture Matrix
 
-This matrix is the current operational map for the MIR 3.2.5 compiler and release-engineering boundary. Historical release reports explain how individual layers arrived here; they do not override these ownership boundaries.
+This matrix is the frozen operational map for the MIR 3 compiler and release-engineering boundary. It remains authoritative for reconstructing the terminal family, but it is no longer the current successor-programme view. MIR 4 R0 imports these proven boundaries and migrates one owner at a time.
 
 | Concern | Canonical authority | Consumers | Mutation authority | Required parity or evidence |
 | --- | --- | --- | --- | --- |

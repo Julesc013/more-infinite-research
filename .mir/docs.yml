@@ -533,18 +533,13 @@ docs:
     checkpoint_source_commit: c3a56e88fa15da7c12db3b0d11c3d4e732935746
     checkpoint_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
   - path: docs/architecture/current-architecture-matrix.md
-    title: "Current MIR Compiler Architecture Matrix"
-    status: current
+    title: "Frozen MIR 3 Compiler Architecture Matrix"
+    status: archived
     audience: maintainer
-    doc_type: reference
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - current-compiler-architecture
-      - canonical-recipe-risk-and-provider-decisions
-      - technology-candidate-promotion-lifecycle
-      - trusted-immutable-compiler-records
-      - research-cost-transition-authority
-      - planned-release-versus-candidate-authority
+    source_of_truth_for: []
+    superseded_by: docs/architecture/mir4-r0-bootstrap.md
   - path: docs/architecture/3.3-2.6-semantic-platform-roadmap.md
     title: "MIR 3.3 And 2.6 Semantic Platform Roadmap"
     status: historical-checkpoint
@@ -2514,6 +2509,56 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - MIR4-Offline-Release-Authority
+  - path: docs/architecture/decisions/0001-mir4-version-authority.md
+    title: "ADR 0001: MIR 4 Version Authority"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-version-authority
+  - path: docs/architecture/decisions/README.md
+    title: "Architecture Decision Records"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - architecture-decision-record-index
+  - path: docs/architecture/decisions/0002-mir4-repository-layout.md
+    title: "ADR 0002: MIR 4 Repository Layout"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-repository-layout
+  - path: docs/architecture/decisions/0003-mir4-terminal-baseline-import.md
+    title: "ADR 0003: MIR 4 Terminal Baseline Import"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-terminal-baseline-import
+  - path: docs/architecture/decisions/0004-mir3-eol-mir4-entry-gate.md
+    title: "ADR 0004: MIR 3 EOL and MIR 4 Entry Gate"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir3-eol-mir4-entry-gate-reconciliation
+  - path: docs/architecture/mir4-r0-bootstrap.md
+    title: "MIR 4 R0 Bootstrap"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-r0-bootstrap-architecture
+      - mir4-r0-current-status
+      - mir4-r0-executable-queue
   - path: docs/releases/mir-3-terminal-dot-9-programme.md
     title: "MIR 3 Terminal .9 Programme"
     status: current

@@ -43,3 +43,11 @@ Direct unmodified Cubium 1.0.28 proof remains bounded by archive acquisition and
 ## Publication and MIR 4 handoff
 
 Promote only `main` to 3.2.9 and `legacy` to 2.5.9. The seven lower releases remain tag-only. Publish the exact ZIPs whose hashes appear in `SHA256SUMS-MIR-3.txt`. MIR 4 begins from these sealed baselines through explicit target profiles and deterministic lowering; it must not reconstruct MIR 3 authority from mutable branch history.
+
+## Live closeout state
+
+The 2026-08-16 Mod Portal API observation found exact SHA-1 parity for 3.2.9 and 2.5.9. Releases 1.9.9 through 1.3.9 were not uploaded, and no authenticated Mod Portal redownload was complete. MIR 3 product development is closed, but archival EOL therefore remains blocked even though all nine GitHub releases are published and verified.
+
+MIR 4 R0 is active on the package-excluded successor plane. All nine final `.9` logical baseline views and normalized imports are deterministically capture-ready, with final sealing still conditional on Mod Portal custody. `tools/mir.ps1 mir4 check` reports `READY_FOR_MIR4_R0_IMPLEMENTATION`; the next local task is the unpublished Factorio 2.1 emergency-lane proof.
+
+The append-only governance reconciliation requires a locally sealed behavior-equivalent 4.x distribution and idempotent publication dry run before EOL, then permits public 4.x replication only after the EOL seal. R0 may not move package-visible source, flip semantic authority, create a public 4.x package or tag, or delete MIR 3 reconstruction machinery.

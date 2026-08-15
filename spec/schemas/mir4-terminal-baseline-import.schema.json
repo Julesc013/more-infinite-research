@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-terminal-baseline-import.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-terminal-baseline-import.schema.json",
+  "title": "MIR 4 terminal baseline import",
+  "type": "object",
+  "required": ["schema", "kind", "status", "package_visible", "semantic_authority", "source_generation", "distribution_generation", "mir3_eol_status", "input_root_sha256", "inputs", "releases", "guarantees", "next_executable_task", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4TerminalBaselineImportV1"},
+    "status": {"const": "ready-for-r0-implementation-public-custody-pending"},
+    "package_visible": {"const": false},
+    "semantic_authority": {"const": false},
+    "source_generation": {"const": "MIR4-R0-pre-release"},
+    "distribution_generation": {"type": "null"},
+    "mir3_eol_status": {"const": "pending"},
+    "input_root_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "inputs": {"type": "array", "minItems": 40, "items": {"$ref": "#/$defs/authority"}},
+    "releases": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"$ref": "#/$defs/release"}},
+    "guarantees": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+    "next_executable_task": {"const": "M4-003-local-offline-emergency-lane"},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "authority": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}},
+      "additionalProperties": false
+    },
+    "release": {
+      "type": "object",
+      "required": ["release", "target", "successor_target", "baseline_manifest", "normalized_snapshot", "release_closure", "distribution", "import_disposition", "snapshot"],
+      "properties": {
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+        "target": {"type": "string", "minLength": 1},
+        "successor_target": {"type": "string", "minLength": 1},
+        "baseline_manifest": {"type": "object"},
+        "normalized_snapshot": {"type": "object"},
+        "release_closure": {"type": "object"},
+        "distribution": {"type": "object"},
+        "import_disposition": {"const": "normalized-shadow-input-no-semantic-authority-before-eol"},
+        "snapshot": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
+  }
+}
