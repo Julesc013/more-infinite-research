@@ -533,6 +533,11 @@ function Update-MIRCPViews {
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.branch_status) -Value $branchStatus -RepoRoot $repo -Check:$Check
 
+  $terminalProgrammeStatus = [string]$pointer.active_programme.status
+  $publicationAdmitted = $terminalProgrammeStatus -in @(
+    "ready-for-local-tagging",
+    "github-published-and-verified-mod-portal-pending"
+  )
   $publication = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-terminal-family-publication-checklist-v1"
@@ -548,8 +553,10 @@ function Update-MIRCPViews {
       }
     })
     family_readiness_seal_present = (Test-Path -LiteralPath (Join-Path $repo ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json") -PathType Leaf)
-    first_public_tag_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
-    publication_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
+    first_public_tag_admitted = $publicationAdmitted
+    publication_admitted = $publicationAdmitted
+    github_publication_complete = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
+    mod_portal_publication_pending = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check
 

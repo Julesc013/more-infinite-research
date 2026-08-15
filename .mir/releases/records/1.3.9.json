@@ -33,6 +33,7 @@
     "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
     "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/1.3.9.json",
     "manual_acceptance": {
       "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
       "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
@@ -47,7 +48,7 @@
   "release": "1.3.9",
   "release_notes": "docs/releases/notes/release-notes-1.3.9.md",
   "remaining_obligations": [
-    "tag-publish-and-publicly-verify",
+    "mod-portal-publish-and-publicly-verify",
     "archive-and-mir4-handoff"
   ],
   "schema": 1,
@@ -57,7 +58,7 @@
     "release": "1.3.5",
     "tag": "1.3.5"
   },
-  "state": "sealed",
+  "state": "publicly-verified",
   "target": "0.13",
-  "updated_at": "2026-08-15T14:27:50+10:00"
+  "updated_at": "2026-08-15T17:21:05+10:00"
 }
