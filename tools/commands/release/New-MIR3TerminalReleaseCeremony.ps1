@@ -27,7 +27,13 @@ function Write-JsonHash([string]$Relative, [Collections.IDictionary]$Value) {
   Write-MIRCPJson -Path $Relative -Value $Value -RepoRoot $repo
 }
 
+function Get-AuthorityTextSha([string]$Relative) {
+  # Ceremony-owned text bindings must survive Windows checkout EOL conversion.
+  return Get-MIRCPPortableTextSha256 -Path (Join-Path $repo $Relative)
+}
+
 function Get-RawSha([string]$Relative) {
+  # Pre-existing frozen evidence retains its already-governed byte identity.
   return (Get-FileHash -LiteralPath (Join-Path $repo $Relative) -Algorithm SHA256).Hash
 }
 
@@ -123,7 +129,7 @@ if ($Check) {
   $acceptance = Read-JsonHash $acceptanceRelative
   Assert-Schema $acceptanceRelative "spec/schemas/mir3-terminal-maintainer-acceptance.schema.json"
   if ((Get-RecordHash $acceptance @("record_sha256")) -ne $acceptance.record_sha256) { throw "Maintainer acceptance record digest is invalid." }
-  $acceptanceSha = Get-RawSha $acceptanceRelative
+  $acceptanceSha = Get-AuthorityTextSha $acceptanceRelative
   foreach ($row in $allocation.allocations) {
     $release = [string]$row.release
     $zip = Join-Path $repo "dist/more-infinite-research_$release.zip"
@@ -138,17 +144,22 @@ if ($Check) {
     $review = Read-JsonHash $reviewRelative
     Assert-Schema $reviewRelative "spec/schemas/mir3-terminal-qualification-review.schema.json"
     if ((Get-RecordHash $review @("record_sha256")) -ne $review.record_sha256 -or
-        $review.qualification.sha256 -ne (Get-RawSha $qualificationRelative) -or
+        $review.qualification.sha256 -ne (Get-AuthorityTextSha $qualificationRelative) -or
         $review.acceptance.sha256 -ne $acceptanceSha) { throw "Qualification review overlay is invalid: $release" }
     $sealRelative = ".mir/releases/terminal/seals/$release.json"
     $seal = Read-JsonHash $sealRelative
     Assert-Schema $sealRelative "spec/schemas/mir3-terminal-target-seal.schema.json"
     if ((Get-RecordHash $seal @("seal_material_sha256", "record_sha256")) -ne $seal.seal_material_sha256 -or
         (Get-RecordHash $seal @("record_sha256")) -ne $seal.record_sha256 -or
-        $seal.qualification_sha256 -ne (Get-RawSha $qualificationRelative) -or
-        $seal.review_sha256 -ne (Get-RawSha $reviewRelative)) { throw "Target seal is invalid: $release" }
+        $seal.qualification_sha256 -ne (Get-AuthorityTextSha $qualificationRelative) -or
+        $seal.review_sha256 -ne (Get-AuthorityTextSha $reviewRelative)) { throw "Target seal is invalid: $release" }
     foreach ($binding in @($seal.package_manifest, $seal.release_manifest, $seal.baseline_bundle, $seal.fixed_point_receipt, $seal.candidate_settings_qualification)) {
-      if ((Get-RawSha ([string]$binding.path)) -ne [string]$binding.sha256) { throw "Target seal binding drifted: $release/$($binding.path)" }
+      $bindingSha = if ([string]$binding.path -match '/manifests/') {
+        Get-AuthorityTextSha ([string]$binding.path)
+      } else {
+        Get-RawSha ([string]$binding.path)
+      }
+      if ($bindingSha -ne [string]$binding.sha256) { throw "Target seal binding drifted: $release/$($binding.path)" }
     }
     Assert-Schema ".mir/releases/terminal/manifests/$release-package.json" "spec/schemas/mir3-terminal-package-manifest.schema.json"
     Assert-Schema ".mir/releases/terminal/manifests/$release-release.json" "spec/schemas/mir3-terminal-release-manifest.schema.json"
@@ -157,7 +168,7 @@ if ($Check) {
   $defectReconciliation = Read-JsonHash $defectReconciliationRelative
   Assert-Schema $defectReconciliationRelative "spec/schemas/mir3-final-defect-qualification-reconciliation.schema.json"
   if ((Get-RecordHash $defectReconciliation @("record_sha256")) -ne $defectReconciliation.record_sha256 -or
-      (Get-RawSha ([string]$defectReconciliation.fixed_point_defect_index.path)) -ne [string]$defectReconciliation.fixed_point_defect_index.sha256) {
+      (Get-AuthorityTextSha ([string]$defectReconciliation.fixed_point_defect_index.path)) -ne [string]$defectReconciliation.fixed_point_defect_index.sha256) {
     throw "Final defect qualification reconciliation is invalid."
   }
   $ready = Read-JsonHash $familyRelative
@@ -165,9 +176,9 @@ if ($Check) {
   if ((Get-RecordHash $ready @("seal_material_sha256", "record_sha256")) -ne $ready.seal_material_sha256 -or
       (Get-RecordHash $ready @("record_sha256")) -ne $ready.record_sha256) { throw "Family-readiness digest is invalid." }
   foreach ($binding in $ready.target_seals) {
-    if ((Get-RawSha ([string]$binding.path)) -ne [string]$binding.sha256) { throw "Family target-seal binding drifted: $($binding.release)" }
+    if ((Get-AuthorityTextSha ([string]$binding.path)) -ne [string]$binding.sha256) { throw "Family target-seal binding drifted: $($binding.release)" }
   }
-  if ((Get-RawSha ([string]$ready.defect_qualification_reconciliation.path)) -ne [string]$ready.defect_qualification_reconciliation.sha256) {
+  if ((Get-AuthorityTextSha ([string]$ready.defect_qualification_reconciliation.path)) -ne [string]$ready.defect_qualification_reconciliation.sha256) {
     throw "Family defect-qualification reconciliation binding drifted."
   }
   Write-Host "[ok] MIR 3 terminal maintainer acceptance, nine target seals, and family readiness are valid"
@@ -220,7 +231,7 @@ $acceptance = [ordered]@{
 }
 $acceptance.record_sha256 = Get-RecordHash $acceptance @("record_sha256")
 Write-JsonHash $acceptanceRelative $acceptance
-$acceptanceSha = Get-RawSha $acceptanceRelative
+$acceptanceSha = Get-AuthorityTextSha $acceptanceRelative
 
 $checksumLines = @()
 foreach ($row in $allocation.allocations) {
@@ -245,7 +256,7 @@ foreach ($row in $allocation.allocations) {
     release = $release
     candidate_id = [string]$row.assigned_id
     archive_sha256 = [string]$row.archive_sha256
-    qualification = [ordered]@{path=$qualificationRelative;sha256=(Get-RawSha $qualificationRelative);status="passed-automated-awaiting-human-review";mutated=$false}
+    qualification = [ordered]@{path=$qualificationRelative;sha256=(Get-AuthorityTextSha $qualificationRelative);status="passed-automated-awaiting-human-review";mutated=$false}
     acceptance = [ordered]@{path=$acceptanceRelative;sha256=$acceptanceSha;reviewer=$Reviewer;decision="approved"}
     scope = "maintainer-inspected-exact-frozen-distribution; automated-record-covers-engine-settings-compatibility-performance-and-upgrade-surfaces"
     status = "accepted-exact-package-inspection"
@@ -284,7 +295,7 @@ foreach ($row in $allocation.allocations) {
     bytes = [long]$row.bytes
     entries = [int]$row.entries
     qualification = [ordered]@{path=$qualificationRelative;status="passed-automated-awaiting-human-review"}
-    review = [ordered]@{path=$reviewRelative;sha256=(Get-RawSha $reviewRelative);status="accepted-exact-package-inspection"}
+    review = [ordered]@{path=$reviewRelative;sha256=(Get-AuthorityTextSha $reviewRelative);status="accepted-exact-package-inspection"}
     seal = [ordered]@{path=".mir/releases/terminal/seals/$release.json";status="created-after-manifest-root"}
     tag = [ordered]@{name=$release;target_commit=[string]$row.candidate_commit;status="authorized-pending-creation"}
     github_release_body = ".mir/releases/terminal/release-bodies/$release.md"
@@ -322,7 +333,7 @@ $body
   $record = Read-JsonHash $recordRelative
   $record.state = "sealed"
   $record.release_notes = "docs/releases/notes/release-notes-$release.md"
-  $record.proofs.manual_acceptance = [ordered]@{path=$reviewRelative;sha256=(Get-RawSha $reviewRelative);family_acceptance_path=$acceptanceRelative;family_acceptance_sha256=$acceptanceSha}
+  $record.proofs.manual_acceptance = [ordered]@{path=$reviewRelative;sha256=(Get-AuthorityTextSha $reviewRelative);family_acceptance_path=$acceptanceRelative;family_acceptance_sha256=$acceptanceSha}
   $record.proofs.package_manifest = $packageManifestRelative
   $record.proofs.release_manifest = $releaseManifestRelative
   $record.proofs.target_seal = ".mir/releases/terminal/seals/$release.json"
@@ -364,13 +375,13 @@ foreach ($row in $allocation.allocations) {
     engine = $meta.freeze.engine
     target_profile = [ordered]@{id=[string]$meta.freeze.profile;adapter=[string]$meta.freeze.adapter;freeze_path=".mir/releases/terminal/freezes/$release.json"}
     qualification = [ordered]@{path=$qualificationRelative;status="passed-automated-awaiting-human-review";review_resolution=".mir/releases/terminal/reviews/$release.json"}
-    qualification_sha256 = Get-RawSha $qualificationRelative
+    qualification_sha256 = Get-AuthorityTextSha $qualificationRelative
     candidate_settings_qualification = [ordered]@{path=$settingsRelative;sha256=$settingsSha;status="passed"}
     upgrade_rows = @($meta.freeze.upgrade_rows | ForEach-Object { [ordered]@{id=[string]$_;status="passed"} })
     review = [ordered]@{path=".mir/releases/terminal/reviews/$release.json";reviewer=$Reviewer;decision="approved";family_acceptance=$acceptanceRelative}
-    review_sha256 = Get-RawSha ".mir/releases/terminal/reviews/$release.json"
-    package_manifest = [ordered]@{path=$packageManifestRelative;sha256=(Get-RawSha $packageManifestRelative)}
-    release_manifest = [ordered]@{path=$releaseManifestRelative;sha256=(Get-RawSha $releaseManifestRelative)}
+    review_sha256 = Get-AuthorityTextSha ".mir/releases/terminal/reviews/$release.json"
+    package_manifest = [ordered]@{path=$packageManifestRelative;sha256=(Get-AuthorityTextSha $packageManifestRelative)}
+    release_manifest = [ordered]@{path=$releaseManifestRelative;sha256=(Get-AuthorityTextSha $releaseManifestRelative)}
     baseline_bundle = [ordered]@{path=$baselineRelative;sha256=(Get-RawSha $baselineRelative);root_sha256=[string]$baseline.baseline_root_sha256}
     fixed_point_receipt = [ordered]@{path=$fixedPointRelative;sha256=$fixedPointSha;status="accepted-all-nine"}
     tag_authority = [ordered]@{name=$release;target_commit=[string]$row.candidate_commit;immutable=$true;update_or_delete=$false}
@@ -379,7 +390,7 @@ foreach ($row in $allocation.allocations) {
   $seal.seal_material_sha256 = Get-RecordHash $seal @("seal_material_sha256", "record_sha256")
   $seal.record_sha256 = Get-RecordHash $seal @("record_sha256")
   Write-JsonHash $sealRelative $seal
-  $sealRows += [ordered]@{release=$release;path=$sealRelative;sha256=(Get-RawSha $sealRelative);record_sha256=[string]$seal.record_sha256}
+  $sealRows += [ordered]@{release=$release;path=$sealRelative;sha256=(Get-AuthorityTextSha $sealRelative);record_sha256=[string]$seal.record_sha256}
 }
 
 $defectReconciliationRelative = ".mir/releases/terminal/MIR3FinalDefectQualificationReconciliationV1.json"
@@ -391,7 +402,7 @@ $defectReconciliation = [ordered]@{
   schema = 1
   kind = "MIR3FinalDefectQualificationReconciliationV1"
   recorded_at = $AcceptedAt
-  fixed_point_defect_index = [ordered]@{path=$defectsRelative;sha256=(Get-RawSha $defectsRelative);status=[string]$defects.status;mutated=$false}
+  fixed_point_defect_index = [ordered]@{path=$defectsRelative;sha256=(Get-AuthorityTextSha $defectsRelative);status=[string]$defects.status;mutated=$false}
   candidate_allocation = [ordered]@{path=".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json";sha256=(Get-RawSha ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json")}
   target_seals = $sealRows
   completion_updates = $completionUpdates
@@ -401,8 +412,8 @@ $defectReconciliation = [ordered]@{
 $defectReconciliation.record_sha256 = Get-RecordHash $defectReconciliation @("record_sha256")
 Write-JsonHash $defectReconciliationRelative $defectReconciliation
 
-$bodyRows = @($family | ForEach-Object { $path=".mir/releases/terminal/release-bodies/$_.md"; [ordered]@{release=$_;path=$path;sha256=(Get-RawSha $path)} })
-$portalRows = @($family | ForEach-Object { $path=".mir/releases/terminal/mod-portal-descriptions/$_.md"; [ordered]@{release=$_;path=$path;sha256=(Get-RawSha $path)} })
+$bodyRows = @($family | ForEach-Object { $path=".mir/releases/terminal/release-bodies/$_.md"; [ordered]@{release=$_;path=$path;sha256=(Get-AuthorityTextSha $path)} })
+$portalRows = @($family | ForEach-Object { $path=".mir/releases/terminal/mod-portal-descriptions/$_.md"; [ordered]@{release=$_;path=$path;sha256=(Get-AuthorityTextSha $path)} })
 $sealedArchives = @($allocation.allocations | ForEach-Object { [ordered]@{release=[string]$_.release;candidate_id=[string]$_.assigned_id;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;bytes=[long]$_.bytes;entries=[int]$_.entries} })
 $ready = [ordered]@{
   schema = 1
@@ -413,11 +424,11 @@ $ready = [ordered]@{
   fixed_point_receipt = [ordered]@{path=$fixedPointRelative;sha256=$fixedPointSha;status="accepted-all-nine"}
   sealed_archives = $sealedArchives
   unresolved_release_blockers = 0
-  defect_index = [ordered]@{path=$defectsRelative;sha256=(Get-RawSha $defectsRelative)}
-  defect_qualification_reconciliation = [ordered]@{path=$defectReconciliationRelative;sha256=(Get-RawSha $defectReconciliationRelative);status="final-candidates-qualified-and-sealed"}
+  defect_index = [ordered]@{path=$defectsRelative;sha256=(Get-AuthorityTextSha $defectsRelative)}
+  defect_qualification_reconciliation = [ordered]@{path=$defectReconciliationRelative;sha256=(Get-AuthorityTextSha $defectReconciliationRelative);status="final-candidates-qualified-and-sealed"}
   release_bodies = $bodyRows
   mod_portal_descriptions = $portalRows
-  checksum_file = [ordered]@{path="docs/releases/SHA256SUMS-MIR-3.txt";sha256=(Get-RawSha "docs/releases/SHA256SUMS-MIR-3.txt")}
+  checksum_file = [ordered]@{path="docs/releases/SHA256SUMS-MIR-3.txt";sha256=(Get-AuthorityTextSha "docs/releases/SHA256SUMS-MIR-3.txt")}
   branch_promotion_preflight = [ordered]@{
     main = [ordered]@{from="391684ffe5822dbadc0b6644d22fd9640ee0ffa8";to="a60230a0695d2dd8fd1e727744614e746cda0bd8";mode="governed-fast-forward";status="ready"}
     legacy = [ordered]@{from="27877275854eb131efeb42672d3676c9c513c85e";to="89719eb8ea5c938b6a0e9d816e6324d4d59b87bb";mode="governed-fast-forward";status="ready"}
