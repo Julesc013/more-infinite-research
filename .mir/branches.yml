@@ -24,6 +24,7 @@ remote_topology:
     - legacy is the published Factorio 2.0 maintenance line at immutable tag MIR 2.5.5 and advances only through governed 2.5.9 promotion
     - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
     - main and dev must not be made identical to Factorio 2.0 target branches
+    - terminal main and legacy promotion requires the exact candidate SHA to pass the current package-excluded promotion controller, which attaches the required GitHub Actions verification-gate context only after allocation, archive, acceptance, seal, family-readiness, remote-ref, and fast-forward checks pass
 
 branches:
   main:
