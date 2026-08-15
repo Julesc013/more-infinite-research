@@ -73,4 +73,3 @@ jobs:
               }
             });
             if (!passed) core.setFailed('Terminal promotion verification did not pass.');
-
