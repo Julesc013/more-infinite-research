@@ -276,6 +276,33 @@ function Get-MIRAssuranceInputFingerprint {
         "spec/schemas/upgrade-matrix.schema.json"
       )
     }
+    "mir4-bootstrap-governed-output" {
+      $governedRoot = Join-Path $repo "build/mir4/emergency-lane"
+      $rootItem = if (Test-Path -LiteralPath $governedRoot) { Get-Item -LiteralPath $governedRoot -Force } else { $null }
+      $isDirectory = $null -ne $rootItem -and $rootItem.PSIsContainer
+      $isReparse = $null -ne $rootItem -and (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
+      $state = if ($null -eq $rootItem) { "missing" } elseif (-not $isDirectory) { "invalid-file" } `
+        elseif ($isReparse) { "invalid-reparse-directory" } else { "directory" }
+      $files = if ($isDirectory -and -not $isReparse) {
+        @(Get-ChildItem -LiteralPath $governedRoot -Recurse -File -Force | ForEach-Object {
+          Get-MIRAssuranceRepoRelativePath -Path $_.FullName
+        })
+      } elseif ($null -ne $rootItem -and -not $isDirectory) {
+        @(Get-MIRAssuranceRepoRelativePath -Path $rootItem.FullName)
+      } else { @() }
+      return [ordered]@{
+        kind="mir4-bootstrap-governed-output"
+        state=$state
+        file_count=$files.Count
+        sha256=$(if ($files.Count -gt 0) {
+          Get-MIRAssuranceTreeHash -Paths $files
+        } elseif ($isDirectory -and -not $isReparse) {
+          Get-MIRAssuranceTextHash -Text "EMPTY:mir4-bootstrap-governed-output"
+        } else {
+          Get-MIRAssuranceTextHash -Text "$($state.ToUpperInvariant()):mir4-bootstrap-governed-output"
+        })
+      }
+    }
     "candidate-seal" {
       if ($Context.seal) { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.seal -MissingLabel "candidate-seal" }
       return Get-MIRAssurancePatternFingerprint -Patterns @(".mir/evidence/candidate-seals/**")

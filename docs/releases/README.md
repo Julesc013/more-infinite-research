@@ -1,36 +1,36 @@
 ---
 title: "Releases"
 status: current
-applies_to: "MIR 3 terminal release train"
+applies_to: "MIR 3 terminal release train and MIR 4 bootstrap"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
 ---
 
 # Releases
 
-The MIR 3 `.5` wave is published and immutable. The single active planning authority is the [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md). It routes every later MIR 3 correction to the matching `.9` line, prohibits `.6` through `.8`, and hands the completed programme to MIR 4.
+The MIR 3 terminal `.9` family is sealed, GitHub-published, and verified. The [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md) remains the custody authority while Mod Portal upload/redownload evidence and EOL closure are completed. It routes every later MIR 3 correction to the matching `.9` line, prohibits `.6` through `.8`, and hands the completed programme to MIR 4.
 
 Machine-readable release authority lives in `.mir/releases/records/`, with current roles in `.mir/releases/records/current.json` and the wave decision in `.mir/releases/waves/MIR3-Terminal-ChangeSet.json`. Generated dashboards and `todo.md` are views, not independent release state.
 
-## Current published wave
+## Current terminal wave
 
-| Factorio target | Published release | Next planned release | State |
+| Factorio target | Terminal release | GitHub custody | Mod Portal custody |
 | --- | --- | --- | --- |
-| `2.1` | [`3.2.5`](notes/release-notes-3.2.5.md) | [`3.2.9`](notes/release-notes-3.2.9.md) | Publicly verified; protected qualification and seal reconciliation remain post-publication debt |
-| `2.0` | [`2.5.5`](notes/release-notes-2.5.5.md) | `2.5.9` | Publicly verified; protected qualification and seal reconciliation remain post-publication debt |
-| `1.1.110` | [`1.9.5`](notes/release-notes-1.9.5.md) | `1.9.9` | Publicly verified |
-| `1.0.0` only | [`1.8.5`](notes/release-notes-1.8.5.md) | `1.8.9` | Publicly verified; no Factorio 0.18 claim |
-| `0.17.79` | [`1.7.5`](notes/release-notes-1.7.5.md) | `1.7.9` | Publicly verified |
-| `0.16.51` | [`1.6.5`](notes/release-notes-1.6.5.md) | `1.6.9` | Publicly verified |
-| `0.15.40` | [`1.5.5`](notes/release-notes-1.5.5.md) | `1.5.9` | Publicly verified |
-| `0.14.23` | [`1.4.5`](notes/release-notes-1.4.5.md) | `1.4.9` | Publicly verified |
-| `0.13.20` | [`1.3.5`](notes/release-notes-1.3.5.md) | `1.3.9` | Publicly verified |
+| `2.1` | [`3.2.9`](notes/release-notes-3.2.9.md) | Published and redownload-verified | Visible; authenticated redownload still required for EOL |
+| `2.0` | [`2.5.9`](notes/release-notes-2.5.9.md) | Published and redownload-verified | Visible; authenticated redownload still required for EOL |
+| `1.1.110` | [`1.9.9`](notes/release-notes-1.9.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
+| `1.0.0` only | [`1.8.9`](notes/release-notes-1.8.9.md) | Published and redownload-verified | Upload and authenticated redownload pending; no Factorio 0.18 claim |
+| `0.17.79` | [`1.7.9`](notes/release-notes-1.7.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
+| `0.16.51` | [`1.6.9`](notes/release-notes-1.6.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
+| `0.15.40` | [`1.5.9`](notes/release-notes-1.5.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
+| `0.14.23` | [`1.4.9`](notes/release-notes-1.4.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
+| `0.13.20` | [`1.3.9`](notes/release-notes-1.3.9.md) | Published and redownload-verified | Upload and authenticated redownload pending |
 
-The `.5` publication exceptions remain release-specific. They do not claim normal protected qualification, do not create protected seals, and do not weaken the normal `.9` gates.
+The historical `.5` publication exceptions remain release-specific. They do not weaken the terminal `.9` gates or authorize MIR 4 publication. The live R0 dashboard is authoritative for the remaining custody and EOL blockers.
 
 ## Current release documents
 
@@ -40,6 +40,7 @@ The `.5` publication exceptions remain release-specific. They do not claim norma
 - [Current Mod Portal page](mod-portal-page.md)
 - [Release-note index](notes/README.md)
 - [MIR 4 offline release authority](../architecture/mir4-offline-release-authority.md)
+- [MIR 4 bootstrap local beta plan](mir4-bootstrap-local-beta-plan.md)
 
 ## Historical records
 

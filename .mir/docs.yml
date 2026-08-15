@@ -534,12 +534,15 @@ docs:
     checkpoint_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
   - path: docs/architecture/current-architecture-matrix.md
     title: "Frozen MIR 3 Compiler Architecture Matrix"
-    status: archived
+    status: current
     audience: maintainer
-    doc_type: archive
+    doc_type: reference
     owner: mir-maintainers
-    source_of_truth_for: []
-    superseded_by: docs/architecture/mir4-r0-bootstrap.md
+    source_of_truth_for:
+      - mir3-terminal-compiler-boundaries
+      - mir3-terminal-mutation-authorities
+      - mir4-bootstrap-parity-baseline
+    superseded_by: []
   - path: docs/architecture/3.3-2.6-semantic-platform-roadmap.md
     title: "MIR 3.3 And 2.6 Semantic Platform Roadmap"
     status: historical-checkpoint
@@ -2517,6 +2520,8 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-version-authority
+      - mir4-distribution-target-registry
+      - mir4-distribution-version-codec
   - path: docs/architecture/decisions/README.md
     title: "Architecture Decision Records"
     status: current
@@ -2549,6 +2554,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir3-eol-mir4-entry-gate-reconciliation
+  - path: docs/architecture/decisions/0005-mir4-local-beta-candidate-boundary.md
+    title: "ADR 0005: MIR 4 Local Beta Candidate Boundary"
+    status: current
+    audience: release-manager
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-bootstrap-local-candidate-boundary
+      - mir4-bootstrap-canonical-json-v1
+      - mir4-bootstrap-seal-restoration-order
   - path: docs/architecture/mir4-r0-bootstrap.md
     title: "MIR 4 R0 Bootstrap"
     status: current
@@ -2557,6 +2572,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-r0-bootstrap-architecture
+      - mir4-r0-bootstrap-root-set
       - mir4-r0-current-status
       - mir4-r0-executable-queue
   - path: docs/releases/mir-3-terminal-dot-9-programme.md
@@ -2574,6 +2590,15 @@ docs:
       - mir-3-final-defect-index
       - mir-3-terminal-product-admission
       - mir-3-mod-portal-discussion-reconciliation
+  - path: docs/releases/mir4-bootstrap-local-beta-plan.md
+    title: "MIR 4 Bootstrap Local Beta Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-bootstrap-local-candidate-execution-plan
+      - mir4-bootstrap-local-candidate-status
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current

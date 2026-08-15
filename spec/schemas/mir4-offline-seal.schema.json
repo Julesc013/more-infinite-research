@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-offline-seal.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-offline-seal.schema.json",
+  "title": "MIR4OfflineSealV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "status",
+    "publication_authority",
+    "payload",
+    "signature",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4OfflineSealV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "status": {"const": "sealed-local-proof-only"},
+    "publication_authority": {"const": false},
+    "payload": {
+      "type": "object",
+      "required": [
+        "schema",
+        "kind",
+        "canonicalization",
+        "seal_scope",
+        "publication_authority",
+        "candidate",
+        "source_identity",
+        "distribution_identity",
+        "identity_authorities",
+        "bound_records",
+        "signing_provider",
+        "record_sha256"
+      ],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4OfflineSealPayloadV1"},
+        "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+        "seal_scope": {"const": "local-offline-proof-only"},
+        "publication_authority": {"const": false},
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "source_identity": {
+          "type": "object",
+          "required": ["version", "proposed_tag"],
+          "properties": {
+            "version": {"const": "4.0.0"},
+            "proposed_tag": {"const": "v4.0.0"}
+          },
+          "additionalProperties": false
+        },
+        "distribution_identity": {
+          "type": "object",
+          "required": ["target_id", "version", "proposed_tag"],
+          "properties": {
+            "target_id": {"const": "factorio-2.1"},
+            "version": {"const": "4.0.21000"},
+            "proposed_tag": {"const": "dist/f210/v4.0.21000"}
+          },
+          "additionalProperties": false
+        },
+        "identity_authorities": {"$ref": "#/$defs/identityAuthorities"},
+        "bound_records": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "allOf": [
+              {"contains": {"type": "object", "properties": {"role": {"const": "candidate-manifest"}, "kind": {"const": "MIR4BootstrapLocalCandidateManifestV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
+              {"contains": {"type": "object", "properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
+              {"contains": {"type": "object", "properties": {"role": {"const": "exact-engine-evidence"}, "kind": {"const": "MIR4ExactEngineQualificationEvidenceBundleV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
+              {"contains": {"type": "object", "properties": {"role": {"const": "qualification"}, "kind": {"const": "MIR4OfflineQualificationRecordV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
+              {"contains": {"type": "object", "properties": {"role": {"const": "review"}, "kind": {"const": "MIR4OfflineReviewRecordV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1}
+          ],
+          "items": {
+            "type": "object",
+            "required": ["role", "kind", "record_sha256", "file_sha256"],
+            "properties": {
+              "role": {"enum": ["candidate-manifest", "candidate-plan", "exact-engine-evidence", "qualification", "review"]},
+              "kind": {"type": "string", "pattern": "^MIR4[A-Za-z0-9]+V1$"},
+              "record_sha256": {"$ref": "#/$defs/sha256"},
+              "file_sha256": {"$ref": "#/$defs/sha256"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "signing_provider": {
+          "type": "object",
+          "required": [
+            "kind",
+            "algorithm",
+            "signature_format",
+            "implementation",
+            "executable_sha256",
+            "public_key",
+            "public_key_fingerprint",
+            "identity",
+            "namespace",
+            "scope",
+            "private_key_committed"
+          ],
+          "properties": {
+            "kind": {"const": "MIR4SigningProviderV1"},
+            "algorithm": {"const": "ssh-ed25519"},
+            "signature_format": {"const": "sshsig"},
+            "implementation": {"const": "OpenSSH-ssh-keygen"},
+            "executable_sha256": {"$ref": "#/$defs/sha256"},
+            "public_key": {"type": "string", "pattern": "^ssh-ed25519 [A-Za-z0-9+/]+={0,3}(?: [^\\r\\n]+)?$"},
+            "public_key_fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+={0,3}$"},
+            "identity": {"$ref": "#/$defs/identity"},
+            "namespace": {"const": "mir4-offline-candidate-seal-v1"},
+            "scope": {"const": "proof-only-local-r0"},
+            "private_key_committed": {"const": false}
+          },
+          "additionalProperties": false
+        },
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "format",
+        "identity",
+        "namespace",
+        "payload_record_sha256",
+        "signature_sha256",
+        "signature_base64"
+      ],
+      "properties": {
+        "algorithm": {"const": "ssh-ed25519"},
+        "format": {"const": "sshsig"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "namespace": {"const": "mir4-offline-candidate-seal-v1"},
+        "payload_record_sha256": {"$ref": "#/$defs/sha256"},
+        "signature_sha256": {"$ref": "#/$defs/sha256"},
+        "signature_base64": {"type": "string", "pattern": "^[A-Za-z0-9+/]+={0,3}$"}
+      },
+      "additionalProperties": false
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "identity": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,127}$"},
+    "identityAuthorities": {
+      "type": "object",
+      "required": ["target_registry", "version_authority"],
+      "properties": {
+        "target_registry": {"$ref": "#/$defs/targetRegistryAuthority"},
+        "version_authority": {"$ref": "#/$defs/versionAuthority"}
+      },
+      "additionalProperties": false
+    },
+    "targetRegistryAuthority": {
+      "type": "object",
+      "required": ["kind", "status", "path", "file_sha256"],
+      "properties": {
+        "kind": {"const": "MIR4-Target-RegistryV2"},
+        "status": {"const": "accepted-pre-publication-current"},
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "versionAuthority": {
+      "type": "object",
+      "required": ["kind", "status", "path", "file_sha256"],
+      "properties": {
+        "kind": {"const": "MIR4-Versioning-and-Distribution-Identity-ADRv2"},
+        "status": {"const": "accepted-pre-publication-current"},
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["candidate_id", "target_id", "distribution_version", "archive_name", "archive_sha256", "bytes"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]},
+        "distribution_version": {"type": "string", "pattern": "^4\\.[0-9]+\\.[0-9]{5}$"},
+        "archive_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.zip$"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

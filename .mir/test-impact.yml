@@ -163,6 +163,36 @@
       "tags": []
     },
     {
+      "pattern": "tools/lib/mir4/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/validation/MIR4DistributionIdentity.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4R0Identity.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4BootstrapMaterialization.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "spec/schemas/mir4-*.schema.json",
       "groups": [],
       "scenarios": [],

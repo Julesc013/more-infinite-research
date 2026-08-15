@@ -184,6 +184,16 @@ Invoke-RepoCheck "terminal baseline calibrations are exact and deterministic" {
   & (Join-Path $repo "validation\tests\release\Test-MIRTerminalBaselineCapture.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
+  & (Join-Path $repo "validation\tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 bootstrap materialization and offline custody are deterministic and proof-only" {
+  & (Join-Path $repo "tools\commands\release\Test-MIR4R0Bootstrap.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapMaterialization.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4OfflineCandidateCustody.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "terminal exact-engine observation normalization is deterministic" {
   & (Join-Path $repo "validation\tests\release\Test-MIRTerminalEngineObservation.ps1") -RepoRoot $repo
 }

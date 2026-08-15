@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-source-capsule.schema.json",
+  "title": "MIR 4 bootstrap source capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "source", "predecessor", "package_membership", "capsule", "record_sha256"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4BootstrapSourceCapsuleV1" },
+    "status": { "const": "local-unpublished-input" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
+    "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_commit", "source_tree", "common_source_commit"],
+      "properties": {
+        "candidate_commit": { "$ref": "#/$defs/gitSha1" },
+        "source_tree": { "$ref": "#/$defs/gitSha1" },
+        "common_source_commit": { "$ref": "#/$defs/gitSha1" }
+      }
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release", "archive_path", "archive_sha256", "content_sha256", "bytes", "entry_count", "baseline_manifest", "baseline_record_sha256", "normalized_snapshot", "snapshot_record_sha256"],
+      "properties": {
+        "release": { "type": "string" },
+        "archive_path": { "type": "string" },
+        "archive_sha256": { "$ref": "#/$defs/sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "entry_count": { "type": "integer", "minimum": 1 },
+        "baseline_manifest": { "type": "string" },
+        "baseline_record_sha256": { "$ref": "#/$defs/sha256" },
+        "normalized_snapshot": { "type": "string" },
+        "snapshot_record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "package_membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "authority_sha256", "capsule_tool", "capsule_tool_sha256", "shipped_sidecars", "evidence_inside_package"],
+      "properties": {
+        "authority": { "const": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots" },
+        "authority_sha256": { "$ref": "#/$defs/sha256" },
+        "capsule_tool": { "const": "tools/lib/mir4/BootstrapMaterialization.ps1#New-MIR4BootstrapSourceCapsule" },
+        "capsule_tool_sha256": { "$ref": "#/$defs/sha256" },
+        "shipped_sidecars": { "const": [] },
+        "evidence_inside_package": { "const": false }
+      }
+    },
+    "capsule": { "$ref": "#/$defs/artifact" },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "archive_sha256", "content_sha256", "bytes", "entry_count"],
+      "properties": {
+        "path": { "const": "source-capsule.zip" },
+        "archive_sha256": { "$ref": "#/$defs/sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "entry_count": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

@@ -27,6 +27,8 @@ Usage:
   .\tools\mir.ps1 mir4 capture-terminal-baselines [--check] [--build-bundles]
   .\tools\mir.ps1 mir4 import-terminal-baselines [--output <path>] [--check]
   .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
+  .\tools\mir.ps1 mir4 build-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
@@ -476,6 +478,21 @@ switch ($area) {
           -RepoRoot $repo.Path `
           -Update:(Test-MIRArgSwitch -Items $Args -Name "--update") `
           -BuildBundles:(Test-MIRArgSwitch -Items $Args -Name "--build-bundles")
+      }
+      { $_ -in @("build-local-beta", "check-local-beta") } {
+        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "f210"
+        $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/emergency-lane"
+        $repetitionsText = Get-MIRArgValue -Items $Args -Name "--repetitions" -Default "3"
+        $repetitions = 0
+        if (-not [int]::TryParse($repetitionsText, [ref]$repetitions) -or $repetitions -ne 3) {
+          throw "--repetitions must be exactly 3 for the A/B/C bootstrap profile."
+        }
+        & (Join-Path $repo "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1") `
+          -RepoRoot $repo.Path `
+          -Target $target `
+          -OutputRoot $output `
+          -Repetitions $repetitions `
+          -Check:($verb -eq "check-local-beta")
       }
       default { throw "Unknown mir4 command: $verb" }
     }

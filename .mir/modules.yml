@@ -765,6 +765,36 @@ validation_tooling:
     terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
     terminal_fixed_point_receipt: .mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json
     terminal_fixed_point_receipt_schema: spec/schemas/mir3-terminal-fixed-point-receipt.schema.json
+    mir4_r0_target_registry_historical: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json
+    mir4_r0_version_authority_historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
+    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
+    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v2.schema.json
+    mir4_r0_version_authority: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json
+    mir4_r0_version_authority_schema: spec/schemas/mir4-versioning-distribution-identity-v2.schema.json
+    mir4_r0_codec_vectors: .mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json
+    mir4_r0_codec_vectors_schema: spec/schemas/mir4-distribution-version-codec-vectors-v2.schema.json
+    mir4_distribution_identity: tools/lib/validation/MIR4DistributionIdentity.ps1
+    mir4_distribution_identity_gate: validation/tests/release/Test-MIR4R0Identity.ps1
+    mir4_r0_bootstrap_root_set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
+    mir4_r0_bootstrap_root_set_schema: spec/schemas/mir4-bootstrap-root-set.schema.json
+    mir4_r0_bootstrap_root_set_generator: tools/commands/release/New-MIR4BootstrapRootSet.ps1
+    mir4_r0_bootstrap_gate: tools/commands/release/Test-MIR4R0Bootstrap.ps1
+    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
+    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
+    mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
+    mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
+    mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
+    mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
+    mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
+    mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
+    mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
+    mir4_offline_review_schema: spec/schemas/mir4-offline-review-record.schema.json
+    mir4_publication_dry_run_schema: spec/schemas/mir4-publication-dry-run-bundle.schema.json
+    mir4_offline_seal_schema: spec/schemas/mir4-offline-seal.schema.json
+    mir4_restoration_receipt_schema: spec/schemas/mir4-restoration-receipt.schema.json
+    mir4_emergency_lane_completion_schema: spec/schemas/mir4-emergency-lane-completion-record.schema.json
+    mir4_offline_candidate_custody_gate: validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
@@ -893,6 +923,12 @@ validation_tooling:
     - the historical maintainer-statement manual-review mode is limited to an already publicly verified immutable package, records an after-publication attestation time, forbids invented checklist observations, and can never satisfy a new candidate's pre-seal review gate
     - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
     - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
+    - MIR 4 distribution target codes are immutable three-digit decimal strings owned by Target Registry V2; leading zeroes are semantic and the values are never parsed as octal
+    - MIR 4 V1 target and version records are frozen historical evidence only; executable distribution identity resolves exclusively through the current V2 registry and codec authority
+    - MIR 4 bootstrap records use the single BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer and custody tooling consumes that authority without reimplementation
+    - MIR 4 offline seals require the exact admitted f210 plan and self-hashed package-equivalent candidate manifest, an exact Factorio 2.1.13 executable, six passed artifact-bound observations in an independently signed exact-engine evidence bundle, passed qualification and human review, and an explicitly trust-anchored proof-only OpenSSH Ed25519 seal signature; synthetic probes never satisfy this gate and private keys and evidence remain under verified ignored local roots
+    - MIR 4 publication dry-run idempotence requires two independently written canonically and byte-identical bundles after sealing; both bind the verified seal and current V2 identity authorities, remain non-mutating, and reject apply tag upload and public modes
+    - MIR 4 offline seals omit publication dry-run and restoration evidence; the final local proof completion record binds the verified seal, both independently written post-seal dry runs, and the clean restoration receipt without granting publication authority
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns

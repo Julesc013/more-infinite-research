@@ -23,6 +23,7 @@
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "museum-exact": ["static.museum", "runtime.museum-exact"],
+    "mir4-bootstrap": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
@@ -32,6 +33,11 @@
     "promotion-check": ["seal.verify"]
   },
   "classes": [
+    {
+      "id": "mir4-bootstrap",
+      "patterns": ["^\\.mir/releases/waves/mir4-r0/", "^tools/lib/mir4/", "^tools/lib/validation/MIR4DistributionIdentity\\.ps1$", "^tools/commands/release/(?:New-MIR4Bootstrap(?:RootSet|LocalCandidate)|Test-MIR4R0Bootstrap)\\.ps1$", "^spec/schemas/mir4-", "^validation/tests/release/Test-MIR4", "^docs/architecture/(?:current-architecture-matrix|mir4-|decisions/000[1-5]-mir)"],
+      "tests": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody"]
+    },
     {
       "id": "runtime-or-migration",
       "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^validation/tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
@@ -69,7 +75,7 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^\\.gitattributes$", "^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {

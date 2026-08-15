@@ -1,19 +1,18 @@
 ---
 title: "Frozen MIR 3 Compiler Architecture Matrix"
-status: archived
+status: current
 applies_to: "MIR3 terminal family"
 audience: maintainer
-doc_type: archive
+doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-08-16
 supersedes: []
-superseded_by:
-  - docs/architecture/mir4-r0-bootstrap.md
+superseded_by: []
 ---
 
 # Frozen MIR 3 Compiler Architecture Matrix
 
-This matrix is the frozen operational map for the MIR 3 compiler and release-engineering boundary. It remains authoritative for reconstructing the terminal family, but it is no longer the current successor-programme view. MIR 4 R0 imports these proven boundaries and migrates one owner at a time.
+This matrix is the current frozen operational map for reconstructing the MIR 3 compiler and release-engineering boundary. It is the mutation-authority and parity baseline consumed by MIR 4 bootstrap work, but it does not own current successor-programme status. MIR 4 R0 imports these proven boundaries and migrates one owner at a time.
 
 | Concern | Canonical authority | Consumers | Mutation authority | Required parity or evidence |
 | --- | --- | --- | --- | --- |
@@ -52,4 +51,4 @@ This matrix is the frozen operational map for the MIR 3 compiler and release-eng
 
 ## Candidate boundary
 
-Historical candidate archives remain immutable in release authority. The current development reservation or candidate and all archive, package-source, and qualification fields are generated in [Current Development Candidate](../releases/current-candidate.md) from the typed `.mir/releases/records/3.2.5.json` authority; `.mir/releases.json` is only a generated compatibility projection. This architecture document does not duplicate mutable candidate identity. Qualification evidence transfers only when every bound package and assurance fingerprint is identical.
+Historical candidate archives remain immutable in release authority. The terminal `.9` family and its current roles are owned by `.mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json` and `.mir/releases/records/current.json`; MIR 4 consumes the normalized, non-semantic imports beneath `.mir/releases/waves/mir4-r0/`. The [Current Development Candidate](../releases/current-candidate.md) page and the typed `3.2.5` record are historical predecessor context, while `.mir/releases.json` remains only a generated compatibility projection. This architecture document does not duplicate mutable candidate identity. Qualification evidence transfers only when every bound package and assurance fingerprint is identical.

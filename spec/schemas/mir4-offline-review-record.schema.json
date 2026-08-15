@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-offline-review-record.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-offline-review-record.schema.json",
+  "title": "MIR4OfflineReviewRecordV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "review_scope",
+    "publication_authority",
+    "candidate_manifest",
+    "candidate_plan",
+    "qualification",
+    "review_class",
+    "reviewer",
+    "decision",
+    "status",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4OfflineReviewRecordV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "review_scope": {"const": "local-offline-proof-only"},
+    "publication_authority": {"const": false},
+    "candidate_manifest": {"$ref": "#/$defs/candidateManifestBinding"},
+    "candidate_plan": {"$ref": "#/$defs/candidatePlanBinding"},
+    "qualification": {"$ref": "#/$defs/qualificationBinding"},
+    "review_class": {"const": "human-manual"},
+    "reviewer": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,127}$"},
+    "decision": {"enum": ["accepted-local-proof-only", "rejected", "blocked"]},
+    "status": {"enum": ["passed", "failed", "blocked"]},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "candidateManifestBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "candidate-manifest"},
+        "kind": {"const": "MIR4BootstrapLocalCandidateManifestV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "candidatePlanBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "candidate-plan"},
+        "kind": {"const": "MIR4BootstrapLocalCandidatePlanV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "qualificationBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "qualification"},
+        "kind": {"const": "MIR4OfflineQualificationRecordV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

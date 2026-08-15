@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "kind": "MIR4BootstrapLocalCandidatePlanV1",
+  "status": "local-unpublished-package-construction-only",
+  "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "source_version": "4.0.0",
+  "public_output_authorized": false,
+  "imports": [
+    ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
+    ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+    ".mir/releases/waves/mir4-r0/bootstrap-root-set.json"
+  ],
+  "compiler_host_adapter": {
+    "kind": "LegacyCompilerHostAdapterV1",
+    "maturity": "bootstrap-private",
+    "semantic_authority": "terminal-target-snapshot-and-sealed-package-source",
+    "operations": [
+      "capture-exact-package-source",
+      "project-distribution-version",
+      "emit-deterministic-target-package"
+    ],
+    "forbidden_operations": [
+      "semantic-rewrite",
+      "manual-backport",
+      "prototype-mutation-outside-existing-emission",
+      "public-allocation",
+      "publication"
+    ]
+  },
+  "targets": [
+    {
+      "target_key": "f210",
+      "target_id": "factorio-2.1",
+      "factorio_line": "2.1",
+      "distribution_target_code": "210",
+      "distribution_version": "4.0.21000",
+      "release_role": "mandatory",
+      "admission": "admitted-local-emergency-lane",
+      "source": {
+        "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+        "source_tree": "f423b351249f5f8d2a6164054f42ae166d8d066e",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "predecessor": {
+        "release": "3.2.9",
+        "archive_path": "dist/more-infinite-research_3.2.9.zip",
+        "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+        "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+        "bytes": 1061572,
+        "entry_count": 303,
+        "baseline_manifest": ".mir/releases/terminal/baselines/3.2.9/baseline-manifest.json",
+        "baseline_record_sha256": "98C4519832F147EAEC7014751DFE676FCECDB4C70CCEA9A967A3A6CF784A2172",
+        "normalized_snapshot": ".mir/releases/terminal/baselines/3.2.9/normalized-snapshot.json",
+        "snapshot_record_sha256": "C8E6D0A05C016CDF2A25444E8622AA0F011492240832C15561E81C0D91D69644"
+      },
+      "engine_lock": {
+        "version": "2.1.13",
+        "executable_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+        "qualification_status": "required-not-reusable-across-distribution-identity"
+      },
+      "dispositions": {
+        "semantic_change": "none-bootstrap-fixed-point",
+        "features": "preserve-predecessor-target-local-inventory",
+        "settings": "preserve-ids-types-defaults-and-scopes",
+        "locales": "preserve-predecessor-package-inventory",
+        "runtime": "preserve-target-local-state-owner-and-schema",
+        "migrations": "direct-predecessor-version-identity-only",
+        "package": "metadata-only-version-and-root-difference",
+        "capability_omissions": ".mir/releases/terminal/baselines/3.2.9/normalized-snapshot.json#/capability_omissions"
+      }
+    },
+    {
+      "target_key": "f200",
+      "target_id": "factorio-2.0",
+      "factorio_line": "2.0",
+      "distribution_target_code": "200",
+      "distribution_version": "4.0.20000",
+      "release_role": "mandatory",
+      "admission": "non-authoritative-shadow-blocked-by-eol",
+      "source": {
+        "candidate_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+        "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "predecessor": {
+        "release": "2.5.9",
+        "archive_path": "dist/more-infinite-research_2.5.9.zip",
+        "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+        "content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+        "bytes": 1058800,
+        "entry_count": 301,
+        "baseline_manifest": ".mir/releases/terminal/baselines/2.5.9/baseline-manifest.json",
+        "baseline_record_sha256": "C0CE554091FA4D1E1B498C2AADDD5AB99A959FABA22E6A3F3627957C098DE40E",
+        "normalized_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+        "snapshot_record_sha256": "957FF3BC563227B2089219FE8939F2766B359E2B293C8583B8C2469404A21F81"
+      },
+      "engine_lock": {
+        "version": "2.0.77",
+        "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "qualification_status": "required-not-reusable-across-distribution-identity"
+      },
+      "dispositions": {
+        "semantic_change": "none-bootstrap-fixed-point",
+        "features": "preserve-predecessor-target-local-inventory",
+        "settings": "preserve-ids-types-defaults-and-scopes",
+        "locales": "preserve-predecessor-package-inventory",
+        "runtime": "preserve-target-local-state-owner-and-schema",
+        "migrations": "direct-predecessor-version-identity-only",
+        "package": "metadata-only-version-and-root-difference",
+        "capability_omissions": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json#/capability_omissions"
+      }
+    },
+    {
+      "target_key": "f110",
+      "target_id": "factorio-1.1",
+      "factorio_line": "1.1",
+      "distribution_target_code": "110",
+      "distribution_version": "4.0.11000",
+      "release_role": "conditional-same-source",
+      "admission": "non-authoritative-shadow-blocked-by-eol",
+      "source": {
+        "candidate_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+        "source_tree": "cd8704581f5cd8f8da6238fd76f2b0c5ee7e56ff",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "predecessor": {
+        "release": "1.9.9",
+        "archive_path": "dist/more-infinite-research_1.9.9.zip",
+        "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843",
+        "content_sha256": "3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064",
+        "bytes": 397677,
+        "entry_count": 174,
+        "baseline_manifest": ".mir/releases/terminal/baselines/1.9.9/baseline-manifest.json",
+        "baseline_record_sha256": "BC728DF485E1F8B92BCAD22274F4474CD979381C424D112DCF2AE087A38C8669",
+        "normalized_snapshot": ".mir/releases/terminal/baselines/1.9.9/normalized-snapshot.json",
+        "snapshot_record_sha256": "75EB9FEF076D6C9A65776A3522A008173F8935F7962165E4B8672DD9E432063C"
+      },
+      "engine_lock": {
+        "version": "1.1.110",
+        "executable_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+        "qualification_status": "required-not-reusable-across-distribution-identity"
+      },
+      "dispositions": {
+        "semantic_change": "none-bootstrap-fixed-point",
+        "features": "preserve-predecessor-target-local-inventory",
+        "settings": "preserve-ids-types-defaults-and-scopes",
+        "locales": "preserve-predecessor-package-inventory",
+        "runtime": "preserve-target-local-state-owner-and-schema",
+        "migrations": "direct-predecessor-version-identity-only",
+        "package": "metadata-only-version-and-root-difference",
+        "capability_omissions": ".mir/releases/terminal/baselines/1.9.9/normalized-snapshot.json#/capability_omissions"
+      }
+    },
+    {
+      "target_key": "f100",
+      "target_id": "factorio-1.0",
+      "factorio_line": "1.0",
+      "distribution_target_code": "100",
+      "distribution_version": "4.0.10000",
+      "release_role": "conditional-same-source",
+      "admission": "non-authoritative-shadow-blocked-by-eol",
+      "source": {
+        "candidate_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+        "source_tree": "2d5599b1c31fbc5b35bce69ce651159d0877e7a4",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "predecessor": {
+        "release": "1.8.9",
+        "archive_path": "dist/more-infinite-research_1.8.9.zip",
+        "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+        "content_sha256": "7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E",
+        "bytes": 397678,
+        "entry_count": 174,
+        "baseline_manifest": ".mir/releases/terminal/baselines/1.8.9/baseline-manifest.json",
+        "baseline_record_sha256": "3649463A957ABA87751C045D33E6A271E2D1193A0B0225A93876D683D85F89FC",
+        "normalized_snapshot": ".mir/releases/terminal/baselines/1.8.9/normalized-snapshot.json",
+        "snapshot_record_sha256": "9A1B0AA1C9D717CF4EB9044737835F04D73CA71BA92057BB5D4C3DAAE5EFFFC2"
+      },
+      "engine_lock": {
+        "version": "1.0.0-only",
+        "executable_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+        "qualification_status": "required-not-reusable-across-distribution-identity"
+      },
+      "dispositions": {
+        "semantic_change": "none-bootstrap-fixed-point",
+        "features": "preserve-predecessor-target-local-inventory",
+        "settings": "preserve-ids-types-defaults-and-scopes",
+        "locales": "preserve-predecessor-package-inventory",
+        "runtime": "preserve-target-local-state-owner-and-schema",
+        "migrations": "direct-predecessor-version-identity-only",
+        "package": "metadata-only-version-and-root-difference",
+        "capability_omissions": ".mir/releases/terminal/baselines/1.8.9/normalized-snapshot.json#/capability_omissions"
+      }
+    }
+  ],
+  "package_policy": {
+    "membership_authority": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots",
+    "allowed_differences": ["generated-package-root", "info.json#/version"],
+    "shipped_sidecars": [],
+    "evidence_inside_package": false,
+    "output_root": "build/mir4/emergency-lane"
+  },
+  "record_sha256": "115E44174F8CA2BED65403B079A31923FFA9D3EC6AC73EF038E897AFE603E53C"
+}

@@ -12,6 +12,8 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 }
 
+. (Join-Path $RepoRoot "tools\lib\validation\MIR4DistributionIdentity.ps1")
+
 function Read-Json([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Required MIR 4 R0 input is absent: $RelativePath" }
@@ -62,6 +64,7 @@ function Assert-Schema([string]$RelativePath, [string]$SchemaPath) {
 
 $captureScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Dot9TerminalBaselines.ps1"
 $importScript = Join-Path $RepoRoot "tools\commands\release\Import-MIR3TerminalBaselines.ps1"
+$bootstrapRootSetScript = Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapRootSet.ps1"
 if ($Update) {
   $captureParams = @{ RepoRoot=$RepoRoot }
   if ($BuildBundles) { $captureParams.BuildBundles = $true }
@@ -71,23 +74,33 @@ if ($Update) {
   & $captureScript -RepoRoot $RepoRoot -Check
   & $importScript -RepoRoot $RepoRoot -Check
 }
+if ($Update) {
+  & $bootstrapRootSetScript -RepoRoot $RepoRoot
+} else {
+  & $bootstrapRootSetScript -RepoRoot $RepoRoot -Check
+}
 
 $authorityDirectory = ".mir/releases/waves/mir4-r0"
-$requiredKinds = @(
+$executableKinds = @(
   "MIR4-ProgrammeV1",
   "MIR4-Entry-GateV1",
-  "MIR4-Versioning-and-Distribution-Identity-ADRv1",
+  "MIR4-Versioning-and-Distribution-Identity-ADRv2",
   "MIR4-Repository-Layout-TransitionV1",
-  "MIR4-Target-RegistryV1",
+  "MIR4-Target-RegistryV2",
   "MIR4-Terminal-Import-ContractV1",
   "MIR4-Equivalence-PolicyV1",
   "MIR4-Emergency-LaneV1",
   "MIR4-Offline-Release-AuthorityV1",
   "MIR3-to-MIR4-Governance-ReconciliationV1"
 )
-foreach ($kind in $requiredKinds) {
+foreach ($kind in $executableKinds) {
   $path = "$authorityDirectory/$kind.json"
-  Assert-Schema $path "spec/schemas/mir4-r0-authority.schema.json"
+  $schemaPath = switch ($kind) {
+    "MIR4-Target-RegistryV2" { "spec/schemas/mir4-target-registry-v2.schema.json"; break }
+    "MIR4-Versioning-and-Distribution-Identity-ADRv2" { "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json"; break }
+    default { "spec/schemas/mir4-r0-authority.schema.json" }
+  }
+  Assert-Schema $path $schemaPath
   $authority = Read-Json $path
   if ([string]$authority.kind -ne $kind -or [bool]$authority.package_visible) { throw "MIR 4 R0 authority identity mismatch: $path" }
 }
@@ -105,30 +118,9 @@ if ([bool]$reconciliation.payload.public_4x_before_eol -or [bool]$entry.payload.
   throw "MIR 3 EOL / MIR 4 entry graph is circular or publication permission was widened."
 }
 
-$registry = Read-Json "$authorityDirectory/MIR4-Target-RegistryV1.json"
-$targets = @($registry.payload.targets)
-if (@($targets | Group-Object id | Where-Object Count -ne 1).Count -ne 0 -or
-    @($targets | Group-Object portal_target_id | Where-Object Count -ne 1).Count -ne 0 -or
-    @($targets | Where-Object state -eq "active").Count -ne 9) {
-  throw "MIR 4 target registry identity is not unique or does not contain exactly nine active targets."
-}
-$expectedPredecessors = @{
-  "factorio-2.1"="3.2.9"; "factorio-2.0"="2.5.9"; "factorio-1.1"="1.9.9"; "factorio-1.0"="1.8.9";
-  "factorio-0.17"="1.7.9"; "factorio-0.16"="1.6.9"; "factorio-0.15"="1.5.9"; "factorio-0.14"="1.4.9"; "factorio-0.13"="1.3.9"
-}
-foreach ($row in @($targets | Where-Object state -eq "active")) {
-  if ([string]$row.mir3_predecessor -ne [string]$expectedPredecessors[[string]$row.id]) { throw "MIR 3 predecessor drift for $($row.id)." }
-  foreach ($sourcePatch in @(0, 1, 8, 99)) {
-    $encoded = ([int]$row.portal_target_id * 100) + $sourcePatch
-    if ($encoded -gt 65535 -or [Math]::Floor($encoded / 100) -ne [int]$row.portal_target_id -or ($encoded % 100) -ne $sourcePatch) {
-      throw "MIR 4 distribution version projection is not bounded and reversible for $($row.id)."
-    }
-  }
-}
-$versionAuthority = Read-Json "$authorityDirectory/MIR4-Versioning-and-Distribution-Identity-ADRv1.json"
-if ([int]$versionAuthority.payload.source_patch_range.maximum -ne 99 -or [int]$versionAuthority.payload.component_maximum -ne 65535 -or
-    [string]$versionAuthority.payload.public_allocation -ne "blocked-until-mir3-eol") {
-  throw "MIR 4 version allocation boundary was weakened."
+$identityValidation = Assert-MIR4R0DistributionIdentity -RepoRoot $RepoRoot
+if ([string]$identityValidation.status -ne "passed" -or [bool]$identityValidation.historical_v1_executable) {
+  throw "MIR 4 V2 distribution identity validation did not close."
 }
 
 $catalogPath = ".mir/releases/terminal/baselines/dot9-family-catalog.json"
@@ -145,11 +137,32 @@ foreach ($row in @($catalog.releases)) {
 }
 Assert-Schema $importPath "spec/schemas/mir4-terminal-baseline-import.schema.json"
 
+$bootstrapRootSetPath = "$authorityDirectory/bootstrap-root-set.json"
+Assert-Schema $bootstrapRootSetPath "spec/schemas/mir4-bootstrap-root-set.schema.json"
+$bootstrapRootSet = Read-Json $bootstrapRootSetPath
+$expectedBootstrapTargets = "f210|f200|f110|f100"
+if ([string]$bootstrapRootSet.kind -ne "MIR4BootstrapRootSetV1" -or
+    [string]$bootstrapRootSet.status -ne "current-pre-eol-package-excluded" -or
+    [bool]$bootstrapRootSet.package_visible -or
+    [bool]$bootstrapRootSet.semantic_authority -or
+    [string]$bootstrapRootSet.derived_from.record_sha256 -ne [string]$import.record_sha256 -or
+    (@($bootstrapRootSet.targets.target_id) -join "|") -cne $expectedBootstrapTargets -or
+    @($bootstrapRootSet.targets.roots.semantic.domain | Where-Object { $_ -cne "mir4.bootstrap.semantic.v1" }).Count -ne 0 -or
+    @($bootstrapRootSet.targets.roots.authority.domain | Where-Object { $_ -cne "mir4.bootstrap.authority.v1" }).Count -ne 0 -or
+    @($bootstrapRootSet.targets.roots.qualification.domain | Where-Object { $_ -cne "mir4.bootstrap.qualification.v1" }).Count -ne 0) {
+  throw "MIR 4 bootstrap root set is not the exact four-target domain-separated derivation."
+}
+$bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
+Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
+
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw ".work must remain absent during MIR 4 R0 bootstrap." }
 
-$generatedSources = @($requiredKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
+$generatedSources = @($executableKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Distribution-Version-Codec-VectorsV2.json"
 $generatedSources += Get-Binding $catalogPath
 $generatedSources += Get-Binding $importPath
+$generatedSources += Get-Binding $bootstrapRootSetPath
+$generatedSources += Get-Binding $bootstrapCandidatePlanPath
 $generatedSources += Get-Binding ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json"
 $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json"
 $generatedSources = @($generatedSources | Sort-Object path)
@@ -161,8 +174,8 @@ $dashboard = Add-RecordSha256 ([ordered]@{
   package_visible = $false
   generated_from = $generatedSources
   payload = [ordered]@{
-    mir3 = [ordered]@{ product_development="closed"; github_publication="complete"; mod_portal_custody="partial-two-visible-seven-not-uploaded"; terminal_dot9_baselines="capture-ready-custody-pending"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
+    mir3 = [ordered]@{ product_development="closed"; github_publication="complete"; mod_portal_custody="partial-two-visible-seven-not-uploaded"; terminal_dot9_baselines="captured-and-imported-custody-pending"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
+    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v2-direct-factorio-line-codes"; historical_v1_executable=$false; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
     package_delta = 0
     next_executable_task = "M4-003-local-offline-emergency-lane"
   }
@@ -175,12 +188,13 @@ $queue = Add-RecordSha256 ([ordered]@{
   generated_from = $generatedSources
   payload = [ordered]@{
     tasks = @(
-      [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="ready-at-bootstrap-head";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-and-import";state="ready-at-bootstrap-head-public-custody-pending";blocked_by=@("manual-mod-portal-custody-for-final-seal")},
-      [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="ready-at-bootstrap-head";blocked_by=@()},
+      [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
+      [ordered]@{id="M4-001";scope="dot9-baseline-capture-and-import";state="completed-captured-and-imported";blocked_by=@()},
+      [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
       [ordered]@{id="M4-003";scope="local-offline-emergency-lane";state="ready";blocked_by=@()},
-      [ordered]@{id="M4-004";scope="museum-final-index-archive-and-restore";state="pending";blocked_by=@("M4-003")},
-      [ordered]@{id="M4-005";scope="mod-portal-custody-and-mir3-eol";state="blocked-external-and-local";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads", "M4-003", "M4-004")}
+      [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
+      [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
+      [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
     )
   }
 })

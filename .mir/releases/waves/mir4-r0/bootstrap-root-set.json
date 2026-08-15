@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "kind": "MIR4BootstrapRootSetV1",
+  "status": "current-pre-eol-package-excluded",
+  "package_visible": false,
+  "semantic_authority": false,
+  "source_generation": "MIR4-R0-pre-release",
+  "canonicalization": "utf8-null-delimited-labelled-fields-v1",
+  "hash_algorithm": "sha256",
+  "derived_from": {
+    "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+    "record_sha256": "BE6C793B645ACED1CB72D8AE11C53F7CE373595EB6FE964A59832005A1C3CD68"
+  },
+  "targets": [
+    {
+      "target_id": "f210",
+      "factorio_line": "2.1",
+      "predecessor_release": "3.2.9",
+      "source_identity": {
+        "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+        "candidate_tree": "f423b351249f5f8d2a6164054f42ae166d8d066e",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "terminal_distribution": {
+        "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+        "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25"
+      },
+      "baseline_identity": {
+        "path": ".mir/releases/terminal/baselines/3.2.9/baseline-manifest.json",
+        "record_sha256": "98C4519832F147EAEC7014751DFE676FCECDB4C70CCEA9A967A3A6CF784A2172",
+        "input_root_sha256": "F2964B86ECC8588A754B51D30F5EAAC0CB3F2FFFD81FF4CE4D4443E40DD581D4"
+      },
+      "snapshot_identity": {
+        "path": ".mir/releases/terminal/baselines/3.2.9/normalized-snapshot.json",
+        "record_sha256": "C8E6D0A05C016CDF2A25444E8622AA0F011492240832C15561E81C0D91D69644"
+      },
+      "exact_engine": {
+        "version": "2.1.13",
+        "executable_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084"
+      },
+      "roots": {
+        "semantic": {
+          "domain": "mir4.bootstrap.semantic.v1",
+          "sha256": "AB49AAF782B0E3E7E51A2FF9BFD00CEB22D43CA818B2EF4D3A9B54F405533B2F"
+        },
+        "authority": {
+          "domain": "mir4.bootstrap.authority.v1",
+          "sha256": "111B8E438A97C981465F86048B9B0D53AF4CE1FF4D99F7D9FC4775125B4ED8F4"
+        },
+        "qualification": {
+          "domain": "mir4.bootstrap.qualification.v1",
+          "sha256": "AD7F9E48D1C888DF4D45F61710C41B3E80AB8D9DB949C89F0C59D3FA4737A08A"
+        }
+      }
+    },
+    {
+      "target_id": "f200",
+      "factorio_line": "2.0",
+      "predecessor_release": "2.5.9",
+      "source_identity": {
+        "candidate_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+        "candidate_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "terminal_distribution": {
+        "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+        "content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"
+      },
+      "baseline_identity": {
+        "path": ".mir/releases/terminal/baselines/2.5.9/baseline-manifest.json",
+        "record_sha256": "C0CE554091FA4D1E1B498C2AADDD5AB99A959FABA22E6A3F3627957C098DE40E",
+        "input_root_sha256": "85FA62B7D8C7CA34DD9BFB096133B123570034E7D6BE5D766DFCF1C2AAD94748"
+      },
+      "snapshot_identity": {
+        "path": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+        "record_sha256": "957FF3BC563227B2089219FE8939F2766B359E2B293C8583B8C2469404A21F81"
+      },
+      "exact_engine": {
+        "version": "2.0.77",
+        "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "roots": {
+        "semantic": {
+          "domain": "mir4.bootstrap.semantic.v1",
+          "sha256": "4E40D5F2DA1EC343EAAE4AC5566E07CC8ADD870EA797522FC2223E2E480EDDFD"
+        },
+        "authority": {
+          "domain": "mir4.bootstrap.authority.v1",
+          "sha256": "B0A6D64CAADF1B11D7CFA3A19579D1C69998EFF5A4230E8381B75E9792755DDF"
+        },
+        "qualification": {
+          "domain": "mir4.bootstrap.qualification.v1",
+          "sha256": "8206742E5DDE0B3B38C3AE97684A7DD39EF9DBB2D5EE06280B530A9574668060"
+        }
+      }
+    },
+    {
+      "target_id": "f110",
+      "factorio_line": "1.1",
+      "predecessor_release": "1.9.9",
+      "source_identity": {
+        "candidate_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+        "candidate_tree": "cd8704581f5cd8f8da6238fd76f2b0c5ee7e56ff",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "terminal_distribution": {
+        "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843",
+        "content_sha256": "3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064"
+      },
+      "baseline_identity": {
+        "path": ".mir/releases/terminal/baselines/1.9.9/baseline-manifest.json",
+        "record_sha256": "BC728DF485E1F8B92BCAD22274F4474CD979381C424D112DCF2AE087A38C8669",
+        "input_root_sha256": "507CD7938EBB784FA0EAA8B7FCA1467D7E7BFB13880E13D981CD47FC00AA463F"
+      },
+      "snapshot_identity": {
+        "path": ".mir/releases/terminal/baselines/1.9.9/normalized-snapshot.json",
+        "record_sha256": "75EB9FEF076D6C9A65776A3522A008173F8935F7962165E4B8672DD9E432063C"
+      },
+      "exact_engine": {
+        "version": "1.1.110",
+        "executable_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+      },
+      "roots": {
+        "semantic": {
+          "domain": "mir4.bootstrap.semantic.v1",
+          "sha256": "C86489E2293EF803094DBE7A74E7191D975C303EB7B3D4A359912C37E41E0C0D"
+        },
+        "authority": {
+          "domain": "mir4.bootstrap.authority.v1",
+          "sha256": "5C9C0F518498C1083AE583A64F47D759DB5FAD84B2F4E4883615131126060086"
+        },
+        "qualification": {
+          "domain": "mir4.bootstrap.qualification.v1",
+          "sha256": "B2D31A0E0F96B00C4BD8F3C7308463C43C1D427C071D9007D0E226194ACEC987"
+        }
+      }
+    },
+    {
+      "target_id": "f100",
+      "factorio_line": "1.0",
+      "predecessor_release": "1.8.9",
+      "source_identity": {
+        "candidate_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+        "candidate_tree": "2d5599b1c31fbc5b35bce69ce651159d0877e7a4",
+        "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+      },
+      "terminal_distribution": {
+        "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+        "content_sha256": "7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E"
+      },
+      "baseline_identity": {
+        "path": ".mir/releases/terminal/baselines/1.8.9/baseline-manifest.json",
+        "record_sha256": "3649463A957ABA87751C045D33E6A271E2D1193A0B0225A93876D683D85F89FC",
+        "input_root_sha256": "4A590E5EEC3E81CF649DD8C1F2F051050D56B2C4DB4EE2596D65127B1677EF25"
+      },
+      "snapshot_identity": {
+        "path": ".mir/releases/terminal/baselines/1.8.9/normalized-snapshot.json",
+        "record_sha256": "9A1B0AA1C9D717CF4EB9044737835F04D73CA71BA92057BB5D4C3DAAE5EFFFC2"
+      },
+      "exact_engine": {
+        "version": "1.0.0-only",
+        "executable_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+      },
+      "roots": {
+        "semantic": {
+          "domain": "mir4.bootstrap.semantic.v1",
+          "sha256": "3FE64618C3101F45335A4273AD05A9A32B598CF16CB996311A1D4B7600C8F0EB"
+        },
+        "authority": {
+          "domain": "mir4.bootstrap.authority.v1",
+          "sha256": "BE50E3E412EA4175C83F856245383108B548A1F30E1B8D686AD4F1F6459248AB"
+        },
+        "qualification": {
+          "domain": "mir4.bootstrap.qualification.v1",
+          "sha256": "0F899B1EF34A7DCFBADD3D0F7F209D74994D77B545A810FDCA6C2193536BF164"
+        }
+      }
+    }
+  ],
+  "record_sha256": "BF052A1D63C44CA4D5A06C378F6CF2245F6D82A52FB2CBF106AEA0626FB5621D"
+}

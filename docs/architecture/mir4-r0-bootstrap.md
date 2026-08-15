@@ -6,8 +6,7 @@ audience: maintainer
 doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-08-16
-supersedes:
-  - docs/architecture/current-architecture-matrix.md
+supersedes: []
 superseded_by: []
 ---
 
@@ -15,7 +14,7 @@ superseded_by: []
 
 MIR 3 product development is closed. All nine `.9` releases are immutable and GitHub-published; Mod Portal custody and the archival EOL programme remain open. MIR 4 R0 is active only on the package-excluded successor plane.
 
-The executable authority is `.mir/releases/waves/mir4-r0/`. It separates programme, entry, version, target, equivalence, layout, terminal import, emergency-lane, offline release, and governance-reconciliation decisions. The generated dashboard must report `READY_FOR_MIR4_R0_IMPLEMENTATION`, and the generated queue must name `M4-003-local-offline-emergency-lane` as the next executable task.
+The executable authority is `.mir/releases/waves/mir4-r0/`. It separates programme, entry, version, target, equivalence, layout, terminal import, bootstrap roots, emergency-lane, offline release, and governance-reconciliation decisions. The generated dashboard must report `READY_FOR_MIR4_R0_IMPLEMENTATION`, and the generated queue must name `M4-003-local-offline-emergency-lane` as the next executable task.
 
 ## Current boundary
 
@@ -29,7 +28,11 @@ MIR 4 R0: active, package-excluded, non-authoritative
 public 4.x: forbidden until MIR 3 EOL
 ```
 
-`tools/mir.ps1 mir4 check` validates the acyclic entry gate, all ten typed R0 authorities, version projection, nine baseline manifests, nine normalized snapshots, nine release-closure views, the all-nine import, dashboard, queue, and unchanged terminal distributions.
+Distribution identity is now owned by `MIR4-Target-RegistryV2` and `MIR4-Versioning-and-Distribution-Identity-ADRv2`. The registry contains all 17 direct string codes from `210` through `006`; the exhaustive codec fixture covers patches `00`, `01`, `08`, `09`, and `99`, the `65499` internal boundary, and negative inputs. The two V1 identity records are preserved byte-for-byte as historical evidence and are rejected by the executable resolver.
+
+`tools/mir.ps1 mir4 check` validates the acyclic entry gate, all ten typed R0 authorities, version projection, nine baseline manifests, nine normalized snapshots, nine release-closure views, the all-nine import, the four-target bootstrap root set, dashboard, queue, and unchanged terminal distributions.
+
+`bootstrap-root-set.json` derives the `f210`, `f200`, `f110`, and `f100` semantic, authority, and qualification roots from the all-nine terminal import. Semantic roots bind only target, predecessor, source, and terminal content identity. Baseline and snapshot records, terminal archive identity, and exact-engine proof remain separately authority- or qualification-bound, so custody-only updates cannot silently change a semantic root.
 
 `tools/mir.ps1 mir4 capture-terminal-baselines --build-bundles` reconstructs each logical terminal bundle twice. The bundles live under `build/terminal/dot9-baselines/`; they are evidence outputs, not public mod packages.
 
@@ -41,4 +44,4 @@ The eventual layout separates `src/`, `platforms/factorio/`, and `targets/`. Cur
 
 ## Next slice
 
-M4-003 will generate a local unpublished Factorio 2.1 distribution from the 3.2.9 baseline, double-build it, run clean-install and direct-upgrade proof, verify reload and settings/profile preservation, seal it offline, and dry-run publication twice. Completing that slice does not itself authorize publication.
+The M4-003A identity precondition is closed. The local package-construction portion now resolves source proposal `4.0.0`, code `210`, and projected distribution `4.0.21000` through V2, then performs three independently recaptured source-capsule and repeated deterministic package-construction runs from the exact 3.2.9 source. This establishes bounded same-tool repeatability, not checkout-independent C reconstruction; a toolchain-closed capsule remains open. It allocates no public tag. The remaining lane requires exact-engine clean-install and direct-upgrade proof, reload and settings/profile preservation, offline sealing, restoration, and two independently written, byte-identical publication dry runs. Completing that slice does not itself authorize publication.
