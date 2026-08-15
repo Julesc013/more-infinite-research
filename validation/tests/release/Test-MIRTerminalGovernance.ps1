@@ -9,7 +9,7 @@ if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation fail
 if ($LASTEXITCODE -ne 0) { throw "MIR GitHub administration preflight validation failed." }
 
 $promotionToolPath = Join-Path $RepoRoot "tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1"
-$promotionWorkflowPath = Join-Path $RepoRoot ".github/workflows/terminal-promotion-check.yml"
+$promotionWorkflowPath = Join-Path $RepoRoot ".github/workflows/branch-policy.yml"
 if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
     -not (Test-Path -LiteralPath $promotionWorkflowPath -PathType Leaf)) {
   throw "The terminal promotion controller or workflow is missing."
@@ -28,18 +28,19 @@ foreach ($snippet in @(
 }
 foreach ($snippet in @(
   "workflow_dispatch:",
+  "terminal_release:",
+  "terminal_candidate_sha:",
   "checks: write",
-  "cancel-in-progress: false",
   "Test-MIR3TerminalPromotionCandidate.ps1",
   "name: 'verification-gate'",
-  "head_sha: process.env.CANDIDATE_SHA",
+  "head_sha: sha",
   "if (!passed) core.setFailed"
 )) {
   if (-not $promotionWorkflow.Contains($snippet)) { throw "Terminal promotion workflow omits required fail-closed behavior: $snippet" }
 }
-if ($promotionWorkflow -match '(?m)^\s*pull_request(?:_target)?:' -or
+if ($promotionWorkflow -notmatch "(?m)^\s+if:\s+\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.terminal_release != 'none' \}\}\s*$" -or
     $promotionWorkflow -notmatch '(?m)^\s+checks:\s+write\s*$') {
-  throw "Terminal promotion verification must be explicit-dispatch-only and must publish through GitHub Actions checks authority."
+  throw "Terminal promotion verification must run only from the explicit dispatch path and must publish through GitHub Actions checks authority."
 }
 
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
