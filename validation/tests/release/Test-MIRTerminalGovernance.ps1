@@ -32,7 +32,7 @@ foreach ($snippet in @(
   "terminal_candidate_sha:",
   "checks: write",
   "Test-MIR3TerminalPromotionCandidate.ps1",
-  "name: 'verification-gate'",
+  "name: 'terminal-promotion-verification'",
   "head_sha: sha",
   "if (!passed) core.setFailed"
 )) {
@@ -955,7 +955,10 @@ if (@($publication.first_public_tag_requires).Count -lt 4 -or $publication.failu
 $protection = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-HandoffV1.json") | ConvertFrom-Json -Depth 100
 $dot5Tags = @("refs/tags/3.2.5", "refs/tags/2.5.5", "refs/tags/1.9.5", "refs/tags/1.8.5", "refs/tags/1.7.5", "refs/tags/1.6.5", "refs/tags/1.5.5", "refs/tags/1.4.5", "refs/tags/1.3.5")
 $dot9Tags = @($family | ForEach-Object { "refs/tags/$_" })
-$checkNames = @("branch-policy", "verification-gate")
+$devCheckNames = @("branch-policy", "verification-gate")
+$promotionCheckNames = @("branch-policy", "terminal-promotion-verification")
+$contextAmendmentPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-RequiredContext-AmendmentV1.json"
+$contextAmendment = Get-Content -Raw -LiteralPath $contextAmendmentPath | ConvertFrom-Json -Depth 100
 if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     [string]$protection.status -ne "applied-and-verified" -or
     [string]$protection.application_receipt.status -ne "applied-and-verified" -or
@@ -967,8 +970,25 @@ if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     @($protection.application_receipt.negative_tests).Count -lt 8 -or
     (@($protection.immutable_dot5_tags) -join "|") -ne ($dot5Tags -join "|") -or
     (@($protection.future_terminal_tags) -join "|") -ne ($dot9Tags -join "|") -or
-    @($protection.observed_required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
-    @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0) {
+    @($protection.observed_required_checks | Where-Object { $_.context -notin $devCheckNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
+    @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0 -or
+    [string]$contextAmendment.kind -ne "MIR3TerminalProtectionRequiredContextAmendmentV1" -or
+    [string]$contextAmendment.status -notin @("authorized-for-application", "applied-and-verified") -or
+    (@($contextAmendment.scope) -join "|") -ne "refs/heads/main|refs/heads/legacy" -or
+    (@($contextAmendment.ruleset_ids) -join "|") -ne "20833408|20833410" -or
+    [string]$contextAmendment.old_context.context -ne "verification-gate" -or
+    [string]$contextAmendment.new_context.context -ne "terminal-promotion-verification" -or
+    [int]$contextAmendment.old_context.integration_id -ne 15368 -or
+    [int]$contextAmendment.new_context.integration_id -ne 15368 -or
+    [int]$contextAmendment.invariants.required_check_count -ne 2 -or
+    -not [bool]$contextAmendment.invariants.strict_required_status_checks_policy -or
+    [int]$contextAmendment.invariants.integrity_bypass_actors -ne 0 -or
+    -not [bool]$contextAmendment.invariants.deletion_protection -or
+    -not [bool]$contextAmendment.invariants.non_fast_forward_protection -or
+    -not [bool]$contextAmendment.invariants.promotion_actor_restriction_unchanged -or
+    -not [bool]$contextAmendment.invariants.dev_required_checks_unchanged -or
+    -not [bool]$contextAmendment.invariants.frozen_candidate_bytes_unchanged -or
+    -not [bool]$contextAmendment.invariants.historical_check_evidence_unchanged) {
   throw "Terminal protection handoff is incomplete, overclaims application, or contradicts promotion topology."
 }
 foreach ($field in @("applied_at", "verified_at")) {
@@ -998,7 +1018,7 @@ if ([string]$protectionApplication.kind -ne "MIR3TerminalProtectionApplicationRe
     @($protectionApplication.production_rulesets).Count -ne 9 -or
     @($protectionApplication.production_rulesets | Where-Object enforcement -ne "active").Count -ne 0 -or
     (@($protectionApplication.production_rulesets.id) -join "|") -ne (@($protection.application_receipt.production_ruleset_ids) -join "|") -or
-    @($protectionApplication.required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
+    @($protectionApplication.required_checks | Where-Object { $_.context -notin $devCheckNames -or [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
     -not [bool]$protectionApplication.canary.rulesets_removed -or -not [bool]$protectionApplication.canary.refs_removed -or
     @($protectionApplication.canary.negative_tests | Where-Object result -ne "rejected-http-422").Count -ne 0 -or
     [string]$protectionEvidence.kind -ne "MIR3TerminalProtectionEvidenceManifestV1" -or
@@ -1031,8 +1051,9 @@ foreach ($name in $payloadNames) {
 foreach ($name in @("dev-integrity.json", "main-integrity.json", "legacy-integrity.json")) {
   $payload = $payloads[$name]
   $statusRule = @($payload.rules | Where-Object type -eq "required_status_checks")
+  $expectedChecks = if ($name -eq "dev-integrity.json") { $devCheckNames } else { $promotionCheckNames }
   if (@($payload.bypass_actors).Count -ne 0 -or $statusRule.Count -ne 1 -or
-      (@($statusRule[0].parameters.required_status_checks.context) -join "|") -ne ($checkNames -join "|") -or
+      (@($statusRule[0].parameters.required_status_checks.context) -join "|") -ne ($expectedChecks -join "|") -or
       @($statusRule[0].parameters.required_status_checks | Where-Object { [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
       @($payload.rules | Where-Object type -eq "deletion").Count -ne 1 -or @($payload.rules | Where-Object type -eq "non_fast_forward").Count -ne 1) {
     throw "Terminal branch integrity checks are bypassable or incomplete: $name"
