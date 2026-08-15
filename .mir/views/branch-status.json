@@ -45,10 +45,10 @@
       "branch": "legacy",
       "candidate_floor": "2.5-P13",
       "candidate_id": "2.5-P13",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "2.5.9",
       "source_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "2.0"
     },
     {
@@ -95,10 +95,10 @@
       "branch": "main",
       "candidate_floor": "C33",
       "candidate_id": "C33",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "3.2.9",
       "source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "2.1"
     },
     {
@@ -115,10 +115,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.3-P1",
       "candidate_id": "1.3-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.3.9",
       "source_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "0.13"
     },
     {
@@ -135,10 +135,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.4-P1",
       "candidate_id": "1.4-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.4.9",
       "source_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "0.14"
     },
     {
@@ -155,10 +155,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.5-P1",
       "candidate_id": "1.5-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.5.9",
       "source_commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "0.15"
     },
     {
@@ -175,10 +175,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.6-P1",
       "candidate_id": "1.6-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.6.9",
       "source_commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "0.16"
     },
     {
@@ -195,10 +195,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.7-P1",
       "candidate_id": "1.7-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.7.9",
       "source_commit": "215ccced7018aac70919221c73e15d795f9d1653",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "0.17"
     },
     {
@@ -215,10 +215,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.8-P1",
       "candidate_id": "1.8-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.8.9",
       "source_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "1.0"
     },
     {
@@ -235,10 +235,10 @@
       "branch": "tag-only",
       "candidate_floor": "1.9-P1",
       "candidate_id": "1.9-P1",
-      "effective_status": "automated-qualified-awaiting-human-review",
+      "effective_status": "sealed",
       "release": "1.9.9",
       "source_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
-      "state": "automated-qualified-awaiting-human-review",
+      "state": "sealed",
       "target": "1.1"
     }
   ],

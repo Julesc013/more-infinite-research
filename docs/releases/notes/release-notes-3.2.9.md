@@ -1,30 +1,43 @@
 ---
-title: "MIR 3.2.9 Planning Notes"
-status: draft
+title: "MIR 3.2.9 Release Notes"
+status: current
 applies_to: "3.2.9"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
 
-# MIR 3.2.9 Planning Notes
+# More Infinite Research 3.2.9
 
-MIR 3.2.9 is the planned final MIR 3 release for Factorio 2.1. These are planning notes, not released changes or a compatibility claim.
+Final MIR 3 terminal release for Factorio 2.1.13.
 
-The release starts from immutable MIR 3.2.5 and is limited to admitted defect corrections, stabilization, documentation and locale corrections, package and migration corrections, performance corrections, and release-assurance hardening. MIR 3.2.5 remains the current public release until an exact 3.2.9 candidate completes the normal release gate.
+Candidate: `C33`
 
-There will be no MIR 3.2.6, 3.2.7, or 3.2.8 releases. The detailed cross-target policy is the [MIR 3 terminal `.9` programme](../mir-3-terminal-dot-9-programme.md).
+Archive SHA-256: `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20`
 
-## Current implementation state
+Normalized content SHA-256: `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25`
 
-The admitted implementation now contains `SciencePackProductionRoutePolicyV1`, which evaluates alternate recipes as independent production routes and selects the deterministic earliest safe route before technology names can break a tie. A Factorio 2.1 fixture proves that adding a lexically earlier but downstream route does not delay an already-reachable science pack.
+Upgrade paths: `3.2.5 -> 3.2.9` and `3.2.3 -> 3.2.9`
 
-The implementation also contains exact-version-gated `K2SciencePhasePolicyV1` for Krastorio 2 `2.1.2` with K2SO `2.0.13`. The policy normalizes only MIR-owned stream and base-continuation technologies after lab-compatible science selection, preserves technology IDs and ingredient shapes, and does nothing when the exact envelope is absent. Focused fixture proof, an exact K2/K2SO campaign, and the direct 3.2.5-to-3.2.9 five-archetype upgrade proof are complete. Lower-target projection and the all-nine fixed point remain pending, so this is still not a public release claim.
+## Changes
 
-Direct unmodified Cubium 1.0.28 proof on Factorio 2.0 remains pending authenticated archive acquisition. No unmodified Cubium 2.1 support claim is made while that upstream release cannot load on Factorio 2.1 without a diagnostic shim.
+- Corrects K2/K2SO science-card phasing for the qualified K2 2.1.2 and K2SO 2.0.13 envelope.
+- Selects the deterministic earliest safe science-production route instead of an arbitrary technology-name gate.
+- Resolves direct-effect ownership across the combined compilation plan, including the reported Tesla shooting-speed startup crash.
+- Preserves stable technology IDs, completed research, current research, fractional progress, queue state, and reload behavior across the governed upgrades.
+- Keeps every released setting in its existing Startup/compile scope; MIRSET1 and setting identities are unchanged.
+- Establishes the permanent MIR 3 Factorio 2.1 baseline. Future architecture work belongs to MIR 4.
+
+## Qualification
+
+The exact archive was reconstructed three times from clean detached roots and passed its target-tier automated qualification. Maintainer acceptance is limited to inspection of the exact frozen distribution; engine, settings, compatibility, performance, and upgrade claims come from the recorded automated evidence.
+
+## Installation
+
+Use the attached `more-infinite-research_3.2.9.zip` unchanged. Do not rename or unpack it into another archive.
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity
@@ -33,7 +46,7 @@ Direct unmodified Cubium 1.0.28 proof on Factorio 2.0 remains pending authentica
 
 | Field | Value |
 | --- | --- |
-| State | `automated-qualified-awaiting-human-review` |
+| State | `sealed` |
 | Candidate | `C33` |
 | Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
 | Archive SHA-256 | `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20` |

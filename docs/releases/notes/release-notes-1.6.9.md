@@ -1,0 +1,55 @@
+---
+title: "MIR 1.6.9 Release Notes"
+status: current
+applies_to: "1.6.9"
+audience: player
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-08-15
+supersedes: []
+superseded_by: []
+---
+
+# More Infinite Research 1.6.9
+
+Final MIR 3 terminal release for Factorio 0.16.51.
+
+Candidate: `1.6-P1`
+
+Archive SHA-256: `928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84`
+
+Normalized content SHA-256: `09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493`
+
+Upgrade paths: `1.6.5 -> 1.6.9` and `1.6.0 -> 1.6.9`
+
+## Changes
+
+- Final target-native MIR 3 baseline for Factorio 0.16.51.
+- Preserves the target-supported `.5` behavior, stable public identities, deterministic packaging, explicit omissions, and both governed upgrade paths.
+- Does not approximate unsupported modern features on this historical engine.
+
+## Qualification
+
+The exact archive was reconstructed three times from clean detached roots and passed its target-tier automated qualification. Maintainer acceptance is limited to inspection of the exact frozen distribution; engine, settings, compatibility, performance, and upgrade claims come from the recorded automated evidence.
+
+## Installation
+
+Use the attached `more-infinite-research_1.6.9.zip` unchanged. Do not rename or unpack it into another archive.
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
+## Immutable release identity
+
+> Generated from `path:releases.records/1.6.9.json`. The typed record is authoritative.
+
+| Field | Value |
+| --- | --- |
+| State | `sealed` |
+| Candidate | `1.6-P1` |
+| Package source commit | `595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d` |
+| Archive SHA-256 | `928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84` |
+| Content SHA-256 | `09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493` |
+| Tag | `pending` |
+| Tag commit | `pending` |
+| Assurance exceptions | `pending` |
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:END -->

@@ -7,20 +7,16 @@
   ],
   "release": "2.5.9",
   "remaining_obligations": [
-    "complete-exact-hash-manual-review",
-    "target-and-family-seal",
-    "promote-tag-publish-and-publicly-verify"
+    "promote-tag-publish-and-publicly-verify",
+    "archive-and-mir4-handoff"
   ],
   "remaining_states": [
-    "manually-accepted",
-    "protected-qualified",
-    "sealed",
     "promoted",
     "tagged",
     "published",
     "publicly-verified"
   ],
   "schema": 1,
-  "state": "automated-qualified-awaiting-human-review",
+  "state": "sealed",
   "target": "2.0"
 }

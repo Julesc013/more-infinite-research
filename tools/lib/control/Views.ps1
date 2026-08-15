@@ -377,7 +377,7 @@ function New-MIRCPTodoLines {
   $lines.Add("")
   $lines.Add("## Canonical execution programme")
   $lines.Add("")
-  $lines.Add("The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; no .9 implementation begins before the unified finding inventory is frozen.")
+  $lines.Add("The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; the exact .9 family is source-frozen, qualified, maintainer-accepted, sealed, and ready for governed local tagging.")
   $lines.Add("")
   $lines.Add("Change-record IDs are identities, not execution order. Follow the terminal programme's workstreams and gates.")
   $lines.Add("")
@@ -388,11 +388,11 @@ function New-MIRCPTodoLines {
   $staticBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -in @("static-captured-realized-probes-pending", "complete") }).Count
   $completeBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -eq "complete" }).Count
   $lines.Add("| ``T9-0`` immutable .5 semantic baselines | $staticBaselineCount/9 semantic captures; $completeBaselineCount/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |")
-  $lines.Add("| ``T9-A`` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |")
-  $lines.Add("| ``T9-B`` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |")
-  $lines.Add("| ``T9-C`` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |")
-  $lines.Add("| ``T9-D`` family qualification and seals | Planning only; every candidate unassigned | Freeze after fixed point, allocate candidates, independently qualify and seal all nine, then create one family-readiness seal before any public tag |")
-  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |")
+  $lines.Add("| ``T9-A`` retained .5 assurance debt | Complete and frozen | Reopen only for a false pass/failure, lost evidence, unsafe adoption, or nondeterministic seal |")
+  $lines.Add("| ``T9-B`` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |")
+  $lines.Add("| ``T9-C`` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |")
+  $lines.Add("| ``T9-D`` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |")
+  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication in progress; Mod Portal manual upload pending | Verify public bytes and exact-engine smokes, complete terminal indexes, then hand sealed baselines to MIR 4 |")
   $lines.Add("")
   $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
   if ($plannedChanges.Count -gt 0) {
@@ -538,17 +538,18 @@ function Update-MIRCPViews {
     authority = "mir-generated-terminal-family-publication-checklist-v1"
     generated_from = @("path:releases.current", ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json", "path:releases.records/*.9.json")
     family = @($terminalReleases | ForEach-Object {
+      $targetSealPath = Join-Path $repo ".mir/releases/terminal/seals/$($_.release).json"
       [pscustomobject][ordered]@{
         release = [string]$_.release
         candidate_id = [string]$_.candidate_id
         state = [string]$_.state
         remaining_states = @(Get-MIRCPRemainingReleaseStates -Release $_ -RepoRoot $repo)
-        target_seal_present = $false
+        target_seal_present = (Test-Path -LiteralPath $targetSealPath -PathType Leaf)
       }
     })
-    family_readiness_seal_present = $false
-    first_public_tag_admitted = $false
-    publication_admitted = $false
+    family_readiness_seal_present = (Test-Path -LiteralPath (Join-Path $repo ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json") -PathType Leaf)
+    first_public_tag_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
+    publication_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check
 
@@ -564,7 +565,9 @@ function Update-MIRCPViews {
     remaining_obligations = @($backport.remaining_obligations)
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.backport_queue) -Value $backportQueue -RepoRoot $repo -Check:$Check
-  Set-MIRCPReleaseNoteIdentityBlock -Release $canonical -RepoRoot $repo -Check:$Check
+  foreach ($terminalRelease in $terminalReleases) {
+    Set-MIRCPReleaseNoteIdentityBlock -Release $terminalRelease -RepoRoot $repo -Check:$Check
+  }
 
   return [pscustomobject][ordered]@{status=if ($Check) { "current" } else { "updated" }; releases=$releases.Count; changes=$changes.Count; incidents=$incidents.Count; tasks=$tasks.Count}
 }

@@ -16,6 +16,8 @@ $authorityNames = @(
   "MIR3-Terminal-Candidate-AllocationV1",
   "MIR3TerminalCandidateReconstructionReceiptV1",
   "MIR3TerminalCandidateSettingsQualificationV1",
+  "MIR3TerminalMaintainerAcceptanceV1",
+  "MIR3TerminalFamilyReadinessV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3TerminalFixedPointReceiptV1",
   "MIR3TerminalSourceFreezeV1",
@@ -32,6 +34,7 @@ $authorityNames = @(
   "MIR3-Compatibility-ClaimsV1",
   "MIR3-Effective-Mutation-Owner-ReportV1",
   "MIR3-FINAL-DEFECT-INDEX",
+  "MIR3FinalDefectQualificationReconciliationV1",
   "MIR3-Engine-Gap-AuditV1",
   "MIR3TerminalProductAdmissionBundleV1"
 )
@@ -264,8 +267,8 @@ if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work 
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
-    [string]$programme.status -ne "family-ready-for-human-review") {
-  throw "Terminal programme must bind the exact automated-qualified nine-candidate family awaiting human review."
+    [string]$programme.status -ne "ready-for-local-tagging") {
+  throw "Terminal programme must bind the exact qualified, accepted, and sealed nine-candidate family ready for local tagging."
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -279,11 +282,14 @@ $productIntakeSchemaByKind = @{
   "MIR3-Compatibility-ClaimsV1" = "mir3-compatibility-claims"
   "MIR3-Effective-Mutation-Owner-ReportV1" = "mir3-effective-mutation-owner-report"
   "MIR3-FINAL-DEFECT-INDEX" = "mir3-final-defect-index"
+  "MIR3FinalDefectQualificationReconciliationV1" = "mir3-final-defect-qualification-reconciliation"
   "MIR3-Engine-Gap-AuditV1" = "mir3-engine-gap-audit"
   "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
   "MIR3TerminalFixedPointReceiptV1" = "mir3-terminal-fixed-point-receipt"
   "MIR3TerminalCandidateReconstructionReceiptV1" = "mir3-terminal-candidate-reconstruction"
   "MIR3TerminalCandidateSettingsQualificationV1" = "mir3-terminal-candidate-settings-qualification"
+  "Mir3TerminalMaintainerAcceptanceV1" = "mir3-terminal-maintainer-acceptance"
+  "Mir3TerminalFamilyReadinessV1" = "mir3-terminal-family-readiness"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -601,7 +607,7 @@ foreach ($release in $family) {
       [long]$packageLock[0].archive_bytes -ne [long]$row[0].bytes -or
       [int]$packageLock[0].archive_entries -ne [int]$row[0].entries -or
       [string]$packageLock[0].mode -ne "frozen-terminal-candidate-awaiting-manual-approval" -or
-      [string]$record.state -ne "automated-qualified-awaiting-human-review" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+      [string]$record.state -ne "sealed" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
       [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
       [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
       [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
@@ -646,7 +652,7 @@ foreach ($release in $family) {
       -not [bool]$qualification.manual_review.required -or
       [string]$qualification.manual_review.status -ne "pending-maintainer-approval" -or
       -not [bool]$qualification.manual_review.candidate_hash_bound) {
-    throw "Terminal automated qualification is absent, malformed, or not candidate-bound: $release"
+    throw "Terminal immutable automated qualification is absent, malformed, or not candidate-bound: $release"
   }
   $requiredChecks = @($qualification.required_checks)
   $resultIds = @($qualification.results.id)
@@ -1019,7 +1025,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-candidate-settings-qualification", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-candidate-settings-qualification", "mir3-terminal-maintainer-acceptance", "mir3-terminal-qualification-review", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-defect-qualification-reconciliation", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -1101,9 +1107,12 @@ if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $curr
     $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
     $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
     $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "family-ready-for-human-review") {
-  throw "Current release roles do not distinguish published .5 from automated-qualified .9 candidates awaiting human review."
+    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "ready-for-local-tagging") {
+  throw "Current release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."
 }
+
+& (Join-Path $RepoRoot "tools/commands/release/New-MIR3TerminalReleaseCeremony.ps1") -RepoRoot $RepoRoot -Check
+if ($LASTEXITCODE -ne 0) { throw "MIR 3 terminal release-ceremony authority validation failed." }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json
 if ([string]$wave.mod_portal_custody.authority -ne [string]$baselineQueue.source_authorities.mod_portal_custody -or

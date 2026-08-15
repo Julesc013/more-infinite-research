@@ -1,0 +1,118 @@
+{
+  "candidate_allocation": {
+    "path": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "sha256": "622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010"
+  },
+  "completion_updates": [
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "MIR3-TERM-0027",
+      "source_kind": "terminal-finding"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "MIR3-TERM-0028",
+      "source_kind": "terminal-finding"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "MIR3-TERM-0031",
+      "source_kind": "terminal-finding"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "6a4e8c6884594f98390cc27e",
+      "source_kind": "mod-portal-discussion"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "6a58dc5e15625739f8897041",
+      "source_kind": "mod-portal-discussion"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "6a79147520108b995a72702a",
+      "source_kind": "mod-portal-discussion"
+    },
+    {
+      "final_completion": "final-candidate-qualified-and-sealed",
+      "prior_completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification",
+      "source_id": "6a7cc4ed6d4d8ec344e3cc66",
+      "source_kind": "mod-portal-discussion"
+    }
+  ],
+  "fixed_point_defect_index": {
+    "mutated": false,
+    "path": ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json",
+    "sha256": "DD683F8AF324B96D7E034B4325E36DAD184002880070E9B78733C8BEC6A6217C",
+    "status": "terminal-dispositions-complete-fixed-point-accepted"
+  },
+  "kind": "MIR3FinalDefectQualificationReconciliationV1",
+  "record_sha256": "424B9C8CD5F9490CCD80A811EF49FD6606E896DF702C35B0E45CBE5824B177DF",
+  "recorded_at": "2026-08-15T14:27:50+10:00",
+  "schema": 1,
+  "status": "final-candidates-qualified-and-sealed",
+  "target_seals": [
+    {
+      "path": ".mir/releases/terminal/seals/3.2.9.json",
+      "record_sha256": "BD1371FD08A6E87D9DB3220A9B6F5F89FA657644235D7A3996EE90B430D31723",
+      "release": "3.2.9",
+      "sha256": "A098AC1F487BE702114F480C7BFEECA9BA19168DEB2B50FC69D8C36455C9B9EF"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/2.5.9.json",
+      "record_sha256": "A3DD1C36FAAC7D5EE79D8BFA19108E5A9C570A0CD17548B320A47D36A04B88E9",
+      "release": "2.5.9",
+      "sha256": "8A49DF73690EC53F3161959D53517898887DAE75336F22BFE6A34AE2EE8E8565"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.9.9.json",
+      "record_sha256": "7BAEA7B09CA55007EA913E1745D5913DB01A2A134A14FAB0BAF35899E2C47B39",
+      "release": "1.9.9",
+      "sha256": "E3353EB81AB538D0732E3A092AB9DD0E8C88FAF161409F8FEA6E124B13864A14"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.8.9.json",
+      "record_sha256": "4B2C18E8D19F76798EA8C2613A1C5330632BC358635BD368BD0EDF9D6A170496",
+      "release": "1.8.9",
+      "sha256": "12C94FE381100B2D3421A808D2F2FDF602D055567ACDF9CD9071FA19D057E3B9"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.7.9.json",
+      "record_sha256": "84CBEF99D17F4722CD250616715A7C227A1C753F03A81550B51F83B09829AACC",
+      "release": "1.7.9",
+      "sha256": "0E98BC0E5FC77D66802A6BEA67208925AC47BE9A493D4CEB184C824DA6548564"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.6.9.json",
+      "record_sha256": "E34DBBE77AFD93B1105853F5D20DBED3581F311BBB4C94CA1FE729F668A8A999",
+      "release": "1.6.9",
+      "sha256": "FBCF04C327DD303D3DEBF26FD04F134BDB08497CF72FD70721DED33D9FA6063E"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.5.9.json",
+      "record_sha256": "5A44447BDBFB4C786EED12E05B36492D1CF2FA714E16FBA636F37987E044FF94",
+      "release": "1.5.9",
+      "sha256": "3CFE3F30AD33B1A3CDDED6E22277736CFDD38D4AF0E6167AD8EC6DD43D0215C4"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.4.9.json",
+      "record_sha256": "EA6961A0075FF7BDD2065DC8EA813E2A0AE156B89762DCE74B2CF59A0FF32BB8",
+      "release": "1.4.9",
+      "sha256": "61C2555DD6E5DF6FE38C3FAFF70E0FBCEC24D070F2B6A0B90A355CAA8407215E"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.3.9.json",
+      "record_sha256": "F41067FE163C1AF7DA9A49FDDA83C63CFAF5150686344D421D5CB30A365F1080",
+      "release": "1.3.9",
+      "sha256": "9F740293F7F48FBDB3E50CF1320EED922C7BF16C2B969574329164AFC3CB43E3"
+    }
+  ],
+  "unresolved_release_blockers": 0
+}

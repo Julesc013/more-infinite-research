@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-maintainer-acceptance.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-maintainer-acceptance.schema.json",
+  "title": "Mir3TerminalMaintainerAcceptanceV1",
+  "type": "object",
+  "required": ["schema", "kind", "recorded_at", "reviewer", "scope", "decision", "statement", "limitations", "condition", "candidates", "authorization", "record_sha256", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "Mir3TerminalMaintainerAcceptanceV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "reviewer": {"const": "Julesc013"},
+    "decision": {"const": "approved"},
+    "candidates": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": ["release", "candidate_id", "candidate_commit", "source_tree", "archive_sha256", "content_sha256", "bytes", "entries"],
+        "properties": {
+          "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+          "candidate_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "archive_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+          "content_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "required": ["create_target_seals", "create_family_readiness", "promote_branches", "create_annotated_tags", "publish_github_releases", "mod_portal_upload"],
+      "properties": {
+        "create_target_seals": {"const": true},
+        "create_family_readiness": {"const": true},
+        "promote_branches": {"const": true},
+        "create_annotated_tags": {"const": true},
+        "publish_github_releases": {"const": true},
+        "mod_portal_upload": {"const": false}
+      }
+    },
+    "record_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$", "description": "SHA-256 of canonical final record with record_sha256 omitted."},
+    "status": {"const": "accepted-exact-nine-candidate-distributions"}
+  },
+  "additionalProperties": true
+}
