@@ -31,6 +31,7 @@ on:
 permissions:
   contents: read
   checks: write
+  statuses: write
 
 jobs:
   branch-policy:
@@ -96,5 +97,16 @@ jobs:
                   ? 'The exact allocated candidate, archive, maintainer acceptance, target seal, family readiness, remote candidate ref, and fast-forward boundary passed the current package-excluded promotion controller.'
                   : 'Terminal promotion verification failed closed. Inspect the workflow evidence; branch promotion is forbidden.'
               }
+            });
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha,
+              state: passed ? 'success' : 'failure',
+              context: 'terminal-promotion-verification',
+              target_url: runUrl,
+              description: passed
+                ? 'Exact sealed MIR 3 terminal candidate passed promotion verification.'
+                : 'Terminal promotion verification failed closed.'
             });
             if (!passed) core.setFailed('Terminal promotion verification did not pass.');

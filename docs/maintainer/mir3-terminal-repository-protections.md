@@ -42,6 +42,8 @@ The promotion context is intentionally unique. GitHub requires every check and c
 
 The required-context amendment was applied and read back on 15 August 2026. Its append-only receipt is `.mir/evidence/terminal-protections/2026-08-15/required-context-amendment-application-receipt.json`; it binds rulesets `20833408` and `20833410`, current controller commit `92ba00191fc511af6aa9445c8aa267e97d1cc8e5`, both successful candidate controller runs, and the exact App-ID-bound check runs attached to each immutable candidate.
 
+The controller publishes the same fail-closed result as both a Checks API check run and a commit status under the unique context name. GitHub may evaluate either transport when enforcing a ruleset required-status context. Because both records are emitted by the same GitHub Actions step with the same conclusion, GitHub's rule that every same-named check and status must pass preserves the fail-closed boundary; neither signal can mask a failure in the other.
+
 ## Tag model
 
 The nine published `.5` refs are immutable immediately and have no bypass:
