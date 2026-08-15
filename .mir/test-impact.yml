@@ -193,6 +193,36 @@
       "tags": []
     },
     {
+      "pattern": "validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/evidence/mir4-r0/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "spec/schemas/mir4-*.schema.json",
       "groups": [],
       "scenarios": [],
@@ -200,6 +230,12 @@
     },
     {
       "pattern": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json",
       "groups": [],
       "scenarios": [],
       "tags": []

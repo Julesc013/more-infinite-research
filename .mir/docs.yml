@@ -2564,6 +2564,7 @@ docs:
       - mir4-bootstrap-local-candidate-boundary
       - mir4-bootstrap-canonical-json-v1
       - mir4-bootstrap-seal-restoration-order
+      - mir4-bootstrap-capsule-reconstruction-boundary
   - path: docs/architecture/mir4-r0-bootstrap.md
     title: "MIR 4 R0 Bootstrap"
     status: current
@@ -2575,6 +2576,8 @@ docs:
       - mir4-r0-bootstrap-root-set
       - mir4-r0-current-status
       - mir4-r0-executable-queue
+      - mir4-bootstrap-target-readiness
+      - mir3-terminal-public-visibility-status
   - path: docs/releases/mir-3-terminal-dot-9-programme.md
     title: "MIR 3 Terminal .9 Programme"
     status: current
@@ -2599,6 +2602,7 @@ docs:
     source_of_truth_for:
       - mir4-bootstrap-local-candidate-execution-plan
       - mir4-bootstrap-local-candidate-status
+      - mir4-final-programme-reconciliation-status
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current

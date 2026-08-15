@@ -31,6 +31,53 @@ function Assert-Equal([string]$Actual, [string]$Expected, [string]$Context) {
   if ($Actual -cne $Expected) { throw "$Context mismatch: expected '$Expected', got '$Actual'." }
 }
 
+function Invoke-MIR4CapsuleChildProcess {
+  param(
+    [Parameter(Mandatory)][string]$PwshPath,
+    [Parameter(Mandatory)][string]$RunnerPath,
+    [Parameter(Mandatory)][string]$CapsulePath,
+    [Parameter(Mandatory)][string]$EnvelopePath,
+    [Parameter(Mandatory)][string]$PredecessorPath,
+    [Parameter(Mandatory)][string]$ToolchainRoot,
+    [Parameter(Mandatory)][string]$OutputPath
+  )
+
+  $processInfo = [Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $PwshPath
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.WorkingDirectory = (Split-Path -Parent $OutputPath)
+  $processInfo.RedirectStandardOutput = $true
+  $processInfo.RedirectStandardError = $true
+  foreach ($argument in @(
+    '-NoLogo', '-NoProfile', '-NonInteractive', '-File', $RunnerPath,
+    '-CapsulePath', $CapsulePath,
+    '-EnvelopePath', $EnvelopePath,
+    '-PredecessorPath', $PredecessorPath,
+    '-ToolchainRoot', $ToolchainRoot,
+    '-OutputRoot', $OutputPath
+  )) { $null = $processInfo.ArgumentList.Add([string]$argument) }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $processInfo
+  if (-not $process.Start()) { throw 'Unable to start the detached MIR 4 capsule reconstruction process.' }
+  $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+  $stderrTask = $process.StandardError.ReadToEndAsync()
+  $process.WaitForExit()
+  $stdout = $stdoutTask.GetAwaiter().GetResult()
+  $stderr = $stderrTask.GetAwaiter().GetResult()
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+  if ($exitCode -ne 0) { throw "Detached MIR 4 capsule reconstruction failed with exit code $exitCode`: $stderr" }
+  $summaryLines = @($stdout -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+  if ($summaryLines.Count -ne 1) { throw "Detached MIR 4 capsule reconstruction emitted an unexpected stdout protocol: $stdout" }
+  $summary = $summaryLines[0] | ConvertFrom-Json
+  if ([string]$summary.status -cne 'passed' -or [string]$summary.candidate_path -cne 'candidate.zip' -or
+      [string]$summary.receipt_path -cne 'reconstruction.json') {
+    throw 'Detached MIR 4 capsule reconstruction returned an invalid summary.'
+  }
+  return $summary
+}
+
 function Assert-MIR4PlanTarget {
   param(
     [Parameter(Mandatory)]$PlanTarget,
@@ -113,18 +160,18 @@ function Test-MIR4ExistingCandidate {
   Assert-Equal ([string]$inventory.entry_count) ([string]$manifest.local_distribution.entry_count) "candidate entry count"
 
   $capsulePath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$manifest.source_capsule.path)
-  $capsuleInventory = Get-MIR4ArchiveInventory -Path $capsulePath
-  Assert-Equal ([string]$capsuleInventory.root) 'source' "source capsule root"
+  $capsuleRecordPath = Join-Path (Split-Path -Parent $capsulePath) 'source-capsule.json'
+  $capsuleRunnerPath = Join-Path (Split-Path -Parent $capsulePath) 'Invoke-MIR4BootstrapCapsule.ps1'
+  $capsuleArtifact = Assert-MIR4BootstrapCapsuleArtifact `
+    -CapsulePath $capsulePath `
+    -EnvelopePath $capsuleRecordPath `
+    -RunnerPath $capsuleRunnerPath `
+    -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
+  $capsuleInventory = $capsuleArtifact.inventory
   foreach ($field in @('archive_sha256', 'content_sha256', 'bytes', 'entry_count')) {
     Assert-Equal ([string]$capsuleInventory.$field) ([string]$manifest.source_capsule.$field) "source capsule $field"
   }
-  $capsuleRecordPath = Join-Path (Split-Path -Parent $capsulePath) 'source-capsule.json'
-  $capsuleRecordText = Get-Content -Raw -LiteralPath $capsuleRecordPath
-  if (-not ($capsuleRecordText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-source-capsule.schema.json'))) {
-    throw "Source capsule record schema validation failed: $capsuleRecordPath"
-  }
-  $capsuleRecord = $capsuleRecordText | ConvertFrom-Json
-  if (-not (Test-MIR4BootstrapRecordHash -Record $capsuleRecord)) { throw "Source capsule record self-hash mismatch: $capsuleRecordPath" }
+  $capsuleRecord = $capsuleArtifact.envelope
   Assert-Equal ([string]$capsuleRecord.record_sha256) ([string]$manifest.source_capsule_record_sha256) "source capsule record binding"
   Assert-Equal ([string]$capsuleRecord.target_key) ([string]$PlanTarget.target_key) "source capsule target"
   Assert-Equal ([string]$capsuleRecord.factorio_line) ([string]$PlanTarget.factorio_line) "source capsule Factorio line"
@@ -136,6 +183,38 @@ function Test-MIR4ExistingCandidate {
   Assert-Equal ([string]$capsuleRecord.capsule.content_sha256) ([string]$capsuleInventory.content_sha256) "source capsule record content"
   Assert-Equal ([string]$capsuleRecord.package_membership.authority_sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')) "package membership tool hash"
   Assert-Equal ([string]$capsuleRecord.package_membership.capsule_tool_sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')) "source capsule tool hash"
+  foreach ($governedRelative in @(
+    (Get-MIR4BootstrapCapsuleControllerPaths) +
+    (Get-MIR4BootstrapCapsuleAuthorityPaths) +
+    (Get-MIR4BootstrapCapsuleSchemaPaths)
+  )) {
+    $memberRows = @($capsuleArtifact.manifest.members | Where-Object { [string]$_.path -ceq [string]$governedRelative })
+    if ($memberRows.Count -ne 1) { throw "Source capsule omits governed closure input: $governedRelative" }
+    Assert-Equal ([string]$memberRows[0].sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot $governedRelative)) "governed source capsule member $governedRelative"
+  }
+  foreach ($field in @('internal_manifest_record_sha256', 'payload_root_sha256', 'capsule_content_root_sha256', 'authority_closure_root_sha256', 'git_source_proof_record_sha256', 'toolchain_lock_record_sha256', 'canonical_builder_sha256', 'reconstruction_runner_sha256')) {
+    Assert-Equal ([string]$manifest.capsule_closure.$field) ([string]$capsuleRecord.closure.$field) "candidate capsule closure $field"
+  }
+  if ([int]$manifest.capsule_closure.capture_count -ne 2 -or
+      [bool]$manifest.capsule_closure.captures_identical -ne $true -or
+      [bool]$manifest.capsule_closure.separate_processes -ne $true -or
+      [bool]$manifest.capsule_closure.complete_ab_workspaces_deleted_before_c -ne $true -or
+      [string]$manifest.capsule_closure.c_reconstruction_source -cne 'copied-canonical-capsule-no-checkout') {
+    throw 'Candidate capsule construction claims do not describe the required A/B/delete/C sequence.'
+  }
+
+  $predecessorPath = Join-Path $RepoRoot ([string]$PlanTarget.predecessor.archive_path)
+  $actualComparison = Compare-MIR4BootstrapCandidate `
+    -CandidatePath $archivePath `
+    -PredecessorPath $predecessorPath `
+    -ExpectedCandidateVersion $PlanTarget.distribution_version `
+    -ExpectedPredecessorVersion $PlanTarget.predecessor.release `
+    -ExpectedCandidateRoot "more-infinite-research_$($PlanTarget.distribution_version)" `
+    -ExpectedPredecessorRoot "more-infinite-research_$($PlanTarget.predecessor.release)" `
+    -ThrowOnDifference
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.equivalence)) {
+    throw "Candidate equivalence record is stale or incomplete."
+  }
 
   $rows = @($manifest.reconstructions)
   if ($rows.Count -ne 3 -or (@($rows.id) -join '|') -cne 'A|B|C') { throw "Candidate manifest must contain exact A/B/C reconstructions." }
@@ -146,23 +225,73 @@ function Test-MIR4ExistingCandidate {
       Assert-Equal ([string]$rowInventory.$field) ([string]$row.$field) "reconstruction $($row.id) $field"
     }
     $rowCapsulePath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$row.source_capsule_path)
-    $rowCapsuleInventory = Get-MIR4ArchiveInventory -Path $rowCapsulePath
-    Assert-Equal ([string]$rowCapsuleInventory.root) 'source' "reconstruction $($row.id) capsule root"
+    $rowCapsuleEnvelopePath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$row.source_capsule_envelope_path)
+    $rowRunnerPath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$row.reconstruction_runner_path)
+    $rowCapsuleArtifact = Assert-MIR4BootstrapCapsuleArtifact `
+      -CapsulePath $rowCapsulePath `
+      -EnvelopePath $rowCapsuleEnvelopePath `
+      -RunnerPath $rowRunnerPath `
+      -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
+    $rowCapsuleInventory = $rowCapsuleArtifact.inventory
     Assert-Equal ([string]$rowCapsuleInventory.archive_sha256) ([string]$row.source_capsule_archive_sha256) "reconstruction $($row.id) capsule archive"
-    $rowCapsuleRecordPath = Join-Path (Split-Path -Parent $rowCapsulePath) 'source-capsule.json'
-    $rowCapsuleRecordText = Get-Content -Raw -LiteralPath $rowCapsuleRecordPath
-    if (-not ($rowCapsuleRecordText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-source-capsule.schema.json'))) {
-      throw "Reconstruction $($row.id) source capsule schema validation failed."
-    }
-    $rowCapsuleRecord = $rowCapsuleRecordText | ConvertFrom-Json
-    if (-not (Test-MIR4BootstrapRecordHash -Record $rowCapsuleRecord)) { throw "Reconstruction $($row.id) source capsule record self-hash mismatch." }
+    $rowCapsuleRecord = $rowCapsuleArtifact.envelope
     Assert-Equal ([string]$rowCapsuleRecord.record_sha256) ([string]$row.source_capsule_record_sha256) "reconstruction $($row.id) capsule record"
     Assert-Equal ([string]$rowCapsuleRecord.capsule.archive_sha256) ([string]$rowCapsuleInventory.archive_sha256) "reconstruction $($row.id) capsule record archive"
+    Assert-Equal ([string]$row.capsule_content_root_sha256) ([string]$rowCapsuleRecord.closure.capsule_content_root_sha256) "reconstruction $($row.id) capsule content root"
+    Assert-Equal ([string]$row.toolchain_lock_record_sha256) ([string]$rowCapsuleArtifact.toolchain_lock.record_sha256) "reconstruction $($row.id) toolchain lock root"
+    $receiptPath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$row.receipt_path)
+    $receiptText = Get-Content -Raw -LiteralPath $receiptPath
+    if (-not ($receiptText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json'))) {
+      throw "Reconstruction $($row.id) receipt schema validation failed."
+    }
+    $receipt = $receiptText | ConvertFrom-Json -Depth 100
+    if (-not (Test-MIR4BootstrapRecordHash -Record $receipt)) { throw "Reconstruction $($row.id) receipt self-hash mismatch." }
+    foreach ($field in @('record_sha256', 'source_capsule_record_sha256', 'source_capsule_archive_sha256', 'capsule_content_root_sha256', 'toolchain_lock_record_sha256', 'package_manifest_sha256', 'equivalence_sha256', 'input_root_sha256', 'result_root_sha256')) {
+      $rowField = if ($field -eq 'record_sha256') { 'reconstruction_record_sha256' } else { $field }
+      Assert-Equal ([string]$receipt.$field) ([string]$row.$rowField) "reconstruction $($row.id) receipt $field"
+    }
+    if ([string]$receipt.mode -cne 'capsule-local-fresh-process' -or [bool]$receipt.capsule_only -ne $true -or
+        [bool]$receipt.checkout_argument_supplied -ne $false -or [string]$row.mode -cne [string]$receipt.mode -or
+        [bool]$row.capsule_only -ne $true -or [bool]$row.checkout_argument_supplied -ne $false) {
+      throw "Reconstruction $($row.id) is not a capsule-only fresh child process."
+    }
+    foreach ($field in @('archive_sha256', 'content_sha256', 'bytes', 'entry_count')) {
+      Assert-Equal ([string]$receipt.candidate.$field) ([string]$row.$field) "reconstruction $($row.id) receipt candidate $field"
+      Assert-Equal ([string]$receipt.predecessor.$field) ([string]$PlanTarget.predecessor.$field) "reconstruction $($row.id) receipt predecessor $field"
+    }
+    Assert-Equal ([string]$receipt.target_key) ([string]$PlanTarget.target_key) "reconstruction $($row.id) receipt target"
+    Assert-Equal ([string]$receipt.factorio_line) ([string]$PlanTarget.factorio_line) "reconstruction $($row.id) receipt Factorio line"
+    Assert-Equal ([string]$receipt.distribution_version) ([string]$PlanTarget.distribution_version) "reconstruction $($row.id) receipt version"
+    $packageRows = @($rowInventory.entries | ForEach-Object { "$($_.path)|$($_.bytes)|$($_.raw_sha256)" })
+    $expectedPackageManifest = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.package-manifest.v1' -Fields ([ordered]@{ entries = $packageRows })
+    $expectedEquivalenceSha = Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.equivalence)
+    if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.equivalence) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison)) {
+      throw "Reconstruction $($row.id) receipt equivalence differs from the freshly verified candidate."
+    }
+    $expectedInputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v1' -Fields ([ordered]@{
+      capsule_content_root_sha256 = [string]$rowCapsuleRecord.closure.capsule_content_root_sha256
+      envelope_record_sha256 = [string]$rowCapsuleRecord.record_sha256
+      predecessor_archive_sha256 = [string]$PlanTarget.predecessor.archive_sha256
+      toolchain_lock_record_sha256 = [string]$rowCapsuleArtifact.toolchain_lock.record_sha256
+    })
+    $expectedResultRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-result.v1' -Fields ([ordered]@{
+      candidate_archive_sha256 = [string]$rowInventory.archive_sha256
+      candidate_content_sha256 = [string]$rowInventory.content_sha256
+      package_manifest_sha256 = $expectedPackageManifest
+      equivalence_sha256 = $expectedEquivalenceSha
+    })
+    Assert-Equal ([string]$receipt.package_manifest_sha256) $expectedPackageManifest "reconstruction $($row.id) package manifest root"
+    Assert-Equal ([string]$receipt.equivalence_sha256) $expectedEquivalenceSha "reconstruction $($row.id) equivalence digest"
+    Assert-Equal ([string]$receipt.input_root_sha256) $expectedInputRoot "reconstruction $($row.id) input root"
+    Assert-Equal ([string]$receipt.result_root_sha256) $expectedResultRoot "reconstruction $($row.id) result root"
   }
   if (@($rows.archive_sha256 | Sort-Object -Unique).Count -ne 1 -or
       @($rows.content_sha256 | Sort-Object -Unique).Count -ne 1 -or
       @($rows.source_capsule_archive_sha256 | Sort-Object -Unique).Count -ne 1 -or
-      @($rows.source_capsule_record_sha256 | Sort-Object -Unique).Count -ne 1) {
+      @($rows.source_capsule_record_sha256 | Sort-Object -Unique).Count -ne 1 -or
+      @($rows.reconstruction_record_sha256 | Sort-Object -Unique).Count -ne 1 -or
+      @($rows.package_manifest_sha256 | Sort-Object -Unique).Count -ne 1 -or
+      @($rows.equivalence_sha256 | Sort-Object -Unique).Count -ne 1) {
     throw "A/B/C candidate or source-capsule identities differ."
   }
   $expectedAuthorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields ([ordered]@{
@@ -176,6 +305,7 @@ function Test-MIR4ExistingCandidate {
     source_capsule_record_sha256 = [string]$manifest.source_capsule_record_sha256
     source_capsule_archive_sha256 = [string]$manifest.source_capsule.archive_sha256
     source_capsule_content_sha256 = [string]$manifest.source_capsule.content_sha256
+    capsule_content_root_sha256 = [string]$manifest.capsule_closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$inventory.archive_sha256
     candidate_content_sha256 = [string]$inventory.content_sha256
   })
@@ -193,18 +323,6 @@ function Test-MIR4ExistingCandidate {
   if ([bool]$manifest.qualification.runtime_claim_permitted -ne $false -or
       [bool]$manifest.qualification.release_claim_permitted -ne $false) {
     throw "Candidate qualification must not permit runtime or release claims."
-  }
-  $predecessorPath = Join-Path $RepoRoot ([string]$PlanTarget.predecessor.archive_path)
-  $actualComparison = Compare-MIR4BootstrapCandidate `
-    -CandidatePath $archivePath `
-    -PredecessorPath $predecessorPath `
-    -ExpectedCandidateVersion $PlanTarget.distribution_version `
-    -ExpectedPredecessorVersion $PlanTarget.predecessor.release `
-    -ExpectedCandidateRoot "more-infinite-research_$($PlanTarget.distribution_version)" `
-    -ExpectedPredecessorRoot "more-infinite-research_$($PlanTarget.predecessor.release)" `
-    -ThrowOnDifference
-  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.equivalence)) {
-    throw "Candidate equivalence record is stale or incomplete."
   }
   return $manifest
 }
@@ -345,51 +463,161 @@ foreach ($targetPlan in $targets) {
   $candidateRoot = Join-Path $OutputRoot "candidates\$($targetPlan.target_key)"
   Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path $candidateRoot
   New-Item -ItemType Directory -Force -Path $candidateRoot | Out-Null
+  $receiptRoot = Join-Path $OutputRoot "receipts\$($targetPlan.target_key)"
+  Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path $receiptRoot
+  New-Item -ItemType Directory -Force -Path $receiptRoot | Out-Null
   $reconstructions = @()
   $candidatePaths = @()
-  $capsules = @()
+  $capsules = [ordered]@{}
+  foreach ($id in @('A', 'B')) {
+    $capture = New-MIR4BootstrapSourceCapsule -RepoRoot $RepoRoot -Target $targetPlan -OutputRoot $OutputRoot -CapsuleId $id
+    $artifact = Assert-MIR4BootstrapCapsuleArtifact `
+      -CapsulePath $capture.archive_path `
+      -EnvelopePath $capture.record_path `
+      -RunnerPath $capture.runner_path `
+      -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
+    $capsules[$id] = [pscustomobject][ordered]@{ result = $capture; artifact = $artifact }
+  }
+  foreach ($field in @('archive_sha256', 'content_sha256')) {
+    Assert-Equal ([string]$capsules.A.artifact.inventory.$field) ([string]$capsules.B.artifact.inventory.$field) "independent capsule capture $field"
+  }
+  Assert-Equal ([string]$capsules.A.result.record.record_sha256) ([string]$capsules.B.result.record.record_sha256) 'independent capsule envelope'
+  Assert-Equal ([string]$capsules.A.result.record.closure.capsule_content_root_sha256) ([string]$capsules.B.result.record.closure.capsule_content_root_sha256) 'independent capsule content root'
 
-  for ($index = 0; $index -lt $Repetitions; $index++) {
-    $id = [char]([int][char]'A' + $index)
-    $capsule = New-MIR4BootstrapSourceCapsule -RepoRoot $RepoRoot -Target $targetPlan -OutputRoot $OutputRoot -CapsuleId ([string]$id)
-    $capsuleInventory = Get-MIR4ArchiveInventory -Path $capsule.archive_path
-    $capsules += [pscustomobject][ordered]@{ result = $capsule; inventory = $capsuleInventory }
-    $runRoot = Join-Path $candidateRoot ([string]$id)
-    $extractRoot = Join-Path $runRoot 'reconstruction'
-    New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
-    Expand-MIR4SafeArchive -ArchivePath $capsule.archive_path -Destination $extractRoot -OutputRoot $OutputRoot
-    $sourceRoot = Join-Path $extractRoot 'source'
-    $infoPath = Join-Path $sourceRoot 'info.json'
-    $sourceInfo = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
-    Assert-Equal ([string]$sourceInfo.version) ([string]$targetPlan.predecessor.release) "$($targetPlan.target_key) capsule predecessor version"
-    Assert-Equal ([string]$sourceInfo.factorio_version) ([string]$targetPlan.factorio_line) "$($targetPlan.target_key) capsule Factorio line"
-    Set-MIR4InfoVersion -InfoPath $infoPath -Version ([string]$targetPlan.distribution_version)
+  $capsuleCRoot = Join-Path $capsuleTargetRoot 'C'
+  New-Item -ItemType Directory -Force -Path $capsuleCRoot | Out-Null
+  $capsuleCPath = Join-Path $capsuleCRoot 'source-capsule.zip'
+  $envelopeCPath = Join-Path $capsuleCRoot 'source-capsule.json'
+  $runnerCPath = Join-Path $capsuleCRoot 'Invoke-MIR4BootstrapCapsule.ps1'
+  Copy-Item -LiteralPath $capsules.A.result.archive_path -Destination $capsuleCPath
+  Copy-Item -LiteralPath $capsules.A.result.record_path -Destination $envelopeCPath
+  Copy-Item -LiteralPath $capsules.A.result.runner_path -Destination $runnerCPath
+  $capsules.C = [pscustomobject][ordered]@{
+    result = [pscustomobject][ordered]@{
+      archive_path = $capsuleCPath
+      record_path = $envelopeCPath
+      runner_path = $runnerCPath
+      record = (Get-Content -Raw -LiteralPath $envelopeCPath | ConvertFrom-Json -Depth 100)
+    }
+    artifact = Assert-MIR4BootstrapCapsuleArtifact `
+      -CapsulePath $capsuleCPath `
+      -EnvelopePath $envelopeCPath `
+      -RunnerPath $runnerCPath `
+      -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
+  }
 
-    $packageName = "more-infinite-research_$($targetPlan.distribution_version)"
-    $candidatePath = Join-Path $runRoot "$packageName.zip"
-    Write-MIR4DeterministicArchive -SourceRoot $sourceRoot -EntryRoot $packageName -OutputPath $candidatePath -ContainmentRoot $OutputRoot
+  $tempParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  $constructionTaskRoot = Join-Path $tempParent ("mir4-bootstrap-" + [guid]::NewGuid().ToString('N'))
+  $null = Assert-MIR4DescendantPath -Root $tempParent -Path $constructionTaskRoot
+  New-Item -ItemType Directory -Path $constructionTaskRoot | Out-Null
+  $pwshPath = (Get-Process -Id $PID).Path
+  $toolchainRoot = Split-Path -Parent $pwshPath
+  $packageName = "more-infinite-research_$($targetPlan.distribution_version)"
+  try {
+    foreach ($id in @('A', 'B')) {
+      $runRoot = Join-Path $constructionTaskRoot $id
+      $inputRoot = Join-Path $runRoot 'input'
+      $childOutput = Join-Path $runRoot 'output'
+      New-Item -ItemType Directory -Force -Path $inputRoot | Out-Null
+      $inputCapsule = Join-Path $inputRoot 'source-capsule.zip'
+      $inputEnvelope = Join-Path $inputRoot 'source-capsule.json'
+      $inputRunner = Join-Path $inputRoot 'Invoke-MIR4BootstrapCapsule.ps1'
+      $inputPredecessor = Join-Path $inputRoot ([IO.Path]::GetFileName($predecessorPath))
+      Copy-Item -LiteralPath $capsules[$id].result.archive_path -Destination $inputCapsule
+      Copy-Item -LiteralPath $capsules[$id].result.record_path -Destination $inputEnvelope
+      Copy-Item -LiteralPath $capsules[$id].result.runner_path -Destination $inputRunner
+      Copy-Item -LiteralPath $predecessorPath -Destination $inputPredecessor
+      $null = Invoke-MIR4CapsuleChildProcess `
+        -PwshPath $pwshPath `
+        -RunnerPath $inputRunner `
+        -CapsulePath $inputCapsule `
+        -EnvelopePath $inputEnvelope `
+        -PredecessorPath $inputPredecessor `
+        -ToolchainRoot $toolchainRoot `
+        -OutputPath $childOutput
+      $candidateDir = Join-Path $candidateRoot $id
+      $receiptDir = Join-Path $receiptRoot $id
+      New-Item -ItemType Directory -Force -Path $candidateDir, $receiptDir | Out-Null
+      $candidatePath = Join-Path $candidateDir "$packageName.zip"
+      $receiptPath = Join-Path $receiptDir 'reconstruction.json'
+      Copy-Item -LiteralPath (Join-Path $childOutput 'candidate.zip') -Destination $candidatePath
+      Copy-Item -LiteralPath (Join-Path $childOutput 'reconstruction.json') -Destination $receiptPath
+    }
+
+    foreach ($id in @('A', 'B')) {
+      $runRoot = Join-Path $constructionTaskRoot $id
+      Remove-MIR4BuildTree -OutputRoot $constructionTaskRoot -Path $runRoot
+      if (Test-Path -LiteralPath $runRoot) { throw "Construction workspace $id survived its required deletion." }
+    }
+
+    $id = 'C'
+    $runRoot = Join-Path $constructionTaskRoot $id
+    $inputRoot = Join-Path $runRoot 'input'
+    $childOutput = Join-Path $runRoot 'output'
+    New-Item -ItemType Directory -Force -Path $inputRoot | Out-Null
+    $inputCapsule = Join-Path $inputRoot 'source-capsule.zip'
+    $inputEnvelope = Join-Path $inputRoot 'source-capsule.json'
+    $inputRunner = Join-Path $inputRoot 'Invoke-MIR4BootstrapCapsule.ps1'
+    $inputPredecessor = Join-Path $inputRoot ([IO.Path]::GetFileName($predecessorPath))
+    Copy-Item -LiteralPath $capsules.C.result.archive_path -Destination $inputCapsule
+    Copy-Item -LiteralPath $capsules.C.result.record_path -Destination $inputEnvelope
+    Copy-Item -LiteralPath $capsules.C.result.runner_path -Destination $inputRunner
+    Copy-Item -LiteralPath $predecessorPath -Destination $inputPredecessor
+    $null = Invoke-MIR4CapsuleChildProcess `
+      -PwshPath $pwshPath `
+      -RunnerPath $inputRunner `
+      -CapsulePath $inputCapsule `
+      -EnvelopePath $inputEnvelope `
+      -PredecessorPath $inputPredecessor `
+      -ToolchainRoot $toolchainRoot `
+      -OutputPath $childOutput
+    $candidateDir = Join-Path $candidateRoot $id
+    $receiptDir = Join-Path $receiptRoot $id
+    New-Item -ItemType Directory -Force -Path $candidateDir, $receiptDir | Out-Null
+    Copy-Item -LiteralPath (Join-Path $childOutput 'candidate.zip') -Destination (Join-Path $candidateDir "$packageName.zip")
+    Copy-Item -LiteralPath (Join-Path $childOutput 'reconstruction.json') -Destination (Join-Path $receiptDir 'reconstruction.json')
+  } finally {
+    if (Test-Path -LiteralPath $constructionTaskRoot) { Remove-MIR4BuildTree -OutputRoot $tempParent -Path $constructionTaskRoot }
+  }
+
+  foreach ($id in @('A', 'B', 'C')) {
+    $capsule = $capsules[$id].result
+    $capsuleInventory = $capsules[$id].artifact.inventory
+    $candidatePath = Join-Path $candidateRoot "$id\$packageName.zip"
+    $receiptPath = Join-Path $receiptRoot "$id\reconstruction.json"
     $inventory = Get-MIR4ArchiveInventory -Path $candidatePath
-    $null = Compare-MIR4BootstrapCandidate `
-      -CandidatePath $candidatePath `
-      -PredecessorPath $predecessorPath `
-      -ExpectedCandidateVersion $targetPlan.distribution_version `
-      -ExpectedPredecessorVersion $targetPlan.predecessor.release `
-      -ExpectedCandidateRoot $packageName `
-      -ExpectedPredecessorRoot "more-infinite-research_$($targetPlan.predecessor.release)" `
-      -ThrowOnDifference
+    $receiptText = Get-Content -Raw -LiteralPath $receiptPath
+    if (-not ($receiptText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json'))) {
+      throw "Generated reconstruction receipt failed schema validation for $id."
+    }
+    $receipt = $receiptText | ConvertFrom-Json -Depth 100
+    if (-not (Test-MIR4BootstrapRecordHash -Record $receipt)) { throw "Generated reconstruction receipt self-hash mismatch for $id." }
     $reconstructions += [pscustomobject][ordered]@{
-      id = [string]$id
+      id = $id
       path = Get-MIR4PortablePath -Root $OutputRoot -Path $candidatePath
       source_capsule_path = Get-MIR4PortablePath -Root $OutputRoot -Path $capsule.archive_path
-      source_capsule_archive_sha256 = $capsuleInventory.archive_sha256
+      source_capsule_envelope_path = Get-MIR4PortablePath -Root $OutputRoot -Path $capsule.record_path
+      reconstruction_runner_path = Get-MIR4PortablePath -Root $OutputRoot -Path $capsule.runner_path
+      receipt_path = Get-MIR4PortablePath -Root $OutputRoot -Path $receiptPath
+      source_capture = if ($id -eq 'C') { 'copied-canonical-capsule-a' } else { 'independent-git-object-capture' }
+      mode = 'capsule-local-fresh-process'
+      capsule_only = $true
+      checkout_argument_supplied = $false
+      source_capsule_archive_sha256 = [string]$capsuleInventory.archive_sha256
       source_capsule_record_sha256 = [string]$capsule.record.record_sha256
-      archive_sha256 = $inventory.archive_sha256
-      content_sha256 = $inventory.content_sha256
-      bytes = $inventory.bytes
-      entry_count = $inventory.entry_count
+      capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
+      toolchain_lock_record_sha256 = [string]$receipt.toolchain_lock_record_sha256
+      reconstruction_record_sha256 = [string]$receipt.record_sha256
+      package_manifest_sha256 = [string]$receipt.package_manifest_sha256
+      equivalence_sha256 = [string]$receipt.equivalence_sha256
+      input_root_sha256 = [string]$receipt.input_root_sha256
+      result_root_sha256 = [string]$receipt.result_root_sha256
+      archive_sha256 = [string]$inventory.archive_sha256
+      content_sha256 = [string]$inventory.content_sha256
+      bytes = [long]$inventory.bytes
+      entry_count = [int]$inventory.entry_count
     }
     $candidatePaths += $candidatePath
-    Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path $extractRoot
   }
 
   $archiveHashes = @($reconstructions.archive_sha256 | Sort-Object -Unique)
@@ -401,17 +629,20 @@ foreach ($targetPlan in $targets) {
     throw "Independent source capture or A/B/C reconstruction differs for $($targetPlan.target_key)."
   }
 
-  $capsule = $capsules[0].result
-  $capsuleInventory = $capsules[0].inventory
+  $receiptHashes = @($reconstructions.reconstruction_record_sha256 | Sort-Object -Unique)
+  if ($receiptHashes.Count -ne 1) { throw "A/B/C capsule reconstruction receipts differ for $($targetPlan.target_key)." }
+
+  $capsule = $capsules.A.result
+  $capsuleInventory = $capsules.A.artifact.inventory
 
   $distributionRoot = Join-Path $OutputRoot 'distributions'
   $null = Assert-MIR4NoReparseAncestors -Root $OutputRoot -Path $distributionRoot
   New-Item -ItemType Directory -Force -Path $distributionRoot | Out-Null
-  $distributionPath = Join-Path $distributionRoot ([IO.Path]::GetFileName($candidatePaths[0]))
+  $distributionPath = Join-Path $distributionRoot ([IO.Path]::GetFileName($candidatePaths[2]))
   if (Test-Path -LiteralPath $distributionPath) {
     Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path $distributionPath
   }
-  Copy-Item -LiteralPath $candidatePaths[0] -Destination $distributionPath
+  Copy-Item -LiteralPath $candidatePaths[2] -Destination $distributionPath
   $distribution = Get-MIR4ArchiveInventory -Path $distributionPath
   $equivalence = Compare-MIR4BootstrapCandidate `
     -CandidatePath $distributionPath `
@@ -432,6 +663,7 @@ foreach ($targetPlan in $targets) {
     source_capsule_record_sha256 = [string]$capsule.record.record_sha256
     source_capsule_archive_sha256 = [string]$capsuleInventory.archive_sha256
     source_capsule_content_sha256 = [string]$capsuleInventory.content_sha256
+    capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$distribution.archive_sha256
     candidate_content_sha256 = [string]$distribution.content_sha256
   })
@@ -460,6 +692,21 @@ foreach ($targetPlan in $targets) {
       entry_count = $capsuleInventory.entry_count
     }
     source_capsule_record_sha256 = [string]$capsule.record.record_sha256
+    capsule_closure = [pscustomobject][ordered]@{
+      internal_manifest_record_sha256 = [string]$capsule.record.closure.internal_manifest_record_sha256
+      payload_root_sha256 = [string]$capsule.record.closure.payload_root_sha256
+      capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
+      authority_closure_root_sha256 = [string]$capsule.record.closure.authority_closure_root_sha256
+      git_source_proof_record_sha256 = [string]$capsule.record.closure.git_source_proof_record_sha256
+      toolchain_lock_record_sha256 = [string]$capsule.record.closure.toolchain_lock_record_sha256
+      canonical_builder_sha256 = [string]$capsule.record.closure.canonical_builder_sha256
+      reconstruction_runner_sha256 = [string]$capsule.record.closure.reconstruction_runner_sha256
+      capture_count = 2
+      captures_identical = $true
+      separate_processes = $true
+      complete_ab_workspaces_deleted_before_c = $true
+      c_reconstruction_source = 'copied-canonical-capsule-no-checkout'
+    }
     identity_roots = [pscustomobject][ordered]@{
       semantic = [string]$rootRow.roots.semantic.sha256
       candidate_authority = $authorityRoot

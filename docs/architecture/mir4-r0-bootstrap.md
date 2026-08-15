@@ -26,7 +26,13 @@ MIR 3 final .9 baselines: deterministic capture ready; custody pending
 MIR 3 EOL: pending
 MIR 4 R0: active, package-excluded, non-authoritative
 public 4.x: forbidden until MIR 3 EOL
+f210 exact executable lock: unavailable; observed same version/build has a different SHA-256
+f200/f110/f100 exact executable locks: observed matching; no MIR 4 candidates admitted
 ```
+
+The dated non-emitting readiness records refine the earlier environment snapshot without changing the entry gate. Factorio 2.0.77.84539, 1.1.110.62357, and 1.0.0.54889 Windows x86-64 executables match their imported locks. The observed Factorio 2.1.13.87164 executable does not match the required executable SHA-256, so M4-003 exact-engine qualification remains blocked. No official data/module closure or MIR 4 runtime result is claimed by this executable-only observation.
+
+Mod Portal custody also remains fail-closed. A dated read-only recheck confirms that both `3.2.9` and `2.5.9` appear in the official API and the rendered downloads table with API SHA-1 values matching their sealed archives. That public visibility does not substitute for custody: authenticated redownload, byte verification, exact-engine public-asset smoke, archive and rights records, and the MIR 3 EOL seal remain open.
 
 Distribution identity is now owned by `MIR4-Target-RegistryV2` and `MIR4-Versioning-and-Distribution-Identity-ADRv2`. The registry contains all 17 direct string codes from `210` through `006`; the exhaustive codec fixture covers patches `00`, `01`, `08`, `09`, and `99`, the `65499` internal boundary, and negative inputs. The two V1 identity records are preserved byte-for-byte as historical evidence and are rejected by the executable resolver.
 
@@ -44,4 +50,4 @@ The eventual layout separates `src/`, `platforms/factorio/`, and `targets/`. Cur
 
 ## Next slice
 
-The M4-003A identity precondition is closed. The local package-construction portion now resolves source proposal `4.0.0`, code `210`, and projected distribution `4.0.21000` through V2, then performs three independently recaptured source-capsule and repeated deterministic package-construction runs from the exact 3.2.9 source. This establishes bounded same-tool repeatability, not checkout-independent C reconstruction; a toolchain-closed capsule remains open. It allocates no public tag. The remaining lane requires exact-engine clean-install and direct-upgrade proof, reload and settings/profile preservation, offline sealing, restoration, and two independently written, byte-identical publication dry runs. Completing that slice does not itself authorize publication.
+The M4-003A identity precondition is closed. The local package-construction portion resolves source proposal `4.0.0`, code `210`, and projected distribution `4.0.21000` through V2. Capsule V2 binds raw package-source Git objects, the exact authority/schema/tool closure, the canonical builder, and the complete executing PowerShell/.NET home. A and B run in distinct child processes; both complete workspaces are deleted; C then runs in a fresh system-temporary root from copied capsule inputs with no checkout argument or inherited checkout working directory. The three receipts and candidate bytes are identical, closing capsule-only checkout-independent C reconstruction. This does not claim a separate OS ACL/container checkout denial or a network-denied runtime campaign. It allocates no public tag. The remaining lane requires exact-engine clean-install and direct-upgrade proof, reload and settings/profile preservation, offline sealing, restoration, and two independently written, byte-identical publication dry runs. Completing that slice does not itself authorize publication.

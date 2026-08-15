@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-bootstrap-target-readiness.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-bootstrap-target-readiness.schema.json",
+  "title": "MIR 4 bootstrap non-emitting target readiness record",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "package_visible",
+    "semantic_authority",
+    "public_output_authorized",
+    "construction_authority",
+    "scope",
+    "imports",
+    "entry_state",
+    "targets",
+    "hard_boundary",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4BootstrapTargetReadinessV1"},
+    "status": {"const": "pre-eol-non-emitting-readiness-only"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "package_visible": {"const": false},
+    "semantic_authority": {"const": false},
+    "public_output_authorized": {"const": false},
+    "construction_authority": {"const": false},
+    "scope": {"const": "readiness-observation-not-target-admission"},
+    "imports": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/recordBinding"}
+    },
+    "entry_state": {
+      "type": "object",
+      "required": [
+        "mir3_eol",
+        "public_4x",
+        "current_admission_authority",
+        "construction_admitted_targets",
+        "blocked_targets",
+        "future_admission_authority"
+      ],
+      "properties": {
+        "mir3_eol": {"const": "pending"},
+        "public_4x": {"const": "forbidden-until-mir3-eol"},
+        "current_admission_authority": {
+          "const": ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json"
+        },
+        "construction_admitted_targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "prefixItems": [{"const": "f210"}],
+          "items": false
+        },
+        "blocked_targets": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [{"const": "f200"}, {"const": "f110"}, {"const": "f100"}],
+          "items": false
+        },
+        "future_admission_authority": {"const": "not-created"}
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "prefixItems": [
+        {"allOf": [{"$ref": "#/$defs/targetReadiness"}], "properties": {"target_key": {"const": "f210"}}},
+        {"allOf": [{"$ref": "#/$defs/targetReadiness"}], "properties": {"target_key": {"const": "f200"}}},
+        {"allOf": [{"$ref": "#/$defs/targetReadiness"}], "properties": {"target_key": {"const": "f110"}}},
+        {"allOf": [{"$ref": "#/$defs/targetReadiness"}], "properties": {"target_key": {"const": "f100"}}}
+      ],
+      "items": false
+    },
+    "hard_boundary": {
+      "const": "This record reports non-emitting readiness and blockers. It is not an admission, construction, semantic, release, EOL, signing, allocation, sealing, or publication authority; no blocked target may be materialized from it."
+    },
+    "record_sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$",
+      "description": "SHA-256 of MIR4BootstrapCanonicalJsonV1 with record_sha256 omitted."
+    }
+  },
+  "$defs": {
+    "recordBinding": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^\\.mir/[A-Za-z0-9._/-]+$"
+        },
+        "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "engineReadiness": {
+      "type": "object",
+      "required": ["observation_state", "executable_lock_available", "official_data_module_closure", "candidate_qualification"],
+      "properties": {
+        "observation_state": {"enum": ["exact-lock-match", "hash-mismatch"]},
+        "executable_lock_available": {"type": "boolean"},
+        "official_data_module_closure": {"const": "not-captured-by-readiness-observation"},
+        "candidate_qualification": {
+          "enum": ["blocked-exact-engine-hash-mismatch", "not-admitted-candidate-absent"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilityReadiness": {
+      "type": "object",
+      "required": [
+        "state",
+        "canonical_expected_stream_count",
+        "terminal_expected_stream_count",
+        "current_positive_allowlist_state",
+        "terminal_positive_allowlist_state",
+        "drift"
+      ],
+      "properties": {
+        "state": {"enum": ["no-known-field-drift-readiness-only", "blocked-stream-count-conflict", "blocked-missing-positive-allowlists"]},
+        "canonical_expected_stream_count": {"type": "integer", "minimum": 1},
+        "terminal_expected_stream_count": {"type": "integer", "minimum": 1},
+        "current_positive_allowlist_state": {"enum": ["present", "missing-required-fields"]},
+        "terminal_positive_allowlist_state": {"const": "present"},
+        "drift": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "expected-stream-count-current-73-terminal-74",
+              "supported-required-mods-field-absent",
+              "supported-effect-types-field-absent"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "projectionReadiness": {
+      "type": "object",
+      "required": ["state", "canonical_source_proven", "complete_target_dispositions", "provider_contract_proven"],
+      "properties": {
+        "state": {"const": "not-defined"},
+        "canonical_source_proven": {"const": false},
+        "complete_target_dispositions": {"const": false},
+        "provider_contract_proven": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "transitionReadiness": {
+      "type": "object",
+      "required": ["direct_predecessor", "fixture_state", "candidate_bound_evidence_present", "historical_evidence_substitution_allowed"],
+      "properties": {
+        "direct_predecessor": {"enum": ["3.2.9", "2.5.9", "1.9.9", "1.8.9"]},
+        "fixture_state": {"const": "not-defined"},
+        "candidate_bound_evidence_present": {"const": false},
+        "historical_evidence_substitution_allowed": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "targetReadiness": {
+      "type": "object",
+      "required": [
+        "target_key",
+        "target_id",
+        "factorio_line",
+        "distribution_version",
+        "release_role",
+        "current_admission",
+        "local_construction_admitted",
+        "public_output_authorized",
+        "engine",
+        "capability",
+        "projection",
+        "transition",
+        "blockers"
+      ],
+      "properties": {
+        "target_key": {"enum": ["f210", "f200", "f110", "f100"]},
+        "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]},
+        "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]},
+        "distribution_version": {"enum": ["4.0.21000", "4.0.20000", "4.0.11000", "4.0.10000"]},
+        "release_role": {"enum": ["mandatory", "conditional"]},
+        "current_admission": {"enum": ["admitted-local-emergency-lane", "non-authoritative-shadow-blocked-by-eol"]},
+        "local_construction_admitted": {"type": "boolean"},
+        "public_output_authorized": {"const": false},
+        "engine": {"$ref": "#/$defs/engineReadiness"},
+        "capability": {"$ref": "#/$defs/capabilityReadiness"},
+        "projection": {"$ref": "#/$defs/projectionReadiness"},
+        "transition": {"$ref": "#/$defs/transitionReadiness"},
+        "blockers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"target_key": {"const": "f210"}}, "required": ["target_key"]},
+          "then": {
+            "properties": {
+              "target_id": {"const": "factorio-2.1"},
+              "factorio_line": {"const": "2.1"},
+              "distribution_version": {"const": "4.0.21000"},
+              "release_role": {"const": "mandatory"},
+              "current_admission": {"const": "admitted-local-emergency-lane"},
+              "local_construction_admitted": {"const": true},
+              "engine": {
+                "properties": {
+                  "observation_state": {"const": "hash-mismatch"},
+                  "executable_lock_available": {"const": false},
+                  "candidate_qualification": {"const": "blocked-exact-engine-hash-mismatch"}
+                }
+              },
+              "capability": {
+                "properties": {
+                  "state": {"const": "no-known-field-drift-readiness-only"},
+                  "canonical_expected_stream_count": {"const": 76},
+                  "terminal_expected_stream_count": {"const": 76},
+                  "current_positive_allowlist_state": {"const": "present"},
+                  "drift": {"maxItems": 0}
+                }
+              },
+              "transition": {"properties": {"direct_predecessor": {"const": "3.2.9"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"target_key": {"const": "f200"}}, "required": ["target_key"]},
+          "then": {
+            "properties": {
+              "target_id": {"const": "factorio-2.0"},
+              "factorio_line": {"const": "2.0"},
+              "distribution_version": {"const": "4.0.20000"},
+              "release_role": {"const": "mandatory"},
+              "current_admission": {"const": "non-authoritative-shadow-blocked-by-eol"},
+              "local_construction_admitted": {"const": false},
+              "engine": {
+                "properties": {
+                  "observation_state": {"const": "exact-lock-match"},
+                  "executable_lock_available": {"const": true},
+                  "candidate_qualification": {"const": "not-admitted-candidate-absent"}
+                }
+              },
+              "capability": {
+                "properties": {
+                  "state": {"const": "blocked-stream-count-conflict"},
+                  "canonical_expected_stream_count": {"const": 73},
+                  "terminal_expected_stream_count": {"const": 74},
+                  "current_positive_allowlist_state": {"const": "present"},
+                  "drift": {
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "prefixItems": [{"const": "expected-stream-count-current-73-terminal-74"}],
+                    "items": false
+                  }
+                }
+              },
+              "transition": {"properties": {"direct_predecessor": {"const": "2.5.9"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"target_key": {"const": "f110"}}, "required": ["target_key"]},
+          "then": {
+            "properties": {
+              "target_id": {"const": "factorio-1.1"},
+              "factorio_line": {"const": "1.1"},
+              "distribution_version": {"const": "4.0.11000"},
+              "release_role": {"const": "conditional"},
+              "current_admission": {"const": "non-authoritative-shadow-blocked-by-eol"},
+              "local_construction_admitted": {"const": false},
+              "engine": {
+                "properties": {
+                  "observation_state": {"const": "exact-lock-match"},
+                  "executable_lock_available": {"const": true},
+                  "candidate_qualification": {"const": "not-admitted-candidate-absent"}
+                }
+              },
+              "capability": {
+                "properties": {
+                  "state": {"const": "blocked-missing-positive-allowlists"},
+                  "canonical_expected_stream_count": {"const": 11},
+                  "terminal_expected_stream_count": {"const": 11},
+                  "current_positive_allowlist_state": {"const": "missing-required-fields"},
+                  "drift": {
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "prefixItems": [
+                      {"const": "supported-required-mods-field-absent"},
+                      {"const": "supported-effect-types-field-absent"}
+                    ],
+                    "items": false
+                  }
+                }
+              },
+              "transition": {"properties": {"direct_predecessor": {"const": "1.9.9"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"target_key": {"const": "f100"}}, "required": ["target_key"]},
+          "then": {
+            "properties": {
+              "target_id": {"const": "factorio-1.0"},
+              "factorio_line": {"const": "1.0"},
+              "distribution_version": {"const": "4.0.10000"},
+              "release_role": {"const": "conditional"},
+              "current_admission": {"const": "non-authoritative-shadow-blocked-by-eol"},
+              "local_construction_admitted": {"const": false},
+              "engine": {
+                "properties": {
+                  "observation_state": {"const": "exact-lock-match"},
+                  "executable_lock_available": {"const": true},
+                  "candidate_qualification": {"const": "not-admitted-candidate-absent"}
+                }
+              },
+              "capability": {
+                "properties": {
+                  "state": {"const": "blocked-missing-positive-allowlists"},
+                  "canonical_expected_stream_count": {"const": 11},
+                  "terminal_expected_stream_count": {"const": 11},
+                  "current_positive_allowlist_state": {"const": "missing-required-fields"},
+                  "drift": {
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "prefixItems": [
+                      {"const": "supported-required-mods-field-absent"},
+                      {"const": "supported-effect-types-field-absent"}
+                    ],
+                    "items": false
+                  }
+                }
+              },
+              "transition": {"properties": {"direct_predecessor": {"const": "1.8.9"}}}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,22 +1,42 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-local-candidate-manifest.schema.json",
-  "title": "MIR 4 bootstrap local candidate manifest",
+  "title": "MIR 4 bootstrap local candidate manifest with capsule reconstruction closure",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "source_capsule", "source_capsule_record_sha256", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "source_capsule", "source_capsule_record_sha256", "capsule_closure", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
   "properties": {
     "schema": { "const": 1 },
     "kind": { "const": "MIR4BootstrapLocalCandidateManifestV1" },
     "status": { "const": "built-unqualified-local-package-candidate" },
     "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
-    "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
-    "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
-    "distribution_version": { "type": "string", "pattern": "^4\\.0\\.[0-9]{5}$" },
-    "admission": { "enum": ["admitted-local-emergency-lane", "non-authoritative-shadow-blocked-by-eol"] },
+    "target_key": { "const": "f210" },
+    "factorio_line": { "const": "2.1" },
+    "distribution_version": { "const": "4.0.21000" },
+    "admission": { "const": "admitted-local-emergency-lane" },
     "public_output_authorized": { "const": false },
     "source_capsule": { "$ref": "#/$defs/artifact" },
     "source_capsule_record_sha256": { "$ref": "#/$defs/sha256" },
+    "capsule_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["internal_manifest_record_sha256", "payload_root_sha256", "capsule_content_root_sha256", "authority_closure_root_sha256", "git_source_proof_record_sha256", "toolchain_lock_record_sha256", "canonical_builder_sha256", "reconstruction_runner_sha256", "capture_count", "captures_identical", "separate_processes", "complete_ab_workspaces_deleted_before_c", "c_reconstruction_source"],
+      "properties": {
+        "internal_manifest_record_sha256": { "$ref": "#/$defs/sha256" },
+        "payload_root_sha256": { "$ref": "#/$defs/sha256" },
+        "capsule_content_root_sha256": { "$ref": "#/$defs/sha256" },
+        "authority_closure_root_sha256": { "$ref": "#/$defs/sha256" },
+        "git_source_proof_record_sha256": { "$ref": "#/$defs/sha256" },
+        "toolchain_lock_record_sha256": { "$ref": "#/$defs/sha256" },
+        "canonical_builder_sha256": { "$ref": "#/$defs/sha256" },
+        "reconstruction_runner_sha256": { "$ref": "#/$defs/sha256" },
+        "capture_count": { "const": 2 },
+        "captures_identical": { "const": true },
+        "separate_processes": { "const": true },
+        "complete_ab_workspaces_deleted_before_c": { "const": true },
+        "c_reconstruction_source": { "const": "copied-canonical-capsule-no-checkout" }
+      }
+    },
     "identity_roots": {
       "type": "object",
       "required": ["semantic", "candidate_authority", "qualification_input"],
@@ -31,44 +51,14 @@
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "allOf": [
-        { "contains": { "type": "object", "properties": { "id": { "const": "A" } }, "required": ["id"] }, "minContains": 1, "maxContains": 1 },
-        { "contains": { "type": "object", "properties": { "id": { "const": "B" } }, "required": ["id"] }, "minContains": 1, "maxContains": 1 },
-        { "contains": { "type": "object", "properties": { "id": { "const": "C" } }, "required": ["id"] }, "minContains": 1, "maxContains": 1 }
+      "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/reconstruction" }, { "properties": { "id": { "const": "A" }, "source_capture": { "const": "independent-git-object-capture" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/reconstruction" }, { "properties": { "id": { "const": "B" }, "source_capture": { "const": "independent-git-object-capture" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/reconstruction" }, { "properties": { "id": { "const": "C" }, "source_capture": { "const": "copied-canonical-capsule-a" } } }] }
       ],
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["id", "path", "source_capsule_path", "source_capsule_archive_sha256", "source_capsule_record_sha256", "archive_sha256", "content_sha256", "bytes", "entry_count"],
-        "properties": {
-          "id": { "type": "string", "enum": ["A", "B", "C"] },
-          "path": { "$ref": "#/$defs/path" },
-          "source_capsule_path": { "$ref": "#/$defs/path" },
-          "source_capsule_archive_sha256": { "$ref": "#/$defs/sha256" },
-          "source_capsule_record_sha256": { "$ref": "#/$defs/sha256" },
-          "archive_sha256": { "$ref": "#/$defs/sha256" },
-          "content_sha256": { "$ref": "#/$defs/sha256" },
-          "bytes": { "type": "integer", "minimum": 1 },
-          "entry_count": { "type": "integer", "minimum": 1 }
-        }
-      }
+      "items": false
     },
-    "equivalence": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
-      "properties": {
-        "equivalent": { "const": true },
-        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
-        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
-        "added": { "const": [] },
-        "removed": { "const": [] },
-        "changed": { "const": ["info.json"] },
-        "metadata_equivalent": { "const": true },
-        "candidate": { "$ref": "#/$defs/identity" },
-        "predecessor": { "$ref": "#/$defs/identity" }
-      }
-    },
+    "equivalence": { "$ref": "#/$defs/equivalence" },
     "local_distribution": { "$ref": "#/$defs/artifact" },
     "qualification": {
       "type": "object",
@@ -86,6 +76,7 @@
   },
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "path": { "type": "string", "pattern": "^(?:capsules|candidates|distributions|receipts)/(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" },
     "artifact": {
       "type": "object",
       "additionalProperties": false,
@@ -109,6 +100,51 @@
         "entry_count": { "type": "integer", "minimum": 1 }
       }
     },
-    "path": { "type": "string", "pattern": "^(?:capsules|candidates|distributions)/(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" }
+    "reconstruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "source_capsule_path", "source_capsule_envelope_path", "reconstruction_runner_path", "receipt_path", "source_capture", "mode", "capsule_only", "checkout_argument_supplied", "source_capsule_archive_sha256", "source_capsule_record_sha256", "capsule_content_root_sha256", "toolchain_lock_record_sha256", "reconstruction_record_sha256", "package_manifest_sha256", "equivalence_sha256", "input_root_sha256", "result_root_sha256", "archive_sha256", "content_sha256", "bytes", "entry_count"],
+      "properties": {
+        "id": { "enum": ["A", "B", "C"] },
+        "path": { "$ref": "#/$defs/path" },
+        "source_capsule_path": { "$ref": "#/$defs/path" },
+        "source_capsule_envelope_path": { "$ref": "#/$defs/path" },
+        "reconstruction_runner_path": { "$ref": "#/$defs/path" },
+        "receipt_path": { "$ref": "#/$defs/path" },
+        "source_capture": { "enum": ["independent-git-object-capture", "copied-canonical-capsule-a"] },
+        "mode": { "const": "capsule-local-fresh-process" },
+        "capsule_only": { "const": true },
+        "checkout_argument_supplied": { "const": false },
+        "source_capsule_archive_sha256": { "$ref": "#/$defs/sha256" },
+        "source_capsule_record_sha256": { "$ref": "#/$defs/sha256" },
+        "capsule_content_root_sha256": { "$ref": "#/$defs/sha256" },
+        "toolchain_lock_record_sha256": { "$ref": "#/$defs/sha256" },
+        "reconstruction_record_sha256": { "$ref": "#/$defs/sha256" },
+        "package_manifest_sha256": { "$ref": "#/$defs/sha256" },
+        "equivalence_sha256": { "$ref": "#/$defs/sha256" },
+        "input_root_sha256": { "$ref": "#/$defs/sha256" },
+        "result_root_sha256": { "$ref": "#/$defs/sha256" },
+        "archive_sha256": { "$ref": "#/$defs/sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "entry_count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "equivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
+      "properties": {
+        "equivalent": { "const": true },
+        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
+        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "added": { "const": [] },
+        "removed": { "const": [] },
+        "changed": { "const": ["info.json"] },
+        "metadata_equivalent": { "const": true },
+        "candidate": { "$ref": "#/$defs/identity" },
+        "predecessor": { "$ref": "#/$defs/identity" }
+      }
+    }
   }
 }

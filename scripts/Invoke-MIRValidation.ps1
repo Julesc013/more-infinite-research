@@ -190,6 +190,9 @@ Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
 
 Invoke-RepoCheck "MIR 4 bootstrap materialization and offline custody are deterministic and proof-only" {
   & (Join-Path $repo "tools\commands\release\Test-MIR4R0Bootstrap.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4FinalProgrammeReconciliation.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR3Dot9ModPortalVisibilityRecheck.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapTargetReadiness.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapMaterialization.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4OfflineCandidateCustody.ps1") -RepoRoot $repo
 }

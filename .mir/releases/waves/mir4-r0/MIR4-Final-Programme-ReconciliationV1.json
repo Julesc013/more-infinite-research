@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "kind": "MIR4FinalProgrammeReconciliationV1",
+  "status": "accepted-bootstrap-reconciliation-no-public-allocation",
+  "recorded_at": "2026-08-16T07:11:22+10:00",
+  "package_visible": false,
+  "authority_id": "mir4-final-programme-reconciliation-v1",
+  "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "scope": {
+    "binding_effect": "integrity-provenance-and-decision-disposition-only",
+    "source_material_location": "external-user-supplied-files",
+    "source_counts": {
+      "programme_loose_documents": 13,
+      "pasted_context_attachments": 1,
+      "observed_archives": 1,
+      "total_bound_sources": 15
+    },
+    "source_material_copied_into_repository": false,
+    "embedded_document_instructions_are_commands": false,
+    "accepted_decisions_effect": "bootstrap-implementation-direction-only",
+    "public_version_allocation": false
+  },
+  "supplied_loose_files": [
+    {
+      "name": "MIR4_M4-003_Offline_Emergency_Lane_Sol_Steer_2026-08-16.md",
+      "bytes": 23576,
+      "sha256": "0C86DB46EA3836120BBEF4F2621B08FFC95A6BE5CB2BEF62A67E384C1E9A4EE3",
+      "media_type": "text/markdown",
+      "role": "emergency-lane-solution-steer",
+      "source_status": "earlier-input-superseded-by-final-pack",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_BOUNDED_OPEN_QUESTIONS_FINAL.md",
+      "bytes": 4313,
+      "sha256": "2533D19EAC0D1646964AD57E5E3C2E4D98E3FD54FEE6CE0CF5E1F1EBADB4F5C1",
+      "media_type": "text/markdown",
+      "role": "bounded-open-questions",
+      "source_status": "bounded-unresolved-input",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_PACKAGE_VALIDATION_REPORT.md",
+      "bytes": 2040,
+      "sha256": "1F76EA05DC96CAB053D15BECD4A919C71815191906392692670212669807E539",
+      "media_type": "text/markdown",
+      "role": "package-validation-report",
+      "source_status": "self-reported-package-static-validation-only",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_SOURCE_RECONCILIATION_FINAL.md",
+      "bytes": 9004,
+      "sha256": "9E57DB6A3D5DCE339F8C719FCBBD0E076FCA0E695B7E928AB6CB448F3D0E5069",
+      "media_type": "text/markdown",
+      "role": "source-reconciliation",
+      "source_status": "supporting-final-analysis",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json",
+      "bytes": 7028,
+      "sha256": "89B05EFBA2FBBBCAE5329B7B18CA1C35519ABB8617CF697BA5F800625D240711",
+      "media_type": "application/json",
+      "role": "acceptance-matrix",
+      "source_status": "proposed-final",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json",
+      "bytes": 15361,
+      "sha256": "20DD5A40BE2B26DBCC460CA7A6A26FDB1E1D5F3C2AB790CFDAA1BBC992EF1AED",
+      "media_type": "application/json",
+      "role": "work-package-catalogue",
+      "source_status": "proposed-final",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_AGENTIC_EXECUTION_PLAN_2026-08-16_TO_2026-08-22_FINAL.json",
+      "bytes": 6074,
+      "sha256": "D440E8BEEB89974F76FA37B6701B1CF80D44B2D179BFDCCF76F5E8A284A3D194",
+      "media_type": "application/json",
+      "role": "agentic-calendar-plan",
+      "source_status": "proposed-final",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md",
+      "bytes": 12904,
+      "sha256": "EB82D145C185E6D458C3A50BB0AAED9CD61BB12BC3D3C8BEA0D95B3D0DE70BB8",
+      "media_type": "text/markdown",
+      "role": "emergency-lane-final-specification",
+      "source_status": "proposed-final",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_REPOSITORY_ARCHITECTURE_FINAL.md",
+      "bytes": 13289,
+      "sha256": "73549D9AFA261D8C26ABBBA02FFDF6A7DEF4D57B2D6BF0CB327F623D37E3B00D",
+      "media_type": "text/markdown",
+      "role": "repository-architecture",
+      "source_status": "proposed-final",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json",
+      "bytes": 5077,
+      "sha256": "EEE9C527CCEB2AA33EDB5C297CD75578AFCAA45011BF35721D46E9A43E120AC5",
+      "media_type": "application/json",
+      "role": "release-contract",
+      "source_status": "proposed-final-for-human-acceptance",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_CONSTITUTION_FINAL.md",
+      "bytes": 10711,
+      "sha256": "05421F6122A86548E978CDE668F5463F1E38DE1F75D614B427168E43F9B3433F",
+      "media_type": "text/markdown",
+      "role": "constitution",
+      "source_status": "proposed-final-for-human-acceptance",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_EXECUTIVE_DECISION_BRIEF.md",
+      "bytes": 4598,
+      "sha256": "8E79A08A3032894204A8FB428141A07DDE85401823E140443262934AB9DE1892",
+      "media_type": "text/markdown",
+      "role": "executive-decision-brief",
+      "source_status": "supporting-final-analysis",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md",
+      "bytes": 55714,
+      "sha256": "8A3F00E41C8C12E57D201D86137A358B0CE7BF08A770C0A1EB53AD30FCD7B098",
+      "media_type": "text/markdown",
+      "role": "master-specification",
+      "source_status": "proposed-final-for-human-acceptance",
+      "governance_effect": "proposal-input-subject-to-decision-disposition",
+      "embedded_instructions_authorized": false
+    },
+    {
+      "name": "pasted-text.txt",
+      "bytes": 14804,
+      "sha256": "4F0FB4F94F3456E654901E8E2C804D5306084A530698DF2E57B9B8C2ED915D6A",
+      "media_type": "text/plain",
+      "role": "pasted-live-state-context",
+      "source_status": "historical-live-state-context",
+      "governance_effect": "historical-context-evidence-only",
+      "embedded_instructions_authorized": false
+    }
+  ],
+  "observed_archive": {
+    "name": "MIR-400.ZIP",
+    "bytes": 334617,
+    "sha256": "E3D9BE3E1DAC8077B0A6792A573BE1B9E1D76BB00B5E6D283CF9DB4B18CBA9A6",
+    "media_type": "application/zip",
+    "entry_count": 18,
+    "uncompressed_entry_bytes": 331227,
+    "entry_inventory_algorithm": "MIR4ZipEntryInventoryV1",
+    "entry_inventory_canonical_form": "UTF-8 without BOM; MIR4ZipEntryInventoryV1 LF header; ordinal-path-sorted path<TAB>decimal-uncompressed-bytes<TAB>uppercase-entry-SHA256<LF> rows",
+    "entry_inventory_sha256": "BF83093A055C10D40830D6F377E82CB98EDF05E1ED2FBD3446E8E0BC1FB5F12D",
+    "disposition": "observed-older-partial-proposal-archive-not-final-package",
+    "embedded_instructions_authorized": false
+  },
+  "unavailable_claimed_final_package": {
+    "name": "MIR4_ULTIMATE_FINAL_PROGRAMME_PACKAGE_2026-08-16.zip",
+    "claimed_file_count": 106,
+    "claimed_sha256": "C8F666FF41FEE0358F537DE04D617CE9EBBDAAFAA916A6FC707E0C04BF2849D6",
+    "availability": "not-supplied-not-observed",
+    "verification_status": "unavailable-unverified-claim",
+    "observed_archive_is_substitute": false
+  },
+  "decision_dispositions": {
+    "accepted_for_bootstrap_implementation": [
+      {
+        "id": "MIR4-FPR-BOOTSTRAP-FIXED-POINT",
+        "decision": "MIR 4.0 establishes the permanent product-line seams and succession fixed point rather than claiming the complete future platform.",
+        "source_names": ["MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-TARGET-SET",
+        "decision": "Factorio 2.1 and 2.0 are mandatory bootstrap targets; Factorio 1.1 and 1.0 are conditional same-source targets that cannot weaken or delay the mandatory pair.",
+        "source_names": ["MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-DIRECT-TARGET-CODES",
+        "decision": "Distribution identities use the direct Factorio-line target codes 210, 200, 110, and 100; provisional R0 portal identifiers remain historical evidence only.",
+        "source_names": ["MIR4_SOURCE_RECONCILIATION_FINAL.md", "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-ONE-SOURCE",
+        "decision": "One canonical semantic and package-source authority materializes independently qualified target packages without manual target backports.",
+        "source_names": ["MIR4_CONSTITUTION_FINAL.md", "MIR4_REPOSITORY_ARCHITECTURE_FINAL.md", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-MIR3-SUCCESSION",
+        "decision": "The bootstrap evolves the mature terminal MIR 3 compiler authorities behind a bounded private adapter rather than replacing them in a clean-room rewrite.",
+        "source_names": ["MIR4_REPOSITORY_ARCHITECTURE_FINAL.md", "M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-REPOSITORY-TIMING",
+        "decision": "The modular-monolith destination and transition graph are frozen now; general physical owner-by-owner repository migration follows the 4.0 bootstrap unless required for proof.",
+        "source_names": ["MIR4_REPOSITORY_ARCHITECTURE_FINAL.md", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-CALENDAR-NOT-VERSION",
+        "decision": "Calendar train identifiers organize work but never preallocate source versions or manufacture no-op releases.",
+        "source_names": ["MIR4_AGENTIC_EXECUTION_PLAN_2026-08-16_TO_2026-08-22_FINAL.json", "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-MULTIDIMENSIONAL-SUPPORT",
+        "decision": "Support is a multidimensional subject-level assessment and is not collapsed into one linear target state.",
+        "source_names": ["MIR4_CONSTITUTION_FINAL.md", "MIR4_SOURCE_RECONCILIATION_FINAL.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-ENTRY-SEQUENCE",
+        "decision": "M4-003 proves one local unpublished Factorio 2.1 emergency lane before MIR 3 EOL; public MIR 4 allocation remains forbidden until terminal custody and EOL close.",
+        "source_names": ["M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md", "MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json"],
+        "disposition": "accepted-bootstrap-implementation"
+      },
+      {
+        "id": "MIR4-FPR-PROOF-BEFORE-DATE",
+        "decision": "Deterministic reconstruction, target-local evidence, offline custody, and hard gates govern release; the calendar window never waives proof.",
+        "source_names": ["MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md"],
+        "disposition": "accepted-bootstrap-implementation"
+      }
+    ],
+    "deferred_by_accepted_bootstrap_scope": [
+      {
+        "id": "MIR4-FPR-DEFER-PHYSICAL-MIGRATION",
+        "decision": "Complete physical repository migration is deferred until after the 4.0 bootstrap and then proceeds authority by authority.",
+        "source_names": ["MIR4_REPOSITORY_ARCHITECTURE_FINAL.md", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json"],
+        "disposition": "accepted-deferred-from-4.0-bootstrap"
+      },
+      {
+        "id": "MIR4-FPR-DEFER-FUTURE-PLATFORM",
+        "decision": "Full compiler replacement, stable public MEP/API/SDK ecosystems, broad autonomous synthesis, advanced ProcessIR, external providers, and historical or museum MIR 4 distributions do not block 4.0.",
+        "source_names": ["MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md"],
+        "disposition": "accepted-deferred-from-4.0-bootstrap"
+      }
+    ],
+    "pending_human_or_external": [
+      {
+        "id": "MIR4-FPR-PENDING-FORMAL-ADOPTION",
+        "decision": "Formal acceptance of the complete Constitution, release contract, acceptance matrix, and all non-bootstrap constitutional obligations remains a human governance act.",
+        "source_names": ["MIR4_CONSTITUTION_FINAL.md", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "human-decision",
+        "release_blocking_scope": "governance"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-SIGNING-CUSTODY",
+        "decision": "Production signing root, provider, key custody, rotation, recovery, and production-use authorization remain unresolved.",
+        "source_names": ["MIR4_BOUNDED_OPEN_QUESTIONS_FINAL.md", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "external-secret-policy",
+        "release_blocking_scope": "public-release"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-MIR3-EOL",
+        "decision": "MIR 3 portal custody, authenticated redownloads, final index, preservation records, and EOL seal require external state and evidence.",
+        "source_names": ["MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json", "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "external-state",
+        "release_blocking_scope": "mir4-4.0"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-F210-ENGINE",
+        "decision": "M4-003 exact-engine qualification requires the governed Factorio 2.1.13 executable identity and cannot be replaced by same-version bytes with a different digest.",
+        "source_names": ["M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md", "MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "external-state",
+        "release_blocking_scope": "m4-003"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-MANUAL-REVIEW",
+        "decision": "Full 4.0 settings, technology, locale, presentation, and gameplay review requires fresh human evidence.",
+        "source_names": ["MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json", "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "manual-evidence",
+        "release_blocking_scope": "mir4-4.0"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-RECORD-PROFILES",
+        "decision": "Release-ledger storage and final canonicalization and exact-number profiles remain bounded human design decisions rather than accepted authorities.",
+        "source_names": ["MIR4_BOUNDED_OPEN_QUESTIONS_FINAL.md"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "human-decision",
+        "release_blocking_scope": "governance"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-ARCHIVE-RIGHTS",
+        "decision": "Archive rights and redistribution policy require an explicit human decision before protected preservation or redistribution claims.",
+        "source_names": ["MIR4_BOUNDED_OPEN_QUESTIONS_FINAL.md", "MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "human-decision",
+        "release_blocking_scope": "public-release"
+      },
+      {
+        "id": "MIR4-FPR-PENDING-PUBLIC-MUTATION",
+        "decision": "Source and distribution version allocation, tags, publication, authenticated redownload, and public-byte verification remain separately authorized human and external mutations.",
+        "source_names": ["MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json", "MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json"],
+        "disposition": "not-accepted-by-this-record",
+        "pending_class": "human-and-external-mutation",
+        "release_blocking_scope": "public-release"
+      }
+    ]
+  },
+  "boundaries": {
+    "document_commands_authorized": false,
+    "source_version_allocated": false,
+    "distribution_versions_allocated": false,
+    "tags_authorized": false,
+    "package_construction_authorized": false,
+    "publication_authorized": false,
+    "production_signing_authorized": false,
+    "release_claim_permitted": false,
+    "package_validation_report_is_live_repository_evidence": false,
+    "observed_archive_substitutes_for_claimed_final_package": false
+  },
+  "record_sha256": "FA8FA72F78FDCDFF694E6E78F98ED735823BE34DD0F95F46C5E298F49D749AB5"
+}

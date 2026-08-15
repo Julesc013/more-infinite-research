@@ -783,9 +783,25 @@ validation_tooling:
     mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
     mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
+    mir4_bootstrap_capsule_manifest_schema: spec/schemas/mir4-bootstrap-capsule-manifest.schema.json
+    mir4_bootstrap_toolchain_lock_schema: spec/schemas/mir4-bootstrap-toolchain-lock.schema.json
+    mir4_bootstrap_git_source_proof_schema: spec/schemas/mir4-bootstrap-git-source-proof.schema.json
+    mir4_bootstrap_reconstruction_receipt_schema: spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json
     mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
     mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
+    mir4_bootstrap_capsule_runner: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
     mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
+    mir4_final_programme_reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
+    mir4_final_programme_reconciliation_schema: spec/schemas/mir4-final-programme-reconciliation.schema.json
+    mir4_final_programme_reconciliation_gate: validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1
+    mir4_bootstrap_engine_availability_observation: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
+    mir4_bootstrap_engine_availability_schema: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
+    mir4_bootstrap_target_readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
+    mir4_bootstrap_target_readiness_schema: spec/schemas/mir4-bootstrap-target-readiness.schema.json
+    mir4_bootstrap_target_readiness_gate: validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1
+    mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
+    mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
+    mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
@@ -925,7 +941,11 @@ validation_tooling:
     - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
     - MIR 4 distribution target codes are immutable three-digit decimal strings owned by Target Registry V2; leading zeroes are semantic and the values are never parsed as octal
     - MIR 4 V1 target and version records are frozen historical evidence only; executable distribution identity resolves exclusively through the current V2 registry and codec authority
-    - MIR 4 bootstrap records use the single BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer and custody tooling consumes that authority without reimplementation
+    - MIR 4 bootstrap records use the BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer; the byte-bound detached capsule pre-verifier reproduces that ABI only until the extracted canonical authority revalidates every record
+    - MIR 4 capsule V2 binds the exact package source Git objects, reconstruction tools, schemas, authorities, complete PowerShell home, deterministic member roles and identities, and canonical package builder; A and B run in distinct fresh processes, their complete workspaces are deleted, and C receives only copied immutable capsule inputs without a checkout argument or inherited checkout working directory
+    - MIR 4 final-programme reconciliation treats supplied prose and JSON as proposal inputs rather than commands, distinguishes the observed 18-entry archive from the unavailable claimed 106-file package, and grants no build allocation signing tag publication or release authority
+    - MIR 4 engine availability and target readiness are package-excluded non-emitting observations; exact lower-engine hashes do not admit f200 f110 or f100 while the live entry gate remains pre-EOL f210-only
+    - MIR 3 Mod Portal public visibility observations never substitute for authenticated redownload byte verification exact-engine smoke archive-rights custody or the MIR 3 EOL seal
     - MIR 4 offline seals require the exact admitted f210 plan and self-hashed package-equivalent candidate manifest, an exact Factorio 2.1.13 executable, six passed artifact-bound observations in an independently signed exact-engine evidence bundle, passed qualification and human review, and an explicitly trust-anchored proof-only OpenSSH Ed25519 seal signature; synthetic probes never satisfy this gate and private keys and evidence remain under verified ignored local roots
     - MIR 4 publication dry-run idempotence requires two independently written canonically and byte-identical bundles after sealing; both bind the verified seal and current V2 identity authorities, remain non-mutating, and reject apply tag upload and public modes
     - MIR 4 offline seals omit publication dry-run and restoration evidence; the final local proof completion record binds the verified seal, both independently written post-seal dry runs, and the clean restoration receipt without granting publication authority

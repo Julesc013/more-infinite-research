@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-capsule-manifest.schema.json",
+  "title": "MIR 4 bootstrap capsule-internal manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "canonicalization", "target", "package_membership_authority", "member_count", "members", "payload_root_sha256", "authority_closure_root_sha256", "git_source_proof_record_sha256", "toolchain_lock_record_sha256", "canonical_builder_sha256", "reconstruction_runner_sha256", "record_sha256"],
+  "properties": {
+    "schema": { "const": 2 },
+    "kind": { "const": "MIR4BootstrapCapsuleManifestV2" },
+    "status": { "const": "local-unpublished-closed-construction-input" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_key", "factorio_line", "distribution_version", "source", "predecessor"],
+      "properties": {
+        "target_key": { "const": "f210" },
+        "factorio_line": { "const": "2.1" },
+        "distribution_version": { "const": "4.0.21000" },
+        "source": { "type": "object" },
+        "predecessor": { "type": "object" }
+      }
+    },
+    "package_membership_authority": { "const": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots" },
+    "member_count": { "type": "integer", "minimum": 1, "maximum": 4095 },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4095,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role", "bytes", "sha256"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(?!\\.mir/capsule/manifest\\.json$)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" },
+          "role": { "enum": ["package-source", "authority", "schema", "canonical-package-builder", "reconstruction-tool", "git-object-proof", "toolchain-lock", "reconstruction-instructions"] },
+          "bytes": { "type": "integer", "minimum": 0, "maximum": 268435456 },
+          "sha256": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    "payload_root_sha256": { "$ref": "#/$defs/sha256" },
+    "authority_closure_root_sha256": { "$ref": "#/$defs/sha256" },
+    "git_source_proof_record_sha256": { "$ref": "#/$defs/sha256" },
+    "toolchain_lock_record_sha256": { "$ref": "#/$defs/sha256" },
+    "canonical_builder_sha256": { "$ref": "#/$defs/sha256" },
+    "reconstruction_runner_sha256": { "$ref": "#/$defs/sha256" },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": { "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" } }
+}

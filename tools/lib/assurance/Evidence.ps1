@@ -303,6 +303,51 @@ function Get-MIRAssuranceInputFingerprint {
         })
       }
     }
+    "mir4-bootstrap-toolchain" {
+      $pwshPath = (Get-Process -Id $PID).Path
+      $toolchainRoot = (Resolve-Path -LiteralPath $PSHOME).Path
+      $rootItem = Get-Item -LiteralPath $toolchainRoot -Force
+      $rows = [Collections.Generic.List[string]]::new()
+      [int]$fileCount = 0
+      foreach ($item in @(Get-ChildItem -LiteralPath $toolchainRoot -Recurse -Force)) {
+        $relative = [IO.Path]::GetRelativePath($toolchainRoot, $item.FullName).Replace('\', '/')
+        $isReparse = (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
+        if ($item.PSIsContainer) {
+          $rows.Add("D`t$relative`t$([bool]$isReparse)")
+        } else {
+          $rows.Add("F`t$relative`t$([long]$item.Length)`t$(Get-MIRAssuranceSha256 -Path $item.FullName)`t$([bool]$isReparse)")
+          $fileCount++
+        }
+      }
+      $rows.Sort([StringComparer]::Ordinal)
+      $portableTree = [ordered]@{
+        kind='external-tree'
+        state=$(if (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { 'reparse-root' } else { 'present' })
+        entry_count=[int]$rows.Count
+        file_count=$fileCount
+        sha256=(Get-MIRAssuranceTextHash -Text $(if ($rows.Count -gt 0) { $rows -join "`n" } else { 'EMPTY:mir4-bootstrap-toolchain' }))
+      }
+      $material = [ordered]@{
+        powershell_version=[string]$PSVersionTable.PSVersion
+        dotnet_runtime_version=[string][Environment]::Version
+        os_platform=[string][Environment]::OSVersion.Platform
+        os_version=[string][Environment]::OSVersion.Version
+        process_architecture=[string][Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture
+        executable=[IO.Path]::GetFileName($pwshPath)
+        files=$portableTree
+      }
+      return [ordered]@{
+        kind='mir4-bootstrap-toolchain'
+        powershell_version=[string]$material.powershell_version
+        dotnet_runtime_version=[string]$material.dotnet_runtime_version
+        os_platform=[string]$material.os_platform
+        os_version=[string]$material.os_version
+        process_architecture=[string]$material.process_architecture
+        executable=[string]$material.executable
+        files=$portableTree
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
+    }
     "candidate-seal" {
       if ($Context.seal) { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.seal -MissingLabel "candidate-seal" }
       return Get-MIRAssurancePatternFingerprint -Patterns @(".mir/evidence/candidate-seals/**")

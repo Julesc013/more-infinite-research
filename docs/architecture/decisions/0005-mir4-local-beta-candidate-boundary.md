@@ -30,7 +30,7 @@ The f210 candidate is admitted by the emergency lane; f200, f110, and f100 are n
 
 It cannot perform a semantic rewrite, a manual backport, publication, public identity allocation, or prototype mutation outside the existing emission boundary.
 
-Each candidate undergoes at least three independently recaptured source-capsule and repeated deterministic package-construction runs, and must match its exact predecessor at every package-visible path except the generated package root and `info.json#/version`. These runs establish bounded same-tool repeatability, not checkout-independent C reconstruction; a toolchain-closed capsule remains open.
+Each candidate undergoes capsule-only A/B/C reconstruction and must match its exact predecessor at every package-visible path except the generated package root and `info.json#/version`. Capsule V2 binds raw package-source Git objects, the exact authority/schema/tool closure, the canonical builder, and the complete executing PowerShell/.NET home. A and B run in distinct child processes, their complete workspaces are deleted, and C runs from copied capsule inputs in a fresh system-temporary root without a checkout argument or inherited checkout working directory. Identical receipts and package bytes close checkout-independent C construction without claiming an OS ACL/container denial or a network-denied runtime campaign.
 
 The candidate semantic root reuses the terminal semantic root, the candidate authority root additionally binds the plan, its exact imported authority closure, capsule, target, version, and candidate bytes, and the pre-qualification root binds that authority to the exact required engine without claiming an observation.
 
@@ -55,3 +55,9 @@ The terminal `.9` archives, root package source, Git tags, public channels, and 
 The general repository move and compiler-authority replacement remain post-4.0 owner-by-owner work.
 
 Release managers build the admitted candidate with `tools/mir.ps1 mir4 build-local-beta --target f210` and verify it with `tools/mir.ps1 mir4 check-local-beta --target f210`.
+
+## Dated environment supersession
+
+The executable-absence sentence in Context records the environment observed when this decision was adopted. A later read-only observation on `2026-08-16` found exact executable-lock matches for Factorio 2.0.77.84539, 1.1.110.62357, and 1.0.0.54889 on Windows x86-64. The observed Factorio 2.1.13.87164 executable has SHA-256 `B90CA5940D49799280614A9945DDFC1AB06E2A8BD6BBD874E542FE7167465485`, which does not match the locked `CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084`.
+
+This supersedes only the mutable environment observation, not the decision. It does not capture official data/module closures, qualify a MIR 4 candidate, admit f200/f110/f100 construction, or change the MIR 3 EOL and public publication boundaries.

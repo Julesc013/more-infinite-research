@@ -1,0 +1,168 @@
+param([string]$RepoRoot = "")
+
+$ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
+} else {
+  $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+
+. (Join-Path $RepoRoot "tools/lib/mir4/BootstrapMaterialization.ps1")
+
+function Assert-True([bool]$Condition, [string]$Message) {
+  if (-not $Condition) { throw $Message }
+}
+
+function Get-JsonRecord([string]$RelativePath) {
+  $path = Join-Path $RepoRoot $RelativePath
+  return [pscustomobject]@{
+    Path = $path
+    Text = Get-Content -Raw -LiteralPath $path
+    Value = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+  }
+}
+
+if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) {
+  throw "Test-Json is required for fail-closed MIR 4 readiness tests."
+}
+
+$engineRelativePath = ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json"
+$engineSchemaPath = Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json"
+$readinessRelativePath = ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json"
+$readinessSchemaPath = Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-target-readiness.schema.json"
+
+$engineRecord = Get-JsonRecord $engineRelativePath
+$readinessRecord = Get-JsonRecord $readinessRelativePath
+$planRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
+$entryGateRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json"
+$registryRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json"
+$targetProfilesRecord = Get-JsonRecord ".mir/targets.json"
+$visibilityRecord = Get-JsonRecord ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
+
+Assert-True ($engineRecord.Text | Test-Json -SchemaFile $engineSchemaPath) "MIR 4 engine-availability observation schema validation failed."
+Assert-True ($readinessRecord.Text | Test-Json -SchemaFile $readinessSchemaPath) "MIR 4 target-readiness record schema validation failed."
+Assert-True (Test-MIR4BootstrapRecordHash -Record $engineRecord.Value) "MIR 4 engine-availability observation self-hash is stale."
+Assert-True (Test-MIR4BootstrapRecordHash -Record $readinessRecord.Value) "MIR 4 target-readiness record self-hash is stale."
+
+Assert-True ($engineRecord.Value.package_visible -eq $false -and
+  $engineRecord.Value.semantic_authority -eq $false -and
+  $engineRecord.Value.public_output_authorized -eq $false -and
+  $engineRecord.Value.construction_authority -eq $false) "Engine availability escaped its non-authoritative boundary."
+Assert-True ($readinessRecord.Value.package_visible -eq $false -and
+  $readinessRecord.Value.semantic_authority -eq $false -and
+  $readinessRecord.Value.public_output_authorized -eq $false -and
+  $readinessRecord.Value.construction_authority -eq $false) "Target readiness escaped its non-authoritative boundary."
+Assert-True ($engineRecord.Text -notmatch '(?i)[A-Z]:[\\/]' -and $engineRecord.Text -notmatch '\\\\') "Engine observation contains an absolute local path."
+
+Assert-True ((Get-MIR4Sha256File -Path (Join-Path $RepoRoot ([string]$engineRecord.Value.lock_authority.path))) -ceq [string]$engineRecord.Value.lock_authority.sha256) "Engine observation plan binding is stale."
+foreach ($binding in $readinessRecord.Value.imports) {
+  $boundPath = Join-Path $RepoRoot ([string]$binding.path)
+  Assert-True (Test-Path -LiteralPath $boundPath -PathType Leaf) "Readiness import does not exist: $($binding.path)"
+  Assert-True ((Get-MIR4Sha256File -Path $boundPath) -ceq [string]$binding.sha256) "Readiness import hash is stale: $($binding.path)"
+}
+
+$engineTargets = @($engineRecord.Value.targets)
+$readinessTargets = @($readinessRecord.Value.targets)
+$expectedTargetKeys = @("f210", "f200", "f110", "f100")
+Assert-True (($engineTargets.target_key -join '|') -ceq ($expectedTargetKeys -join '|')) "Engine observation target order or coverage drifted."
+Assert-True (($readinessTargets.target_key -join '|') -ceq ($expectedTargetKeys -join '|')) "Readiness target order or coverage drifted."
+Assert-True ((@($readinessTargets | Where-Object local_construction_admitted).target_key -join '|') -ceq "f210") "Readiness admits construction for a target other than f210."
+Assert-True ((@($readinessRecord.Value.entry_state.construction_admitted_targets) -join '|') -ceq "f210") "Entry summary admits a target other than f210."
+Assert-True ((@($readinessRecord.Value.entry_state.blocked_targets) -join '|') -ceq "f200|f110|f100") "Entry summary no longer blocks the three non-f210 targets."
+
+Assert-True ($entryGateRecord.Value.status -ceq "pre-eol-local-proof-authorized-publication-forbidden") "Live MIR 4 entry-gate state drifted."
+Assert-True ($entryGateRecord.Value.target_dispositions.'other-active-targets' -ceq "blocked-until-r1-and-eol") "Live MIR 4 entry gate no longer blocks non-f210 targets."
+Assert-True ([string]$visibilityRecord.Value.status -ceq "api-and-rendered-table-two-visible-sha1-matched-redownloads-pending" -and
+  (@($visibilityRecord.Value.releases | Where-Object { $_.api_visible -and $_.rendered_table_visible -and $_.sha1_matches_sealed }).Count -eq 2) -and
+  [int]$visibilityRecord.Value.custody_state.authenticated_redownloads_complete -eq 0 -and
+  $visibilityRecord.Value.custody_state.mir3_eol_blocked -eq $true) "Readiness no longer binds the accurate visibility-only, custody-open portal state."
+
+foreach ($targetKey in $expectedTargetKeys) {
+  $engineRows = @($engineTargets | Where-Object { [string]$_.target_key -ceq $targetKey })
+  $readinessRows = @($readinessTargets | Where-Object { [string]$_.target_key -ceq $targetKey })
+  $planRows = @($planRecord.Value.targets | Where-Object { [string]$_.target_key -ceq $targetKey })
+  Assert-True ($engineRows.Count -eq 1 -and $readinessRows.Count -eq 1 -and $planRows.Count -eq 1) "Target $targetKey is not uniquely represented."
+
+  $engine = $engineRows[0]
+  $readiness = $readinessRows[0]
+  $plan = $planRows[0]
+  Assert-True ([string]$engine.target_id -ceq [string]$plan.target_id -and
+    [string]$engine.factorio_line -ceq [string]$plan.factorio_line -and
+    [string]$engine.lock_label -ceq [string]$plan.engine_lock.version -and
+    [string]$engine.required_engine.executable_sha256 -ceq [string]$plan.engine_lock.executable_sha256) "Engine lock no longer binds the plan row for $targetKey."
+  Assert-True ([string]$readiness.target_id -ceq [string]$plan.target_id -and
+    [string]$readiness.factorio_line -ceq [string]$plan.factorio_line -and
+    [string]$readiness.distribution_version -ceq [string]$plan.distribution_version -and
+    [string]$readiness.current_admission -ceq [string]$plan.admission) "Readiness identity no longer binds the plan row for $targetKey."
+
+  $registryRows = @($registryRecord.Value.payload.targets | Where-Object { [string]$_.id -ceq [string]$plan.target_id })
+  Assert-True ($registryRows.Count -eq 1) "V2 target registry does not uniquely contain $targetKey."
+  Assert-True ([string]$registryRows[0].factorio -ceq [string]$readiness.factorio_line -and
+    [string]$registryRows[0].mir3_predecessor -ceq [string]$readiness.transition.direct_predecessor) "Readiness target/predecessor identity drifted from the V2 registry for $targetKey."
+
+  $allIdentityFieldsMatch = [string]$engine.required_engine.version -ceq [string]$engine.observed_engine.version -and
+    [int]$engine.required_engine.build -eq [int]$engine.observed_engine.build -and
+    [string]$engine.required_engine.platform -ceq [string]$engine.observed_engine.platform -and
+    [string]$engine.required_engine.architecture -ceq [string]$engine.observed_engine.architecture
+  Assert-True $allIdentityFieldsMatch "Observed engine version/build/platform/architecture drifted for $targetKey."
+
+  $hashMatches = [string]$engine.required_engine.executable_sha256 -ceq [string]$engine.observed_engine.executable_sha256
+  Assert-True ($hashMatches -eq [bool]$engine.comparison.executable_sha256_match -and
+    $hashMatches -eq [bool]$engine.comparison.exact_lock_match) "Engine match flags are inconsistent for $targetKey."
+  if ($targetKey -ceq "f210") {
+    Assert-True (-not $hashMatches -and [string]$engine.lock_state -ceq "hash-mismatch" -and
+      [string]$readiness.engine.observation_state -ceq "hash-mismatch" -and
+      $readiness.engine.executable_lock_available -eq $false) "f210 must remain blocked by the observed executable hash mismatch."
+  } else {
+    Assert-True ($hashMatches -and [string]$engine.lock_state -ceq "exact-lock-match" -and
+      [string]$readiness.engine.observation_state -ceq "exact-lock-match" -and
+      $readiness.engine.executable_lock_available -eq $true) "$targetKey must record its exact executable lock match without claiming qualification."
+  }
+
+  Assert-True ($readiness.projection.state -ceq "not-defined" -and
+    $readiness.projection.canonical_source_proven -eq $false -and
+    $readiness.projection.complete_target_dispositions -eq $false -and
+    $readiness.projection.provider_contract_proven -eq $false) "Readiness falsely claims a completed projection for $targetKey."
+  Assert-True ($readiness.transition.fixture_state -ceq "not-defined" -and
+    $readiness.transition.candidate_bound_evidence_present -eq $false -and
+    $readiness.transition.historical_evidence_substitution_allowed -eq $false) "Readiness falsely claims transition evidence for $targetKey."
+
+  $currentProfile = $targetProfilesRecord.Value.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
+  Assert-True ([int]$currentProfile.expected_stream_count -eq [int]$readiness.capability.canonical_expected_stream_count) "Current target profile stream count drifted for $targetKey."
+
+  $terminalTargetsText = (& git -C $RepoRoot show "$($plan.source.candidate_commit):.mir/targets.json") -join "`n"
+  if ($LASTEXITCODE -ne 0) { throw "Could not read terminal target profile authority for $targetKey." }
+  $terminalTargets = $terminalTargetsText | ConvertFrom-Json
+  $terminalProfile = $terminalTargets.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
+  Assert-True ([int]$terminalProfile.expected_stream_count -eq [int]$readiness.capability.terminal_expected_stream_count) "Terminal target profile stream count drifted for $targetKey."
+  Assert-True ($null -ne $terminalProfile.PSObject.Properties['supported_required_mods'] -and
+    $null -ne $terminalProfile.PSObject.Properties['supported_effect_types']) "Terminal target profile lacks the positive capability fields recorded for $targetKey."
+}
+
+$f200 = @($readinessTargets | Where-Object { [string]$_.target_key -ceq "f200" })[0]
+Assert-True ($f200.capability.state -ceq "blocked-stream-count-conflict" -and
+  [int]$f200.capability.canonical_expected_stream_count -eq 73 -and
+  [int]$f200.capability.terminal_expected_stream_count -eq 74) "f200 stream-count drift is no longer represented fail-closed."
+Assert-True (@($f200.blockers | Where-Object { [string]$_ -match 'rendering-discrepancy' }).Count -eq 0 -and
+  @($f200.blockers | Where-Object { [string]$_ -ceq 'mir3-authenticated-redownload-and-eol-custody-pending' }).Count -eq 1) "f200 readiness retains the disproven portal-rendering discrepancy or drops the real custody blocker."
+
+foreach ($targetKey in @("f110", "f100")) {
+  $readiness = @($readinessTargets | Where-Object { [string]$_.target_key -ceq $targetKey })[0]
+  $currentProfile = $targetProfilesRecord.Value.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
+  Assert-True ($null -eq $currentProfile.PSObject.Properties['supported_required_mods'] -and
+    $null -eq $currentProfile.PSObject.Properties['supported_effect_types'] -and
+    [string]$readiness.capability.state -ceq "blocked-missing-positive-allowlists") "Missing canonical positive capability fields are not represented for $targetKey."
+}
+
+$badReadiness = $readinessRecord.Text | ConvertFrom-Json
+$badF200 = @($badReadiness.targets | Where-Object { [string]$_.target_key -ceq "f200" })[0]
+$badF200.local_construction_admitted = $true
+$badReadinessText = $badReadiness | ConvertTo-Json -Depth 100
+Assert-True (-not ($badReadinessText | Test-Json -SchemaFile $readinessSchemaPath -ErrorAction SilentlyContinue)) "Readiness schema admitted f200 construction."
+
+$badEngine = $engineRecord.Text | ConvertFrom-Json
+$badEngine.targets[0].observed_engine | Add-Member -NotePropertyName local_path -NotePropertyValue "D:\\Programs\\Factorio\\factorio.exe"
+$badEngineText = $badEngine | ConvertTo-Json -Depth 100
+Assert-True (-not ($badEngineText | Test-Json -SchemaFile $engineSchemaPath -ErrorAction SilentlyContinue)) "Engine observation schema accepted an absolute local path field."
+
+Write-Host "[ok] MIR 4 non-emitting target readiness and engine availability are fail-closed"

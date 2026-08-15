@@ -10,6 +10,10 @@ paths:
   spec.compatibility.lanes: spec/compatibility/support-lanes.json
   spec.schemas: spec/schemas
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
+  spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
+  spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json
+  spec.schemas.mir4-final-programme-reconciliation: spec/schemas/mir4-final-programme-reconciliation.schema.json
+  spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
   validation.adapters: validation/adapters
   validation.adapters.portal-exclusions: validation/adapters/portal-exclusions.json
@@ -83,6 +87,7 @@ paths:
   tools.commands.release.mir4-terminal-baseline-import: tools/commands/release/Import-MIR3TerminalBaselines.ps1
   tools.commands.release.mir4-bootstrap-root-set: tools/commands/release/New-MIR4BootstrapRootSet.ps1
   tools.commands.release.mir4-bootstrap-local-candidate: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
+  tools.commands.release.mir4-bootstrap-capsule: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
   tools.commands.release.mir4-r0-check: tools/commands/release/Test-MIR4R0Bootstrap.ps1
   tools.lib.mir4: tools/lib/mir4
   tools.lib.mir4.bootstrap-materialization: tools/lib/mir4/BootstrapMaterialization.ps1
@@ -139,9 +144,13 @@ paths:
   releases.waves.mir4-terminal-baseline-import: .mir/releases/waves/mir4-r0/terminal-baseline-import.json
   releases.waves.mir4-r0-bootstrap-root-set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
   releases.waves.mir4-r0-bootstrap-local-candidate-plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
+  releases.waves.mir4-r0-bootstrap-target-readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
+  releases.waves.mir4-r0-final-programme-reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json
   releases.waves.mir4-r0-queue: .mir/releases/waves/mir4-r0/queue.json
   evidence.root: .mir/evidence
+  evidence.mir4-r0-engine-availability: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
+  evidence.mir3-dot9-mod-portal-visibility-recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
   evidence.manifests: .mir/evidence/manifests
   evidence.attestations: .mir/evidence/attestations
   evidence.seals: .mir/evidence/seals

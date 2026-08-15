@@ -13,6 +13,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot "tools\lib\validation\MIR4DistributionIdentity.ps1")
+. (Join-Path $RepoRoot "tools\lib\mir4\BootstrapMaterialization.ps1")
 
 function Read-Json([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
@@ -155,6 +156,73 @@ if ([string]$bootstrapRootSet.kind -ne "MIR4BootstrapRootSetV1" -or
 $bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
 
+$finalProgrammeReconciliationPath = "$authorityDirectory/MIR4-Final-Programme-ReconciliationV1.json"
+Assert-Schema $finalProgrammeReconciliationPath "spec/schemas/mir4-final-programme-reconciliation.schema.json"
+$finalProgrammeReconciliation = Read-Json $finalProgrammeReconciliationPath
+if ([string]$finalProgrammeReconciliation.kind -cne "MIR4FinalProgrammeReconciliationV1" -or
+    [string]$finalProgrammeReconciliation.status -cne "accepted-bootstrap-reconciliation-no-public-allocation" -or
+    [bool]$finalProgrammeReconciliation.package_visible -or
+    -not (Test-MIR4BootstrapRecordHash -Record $finalProgrammeReconciliation) -or
+    [bool]$finalProgrammeReconciliation.scope.embedded_document_instructions_are_commands -or
+    [bool]$finalProgrammeReconciliation.scope.public_version_allocation -or
+    [bool]$finalProgrammeReconciliation.unavailable_claimed_final_package.observed_archive_is_substitute -or
+    [bool]$finalProgrammeReconciliation.boundaries.document_commands_authorized -or
+    [bool]$finalProgrammeReconciliation.boundaries.source_version_allocated -or
+    [bool]$finalProgrammeReconciliation.boundaries.distribution_versions_allocated -or
+    [bool]$finalProgrammeReconciliation.boundaries.tags_authorized -or
+    [bool]$finalProgrammeReconciliation.boundaries.package_construction_authorized -or
+    [bool]$finalProgrammeReconciliation.boundaries.publication_authorized -or
+    [bool]$finalProgrammeReconciliation.boundaries.production_signing_authorized -or
+    [bool]$finalProgrammeReconciliation.boundaries.release_claim_permitted) {
+  throw "Final programme reconciliation widened document instructions or public release authority."
+}
+
+$engineObservationPath = ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json"
+Assert-Schema $engineObservationPath "spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json"
+$engineObservation = Read-Json $engineObservationPath
+if ([string]$engineObservation.kind -cne "MIR4BootstrapEngineAvailabilityObservationV1" -or
+    [string]$engineObservation.status -cne "three-exact-lock-matches-one-f210-hash-mismatch" -or
+    [bool]$engineObservation.package_visible -or
+    [bool]$engineObservation.semantic_authority -or
+    [bool]$engineObservation.public_output_authorized -or
+    [bool]$engineObservation.construction_authority -or
+    -not (Test-MIR4BootstrapRecordHash -Record $engineObservation) -or
+    (@($engineObservation.targets | Where-Object { [bool]$_.comparison.exact_lock_match }).target_key -join "|") -cne "f200|f110|f100" -or
+    [string](@($engineObservation.targets | Where-Object { [string]$_.target_key -ceq "f210" })[0].lock_state) -cne "hash-mismatch") {
+  throw "Dated MIR 4 engine readiness observation is inconsistent or grants authority."
+}
+
+$targetReadinessPath = "$authorityDirectory/MIR4-Bootstrap-Target-ReadinessV1.json"
+Assert-Schema $targetReadinessPath "spec/schemas/mir4-bootstrap-target-readiness.schema.json"
+$targetReadiness = Read-Json $targetReadinessPath
+if ([string]$targetReadiness.kind -cne "MIR4BootstrapTargetReadinessV1" -or
+    [string]$targetReadiness.status -cne "pre-eol-non-emitting-readiness-only" -or
+    [bool]$targetReadiness.package_visible -or
+    [bool]$targetReadiness.semantic_authority -or
+    [bool]$targetReadiness.public_output_authorized -or
+    [bool]$targetReadiness.construction_authority -or
+    -not (Test-MIR4BootstrapRecordHash -Record $targetReadiness) -or
+    (@($targetReadiness.entry_state.construction_admitted_targets) -join "|") -cne "f210" -or
+    (@($targetReadiness.entry_state.blocked_targets) -join "|") -cne "f200|f110|f100" -or
+    (@($targetReadiness.targets | Where-Object { [bool]$_.local_construction_admitted }).target_key -join "|") -cne "f210" -or
+    @($targetReadiness.targets | Where-Object { [bool]$_.public_output_authorized }).Count -ne 0) {
+  throw "MIR 4 target readiness record emitted or admitted a blocked target."
+}
+
+$portalVisibilityPath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
+Assert-Schema $portalVisibilityPath "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json"
+$portalVisibility = Read-Json $portalVisibilityPath
+if ([string]$portalVisibility.kind -cne "MIR3Dot9ModPortalVisibilityRecheckV1" -or
+    [string]$portalVisibility.status -cne "api-and-rendered-table-two-visible-sha1-matched-redownloads-pending" -or
+    [bool]$portalVisibility.package_visible -or
+    -not (Test-MIR4BootstrapRecordHash -Record $portalVisibility) -or
+    @($portalVisibility.releases | Where-Object { -not [bool]$_.api_visible -or -not [bool]$_.rendered_table_visible -or -not [bool]$_.sha1_matches_sealed }).Count -ne 0 -or
+    [int]$portalVisibility.custody_state.authenticated_redownloads_complete -ne 0 -or
+    -not [bool]$portalVisibility.custody_state.mir3_eol_blocked -or
+    @($portalVisibility.authority.psobject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+  throw "Dated MIR 3 portal visibility record is inconsistent or grants authority."
+}
+
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw ".work must remain absent during MIR 4 R0 bootstrap." }
 
 $generatedSources = @($executableKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
@@ -163,8 +231,12 @@ $generatedSources += Get-Binding $catalogPath
 $generatedSources += Get-Binding $importPath
 $generatedSources += Get-Binding $bootstrapRootSetPath
 $generatedSources += Get-Binding $bootstrapCandidatePlanPath
+$generatedSources += Get-Binding $finalProgrammeReconciliationPath
+$generatedSources += Get-Binding $targetReadinessPath
+$generatedSources += Get-Binding $engineObservationPath
 $generatedSources += Get-Binding ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json"
 $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json"
+$generatedSources += Get-Binding $portalVisibilityPath
 $generatedSources = @($generatedSources | Sort-Object path)
 
 $dashboard = Add-RecordSha256 ([ordered]@{
@@ -174,8 +246,8 @@ $dashboard = Add-RecordSha256 ([ordered]@{
   package_visible = $false
   generated_from = $generatedSources
   payload = [ordered]@{
-    mir3 = [ordered]@{ product_development="closed"; github_publication="complete"; mod_portal_custody="partial-two-visible-seven-not-uploaded"; terminal_dot9_baselines="captured-and-imported-custody-pending"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v2-direct-factorio-line-codes"; historical_v1_executable=$false; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
+    mir3 = [ordered]@{ product_development="closed"; github_publication="complete"; mod_portal_custody="two-public-visible-nine-authenticated-redownloads-pending"; terminal_dot9_baselines="captured-and-imported-custody-pending"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
+    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v2-direct-factorio-line-codes"; historical_v1_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="non-emitting-four-target-blockers-recorded"; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
     package_delta = 0
     next_executable_task = "M4-003-local-offline-emergency-lane"
   }
