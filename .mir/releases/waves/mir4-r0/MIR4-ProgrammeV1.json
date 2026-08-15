@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "MIR4-ProgrammeV1",
+  "status": "r0-active-package-excluded",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-R0-programme",
+  "imports": [
+    ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
+    ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json"
+  ],
+  "semantic_reads": ["mir3-terminal-authority", "mir3-publication-state", "mir3-eol-state"],
+  "semantic_writes": ["mir4-r0-programme-state", "mir4-r0-executable-queue"],
+  "target_dispositions": {"terminal-nine": "import-and-preserve", "factorio-0.18": "reserve-bridge", "museum": "archive-only"},
+  "digest_classes": {"semantic": "unchanged-mir3", "authority": "mir4-r0-programme", "qualification": "not-yet-applicable"},
+  "migration": {"from": "mir3-closeout-plus-successor-firewall", "to": "mir4-r0-shadow-authority", "state": "active-package-excluded"},
+  "rollback": {"strategy": "discard-r0-shadow-and-retain-mir3-authority", "permitted_until": "mir3-eol-and-mir4-authority-cutover"},
+  "parity_test": ["zero-package-membership-delta", "nine-terminal-identities-unchanged", "mir3-remains-semantic-authority"],
+  "sunset_condition": "superseded-by-sealed-mir4-r0-entry-and-r1-emergency-lane-authority",
+  "payload": {
+    "source_generation": "MIR4-R0-pre-release",
+    "distribution_generation": null,
+    "identity_axes": ["source-revision", "source-release-version", "target-identity", "distribution-version", "candidate-identity", "package-tree-and-archive", "qualification-identity", "publication-identity"],
+    "phases": ["C0-mir3-custody-and-archive", "R0-bootstrap", "R1-local-emergency-lane", "R2-mir3-eol", "R3-authority-cutover", "R4-semantic-build-graph", "R5-target-compiler", "R6-runtime-settings-migration", "R7-extension-compatibility", "R8-process-ir", "R9-4.0-family"],
+    "current_exit": "READY_FOR_MIR4_R0_IMPLEMENTATION",
+    "next_executable_task": "M4-003-local-offline-emergency-lane",
+    "first_public_4x": "forbidden-until-mir3-sealed-eol"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Offline-Release-AuthorityV1",
+  "status": "r0-authority-admitted-implementation-pending",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-offline-release-authority-v1",
+  "imports": [".mir/releases/waves/MIR4-Offline-Release-Authority.json", ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json"],
+  "semantic_reads": ["source", "target-profile", "toolchain-lock", "qualification-policy"],
+  "semantic_writes": ["local-candidate", "observation", "evaluation", "qualification", "review", "seal", "tag-bundle", "publication-bundle"],
+  "target_dispositions": {"registered": "locally-executable", "unregistered": "fail-closed", "hosted-services": "replaceable-workers"},
+  "digest_classes": {"semantic": "behavior-content", "authority": "inputs-and-decisions", "qualification": "observations-and-evaluations"},
+  "migration": {"from": "mir3-local-authority-plus-hosted-verification", "to": "mir4-local-release-dag", "state": "authority-admitted-kernel-pending"},
+  "rollback": {"strategy": "retain-terminal-control-plane-v5-executor", "permitted_until": "offline-dag-equivalence-and-restore-pass"},
+  "parity_test": ["offline-complete", "row-checkpoint-resumption", "same-plan-adoption", "observation-evaluator-separation", "idempotent-replication", "restore-from-evidence-store"],
+  "sunset_condition": "superseded-by-qualified-offline-release-kernel-version",
+  "payload": {
+    "dag": ["plan", "build", "observe", "evaluate", "qualify", "review", "seal", "tag-bundle", "publication-dry-run", "replicate"],
+    "checkpoint_invariants": ["immutable-campaign-identity", "row-content-addressed-capsules", "safe-stop-between-rows", "checkpointed-not-passed", "live-worker-adoption", "stale-worker-recovery", "no-retry-until-green"],
+    "hosted_role": "publication-mirror-and-replaceable-verification-worker",
+    "mandatory_cloud_service": false
+  }
+}

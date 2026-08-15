@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-r0-status.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-r0-status.schema.json",
+  "title": "MIR 4 R0 dashboard or executable queue",
+  "type": "object",
+  "required": ["schema", "kind", "status", "package_visible", "generated_from", "payload", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"enum": ["MIR4R0DashboardV1", "MIR4R0ExecutableQueueV1"]},
+    "status": {"type": "string", "minLength": 1},
+    "package_visible": {"const": false},
+    "generated_from": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "payload": {"type": "object"},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": false
+}
