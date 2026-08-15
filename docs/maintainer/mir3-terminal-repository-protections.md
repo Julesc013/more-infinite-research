@@ -5,7 +5,7 @@ applies_to: "MIR 3 terminal programme"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
@@ -35,6 +35,8 @@ On failure, use the receipt classification: HTTP 401 is authentication, HTTP 403
 `main` and `legacy` are promotion refs, not development branches. They must accept only an exact governed fast-forward promotion by the repository owner after the promotion commit has both required checks. Requiring a pull request on these refs would contradict the release topology: `main` advances to the immutable 3.2.9 commit, while `legacy` advances to the independently qualified dual-parent 2.5.9 integration. Their integrity/check rules have no bypass; a separate update restriction names the only actor allowed to perform the fast-forward.
 
 Integrity rules and actor/update rules are intentionally separate. An actor allowed to satisfy an update restriction cannot thereby bypass required checks, deletion protection, or non-fast-forward protection.
+
+For a source-frozen terminal candidate, dispatch `MIR 3 Terminal Promotion Check` from the current green `dev` controller with the exact release and allocated candidate SHA. The workflow validates all nine frozen ZIP identities and ceremony records, then validates the selected candidate commit, tree, parents, remote candidate ref, target seal, family-readiness authorization, and current fast-forward boundary. Only a passing run creates the required GitHub Actions `verification-gate` check on the immutable candidate SHA. This is the governed bridge for a candidate whose package-excluded historical verifier predates the final controller; it does not rewrite the candidate, relax a ruleset, or relabel a failed product qualification.
 
 ## Tag model
 

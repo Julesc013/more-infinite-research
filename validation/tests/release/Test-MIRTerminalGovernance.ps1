@@ -8,6 +8,40 @@ if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation fail
 & (Join-Path $RepoRoot "validation/tests/release/Test-MIRGitHubAdministration.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR GitHub administration preflight validation failed." }
 
+$promotionToolPath = Join-Path $RepoRoot "tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1"
+$promotionWorkflowPath = Join-Path $RepoRoot ".github/workflows/terminal-promotion-check.yml"
+if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $promotionWorkflowPath -PathType Leaf)) {
+  throw "The terminal promotion controller or workflow is missing."
+}
+$promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
+$promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
+foreach ($snippet in @(
+  'ValidateSet("3.2.9", "2.5.9")',
+  'New-MIR3TerminalReleaseCeremony.ps1',
+  'Get-MIRZipContentFingerprint',
+  'candidate_ref',
+  'governed-fast-forward',
+  'github-publication-only'
+)) {
+  if (-not $promotionTool.Contains($snippet)) { throw "Terminal promotion controller omits required boundary: $snippet" }
+}
+foreach ($snippet in @(
+  "workflow_dispatch:",
+  "checks: write",
+  "cancel-in-progress: false",
+  "Test-MIR3TerminalPromotionCandidate.ps1",
+  "name: 'verification-gate'",
+  "head_sha: process.env.CANDIDATE_SHA",
+  "if (!passed) core.setFailed"
+)) {
+  if (-not $promotionWorkflow.Contains($snippet)) { throw "Terminal promotion workflow omits required fail-closed behavior: $snippet" }
+}
+if ($promotionWorkflow -match '(?m)^\s*pull_request(?:_target)?:' -or
+    $promotionWorkflow -notmatch '(?m)^\s+checks:\s+write\s*$') {
+  throw "Terminal promotion verification must be explicit-dispatch-only and must publish through GitHub Actions checks authority."
+}
+
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $authorityNames = @(
   "MIR3-Terminal-ProgrammeV1",
