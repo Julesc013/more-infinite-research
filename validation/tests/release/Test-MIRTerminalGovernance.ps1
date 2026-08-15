@@ -305,9 +305,53 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
+$programmeStatus = [string]$programme.status
+$admittedProgrammeStatuses = @(
+  "ready-for-local-tagging",
+  "github-published-and-verified-mod-portal-pending"
+)
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
-    [string]$programme.status -ne "ready-for-local-tagging") {
-  throw "Terminal programme must bind the exact qualified, accepted, and sealed nine-candidate family ready for local tagging."
+    $programmeStatus -notin $admittedProgrammeStatuses) {
+  throw "Terminal programme must bind the exact qualified, accepted, and sealed nine-candidate family at an admitted publication phase."
+}
+if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending") {
+  $githubFamilyPublicationPath = Join-Path $RepoRoot ([string]$programme.authorities.github_family_publication)
+  $githubPublicationReceiptsPath = Join-Path $RepoRoot ([string]$programme.authorities.github_publication_receipts)
+  if (-not (Test-Path -LiteralPath $githubFamilyPublicationPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $githubPublicationReceiptsPath -PathType Container)) {
+    throw "GitHub-published terminal programme is missing its family or per-target publication authority."
+  }
+  $githubFamilyPublication = Get-Content -Raw -LiteralPath $githubFamilyPublicationPath | ConvertFrom-Json -Depth 100
+  $githubPublicationReceipts = @(Get-ChildItem -LiteralPath $githubPublicationReceiptsPath -Filter "*.json" -File)
+  if ([string]$githubFamilyPublication.kind -ne "MIR3GitHubFamilyPublicationV1" -or
+      [string]$githubFamilyPublication.status -ne "github-family-published-and-verified" -or
+      [int]$githubFamilyPublication.github_releases.published -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.redownloaded -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.archive_hashes_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.content_hashes_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.byte_counts_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.entry_counts_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_asset_smokes.failed -ne 0 -or
+      [string]$githubFamilyPublication.mod_portal.status -ne "pending-maintainer-manual-upload" -or
+      $githubPublicationReceipts.Count -ne 9) {
+    throw "GitHub-published terminal programme does not bind a complete and verified nine-target publication family."
+  }
+  foreach ($release in $family) {
+    $receiptPath = Join-Path $githubPublicationReceiptsPath "$release.json"
+    if (-not (Test-Path -LiteralPath $receiptPath -PathType Leaf)) {
+      throw "GitHub publication receipt is missing: $release"
+    }
+    $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
+    if ([string]$receipt.kind -ne "Mir3TerminalPublicationReceiptV1" -or [string]$receipt.release -ne $release -or
+        [string]$receipt.channel -ne "github" -or [string]$receipt.status -ne "published-and-verified" -or
+        [string]$receipt.download_verification.archive_sha256 -ne "passed" -or
+        [string]$receipt.download_verification.content_sha256 -ne "passed" -or
+        [string]$receipt.download_verification.bytes -ne "passed" -or
+        [string]$receipt.download_verification.entries -ne "passed" -or
+        [string]$receipt.download_verification.package_composition -ne "passed") {
+      throw "GitHub publication receipt is incomplete or invalid: $release"
+    }
+  }
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -630,6 +674,13 @@ foreach ($release in $family) {
   $packageLock = @($packageLockAuthority.locks | Where-Object release -eq $release)
   $recordPath = Join-Path $RepoRoot ".mir\releases\records\$release.json"
   $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
+  $expectedReleaseRecordState = "sealed"
+  $githubPublicationReceipt = $null
+  if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending") {
+    $expectedReleaseRecordState = "publicly-verified"
+    $githubPublicationReceiptPath = Join-Path $githubPublicationReceiptsPath "$release.json"
+    $githubPublicationReceipt = Get-Content -Raw -LiteralPath $githubPublicationReceiptPath | ConvertFrom-Json -Depth 100
+  }
   $qualificationPath = Join-Path $RepoRoot ".mir\releases\terminal\qualifications\$release.json"
   $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json -Depth 100
   $targetFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json") | ConvertFrom-Json -Depth 100
@@ -646,7 +697,7 @@ foreach ($release in $family) {
       [long]$packageLock[0].archive_bytes -ne [long]$row[0].bytes -or
       [int]$packageLock[0].archive_entries -ne [int]$row[0].entries -or
       [string]$packageLock[0].mode -ne "frozen-terminal-candidate-awaiting-manual-approval" -or
-      [string]$record.state -ne "sealed" -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+      [string]$record.state -ne $expectedReleaseRecordState -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
       [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
       [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
       [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
@@ -676,6 +727,14 @@ foreach ($release in $family) {
       [string]$row[0].content_sha256 -ne [string]$targetFreeze.package.content_sha256 -or
       [long]$row[0].bytes -ne [long]$targetFreeze.package.bytes -or [int]$row[0].entries -ne [int]$targetFreeze.package.entries) {
     throw "Terminal release/candidate authority disagrees for $release."
+  }
+  if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending" -and
+      ([string]$record.proofs.github_publication -ne "$(([string]$programme.authorities.github_publication_receipts).TrimEnd('/', '\'))/$release.json" -or
+       [string]$record.proofs.tag.kind -ne "annotated-tag" -or [string]$record.proofs.tag.name -ne $release -or
+       [string]$record.proofs.tag.commit -ne [string]$row[0].candidate_commit -or
+       [string]$record.proofs.tag.tag_object -ne [string]$githubPublicationReceipt.tag.object_sha -or
+       (@($record.remaining_obligations) -join "|") -ne "mod-portal-publish-and-publicly-verify|archive-and-mir4-handoff")) {
+    throw "Published release record does not bind its exact GitHub receipt, annotated tag, and remaining obligations: $release"
   }
   if (-not ((Get-Content -Raw -LiteralPath $qualificationPath) | Test-Json -SchemaFile (Join-Path $RepoRoot "spec\schemas\mir3-terminal-qualification-record.schema.json")) -or
       [string]$qualification.release -ne $release -or $matrixTarget.Count -ne 1 -or
@@ -785,7 +844,19 @@ foreach ($release in $family) {
     }
   }
   & git -C $RepoRoot show-ref --verify --quiet "refs/tags/$release"
-  if ($LASTEXITCODE -eq 0) { throw "Terminal tag was created before manual approval: $release" }
+  if ($programmeStatus -eq "ready-for-local-tagging") {
+    if ($LASTEXITCODE -eq 0) { throw "Terminal tag was created before manual approval: $release" }
+  } else {
+    if ($LASTEXITCODE -ne 0) { throw "Published terminal tag is missing: $release" }
+    $tagObject = (& git -C $RepoRoot rev-parse "refs/tags/$release").Trim()
+    $peeledCommit = (& git -C $RepoRoot rev-parse "refs/tags/$release^{}").Trim()
+    $tagType = (& git -C $RepoRoot cat-file -t "refs/tags/$release").Trim()
+    if ($LASTEXITCODE -ne 0 -or $tagType -ne "tag" -or $tagObject -ne [string]$githubPublicationReceipt.tag.object_sha -or
+        $peeledCommit -ne [string]$row[0].candidate_commit -or $peeledCommit -ne [string]$githubPublicationReceipt.tag.peeled_commit -or
+        -not [bool]$githubPublicationReceipt.tag.immutable) {
+      throw "Published terminal tag is not the exact immutable annotated tag bound by authority: $release"
+    }
+  }
 }
 
 $matrix = $authorities["MIR3-Terminal-Target-MatrixV1"]
@@ -1194,11 +1265,21 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
 if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or -not $current.source_frozen -or
-    $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
-    $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
-    $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "ready-for-local-tagging") {
-  throw "Current release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."
+    $current.roles.canonical -ne "3.2.9" -or $current.roles.planned_canonical -ne "3.2.9" -or
+    $current.roles.planned_backport -ne "2.5.9" -or $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or
+    [string]$current.active_programme.status -ne $programmeStatus) {
+  throw "Current release roles do not bind the active terminal programme and canonical .9 family."
+}
+if ($programmeStatus -eq "ready-for-local-tagging") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
+      $current.roles.backport_calibration -ne "2.5.5") {
+    throw "Pre-publication release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."
+  }
+} elseif ($current.roles.latest_published_factorio_2_1 -ne "3.2.9" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.latest_tagged_factorio_2_1 -ne "3.2.9" -or $current.roles.latest_tagged_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.published_factorio_2_1 -ne "3.2.9" -or $current.roles.published_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.tagged_factorio_2_1 -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.9") {
+  throw "Post-publication release roles do not identify the tagged and published 3.2.9/2.5.9 authorities."
 }
 
 & (Join-Path $RepoRoot "tools/commands/release/New-MIR3TerminalReleaseCeremony.ps1") -RepoRoot $RepoRoot -Check

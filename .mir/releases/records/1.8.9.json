@@ -33,21 +33,24 @@
     "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
     "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/1.8.9.json",
     "manual_acceptance": {
       "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
       "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
       "path": ".mir/releases/terminal/reviews/1.8.9.json",
-      "sha256": "66129D342AF751CD8FC3AF23F1B3F83C903E0BAE68C386F70C0DB7F8F86BD70F"
+      "sha256": "66129D342AF751CD8FC3AF23F1B3F83C903E0BAE68C386F70C0DB7F8F86BD70F",
+      "digest_policy": "utf8-lf"
     },
     "package_manifest": ".mir/releases/terminal/manifests/1.8.9-package.json",
     "release_manifest": ".mir/releases/terminal/manifests/1.8.9-release.json",
     "source_freeze": ".mir/releases/terminal/freezes/1.8.9.json",
-    "target_seal": ".mir/releases/terminal/seals/1.8.9.json"
+    "target_seal": ".mir/releases/terminal/seals/1.8.9.json",
+    "tag": {"kind":"annotated-tag","name":"1.8.9","commit":"8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309","tag_object":"9e933200ddcbb2f8c391a7cf214c95364aa4f6db"}
   },
   "release": "1.8.9",
   "release_notes": "docs/releases/notes/release-notes-1.8.9.md",
   "remaining_obligations": [
-    "tag-publish-and-publicly-verify",
+    "mod-portal-publish-and-publicly-verify",
     "archive-and-mir4-handoff"
   ],
   "schema": 1,
@@ -57,7 +60,7 @@
     "release": "1.8.5",
     "tag": "1.8.5"
   },
-  "state": "sealed",
+  "state": "publicly-verified",
   "target": "1.0",
-  "updated_at": "2026-08-15T14:27:50+10:00"
+  "updated_at": "2026-08-15T17:21:05+10:00"
 }

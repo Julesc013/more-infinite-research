@@ -392,7 +392,7 @@ function New-MIRCPTodoLines {
   $lines.Add("| ``T9-B`` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |")
   $lines.Add("| ``T9-C`` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |")
   $lines.Add("| ``T9-D`` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |")
-  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication in progress; Mod Portal manual upload pending | Verify public bytes and exact-engine smokes, complete terminal indexes, then hand sealed baselines to MIR 4 |")
+  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication verified; Mod Portal manual upload pending | Upload and verify the same sealed bytes on Mod Portal, complete terminal indexes, then hand sealed baselines to MIR 4 |")
   $lines.Add("")
   $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
   if ($plannedChanges.Count -gt 0) {
@@ -533,6 +533,11 @@ function Update-MIRCPViews {
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.branch_status) -Value $branchStatus -RepoRoot $repo -Check:$Check
 
+  $terminalProgrammeStatus = [string]$pointer.active_programme.status
+  $publicationAdmitted = $terminalProgrammeStatus -in @(
+    "ready-for-local-tagging",
+    "github-published-and-verified-mod-portal-pending"
+  )
   $publication = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-terminal-family-publication-checklist-v1"
@@ -548,8 +553,10 @@ function Update-MIRCPViews {
       }
     })
     family_readiness_seal_present = (Test-Path -LiteralPath (Join-Path $repo ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json") -PathType Leaf)
-    first_public_tag_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
-    publication_admitted = ([string]$pointer.active_programme.status -eq "ready-for-local-tagging")
+    first_public_tag_admitted = $publicationAdmitted
+    publication_admitted = $publicationAdmitted
+    github_publication_complete = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
+    mod_portal_publication_pending = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check
 

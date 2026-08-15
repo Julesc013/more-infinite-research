@@ -17,6 +17,8 @@
     "final_defect_qualification_reconciliation": ".mir/releases/terminal/MIR3FinalDefectQualificationReconciliationV1.json",
     "fixed_point": ".mir/releases/terminal/MIR3-Terminal-FixedPointPolicyV1.json",
     "fixed_point_receipt": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_family_publication": ".mir/evidence/terminal-publication/2026-08-15/MIR3-GitHub-Family-PublicationV1.json",
+    "github_publication_receipts": ".mir/evidence/terminal-publication/2026-08-15/github",
     "incident_reconciliation": ".mir/releases/terminal/MIR3-Terminal-Incident-ReconciliationV1.json",
     "maintainer_acceptance": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
     "mod_interaction_matrix": ".mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json",
@@ -58,10 +60,10 @@
     "1.4.9",
     "1.3.9"
   ],
-  "hard_gate": "Nine exact frozen candidates are maintainer-accepted, independently sealed, and bound by a valid family-readiness record. Governed branch promotion and immutable annotated tag creation are authorized; publication must use only the sealed ZIPs.",
+  "hard_gate": "The nine exact frozen candidates are published and publicly verified on GitHub. Mod Portal custody remains pending the maintainer's manual upload of the same sealed ZIPs, followed by authenticated redownload verification and exact-engine smoke evidence.",
   "implementation_admitted": true,
   "kind": "MIR3-Terminal-ProgrammeV1",
   "schema": 1,
   "source_frozen": true,
-  "status": "ready-for-local-tagging"
+  "status": "github-published-and-verified-mod-portal-pending"
 }

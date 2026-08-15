@@ -43,13 +43,13 @@ Use the attached `more-infinite-research_1.5.9.zip` unchanged. Do not rename or 
 
 | Field | Value |
 | --- | --- |
-| State | `sealed` |
+| State | `publicly-verified` |
 | Candidate | `1.5-P1` |
 | Package source commit | `8098510acc3530321a2dc32b8d2292aa814bb9c3` |
 | Archive SHA-256 | `85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E` |
 | Content SHA-256 | `C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED` |
-| Tag | `pending` |
-| Tag commit | `pending` |
+| Tag | `1.5.9` |
+| Tag commit | `8098510acc3530321a2dc32b8d2292aa814bb9c3` |
 | Assurance exceptions | `pending` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

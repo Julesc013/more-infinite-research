@@ -7,16 +7,11 @@
   ],
   "release": "2.5.9",
   "remaining_obligations": [
-    "promote-tag-publish-and-publicly-verify",
+    "mod-portal-publish-and-publicly-verify",
     "archive-and-mir4-handoff"
   ],
-  "remaining_states": [
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
+  "remaining_states": [],
   "schema": 1,
-  "state": "sealed",
+  "state": "publicly-verified",
   "target": "2.0"
 }
