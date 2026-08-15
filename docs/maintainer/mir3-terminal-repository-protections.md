@@ -40,6 +40,8 @@ For a source-frozen terminal candidate, dispatch the already registered `Branch 
 
 The promotion context is intentionally unique. GitHub requires every check and commit status sharing a required context name to succeed, so reusing the generic `verification-gate` name would allow an obsolete package-excluded controller failure to remain an unrelated promotion blocker even after the current sealed-candidate controller passes. The context amendment does not rewrite historical evidence or weaken protection: `dev` retains its ordinary `verification-gate`; `main` and `legacy` retain two strict App-ID-bound checks, deletion and non-fast-forward protection, no integrity bypass, and the exact owner-only update restriction.
 
+The required-context amendment was applied and read back on 15 August 2026. Its append-only receipt is `.mir/evidence/terminal-protections/2026-08-15/required-context-amendment-application-receipt.json`; it binds rulesets `20833408` and `20833410`, current controller commit `92ba00191fc511af6aa9445c8aa267e97d1cc8e5`, both successful candidate controller runs, and the exact App-ID-bound check runs attached to each immutable candidate.
+
 ## Tag model
 
 The nine published `.5` refs are immutable immediately and have no bypass:
