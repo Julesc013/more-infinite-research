@@ -52,7 +52,7 @@
       "candidate_floor": "C33",
       "candidate_id": "C33",
       "development_branch": "dev",
-      "manual_review": "pending",
+      "manual_review": "maintainer-patch-review-approved",
       "mir_version": "3.2.9",
       "package_content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
       "package_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
@@ -65,25 +65,20 @@
       "package_source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
       "package_source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa",
       "protected_qualification": "pending",
-      "publication_status": "automated-qualified-awaiting-human-review",
-      "qualification": "automated-qualified-awaiting-human-review",
+      "publication_status": "sealed",
+      "qualification": "sealed",
       "remaining_obligations": [
-        "complete-exact-hash-manual-review",
-        "target-and-family-seal",
         "promote-tag-publish-and-publicly-verify",
         "archive-and-mir4-handoff"
       ],
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
       "source_anchor": "3.2.5",
-      "status": "C33-automated-qualified-awaiting-human-review"
+      "status": "C33-sealed"
     }
   },
   "generated_from": [

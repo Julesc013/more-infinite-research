@@ -2530,13 +2530,97 @@ docs:
       - mir-3-terminal-product-admission
       - mir-3-mod-portal-discussion-reconciliation
   - path: docs/releases/notes/release-notes-3.2.9.md
-    title: "MIR 3.2.9 Planning Notes"
-    status: draft
+    title: "MIR 3.2.9 Release Notes"
+    status: current
     audience: player
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.9-release-notes
+  - path: docs/releases/notes/release-notes-2.5.9.md
+    title: "MIR 2.5.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.9-release-notes
+  - path: docs/releases/notes/release-notes-1.9.9.md
+    title: "MIR 1.9.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.9-release-notes
+  - path: docs/releases/notes/release-notes-1.8.9.md
+    title: "MIR 1.8.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.9-release-notes
+  - path: docs/releases/notes/release-notes-1.7.9.md
+    title: "MIR 1.7.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.9-release-notes
+  - path: docs/releases/notes/release-notes-1.6.9.md
+    title: "MIR 1.6.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.9-release-notes
+  - path: docs/releases/notes/release-notes-1.5.9.md
+    title: "MIR 1.5.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.9-release-notes
+  - path: docs/releases/notes/release-notes-1.4.9.md
+    title: "MIR 1.4.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.9-release-notes
+  - path: docs/releases/notes/release-notes-1.3.9.md
+    title: "MIR 1.3.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.3.9-release-notes
+  - path: docs/releases/mir3-terminal-release-and-mir4-handoff.md
+    title: "MIR 3 Terminal Release and MIR 4 Handoff Guide"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3-terminal-release-guide
+      - mir-3-to-mir-4-handoff
+      - mir-3-terminal-feature-omission-matrix
+      - mir-3-terminal-upgrade-matrix
+      - mir-3-terminal-known-limitations
+  - path: docs/releases/mir3-terminal-mod-portal-upload-checklist.md
+    title: "MIR 3 Terminal Mod Portal Upload Checklist"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3-terminal-mod-portal-upload-checklist
   - path: docs/releases/notes/release-notes-2.5.5.md
     title: "MIR 2.5.5 Release Notes"
     status: current

@@ -5,145 +5,118 @@
       "candidate_id": "C33",
       "release": "3.2.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "2.5-P13",
       "release": "2.5.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.9-P1",
       "release": "1.9.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.8-P1",
       "release": "1.8.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.7-P1",
       "release": "1.7.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.6-P1",
       "release": "1.6.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.5-P1",
       "release": "1.5.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.4-P1",
       "release": "1.4.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     },
     {
       "candidate_id": "1.3-P1",
       "release": "1.3.9",
       "remaining_states": [
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "automated-qualified-awaiting-human-review",
-      "target_seal_present": false
+      "state": "sealed",
+      "target_seal_present": true
     }
   ],
-  "family_readiness_seal_present": false,
-  "first_public_tag_admitted": false,
+  "family_readiness_seal_present": true,
+  "first_public_tag_admitted": true,
   "generated_from": [
     "path:releases.current",
     ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
     "path:releases.records/*.9.json"
   ],
-  "publication_admitted": false,
+  "publication_admitted": true,
   "schema": 1
 }

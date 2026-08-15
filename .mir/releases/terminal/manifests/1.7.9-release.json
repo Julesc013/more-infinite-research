@@ -1,0 +1,31 @@
+{
+  "archive_sha256": "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C",
+  "bytes": 385310,
+  "candidate_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+  "candidate_id": "1.7-P1",
+  "content_sha256": "3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014",
+  "entries": 177,
+  "github_release_body": ".mir/releases/terminal/release-bodies/1.7.9.md",
+  "kind": "Mir3TerminalReleaseManifestV1",
+  "mod_portal_description": ".mir/releases/terminal/mod-portal-descriptions/1.7.9.md",
+  "qualification": {
+    "path": ".mir/releases/terminal/qualifications/1.7.9.json",
+    "status": "passed-automated-awaiting-human-review"
+  },
+  "release": "1.7.9",
+  "review": {
+    "path": ".mir/releases/terminal/reviews/1.7.9.json",
+    "sha256": "EA1782D0B2E53DD18193CAB8126CC4BCF4ED76DEEF733078A5685B68DCAA3AE0",
+    "status": "accepted-exact-package-inspection"
+  },
+  "schema": 1,
+  "seal": {
+    "path": ".mir/releases/terminal/seals/1.7.9.json",
+    "status": "created-after-manifest-root"
+  },
+  "tag": {
+    "name": "1.7.9",
+    "status": "authorized-pending-creation",
+    "target_commit": "215ccced7018aac70919221c73e15d795f9d1653"
+  }
+}

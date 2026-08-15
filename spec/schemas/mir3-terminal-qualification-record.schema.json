@@ -38,16 +38,33 @@
       }
     },
     "manual_review": {
-      "type": "object",
-      "required": ["required", "status", "candidate_hash_bound"],
-      "properties": {
-        "required": {"const": true},
-        "status": {"const": "pending-maintainer-approval"},
-        "candidate_hash_bound": {"const": true}
-      },
-      "additionalProperties": true
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["required", "status", "candidate_hash_bound"],
+          "properties": {
+            "required": {"const": true},
+            "status": {"const": "pending-maintainer-approval"},
+            "candidate_hash_bound": {"const": true}
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": ["required", "status", "candidate_hash_bound", "acceptance_path", "acceptance_sha256", "scope"],
+          "properties": {
+            "required": {"const": true},
+            "status": {"const": "accepted-exact-package-inspection"},
+            "candidate_hash_bound": {"const": true},
+            "acceptance_path": {"const": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json"},
+            "acceptance_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+            "scope": {"const": "maintainer-inspected-exact-frozen-distribution; automated-record-covers-engine-settings-compatibility-performance-and-upgrade-surfaces"}
+          },
+          "additionalProperties": true
+        }
+      ]
     },
-    "status": {"const": "passed-automated-awaiting-human-review"}
+    "status": {"enum": ["passed-automated-awaiting-human-review", "passed-automated-maintainer-accepted"]}
   },
   "additionalProperties": true
 }

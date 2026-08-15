@@ -8,19 +8,19 @@ Generated: 2026-08-15
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.9` | `C33` | `C / 33` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
-| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `automated-qualified-awaiting-human-review` | `manually-accepted` |
+| `3.2.9` | `C33` | `C / 33` | `sealed` | `promoted` |
+| `2.5.9` | `2.5-P13` | `2.5-P / 13` | `sealed` | `promoted` |
+| `1.9.9` | `1.9-P1` | `1.9-P / 1` | `sealed` | `promoted` |
+| `1.8.9` | `1.8-P1` | `1.8-P / 1` | `sealed` | `promoted` |
+| `1.7.9` | `1.7-P1` | `1.7-P / 1` | `sealed` | `promoted` |
+| `1.6.9` | `1.6-P1` | `1.6-P / 1` | `sealed` | `promoted` |
+| `1.5.9` | `1.5-P1` | `1.5-P / 1` | `sealed` | `promoted` |
+| `1.4.9` | `1.4-P1` | `1.4-P / 1` | `sealed` | `promoted` |
+| `1.3.9` | `1.3-P1` | `1.3-P / 1` | `sealed` | `promoted` |
 
 ## Canonical execution programme
 
-The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; no .9 implementation begins before the unified finding inventory is frozen.
+The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; the exact .9 family is source-frozen, qualified, maintainer-accepted, sealed, and ready for governed local tagging.
 
 Change-record IDs are identities, not execution order. Follow the terminal programme's workstreams and gates.
 
@@ -29,11 +29,11 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 | Workstream | Current boundary | Completion proof |
 | --- | --- | --- |
 | `T9-0` immutable .5 semantic baselines | 9/9 semantic captures; 9/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |
-| `T9-A` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |
-| `T9-B` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |
-| `T9-C` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |
-| `T9-D` family qualification and seals | Planning only; every candidate unassigned | Freeze after fixed point, allocate candidates, independently qualify and seal all nine, then create one family-readiness seal before any public tag |
-| `T9-E` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |
+| `T9-A` retained .5 assurance debt | Complete and frozen | Reopen only for a false pass/failure, lost evidence, unsafe adoption, or nondeterministic seal |
+| `T9-B` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |
+| `T9-C` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |
+| `T9-D` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |
+| `T9-E` MIR 3 archive and MIR 4 handoff | GitHub publication in progress; Mod Portal manual upload pending | Verify public bytes and exact-engine smokes, complete terminal indexes, then hand sealed baselines to MIR 4 |
 
 | Planned change | Package visible | Targets | Completion boundary |
 | --- | --- | --- | --- |
@@ -97,31 +97,21 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `complete-exact-hash-manual-review` for `3.2.9`
-- [ ] `target-and-family-seal` for `3.2.9`
 - [ ] `promote-tag-publish-and-publicly-verify` for `3.2.9`
 - [ ] `archive-and-mir4-handoff` for `3.2.9`
-- [ ] `complete-exact-hash-manual-review` for `2.5.9`
-- [ ] `target-and-family-seal` for `2.5.9`
 - [ ] `promote-tag-publish-and-publicly-verify` for `2.5.9`
-- [ ] `complete-exact-hash-manual-review` for `1.9.9`
-- [ ] `target-and-family-seal` for `1.9.9`
+- [ ] `archive-and-mir4-handoff` for `2.5.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.9.9`
-- [ ] `complete-exact-hash-manual-review` for `1.8.9`
-- [ ] `target-and-family-seal` for `1.8.9`
+- [ ] `archive-and-mir4-handoff` for `1.9.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.8.9`
-- [ ] `complete-exact-hash-manual-review` for `1.7.9`
-- [ ] `target-and-family-seal` for `1.7.9`
+- [ ] `archive-and-mir4-handoff` for `1.8.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.7.9`
-- [ ] `complete-exact-hash-manual-review` for `1.6.9`
-- [ ] `target-and-family-seal` for `1.6.9`
+- [ ] `archive-and-mir4-handoff` for `1.7.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.6.9`
-- [ ] `complete-exact-hash-manual-review` for `1.5.9`
-- [ ] `target-and-family-seal` for `1.5.9`
+- [ ] `archive-and-mir4-handoff` for `1.6.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.5.9`
-- [ ] `complete-exact-hash-manual-review` for `1.4.9`
-- [ ] `target-and-family-seal` for `1.4.9`
+- [ ] `archive-and-mir4-handoff` for `1.5.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.4.9`
-- [ ] `complete-exact-hash-manual-review` for `1.3.9`
-- [ ] `target-and-family-seal` for `1.3.9`
+- [ ] `archive-and-mir4-handoff` for `1.4.9`
 - [ ] `tag-publish-and-publicly-verify` for `1.3.9`
+- [ ] `archive-and-mir4-handoff` for `1.3.9`

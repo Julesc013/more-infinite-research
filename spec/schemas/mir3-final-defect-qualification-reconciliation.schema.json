@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-final-defect-qualification-reconciliation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-final-defect-qualification-reconciliation.schema.json",
+  "title": "MIR3FinalDefectQualificationReconciliationV1",
+  "type": "object",
+  "required": ["schema", "kind", "recorded_at", "fixed_point_defect_index", "candidate_allocation", "target_seals", "completion_updates", "unresolved_release_blockers", "record_sha256", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3FinalDefectQualificationReconciliationV1"},
+    "target_seals": {"type": "array", "minItems": 9, "maxItems": 9},
+    "completion_updates": {"type": "array", "minItems": 7, "maxItems": 7},
+    "unresolved_release_blockers": {"const": 0},
+    "record_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$", "description": "SHA-256 of canonical final record with record_sha256 omitted."},
+    "status": {"const": "final-candidates-qualified-and-sealed"}
+  },
+  "additionalProperties": true
+}
