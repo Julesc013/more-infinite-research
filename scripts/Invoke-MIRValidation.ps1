@@ -32,6 +32,37 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+if ($ScenarioWorker -and -not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+  $candidateMetadataPath = if ([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+  if (-not (Test-Path -LiteralPath $candidateMetadataPath -PathType Leaf)) {
+    throw "Scenario worker candidate package not found: $CandidateZip"
+  }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $candidateArchive = [IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $candidateMetadataPath).Path)
+  try {
+    $candidateInfoEntries = @($candidateArchive.Entries | Where-Object {
+      -not $_.FullName.EndsWith('/') -and $_.FullName -match '^[^/]+/info\.json$'
+    })
+    if ($candidateInfoEntries.Count -ne 1) {
+      throw "Scenario worker candidate must contain exactly one package-root info.json."
+    }
+    $candidateInfoReader = [IO.StreamReader]::new($candidateInfoEntries[0].Open(), [Text.UTF8Encoding]::new($false), $true)
+    try {
+      $candidateInfo = $candidateInfoReader.ReadToEnd() | ConvertFrom-Json
+    } finally {
+      $candidateInfoReader.Dispose()
+    }
+  } finally {
+    $candidateArchive.Dispose()
+  }
+  if ([string]$candidateInfo.name -ne [string]$repoInfo.name -or
+      [string]$candidateInfo.factorio_version -notin @('2.1', '2.0', '1.1', '1.0')) {
+    throw "Scenario worker candidate metadata does not identify a supported MIR target."
+  }
+  # Runtime evidence must describe the exact candidate target rather than the
+  # controller checkout's current product line.
+  $repoInfo = $candidateInfo
+}
 $expectedScenariosPath = Join-Path $repo "validation\scenarios\runtime.json"
 if ($List) {
   $listed = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
