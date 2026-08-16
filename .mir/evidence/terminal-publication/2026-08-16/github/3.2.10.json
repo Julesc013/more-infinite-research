@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "Mir3PostTerminalEmergencyPublicationReceiptV1",
+  "release": "3.2.10",
+  "channel": "github",
+  "candidate_id": "C34",
+  "candidate_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+  "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+  "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+  "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+  "download_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+  "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+  "bytes": 1065178,
+  "entries": 304,
+  "tag": {
+    "name": "3.2.10",
+    "object_sha": "635a9842db208522648a26d3db4f0d71131d4240",
+    "peeled_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+    "kind": "annotated-unsigned",
+    "immutable": true
+  },
+  "tag_annotation_correction": {
+    "status": "append-only-correction",
+    "incorrect_descriptive_fields": {
+      "Package-Source-Commit": "19ddb2984993d826757847c78b13546797c5f860",
+      "Package-Source-Tree": "46eb122745514c420d62adf9d41d46b6c186107b"
+    },
+    "authoritative_fields": {
+      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a"
+    },
+    "impact": "The immutable tag object points to the correct protected-main release commit and records the correct release tree, archive identity, content identity, engine identity, and promotion proof. Only two descriptive package-source lines in its message are incorrect; this receipt is the append-only correction and the tag is not rewritten."
+  },
+  "github_release": {
+    "id": 371323367,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.10",
+    "draft": false,
+    "prerelease": false,
+    "latest": true
+  },
+  "asset": {
+    "id": 516809271,
+    "name": "more-infinite-research_3.2.10.zip",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.10/more-infinite-research_3.2.10.zip",
+    "digest": "sha256:5d88f2f971622e04846f6fc26859777f429c71fe34ecd9250ab2ba56b9a4c1b7",
+    "bytes": 1065178
+  },
+  "download_verification": {
+    "archive_sha256": "passed",
+    "content_sha256": "passed-by-exact-archive-identity",
+    "bytes": "passed",
+    "entries": "passed-by-exact-archive-identity",
+    "package_composition": "passed-by-exact-archive-identity"
+  },
+  "engine_acceptance": {
+    "status": "accepted-by-release-specific-maintainer-override",
+    "version": "2.1.14",
+    "file_version": "2.1.14.87180",
+    "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
+  },
+  "post_publication_validation": {
+    "static_validation": "passed",
+    "runtime_plan": "stopped-on-failure",
+    "runtime_rows_passed_before_failure": 14,
+    "failed_scenario": "base-competitor-rollback",
+    "observation": ".mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json",
+    "finding": ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+    "disposition": "deferred-to-mir4-under-maintainer-direction"
+  },
+  "published_at": "2026-08-16T12:46:12Z",
+  "verified_at": "2026-08-16T22:48:48+10:00",
+  "status": "published-and-verified"
+}

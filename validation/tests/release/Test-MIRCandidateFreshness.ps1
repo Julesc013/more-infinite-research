@@ -351,8 +351,17 @@ if ($status -eq "maintainer-accepted-emergency") {
   $artifactPath = Join-Path $repo $artifactRelative
   $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.10.json") | ConvertFrom-Json
   $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json") | ConvertFrom-Json
+  $admittedEmergencyStates = @(
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  )
   if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
-      [string]$release.state -ne "manually-accepted" -or [string]$release.candidate_id -ne "C34" -or
+      $admittedEmergencyStates -notcontains [string]$release.state -or [string]$release.candidate_id -ne "C34" -or
       [string]$release.package.source_commit -ne $packageSourceCommit -or
       [string]$release.package.archive -ne $artifactRelative -or
       (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
@@ -363,7 +372,7 @@ if ($status -eq "maintainer-accepted-emergency") {
       [string]$override.maintainer_decision.factorio_2_1_13_gate -ne "waived and superseded for 3.2.10 only") {
     throw "The emergency accepted candidate, release record, override, or frozen ZIP identity disagrees."
   }
-  Write-Host "[ok] exact C34 bytes are maintainer-accepted under the explicit Factorio 2.1.14 emergency release exception."
+  Write-Host "[ok] exact C34 bytes remain frozen in emergency release state '$($release.state)' under the explicit Factorio 2.1.14 exception."
   exit 0
 }
 

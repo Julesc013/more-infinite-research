@@ -42,3 +42,11 @@ The accepted ZIP is `dist/more-infinite-research_3.2.10.zip`, SHA-256 `5D88F2F97
 After publication, the movable `legacy` branch becomes an exact alias of the `3.2.10` release commit. This changes the branch role only: immutable `2.5.9` and `3.2.9` tags, releases, and assets remain available and unchanged. `2.5.10` is not published, and no Factorio 2.0 applicability claim is made.
 
 The machine authority is `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`. Repository cleanup remains a read-only audit; no deletion is part of this override.
+
+## Publication — 2026-08-16
+
+`3.2.10` was merged to protected `main` at `4cbea531a1043e0cacb9ac5c496731c8d77bbdb6`, annotated with immutable tag `3.2.10`, and published as the GitHub Latest release. A fresh public redownload reproduced SHA-256 `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` and 1,065,178 bytes exactly. The append-only publication receipt is `.mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json`.
+
+The immutable tag message contains two incorrect descriptive package-source fields. The tag itself points to the correct protected-main release commit and records the correct release tree, archive hash, content hash, engine identity, and promotion proof. The authoritative package source remains commit `19ddb7db4c960f77aef53d2bb47d23e0f311918f`, tree `46eb4cd0c48a1d997a632a3ff83606d19d9af19a`; the receipt records the correction without rewriting the tag.
+
+Post-publication qualification passed static validation and 14 consecutive Factorio 2.1.14 runtime rows before `base-competitor-rollback` reproduced MIR3-TERM-0033: when an absolute cap is below the first generated base-extension level, the external owner is removed before MIR skips replacement. The public ZIP is unchanged. Under the maintainer's direction that remaining issues move to MIR 4, the exact observation is retained at `.mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json` and is a required M4-003 follow-up.

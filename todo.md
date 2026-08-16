@@ -8,7 +8,7 @@ Generated: 2026-08-16
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.10` | `C34` | `C / 34` | `manually-accepted` | `protected-qualified` |
+| `3.2.10` | `C34` | `C / 34` | `publicly-verified` | `complete` |
 | `2.5.10` | `not-assigned` | `2.5-P / 14` | `planned` | `source-frozen` |
 | `3.2.9` | `C33` | `C / 33` | `publicly-verified` | `complete` |
 | `2.5.9` | `2.5-P13` | `2.5-P / 13` | `publicly-verified` | `complete` |
@@ -99,9 +99,6 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `protected-main-promotion` for `3.2.10`
-- [ ] `annotated-tag` for `3.2.10`
-- [ ] `github-publication-and-public-byte-verification` for `3.2.10`
 - [ ] `legacy-branch-alias-repoint` for `3.2.10`
 - [ ] `corrected-terminal-baseline-handoff-to-mir4` for `3.2.10`
 - [ ] `focused-qualification` for `2.5.10`

@@ -32,7 +32,16 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
     Write-Host "[ok] active candidate is pre-qualification; approved-delta evidence remains explicitly pending."
     exit 0
   }
-  if ($activeVersion -eq "3.2.10" -and [string]$activeRelease.state -eq "manually-accepted") {
+  $admittedEmergencyStates = @(
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  )
+  if ($activeVersion -eq "3.2.10" -and [string]$activeRelease.state -in $admittedEmergencyStates) {
     $changeSetPath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json"
     $overridePath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
     $changeSet = Get-Content -Raw -LiteralPath $changeSetPath | ConvertFrom-Json

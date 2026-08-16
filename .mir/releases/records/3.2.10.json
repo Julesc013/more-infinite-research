@@ -15,7 +15,7 @@
   "target": "2.1",
   "branch": "main",
   "development_branch": "dev",
-  "state": "manually-accepted",
+  "state": "publicly-verified",
   "package": {
     "source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
     "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
@@ -36,7 +36,16 @@
     "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
     "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
     "local_factorio_2_1_14_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
-    "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
+    "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
+    "tag": {
+      "kind": "annotated-tag",
+      "name": "3.2.10",
+      "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+      "tag_object": "635a9842db208522648a26d3db4f0d71131d4240",
+      "annotation_correction": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json#tag_annotation_correction"
+    },
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json",
+    "post_publication_runtime_observation": ".mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json"
   },
   "assurance_exceptions": [
     {
@@ -46,9 +55,6 @@
     }
   ],
   "remaining_obligations": [
-    "protected-main-promotion",
-    "annotated-tag",
-    "github-publication-and-public-byte-verification",
     "legacy-branch-alias-repoint",
     "corrected-terminal-baseline-handoff-to-mir4"
   ],
@@ -75,6 +81,8 @@
   },
   "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
   "release_notes": "docs/releases/notes/release-notes-3.2.10.md",
-  "incident_ids": [],
-  "updated_at": "2026-08-16T21:56:33+10:00"
+  "incident_ids": [
+    "MIR3-TERM-0033"
+  ],
+  "updated_at": "2026-08-16T22:48:48+10:00"
 }

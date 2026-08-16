@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "Mir3PostPublicationRuntimeObservationV1",
+  "release": "3.2.10",
+  "candidate_id": "C34",
+  "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+  "engine": {
+    "version": "2.1.14",
+    "file_version": "2.1.14.87180",
+    "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+  },
+  "verification_plan": "build/results/assurance/3.2.10-publication-plan.json",
+  "scenario": "base-competitor-rollback",
+  "scenario_input_key": "88C881C3FE471D204139722BBFFBCC0453A79A36197E9F79F51CE9E0204CA9E2",
+  "preceding_runtime_rows_passed": 14,
+  "expected": "When an absolute cap is below the first MIR base-extension level, MIR skips replacement and retains the external infinite owner and dependent prerequisite unchanged.",
+  "observed": "The external owner better-worker-robots-storage-infinite was absent after MIR skipped generation.",
+  "factorio_error": "MIR base competitor transaction validation failed: external owner was deleted after MIR skipped generation",
+  "factorio_log": {
+    "bytes": 1377886,
+    "sha256": "58BC81C6BD416B039899B0FE2073E73B45F8FC20937A3CEDA54F4D785B5C1700"
+  },
+  "candidate_bytes_changed": false,
+  "publication_record_changes_caused_failure": false,
+  "disposition": "deferred-to-mir4-under-maintainer-direction",
+  "finding": ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+  "observed_at": "2026-08-16T23:07:09+10:00"
+}

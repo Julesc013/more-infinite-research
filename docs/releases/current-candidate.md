@@ -24,7 +24,7 @@ superseded_by: []
 | Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `manually-accepted` |
+| State | `publicly-verified` |
 | Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
 | Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
 | Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
@@ -36,12 +36,7 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `protected-qualified`
-- [ ] `sealed`
-- [ ] `promoted`
-- [ ] `tagged`
-- [ ] `published`
-- [ ] `publicly-verified`
+None.
 
 ## Assurance exceptions
 
