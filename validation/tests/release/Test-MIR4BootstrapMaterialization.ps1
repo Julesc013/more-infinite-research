@@ -293,7 +293,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
     foreach ($argument in @(
       '-NoLogo', '-NoProfile', '-NonInteractive', '-File', $runnerA,
       '-CapsulePath', $aliasCapsule, '-EnvelopePath', $aliasEnvelope,
-      '-PredecessorPath', (Join-Path $RepoRoot 'dist/more-infinite-research_3.2.9.zip'),
+      '-PredecessorPath', (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)),
       '-ToolchainRoot', $PSHOME, '-OutputRoot', $aliasOutput
     )) { $null = $probeInfo.ArgumentList.Add([string]$argument) }
     $probeProcess = [Diagnostics.Process]::new()
