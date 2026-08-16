@@ -22,7 +22,7 @@ The permanent remote topology contains `main`, `dev`, and `legacy`.
 | --- | --- |
 | `main` | Published Factorio 2.1 line, promoted to the accepted `3.2.10` emergency hotfix. |
 | `dev` | Canonical integration line for the corrected terminal authority and MIR 4 handoff. |
-| `legacy` | Compatibility alias of the latest MIR 3 Factorio 2.1 release; after publication it points to the exact `3.2.10` release commit. |
+| `legacy` | Compatibility alias of the latest MIR 3 Factorio 2.1 terminal authority; its two-parent alias commit preserves the historical branch and has a tree exactly matching protected `main`. |
 
 Temporary target worktrees or candidate branches are disposable qualification surfaces. Delete their remote branches after publication while retaining immutable tags and evidence. Never use `legacy` or a historical target branch as scratch space.
 

@@ -700,6 +700,10 @@ foreach ($requiredWorkflowSnippet in @(
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
 }
+if ($validateWorkflow -match "github\.(ref|head_ref|base_ref)\s*==\s*'[^']*legacy'" -or
+    $validateWorkflow -notmatch "github\.base_ref\s*==\s*'tmp/2\.0'") {
+  throw "Hosted validation must treat legacy as the Factorio 2.1 terminal alias and reserve the Factorio 2.0 lane for tmp/2.0."
+}
 if ($validateWorkflow.Contains('$candidate = Join-Path $PWD ([string]$plan.candidate)') -or
     @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 2 -or
     @([regex]::Matches($validateWorkflow, '\[IO\.Path\]::IsPathRooted\(\$candidateRelative\)')).Count -ne 2) {
