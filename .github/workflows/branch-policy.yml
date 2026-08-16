@@ -41,6 +41,14 @@ on:
         required: false
         default: ""
         type: string
+      terminal_promotion_branch:
+        description: Protected branch receiving the exact verified candidate
+        required: false
+        default: main
+        type: choice
+        options:
+          - main
+          - legacy
 
 permissions:
   contents: read
@@ -76,6 +84,7 @@ jobs:
             -CandidateSha '${{ inputs.terminal_candidate_sha }}' `
             -Operation '${{ inputs.terminal_operation }}' `
             -CandidateRef '${{ inputs.terminal_candidate_ref }}' `
+            -PromotionBranch '${{ inputs.terminal_promotion_branch }}' `
             -OutputPath 'build/results/terminal-promotion/${{ inputs.terminal_release }}.json'
       - name: Preserve exact promotion verification
         if: always()
