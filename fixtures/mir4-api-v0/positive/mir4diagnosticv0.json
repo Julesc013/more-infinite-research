@@ -1,0 +1,27 @@
+{
+  "kind": "MIR4DiagnosticV0",
+  "schema": 0,
+  "target": {
+    "id": "f210",
+    "factorio_line": "2.1",
+    "transport": "build-time-static"
+  },
+  "versions": {
+    "source": "4.0.0",
+    "distribution": "4.0.21000"
+  },
+  "capabilities": [
+    "query.read",
+    "support.read"
+  ],
+  "canonicalization": "mir-canonical-json-v0",
+  "extensions": {
+    "org.factorio.mir.example": {
+      "enabled": true
+    }
+  },
+  "payload": {
+    "sample": "MIR4DiagnosticV0"
+  },
+  "digest": "sha256:bd685cfd3557d7db0bc86547c45ab59753df8206bd8258d2298d37a060a3b7d1"
+}

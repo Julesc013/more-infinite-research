@@ -162,6 +162,15 @@ real_mod_gates:
     status: required
 
 fixtures:
+  mir4-api-v0-conformance:
+    requires_features: []
+    path: fixtures/mir4-api-v0
+    validates:
+      - six-experimental-v0-contracts
+      - canonical-digest-vectors
+      - stable-negative-diagnostics
+      - extension-profile-round-trip
+
   museum-synthetic-installation:
     requires_features: []
     path: fixtures/museum/synthetic-installation

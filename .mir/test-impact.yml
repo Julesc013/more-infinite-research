@@ -368,6 +368,18 @@
       "groups": ["local-mod-library"]
     },
     {
+      "pattern": "spec/api/mir4-v0/**",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "sdk/experimental/mir4/**",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "tools/lib/mir4/ExperimentalApiSdk.ps1",
+      "tags": ["smoke"]
+    },
+    {
       "pattern": "scripts/Invoke-MIRValidation.ps1",
       "tags": ["smoke"]
     },

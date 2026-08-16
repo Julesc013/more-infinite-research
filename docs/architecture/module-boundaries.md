@@ -723,6 +723,8 @@ Diagnostic catalog alternatives similarly qualify against the exact trusted gate
 
 ## Compiler boundary closure
 
+The package-excluded MIR 4 experimental API/SDK V0 is owned by `spec/api/mir4-v0/contracts.json` and generated through `tools/lib/mir4/ExperimentalApiSdk.ps1`. It may project immutable public compiler artifacts into query and support snapshots, but it cannot import mutable `CompilerContext`, executor, SafetyKernel, emission, or Factorio prototype adapters. Its Lua output is an offline binding under `sdk/experimental/`; it is not shipped prototype-stage code and does not create a second semantic authority.
+
 `prototypes/mir/planner/compiler.lua` is the pure compiler entry point. Its complete arguments are normalized `CompilationSnapshot` schema 2 and `PolicySnapshot` schema 1. It may require only deterministic core/domain/planner contracts; direct or transitive reads of `data.raw`, settings, loaded mods, logging, clocks, telemetry, or `CompilerContext` are forbidden. `pipeline/compilation_snapshot_adapter.lua` and `pipeline/policy_snapshot_adapter.lua` compose the outer Factorio and governance adapters. Snapshot capture may consume canonical index, graph, platform, and capability fact registries; those dependencies end at the adapter and do not enter the pure compiler.
 
 `CompilerContext` schema 4 has scoped activation. `new()` never changes active state. `with_active()` restores the outer context on normal return and error. Effective settings import state and competing-technology preparation belong to context state, and architecture validation rejects their former mutable module globals.

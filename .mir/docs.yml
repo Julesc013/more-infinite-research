@@ -1,6 +1,14 @@
 schema: 1
 
 docs:
+  - path: docs/reference/generated/mir4-experimental-api-v0.md
+    title: "MIR 4 Experimental API V0"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-experimental-api-v0-reference
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

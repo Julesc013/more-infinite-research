@@ -41,6 +41,15 @@ stage_entrypoints:
   data-final-fixes.lua: prototypes/mir/stage/data_final_fixes.lua
   control.lua: prototypes/mir/stage/control.lua
 
+package_excluded_modules:
+  experimental_api_sdk_v0:
+    authority: spec/api/mir4-v0/contracts.json
+    implementation: tools/lib/mir4/ExperimentalApiSdk.ps1
+    command: tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
+    generated_root: sdk/experimental/mir4
+    boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
+    stability: experimental-not-public-api
+
 runtime_boundaries:
   control.lua:
     stage_entrypoint: prototypes/mir/stage/control.lua

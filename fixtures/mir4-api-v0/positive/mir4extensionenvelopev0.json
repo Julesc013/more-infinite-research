@@ -1,0 +1,27 @@
+{
+  "kind": "MIR4ExtensionEnvelopeV0",
+  "schema": 0,
+  "target": {
+    "id": "f210",
+    "factorio_line": "2.1",
+    "transport": "build-time-static"
+  },
+  "versions": {
+    "source": "4.0.0",
+    "distribution": "4.0.21000"
+  },
+  "capabilities": [
+    "query.read",
+    "support.read"
+  ],
+  "canonicalization": "mir-canonical-json-v0",
+  "extensions": {
+    "org.factorio.mir.example": {
+      "enabled": true
+    }
+  },
+  "payload": {
+    "sample": "MIR4ExtensionEnvelopeV0"
+  },
+  "digest": "sha256:62681dde1429586d7b680c32967b9259af36a6c069b47a84f574d55ebdb88dd8"
+}

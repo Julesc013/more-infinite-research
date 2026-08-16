@@ -1,0 +1,27 @@
+{
+  "kind": "MIR4ProfileV0",
+  "schema": 0,
+  "target": {
+    "id": "f210",
+    "factorio_line": "2.1",
+    "transport": "build-time-static"
+  },
+  "versions": {
+    "source": "4.0.0",
+    "distribution": "4.0.21000"
+  },
+  "capabilities": [
+    "query.read",
+    "support.read"
+  ],
+  "canonicalization": "mir-canonical-json-v0",
+  "extensions": {
+    "org.factorio.mir.example": {
+      "enabled": true
+    }
+  },
+  "payload": {
+    "sample": "MIR4ProfileV0"
+  },
+  "digest": "sha256:b6a7ffd7cd15a9cf5f23cb0e2dd9b6d78ba46c641eb3fd9d8e5ccc14344bc80b"
+}

@@ -29,6 +29,8 @@ Usage:
   .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
   .\tools\mir.ps1 mir4 build-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>] [--repetitions <n>]
   .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 api <check|conformance>
+  .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
@@ -493,6 +495,13 @@ switch ($area) {
           -OutputRoot $output `
           -Repetitions $repetitions `
           -Check:($verb -eq "check-local-beta")
+      }
+      { $_ -in @("api", "sdk") } {
+        if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }
+        $subcommand = [string]$Args[2]
+        $allowed = if ($verb -eq "api") { @("check", "conformance") } else { @("generate", "check") }
+        if ($subcommand -notin $allowed) { throw "Unknown mir4 $verb command: $subcommand" }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
       }
       default { throw "Unknown mir4 command: $verb" }
     }

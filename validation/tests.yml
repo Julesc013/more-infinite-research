@@ -544,6 +544,23 @@
       "requires_factorio": true
     },
     {
+      "id": "static.mir4-experimental-api-sdk",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/api/mir4-v0/**",
+        "spec/schemas/experimental/**",
+        "sdk/experimental/mir4/**",
+        "fixtures/mir4-api-v0/**",
+        "tools/lib/mir4/ExperimentalApiSdk.ps1",
+        "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1",
+        "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",
