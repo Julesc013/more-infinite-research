@@ -87,6 +87,20 @@
       "mode": "frozen-terminal-candidate-awaiting-manual-approval"
     },
     {
+      "id": "mir-3.2.10-c34",
+      "target": "2.1",
+      "release": "3.2.10",
+      "candidate_id": "C34",
+      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+      "package_source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+      "archive": "build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip",
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "archive_bytes": 1065178,
+      "archive_entries": 304,
+      "mode": "frozen-emergency-candidate-awaiting-exact-qualification"
+    },
+    {
       "id": "mir-2.5.9-p13",
       "target": "2.0",
       "release": "2.5.9",

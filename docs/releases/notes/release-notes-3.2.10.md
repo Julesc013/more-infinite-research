@@ -31,11 +31,11 @@ The `3.2.9` release remains unchanged and downloadable.
 
 | Field | Value |
 | --- | --- |
-| State | `planned` |
-| Candidate | `not-assigned` |
-| Package source commit | `pending` |
-| Archive SHA-256 | `pending` |
-| Content SHA-256 | `pending` |
+| State | `package-built` |
+| Candidate | `C34` |
+| Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
+| Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
+| Content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
 | Tag | `pending` |
 | Tag commit | `pending` |
 | Assurance exceptions | `pending` |

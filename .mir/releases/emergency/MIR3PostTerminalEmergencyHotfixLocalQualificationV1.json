@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixLocalQualificationV1",
+  "status": "passed-local-non-authoritative-for-exact-target",
+  "release": "3.2.10",
+  "candidate_id": "C34",
+  "factorio_version": "2.1.14",
+  "required_exact_factorio_version": "2.1.13",
+  "candidate_archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+  "candidate_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+  "scenarios": [
+    {"name": "base-continuation-maximum-level-lowering-config-change", "summary_sha256": "1346860EE52092B52308A9E9B13FC63FBE5D93EE6930ECA700966ECFCE0E9831"},
+    {"name": "generated-maximum-level-absolute", "summary_sha256": "EC37550C9D8D17D041D2CCD71A54D3A7D98015F3E7A7414319DB2EC2685384A5"},
+    {"name": "generated-maximum-level-lowering-config-change", "summary_sha256": "61D6FD39182DB3757D8D86916BE9DC6280E3B8161BF825805DE40F474602E706"},
+    {"name": "space-age-native-owner-cap-lowering-config-change", "summary_sha256": "B6A4C5AB073155EAAB745EB351979ED24A1322B3EA119A1BC3664BE0BEB3E1EB"},
+    {"name": "space-age-native-owner-cap-raising-config-change", "summary_sha256": "064192802A30524B07AB576FFEE7BE23366402F096A9C5E97B681996786D95FC"},
+    {"name": "space-age-native-owner-cap-removal-config-change", "summary_sha256": "5D44F0434346709CA15C8E1B9D63D172FD01C4C0A137F60266D698AB0A7C9FB9"},
+    {"name": "space-age-native-owner-settings-default", "summary_sha256": "EB4C4011DBC8ABE5469BE1AED5740F4F73A1D700C50D561797A78C15475B99B3"},
+    {"name": "space-age-native-owner-settings-max-level", "summary_sha256": "EE74BE745DBA7E3A06BB3B5E9B5CB67ED51205E1265D42BBC6F43917D8F1ED88"},
+    {"name": "space-age-native-owner-settings-max-level-1", "summary_sha256": "0E86B9172DDD62766188142147651888A889C241DC3781A88CC70CD8CC9299B8"},
+    {"name": "space-age-native-owner-settings-max-level-2", "summary_sha256": "2013E2265027B982F0B4C75F5EB1C848E8EACE984B9769B14B7B0A1F2D41601A"},
+    {"name": "space-age-native-owner-settings-max-level-7", "summary_sha256": "0DF155056570F6E5949C8C7AA46797617821B1FD223FE489D20A3D76C45E1D09"},
+    {"name": "space-age-native-owner-settings-max-level-late-conflict", "summary_sha256": "582D8C7F57062AA63732769AA2634A3F0CD7920132608C5467DFF53626617F24"},
+    {"name": "space-age-native-owner-settings-max-level-profile-import", "summary_sha256": "CA5B40AD015BDE02469C917F6C6C99FAAFB86E793A18AC0FFA41C1B9AFC519DD"}
+  ],
+  "passed": 13,
+  "failed": 0,
+  "boundaries": {
+    "exact_target_qualification_complete": false,
+    "governed_upgrade_matrix_complete": false,
+    "publication_permitted": false
+  },
+  "created_at": "2026-08-16T19:18:00+10:00"
+}

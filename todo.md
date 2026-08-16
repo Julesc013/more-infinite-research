@@ -8,7 +8,7 @@ Generated: 2026-08-16
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.10` | `not-assigned` | `C / 34` | `planned` | `source-frozen` |
+| `3.2.10` | `C34` | `C / 34` | `package-built` | `focused-qualified` |
 | `2.5.10` | `not-assigned` | `2.5-P / 14` | `planned` | `source-frozen` |
 | `3.2.9` | `C33` | `C / 33` | `publicly-verified` | `complete` |
 | `2.5.9` | `2.5-P13` | `2.5-P / 13` | `publicly-verified` | `complete` |
@@ -101,7 +101,6 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 - [ ] `focused-qualification` for `3.2.10`
 - [ ] `exact-2.1.13-qualification` for `3.2.10`
-- [ ] `deterministic-candidate-construction` for `3.2.10`
 - [ ] `governed-upgrades` for `3.2.10`
 - [ ] `target-seal` for `3.2.10`
 - [ ] `publication-and-public-byte-verification` for `3.2.10`

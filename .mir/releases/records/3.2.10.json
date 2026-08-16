@@ -1,32 +1,45 @@
 {
   "schema": 1,
   "release": "3.2.10",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C34",
   "candidate_floor": "C34",
   "candidate_allocation": {
     "namespace": "C",
     "predecessor_max_ordinal": 33,
     "minimum_next_ordinal": 34,
-    "assigned_id": null,
-    "assignment_condition": "emergency-fixed-point-and-source-freeze"
+    "assigned_id": "C34",
+    "assigned_at": "2026-08-16T19:20:00+10:00",
+    "candidate_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "assignment_condition": "emergency-fixed-point-and-source-freeze-satisfied"
   },
   "target": "2.1",
   "branch": "main",
   "development_branch": "dev",
-  "state": "planned",
-  "package": {},
+  "state": "package-built",
+  "package": {
+    "source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+    "source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+    "archive": "build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+    "bytes": 1065178,
+    "entries": 304
+  },
   "proofs": {
     "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
     "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
     "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
-    "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json"
+    "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
+    "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
+    "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
+    "local_non_target_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json"
   },
   "assurance_exceptions": [],
   "remaining_obligations": [
     "focused-qualification",
     "exact-2.1.13-qualification",
-    "deterministic-candidate-construction",
     "governed-upgrades",
     "target-seal",
     "publication-and-public-byte-verification"
@@ -42,5 +55,5 @@
   "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
   "release_notes": "docs/releases/notes/release-notes-3.2.10.md",
   "incident_ids": [],
-  "updated_at": "2026-08-16T00:00:00+10:00"
+  "updated_at": "2026-08-16T19:24:00+10:00"
 }
