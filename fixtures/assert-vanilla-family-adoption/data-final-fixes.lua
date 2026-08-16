@@ -109,7 +109,7 @@ for _, expectation in ipairs({
   end
   local separator = string.find(signature, ";", prefix_end + 1, true)
   local entry = string.sub(signature, entry_start, separator and (separator - 1) or #signature)
-  for _, marker in ipairs({ "|input-cost=", "|output-cost=", "|output=" }) do
+  for _, marker in ipairs({ "|input-cost=", "|output-cost=", "|output=", "|planned-max=" }) do
     local _, marker_end = string.find(entry, marker, 1, true)
     if not marker_end or marker_end == #entry or string.sub(entry, marker_end + 1, marker_end + 1) == "|" then
       fail("expected non-empty " .. marker .. " field in adoption signature entry " .. entry)
