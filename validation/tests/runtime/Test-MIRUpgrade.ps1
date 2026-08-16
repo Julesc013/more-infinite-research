@@ -203,7 +203,12 @@ if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
 
   $stagedControlPath = Join-Path $stagedFixture "control.lua"
   $stagedControlText = Get-Content -Raw -LiteralPath $stagedControlPath
-  $stagedControlText = $stagedControlText.Replace("3.2.9", $FromVersion).Replace("3.2.10", $ToVersion)
+  # Use collision-proof placeholders because the requested predecessor may be
+  # the template's target (for example 3.2.10 -> 4.0.21000).
+  $fromPlaceholder = "__MIR_UPGRADE_FROM_VERSION__"
+  $toPlaceholder = "__MIR_UPGRADE_TO_VERSION__"
+  $stagedControlText = $stagedControlText.Replace("3.2.9", $fromPlaceholder).Replace("3.2.10", $toPlaceholder)
+  $stagedControlText = $stagedControlText.Replace($fromPlaceholder, $FromVersion).Replace($toPlaceholder, $ToVersion)
   Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
 }
 if ($Archetype) {
