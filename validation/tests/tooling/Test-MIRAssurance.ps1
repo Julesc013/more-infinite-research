@@ -545,7 +545,9 @@ $candidateRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/rel
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
 $candidatePathIdentity = if ([string]$candidateRelease.state -eq "planned") { "unassigned" } else { [regex]::Escape([string]$candidateRelease.candidate_id) }
-if ($candidatePath -notmatch "/build/candidates/3\.2\.9/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
+$candidateVersionPattern = [regex]::Escape([string]$candidateInfo.version)
+$expectedCandidatePattern = "/build/candidates/$candidateVersionPattern/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_$candidateVersionPattern\.zip$"
+if ($candidatePath -notmatch $expectedCandidatePattern -or
     $candidatePath -match "/dist/") {
   throw "Default assurance candidates must be release/candidate/source-tree addressed outside immutable dist."
 }
