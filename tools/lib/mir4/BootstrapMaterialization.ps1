@@ -722,7 +722,7 @@ function Compare-MIR4BootstrapCorrectedCandidate {
   $changed = @($candidateMap.Keys | Where-Object {
     $predecessorMap.ContainsKey($_) -and $candidateMap[$_].raw_sha256 -cne $predecessorMap[$_].raw_sha256
   } | Sort-Object)
-  $expectedChanged = @(('info.json') + @($Correction.deltas.path) | Sort-Object)
+  $expectedChanged = @(@('info.json') + @($Correction.deltas.path) | Sort-Object)
   $exactDelta = $added.Count -eq 0 -and $removed.Count -eq 0 -and
     ($changed -join '|') -ceq ($expectedChanged -join '|')
   foreach ($delta in @($Correction.deltas)) {
@@ -878,7 +878,7 @@ function Write-MIR4DeterministicRawTreeArchive {
 function Invoke-MIR4GitCatFileToPath {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][ValidateSet('commit', 'tree')][string]$Type,
+    [Parameter(Mandatory)][ValidateSet('blob', 'commit', 'tree')][string]$Type,
     [Parameter(Mandatory)][string]$ObjectId,
     [Parameter(Mandatory)][string]$OutputPath
   )
@@ -1182,6 +1182,7 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json',
     '.mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json',
     '.mir/releases/waves/mir4-r0/terminal-baseline-import.json',
@@ -1203,6 +1204,7 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
   return @(
     'spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json',
     'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json',
+    'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json',
     'spec/schemas/mir4-bootstrap-root-set.schema.json',
     'spec/schemas/mir4-bootstrap-source-capsule.schema.json',
     'spec/schemas/mir4-bootstrap-capsule-manifest.schema.json',
@@ -1568,18 +1570,35 @@ function New-MIR4BootstrapSourceCapsule {
   $authorityClosureRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.capsule-authority.v1' -Fields $authorityFields
   $builderIdentity = Get-MIR4RawFileIdentity -Path (Join-Path $capsuleRoot 'tools/commands/package/Build-MIRPackage.ps1')
   $runnerIdentity = Get-MIR4RawFileIdentity -Path (Join-Path $capsuleRoot 'tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1')
+  $targetDescriptor = [ordered]@{
+    target_key = [string]$Target.target_key
+    factorio_line = [string]$Target.factorio_line
+    distribution_version = [string]$Target.distribution_version
+    source = $Target.source
+    predecessor = $Target.predecessor
+  }
+  $correctionBinding = $null
+  if ($null -ne $Target.PSObject.Properties['correction_authority']) {
+    $correctionPath = Join-Path $repo ([string]$Target.correction_authority.path)
+    $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json -Depth 100
+    if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
+        [string]$correction.record_sha256 -cne [string]$Target.correction_authority.record_sha256) {
+      throw '[mir4-approved-delta] Capsule construction received a stale correction binding.'
+    }
+    $correctionBinding = [pscustomobject][ordered]@{
+      path = [string]$Target.correction_authority.path
+      kind = [string]$correction.kind
+      finding = [string]$correction.finding
+      record_sha256 = [string]$correction.record_sha256
+    }
+    $targetDescriptor.correction_authority = $correctionBinding
+  }
   $manifest = [pscustomobject][ordered]@{
     schema = 2
     kind = 'MIR4BootstrapCapsuleManifestV2'
     status = 'local-unpublished-closed-construction-input'
     canonicalization = 'MIR4BootstrapCanonicalJsonV1'
-    target = [pscustomobject][ordered]@{
-      target_key = [string]$Target.target_key
-      factorio_line = [string]$Target.factorio_line
-      distribution_version = [string]$Target.distribution_version
-      source = $Target.source
-      predecessor = $Target.predecessor
-    }
+    target = [pscustomobject]$targetDescriptor
     package_membership_authority = 'tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots'
     member_count = [int]$members.Count
     members = $members
@@ -1606,7 +1625,7 @@ function New-MIR4BootstrapSourceCapsule {
   }
   $runnerSidecarPath = Join-Path $targetRoot 'Invoke-MIR4BootstrapCapsule.ps1'
   Copy-Item -LiteralPath (Join-Path $capsuleRoot 'tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1') -Destination $runnerSidecarPath
-  $record = [pscustomobject][ordered]@{
+  $recordFields = [ordered]@{
     schema = 2
     kind = 'MIR4BootstrapSourceCapsuleV2'
     status = 'local-unpublished-input'
@@ -1648,8 +1667,10 @@ function New-MIR4BootstrapSourceCapsule {
       bytes = $inventory.bytes
       entry_count = $inventory.entry_count
     }
-    record_sha256 = ''
   }
+  if ($null -ne $correctionBinding) { $recordFields.correction_authority = $correctionBinding }
+  $recordFields.record_sha256 = ''
+  $record = [pscustomobject]$recordFields
   $recordPath = Join-Path $targetRoot 'source-capsule.json'
   $null = Write-MIR4BootstrapRecord -Record $record -Path $recordPath
   if (Get-Command Test-Json -ErrorAction SilentlyContinue) {

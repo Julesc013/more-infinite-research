@@ -97,13 +97,18 @@ function Assert-MIR4PlanTarget {
   Assert-Equal ([string]$projection.distribution_target_code) ([string]$PlanTarget.distribution_target_code) "$($PlanTarget.target_key) projected code"
   Assert-Equal ([string]$projection.distribution_version) ([string]$PlanTarget.distribution_version) "$($PlanTarget.target_key) projected version"
 
+  $terminalSource = if ($null -ne $PlanTarget.PSObject.Properties['predecessor_source']) {
+    $PlanTarget.predecessor_source
+  } else {
+    $PlanTarget.source
+  }
   $importRow = @($TerminalImport.releases | Where-Object { $_.release -eq $PlanTarget.predecessor.release })
   if ($importRow.Count -ne 1) { throw "Terminal import does not contain exactly one $($PlanTarget.predecessor.release) row." }
   $import = $importRow[0]
   Assert-Equal ([string]$import.target) ([string]$PlanTarget.factorio_line) "$($PlanTarget.target_key) terminal target"
-  Assert-Equal ([string]$import.snapshot.source_identity.candidate_commit) ([string]$PlanTarget.source.candidate_commit) "$($PlanTarget.target_key) candidate commit"
-  Assert-Equal ([string]$import.snapshot.source_identity.source_tree) ([string]$PlanTarget.source.source_tree) "$($PlanTarget.target_key) source tree"
-  Assert-Equal ([string]$import.snapshot.source_identity.common_source_commit) ([string]$PlanTarget.source.common_source_commit) "$($PlanTarget.target_key) common source"
+  Assert-Equal ([string]$import.snapshot.source_identity.candidate_commit) ([string]$terminalSource.candidate_commit) "$($PlanTarget.target_key) predecessor candidate commit"
+  Assert-Equal ([string]$import.snapshot.source_identity.source_tree) ([string]$terminalSource.source_tree) "$($PlanTarget.target_key) predecessor source tree"
+  Assert-Equal ([string]$import.snapshot.source_identity.common_source_commit) ([string]$terminalSource.common_source_commit) "$($PlanTarget.target_key) predecessor common source"
   Assert-Equal ([string]$import.distribution.archive_sha256) ([string]$PlanTarget.predecessor.archive_sha256) "$($PlanTarget.target_key) predecessor archive"
   Assert-Equal ([string]$import.distribution.content_sha256) ([string]$PlanTarget.predecessor.content_sha256) "$($PlanTarget.target_key) predecessor content"
   Assert-Equal ([string]$import.distribution.bytes) ([string]$PlanTarget.predecessor.bytes) "$($PlanTarget.target_key) predecessor bytes"
@@ -117,9 +122,9 @@ function Assert-MIR4PlanTarget {
   if ($rootRow.Count -ne 1) { throw "Bootstrap root set does not contain exactly one $($PlanTarget.target_key) row." }
   Assert-Equal ([string]$rootRow[0].predecessor_release) ([string]$PlanTarget.predecessor.release) "$($PlanTarget.target_key) root predecessor"
   Assert-Equal ([string]$rootRow[0].factorio_line) ([string]$PlanTarget.factorio_line) "$($PlanTarget.target_key) root Factorio line"
-  Assert-Equal ([string]$rootRow[0].source_identity.candidate_commit) ([string]$PlanTarget.source.candidate_commit) "$($PlanTarget.target_key) root candidate commit"
-  Assert-Equal ([string]$rootRow[0].source_identity.candidate_tree) ([string]$PlanTarget.source.source_tree) "$($PlanTarget.target_key) root source tree"
-  Assert-Equal ([string]$rootRow[0].source_identity.common_source_commit) ([string]$PlanTarget.source.common_source_commit) "$($PlanTarget.target_key) root common source"
+  Assert-Equal ([string]$rootRow[0].source_identity.candidate_commit) ([string]$terminalSource.candidate_commit) "$($PlanTarget.target_key) root predecessor commit"
+  Assert-Equal ([string]$rootRow[0].source_identity.candidate_tree) ([string]$terminalSource.source_tree) "$($PlanTarget.target_key) root predecessor tree"
+  Assert-Equal ([string]$rootRow[0].source_identity.common_source_commit) ([string]$terminalSource.common_source_commit) "$($PlanTarget.target_key) root predecessor common source"
   Assert-Equal ([string]$rootRow[0].terminal_distribution.archive_sha256) ([string]$PlanTarget.predecessor.archive_sha256) "$($PlanTarget.target_key) root archive"
   Assert-Equal ([string]$rootRow[0].terminal_distribution.content_sha256) ([string]$PlanTarget.predecessor.content_sha256) "$($PlanTarget.target_key) root content"
   Assert-Equal ([string]$rootRow[0].baseline_identity.path) ([string]$PlanTarget.predecessor.baseline_manifest) "$($PlanTarget.target_key) root baseline path"
@@ -129,6 +134,54 @@ function Assert-MIR4PlanTarget {
   Assert-Equal ([string]$rootRow[0].exact_engine.version) ([string]$PlanTarget.engine_lock.version) "$($PlanTarget.target_key) root engine version"
   Assert-Equal ([string]$rootRow[0].exact_engine.executable_sha256) ([string]$PlanTarget.engine_lock.executable_sha256) "$($PlanTarget.target_key) root engine hash"
   return $rootRow[0]
+}
+
+function Get-MIR4PlanCorrection {
+  param([Parameter(Mandatory)]$PlanTarget)
+
+  if ($null -eq $PlanTarget.PSObject.Properties['correction_authority']) { return $null }
+  $relativePath = [string]$PlanTarget.correction_authority.path
+  $path = Join-Path $RepoRoot $relativePath
+  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json'
+  $text = Get-Content -Raw -LiteralPath $path
+  if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-approved-delta] The correction authority fails its exact schema.' }
+  $correction = $text | ConvertFrom-Json -Depth 100
+  if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
+      [string]$correction.record_sha256 -cne [string]$PlanTarget.correction_authority.record_sha256) {
+    throw '[mir4-approved-delta] The correction authority record binding is stale.'
+  }
+  foreach ($binding in @(
+    @($correction.base_source.commit, $PlanTarget.predecessor_source.candidate_commit, 'base commit'),
+    @($correction.base_source.tree, $PlanTarget.predecessor_source.source_tree, 'base tree'),
+    @($correction.integration_source.commit, $PlanTarget.source.candidate_commit, 'integration commit'),
+    @($correction.integration_source.tree, $PlanTarget.source.source_tree, 'integration tree')
+  )) { Assert-Equal ([string]$binding[0]) ([string]$binding[1]) "approved correction $($binding[2])" }
+  Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.base_source.commit)) ([string]$correction.base_source.tree) 'approved correction base Git tree'
+  Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.correction_source.commit)) ([string]$correction.correction_source.tree) 'approved correction commit Git tree'
+  Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.integration_source.commit)) ([string]$correction.integration_source.tree) 'approved correction integration Git tree'
+  return $correction
+}
+
+function Compare-MIR4PlanCandidate {
+  param(
+    [Parameter(Mandatory)]$PlanTarget,
+    [Parameter(Mandatory)][string]$CandidatePath,
+    [Parameter(Mandatory)][string]$PredecessorPath
+  )
+  $common = @{
+    CandidatePath = $CandidatePath
+    PredecessorPath = $PredecessorPath
+    ExpectedCandidateVersion = [string]$PlanTarget.distribution_version
+    ExpectedPredecessorVersion = [string]$PlanTarget.predecessor.release
+    ExpectedCandidateRoot = "more-infinite-research_$($PlanTarget.distribution_version)"
+    ExpectedPredecessorRoot = "more-infinite-research_$($PlanTarget.predecessor.release)"
+    ThrowOnDifference = $true
+  }
+  $correction = Get-MIR4PlanCorrection -PlanTarget $PlanTarget
+  if ($null -ne $correction) {
+    return Compare-MIR4BootstrapCorrectedCandidate @common -Correction $correction
+  }
+  return Compare-MIR4BootstrapCandidate @common
 }
 
 function Test-MIR4ExistingCandidate {
@@ -151,6 +204,12 @@ function Test-MIR4ExistingCandidate {
   Assert-Equal ([string]$manifest.distribution_version) ([string]$PlanTarget.distribution_version) "candidate version"
   Assert-Equal ([string]$manifest.admission) ([string]$PlanTarget.admission) "candidate admission"
   Assert-Equal ([string]$manifest.identity_roots.semantic) ([string]$RootRow.roots.semantic.sha256) "candidate semantic root"
+  $correction = Get-MIR4PlanCorrection -PlanTarget $PlanTarget
+  if ($null -eq $correction) { throw '[mir4-approved-delta] The f210 candidate plan does not bind its required correction.' }
+  Assert-Equal ([string]$manifest.correction_authority.path) ([string]$PlanTarget.correction_authority.path) 'candidate correction path'
+  Assert-Equal ([string]$manifest.correction_authority.kind) ([string]$correction.kind) 'candidate correction kind'
+  Assert-Equal ([string]$manifest.correction_authority.finding) ([string]$correction.finding) 'candidate correction finding'
+  Assert-Equal ([string]$manifest.correction_authority.record_sha256) ([string]$correction.record_sha256) 'candidate correction record'
 
   $archivePath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$manifest.local_distribution.path)
   $inventory = Get-MIR4ArchiveInventory -Path $archivePath
@@ -179,6 +238,8 @@ function Test-MIR4ExistingCandidate {
   Assert-Equal ([string]$capsuleRecord.source.source_tree) ([string]$PlanTarget.source.source_tree) "source capsule tree"
   Assert-Equal ([string]$capsuleRecord.source.common_source_commit) ([string]$PlanTarget.source.common_source_commit) "source capsule common source"
   Assert-Equal ([string]$capsuleRecord.predecessor.archive_sha256) ([string]$PlanTarget.predecessor.archive_sha256) "source capsule predecessor archive"
+  Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleRecord.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'source capsule correction binding'
+  Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleArtifact.manifest.target.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'internal capsule correction binding'
   Assert-Equal ([string]$capsuleRecord.capsule.archive_sha256) ([string]$capsuleInventory.archive_sha256) "source capsule record archive"
   Assert-Equal ([string]$capsuleRecord.capsule.content_sha256) ([string]$capsuleInventory.content_sha256) "source capsule record content"
   Assert-Equal ([string]$capsuleRecord.package_membership.authority_sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')) "package membership tool hash"
@@ -204,14 +265,7 @@ function Test-MIR4ExistingCandidate {
   }
 
   $predecessorPath = Join-Path $RepoRoot ([string]$PlanTarget.predecessor.archive_path)
-  $actualComparison = Compare-MIR4BootstrapCandidate `
-    -CandidatePath $archivePath `
-    -PredecessorPath $predecessorPath `
-    -ExpectedCandidateVersion $PlanTarget.distribution_version `
-    -ExpectedPredecessorVersion $PlanTarget.predecessor.release `
-    -ExpectedCandidateRoot "more-infinite-research_$($PlanTarget.distribution_version)" `
-    -ExpectedPredecessorRoot "more-infinite-research_$($PlanTarget.predecessor.release)" `
-    -ThrowOnDifference
+  $actualComparison = Compare-MIR4PlanCandidate -PlanTarget $PlanTarget -CandidatePath $archivePath -PredecessorPath $predecessorPath
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.equivalence)) {
     throw "Candidate equivalence record is stale or incomplete."
   }
@@ -262,6 +316,7 @@ function Test-MIR4ExistingCandidate {
     Assert-Equal ([string]$receipt.target_key) ([string]$PlanTarget.target_key) "reconstruction $($row.id) receipt target"
     Assert-Equal ([string]$receipt.factorio_line) ([string]$PlanTarget.factorio_line) "reconstruction $($row.id) receipt Factorio line"
     Assert-Equal ([string]$receipt.distribution_version) ([string]$PlanTarget.distribution_version) "reconstruction $($row.id) receipt version"
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) "reconstruction $($row.id) correction binding"
     $packageRows = @($rowInventory.entries | ForEach-Object { "$($_.path)|$($_.bytes)|$($_.raw_sha256)" })
     $expectedPackageManifest = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.package-manifest.v1' -Fields ([ordered]@{ entries = $packageRows })
     $expectedEquivalenceSha = Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.equivalence)
@@ -273,6 +328,7 @@ function Test-MIR4ExistingCandidate {
       envelope_record_sha256 = [string]$rowCapsuleRecord.record_sha256
       predecessor_archive_sha256 = [string]$PlanTarget.predecessor.archive_sha256
       toolchain_lock_record_sha256 = [string]$rowCapsuleArtifact.toolchain_lock.record_sha256
+      correction_record_sha256 = [string]$correction.record_sha256
     })
     $expectedResultRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-result.v1' -Fields ([ordered]@{
       candidate_archive_sha256 = [string]$rowInventory.archive_sha256
@@ -308,6 +364,7 @@ function Test-MIR4ExistingCandidate {
     capsule_content_root_sha256 = [string]$manifest.capsule_closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$inventory.archive_sha256
     candidate_content_sha256 = [string]$inventory.content_sha256
+    correction_record_sha256 = [string]$correction.record_sha256
   })
   Assert-Equal ([string]$manifest.identity_roots.candidate_authority) $expectedAuthorityRoot "candidate authority root"
   $expectedQualificationRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.qualification-input.v1' -Fields ([ordered]@{
@@ -347,6 +404,7 @@ $expectedImports = @(
   '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json',
   '.mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json',
   '.mir/releases/waves/mir4-r0/terminal-baseline-import.json',
@@ -646,14 +704,7 @@ foreach ($targetPlan in $targets) {
   }
   Copy-Item -LiteralPath $candidatePaths[2] -Destination $distributionPath
   $distribution = Get-MIR4ArchiveInventory -Path $distributionPath
-  $equivalence = Compare-MIR4BootstrapCandidate `
-    -CandidatePath $distributionPath `
-    -PredecessorPath $predecessorPath `
-    -ExpectedCandidateVersion $targetPlan.distribution_version `
-    -ExpectedPredecessorVersion $targetPlan.predecessor.release `
-    -ExpectedCandidateRoot "more-infinite-research_$($targetPlan.distribution_version)" `
-    -ExpectedPredecessorRoot "more-infinite-research_$($targetPlan.predecessor.release)" `
-    -ThrowOnDifference
+  $equivalence = Compare-MIR4PlanCandidate -PlanTarget $targetPlan -CandidatePath $distributionPath -PredecessorPath $predecessorPath
   $authorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields ([ordered]@{
     terminal_authority_root = [string]$rootRow.roots.authority.sha256
     root_set_record_sha256 = [string]$rootSet.record_sha256
@@ -668,6 +719,7 @@ foreach ($targetPlan in $targets) {
     capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$distribution.archive_sha256
     candidate_content_sha256 = [string]$distribution.content_sha256
+    correction_record_sha256 = [string]$targetPlan.correction_authority.record_sha256
   })
   $qualificationInputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.qualification-input.v1' -Fields ([ordered]@{
     candidate_authority_root = $authorityRoot
@@ -686,6 +738,12 @@ foreach ($targetPlan in $targets) {
     distribution_version = [string]$targetPlan.distribution_version
     admission = [string]$targetPlan.admission
     public_output_authorized = $false
+    correction_authority = [pscustomobject][ordered]@{
+      path = [string]$targetPlan.correction_authority.path
+      kind = [string]$capsule.record.correction_authority.kind
+      finding = [string]$capsule.record.correction_authority.finding
+      record_sha256 = [string]$targetPlan.correction_authority.record_sha256
+    }
     source_capsule = [pscustomobject][ordered]@{
       path = Get-MIR4PortablePath -Root $OutputRoot -Path $capsule.archive_path
       archive_sha256 = $capsuleInventory.archive_sha256

@@ -17,6 +17,7 @@
         ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json",
         ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
         ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
@@ -64,6 +65,16 @@
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
     "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "sourceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_commit", "source_tree", "common_source_commit"],
+      "properties": {
+        "candidate_commit": { "$ref": "#/$defs/gitSha1" },
+        "source_tree": { "$ref": "#/$defs/gitSha1" },
+        "common_source_commit": { "$ref": "#/$defs/gitSha1" }
+      }
+    },
     "target": {
       "type": "object",
       "additionalProperties": false,
@@ -76,14 +87,15 @@
         "distribution_version": { "type": "string", "pattern": "^4\\.0\\.(21000|20000|11000|10000)$" },
         "release_role": { "enum": ["mandatory", "conditional-same-source"] },
         "admission": { "enum": ["admitted-local-emergency-lane", "non-authoritative-shadow-blocked-by-eol"] },
-        "source": {
+        "predecessor_source": { "$ref": "#/$defs/sourceIdentity" },
+        "source": { "$ref": "#/$defs/sourceIdentity" },
+        "correction_authority": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["candidate_commit", "source_tree", "common_source_commit"],
+          "required": ["path", "record_sha256"],
           "properties": {
-            "candidate_commit": { "$ref": "#/$defs/gitSha1" },
-            "source_tree": { "$ref": "#/$defs/gitSha1" },
-            "common_source_commit": { "$ref": "#/$defs/gitSha1" }
+            "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+            "record_sha256": { "$ref": "#/$defs/sha256" }
           }
         },
         "predecessor": {
@@ -118,22 +130,22 @@
           "additionalProperties": false,
           "required": ["semantic_change", "features", "settings", "locales", "runtime", "migrations", "package", "capability_omissions"],
           "properties": {
-            "semantic_change": { "const": "none-bootstrap-fixed-point" },
+            "semantic_change": { "enum": ["none-bootstrap-fixed-point", "approved-exact-correction-MIR3-TERM-0033"] },
             "features": { "const": "preserve-predecessor-target-local-inventory" },
             "settings": { "const": "preserve-ids-types-defaults-and-scopes" },
             "locales": { "const": "preserve-predecessor-package-inventory" },
             "runtime": { "const": "preserve-target-local-state-owner-and-schema" },
             "migrations": { "const": "direct-predecessor-version-identity-only" },
-            "package": { "const": "metadata-only-version-and-root-difference" },
+            "package": { "enum": ["metadata-only-version-and-root-difference", "metadata-plus-approved-MIR3-TERM-0033-exact-delta"] },
             "capability_omissions": { "type": "string", "pattern": "^\\.mir/releases/terminal/baselines/.+/normalized-snapshot\\.json#/capability_omissions$" }
           }
         }
       },
       "allOf": [
-        { "if": { "properties": { "target_key": { "const": "f210" } }, "required": ["target_key"] }, "then": { "properties": { "target_id": { "const": "factorio-2.1" }, "factorio_line": { "const": "2.1" }, "distribution_target_code": { "const": "210" }, "distribution_version": { "const": "4.0.21000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "admitted-local-emergency-lane" } } } },
-        { "if": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "then": { "properties": { "target_id": { "const": "factorio-2.0" }, "factorio_line": { "const": "2.0" }, "distribution_target_code": { "const": "200" }, "distribution_version": { "const": "4.0.20000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
-        { "if": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "then": { "properties": { "target_id": { "const": "factorio-1.1" }, "factorio_line": { "const": "1.1" }, "distribution_target_code": { "const": "110" }, "distribution_version": { "const": "4.0.11000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
-        { "if": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "then": { "properties": { "target_id": { "const": "factorio-1.0" }, "factorio_line": { "const": "1.0" }, "distribution_target_code": { "const": "100" }, "distribution_version": { "const": "4.0.10000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } }
+        { "if": { "properties": { "target_key": { "const": "f210" } }, "required": ["target_key"] }, "then": { "required": ["predecessor_source", "correction_authority"], "properties": { "target_id": { "const": "factorio-2.1" }, "factorio_line": { "const": "2.1" }, "distribution_target_code": { "const": "210" }, "distribution_version": { "const": "4.0.21000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "admitted-local-emergency-lane" }, "predecessor_source": { "const": { "candidate_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f", "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff" } }, "source": { "const": { "candidate_commit": "01b7cb1f70e085a942580a5e3fbe74b93150ab3d", "source_tree": "5ccc59c384c0e9bba32a57291d64dea247218fb4", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff" } }, "correction_authority": { "const": { "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json", "record_sha256": "989FB0DB9E07140053BA3188A5A808AA825B4C4D0441F6683D3ED5BA35B087E1" } }, "dispositions": { "properties": { "semantic_change": { "const": "approved-exact-correction-MIR3-TERM-0033" }, "package": { "const": "metadata-plus-approved-MIR3-TERM-0033-exact-delta" } } } } } },
+        { "if": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-2.0" }, "factorio_line": { "const": "2.0" }, "distribution_target_code": { "const": "200" }, "distribution_version": { "const": "4.0.20000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
+        { "if": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-1.1" }, "factorio_line": { "const": "1.1" }, "distribution_target_code": { "const": "110" }, "distribution_version": { "const": "4.0.11000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
+        { "if": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-1.0" }, "factorio_line": { "const": "1.0" }, "distribution_target_code": { "const": "100" }, "distribution_version": { "const": "4.0.10000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } }
       ]
     }
   }

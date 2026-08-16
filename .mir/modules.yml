@@ -792,6 +792,8 @@ validation_tooling:
     mir4_r0_bootstrap_gate: tools/commands/release/Test-MIR4R0Bootstrap.ps1
     mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
     mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
+    mir4_bootstrap_approved_correction: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json
+    mir4_bootstrap_approved_correction_schema: spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
     mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
     mir4_bootstrap_capsule_manifest_schema: spec/schemas/mir4-bootstrap-capsule-manifest.schema.json

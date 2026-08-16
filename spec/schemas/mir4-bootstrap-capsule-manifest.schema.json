@@ -13,13 +13,14 @@
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["target_key", "factorio_line", "distribution_version", "source", "predecessor"],
+      "required": ["target_key", "factorio_line", "distribution_version", "source", "predecessor", "correction_authority"],
       "properties": {
         "target_key": { "const": "f210" },
         "factorio_line": { "const": "2.1" },
         "distribution_version": { "const": "4.0.21000" },
         "source": { "type": "object" },
-        "predecessor": { "type": "object" }
+        "predecessor": { "type": "object" },
+        "correction_authority": { "$ref": "#/$defs/correctionAuthority" }
       }
     },
     "package_membership_authority": { "const": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots" },
@@ -49,5 +50,18 @@
     "reconstruction_runner_sha256": { "$ref": "#/$defs/sha256" },
     "record_sha256": { "$ref": "#/$defs/sha256" }
   },
-  "$defs": { "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" } }
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "finding": { "const": "MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
 }

@@ -201,6 +201,15 @@ function Get-MIR4CustodyAdmissionV1 {
       [string]$target.admission -cne "admitted-local-emergency-lane") {
     throw "The current bootstrap plan does not admit the exact f210 distribution identity."
   }
+  $correctionPath = Join-Path $repo ([string]$target.correction_authority.path)
+  $correction = Assert-MIR4BootstrapRecordFileV1 -Path $correctionPath `
+    -SchemaPath (Join-Path $schemas 'mir4-approved-bootstrap-correction-delta.schema.json')
+  if ([string]$correction.record_sha256 -cne [string]$target.correction_authority.record_sha256 -or
+      [string]$manifest.correction_authority.record_sha256 -cne [string]$correction.record_sha256 -or
+      [string]$correction.finding -cne 'MIR3-TERM-0033' -or
+      [string]$correction.target_key -cne 'f210') {
+    throw 'Offline candidate custody requires the exact approved MIR3-TERM-0033 correction binding.'
+  }
   $rootSetPath = Join-Path $repo ".mir/releases/waves/mir4-r0/bootstrap-root-set.json"
   $rootSet = Assert-MIR4CheckedRootSetFileV1 -RepoRoot $repo -Path $rootSetPath `
     -SchemaPath (Join-Path $schemas "mir4-bootstrap-root-set.schema.json")
@@ -239,10 +248,10 @@ function Get-MIR4CustodyAdmissionV1 {
   if ((Get-MIR4Sha256File -Path $predecessorPath) -cne [string]$target.predecessor.archive_sha256) {
     throw "The admitted plan predecessor archive does not match its exact bound identity."
   }
-  $equivalence = Compare-MIR4BootstrapCandidate -CandidatePath $candidate -PredecessorPath $predecessorPath `
+  $equivalence = Compare-MIR4BootstrapCorrectedCandidate -CandidatePath $candidate -PredecessorPath $predecessorPath `
     -ExpectedCandidateRoot $expectedRoot -ExpectedPredecessorRoot "more-infinite-research_$($target.predecessor.release)" `
     -ExpectedCandidateVersion ([string]$projection.distribution_version) `
-    -ExpectedPredecessorVersion ([string]$target.predecessor.release) -ThrowOnDifference
+    -ExpectedPredecessorVersion ([string]$target.predecessor.release) -Correction $correction -ThrowOnDifference
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $equivalence) -cne
       (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.equivalence)) {
     throw "The admitted manifest equivalence record does not equal a fresh predecessor comparison."

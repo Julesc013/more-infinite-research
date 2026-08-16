@@ -4,7 +4,7 @@
   "title": "MIR 4 bootstrap local candidate manifest with capsule reconstruction closure",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "source_capsule", "source_capsule_record_sha256", "capsule_closure", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "correction_authority", "source_capsule", "source_capsule_record_sha256", "capsule_closure", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
   "properties": {
     "schema": { "const": 1 },
     "kind": { "const": "MIR4BootstrapLocalCandidateManifestV1" },
@@ -15,6 +15,7 @@
     "distribution_version": { "const": "4.0.21000" },
     "admission": { "const": "admitted-local-emergency-lane" },
     "public_output_authorized": { "const": false },
+    "correction_authority": { "$ref": "#/$defs/correctionAuthority" },
     "source_capsule": { "$ref": "#/$defs/artifact" },
     "source_capsule_record_sha256": { "$ref": "#/$defs/sha256" },
     "capsule_closure": {
@@ -100,6 +101,17 @@
         "entry_count": { "type": "integer", "minimum": 1 }
       }
     },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "finding": { "const": "MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
     "reconstruction": {
       "type": "object",
       "additionalProperties": false,
@@ -133,15 +145,18 @@
     "equivalence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
+      "required": ["equivalent", "policy", "correction_kind", "correction_record_sha256", "finding", "added", "removed", "changed", "metadata_equivalent", "exact_correction_delta", "candidate", "predecessor"],
       "properties": {
         "equivalent": { "const": true },
-        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
-        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "policy": { "const": "MIR4BootstrapApprovedCorrectionEquivalenceV1" },
+        "correction_kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "correction_record_sha256": { "$ref": "#/$defs/sha256" },
+        "finding": { "const": "MIR3-TERM-0033" },
         "added": { "const": [] },
         "removed": { "const": [] },
-        "changed": { "const": ["info.json"] },
+        "changed": { "const": ["info.json", "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "prototypes/mir/planner/base_continuations.lua"] },
         "metadata_equivalent": { "const": true },
+        "exact_correction_delta": { "const": true },
         "candidate": { "$ref": "#/$defs/identity" },
         "predecessor": { "$ref": "#/$defs/identity" }
       }

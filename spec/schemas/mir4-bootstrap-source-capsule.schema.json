@@ -4,7 +4,7 @@
   "title": "MIR 4 bootstrap source capsule V2 detached envelope",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "public_output_authorized", "target_key", "factorio_line", "distribution_version", "source", "predecessor", "package_membership", "closure", "bootstrap_runner", "capsule", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "public_output_authorized", "target_key", "factorio_line", "distribution_version", "source", "predecessor", "correction_authority", "package_membership", "closure", "bootstrap_runner", "capsule", "record_sha256"],
   "properties": {
     "schema": { "const": 2 },
     "kind": { "const": "MIR4BootstrapSourceCapsuleV2" },
@@ -16,6 +16,7 @@
     "distribution_version": { "const": "4.0.21000" },
     "source": { "$ref": "#/$defs/source" },
     "predecessor": { "$ref": "#/$defs/predecessor" },
+    "correction_authority": { "$ref": "#/$defs/correctionAuthority" },
     "package_membership": {
       "type": "object",
       "additionalProperties": false,
@@ -69,6 +70,17 @@
         "candidate_commit": { "$ref": "#/$defs/gitSha1" },
         "source_tree": { "$ref": "#/$defs/gitSha1" },
         "common_source_commit": { "$ref": "#/$defs/gitSha1" }
+      }
+    },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "finding": { "const": "MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
       }
     },
     "predecessor": {

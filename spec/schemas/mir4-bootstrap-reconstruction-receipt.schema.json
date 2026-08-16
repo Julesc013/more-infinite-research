@@ -4,7 +4,7 @@
   "title": "MIR 4 capsule-local reconstruction receipt",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "mode", "capsule_only", "checkout_argument_supplied", "source_capsule_record_sha256", "source_capsule_archive_sha256", "capsule_content_root_sha256", "toolchain_lock_record_sha256", "predecessor", "candidate", "package_manifest_sha256", "equivalence_sha256", "equivalence", "input_root_sha256", "result_root_sha256", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "target_key", "factorio_line", "distribution_version", "correction_authority", "mode", "capsule_only", "checkout_argument_supplied", "source_capsule_record_sha256", "source_capsule_archive_sha256", "capsule_content_root_sha256", "toolchain_lock_record_sha256", "predecessor", "candidate", "package_manifest_sha256", "equivalence_sha256", "equivalence", "input_root_sha256", "result_root_sha256", "record_sha256"],
   "properties": {
     "schema": { "const": 1 },
     "kind": { "const": "MIR4BootstrapCapsuleReconstructionReceiptV1" },
@@ -13,6 +13,7 @@
     "target_key": { "const": "f210" },
     "factorio_line": { "const": "2.1" },
     "distribution_version": { "const": "4.0.21000" },
+    "correction_authority": { "$ref": "#/$defs/correctionAuthority" },
     "mode": { "const": "capsule-local-fresh-process" },
     "capsule_only": { "const": true },
     "checkout_argument_supplied": { "const": false },
@@ -42,18 +43,32 @@
         "entry_count": { "type": "integer", "minimum": 1 }
       }
     },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "finding": { "const": "MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
     "equivalence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
+      "required": ["equivalent", "policy", "correction_kind", "correction_record_sha256", "finding", "added", "removed", "changed", "metadata_equivalent", "exact_correction_delta", "candidate", "predecessor"],
       "properties": {
         "equivalent": { "const": true },
-        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
-        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "policy": { "const": "MIR4BootstrapApprovedCorrectionEquivalenceV1" },
+        "correction_kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "correction_record_sha256": { "$ref": "#/$defs/sha256" },
+        "finding": { "const": "MIR3-TERM-0033" },
         "added": { "const": [] },
         "removed": { "const": [] },
-        "changed": { "const": ["info.json"] },
+        "changed": { "const": ["info.json", "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "prototypes/mir/planner/base_continuations.lua"] },
         "metadata_equivalent": { "const": true },
+        "exact_correction_delta": { "const": true },
         "candidate": { "$ref": "#/$defs/identity" },
         "predecessor": { "$ref": "#/$defs/identity" }
       }

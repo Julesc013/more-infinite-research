@@ -44,6 +44,7 @@ Assert-True ($planText | Test-Json -SchemaFile $planSchema) "MIR4 bootstrap plan
 foreach ($schemaName in @(
   'mir4-bootstrap-source-capsule.schema.json',
   'mir4-bootstrap-capsule-manifest.schema.json',
+  'mir4-approved-bootstrap-correction-delta.schema.json',
   'mir4-bootstrap-toolchain-lock.schema.json',
   'mir4-bootstrap-git-source-proof.schema.json',
   'mir4-bootstrap-reconstruction-receipt.schema.json',
@@ -75,13 +76,23 @@ Assert-True ($entryGate.target_dispositions.'other-active-targets' -ceq 'blocked
 Assert-True (@($entryGate.payload.before_mir3_eol | Where-Object { [string]$_ -ceq 'generate-local-behavior-equivalent-factorio-2.1-distribution' }).Count -eq 1) "MIR4 entry gate must contain exactly one local f210 construction admission."
 Assert-True (@($plan.targets | Where-Object { $_.target_key -eq 'f210' -and $_.admission -eq 'admitted-local-emergency-lane' }).Count -eq 1) "The f210 plan row is not uniquely admitted by the emergency lane."
 Assert-True (@($plan.targets | Where-Object { $_.target_key -ne 'f210' -and $_.admission -ne 'non-authoritative-shadow-blocked-by-eol' }).Count -eq 0) "A pre-EOL non-f210 target is executable."
+$f210 = @($plan.targets | Where-Object { [string]$_.target_key -ceq 'f210' })[0]
+$correctionPath = Join-Path $RepoRoot ([string]$f210.correction_authority.path)
+$correctionText = Get-Content -Raw -LiteralPath $correctionPath
+Assert-True ($correctionText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json')) 'The exact MIR3-TERM-0033 correction authority fails its schema.'
+$correction = $correctionText | ConvertFrom-Json -Depth 100
+Assert-True (Test-MIR4BootstrapRecordHash -Record $correction) 'The exact MIR3-TERM-0033 correction authority self-hash is stale.'
+Assert-True ([string]$correction.record_sha256 -ceq [string]$f210.correction_authority.record_sha256) 'The f210 plan correction binding is stale.'
+Assert-True ([string]$correction.authority_family -ceq 'MIRApprovedDeltaV1') 'The correction does not use the reusable exact-delta authority family.'
+Assert-True ([bool]$correction.authority_scope.release_admission_authorized -eq $false -and
+  [bool]$correction.authority_scope.publication_authorized -eq $false -and
+  [bool]$correction.authority_scope.transitive_target_inheritance_authorized -eq $false) 'The exact correction improperly grants a higher or transitive authority.'
 
 $cultureProbeBase = Join-Path $RepoRoot 'build/mir4'
 $cultureProbeRoot = Join-Path $cultureProbeBase ("capsule-culture-probe-" + [guid]::NewGuid().ToString('N'))
 $originalCulture = [Threading.Thread]::CurrentThread.CurrentCulture
 $originalUICulture = [Threading.Thread]::CurrentThread.CurrentUICulture
 try {
-  $f210 = @($plan.targets | Where-Object { [string]$_.target_key -ceq 'f210' })[0]
   [Threading.Thread]::CurrentThread.CurrentCulture = [Globalization.CultureInfo]::GetCultureInfo('en-US')
   [Threading.Thread]::CurrentThread.CurrentUICulture = [Globalization.CultureInfo]::GetCultureInfo('en-US')
   $cultureA = New-MIR4BootstrapSourceCapsule -RepoRoot $RepoRoot -Target $f210 -OutputRoot $cultureProbeRoot -CapsuleId A
@@ -136,6 +147,25 @@ try {
   Assert-True ((Get-MIR4Sha256File -Path $candidateA) -eq (Get-MIR4Sha256File -Path $candidateB)) "Independent deterministic archives differ."
   $comparison = Compare-MIR4BootstrapCandidate -CandidatePath $candidateA -PredecessorPath $predecessorZip -ExpectedCandidateRoot "mir4-probe_4.0.21000" -ExpectedPredecessorRoot "mir4-probe_3.2.9" -ExpectedCandidateVersion "4.0.21000" -ExpectedPredecessorVersion "3.2.9" -ThrowOnDifference
   Assert-True $comparison.equivalent "The bounded version/root difference was not accepted."
+
+  $correctedSourceContainer = Join-Path $testRoot 'corrected-source-container'
+  Expand-MIR4SafeArchive -ArchivePath (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)) -Destination $correctedSourceContainer -OutputRoot $testRoot
+  $correctedSource = Join-Path $correctedSourceContainer "more-infinite-research_$($f210.predecessor.release)"
+  Set-MIR4InfoVersion -InfoPath (Join-Path $correctedSource 'info.json') -Version ([string]$f210.distribution_version)
+  foreach ($delta in @($correction.deltas)) {
+    $destination = Join-Path $correctedSource ([string]$delta.path)
+    Invoke-MIR4GitCatFileToPath -RepoRoot $RepoRoot -Type blob -ObjectId ([string]$delta.after_blob) -OutputPath $destination
+    Assert-True ((Get-MIR4Sha256File -Path $destination) -ceq [string]$delta.after_sha256) "The captured approved after-blob differs for $($delta.path)."
+  }
+  $correctedCandidate = Join-Path $testRoot 'corrected-candidate.zip'
+  Write-MIR4DeterministicArchive -SourceRoot $correctedSource -EntryRoot 'more-infinite-research_4.0.21000' -OutputPath $correctedCandidate -ContainmentRoot $testRoot
+  Assert-Throws { Compare-MIR4BootstrapCandidate -CandidatePath $correctedCandidate -PredecessorPath (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)) -ExpectedCandidateRoot 'more-infinite-research_4.0.21000' -ExpectedPredecessorRoot 'more-infinite-research_3.2.10' -ExpectedCandidateVersion '4.0.21000' -ExpectedPredecessorVersion '3.2.10' -ThrowOnDifference } 'The original metadata-only comparator accepted the behavioral correction.'
+  $correctedComparison = Compare-MIR4BootstrapCorrectedCandidate -CandidatePath $correctedCandidate -PredecessorPath (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)) -ExpectedCandidateRoot 'more-infinite-research_4.0.21000' -ExpectedPredecessorRoot 'more-infinite-research_3.2.10' -ExpectedCandidateVersion '4.0.21000' -ExpectedPredecessorVersion '3.2.10' -Correction $correction -ThrowOnDifference
+  Assert-True ([bool]$correctedComparison.equivalent -and [bool]$correctedComparison.exact_correction_delta) 'The exact approved correction comparator rejected its two bound byte transitions.'
+  [IO.File]::AppendAllText((Join-Path $correctedSource ([string]$correction.deltas[0].path)), "`n-- unapproved fourth difference`n", [Text.UTF8Encoding]::new($false))
+  $tamperedCorrectedCandidate = Join-Path $testRoot 'corrected-candidate-tampered.zip'
+  Write-MIR4DeterministicArchive -SourceRoot $correctedSource -EntryRoot 'more-infinite-research_4.0.21000' -OutputPath $tamperedCorrectedCandidate -ContainmentRoot $testRoot
+  Assert-Throws { Compare-MIR4BootstrapCorrectedCandidate -CandidatePath $tamperedCorrectedCandidate -PredecessorPath (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)) -ExpectedCandidateRoot 'more-infinite-research_4.0.21000' -ExpectedPredecessorRoot 'more-infinite-research_3.2.10' -ExpectedCandidateVersion '4.0.21000' -ExpectedPredecessorVersion '3.2.10' -Correction $correction -ThrowOnDifference } 'The approved-delta comparator accepted bytes outside the exact after-digest.'
 
   [IO.File]::WriteAllText((Join-Path $candidateSource "data.lua"), "return false`n", [Text.UTF8Encoding]::new($false))
   $badCandidate = Join-Path $testRoot "candidate-bad.zip"
@@ -241,6 +271,14 @@ try {
 $governedRoot = Join-Path $RepoRoot 'build/mir4/emergency-lane'
 $governedManifest = Join-Path $governedRoot 'manifests/f210.json'
 if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
+  $governedManifestObject = Get-Content -Raw -LiteralPath $governedManifest | ConvertFrom-Json -Depth 100
+  if ($null -eq $governedManifestObject.PSObject.Properties['correction_authority'] -or
+      [string]$governedManifestObject.correction_authority.record_sha256 -cne [string]$correction.record_sha256) {
+    Assert-Throws {
+      & (Join-Path $RepoRoot 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') -RepoRoot $RepoRoot -Target f210 -OutputRoot $governedRoot -Check
+    } 'The superseded pre-correction f210 candidate was still accepted.'
+    Write-Host 'Superseded pre-correction f210 candidate correctly rejected; capsule tamper probes deferred until rebuild.'
+  } else {
   $null = & (Join-Path $RepoRoot 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') `
     -RepoRoot $RepoRoot -Target f210 -OutputRoot $governedRoot -Check
   $capsuleA = Join-Path $governedRoot 'capsules/f210/A/source-capsule.zip'
@@ -310,6 +348,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
     Assert-True (($probeStdout + $probeStderr).Contains('DOS device alias')) 'The detached runner rejected an adversarial capsule for the wrong boundary.'
   } finally {
     if (Test-Path -LiteralPath $tamperRoot) { Remove-MIR4BuildTree -OutputRoot (Join-Path $RepoRoot 'build/tests') -Path $tamperRoot }
+  }
   }
 }
 

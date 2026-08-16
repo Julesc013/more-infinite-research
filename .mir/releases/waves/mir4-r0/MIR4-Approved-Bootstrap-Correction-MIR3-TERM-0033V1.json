@@ -1,24 +1,120 @@
 {
   "schema": 1,
   "kind": "MIR4ApprovedBootstrapCorrectionDeltaV1",
+  "authority_family": "MIRApprovedDeltaV1",
   "status": "approved-local-bootstrap-correction-only",
   "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "approved_by": "explicit-maintainer-bounded-authorization-2026-08-17",
   "package_visible": false,
   "public_output_authorized": false,
+  "authority_scope": {
+    "construction_authorized": true,
+    "exact_difference_classification_authorized": true,
+    "release_admission_authorized": false,
+    "signing_or_sealing_authorized": false,
+    "publication_authorized": false,
+    "transitive_target_inheritance_authorized": false
+  },
   "finding": "MIR3-TERM-0033",
   "target_key": "f210",
-  "predecessor": { "release": "3.2.10", "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7", "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9" },
-  "base_source": { "commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f", "tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a" },
-  "correction_source": { "commit": "029d527bc2fb234bc20ae988cc044229450e32f2", "tree": "a30e5b99225807cfc909ec21865faac2eaac37a1" },
-  "integration_source": { "commit": "01b7cb1f70e085a942580a5e3fbe74b93150ab3d", "tree": "5ccc59c384c0e9bba32a57291d64dea247218fb4" },
-  "canonical_patch": { "algorithm": "SHA-256", "format": "git-diff-no-ext-diff-no-color-full-index-utf8-lf-v1", "sha256": "30E047586BA3F1878174D0A72302E0EE7D5260FFA84FAC32A0B3B05635A4427C", "bytes": 2489 },
+  "correction_commit": "029d527bc2fb234bc20ae988cc044229450e32f2",
+  "predecessor": {
+    "release": "3.2.10",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9"
+  },
+  "base_source": {
+    "commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a"
+  },
+  "correction_source": {
+    "commit": "029d527bc2fb234bc20ae988cc044229450e32f2",
+    "tree": "a30e5b99225807cfc909ec21865faac2eaac37a1"
+  },
+  "integration_source": {
+    "commit": "01b7cb1f70e085a942580a5e3fbe74b93150ab3d",
+    "tree": "5ccc59c384c0e9bba32a57291d64dea247218fb4"
+  },
+  "canonical_patch": {
+    "algorithm": "SHA-256",
+    "format": "git-diff-no-ext-diff-no-color-full-index-utf8-lf-v1",
+    "sha256": "30E047586BA3F1878174D0A72302E0EE7D5260FFA84FAC32A0B3B05635A4427C",
+    "bytes": 2489
+  },
   "deltas": [
-    { "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "before_blob": "010ca0052a8e3292b25b2b245b6f2a68ed765744", "after_blob": "bfd3da244edeef83a4f32ebc39f223a90908197f", "before_sha256": "8648C1D0673BA7389F1EC2B4F0F3E7B91F5B5153343989D8205BE4F9297E6491", "after_sha256": "F0E3BDD20EFCAD0E137732D94EDCDC0380D82DBDD654BC7E32743992CED9F15B", "before_bytes": 1238, "after_bytes": 1808 },
-    { "path": "prototypes/mir/planner/base_continuations.lua", "before_blob": "2f4ce2dbf3a01ebb1f290d8633640f4d417bddf7", "after_blob": "0f6230c14c5726ecab0139a805b583fa1fad4d0d", "before_sha256": "C1E375043D764D68D2BE1C2DE6B17F7E27459974FE170B1A6A67997CC02B088E", "after_sha256": "96CF734A1C91B0D27902DFC61B5C67797D2F35E1847AFD9F615EFE209DBD2150", "before_bytes": 27312, "after_bytes": 27213 }
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "before_blob": "010ca0052a8e3292b25b2b245b6f2a68ed765744",
+      "after_blob": "bfd3da244edeef83a4f32ebc39f223a90908197f",
+      "before_sha256": "8648C1D0673BA7389F1EC2B4F0F3E7B91F5B5153343989D8205BE4F9297E6491",
+      "after_sha256": "F0E3BDD20EFCAD0E137732D94EDCDC0380D82DBDD654BC7E32743992CED9F15B",
+      "before_bytes": 1238,
+      "after_bytes": 1808
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations.lua",
+      "before_blob": "2f4ce2dbf3a01ebb1f290d8633640f4d417bddf7",
+      "after_blob": "0f6230c14c5726ecab0139a805b583fa1fad4d0d",
+      "before_sha256": "C1E375043D764D68D2BE1C2DE6B17F7E27459974FE170B1A6A67997CC02B088E",
+      "after_sha256": "96CF734A1C91B0D27902DFC61B5C67797D2F35E1847AFD9F615EFE209DBD2150",
+      "before_bytes": 27312,
+      "after_bytes": 27213
+    }
   ],
   "semantic_effect": "When the configured continuation cap is below the first MIR extension level, MIR does not generate the extension and does not remove or replace the external owner or its dependent prerequisites.",
-  "non_effects": ["no-owner-replacement-when-replacement-cannot-survive-cap", "no-removal-of-dependent-prerequisites", "no-new-owner", "no-unrelated-technology-mutation", "no-unrelated-target-capability-change", "no-unrelated-setting-change", "no-runtime-state-change", "no-migration-change-except-governed-package-source-transition"],
-  "proof_obligations": ["static-exact-delta", "exact-engine-base-competitor-rollback", "exact-engine-technology-prerequisite-rewire", "direct-predecessor-upgrade", "reload-one", "reload-two", "settings-and-state-preservation"],
-  "expiry": ["source-identity-changes", "candidate-abandoned", "formal-admission-supersedes", "public-allocation-attempted"],
-  "record_sha256": "544774704774E3C85C4715D5BD05A9FAF597AB4D10F9AF8AB8CFBC7A65387780"
+  "semantic_reads": [
+    "configured-continuation-cap",
+    "first-mir-extension-level",
+    "external-owner-identity",
+    "dependent-technology-prerequisites"
+  ],
+  "semantic_writes": [
+    "skip-non-surviving-mir-extension",
+    "preserve-external-owner",
+    "preserve-dependent-prerequisites"
+  ],
+  "forbidden_side_effects": [
+    "generic-changed-path-allowance",
+    "directory-or-glob-allowance",
+    "unrelated-package-visible-difference",
+    "external-owner-removal",
+    "dependent-prerequisite-removal",
+    "cross-target-inheritance",
+    "release-admission",
+    "seal-or-publication"
+  ],
+  "non_effects": [
+    "no-owner-replacement-when-replacement-cannot-survive-cap",
+    "no-removal-of-dependent-prerequisites",
+    "no-new-owner",
+    "no-unrelated-technology-mutation",
+    "no-unrelated-target-capability-change",
+    "no-unrelated-setting-change",
+    "no-runtime-state-change",
+    "no-migration-change-except-governed-package-source-transition"
+  ],
+  "target_dispositions": {
+    "f210": "approved-exact-target-bound-correction",
+    "f200": "not-inherited-requires-independent-impact-classification",
+    "f110": "not-inherited-requires-independent-impact-classification",
+    "f100": "not-inherited-requires-independent-impact-classification"
+  },
+  "proof_obligations": [
+    "static-exact-delta",
+    "exact-engine-base-competitor-rollback",
+    "exact-engine-technology-prerequisite-rewire",
+    "direct-predecessor-upgrade",
+    "reload-one",
+    "reload-two",
+    "settings-and-state-preservation"
+  ],
+  "expiry": [
+    "source-identity-changes",
+    "candidate-abandoned",
+    "formal-admission-supersedes",
+    "public-allocation-attempted"
+  ],
+  "supersession": "A later target-admission or approved-delta authority must bind the same or replacement exact bytes and explicitly supersede this record.",
+  "rollback": "Abandon every candidate and candidate-bound proof that imports this record; do not mutate the sealed MIR 3 predecessor or publish the corrected bytes.",
+  "record_sha256": "989FB0DB9E07140053BA3188A5A808AA825B4C4D0441F6683D3ED5BA35B087E1"
 }

@@ -186,6 +186,9 @@ if ([int]$envelope.schema -ne 2 -or [string]$envelope.status -cne 'local-unpubli
     [bool]$envelope.public_output_authorized -ne $false -or [string]$envelope.target_key -cne 'f210') {
   throw 'The capsule runner admits only the unpublished f210 bootstrap envelope.'
 }
+if ($null -eq $envelope.PSObject.Properties['correction_authority']) {
+  throw 'The f210 capsule envelope must bind the approved MIR3-TERM-0033 correction.'
+}
 Assert-Exact (Get-RawSha256 $capsule) $envelope.capsule.archive_sha256 'Capsule archive hash'
 Assert-Exact (Get-Item -LiteralPath $capsule).Length $envelope.capsule.bytes 'Capsule byte count'
 if ([long](Get-Item -LiteralPath $capsule).Length -gt 536870912) { throw 'The capsule archive exceeds its bounded compressed size.' }
@@ -230,6 +233,7 @@ try {
   Assert-Exact $manifest.target.distribution_version $envelope.distribution_version 'Internal manifest distribution version'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.source) (ConvertTo-CanonicalJson $envelope.source) 'Internal manifest source authority'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.predecessor) (ConvertTo-CanonicalJson $envelope.predecessor) 'Internal manifest predecessor authority'
+  Assert-Exact (ConvertTo-CanonicalJson $manifest.target.correction_authority) (ConvertTo-CanonicalJson $envelope.correction_authority) 'Internal manifest correction authority'
 
   $expectedPaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   $null = $expectedPaths.Add($manifestRelative)
@@ -281,6 +285,24 @@ foreach ($schemaProbe in @(
 if (-not (Test-MIR4BootstrapRecordHash -Record $envelope)) {
   throw 'The detached envelope differs under the capsule-owned canonicalization authority.'
 }
+
+$correctionRelativePath = [string]$envelope.correction_authority.path
+Assert-SafeRelativePath $correctionRelativePath
+$correctionPath = Assert-Descendant $workspace (Join-Path $workspace $correctionRelativePath)
+if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
+  throw 'The capsule omits its bound approved correction authority.'
+}
+$correctionText = Get-Content -Raw -LiteralPath $correctionPath
+if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta.schema.json'))) {
+  throw 'The capsule approved correction authority fails its exact schema.'
+}
+$correction = $correctionText | ConvertFrom-Json -Depth 100
+Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV1'
+Assert-Exact $correction.finding 'MIR3-TERM-0033' 'Approved correction finding'
+Assert-Exact $correction.target_key $envelope.target_key 'Approved correction target'
+Assert-Exact $correction.record_sha256 $envelope.correction_authority.record_sha256 'Approved correction record binding'
+Assert-Exact $correction.kind $envelope.correction_authority.kind 'Approved correction kind binding'
+Assert-Exact $correction.finding $envelope.correction_authority.finding 'Approved correction finding binding'
 
 $capsuleInventory = Get-MIR4ArchiveInventory -Path $capsule
 Assert-Exact $capsuleInventory.root 'mir4-source-capsule' 'Capsule archive root'
@@ -414,13 +436,14 @@ $packageName = "more-infinite-research_$($envelope.distribution_version)"
 $builtPath = Join-Path $workspace "build/capsule-output/$packageName.zip"
 if (-not (Test-Path -LiteralPath $builtPath -PathType Leaf)) { throw 'The canonical package builder did not emit the expected candidate.' }
 $candidateInventory = Get-MIR4ArchiveInventory -Path $builtPath
-$equivalence = Compare-MIR4BootstrapCandidate `
+$equivalence = Compare-MIR4BootstrapCorrectedCandidate `
   -CandidatePath $builtPath `
   -PredecessorPath $predecessor `
   -ExpectedCandidateVersion ([string]$envelope.distribution_version) `
   -ExpectedPredecessorVersion ([string]$envelope.predecessor.release) `
   -ExpectedCandidateRoot $packageName `
   -ExpectedPredecessorRoot "more-infinite-research_$($envelope.predecessor.release)" `
+  -Correction $correction `
   -ThrowOnDifference
 
 $candidatePath = Join-Path $output 'candidate.zip'
@@ -433,6 +456,7 @@ $inputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v
   envelope_record_sha256 = [string]$envelope.record_sha256
   predecessor_archive_sha256 = [string]$predecessorInventory.archive_sha256
   toolchain_lock_record_sha256 = [string]$toolchainLock.record_sha256
+  correction_record_sha256 = [string]$correction.record_sha256
 })
 $resultRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-result.v1' -Fields ([ordered]@{
   candidate_archive_sha256 = [string]$candidateInventory.archive_sha256
@@ -448,6 +472,12 @@ $receipt = [pscustomobject][ordered]@{
   target_key = [string]$envelope.target_key
   factorio_line = [string]$envelope.factorio_line
   distribution_version = [string]$envelope.distribution_version
+  correction_authority = [pscustomobject][ordered]@{
+    path = [string]$envelope.correction_authority.path
+    kind = [string]$correction.kind
+    finding = [string]$correction.finding
+    record_sha256 = [string]$correction.record_sha256
+  }
   mode = 'capsule-local-fresh-process'
   capsule_only = $true
   checkout_argument_supplied = $false
