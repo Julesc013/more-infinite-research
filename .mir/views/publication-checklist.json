@@ -4,19 +4,8 @@
     {
       "candidate_id": "C34",
       "release": "3.2.10",
-      "remaining_states": [
-        "focused-qualified",
-        "candidate-qualified",
-        "automated-qualified-awaiting-human-review",
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
-      "state": "package-built",
+      "remaining_states": [],
+      "state": "publicly-verified",
       "target_seal_present": false
     },
     {

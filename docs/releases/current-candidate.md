@@ -24,11 +24,11 @@ superseded_by: []
 | Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `package-built` |
+| State | `publicly-verified` |
 | Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
 | Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
 | Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
-| Archive | `build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip` |
+| Archive | `dist/more-infinite-research_3.2.10.zip` |
 | Archive bytes | `1065178` |
 | Archive entries | `304` |
 | Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
@@ -36,17 +36,8 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `focused-qualified`
-- [ ] `candidate-qualified`
-- [ ] `automated-qualified-awaiting-human-review`
-- [ ] `manually-accepted`
-- [ ] `protected-qualified`
-- [ ] `sealed`
-- [ ] `promoted`
-- [ ] `tagged`
-- [ ] `published`
-- [ ] `publicly-verified`
+None.
 
 ## Assurance exceptions
 
-None.
+- `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`:  Disposition: `pending`.

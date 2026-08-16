@@ -3,7 +3,8 @@
   "kind": "MIR3PostTerminalEmergencyHotfixProgrammeV1",
   "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
   "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
-  "status": "implementation-and-qualification-in-progress",
+  "status": "c34-maintainer-accepted-promotion-authorized",
+  "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
   "contract": {
     "zero": "infinite",
     "positive_integer": "absolute-highest-technology-level-permitted",

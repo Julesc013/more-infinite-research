@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.10-tagged",
+  "release": "3.2.10",
+  "from": "manually-accepted",
+  "to": "tagged",
+  "admission": "grandfathered-import",
+  "proofs": [
+    {
+      "kind": "annotated-tag",
+      "tag": "3.2.10",
+      "tag_object": "635a9842db208522648a26d3db4f0d71131d4240",
+      "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"
+    },
+    {
+      "kind": "protected-main-promotion",
+      "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/31947535493"
+    }
+  ],
+  "exception": "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1 explicitly accepted C34 and waived the separately staged protected-qualification and seal ceremony for 3.2.10 only. The protected main promotion controller still passed before the immutable tag was created; this transition records the skipped lifecycle states without claiming those gates passed.",
+  "recorded_at": "2026-08-16T22:48:48+10:00"
+}

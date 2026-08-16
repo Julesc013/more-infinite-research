@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1",
+  "status": "accepted-for-immediate-promotion",
+  "recorded_at": "2026-08-16T21:56:33+10:00",
+  "release": "3.2.10",
+  "candidate_id": "C34",
+  "scope": "release-specific post-terminal exception for MIR3-TERM-0032",
+  "maintainer_decision": {
+    "candidate_manual_playtest": "passed on the exact C34 archive",
+    "accepted_factorio": {
+      "distribution": "Steam",
+      "version": "2.1.14",
+      "file_version": "2.1.14.87180",
+      "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+    },
+    "factorio_2_1_13_gate": "waived and superseded for 3.2.10 only",
+    "local_2_1_14_qualification": "accepted together with the maintainer playtest",
+    "publication": "authorized immediately",
+    "cleanup": "read-only audit only; no file, worktree, branch, tag, release, or archive deletion authorized"
+  },
+  "candidate": {
+    "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+    "archive": "dist/more-infinite-research_3.2.10.zip",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+    "bytes": 1065178,
+    "entries": 304
+  },
+  "legacy_branch_override": {
+    "action": "repoint the movable legacy branch to the exact published 3.2.10 commit",
+    "new_role": "Factorio 2.1 latest-MIR-3 compatibility alias of main",
+    "factorio_2_0_release": "2.5.9 remains available only through its immutable annotated tag and public release",
+    "release_2_5_10": "not published and no Factorio 2.0 applicability claim is made",
+    "historical_rewrite": false
+  },
+  "invariants": {
+    "release_3_2_9_unchanged": true,
+    "release_2_5_9_unchanged": true,
+    "historical_tags_unchanged": true,
+    "historical_assets_unchanged": true,
+    "candidate_bytes_rebuilt_or_replaced_after_acceptance": false,
+    "mir4_r0_preserved": true
+  },
+  "evidence": [
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
+    "docs/releases/notes/release-notes-3.2.10.md"
+  ]
+}

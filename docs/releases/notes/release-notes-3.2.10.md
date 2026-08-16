@@ -24,6 +24,8 @@ superseded_by: []
 
 The `3.2.9` release remains unchanged and downloadable.
 
+This exact package was qualified locally and accepted by the maintainer on Steam Factorio `2.1.14` build `87180`. The release-specific emergency override replaces the former 2.1.13 gate for `3.2.10` only; it does not change the historical qualification claims of earlier releases.
+
 <!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
 ## Immutable release identity
 
@@ -31,13 +33,13 @@ The `3.2.9` release remains unchanged and downloadable.
 
 | Field | Value |
 | --- | --- |
-| State | `package-built` |
+| State | `publicly-verified` |
 | Candidate | `C34` |
 | Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
 | Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
 | Content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
-| Tag | `pending` |
-| Tag commit | `pending` |
-| Assurance exceptions | `pending` |
+| Tag | `3.2.10` |
+| Tag commit | `4cbea531a1043e0cacb9ac5c496731c8d77bbdb6` |
+| Assurance exceptions | `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->
