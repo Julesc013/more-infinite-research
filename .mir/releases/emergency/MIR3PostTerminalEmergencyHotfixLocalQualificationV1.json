@@ -1,11 +1,19 @@
 {
   "schema": 1,
   "kind": "MIR3PostTerminalEmergencyHotfixLocalQualificationV1",
-  "status": "passed-local-non-authoritative-for-exact-target",
+  "status": "passed-and-accepted-by-release-specific-maintainer-override",
   "release": "3.2.10",
   "candidate_id": "C34",
   "factorio_version": "2.1.14",
   "required_exact_factorio_version": "2.1.13",
+  "engine_file_version": "2.1.14.87180",
+  "engine_binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+  "maintainer_disposition": {
+    "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
+    "candidate_playtest": "accepted",
+    "exact_2_1_13_gate": "waived-for-3.2.10-only",
+    "publication": "permitted"
+  },
   "candidate_archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
   "candidate_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
   "scenarios": [
@@ -81,8 +89,9 @@
     "local_governed_upgrade_matrix_complete": true,
     "local_retained_regressions_complete": true,
     "governed_upgrade_matrix_complete": false,
-    "publication_permitted": false
+    "publication_permitted": true,
+    "publication_permission_basis": "release-specific-maintainer-override; not a claim that protected or exact-2.1.13 gates passed"
   },
   "created_at": "2026-08-16T19:18:00+10:00",
-  "updated_at": "2026-08-16T20:03:00+10:00"
+  "updated_at": "2026-08-16T21:56:33+10:00"
 }

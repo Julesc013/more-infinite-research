@@ -2,7 +2,7 @@
   "active_programme": {
     "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
     "id": "MIR3PostTerminalEmergencyHotfixProgrammeV1",
-    "status": "c34-package-built-qualification-in-progress"
+    "status": "c34-maintainer-accepted-promotion-authorized"
   },
   "authority": "mir-current-release-roles-v2",
   "implementation_admitted": true,
@@ -30,7 +30,8 @@
     "planned_canonical": "3.2.10",
     "published_factorio_2_0": "2.5.9",
     "published_factorio_2_1": "3.2.9",
-    "tagged_factorio_2_1": "3.2.9"
+    "tagged_factorio_2_1": "3.2.9",
+    "legacy_pointer_after_3_2_10_publication": "3.2.10"
   },
   "schema": 1,
   "source_frozen": true

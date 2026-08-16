@@ -1274,7 +1274,7 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
   $current.roles.planned_backport -eq "2.5.10" -and
   $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV1" -and
   [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json" -and
-  [string]$current.active_programme.status -eq "c34-package-built-qualification-in-progress")
+  [string]$current.active_programme.status -in @("c34-package-built-qualification-in-progress", "c34-maintainer-accepted-promotion-authorized"))
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
     (-not $terminalCurrent -and -not $emergencyCurrent)) {
   throw "Current release roles do not bind the active terminal programme and canonical .9 family."

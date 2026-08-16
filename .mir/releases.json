@@ -38,12 +38,14 @@
       "tag_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb"
     },
     "factorio-2.1": {
-      "archive": "build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip",
+      "archive": "dist/more-infinite-research_3.2.10.zip",
       "archive_bytes": 1065178,
       "archive_class": "frozen-unreleased-candidate",
       "archive_entries": 304,
       "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
-      "assurance_exception_ids": [],
+      "assurance_exception_ids": [
+        ""
+      ],
       "branch": "main",
       "candidate_floor": "C34",
       "candidate_id": "C34",
@@ -61,20 +63,16 @@
       "package_source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
       "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
       "protected_qualification": "pending",
-      "publication_status": "package-built",
-      "qualification": "package-built",
+      "publication_status": "manually-accepted",
+      "qualification": "manually-accepted",
       "remaining_obligations": [
-        "focused-qualification",
-        "exact-2.1.13-qualification",
-        "governed-upgrades",
-        "target-seal",
-        "publication-and-public-byte-verification"
+        "protected-main-promotion",
+        "annotated-tag",
+        "github-publication-and-public-byte-verification",
+        "legacy-branch-alias-repoint",
+        "corrected-terminal-baseline-handoff-to-mir4"
       ],
       "remaining_states": [
-        "focused-qualified",
-        "candidate-qualified",
-        "automated-qualified-awaiting-human-review",
-        "manually-accepted",
         "protected-qualified",
         "sealed",
         "promoted",
@@ -83,7 +81,7 @@
         "publicly-verified"
       ],
       "source_anchor": "3.2.9",
-      "status": "C34-package-built"
+      "status": "C34-manually-accepted"
     }
   },
   "generated_from": [

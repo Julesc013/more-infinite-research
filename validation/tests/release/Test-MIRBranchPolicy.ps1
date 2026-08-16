@@ -21,11 +21,13 @@ $branches = @{
     Description = "experimental development branch for the main Factorio 2.1.x line"
   }
   legacy = @{
-    FactorioVersion = "2.0"
-    BaseDependencyPattern = "^base\s+>=\s+2\.0(\.|$)"
-    Description = "Factorio 2.0.x backport branch"
+    FactorioVersion = "2.1"
+    BaseDependencyPattern = "^base\s+>=\s+2\.1(\.|$)"
+    Description = "latest MIR 3 Factorio 2.1 compatibility alias"
   }
 }
+
+$historicalLegacyCommit = "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb"
 
 function Invoke-Git {
   param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
@@ -79,7 +81,9 @@ foreach ($branch in @("main", "dev", "legacy")) {
   if ($info.name -ne "more-infinite-research") {
     throw "origin/$branch info.json has unexpected mod name '$($info.name)'."
   }
-  if ($info.factorio_version -ne $policy.FactorioVersion) {
+  $resolvedCommit = (Invoke-Git rev-parse "$ref`^{commit}" | Select-Object -First 1).Trim()
+  $legacyTransitionState = ($branch -eq "legacy" -and $resolvedCommit -eq $historicalLegacyCommit -and $info.factorio_version -eq "2.0")
+  if (-not $legacyTransitionState -and $info.factorio_version -ne $policy.FactorioVersion) {
     throw "origin/$branch must target Factorio $($policy.FactorioVersion) for the $($policy.Description); found $($info.factorio_version)."
   }
 
@@ -87,9 +91,10 @@ foreach ($branch in @("main", "dev", "legacy")) {
   if ([string]::IsNullOrWhiteSpace($baseDependency)) {
     throw "origin/$branch must declare a base dependency."
   }
-  if ($baseDependency -notmatch $policy.BaseDependencyPattern) {
+  $baseDependencyPattern = if ($legacyTransitionState) { "^base\s+>=\s+2\.0(\.|$)" } else { $policy.BaseDependencyPattern }
+  if ($baseDependency -notmatch $baseDependencyPattern) {
     throw "origin/$branch has invalid base dependency '$baseDependency' for the $($policy.Description)."
   }
 }
 
-Write-Host "[ok] branch policy validated for origin/main, origin/dev, and origin/legacy."
+Write-Host "[ok] branch policy validated for origin/main, origin/dev, and the governed legacy transition to the MIR 3 Factorio 2.1 alias."

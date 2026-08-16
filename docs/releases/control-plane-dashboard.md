@@ -18,7 +18,7 @@ superseded_by: []
 
 | Release | Candidate | Namespace / minimum next ordinal | Target | Branch | Historical state | Effective status | Exceptions |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `3.2.10` | `C34` | `C / 34` | `2.1` | `main` | `package-built` | `package-built` | 0 |
+| `3.2.10` | `C34` | `C / 34` | `2.1` | `main` | `manually-accepted` | `manually-accepted` | 1 |
 | `3.2.9` | `C33` | `C / 33` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 0 |
 | `3.2.5` | `C32` | `C32` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.4` | `C31` | `pending` | `2.1` | `dev` | `package-built` | `superseded-unpublished` | 0 |

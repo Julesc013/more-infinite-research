@@ -188,6 +188,7 @@ $allowedStatuses = @(
   "requalifying-after-validation-harness-change",
   "source-frozen",
   "package-built",
+  "maintainer-accepted-emergency",
   "release-candidate-awaiting-external-qualification",
   "release-candidate-awaiting-manual-review",
   "release-candidate-accepted",
@@ -319,6 +320,50 @@ if ($status -eq "package-built") {
     throw "Package-built candidate bytes do not match the typed ReleaseRecord."
   }
   Write-Host "[ok] MIR candidate package bytes are frozen while automated and exact manual qualification remain pending."
+  exit 0
+}
+
+if ($status -eq "maintainer-accepted-emergency") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "The emergency accepted candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Emergency package source commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed-local-2.1.14-release-exception" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "accepted-for-publication") {
+    throw "The emergency candidate must retain the exact local-qualification exception and maintainer acceptance."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $unsupportedFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($unsupportedFields.Count -gt 0) {
+    throw "The emergency candidate contains unsupported fields: $($unsupportedFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after emergency acceptance." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after emergency acceptance: $($changedPackagePaths -join ', ')"
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.10.json") | ConvertFrom-Json
+  $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json") | ConvertFrom-Json
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      [string]$release.state -ne "manually-accepted" -or [string]$release.candidate_id -ne "C34" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive -ne $artifactRelative -or
+      (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256 -or
+      [string]$override.status -ne "accepted-for-immediate-promotion" -or
+      [string]$override.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
+      [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
+      [string]$override.maintainer_decision.factorio_2_1_13_gate -ne "waived and superseded for 3.2.10 only") {
+    throw "The emergency accepted candidate, release record, override, or frozen ZIP identity disagrees."
+  }
+  Write-Host "[ok] exact C34 bytes are maintainer-accepted under the explicit Factorio 2.1.14 emergency release exception."
   exit 0
 }
 

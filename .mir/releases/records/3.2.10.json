@@ -15,12 +15,12 @@
   "target": "2.1",
   "branch": "main",
   "development_branch": "dev",
-  "state": "package-built",
+  "state": "manually-accepted",
   "package": {
     "source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
     "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
     "source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
-    "archive": "build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip",
+    "archive": "dist/more-infinite-research_3.2.10.zip",
     "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
     "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
     "bytes": 1065178,
@@ -34,16 +34,27 @@
     "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
     "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
     "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
-    "local_non_target_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json"
+    "local_factorio_2_1_14_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
+    "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
   },
-  "assurance_exceptions": [],
-  "remaining_obligations": [
-    "focused-qualification",
-    "exact-2.1.13-qualification",
-    "governed-upgrades",
-    "target-seal",
-    "publication-and-public-byte-verification"
+  "assurance_exceptions": [
+    "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1"
   ],
+  "remaining_obligations": [
+    "protected-main-promotion",
+    "annotated-tag",
+    "github-publication-and-public-byte-verification",
+    "legacy-branch-alias-repoint",
+    "corrected-terminal-baseline-handoff-to-mir4"
+  ],
+  "qualification": {
+    "engine_version": "2.1.14",
+    "engine_file_version": "2.1.14.87180",
+    "engine_binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "automated_local": "passed",
+    "maintainer_playtest": "accepted",
+    "exact_2_1_13": "waived-by-release-specific-maintainer-override"
+  },
   "upgrade": {
     "fixture": "assert-upgrade-3-2-9-to-3-2-10",
     "from_version": "3.2.9",
@@ -60,5 +71,5 @@
   "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
   "release_notes": "docs/releases/notes/release-notes-3.2.10.md",
   "incident_ids": [],
-  "updated_at": "2026-08-16T19:24:00+10:00"
+  "updated_at": "2026-08-16T21:56:33+10:00"
 }

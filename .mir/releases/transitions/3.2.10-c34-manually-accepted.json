@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.10-manually-accepted",
+  "release": "3.2.10",
+  "from": "package-built",
+  "to": "manually-accepted",
+  "admission": "grandfathered-import",
+  "proofs": [
+    {
+      "kind": "release-specific-maintainer-override",
+      "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
+    },
+    {
+      "kind": "local-qualification",
+      "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json"
+    },
+    {
+      "kind": "deterministic-candidate-reconstruction",
+      "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json"
+    }
+  ],
+  "exception": "The maintainer explicitly accepted exact C34 on Factorio 2.1.14 and waived the superseded 2.1.13, separately staged focused/candidate/automated/protected/seal ceremony for this release only. The transition records the skipped formal lifecycle states without claiming that those protected gates passed.",
+  "recorded_at": "2026-08-16T21:56:33+10:00"
+}
