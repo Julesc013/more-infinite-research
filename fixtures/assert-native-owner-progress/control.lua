@@ -79,7 +79,7 @@ end
 local function adoption_binding()
   local prototype = prototypes and prototypes.mod_data and prototypes.mod_data[adoption_data_name]
   local data = prototype and prototype.data
-  if not data or data.version ~= 3 then fail("native-owner adoption descriptor schema 3 is absent") end
+  if not data or data.version ~= 4 then fail("native-owner adoption descriptor schema 4 is absent") end
   for _, binding in ipairs(data.bindings or {}) do
     if binding.owner == technology_name then return binding end
   end

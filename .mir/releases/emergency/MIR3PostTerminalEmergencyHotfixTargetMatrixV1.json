@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixTargetMatrixV1",
+  "status": "3.2.10-maintainer-accepted-promotion-authorized",
+  "candidate_allocation_basis": {
+    "3.2.10": "C34 is the next monotonic C identity after sealed C33; repository refs and release records contain no higher C allocation.",
+    "2.5.10": "2.5-P14 is the next monotonic 2.5 identity after sealed 2.5-P13; repository refs and release records contain no higher 2.5-P allocation."
+  },
+  "targets": [
+    {
+      "release": "3.2.10",
+      "factorio": "2.1",
+      "lineage": "main/3.2.9",
+      "candidate_floor": "C34",
+      "disposition": "immediate-publication-authorized",
+      "current_gate": "accepted-on-exact-c34-with-factorio-2.1.14-release-exception"
+    },
+    {
+      "release": "2.5.10",
+      "factorio": "2.0",
+      "lineage": "legacy/2.5.9",
+      "candidate_floor": "2.5-P14",
+      "disposition": "not-published-no-applicability-claim",
+      "current_gate": "permanent-legacy-branch-reassigned-to-3.2.10-alias; immutable-2.5.9-tag-retained"
+    },
+    {
+      "release_family": "1.3.9-through-1.9.9",
+      "disposition": "unchanged-not-projected"
+    }
+  ]
+}

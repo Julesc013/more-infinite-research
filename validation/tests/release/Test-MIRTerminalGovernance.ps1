@@ -17,10 +17,18 @@ if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
 $promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
 $promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
 foreach ($snippet in @(
-  'ValidateSet("3.2.9", "2.5.9")',
+  'ValidateSet("3.2.10", "3.2.9", "2.5.9")',
+  'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
   'candidate_ref',
+  'post-publication-sync',
+  'post-publication-authority-sync-only',
+  'ValidateSet("main", "legacy")',
+  'Legacy alias promotion tree must be exactly identical to protected main.',
+  'merge-base --is-ancestor $mainRemote $CandidateSha',
+  'Mir3PostTerminalEmergencyPublicationReceiptV1',
+  'MIR3-TERM-0033',
   'governed-fast-forward',
   'github-publication-only'
 )) {
@@ -30,6 +38,10 @@ foreach ($snippet in @(
   "workflow_dispatch:",
   "terminal_release:",
   "terminal_candidate_sha:",
+  "terminal_operation:",
+  "terminal_candidate_ref:",
+  "terminal_promotion_branch:",
+  "ref: `${{ inputs.terminal_candidate_sha }}",
   "checks: write",
   "statuses: write",
   "Test-MIR3TerminalPromotionCandidate.ps1",
@@ -1264,13 +1276,37 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
     $museum.artificial_dot9_versions_permitted -or @($museum.targets).Count -ne 7) { throw "0.18 or museum custody policy is invalid." }
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
-if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or -not $current.source_frozen -or
-    $current.roles.canonical -ne "3.2.9" -or $current.roles.planned_canonical -ne "3.2.9" -or
-    $current.roles.planned_backport -ne "2.5.9" -or $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or
-    [string]$current.active_programme.status -ne $programmeStatus) {
-  throw "Current release roles do not bind the active terminal programme and canonical .9 family."
+$terminalCurrent = (($current.planned_releases -join "|") -eq ($family -join "|") -and
+  $current.roles.canonical -eq "3.2.9" -and $current.roles.planned_canonical -eq "3.2.9" -and
+  $current.roles.planned_backport -eq "2.5.9" -and $current.active_programme.id -eq "MIR3-Terminal-ProgrammeV1" -and
+  [string]$current.active_programme.status -eq $programmeStatus)
+$emergencyFamily = @("3.2.10", "2.5.10") + $family
+$emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily -join "|") -and
+  $current.roles.canonical -eq "3.2.10" -and $current.roles.planned_canonical -eq "3.2.10" -and
+  $current.roles.planned_backport -eq "2.5.10" -and
+  $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV1" -and
+  [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json" -and
+  [string]$current.active_programme.status -in @(
+    "c34-package-built-qualification-in-progress",
+    "c34-maintainer-accepted-promotion-authorized",
+    "3.2.10-published-publicly-verified-branch-and-mir4-handoff"
+  ))
+if (-not $current.implementation_admitted -or -not $current.source_frozen -or
+    (-not $terminalCurrent -and -not $emergencyCurrent)) {
+  throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($programmeStatus -eq "ready-for-local-tagging") {
+if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.backport_calibration -ne "2.5.9") {
+    throw "Post-terminal publication roles do not identify 3.2.10 as the current 2.1 authority while preserving immutable 2.5.9 as the current 2.0 authority."
+  }
+} elseif ($programmeStatus -eq "ready-for-local-tagging") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
       $current.roles.backport_calibration -ne "2.5.5") {
     throw "Pre-publication release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."

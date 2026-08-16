@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.10-publicly-verified",
+  "release": "3.2.10",
+  "from": "published",
+  "to": "publicly-verified",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "public-redownload-verification",
+      "path": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json"
+    }
+  ],
+  "recorded_at": "2026-08-16T22:48:48+10:00"
+}

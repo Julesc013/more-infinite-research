@@ -643,6 +643,34 @@ fixtures:
       - fixture-storage-retention
       - upgraded-save-reload
 
+  upgrade-3-2-9-to-3-2-10:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-9-to-3-2-10
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.9"
+    target_candidate: C34
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-9-source-archive-for-3-2-10
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention
+      - native-owner-runtime-cap-policy-installation
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - upgraded-save-reload
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
@@ -700,6 +728,30 @@ fixtures:
       - configuration-change-current-research-progress-retention
       - atomic-base-increment-growth-setting-semantics
       - settings-profile-compatible-stable-ids
+
+  maximum-level-runtime-control:
+    requires_features: [scripted_techs]
+    path: fixtures/assert-generated-max-level
+    supplemental_paths:
+      - fixtures/assert-generated-cap-transition
+      - fixtures/assert-base-continuation-cap-transition
+      - fixtures/assert-native-owner-cap-transition
+      - fixtures/assert-native-owner-cap-relaxation
+      - fixtures/late-native-owner-max-level
+    validates:
+      - zero-means-infinite
+      - positive-value-is-absolute-highest-level
+      - generated-stream-cap-enforcement
+      - generated-base-continuation-cap-enforcement
+      - five-native-owner-cap-enforcement
+      - completed-levels-retained-above-lowered-cap
+      - valid-fractional-progress-retained
+      - invalid-current-and-queued-research-removed
+      - cap-raise-restores-future-research
+      - cap-removal-restores-infinite-research
+      - MIRSET1-effective-cap-projection
+      - late-prototype-conflict-reported-and-refused
+      - repeated-reload-idempotence
 
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]

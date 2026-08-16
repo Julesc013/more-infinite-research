@@ -20,11 +20,13 @@ The permanent remote topology contains `main`, `dev`, and `legacy`.
 
 | Branch | Role |
 | --- | --- |
-| `main` | Published Factorio 2.1 line rooted at immutable tag `3.2.5`; accepts release documentation, planning synchronization, emergency release work, and qualified promotion from `dev`. |
-| `dev` | Canonical MIR 3 terminal planning and implementation line. It owns shared tooling, tests, governance, target-neutral corrections, and eventual `3.2.9` qualification. |
-| `legacy` | Published Factorio 2.0 line at immutable tag `2.5.5`; advances only through governed, qualified `2.5.9` promotion. |
+| `main` | Published Factorio 2.1 line, promoted to the accepted `3.2.10` emergency hotfix. |
+| `dev` | Canonical integration line for the corrected terminal authority and MIR 4 handoff. |
+| `legacy` | Compatibility alias of the latest MIR 3 Factorio 2.1 terminal authority; its two-parent alias commit preserves the historical branch and has a tree exactly matching protected `main`. |
 
 Temporary target worktrees or candidate branches are disposable qualification surfaces. Delete their remote branches after publication while retaining immutable tags and evidence. Never use `legacy` or a historical target branch as scratch space.
+
+The `legacy` role changed under `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`. Factorio 2.0 release `2.5.9` remains immutable and downloadable through its annotated tag and release; moving the branch does not replace that history. `2.5.10` was not published and MIR makes no new 2.0 hotfix claim. This exception supersedes the branch-routing text below only where it describes `legacy` as the active 2.0 lane; the historical materialization record remains authoritative for the completed `.9` family.
 
 ## Target-line map
 
@@ -43,6 +45,8 @@ Temporary target worktrees or candidate branches are disposable qualification su
 Historical transition exceptions remain historical: MIR `1.9.0` through `1.9.2` targeted Factorio 2.0, and MIR `1.8.0` was a one-time Factorio 0.18 bridge. Neither exception expands the current target claim. `1.8.5` and `1.8.9` support Factorio 1.0 only.
 
 ## Terminal version rule
+
+The post-terminal `3.2.10` maximum-level exception and the `legacy` alias are governed by the emergency authority above. The rules in this section remain the historical policy for the completed `.5`/`.9` wave.
 
 - Published `.5` packages and tags never change.
 - Do not create `.6`, `.7`, or `.8` releases.

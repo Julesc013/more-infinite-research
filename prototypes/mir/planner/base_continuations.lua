@@ -23,6 +23,7 @@ local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_
 local technology_risk = require("prototypes.mir.domain.technology.technology_risk")
 local research_cost_model = require("prototypes.mir.domain.research_cost.model")
 local cost_contract = require("prototypes.mir.settings.cost_contract")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -402,7 +403,8 @@ local function plan_chain(key)
   if max_level_value == "infinite" then
     max_level_value = coerce_max_level_value(spec.max_level)
   end
-  if max_level_value ~= "infinite" and max_level_value < desired_new_level then
+  if not (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
+      and max_level_value ~= "infinite" and max_level_value < desired_new_level then
     D.extension(D.extension_fields(key, "skipped", "max_level_below_first_extension"))
     return rejected_candidate(key, "max_level_below_first_extension", "progression_safe")
   end
@@ -576,7 +578,13 @@ local function plan_chain(key)
   end
   new.effects = effect_scaling.scale_base_effects(key, desired_effects)
 
-  new.max_level = max_level_value
+  -- A finite prototype max_level makes Factorio clamp completed levels before
+  -- on_configuration_changed runs. Targets with the governed runtime-policy
+  -- transport therefore keep the prototype infinite and enforce the selected
+  -- absolute cap losslessly at runtime, including when the cap is below this
+  -- continuation's first level.
+  new.max_level = (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
+    and "infinite" or max_level_value
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))
@@ -629,6 +637,7 @@ local function plan_chain(key)
     base_technology_name = chain_key .. "-" .. base_level,
     technology_name = new.name,
     technology = new,
+    planned_max_level = max_level_value,
     research_cost_model = cost_model,
     science_phase_policy = science_phase_decision,
     technology_risk = technology_risk.classification(spec.technology_risk),

@@ -136,6 +136,30 @@ function Set-CopiedStartupSettingDefaults {
   }
 }
 
+function Set-CopiedMIRSettingsProfileDefault {
+  param(
+    [Parameter(Mandatory)][string]$ModsDir,
+    [Parameter(Mandatory)][hashtable]$Settings
+  )
+
+  $overridePath = Join-Path $ModsDir "mir-validation-settings-overrides\settings-updates.lua"
+  if (-not (Test-Path -LiteralPath $overridePath -PathType Leaf)) {
+    throw "Unable to find validation settings override fixture."
+  }
+  $profile = [ordered]@{
+    schema = 1
+    kind = "mir-settings-profile"
+    mod = "more-infinite-research"
+    metadata = [ordered]@{ fixture = "maximum-level-profile-import" }
+    settings = $Settings
+  }
+  $json = $profile | ConvertTo-Json -Depth 8 -Compress
+  $jsonLiteral = ConvertTo-MIRLuaLiteral -Value $json
+  Add-Content -LiteralPath $overridePath `
+    -Value "override(`"mir-settings-profile-import`", `"MIRSET1:`" .. helpers.encode_string($jsonLiteral))" `
+    -Encoding UTF8
+}
+
 function Set-CopiedGeneratedStartupSettingDefault {
   param(
     [string]$ModsDir,

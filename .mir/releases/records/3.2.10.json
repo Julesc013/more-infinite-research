@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "release": "3.2.10",
+  "candidate_id": "C34",
+  "candidate_floor": "C34",
+  "candidate_allocation": {
+    "namespace": "C",
+    "predecessor_max_ordinal": 33,
+    "minimum_next_ordinal": 34,
+    "assigned_id": "C34",
+    "assigned_at": "2026-08-16T19:20:00+10:00",
+    "candidate_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "assignment_condition": "emergency-fixed-point-and-source-freeze-satisfied"
+  },
+  "target": "2.1",
+  "branch": "main",
+  "development_branch": "dev",
+  "state": "publicly-verified",
+  "package": {
+    "source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+    "source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+    "archive": "dist/more-infinite-research_3.2.10.zip",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+    "bytes": 1065178,
+    "entries": 304
+  },
+  "proofs": {
+    "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+    "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+    "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
+    "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
+    "approved_delta": ".mir/releases/deltas/3.2.9-to-3.2.10.json",
+    "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
+    "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
+    "local_factorio_2_1_14_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
+    "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
+    "tag": {
+      "kind": "annotated-tag",
+      "name": "3.2.10",
+      "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+      "tag_object": "635a9842db208522648a26d3db4f0d71131d4240",
+      "annotation_correction": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json#tag_annotation_correction"
+    },
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json",
+    "post_publication_runtime_observation": ".mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json"
+  },
+  "assurance_exceptions": [
+    {
+      "id": "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1",
+      "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
+      "scope": "3.2.10 only"
+    }
+  ],
+  "remaining_obligations": [
+    "legacy-branch-alias-repoint",
+    "corrected-terminal-baseline-handoff-to-mir4"
+  ],
+  "qualification": {
+    "engine_version": "2.1.14",
+    "engine_file_version": "2.1.14.87180",
+    "engine_binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "automated_local": "passed",
+    "maintainer_playtest": "accepted",
+    "exact_2_1_13": "waived-by-release-specific-maintainer-override"
+  },
+  "upgrade": {
+    "fixture": "assert-upgrade-3-2-9-to-3-2-10",
+    "from_version": "3.2.9",
+    "to_version": "3.2.10"
+  },
+  "source_release": {
+    "release": "3.2.9",
+    "candidate_id": "C33",
+    "tag": "3.2.9",
+    "tag_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+    "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+    "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25"
+  },
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+  "release_notes": "docs/releases/notes/release-notes-3.2.10.md",
+  "incident_ids": [
+    "MIR3-TERM-0033"
+  ],
+  "updated_at": "2026-08-16T22:48:48+10:00"
+}

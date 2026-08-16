@@ -1,0 +1,1 @@
+-- Runtime-only assertion fixture; the data-stage entrypoint is intentionally inert.
