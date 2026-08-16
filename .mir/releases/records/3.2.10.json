@@ -32,13 +32,18 @@
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
     "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
     "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
+    "approved_delta": ".mir/releases/deltas/3.2.9-to-3.2.10.json",
     "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
     "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
     "local_factorio_2_1_14_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
     "maintainer_release_override": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
   },
   "assurance_exceptions": [
-    "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1"
+    {
+      "id": "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1",
+      "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
+      "scope": "3.2.10 only"
+    }
   ],
   "remaining_obligations": [
     "protected-main-promotion",

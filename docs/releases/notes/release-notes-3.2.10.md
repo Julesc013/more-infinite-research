@@ -40,6 +40,6 @@ This exact package was qualified locally and accepted by the maintainer on Steam
 | Content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
 | Tag | `pending` |
 | Tag commit | `pending` |
-| Assurance exceptions | `pending` |
+| Assurance exceptions | `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

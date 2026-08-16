@@ -44,7 +44,7 @@
       "archive_entries": 304,
       "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
       "assurance_exception_ids": [
-        ""
+        "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1"
       ],
       "branch": "main",
       "candidate_floor": "C34",

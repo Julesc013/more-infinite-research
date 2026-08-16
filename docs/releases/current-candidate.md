@@ -45,4 +45,4 @@ superseded_by: []
 
 ## Assurance exceptions
 
-- `pending`:  Disposition: `pending`.
+- `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`:  Disposition: `pending`.
