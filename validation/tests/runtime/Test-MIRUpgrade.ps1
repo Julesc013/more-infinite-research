@@ -209,6 +209,7 @@ if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   $toPlaceholder = "__MIR_UPGRADE_TO_VERSION__"
   $stagedControlText = $stagedControlText.Replace("3.2.9", $fromPlaceholder).Replace("3.2.10", $toPlaceholder)
   $stagedControlText = $stagedControlText.Replace($fromPlaceholder, $FromVersion).Replace($toPlaceholder, $ToVersion)
+  $stagedControlText = $stagedControlText.Replace("mir-3210-upgraded", "mir-$($ToVersion.Replace('.', ''))-upgraded")
   Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
 }
 if ($Archetype) {
