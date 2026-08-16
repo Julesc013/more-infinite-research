@@ -1275,12 +1275,27 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
   $current.roles.planned_backport -eq "2.5.10" -and
   $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV1" -and
   [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json" -and
-  [string]$current.active_programme.status -in @("c34-package-built-qualification-in-progress", "c34-maintainer-accepted-promotion-authorized"))
+  [string]$current.active_programme.status -in @(
+    "c34-package-built-qualification-in-progress",
+    "c34-maintainer-accepted-promotion-authorized",
+    "3.2.10-published-publicly-verified-branch-and-mir4-handoff"
+  ))
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
     (-not $terminalCurrent -and -not $emergencyCurrent)) {
-  throw "Current release roles do not bind the active terminal programme and canonical .9 family."
+  throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($programmeStatus -eq "ready-for-local-tagging") {
+if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.9" -or
+      $current.roles.backport_calibration -ne "2.5.9") {
+    throw "Post-terminal publication roles do not identify 3.2.10 as the current 2.1 authority while preserving immutable 2.5.9 as the current 2.0 authority."
+  }
+} elseif ($programmeStatus -eq "ready-for-local-tagging") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
       $current.roles.backport_calibration -ne "2.5.5") {
     throw "Pre-publication release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."
