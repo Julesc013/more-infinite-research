@@ -27,9 +27,10 @@ jobs:
           fetch-depth: 0
       - name: Materialize target plan
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance backport --target '${{ matrix.target }}' --baseline '${{ inputs.baseline_sha }}' --output artifacts/assurance/backport-${{ matrix.target }}.json
+        run: ./tools/mir.ps1 assurance backport --target '${{ matrix.target }}' --baseline '${{ inputs.baseline_sha }}' --output build/results/assurance/backport-${{ matrix.target }}.json
       - uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: assurance-backport-plan-${{ matrix.target }}-${{ inputs.candidate_sha }}
-          path: artifacts/assurance/**
+          path: build/results/assurance/**
           if-no-files-found: error

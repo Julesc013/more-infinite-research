@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0005",
+  "title": "MIR 3.2.5 compatibility observability and convergence",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "compatibility.policy",
+    "compatibility.native-owner",
+    "assurance.evidence",
+    "release.authority"
+  ],
+  "domains_written": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "product.locale",
+    "compatibility.policy",
+    "compatibility.reports",
+    "assurance.schemas",
+    "release.authority",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Combines the unreleased C31 research-cost work with derived compatibility dispositions, proof assertions, bounded support reporting, profile hardening, and behavior-preserving compiler consolidation. The public upgrade starts at 3.2.3; stable IDs and neutral defaults are preserved.",
+  "release_note_impact": "One consolidated 3.2.5 release note and migration guide replace the unpublished 3.2.4 release plan.",
+  "test_obligations": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "product.locale",
+    "compatibility.policy",
+    "compatibility.native-owner",
+    "compatibility.reports",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog",
+    "transition.upgrade",
+    "release.authority"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical implementation and one public release on dev/main as MIR 3.2.5",
+    "factorio-2.0": "continuously project through target adapters and release as MIR 2.5.5 only after exact reconstruction and independent target qualification"
+  },
+  "terminal_disposition": "Implemented and published in the immutable 3.2.5 and 2.5.5 wave; later corrections are owned by CHG-2026-0020.",
+  "state": "implemented"
+}

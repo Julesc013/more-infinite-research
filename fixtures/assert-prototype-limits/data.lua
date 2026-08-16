@@ -56,7 +56,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
     local recipe = {
       type = "recipe",
       name = name,
-      category = "crafting",
+      categories = {"crafting"},
       enabled = true,
       allow_productivity = true,
       icon = "__base__/graphics/icons/iron-plate.png",
@@ -71,7 +71,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-self-recycling-production",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = "iron-plate", amount = 1}},
@@ -80,7 +80,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-self-recycling-loop",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = safe_item.name, amount = 1}},
@@ -89,7 +89,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-non-recycling-production",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = "copper-plate", amount = 1}},
@@ -98,7 +98,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-preexisting-high-productivity-cap",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     maximum_productivity = 50,
@@ -108,7 +108,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-generated-recycling",
-    category = "recycling",
+    categories = {"recycling"},
     hidden = true,
     enabled = false,
     unlock_results = false,
@@ -124,7 +124,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-visible-recycling",
-    category = "recycling",
+    categories = {"recycling"},
     hidden = false,
     enabled = true,
     unlock_results = true,
@@ -166,7 +166,7 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
   boundary_recipe("mir-fixture-boundary-fluid-candidate",
     {{type = "item", name = "iron-plate", amount = 1}},
     {{type = "fluid", name = "water", amount = 10}},
-    {category = "chemistry"})
+    {categories = {"chemistry"}})
 
   table.insert(fixture_prototypes, {
     type = "recipe",

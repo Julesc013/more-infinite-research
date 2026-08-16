@@ -1,0 +1,66 @@
+{
+  "assurance_exceptions": [],
+  "branch": "tag-only",
+  "candidate_allocation": {
+    "assigned_at": "2026-08-14T18:05:46+10:00",
+    "assigned_id": "1.3-P1",
+    "assignment_condition": "accepted-family-fixed-point-and-source-freeze",
+    "candidate_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+    "candidate_ref": "refs/heads/candidate/1.3.9-1.3-P1",
+    "minimum_next_ordinal": 1,
+    "namespace": "1.3-P",
+    "predecessor_max_ordinal": 0
+  },
+  "candidate_floor": "1.3-P1",
+  "candidate_id": "1.3-P1",
+  "incident_ids": [],
+  "package": {
+    "archive": "dist/more-infinite-research_1.3.9.zip",
+    "archive_sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A",
+    "bytes": 386160,
+    "content_sha256": "AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B",
+    "entries": 177,
+    "source_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+    "source_sha256": "AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B",
+    "source_tree": "0aa837a71c7d8ebac4ca0d73c9c96bc06ce3fddf"
+  },
+  "portable_source_release": "3.2.9",
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "proofs": {
+    "automated_qualification": ".mir/releases/terminal/qualifications/1.3.9.json",
+    "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "candidate_reconstruction": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+    "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+    "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/1.3.9.json",
+    "manual_acceptance": {
+      "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
+      "path": ".mir/releases/terminal/reviews/1.3.9.json",
+      "sha256": "C3A3E80111E0A05FB9A94D0B1A857E86C39FBA5562CB8D29AC9779DC5E4C7DD2",
+      "digest_policy": "utf8-lf"
+    },
+    "package_manifest": ".mir/releases/terminal/manifests/1.3.9-package.json",
+    "release_manifest": ".mir/releases/terminal/manifests/1.3.9-release.json",
+    "source_freeze": ".mir/releases/terminal/freezes/1.3.9.json",
+    "target_seal": ".mir/releases/terminal/seals/1.3.9.json",
+    "tag": {"kind":"annotated-tag","name":"1.3.9","commit":"b9459906a0971e237aed66855b51231e9b6bf028","tag_object":"b66155d24221e771a2b389753abab51a7a11d427"}
+  },
+  "release": "1.3.9",
+  "release_notes": "docs/releases/notes/release-notes-1.3.9.md",
+  "remaining_obligations": [
+    "mod-portal-publish-and-publicly-verify",
+    "archive-and-mir4-handoff"
+  ],
+  "schema": 1,
+  "source_release": {
+    "archive_sha256": "78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0",
+    "content_sha256": "9E57F57D760D49CF165C66DB3413E2C50D639FA2EC7DB63C44846D001E4EF88A",
+    "release": "1.3.5",
+    "tag": "1.3.5"
+  },
+  "state": "publicly-verified",
+  "target": "0.13",
+  "updated_at": "2026-08-15T17:21:05+10:00"
+}

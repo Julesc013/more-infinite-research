@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.2-tagged",
+  "release": "3.2.2",
+  "from": "manually-accepted",
+  "to": "tagged",
+  "admission": "grandfathered-import",
+  "proofs": [
+    {
+      "kind": "annotated-tag",
+      "tag": "3.2.2",
+      "tag_object": "e5b2a85a23e6aa765759a47b43b66e053ad92077",
+      "commit": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378"
+    }
+  ],
+  "exception": "Protected qualification, seal, and promotion proof were not committed before the immutable tag; this imported transition is calibration evidence only.",
+  "recorded_at": "2026-07-28T11:38:00Z"
+}

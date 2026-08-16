@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/observation.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/observation.schema.json",
+  "title": "MIR canonical observation",
+  "type": "object",
+  "required": ["schema", "kind", "observation_abi", "canonicalization_abi", "capture_key", "environment_signature", "target", "candidate_sha256", "facts", "diagnostics", "artifacts"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"enum": ["environment-capture", "engine-realization", "legacy-v4-adapter"]},
+    "observation_abi": {"type": "integer", "minimum": 1},
+    "canonicalization_abi": {"type": "integer", "minimum": 1},
+    "capture_key": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "environment_signature": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "target": {"type": "string"},
+    "candidate_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "source": {"type": "object"},
+    "facts": {"type": "object"},
+    "diagnostics": {"type": "array", "items": {"type": "object"}},
+    "artifacts": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

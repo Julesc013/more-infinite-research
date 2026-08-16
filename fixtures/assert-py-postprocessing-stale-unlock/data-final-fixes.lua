@@ -42,39 +42,27 @@ end
 local internal_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
 local internal = internal_prototype and internal_prototype.data
 local ledger = internal and internal.input_sanitation_ledger
-if ledger then
-  if ledger.pass ~= "input" or ledger.pruned_effect_count ~= 1
-    or ledger.affected_technology_count ~= 1 then
-    error("MIR Py ordering assertion failed: input sanitation did not record exactly one prune")
-  end
-
-  local row
-  for _, candidate in ipairs(ledger.technologies or {}) do
-    if candidate.original_technology == technology_name then
-      row = candidate
-      break
-    end
-  end
-  if not row or row.owner_kind ~= "external" or row.original_effect_count ~= 3
-    or #row.removed_effects ~= 1 or #row.retained_effect_order ~= 2
-    or row.retained_effect_order[1] ~= 1 or row.retained_effect_order[2] ~= 3 then
-    error("MIR Py ordering assertion failed: sanitation ledger did not preserve exact effect order")
-  end
-
-  local removed = row.removed_effects[1]
-  if removed.type ~= "unlock-recipe" or removed.target ~= missing_recipe
-    or removed.original_effect_index ~= 2
-    or type(removed.removed_effect_fingerprint) ~= "string" then
-    error("MIR Py ordering assertion failed: sanitation ledger did not bind casting-gear exactly")
-  end
-else
-  for name, _ in pairs(data.raw["mod-data"] or {}) do
-    if string.match(name, "^more%-infinite%-research%-")
-      and name ~= "more-infinite-research-compatibility-pack" then
-      error("MIR Py ordering assertion failed: target-native validation unexpectedly published MIR mod-data "
-        .. tostring(name))
-    end
-  end
+if not ledger or ledger.pass ~= "input" or ledger.pruned_effect_count ~= 1
+  or ledger.affected_technology_count ~= 1 then
+  error("MIR Py ordering assertion failed: input sanitation did not record exactly one prune")
 end
 
-log("[mir-fixture] Py stale-unlock sanitation proof complete")
+local row
+for _, candidate in ipairs(ledger.technologies or {}) do
+  if candidate.original_technology == technology_name then
+    row = candidate
+    break
+  end
+end
+if not row or row.owner_kind ~= "external" or row.original_effect_count ~= 3
+  or #row.removed_effects ~= 1 or #row.retained_effect_order ~= 2
+  or row.retained_effect_order[1] ~= 1 or row.retained_effect_order[2] ~= 3 then
+  error("MIR Py ordering assertion failed: sanitation ledger did not preserve exact effect order")
+end
+
+local removed = row.removed_effects[1]
+if removed.type ~= "unlock-recipe" or removed.target ~= missing_recipe
+  or removed.original_effect_index ~= 2
+  or type(removed.removed_effect_fingerprint) ~= "string" then
+  error("MIR Py ordering assertion failed: sanitation ledger did not bind casting-gear exactly")
+end

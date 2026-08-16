@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineFeatureInventoryV1",
+  "release": "1.8.5",
+  "target": "1.0.0-only",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json",
+    "dist/more-infinite-research_1.8.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.8.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "exact-engine-semantic-observation",
+      "target": "1.0.0-only",
+      "state": "passed",
+      "origin": "read-only-post-final-fixes-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json",
+        "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json"
+      ],
+      "target_disposition": "accepted-exact-engine-semantic-observation",
+      "mir4_transition_rule": "retain-as-terminal-input-not-substitute-for-mir4-proof",
+      "attributes": [
+        {
+          "name": "engine_sha256",
+          "value": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+        },
+        {
+          "name": "official_data_sha256",
+          "value": "DCD0AAADFE222E94AB97B441F50A3BA26A4D5363FA2F669F2B50E20A85A58DBA"
+        },
+        {
+          "name": "installation_sha256",
+          "value": "EF898DEEDF3DF1E094ADB6FE9572C9D29D13F58E27788689C7DC5EA6F6173250"
+        },
+        {
+          "name": "semantic_observation_sha256",
+          "value": "9BCD0549E5C29DCEE035383A0D4A6E35BAC360E897926A295CD565CC4DE595C6"
+        },
+        {
+          "name": "smokes",
+          "value": [
+            "base"
+          ]
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

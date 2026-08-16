@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalQualificationRecordV1",
+  "recorded_at": "2026-08-15T08:10:14+10:00",
+  "release": "1.6.9",
+  "target": "0.16.51",
+  "support_tier": "historical",
+  "candidate_id": "1.6-P1",
+  "candidate_commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+  "source_tree": "30f2eab0ac7624d14f4630e76aaff79e2d81b92f",
+  "archive_sha256": "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84",
+  "content_sha256": "09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493",
+  "required_checks": ["source-and-archive-identity","deterministic-triple-reconstruction","exact-engine-load","immutable-dot5-upgrade","pre-dot5-upgrade","clean-root-independent-confirmation","candidate-settings-contract"],
+  "results": [
+    {"id":"source-and-archive-identity","status":"passed","evidence":[".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json#1.6.9","archive-sha256:928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84"]},
+    {"id":"deterministic-triple-reconstruction","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json#1.6.9","receipt-raw-sha256:5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"]},
+    {"id":"exact-engine-load","status":"passed","evidence":["factorio-0.16.51-sha256:ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966","confirmation-result-sha256:8318B464488EA2DF76940709AEB6CE7E2C7C3EE26E0C47DA9A3AFB9C5B73F61C"]},
+    {"id":"immutable-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#1.6.5-to-1.6.9"]},
+    {"id":"pre-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#1.6.0-to-1.6.9"]},
+    {"id":"clean-root-independent-confirmation","status":"passed","evidence":["plan-sha256:BCD7540C35D10A23E11F2E503778623C6DC243A54AA62C7BB55DDB96ABDC0B53","result-sha256:8318B464488EA2DF76940709AEB6CE7E2C7C3EE26E0C47DA9A3AFB9C5B73F61C"]},
+    {"id":"candidate-settings-contract","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json#1.6.9"]}
+  ],
+  "manual_review": {"required":true,"status":"pending-maintainer-approval","candidate_hash_bound":true},
+  "status": "passed-automated-awaiting-human-review"
+}

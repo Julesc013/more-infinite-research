@@ -4,6 +4,6 @@
   "title": "MIR Performance Regression Probe",
   "author": "MIR performance harness",
   "description": "Non-shipped exact-archive phase and telemetry probe for paired release qualification.",
-  "factorio_version": "2.0",
-  "dependencies": ["base >= 2.0.77", "more-infinite-research"]
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8", "more-infinite-research"]
 }

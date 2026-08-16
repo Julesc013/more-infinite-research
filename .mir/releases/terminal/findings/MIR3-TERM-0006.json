@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0006",
+  "title": "Cross-SID clean-root assurance clone rejection",
+  "source_observation": {
+    "observed_at": "2026-08-09T06:08:00+10:00",
+    "environment": "Windows exact C32 full no-reuse calibration on dev 529ebeaa with Factorio 2.1.13",
+    "fact": "The assurance self-test rejected its source repository as dubious ownership when the workspace .git directory owner SID differed from the executing operator SID."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\tools\\mir.ps1 verify run --target 2.1 --candidate dist/more-infinite-research_3.2.5.zip --prior dist/more-infinite-research_3.2.3.zip --factorio <exact-2.1.13> --no-reuse --plan build/results/terminal-325-post-publication-plan.json",
+    "expected": "The clean-root equivalence test creates independent LF and CRLF clones and compares canonical plans.",
+    "observed": "Git rejected C:\\Projects\\Factorio\\more-infinite-research\\.git as dubious ownership before the LF clone was created."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; package-excluded verifier invocation only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "shared clean-root verification harness"}
+  ],
+  "regression_obligations": ["cross-SID source clone succeeds without global Git configuration", "LF and CRLF clean roots retain identical plan material"],
+  "fixed_point_restart_scope": "all target assurance proofs produced after this harness correction; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The failure is reproduced, bounded to test-process Git trust, and fixed without changing product or package bytes."
+  },
+  "closure": {"status": "closed", "evidence": "validation/tests/tooling/Test-MIRAssurance.ps1 passed the cross-SID LF/CRLF clean-root equivalence regression on 2026-08-09"}
+}

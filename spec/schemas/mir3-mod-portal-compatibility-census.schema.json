@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-mod-portal-compatibility-census.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-mod-portal-compatibility-census.schema.json",
+  "title": "MIR 3 Mod Portal compatibility census",
+  "type": "object",
+  "required": ["schema", "kind", "status", "observed_at", "scope", "api", "tier_a", "supplemental_exact_archive_locks", "known_discussions", "archive_policy", "tier_b_disposition", "intake_cutoff"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-ModPortal-Compatibility-CensusV1"},
+    "status": {"const": "tier-a-selection-frozen-qualification-pending"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "public-mod-portal-metadata-and-local-exact-archive-inventory"},
+    "api": {"type": "object", "required": ["authority", "targets", "rows_scanned", "terms", "declared_term_matches", "selection_rule"], "properties": {"authority": {"const": "https://mods.factorio.com/api"}, "targets": {"const": ["2.1", "2.0"]}, "rows_scanned": {"type": "object"}, "terms": {"type": "array", "minItems": 13, "uniqueItems": true}, "declared_term_matches": {"type": "object"}, "selection_rule": {"type": "string"}}, "additionalProperties": false},
+    "tier_a": {"type": "array", "minItems": 16, "maxItems": 16, "items": {"$ref": "#/$defs/mod"}},
+    "supplemental_exact_archive_locks": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/lock"}},
+    "known_discussions": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["mod", "url", "state", "relevance"], "properties": {"mod": {"type": "string"}, "url": {"type": "string", "format": "uri"}, "state": {"type": "string"}, "relevance": {"type": "string"}}, "additionalProperties": false}},
+    "archive_policy": {"type": "object", "required": ["authenticated_download_completed_for_current_census", "local_exact_sha1_match_is_runtime-proof", "modified_or_shim_archive_may_support_public_claim", "missing_exact_archives_remain"], "properties": {"authenticated_download_completed_for_current_census": {"const": false}, "local_exact_sha1_match_is_runtime-proof": {"const": false}, "modified_or_shim_archive_may_support_public_claim": {"const": false}, "missing_exact_archives_remain": {"const": true}}, "additionalProperties": false},
+    "tier_b_disposition": {"type": "string", "minLength": 1},
+    "intake_cutoff": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "sha256": {"type": ["string", "null"], "pattern": "^[A-F0-9]{64}$"},
+    "release": {"type": "object", "required": ["target", "version", "released_at", "sha1", "dependencies", "archive_state", "local_sha256"], "properties": {"target": {"enum": ["2.1", "2.0"]}, "version": {"type": "string"}, "released_at": {"type": "string", "format": "date-time"}, "sha1": {"$ref": "#/$defs/sha1"}, "dependencies": {"type": "array", "items": {"type": "string"}}, "archive_state": {"type": "string", "minLength": 1}, "local_sha256": {"$ref": "#/$defs/sha256"}}, "additionalProperties": false},
+    "mod": {"type": "object", "required": ["name", "title", "downloads", "source_url", "license", "tags", "selection_reason", "releases"], "properties": {"name": {"type": "string"}, "title": {"type": "string"}, "downloads": {"type": "integer", "minimum": 0}, "source_url": {"type": ["string", "null"]}, "license": {"type": "string"}, "tags": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "selection_reason": {"type": "string"}, "releases": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/release"}}}, "additionalProperties": false},
+    "lock": {"type": "object", "required": ["name", "target", "version", "portal_sha1", "local_sha256", "purpose"], "properties": {"name": {"type": "string"}, "target": {"enum": ["2.1", "2.0"]}, "version": {"type": "string"}, "portal_sha1": {"$ref": "#/$defs/sha1"}, "local_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}, "purpose": {"type": "string"}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

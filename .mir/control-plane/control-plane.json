@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "policy_id": "mir-control-plane-v5",
+  "component_abis": {
+    "record": 1,
+    "planner": 1,
+    "capture": 3,
+    "compilation": 1,
+    "realization": 1,
+    "evaluation": 1,
+    "canonicalization": 1,
+    "evidence_store": 1,
+    "view_generator": 1,
+    "shadow": 2,
+    "release_controller": 1
+  },
+  "records": {
+    "changes": "lifecycle.changes",
+    "candidate_closures": "releases.closures",
+    "incidents": "lifecycle.incidents",
+    "tasks": "lifecycle.tasks",
+    "releases": "releases.records",
+    "transitions": "releases.transitions",
+    "current": "releases.current"
+  },
+  "catalogs": {
+    "domains": "path:control.state/domains.json",
+    "freshness": "path:control.state/freshness.json",
+    "ownership": "path:control.state/ownership.json",
+    "package_locks": "path:control.state/package-locks.json",
+    "performance_campaigns": ".mir/performance-campaigns",
+    "mutation_calibration": "path:control.state/mutation-calibration.json",
+    "evidence_revocations": "path:control.state/evidence-revocations.json",
+    "v4_equivalence": "path:control.state/v4-v5-equivalence.json",
+    "scenario_source": "path:validation.scenarios.runtime",
+    "execution_registry": "path:validation.root/generated/execution-registry.json",
+    "historical_replay": "path:validation.baselines.control/3.2.2-v5-replay.json"
+  },
+  "outputs": {
+    "verification_context": "path:workspace.build.results.verification-context",
+    "evidence_store": "path:workspace.build.results.evidence",
+    "todo": "todo.md",
+    "current_candidate": "path:docs.root/releases/current-candidate.md",
+    "release_dashboard": "path:docs.root/releases/control-plane-dashboard.md",
+    "branch_status": "path:views.branch-status",
+    "publication_checklist": "path:views.publication-checklist",
+    "backport_queue": "path:views.backport-queue"
+  },
+  "release_states": [
+    "planned",
+    "source-frozen",
+    "package-built",
+    "focused-qualified",
+    "candidate-qualified",
+    "automated-qualified-awaiting-human-review",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
+  "rules": {
+    "package_roots_locked": true,
+    "unknown_ownership_is_conservative": true,
+    "aggregate_tasks_execute_children": false,
+    "mutable_job_status_is_evidence": false,
+    "cross_target_reuse_requires_target_neutral_scope": true,
+    "release_views_are_generated": true,
+    "ai_may_omit_required_proof": false
+  }
+}

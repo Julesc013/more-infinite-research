@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "release": "2.4.9",
+  "candidate_id": "2.4.9-final",
+  "target": "2.0",
+  "branch": "legacy",
+  "state": "publicly-verified",
+  "package": {
+    "source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+    "source_tree": "26a18e2ac17171bdd75b2c1a75875b14fc71d0b4",
+    "source_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+    "archive": "dist/more-infinite-research_2.4.9.zip",
+    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+    "content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+    "bytes": 893263,
+    "entries": 209
+  },
+  "proofs": {
+    "tag": [
+      {
+        "name": "2.4.9",
+        "commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
+      }
+    ]
+  },
+  "assurance_exceptions": [
+    {
+      "id": "249-MANUAL-PROTECTED-ABSENT",
+      "reason": "Publication occurred without a recorded package-focused manual attestation or protected qualification.",
+      "disposition": "historical-release-only",
+      "may_satisfy_future_release_gate": false
+    }
+  ],
+  "release_notes": "docs/releases/notes/release-notes-2.4.9.md",
+  "updated_at": "2026-07-26T00:00:00Z"
+}

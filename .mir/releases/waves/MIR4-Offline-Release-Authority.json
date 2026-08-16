@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "MIR4FutureArchitectureRequirementV1",
+  "requirement_id": "MIR4-Offline-Release-Authority",
+  "status": "future-requirement-only",
+  "implementation_admitted": false,
+  "package_visible": false,
+  "requirements": [
+    "complete-build-and-qualification-without-github",
+    "local-protected-equivalent-trust-policy",
+    "local-workflow-dag-execution",
+    "signed-immutable-local-evidence",
+    "local-candidate-sealing",
+    "local-annotated-release-tags",
+    "local-release-bundle-generation",
+    "idempotent-later-github-replication",
+    "github-as-publication-mirror-not-sole-release-authority",
+    "no-mandatory-cloud-service",
+    "evidence-store-restore",
+    "branch-loss-reconstruction",
+    "repository-bundle-recovery"
+  ],
+  "boundary": {
+    "mir_3_5_wave_expansion": false,
+    "mir_4_implementation": false,
+    "terminal_dot_9_implementation": false
+  }
+}

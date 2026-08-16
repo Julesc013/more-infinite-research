@@ -24,7 +24,8 @@ remote.add_interface(interface_name, {
       player_inventory_available = snapshot.player_inventory_available,
       initial_token_count = snapshot.initial_token_count,
       token_count_before_mir = snapshot.token_count_before_mir,
-      recipe_enabled_after_override = snapshot.recipe_enabled_after_override
+      recipe_enabled_after_override = snapshot.recipe_enabled_after_override,
+      research_progress_before_mir = snapshot.research_progress_before_mir
     }
   end
 })
@@ -47,6 +48,11 @@ script.on_configuration_changed(function()
   snapshot.player_inventory_available = storage.mir_reset_safety_player_inventory_available == true
   snapshot.configuration_change_seen = true
   snapshot.token_count_before_mir = token_count()
+  local current_research = force.current_research
+  if not current_research or current_research.name ~= "low-density-structure-productivity" then
+    error("MIR reset-safety fixture could not observe native-owner research before MIR")
+  end
+  snapshot.research_progress_before_mir = force.research_progress
   if snapshot.player_inventory_available and snapshot.token_count_before_mir ~= snapshot.initial_token_count then
     error("MIR reset-safety fixture external give-item effect was reapplied during configuration change")
   end

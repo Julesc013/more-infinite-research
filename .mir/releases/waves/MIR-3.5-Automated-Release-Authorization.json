@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5WaveAutomatedReleaseAuthorizationV1",
+  "authorized_at": "2026-08-06T18:25:14.9121889Z",
+  "authorizer": "Julesc013",
+  "authorization_source": {
+    "kind": "maintainer-directive",
+    "sha256": "13703243188EE17D121FFBEB2F90D4C91D7F890AA9C016D4962CDA952FB0DC86"
+  },
+  "scope": {
+    "release_family": [
+      "3.2.5",
+      "2.5.5",
+      "1.9.5",
+      "1.8.5",
+      "1.7.5",
+      "1.6.5",
+      "1.5.5",
+      "1.4.5",
+      "1.3.5"
+    ],
+    "github_repository": "Julesc013/more-infinite-research",
+    "github_release_only": true,
+    "mod_portal_upload_authorized": false
+  },
+  "decision": {
+    "additional_interactive_or_manual_approval_required": false,
+    "lower_release_manual_review_disposition": "waived-by-explicit-maintainer-authorization",
+    "lower_release_manual_playtest_claim": "prohibited",
+    "ordinary_release_policy_globally_weakened": false,
+    "factorio_3_2_5_manual_attestation": {
+      "disposition": "retain-existing-exact-hash-attestation",
+      "path": ".mir/evidence/3.2.5-manual-review-attestation.json",
+      "replace_or_duplicate": false
+    }
+  },
+  "sequence": {
+    "modern_release_first": "3.2.5",
+    "lower_projection_source": "immutable-publicly-verified-3.2.5-tag",
+    "lower_projection_formalization_before_3_2_5_publication": false,
+    "release_order": [
+      "3.2.5",
+      "2.5.5",
+      "1.9.5",
+      "1.8.5",
+      "1.7.5",
+      "1.6.5",
+      "1.5.5",
+      "1.4.5",
+      "1.3.5"
+    ]
+  },
+  "required_conditions": [
+    "immutable-source-and-target-inputs",
+    "complete-target-disposition",
+    "deterministic-double-build-and-reconstruction",
+    "exact-target-engine-load",
+    "direct-predecessor-upgrade-proof",
+    "target-tier-automated-qualification",
+    "package-composition-proof",
+    "candidate-seal",
+    "independent-seal-verification",
+    "immutable-annotated-tag",
+    "github-release-with-exact-sealed-zip",
+    "public-byte-redownload-verification",
+    "post-publication-exact-engine-smoke"
+  ],
+  "hard_stops": [
+    "unexpected-semantic-delta",
+    "unclassified-path-or-semantic",
+    "missing-or-mismatched-target-input",
+    "package-nondeterminism",
+    "failed-target-engine-load",
+    "failed-direct-upgrade",
+    "failed-target-tier-gate",
+    "failed-seal",
+    "existing-tag-conflict",
+    "public-byte-mismatch"
+  ],
+  "prohibited_actions": [
+    "force-push",
+    "tag-movement-or-replacement",
+    "history-rewrite",
+    "failed-gate-bypass",
+    "fabricated-manual-review-evidence",
+    "mod-portal-upload",
+    "mir-4-implementation",
+    "terminal-dot-9-wave-implementation"
+  ],
+  "targets": [
+    { "release": "3.2.5", "factorio": "2.1", "predecessor": "3.2.3", "promotion": "main", "qualification_tier": "current-protected", "github_latest": true },
+    { "release": "2.5.5", "factorio": "2.0", "predecessor": "2.5.0", "promotion": "legacy", "qualification_tier": "maintained-protected", "github_latest": false },
+    { "release": "1.9.5", "factorio": "1.1", "predecessor": "1.9.4", "promotion": "immutable-release-tag", "qualification_tier": "lts", "github_latest": false },
+    { "release": "1.8.5", "factorio": "1.0", "predecessor": "1.8.2", "promotion": "immutable-release-tag", "qualification_tier": "lts", "github_latest": false, "factorio_0_18_bridge_claim": false },
+    { "release": "1.7.5", "factorio": "0.17", "predecessor": "1.7.1", "promotion": "immutable-release-tag", "qualification_tier": "historical", "github_latest": false },
+    { "release": "1.6.5", "factorio": "0.16", "predecessor": "1.6.0", "promotion": "immutable-release-tag", "qualification_tier": "historical", "github_latest": false },
+    { "release": "1.5.5", "factorio": "0.15", "predecessor": "1.5.0", "promotion": "immutable-release-tag", "qualification_tier": "historical", "github_latest": false },
+    { "release": "1.4.5", "factorio": "0.14", "predecessor": "1.4.0", "promotion": "immutable-release-tag", "qualification_tier": "finite", "github_latest": false },
+    { "release": "1.3.5", "factorio": "0.13", "predecessor": "1.3.0", "promotion": "immutable-release-tag", "qualification_tier": "finite", "github_latest": false }
+  ]
+}

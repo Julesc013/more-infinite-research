@@ -13,57 +13,294 @@ on:
         description: "Release-targeted run profile"
         required: true
         default: "release-targeted-2.1"
+      local_authority_repo:
+        description: "Self-hosted runner path to the already-synced local Git authority"
+        required: true
+        default: 'C:\Projects\Factorio\more-infinite-research'
+      resume_exact_dist_evidence_run:
+        description: "Prior protected run-attempt whose passing exact-dist evidence may be admitted"
+        required: false
+        default: ""
 
 jobs:
   exact-candidate:
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.candidate_sha }}
-          fetch-depth: 0
+      - name: Materialize clean roots from local Git authority
+        id: roots
+        shell: pwsh
+        run: |
+          $authority = (Resolve-Path -LiteralPath '${{ inputs.local_authority_repo }}').Path
+          $remote = (git -C $authority remote get-url origin).Trim()
+          if ($LASTEXITCODE -ne 0 -or $remote -notmatch 'Julesc013/more-infinite-research(?:\.git)?$') {
+            throw "Local authority is not the governed repository: $remote"
+          }
+          foreach ($commit in @('${{ github.sha }}', '${{ inputs.candidate_sha }}')) {
+            git -C $authority cat-file -e "$commit^{commit}"
+            if ($LASTEXITCODE -ne 0) { throw "Local Git authority is missing commit $commit." }
+          }
+          $workRoot = Join-Path $env:RUNNER_TEMP "mir-release-candidate-${{ github.run_id }}-${{ github.run_attempt }}"
+          $controller = Join-Path $workRoot 'controller'
+          $candidate = Join-Path $workRoot 'candidate'
+          if (Test-Path -LiteralPath $workRoot) { throw "Unique release-candidate root already exists: $workRoot" }
+          New-Item -ItemType Directory -Path $workRoot | Out-Null
+          foreach ($row in @(
+            @{ path = $controller; commit = '${{ github.sha }}' },
+            @{ path = $candidate; commit = '${{ inputs.candidate_sha }}' }
+          )) {
+            git clone --quiet --shared --no-checkout -- $authority $row.path
+            if ($LASTEXITCODE -ne 0) { throw "Unable to clone local authority into $($row.path)." }
+            git -C $row.path checkout --quiet --detach $row.commit
+            if ($LASTEXITCODE -ne 0) { throw "Unable to check out $($row.commit) in $($row.path)." }
+          }
+          "authority=$authority" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "controller=$controller" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "candidate=$candidate" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Verify immutable source identity
         shell: pwsh
         run: |
-          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $candidate = '${{ steps.roots.outputs.candidate }}'
+          if ((git -C $candidate rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
             throw 'Checked-out source does not match candidate_sha.'
           }
-          if (git status --porcelain --untracked-files=all) {
+          if ((git -C $controller rev-parse HEAD).Trim() -ne '${{ github.sha }}') {
+            throw 'Checked-out controller does not match the workflow source commit.'
+          }
+          if (git -C $candidate status --porcelain --untracked-files=all) {
             throw 'Release-candidate checkout is not clean.'
+          }
+          if (git -C $controller status --porcelain --untracked-files=all) {
+            throw 'Release-controller checkout is not clean.'
           }
 
       - name: Build and verify exact archive
         shell: pwsh
         run: |
-          ./scripts/Build-MIRPackage.ps1
-          $info = Get-Content info.json -Raw | ConvertFrom-Json
-          $archive = "dist/more-infinite-research_$($info.version).zip"
-          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash
-          if ($actual -ne '${{ inputs.archive_sha256 }}') {
-            throw "Archive SHA mismatch: expected ${{ inputs.archive_sha256 }}, got $actual"
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $candidate = '${{ steps.roots.outputs.candidate }}'
+          Push-Location $candidate
+          try {
+            ./tools/commands/package/Build-MIRPackage.ps1
+            $info = Get-Content info.json -Raw | ConvertFrom-Json
+          } finally {
+            Pop-Location
+          }
+          $candidateArchive = Join-Path $candidate "dist/more-infinite-research_$($info.version).zip"
+          $controllerArchive = Join-Path $controller "dist/more-infinite-research_$($info.version).zip"
+          foreach ($archive in @($candidateArchive, $controllerArchive)) {
+            if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) {
+              throw "Required exact candidate archive is absent: $archive"
+            }
+            $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+            if ($actual -ne '${{ inputs.archive_sha256 }}') {
+              throw "Archive SHA mismatch for ${archive}: expected ${{ inputs.archive_sha256 }}, got $actual"
+            }
           }
 
       - name: Run complete exact-dist validation
+        if: ${{ inputs.resume_exact_dist_evidence_run == '' }}
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN
+        run: |
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
+          if ($actual -ne '${{ inputs.archive_sha256 }}') {
+            throw "Exact validation archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          }
+          Push-Location $controller
+          try {
+            ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN -CandidateZip $candidateArchive
+          } finally {
+            Pop-Location
+          }
+
+      - name: Admit prior passing exact-dist evidence
+        if: ${{ inputs.resume_exact_dist_evidence_run != '' }}
+        shell: pwsh
+        run: |
+          $authority = '${{ steps.roots.outputs.authority }}'
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $candidate = '${{ steps.roots.outputs.candidate }}'
+          $priorRun = '${{ inputs.resume_exact_dist_evidence_run }}'
+          if ($priorRun -notmatch '^\d+-\d+$') {
+            throw "Prior protected run-attempt must use the run_id-run_attempt form, got: $priorRun"
+          }
+          $priorRoot = Join-Path $authority "build/results/protected-release-candidate/$priorRun"
+          $priorReceiptPath = Join-Path $priorRoot 'receipt.json'
+          $priorSummaryPath = Join-Path $priorRoot 'build/results/validation/factorio-2.1-summary.json'
+          foreach ($requiredPath in @($priorReceiptPath, $priorSummaryPath)) {
+            if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+              throw "Prior protected evidence is incomplete: $requiredPath"
+            }
+          }
+          $priorReceipt = Get-Content -Raw -LiteralPath $priorReceiptPath | ConvertFrom-Json
+          if ([string]$priorReceipt.kind -ne 'MIRProtectedReleaseCandidateRunV1' -or
+              [string]$priorReceipt.candidate_commit -ne '${{ inputs.candidate_sha }}' -or
+              [string]$priorReceipt.expected_archive_sha256 -ne '${{ inputs.archive_sha256 }}') {
+            throw 'Prior protected receipt does not bind the requested candidate commit and archive.'
+          }
+          $priorArchives = @($priorReceipt.archives)
+          if ($priorArchives.Count -ne 2 -or
+              @($priorArchives | Where-Object { [string]$_.sha256 -ne '${{ inputs.archive_sha256 }}' }).Count -ne 0) {
+            throw 'Prior protected receipt does not contain both exact candidate archives.'
+          }
+          $priorController = [string]$priorReceipt.controller_commit
+          if ($priorController -notmatch '^[0-9a-f]{40}$') {
+            throw "Prior protected receipt has an invalid controller commit: $priorController"
+          }
+          git -C $authority merge-base --is-ancestor $priorController '${{ github.sha }}'
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Prior exact-dist controller is not an ancestor of the current controller.'
+          }
+          $allowedControllerPaths = @(
+            '.github/workflows/release-candidate.yml',
+            'scripts/Invoke-MIRCompatAudit.ps1',
+            'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1',
+            'validation/tests/release/Test-MIRPerformanceBudgets.ps1',
+            'validation/tests/tooling/Test-MIRAssurance.ps1'
+          )
+          $controllerDelta = @(git -C $authority diff --name-only "$priorController..${{ github.sha }}" --)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect the controller delta for evidence admission.' }
+          $disallowedControllerPaths = @($controllerDelta | Where-Object { $_ -notin $allowedControllerPaths })
+          if ($disallowedControllerPaths.Count -ne 0) {
+            throw "Prior exact-dist evidence was invalidated by controller changes: $($disallowedControllerPaths -join ', ')"
+          }
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
+          $releaseRecord = Get-Content -Raw -LiteralPath (Join-Path $controller ".mir/releases/records/$version.json") | ConvertFrom-Json
+          $summary = Get-Content -Raw -LiteralPath $priorSummaryPath | ConvertFrom-Json
+          if ([string]$summary.status -ne 'passed' -or
+              [string]$summary.mir_version -ne $version -or
+              [string]$summary.package_source_sha256 -ne [string]$releaseRecord.package.content_sha256 -or
+              @($summary.expected_scenarios).Count -ne 124 -or
+              @($summary.scenarios).Count -ne 124 -or
+              @($summary.scenarios | Where-Object { [string]$_.status -ne 'passed' }).Count -ne 0) {
+            throw 'Prior exact-dist summary is not the complete passing 124-scenario candidate result.'
+          }
+          $resultsRoot = Join-Path $controller 'build/results'
+          New-Item -ItemType Directory -Force -Path $resultsRoot | Out-Null
+          Copy-Item -LiteralPath (Split-Path -Parent $priorSummaryPath) -Destination $resultsRoot -Recurse
+          "Admitted exact-dist evidence from protected run ``$priorRun`` after candidate and controller-delta verification." |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
       - name: Run strict targeted compatibility gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull
+          MIR_COMPAT_RUNTIME_ROOT: 'C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}'
+        run: |
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
+          if ($actual -ne '${{ inputs.archive_sha256 }}') {
+            throw "Targeted-gate archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          }
+          Push-Location $controller
+          try {
+            ./tools/mir.ps1 release gate `
+              --profile '${{ inputs.release_profile }}' `
+              --candidate $candidateArchive `
+              --candidate-source '${{ inputs.candidate_sha }}' `
+              --output 'build/results/release-gate' `
+              --no-git-pull
+          } finally {
+            Pop-Location
+          }
 
-      - name: Upload exact candidate evidence
+      - name: Retain exact candidate evidence in local authority
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-candidate-${{ inputs.candidate_sha }}
-          path: |
-            dist/*.zip
-            artifacts/validation/*.json
-            artifacts/release-gate/**
-          if-no-files-found: error
+        shell: pwsh
+        run: |
+          $authority = '${{ steps.roots.outputs.authority }}'
+          $controller = '${{ steps.roots.outputs.controller }}'
+          $candidate = '${{ steps.roots.outputs.candidate }}'
+          $evidenceRoot = Join-Path $authority 'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}'
+          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
+          if (Test-Path -LiteralPath $evidenceRoot) { throw "Protected evidence root already exists: $evidenceRoot" }
+          New-Item -ItemType Directory -Path $evidenceRoot | Out-Null
+          foreach ($row in @(
+            @{ source = $candidate; destination = 'candidate' },
+            @{ source = $controller; destination = 'controller' }
+          )) {
+            $archive = @(Get-ChildItem -LiteralPath (Join-Path $row.source 'dist') -Filter "more-infinite-research_$version.zip" -File)
+            if ($archive.Count -eq 1) {
+              $destination = Join-Path $evidenceRoot $row.destination
+              New-Item -ItemType Directory -Path $destination | Out-Null
+              Copy-Item -LiteralPath $archive[0].FullName -Destination $destination
+            }
+          }
+          foreach ($relative in @('build/results/validation', 'build/results/release-gate')) {
+            $source = Join-Path $controller $relative
+            if (Test-Path -LiteralPath $source) {
+              $destination = Join-Path $evidenceRoot $relative
+              New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+              Copy-Item -LiteralPath $source -Destination $destination -Recurse
+            }
+          }
+          $runtimeEvidenceRoot = Join-Path $evidenceRoot 'runtime-evidence'
+          $summaryPath = Join-Path $controller 'build/results/validation/factorio-2.1-summary.json'
+          if (Test-Path -LiteralPath $summaryPath -PathType Leaf) {
+            $controllerRoot = [IO.Path]::GetFullPath($controller).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+            $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+            $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+            foreach ($scenario in @($summary.scenarios)) {
+              foreach ($evidencePath in @($scenario.evidence_paths)) {
+                if ([string]::IsNullOrWhiteSpace([string]$evidencePath) -or -not [IO.Path]::IsPathRooted([string]$evidencePath)) { continue }
+                $resolvedEvidence = [IO.Path]::GetFullPath([string]$evidencePath)
+                if (-not $resolvedEvidence.StartsWith($controllerRoot, [StringComparison]::OrdinalIgnoreCase) -or
+                    -not (Test-Path -LiteralPath $resolvedEvidence -PathType Leaf) -or
+                    [IO.Path]::GetExtension($resolvedEvidence) -ne '.log' -or
+                    -not $seen.Add($resolvedEvidence)) { continue }
+                $relativeEvidence = [IO.Path]::GetRelativePath($controller, $resolvedEvidence)
+                $destination = Join-Path $runtimeEvidenceRoot $relativeEvidence
+                New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+                Copy-Item -LiteralPath $resolvedEvidence -Destination $destination
+              }
+            }
+          }
+          $archiveRows = @(
+            Get-ChildItem -LiteralPath $evidenceRoot -Recurse -Filter '*.zip' -File | Sort-Object FullName | ForEach-Object {
+              [ordered]@{
+                path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
+                bytes = $_.Length
+                sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+              }
+            }
+          )
+          $runtimeEvidenceRows = @(
+            if (Test-Path -LiteralPath $runtimeEvidenceRoot) {
+              Get-ChildItem -LiteralPath $runtimeEvidenceRoot -Recurse -File | Sort-Object FullName | ForEach-Object {
+                [ordered]@{
+                  path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
+                  bytes = $_.Length
+                  sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+                }
+              }
+            }
+          )
+          $receipt = [ordered]@{
+            schema = 1
+            kind = 'MIRProtectedReleaseCandidateRunV1'
+            status = '${{ job.status }}'
+            run_id = '${{ github.run_id }}'
+            run_attempt = '${{ github.run_attempt }}'
+            controller_commit = '${{ github.sha }}'
+            candidate_commit = '${{ inputs.candidate_sha }}'
+            expected_archive_sha256 = '${{ inputs.archive_sha256 }}'
+            resumed_exact_dist_evidence_run = '${{ inputs.resume_exact_dist_evidence_run }}'
+            archives = $archiveRows
+            runtime_evidence = $runtimeEvidenceRows
+            retained_at = [DateTime]::UtcNow.ToString('o')
+          }
+          [IO.File]::WriteAllText(
+            (Join-Path $evidenceRoot 'receipt.json'),
+            ($receipt | ConvertTo-Json -Depth 10),
+            [Text.UTF8Encoding]::new($false)
+          )
+          "Exact evidence retained at ``$evidenceRoot``." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8

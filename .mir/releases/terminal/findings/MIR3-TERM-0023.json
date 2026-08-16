@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0023",
+  "title": "Historical performance harness refactor broke the existing current-target control-plane caller",
+  "source_observation": {
+    "observed_at": "2026-08-09T15:20:00.0000000Z",
+    "environment": "Committed 0012 assurance branch control-plane executor regression",
+    "fact": "New-MIRCPPerformanceSourceOverlay invokes Get-MIRPerformanceHarnessFingerprint with its established -RepoRoot parameter. The target-era refactor renamed the required parameter to ExecutionRoot without a compatibility alias, so the control-plane regression failed before any package or Factorio action."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\validation\\tests\\tooling\\Test-MIRControlPlaneExecutor.ps1 -RepoRoot .",
+    "expected": "The existing current-target -RepoRoot caller remains valid and derives its active campaign target authority, while historical callers provide explicit execution and target roots.",
+    "observed": "PowerShell rejected New-MIRCPPerformanceSourceOverlay with 'A parameter cannot be found that matches parameter name RepoRoot'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; verifier API compatibility only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "current control-plane callers retain their governed parameter contract"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "historical target calls remain explicit about execution and target roots"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "target-era proof supports both explicit and current-target derivation paths"}
+  ],
+  "regression_obligations": [
+    "the existing -RepoRoot current-target caller remains accepted",
+    "a current-target caller derives the active campaign manual scenario only from its own authority root",
+    "historical calls still declare separate execution and target authority roots",
+    "control-plane executor regression completes without package mutation",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "assurance control-plane and historical performance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The defect is a parameter-name compatibility regression in package-excluded verification tooling. The correction preserves current callers and cannot affect package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

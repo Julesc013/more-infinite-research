@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProtectionRequiredContextAmendmentV1",
+  "status": "authorized-for-application",
+  "repository": "Julesc013/more-infinite-research",
+  "scope": ["refs/heads/main", "refs/heads/legacy"],
+  "ruleset_ids": [20833408, 20833410],
+  "old_context": {"context":"verification-gate","integration_id":15368},
+  "new_context": {"context":"terminal-promotion-verification","integration_id":15368},
+  "reason": "GitHub requires every check or commit status sharing a required context name to pass. The independently projected 2.5.9 candidate retains an obsolete package-excluded verification-gate failure even though its sealed package qualification and current promotion controller pass. A unique promotion context prevents unrelated historical check-name collision without rewriting evidence or weakening the gate.",
+  "invariants": {
+    "required_check_count": 2,
+    "strict_required_status_checks_policy": true,
+    "integrity_bypass_actors": 0,
+    "deletion_protection": true,
+    "non_fast_forward_protection": true,
+    "promotion_actor_restriction_unchanged": true,
+    "dev_required_checks_unchanged": true,
+    "frozen_candidate_bytes_unchanged": true,
+    "historical_check_evidence_unchanged": true
+  },
+  "governed_payloads": [
+    ".mir/releases/terminal/protections/main-integrity.json",
+    ".mir/releases/terminal/protections/legacy-integrity.json"
+  ],
+  "application_receipt": ".mir/evidence/terminal-protections/2026-08-15/required-context-amendment-application-receipt.json"
+}

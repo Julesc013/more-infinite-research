@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.14 exact-candidate retention fresh create",
+  "failed_command": ".\\scripts\\Test-MIRCandidateRetention.ps1 -FactorioBin D:\\Programs\\Factorio\\0.14\\bin\\x64\\factorio.exe -CandidateZip dist\\more-infinite-research_1.4.0.zip",
+  "exit_code": 1,
+  "error": "Factorio exited before creating the save when passed the unsupported --disable-audio option",
+  "target_branch": "rebuild/0.14",
+  "factorio_binary_version": "0.14.23",
+  "target_candidate_sha256": "69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1",
+  "root_cause_classification": "portable-target-capability-adapter",
+  "root_cause": "The shared retention harness passed --disable-audio to Factorio 0.14 even though the finite archive binaries do not support that option.",
+  "fix": "Omit --disable-audio for the declared Factorio 0.13 and 0.14 target lines.",
+  "positive_reproduction": {
+    "exit_code_without_option": 0,
+    "save_created": true,
+    "authoritative_log_markers": [
+      "Loading mod more-infinite-research 1.4.0",
+      "Creating new map",
+      "Map version 0.14.23-0"
+    ],
+    "surviving_factorio_processes": 0
+  },
+  "regression": "Test-MIRPowerShellQuality requires --disable-audio to be omitted for Factorio 0.13 and 0.14.",
+  "affected_targets": [
+    "0.14",
+    "0.13"
+  ],
+  "candidate_implication": "The 1.4.0 and 1.3.0 candidates require corrected retention reruns and fresh seals; no published version is affected."
+}

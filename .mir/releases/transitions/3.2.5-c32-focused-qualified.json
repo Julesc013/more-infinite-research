@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.5-c32-focused-qualified",
+  "release": "3.2.5",
+  "from": "package-built",
+  "to": "focused-qualified",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "approved-package-delta",
+      "path": ".mir/releases/deltas/3.2.3-to-3.2.5.json",
+      "sha256": "5EB9247EFD08BFDE691371B7DAA46FD16E20EB0D7582CEF9585E1F14C160DEC8",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "five-archetype-upgrade-matrix",
+      "path": ".mir/evidence/3.2.5-upgrade-proof.json",
+      "sha256": "121EF12D510256E17F01B1BBD7E03708D82DD70D2F4C4B656A2C145B0483EDE1",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "candidate-bound-ecosystem-campaign",
+      "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+      "sha256": "2BDF602D37F3016D2E720D3B0F404B359DBC1723031762C0DDF8794D6EB7DC41",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "paired-performance-regression",
+      "path": ".mir/evidence/3.2.5-performance-regression.json",
+      "sha256": "D249D32480E128150428C3789AB27612B5D845510810A4A06BA357DD43120239",
+      "digest_policy": "utf8-lf"
+    }
+  ],
+  "recorded_at": "2026-08-05T21:42:34.973Z"
+}

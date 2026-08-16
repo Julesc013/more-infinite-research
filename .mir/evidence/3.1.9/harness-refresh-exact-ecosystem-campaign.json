@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-14T11:29:04.1806090Z",
+  "factorio_line": "2.1",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\more-infinite-research_3.1.9.zip",
+    "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
+    "source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\release-targeted-3.1.9-exact-bound-canary\\compat-candidates.lock.json",
+    "sha256": "E81110C417E2DE359C2B1D6BEBC709999A8A098B21E97F5E770218F5F0C28465"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "local-2-1-bz-suite-space-age",
+      "requested_roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "actual_executed_roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "resolved_mods": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [
+        {
+          "name": "bzcarbon",
+          "version": "2.0.23",
+          "sha256": "97fd7defc9b7a3cd7ed4be5e9180ca69576536e17a207fe62b8fe39c886aa19f",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzlead",
+          "version": "2.0.29",
+          "sha256": "956df1ac308af33c4fde8f9b2b94ae9d79aa7b350fa76e15d98709c904ed77fb",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzsilicon",
+          "version": "2.0.19",
+          "sha256": "d405b90c531c478f6f48d954751aa487a61caf59dc09fddf87bfd371ffe4de40",
+          "source": "local_zip"
+        },
+        {
+          "name": "bztin",
+          "version": "2.1.16",
+          "sha256": "eac78322c9edad0e618245f0602b7ca7479e91690fcac4b3bc2b3d2c4adfe4de",
+          "source": "local_zip"
+        },
+        {
+          "name": "bztitanium",
+          "version": "2.0.27",
+          "sha256": "074d430bc67a3a19dfd2d6df47ca44952f4db5ae2ded208f9f555607ffe4c94b",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzzirconium",
+          "version": "2.1.14",
+          "sha256": "cc2b262cd4c042198317bf8bd2982d10bffb9a736db3a8b7137ed1922138080e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    }
+  ]
+}

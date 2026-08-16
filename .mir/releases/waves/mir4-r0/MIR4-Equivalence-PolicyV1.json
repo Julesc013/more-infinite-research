@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Equivalence-PolicyV1",
+  "status": "accepted-shadow-policy",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-equivalence-policy-v1",
+  "imports": [".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json", ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"],
+  "semantic_reads": ["mir3-terminal-baseline", "mir4-shadow-projection"],
+  "semantic_writes": ["equivalence-result", "cutover-permission"],
+  "target_dispositions": {"active-nine": "exact-target-local-equivalence", "factorio-0.18": "no-claim-until-readmitted", "museum": "archive-integrity-only"},
+  "digest_classes": {"semantic": "behavior-and-inventory", "authority": "source-and-target-projection", "qualification": "exact-engine-and-upgrade"},
+  "migration": {"from": "mir3-target-specific-authority", "to": "mir4-source-plus-target-projection", "state": "shadow-comparison-only"},
+  "rollback": {"strategy": "retain-current-mir3-owner-and-reject-cutover", "permitted_until": "each-owner-sunset"},
+  "parity_test": ["technology-and-stable-id", "settings-id-type-default", "owners-aliases-tombstones", "features-and-omissions", "migration-contracts", "locale", "package-composition-modulo-declared-metadata", "exact-engine-behavior"],
+  "sunset_condition": "superseded-by-versioned-equivalence-policy-after-4.0-parity-release",
+  "payload": {
+    "permitted_differences": ["version-and-distribution-metadata", "mir4-package-and-release-manifests", "explicit-successor-migration-metadata", "expected-generated-package-root-and-version-name"],
+    "hard_failures": ["stable-id-loss", "setting-id-or-type-drift", "unclassified-capability-omission", "package-visible-difference-outside-permitted-set", "behavior-mismatch", "claim-maturity-promotion", "duplicate-writable-authority"],
+    "digest_separation": ["semantic", "authority", "qualification"],
+    "cutover_requires": ["parity-pass", "rollback-proven", "one-writable-owner", "two-clean-reconstructions"]
+  }
+}

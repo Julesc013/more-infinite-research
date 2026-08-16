@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0001",
+  "title": "Establish MIR Control Plane v5",
+  "kind": "tooling",
+  "package_visible": false,
+  "domains_read": [
+    "assurance.v4",
+    "release.authority",
+    "scenario.authority",
+    "target.profile"
+  ],
+  "domains_written": [
+    "assurance.control-plane",
+    "assurance.task-graph",
+    "assurance.observation",
+    "assurance.evaluation",
+    "assurance.evidence",
+    "release.approved-delta",
+    "release.performance",
+    "release.generated-views"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Shadow v4 and v5 until exact plan and verdict equivalence passes; no player-save migration.",
+  "release_note_impact": "tooling-only",
+  "test_obligations": [
+    "control-plane.schemas",
+    "control-plane.records",
+    "control-plane.graph",
+    "control-plane.package-freeze",
+    "control-plane.shadow",
+    "control-plane.native-approved-delta",
+    "control-plane.performance-path-budget",
+    "control-plane.distribution-inventory",
+    "control-plane.idempotent-aggregate-closure",
+    "control-plane.manifest-bound-calibration-proof",
+    "control-plane.compact-manifest-proof-resolution",
+    "control-plane.descendant-calibration-proof-verifier",
+    "control-plane.compat-audit-output-durability",
+    "control-plane.registered-protected-workflow-dispatch"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "shared-control-plane",
+    "factorio-2.0": "shared-control-plane"
+  },
+  "state": "implemented"
+}

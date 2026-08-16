@@ -1,0 +1,597 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-18T15:15:16+10:00",
+  "min_downloads": 10000,
+  "factorio_line": "2.1",
+  "factorio_versions": [
+    "2.0",
+    "2.1"
+  ],
+  "include_space_age": false,
+  "scenario_timeout_seconds": 900,
+  "continue_on_dependency_failure": true,
+  "include_recommended_dependencies": false,
+  "max_candidates": 50,
+  "catalog_pages": 0,
+  "from_lockfile": "",
+  "start_index": 0,
+  "count": 0,
+  "offline": true,
+  "local_mod_zip_dirs": [],
+  "local_mod_zips": [],
+  "local_mod_library_dirs": [
+    "C:\\Projects\\Factorio\\testmods_2.1"
+  ],
+  "local_mod_library_zips": [],
+  "mod_under_test_zip": "C:\\Projects\\Factorio\\more-infinite-research\\build\\ecosystem-candidate\\more-infinite-research_3.2.0.zip",
+  "mod_under_test_sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C",
+  "mod_under_test_source_commit": "565e68398315762af653daf2ed6c1d40b93a4136",
+  "link_mode": "Copy",
+  "local_root_zip_count": 0,
+  "local_library_zip_count": 599,
+  "candidates_selected": [],
+  "manual_scenarios_selected": [
+    "local-2-1-krastorio-spaced-out"
+  ],
+  "generated_local_scenarios_selected": [],
+  "local_zip_scenarios_selected": [],
+  "mods": [
+    {
+      "name": "flib",
+      "title": "Factorio Library",
+      "version": "0.17.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "flib_0.17.2.zip",
+      "sha1": "6c7cedeefbdce89348d1e979a24e5706fd5a4311",
+      "sha256": "0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\flib_0.17.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "k2so-assets",
+      "title": "Krastorio 2 Spaced Out Assets",
+      "version": "1.0.7",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "k2so-assets_1.0.7.zip",
+      "sha1": "94df2729880ed27df14918fd28ed37f448778d14",
+      "sha256": "c3e11214407b08120b2ee717405d3b0398f533647695ab2e6ef6df9267d62017",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\k2so-assets_1.0.7.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2",
+      "title": "Krastorio 2",
+      "version": "2.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2_2.1.2.zip",
+      "sha1": "6ed03661f3887fc39d8615f9063116d41d53c427",
+      "sha256": "89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2_2.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2Assets >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2MenuSimulations >= 2.1.0"
+        },
+        {
+          "name": "ChangeInserterDropLane",
+          "kind": "recommended",
+          "required": false,
+          "raw": "+ ChangeInserterDropLane >= 1.3.0"
+        },
+        {
+          "name": "flib",
+          "kind": "required",
+          "required": true,
+          "raw": "flib >= 0.16.2"
+        },
+        {
+          "name": "aai-vehicles-chaingunner",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) aai-vehicles-chaingunner >= 0.5.2"
+        },
+        {
+          "name": "Aircraft",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Aircraft >= 1.6.6"
+        },
+        {
+          "name": "angelsindustries",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) angelsindustries >= 0.4.3"
+        },
+        {
+          "name": "angelspetrochem",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) angelspetrochem >= 0.9.11"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) bobenemies >= 0.17.6"
+        },
+        {
+          "name": "bullet-trails",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) bullet-trails >= 0.4.1"
+        },
+        {
+          "name": "ElectricTrain",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) ElectricTrain"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) deadlock-beltboxes-loaders >= 2.1.13"
+        },
+        {
+          "name": "DeadlockLargerLamp",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DeadlockLargerLamp >= 1.3.1"
+        },
+        {
+          "name": "Dectorio",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Dectorio >= 0.10.5"
+        },
+        {
+          "name": "DiscoScience",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DiscoScience >= 1.0.0"
+        },
+        {
+          "name": "Flow Control",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Flow Control >= 3.0.5"
+        },
+        {
+          "name": "rso-mod",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) rso-mod >= 6.0.6"
+        },
+        {
+          "name": "Tral_robot_tree_farm",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Tral_robot_tree_farm >= 1.2.5"
+        },
+        {
+          "name": "vtk-armor-plating",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) vtk-armor-plating >= 0.8.0"
+        },
+        {
+          "name": "WaterAsAResource",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) WaterAsAResource >= 0.7.8"
+        },
+        {
+          "name": "better-victory-screen",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) better-victory-screen >= 0.2.10"
+        },
+        {
+          "name": "quality",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) quality"
+        },
+        {
+          "name": "space-age",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) space-age"
+        },
+        {
+          "name": "Annotorio",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Annotorio"
+        },
+        {
+          "name": "brave-new-world",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! brave-new-world"
+        },
+        {
+          "name": "Clowns-Nuclear",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Clowns-Nuclear"
+        },
+        {
+          "name": "HdProcessedMetal",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! HdProcessedMetal"
+        },
+        {
+          "name": "KS_Power",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! KS_Power"
+        },
+        {
+          "name": "Krastorio",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Krastorio"
+        },
+        {
+          "name": "Krastorio-graphics",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Krastorio-graphics"
+        },
+        {
+          "name": "KS_Combat",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! KS_Combat"
+        },
+        {
+          "name": "ModularLife",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ModularLife"
+        },
+        {
+          "name": "Power Armor MK3",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Power Armor MK3"
+        },
+        {
+          "name": "PowerAndArmor",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! PowerAndArmor"
+        },
+        {
+          "name": "SimpleSilicon",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! SimpleSilicon"
+        },
+        {
+          "name": "bobequipment",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! bobequipment"
+        },
+        {
+          "name": "bobvehicleequipment",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! bobvehicleequipment"
+        },
+        {
+          "name": "custom_power_armor_fix",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! custom_power_armor_fix"
+        },
+        {
+          "name": "laborat",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! laborat"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2-spaced-out",
+      "title": "Krastorio 2 Spaced Out",
+      "version": "2.0.13",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2-spaced-out_2.0.13.zip",
+      "sha1": "b8633540afb7f970538183bc26ea9112100ebe45",
+      "sha256": "a2eeb2e5a6119c4117bd3653979d40d305d17539e184bfa6f4ed53ef12a5f242",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2-spaced-out_2.0.13.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "required",
+          "required": true,
+          "raw": "space-age >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2"
+        },
+        {
+          "name": "k2so-assets",
+          "kind": "required",
+          "required": true,
+          "raw": "k2so-assets >= 1.0.7"
+        },
+        {
+          "name": "factorioplus",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! factorioplus"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2Assets",
+      "title": "Krastorio 2 Assets",
+      "version": "2.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2Assets_2.1.0.zip",
+      "sha1": "754e187664fd45a4bcfce016366f0029f093a249",
+      "sha256": "39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2Assets_2.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "title": "Krastorio 2 Menu Simulations",
+      "version": "2.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2MenuSimulations_2.1.0.zip",
+      "sha1": "ead8df6d63241e8cb6f0f0def3894d5efa1de3b2",
+      "sha256": "3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2MenuSimulations_2.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        }
+      ]
+    },
+    {
+      "name": "xy-k2so-enhancements-nulls-fork",
+      "title": "xyrc's K2SO Enhancements (Null's Fork)",
+      "version": "0.8.3",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+      "sha1": "338a7e2ff2eb1a1be6e744470babb4f0cc15f437",
+      "sha256": "930f43b96b04012fef090c40d8b16a6b3f259d1713c86cf59dff3e9a5a97e2be",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2-spaced-out >= 2.0.0"
+        },
+        {
+          "name": "nulls-k2so-tweaks",
+          "kind": "optional",
+          "required": false,
+          "raw": "? nulls-k2so-tweaks"
+        },
+        {
+          "name": "castra",
+          "kind": "optional",
+          "required": false,
+          "raw": "? castra"
+        },
+        {
+          "name": "corrundum",
+          "kind": "optional",
+          "required": false,
+          "raw": "? corrundum"
+        },
+        {
+          "name": "maraxsis",
+          "kind": "optional",
+          "required": false,
+          "raw": "? maraxsis"
+        },
+        {
+          "name": "Moshine",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Moshine"
+        },
+        {
+          "name": "planet-muluna",
+          "kind": "optional",
+          "required": false,
+          "raw": "? planet-muluna"
+        },
+        {
+          "name": "Paracelsin",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Paracelsin"
+        },
+        {
+          "name": "rubia",
+          "kind": "optional",
+          "required": false,
+          "raw": "? rubia"
+        },
+        {
+          "name": "secretas",
+          "kind": "optional",
+          "required": false,
+          "raw": "? secretas"
+        },
+        {
+          "name": "outer-rim",
+          "kind": "optional",
+          "required": false,
+          "raw": "? outer-rim"
+        },
+        {
+          "name": "slp-dyson-sphere-reworked",
+          "kind": "optional",
+          "required": false,
+          "raw": "? slp-dyson-sphere-reworked"
+        },
+        {
+          "name": "se-space-trains",
+          "kind": "optional",
+          "required": false,
+          "raw": "? se-space-trains"
+        },
+        {
+          "name": "science-tab",
+          "kind": "optional",
+          "required": false,
+          "raw": "? science-tab"
+        },
+        {
+          "name": "particle-physics",
+          "kind": "optional",
+          "required": false,
+          "raw": "? particle-physics"
+        },
+        {
+          "name": "workshop-science",
+          "kind": "optional",
+          "required": false,
+          "raw": "? workshop-science"
+        },
+        {
+          "name": "atan-nuclear-science",
+          "kind": "optional",
+          "required": false,
+          "raw": "? atan-nuclear-science"
+        },
+        {
+          "name": "pelagos",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pelagos"
+        },
+        {
+          "name": "planetaris-arig",
+          "kind": "optional",
+          "required": false,
+          "raw": "? planetaris-arig"
+        },
+        {
+          "name": "skewer_planet_vesta",
+          "kind": "optional",
+          "required": false,
+          "raw": "? skewer_planet_vesta"
+        },
+        {
+          "name": "apia",
+          "kind": "optional",
+          "required": false,
+          "raw": "? apia"
+        },
+        {
+          "name": "xy-k2so-enhancements",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! xy-k2so-enhancements"
+        }
+      ]
+    }
+  ]
+}

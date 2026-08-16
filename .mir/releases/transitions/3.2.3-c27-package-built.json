@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.3-c27-package-built",
+  "release": "3.2.3",
+  "from": "source-frozen",
+  "to": "package-built",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "deterministic-package",
+      "archive": "dist/more-infinite-research_3.2.3.zip",
+      "archive_sha256": "1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310",
+      "archive_bytes": 1032404,
+      "archive_entries": 291
+    }
+  ],
+  "recorded_at": "2026-07-30T11:08:02Z"
+}

@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "kind": "mir-upgrade-matrix",
+  "status": "passed",
+  "generated_at": "2026-08-05T20:39:19.9111332Z",
+  "source_commit": "dab540754540acbbc82ef22f4947e395cf3b66de",
+  "factorio": {
+    "version": "2.1.12.87038",
+    "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "baseline": {
+    "version": "3.2.3",
+    "archive": "more-infinite-research_3.2.3.zip",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+  },
+  "candidate": {
+    "version": "3.2.5",
+    "archive": "more-infinite-research_3.2.5.zip",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF"
+  },
+  "required_archetypes": [
+    "base-default",
+    "space-age-native-owner",
+    "automatic-family-creation",
+    "base-continuations",
+    "mod-set-configuration-change"
+  ],
+  "rows": [
+    {
+      "id": "base-default",
+      "status": "passed",
+      "result": ".work/artifacts/assurance/3.2.5-upgrade-base-default.json",
+      "result_sha256": "C3EA3F433EBA1AC5F01357714006CE64C6372CC42F7329B8DBB00D5743A98B70",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "base-only-mod-set-retained"
+      ]
+    },
+    {
+      "id": "space-age-native-owner",
+      "status": "passed",
+      "result": ".work/artifacts/assurance/3.2.5-upgrade-space-age-native-owner.json",
+      "result_sha256": "C49657EBC7537AF6C4605039213D1AB843BBA8564CB7DF828E47D43F2450189E",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "space-age-native-owner-retained"
+      ]
+    },
+    {
+      "id": "automatic-family-creation",
+      "status": "passed",
+      "result": ".work/artifacts/assurance/3.2.5-upgrade-automatic-family-creation.json",
+      "result_sha256": "2720E0E28F6FD6DE7CC47920689B0DE7C785EDDC5174D5B1EE3E829BC0E0A1B7",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "automatic-generated-family-retained",
+        "automatic-recipe-target-retained"
+      ]
+    },
+    {
+      "id": "base-continuations",
+      "status": "passed",
+      "result": ".work/artifacts/assurance/3.2.5-upgrade-base-continuations.json",
+      "result_sha256": "209E26B0E091193607726A1AC32D77AD46D6D522E937355B2EF660F7EF498B45",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "base-continuation-retained"
+      ]
+    },
+    {
+      "id": "mod-set-configuration-change",
+      "status": "passed",
+      "result": ".work/artifacts/assurance/3.2.5-upgrade-mod-set-configuration-change.json",
+      "result_sha256": "36A034EFDC8DA9197B9CAACB9EEBF661F1CF9CF67C766535183886BC5C95C1B4",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "source-only-mod-removed",
+        "removed-recipe-target-sanitized"
+      ]
+    }
+  ]
+}

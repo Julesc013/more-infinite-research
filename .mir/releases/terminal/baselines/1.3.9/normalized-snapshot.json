@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "kind": "MIR4TerminalNormalizedSnapshotV1",
+  "status": "importable-pre-eol-public-custody-pending",
+  "semantic_authority": false,
+  "release": "1.3.9",
+  "target": "0.13",
+  "successor_target": "MIR4-R0/0.13",
+  "source_identity": {
+    "candidate_id": "1.3-P1",
+    "candidate_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+    "source_tree": "0aa837a71c7d8ebac4ca0d73c9c96bc06ce3fddf",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_1.3.9.zip",
+    "archive_sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A",
+    "content_sha256": "AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B",
+    "bytes": 386160,
+    "entries": 177,
+    "tag": "1.3.9"
+  },
+  "engine": {
+    "version": "0.13.20",
+    "executable_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+    "qualification": ".mir/releases/terminal/qualifications/1.3.9.json",
+    "status": "exact-engine-qualified"
+  },
+  "predecessors": [
+    {
+      "release": "1.3.5",
+      "role": "immutable-dot5",
+      "upgrade_id": "1.3.5-to-1.3.9"
+    },
+    {
+      "release": "1.3.0",
+      "role": "pre-dot5",
+      "upgrade_id": "1.3.0-to-1.3.9"
+    }
+  ],
+  "foundation": {
+    "release": "1.3.5",
+    "manifest": ".mir/releases/terminal/baselines/1.3.5/baseline-manifest.json",
+    "root_sha256": "07B8C5AD6525B8AB19F2ACE430FB7C2FC465910957FD5CD5FAF6C3D2EB3FD43A"
+  },
+  "inventories": {
+    "features": {
+      "package_manifest": ".mir/releases/terminal/manifests/1.3.9-package.json",
+      "package_composition": ".mir/releases/terminal/baselines/1.3.9/package-composition.json",
+      "disposition": "foundation-plus-sealed-terminal-delta"
+    },
+    "technologies": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/technologies.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "stable_ids_preserved": true
+    },
+    "settings": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/settings.json",
+      "terminal_audit": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+      "released_id_or_type_changes": 0,
+      "codec": "MIRSET1"
+    },
+    "owners_aliases_tombstones": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/owners-aliases-tombstones.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+    },
+    "migrations": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/migrations.json",
+      "watermark": {
+        "from": [
+          "1.3.5",
+          "1.3.0"
+        ],
+        "stable_ids": true,
+        "to": "1.3.9"
+      }
+    },
+    "locales": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/locales.json",
+      "package_composition": ".mir/releases/terminal/baselines/1.3.9/package-composition.json"
+    },
+    "runtime_profiles": {
+      "foundation": ".mir/releases/terminal/baselines/1.3.5/declared/runtime-profile-schemas.json",
+      "target_backend": "explicit-capability-omission"
+    },
+    "upgrades": {
+      "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "qualification": ".mir/releases/terminal/qualifications/1.3.9.json",
+      "required": [
+        "1.3.5-to-1.3.9",
+        "1.3.0-to-1.3.9"
+      ]
+    }
+  },
+  "capability_omissions": [
+    {
+      "field": "canonical-target-profile",
+      "reason": "terminal-finite-target-is-represented-by-the-sealed-shadow-profile-rather-than-.mir/targets.json",
+      "disposition": "explicit-capability-omission"
+    }
+  ],
+  "compatibility_import": {
+    "authority": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "level_counts": {
+      "COEXISTS_EXACT": 1,
+      "KNOWN_CONFLICT": 1,
+      "OBSERVED_ONLY": 9,
+      "UNQUALIFIED": 4,
+      "UPSTREAM_BLOCKED": 1
+    },
+    "public_claims_allowed": 1,
+    "promoted_claims": 0,
+    "rule": "preserve-level-envelope-dimensions-and-public-permission"
+  },
+  "record_sha256": "3DAC19F059738A45A5FFF326A5009DAFD83F11571EED0E7B174F3E0F906A6620"
+}

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0014",
+  "title": "Add typed settings and ProcessIR economy safety",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "assurance.evidence"
+  ],
+  "domains_written": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "assurance.schemas",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Introduce typed setting values and ordered override provenance, then derive ProcessIR from canonical recipe facts for cycle, catalyst, recycling, probability, quality, spoilage, and protected-resource safety before broad complex-overhaul productivity.",
+  "release_note_impact": "Future 3.3.x notes must distinguish static setting types, sparse dynamic selectors, supported process classes, hard-safety certificates, and deliberately unsupported overhaul families.",
+  "test_obligations": [
+    "product.settings",
+    "product.compiler",
+    "product.balance",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "stage typed settings and ProcessIR after the 3.3.0 fixed point; broad speculative generation remains disabled",
+    "factorio-2.0": "project only operators and process classes supported by the 2.0 capability certificate and exact target proof"
+  },
+  "terminal_disposition": "Feature and platform expansion is outside terminal stabilization and is deferred to MIR 4 through CHG-2026-0020.",
+  "state": "closed"
+}

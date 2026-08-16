@@ -1,161 +1,124 @@
 {
-  "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-08-01",
-  "published_baselines": {
-    "factorio-2.1": {
-      "mir_version": "3.1.9",
-      "branch": "main",
-      "tag": "3.1.9",
-      "archive": "dist/more-infinite-research_3.1.9.zip",
-      "status": "published-frozen"
-    },
-    "factorio-2.0": {
-      "mir_version": "2.4.9",
-      "branch": "legacy",
-      "tag": "2.4.9",
-      "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
-      "archive": "dist/more-infinite-research_2.4.9.zip",
-      "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
-      "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
-      "status": "published-frozen"
-    }
-  },
   "development": {
-    "factorio-2.1": {
-      "mir_version": "3.2.0",
-      "candidate_id": "C16",
-      "branch": "dev",
-      "source_anchor": "3.1.9",
-      "archive": "dist/more-infinite-research_3.2.0.zip",
-      "archive_bytes": 1014593,
-      "archive_entries": 288,
-      "package_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
-      "package_source_tree": "eb6a5b42676ab65bb95ee7c1422f2191730b1338",
-      "package_source_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
-      "package_source_material": {
-        "schema": 1,
-        "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "eb6a5b42676ab65bb95ee7c1422f2191730b1338",
-        "file_count": 288
-      },
-      "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D",
-      "package_content_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
-      "archive_class": "automated-playtest-candidate",
-      "qualification": "focused-automation-passed-full-no-reuse-pending",
-      "publication_status": "unreleased",
-      "status": "focused-performance-and-semantic-parity-passed-awaiting-full-no-reuse",
-      "supersedes_candidate": {
-        "candidate_id": "C15",
-        "archive_bytes": 1000692,
-        "archive_entries": 286,
-        "archive_sha256": "89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA",
-        "package_content_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
-        "package_source_commit": "c3a56e88fa15da7c12db3b0d11c3d4e732935746",
-        "package_source_tree": "de885bb52a10a6ee44517a8efda84be629019c28",
-        "package_source_sha256": "E7729822E79265E2C2BE49353755883B145CEE8413F99A00C62CBA6EDAA80242",
-        "reason": "C15 passed gameplay, package, K2SO, upgrade, and scale checks but failed the governed fixed-cost performance gate; C16 removes redundant trusted-record validation, copying, fingerprinting, and canonicalization while preserving exact seven-scenario semantic output"
-      }
-    },
     "factorio-2.0": {
-      "mir_version": "2.5.5",
-      "candidate_id": "2.5-P12",
-      "branch": "candidate/2.5.5-projection",
-      "source_anchor": "C32",
-      "portable_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
-      "prior_release": "2.5.0",
-      "archive": "build/candidates/2.5.5/a/more-infinite-research_2.5.5.zip",
-      "archive_bytes": 1055047,
-      "archive_entries": 300,
-      "package_source_commit": "689940f436b004cf4e5981f1944ddb04eaa17367",
-      "package_source_tree": "512f6d74d67f99526211247e7ede09b8619f7f3f",
-      "package_source_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+      "archive": "dist/more-infinite-research_2.5.9.zip",
+      "archive_bytes": 1058800,
+      "archive_class": "immutable-publicly-verified-release",
+      "archive_entries": 301,
+      "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "assurance_exception_ids": [],
+      "branch": "legacy",
+      "candidate_floor": "2.5-P13",
+      "candidate_id": "2.5-P13",
+      "development_branch": "dev",
+      "manual_review": "maintainer-patch-review-approved",
+      "mir_version": "2.5.9",
+      "package_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "package_source_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
       "package_source_material": {
-        "schema": 1,
+        "file_count": 301,
         "hash_algorithm": "git-commit-normalized-package-v1",
-        "source_tree": "512f6d74d67f99526211247e7ede09b8619f7f3f",
-        "file_count": 300
+        "schema": 1,
+        "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3"
       },
-      "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
-      "package_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
-      "archive_class": "local-candidate",
-      "qualification": "local-candidate-qualification-running",
-      "automated_qualification": "build/reports/release/2.5.5/verification-plan.json",
-      "focused_runtime_evidence": "build/reports/release/2.5.5/upgrade-matrix-focused.json",
-      "upgrade_evidence": "build/reports/release/2.5.5/upgrade-matrix-focused.json",
-      "exact_py_evidence": "pending-target-plan",
-      "runtime_performance_evidence": "pending-target-plan",
-      "approved_delta_evidence": "pending-target-plan",
-      "manual_review": "automated-only-authorized-by-MIR3Dot5WaveOutageReleaseAuthorizationV1",
-      "protected_qualification": "pending-post-outage",
-      "publication_decision": "pending-local-outage-seal",
-      "publication_status": "local-candidate-qualification-running",
-      "status": "local-candidate-qualification-running",
-      "portable_delta_ledger": ".mir/backport-portable-delta-3.2.5-to-2.5.5.json",
-      "release_gate": "local-outage-qualification-required",
-      "superseded_candidates": [
-        {
-          "candidate_id": "2.5-P11",
-          "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
-          "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
-          "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
-          "reason": "published 2.5.0 predecessor retained as the immutable direct-upgrade baseline for 2.5.5",
-          "status": "published-predecessor"
-        },
-        {
-          "candidate_id": "2.5-P10",
-          "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
-          "package_content_sha256": "07EEE7F248D55873BAA703347C3A3751BAC637E13D762DF89B94CA0E1A4B96F9",
-          "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
-          "reason": "base-generation-integrity found the shipped Factorio 2.0 target profile still expected 73 descriptors after Platform Productivity increased the exact catalog to 74",
-          "status": "superseded-during-local-qualification"
-        },
-        {
-          "candidate_id": "2.5-P9",
-          "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
-          "package_content_sha256": "02442BE983D20FEB45D0657FA7DE0198C49332B747CE509673932270EED66BC2",
-          "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
-          "reason": "superseded by the tagged MIR 3.2.3 semantic projection before final qualification",
-          "status": "superseded-before-final-qualification"
-        },
-        {
-          "candidate_id": "2.5-P8",
-          "archive_sha256": "A76D1BBD643CBE6D563FD068558CC8AB49409ECA934C717492F6CD353B8FF34F",
-          "package_content_sha256": "65E8ED27BF06D8428125A170456FDE8A44D30DD8BA182DC7382484BDB0F20540",
-          "package_source_commit": "ee88e54af52294452fb4d94cd9e3eae1a8929d3d",
-          "reason": "Factorio changelog syntax rejected continuation prose",
-          "status": "rejected-before-runtime-qualification"
-        },
-        {
-          "candidate_id": "2.5-P7",
-          "archive_sha256": "569D53D6C528317106D57D7A8C3C5AEE450FA76B213DE629A6459CB0930E4445",
-          "package_content_sha256": "36D1FD63EE37AC2C4242904FF7BA83959E7579B95ED60304E52130E67312D697",
-          "package_source_commit": "21ce5f976ffed77fdba8059b87a7481ee2d69e49",
-          "reason": "packaged changelog exceeded the governed 132-character line limit",
-          "status": "rejected-before-runtime-qualification"
-        },
-        {
-          "candidate_id": "2.5-P6",
-          "archive_sha256": "98A8A8F50D8F98F8DD109E9AFF7A3C6F0097B380224A16E7065233186A4CA3BE",
-          "package_content_sha256": "6A6DD4937F72AA73CECBF0A74281183A511162A38AFA0E039F0463E71F8F1DD3",
-          "package_source_commit": "f9eb34eae9b767275a17b5e68351343042ef7532",
-          "evidence_root": ".mir/evidence/superseded/2.5-P6",
-          "status": "superseded-unpublished-by-final-c24-reanchor"
-        }
-      ]
+      "package_source_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "package_source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+      "protected_qualification": "pending",
+      "publication_status": "publicly-verified",
+      "qualification": "publicly-verified",
+      "remaining_obligations": [
+        "mod-portal-publish-and-publicly-verify",
+        "archive-and-mir4-handoff"
+      ],
+      "remaining_states": [],
+      "source_anchor": "2.5.5",
+      "status": "2.5-P13-publicly-verified",
+      "tag": "2.5.9",
+      "tag_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb"
+    },
+    "factorio-2.1": {
+      "archive": "dist/more-infinite-research_3.2.10.zip",
+      "archive_bytes": 1065178,
+      "archive_class": "immutable-publicly-verified-release",
+      "archive_entries": 304,
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "assurance_exception_ids": [
+        "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1"
+      ],
+      "branch": "main",
+      "candidate_floor": "C34",
+      "candidate_id": "C34",
+      "development_branch": "dev",
+      "manual_review": "pending",
+      "mir_version": "3.2.10",
+      "package_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "package_source_material": {
+        "file_count": 304,
+        "hash_algorithm": "git-commit-normalized-package-v1",
+        "schema": 1,
+        "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a"
+      },
+      "package_source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+      "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+      "protected_qualification": "pending",
+      "publication_status": "publicly-verified",
+      "qualification": "publicly-verified",
+      "remaining_obligations": [
+        "legacy-branch-alias-repoint",
+        "corrected-terminal-baseline-handoff-to-mir4"
+      ],
+      "remaining_states": [],
+      "source_anchor": "3.2.9",
+      "status": "C34-publicly-verified",
+      "tag": "3.2.10",
+      "tag_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"
     }
   },
-  "views": {
-    "branch_policy": ".mir/branches.yml",
-    "release_wave": ".mir/release-wave.yml",
-    "distribution_inventory": ".mir/distributions.json",
-    "maintainer_queue": "todo.md",
-    "promotion_workflow": ".github/workflows/assurance-promotion.yml"
+  "generated_from": [
+    "path:releases.current",
+    "path:releases.records/3.2.10.json",
+    "path:releases.records/2.5.9.json"
+  ],
+  "published_baselines": {
+    "factorio-2.0": {
+      "archive": "dist/more-infinite-research_2.5.9.zip",
+      "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "branch": "legacy",
+      "mir_version": "2.5.9",
+      "package_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "package_source_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+      "status": "release-publicly-verified",
+      "tag": "2.5.9",
+      "tag_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb"
+    },
+    "factorio-2.1": {
+      "archive": "dist/more-infinite-research_3.2.10.zip",
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "branch": "main",
+      "mir_version": "3.2.10",
+      "package_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "status": "release-publicly-verified",
+      "tag": "3.2.10",
+      "tag_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"
+    }
   },
   "rules": {
-    "published_archives_are_immutable": true,
-    "development_archives_are_not_releases": true,
     "backports_start_after_canonical_source_freeze": true,
-    "manual_view_disagreement_fails_validation": true
+    "development_archives_are_not_releases": true,
+    "manual_view_disagreement_fails_validation": true,
+    "published_archives_are_immutable": true,
+    "typed_release_records_are_authoritative": true
+  },
+  "schema": 1,
+  "updated_at": "2026-08-16",
+  "views": {
+    "backport_queue": "path:views.backport-queue",
+    "branch_policy": ".mir/branches.yml",
+    "maintainer_queue": "todo.md",
+    "publication_checklist": "path:views.publication-checklist",
+    "release_dashboard": "docs/releases/control-plane-dashboard.md"
   }
 }

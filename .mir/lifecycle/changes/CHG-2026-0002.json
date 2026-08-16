@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0002",
+  "title": "MIR 3.2.3 platform progression and structural logistics hotfix",
+  "kind": "product",
+  "package_visible": true,
+  "domains_read": [
+    "compiler.contract",
+    "product.metadata",
+    "scenario.catalog"
+  ],
+  "domains_written": [
+    "product.compiler",
+    "product.settings",
+    "product.locale",
+    "product.package",
+    "scenario.catalog",
+    "release.presentation"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0",
+    "factorio-1.1"
+  ],
+  "migration_impact": "Adds one stable Platform Productivity technology and settings family, with cryogenic science replacing metallurgic science while retaining Landfill's remaining progression. Existing Landfill and Ice levels, current Ice research, fractional progress, and startup settings remain stable. Platform starts unresearched; Landfill levels are not copied because doing so would bypass the new Aquilo gate and multiply the transferred bonus. Target-line backports require independent package and binary qualification.",
+  "release_note_impact": "3.2.3 hotfix notes required",
+  "test_obligations": [
+    "product.compiler",
+    "product.settings",
+    "product.locale",
+    "product.package",
+    "compatibility.advanced-belts",
+    "transition.upgrade"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "release in MIR 3.2.3",
+    "factorio-2.0": "portable structural logistics portion; queue after held MIR 2.5.0 is resumed",
+    "factorio-1.1": "portable AdvancedBelts portion; requires target-line projection and exact Factorio 1.1 qualification"
+  },
+  "state": "implemented"
+}

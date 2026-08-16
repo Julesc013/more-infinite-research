@@ -164,7 +164,7 @@ table.insert(prototypes, {
         change = 0.01,
         evidence = {"semantic-family-attach"}
       }},
-      targets = {factorio_lines = {"2.0", "2.1"}},
+      targets = {factorio_lines = {"2.1"}},
       evidence = {fixtures = {"semantic-family-attach"}, real_mod = {}},
       claim = {level = "fixture-only", public = false}
     }

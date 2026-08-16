@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5WaveOutageReleaseAuthorizationV1",
+  "authorized_at": "2026-08-06T20:06:45.5262473Z",
+  "maintainer": "Julesc013",
+  "incident": {
+    "provider": "github-status",
+    "service": "actions",
+    "identity": "github-actions-major-outage-observed-2026-08-07",
+    "observed_status": "major-outage",
+    "remote_operations_suspended": true
+  },
+  "releases": [
+    "3.2.5",
+    "2.5.5",
+    "1.9.5",
+    "1.8.5",
+    "1.7.5",
+    "1.6.5",
+    "1.5.5",
+    "1.4.5",
+    "1.3.5"
+  ],
+  "c32": {
+    "candidate": "C32",
+    "package_source": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301
+  },
+  "authorization": {
+    "lower_target_review": "automated-only-approved",
+    "local_candidate_assignment": true,
+    "local_annotated_release_tags": true,
+    "local_fast_forward_promotion": true,
+    "remote_push": false,
+    "github_release_creation": false,
+    "mod_portal_upload": false
+  },
+  "trust_contract": {
+    "seal_kind": "MirLocalOutageReleaseSealV1",
+    "protected": false,
+    "remote_producer": "none",
+    "release_authority": "maintainer-time-boxed-actions-outage",
+    "release_eligible_under_outage_exception": true,
+    "protected_qualification": "pending-post-outage",
+    "public_verification": "pending",
+    "package_immutable_after_tag": true
+  },
+  "obligations": [
+    "run-post-outage-protected-qualification-for-current-and-maintained-lines",
+    "replicate-existing-commits-tags-and-packages-without-rebuilding",
+    "never-move-final-release-tags",
+    "preserve-local-evidence-as-local-not-protected",
+    "create-dot-6-correction-for-any-post-tag-package-defect"
+  ],
+  "prohibitions": [
+    "fabricate-protected-evidence",
+    "claim-lower-target-visual-playtest",
+    "force-push",
+    "rewrite-public-history",
+    "move-or-recreate-final-tag",
+    "restore-dot-work",
+    "start-mir-4-implementation",
+    "start-terminal-dot-9-wave"
+  ]
+}

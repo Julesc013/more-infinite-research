@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0015",
+  "title": "Generate deterministic 2.5.5 and 2.6 target projections",
+  "kind": "backport",
+  "package_visible": true,
+  "domains_read": [
+    "release.authority",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "assurance.evidence"
+  ],
+  "domains_written": [
+    "release.authority",
+    "product.package",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Create projection feasibility before candidate authority, generate exact Factorio 2.0 trees from immutable modern semantics plus the latest qualified target baseline, and prove adapter preservation, idempotence, locality, reconstruction, migration, report transport, and target semantic parity.",
+  "release_note_impact": "Conditional 2.5.5 and 2.6 notes must enumerate projected, adapted, native-equivalent, omitted, target-specific, tooling-only, and unsupported-with-evidence differences.",
+  "test_obligations": [
+    "release.authority",
+    "product.compiler",
+    "product.settings",
+    "product.runtime",
+    "product.package",
+    "assurance.schemas",
+    "assurance.evidence",
+    "scenario.catalog",
+    "transition.upgrade"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "immutable semantic source for 3.2.5 and later 3.3 releases",
+    "factorio-2.0": "conditional 2.5.5 after feasibility and generated 2.6 after frozen 3.3 semantics, each independently qualified"
+  },
+  "terminal_disposition": "The 2.5.5 projection is published. The planned 2.6 projection is superseded by the independently materialized 2.5.9 terminal target under CHG-2026-0020.",
+  "state": "closed"
+}

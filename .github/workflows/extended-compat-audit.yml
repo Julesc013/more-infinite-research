@@ -162,6 +162,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: extended-compat-audit
-          path: artifacts/extended-tests
+          path: build/results/extended-tests
           if-no-files-found: ignore

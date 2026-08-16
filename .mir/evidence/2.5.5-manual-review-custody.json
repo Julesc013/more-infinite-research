@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR3HistoricalManualReviewCustodyV1",
+  "recorded_at": "2026-08-09T10:08:12.7017966Z",
+  "retention": "repository-governed-content-addressed-evidence-v1",
+  "package": {
+    "release": "2.5.5",
+    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+    "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+    "source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce"
+  },
+  "attestation": {
+    "path": ".mir/evidence/2.5.5-manual-review-attestation.json",
+    "sha256": "83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748",
+    "canonical_self_sha256": "34692BC2108BDDC0188A1F101E78468121443DA7706CBEBDDE59F08D399D64DB"
+  },
+  "object": {
+    "path": ".mir/evidence/objects/sha256/83/83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748.json",
+    "sha256": "83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748"
+  }
+}

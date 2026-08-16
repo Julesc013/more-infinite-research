@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0009",
+  "title": "Make logical path IDs the sole durable path authority",
+  "kind": "tooling",
+  "package_visible": false,
+  "domains_read": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "release.authority"
+  ],
+  "domains_written": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "release.presentation"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "Store logical path IDs in durable records, resolve them through one authority, and migrate aliases through dual-read/single-write parity receipts with declared sunset releases.",
+  "release_note_impact": "Package-excluded repository migration; maintainer documentation must name canonical IDs, aliases, parity receipts, and sunset status.",
+  "test_obligations": [
+    "architecture.boundaries",
+    "assurance.control-plane",
+    "release.authority",
+    "release.presentation",
+    "control-plane.schemas",
+    "control-plane.records"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "canonical logical path resolver and single-write policy on dev",
+    "factorio-2.0": "reuse the package-excluded resolver for reconstruction and evidence without changing published package bytes"
+  },
+  "implementation_evidence": [
+    ".mir/evidence/receipts/control-plane-paths-v1.json",
+    ".work/output/control-plane-v5-path-migration-plan.json",
+    "validation/tests/tooling/Test-MIRLayout.ps1",
+    "validation/tests/tooling/Test-MIRControlPlane.ps1",
+    "validation/tests/tooling/Test-MIRAssurance.ps1",
+    "validation/tests/tooling/Test-MIRGovernance.ps1",
+    "validation/tests/tooling/Test-MIRPowerShellQuality.ps1",
+    "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+    "validation/tests/release/Test-MIRBackportManifest.ps1"
+  ],
+  "state": "implemented"
+}

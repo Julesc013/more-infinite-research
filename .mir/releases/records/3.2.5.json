@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "release": "3.2.5",
+  "candidate_id": "C32",
+  "candidate_floor": "C32",
+  "target": "2.1",
+  "branch": "main",
+  "state": "publicly-verified",
+  "source_release": {
+    "release": "3.2.3",
+    "tag": "3.2.3",
+    "tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "candidate_id": "C30",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db"
+  },
+  "development_lineage": {
+    "superseded_release": "3.2.4",
+    "superseded_candidate_id": "C31",
+    "candidate_closure": "path:releases.closures/3.2.4-C31.json",
+    "package_source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4"
+  },
+  "package": {
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "archive": "dist/more-infinite-research_3.2.5.zip",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301
+  },
+  "upgrade": {
+    "from_version": "3.2.3",
+    "to_version": "3.2.5",
+    "fixture": "assert-upgrade-3-2-3-to-3-2-5"
+  },
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "source-freeze-packet",
+        "path": ".mir/releases/freezes/3.2.5-D1.json",
+        "candidate_id": "C32",
+        "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+        "plan_material_sha256": "5A72914277E8331E2B38766F0C9E3B79E42E659FE071BF9125B9094D7055ADF4",
+        "required_test_set_sha256": "E59A65D80C1DDD0AC6DF8EE3E911A890D5DCC7405FA49D48FAAC40DE6FE66F3D"
+      }
+    ],
+    "package_build": [
+      {
+        "kind": "deterministic-package",
+        "path": "scripts/Test-MIRDeterministicPackage.ps1",
+        "archive": "dist/more-infinite-research_3.2.5.zip",
+        "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+        "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+        "bytes": 1056249,
+        "entries": 301,
+        "builds": 2
+      }
+    ],
+    "focused_qualification": [
+      {
+        "kind": "approved-package-delta",
+        "path": ".mir/releases/deltas/3.2.3-to-3.2.5.json",
+        "sha256": "AAC57BED3A907F56D185BBE2AA16272C0745DF3E81A1625D9F8F87431F0F1499",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "five-archetype-upgrade-matrix",
+        "path": ".mir/evidence/3.2.5-upgrade-proof.json",
+        "sha256": "121EF12D510256E17F01B1BBD7E03708D82DD70D2F4C4B656A2C145B0483EDE1",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "candidate-bound-ecosystem-campaign",
+        "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+        "sha256": "2BDF602D37F3016D2E720D3B0F404B359DBC1723031762C0DDF8794D6EB7DC41",
+        "digest_policy": "utf8-lf"
+      },
+      {
+        "kind": "paired-performance-regression",
+        "path": ".mir/evidence/3.2.5-performance-regression.json",
+        "sha256": "D249D32480E128150428C3789AB27612B5D845510810A4A06BA357DD43120239",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "candidate_qualification": [
+      {
+        "kind": "fresh-candidate-qualification",
+        "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+        "sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "digest_policy": "utf8-lf",
+        "source_commit": "43392fed9b245a14734935f1ed35cf88a7a1dfb0",
+        "source_tree": "f4e9019563ad4b77cdaf272a46f5a9d427bc78aa",
+        "plan_material_sha256": "85E90403CC88977A906071C99A7F43C10F2F645E1821B0F4CC6E00C95412A459",
+        "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
+        "expected": 135,
+        "executed": 135,
+        "reused": 0,
+        "failed": 0,
+        "incomplete": 0,
+        "unexpected": 0
+      }
+    ],
+    "manual_acceptance": [
+      {
+        "kind": "schema-2-maintainer-attestation",
+        "path": ".mir/evidence/3.2.5-manual-review-attestation.json",
+        "sha256": "8F5D300715972DFFB2EEE9D0D00171B22BD48AF439021F946B1552D052F01BD3",
+        "digest_policy": "utf8-lf",
+        "reviewer": "Julesc013",
+        "reviewed_at": "2026-08-06T09:07:40.9699842Z"
+      }
+    ],
+    "publication_exception": [
+      {
+        "kind": "timeboxed-maintainer-decision",
+        "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "tag": [
+      {
+        "kind": "annotated-tag",
+        "name": "3.2.5",
+        "commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+        "tag_object": "f97e10c19859297666f7f0014ee3d91d8cf4c254"
+      }
+    ],
+    "publication": [
+      {
+        "kind": "github-publication-under-release-specific-exception",
+        "path": ".mir/evidence/3.2.5-publication.json",
+        "sha256": "24FDBFDCC2D533706F32E3820290FEE8A660C8E25145728E65FBC33597DD1BF7",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "public_byte_verification": [
+      {
+        "kind": "public-asset-identity-and-exact-engine-smokes",
+        "path": ".mir/evidence/3.2.5-publication.json",
+        "sha256": "24FDBFDCC2D533706F32E3820290FEE8A660C8E25145728E65FBC33597DD1BF7",
+        "digest_policy": "utf8-lf"
+      }
+    ]
+  },
+  "assurance_exceptions": [
+    {
+      "id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
+      "kind": "release-specific-timeboxed-publication",
+      "status": "authorized",
+      "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+      "sha256": "F9AEFDFA2C847E4703FA097E30D4EE455A01F98DBE7064A3C73508873A698B21",
+      "digest_policy": "utf8-lf",
+      "normal_gates_waived_for_publication_only": true,
+      "generic_policy_changed": false,
+      "protected_qualification": "pending-post-publication",
+      "protected_seal": "pending-post-publication",
+      "package_change_permitted": false,
+      "corrective_release": "3.2.9"
+    }
+  ],
+  "remaining_obligations": [
+    "protected-qualification-post-publication",
+    "protected-seal-and-reconciliation-post-publication",
+    "normal-promotion-admission-reconciliation",
+    "downstream-always-guard-correction",
+    "transport-robustness-correction",
+    "stage-b-public-asset-audit"
+  ],
+  "release_notes": "docs/releases/notes/release-notes-3.2.5.md",
+  "incident_ids": [
+    "INC-2026-0054",
+    "INC-2026-0056",
+    "INC-2026-0057",
+    "INC-2026-0058",
+    "INC-2026-0059",
+    "INC-2026-0060"
+  ],
+  "updated_at": "2026-08-07T18:47:23.6994556Z"
+}

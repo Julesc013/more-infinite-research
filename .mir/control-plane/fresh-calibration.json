@@ -1,0 +1,61 @@
+{
+  "authority": "mir-control-plane-v5-fresh-independent-calibration",
+  "calibration_sha256": "3DAB4F8C344D86D869EFD371B3141499EC9F0A4ACF4D7F8C13DC9C84AA324E6F",
+  "candidate_archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+  "candidate_content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+  "candidate_id": "C24",
+  "completed_at": "08/01/2026 16:52:35",
+  "component_abis": {
+    "canonicalization": 1,
+    "capture": 3,
+    "compilation": 1,
+    "evaluation": 1,
+    "evidence_store": 1,
+    "planner": 1,
+    "realization": 1,
+    "record": 1,
+    "release_controller": 1,
+    "shadow": 2,
+    "view_generator": 1
+  },
+  "context_id": "F97E2730F4729D835ED4B24593F184A715F02286F53E38F192DEA571322E6975",
+  "control_plane_commit": "42df8500b969c299fc5275dd0a20e8165e0fc37d",
+  "control_plane_worktree_sha256": "",
+  "disposition": "independent-local-calibration-not-release-seal",
+  "environment_results": {
+    "count": 113,
+    "sha256": "5AABE3B7EACF1C4B84E49D2C1092F229AAB1681591CC50E2727289812DC15E85"
+  },
+  "evidence_index_sha256": "C4F4AEF6BFB6376D0C58920D3FEF5D9B215E433514A43A0DE55FD630BA7475DE",
+  "factorio_locks": [
+    {
+      "binary": {
+        "bytes": 48990160,
+        "sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+      },
+      "installation_sha256": "EE86096CAA693E18497AE6EC4D48795B77FB6F5CC4AE27AE359D4A937D540E9B",
+      "official_data": {
+        "file_count": 17296,
+        "sha256": "A301C63BDB504C8CFAAC1DE893D95E608195A1D4783DC8873FC605DB4D579470"
+      },
+      "source": "context-materialization",
+      "version": "2.1.12"
+    }
+  ],
+  "mutation_calibration": {
+    "cases": 10,
+    "false_negative_budget": 0
+  },
+  "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+  "plan_id": "D14C1EE52AF8179F8F85CD3A0D597786C435C6D358D6018975ECD57CFC62F668",
+  "proof_verifier_commit": "d1d45af9f783726036522badb9757f4b0fa218f7",
+  "qualification_manifest": "41034B2E5B1729681BFC26DCC1E86D50EEF68C3236289D5E4FB7C33ECCD3F24C",
+  "release": "3.2.2",
+  "schema": 1,
+  "shadow_analysis_sha256": "CB099A32C75E6E172047245DB98DB874A1B480032C426B8733FE9278B4BE4D0A",
+  "status": "passed",
+  "task_results": {
+    "count": 36,
+    "sha256": "52F2626EE41792B28B91BF8D801DB8D79A272C6912577B6C6782E3C82729A2DF"
+  }
+}

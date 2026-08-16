@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -30,13 +30,13 @@ Rules:
 Format Markdown prose:
 
 ```powershell
-.\scripts\Format-MIRMarkdown.ps1
+.\tools\commands\docs\Format-MIRMarkdown.ps1
 ```
 
 Check Markdown prose without changing files:
 
 ```powershell
-.\scripts\Format-MIRMarkdown.ps1 -Check
+.\tools\commands\docs\Format-MIRMarkdown.ps1 -Check
 ```
 
 Run docs governance through static validation:

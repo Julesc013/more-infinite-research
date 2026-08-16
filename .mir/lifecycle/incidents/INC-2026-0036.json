@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0036",
+  "title": "C24 fresh approved-delta adapter bound stale C22 authority",
+  "external_issue": "internal://control-plane/c24-approved-delta-candidate-binding",
+  "state": "closed",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "context_id": "2C77651DB6C73A00C108EAD8DA7220703A179EF071EA08E64DE6FE92A15A9394",
+    "task": "approved-delta.measurement"
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "error": "Package-visible source changed after the approved-delta package-source commit.",
+    "failed_after": "113 exact environment batches, upgrade measurement, and ecosystem measurement",
+    "repair_context_id": "296A0AD1FED48028F83EDD8CFD1D9BF800D07EAF6F1040B6F1A09240DA066AE9",
+    "repair_task_object": "EA98FF1F19AB13AA4F8B68DB1D98BD8D92F2749D3312C4C1CC4F599B79304B2C"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "The v5 adapter invoked the frozen full-release exporter at C24 package-source commit 29f81add, whose pre-final release ledger still named C22. The 3.2.2 validator also redirected to a committed patch artifact and hard-coded C22, so neither legacy path could freshly evaluate immutable C24."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:native-c24-patch-delta-v1"
+  ],
+  "regression_propositions": [
+    "the native observation binds exact C21 and C24 archive, content, byte, entry, and source identities",
+    "the native evaluator admits exactly one added path, zero removed paths, and exactly three changed paths",
+    "the approved-delta TaskNode effective input binds the versioned policy authority",
+    "the immutable context locks the policy authority and executor implementation"
+  ],
+  "affected_releases": [
+    "3.2.2"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+    "approved_delta_difference_count": 4,
+    "approved_delta_unapproved_count": 0
+  },
+  "closure": {
+    "status": "closed-exact-c24-fresh-calibration",
+    "proof_required": "complete fresh C24 calibration under a new immutable context",
+    "proof_path": ".mir/control-plane/fresh-calibration.json",
+    "proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2",
+    "context_digest": "F97E2730F4729D835ED4B24593F184A715F02286F53E38F192DEA571322E6975",
+    "qualification_manifest_digest": "41034B2E5B1729681BFC26DCC1E86D50EEF68C3236289D5E4FB7C33ECCD3F24C"
+  }
+}

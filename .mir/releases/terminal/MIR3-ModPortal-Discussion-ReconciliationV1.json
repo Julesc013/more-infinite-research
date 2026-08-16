@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "kind": "MIR3-ModPortal-Discussion-ReconciliationV1",
+  "status": "all-public-threads-terminally-disposed-fixed-point-accepted",
+  "observed_at": "2026-08-14T01:29:40+10:00",
+  "scope": "every-public-discussion-visible-on-the-more-infinite-research-mod-portal-index",
+  "public_index": {
+    "url": "https://mods.factorio.com/mod/more-infinite-research/discussion",
+    "http_status": 200,
+    "utf8_bytes": 62797,
+    "sha256": "7A3C7E5093A0F983BA1D92FED3A1331E378B287E94B7B89D50672BEF89E27CB8",
+    "thread_count": 24,
+    "thread_ids": [
+      "68f8e983f3937755388bce07", "68fa30a0e3359475cfbc8e3b", "690240a9a8da210ba60a6655", "6a1fbbdca2b1de38bd581fdd",
+      "6a4364f99578b6446a283279", "6a43666bf41b7876460c7a67", "6a4a3d24d67098d68c57f90c", "6a4e8c6884594f98390cc27e",
+      "6a5029a0fc2d087349d7b27b", "6a53de8c425eced196e68c24", "6a53f0cd425eced196e68c32", "6a55009eaccd254ecaa02683",
+      "6a55d1e51aacedd553f17d69", "6a58dc5e15625739f8897041", "6a5908b2e0bb1eb64fa996f6", "6a594aefe0bb1eb64fa99702",
+      "6a5bb7abae192b42f00bc4a4", "6a64fba3954cdc5ccdc7127d", "6a6a3195bf84e2fe914c920c", "6a6a328023ef8e8966de505b",
+      "6a6b723800cdd256f60059c3", "6a6c270932c3548953769590", "6a79147520108b995a72702a", "6a7cc4ed6d4d8ec344e3cc66"
+    ]
+  },
+  "allowed_states": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"],
+  "threads": [
+    {
+      "id": "68f8e983f3937755388bce07", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/68f8e983f3937755388bce07", "category": "Bugs", "title": "unknown key", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/locales/manifest.json"], "evidence": ["validation/tests/docs/Test-MIRLocales.ps1", "current locale generation requires every governed setting key"], "rationale": "The missing setting-locale report was corrected and the locale generator plus static locale gate retain the contract.", "release_blocking": false
+    },
+    {
+      "id": "68fa30a0e3359475cfbc8e3b", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/68fa30a0e3359475cfbc8e3b", "category": "Ideas", "title": "tech cost as opction", "source_class": "feature-request", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"], "evidence": ["ips-cost-base-* and ips-cost-growth-* released startup settings", "validation/tests/compiler/Test-MIRResearchCostModels.ps1"], "rationale": "Configurable research-cost controls are shipped, schema-governed, and regression-tested.", "release_blocking": false
+    },
+    {
+      "id": "690240a9a8da210ba60a6655", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/690240a9a8da210ba60a6655", "category": "General", "title": "plates-n-circuit-productivity needed?", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/fixtures.yml"], "evidence": ["fixtures/plates-n-circuit-productivity", "fixtures/plates-n-circuit-productivity-blocked", "reporter confirmation recorded in the public thread"], "rationale": "Duplicate productivity ownership was corrected and retained through positive, blocked, and change-mismatch fixtures.", "release_blocking": false
+    },
+    {
+      "id": "6a1fbbdca2b1de38bd581fdd", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a1fbbdca2b1de38bd581fdd", "category": "Ideas", "title": "Mod compatibly support", "source_class": "compatibility-request", "state": "support-claim-narrowed", "completion": "not-a-product-fix", "linked_authorities": [".mir/compatibility.yml", ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json"], "evidence": ["fixture-backed named-family claims only", "unknown and broad requested mods remain unqualified"], "rationale": "Individual named families may be proved, but the thread cannot establish blanket support for belts, overhaul recipes, Fluid Quality, solar content, or other requested mods.", "release_blocking": false
+    },
+    {
+      "id": "6a4364f99578b6446a283279", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a4364f99578b6446a283279", "category": "Bugs", "title": "Some techs already exist in vanilla Space Age", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/streams.yml"], "evidence": ["fixtures/assert-generation-integrity", "fixtures/assert-native-owner-settings", "reporter confirmation recorded in the public thread"], "rationale": "Vanilla and named external productivity owners remain authoritative instead of receiving parallel MIR duplicates.", "release_blocking": false
+    },
+    {
+      "id": "6a43666bf41b7876460c7a67", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a43666bf41b7876460c7a67", "category": "Bugs", "title": "Electric Shooting Speed only affects discharge defense", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/streams.yml", ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json"], "evidence": ["recipe-prod-research_electric_shooting_speed-1 stable stream", "fixtures/assert-weapon-speed-safety", "GH-3 locale and icon regressions retained"], "rationale": "Electric shooting-speed effect and presentation coverage were corrected without changing the released stable technology ID.", "release_blocking": false
+    },
+    {
+      "id": "6a4a3d24d67098d68c57f90c", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a4a3d24d67098d68c57f90c", "category": "Ideas", "title": "Add support for air-scrubbing mod?", "source_class": "compatibility-request", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/compatibility.yml", ".mir/streams.yml"], "evidence": ["fixtures/air-scrubbing", "fixtures/assert-air-scrubbing-clean-filter", "full-family-support is limited to clean-filter crafting productivity"], "rationale": "The requested clean-filter family is fixture-qualified; environmental removal and recovery behavior remains explicitly outside the claim.", "release_blocking": false
+    },
+    {
+      "id": "6a4e8c6884594f98390cc27e", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a4e8c6884594f98390cc27e", "category": "General", "title": "Krastorio 2 / K2SO Support ?", "source_class": "bug-report", "state": "fixed-in-dot9", "completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "linked_authorities": [".mir/releases/terminal/findings/MIR3-TERM-0027.json", ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json", ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"], "evidence": ["K2SciencePhasePolicyV1", "exact Factorio 2.1.13 K2 2.1.2 K2SO 2.0.13 envelope"], "rationale": "The reproduced science-card phasing defect is corrected only for the exact admitted envelope and passed revised 3.2.9 fixed-point proof; final frozen-candidate qualification remains required.", "release_blocking": true
+    },
+    {
+      "id": "6a5029a0fc2d087349d7b27b", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a5029a0fc2d087349d7b27b", "category": "Bugs", "title": "Planet Crucible/Rigor Module compatibility", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/fixtures.yml", ".mir/sanitation-budgets.json"], "evidence": ["fixtures/rigor-late-recipe-removal", "target-aware effect sanitation", "reporter confirmation recorded in the public thread"], "rationale": "Late removed-recipe references are pruned under an exact sanitation budget and retained as a release regression.", "release_blocking": false
+    },
+    {
+      "id": "6a53de8c425eced196e68c24", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a53de8c425eced196e68c24", "category": "General", "title": "Crash on 3.1.0", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": ["docs/releases/notes/release-notes-3.1.1.md", ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json"], "evidence": ["scenario space-age-galore-effect-ownership", "GH-24 historical disposition"], "rationale": "The duplicate coal-crushing productivity effect was corrected and the exact ownership regression remains in the current scenario catalog.", "release_blocking": false
+    },
+    {
+      "id": "6a53f0cd425eced196e68c32", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a53f0cd425eced196e68c32", "category": "General", "title": "Crash on 2.3.5", "source_class": "bug-report", "state": "not-reproduced", "completion": "not-a-product-fix", "linked_authorities": [".mir/compatibility.yml", ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"], "evidence": ["the public thread does not bind an immutable mod closure or complete Factorio log", "generated and external graph-cycle safety fixtures pass", "exact 2.5.5 calibration passed 104 of 104 twice"], "rationale": "The initial report changed after an update and the later 9-percent stall has no immutable reproducer; current graph and maintained-target campaigns do not reproduce it, so no product mutation is admitted.", "release_blocking": false
+    },
+    {
+      "id": "6a55009eaccd254ecaa02683", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a55009eaccd254ecaa02683", "category": "Ideas", "title": "Allow Configuring Vanilla Infinite Researches?", "source_class": "feature-request", "state": "mir4-deferred", "completion": "not-a-product-fix", "linked_authorities": [".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json", ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json"], "evidence": ["terminal settings audit admits no new dot9 runtime setting", "MIR-owned stream and bounded native-owner controls retain existing released scopes"], "rationale": "Broad configuration of arbitrary vanilla-owned infinite technologies would expand ownership and settings semantics beyond the sealed MIR 3 terminal change set.", "release_blocking": false
+    },
+    {
+      "id": "6a55d1e51aacedd553f17d69", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a55d1e51aacedd553f17d69", "category": "General", "title": "Incompatible", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/fixtures.yml"], "evidence": ["scenario generated-prerequisite-safety", "disabled vanilla science technology does not block generated streams", "reporter confirmation recorded in the public thread"], "rationale": "Disabled unlocker technologies are excluded from reachability and an initially available recipe needs no technology prerequisite.", "release_blocking": false
+    },
+    {
+      "id": "6a58dc5e15625739f8897041", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a58dc5e15625739f8897041", "category": "General", "title": "K2SE Compat", "source_class": "mixed-thread", "state": "fixed-in-dot9", "completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "linked_authorities": [".mir/compatibility.yml", ".mir/releases/terminal/findings/MIR3-TERM-0027.json", ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"], "evidence": ["space-exploration-finalized-recipe-set load-order repair", "K2SciencePhasePolicyV1 exact envelope"], "rationale": "The removed-recipe crash is historically fixed; the reproduced K2SO science-phasing portion maps to MIR3-TERM-0027 and passed revised modern fixed-point acceptance, with final frozen-candidate qualification still required.", "release_blocking": true,
+      "topics": [
+        {"topic": "Space Exploration removes kr-copper-cable-from-copper-ore", "state": "already-fixed-regression-retained", "evidence": "fixtures/space-exploration-recipe-removal"},
+        {"topic": "K2SO retains early science cards on MIR technologies", "state": "fixed-in-dot9", "evidence": "MIR3-TERM-0027"}
+      ]
+    },
+    {
+      "id": "6a5908b2e0bb1eb64fa996f6", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a5908b2e0bb1eb64fa996f6", "category": "General", "title": "Some ideas", "source_class": "mixed-thread", "state": "support-claim-narrowed", "completion": "not-a-product-fix", "linked_authorities": [".mir/streams.yml", ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json"], "evidence": ["stable platform, capture-robot-rocket, and nutrient stream rows", "generation-integrity fixtures", "no blanket belt-throughput or external-balance claim"], "rationale": "Implemented stream ideas retain their existing evidence; risky belt-speed and unspecified balance ideas are not silently admitted to the terminal patch.", "release_blocking": false,
+      "topics": [
+        {"topic": "platform, capture-robot-rocket, nutrient, and other named productivity streams", "state": "already-fixed-regression-retained", "evidence": ".mir/streams.yml"},
+        {"topic": "belt speed and other factory-disruptive balance expansion", "state": "rejected-with-reason", "evidence": "terminal product scope remains defect-only"}
+      ]
+    },
+    {
+      "id": "6a594aefe0bb1eb64fa99702", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a594aefe0bb1eb64fa99702", "category": "General", "title": "Do we need this?", "source_class": "feature-request", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/streams.yml"], "evidence": ["recipe-prod-research_steel-1 stable stream", "fixtures/assert-generation-integrity", "fixtures/assert-native-owner-settings"], "rationale": "Steel productivity is implemented with stable identity and bounded native-owner behavior.", "release_blocking": false
+    },
+    {
+      "id": "6a5bb7abae192b42f00bc4a4", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a5bb7abae192b42f00bc4a4", "category": "General", "title": "CN translation incomplete", "source_class": "contribution-request", "state": "rejected-with-reason", "completion": "not-a-product-fix", "linked_authorities": [".mir/locales/manifest.json"], "evidence": ["no replacement translation payload or exact missing-key list was supplied", "localization projection remains source-hash-bound"], "rationale": "The thread requests a translation contribution but supplies no governed translation artifact from which a deterministic correction can be admitted.", "release_blocking": false
+    },
+    {
+      "id": "6a64fba3954cdc5ccdc7127d", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a64fba3954cdc5ccdc7127d", "category": "Bugs", "title": "Space Age planets and connections disappeared after 3.2.0", "source_class": "bug-report", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": ["docs/releases/notes/release-notes-3.2.1.md", "docs/releases/notes/release-notes-3.2.2.md"], "evidence": ["3.2.1 emergency correction", "3.2.1-to-3.2.2 upgrade fixture", "reporter confirmation recorded in the public thread"], "rationale": "The destructive runtime migration was corrected and its upgrade/recovery boundary remains in release evidence.", "release_blocking": false
+    },
+    {
+      "id": "6a6a3195bf84e2fe914c920c", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a6a3195bf84e2fe914c920c", "category": "General", "title": "Ice Productivity", "source_class": "feature-request", "state": "rejected-with-reason", "completion": "not-a-product-fix", "linked_authorities": [".mir/streams.yml", ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json"], "evidence": ["research_ice targets reachable oxide-asteroid-crushing production routes", "SciencePackProductionRoutePolicyV1 retains earliest safe reachability semantics", "no load, invalid-reference, or self-lock reproducer was supplied"], "rationale": "Requiring Aquilo despite an earlier legitimate ice-production route is a progression/balance preference, not a reproduced package defect; changing it would delay an already-producible family contrary to the terminal reachability doctrine.", "release_blocking": false
+    },
+    {
+      "id": "6a6a328023ef8e8966de505b", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a6a328023ef8e8966de505b", "category": "General", "title": "Modded Support", "source_class": "compatibility-request", "state": "support-claim-narrowed", "completion": "not-a-product-fix", "linked_authorities": ["docs/compatibility/targets/advanced-belts-sa.md", ".mir/compatibility.yml"], "evidence": ["fixtures/assert-advanced-belts-sa-productivity", "exact target-local AdvancedBeltsSA proof", "no inference to every belt mod"], "rationale": "The named AdvancedBeltsSA surface has bounded evidence; broad modded-belt support remains unqualified.", "release_blocking": false
+    },
+    {
+      "id": "6a6b723800cdd256f60059c3", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a6b723800cdd256f60059c3", "category": "General", "title": "Overhauls", "source_class": "compatibility-request", "state": "support-claim-narrowed", "completion": "not-a-product-fix", "linked_authorities": [".mir/compatibility.yml", ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json"], "evidence": ["public text must describe the tested family rather than broad external-mod support", "Py and Space Exploration claims are exact startup-integrity corrections only"], "rationale": "No thread-level statement can prove complete K2, SE, Bob, Angel, Py, or arbitrary overhaul semantics; only named evidence-bound behaviors may be published.", "release_blocking": false
+    },
+    {
+      "id": "6a6c270932c3548953769590", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a6c270932c3548953769590", "category": "General", "title": "linear cost growth?", "source_class": "feature-request", "state": "already-fixed-regression-retained", "completion": "historical-verified", "linked_authorities": [".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"], "evidence": ["ips-cost-linear-increment-* and mir-cost-linear-increment-* settings", "validation/tests/compiler/Test-MIRResearchCostModels.ps1", "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1"], "rationale": "Additive linear cost growth is represented explicitly in the canonical research-cost model and protected for generated and adopted owners.", "release_blocking": false
+    },
+    {
+      "id": "6a79147520108b995a72702a", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a79147520108b995a72702a", "category": "Bugs", "title": "Odd Compatibility with Cubium", "source_class": "bug-report", "state": "fixed-in-dot9", "completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "linked_authorities": [".mir/releases/terminal/findings/MIR3-TERM-0028.json", ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json", ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"], "evidence": ["SciencePackProductionRoutePolicyV1", "exact generic Factorio 2.1 and 2.0 route fixtures", "direct Cubium claims remain separately bounded"], "rationale": "The generic alternate-route ordering defect is corrected on affected targets and passed revised affected-target fixed-point acceptance; direct Cubium claims remain bounded and final frozen-candidate qualification is pending.", "release_blocking": true
+    },
+    {
+      "id": "6a7cc4ed6d4d8ec344e3cc66", "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a7cc4ed6d4d8ec344e3cc66", "category": "Bugs", "title": "Error loading mod", "source_class": "bug-report", "state": "fixed-in-dot9", "completion": "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "linked_authorities": [".mir/releases/terminal/findings/MIR3-TERM-0031.json", ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json", ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"], "evidence": ["duplicate type=gun-speed;ammo_category=tesla reproduced on immutable 3.2.5 and 2.5.5", "CombinedCompilationPlanEffectOwnershipV1", "exact Factorio 2.1.13 and 2.0.77 Space Exploration correction proof"], "rationale": "The late P0 has a generic combined-plan ownership correction on both affected targets and passed their revised confirmation sweep; final frozen-candidate qualification remains release-blocking.", "release_blocking": true
+    }
+  ],
+  "summary": {
+    "threads": 24,
+    "already_fixed_regression_retained": 12,
+    "fixed_in_dot9": 4,
+    "support_claim_narrowed": 4,
+    "not_reproduced": 1,
+    "rejected_with_reason": 2,
+    "mir4_deferred": 1,
+    "unclassified": 0,
+    "additional_product_findings_admitted": 0
+  },
+  "boundaries": {
+    "ordinary_intake_closed": true,
+    "source_frozen": false,
+    "candidate_assigned": false,
+    "dot5_package_mutation_permitted": false,
+    "broad_support_inferred_from_thread": false,
+    "portal_status_substitutes_for_regression_evidence": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1, "release": "1.5.5", "candidate_id": "1.5.5-final", "target": "0.15", "branch": "tag-only", "state": "publicly-verified",
+  "package": { "source_commit": "d855a68b88eb6864d537e8149f75ae73f50b0b39", "source_tree": "f3bdb4a3f86cb36d298f06d6773fbd153bc5a329", "source_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778", "archive": "dist/more-infinite-research_1.5.5.zip", "archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD", "content_sha256": "955DF3150304BF6A904E9B90E498F1DDA1D75E433FD1C61D5AD6A4BD139E2778", "bytes": 385548, "entries": 177 },
+  "source_release": { "release": "3.2.5", "tag": "3.2.5", "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857", "candidate_id": "C32", "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3" },
+  "baseline_release": { "release": "1.5.0", "tag": "1.5.0", "tag_commit": "c2b526fd6dde81be7703daef53b075a1fd773e09" },
+  "integration": { "strategy": "dual-parent-target-projection-v1", "commit": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6", "first_parent": "c2b526fd6dde81be7703daef53b075a1fd773e09", "second_parent": "62fddd86b51db7c0238731815d15ca26a4b45857" },
+  "proofs": {
+    "source_freeze": [{ "kind": "wave-local-qualification-inventory", "path": ".mir/releases/waves/MIR-3.5-Local-Qualification-Inventory.json" }],
+    "candidate_qualification": [{ "kind": "historical-automated-target-qualification", "path": ".mir/evidence/archive/mir3-dot5-local-qualification/1.5.5-local-candidate-qualification.json", "sha256": "A6AD6491B455FFBD2190635660D0A30B6AAEAE061061D387EF29C17F5C57ACE0", "digest_policy": "utf8-lf", "result": "passed-12-selected-no-reuse" }],
+    "backport_reconstruction": [{ "kind": "deterministic-two-parent-lineage", "path": ".mir/releases/waves/MIR-3.5-Lineage-Finalization.json", "sha256": "EC42486E7F8788CAAF4E1A41782778A8C335A773E6F4D6DBDEFAB96D042BFB1A", "digest_policy": "utf8-lf" }],
+    "publication_exception": [{ "kind": "wave-timeboxed-maintainer-decision", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "digest_policy": "utf8-lf" }],
+    "tag": [{ "kind": "annotated-tag", "name": "1.5.5", "commit": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6", "tag_object": "907c75a9867d1b1b8dcb3124daa1f88193e610c4" }],
+    "publication": [{ "kind": "github-publication-under-release-specific-exception", "path": ".mir/evidence/MIR-3.5-wave-publication.json", "sha256": "0FE62C34DF863B0C8BEB0D9FBC67C3ED422CE2E6788C9D365A9FF1C7540FF12D", "digest_policy": "utf8-lf" }],
+    "public_byte_verification": [{ "kind": "public-asset-identity-and-exact-engine-smoke", "path": ".mir/evidence/MIR-3.5-wave-publication.json", "sha256": "0FE62C34DF863B0C8BEB0D9FBC67C3ED422CE2E6788C9D365A9FF1C7540FF12D", "digest_policy": "utf8-lf" }]
+  },
+  "assurance_exceptions": [{ "id": "MIR35-1.5.5-TIMEBOXED-PUBLICATION-2026-08-08", "kind": "release-specific-timeboxed-publication", "status": "authorized", "path": ".mir/releases/waves/MIR-3.5-Timeboxed-Publication-Decision.json", "sha256": "493F99D94990EACC4A3F0154C2D6730FF03CDBED654881E282072C063BABEF08", "normal_gates_waived_for_publication_only": true, "generic_policy_changed": false, "automated_target_qualification_accepted": true, "qualification_tier": "historical", "manual_review": "waived-by-maintainer-authorization", "personal_visual_playtest_claim": "none", "package_change_permitted": false, "corrective_release": "1.5.9" }],
+  "remaining_obligations": [],
+  "release_notes": "docs/releases/notes/release-notes-1.5.5.md",
+  "updated_at": "2026-08-08T15:51:00+10:00"
+}

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.5-c32-candidate-qualified",
+  "release": "3.2.5",
+  "from": "focused-qualified",
+  "to": "candidate-qualified",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "fresh-candidate-qualification",
+      "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+      "sha256": "B5276061488DF7C96899090772028B294DDCB889AD76C2829EB373C72410789E",
+      "digest_policy": "utf8-lf",
+      "source_commit": "2e2017bc662ffd816ea7f01ebda7989dfc73e0ea",
+      "source_tree": "bd38892ec69eef1d23253088d0922a6ecbc98a21",
+      "plan_material_sha256": "F06460E40F4C671E5F69A86ECB687EDA316F38F2651D7E075893CF81280AD38E",
+      "required_test_set_sha256": "C3A98D796C012F2CA5F64A7722AA1717C6D16D1FBD6DAA352CB39DC9B25AD4D7",
+      "expected": 135,
+      "executed": 135,
+      "reused": 0,
+      "failed": 0,
+      "incomplete": 0,
+      "unexpected": 0
+    }
+  ],
+  "recorded_at": "2026-08-05T22:52:25.779Z"
+}

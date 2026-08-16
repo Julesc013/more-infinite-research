@@ -7,7 +7,7 @@ doc_type: archive
 owner: mir-maintainers
 last_reviewed: 2026-07-07
 supersedes: ["../../../todo.md"]
-superseded_by: ["../../../todo.md", "../../releases/3.0.0-plan.md"]
+superseded_by: ["../../../todo.md", "../../releases/archive/3.0.0-plan.md"]
 ---
 
 # 2.x Completed Task Ledger
@@ -15,7 +15,7 @@ superseded_by: ["../../../todo.md", "../../releases/3.0.0-plan.md"]
 > Archived document.
 >
 > This page is retained for historical context only.
-> Current replacement: [root active TODO](../../../todo.md) and [3.0.0 plan](../../releases/3.0.0-plan.md).
+> Current replacement: [root active TODO](../../../todo.md) and [archived 3.0.0 plan](../../releases/archive/3.0.0-plan.md).
 
 This file preserves the old root `todo.md` completion ledger for the 2.0.5, 2.1.x, 2.2.0, and 1.9.x transition work. It was archived when `2.2.0` and `1.9.2` were accepted as released as-is and the active queue moved to MIR 3.0.0.
 
@@ -86,7 +86,7 @@ Done in the current development branch:
 - [x] Make Science pack productivity fall back to base-game Space science pack technology art instead of the automation science pack item icon.
 - [x] Add base-game Research productivity with the native `laboratory-productivity` modifier and Military science pack technology art, while skipping it in Space Age where vanilla `research-productivity` exists.
 - [x] Add runtime fixture coverage for the new icon sources and base/Space Age Research productivity behavior.
-- [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/releases/2.2.0-validation-record.md`.
+- [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/releases/archive/2.2.0-validation-record.md`.
 - [x] Add mod-portal-ready public copy with a complete generated technology catalog.
 - [x] Add simplified player-facing `v2.0.5` release notes derived from `changelog.txt`.
 - [x] Add simplified player-facing `v1.9.0` legacy release notes derived from `changelog.txt`.
@@ -230,7 +230,7 @@ These checks are no longer release blockers while Agricultural growth speed rema
 - [x] Run `.\scripts\Test-MIRBranchPolicy.ps1`.
 - [x] Run `git diff --check`.
 - [ ] Copy the zip to a normal Factorio mods folder and confirm Factorio sees it.
-- [x] Record validation results in `docs/releases/2.2.0-validation-record.md`.
+- [x] Record validation results in `docs/releases/archive/2.2.0-validation-record.md`.
 - [x] Commit docs, code, changelog, and package together for the tested candidate.
 
 ## v1.9.0 Legacy Backport After v2.0.5
@@ -302,7 +302,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] Parser-friendly generation audit rows added for stream/native-overlap/recipe-owner diagnostics.
 - [x] Local mod-portal compatibility audit harness added with committed matrix inputs and ignored generated reports.
 - [x] Extended compatibility automation added: executable manual scenarios, sharded/resumable audits, grouped failure reports, review-only profile stubs, tiered extended-test wrapper, and self-hosted workflow.
-- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/releases/3.0.0-plan.md` is high-level rationale, `docs/archive/superseded/` contains historical plans, and `docs/releases/notes/` contains release-note material.
+- [x] Documentation hierarchy reorganized: root `todo.md` is the generated future-work view, `changelog.txt` is past-change authority, the [archived 3.0.0 plan](../../releases/archive/3.0.0-plan.md) preserves its high-level rationale, `docs/archive/superseded/` contains historical plans, and `docs/releases/notes/` contains release-note material.
 - [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
 - [x] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.

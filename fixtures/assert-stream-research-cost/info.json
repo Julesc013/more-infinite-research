@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-stream-research-cost",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Stream Research Cost",
+  "author": "Julesc013",
+  "description": "Asserts a generated stream uses the unified anchored hybrid research-cost model.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-target-source-freeze.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-target-source-freeze.schema.json",
+  "title": "MIR 3 terminal target source freeze",
+  "type": "object",
+  "required": ["schema", "kind", "status", "release", "target", "support_tier", "candidate_floor", "candidate_id", "frozen_at", "common_source_commit", "shadow_source", "engine", "profile", "adapter", "predecessors", "package", "upgrade_rows", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalTargetSourceFreezeV1"},
+    "status": {"const": "source-frozen-candidate-unassigned"},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+    "target": {"type": "string", "minLength": 1},
+    "support_tier": {"enum": ["current", "maintained", "lts", "historical", "finite"]},
+    "candidate_floor": {"type": "string", "pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*)$"},
+    "candidate_id": {"type": "null"},
+    "frozen_at": {"type": "string", "format": "date-time"},
+    "common_source_commit": {"$ref": "#/$defs/gitObject"},
+    "shadow_source": {
+      "type": "object",
+      "required": ["ref", "commit", "tree"],
+      "properties": {"ref": {"type": "string", "minLength": 1}, "commit": {"$ref": "#/$defs/gitObject"}, "tree": {"$ref": "#/$defs/gitObject"}},
+      "additionalProperties": false
+    },
+    "engine": {
+      "type": "object",
+      "required": ["version", "binary_sha256"],
+      "properties": {"version": {"type": "string", "minLength": 1}, "binary_sha256": {"$ref": "#/$defs/sha256"}},
+      "additionalProperties": false
+    },
+    "profile": {"type": "string", "minLength": 1},
+    "adapter": {"type": "string", "minLength": 1},
+    "predecessors": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object", "required": ["role", "release", "tag", "commit"],
+        "properties": {"role": {"enum": ["dot5", "pre-dot5"]}, "release": {"type": "string"}, "tag": {"type": "string"}, "commit": {"$ref": "#/$defs/gitObject"}},
+        "additionalProperties": false
+      }
+    },
+    "package": {"$ref": "#/$defs/packageIdentity"},
+    "upgrade_rows": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "boundaries": {
+      "type": "object",
+      "required": ["candidate_assigned", "candidate_built", "manual_review_complete", "sealed", "tagged", "published"],
+      "properties": {
+        "candidate_assigned": {"const": false}, "candidate_built": {"const": false}, "manual_review_complete": {"const": false},
+        "sealed": {"const": false}, "tagged": {"const": false}, "published": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "packageIdentity": {
+      "type": "object", "required": ["archive_sha256", "content_sha256", "bytes", "entries"],
+      "properties": {"archive_sha256": {"$ref": "#/$defs/sha256"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer", "minimum": 1}, "entries": {"type": "integer", "minimum": 1}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

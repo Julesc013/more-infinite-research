@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalQualificationRecordV1",
+  "recorded_at": "2026-08-15T08:10:14+10:00",
+  "release": "2.5.9",
+  "target": "2.0",
+  "support_tier": "maintained",
+  "candidate_id": "2.5-P13",
+  "candidate_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+  "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+  "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+  "content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+  "required_checks": [
+    "source-and-archive-identity",
+    "deterministic-triple-reconstruction",
+    "exact-engine-load",
+    "immutable-dot5-upgrade",
+    "pre-dot5-upgrade",
+    "clean-root-independent-confirmation",
+    "candidate-settings-contract",
+    "maintained-targeted-compatibility",
+    "candidate-ecosystem-and-performance"
+  ],
+  "results": [
+    {"id":"source-and-archive-identity","status":"passed","evidence":[".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json#2.5.9","archive-sha256:B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35"]},
+    {"id":"deterministic-triple-reconstruction","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json#2.5.9","receipt-raw-sha256:5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"]},
+    {"id":"exact-engine-load","status":"passed","evidence":["factorio-2.0.77-sha256:D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B","load-results-sha256:767D2DB0019BE71C58BACF9E3773BF0CA7CC361D845E7306FB50F2CDF5ED3064"]},
+    {"id":"immutable-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#2.5.5-to-2.5.9","receipt-raw-sha256:C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"]},
+    {"id":"pre-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#2.5.0-to-2.5.9","receipt-raw-sha256:C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"]},
+    {"id":"clean-root-independent-confirmation","status":"passed","evidence":["plan-sha256:22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994","result-sha256:16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349","bundle-sha256:F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F"]},
+    {"id":"candidate-settings-contract","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json#2.5.9"]},
+    {"id":"maintained-targeted-compatibility","status":"passed","evidence":["campaign-evidence-sha256:3200F6F5DE666275B85FF94CDD8EF545FB9C42F94D07D000A0DEB4C630EA67D6","release-targeted-summary-sha256:ACBAF53C4393256DB6007D6DAC16CC1A4A0AA12CCAB0126D4457BF08956BD24F","compat-report-sha256:3EA048FABAA4495C95092F30BF35853C7AC6B997338ADC0DC3FB61B4003CDC97","unexpected-failures:0"]},
+    {"id":"candidate-ecosystem-and-performance","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#2.5.9-confirmation","plan-sha256:22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994","result-sha256:16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349","bundle-sha256:F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F"]}
+  ],
+  "manual_review": {"required":true,"status":"pending-maintainer-approval","candidate_hash_bound":true},
+  "status": "passed-automated-awaiting-human-review"
+}

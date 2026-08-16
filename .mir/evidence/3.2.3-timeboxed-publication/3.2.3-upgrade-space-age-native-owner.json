@@ -1,0 +1,44 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "generated_at": "2026-08-01T08:13:49.2533499Z",
+  "git_commit": "95cba43b7621f108b8b7e245d2e018d70b10362f",
+  "archetype": "space-age-native-owner",
+  "factorio_binary_version": "2.1.12.87038",
+  "factorio_binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27",
+  "from": {
+    "version": "3.2.2",
+    "path": ".\\dist\\more-infinite-research_3.2.2.zip",
+    "sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
+  },
+  "to": {
+    "version": "3.2.3",
+    "path": ".\\dist\\more-infinite-research_3.2.3.zip",
+    "sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+  },
+  "source_only_fixtures": [],
+  "assertions": [
+    "startup-profile-retained",
+    "technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load",
+    "landfill-level-retained",
+    "ice-level-retained",
+    "current-ice-research-retained",
+    "fractional-ice-progress-retained",
+    "platform-starts-unresearched",
+    "landfill-platform-effects-removed",
+    "platform-owner-transfer-exact",
+    "duplicate-owner-forbidden",
+    "startup-settings-retained",
+    "upgraded-save-reload-passed"
+  ],
+  "create_log": "3.2.3-upgrade-space-age-native-owner-from-3.2.2-create.txt",
+  "create_log_sha256": "175D8FB6B8D96E3BDF38A336F19F77978396E21BB50CB6EE8E04E78E6095E66A",
+  "load_log": "3.2.3-upgrade-space-age-native-owner-from-3.2.2-load.txt",
+  "load_log_sha256": "9E73CA7CF0EC6E76562FEC04795D93A5DD71F66AC5043C1BDFCE9774617CCA21",
+  "reload_log": "3.2.3-upgrade-space-age-native-owner-from-3.2.2-reload.txt",
+  "reload_log_sha256": "D702E157728D9EF04170B18C66392632C9860E7DDFDE195C39612B4352F3291D"
+}

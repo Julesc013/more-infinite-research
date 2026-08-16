@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0046",
+  "title": "New-candidate verification context omitted a Factorio installation lock",
+  "external_issue": "internal://control-plane/context-factorio-lock-seed",
+  "state": "regression-proven",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C30",
+    "context_id": "46A103F49BA825CF3A4F511E9C6D150B3912BD7181CE3A69A44773C183A18364",
+    "context_abi": 2
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "observed": "The immutable C30 context was structurally valid but environment-locks.json contained zero Factorio locks. Every native worker then failed closed before launch with Verification context contains no governed Factorio installation lock.",
+    "factorio_lock_count": 0,
+    "candidate_archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "Context creation imported Factorio identities only from an already-complete candidate qualification bundle. A new candidate necessarily has no such bundle, creating a circular dependency between context creation and the first native observation. The CLI and protected context job had no FactorioBin input path."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:context-abi-3-factorio-lock-seeding"
+  ],
+  "regression_propositions": [
+    "new-candidate context creation requires an explicit Factorio binary when no exact governed lock exists",
+    "the selected Factorio product version equals the target profile qualification version",
+    "ABI 3 stores the complete portable installation binary and official-data identity",
+    "zero-lock contexts fail before staging",
+    "the protected workflow materializes the context on the protected self-hosted Windows runner",
+    "native workers accept only a Factorio installation matching one exact immutable context lock"
+  ],
+  "affected_releases": [
+    "3.2.3"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "c24-calibration-passed-pending-complete-c30-qualification",
+    "proof_required": "complete exact C30 local and protected qualification under a new immutable ABI-3 context with the exact Factorio 2.1.12 installation lock",
+    "c24_proof_path": ".mir/control-plane/fresh-calibration.json",
+    "c24_proof_sha256": "F7B124E1044EF2B83C49FFFB1BD784E5E83FE99FC3B352BC29A6EAFC135A00F2"
+  }
+}

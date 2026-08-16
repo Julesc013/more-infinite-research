@@ -1,0 +1,829 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-28T01:56:38+10:00",
+  "min_downloads": 10000,
+  "factorio_line": "2.1",
+  "factorio_versions": [
+    "2.0",
+    "2.1"
+  ],
+  "include_space_age": false,
+  "scenario_timeout_seconds": 900,
+  "continue_on_dependency_failure": false,
+  "include_recommended_dependencies": false,
+  "max_candidates": 50,
+  "catalog_pages": 0,
+  "from_lockfile": "",
+  "start_index": 0,
+  "count": 0,
+  "offline": true,
+  "local_mod_zip_dirs": [],
+  "local_mod_zips": [],
+  "local_mod_library_dirs": [
+    "<external:testmods_2.1>"
+  ],
+  "local_mod_library_zips": [],
+  "mod_under_test_zip": "dist/more-infinite-research_3.2.2.zip",
+  "mod_under_test_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+  "mod_under_test_source_commit": "a83b21b7a2ef00eac03b8354c7ac39913cd0eaa8",
+  "link_mode": "Copy",
+  "local_root_zip_count": 0,
+  "local_library_zip_count": 616,
+  "candidates_selected": [],
+  "manual_scenarios_selected": [
+    "py-casting-finalizer-repair"
+  ],
+  "generated_local_scenarios_selected": [],
+  "local_zip_scenarios_selected": [],
+  "mods": [
+    {
+      "name": "pyalienlife",
+      "title": "Pyanodons AlienLife",
+      "version": "3.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyalienlife_3.1.2.zip",
+      "sha1": "9fc0531bd8f291c38e77e7d563b2583eb7abffba",
+      "sha256": "8928653a49cfe1adb3544b653b19c166cd9aa5402b61e54004523db66fa63c36",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyalienlife_3.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "pyalienlifegraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyalienlifegraphics >= 3.1.0"
+        },
+        {
+          "name": "pyalienlifegraphics2",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyalienlifegraphics2 >= 3.1.0"
+        },
+        {
+          "name": "pyalienlifegraphics3",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyalienlifegraphics3 >= 3.1.0"
+        },
+        {
+          "name": "pyrawores",
+          "kind": "required",
+          "required": true,
+          "raw": "pyrawores >= 3.1.0"
+        },
+        {
+          "name": "pypetroleumhandling",
+          "kind": "required",
+          "required": true,
+          "raw": "pypetroleumhandling >= 3.1.0"
+        },
+        {
+          "name": "pycoalprocessing",
+          "kind": "required",
+          "required": true,
+          "raw": "pycoalprocessing >= 3.1.0"
+        },
+        {
+          "name": "pyhightech",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyhightech >= 3.1.0"
+        },
+        {
+          "name": "pypostprocessing",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pypostprocessing >= 3.1.0"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pyalienlifegraphics",
+      "title": "Pyanodons AlienLife Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyalienlifegraphics_3.1.0.zip",
+      "sha1": "5e5ff9ae1c8a70731ed9183cc3588edc1a9559e5",
+      "sha256": "e09cc0b8f64456263ef07ca9b0b846f9805335fcae6c6fb8c37693d932d628ca",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyalienlifegraphics_3.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.0.33"
+        }
+      ]
+    },
+    {
+      "name": "pyalienlifegraphics2",
+      "title": "Pyanodons AlienLife Graphics 2",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyalienlifegraphics2_3.1.0.zip",
+      "sha1": "d4944fe17d8c50acab906d390ee4d8bd34a9ff9d",
+      "sha256": "af240ab03fd46a5266511648b56c1bfe9cd9576fac3b2faeab9ef88eb7be30ef",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyalienlifegraphics2_3.1.0.zip",
+      "dependencies": []
+    },
+    {
+      "name": "pyalienlifegraphics3",
+      "title": "Pyanodons AlienLife Graphics 3",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyalienlifegraphics3_3.1.0.zip",
+      "sha1": "09b3dc9ddf83f3fb2279570acbfcce6e2819d000",
+      "sha256": "6dba347caa017df4a16391680ad932ab9c0c97cc0561ae7390c21c399ae9c35a",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyalienlifegraphics3_3.1.0.zip",
+      "dependencies": []
+    },
+    {
+      "name": "pycoalprocessing",
+      "title": "Pyanodons Coal Processing",
+      "version": "3.1.3",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pycoalprocessing_3.1.3.zip",
+      "sha1": "97f1122041ce75cd2eb3ee87ff160bd333384435",
+      "sha256": "dd13de035ef14992664f85e80b95e309751d812666152154e72a72302b5ec975",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pycoalprocessing_3.1.3.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1"
+        },
+        {
+          "name": "pycoalprocessinggraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pycoalprocessinggraphics >= 3.1.0"
+        },
+        {
+          "name": "pypostprocessing",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pypostprocessing >= 3.1.1"
+        },
+        {
+          "name": "DiscoScience",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DiscoScience"
+        },
+        {
+          "name": "better-victory-screen",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) better-victory-screen"
+        },
+        {
+          "name": "elevated-rails",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) elevated-rails"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "beacon-overhaul",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! beacon-overhaul"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        }
+      ]
+    },
+    {
+      "name": "pycoalprocessinggraphics",
+      "title": "Pyanodons Coal Processing Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pycoalprocessinggraphics_3.1.0.zip",
+      "sha1": "b53c5439ba18ba0f95e1039d62bb94b2cb742a54",
+      "sha256": "fbfc18f0f5374ec9aa8670308a280de3c40f83aa547c5752acce7b7b96736563",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pycoalprocessinggraphics_3.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "pyfusionenergy",
+      "title": "Pyanodons Fusion Energy",
+      "version": "3.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyfusionenergy_3.1.2.zip",
+      "sha1": "a3416cd9112dd03f455ab246f8318a0791e86f17",
+      "sha256": "22109e96e6aa0d38c996b838ffd1a8ecda27ec0c867895ceb0a9d592371cc6d7",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyfusionenergy_3.1.2.zip",
+      "dependencies": [
+        {
+          "name": "pycoalprocessing",
+          "kind": "required",
+          "required": true,
+          "raw": "pycoalprocessing >= 3.1.1"
+        },
+        {
+          "name": "pyfusionenergygraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyfusionenergygraphics >= 3.1.0"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pyfusionenergygraphics",
+      "title": "Pyanodons Fusion Energy Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyfusionenergygraphics_3.1.0.zip",
+      "sha1": "1e318e20f4be762547a39efabe894cffc5bf94e9",
+      "sha256": "918216b066269f1119e9d6ef9f1e87835c2b4b7f868dac7acd3bbbd156d34454",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyfusionenergygraphics_3.1.0.zip",
+      "dependencies": []
+    },
+    {
+      "name": "pyindustry",
+      "title": "Pyanodons Industry",
+      "version": "3.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyindustry_3.1.2.zip",
+      "sha1": "a36ea00629035336022334bd3d69165d0fe4deeb",
+      "sha256": "574903af898187389d28ac7a9c3fd2cb15ad8c31ab64806e2f854ac9d65f8987",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyindustry_3.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "pypostprocessing",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pypostprocessing >= 3.1.1"
+        },
+        {
+          "name": "pyindustrygraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyindustrygraphics >= 3.1.0"
+        },
+        {
+          "name": "pycoalprocessing",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pycoalprocessing >= 3.1.1"
+        },
+        {
+          "name": "pyfusionenergy",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyfusionenergy >= 3.1.1"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pyindustrygraphics",
+      "title": "Pyanodons Industry Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyindustrygraphics_3.1.0.zip",
+      "sha1": "c4ab2373e1ce675c73a05f5d874e4d69d338112d",
+      "sha256": "90606a5b2e89bc3ef53865746473299176144388675a7676aede734922c633ef",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyindustrygraphics_3.1.0.zip",
+      "dependencies": []
+    },
+    {
+      "name": "pypetroleumhandling",
+      "title": "Pyanodons Petroleum Handling",
+      "version": "3.1.1",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pypetroleumhandling_3.1.1.zip",
+      "sha1": "fb87338d8ebe26251b97803ca64030265256cfd4",
+      "sha256": "31eea900aaf315343aeb3cb3889bbcb44e5a11e2950593aadefce50b964a2239",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pypetroleumhandling_3.1.1.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "pyfusionenergy",
+          "kind": "required",
+          "required": true,
+          "raw": "pyfusionenergy >= 3.1.0"
+        },
+        {
+          "name": "pyindustry",
+          "kind": "required",
+          "required": true,
+          "raw": "pyindustry >= 3.1.0"
+        },
+        {
+          "name": "pyrawores",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyrawores >= 3.1.0"
+        },
+        {
+          "name": "pyhightech",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyhightech >= 3.1.0"
+        },
+        {
+          "name": "rso-mod",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) rso-mod"
+        },
+        {
+          "name": "pypetroleumhandlinggraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pypetroleumhandlinggraphics >= 3.1.0"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pypetroleumhandlinggraphics",
+      "title": "Pyanodons Petroleum Handling Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pypetroleumhandlinggraphics_3.1.0.zip",
+      "sha1": "fc98619621c5795b56bf975f61001da6d730bf3e",
+      "sha256": "0741bfe9615ad05d58dd7c591ebbf7cd1fb0a8e8da99a3b843888b6475b8b3ad",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pypetroleumhandlinggraphics_3.1.0.zip",
+      "dependencies": []
+    },
+    {
+      "name": "pypostprocessing",
+      "title": "Pyanodons Post-processing",
+      "version": "3.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pypostprocessing_3.1.2.zip",
+      "sha1": "904de9b3d5f955e302c0ad122aa0d1ce605b0dbb",
+      "sha256": "3c7f3ee12d08f7083af1f39e2bf2393f11d3df628b495d656795787a6a0ab8cc",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pypostprocessing_3.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "quality",
+          "kind": "optional",
+          "required": false,
+          "raw": "? quality"
+        },
+        {
+          "name": "recycler",
+          "kind": "optional",
+          "required": false,
+          "raw": "? recycler"
+        },
+        {
+          "name": "elevated-rails",
+          "kind": "optional",
+          "required": false,
+          "raw": "? elevated-rails"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "pycoalprocessing",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pycoalprocessing"
+        },
+        {
+          "name": "pyindustry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyindustry"
+        },
+        {
+          "name": "pyfusionenergy",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyfusionenergy"
+        },
+        {
+          "name": "pyhightech",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyhightech"
+        },
+        {
+          "name": "pyrawores",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyrawores"
+        },
+        {
+          "name": "pypetroleumhandling",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pypetroleumhandling"
+        },
+        {
+          "name": "pyalienlife",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyalienlife"
+        },
+        {
+          "name": "pyalternativeenergy",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyalternativeenergy"
+        },
+        {
+          "name": "PyBlock",
+          "kind": "optional",
+          "required": false,
+          "raw": "? PyBlock"
+        },
+        {
+          "name": "pyhardmode",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyhardmode"
+        },
+        {
+          "name": "pystellarexpedition",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pystellarexpedition"
+        },
+        {
+          "name": "pyaliens",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pyaliens"
+        },
+        {
+          "name": "omnimatter",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) omnimatter"
+        },
+        {
+          "name": "omnimatter_water",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) omnimatter_water"
+        },
+        {
+          "name": "omnimatter_wood",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) omnimatter_wood"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DeadlockCrating"
+        },
+        {
+          "name": "deadlock_stacked_recipes",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) deadlock_stacked_recipes"
+        },
+        {
+          "name": "DeadlocksStackingForPyanadon",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DeadlocksStackingForPyanadon"
+        },
+        {
+          "name": "LightedPolesPlus",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) LightedPolesPlus"
+        },
+        {
+          "name": "jetpack",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) jetpack"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pyrawores",
+      "title": "Pyanodons Raw Ores",
+      "version": "3.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyrawores_3.1.2.zip",
+      "sha1": "1f0a896774b5bcc29ebdb011565247a07b5bb3c0",
+      "sha256": "967d2fb9afeed7fec309c02fa5ec349cf355ba364943033062c94e2c832467eb",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyrawores_3.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "pycoalprocessing",
+          "kind": "required",
+          "required": true,
+          "raw": "pycoalprocessing >= 3.1.1"
+        },
+        {
+          "name": "pyindustry",
+          "kind": "required",
+          "required": true,
+          "raw": "pyindustry >= 3.1.1"
+        },
+        {
+          "name": "pyfusionenergy",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) pyfusionenergy"
+        },
+        {
+          "name": "rso-mod",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) rso-mod"
+        },
+        {
+          "name": "pyraworesgraphics",
+          "kind": "no_order",
+          "required": true,
+          "raw": "~ pyraworesgraphics >= 3.1.0"
+        },
+        {
+          "name": "wret-beacon-rebalance-mod",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! wret-beacon-rebalance-mod"
+        },
+        {
+          "name": "BigBags",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! BigBags"
+        },
+        {
+          "name": "ResearchFog",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ResearchFog"
+        },
+        {
+          "name": "omnimatter_energy",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! omnimatter_energy"
+        }
+      ]
+    },
+    {
+      "name": "pyraworesgraphics",
+      "title": "Pyanodons Raw Ores Graphics",
+      "version": "3.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "pyraworesgraphics_3.1.0.zip",
+      "sha1": "3fd78ceb7865a9ac5815f9112bb5cd43c719075f",
+      "sha256": "a360a0b6367d38fb41aae7a6acf956eafbcaa01af81914f756fd50212ddf6519",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "pyraworesgraphics_3.1.0.zip",
+      "dependencies": []
+    }
+  ]
+}

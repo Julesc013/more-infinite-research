@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "locally-qualified-lineage-blocked",
+  "release_status": "not-released",
+  "version": "1.4.5",
+  "target": "0.14",
+  "source_commit": "4698d9e84adc987453a02a6954690fce26c85c6a",
+  "source_tree": "a93b61ed7ece35e54431f8c4c08b6bcb371d80cd",
+  "package": {
+    "path": "build/candidates/1.4.5/final-a/more-infinite-research_1.4.5.zip",
+    "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47",
+    "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4",
+    "size_bytes": 385987,
+    "entries": 177,
+    "deterministic_double_build": true
+  },
+  "engine": {
+    "version": "0.14.23.25374",
+    "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"
+  },
+  "plan": {
+    "path": "build/reports/release/1.4.5/plan-final-5.json",
+    "sha256": "FAB020502D7DF57641EE29E955BDE3A5477608542B9F560B48D53CDF4FDE6C04",
+    "selected": 12,
+    "unknown": 0,
+    "reuse_enabled": false
+  },
+  "aggregate": {
+    "path": "build/reports/release/1.4.5/verify-final-5.json",
+    "status": "passed",
+    "executed": 11,
+    "subsumed": 1,
+    "failed": 0
+  },
+  "lineage_blocker": "The mandatory immutable 3.2.5 source tag does not exist because exact Factorio 2.1.13 protected qualification remains unavailable. Local tag and dist promotion are therefore intentionally withheld."
+}

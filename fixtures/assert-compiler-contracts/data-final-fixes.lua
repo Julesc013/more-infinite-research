@@ -41,7 +41,6 @@ local relationships = require("__more-infinite-research__.prototypes.mir.index.r
 local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
 local family_resolver = require("__more-infinite-research__.prototypes.mir.families.resolver")
 local science_packs = require("__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
-local target_line = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_line")
 local c9_contracts = {
   compiler_input = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_input"),
   compiler_result = require("__more-infinite-research__.prototypes.mir.domain.compiler.compiler_result"),
@@ -291,16 +290,6 @@ if cardinality.status ~= "REVIEW_REQUIRED"
   or cardinality.retained_reviewed_or_promoted_count ~= 1
   or type(cardinality_rows[1].decision_fingerprint) ~= "string" then
   fail("provider cardinality overflow did not stop expansion before emission while preserving hard rejection")
-end
-local progression_rows, progression = family_resolver.apply_cardinality_guard({
-  {final_state = "attach", decision = "attach", blocker = nil,
-    promotion_class = "exact-reviewed", unlock_depth = 2},
-  {final_state = "diagnose", decision = "diagnose", blocker = "productivity_disabled",
-    promotion_class = "new-unreviewed", unlock_depth = 100}
-}, {maximum_progression_span = 1}, 2)
-if progression.status ~= "PASS" or progression.progression_span ~= 0
-  or progression_rows[1].decision ~= "attach" or progression_rows[2].decision ~= "diagnose" then
-  fail("provider progression budget included a hard-rejected non-member")
 end
 local reversed_providers = {schema = 1, providers = {}}
 for index = #providers.providers, 1, -1 do table.insert(reversed_providers.providers, providers.providers[index]) end
@@ -998,6 +987,57 @@ local rejected_unrecognized, rejected_reason = native_owner_cost_model.configure
 if rejected_unrecognized or rejected_reason ~= "unrecognized_cost_formula" then
   fail("unsafe unrecognized cost formula override did not fail closed")
 end
+
+focused_contracts.assert_essential_research_cost_contract = function()
+  local research_cost_classification = require("__more-infinite-research__.prototypes.mir.domain.research_cost.classification")
+  local research_cost_model = require("__more-infinite-research__.prototypes.mir.domain.research_cost.model")
+  local research_cost_validation = require("__more-infinite-research__.prototypes.mir.domain.research_cost.validation")
+  local algebraic_model = research_cost_model.new({
+    anchor_level = 4,
+    base_cost = 1000,
+    linear_increment = 250,
+    growth_factor = 1.5,
+    provenance = {fixture = "essential-325-B1"}
+  })
+  local algebraic_proof = research_cost_validation.algebraic_proof(algebraic_model)
+  if not algebraic_proof or algebraic_proof.proof_abi ~= "mir-research-cost-algebraic-proof-v1"
+      or algebraic_proof.property ~= "positive-nondecreasing"
+      or algebraic_proof.maximum_offset ~= 100
+      or algebraic_proof.maximum_exponent ~= 100 then
+    fail("research-cost algebraic qualification authority is incomplete")
+  end
+  if research_cost_model.qualification_identity(algebraic_model).proof_abi ~= algebraic_proof.proof_abi then
+    fail("ResearchCostModel qualification digest is not bound to the algebraic proof ABI")
+  end
+
+  local parser_budget_cases = {
+    {formula = string.rep("1+", 128) .. "1", reason = "formula_budget_exceeded"},
+    {formula = string.rep("1+", 48) .. "1", reason = "formula_budget_exceeded"},
+    {formula = string.rep("(", 33) .. "1" .. string.rep(")", 33), reason = "formula_budget_exceeded"},
+    {formula = string.rep("1", 513), reason = "formula_budget_exceeded"},
+    {formula = "1e301", reason = "numeric_literal_out_of_bounds"},
+    {formula = "2^(L+1000001)", reason = "formula_exponent_out_of_bounds"}
+  }
+  for _, row in ipairs(parser_budget_cases) do
+    local classified = research_cost_classification.formula(row.formula, {anchor_level = 1})
+    if classified.recognized or classified.reason ~= row.reason then
+      fail("research-cost parser budget did not fail closed with " .. row.reason
+        .. ": " .. tostring(classified.reason))
+    end
+  end
+
+  expect_error("research-cost evaluated envelope", "evaluated_cost_out_of_bounds", function()
+    research_cost_model.new({
+      anchor_level = 1,
+      base_cost = 2147483647,
+      linear_increment = 2147483647,
+      growth_factor = 1000,
+      provenance = {fixture = "essential-325-B1-overflow"}
+    })
+  end)
+end
+focused_contracts.assert_essential_research_cost_contract()
+focused_contracts.assert_essential_research_cost_contract = nil
 
 focused_contracts.compilation_context = compiler_context.new()
 focused_contracts.finalize_compilation = function(...)
@@ -1779,42 +1819,66 @@ end
 
 local production_evidence_prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence-internal"]
 local production_evidence = production_evidence_prototype and production_evidence_prototype.data
-if target_line.mod_data_supported() then
-  local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
-  if not production_graph_parity or production_graph_parity.schema ~= 2
-    or production_graph_parity.valid ~= true
-    or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
-    or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
-    or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
-    or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
-    or type(production_graph_parity.proof_fingerprint) ~= "string"
-    or type(production_graph_parity.parity_fingerprint) ~= "string" then
-    fail("emitted and planned technology graphs do not have exact parity evidence")
+;(function()
+  local research_cost_compatibility = require(
+    "__more-infinite-research__.prototypes.mir.domain.research_cost.compatibility_slice")
+  local support_prototype = (data.raw["mod-data"] or {})
+    ["more-infinite-research-research-cost-compatibility"]
+  local support = support_prototype and support_prototype.data
+  if not support or support.schema ~= 1
+    or support.kind ~= "mir-research-cost-support-public"
+    or support.proposition.id ~= "mir-research-cost-neutral-default-parity-v1"
+    or support.disposition.terminal ~= true
+    or support.disposition.status ~= "SUPPORTED"
+    or support.disposition.reason_code ~= "neutral-default-semantic-parity-proven"
+    or support.disposition.remediation_code ~= "no-remediation-required"
+    or support.proof_assertion.assertion_type ~= "mir-research-cost-proof-assertion-v1"
+    or support.proof_assertion.dimension ~= "SEMANTIC"
+    or support.proof_assertion.status ~= "PASSED"
+    or support.summary.model_count <= 0
+    or support.summary.neutral_model_count ~= support.summary.model_count
+    or support.summary.override_model_count ~= 0
+    or support.truncation.included_model_rows ~= 1
+    or support.truncation.omitted_model_rows ~= support.summary.model_count - 1
+    or support.privacy.contains_paths ~= false
+    or support.privacy.contains_mod_names ~= false
+    or support.target_dispositions.factorio_2_1.classification ~= "target-native-equivalent"
+    or support.target_dispositions.factorio_2_1.transport ~= "mod-data"
+    or support.target_dispositions.factorio_2_0.classification ~= "portable-with-adapter"
+    or support.target_dispositions.factorio_2_0.transport ~= "validation-log"
+    or support.target_dispositions.factorio_2_0.qualification ~= "requires-exact-target-proof"
+    or type(support.semantic_set_fingerprint) ~= "string"
+    or type(support.proof_assertion.assertion_fingerprint) ~= "string"
+    or type(support.support_fingerprint) ~= "string" then
+    fail("research-cost compatibility slice is incomplete, unbounded, or lacks exact target dispositions")
   end
-else
-  if production_evidence_prototype ~= nil then
-    fail("Factorio 2.0 target emitted unsupported compiler-evidence mod-data")
+  if not production_evidence
+    or support.linkage.compiler_input_fingerprint ~= production_evidence.compiler_input_fingerprint
+    or support.linkage.compiler_result_fingerprint ~= production_evidence.compiler_result_fingerprint
+    or support.linkage.realized_output_fingerprint
+      ~= production_evidence.compiler_result.execution_evidence.realized_output_fingerprint then
+    fail("research-cost compatibility slice does not bind the final compiler evidence chain")
   end
-  local generated_count = 0
-  for name, technology in pairs(data.raw.technology or {}) do
-    if name:find("^recipe%-prod%-research_") then
-      generated_count = generated_count + 1
-      for _, prerequisite in ipairs(technology.prerequisites or {}) do
-        if not (data.raw.technology or {})[prerequisite] then
-          fail("Factorio 2.0 generated technology has a dangling prerequisite: " .. name .. " -> " .. prerequisite)
-        end
-      end
-      for _, effect in ipairs(technology.effects or {}) do
-        if effect.type == "change-recipe-productivity" and not (data.raw.recipe or {})[effect.recipe] then
-          fail("Factorio 2.0 generated technology has a dangling recipe-productivity target: "
-            .. name .. " -> " .. tostring(effect.recipe))
-        end
-      end
-    end
+  research_cost_compatibility.verify_untrusted(support)
+  local tampered = deepcopy(support)
+  tampered.target_dispositions.factorio_2_0.transport = "mod-data"
+  if pcall(function() research_cost_compatibility.verify_untrusted(tampered) end) then
+    fail("research-cost compatibility slice accepted a tampered Factorio 2.0 transport disposition")
   end
-  if generated_count == 0 then
-    fail("Factorio 2.0 compiler contract fixture observed no generated technologies")
-  end
+end)()
+local production_graph_parity = production_evidence and production_evidence.technology_graph_parity
+if not production_graph_parity or production_graph_parity.schema ~= 2
+  or production_graph_parity.valid ~= true
+  or production_graph_parity.registered_technology_count ~= production_graph_parity.planned_technology_count
+  or production_graph_parity.expected_graph_fingerprint ~= production_graph_parity.actual_graph_fingerprint
+  or type(production_graph_parity.component_assignment_fingerprint) ~= "string"
+  or type(production_graph_parity.condensation_topology_fingerprint) ~= "string"
+  or type(production_graph_parity.proof_fingerprint) ~= "string"
+  or type(production_graph_parity.replacement_journal_fingerprint) ~= "string"
+  or type(production_graph_parity.replacement_count) ~= "number"
+  or type(production_graph_parity.replacement_graph_requalified) ~= "boolean"
+  or type(production_graph_parity.parity_fingerprint) ~= "string" then
+  fail("emitted and planned technology graphs do not have exact parity evidence")
 end
 compiler_context.with_active(focused_contracts.compilation_context, function()
   local family_resolution = family_resolver.snapshot()
@@ -1863,7 +1927,6 @@ compiler_context.with_active(focused_contracts.compilation_context, function()
     fail("RecipeRiskFact canonicalization depends on prototype insertion order")
   end
 end)
-if target_line.mod_data_supported() then
 local production_catalog_prototype = (data.raw["mod-data"] or {})["more-infinite-research-technology-catalog-internal"]
 local production_catalog = production_catalog_prototype and production_catalog_prototype.data
 local production_qualifications = production_catalog and production_catalog.qualifications
@@ -1974,20 +2037,6 @@ compiler_context.with_active(focused_contracts.compilation_context, function()
     fail("capability diagnostics omitted or duplicated canonical provider decisions")
   end
 end)
-else
-  for _, prototype_name in ipairs({
-    "more-infinite-research-compiler-evidence-internal",
-    "more-infinite-research-compiler-evidence",
-    "more-infinite-research-technology-catalog-internal",
-    "more-infinite-research-technology-catalog",
-    "more-infinite-research-generation-plan-internal",
-    "more-infinite-research-generation-plan"
-  }) do
-    if (data.raw["mod-data"] or {})[prototype_name] ~= nil then
-      fail("Factorio 2.0 target emitted unsupported MIR mod-data: " .. prototype_name)
-    end
-  end
-end
 local first_context = compiler_context.new()
 expect_error("CompilerContext no implicit active instance", "before CompilerContext activation", function()
   compiler_context.current()

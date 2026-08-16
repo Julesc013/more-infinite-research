@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/release-work-package-reconciliation.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/release-work-package-reconciliation.schema.json",
+  "title": "MIR release work-package reconciliation",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "release",
+    "reconciled_at",
+    "source_baseline",
+    "boundaries",
+    "authorities",
+    "priority",
+    "work_packages"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "mir-release-work-package-reconciliation"},
+    "release": {"const": "3.2.5"},
+    "reconciled_at": {"type": "string", "format": "date"},
+    "source_baseline": {
+      "type": "object",
+      "required": ["commit", "tree", "archive_sha256", "content_sha256", "bytes", "entries", "factorio_version", "qualification"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1},
+        "factorio_version": {"type": "string", "minLength": 1},
+        "qualification": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["release_state", "candidate_floor", "candidate_id", "factorio_2_0_release_authority", "mir_3_3_admission", "published_dist_mutation"],
+      "properties": {
+        "release_state": {"const": "planned"},
+        "candidate_floor": {"const": "C32"},
+        "candidate_id": {"const": "not-assigned"},
+        "factorio_2_0_release_authority": {"const": "not-created"},
+        "mir_3_3_admission": {"const": "not-admitted"},
+        "published_dist_mutation": {"const": "forbidden"}
+      },
+      "additionalProperties": false
+    },
+    "authorities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "priority": {
+      "type": "object",
+      "required": ["next_work_package", "reason"],
+      "properties": {
+        "next_work_package": {"const": "325-B0"},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "work_packages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "status",
+          "required_product_surface",
+          "current_implementation",
+          "current_tests",
+          "current_evidence",
+          "remaining_gap",
+          "package_visibility",
+          "target_disposition",
+          "next_bounded_action"
+        ],
+        "properties": {
+          "id": {"pattern": "^325-(?:A0|A1b?|B[0-5]|C1|D[1-4])$"},
+          "category": {"enum": ["assurance", "product", "projection", "freeze", "release"]},
+          "status": {"enum": ["implemented-awaiting-closure", "partial", "open", "blocked-by-prerequisite"]},
+          "required_product_surface": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "current_implementation": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "current_tests": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "current_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "remaining_gap": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "package_visibility": {"enum": ["excluded", "visible", "mixed", "none-until-admitted"]},
+          "target_disposition": {
+            "type": "object",
+            "required": ["factorio_2_1", "factorio_2_0"],
+            "properties": {
+              "factorio_2_1": {"type": "string", "minLength": 1},
+              "factorio_2_0": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
+          },
+          "next_bounded_action": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "authority": "mir-publication-receipt-v1",
+  "release": "3.2.5",
+  "candidate_id": "C32",
+  "recorded_at": "2026-08-07T18:47:23.6994556Z",
+  "status": "published-public-identities-and-engine-smokes-verified-under-release-specific-exception",
+  "publication_exception": {
+    "id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
+    "path": ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+    "protected_qualification": "pending-post-publication",
+    "protected_seal": "pending-post-publication",
+    "generic_policy_changed": false
+  },
+  "package": {
+    "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301,
+    "rebuilt_after_freeze": false
+  },
+  "promotion": {
+    "branch": "main",
+    "previous_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+    "fast_forward": true,
+    "force_push": false
+  },
+  "tag": {
+    "name": "3.2.5",
+    "commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+    "tag_object": "f97e10c19859297666f7f0014ee3d91d8cf4c254",
+    "annotated": true
+  },
+  "github": {
+    "release_id": 366944993,
+    "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.5",
+    "asset_id": 505523392,
+    "asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.5/more-infinite-research_3.2.5.zip",
+    "asset_name": "more-infinite-research_3.2.5.zip",
+    "published_at": "2026-08-07T18:41:34Z",
+    "latest": true,
+    "asset_digest": "sha256:ac81cad1ac37f20e27a46bfad243611db251caccf52e1ab4da5d06cfdaa11adf",
+    "asset_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "asset_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "asset_bytes": 1056249,
+    "asset_entries": 301,
+    "verified": true
+  },
+  "public_asset_verification": {
+    "download_path": "build/results/public-verification/3.2.5/more-infinite-research_3.2.5.zip",
+    "local_frozen_archive_equal": true,
+    "archive_sha256_verified": true,
+    "normalized_content_sha256_verified": true,
+    "bytes_verified": true,
+    "entries_verified": true,
+    "package_composition_verified": true,
+    "verification_basis": "The downloaded public archive is byte-identical to the frozen C32 archive, whose package composition is bound by the C32 freeze and qualification records."
+  },
+  "factorio": {
+    "version": "2.1.13",
+    "build": 87164,
+    "binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+    "official_data_sha256": "11C677CA4A308362BD681CA966BE13241741CE6E7429CC2CD7F3A53EFA67E703",
+    "installation_sha256": "5F026A28175FAED6434A2A231F6AB529732E1A6641BA76437422A8E8388DA2B9"
+  },
+  "startup_smokes": [
+    {
+      "scenario": "package-zip-base",
+      "status": "passed",
+      "run_id": "f1c8c869-6984-4d68-a8eb-ad45a081002c",
+      "summary": "build/results/public-verification/3.2.5/base-smoke-summary-preserved.json",
+      "completed_at": "2026-08-07T18:46:15.9440055Z"
+    },
+    {
+      "scenario": "package-zip-space-age",
+      "status": "passed",
+      "run_id": "d4af5141-28f1-42fe-82b1-de6ffc6aa221",
+      "summary": "build/results/public-verification/3.2.5/space-age-smoke-summary.json",
+      "completed_at": "2026-08-07T18:46:41.040743Z"
+    }
+  ],
+  "diagnostic_attempts": [
+    {
+      "scenario": "package-zip-base",
+      "run_id": "3cf86d8b-ea1a-4755-a747-851020544427",
+      "status": "failed-before-assertions",
+      "classification": "ephemeral-userdata-startup-failure",
+      "assertions_executed": 0,
+      "summary": "build/results/public-verification/3.2.5/base-smoke-summary.json",
+      "admitted_as_release_evidence": false,
+      "resolution": "The identical downloaded asset passed when the harness used a preserved workspace user-data directory."
+    }
+  ],
+  "assurance": {
+    "product_qualification": "passed",
+    "deterministic_package_identity": "passed",
+    "manual_playtest": "passed",
+    "exact_factorio_environment": "verified",
+    "fresh_protected_github_qualification": "not-completed",
+    "publication": "maintainer-authorized-exception",
+    "protected_qualification": "pending-post-publication",
+    "protected_seal": "pending-post-publication"
+  },
+  "mod_portal": {
+    "uploaded": false,
+    "state": "not-uploaded"
+  }
+}

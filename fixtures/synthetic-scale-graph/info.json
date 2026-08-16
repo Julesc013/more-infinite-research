@@ -4,6 +4,6 @@
   "title": "MIR Fixture - Synthetic Scale Graph",
   "author": "MIR maintainers",
   "description": "Creates a 60000-technology maximum-legal engine load; its assertion adds an auditable 100000-node in-memory compiler graph with a 25000-node SCC.",
-  "factorio_version": "2.0",
-  "dependencies": ["base >= 2.0.77"]
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8"]
 }

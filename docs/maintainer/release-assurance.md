@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-10
 supersedes: []
 superseded_by: []
 ---
@@ -23,10 +23,10 @@ MIR release assurance is a persistent content-addressed evidence system. It plan
 | `validation/domains.yml` | Package domains, scenario dependency sets, dependency-contract normalization, unknown-input fallback |
 | `validation/profiles/factorio-<target>.json` | Target policy, deterministic seed, evidence TTL, upgrade source and fixture |
 | `validation/trust.json` | Evidence trust classes and protected release producer requirements |
-| `verification/schema/*.schema.json` | Strict test, plan, result, capsule, bundle, and seal contracts |
-| `fixtures/compat-matrix/expected-scenarios.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
+| `spec/schemas/*.schema.json` | Strict test, plan, result, capsule, bundle, and seal contracts |
+| `validation/scenarios/runtime.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
 | `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
-| `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
+| `build/results/assurance/evidence` | Persistent local or CI-restored evidence ledger |
 | `out/verification-plan.json` | Reviewable plan for one candidate and target |
 
 `tools/mir_verify/Invoke-MIRVerify.ps1` is only a forwarding entrypoint. It does not implement a second verifier.
@@ -40,12 +40,12 @@ Before running tests, materialize or inspect the verification plan. Run only the
 Use:
 
 ```powershell
-./scripts/mir.ps1 assurance doctor --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-./scripts/mir.ps1 verify plan --target 2.1 --baseline <qualified-ref> --profile auto --output out/verification-plan.json
-./scripts/mir.ps1 verify explain --target 2.1 --plan out/verification-plan.json --test <stable-id>
+./tools/mir.ps1 assurance doctor --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+./tools/mir.ps1 verify plan --target 2.1 --baseline <qualified-ref> --profile auto --output out/verification-plan.json
+./tools/mir.ps1 verify explain --target 2.1 --plan out/verification-plan.json --test <stable-id>
 ```
 
-Each test has one disposition:
+Each planned test has one disposition; execution summaries may additionally show `CHECKPOINT` for an exact fresh row adopted after an interrupted coordinator:
 
 | Disposition | Meaning |
 | --- | --- |
@@ -53,8 +53,15 @@ Each test has one disposition:
 | `WAIT` | A non-expired `running.json` shows another worker owns the same fingerprint |
 | `RUN` | No exact evidence exists or reuse was disabled |
 | `INVALID` | Evidence material exists but is failed, blocked, malformed, untrusted, or digest-mismatched |
+| `CHECKPOINT` | An exact passing row already completed for this immutable fresh campaign and is carried forward without re-execution |
 
 Unknown repository inputs escalate through `.mir/assurance.json`. Unknown packaged paths are included in every scenario dependency set, conservatively invalidating the scenario matrix.
+
+The current target profile must exactly match the active typed release record's public upgrade source, target, and fixture. Historical releases continue to receive release-specific projected profiles, but the development planner may not fall back to an older public transition. A declared external input whose fingerprint is `missing` makes that exact plan row `INVALID`; the runner must not discover a missing prior archive, candidate, Factorio installation, or mod closure only after execution starts.
+
+Before focused qualification, `release.approved-delta` binds the active release record and the exact future transition path as `pending`; this is development-state proof that approved-delta authority has not been created. It does not create a delta artifact or an approval claim. Once the release leaves the pre-qualification states, the exact transition artifact must exist and becomes the fingerprinted input.
+
+`development-breadth` is the canonical fresh pre-candidate campaign. It includes every development-valid static, exact-ZIP, full runtime, upgrade, ecosystem, and approved-delta row, but deliberately excludes candidate-bound performance, manual-review, and seal authority. Use it with `--no-reuse` for a complete development calibration. `full` remains the release profile and must continue to fail closed when its exact manual attestation or other candidate inputs are absent.
 
 ## Fingerprint Model
 
@@ -74,16 +81,28 @@ Factorio layers are:
 
 ## Evidence Ledger
 
-Evidence lives at `artifacts/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs.
+Evidence lives at `build/results/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs. Worker-supplied pointers are never aggregate authority: the importer selects the immutable capsule from the current plan-bound receipt, validates its complete object closure, and derives the destination pointer. A missing, stale, or invalid supplied pointer is recorded but cannot replace or invalidate an otherwise complete immutable contribution.
 
 A schema-4 capsule binds the test ID, target, definition hash, full effective-input map, exact Factorio installation and resolved mod closure when applicable, trust-class-validated producer identity, exit code, structured `mir-test-result-v1`, assertion outcomes, artifact hashes, stdout and stderr hashes, timestamps, duration, and result digest. `passed.json` is only an atomic pointer to an immutable attempt capsule. Corrupt pointers are quarantined. A changed definition, verifier, policy, binary, mod archive, candidate, or other effective input creates a different fingerprint instead of rewriting history.
+
+### Fresh campaign checkpoints
+
+`--no-reuse` means no evidence from another campaign can satisfy the plan; it does not mean completed rows become worthless when a process, runner, or tool session ends. Every fresh plan owns a deterministic campaign identity derived from its immutable plan-material digest and records a minimum completion time. A completed row is resumed only when its full fingerprint, trusted producer, source commit, campaign ID, campaign plan-material digest, and completion time all match the named plan. The aggregate gate independently repeats those checks. An old row, a row from a changed plan, and a row from a different trust or source remain invalid.
+
+Use a deliberate boundary for long local or hosted runs instead of allowing an outer timeout to terminate an active Factorio process:
+
+```powershell
+./tools/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --no-reuse --time-budget-minutes 45 --factorio <factorio.exe>
+```
+
+The command stops only between rows, writes a `status: checkpointed` summary with the next test ID, and exits without treating the campaign as passing. Re-run the exact same command and `--plan`; only missing rows execute while accepted rows show `CHECKPOINT`. `verify gate` stays fail-closed until every plan row is present and valid. A stale `running.json` is automatically discarded after process-incarnation or lease verification, while a live matching worker is waited for rather than duplicated.
 
 ## Worker And Aggregate Gate
 
 Run one planned test with:
 
 ```powershell
-./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test <stable-id> --fingerprint <sha256> --factorio <factorio.exe>
+./tools/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test <stable-id> --fingerprint <sha256> --factorio <factorio.exe>
 ```
 
 The worker rechecks the exact evidence before execution. If a matching worker is active, it waits and adopts the completed pass. Otherwise it writes `running.json`, executes the command, writes the attempt and pass or block capsule, and clears the marker.
@@ -91,41 +110,53 @@ The worker rechecks the exact evidence before execution. If a matching worker is
 Evaluate the complete plan with:
 
 ```powershell
-./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output build/results/assurance/evidence-bundle.json
 ```
 
-Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time, run ID, and run attempt rather than inheriting plan-wide freshness only.
+Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time plus immutable campaign and plan-material identities; the operational run ID and attempt remain execution audit data, not a reason to repeat a valid row after recovery.
 
 ## CI
 
-The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. When every fast-profile fingerprint is already present as trusted reusable evidence, the workflow schedules one explicit reuse-only no-op row because GitHub rejects an empty dynamic matrix. That row runs no repository test and produces no capsule; the aggregate gate still validates every planned fingerprint from the restored ledger. The protected full workflow enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`. Its plan is always fresh, uploads only the exact planned candidate, the verification plan, and the candidate descriptor, and never transfers historical distribution archives. Each worker starts without the shared ledger and uploads only its immutable fingerprint capsule plus any structured scenario result. The performance worker additionally transfers the fresh schema-3 performance evidence that its F4 command produced; staging rejects that file unless its candidate version, evidence-producing commit, archive hash, and package-content hash match the exact worker plan, and verifies the copied file hash. The tightly scoped worker delta explicitly includes hidden files so the exact `.mir/evidence` path survives artifact upload; no other worker may supply that seal input. The gate restores the reusable ledger once, merges those capsule deltas and the exact performance evidence, evaluates the plan, writes the evidence bundle, and saves one updated immutable cache key.
+The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. When every fast-profile fingerprint is already present as trusted reusable evidence, the workflow schedules one explicit reuse-only no-op row because GitHub rejects an empty dynamic matrix. That row runs no repository test and produces no capsule; the aggregate gate still validates every planned fingerprint from the restored ledger.
+
+Fast, targeted, and scheduled matrix workers upload only their exact `test-id/fingerprint` subtree. Every completed worker attempt, including a failed attempt, also writes `worker-receipts/<plan-material-sha256>.json`. Receipt schema 2 binds the semantic plan and required-test-set digests, plan generation/source/target/profile, plan coordination producer, exact work row and freshness policy, contribution-preparation workflow/run/attempt/job identity, evidence producer and trust, completion state, immutable capsule hash, and result digest. The aggregate job downloads each GitHub artifact into its own artifact-name directory and invokes the plan-bound importer. The importer admits only the artifact selected by each scheduled work row, validates the receipt, capsule, structured result, stdout/stderr, and every declared artifact digest, copies only selected immutable files without overwriting different bytes, preserves failed capsules behind a derived blocking pointer, and derives passing pointers deterministically. Missing and failed rows do not stop later successful imports, duplicate exact-row contributions are release-blocking, irrelevant stale artifacts are reported and ignored, and the summary remains available even when proof closure fails. Whole-ledger artifact merging and `merge-multiple: true` are forbidden because creation or extraction order must never select evidence.
+
+Worker ingestion rejects absolute or traversing paths, mixed-slash traversal, NTFS alternate data streams, Windows device names, symlinks and reparse points, duplicate case-folded or Unicode-normalized paths, and immutable-object collisions. `.mir/assurance.json` also caps artifact count, per-artifact entries, total expanded bytes, and individual file size. Generated scenario summaries remain outputs under `build/results/`; repository input enumeration excludes ignored `build/results/` and `build/`, while the receipt and capsule bind the resulting summary digest.
+
+The protected full workflow remains a separate content-addressed-object path. It enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`; its plan is always fresh, uploads only the exact planned candidate, verification context, and candidate descriptor, and never transfers historical distribution archives. Each worker starts without the shared ledger and uploads content-addressed evidence objects plus non-authoritative raw outputs. The gate downloads every contribution into an isolated artifact directory, imports only canonical JSON objects whose filename and bytes match the SHA-256 address, rebuilds its evidence index from those accepted objects, evaluates the plan, writes the evidence bundle, and saves one updated immutable cache key. Mutable indexes, leases, raw outputs, artifact listing order, and completion order cannot choose the aggregate result.
 
 Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows runners. They build one candidate, upload the same bytes to every worker, and never use `pull_request_target`. Self-hosted Factorio binaries, local proprietary mods, publishing credentials, and untrusted fork code must remain isolated.
 
 ## Qualification And Sealing
 
+### Candidate reservation and assignment
+
+A planned release reserves a `candidate_floor` but has `candidate_id: not-assigned`. A reservation is sequencing policy, not evidence and not a package identity. At source freeze, assign the first exact candidate ID at or above that floor and bind it to the frozen source commit, tree, and package-source digest in the ReleaseRecord and append-only transition record. Any later package-visible source change invalidates that candidate and requires a new candidate ID; never rewrite an existing candidate's source or archive identity. Generated views must show reservation and exact candidate identity separately.
+
+Verification planning is valid before candidate assignment, but scenario-domain plans still require exact archive bytes. In the `planned` state, the fast workflow deterministically builds one development archive and transfers those same bytes with the plan; the plan binds its `package_source_commit` field to the current source snapshot for command reconstruction and fingerprinting, while the typed release record remains package-empty and `authority_class` remains a non-candidate planned reservation. Development-archive evidence is useful for integration and regression feedback but cannot qualify or seal a release. Source-frozen planning binds the recorded package-source commit. Candidate sealing, seal verification, promotion, and every exact-candidate assertion continue to use strict candidate authority and reject `not-assigned`, a reserved floor, missing package identity, or an unfrozen archive.
+
 For MIR 3.2.0:
 
 ```powershell
-./scripts/mir.ps1 assurance build --target 2.1
-./scripts/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
-./scripts/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
-./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/3.2.0-assurance-qualification.json
+./tools/mir.ps1 assurance build --target 2.1
+./tools/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
+./tools/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
+./tools/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output build/results/assurance/3.2.0-assurance-qualification.json
 ```
 
 The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
 
-- `release.approved-delta` checks both archive and package-content hashes plus package source authority; its producer fingerprint uses canonical LF-normalized text identities so an exact Git tree has one authority on every checkout;
+- `release.approved-delta` checks both archive and package-content hashes plus package source authority;
 - `runtime.performance-regression` produces a fresh paired qualified-baseline campaign in `.mir/evidence/<version>-performance-regression.json` and immediately checks it;
 - `manual.release-review` checks the package-focused attestation in `.mir/evidence/<version>-manual-review-attestation.json`.
 
-Schema-3 performance evidence must bind the exact prior release, candidate, evidence-producing commit, Factorio binary, machine, mod closure, settings, scenarios, and harness. The package-source commit must be an ancestor of that producer, the producer must be an ancestor of qualification, and package-visible roots must remain identical throughout. It uses at least one warm-up and five balanced measured pairs. Every governed lane must meet the 20 percent median ceiling or its small absolute-noise allowance, and any declared absolute ceiling. It also preserves maximum-observed compiler artifact-volume counters plus the telemetry fingerprint for every measured diagnostics-off and diagnostics-on candidate run, so timing changes can be separated from plan, coverage, context-copy, closure-cache, and sanitation volume.
+Schema-3 performance evidence must bind the exact prior release, candidate, source commit, Factorio binary, machine, mod closure, settings, scenarios, and harness. It uses at least one warm-up and five balanced measured pairs. Every governed lane must meet the 20 percent median ceiling or its small absolute-noise allowance, and any declared absolute ceiling. It also preserves maximum-observed compiler artifact-volume counters plus the telemetry fingerprint for every measured diagnostics-off and diagnostics-on candidate run, so timing changes can be separated from plan, coverage, context-copy, closure-cache, and sanitation volume.
 
 The full and backport no-reuse plans create and validate that evidence as one capsule. For a focused preflight, run the same composed producer/verifier:
 
 ```powershell
 .\scripts\Invoke-MIRPerformanceQualification.ps1 `
-  -Candidate artifacts\candidate\more-infinite-research_3.2.0.zip `
+  -Candidate build\results\candidate\more-infinite-research_3.2.0.zip `
   -PriorRelease dist\more-infinite-research_3.1.9.zip `
   -FactorioBin C:\Factorio-2.1.11\bin\x64\factorio.exe `
   -LocalModZipDir C:\Factorio-mods-2.1 `
@@ -138,18 +169,18 @@ The generated evidence path is an output, not a verification-plan input. This pr
 
 The campaign uses the non-shipped `fixtures/performance-regression-probe` symmetrically for exact-archive diagnostics-off phase timing. The probe does not enter either release ZIP. Medium and large ecosystem lanes remain load observations over their exact resolved closures. Candidate ecosystem rows must also satisfy the current sanitation claim gate. The sealed prior-release baseline must pass its Factorio process, timeout, dependency, and closure checks, but is not required to emit a sanitation ledger introduced by the candidate.
 
-The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, immutable package-source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. Qualification verifies that the package-source commit is an ancestor and that no package-visible path changed; the attestation never claims the later commit that contains itself. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
+The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, immutable package-source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. The package-source commit must be an ancestor of the qualification commit and package-visible roots must remain identical; binding the attestation to the package source avoids the impossible requirement for a committed attestation to predict its containing commit. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
 
 `runtime.upgrade` is one F4 matrix result with five mandatory, independently hashed rows: base/default, Space Age native owner, automatic family creation, base continuation, and mod-set configuration change. The configuration-change row removes its source-only compatibility fixture before loading the candidate and proves current research, fractional progress, generated lifecycle state, and removal of only the dangling recipe target.
 
 Ecosystem evidence is candidate-bound: the release-targeted gate must pass the exact candidate ZIP through every local repair and representative scenario and must not rebuild distribution bytes during verification. The composed `runtime.ecosystem` lane skips the release-gate clean-tree check because source authority is independently enforced by approved-delta, manual-attestation, and protected sealing gates. Ecosystem evidence is also bounded by `.mir/sanitation-budgets.json`. Manifest scenarios resolve through the `campaigns` scope, while target-qualified release repair smokes resolve through `local_mod_zips`. A scenario passes only when its observed external prunes exactly include every reviewed prune and contain no more than the declared maximum unreviewed prunes. Release budgets use zero; a missing budget or mismatch is `REVIEW_REQUIRED`, never a compatibility pass.
 
 ```powershell
-./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
-./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
+./tools/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
+./tools/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 
-Seal schema 4 accepts canonical current-line IDs such as `C16` and target-scoped backport IDs such as `2.5-P6`. It records the immutable package-source commit and material hash and the later qualification-source commit and tree separately. Performance evidence retains its evidence-producing commit; manual review binds the immutable package-source commit. The legacy `source_commit` and `source_tree` seal fields remain qualification-source aliases for evidence compatibility. A clean candidate uses `git-commit-normalized-package-v1`, binding the exact source tree and package file count while deriving the normalized package-source hash directly from committed package files. A historical candidate whose material hash was captured from a dirty precommit worktree uses `git-index-with-captured-worktree-v1`; its descriptor records each affected path, eventual Git blob, and captured worktree hash. The two explicit variants preserve clean commit authority without pretending that checkout newline conversion can recover older mixed index/worktree bytes.
+Seal schema 4 records the candidate ID, immutable package-source commit and material hash, and later qualification-source commit and tree separately. The legacy `source_commit` and `source_tree` fields remain qualification-source aliases for evidence compatibility. A clean candidate uses `git-commit-normalized-package-v1`, binding the exact source tree and package file count while deriving the normalized package-source hash directly from committed package files. A historical candidate whose material hash was captured from a dirty precommit worktree uses `git-index-with-captured-worktree-v1`; its descriptor records each affected path, eventual Git blob, and captured worktree hash. The two explicit variants preserve clean commit authority without pretending that checkout newline conversion can recover older mixed index/worktree bytes.
 
 Seal creation requires the package-source commit to be an ancestor of qualification, proves that package roots are unchanged, re-evaluates the recorded package material identity against identical Git blobs at both commits, and deterministically reconstructs the exact archive and content identities from narrow committed-source archives at both commits. This allows assurance, evidence, and release-governance commits to qualify frozen candidate bytes without misrepresenting them as package source.
 

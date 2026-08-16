@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-18T15:04:03+10:00",
+  "min_downloads": 10000,
+  "factorio_line": "2.1",
+  "factorio_versions": [
+    "2.0",
+    "2.1"
+  ],
+  "include_space_age": false,
+  "scenario_timeout_seconds": 900,
+  "continue_on_dependency_failure": true,
+  "include_recommended_dependencies": false,
+  "max_candidates": 0,
+  "catalog_pages": 0,
+  "from_lockfile": "",
+  "start_index": 0,
+  "count": 0,
+  "offline": true,
+  "local_mod_zip_dirs": [],
+  "local_mod_zips": [],
+  "local_mod_library_dirs": [
+    "C:\\Projects\\Factorio\\testmods_2.1"
+  ],
+  "local_mod_library_zips": [],
+  "mod_under_test_zip": "C:\\Projects\\Factorio\\more-infinite-research\\build\\ecosystem-candidate\\more-infinite-research_3.2.0.zip",
+  "mod_under_test_sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C",
+  "mod_under_test_source_commit": "565e68398315762af653daf2ed6c1d40b93a4136",
+  "link_mode": "Copy",
+  "local_root_zip_count": 0,
+  "local_library_zip_count": 599,
+  "candidates_selected": [],
+  "manual_scenarios_selected": [
+    "pymodpack"
+  ],
+  "generated_local_scenarios_selected": [],
+  "local_zip_scenarios_selected": [],
+  "mods": []
+}

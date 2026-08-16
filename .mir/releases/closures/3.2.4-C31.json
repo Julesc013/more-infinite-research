@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "CLOSE-3.2.4-C31",
+  "release": "3.2.4",
+  "candidate_id": "C31",
+  "disposition": "superseded-unpublished",
+  "reason": "The maintainer incorporated the unreleased 3.2.4 product scope into the 3.2.5 development lineage. C31 itself will not be published, and its unperformed candidate-specific qualification, sealing, promotion, and publication obligations are cancelled rather than transferred.",
+  "successor": {
+    "release": "3.2.5",
+    "candidate_floor": "C32"
+  },
+  "package": {
+    "source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+    "source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c",
+    "source_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+    "archive": "dist/more-infinite-research_3.2.4.zip",
+    "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
+    "content_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+    "bytes": 1048419,
+    "entries": 298
+  },
+  "remaining_obligations_disposition": "cancelled-by-programme-decision",
+  "evidence_policy": "diagnostic-and-exact-proposition-reuse-only",
+  "decision": "docs/adr/0028-3-2-5-convergence-release.md",
+  "closed_at": "2026-08-03T09:35:03.907Z"
+}

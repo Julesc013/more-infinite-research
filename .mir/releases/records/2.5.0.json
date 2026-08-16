@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "release": "2.5.0",
+  "candidate_id": "2.5-P11",
+  "target": "2.0",
+  "branch": "legacy",
+  "state": "publicly-verified",
+  "package": {
+    "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+    "source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685",
+    "source_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+    "content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+    "bytes": 1033875,
+    "entries": 291
+  },
+  "source_release": {
+    "release": "3.2.3",
+    "tag": "3.2.3",
+    "tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "candidate_id": "C30",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db"
+  },
+  "baseline_release": {
+    "release": "2.4.9",
+    "tag": "2.4.9",
+    "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62"
+  },
+  "integration": {
+    "strategy": "dual-parent-target-projection-v1",
+    "commit": "110290598aadd269dad6aa749ebb38495851b4f2",
+    "first_parent": "df669ceb10f3fa703bd2df978a1b51fbfa68ebe3",
+    "second_parent": "1abe07573cde814c3cacf6153b5ae64dee4038ba"
+  },
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "package-lock",
+        "path": ".mir/control-plane/package-locks.json",
+        "candidate_id": "2.5-P11"
+      },
+      {
+        "kind": "backport-source-lock",
+        "path": ".mir/backport-source-lock.json"
+      }
+    ],
+    "candidate_qualification": [
+      {
+        "kind": "local-automated-qualification",
+        "path": ".mir/evidence/2.5.0-local-automated-qualification.json",
+        "sha256": "BC1360B737A225026CFD6F8D517A675FCF43FE25E1D95BFF71C39059C311958E",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "manual_acceptance": [
+      {
+        "kind": "schema-2-maintainer-attestation",
+        "path": ".mir/evidence/2.5.0-manual-review-attestation.json",
+        "sha256": "6D2947B280A5CA354C829B3D2689A429E9D67F994AD2F06C57B02FC273295933",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "tag": [
+      {
+        "kind": "annotated-tag",
+        "name": "2.5.0",
+        "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+        "tag_object": "e31e6df055224dbf218093a89fc852a7b6172c5c"
+      }
+    ],
+    "publication": [
+      {
+        "kind": "github-and-mod-portal-publication",
+        "path": ".mir/evidence/2.5.0-publication.json",
+        "sha256": "C0BB2A197AABBF87D71443FF261A67CBBB06967459F3436304E0C8B4B93DE020",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "public_byte_verification": [
+      {
+        "kind": "public-asset-identity",
+        "path": ".mir/evidence/2.5.0-publication.json",
+        "sha256": "C0BB2A197AABBF87D71443FF261A67CBBB06967459F3436304E0C8B4B93DE020",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "publication_exception": [
+      {
+        "kind": "timeboxed-maintainer-decision",
+        "path": ".mir/evidence/2.5.0-timeboxed-publication-decision.json",
+        "sha256": "DC4A2187433348D3E24FE40E3A80E80AABBA9EFE7EB49039090A02FE5A22B3C6",
+        "digest_policy": "utf8-lf"
+      }
+    ],
+    "backport_reconstruction": [
+      {
+        "kind": "integrated-successor-lineage",
+        "path": ".mir/evidence/2.5.0-p11-lineage.json",
+        "sha256": "499C08A7CA9BC6F8FE8A8F87177CA9BB19276ACE58B4EDAE8123E0CE9710EE04",
+        "digest_policy": "utf8-lf"
+      }
+    ]
+  },
+  "assurance_exceptions": [
+    {
+      "id": "P11-TIMEBOXED-PUBLICATION-2026-08-02",
+      "kind": "release-specific-timeboxed-publication",
+      "status": "authorized",
+      "path": ".mir/evidence/2.5.0-timeboxed-publication-decision.json",
+      "sha256": "DC4A2187433348D3E24FE40E3A80E80AABBA9EFE7EB49039090A02FE5A22B3C6",
+      "digest_policy": "utf8-lf",
+      "normal_gates_waived_for_publication_only": true,
+      "generic_policy_changed": false
+    }
+  ],
+  "remaining_obligations": [
+    "protected-qualification-post-publication",
+    "protected-candidate-seal-post-publication",
+    "normal-promotion-admission-reconciliation",
+    "24-hour-stabilization-decision"
+  ],
+  "backport_manifest": "path:releases.backports/2.5.0.json",
+  "updated_at": "2026-08-02T09:17:25.689Z",
+  "superseded_candidates": [
+    {
+      "candidate_id": "2.5-P10",
+      "package_source_commit": "39f2238c4f83790bf0d2bf5f1459503e96c41925",
+      "archive_sha256": "4BF7DB4238437A3C2C93F08DAEA30C4376C5222C8017C8A63F959C30264DD589",
+      "status": "superseded-during-local-qualification"
+    },
+    {
+      "candidate_id": "2.5-P9",
+      "package_source_commit": "f446d89f94ce4b9dc26f04c31c92f9bcffbac70d",
+      "archive_sha256": "30D7205527F3643169799AD8AF87C313D35DB81B14A6BDD460D9ED4D1B819DE3",
+      "status": "superseded-before-final-qualification"
+    }
+  ]
+}

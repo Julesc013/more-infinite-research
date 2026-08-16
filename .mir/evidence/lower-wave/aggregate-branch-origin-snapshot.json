@@ -1,0 +1,728 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-07-15T00:16:26.8190892Z",
+  "snapshot_aggregate_head": "95fa4fe58797e6411dc19677d285092c804b9c0d",
+  "branch_count": 72,
+  "branches": [
+    {
+      "branch": "dev",
+      "local_sha": "804e7b7332513388ee3b3ef7575a394cea322394",
+      "remote_sha": "804e7b7332513388ee3b3ef7575a394cea322394",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-3.1.9",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "DEV_LOWER_WAVE_ANCHOR",
+      "local_sha": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+      "remote_sha": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "DEV_RING_1_1_1_0_ANCHOR",
+      "local_sha": "53090c6f860bf9cb9aaf10140cbfe3924ef59c6c",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "FINAL_LOWER_WAVE_DEV_ANCHOR",
+      "local_sha": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+      "remote_sha": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "legacy",
+      "local_sha": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+      "remote_sha": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-legacy",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "main",
+      "local_sha": "a32e7fd26de7d96fc27a440a456bc9165630ceca",
+      "remote_sha": "a32e7fd26de7d96fc27a440a456bc9165630ceca",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.10",
+      "local_sha": "58fede301a624cdd3be2d882ba0633ff7a324877",
+      "remote_sha": "58fede301a624cdd3be2d882ba0633ff7a324877",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.10",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.11",
+      "local_sha": "52b3380ce3613c2e7f79665eeb7a5a2170fca345",
+      "remote_sha": "52b3380ce3613c2e7f79665eeb7a5a2170fca345",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.11",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.12",
+      "local_sha": "3908030e1be55b9499878d557e4d85d163dd077b",
+      "remote_sha": "3908030e1be55b9499878d557e4d85d163dd077b",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.12",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.13",
+      "local_sha": "8b712bb4929e283e1aa886574b19371060563f4b",
+      "remote_sha": "8b712bb4929e283e1aa886574b19371060563f4b",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.13",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.14",
+      "local_sha": "5a26a18a970401ff012bde9789bfa0b9a89ae842",
+      "remote_sha": "5a26a18a970401ff012bde9789bfa0b9a89ae842",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.14",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.15",
+      "local_sha": "4774ac9e6fe450722846e223424c10cfed98237b",
+      "remote_sha": "4774ac9e6fe450722846e223424c10cfed98237b",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.15",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.16",
+      "local_sha": "fe1fde90494456b7e710f279ee8e06fd4c22f2ba",
+      "remote_sha": "fe1fde90494456b7e710f279ee8e06fd4c22f2ba",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.16",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.17",
+      "local_sha": "624d5ce876545bb18adf298576b894dc751e515f",
+      "remote_sha": "624d5ce876545bb18adf298576b894dc751e515f",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.17",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.6",
+      "local_sha": "8fce473c079f66d79e2ddae97cda896fdb09956d",
+      "remote_sha": "8fce473c079f66d79e2ddae97cda896fdb09956d",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.6",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.7",
+      "local_sha": "1aac68be89ee38b4365cc21f1970c38ca23e9b81",
+      "remote_sha": "1aac68be89ee38b4365cc21f1970c38ca23e9b81",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.7",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.8",
+      "local_sha": "ecc03a19df517ed452c7336fe9f0e7ffcc4e8ac7",
+      "remote_sha": "ecc03a19df517ed452c7336fe9f0e7ffcc4e8ac7",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.8",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "rebuild/0.9",
+      "local_sha": "312ff7fa5b7edc40004de46827d7a191dd0594e1",
+      "remote_sha": "312ff7fa5b7edc40004de46827d7a191dd0594e1",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-rebuild-0.9",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/legacy-before-1.9.2-backport",
+      "local_sha": "ebb4e07fbe81f90879b2ec58d44fd493bc8ef652",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/legacy-before-1.9.5-backport",
+      "local_sha": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/legacy-before-2.3.0-promotion",
+      "local_sha": "4a56169922c1472bbf8ef1947b8eaa18d8ad992f",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/0.13-4269281",
+      "local_sha": "42692819544c24cc2f88a66f4dfe35d0298de20f",
+      "remote_sha": "42692819544c24cc2f88a66f4dfe35d0298de20f",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/0.14-42aa2ea",
+      "local_sha": "42aa2eacba7095c21a8cf1050510b7dbacb52298",
+      "remote_sha": "42aa2eacba7095c21a8cf1050510b7dbacb52298",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/0.15-b3647fa",
+      "local_sha": "b3647fa491bf8b868bfe9b46c82db6da78256cba",
+      "remote_sha": "b3647fa491bf8b868bfe9b46c82db6da78256cba",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/0.16-1429b02",
+      "local_sha": "1429b02f09d0a693389124dc7b9d1b29033a960b",
+      "remote_sha": "1429b02f09d0a693389124dc7b9d1b29033a960b",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/0.17-bb12acb",
+      "local_sha": "bb12acb29cbef4cd141f157b6ed5e6f4c5e8f494",
+      "remote_sha": "bb12acb29cbef4cd141f157b6ed5e6f4c5e8f494",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/1.0-fdc9e37",
+      "local_sha": "fdc9e37ebae444f59c9c78fe751fbcd69a6bd9c9",
+      "remote_sha": "fdc9e37ebae444f59c9c78fe751fbcd69a6bd9c9",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-2.4.0-wave/1.1-16879c8",
+      "local_sha": "16879c88aeb0f18f043e335ba606be46f65d2535",
+      "remote_sha": "16879c88aeb0f18f043e335ba606be46f65d2535",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-3.1.9-refresh/2.0-6b99308",
+      "local_sha": "6b993088fbd5193e2c28f114af6a71c6143996b4",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-3.1.9-refresh/dev-9c8f400",
+      "local_sha": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-3.1.9-refresh/main-c8bf4a7",
+      "local_sha": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-3.1.9-refresh/synthesis-8ab20f7",
+      "local_sha": "8ab20f7e0dbf33c16ed44fac09f0dee7b3b6de5e",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-3.1.9/dev-c8bf4a7",
+      "local_sha": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+      "remote_sha": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.10-d5346cf",
+      "local_sha": "d5346cf7ac65fd0eb0d23e50c12102d5b9eb7ca7",
+      "remote_sha": "d5346cf7ac65fd0eb0d23e50c12102d5b9eb7ca7",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.11-5117b8a",
+      "local_sha": "5117b8ac9ae374bbce651f26e793cef9721e0da3",
+      "remote_sha": "5117b8ac9ae374bbce651f26e793cef9721e0da3",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.12-cd06a01",
+      "local_sha": "cd06a0123292756ab569fca6d2702da72b966999",
+      "remote_sha": "cd06a0123292756ab569fca6d2702da72b966999",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.13-9037ed0",
+      "local_sha": "9037ed01e04961b0b370f082ccafa5ef0b3a34f9",
+      "remote_sha": "9037ed01e04961b0b370f082ccafa5ef0b3a34f9",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.14-2e9eab8",
+      "local_sha": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6",
+      "remote_sha": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.15-c55cba5",
+      "local_sha": "c55cba5253f82bc93733522736fa303eda5acfa7",
+      "remote_sha": "c55cba5253f82bc93733522736fa303eda5acfa7",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.16-41283b1",
+      "local_sha": "41283b13037fd8b39c875d0d8cdc39ad1e978b23",
+      "remote_sha": "41283b13037fd8b39c875d0d8cdc39ad1e978b23",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.17-c59140c",
+      "local_sha": "c59140c1808575bd26bf4156f9a6891d3cf90945",
+      "remote_sha": "c59140c1808575bd26bf4156f9a6891d3cf90945",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.6-a9fb146",
+      "local_sha": "a9fb146f401187ea7b9a429be179c0c043b09858",
+      "remote_sha": "a9fb146f401187ea7b9a429be179c0c043b09858",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.7-d870255",
+      "local_sha": "d870255cc6810ad6491fa0c58f03aa9a9d2ffe0d",
+      "remote_sha": "d870255cc6810ad6491fa0c58f03aa9a9d2ffe0d",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.8-548a880",
+      "local_sha": "548a880ee1fe5ed83dddd2d18844772b0e5b6a19",
+      "remote_sha": "548a880ee1fe5ed83dddd2d18844772b0e5b6a19",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/0.9-a767c93",
+      "local_sha": "a767c93e36e7f32c5e12f0b675ae5315d782ebbd",
+      "remote_sha": "a767c93e36e7f32c5e12f0b675ae5315d782ebbd",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-lower-wave/dev-f0aa9a7",
+      "local_sha": "f0aa9a77f0cbda0f18c149f3fad4b1c179345f9c",
+      "remote_sha": "f0aa9a77f0cbda0f18c149f3fad4b1c179345f9c",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.10-3c39b42",
+      "local_sha": "3c39b428f82c6a422402f0eadf379e7a9ec806d9",
+      "remote_sha": "3c39b428f82c6a422402f0eadf379e7a9ec806d9",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.11-03ac230",
+      "local_sha": "03ac230c3d20f229dadfaa6e0ccf71135bb0bc10",
+      "remote_sha": "03ac230c3d20f229dadfaa6e0ccf71135bb0bc10",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.12-acfba01",
+      "local_sha": "acfba01036a7955128750b2ae67edbfef3dcf13a",
+      "remote_sha": "acfba01036a7955128750b2ae67edbfef3dcf13a",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.6-20a94c4",
+      "local_sha": "20a94c4dc5abffd7b36d0590f253162afd428645",
+      "remote_sha": "20a94c4dc5abffd7b36d0590f253162afd428645",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.7-7e964b4",
+      "local_sha": "7e964b4705e15ff2365a06a9e00901fae751c0c7",
+      "remote_sha": "7e964b4705e15ff2365a06a9e00901fae751c0c7",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.8-41c2c4f",
+      "local_sha": "41c2c4f842548ddbc7c3513795acd3e12bef4dc3",
+      "remote_sha": "41c2c4f842548ddbc7c3513795acd3e12bef4dc3",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-museum-wave/0.9-d86dfd6",
+      "local_sha": "d86dfd656f4e83cf34e7100e3657688123aef5e0",
+      "remote_sha": "d86dfd656f4e83cf34e7100e3657688123aef5e0",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/pre-ring-1.1-1.0/dev-9c8f400",
+      "local_sha": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-ring-1.1-1.0/tmp-1.0-b2855c7",
+      "local_sha": "b2855c7bbcf5adc69644820491eb8ebc17bcf362",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/pre-ring-1.1-1.0/tmp-1.1-dc6414e",
+      "local_sha": "dc6414e21585e8f565947be1c3b59ebe6bf750b8",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/tmp-2.0-before-2.4.0-regeneration",
+      "local_sha": "4f7c9d18d5491e6e6fcafa5364f9b832cabac233",
+      "remote_sha": "4f7c9d18d5491e6e6fcafa5364f9b832cabac233",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "safety/tmp-2.0-before-dev-sync",
+      "local_sha": "b43f0a99e3a0462799e3afd1a9438a7aedc97899",
+      "remote_sha": null,
+      "ahead": null,
+      "behind": null,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-missing"
+    },
+    {
+      "branch": "safety/tmp-2.0-before-native-owner-settings-repair",
+      "local_sha": "a853f88fd2fae19b45a16553e3273a2015283452",
+      "remote_sha": "a853f88fd2fae19b45a16553e3273a2015283452",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": null,
+      "worktree_state": "not-checked-out",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.10",
+      "local_sha": "c88838b891e4091ea9e549c14cd630c5ee43d950",
+      "remote_sha": "c88838b891e4091ea9e549c14cd630c5ee43d950",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.10",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.11",
+      "local_sha": "2f71e78b2bd2cdadc55654cd1349b3858a75fed4",
+      "remote_sha": "2f71e78b2bd2cdadc55654cd1349b3858a75fed4",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.11",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.12",
+      "local_sha": "f9bce733e9ac78934a827b8a3ce71f5dd570b8ab",
+      "remote_sha": "f9bce733e9ac78934a827b8a3ce71f5dd570b8ab",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.12",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.13",
+      "local_sha": "262e94b39bf30b8bbf4f17f6cbf14dd507f696ba",
+      "remote_sha": "262e94b39bf30b8bbf4f17f6cbf14dd507f696ba",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.13",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.14",
+      "local_sha": "f8251df29a70dd402de12874c231e071bd47bd5b",
+      "remote_sha": "f8251df29a70dd402de12874c231e071bd47bd5b",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.14",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.15",
+      "local_sha": "3e44e19190236d03dc15e50d714b4a7347e05220",
+      "remote_sha": "3e44e19190236d03dc15e50d714b4a7347e05220",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.15",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.16",
+      "local_sha": "b392624d38dbb8ef6c42c8efa20aeb9b6a9c97c9",
+      "remote_sha": "b392624d38dbb8ef6c42c8efa20aeb9b6a9c97c9",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.16",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.17",
+      "local_sha": "828a7359af014105d0aa681722585c26766583e6",
+      "remote_sha": "828a7359af014105d0aa681722585c26766583e6",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.17",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.6",
+      "local_sha": "26886b6eeef6638801268821ee2aa5c1caf94a60",
+      "remote_sha": "26886b6eeef6638801268821ee2aa5c1caf94a60",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.6",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.7",
+      "local_sha": "e44ee8afaa957797431c3f350e9566e0512b7b1c",
+      "remote_sha": "e44ee8afaa957797431c3f350e9566e0512b7b1c",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.7",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.8",
+      "local_sha": "7086ee27486ae4177bbb310245fa24c4a2a3f18e",
+      "remote_sha": "7086ee27486ae4177bbb310245fa24c4a2a3f18e",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.8",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/0.9",
+      "local_sha": "13764da44d971dd1fca6053315f5fcbe996b4ac4",
+      "remote_sha": "13764da44d971dd1fca6053315f5fcbe996b4ac4",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-0.9",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    },
+    {
+      "branch": "tmp/lower-wave-0.17-to-0.6",
+      "local_sha": "95fa4fe58797e6411dc19677d285092c804b9c0d",
+      "remote_sha": "95fa4fe58797e6411dc19677d285092c804b9c0d",
+      "ahead": 0,
+      "behind": 0,
+      "worktree": "C:/Projects/Factorio/more-infinite-research-lower-wave",
+      "worktree_state": "clean",
+      "push_result": "remote-equal"
+    }
+  ]
+}

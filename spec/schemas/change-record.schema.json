@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/change-record.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/change-record.schema.json",
+  "title": "MIR ChangeRecord",
+  "type": "object",
+  "required": ["schema", "id", "title", "kind", "package_visible", "domains_read", "domains_written", "affected_targets", "migration_impact", "release_note_impact", "test_obligations", "backport_disposition", "state"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^CHG-[0-9]{4}-[0-9]{4}$"},
+    "title": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["product", "tooling", "documentation", "release", "backport"]},
+    "package_visible": {"type": "boolean"},
+    "domains_read": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "domains_written": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "affected_targets": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "migration_impact": {"type": "string"},
+    "release_note_impact": {"type": "string"},
+    "test_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "backport_disposition": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string"}},
+    "state": {"enum": ["proposed", "planned", "implemented", "qualified", "released", "closed"]}
+  },
+  "additionalProperties": false
+}

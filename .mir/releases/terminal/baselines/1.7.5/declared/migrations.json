@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineMigrationInventoryV1",
+  "release": "1.7.5",
+  "target": "0.17.79",
+  "view": "declared",
+  "observation_capability": "packaged-migrations",
+  "fields_observed": [
+    "path",
+    "sha256",
+    "watermark"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_1.7.5.zip",
+    "docs/releases/notes/release-notes-1.7.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "migrations/more-infinite-research_2.0.5.json",
+      "target": "0.17.79",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.7.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.7.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-migration-and-watermark",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2"
+        },
+        {
+          "name": "watermark",
+          "value": "more-infinite-research_2.0.5"
+        }
+      ]
+    },
+    {
+      "stable_id": "migrations/more-infinite-research_2.1.0.json",
+      "target": "0.17.79",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.7.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.7.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-migration-and-watermark",
+      "attributes": [
+        {
+          "name": "sha256",
+          "value": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D"
+        },
+        {
+          "name": "watermark",
+          "value": "more-infinite-research_2.1.0"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

@@ -1,0 +1,475 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineOwnershipInventoryV1",
+  "release": "1.8.5",
+  "target": "1.0.0-only",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json",
+    "dist/more-infinite-research_1.8.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.8.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "recipe-prod-research_cannon_shooting_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_cannon_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"cannon-shell\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_crafting_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-crafting-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-crafting-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_mining_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-mining-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-mining-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-reach-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-reach-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-002",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-build-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-build-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-003",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-resource-reach-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-resource-reach-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-004",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-item-drop-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-item-drop-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_walking_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-running-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-running-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "electric"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"electric\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flamethrower_shooting_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_flamethrower_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "flamethrower"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"flamethrower\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-inventory-slots-bonus"
+        },
+        {
+          "name": "target",
+          "value": "1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 1, type = \"character-inventory-slots-bonus\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1#effect-002",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-logistic-trash-slots"
+        },
+        {
+          "name": "target",
+          "value": "1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 1, type = \"character-logistic-trash-slots\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lab_productivity-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_lab_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "laboratory-productivity"
+        },
+        {
+          "name": "target",
+          "value": "0.1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.1, type = \"laboratory-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_robot_battery-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_robot_battery-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "worker-robot-battery"
+        },
+        {
+          "name": "target",
+          "value": "0.1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.1, type = \"worker-robot-battery\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_shooting_speed-1#effect-001",
+      "target": "1.0.0-only",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.8.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rocket_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "rocket"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"rocket\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

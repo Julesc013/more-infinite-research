@@ -21,29 +21,30 @@ jobs:
           fetch-depth: 0
       - uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-2.1-
       - name: Build exact candidate
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance build --target 2.1
+        run: ./tools/mir.ps1 assurance build --target 2.1
       - name: Materialize forced breadth plan
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile full --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse --output out/verification-plan.json
+        run: ./tools/mir.ps1 verify plan --target 2.1 --profile full --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse --output build/results/assurance/verification-plan.json
       - id: matrix
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: mir-scheduled-plan-and-candidate
           path: |
-            out/verification-plan.json
+            build/results/assurance/verification-plan.json
             dist/*.zip
           if-no-files-found: error
 
@@ -69,7 +70,7 @@ jobs:
           path: .
       - uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-2.1-
@@ -78,12 +79,13 @@ jobs:
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
-        run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse
+        run: ./tools/mir.ps1 verify run-one --target 2.1 --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse
       - uses: actions/upload-artifact@v4
         if: always()
         with:
+          include-hidden-files: true
           name: mir-scheduled-evidence-${{ matrix.safe_test_id }}
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
   verification-gate:
@@ -104,34 +106,41 @@ jobs:
           path: .
       - uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-2.1-
-      - name: Merge worker evidence
+      - name: Download isolated worker evidence
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           pattern: mir-scheduled-evidence-*
-          path: artifacts/assurance/evidence
-          merge-multiple: true
+          path: build/results/assurance/worker-evidence
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
+        run: ./tools/mir.ps1 verify import-workers --target 2.1 --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --workers build/results/assurance/worker-evidence --artifact-prefix mir-scheduled-evidence-
       - name: Aggregate forced breadth gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
-        run: ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --output artifacts/assurance/scheduled-summary.json
+        run: ./tools/mir.ps1 verify gate --target 2.1 --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --output build/results/assurance/scheduled-summary.json
       - uses: actions/cache/save@v4
         if: always()
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
+          include-hidden-files: true
           name: assurance-scheduled-2.1-${{ github.sha }}
           path: |
-            out/verification-plan.json
-            artifacts/assurance/evidence-bundle.json
-            artifacts/assurance/scheduled-summary.json
+            build/results/assurance/verification-plan.json
+            build/results/assurance/worker-import.json
+            build/results/assurance/evidence-bundle.json
+            build/results/assurance/scheduled-summary.json
           if-no-files-found: warn

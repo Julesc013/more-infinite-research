@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR3GitHubFamilyPublicationV1",
+  "repository": "Julesc013/more-infinite-research",
+  "recorded_at": "2026-08-15T17:21:05+10:00",
+  "branch_promotions": {
+    "main": {"commit":"a60230a0695d2dd8fd1e727744614e746cda0bd8","mode":"fast-forward","status":"verified"},
+    "legacy": {"commit":"89719eb8ea5c938b6a0e9d816e6324d4d59b87bb","mode":"fast-forward","status":"verified"},
+    "lower_targets": "immutable-annotated-tags-only"
+  },
+  "tag_policy": {"created":9,"verified":9,"immutable_ruleset_id":20833401,"creation_gate_ruleset_id":20833404,"creation_gate_removed_after_verification":true,"updates_or_deletions_permitted":false},
+  "github_releases": {"created":9,"published":9,"drafts_remaining":0,"prereleases":0,"latest":"3.2.9"},
+  "public_assets": {"redownloaded":9,"archive_hashes_passed":9,"content_hashes_passed":9,"byte_counts_passed":9,"entry_counts_passed":9,"composition_checks_passed":9},
+  "public_asset_smokes": {"fresh_exact_engine":8,"exact_byte_identity_bridged":1,"supplementary_current_patch":1,"failed":0},
+  "receipts": [
+    "github/3.2.9.json",
+    "github/2.5.9.json",
+    "github/1.9.9.json",
+    "github/1.8.9.json",
+    "github/1.7.9.json",
+    "github/1.6.9.json",
+    "github/1.5.9.json",
+    "github/1.4.9.json",
+    "github/1.3.9.json"
+  ],
+  "workflow_observations": {
+    "main_post_promotion_branch_policy": {"run":31869997271,"status":"success"},
+    "main_post_promotion_mir": {"run":31869997444,"status":"success"},
+    "legacy_post_promotion_branch_policy": {"run":31870773514,"status":"success"},
+    "legacy_post_promotion_mir": {"run":31870773511,"status":"package-excluded-known-static-release-history-false-failure","release_bytes_affected":false},
+    "dev_post_controller_merge_mir": {"run":31870726183,"status":"success"}
+  },
+  "temporary_promotion_branch": {"name":"release/2.5.9-promotion-check","deleted":true,"commit_retained_by":["legacy","2.5.9"]},
+  "mod_portal": {"status":"pending-maintainer-manual-upload","authorized_for_automation":false,"handoff":"docs/releases/mir3-terminal-mod-portal-upload-checklist.md"},
+  "status": "github-family-published-and-verified"
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0026",
+  "title": "Assurance ecosystem worker dropped the planned local mod closure",
+  "source_observation": {
+    "observed_at": "2026-08-10T11:51:47.1723768Z",
+    "environment": "Full no-reuse 3.2.5 post-publication calibration on merged dev 49b6e7f55ee13be30ae81dfe6dc48e8d33cfa67e, exact immutable 3.2.5 and 3.2.3 packages, Factorio 2.1.13, and explicit C:\\Projects\\Factorio\\testmods\\2.1 closure.",
+    "fact": "The plan fingerprinted the supplied mod-lock and closure, but runtime.ecosystem invoked the release gate without --mods <mods>. The child gate then substituted its absent default C:\\Projects\\Factorio\\testmods_2.1 and failed before ecosystem qualification."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\tools\\mir.ps1 verify run --target 2.1 --profile full --candidate dist\\more-infinite-research_3.2.5.zip --prior dist\\more-infinite-research_3.2.3.zip --factorio <exact-2.1.13> --mods C:\\Projects\\Factorio\\testmods\\2.1 --no-reuse --plan build\\results\\terminal-calibration\\3.2.5-convergence-plan-dev49.json",
+    "expected": "runtime.ecosystem forwards the exact mod closure that its plan fingerprint bound, so the release gate cannot substitute a workstation default.",
+    "observed": "The exact run produced blocked capsule 25BDEC6DCCA7288F45C82656D9CF675339DA626B429710BECC7E7F93FE1377D5 and failed with 'Local mod directory does not exist: C:\\Projects\\Factorio\\testmods_2.1'."
+  },
+  "severity": "assurance",
+  "visibility": {
+    "package": false,
+    "gameplay": false,
+    "assurance": true
+  },
+  "stable_id_and_migration_impact": "none; assurance command transport only",
+  "affected_targets": [
+    "3.2.9",
+    "2.5.9",
+    "1.9.9",
+    "1.8.9",
+    "1.7.9",
+    "1.6.9",
+    "1.5.9",
+    "1.4.9",
+    "1.3.9"
+  ],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "current-target ecosystem evidence must execute the exact planned local closure"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "maintained-target ecosystem evidence must execute the exact planned local closure"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS target runners must not silently substitute workstation defaults"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS target runners must not silently substitute workstation defaults"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical target runners must not silently substitute workstation defaults"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical target runners must not silently substitute workstation defaults"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical target runners must not silently substitute workstation defaults"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite target runners must not silently substitute workstation defaults"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite target runners must not silently substitute workstation defaults"}
+  ],
+  "regression_obligations": [
+    "runtime.ecosystem command forwards --mods <mods> to the release gate",
+    "the ecosystem fingerprint retains the supplied mod-lock and closure",
+    "an exact 3.2.5 full no-reuse campaign executes runtime.ecosystem with the planned closure",
+    "an exact 2.5.5 independent campaign executes its planned 2.0 closure",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "ecosystem assurance proofs for targets using the release-gate runner; no product or package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The correction only forwards an already-fingerprinted external test input and cannot affect package bytes, target semantics, migrations, or public releases."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

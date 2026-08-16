@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "status": "complete",
+  "audited_at": "2026-07-15T05:27:32.0407608+10:00",
+  "scope": [
+    "tmp/1.1",
+    "rebuild/1.1",
+    "refs/tags/1.9.4",
+    "tmp/1.0",
+    "rebuild/1.0",
+    "refs/tags/1.8.2"
+  ],
+  "canonical_implementation_anchor": "53090c6f860bf9cb9aaf10140cbfe3924ef59c6c",
+  "pre_lower_wave_dev": "f0aa9a77f0cbda0f18c149f3fad4b1c179345f9c",
+  "allowed_dispositions": [
+    "PORTABLE-COMPILER",
+    "PORTABLE-CAPABILITY",
+    "PORTABLE-GRAPH",
+    "PORTABLE-PREREQUISITE",
+    "PORTABLE-SETTINGS",
+    "PORTABLE-DEFAULT",
+    "PORTABLE-MIGRATION",
+    "PORTABLE-RUNTIME",
+    "PORTABLE-ASSURANCE",
+    "PORTABLE-PACKAGING",
+    "PORTABLE-HARNESS",
+    "PORTABLE-LOCALE",
+    "PORTABLE-BALANCE",
+    "TARGET-1.1",
+    "TARGET-1.0",
+    "RELEASE-EVIDENCE",
+    "DUPLICATE",
+    "SUPERSEDED"
+  ],
+  "portable_return": {
+    "status": "complete-no-additional-portable-work",
+    "commits": [
+      {"commit":"5a8339ef7a1ce5638946198270e241d6831433e8","disposition":"PORTABLE-HARNESS","result":"Generic source-lock validation is present on dev."},
+      {"commit":"94b175584aaaa3e2d97a7c6f80c3c43a8dc54d18","disposition":"PORTABLE-CAPABILITY","result":"Positive mod-data target capability gating is present on dev."},
+      {"commit":"cf7d2ed6272de13c0faddb899983c58370e3fe2c","disposition":"PORTABLE-HARNESS","result":"Target-aware extension baseline validation is present on dev."},
+      {"commit":"7657172509efe506462aa92cc8d171e02063cc85","disposition":"PORTABLE-ASSURANCE","result":"Safe existing external weapon continuation is present on dev."},
+      {"commit":"93972f4ea980d69652df89ebafea94828dcf0113","disposition":"PORTABLE-MIGRATION","result":"Legacy upgrade initialization is present on dev."},
+      {"commit":"53090c6f860bf9cb9aaf10140cbfe3924ef59c6c","disposition":"PORTABLE-ASSURANCE","result":"Candidate seal version, target, and canonical-anchor binding is present on dev."}
+    ],
+    "additional_portable_commits": [],
+    "search_result": "Final target commits, both reconstruction histories, both superseded candidate histories, target fixtures, release notes, seals, tag merges, and publication ledgers contain no additional generic implementation absent from dev."
+  },
+  "refs": [
+    {"ref":"tmp/1.1","commit":"1e461ecb0785ee34905ab69b1c0e8791135cf98a","tree":"5eb51fe368545d74f6c546d9004b2a5512801929","commits_since_anchor":48,"changed_files":51},
+    {"ref":"rebuild/1.1","commit":"2dee595135444ad72c7aa32710ae10f5d6cf09cb","tree":"18d77bb35af7267dba67b6689184a2a6cd7ddc71","commits_since_anchor":24,"changed_files":50},
+    {"ref":"refs/tags/1.9.4","commit":"426d6d48c6578a786ea7de0f224282baff9d342b","tree":"18d77bb35af7267dba67b6689184a2a6cd7ddc71","commits_since_anchor":47,"changed_files":50},
+    {"ref":"tmp/1.0","commit":"b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2","tree":"028aae1364fe6131e673f123f116200238c9a6ec","commits_since_anchor":48,"changed_files":51},
+    {"ref":"rebuild/1.0","commit":"e5b4b578d8475968da49d8c1261c1ca568dc307b","tree":"9a9d84fc6303a156d291257dfe749c3f97c02df5","commits_since_anchor":24,"changed_files":50},
+    {"ref":"refs/tags/1.8.2","commit":"0a192c27674a6b13847e2f5e1b2b530e62419ee8","tree":"9a9d84fc6303a156d291257dfe749c3f97c02df5","commits_since_anchor":47,"changed_files":50}
+  ],
+  "line_dispositions": [
+    {
+      "line": "1.1",
+      "superseded_candidate": {
+        "head": "dc6414e21585e8f565947be1c3b59ebe6bf750b8",
+        "disposition": "SUPERSEDED",
+        "target_or_release_evidence": [
+          "eecfc291cd5e43e6185691f2ef091648a0dcae83",
+          "146b982744dc67efb9348d908257810a160424a5",
+          "4765b14d8f6dd5f5631c6affc578f9b4a2fcff36",
+          "ca9a0447993b77d53bc0982a22cfe3de64d3858e",
+          "f92c924f2c2e275d90f8526e1589d2468a683e00",
+          "4e5ba79a3afc2fc9d2ce1fc2ddc4df27db05ad23",
+          "c1bb2a6b05bb5d9ed782e010d0ab08f21c16af9c",
+          "d27de2b8ec37fd34558417101cd5bd121ee0497c",
+          "498408854170e893a0fa13bdbd11930197892b1d",
+          "4f3962f53ee0ae7dd267af272eb8e7cb8b08bd82",
+          "16879c88aeb0f18f043e335ba606be46f65d2535",
+          "a2ec0db44ff1e6c494ac1603430f4f6b617fb200",
+          "d88c19fbb21366881560df3380f1c612961aca6f",
+          "dc6414e21585e8f565947be1c3b59ebe6bf750b8"
+        ],
+        "duplicate_or_already_portable": [
+          "f02e9d2850cb0d892728afb43ce853db6b5c62c6",
+          "7804e8e9d088418b66ecec4628e6bad81f3fc87b",
+          "5cdd8d4a82a79bcda535b86b6deaf5b706180aba",
+          "f8ac4c84ef77549739c8e6812664677e72cf6160",
+          "ce509594388aeb7cc4e325df9f9c88692c6ed1c8",
+          "7f9dbe9e7a222732eab0adc0606601a1b4356f91",
+          "30ef8c7cab3c049aa0bb5efa0d74dd12e9c1ec40"
+        ],
+        "replacement_merge": "bb9c29c02052573d095a0975acc7c51d4f7a0edb"
+      },
+      "canonical_reconstruction": {
+        "head": "2dee595135444ad72c7aa32710ae10f5d6cf09cb",
+        "target_1_1": [
+          "d3871e6fb0ae29d70d622d4941195543c9ff09fa",
+          "30d49098e4f67e20764a31f59d8bc6a1cb5e9fb6",
+          "6c8c5b52be5e980ed9804a35955bd2f50b91a3e4",
+          "cdcce3a6034903b39b416bf312eb28092b283912",
+          "405f34c70490bfb2feb857d7aa7cefa66e30222b",
+          "543601ba8226e3d0671f906c30285eb9a41bb8c5",
+          "e80e1eb52fe6b3c2c3a283ade0482332bc13f261",
+          "a5f5ee14684f73e990f378d83908f28ec6038c5a",
+          "9f41f3eb6adc49942399890f67e74e2a674e1afc",
+          "d43ebd1982a4248334f92b332b5371441266b054",
+          "eb1e73f09c881d9cdc1fbadba46972937abd2280",
+          "e4dd641b4c4950ecf2c30da68482ff5bf0892d96",
+          "b7b506d4eb3f2a83bebac0e588eaa5e83124f527"
+        ],
+        "duplicate_anchor_or_portable_merges": [
+          "dd5489c2dd89450f919d45ab07c6bf4a5addad53",
+          "e5e45809d2391f375fcdd55a8bf0f81848dcfb08",
+          "812bff89bef982cd23e830333d63b0c808a00b6d",
+          "8125876f6658441469a72a329aca5474b30860c5",
+          "f9bfa353c527905a7b501891abf663be4365c5bb",
+          "fb146302a6fd7b12eb99e5831871a7a0c301a5f4"
+        ],
+        "release_evidence": [
+          "e49280aebde64c4c3fe6f8775066705082b7a1ae",
+          "64b90944aec67b1f81dee7e6fc7d41265c7813b6",
+          "a5a08072f92e9742ae3323fbf4873ebfb58f6531",
+          "2dee595135444ad72c7aa32710ae10f5d6cf09cb"
+        ],
+        "superseded_seal_attempt": "fc1a5b0bb56b11e877eb69272a7904d991cf4cea"
+      },
+      "tag_merge": {"commit":"426d6d48c6578a786ea7de0f224282baff9d342b","disposition":"DUPLICATE","result":"Tag tree exactly equals the sealed reconstruction tree."},
+      "publication": {"commit":"1e461ecb0785ee34905ab69b1c0e8791135cf98a","disposition":"RELEASE-EVIDENCE"}
+    },
+    {
+      "line": "1.0",
+      "superseded_candidate": {
+        "head": "b2855c7bbcf5adc69644820491eb8ebc17bcf362",
+        "disposition": "SUPERSEDED",
+        "target_or_release_evidence": [
+          "0692099bf9a91d9cc5869024e63af015f095fd8d",
+          "eb7f405b50c4b7f093ccb07ed8db707a4d10541f",
+          "14dca5aacb45294661c10072162a198ba38a5cbd",
+          "33b6bb2cc6fe069aa1cb2226e82b14975756f6a2",
+          "d0de3e716d8b9e7e41677a97d02a1cb0966586d2",
+          "e27b80b9e0139e4018a0b459332b3ff044dfd9cf",
+          "bd47a832df678a9dfd4bc5ae91c822c02ee1a1ed",
+          "aeb14831132572037c4288b595b22978fdda6646",
+          "fdc9e37ebae444f59c9c78fe751fbcd69a6bd9c9",
+          "a50b9ddbf2c7685d2c6b6114cdf1a5f173330b3d",
+          "2e7d6c5495205377d682ccae857ce376786f4c93",
+          "b2855c7bbcf5adc69644820491eb8ebc17bcf362"
+        ],
+        "duplicate_or_already_portable": [
+          "005f5a0dc46a149c6b5c66b3bb0d50047f417050",
+          "6a4c5396e29b861cfa5fc96a779d03654588b85e",
+          "f23433ac6004457a24117bebc297a966e0c4d0f3",
+          "3f2fd222638eb9789fdd6c60332efac8bd16351c",
+          "293714d25af73838cac481a6194b8661dcd7a9e6",
+          "ef663afc6b2262c46e809d342a3895fab3f2c434",
+          "cba7ed0caee9f7724e126f9765bfef4990e5179f",
+          "cc5f601dc2e399870064347d10d9df4dee67fa51",
+          "0b06b9b0420e1fec38959adbc5cdef91e88a9ea0"
+        ],
+        "replacement_merge": "50c2ed6897828ca9912f1480a1657866c297dcf6"
+      },
+      "canonical_reconstruction": {
+        "head": "e5b4b578d8475968da49d8c1261c1ca568dc307b",
+        "target_1_0": [
+          "3913375242ad4151bcd93e075794bb2d32d09fa0",
+          "693079af65a3b443e8f23fc2b498f8724e07d5f7",
+          "3888f33700414cbdfd4c8b429ba5403a0f113abd",
+          "5d6bf53eeabf3523e1a737c87336250024c47e0d",
+          "cc3f0df236876c57e5f5b059b9c2ede8b7e8b884",
+          "98bc356a2981af5801020c70288efd698a25a42e",
+          "4b8df404df7d908008642be9714f8f9b92647a74",
+          "11ccba8808c893b956b24c29b0ec0c65d912d36f",
+          "fd3a9b013624ff0612463335fc4933a74e383e81",
+          "ed54a4f8bb9112ff5a58b22523b1eb6299a33fed",
+          "074caa579cc5d17298b8abbc817719a16aa258e6",
+          "47c4c42be7f44767ad89d04ec92f242a458f3218",
+          "62c75d7ae5daf0650a3db5bf09db38dece4c9b44"
+        ],
+        "duplicate_anchor_or_portable_merges": [
+          "8fc13be2bd1f6b03e666b2de4a891e6ca1a55fda",
+          "82b613655635481ac69277a1b32b0b5daa0562e8",
+          "8be133c01c5f482da7c1c75450ca8bd1d46f9aa0",
+          "a9dd75658a42abd711c27e23d818630de03b86aa",
+          "41c70af3bb8c9480b050f7e45f71d8c82d6a5cce",
+          "679df9581770cb62c19af2daf54f82939ce42ee5"
+        ],
+        "release_evidence": [
+          "0d7af8757ff5424074258fea5b93d4e79376f98c",
+          "23fd587589021970fda52f5445b8b9e2749c1b6d",
+          "3a54a5935faeecf3466fd250e05d15d36bb12dee",
+          "e5b4b578d8475968da49d8c1261c1ca568dc307b"
+        ],
+        "superseded_seal_attempt": "4ae05150bb1a67bb13ed9e8f121de5e655c7626a"
+      },
+      "tag_merge": {"commit":"0a192c27674a6b13847e2f5e1b2b530e62419ee8","disposition":"DUPLICATE","result":"Tag tree exactly equals the sealed reconstruction tree."},
+      "publication": {"commit":"b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2","disposition":"RELEASE-EVIDENCE"}
+    }
+  ],
+  "path_dispositions": [
+    {"paths":["prototypes/mir/platform/factorio/target_profiles.lua","prototypes/mir/settings/defaults.lua","prototypes/streams/direct-effects.lua","info.json","README.md","changelog.txt"],"disposition_by_line":{"1.1":"TARGET-1.1","1.0":"TARGET-1.0"}},
+    {"paths":["fixtures/assert-upgrade-*","fixtures/assert-legacy-effect-icons","fixtures/*owner*","fixtures/assert-reduced-settings-surface",".mir/backport-source-lock.json",".mir/targets.json",".mir/fixtures.yml"],"disposition_by_line":{"1.1":"TARGET-1.1","1.0":"TARGET-1.0"}},
+    {"paths":["dist/more-infinite-research_1.9.4.zip","dist/more-infinite-research_1.8.2.zip",".mir/evidence/1.9.4*",".mir/evidence/1.8.2*","docs/releases/1.9.4.md","docs/releases/1.8.2.md"],"disposition":"RELEASE-EVIDENCE"},
+    {"paths":["portable commits merged from dev"],"disposition":"DUPLICATE"}
+  ],
+  "unmatched_changed_files": [],
+  "target_specific_exclusions": [
+    "Factorio 1.1 and 1.0 metadata and dependency floors",
+    "target-era prototype shapes and runtime adapters",
+    "reduced target defaults and unsupported setting omissions",
+    "target fixtures, runtime logs, release wording, distributions, and publication records"
+  ]
+}

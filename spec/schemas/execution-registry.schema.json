@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/execution-registry.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/execution-registry.schema.json",
+  "title": "MIR generated execution registry",
+  "type": "object",
+  "required": ["schema", "authority", "target", "observation_abi", "source", "metrics", "scenarios", "batches"],
+  "properties": {
+    "schema": {"const": 1},
+    "authority": {"const": "mir-control-plane-v5-execution-registry"},
+    "target": {"type": "string"},
+    "observation_abi": {"type": "integer", "minimum": 1},
+    "source": {"type": "object"},
+    "metrics": {"type": "object"},
+    "scenarios": {"type": "array", "items": {"type": "object"}, "minItems": 1},
+    "batches": {"type": "array", "items": {"type": "object"}, "minItems": 1}
+  },
+  "additionalProperties": false
+}

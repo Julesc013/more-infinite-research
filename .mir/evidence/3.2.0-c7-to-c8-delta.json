@@ -1,0 +1,439 @@
+{
+  "schema": 1,
+  "record_type": "MIRCandidateArchiveDelta",
+  "status": "PASS",
+  "baseline": {
+    "candidate_id": "C7",
+    "archive_bytes": 958994,
+    "archive_entries": 256,
+    "archive_sha256": "1E3CC8016A9DA8F399D01BA6B515DD8CF6D414525F99CC08B08278A077FF8B4B",
+    "candidate_content_sha256": "D687ADB304B6A907BB7604085E0C71788E69CDAF6A256F0D4A2269F8382AA7D7"
+  },
+  "candidate": {
+    "candidate_id": "C8",
+    "archive_bytes": 969200,
+    "archive_entries": 264,
+    "archive_sha256": "5D161E3C05B4223BE87F6C52A2AF65994228CD2626C33BF4B14003FE6A74BFD5",
+    "candidate_content_sha256": "8AF5A69147DBBEA863B552E14F4FF710CFCE68E4F2C332D1FCA601DAA0001CF1"
+  },
+  "policy": {
+    "allowed_change_roots": [
+      "README.md",
+      "prototypes/mir/"
+    ],
+    "removals_allowed": false,
+    "unchanged_entries_omitted": true
+  },
+  "summary": {
+    "added": 8,
+    "changed": 21,
+    "removed": 0,
+    "unchanged": 235,
+    "unexpected": 0
+  },
+  "changes": [
+    {
+      "path": "prototypes/mir/compatibility/claim_registry.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/compatibility/claim_registry.lua",
+        "bytes": 8222,
+        "content_sha256": "2BB704453EE412ACD52CEABE09F4A9B3C5BD0A94C6B203C5E1742AC9B2554503"
+      },
+      "candidate": {
+        "path": "prototypes/mir/compatibility/claim_registry.lua",
+        "bytes": 9562,
+        "content_sha256": "05212A05B7BAA30B96AEFC51F9AC4AC5B27E8A53E085AB1150463157E8201290"
+      }
+    },
+    {
+      "path": "prototypes/mir/core/schema.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/core/schema.lua",
+        "bytes": 775,
+        "content_sha256": "CDBC417A89BC3F65F83D22799C89069BF428D94BD5941C7D96430A89F842770E"
+      },
+      "candidate": {
+        "path": "prototypes/mir/core/schema.lua",
+        "bytes": 775,
+        "content_sha256": "D78C99CFAC1E4A35CE78C12170B7906627ABFE9FD220668248C26FBAA6E75CC9"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_input.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/domain/compiler/compiler_input.lua",
+        "bytes": 2473,
+        "content_sha256": "41B1FA74097AEE5F92ED2336DCF06F1932BC04C0BBDBA254072561C66C670362"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_result.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/domain/compiler/compiler_result.lua",
+        "bytes": 1801,
+        "content_sha256": "C0B9C7E9D9CCB84D37BC80F9293786CD8AAD48327EAA3C1EAC832E4E63856515"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/environment_identity.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/domain/environment_identity.lua",
+        "bytes": 2200,
+        "content_sha256": "FBE85527FD14525DDFD20DB086D574441855DA1E619B12C1E9F5845EC72183C5"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_promotion_registry.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/domain/technology/generated_promotion_registry.lua",
+        "bytes": 1503,
+        "content_sha256": "E8962BC9E1839EB5922944CC67E04C333E57C54330CD0B3E9030130B5E2A60EE"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+        "bytes": 2668,
+        "content_sha256": "193DB66FD0E55DD2931EACAE686B7CB0BA1BFEBC20E066B1898E1BD64A43D3A0"
+      },
+      "candidate": {
+        "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+        "bytes": 2027,
+        "content_sha256": "99C1F7584F38982E7366C6365BB415B2C638C2E76BCD210AAD86D5CD13E385CD"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+        "bytes": 4242,
+        "content_sha256": "DFF71DD0FEF030206EE0DA394BD545D54D92983DA92843D27B0802A3340A8F56"
+      },
+      "candidate": {
+        "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+        "bytes": 4404,
+        "content_sha256": "0A30F8C9B7F692000B0021F1D72A6D16E680CFE3C98B2831889D7B52D20C611F"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+        "bytes": 2526,
+        "content_sha256": "0409E4F4CAA9916F6022823634B74969432F78359F37B228C431BC924593119C"
+      },
+      "candidate": {
+        "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+        "bytes": 4390,
+        "content_sha256": "59AE45146673E0044C67FD2EB3D8753AF194DE8D62EB9CB80FEE5A7A5A40FD26"
+      }
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/emit/effect_safety.lua",
+        "bytes": 7727,
+        "content_sha256": "2222DD820B4702907D9714C936B9BA32F2CE8200DF71B21E5AC436694E071851"
+      },
+      "candidate": {
+        "path": "prototypes/mir/emit/effect_safety.lua",
+        "bytes": 6733,
+        "content_sha256": "E6F64E35B3ABC831BB461FA5C0A69DB13FD4D2156AB01F77BAE13BBBDF6BFE7D"
+      }
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/emit/mod_data.lua",
+        "bytes": 2165,
+        "content_sha256": "FC5E3B1F6E55D8EF28DC8D71237C6BC508F40A11DC70D2367583A1082BCE29B6"
+      },
+      "candidate": {
+        "path": "prototypes/mir/emit/mod_data.lua",
+        "bytes": 2433,
+        "content_sha256": "FAFE10AF8831EE495F675DED9428D45166CB8A59AE4EA8DEC5168A29C2999CEE"
+      }
+    },
+    {
+      "path": "prototypes/mir/families/resolver.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/families/resolver.lua",
+        "bytes": 8908,
+        "content_sha256": "FA91AEC3B9F31EB113225663EB96D53723CE49D99447195A4F26DDDF054C5158"
+      },
+      "candidate": {
+        "path": "prototypes/mir/families/resolver.lua",
+        "bytes": 12191,
+        "content_sha256": "2F9F5BB6C4A777ED2C2E6689514940A919D55737B541BC2AD01DDA2648C93B52"
+      }
+    },
+    {
+      "path": "prototypes/mir/graph/researchability_index.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/graph/researchability_index.lua",
+        "bytes": 3169,
+        "content_sha256": "CF56957D68D05C9A4D5E39EA54C80544685A41EA0AA26A8531B0669E89640D97"
+      },
+      "candidate": {
+        "path": "prototypes/mir/graph/researchability_index.lua",
+        "bytes": 4054,
+        "content_sha256": "5CDC5962898E392C44452E92437F795B58F3C3C9C349749B8BF4F229118D399C"
+      }
+    },
+    {
+      "path": "prototypes/mir/integrity/technology_effects.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/integrity/technology_effects.lua",
+        "bytes": 1639,
+        "content_sha256": "50C42BD9740B8405268FD3CD0A9665B61D3704889AB04BC01715FC49CAE95E83"
+      }
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/pipeline/commands.lua",
+        "bytes": 11764,
+        "content_sha256": "48CFB2339DE77A1FDDF1D20C7615B450D6878B4BF3DDCC7A0FD35118FA8D0A6A"
+      },
+      "candidate": {
+        "path": "prototypes/mir/pipeline/commands.lua",
+        "bytes": 11920,
+        "content_sha256": "5E266C94ECB75F1C5918E029F316B3FBBE6C1902A882CA7EE7A888B3F0A9E80D"
+      }
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+        "bytes": 6770,
+        "content_sha256": "6261D2187ABEBC2455156B21564BD2AF019B23B014432EE1D9714B13330284AB"
+      }
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/planner/compilation_plan.lua",
+        "bytes": 26709,
+        "content_sha256": "E949539790BD8F5C752057A51B6B6CEAC22F9257784CA4414489BA422E2862DD"
+      },
+      "candidate": {
+        "path": "prototypes/mir/planner/compilation_plan.lua",
+        "bytes": 24224,
+        "content_sha256": "44BCC9993F9C47A6537F1DE45312DD1E67D671ADD979A3C96CFC34ABB9B07702"
+      }
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/planner/stream_compiler.lua",
+        "bytes": 20513,
+        "content_sha256": "2CA7867AAB6D555FEE666A2CF4609F2DC9ABAC10304B50A106C390BAE27412F2"
+      },
+      "candidate": {
+        "path": "prototypes/mir/planner/stream_compiler.lua",
+        "bytes": 20385,
+        "content_sha256": "2EC29FC3780712071852E90E4948AC22B7E714A7678F7DE5E183345F75E92458"
+      }
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/planner/technology_catalog.lua",
+        "bytes": 9579,
+        "content_sha256": "B8B01453E0BA37A0E6CB4D81BF8CEB35934B6CD05D73F79EF3ACD362B455EA2F"
+      },
+      "candidate": {
+        "path": "prototypes/mir/planner/technology_catalog.lua",
+        "bytes": 12456,
+        "content_sha256": "68765110133501052CFD56EBEE2F14584B9CD6BC846188A0792A9F32E82CB354"
+      }
+    },
+    {
+      "path": "prototypes/mir/planner/technology_selection_policy.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/planner/technology_selection_policy.lua",
+        "bytes": 3149,
+        "content_sha256": "7DE1C0DE3896D1B3C26F016AA91AF9F05A6BBDBB78D4024666EFBAD755D0A896"
+      },
+      "candidate": {
+        "path": "prototypes/mir/planner/technology_selection_policy.lua",
+        "bytes": 4606,
+        "content_sha256": "2710FDA60CEEEAA107E645BF316174C6F27EB2129A70945B46D25CAD7834460B"
+      }
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/environment_identity.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/platform/factorio/environment_identity.lua",
+        "bytes": 751,
+        "content_sha256": "4887F4E2CCD2D4D79A15D55E224D8D42B78658AA4D5D8A6608A2FAAC7C57DC33"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/budget.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/providers/pipeline/budget.lua",
+        "bytes": 3328,
+        "content_sha256": "0DAE0AD4B85C43D65C4E3D0E12BE2ED8EC76B0121DD8A01FE4FA868DC5BB45F2"
+      },
+      "candidate": {
+        "path": "prototypes/mir/providers/pipeline/budget.lua",
+        "bytes": 3862,
+        "content_sha256": "EC19366CD511857F5EED0421BCB67864DA40FFBFB56C07ABD83501C5557ED5B4"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/classification.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/providers/pipeline/classification.lua",
+        "bytes": 843,
+        "content_sha256": "5E6C6A5D1E7DC72641540049E1D8FE246C2136840AB409313626A8F74743656D"
+      },
+      "candidate": {
+        "path": "prototypes/mir/providers/pipeline/classification.lua",
+        "bytes": 1141,
+        "content_sha256": "4150F48DF2D24F4F93B8646A644A222AB7FA3B3807BFEDD8D2A86FD088BF7E1C"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/decision.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/providers/pipeline/decision.lua",
+        "bytes": 2174,
+        "content_sha256": "7CE161D76010FF82036F6113922902EFF34020BAD88F090D9245A633A12F4F66"
+      },
+      "candidate": {
+        "path": "prototypes/mir/providers/pipeline/decision.lua",
+        "bytes": 2271,
+        "content_sha256": "D0251AF99ABBEB23758ADB47F59369FF4CDD80926197BB9CE1F89959C9E9944C"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/discovery.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/providers/pipeline/discovery.lua",
+        "bytes": 1973,
+        "content_sha256": "397B61B82DD5F74125B8ABBAC5192C3F7141CD321EDAC70F172BE32692826766"
+      },
+      "candidate": {
+        "path": "prototypes/mir/providers/pipeline/discovery.lua",
+        "bytes": 2189,
+        "content_sha256": "277B48D33F916A7F724D52A644E8D6ADEB5657DA5148FCCFDBA234FBFEAD3A5E"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/normalization.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/providers/pipeline/normalization.lua",
+        "bytes": 425,
+        "content_sha256": "F41C77BF4DCF7B66B76920FE88C4E2F5DA0470AAE7D772185E07015056EF6C62"
+      },
+      "candidate": {
+        "path": "prototypes/mir/providers/pipeline/normalization.lua",
+        "bytes": 538,
+        "content_sha256": "609F4A9374A4BE61B7B67E59A4E4261B08D7A84AA6D24F111A34F55196372B18"
+      }
+    },
+    {
+      "path": "prototypes/mir/providers/provider_metrics.lua",
+      "change": "added",
+      "allowed": true,
+      "baseline": null,
+      "candidate": {
+        "path": "prototypes/mir/providers/provider_metrics.lua",
+        "bytes": 7261,
+        "content_sha256": "723081DCAFDFAC60D59CFC3B4C115088E6FE9BC6190A798D930350BEAF9579C7"
+      }
+    },
+    {
+      "path": "prototypes/mir/settings/pipeline_extent.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/settings/pipeline_extent.lua",
+        "bytes": 1185,
+        "content_sha256": "772B3D4EE933706BB8E20B3548A01743FCFA0816417A2CCC0F31E65A4AA24013"
+      },
+      "candidate": {
+        "path": "prototypes/mir/settings/pipeline_extent.lua",
+        "bytes": 992,
+        "content_sha256": "996B9F61FC61E9BCA14EB8F2D9AAEC7521CA72F40F369700903F38726204D09C"
+      }
+    },
+    {
+      "path": "README.md",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "README.md",
+        "bytes": 72085,
+        "content_sha256": "95CAC7900262BED3BCAF1742D5EC8E36B8E1EB97681043E0F2354DDA0E65B6B8"
+      },
+      "candidate": {
+        "path": "README.md",
+        "bytes": 72097,
+        "content_sha256": "65FD0026150D6EAD0EF1F6D25EB0315041230F8ADABB7D4D7CF57565E6872963"
+      }
+    }
+  ]
+}

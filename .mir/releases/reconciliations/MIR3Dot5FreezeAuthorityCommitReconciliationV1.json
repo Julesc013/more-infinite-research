@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5FreezeAuthorityCommitReconciliationV1",
+  "release": "3.2.5",
+  "package_visible": false,
+  "observation": "The source-freeze packet bound exact authority hashes but did not identify the Git commit containing its final amended authority set, causing post-release package-excluded changes to be compared against historical hashes.",
+  "reconciliation": {
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "authority_commit": "dc751935983fb7c0f152967464b2a24a8114049b",
+    "authority_commit_reason": "last immutable C32 packet amendment before the .5 publication lineage",
+    "validation_rule": "Package roots remain bound to package_source_commit; frozen non-package authorities are read from authority_commit."
+  },
+  "package_identity_changed": false,
+  "release_history_changed": false
+}

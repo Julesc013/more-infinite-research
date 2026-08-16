@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/assertion.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/assertion.schema.json",
+  "title": "MIR versioned assertion",
+  "type": "object",
+  "required": ["schema", "id", "version", "type", "reads", "proposition", "expected"],
+  "properties": {
+    "schema": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9./-]+$"},
+    "version": {"type": "integer", "minimum": 1},
+    "type": {"enum": ["status-equals", "field-equals", "captured-proposition"]},
+    "reads": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "proposition": {"type": "string", "minLength": 1},
+    "field": {"type": "string"},
+    "expected": {}
+  },
+  "additionalProperties": false
+}

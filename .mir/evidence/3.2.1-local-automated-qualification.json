@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "mir-local-no-reuse-qualification",
+  "candidate_id": "C21",
+  "release": "3.2.1",
+  "target": "2.1",
+  "status": "passed",
+  "release_eligible": false,
+  "package_source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+  "qualification_source_commit": "9cf57ece3174aedf61e052f936c9e75f152f2539",
+  "qualification_source_tree": "abd8049e455a1a75d21d7f3c785baee8abe3d76e",
+  "candidate": {
+    "archive": "dist/more-infinite-research_3.2.1.zip",
+    "archive_bytes": 1029716,
+    "archive_entries": 290,
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188"
+  },
+  "factorio": {
+    "version": "2.1.12.87038",
+    "binary_sha256": "EB29D1349C4B6067E75C0B6EFDF8E773649579CF2FAEA9297884020C26525F27"
+  },
+  "plan": {
+    "profile": "full",
+    "reuse_enabled": false,
+    "generated_at": "2026-07-26T19:06:48.7324661Z",
+    "completed_at": "2026-07-26T20:36:45.8980739Z",
+    "plan_file": "out/verification-plan-c21-final-direct.json",
+    "plan_file_sha256": "50686AD23073AAE502F45007E5731E83357B9308E8F1EFD21A96D2D8D2370278",
+    "summary_file": "artifacts/assurance/verify-summary.json",
+    "summary_file_sha256": "950E3FB12EDDA9E5CE5DABF61D5F1ED941464D64E3707AC4468706A24328D0E9",
+    "plan_material_sha256": "FB28A74E65AB2CA9EA4D0939BB8CB8EDC9B01780C40FBAD9127DECAFCCC8C7F0",
+    "required_test_set_sha256": "9CF5D2E1DA18385C05DAB119571F151D81C9F1E05B8156652FCDFC64D6228820",
+    "candidate_descriptor_sha256": "7B0F95A28FC4B857EB3FD6E7F47F10BBBC7DD24D344ABC229D797BAC60B15BC2",
+    "test_catalog_sha256": "DDBA3754CEDFEB3B519562EE26FCA2175CE92DC3BE5CE503959E43F678FF2208",
+    "validation_harness_sha256": "39C499434E741A1FCCFEA1A0AC0C5376A584AFD89CFD4E3D4F28333B2443E9E9",
+    "verification_profile_sha256": "8183B1AAFF841F0FD4C11C1F21E021FEFAC24B1184186844BDE1E3B65EB1D6A3",
+    "trust_policy_sha256": "B8D150BC6219C6824C13861361C6BD7ECC43BBFB97D14BA3680601A03C9AE1B0",
+    "domain_policy_sha256": "A0444A1EE9E3A26D87D2B4264FD583FD14562480C58C4E92B0A2E4B61371CBAB",
+    "policy_sha256": "A8A34EAEFB1B2805C057B6FE4DABE0C0D23B3F0EA7AF34448719A61D1A1BEED3"
+  },
+  "result_counts": {
+    "required": 129,
+    "executed": 129,
+    "reused": 0,
+    "passed": 129,
+    "failed": 0,
+    "incomplete": 0,
+    "unexpected": 0
+  },
+  "direct_upgrade": {
+    "baseline": "3.2.0",
+    "candidate": "3.2.1",
+    "archetypes": 5,
+    "status": "passed"
+  },
+  "performance": {
+    "evidence": ".mir/evidence/3.2.1-performance-regression.json",
+    "evidence_sha256": "5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726",
+    "source_commit": "9cf57ece3174aedf61e052f936c9e75f152f2539",
+    "status": "passed",
+    "lanes_passed": 10,
+    "lanes_required": 10
+  },
+  "manual_review": {
+    "evidence": ".mir/evidence/3.2.1-manual-review-attestation.json",
+    "status": "passed"
+  },
+  "remaining_gates": [
+    "protected-no-reuse-qualification",
+    "schema-4-seal-and-independent-check",
+    "promotion-to-main-and-annotated-tag"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/release-record.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/release-record.schema.json",
+  "title": "MIR immutable ReleaseRecord",
+  "type": "object",
+  "required": ["schema", "release", "candidate_id", "target", "branch", "state", "package", "proofs", "updated_at"],
+  "properties": {
+    "schema": {"const": 1},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "candidate_id": {"type": "string", "minLength": 1},
+    "candidate_floor": {"type": "string", "pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*)$"},
+    "candidate_allocation": {
+      "type": "object",
+      "required": ["namespace", "predecessor_max_ordinal", "minimum_next_ordinal", "assigned_id", "assignment_condition"],
+      "properties": {
+        "namespace": {"type": "string", "minLength": 1},
+        "predecessor_max_ordinal": {"type": "integer", "minimum": 0},
+        "minimum_next_ordinal": {"type": "integer", "minimum": 1},
+        "assigned_id": {"type": ["string", "null"]},
+        "assigned_at": {"type": "string", "format": "date-time"},
+        "candidate_ref": {"type": "string", "pattern": "^refs/heads/candidate/"},
+        "candidate_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "assignment_condition": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "target": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "development_branch": {"type": "string", "minLength": 1},
+    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
+    "package": {
+      "type": "object",
+      "properties": {
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "archive": {"type": "string", "minLength": 1},
+        "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "upgrade": {
+      "type": "object",
+      "required": ["from_version", "to_version", "fixture"],
+      "properties": {
+        "from_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "to_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "fixture": {"type": "string", "pattern": "^assert-upgrade-[a-z0-9-]+$"}
+      },
+      "additionalProperties": false
+    },
+    "proofs": {"type": "object"},
+    "assurance_exceptions": {"type": "array", "items": {"type": "object"}},
+    "remaining_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "source_release": {"type": "object"},
+    "portable_source_release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "programme": {"type": "string", "minLength": 1},
+    "development_lineage": {
+      "type": "object",
+      "required": ["superseded_release", "superseded_candidate_id", "candidate_closure", "package_source_commit"],
+      "properties": {
+        "superseded_release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "superseded_candidate_id": {"type": "string", "minLength": 1},
+        "candidate_closure": {"type": "string", "minLength": 1},
+        "package_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      },
+      "additionalProperties": false
+    },
+    "baseline_release": {"type": "object"},
+    "release_notes": {"type": "string"},
+    "incident_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "backport_manifest": {"type": "string"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"const": "planned"}}},
+      "then": {
+        "required": ["candidate_floor"],
+        "properties": {"candidate_id": {"const": "not-assigned"}}
+      },
+      "else": {
+        "properties": {"candidate_id": {"pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*|[0-9]+\\.[0-9]+\\.[0-9]+-final)$"}}
+      }
+    },
+    {
+      "if": {"properties": {"state": {"const": "source-frozen"}}},
+      "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256"]}}}
+    },
+    {
+      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
+      "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries"]}}}
+    }
+  ],
+  "additionalProperties": false
+}

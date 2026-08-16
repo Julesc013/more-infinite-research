@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-r0-authority.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-r0-authority.schema.json",
+  "title": "MIR 4 R0 typed authority",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "package_visible",
+    "authority_id",
+    "imports",
+    "semantic_reads",
+    "semantic_writes",
+    "target_dispositions",
+    "digest_classes",
+    "migration",
+    "rollback",
+    "parity_test",
+    "sunset_condition",
+    "payload"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {
+      "enum": [
+        "MIR4-ProgrammeV1",
+        "MIR4-Entry-GateV1",
+        "MIR4-Versioning-and-Distribution-Identity-ADRv1",
+        "MIR4-Repository-Layout-TransitionV1",
+        "MIR4-Target-RegistryV1",
+        "MIR4-Terminal-Import-ContractV1",
+        "MIR4-Equivalence-PolicyV1",
+        "MIR4-Emergency-LaneV1",
+        "MIR4-Offline-Release-AuthorityV1",
+        "MIR3-to-MIR4-Governance-ReconciliationV1"
+      ]
+    },
+    "status": {"type": "string", "minLength": 1},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "package_visible": {"const": false},
+    "authority_id": {"type": "string", "minLength": 1},
+    "imports": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "semantic_reads": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "semantic_writes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "target_dispositions": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1}},
+    "digest_classes": {
+      "type": "object",
+      "required": ["semantic", "authority", "qualification"],
+      "properties": {
+        "semantic": {"type": "string", "minLength": 1},
+        "authority": {"type": "string", "minLength": 1},
+        "qualification": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "migration": {
+      "type": "object",
+      "required": ["from", "to", "state"],
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "state": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "rollback": {
+      "type": "object",
+      "required": ["strategy", "permitted_until"],
+      "properties": {
+        "strategy": {"type": "string", "minLength": 1},
+        "permitted_until": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "parity_test": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "sunset_condition": {"type": "string", "minLength": 1},
+    "payload": {"type": "object", "minProperties": 1}
+  },
+  "additionalProperties": false
+}

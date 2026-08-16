@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-mir-canonical-path": "spec/schemas/evidence-revocation.schema.json",
+  "$id": "https://more-infinite-research.invalid/verification/evidence-revocation.schema.json",
+  "title": "MIR evidence revocation authority",
+  "type": "object",
+  "required": ["schema", "authority", "default_disposition", "rules"],
+  "properties": {
+    "schema": {"const": 1},
+    "authority": {"const": "mir-control-plane-v5-evidence-revocations"},
+    "default_disposition": {"const": "allow"},
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "active", "reason"],
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"enum": ["object-digest-set", "context-digest-set", "producer-abi", "evaluator-abi", "canonicalization-abi", "produced-time-range"]},
+          "active": {"type": "boolean"},
+          "reason": {"type": "string"},
+          "digests": {"type": "array", "items": {"type": "string", "pattern": "^[0-9A-F]{64}$"}},
+          "abi": {"type": "integer", "minimum": 1},
+          "from": {"type": "string", "format": "date-time"},
+          "through": {"type": "string", "format": "date-time"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

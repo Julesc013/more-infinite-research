@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0052",
+  "title": "Canonical protected workflow had no registered default-branch dispatcher",
+  "external_issue": "internal://control-plane/registered-protected-dispatch",
+  "state": "repaired-pending-protected-execution",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C30",
+    "controller_commit": "42df8500b969c299fc5275dd0a20e8165e0fc37d",
+    "workflow": ".github/workflows/control-plane-v5.yml",
+    "dispatch_result": "HTTP 404 workflow not found on default branch"
+  },
+  "reproduction": {
+    "status": "reproduced-by-github-api",
+    "observed": "The self-hosted protected runner was online and idle, but GitHub exposed only workflows whose paths already existed on main; direct dispatch of control-plane-v5.yml on dev returned HTTP 404."
+  },
+  "root_cause": {
+    "status": "proven-platform-registration-boundary",
+    "summary": "workflow_dispatch evaluates a requested ref only after resolving a workflow registered from the default branch. The canonical v5 path was new on dev and therefore had no registered workflow identity."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:registered-protected-workflow-dispatch",
+    "CHG-2026-0001:reusable-control-plane-v5-workflow"
+  ],
+  "regression_propositions": [
+    "the already registered assurance-full.yml path accepts every exact Control Plane v5 workflow_dispatch input",
+    "the registered path delegates to the canonical control-plane-v5.yml from the same selected ref",
+    "the canonical workflow supports both direct workflow_dispatch after promotion and workflow_call before promotion",
+    "the wrapper inherits the protected Factorio secret without duplicating execution logic",
+    "the final protected workflow still exposes exactly one MIR / verification-gate",
+    "C24, P9, and C30 package bytes remain unchanged"
+  ],
+  "affected_releases": [
+    "3.2.3",
+    "2.5.0"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "pending-exact-protected-c30-dispatch",
+    "proof_required": "one protected C30 qualification dispatched through the registered assurance-full workflow identity and independently verified through seal and promotion"
+  }
+}

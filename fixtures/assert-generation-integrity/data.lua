@@ -23,29 +23,6 @@ for index = 1, 1000 do
   previous = item_name
 end
 
-local complete_product = {
-  type = "item",
-  name = "copper-plate",
-  amount = 1,
-  extra_count_fraction = 0.25
-}
-local factorio_2_0 = mods and type(mods.base) == "string"
-  and string.match(mods.base, "^2%.0%.") ~= nil
-if factorio_2_0 then
-  complete_product.probability = 0.5
-  complete_product.ignored_by_productivity = 0
-  complete_product.ignored_by_stats = 0
-else
-  complete_product.independent_probability = 0.5
-  complete_product.percent_spoiled = 0.1
-  complete_product.always_fresh = true
-  complete_product.reset_freshness_on_craft = true
-  complete_product.quality_min = "normal"
-  complete_product.quality_max = "normal"
-  complete_product.quality_change = 0
-  complete_product.affected_by_quality = false
-end
-
 table.insert(prototypes, {
   type = "recipe",
   name = "mir-fixture-default-productivity-policy",
@@ -59,7 +36,20 @@ table.insert(prototypes, {
   enabled = true,
   allow_productivity = true,
   ingredients = {{type = "item", name = "iron-plate", amount = 1}},
-  results = {complete_product}
+  results = {{
+    type = "item",
+    name = "copper-plate",
+    amount = 1,
+    independent_probability = 0.5,
+    extra_count_fraction = 0.25,
+    percent_spoiled = 0.1,
+    always_fresh = true,
+    reset_freshness_on_craft = true,
+    quality_min = "normal",
+    quality_max = "normal",
+    quality_change = 0,
+    affected_by_quality = false
+  }}
 })
 
 data:extend(prototypes)

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "mir-interactive-review",
+  "status": "passed",
+  "version": "3.2.5",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+  "package_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "reviewer": "Julesc013",
+  "reviewed_at": "2026-08-06T09:07:40.9699842Z",
+  "captures": [
+    {
+      "path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md",
+      "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"
+    },
+    {
+      "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+      "sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+      "sha256": "F6A00AF928F94AFF361F8D38233B61283A3B99990248A74D7E22F3B924B97FBF"
+    }
+  ],
+  "disposition": "The maintainer manually playtested exact C32, reported that it looks good, requested no package-visible change, and authorized release progression."
+}

@@ -1,0 +1,52 @@
+[queue] C24 performance worker exited at 2026-07-30T18:26:41.2208010Z; cooling host for 60 seconds.
+[queue] Starting deterministic C30 dual-build at 2026-07-30T18:27:41.6191079Z.
+Built C:\Projects\Factorio\more-infinite-research\build\deterministic-package-a\more-infinite-research_3.2.3.zip
+Built C:\Projects\Factorio\more-infinite-research\build\deterministic-package-b\more-infinite-research_3.2.3.zip
+[ok] MIR deterministic package SHA-256 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+[ok] package composition reporting
+[queue] C30 focused scenario semantic-family-off starting.
+[run] Factorio load check with fixture mods (semantic-family-off)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-4b12770cdaa946c9aee9ec3a9c27040e\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-semantic-family-off.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario semantic-family-report starting.
+[run] Factorio load check with fixture mods (semantic-family-report)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-b4d5987a8e804e339432eb4418617836\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-semantic-family-report.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario semantic-family-attach starting.
+[run] Factorio load check with fixture mods (semantic-family-attach)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-a54c36d72bcb4738bd2209f05b98422c\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-semantic-family-attach.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario semantic-family-generate starting.
+[run] Factorio load check with fixture mods (semantic-family-generate)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-bc14338ef0054c6b8156f579e3d09a97\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-semantic-family-generate.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario semantic-family-exact-pack starting.
+[run] Factorio load check with fixture mods (semantic-family-exact-pack)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-3c13c48b9a8e46e18854ee7b7faca64f\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-semantic-family-exact-pack.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario aai-loader-belt-productivity starting.
+[run] Factorio load check with fixture mods (aai-loader-belt-productivity)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-c7bb835928cd46dab5b1d15a531f3a63\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-aai-loader-belt-productivity.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario compiler-contracts starting.
+[run] Factorio load check with fixture mods (compiler-contracts)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-c0f3de55d22748afbc7e4bba26a4d9e8\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-compiler-contracts.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario base-generation-integrity starting.
+[run] Factorio load check with fixture mods (base-generation-integrity)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-096269399dce4e71ab44ce83f6ee6443\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-base-generation-integrity.json
+[ok] Selected validation completed.
+[queue] C30 focused scenario space-age-generation-integrity starting.
+[run] Factorio load check with fixture mods (space-age-generation-integrity)
+[info] Factorio log path: C:\Users\Jules\AppData\Local\Temp\mir-factorio-userdata-6c45a23e092b46cf954688c2380810c9\factorio-current.log
+[ok] Structured validation summary: C:\tmp\mir-c30-focused-space-age-generation-integrity.json
+[ok] Selected validation completed.
+[queue] C30 deterministic and focused qualification completed at 2026-07-30T18:29:33.0023737Z.

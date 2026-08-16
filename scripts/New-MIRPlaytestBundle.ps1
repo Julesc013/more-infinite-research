@@ -48,7 +48,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 
 function Resolve-MIRInputFile {
   param([Parameter(Mandatory)][string]$Path)
@@ -248,7 +248,7 @@ $telemetrySummary = if ($null -ne $compilerSummary -and $null -ne $compilerSumma
 
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
   $stamp = [DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss")
-  $OutputDir = Join-Path $repo "artifacts\playtest\$stamp-$Category"
+  $OutputDir = Join-Path $repo "build\results\playtest\$stamp-$Category"
 }
 $outputRoot = if ([System.IO.Path]::IsPathRooted($OutputDir)) { $OutputDir } else { Join-Path $repo $OutputDir }
 if ((Test-Path -LiteralPath $outputRoot) -and @(Get-ChildItem -LiteralPath $outputRoot -Force).Count -gt 0) {

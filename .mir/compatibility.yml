@@ -1,7 +1,7 @@
 schema: 1
 
-canonical_machine_record: fixtures/compat-matrix/claims.json
-canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
+canonical_machine_record: spec/compatibility/claims.json
+canonical_support_lanes: spec/compatibility/support-lanes.json
 lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
 target_docs_root: docs/compatibility/targets
 
@@ -54,28 +54,37 @@ generated_policy_authority:
     - hard prototype safety remains non-overridable
     - public claims remain separately governed and evidence-bound
 
+science_phase_policies:
+  - id: K2SciencePhasePolicyV1
+    implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
+    applicability:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+    scope: MIR-owned generated stream and base-continuation technologies only
+    application_stage: planner-after-lab-compatibility-before-technology-design
+    behavior:
+      production_or_utility: remove-kr-basic-tech-card
+      advanced_space_matter_or_singularity: remove-basic-automation-logistic-military-chemical
+    invariants:
+      - no behavior outside the exact admitted version envelope
+      - stable technology IDs
+      - idempotent ingredient normalization
+      - preserve ingredient order shapes and amounts
+      - never emit an empty or lab-invalid ingredient list
+      - never invoke private K2 finalization code
+    fixture: fixtures/assert-k2-science-phase-policy
+    exact_real_campaign: local-2-1-krastorio-spaced-out
+    admission_status: implemented-awaiting-exact-runtime-proof
+    public_claim: none-until-exact-runtime-proof
+
 mod_interactions:
   policy: .mir/mod-interaction-policy.json
   support_capsules: .mir/compatibility-capsules.json
   generated_graph: .mir/mod-interaction-graph.json
   narrow_delta_policies: .mir/interaction-delta-policies.json
-    - id: pyanodons-finalized-technology-tree
-    mod: pypostprocessing
-    dependency: "(?) pypostprocessing"
-    reason: Pyanodons Post-processing rebuilds technology unlocks during data-final-fixes, so MIR must sanitize the finalized Py technology tree
-    fixture: fixtures/pypostprocessing-stale-unlock
-    assertion_fixture: fixtures/assert-py-postprocessing-stale-unlock
-    exact_real_campaign: py-casting-finalizer-repair
-    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
-    reproduced_technology: casting-mk02
-    synthetic_reproduced_missing_recipe: casting-gear
-    exact_real_observed_recipe: casting-gear
-    integrity_contract: exact-real-target-integrity-with-zero-prunes-plus-synthetic-late-removal-repair
-    claim_level: diagnostic-only
-    public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
-campaigns: .mir/combination-campaigns.json
-  generator: scripts/New-MIRModInteractionGraph.ps1
-  validator: scripts/Test-MIRModInteractions.ps1
+  campaigns: .mir/combination-campaigns.json
+  generator: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
+  validator: validation/tests/compatibility/Test-MIRModInteractions.ps1
   rules:
     - single-mod qualification never proves a combination
     - independent pairs require composition smoke evidence
@@ -112,13 +121,13 @@ load_order_requirements:
     fixture: fixtures/pypostprocessing-stale-unlock
     assertion_fixture: fixtures/assert-py-postprocessing-stale-unlock
     exact_real_campaign: py-casting-finalizer-repair
-    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    exact_real_roots: [pyalienlife, pypetroleumhandling, pypostprocessing, pyrawores]
     reproduced_technology: casting-mk02
-    synthetic_reproduced_missing_recipe: casting-gear
-    exact_real_observed_recipe: casting-gear
-    integrity_contract: exact-real-target-integrity-with-zero-prunes-plus-synthetic-late-removal-repair
+    reproduced_missing_recipe: casting-gear
+    integrity_contract: synthetic-late-stale-unlock-single-prune-and-exact-current-closure-zero-prune
     claim_level: diagnostic-only
-    public_scope: exact Factorio 2.0 startup-integrity correction only; no broad Pyanodons semantic-support claim
+    public_scope: exact startup-integrity correction only; no broad Pyanodons semantic-support claim
+
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1
   sanitation_budget:
@@ -263,25 +272,6 @@ targets:
         - loader-throughput
         - loader-modes
         - compatibility-hooks
-
-    advanced-belts-sa:
-      mod: AdvancedBeltsSA
-      doc: docs/compatibility/targets/advanced-belts-sa.md
-      claim_level: partial-support
-      maturity: unverified
-      behavior: generated
-      scope: partial-family
-      public_claim: belt-family crafting productivity only
-      fixtures:
-        - fixtures/semantic-family-attach
-        - fixtures/assert-semantic-family-attach
-        - fixtures/assert-advanced-belts-sa-productivity
-      streams: []
-      generated_through_existing_stream: research_belts
-      diagnostic_only:
-        - belt-throughput
-        - upgrade-planner
-        - native-factorio-2.0-load-pending
 
     big-mining-drill:
       mod: big-mining-drill

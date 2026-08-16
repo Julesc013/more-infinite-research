@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-candidate-settings-qualification.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-candidate-settings-qualification.schema.json",
+  "title": "MIR3TerminalCandidateSettingsQualificationV1",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "family", "source_authorities", "static_inventory", "behavioural_matrix", "target_dispositions", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalCandidateSettingsQualificationV1"},
+    "status": {"const": "passed-automated-awaiting-human-review"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "family": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"}
+    },
+    "source_authorities": {
+      "type": "object",
+      "minProperties": 6,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path", "canonical_text_sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "canonical_text_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "static_inventory": {
+      "type": "object",
+      "required": ["method", "targets", "setting_path_deltas", "setting_content_deltas", "settings_locale_deltas"],
+      "properties": {
+        "targets": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "object",
+            "required": ["release", "predecessor", "candidate_archive_sha256", "predecessor_archive_sha256", "settings_entries", "locale_entries", "settings_path_delta", "settings_content_delta", "settings_locale_delta"],
+            "properties": {
+              "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+              "predecessor": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.5$"},
+              "candidate_archive_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+              "predecessor_archive_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+              "settings_entries": {"type": "integer", "minimum": 1},
+              "locale_entries": {"type": "integer", "minimum": 1},
+              "settings_path_delta": {"const": 0},
+              "settings_content_delta": {"const": 0},
+              "settings_locale_delta": {"const": 0}
+            },
+            "additionalProperties": true
+          }
+        },
+        "setting_path_deltas": {"const": 0},
+        "setting_content_deltas": {"const": 0},
+        "settings_locale_deltas": {"const": 0}
+      },
+      "additionalProperties": true
+    },
+    "behavioural_matrix": {
+      "type": "object",
+      "required": ["current", "maintained"],
+      "properties": {
+        "current": {"$ref": "#/$defs/behaviouralTarget"},
+        "maintained": {"$ref": "#/$defs/behaviouralTarget"}
+      },
+      "additionalProperties": true
+    },
+    "target_dispositions": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "required": ["release", "target", "status", "basis"],
+        "properties": {
+          "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+          "target": {"type": "string", "minLength": 1},
+          "status": {"const": "passed"},
+          "basis": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": true
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["settings_scope_migrations", "runtime_settings_added", "profile_codec_changed", "candidate_bytes_changed", "manual_review_complete", "tags_created", "publication_permitted"],
+      "properties": {
+        "settings_scope_migrations": {"const": 0},
+        "runtime_settings_added": {"const": 0},
+        "profile_codec_changed": {"const": false},
+        "candidate_bytes_changed": {"const": false},
+        "manual_review_complete": {"const": false},
+        "tags_created": {"const": false},
+        "publication_permitted": {"const": false}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "behaviouralTarget": {
+      "type": "object",
+      "required": ["release", "target", "status", "fresh_rows", "failed_rows", "evidence", "covered_families"],
+      "properties": {
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+        "target": {"type": "string", "minLength": 1},
+        "status": {"const": "passed"},
+        "fresh_rows": {"type": "integer", "minimum": 1},
+        "failed_rows": {"const": 0},
+        "evidence": {"type": "array", "minItems": 2, "items": {"type": "string", "minLength": 1}},
+        "covered_families": {"type": "array", "minItems": 10, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

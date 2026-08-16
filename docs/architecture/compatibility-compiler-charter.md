@@ -407,7 +407,7 @@ Before `3.0.0` can release:
 
 - `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` passes.
 - Factorio `2.1` runtime validation passes.
-- `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull` passes.
+- `.\tools\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull` passes.
 - Policy lints pass.
 - Manifest lints pass.
 - Claim lints pass.

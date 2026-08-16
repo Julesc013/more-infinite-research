@@ -1,47 +1,43 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.0"
+applies_to: "3.2.10"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-01
+last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
 ---
 
 # Current Development Candidate
 
-> Generated from `.mir/releases.json` by `scripts/Update-MIRGeneratedAuthorityDocs.ps1`. Do not edit candidate identity here.
-
-## Factorio 2.1 development line
+> Generated from typed ReleaseRecords by `tools/commands/control/Invoke-MIRControlPlane.ps1 views`. Do not edit this view.
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.0` |
-| Candidate | `C16` |
-| Branch | `dev` |
-| Package source commit | `0448ceb8d3992082718e2df83bd6a42c56955636` |
-| Package source tree | `eb6a5b42676ab65bb95ee7c1422f2191730b1338` |
-| Package source SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
-| Archive | `dist/more-infinite-research_3.2.0.zip` |
-| Archive bytes | `1014593` |
-| Archive entries | `288` |
-| Archive SHA-256 | `4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D` |
-| Package content SHA-256 | `10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7` |
-| Qualification | `focused-automation-passed-full-no-reuse-pending` |
-| Publication | `unreleased` |
-| Status | `focused-performance-and-semantic-parity-passed-awaiting-full-no-reuse` |
+| MIR version | `3.2.10` |
+| Candidate identity | `C34` |
+| Candidate namespace | `C` |
+| Predecessor maximum ordinal | `33` |
+| Minimum next ordinal | `34` |
+| Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
+| Target | `2.1` |
+| Branch | `main` |
+| State | `publicly-verified` |
+| Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
+| Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
+| Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
+| Archive | `dist/more-infinite-research_3.2.10.zip` |
+| Archive bytes | `1065178` |
+| Archive entries | `304` |
+| Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
+| Package content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
 
-## Superseded candidate
+## Remaining state transitions
 
-| Field | Authority |
-| --- | --- |
-| Candidate | `C15` |
-| Package source commit | `c3a56e88fa15da7c12db3b0d11c3d4e732935746` |
-| Archive bytes | `1000692` |
-| Archive entries | `286` |
-| Archive SHA-256 | `89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA` |
-| Reason | C15 passed gameplay, package, K2SO, upgrade, and scale checks but failed the governed fixed-cost performance gate; C16 removes redundant trusted-record validation, copying, fingerprinting, and canonicalization while preserving exact seven-scenario semantic output |
+None.
 
-Published baselines remain immutable and development candidates remain unreleased until exact automated, manual, protected, and seal authority agree.
+## Assurance exceptions
+
+- `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`:  Disposition: `pending`.

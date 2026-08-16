@@ -1,0 +1,131 @@
+[check] info.json parses
+[check] target profile views match canonical manifest
+[ok] MIR target profile Lua matches .mir/targets.json and info.json.
+[check] release authority views match the canonical ledger
+[ok] typed release records, transitions, immutable tag, package locks, evidence hashes, and generated release views agree.
+[check] backport source lock is current when present
+[skip] MIR backport source lock is not present on this branch.
+[check] canonical backport reconstruction manifests are complete
+[ok] MIR 2.5.0 backport manifest binds baseline 2.4.9, source 3.2.2, and 7 classified package adapters.
+[check] release candidate evidence is fresh or explicitly rebuilding
+[ok] MIR candidate package bytes are frozen while automated and exact manual qualification remain pending.
+[check] release metadata matches Factorio line
+[check] release metadata avoids compatibility mod dependencies
+[check] docs match opportunistic compatibility policy
+[check] docs and governance manifests are linted
+[ok] MIR Markdown prose uses renderer-managed word wrapping.
+[ok] MIR docs and governance lint passed.
+[check] MIR architecture boundaries are linted
+[ok] README pipeline table matches commands.lua.
+[ok] generated release, quality/promotion, and compiler-schema documentation is current.
+[ok] MIR target profile Lua matches .mir/targets.json and info.json.
+[ok] technology governance source and generated promotion registry are aligned.
+[ok] MIR architecture boundary lint passed.
+[check] settings visibility policy is linted
+[ok] README effective stream defaults match defaults.lua.
+[ok] MIR settings visibility lint passed.
+[check] legacy inventory thresholds pass
+[ok] wrote MIR legacy inventory to C:\Projects\Factorio\more-infinite-research\artifacts\legacy-inventory
+  - C:\Projects\Factorio\more-infinite-research\artifacts\legacy-inventory\shipped-mod-legacy.json
+  - C:\Projects\Factorio\more-infinite-research\artifacts\legacy-inventory\repo-legacy.json
+  - C:\Projects\Factorio\more-infinite-research\artifacts\legacy-inventory\legacy-summary.md
+[ok] MIR legacy inventory thresholds passed.
+[check] no old tool-based science pack authority remains
+[check] generated count formulas use compact cross-version syntax
+[check] generated icons do not use icon_mipmaps
+[check] local image assets have source notes and do not bundle Space Age art
+[check] control runtime avoids tick handlers
+[check] scripted technology defaults and risks remain explicit
+[check] unsafe pickup reach technology effects are blocked
+[check] merged trash-slot technology has save migration
+[check] locale files match English fallback
+[ok] validated 50 complete Factorio locales and 21350 values against source hashes, placeholders, rich text, prose budgets, and translation memories.
+[check] PowerShell scripts parse and avoid duplicate parameters
+[ok] artifact cleanup is dry-run-first, age-aware, Git-ignored-only, and protects assurance and validation roots.
+[ok] validated 158 PowerShell scripts for parse errors, duplicate parameters, and obvious secret output.
+[check] scenario schema 2 manifests own complete execution records
+[ok] MIR scenario schema 2 manifests own targets, setup, roots, settings, expected plans, timeouts, and claim levels.
+[check] ecosystem campaigns declare exact sanitation budgets
+[ok] every ecosystem campaign and release-targeted local repair smoke has an exact zero-tolerance sanitation budget.
+[check] active release evidence is portable and summary-oriented
+[ok] 3.2.0 tracked evidence is portable, bounded, and summary-oriented.
+[check] planner artifact tools are deterministic and schema-bound
+[ok] wrote MIR planner snapshot C:\Users\Jules\AppData\Local\Temp\mir-planner-tools-6b2c37b1469c466586f37e1707b874a9\before.json rows=3 fingerprint=3157C02728DAA18FB4CDD420FB957C22B0A1B48716E1FAC807B442DB904EA420
+[ok] wrote MIR planner snapshot C:\Users\Jules\AppData\Local\Temp\mir-planner-tools-6b2c37b1469c466586f37e1707b874a9\after.json rows=2 fingerprint=0B2C5B8239287068058373964EAC416158E338D9A2FE0386CF4ECA11A60F4430
+[ok] wrote minimized MIR planner snapshot C:\Users\Jules\AppData\Local\Temp\mir-planner-tools-6b2c37b1469c466586f37e1707b874a9\minimum.json rows=1
+[ok] wrote review-required CompatibilityPack scaffold C:\Users\Jules\AppData\Local\Temp\mir-planner-tools-6b2c37b1469c466586f37e1707b874a9\example-pack.json
+[ok] MIR planner export, coverage, diff, target diff, minimizer, and pack scaffold tools passed.
+[check] the exact active-release approved delta is complete
+[ok] active candidate is pre-qualification; approved-delta evidence remains explicitly pending.
+[check] compiler schema authorities and reference docs do not drift
+[ok] MIR compiler code, stream policies, manifests, authority table, and schema reference versions agree.
+[check] compiler contract coverage and mutation sentinels are complete
+[ok] Generated compiler authorities converge with their machine sources.
+[ok] MIR compiler contract coverage, exhaustive target-bearing modifiers, and mutation sentinels are declared.
+[check] technology lifecycle records and review tooling are schema-bound
+[ok] copied exact MIR TechnologyCatalog schema 3 artifact C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\catalog.json candidates=1
+[ok] wrote TechnologyApproval C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\approval.json
+[ok] wrote TechnologyQualityAssessment schema 2 C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\assessment.json status=PASS measurement=COMPLETE
+[ok] wrote technology review dossier C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\review-dossier.json
+[ok] wrote MIR TechnologyDesign diff C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\approved-diff.json status=APPROVED changes=1
+[ok] wrote MIR TechnologyDesign diff C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\drift-diff.json status=REJECTED_LOCK_VIOLATION changes=1
+[ok] wrote TechnologyApproval C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\quarantine.json
+[ok] wrote TechnologyApproval C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\demotion.json
+[ok] wrote TechnologyPromotion C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\promotion.json
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\admission.json status=ADMITTED
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\candidate-tamper-admission.json status=REJECTED
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\design-tamper-admission.json status=REJECTED
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\evidence-tamper-admission.json status=REVIEW_REQUIRED
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\profile-tamper-admission.json status=REJECTED
+[ok] wrote TechnologyPromotionAdmission C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\migration-tamper-admission.json status=REVIEW_REQUIRED
+[ok] wrote TechnologyMigration C:\Users\Jules\AppData\Local\Temp\mir-technology-lifecycle-d76ad9edeb7a46c58fe045ec34071d67\migration.json
+[ok] MIR technology lifecycle schemas, catalogs, diffs, decisions, transitions, and migrations passed.
+[check] technology policy corpora and applicability envelopes are governed
+[ok] MIR technology policy authority, corpora, applicability envelopes, and operator coverage passed.
+[check] offline family-rule synthesis is deterministic and review-only
+[ok] wrote offline MIR rule proposal C:\Users\Jules\AppData\Local\Temp\mir-rule-synthesis-d7d1d3945b0548f78754f0785b4c79f2\mining-drill-manufacturing.json status=REVIEW_REQUIRED predicates=5 new_matches=0
+[ok] wrote offline MIR rule proposal C:\Users\Jules\AppData\Local\Temp\mir-rule-synthesis-d7d1d3945b0548f78754f0785b4c79f2\assembling-machine-manufacturing.json status=REVIEW_REQUIRED predicates=5 new_matches=0
+[ok] wrote offline MIR rule proposal C:\Users\Jules\AppData\Local\Temp\mir-rule-synthesis-d7d1d3945b0548f78754f0785b4c79f2\logistics-manufacturing.json status=REVIEW_REQUIRED predicates=5 new_matches=0
+[ok] wrote offline MIR rule proposal C:\Users\Jules\AppData\Local\Temp\mir-rule-synthesis-d7d1d3945b0548f78754f0785b4c79f2\repeat.json status=REVIEW_REQUIRED predicates=5 new_matches=0
+[ok] MIR offline rule synthesis is deterministic, hard-gated, counterexample-bound, and review-only.
+[check] semantic mod interactions and combination campaigns are complete
+[ok] wrote MIR interaction graph C:\Users\Jules\AppData\Local\Temp\mir-mod-interaction-dad6e5db222349169a9449a608c52938.json nodes=4 overlap=2 blocked=0
+[ok] MIR semantic mod interactions, narrow deltas, and combination campaigns are complete.
+[check] compatibility dependency declarations preserve full mod names
+[ok] MIR dependency declarations preserve mod names with spaces.
+[check] performance budgets declare every required surface
+[ok] MIR performance manifests bind the immutable tagged baseline while current performance qualification is explicitly pending and declare 11 budgets, ten paired lanes, a schema-3 producer, and complete bounded compiler telemetry.
+[check] validation scenario groups and partial result aggregation are stable
+[ok] Structured validation summary: C:\Users\Jules\AppData\Local\Temp\mir-validation-results-7b77cd4a8be440c596473c333014915d\complete.json
+[ok] MIR validation result aggregation tests passed.
+[check] package and harness fingerprints are checkout-line-ending invariant
+[ok] MIR package identity line-ending invariance tests passed.
+[check] Markdown formatter preserves structural syntax
+warning: in the working copy of 'docs/sample.md', LF will be replaced by CRLF the next time Git touches it
+[ok] MIR Markdown formatting updated 1 file(s).
+[ok] MIR Markdown prose uses renderer-managed word wrapping.
+[ok] MIR Markdown formatter regression tests passed.
+[check] fixture mods have metadata and data entrypoints
+[check] science-pack progression settings are wired
+[check] prototype limit settings are wired
+[check] compat audit automation tooling is wired
+[check] 2.2.0 compiler diagnostics are wired
+[check] Air Scrubbing clean-filter policy is wired
+[check] ATAN Factorio 2.1 schema repairs are wired
+[check] bounded technology prerequisite cycle repairs are wired
+[check] compatibility support lanes are wired
+[check] compatibility policy and claim lints pass
+[ok] MIR policy, manifest, and claim lint passed.
+[check] stable generated technology golden plan passes
+[ok] MIR golden plans preserve 70 baseline, 2 predeclared 3.1 automatic-family, and 3 3.2 identities.
+[check] release documentation lists final manual and API checks
+[check] changelog uses Factorio changelog format
+[check] generated package archive matches metadata
+Built C:\Projects\Factorio\more-infinite-research\build\validation-dist\more-infinite-research_3.2.3.zip (unchanged)
+[check] package construction is byte deterministic
+Built C:\Projects\Factorio\more-infinite-research\build\deterministic-package-a\more-infinite-research_3.2.3.zip
+Built C:\Projects\Factorio\more-infinite-research\build\deterministic-package-b\more-infinite-research_3.2.3.zip
+[ok] MIR deterministic package SHA-256 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+[ok] package composition reporting
+[check] git whitespace check
+[skip] Factorio runtime validation skipped. Set FACTORIO_BIN or pass -FactorioBin to run load tests.

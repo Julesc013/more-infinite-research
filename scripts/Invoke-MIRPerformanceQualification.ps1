@@ -6,7 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedBaselineVersion,
   [Parameter(Mandatory)][string]$ExpectedFactorioVersion,
-  [string]$CampaignPath = ".mir\performance-campaign.json",
+  [string]$CampaignPath = "",
   [string]$LocalModZipDir = "",
   [string]$OutputPath = "",
   [string]$ArtifactRoot = "",
@@ -26,6 +26,16 @@ $candidateInfo = Get-MIRReleasePackageInfo -Path $Candidate
 $versionParts = @([string]$ExpectedFactorioVersion -split '\.')
 if ($versionParts.Count -lt 2) { throw "ExpectedFactorioVersion must identify a target line." }
 $factorioLine = $versionParts[0..1] -join "."
+if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
+  $releaseLedger = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases.json") | ConvertFrom-Json
+  $activeCandidate = $releaseLedger.development.PSObject.Properties["factorio-$factorioLine"].Value
+  if ($null -eq $activeCandidate -or
+      [string]$activeCandidate.mir_version -ne [string]$candidateInfo.version -or
+      [string]::IsNullOrWhiteSpace([string]$activeCandidate.candidate_id)) {
+    throw "No exact active performance campaign can be derived for MIR $($candidateInfo.version) on Factorio $factorioLine."
+  }
+  $CampaignPath = ".mir\performance-campaigns\$($candidateInfo.version)-$($activeCandidate.candidate_id).json"
+}
 if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
   $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine"
 }
@@ -35,7 +45,7 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 
 $resolvedCampaignPath = if ([IO.Path]::IsPathRooted($CampaignPath)) { [IO.Path]::GetFullPath($CampaignPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $CampaignPath)) }
 $campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
-$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "artifacts\performance"))
+$performanceArtifactsRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot "build\results\performance"))
 $usesGeneratedArtifactRoot = [string]::IsNullOrWhiteSpace($ArtifactRoot)
 $generatedArtifactCustodyRoot = ""
 if ($usesGeneratedArtifactRoot) {
@@ -47,10 +57,10 @@ if ($usesGeneratedArtifactRoot) {
   $candidates = if ($ScratchRootCandidates.Count -gt 0) { $ScratchRootCandidates } else { @("C:\mir-tmp", "C:\tmp", [IO.Path]::GetTempPath()) }
   $staging = New-MIRPerformanceStagingRoot -Campaign $campaign -TargetCode $targetCode -TestId "performance.qualification" `
     -PlanFingerprint $planFingerprint -CandidateSha256 $candidateSha256 -BaselineSha256 $baselineSha256 -FactorioBinarySha256 $factorioSha256 `
-    -DurableDestination ("artifacts/assurance/performance-custody/" + $planFingerprint.Substring(0, 16)) -AttemptOrdinal $AttemptOrdinal -ScratchRootCandidates $candidates
+    -DurableDestination ("build/results/performance-custody/" + $planFingerprint.Substring(0, 16)) -AttemptOrdinal $AttemptOrdinal -ScratchRootCandidates $candidates
   $ArtifactRoot = [string]$staging.path
   $generatedArtifactCustodyRoot = if ([string]::IsNullOrWhiteSpace($ArtifactCustodyRoot)) {
-    [IO.Path]::GetFullPath((Join-Path $RepoRoot ("artifacts\assurance\performance-custody\" + $planFingerprint.Substring(0, 16))))
+    [IO.Path]::GetFullPath((Join-Path $RepoRoot ("build\results\performance-custody\" + $planFingerprint.Substring(0, 16))))
   } elseif ([IO.Path]::IsPathRooted($ArtifactCustodyRoot)) {
     [IO.Path]::GetFullPath($ArtifactCustodyRoot)
   } else {

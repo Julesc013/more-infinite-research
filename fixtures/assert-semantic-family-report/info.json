@@ -4,6 +4,6 @@
   "title": "MIR Fixture - Assert Automatic Compiler Report",
   "author": "Julesc013",
   "description": "Asserts report mode records candidates without automatic attachment or generation.",
-  "factorio_version": "2.0",
-  "dependencies": ["base >= 2.0.77", "more-infinite-research", "mir-fixture-semantic-family-attach"]
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8", "more-infinite-research", "mir-fixture-semantic-family-attach"]
 }

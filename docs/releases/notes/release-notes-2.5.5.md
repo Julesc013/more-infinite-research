@@ -5,32 +5,15 @@ applies_to: "2.5.5"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-07
+last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
 ---
 
-# MIR 2.5.5 Release Notes
+# MIR 2.5.5
 
-MIR 2.5.5 brings the 3.2.5 research-cost corrections to Factorio 2.0 while preserving the existing 2.5.0 compatibility surface.
+MIR 2.5.5 is the Factorio 2.0.77 projection of the MIR 3 `.5` research-cost and compatibility corrections. It starts from public MIR 2.5.0, preserves the Factorio 2.0 compatibility surface, and was reconstructed and qualified independently from the Factorio 2.1 package.
 
-## Highlights
+The exact GitHub asset is publicly verified with archive SHA-256 `03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C`. Automated target qualification and public Base and Space Age startup loads passed. No personal visual playtest is claimed. Publication used a release-specific exception, so protected qualification and sealing remain pending post-publication; this is not a protected-qualified claim.
 
-- Adds fixed, linear, exponential, and hybrid research-cost models.
-- Preserves completed science-unit work when costs change during an upgrade or configuration change.
-- Retains stable settings and technology identities from MIR 2.5.0.
-- Emits the bounded research-cost support proposition through a privacy-safe log record.
-- Keeps MIR `mod-data` output and modern productivity-family adoption compiled out on Factorio 2.0.
-
-## Upgrade
-
-The direct supported transition is MIR 2.5.0 to 2.5.5 on Factorio 2.0.77. The governed five-archetype matrix covers Base, Space Age native ownership, automatic family creation, base continuations, and source-mod removal.
-
-## Candidate identity
-
-- Candidate: `2.5-P12`
-- Package source: `689940f436b004cf4e5981f1944ddb04eaa17367`
-- Archive SHA-256: `03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C`
-- Content SHA-256: `047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154`
-
-Protected qualification and publication remain pending during the GitHub Actions outage.
+All later corrections route to MIR 2.5.9. There will be no 2.5.6, 2.5.7, or 2.5.8 release.

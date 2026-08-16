@@ -49,7 +49,9 @@ runtime_boundaries:
       - prototypes/mir/runtime/settings_resolver.lua
       - prototypes/mir/runtime/startup_settings.lua
       - prototypes/mir/runtime/settings_profile.lua
+      - prototypes/mir/runtime/planet_discovery_recovery.lua
       - prototypes/mir/runtime/productivity_family_adoption.lua
+      - prototypes/mir/runtime/maximum_level_control.lua
       - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
       - prototypes/mir/runtime/effects/spoilage_preservation.lua
     allowed_globals:
@@ -309,6 +311,7 @@ modules:
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
     - prototypes/mir/compatibility/policy_authority.lua
+    - prototypes/mir/compatibility/policies/k2_science_phase.lua
     - prototypes/mir/compatibility/overlays/air_scrubbing.lua
     - prototypes/mir/compatibility/overlays/atan_ash.lua
     - prototypes/mir/compatibility/diagnostics/registry.lua
@@ -323,7 +326,9 @@ modules:
     - prototypes/mir/runtime/settings_resolver.lua
     - prototypes/mir/runtime/startup_settings.lua
     - prototypes/mir/runtime/settings_profile.lua
+    - prototypes/mir/runtime/planet_discovery_recovery.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
+    - prototypes/mir/runtime/maximum_level_control.lua
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua
@@ -376,7 +381,7 @@ mutation_commands:
     - internal CompilationPlan state shares the exact trusted CompilerInput rather than deep-copying immutable snapshot and policy trees
     - compiler-owned immutable records may share one exact reference between context state and the internal artifact index only after their module-private trust authority accepts them; all artifact reads and complete context snapshots remain defensive copies
     - singleton strongly connected components use an exact length-prefixed node identity while multi-node components retain canonical fingerprints
-    - realized graph postconditions compare the live normalized prototype projection field by field against the trusted graph snapshot and reuse its exact authority only after equality while mismatches materialize an independently fingerprinted actual snapshot
+    - realized graph postconditions compare the live normalized prototype projection field by field against the trusted graph snapshot and reuse its exact authority only after equality while declared competitor replacements require an exact frozen mutation journal projection and fresh realized-graph qualification
     - each graph qualification shares one exact trusted passing proof across accepted planned technologies while retaining distinct rejection causality
     - graph researchability consumes a snapshot-owned stable node view and externally owned graph maps remain defensive copies
     - graph qualification establishes one sorted technology name authority for snapshot SCC and reverse-edge construction and shares its freshly owned sorted prerequisite arrays and reverse edges with the immutable graph pipeline
@@ -390,6 +395,7 @@ mutation_commands:
     - no sanitation-covered target prototype family may be created or removed after input sanitation
     - CompilationPlan separates compilation qualification and run fingerprints
     - postcondition publication emits target-neutral content-addressed compiler evidence with mod-data and validation-log adapters
+    - final APPLIED compiler results derive one bounded neutral-default research-cost disposition with typed evidence and explicit Factorio 2.1 mod-data and Factorio 2.0 validation-log transport rows
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
@@ -563,6 +569,7 @@ target_layers:
   compatibility:
     path: prototypes/mir/compatibility
     overlay_path: prototypes/mir/compatibility/overlays
+    policy_path: prototypes/mir/compatibility/policies
     repair_path: prototypes/mir/compatibility/repairs
     may_require:
       - policy
@@ -630,6 +637,7 @@ compiler_context:
     - provider-metrics
     - environment-identity
     - technology-graph-parity
+    - technology-replacement-journal
     - context-services
     - state-epochs
   immutable_process_catalogs:
@@ -639,84 +647,232 @@ compiler_context:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    repository_path_catalog: .mir/control/paths.yml
+    repository_alias_catalog: .mir/control/aliases.yml
+    repository_path_catalog_schema: spec/schemas/repository-path-catalog.schema.json
+    repository_alias_catalog_schema: spec/schemas/path-alias-catalog.schema.json
+    repository_layout_manifest_schema: spec/schemas/layout-manifest.schema.json
+    repository_layout_specification: spec/architecture/repository-layout-v2.md
+    repository_path_resolver: tools/lib/workspace/RepoPaths.ps1
+    repository_layout_command: tools/commands/workspace/Invoke-MIRLayoutCheck.ps1
+    repository_path_command: tools/commands/workspace/Resolve-MIRRepoPath.ps1
+    repository_legacy_inventory_command: tools/commands/workspace/Get-MIRLegacyInventory.ps1
+    repository_stale_artifact_command: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
+    deprecated_work_root_cleaner: tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1
+    repository_schema_root_migrator: tools/maintenance/Move-MIRSchemaRoot.ps1
+    repository_test_root_migrator: tools/maintenance/Move-MIRTestRoot.ps1
+    repository_validation_definition_migrator: tools/maintenance/Move-MIRValidationDefinitions.ps1
+    repository_tool_library_migrator: tools/maintenance/Move-MIRToolLibraries.ps1
+    repository_cli_facade_migrator: tools/maintenance/Move-MIRCliFacade.ps1
+    repository_package_command_migrator: tools/maintenance/Move-MIRPackageCommands.ps1
+    repository_workspace_command_migrator: tools/maintenance/Move-MIRWorkspaceCommands.ps1
+    repository_docs_command_migrator: tools/maintenance/Move-MIRDocsCommands.ps1
+    repository_planner_command_migrator: tools/maintenance/Move-MIRPlannerCommands.ps1
+    repository_technology_command_migrator: tools/maintenance/Move-MIRTechnologyCommands.ps1
+    repository_control_command_migrator: tools/maintenance/Move-MIRControlCommands.ps1
+    repository_authority_command_migrator: tools/maintenance/Move-MIRAuthorityCommands.ps1
+    repository_compatibility_command_migrator: tools/maintenance/Move-MIRCompatibilityCommands.ps1
+    repository_museum_command_migrator: tools/maintenance/Move-MIRMuseumCommands.ps1
+    repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
+    maintainer_cli: tools/mir.ps1
+    maintainer_cli_support: tools/lib/cli
+    control_plane_policy: .mir/control-plane/control-plane.json
+    control_plane_candidate_closure_schema: spec/schemas/candidate-closure.schema.json
+    control_plane_candidate_closures: .mir/candidate-closures
+    control_plane_domains: .mir/control-plane/domains.json
+    control_plane_ownership: .mir/control-plane/ownership.json
+    control_plane_freshness: .mir/control-plane/freshness.json
+    control_plane_mutation_calibration: .mir/control-plane/mutation-calibration.json
+    control_plane_shadow_authority: .mir/control-plane/v4-v5-equivalence.json
+    control_plane_task_schema: spec/schemas/task-node.schema.json
+    control_plane_observation_schema: spec/schemas/observation.schema.json
+    control_plane_assertion_schema: spec/schemas/assertion.schema.json
+    control_plane_evaluation_schema: spec/schemas/evaluation.schema.json
+    control_plane_execution_registry_schema: spec/schemas/execution-registry.schema.json
+    control_plane_verification_context_schema: spec/schemas/verification-context.schema.json
+    control_plane_evidence_object_schema: spec/schemas/evidence-object.schema.json
+    control_plane_evidence_manifest_schema: spec/schemas/evidence-manifest.schema.json
+    control_plane_evidence_revocation_schema: spec/schemas/evidence-revocation.schema.json
+    control_plane_evidence_revocations: .mir/control-plane/evidence-revocations.json
+    control_plane_execution_registry: validation/generated/execution-registry.json
+    control_plane_historical_replay: validation/baselines/control/3.2.2-v5-replay.json
+    control_plane_entrypoint: tools/commands/control/Invoke-MIRControlPlane.ps1
+    control_plane_core: tools/lib/control/Core.ps1
+    control_plane_records: tools/lib/control/Records.ps1
+    control_plane_planner: tools/lib/control/Planner.ps1
+    control_plane_scenarios: tools/lib/control/Scenario.ps1
+    control_plane_observations: tools/lib/control/Observation.ps1
+    control_plane_evidence: tools/lib/control/Evidence.ps1
+    control_plane_views: tools/lib/control/Views.ps1
+    control_plane_context: tools/lib/control/Context.ps1
+    control_plane_executor: tools/lib/control/Executor.ps1
+    control_plane_calibration: tools/lib/control/Calibration.ps1
+    control_plane_shadow: tools/lib/control/Shadow.ps1
+    control_plane_shadow_gate: validation/tests/tooling/Test-MIRControlPlaneShadow.ps1
+    control_plane_gate: validation/tests/tooling/Test-MIRControlPlane.ps1
+    control_plane_release: tools/lib/control/Release.ps1
+    control_plane_release_gate: validation/tests/tooling/Test-MIRControlPlaneRelease.ps1
+    control_plane_execution_registry_generator: tools/commands/control/Update-MIRExecutionRegistry.ps1
+    control_plane_execution_registry_gate: validation/tests/tooling/Test-MIRExecutionRegistry.ps1
+    control_plane_observation_replay_generator: tools/commands/control/Update-MIRObservationReplay.ps1
+    control_plane_observation_gate: validation/tests/tooling/Test-MIRObservationEvaluation.ps1
+    control_plane_context_builder: tools/commands/control/New-MIRVerificationContext.ps1
+    control_plane_context_gate: validation/tests/tooling/Test-MIRVerificationContext.ps1
+    control_plane_evidence_gate: validation/tests/tooling/Test-MIREvidenceStore.ps1
+    control_plane_work_entrypoint: tools/commands/control/Invoke-MIRControlPlaneWork.ps1
+    control_plane_executor_gate: validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1
+    control_plane_context_package_gate: validation/tests/package/Test-MIRContextPackage.ps1
+    control_plane_context_registry_gate: validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1
+    control_plane_release_obligation_gate: validation/tests/release/Test-MIRReleaseObligation.ps1
+    control_plane_shadow_baseline_generator: tools/commands/control/Update-MIRShadowBaselines.ps1
+    control_plane_shadow_analysis_generator: tools/commands/control/Update-MIRShadowAnalysis.ps1
+    control_plane_workflow: .github/workflows/control-plane-v5.yml
+    control_plane_workflow_gate: validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
-    assurance_core: scripts/MIRAssurance/Core.ps1
-    assurance_domains: scripts/MIRAssurance/Domains.ps1
-    assurance_evidence: scripts/MIRAssurance/Evidence.ps1
-    assurance_hashing: scripts/MIRAssurance/Hashing.ps1
-    assurance_release: scripts/MIRAssurance/Release.ps1
-    assurance_tests: scripts/Test-MIRAssurance.ps1
-    release_authority: scripts/Test-MIRReleaseAuthority.ps1
-    native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
+    assurance_core: tools/lib/assurance/Core.ps1
+    assurance_domains: tools/lib/assurance/Domains.ps1
+    assurance_evidence: tools/lib/assurance/Evidence.ps1
+    assurance_hashing: tools/lib/assurance/Hashing.ps1
+    assurance_release: tools/lib/assurance/Release.ps1
+    assurance_tests: validation/tests/tooling/Test-MIRAssurance.ps1
+    release_authority: validation/tests/release/Test-MIRReleaseAuthority.ps1
+    native_owner_balance_tests: validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1
+    research_cost_model_tests: validation/tests/compiler/Test-MIRResearchCostModels.ps1
+    research_cost_release_contract: .mir/research-cost-contract-3.2.5.json
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation
-    museum_compiler: scripts/Museum/MuseumCompiler.psm1
-    museum_build: scripts/Build-MIRMuseumTarget.ps1
-    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
-    museum_exact_runtime_gate: scripts/Test-MIRMuseumExact.ps1
-    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
-    museum_qualification: scripts/New-MIRMuseumQualification.ps1
-    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
-    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
-    backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
-    package_identity: scripts/validation/PackageIdentity.ps1
-    package_composition: scripts/Measure-MIRPackageComposition.ps1
-    package_composition_gate: scripts/Test-MIRPackageComposition.ps1
-    target_metadata: scripts/validation/TargetProfiles.ps1
-    scenario_groups: scripts/validation/ScenarioGroups.ps1
-    structured_evidence: scripts/validation/ResultAggregation.ps1
-    factorio_process: scripts/validation/FactorioProcess.ps1
-    settings_overrides: scripts/validation/SettingsOverrides.ps1
-    scenario_registry: scripts/validation/ScenarioRegistry.ps1
-    golden_plans: scripts/Test-MIRGoldenPlans.ps1
-    campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
-    sanitation_budgets: scripts/Test-MIRSanitationBudgets.ps1
-    evidence_hygiene: scripts/Test-MIREvidenceHygiene.ps1
-    planner_artifacts: scripts/Test-MIRPlannerTools.ps1
+    museum_compiler: tools/lib/museum/MuseumCompiler.psm1
+    museum_build: tools/commands/museum/Build-MIRMuseumTarget.ps1
+    museum_static_gate: validation/tests/runtime/Test-MIRMuseumCompiler.ps1
+    museum_exact_runtime_gate: validation/tests/runtime/Test-MIRMuseumExact.ps1
+    museum_runtime_gate: validation/tests/runtime/Test-MIRMuseumRuntime.ps1
+    museum_qualification: tools/commands/museum/New-MIRMuseumQualification.ps1
+    museum_seal_writer: tools/commands/museum/New-MIRMuseumSeal.ps1
+    museum_seal_check: validation/tests/runtime/Test-MIRMuseumSeal.ps1
+    backport_source_lock: validation/tests/release/Test-MIRBackportSourceLock.ps1
+    backport_reconstruction_contract: path:releases.backports/2.5.0.json
+    backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
+    backport_materializer: scripts/Materialize-MIRBackport.ps1
+    backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
+    terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
+    terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
+    terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
+    terminal_shadow_source_publication_schema: spec/schemas/mir3-terminal-shadow-source-publication.schema.json
+    terminal_product_implementation_reconciliation: .mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json
+    terminal_product_implementation_reconciliation_schema: spec/schemas/mir3-terminal-product-implementation-reconciliation.schema.json
+    terminal_mod_portal_discussion_reconciliation: .mir/releases/terminal/MIR3-ModPortal-Discussion-ReconciliationV1.json
+    terminal_mod_portal_discussion_reconciliation_schema: spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json
+    terminal_shadow_kernel_branch_receipt: .mir/releases/terminal/MIR3-Terminal-Shadow-Kernel-Branch-ReceiptV1.json
+    terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
+    terminal_fixed_point_receipt: .mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json
+    terminal_fixed_point_receipt_schema: spec/schemas/mir3-terminal-fixed-point-receipt.schema.json
+    terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
+    terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
+    package_identity: tools/lib/validation/PackageIdentity.ps1
+    package_builder: tools/commands/package/Build-MIRPackage.ps1
+    package_composition: tools/commands/package/Measure-MIRPackageComposition.ps1
+    package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
+    target_metadata: tools/lib/validation/TargetProfiles.ps1
+    target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
+    runtime_scenario_authority_generator: tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1
+    scenario_groups: tools/lib/validation/ScenarioGroups.ps1
+    structured_evidence: tools/lib/validation/ResultAggregation.ps1
+    factorio_process: tools/lib/validation/FactorioProcess.ps1
+    settings_overrides: tools/lib/validation/SettingsOverrides.ps1
+    scenario_registry: tools/lib/validation/ScenarioRegistry.ps1
+    golden_plans: validation/tests/tooling/Test-MIRGoldenPlans.ps1
+    campaign_scenarios: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
+    sanitation_budgets: validation/tests/release/Test-MIRSanitationBudgets.ps1
+    evidence_hygiene: validation/tests/release/Test-MIREvidenceHygiene.ps1
+    planner_artifacts: validation/tests/tooling/Test-MIRPlannerTools.ps1
+    planner_report_diff: tools/commands/planner/Compare-MIRPlannerReports.ps1
+    planner_snapshot_diff: tools/commands/planner/Compare-MIRPlannerSnapshots.ps1
+    planner_snapshot_export: tools/commands/planner/Export-MIRPlannerSnapshot.ps1
+    planner_snapshot_minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
+    compatibility_pack_scaffold: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
+    compatibility_audit: tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+    compatibility_audit_results: tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1
+    compatibility_profile_stub: tools/commands/compatibility/New-MIRCompatProfileStub.ps1
+    compatibility_line_adapter: tools/commands/compatibility/New-MIRFactorioLineTestAdapter.ps1
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
-    technology_catalog_export: scripts/Export-MIRTechnologyCatalog.ps1
-    compiler_preview_export: scripts/Export-MIRCompilerPreview.ps1
-    compiler_preview_export_gate: scripts/Test-MIRCompilerPreviewExport.ps1
+    technology_catalog_export: tools/commands/technology/Export-MIRTechnologyCatalog.ps1
+    compiler_preview_export: tools/commands/technology/Export-MIRCompilerPreview.ps1
+    compiler_preview_export_gate: validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
     technology_governance_source: .mir/technology-governance.json
-    technology_governance_generator: scripts/Update-MIRTechnologyGovernance.ps1
-    technology_quality_assessment: scripts/New-MIRTechnologyQualityAssessment.ps1
-    technology_review_dossier: scripts/New-MIRTechnologyReviewDossier.ps1
-    technology_promotion_admission: scripts/Test-MIRTechnologyPromotionAdmission.ps1
-    technology_lifecycle_gate: scripts/Test-MIRTechnologyLifecycle.ps1
-    offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
-    offline_rule_synthesis_gate: scripts/Test-MIRRuleSynthesis.ps1
-    mod_interaction_graph: scripts/New-MIRModInteractionGraph.ps1
-    mod_interaction_gate: scripts/Test-MIRModInteractions.ps1
+    technology_governance_generator: tools/commands/technology/Update-MIRTechnologyGovernance.ps1
+    technology_design_diff: tools/commands/technology/Compare-MIRTechnologyDesigns.ps1
+    technology_lifecycle_record: tools/commands/technology/New-MIRTechnologyLifecycleRecord.ps1
+    technology_quality_assessment: tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1
+    technology_review_dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
+    technology_promotion_admission: validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
+    technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
+    offline_rule_synthesis: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
+    offline_rule_synthesis_gate: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
+    mod_interaction_graph: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
+    mod_interaction_gate: validation/tests/compatibility/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
-    approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
-    runtime_performance_gate: scripts/Test-MIRPerformanceRegression.ps1
-    manual_release_review_gate: scripts/Test-MIRManualReleaseReview.ps1
+    approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1
+    control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
+    control_plane_performance_campaigns: .mir/performance-campaigns
+    runtime_performance_gate: validation/tests/release/Test-MIRPerformanceRegression.ps1
+    manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
     localization_overrides: .mir/locales/overrides.json
-    localization_generator: scripts/Update-MIRLocales.ps1
-    localization_gate: scripts/Test-MIRLocales.ps1
-    localization_core: scripts/localization/MIRLocalization.psm1
-    release_attestations: scripts/validation/ReleaseAttestations.ps1
-    runtime_performance_evidence_schema: verification/schema/runtime-performance-evidence.schema.json
-    manual_release_attestation_schema: verification/schema/manual-release-attestation.schema.json
-    compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
-    pipeline_documentation: scripts/Update-MIRPipelineDocumentation.ps1
+    localization_generator: tools/commands/localization/Update-MIRLocales.ps1
+    localization_gate: validation/tests/docs/Test-MIRLocales.ps1
+    localization_core: tools/lib/localization/MIRLocalization.psm1
+    release_attestations: tools/lib/validation/ReleaseAttestations.ps1
+    runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
+    manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
+    compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
+    documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
+    generated_authority_documentation: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
+    pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
+    readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
-    compiler_gate: scripts/Test-MIRCompiler.ps1
+    compiler_authority_generator: tools/commands/compiler/Update-MIRCompilerAuthorities.ps1
+    compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
     verification_domains: validation/domains.yml
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
+    - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
+    - source-of-truth projections are owned by domain command families under tools commands while scripts retains parameter-compatible read-only wrappers and immutable historical worktrees may invoke their contemporary legacy paths
+    - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
+    - typed change incident task release and transition records are authoritative and human-readable status files are generated views
+    - F0 through F4 are classification labels while the scheduler follows explicit task prerequisites and resource constraints
+    - aggregate nodes evaluate completed atomic results and never execute their children
+    - aggregate TaskNode closure adopts one exact existing same-context same-trust result only when its member digest set is identical and rejects missing conflicting or ambiguous evidence
+    - fresh calibration proof authority is the one exact final qualification execution-manifest closure and rejects duplicate identities or results outside that closure
+    - compact execution manifest rows select only task identity status and object digest while the dereferenced content addressed TaskNode object supplies and must exactly match context input identity trust and revocation authority
+    - post execution calibration proof materialization may use only a clean committed ABI identical descendant verifier and binds both that verifier and the immutable controller commit while every admitted evidence producer remains exact controller bound
+    - environment capture compilation realization and evaluation use independent content identities
+    - compatible assertions share one exact environment capture while incompatible isolation contracts remain separate
+    - proposition freshness is explicit and no release uses a global no-reuse switch except governed independent calibration
+    - unknown path ownership broadens impact selection and fails governance until classified
+    - verification workers consume one immutable context digest and upload content-addressed objects plus execution manifests
+    - executable context ABI 3 binds the controller commit tracked worktree complete control plane implementation file set and at least one target-version-matching Factorio installation lock and rejects any later checkout drift
+    - native adapters stage context candidate bytes under the exact Factorio info json archive name while preserving and rechecking the immutable archive digest
+    - new-candidate context materialization captures an explicitly selected Factorio binary and complete official data identity on a protected self-hosted runner emits a path-independent composite lock retains path-bound v4 identities only as matching aliases and requires native workers to match that immutable lock before observation capture while process local full scan reuse remains exact key bound
+    - producer evaluator and canonicalization revocation may invalidate derived evaluations without discarding sound observations
+    - v5 toolchain admission requires exact C24 historical verdict equivalence P9 pending verdict parity and one fresh independent C24 calibration pass
+    - non calibration releases inherit only an accepted per target cutover whose exact fresh calibration proof is context locked unrevoked ABI identical and ancestral to the current control plane while P9 remains target local
+    - P9 operational shadow cutover requires exact admitted outcome and seal evidence and never treats pending parity as release proof
+    - P9 qualification may use the governed integration commit or a clean descendant only while the complete package source fingerprint remains frozen
+    - fresh C24 calibration executes every planned TaskNode and exact environment batch under one immutable context and emits one compact proof only after unambiguous evidence closure
+    - release history integrity executes against the current governance checkout because the frozen package source predates its tag and distribution inventory while candidate bytes remain separately package locked
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
+    - release records own release-specific upgrade baseline target and fixture authority which context materialization projects over the stable target-line engine profile and binds by exact staged profile digest
+    - approved delta and performance authorities are selected by exact release candidate and baseline identity so historical calibration and active qualification coexist without mutable authority replacement
     - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
-    - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint
+    - canonical plan result capsule bundle and seal JSON schemas live under spec/schemas and are bound into the verifier release fingerprint
     - matching workers are adopted through explicit process or CI-job leases bound to host identity process incarnation trust class and expiry and duplicate fingerprint work is never cancelled in progress
     - the aggregate verification gate requires exact evidence for every planned instance and never trusts mutable job status
     - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives
-    - candidate seals accept governed current-line and target-scoped backport candidate IDs and bind the immutable package-source commit evidence-producing commit later qualification-source commit unchanged package roots and exact qualified bytes without publishing
+    - candidate seals bind the stable candidate ID immutable package-source commit later qualification-source commit unchanged package roots and exact qualified bytes without publishing
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
     - portable museum compilation and catalog validation require no historical installation and emit finite target-era Lua with an explicit target-matching info.json factorio_version
     - exact museum runtime validation resolves tracked installation IDs through local or protected-runner configuration and binds exact binary and base-data fingerprints
@@ -728,9 +884,17 @@ validation_tooling:
     - settings overrides are declarative and isolated from scenario orchestration
     - every executed scenario resolves through a target-bound declaration record
     - compatibility campaign records own setup roots settings expectations timeout and claim level
-    - normalized approved deltas bind exact package and checkout-line-ending-invariant producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
+    - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
+    - v5 native patch-delta observations separate exact ZIP entry capture from versioned pure policy evaluation and bind the evaluated candidate rather than a superseded release-ledger row
+    - v5 performance execution uses source-side measurement code with a context-addressed controller-authority overlay, deterministic UTF-8 LF probe materialization, an exact overlay manifest, and an unchanged immutable package-source fingerprint
+    - v5 Factorio performance execution uses a fresh context-bound compact scratch root within a conservative path budget, then verifies and relocates raw artifacts into the context-addressed evidence tree
+    - compatibility-audit performance lanes defer output-directory materialization until governed artifact emission, and historical-source overlays bind the exact controller audit bytes and both runner families in the path budget
+    - the registered assurance-full workflow path delegates every exact protected input to the reusable canonical Control Plane v5 workflow on the selected ref
+    - repository-wide validation enumerates tracked and non-ignored untracked governed files and cannot treat ignored control-plane staging clones as repository source
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
-    - the protected performance worker alone transfers freshly generated performance evidence through the explicitly enabled hidden worker delta after exact plan source candidate archive content and copied-file hash checks
+    - the historical maintainer-statement manual-review mode is limited to an already publicly verified immutable package, records an after-publication attestation time, forbids invented checklist observations, and can never satisfy a new candidate's pre-seal review gate
+    - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
+    - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns

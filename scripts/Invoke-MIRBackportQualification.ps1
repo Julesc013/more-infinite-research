@@ -154,7 +154,7 @@ function Get-MIRSealValues {
 if ($Action -eq "qualify") {
   if (-not $RuntimeOnly) {
     if (-not $UseExistingCandidate) {
-      & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
+      & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
     } elseif (-not (Test-Path -LiteralPath $CandidateZip -PathType Leaf)) {
       throw "UseExistingCandidate requires an existing exact candidate ZIP."
     }

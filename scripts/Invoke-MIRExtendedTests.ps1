@@ -21,7 +21,7 @@ param(
   [string]$FactorioLine = "2.1",
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
-  [string]$OutputRoot = ".\artifacts\extended-tests",
+  [string]$OutputRoot = ".\build\results\extended-tests",
   [string]$ModUnderTestZip = "",
   [string]$ModUnderTestSourceCommit = "",
   [string]$FromLockfile,
@@ -51,10 +51,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
-. (Join-Path $PSScriptRoot "MIRCli\RunContext.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\EventLog.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\Artifacts.ps1")
-. (Join-Path $PSScriptRoot "MIRCli\Reports.ps1")
+. (Join-Path $repo "tools\lib\cli\RunContext.ps1")
+. (Join-Path $repo "tools\lib\cli\EventLog.ps1")
+. (Join-Path $repo "tools\lib\cli\Artifacts.ps1")
+. (Join-Path $repo "tools\lib\cli\Reports.ps1")
 
 $outputRootPath = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   $OutputRoot
@@ -229,7 +229,7 @@ function Invoke-MIRCompatAuditTier {
     } elseif (-not [string]::IsNullOrWhiteSpace($script:ManualScenariosPath)) {
       $auditParams.ManualScenariosPath = $script:ManualScenariosPath
     } else {
-      $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+      $auditParams.ManualScenariosPath = (Join-Path $repo "validation\scenarios\manual.json")
     }
   }
   if ($RunLocalModZips) {
@@ -258,8 +258,8 @@ function Invoke-MIRCompatAuditTier {
     $auditParams.Count = $ShardSize
   }
 
-  & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
-  & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+  & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") @auditParams
+  & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
   Assert-MIRNoAuditFailures -Name $Name -AuditDir $auditDir
 }
 
@@ -317,7 +317,7 @@ foreach ($entry in $expandedTiers) {
           FactorioBin = $FactorioBin
           RunManualScenarios = $true
           RunLoadTests = $true
-          ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+          ManualScenariosPath = (Join-Path $repo "validation\scenarios\manual.json")
           ScenarioNames = @($auditSmokeScenario)
           CatalogPages = 0
           MaxCandidates = 0
@@ -328,8 +328,8 @@ foreach ($entry in $expandedTiers) {
           OutputDir = $auditDir
         }
         if ($FailFast -and -not $CollectAll) { $auditParams.FailFast = $true }
-        & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
-        & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+        & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") @auditParams
+        & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
         Assert-MIRNoAuditFailures -Name "audit-smoke" -AuditDir $auditDir
       }
     }
@@ -353,9 +353,9 @@ foreach ($entry in $expandedTiers) {
         $scenarioPath = if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
           $ManualScenariosPath
         } elseif ($FactorioLine -eq "2.0") {
-          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios-2.0.json"
+          Join-Path $repo "validation\scenarios\local-2.0.json"
         } else {
-          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json"
+          Join-Path $repo "validation\scenarios\local-2.1.json"
         }
         Invoke-MIRCompatAuditTier -Name "local-library-scenarios" -RunManualScenarios -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -ManualScenariosPathOverride $scenarioPath
       }

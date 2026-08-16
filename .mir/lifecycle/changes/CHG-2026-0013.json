@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0013",
+  "title": "Defer broad proposition-bound assurance architecture to MIR 4",
+  "kind": "tooling",
+  "package_visible": false,
+  "domains_read": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "scenario.catalog"
+  ],
+  "domains_written": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "assurance.schemas",
+    "ci.workflow"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0"
+  ],
+  "migration_impact": "MIR 4 deferred. The broad CaptureKey, CompilationKey, RealizationKey, EvaluationKey, Merkle-sliced observation, evaluator, and runner architecture is outside MIR 3 terminal scope. Only separately recorded minimal terminal release-safety corrections may enter .9.",
+  "release_note_impact": "No MIR 3 package or release-note impact. The terminal programme records the bounded assurance corrections separately and preserves this architecture as MIR 4 work.",
+  "test_obligations": [
+    "assurance.control-plane",
+    "assurance.plan",
+    "assurance.evidence",
+    "assurance.evaluation",
+    "assurance.schemas",
+    "scenario.catalog",
+    "ci.workflow"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "mir4-deferred; no broad architecture implementation in .9",
+    "factorio-2.0": "mir4-deferred; no broad architecture implementation in .9"
+  },
+  "terminal_disposition": {
+    "status": "closed-as-terminal-scope",
+    "replacement": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json#MIR3-TERM-0005",
+    "mir4_handoff_required": true
+  },
+  "state": "closed"
+}

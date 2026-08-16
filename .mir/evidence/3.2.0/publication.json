@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "version": "3.2.0",
+  "target": "2.1",
+  "tag_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+  "tag_type": "lightweight",
+  "package_source_commit": "303de261629149af5f50bd210368e61423f1a299",
+  "release_commit": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+  "archive": "dist/more-infinite-research_3.2.0.zip",
+  "archive_bytes": 1029464,
+  "archive_entries": 290,
+  "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+  "package_content_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18",
+  "github": {
+    "status": "published",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.0",
+    "published_at": "2026-07-25T14:10:37Z",
+    "asset_url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.0/more-infinite-research_3.2.0.zip",
+    "asset_digest": "sha256:35372ee6d16da6765e8c30aeaaf5da4a5d300f02c0a0a03648c80893a5394f32",
+    "asset_size": 1029464,
+    "tag_commit_verified": true,
+    "asset_byte_verification": "github-recorded-digest-matches-canonical-archive"
+  },
+  "release_assurance": {
+    "fast_validation": "passed-eight-fresh-tests",
+    "focused_runtime": "passed-before-publication",
+    "long_validation": "not-completed-before-maintainer-publication",
+    "manual_review": "not-recorded-before-maintainer-publication",
+    "protected_qualification": "not-run-before-maintainer-publication",
+    "seal": "not-created-before-maintainer-publication",
+    "status": "published-with-recorded-assurance-exceptions"
+  },
+  "mod_portal": {
+    "status": "not-independently-verified"
+  }
+}

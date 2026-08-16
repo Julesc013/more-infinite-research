@@ -6,9 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [Parameter(Mandatory)][string]$ExpectedFactorioVersion
 )
-$ErrorActionPreference = "Stop"
-. (Join-Path $PSScriptRoot "validation\ReleaseAttestations.ps1")
-$result = Test-MIRManualReleaseAttestation -RepoRoot $RepoRoot -Path $Path -Candidate $Candidate `
-  -FactorioBin $FactorioBin -ExpectedSourceCommit $ExpectedSourceCommit `
-  -ExpectedFactorioVersion $ExpectedFactorioVersion
-Write-Host "[ok] MIR manual package review attestation passed: $($result.sha256)"
+
+# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.
+$canonicalTest = Join-Path $PSScriptRoot "../validation/tests/release/Test-MIRManualReleaseReview.ps1"
+& $canonicalTest @PSBoundParameters

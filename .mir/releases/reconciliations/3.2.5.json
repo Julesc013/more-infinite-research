@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "kind": "mir-release-work-package-reconciliation",
+  "release": "3.2.5",
+  "reconciled_at": "2026-08-08",
+  "source_baseline": {
+    "commit": "b1144889386cf8bc5e7561bf6399d1127cfa74cb",
+    "tree": "b2671260c6fb84b75dbd86ad43e9351842cb91bb",
+    "archive_sha256": "79965DD6167488013CEEE414897C4F00350B6FE541F4459B80D49C234DBDF208",
+    "content_sha256": "489DFFB3C5998773B13256DB2298495FB97CE87F8C45C0A916E062DB1475DE0F",
+    "bytes": 1051537,
+    "entries": 299,
+    "factorio_version": "2.1.12 build 87038",
+    "qualification": [
+      "development-playtest-revision-3",
+      "latest-playtest-green",
+      "latest-breadth-green",
+      "fresh-breadth-135-of-135",
+      "base-and-space-age-exact-zip-loads",
+      "five-direct-3.2.3-upgrade-archetypes",
+      "sixteen-cost-transitions",
+      "nine-governed-ecosystem-loads"
+    ]
+  },
+  "admitted_development_baseline": {
+    "revision": 5,
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301,
+    "package_equivalent_governance_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "qualification": [
+      "development-playtest-revision-5",
+      "latest-playtest-green",
+      "latest-breadth-green",
+      "fresh-candidate-qualification-135-of-135",
+      "base-and-space-age-exact-zip-loads",
+      "five-direct-3.2.3-upgrade-archetypes",
+      "sixteen-cost-transitions",
+      "first-and-second-upgrade-reloads",
+      "exact-factorio-2.1.13-installation-verified",
+      "maintainer-playtest-accepted",
+      "github-public-asset-base-and-space-age-smokes"
+    ]
+  },
+  "boundaries": {
+    "release_state": "publicly-verified",
+    "candidate_floor": "C32",
+    "candidate_id": "C32",
+    "factorio_2_0_release_authority": "not-created",
+    "mir_3_3_admission": "not-admitted",
+    "published_dist_mutation": "forbidden"
+  },
+  "authorities": [
+    "docs/releases/3.2.5-to-2.6-convergence-programme.md",
+    "docs/releases/ultimate-convergence-audit-action-register.md",
+    "docs/releases/3.2.5-development-readiness.md",
+    ".mir/distributions.json",
+    ".mir/releases/records/3.2.5.json",
+    ".mir/lifecycle/changes/CHG-2026-0005.json",
+    ".mir/lifecycle/changes/CHG-2026-0010.json",
+    ".mir/lifecycle/changes/CHG-2026-0011.json",
+    ".mir/lifecycle/changes/CHG-2026-0017.json",
+    ".mir/lifecycle/changes/CHG-2026-0018.json",
+    ".mir/lifecycle/changes/CHG-2026-0019.json",
+    ".mir/research-cost-contract-3.2.5.json",
+    ".mir/releases/freezes/3.2.5-D1.json",
+    ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+    ".mir/evidence/3.2.5-publication.json"
+  ],
+  "priority": {
+    "next_work_package": "325-D3",
+    "reason": "Exact C32 is publicly verified under C32-TIMEBOXED-PUBLICATION-2026-08-08. Protected qualification, seal/reconciliation, and normal promotion admission remain post-publication debt without permitting any package change."
+  },
+  "scope_decision": {
+    "authority": ".mir/lifecycle/changes/CHG-2026-0017.json",
+    "public_predecessor": "3.2.3",
+    "superseded_release": "3.2.4",
+    "release_3_2_4": "superseded-unpublished",
+    "release_3_2_5": "narrowed-unified-research-cost-and-bounded-compatibility",
+    "generalized_productization": "deferred-to-3.2.6-or-3.3",
+    "factorio_2_0_scope": "explicit-dispositions-for-shipped-features-only",
+    "deadline_policy": "no-gate-weakening-and-any-package-visible-defect-invalidates-the-frozen-candidate"
+  },
+  "work_packages": [
+    {
+      "id": "325-A1b",
+      "category": "assurance",
+      "status": "implemented-awaiting-closure",
+      "required_product_surface": [
+        "Temporary Git subprocesses cannot inherit alternate repository, worktree, index, or object-store authority."
+      ],
+      "current_implementation": [
+        "Markdown-format and artifact-cleanup temporary repository tests sanitize inherited Git repository variables."
+      ],
+      "current_tests": [
+        "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+        "validation/tests/package/Test-MIRArtifactCleanup.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-3:fresh-breadth-135-of-135"
+      ],
+      "remaining_gap": [
+        "Record the admission and incident closure explicitly instead of leaving the queue at implemented-locally."
+      ],
+      "package_visibility": "excluded",
+      "target_disposition": {
+        "factorio_2_1": "tooling-only",
+        "factorio_2_0": "tooling-only"
+      },
+      "next_bounded_action": "Add an append-only package-excluded closure bound to the admitted decoy-index regression evidence."
+    },
+    {
+      "id": "325-A0",
+      "category": "assurance",
+      "status": "open",
+      "required_product_surface": [
+        "Recover P11 observations and separate transport, observation, evaluation, proof, and infrastructure outcomes.",
+        "Complete exact P11 performance proof, BZ classification, and the post-publication stabilization decision without rewriting public bytes."
+      ],
+      "current_implementation": [
+        "Immutable P11 source, package, publication, manual-review, lineage, and timeboxed-publication records exist.",
+        "Deterministic worker evidence import and content-addressed assurance objects are implemented."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRBackportSourceLock.ps1",
+        "validation/tests/release/Test-MIRBackportManifest.ps1",
+        "validation/tests/tooling/Test-MIRAssurance.ps1"
+      ],
+      "current_evidence": [
+        ".mir/releases/records/2.5.0.json",
+        ".mir/evidence/2.5.0-publication.json",
+        ".mir/evidence/2.5.0-timeboxed-publication-decision.json",
+        ".mir/evidence/2.5.0-local-automated-qualification.json"
+      ],
+      "remaining_gap": [
+        "Protected post-publication qualification and seal obligations remain open.",
+        "Exact performance binding and BZ outcome are not terminal.",
+        "No append-only stabilization decision or independently qualified P12 exists."
+      ],
+      "package_visibility": "excluded",
+      "target_disposition": {
+        "factorio_2_1": "tooling-only",
+        "factorio_2_0": "tooling-only unless a reproduced P11 package defect independently admits P12"
+      },
+      "next_bounded_action": "Inventory retained P11 objects by exact semantic context, re-evaluate sound objects, and materialize the missing-versus-invalid proof set before scheduling any new Factorio work."
+    },
+    {
+      "id": "325-A1",
+      "category": "assurance",
+      "status": "partial",
+      "required_product_surface": [
+        "Append-only release identity, event, status, and post-publication qualification authorities.",
+        "Rejection of skipped transitions, stale or mixed evidence, identity drift, and reserved-floor substitution."
+      ],
+      "current_implementation": [
+        "Typed release records distinguish planned candidate floor C32 from candidate identity.",
+        "Release transitions, candidate closures, package locks, generated views, and controller admission checks exist."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+        "validation/tests/release/Test-MIRReleaseObligation.ps1",
+        "validation/tests/tooling/Test-MIRControlPlaneRelease.ps1"
+      ],
+      "current_evidence": [
+        ".mir/releases/records/3.2.5.json",
+        ".mir/releases/closures/3.2.4-C31.json",
+        ".mir/views/publication-checklist.json"
+      ],
+      "remaining_gap": [
+        "The complete append-only ReleaseEvent and PostPublicationQualification model is not implemented.",
+        "The controller's full illegal-transition matrix is not terminally proven."
+      ],
+      "package_visibility": "excluded",
+      "target_disposition": {
+        "factorio_2_1": "tooling-only",
+        "factorio_2_0": "tooling-only"
+      },
+      "next_bounded_action": "Add strict append-only event schemas and a table-driven controller rejection suite without changing the planned 3.2.5 state."
+    },
+    {
+      "id": "325-B1",
+      "category": "product",
+      "status": "terminal",
+      "required_product_surface": [
+        "Exact 3.2.3 default vectors and all fixed, linear, exponential, and hybrid models.",
+        "Configuration-change, save/reload, second-reload, numeric-envelope, parser, realization, and Factorio 2.0 proof."
+      ],
+      "current_implementation": [
+        "Canonical bounded cost formula, four derived kinds, three digest layers, transition descriptors, legacy operand projection, and no-double-conversion runtime behavior exist.",
+        "The model now carries a canonical algebraic proof ABI and qualification identity with explicit positivity, monotonicity, exponent, evaluated-cost, parser byte, token, depth, AST-node, numeric-literal, and exponent-constant bounds.",
+        "The governed 3.2.3 default vectors, ownership removal and transfer dispositions, first- and second-reload requirements, and shipped-feature Factorio 2.0 dispositions are machine-readable in .mir/research-cost-contract-3.2.5.json."
+      ],
+      "current_tests": [
+        "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+        "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "fixtures/assert-compiler-contracts/data-final-fixes.lua",
+        "validation/scenarios/runtime.json"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-5:sixteen-cost-transitions",
+        "development-playtest-revision-5:configuration-change-green",
+        "development-playtest-revision-5:five-direct-3.2.3-upgrade-archetypes",
+        "development-playtest-revision-5:first-and-second-reload-green",
+        "local-plan:E5EB38EACCC2153730B4B303C17D417541D6A0E2E3D625442A83E5B0A524297B:128-of-128",
+        "hosted-pr-53:latest-head-aggregate-green",
+        ".mir/lifecycle/changes/CHG-2026-0017.json",
+        ".mir/lifecycle/changes/CHG-2026-0018.json",
+        ".mir/research-cost-contract-3.2.5.json",
+        "focused-local:compiler-contracts-passed-with-bounded-exponent-rejection",
+        "focused-local:five-direct-upgrade-archetypes-passed-with-first-and-second-reload"
+      ],
+      "remaining_gap": [
+        "No product-correctness gap remains in 325-B1; candidate-bound performance, manual, protected, and publication evidence belongs to 325-D3/D4."
+      ],
+      "package_visibility": "visible",
+      "target_disposition": {
+        "factorio_2_1": "terminal product contract with exact algebraic, parser, default-vector, ownership, transition, first-reload, and second-reload proof",
+        "factorio_2_0": "explicit shipped-feature dispositions complete; exact target runtime qualification is deferred without creating release authority"
+      },
+      "next_bounded_action": "Make no further package-visible cost-model change; rebind the admitted propositions to the exact candidate during 325-D3."
+    },
+    {
+      "id": "325-B2",
+      "category": "product",
+      "status": "deferred-explicitly",
+      "required_product_surface": [
+        "Exactly one terminal disposition per leaf subject with observed, planned, applied, and realized linkage.",
+        "Stable outcome, reason, remediation, semantic, authority, and qualification identities."
+      ],
+      "current_implementation": [
+        "TechnologyCatalog, CompilerResult, GenerationPlan, TransformationPlan, MutationJournal, coverage, and public compiler evidence provide source read models.",
+        "Current report categories are not the governed terminal disposition contract."
+      ],
+      "current_tests": [
+        "validation/tests/compiler/Test-MIRCompiler.ps1",
+        "validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1",
+        "validation/tests/tooling/Test-MIRGoldenPlans.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-3:fresh-breadth-135-of-135"
+      ],
+      "remaining_gap": [
+        "The generalized all-stream terminal disposition product is intentionally deferred to 3.2.6 or 3.3 and is not a 3.2.5 freeze blocker.",
+        "The admitted bounded 325-B0 research-cost disposition remains the only disposition product shipped by 3.2.5."
+      ],
+      "package_visibility": "deferred-package-visible",
+      "target_disposition": {
+        "factorio_2_1": "deferred to 3.2.6 or 3.3; bounded B0 disposition only in 3.2.5",
+        "factorio_2_0": "deferred with the generalized product; the shipped B0 adapter disposition remains mandatory"
+      },
+      "next_bounded_action": "Take no 3.2.5 implementation action; retain the generalized product requirement for 3.2.6 or 3.3 planning after public 3.2.5."
+    },
+    {
+      "id": "325-B3",
+      "category": "product",
+      "status": "terminal-release-specific-product",
+      "required_product_surface": [
+        "Typed proof assertions with independent claim dimensions.",
+        "Ecosystem profiles and exact environment locks for Base, Space Age, P11/BZ, owner-pack, overhaul, and conflict rows.",
+        "Expiry and revocation behavior for public proposition evidence."
+      ],
+      "current_implementation": [
+        "Control Plane assertions, observations, evaluations, evidence objects, revocation rules, verification contexts, target profiles, and scenario manifests exist.",
+        "The named product-level ProofAssertion, EcosystemProfile, and ExactEnvironmentLock authorities do not yet exist."
+      ],
+      "current_tests": [
+        "validation/tests/tooling/Test-MIRObservationEvaluation.ps1",
+        "validation/tests/tooling/Test-MIRVerificationContext.ps1",
+        "validation/tests/compatibility/Test-MIRScenarioManifests.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-5:base-and-space-age-exact-zip-loads",
+        "development-playtest-revision-5:nine-governed-ecosystem-loads",
+        "development-playtest-revision-5:fresh-breadth-128-of-128",
+        ".mir/releases/freezes/3.2.5-D1.json"
+      ],
+      "remaining_gap": [
+        "Candidate-bound performance, manual, and protected observations remain mandatory release evidence under 325-D3; the release-specific product authority is complete.",
+        "General-purpose public ProofAssertion and EcosystemProfile product authorities remain explicitly deferred to 3.2.6 or 3.3."
+      ],
+      "package_visibility": "mixed",
+      "target_disposition": {
+        "factorio_2_1": "release-specific exact evidence required; generalized public proof product deferred",
+        "factorio_2_0": "shipped-feature dispositions required; no broad target environment authority or 2.5.5 release authority"
+      },
+      "next_bounded_action": "Bind the already shipped B0 assertion and essential B1 propositions to the exact D1 release environments without creating a generalized proof product."
+    },
+    {
+      "id": "325-B4",
+      "category": "product",
+      "status": "terminal-release-specific-product",
+      "required_product_surface": [
+        "Deterministic bounded JSON and localized summary-first support output.",
+        "Effective-setting provenance, privacy allowlist and redaction, stable remediation codes, truncation counts, and diagnostics-off parity."
+      ],
+      "current_implementation": [
+        "Public compiler artifacts have hard byte and sample limits.",
+        "Locale generation, evidence hygiene, sanitation budgets, diagnostics gating, and target-aware evidence transport exist.",
+        "There is no single governed support-bundle contract."
+      ],
+      "current_tests": [
+        "validation/tests/docs/Test-MIRLocales.ps1",
+        "validation/tests/release/Test-MIREvidenceHygiene.ps1",
+        "validation/tests/release/Test-MIRSanitationBudgets.ps1",
+        "validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-5:fresh-breadth-128-of-128",
+        ".mir/public-artifact-budgets.json",
+        ".mir/releases/freezes/3.2.5-D1.json"
+      ],
+      "remaining_gap": [
+        "Exact-candidate privacy, localization, diagnostics-off parity, and human inspection remain 325-D3 evidence obligations, not missing product surfaces.",
+        "A universal support-bundle schema, generalized setting provenance, and broad remediation catalog remain deferred to 3.2.6 or 3.3."
+      ],
+      "package_visibility": "visible",
+      "target_disposition": {
+        "factorio_2_1": "bounded B0 mod-data record plus release-specific privacy and localization proof",
+        "factorio_2_0": "shipped B0 record is portable-with-adapter through bounded validation-log transport; no generalized bundle"
+      },
+      "next_bounded_action": "Prove the existing bounded B0 support record against release-specific privacy, localization, truncation, and diagnostics-off obligations; add no generalized bundle product."
+    },
+    {
+      "id": "325-B5",
+      "category": "product",
+      "status": "deferred-explicitly",
+      "required_product_surface": [
+        "Only retire duplicate paths after characterization, shadow output, exact differential, measured benefit, rollback, and target disposition."
+      ],
+      "current_implementation": [
+        "Logical path authority, read-only aliases, canonical tool commands, compiler context, trusted records, and shadow comparison foundations exist."
+      ],
+      "current_tests": [
+        "validation/tests/tooling/Test-MIRLayout.ps1",
+        "validation/tests/architecture/Test-MIRModuleDependencies.ps1",
+        "validation/tests/tooling/Test-MIRControlPlaneShadow.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-3:fresh-breadth-135-of-135"
+      ],
+      "remaining_gap": [
+        "No further consolidation is earned until B0 through B4 expose exact duplicate authorities and measured costs.",
+        "Mass reorganization and semantic refactoring remain out of scope."
+      ],
+      "package_visibility": "mixed",
+      "target_disposition": {
+        "factorio_2_1": "case-by-case after shadow parity",
+        "factorio_2_0": "case-by-case with explicit target disposition"
+      },
+      "next_bounded_action": "Make no optional 3.2.5 consolidation change; reconsider only after public 3.2.5."
+    },
+    {
+      "id": "325-C1",
+      "category": "projection",
+      "status": "terminal-shipped-features-only",
+      "required_product_surface": [
+        "One Factorio 2.0 disposition for every package-visible 3.2.5 change.",
+        "Cost, profile, owner, runtime, migration, report transport, locale, metadata, reconstruction, and performance mapping."
+      ],
+      "current_implementation": [
+        "Factorio 2.0 target profile, backport source lock, portable delta, deterministic reconstruction tooling, and log fallback transport foundations exist.",
+        "The final research-cost contract classifies all nine shipped feature groups for Factorio 2.0 without creating 2.5.5 authority."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRBackportSourceLock.ps1",
+        "validation/tests/release/Test-MIRBackportReconstruction.ps1",
+        "validation/tests/runtime/Test-MIRMuseumExact.ps1"
+      ],
+      "current_evidence": [
+        ".mir/backport-source-lock.json",
+        ".mir/backport-portable-delta-3.2.3-to-2.5.0.json",
+        "validation/profiles/factorio-2.0.json",
+        ".mir/research-cost-contract-3.2.5.json"
+      ],
+      "remaining_gap": [
+        "No shipped-feature disposition gap remains; target reconstruction, exact closures, and target performance stay deferred until public 3.2.5 and a formal feasibility decision."
+      ],
+      "package_visibility": "mixed",
+      "target_disposition": {
+        "factorio_2_1": "canonical source line",
+        "factorio_2_0": "investigation only; no release, branch, or candidate authority"
+      },
+      "next_bounded_action": "Complete a non-release inventory only for narrowed 3.2.5 shipped features and prove the B0 transport adapter law without materializing a 2.5.5 tree."
+    },
+    {
+      "id": "325-D1",
+      "category": "freeze",
+      "status": "terminal",
+      "required_product_surface": [
+        "Exact 3.2.3 predecessor and lineage packet, package composition, public ABI and approved delta, final cost and bounded B0 contracts, release-specific environments, manual and performance policies, release notes, migration, shipped-feature Factorio 2.0 dispositions, and source-bound verification plan."
+      ],
+      "current_implementation": [
+        "The machine-readable D1 packet binds public 3.2.3 and C31 lineage, exact revision-5 package roots and identity, narrowed product and target contracts, transition authority, exact Factorio environment, performance/manual policies, and release documents.",
+        "Development revision 5 is the final package-visible source selected for freeze."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRApprovedDelta.ps1",
+        "validation/tests/package/Test-MIRPackageComposition.ps1",
+        "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+        "validation/tests/release/Test-MIRSourceFreezePacket.ps1"
+      ],
+      "current_evidence": [
+        "development-playtest-revision-5:latest-playtest-green",
+        "development-playtest-revision-5:latest-breadth-green",
+        ".mir/releases/closures/3.2.4-C31.json",
+        ".mir/releases/records/3.2.3.json",
+        ".mir/releases/freezes/3.2.5-D1.json"
+      ],
+      "remaining_gap": [
+        "No D1 product or authority gap remains; later package, qualification, manual, protected, seal, and publication gates remain separate."
+      ],
+      "package_visibility": "mixed",
+      "target_disposition": {
+        "factorio_2_1": "freeze only after all package-visible work is complete",
+        "factorio_2_0": "record dispositions only; do not create release authority"
+      },
+      "next_bounded_action": "Preserve the admitted packet and invalidate C32 if any later package-visible source changes."
+    },
+    {
+      "id": "325-D2",
+      "category": "release",
+      "status": "terminal",
+      "required_product_surface": [
+        "Assign the first exact candidate at or above C32 only after source freeze and build its deterministic package twice."
+      ],
+      "current_implementation": [
+        "The admitted D1 packet and append-only source-frozen transition assign exact candidate C32 to package source a3bfbc4524b52cede425900e775384eb9c1fc4b3.",
+        "Two deterministic builds produced archive AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF, normalized content 1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D, 1056249 bytes, and 301 entries."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+        "validation/tests/tooling/Test-MIRAssurance.ps1"
+      ],
+      "current_evidence": [
+        ".mir/releases/records/3.2.5.json",
+        ".mir/releases/transitions/3.2.5-c32-package-built.json",
+        "dist/more-infinite-research_3.2.5.zip"
+      ],
+      "remaining_gap": [
+        "No D2 package-construction gap remains; candidate qualification is owned by 325-D3."
+      ],
+      "package_visibility": "none-until-admitted",
+      "target_disposition": {
+        "factorio_2_1": "exact immutable candidate package built",
+        "factorio_2_0": "not applicable; no 2.5.5 authority"
+      },
+      "next_bounded_action": "Preserve exact C32 bytes and invalidate them if any package-visible source changes."
+    },
+    {
+      "id": "325-D3",
+      "category": "release",
+      "status": "in-progress-post-publication-debt",
+      "required_product_surface": [
+        "Focused, complete candidate, manual, protected no-reuse, seal, and shadow-equivalence proof for one immutable candidate."
+      ],
+      "current_implementation": [
+        "Fresh local candidate qualification passed 135 of 135 without reuse, the exact Factorio 2.1.13 installation was verified, and the maintainer accepted the exact C32 archive after playtesting.",
+        "Protected aggregate, seal, reconciliation, and shadow-evaluation machinery remains available for the retained post-publication work."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRManualReleaseReview.ps1",
+        "validation/tests/tooling/Test-MIRControlPlaneRelease.ps1",
+        "validation/tests/tooling/Test-MIRControlPlaneShadow.ps1"
+      ],
+      "current_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+        "dist/more-infinite-research_3.2.5.zip",
+        ".mir/evidence/3.2.5-manual-review-attestation.json",
+        ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        ".mir/evidence/3.2.5-publication.json"
+      ],
+      "remaining_gap": [
+        "Fresh protected GitHub qualification was not completed because both admitted attempts ended in external transport failure.",
+        "Protected qualification, seal/reconciliation, shadow equivalence, and normal promotion-admission reconciliation remain post-publication obligations."
+      ],
+      "package_visibility": "frozen-public-bytes-no-mutation",
+      "target_disposition": {
+        "factorio_2_1": "C32 candidate qualification, exact-environment verification, maintainer acceptance, publication, and public-asset smokes complete; protected qualification and sealing pending post-publication",
+        "factorio_2_0": "not applicable; no 2.5.5 authority"
+      },
+      "next_bounded_action": "Complete protected qualification and seal/reconciliation only against the exact published C32 identity; never modify or republish 3.2.5."
+    },
+    {
+      "id": "325-D4",
+      "category": "release",
+      "status": "completed-under-release-specific-exception",
+      "required_product_surface": [
+        "Promote, tag, publish, re-download, rehash, and clean-room verify the exact sealed bytes."
+      ],
+      "current_implementation": [
+        "Main fast-forward promotion, annotated tag 3.2.5, GitHub release publication, public-byte verification, and exact-engine Base and Space Age smoke verification are complete."
+      ],
+      "current_tests": [
+        "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+        "validation/tests/release/Test-MIRBranchPolicy.ps1"
+      ],
+      "current_evidence": [
+        ".mir/releases/records/3.2.5.json",
+        ".mir/evidence/3.2.5-timeboxed-publication-decision.json",
+        ".mir/evidence/3.2.5-publication.json"
+      ],
+      "remaining_gap": [
+        "Normal protected seal and promotion-admission reconciliation remains retained post-publication; the exception is not a protected seal."
+      ],
+      "package_visibility": "frozen-public-bytes-no-mutation",
+      "target_disposition": {
+        "factorio_2_1": "publicly verified under release-specific exact-byte exception with protected qualification and sealing pending post-publication",
+        "factorio_2_0": "not applicable; no 2.5.5 authority"
+      },
+      "next_bounded_action": "Preserve tag and public asset immutably; perform only the retained post-publication reconciliation against the same bytes."
+    }
+  ]
+}

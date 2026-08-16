@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "release": "3.2.4",
+  "candidate_id": "C31",
+  "target": "2.1",
+  "branch": "dev",
+  "state": "package-built",
+  "source_release": {
+    "release": "3.2.3",
+    "tag": "3.2.3",
+    "tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "candidate_id": "C30",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db"
+  },
+  "package": {
+    "source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+    "source_tree": "c69da6616091f1297e51676983eb5b9ef4847e4c",
+    "source_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+    "archive": "dist/more-infinite-research_3.2.4.zip",
+    "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1",
+    "content_sha256": "C4E6CCBFF2922BE01553CFCBE10982A1DD076FCB306923CBFF8C82AFF700801C",
+    "bytes": 1048419,
+    "entries": 298
+  },
+  "upgrade": {
+    "from_version": "3.2.3",
+    "to_version": "3.2.4",
+    "fixture": "assert-upgrade-3-2-3-to-3-2-4"
+  },
+  "proofs": {
+    "source_freeze": [
+      {
+        "kind": "package-lock",
+        "path": ".mir/control-plane/package-locks.json",
+        "candidate_id": "C31"
+      }
+    ],
+    "package_build": [
+      {
+        "kind": "deterministic-package",
+        "path": "scripts/Test-MIRDeterministicPackage.ps1",
+        "archive_sha256": "64094ED6DFE48B058BB22E2AA55AF1EF11B30ED4264C3BBD5ECE0CE9DB22FCB1"
+      }
+    ]
+  },
+  "remaining_obligations": [
+    "focused-qualification",
+    "candidate-qualification",
+    "manual-acceptance",
+    "protected-qualification",
+    "seal",
+    "promotion",
+    "tag",
+    "publication",
+    "public-byte-verification"
+  ],
+  "release_notes": "docs/releases/3.2.4-unified-research-cost-curves.md",
+  "incident_ids": [],
+  "updated_at": "2026-08-02T16:28:54.686Z"
+}

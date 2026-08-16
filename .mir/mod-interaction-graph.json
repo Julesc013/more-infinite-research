@@ -63,7 +63,7 @@
         "space-age"
       ],
       "evidence": [
-        "approved-delta/3.1.9-to-3.2.0.json"
+        ".mir/releases/deltas/3.1.9-to-3.2.0.json"
       ],
       "footprints": {
         "recipe_output_families": [
@@ -105,7 +105,7 @@
       ],
       "evidence": [
         "fixtures/space-age-galore-overlap",
-        "approved-delta/3.1.9-to-3.2.0.json"
+        ".mir/releases/deltas/3.1.9-to-3.2.0.json"
       ],
       "footprints": {
         "recipe_output_families": [
@@ -225,7 +225,7 @@
   },
   "input_hash_basis": "canonical-json",
   "policy_sha256": "93B33E515A6DA28A56F77AD6CA09F15AB133BFB80356BC584C791591F1FC1F48",
-  "capsules_sha256": "72D990B49F5B014647349D94D484E098763B3C5972B5503001602A47185AE6F5",
+  "capsules_sha256": "306DF6C56B488B757EB7B2AEF2746F3DA39E639BBEBEBBAB2B3E5F9805E884EC",
   "delta_policies_sha256": "B00104FB0481353218702D5EE8580AC2E1F123878014BC6417D0F98EDEDA749F",
-  "graph_sha256": "15B5F9060E95F71CACE852A984C2559EBB1FC94F135BA657A722E8DE97D55749"
+  "graph_sha256": "21FE79CE33E2EF3E3892D800BF445FAE88FB4A683B7F9FB228ACAF1AD0C01B76"
 }

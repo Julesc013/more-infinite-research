@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -38,9 +38,9 @@ The implemented report-first pieces are:
 - `prototypes/mir/capabilities/registry.lua` classifies entity-backed loader recipes, entity-backed mining-drill recipes, and native modifier owners.
 - `prototypes/mir/policy/capabilities.lua` stores capability-specific policy defaults, including confidence thresholds, owner policy, science policy, and deny-risk flags.
 - `prototypes/mir/planner/compiler.lua` emits fact summaries, lab matrices, DecisionRecord-style rows, loop-risk rows, rule-surface rows, capability rows, and useful cap estimates when generation diagnostics are enabled.
-- `scripts/Convert-MIRCompatAuditResults.ps1` preserves capability, subfamily, and evidence fields in compatibility observation artifacts.
-- `scripts/Test-MIRPolicyLints.ps1` checks the capability policy, generated stream manifest, support lanes, and compatibility claims.
-- `scripts/Compare-MIRPlannerReports.ps1` compares two compatibility observation exports and summarizes stream, decision, risk, owner, lab/science, cap, and claim drift.
+- `tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1` preserves capability, subfamily, and evidence fields in compatibility observation artifacts.
+- `validation/tests/tooling/Test-MIRPolicyLints.ps1` checks the capability policy, generated stream manifest, support lanes, and compatibility claims.
+- `tools/commands/planner/Compare-MIRPlannerReports.ps1` compares two compatibility observation exports and summarizes stream, decision, risk, owner, lab/science, cap, and claim drift.
 
 The kernel is report-only except where an existing MIR stream or exact policy already owns the behavior. It does not add broad automatic stream generation, change recipe caps, change recipe productivity eligibility, alter beacons, alter modules, mutate external mod balance, or add runtime productivity systems.
 
@@ -154,7 +154,7 @@ Capability-specific policy lives in `prototypes/mir/policy/capabilities.lua`. It
 - science policy;
 - deny-risk flags.
 
-Machine-readable compatibility claims live in `fixtures/compat-matrix/claims.json`. A claim must say which capabilities are generated, observed, or diagnostic-only; which fixtures back it; whether a generated stream exists; and the exact public text. The policy linter rejects claims that reference generated streams without a manifest row or use broad "full support" wording.
+Machine-readable compatibility claims live in `spec/compatibility/claims.json`. A claim must say which capabilities are generated, observed, or diagnostic-only; which fixtures back it; whether a generated stream exists; and the exact public text. The policy linter rejects claims that reference generated streams without a manifest row or use broad "full support" wording.
 
 Generated stream IDs are part of save compatibility. The generated stream manifest records:
 

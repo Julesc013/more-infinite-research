@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-18
+last_reviewed: 2026-08-14
 supersedes: []
 superseded_by: []
 ---
@@ -40,16 +40,19 @@ Blocked before publish:
 Run the publish-candidate preflight from a clean `dev` checkout. Materialize the plan before executing tests:
 
 ```powershell
+.\tools\commands\release\Test-MIRGitHubAdministration.ps1
 git status
 git rev-parse HEAD
 
-.\scripts\mir.ps1 assurance build --target 2.1
-.\scripts\mir.ps1 verify plan --target 2.1 --profile full --factorio <factorio-2.1.11.exe> --prior <mir-3.1.9.zip> --output out/verification-plan.json
+.\tools\mir.ps1 assurance build --target 2.1
+.\tools\mir.ps1 verify plan --target 2.1 --profile full --factorio <factorio-2.1.11.exe> --prior <mir-3.1.9.zip> --output out/verification-plan.json
 Get-Content -Raw .\out\verification-plan.json
 Get-FileHash .\dist\more-infinite-research_<version>.zip -Algorithm SHA256
 git diff --check
 git status
 ```
+
+The GitHub administration preflight must run in the shell that will perform protection, promotion, tag, or publication operations. Its JSON receipt records token-override presence without token values and distinguishes authentication (401), authorization (403), and payload validation (422). Do not translate sandbox network failures or another connector's credential state into a maintainer reauthentication request.
 
 The full plan expands `runtime.upgrade` into five required archetypes in one schema-bound matrix result. Do not substitute the historical six-assertion native-owner proof. Ecosystem campaign rows and target-qualified local repair smokes must also pass their exact `.mir/sanitation-budgets.json` budget; `REVIEW_REQUIRED` is not a pass.
 

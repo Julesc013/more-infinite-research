@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Space Age Galore Overlap",
   "author": "Julesc013",
   "description": "Reproduces a multi-output recipe claimed by carbon and sulfur productivity streams.",
-  "factorio_version": "2.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.0.77",
+    "base >= 2.1.8",
     "space-age >= 2.0.0",
     "more-infinite-research"
   ]

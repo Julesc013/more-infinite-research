@@ -1,23 +1,57 @@
 ---
-title: "MIR 2.5.9 Planning Notes"
-status: draft
+title: "MIR 2.5.9 Release Notes"
+status: current
 applies_to: "2.5.9"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
 
-<!-- MIR3-TERMINAL-SHADOW release=2.5.9 target=2.0 baseline=2.5.5 pre-dot5=2.5.0 candidate=unassigned source-frozen=false -->
+# More Infinite Research 2.5.9
 
-# MIR 2.5.9 Planning Notes
+Final MIR 3 terminal release for Factorio 2.0.77.
 
-MIR 2.5.9 is the terminal Factorio 2.0 projection from the immutable 2.5.5 baseline. Its only admitted product correction is `SciencePackProductionRoutePolicyV1`: alternate recipes for the same science pack are treated as independent routes, and the deterministic earliest safe route is selected before technology or recipe names can break a tie.
+Candidate: `2.5-P13`
 
-The generic Factorio 2.0 fixture proves that adding a lexically earlier but downstream route cannot delay an already-reachable science pack. Direct unmodified Cubium 1.0.28 evidence remains pending authenticated acquisition, so these notes do not claim direct Cubium support beyond the generic invariant.
+Archive SHA-256: `B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35`
 
-The target retains stable generated technology IDs, settings, and migration behavior. A direct five-archetype 2.5.5-to-2.5.9 upgrade matrix covers base/default generation, Space Age native ownership, automatic family creation, base continuations, and source-only compatibility-mod removal.
+Normalized content SHA-256: `D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C`
 
-This is an unfrozen shadow. No candidate ID, final package identity, tag, release, or publication authority is assigned until the all-nine fixed point is accepted and terminal source freeze occurs.
+Upgrade paths: `2.5.5 -> 2.5.9` and `2.5.0 -> 2.5.9`
+
+## Changes
+
+- Corrects alternate science-production-route prerequisite selection on Factorio 2.0.
+- Resolves duplicate direct-effect ownership on the maintained Factorio 2.0 compiler path.
+- Preserves stable identities and both governed upgrade paths.
+- Keeps every released setting in its existing Startup/compile scope; MIRSET1 and setting identities are unchanged.
+- Establishes the permanent MIR 3 Factorio 2.0 baseline.
+
+## Qualification
+
+The exact archive was reconstructed three times from clean detached roots and passed its target-tier automated qualification. Maintainer acceptance is limited to inspection of the exact frozen distribution; engine, settings, compatibility, performance, and upgrade claims come from the recorded automated evidence.
+
+## Installation
+
+Use the attached `more-infinite-research_2.5.9.zip` unchanged. Do not rename or unpack it into another archive.
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:BEGIN -->
+## Immutable release identity
+
+> Generated from `path:releases.records/2.5.9.json`. The typed record is authoritative.
+
+| Field | Value |
+| --- | --- |
+| State | `publicly-verified` |
+| Candidate | `2.5-P13` |
+| Package source commit | `89719eb8ea5c938b6a0e9d816e6324d4d59b87bb` |
+| Archive SHA-256 | `B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35` |
+| Content SHA-256 | `D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C` |
+| Tag | `2.5.9` |
+| Tag commit | `89719eb8ea5c938b6a0e9d816e6324d4d59b87bb` |
+| Assurance exceptions | `pending` |
+
+<!-- MIR-CONTROL-PLANE-IDENTITY:END -->

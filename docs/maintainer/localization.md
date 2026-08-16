@@ -5,7 +5,7 @@ applies_to: "3.2.0+ and maintained backports"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-19
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -21,9 +21,9 @@ MIR ships a complete locale file for every language directory supported by the q
 | `.mir/locales/manifest.json` | Supported Factorio locale set, translation codes, script expectations, and UI prose budgets. |
 | `.mir/locales/translations/<locale>.json` | Complete per-key translations, English source hashes, and provenance. |
 | `.mir/locales/overrides.json` | Small reviewed corrections for terminology or machine-draft values that need explicit wording. |
-| `scripts/Update-MIRLocales.ps1` | Deterministic CFG and translation-memory generator. |
-| `scripts/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
-| `scripts/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
+| `tools/commands/localization/Update-MIRLocales.ps1` | Deterministic CFG and translation-memory generator. |
+| `validation/tests/docs/Test-MIRLocales.ps1` | Offline release gate for completeness, freshness, syntax, and prose constraints. |
+| `tools/lib/localization/MIRLocalization.psm1` | Shared parser, writer, hashing, placeholder, rich-text, and length primitives. |
 
 Files below `locale/<code>/` other than English are generated outputs. Change a translation-memory value or add a narrow override, then regenerate; do not leave a hand-edited CFG that differs from its memory.
 
@@ -32,14 +32,14 @@ Files below `locale/<code>/` other than English are generated outputs. Change a 
 After changing English locale text:
 
 ```powershell
-.\scripts\Update-MIRLocales.ps1
+.\tools\commands\localization\Update-MIRLocales.ps1
 ```
 
 This intentionally fails and lists a language with missing or stale source hashes. A maintainer can translate those keys directly in the language memory or create machine-assisted drafts:
 
 ```powershell
-.\scripts\Update-MIRLocales.ps1 -MachineTranslateMissing
-.\scripts\Test-MIRLocales.ps1
+.\tools\commands\localization\Update-MIRLocales.ps1 -MachineTranslateMissing
+.\validation\tests\docs\Test-MIRLocales.ps1
 ```
 
 Machine assistance is an initial completion mechanism, not a substitute for the exact-candidate `locale-fit-and-truncation` manual release item. Community or maintainer corrections should replace machine-assisted values in translation memory or the small override catalog and preserve the matching English source hash.

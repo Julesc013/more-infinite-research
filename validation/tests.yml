@@ -17,21 +17,30 @@
       "id": "tooling.self-test",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRAssurance.ps1",
+      "command": "./validation/tests/tooling/Test-MIRAssurance.ps1",
       "requires_factorio": false,
       "inputs": [
         "scripts/Invoke-MIRAssurance.ps1",
-        "scripts/MIRAssurance/**",
-        "scripts/Test-MIRAssurance.ps1",
-        "scripts/Test-MIRNativeOwnerCostModels.ps1",
-        "scripts/mir.ps1",
+        "tools/lib/assurance/**",
+        "validation/tests/tooling/Test-MIRAssurance.ps1",
+        "validation/tests/release/Test-MIRTerminalGovernance.ps1",
+        "validation/tests/release/Test-MIRGitHubAdministration.ps1",
+        "tools/commands/release/Test-MIRGitHubAdministration.ps1",
+        "validation/tests/release/Test-MIRTerminalShadowProjection.ps1",
+        "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+        "fixtures/export-approved-delta/data-final-fixes.lua",
+        "validation/tests/release/Test-MIRTerminalBaselineCapture.ps1",
+        "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+        "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+        "tools/mir.ps1",
         "tools/mir_verify/**",
         ".mir/assurance.json",
+        ".mir/releases/terminal/**",
         "validation/tests.yml",
         "validation/domains.yml",
         "validation/trust.json",
         ".mir/releases.json",
-        "verification/schema/**",
+        "spec/schemas/**",
         "validation/profiles/**"
       ]
     },
@@ -45,14 +54,35 @@
         "prototypes/**",
         ".mir/modules.yml",
         ".mir/module-dependencies.json",
-        "scripts/Test-MIRArchitecture.ps1"
+        "validation/tests/architecture/Test-MIRArchitecture.ps1"
+      ]
+    },
+    {
+      "id": "static.layout",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/tooling/Test-MIRLayout.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/paths.yml",
+        ".mir/control/aliases.yml",
+        ".mir/control-plane/ownership.json",
+        ".mir/modules.yml",
+        "spec/architecture/repository-layout-v2.md",
+        "spec/schemas/*layout*.schema.json",
+        "spec/schemas/*path*.schema.json",
+        "tools/mir.ps1",
+        "tools/lib/workspace/**",
+        "tools/commands/workspace/**",
+        "tools/maintenance/**",
+        "validation/tests/tooling/Test-MIRLayout.ps1"
       ]
     },
     {
       "id": "static.compiler",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRCompiler.ps1",
+      "command": "./validation/tests/compiler/Test-MIRCompiler.ps1",
       "requires_factorio": false,
       "inputs": [
         "prototypes/mir/**",
@@ -64,31 +94,33 @@
         ".mir/technology-quality-profiles.json",
         ".mir/compiler-schema-authority.json",
         ".mir/public-artifact-budgets.json",
+        ".mir/research-cost-contract-3.2.5.json",
         "fixtures/assert-compiler-contracts/**",
-        "scripts/Test-MIRCompiler.ps1",
-        "scripts/Test-MIRModuleDependencies.ps1",
-        "scripts/Test-MIRCompilerContractCoverage.ps1",
-        "scripts/Test-MIRCompilerSchemaDrift.ps1"
-        ,"scripts/Update-MIRCompilerAuthorities.ps1"
+        "validation/tests/compiler/Test-MIRCompiler.ps1",
+        "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+        "validation/tests/architecture/Test-MIRModuleDependencies.ps1",
+        "validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1",
+        "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1"
+        ,"tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
       ]
     },
     {
       "id": "static.compiler-preview",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRCompilerPreviewExport.ps1",
+      "command": "./validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1",
       "requires_factorio": false,
       "inputs": [
         ".mir/public-artifact-budgets.json",
-        "scripts/Export-MIRCompilerPreview.ps1",
-        "scripts/Test-MIRCompilerPreviewExport.ps1"
+        "tools/commands/technology/Export-MIRCompilerPreview.ps1",
+        "validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1"
       ]
     },
     {
       "id": "static.settings",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRSettingsVisibility.ps1",
+      "command": "./validation/tests/compiler/Test-MIRSettingsVisibility.ps1",
       "requires_factorio": false,
       "inputs": [
         "settings*.lua",
@@ -100,22 +132,22 @@
         "docs/user/settings.md",
         "docs/reference/settings.md",
         "docs/maintainer/settings-governance.md",
-        "scripts/Update-MIRREADMEStreamDefaults.ps1",
-        "scripts/Test-MIRSettingsVisibility.ps1"
+        "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
+        "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"
       ]
     },
     {
       "id": "static.locales",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRLocales.ps1 -AllowMissingSupportedLanguages",
+      "command": "./validation/tests/docs/Test-MIRLocales.ps1 -AllowMissingSupportedLanguages",
       "requires_factorio": false,
       "inputs": [
         ".mir/locales/**",
         "locale/**",
-        "scripts/localization/**",
-        "scripts/Update-MIRLocales.ps1",
-        "scripts/Test-MIRLocales.ps1",
+        "tools/lib/localization/**",
+        "tools/commands/localization/Update-MIRLocales.ps1",
+        "validation/tests/docs/Test-MIRLocales.ps1",
         "prototypes/mir/settings/**",
         "prototypes/streams/**"
       ]
@@ -124,7 +156,7 @@
       "id": "static.balance",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/mir.ps1 assurance balance",
+      "command": "./tools/mir.ps1 assurance balance",
       "requires_factorio": false,
       "inputs": [
         "balance-contract",
@@ -137,44 +169,44 @@
       "id": "static.museum",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRMuseumCompiler.ps1",
+      "command": "./validation/tests/runtime/Test-MIRMuseumCompiler.ps1",
       "requires_factorio": false,
       "inputs": [
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
         "fixtures/museum/synthetic-installation/**",
-        "scripts/Museum/**",
-        "scripts/Build-MIRMuseumTarget.ps1",
-        "scripts/Test-MIRMuseumCompiler.ps1"
+        "tools/lib/museum/**",
+        "tools/commands/museum/Build-MIRMuseumTarget.ps1",
+        "validation/tests/runtime/Test-MIRMuseumCompiler.ps1"
       ]
     },
     {
       "id": "runtime.museum-exact",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/Test-MIRMuseumExact.ps1",
+      "command": "./validation/tests/runtime/Test-MIRMuseumExact.ps1",
       "requires_factorio": false,
       "inputs": [
         "museum-installations",
         ".mir/canonical-lower-features.json",
         ".mir/museum-targets.json",
-        "scripts/Museum/**",
-        "scripts/Build-MIRMuseumTarget.ps1",
-        "scripts/Test-MIRMuseumRuntime.ps1",
-        "scripts/Test-MIRMuseumExact.ps1"
+        "tools/lib/museum/**",
+        "tools/commands/museum/Build-MIRMuseumTarget.ps1",
+        "validation/tests/runtime/Test-MIRMuseumRuntime.ps1",
+        "validation/tests/runtime/Test-MIRMuseumExact.ps1"
       ]
     },
     {
       "id": "static.package",
       "kind": "static",
       "layer": "F1",
-      "command": "./scripts/Test-MIRDeterministicPackage.ps1",
+      "command": "./validation/tests/package/Test-MIRDeterministicPackage.ps1",
       "requires_factorio": false,
       "inputs": [
-        "scripts/Build-MIRPackage.ps1",
-        "scripts/Measure-MIRPackageComposition.ps1",
-        "scripts/Test-MIRPackageComposition.ps1",
-        "scripts/validation/PackageIdentity.ps1",
+        "tools/commands/package/Build-MIRPackage.ps1",
+        "tools/commands/package/Measure-MIRPackageComposition.ps1",
+        "validation/tests/package/Test-MIRPackageComposition.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
         "info.json",
         "package-source"
       ]
@@ -183,11 +215,11 @@
       "id": "static.release-history",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRPublishedSnapshotIntegrity.ps1 -Index",
+      "command": "./validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1 -Index",
       "requires_factorio": false,
       "inputs": [
         "release-history",
-        "scripts/Test-MIRPublishedSnapshotIntegrity.ps1"
+        "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1"
       ]
     },
     {
@@ -206,54 +238,38 @@
       "id": "performance.static",
       "kind": "static",
       "layer": "F0",
-      "command": "./scripts/Test-MIRPerformanceBudgets.ps1 -ValidateManifestOnly",
+      "command": "./validation/tests/release/Test-MIRPerformanceBudgets.ps1 -ValidateManifestOnly",
       "requires_factorio": false,
       "inputs": [
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
-        ".mir/performance-campaign.json",
+        "performance-campaign",
         ".mir/sanitation-budgets.json",
-        "fixtures/compat-matrix/local-library-scenarios.json",
+        "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
-        "scripts/Invoke-MIRCompatAudit.ps1",
-        "scripts/MIRCompatAudit/**",
-        "scripts/Test-MIRPerformanceBudgets.ps1",
-        "scripts/Test-MIRPerformanceRegression.ps1",
+        "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
+        "tools/lib/compatibility/**",
+        "validation/tests/release/Test-MIRPerformanceBudgets.ps1",
+        "validation/tests/release/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
-        "scripts/validation/PerformanceCampaign.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/SettingsOverrides.ps1",
+        "tools/lib/validation/PerformanceCampaign.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1",
         "prototypes/mir/report/compiler_telemetry.lua"
-      ]
-    },
-    {
-      "id": "runtime.advanced-belts-sa",
-      "kind": "runtime-evidence",
-      "layer": "F4",
-      "command": "./scripts/Test-MIRAdvancedBeltsSA.ps1 -Candidate <candidate> -FactorioBin <factorio> -LocalModZipDir <mods> -ExpectedSourceCommit <source-commit> -OutputPath artifacts/assurance/<upgrade-to>-advanced-belts-sa.json",
-      "requires_factorio": true,
-      "inputs": [
-        "candidate",
-        "factorio",
-        "mod-closure",
-        "fixtures/assert-advanced-belts-sa-productivity/**",
-        "scripts/Test-MIRAdvancedBeltsSA.ps1",
-        "scripts/validation/FactorioProcess.ps1",
-        "scripts/validation/PackageIdentity.ps1"
       ]
     },
     {
       "id": "release.approved-delta",
       "kind": "release-evidence",
       "layer": "F4",
-      "command": "./scripts/Test-MIRApprovedDelta.ps1 -Path approved-delta/<upgrade-from>-to-<upgrade-to>.json -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
+      "command": "./validation/tests/release/Test-MIRApprovedDelta.ps1 -Path <approved-delta-path> -Candidate <candidate> -ExpectedSourceCommit <source-commit>",
       "requires_factorio": false,
       "inputs": [
         "candidate",
         "approved-delta-transition",
-        "scripts/Test-MIRApprovedDelta.ps1",
-        "scripts/Export-MIRApprovedDelta.ps1",
-        "scripts/validation/PackageIdentity.ps1"
+        "validation/tests/release/Test-MIRApprovedDelta.ps1",
+        "validation/tests/release/Test-MIRApprovedPatchDelta.ps1",
+        "tools/lib/validation/PackageIdentity.ps1"
       ]
     },
     {
@@ -269,36 +285,36 @@
         "mod-closure",
         ".mir/performance.yml",
         ".mir/performance-budgets.json",
-        ".mir/performance-campaign.json",
+        "performance-campaign",
         ".mir/sanitation-budgets.json",
-        "fixtures/compat-matrix/local-library-scenarios.json",
+        "validation/scenarios/local-2.1.json",
         "fixtures/performance-regression-probe/**",
-        "scripts/Invoke-MIRCompatAudit.ps1",
-        "scripts/MIRCompatAudit/**",
-        "verification/schema/runtime-performance-evidence.schema.json",
+        "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
+        "tools/lib/compatibility/**",
+        "spec/schemas/runtime-performance-evidence.schema.json",
         "scripts/Invoke-MIRPerformanceQualification.ps1",
-        "scripts/Test-MIRPerformanceRegression.ps1",
+        "validation/tests/release/Test-MIRPerformanceRegression.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1",
-        "scripts/validation/PerformanceCampaign.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/PackageIdentity.ps1",
-        "scripts/validation/SettingsOverrides.ps1"
+        "tools/lib/validation/PerformanceCampaign.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/lib/validation/SettingsOverrides.ps1"
       ]
     },
     {
       "id": "manual.release-review",
       "kind": "manual-evidence",
       "layer": "F4",
-      "command": "./scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedFactorioVersion <qualification-factorio-version>",
+      "command": "./validation/tests/release/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedFactorioVersion <qualification-factorio-version>",
       "requires_factorio": true,
       "inputs": [
         "candidate",
         "factorio",
         "manual-review-attestation",
-        "verification/schema/manual-release-attestation.schema.json",
-        "scripts/Test-MIRManualReleaseReview.ps1",
-        "scripts/validation/ReleaseAttestations.ps1",
-        "scripts/validation/PackageIdentity.ps1"
+        "spec/schemas/manual-release-attestation.schema.json",
+        "validation/tests/release/Test-MIRManualReleaseReview.ps1",
+        "tools/lib/validation/ReleaseAttestations.ps1",
+        "tools/lib/validation/PackageIdentity.ps1"
       ]
     },
     {
@@ -335,7 +351,7 @@
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath artifacts/assurance/<upgrade-to>-upgrade-proof.json",
+      "command": "./validation/tests/runtime/Test-MIRUpgradeMatrix.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath build/results/assurance/<upgrade-to>-upgrade-proof.json",
       "requires_factorio": true,
       "inputs": [
         "candidate",
@@ -343,8 +359,8 @@
         "factorio",
         "upgrade-fixture",
         "fixtures/upgrade-modset-source/**",
-        "scripts/Test-MIRUpgradeMatrix.ps1",
-        "verification/schema/upgrade-matrix.schema.json",
+        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "spec/schemas/upgrade-matrix.schema.json",
         "scenario-harness",
         "settings"
       ]
@@ -353,10 +369,11 @@
       "id": "runtime.ecosystem",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --mods <mods> --candidate <candidate> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
+      "command": "./tools/mir.ps1 release gate --profile release-targeted-<target> --factorio <factorio> --mods <mods> --candidate <candidate> --candidate-source <package-source-commit> --no-git-pull --skip-strict-gate --skip-build --skip-clean-git-status",
       "requires_factorio": true,
       "inputs": [
         "candidate",
+        "package-source",
         "factorio",
         "mod-lock",
         "ecosystem-profile",
@@ -368,7 +385,7 @@
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
-      "command": "./scripts/mir.ps1 assurance check-seal --seal <seal>",
+      "command": "./tools/mir.ps1 assurance check-seal --seal <seal>",
       "requires_factorio": false,
       "inputs": [
         "candidate-seal",

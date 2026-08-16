@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineCompatibilityInventoryV1",
+  "release": "1.6.5",
+  "target": "0.16.51",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [
+    {
+      "field": "package-source-public-compatibility-claims",
+      "reason": "The target package source has no canonical public compatibility claim authority; no modern claim is projected backward or requires realization.",
+      "static_fallback_source": "docs/releases/notes/release-notes-1.6.5.md"
+    }
+  ],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.6.5-engine-observation.json",
+    "dist/more-infinite-research_1.6.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.6.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [],
+  "omissions": []
+}

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Versioning-and-Distribution-Identity-ADRv1",
+  "status": "accepted-pre-publication",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-versioning-distribution-identity-v1",
+  "imports": [".mir/targets.json", ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json"],
+  "semantic_reads": ["source-release-version", "target-registry-id"],
+  "semantic_writes": ["distribution-version", "source-seal-tag", "distribution-tag"],
+  "target_dispositions": {"registered": "deterministic-numeric-projection", "unregistered": "fail-closed", "museum": "no-distribution-unless-readmitted"},
+  "digest_classes": {"semantic": "source-version", "authority": "registry-and-projection-algorithm", "qualification": "round-trip-ordering-bounds"},
+  "migration": {"from": "mir3-target-line-versions", "to": "one-source-version-plus-target-distributions", "state": "accepted-not-allocated"},
+  "rollback": {"strategy": "change-versioning-authority-before-first-public-4x-only", "permitted_until": "first-public-mir4-source-seal"},
+  "parity_test": ["target-code-unique", "projection-round-trip", "patch-component-within-65535", "monotonic-within-target", "source-and-distribution-identities-not-conflated"],
+  "sunset_condition": "superseded-by-versioned-mir4-public-release-identity-authority",
+  "payload": {
+    "source_version": "4.MINOR.PATCH",
+    "source_patch_range": {"minimum": 0, "maximum": 99},
+    "source_tag": "source/4.MINOR.PATCH",
+    "distribution_formula": "encoded_patch = target_registry_id * 100 + source_patch",
+    "decode_formula": {"target_registry_id": "floor(encoded_patch / 100)", "source_patch": "encoded_patch % 100"},
+    "distribution_version": "4.MINOR.ENCODED_PATCH",
+    "distribution_tag": "release/<target>/<distribution-version>",
+    "component_maximum": 65535,
+    "overflow": "increment-source-minor-and-reset-source-patch-to-zero;never-carry-inside-encoded-patch",
+    "public_allocation": "blocked-until-mir3-eol"
+  }
+}

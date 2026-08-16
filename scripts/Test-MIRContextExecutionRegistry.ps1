@@ -1,0 +1,9 @@
+param(
+  [Parameter(Mandatory)][string]$ContextPath,
+  [Parameter(Mandatory)][string]$SourceRepoRoot,
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+)
+
+# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.
+$canonicalTest = Join-Path $PSScriptRoot "../validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1"
+& $canonicalTest @PSBoundParameters

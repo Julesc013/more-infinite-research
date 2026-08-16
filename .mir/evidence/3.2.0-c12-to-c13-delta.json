@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "record_type": "MIRCandidateArchiveDelta",
+  "status": "PASS",
+  "baseline": {
+    "candidate_id": "C12",
+    "archive_bytes": 1000368,
+    "archive_entries": 286,
+    "archive_sha256": "1E9514AD2A43EDCC51071FC1A2527291088632A4A2081666125B668E8B7394CC",
+    "candidate_content_sha256": "D27D8ECA3535A82E68AF16C2873491F0B7D5132DAE274D80B09B0118B4A76FF5"
+  },
+  "candidate": {
+    "candidate_id": "C13",
+    "archive_bytes": 1000637,
+    "archive_entries": 286,
+    "archive_sha256": "28126F12D01C40AC0935E0F0AE2D9D872742A503BE726C8861926071F2398837",
+    "candidate_content_sha256": "04C6D0117DFC714BC0B1FE0A20764791F667DBF6D2482EDD4DA370225DA96620"
+  },
+  "policy": {
+    "allowed_change_roots": [
+      "prototypes/mir/domain/technology/technology_design.lua",
+      "prototypes/mir/planner/technology_catalog.lua",
+      "changelog.txt"
+    ],
+    "removals_allowed": false,
+    "unchanged_entries_omitted": true
+  },
+  "summary": {
+    "added": 0,
+    "changed": 3,
+    "removed": 0,
+    "unchanged": 283,
+    "unexpected": 0
+  },
+  "changes": [
+    {
+      "path": "changelog.txt",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "changelog.txt",
+        "bytes": 71085,
+        "content_sha256": "7E55F51EAADDEB2527424CEA2CA6800FF06D5D80AEA5827BA5BE27321EE8C0B0"
+      },
+      "candidate": {
+        "path": "changelog.txt",
+        "bytes": 71216,
+        "content_sha256": "9250B1AFB251F643DB1F102892DCC1C3E68DCC6AC4E639EA8A46CB1932E61427"
+      }
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_design.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/domain/technology/technology_design.lua",
+        "bytes": 43698,
+        "content_sha256": "6669497521F548A483AAE4D9BFD3F07DCC875E510B067803048F42E7C380E518"
+      },
+      "candidate": {
+        "path": "prototypes/mir/domain/technology/technology_design.lua",
+        "bytes": 44632,
+        "content_sha256": "30AA07CDBB889C12BDC457E4F86C47E8F2D4DCAD1070989FC0D928FCE99F5CBA"
+      }
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog.lua",
+      "change": "changed",
+      "allowed": true,
+      "baseline": {
+        "path": "prototypes/mir/planner/technology_catalog.lua",
+        "bytes": 13444,
+        "content_sha256": "5C42C27FCD16195CE14E29A7B8CA1C90EA2424D8DCE41776FBA54DB82544F580"
+      },
+      "candidate": {
+        "path": "prototypes/mir/planner/technology_catalog.lua",
+        "bytes": 13556,
+        "content_sha256": "BE7C3FF2960009689F8011BFF59EBEDC0AE9358AED019D34FF2062492A84229E"
+      }
+    }
+  ]
+}

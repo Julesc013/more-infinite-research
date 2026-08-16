@@ -2,9 +2,22 @@ local function fail(message)
   error("MIR native-owner settings validation failed: " .. message)
 end
 
+local profile
+do
+  local row = settings.startup["mir-settings-profile-import"]
+  local text = row and tostring(row.value or "") or ""
+  if text ~= "" then
+    local json = text
+    if string.sub(text, 1, 8) == "MIRSET1:" then json = helpers.decode_string(string.sub(text, 9)) end
+    profile = json and helpers.json_to_table(json) or nil
+  end
+end
+
 local function setting(name)
   local row = settings.startup[name]
   if not row then fail("missing visible startup setting " .. name) end
+  local imported = profile and profile.settings and profile.settings[name]
+  if imported ~= nil then return imported end
   return row.value
 end
 
@@ -48,8 +61,8 @@ local streams = {
 local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
-if not adoption_data or adoption_data.version ~= 2 then
-  fail("expected native-owner binding mod-data schema 2")
+if not adoption_data or adoption_data.version ~= 4 then
+  fail("expected native-owner binding mod-data schema 4")
 end
 local signature = tostring(adoption_data.signature or "")
 local expected_binding_count = 0
@@ -57,6 +70,7 @@ local expected_binding_count = 0
 for _, stream in ipairs(streams) do
   local enabled = setting("ips-enable-" .. stream.key)
   local base = setting("ips-cost-base-" .. stream.key)
+  local linear_increment = setting("ips-cost-linear-increment-" .. stream.key)
   local growth = setting("ips-cost-growth-" .. stream.key)
   local max_level = setting("ips-max-level-" .. stream.key)
   local research_time = setting("ips-research-time-" .. stream.key)
@@ -65,13 +79,17 @@ for _, stream in ipairs(streams) do
   if not owner then fail("missing native owner " .. stream.owner) end
 
   local unrecognized = stream.key == "research_processing_unit"
-    and owner.unit.count_formula == "1000 + 100 * L"
-  local cost_changed = base ~= 8000 or growth ~= 2
+    and owner.unit.count_formula == "1000 + 100 * L^2"
+  local recognized_linear = stream.key == "research_processing_unit"
+    and owner.unit.count_formula == "1000 + 250 * (L - 1)"
+  local recognized_fixed = stream.key == "research_processing_unit"
+    and owner.unit.count == 1000 and owner.unit.count_formula == nil
+  local cost_changed = base ~= 8000 or linear_increment ~= 0 or growth ~= 2
   local time_changed = research_time ~= 60 and research_time > 0
   local max_changed = max_level ~= 0
   local effect_changed = effect_percent ~= 10
   local safely_rejected = enabled and unrecognized and cost_changed
-  local signature_prefix = "schema=2|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
+  local signature_prefix = "schema=4|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
 
   if not enabled then
     if string.find(signature, signature_prefix, 1, true) then
@@ -81,7 +99,7 @@ for _, stream in ipairs(streams) do
     if string.find(signature, signature_prefix, 1, true) then
       fail("unsafe cost override unexpectedly bound unrecognized formula for " .. stream.owner)
     end
-    if owner.unit.count_formula ~= "1000 + 100 * L" then
+    if owner.unit.count_formula ~= "1000 + 100 * L^2" then
       fail("unsafe cost override changed unrecognized formula for " .. stream.owner)
     end
   else
@@ -93,23 +111,45 @@ for _, stream in ipairs(streams) do
     if time_changed then table.insert(configured, "research_time") end
     local operation = #configured > 0 and "configure_native_owner" or "preserve_native_owner"
     local expected_fragment = signature_prefix .. operation
-      .. "|configured=" .. table.concat(configured, ",") .. "|effects=0|output="
+      .. "|configured=" .. table.concat(configured, ",") .. "|effects=0|input-cost="
     if not string.find(signature, expected_fragment, 1, true) then
       fail("binding signature mismatch for " .. stream.owner .. "; expected " .. expected_fragment
         .. " in " .. signature)
     end
+    if not string.find(signature, "|output-cost=", 1, true)
+        or not string.find(signature, "|output=", 1, true) then
+      fail("binding signature omitted cost identities or output fingerprint for " .. stream.owner)
+    end
 
     if unrecognized then
-      if owner.unit.count_formula ~= "1000 + 100 * L" then
+      if owner.unit.count_formula ~= "1000 + 100 * L^2" then
         fail("default settings did not preserve unrecognized formula for " .. stream.owner)
       end
+    elseif recognized_fixed and not cost_changed then
+      if owner.unit.count ~= 1000 or owner.unit.count_formula ~= nil then
+        fail("default settings did not preserve fixed count for " .. stream.owner)
+      end
     else
-      local expected_base = cost_changed and base or 1000
-      local expected_growth = cost_changed and growth or 1.5
-      local expected_formula = number_text(expected_growth) .. "^L*" .. number_text(expected_base)
+      local expected_formula = recognized_linear and "1000 + 250 * (L - 1)" or "1.5^L*1000"
+      if cost_changed then
+        local offset = "(L-1)"
+        if linear_increment == 0 and growth == 1 then
+          expected_formula = number_text(base)
+        elseif linear_increment > 0 and growth == 1 then
+          expected_formula = number_text(base) .. "+" .. number_text(linear_increment) .. "*" .. offset
+        elseif linear_increment == 0 then
+          expected_formula = number_text(base) .. "*" .. number_text(growth) .. "^" .. offset
+        else
+          expected_formula = "(" .. number_text(base) .. "+" .. number_text(linear_increment)
+            .. "*" .. offset .. ")*" .. number_text(growth) .. "^" .. offset
+        end
+      end
       if owner.unit.count_formula ~= expected_formula then
         fail(stream.owner .. " formula differs; expected " .. expected_formula
           .. " got " .. tostring(owner.unit.count_formula))
+      end
+      if cost_changed and owner.unit.count ~= nil then
+        fail(stream.owner .. " retained a fixed count after projection to a configured curve")
       end
     end
 
@@ -117,10 +157,14 @@ for _, stream in ipairs(streams) do
     if not close(owner.unit.time, expected_time) then
       fail(stream.owner .. " research time differs")
     end
-    local expected_max = max_changed and math.floor(max_level) or "infinite"
+    local expected_max = "infinite"
     if owner.max_level ~= expected_max then
-      fail(stream.owner .. " max level differs; expected " .. tostring(expected_max)
+      fail(stream.owner .. " prototype maximum must remain infinite for lossless runtime capping; expected " .. tostring(expected_max)
         .. " got " .. tostring(owner.max_level))
+    end
+    local planned_max = max_changed and math.floor(max_level) or "infinite"
+    if not string.find(signature, "|planned-max=" .. tostring(planned_max), 1, true) then
+      fail(stream.owner .. " binding signature omitted selected runtime maximum " .. tostring(planned_max))
     end
 
     local relevant = 0

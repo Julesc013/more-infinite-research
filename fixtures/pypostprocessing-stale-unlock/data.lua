@@ -2,7 +2,7 @@ local function recipe(name)
   return {
     type = "recipe",
     name = name,
-    category = "crafting",
+    categories = {"crafting"},
     enabled = false,
     ingredients = {{type = "item", name = "iron-ore", amount = 1}},
     results = {{type = "item", name = "iron-plate", amount = 1}}

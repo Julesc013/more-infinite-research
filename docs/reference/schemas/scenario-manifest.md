@@ -12,7 +12,7 @@ superseded_by: []
 
 # Scenario Manifest Schema
 
-`fixtures/compat-matrix/expected-scenarios.json` uses schema 3. Every target profile contains full declaration records rather than a list of names.
+`validation/scenarios/runtime.json` uses schema 3. Every target profile contains full declaration records rather than a list of names.
 
 Required fields are `name`, `target_profile`, `kind`, `group`, `surface`, `fixtures`, `settings`, `source_mode`, `timeout_seconds`, `tags`, `isolation`, and `assertions`. `required_features` records the positive target capabilities needed by the scenario. The registry rejects bare names, duplicate names, target mismatches, unsupported kinds, missing setup fields, nonpositive timeouts, and scenarios with zero declared assertions before validation starts.
 

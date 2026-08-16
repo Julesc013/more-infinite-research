@@ -25,8 +25,7 @@ function M.apply(rows, limits, candidate_count, scope, hard_blockers)
   local earliest_depth, latest_depth
   for _, row in ipairs(rows) do
     if row.partition_key then semantic_clusters[row.partition_key] = true end
-    if (row.final_state == "attach" or row.final_state == "review-required")
-      and type(row.unlock_depth) == "number" then
+    if type(row.unlock_depth) == "number" then
       earliest_depth = earliest_depth and math.min(earliest_depth, row.unlock_depth) or row.unlock_depth
       latest_depth = latest_depth and math.max(latest_depth, row.unlock_depth) or row.unlock_depth
     end

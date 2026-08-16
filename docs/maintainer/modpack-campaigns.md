@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -17,9 +17,9 @@ Run ecosystems independently before any combined stress scenario. A mega-smash c
 Use an exact MIR candidate archive and bind it to the source commit that produced it:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -RunManualScenarios `
-  -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json `
+  -ManualScenariosPath .\validation\scenarios\local-2.1.json `
   -ScenarioNames local-2-1-bz-suite-space-age `
   -LocalModLibraryDirs C:\Projects\Factorio\testmods_2.1 `
   -Offline `
@@ -30,7 +30,7 @@ Use an exact MIR candidate archive and bind it to the source commit that produce
   -ModUnderTestZip .\build\validation-dist\more-infinite-research_3.1.0.zip `
   -ModUnderTestSourceCommit <full-commit> `
   -RunLoadTests `
-  -OutputDir .\artifacts\campaigns\bz
+  -OutputDir .\build\results\campaigns\bz
 ```
 
 The runner writes `campaign-evidence.json`. Every executed scenario records the MIR archive SHA-256 and source commit, dependency-lock fingerprint, requested and actual roots, exact root and dependency versions with archive SHA-256, result, timeout state, and claim level. Missing archive SHA-256 blocks evidence creation.

@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineFeatureInventoryV1",
+  "release": "1.8.5",
+  "target": "1.0.0-only",
+  "view": "declared",
+  "observation_capability": "package-and-release-authority",
+  "fields_observed": [
+    "package-presence",
+    "target-disposition"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    "dist/more-infinite-research_1.8.5.zip",
+    "docs/releases/notes/release-notes-1.8.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "feature:compiler",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "prototypes/mir/planner/compiler.lua"
+        }
+      ]
+    },
+    {
+      "stable_id": "feature:compatibility-policy",
+      "target": "1.0.0-only",
+      "state": "omitted",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "target-omission",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "prototypes/mir/compatibility/policy_authority.lua"
+        }
+      ]
+    },
+    {
+      "stable_id": "feature:settings-profile",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "prototypes/mir/settings/profile_codec.lua"
+        }
+      ]
+    },
+    {
+      "stable_id": "feature:scripted-runtime",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "prototypes/mir/runtime/scripted_techs.lua"
+        }
+      ]
+    },
+    {
+      "stable_id": "feature:migrations",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "migrations/"
+        }
+      ]
+    },
+    {
+      "stable_id": "feature:locales",
+      "target": "1.0.0-only",
+      "state": "packaged",
+      "origin": "exact-public-zip",
+      "observed_release": "1.8.5",
+      "source_evidence": [
+        "dist/more-infinite-research_1.8.5.zip"
+      ],
+      "target_disposition": "retained-on-target",
+      "mir4_transition_rule": "import-explicit-feature-state",
+      "attributes": [
+        {
+          "name": "package_match",
+          "value": "locale/en/more-infinite-research.cfg"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

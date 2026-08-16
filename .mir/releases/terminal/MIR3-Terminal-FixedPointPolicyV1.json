@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-FixedPointPolicyV1",
+  "participants": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "iteration": ["materialize-all-nine-shadows", "run-target-tier-checks", "classify-every-finding", "return-shared-fixes-to-dev", "replay-target-adapters", "rerun-affected-proof"],
+  "convergence": ["zero-new-shared-product-fixes", "zero-new-reusable-tooling-fixes", "zero-target-profile-fixes-affecting-higher-targets", "zero-package-governance-fixes", "zero-unexplained-semantic-drift"],
+  "restart": {"shared_defect":"all-affected-targets","target_local_defect":"affected-target-only","unexplained_drift":"whole-family-hard-stop"},
+  "receipt_schema": "spec/schemas/mir3-terminal-fixed-point-receipt.schema.json",
+  "source_freeze_requires_accepted_receipt": true
+}

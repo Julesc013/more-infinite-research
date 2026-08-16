@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.3-c29-source-frozen",
+  "release": "3.2.3",
+  "from": "planned",
+  "to": "source-frozen",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "package-lock",
+      "path": ".mir/control-plane/package-locks.json",
+      "candidate_id": "C29",
+      "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762",
+      "package_source_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4"
+    }
+  ],
+  "recorded_at": "2026-07-30T13:52:25Z"
+}

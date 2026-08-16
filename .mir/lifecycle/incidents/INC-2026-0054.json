@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0054",
+  "title": "Runtime research progress conversion loses completed work",
+  "external_issue": "internal://runtime/research-cost-transition-progress",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release_line": "3.1.9-through-planned-3.2.5",
+    "surface": "productivity family adoption configuration change",
+    "runtime_campaign": "development scenario originally passed an internal ratio check but direct 3.2.3-to-3.2.5 upgrade proof exposed a redundant second conversion; corrected development and candidate-bound campaigns remain pending"
+  },
+  "reproduction": {
+    "status": "reproduced-by-source-analysis-and-engine-execution",
+    "observed": "The original runtime used an inverse ratio. Its first repair used the mathematically correct old_cost / new_cost ratio, but Factorio had already normalized active research before on_configuration_changed. The second conversion reduced valid completed work in both same-version settings changes and the direct 3.2.3-to-3.2.5 upgrade."
+  },
+  "root_cause": {
+    "status": "proven-inverse-conversion-then-redundant-second-conversion",
+    "summary": "The legacy implementation reconstructed costs from a narrow string grammar and applied the inverse ratio. The descriptor repair corrected the algebra but still mutated an engine-normalized value. Runtime descriptors remain useful evidence, but MIR must not reapply Factorio's completed-work conversion."
+  },
+  "repair_changes": [
+    "CHG-2026-0007:versioned-cost-transition-descriptor",
+    "CHG-2026-0007:retain-factorio-normalized-progress-without-second-conversion",
+    "CHG-2026-0007:complete-sixteen-row-transition-matrix",
+    "CHG-2026-0007:bounded-canonical-evaluator"
+  ],
+  "regression_propositions": [
+    "fixed linear exponential and hybrid form a complete sixteen-row transition matrix",
+    "completed unit-equivalent work is preserved across every recognized model transition without a redundant runtime mutation",
+    "current research exact level fractional progress queue and completed levels are preserved",
+    "configuration change save reload and a second reload are idempotent",
+    "continuous execution equals save reload execution",
+    "unknown or over-budget descriptors fail closed without guessing",
+    "default behavior remains equivalent to public 3.2.3 except for the named correction",
+    "Factorio 2.0 receives an explicit target disposition and independent proof"
+  ],
+  "affected_releases": [
+    "3.1.9",
+    "3.2.0",
+    "3.2.1",
+    "3.2.2",
+    "3.2.3",
+    "3.2.4",
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "not-frozen",
+    "package_bytes_changed": true
+  },
+  "closure": {
+    "status": "development-runtime-proof-passed-pending-complete-regression-proof",
+    "development_archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "development_result": "passed direct five-archetype 3.2.3-to-3.2.5 upgrade and Space Age native-owner settings configuration change without a redundant second conversion",
+    "proof_required": "exact 3.2.3 default parity, configuration-change and reload equivalence, idempotence, exact candidate engine realization, and Factorio 2.0 target disposition before candidate freeze"
+  }
+}

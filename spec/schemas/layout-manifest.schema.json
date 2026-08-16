@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/layout-manifest.schema.json",
+  "title": "LayoutManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "authority", "generated_at", "head", "entries", "summary"],
+  "properties": {
+    "schema": {"const": 1},
+    "authority": {"const": "mir-layout-manifest-v1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "class", "owner", "writer", "package_included", "generated", "status", "canonical_target"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1, "pattern": "^[^\\\\]+$"},
+          "class": {"type": "string", "minLength": 1},
+          "owner": {"type": "string", "minLength": 1},
+          "writer": {"type": "string", "minLength": 1},
+          "package_included": {"type": "boolean"},
+          "generated": {"type": "boolean"},
+          "status": {"enum": ["canonical", "legacy", "unclassified"]},
+          "canonical_target": {"type": "string"},
+          "bytes": {"type": "integer", "minimum": 0},
+          "git_mode": {"type": "string", "pattern": "^[0-9]{6}$"}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tracked", "bytes", "package", "legacy", "unclassified", "case_collisions", "links"],
+      "properties": {
+        "tracked": {"type": "integer", "minimum": 0},
+        "bytes": {"type": "integer", "minimum": 0},
+        "package": {"type": "integer", "minimum": 0},
+        "legacy": {"type": "integer", "minimum": 0},
+        "unclassified": {"type": "integer", "minimum": 0},
+        "case_collisions": {"type": "integer", "minimum": 0},
+        "links": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}
