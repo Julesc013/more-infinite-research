@@ -1,12 +1,28 @@
-param([Parameter(Mandatory)][ValidateSet('api-check','api-conformance','sdk-generate','sdk-check')][string]$Command,[string]$RepoRoot='')
-$ErrorActionPreference='Stop'
-if(-not $RepoRoot){$RepoRoot=(Resolve-Path(Join-Path $PSScriptRoot '..\..\..')).Path}
+param(
+  [Parameter(Mandatory)]
+  [ValidateSet('api-check', 'api-conformance', 'sdk-generate', 'sdk-check')]
+  [string]$Command,
+  [string]$RepoRoot = ''
+)
+
+$ErrorActionPreference = 'Stop'
+if (-not $RepoRoot) {
+  $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+}
 . (Join-Path $RepoRoot 'tools\lib\mir4\ExperimentalApiSdk.ps1')
-if($Command-eq'sdk-generate'){Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot;Write-Host 'MIR4 experimental SDK generated.';exit}
+
+if ($Command -eq 'sdk-generate') {
+  Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot
+  Write-Host 'MIR4 experimental SDK generated.'
+  exit
+}
 Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot -Check
-$positive=Get-ChildItem (Join-Path $RepoRoot 'fixtures\mir4-api-v0\positive') -Filter *.json
-$reference=Get-ChildItem (Join-Path $RepoRoot 'fixtures\mir4-api-v0\reference') -Filter *.json
-foreach($file in @($positive)+@($reference)){Test-MIR4ApiRecord (Get-Content -Raw $file.FullName|ConvertFrom-Json) -RepoRoot $RepoRoot|Out-Null}
+$positive = Get-ChildItem (Join-Path $RepoRoot 'fixtures\mir4-api-v0\positive') -Filter *.json
+$reference = Get-ChildItem (Join-Path $RepoRoot 'fixtures\mir4-api-v0\reference') -Filter *.json
+foreach ($file in @($positive) + @($reference)) {
+  $record = Get-Content -Raw $file.FullName | ConvertFrom-Json
+  Test-MIR4ApiRecord $record -RepoRoot $RepoRoot | Out-Null
+}
 if($Command-eq'api-conformance'){
  foreach($file in Get-ChildItem (Join-Path $RepoRoot 'fixtures\mir4-api-v0\negative') -Filter *.json){$v=Get-Content -Raw $file.FullName|ConvertFrom-Json;$expected=[string]$v.expected_diagnostic;$v.PSObject.Properties.Remove('expected_diagnostic');try{Test-MIR4ApiRecord $v -RepoRoot $RepoRoot|Out-Null;throw '[mir4-api-negative-accepted] Negative fixture was accepted.'}catch{if(-not $_.Exception.Message.StartsWith("[$expected]")){throw "[mir4-api-negative-diagnostic] Expected $expected for $($file.Name), got $($_.Exception.Message)"}}}
  $source=Get-Content -Raw(Join-Path $RepoRoot 'fixtures\mir4-api-v0\reference\extension-profile.json')|ConvertFrom-Json
