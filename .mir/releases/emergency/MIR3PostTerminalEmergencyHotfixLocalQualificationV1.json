@@ -25,19 +25,41 @@
   ],
   "passed": 13,
   "failed": 0,
-  "primary_upgrade_matrix": {
-    "baseline": "3.2.9",
-    "target": "3.2.10",
-    "archetypes_passed": 5,
-    "first_reload_passed": true,
-    "second_reload_passed": true,
-    "local_result": "build/results/hotfix/3.2.10-upgrade-matrix-first-second-reload-2.1.14.json",
-    "local_result_sha256": "97660ADA9871E233D2AB9D5766FB88F232E7ECC81D309B2E6044E96EDAF7D697"
-  },
+  "upgrade_matrices": [
+    {
+      "baseline": "3.2.9",
+      "target": "3.2.10",
+      "archetypes_passed": 5,
+      "first_reload_passed": true,
+      "second_reload_passed": true,
+      "local_result": "build/results/hotfix/3.2.9-to-3.2.10-upgrade-matrix-2.1.14.json",
+      "local_result_sha256": "D9CD526020A3BBC054ECBC1BCF4589DC905689EE2FA6237B84401D6565C39573"
+    },
+    {
+      "baseline": "3.2.5",
+      "target": "3.2.10",
+      "archetypes_passed": 5,
+      "first_reload_passed": true,
+      "second_reload_passed": true,
+      "local_result": "build/results/hotfix/3.2.5-to-3.2.10-upgrade-matrix-2.1.14.json",
+      "local_result_sha256": "97F32197FB50D1B06922439A82FE88BD5EFD47C76A67DD9F4CC967833F60004E"
+    },
+    {
+      "baseline": "3.2.3",
+      "target": "3.2.10",
+      "archetypes_passed": 5,
+      "first_reload_passed": true,
+      "second_reload_passed": true,
+      "local_result": "build/results/hotfix/3.2.3-to-3.2.10-upgrade-matrix-2.1.14.json",
+      "local_result_sha256": "BB44F95BFAB270C107808BC4DAAAB3C6C01DCC5A734D59223BDA049C5C6E8930"
+    }
+  ],
   "boundaries": {
     "exact_target_qualification_complete": false,
+    "local_governed_upgrade_matrix_complete": true,
     "governed_upgrade_matrix_complete": false,
     "publication_permitted": false
   },
-  "created_at": "2026-08-16T19:18:00+10:00"
+  "created_at": "2026-08-16T19:18:00+10:00",
+  "updated_at": "2026-08-16T19:56:00+10:00"
 }

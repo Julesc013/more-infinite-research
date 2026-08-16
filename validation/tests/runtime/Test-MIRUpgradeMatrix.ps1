@@ -33,7 +33,7 @@ if ($FixtureName -eq "assert-upgrade-3-2-1-to-3-2-2") {
 
 $rows = @()
 foreach ($case in $cases) {
-  $rowOutput = Join-Path $outputParent "$ToVersion-upgrade-$($case.id).json"
+  $rowOutput = Join-Path $outputParent "$ToVersion-upgrade-$($case.id)-from-$FromVersion.json"
   $arguments = @{
     RepoRoot = $RepoRoot
     FactorioBin = $FactorioBin

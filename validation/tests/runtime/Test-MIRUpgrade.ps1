@@ -192,6 +192,20 @@ Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -Enab
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
 $stagedFixture = Join-Path $mods $fixtureModName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
+if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
+  # The emergency programme governs three predecessor lanes through one
+  # contract fixture. Specialize only the disposable staged copy so the
+  # checked-in fixture remains the exact primary 3.2.9 -> 3.2.10 proof.
+  $stagedInfoPath = Join-Path $stagedFixture "info.json"
+  $stagedInfoText = Get-Content -Raw -LiteralPath $stagedInfoPath
+  $stagedInfoText = $stagedInfoText -replace 'more-infinite-research >= 3\.2\.9', ("more-infinite-research >= " + $FromVersion)
+  Set-Content -LiteralPath $stagedInfoPath -Value $stagedInfoText -Encoding UTF8
+
+  $stagedControlPath = Join-Path $stagedFixture "control.lua"
+  $stagedControlText = Get-Content -Raw -LiteralPath $stagedControlPath
+  $stagedControlText = $stagedControlText.Replace("3.2.9", $FromVersion).Replace("3.2.10", $ToVersion)
+  Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
+}
 if ($Archetype) {
   $settingsPath = Join-Path $stagedFixture "settings.lua"
   if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
