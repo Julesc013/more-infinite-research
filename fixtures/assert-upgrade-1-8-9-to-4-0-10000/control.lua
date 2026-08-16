@@ -18,6 +18,7 @@ end
 script.on_init(function()
   if script.active_mods["more-infinite-research"] ~= from_version then fail("source mod version drifted") end
   if archetype ~= "base-default" then fail("unexpected target-local archetype") end
+  game.forces.player.research_all_technologies()
   local tech = technology()
   tech.level = 5
   if not game.forces.player.add_research(tech) then fail("could not queue stable base research") end
