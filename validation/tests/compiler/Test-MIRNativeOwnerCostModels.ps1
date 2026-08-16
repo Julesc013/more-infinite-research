@@ -84,11 +84,12 @@ if ($compilerContractFixtureSource -notmatch 'native_model\.base\s*~=\s*1500' -o
     $compilerContractFixtureSource -notmatch 'count_formula\s*=\s*"1000 \+ 100 \* L\^2"') {
   throw "Compiler-contract fixture must assert anchor-level native base cost and canonical configured formula output."
 }
-if ($adoptionFixtureSource -notmatch 'adoption_data\.version\s*==\s*3' -or
-    $adoptionFixtureSource -notmatch 'schema=3\|stream=' -or
+if ($adoptionFixtureSource -notmatch 'adoption_data\.version\s*==\s*4' -or
+    $adoptionFixtureSource -notmatch 'schema=4\|stream=' -or
     $adoptionFixtureSource -notmatch '\|input-cost=' -or
-    $adoptionFixtureSource -notmatch '\|output-cost=') {
-  throw "Vanilla-family adoption fixture must assert the descriptor-only schema-3 receipt ABI."
+    $adoptionFixtureSource -notmatch '\|output-cost=' -or
+    $adoptionFixtureSource -notmatch '\|planned-max=') {
+  throw "Vanilla-family adoption fixture must assert the schema-4 cost and maximum-level receipt ABI."
 }
 $costTrioIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or linear_increment\.changed or growth\.changed' -and
   $bindingSource -match 'base = cost_changed and base\.value or nil' -and
@@ -101,8 +102,10 @@ if ($transitionSource -notmatch 'factorio-research-unit-count-floor-v1' -or
     $transitionSource -notmatch 'previous_cost' -or $transitionSource -notmatch 'current_cost') {
   throw "Native-owner transition descriptor does not bind realized old/new cost evidence."
 }
-if ($emitterSource -notmatch 'VERSION\s*=\s*3' -or $runtimeSource -match 'count_formula.*match') {
-  throw "Native-owner runtime ABI is not descriptor-only schema 3."
+if ($emitterSource -notmatch 'VERSION\s*=\s*4' -or
+    $emitterSource -notmatch 'planned_max_level' -or
+    $runtimeSource -match 'count_formula.*match') {
+  throw "Native-owner runtime ABI is not descriptor-only schema 4 with maximum-level policy transport."
 }
 if ($progressFixtureSource -notmatch 'rows ~= 16' -or
     $progressFixtureSource -notmatch 'native-owner observed progress proof' -or

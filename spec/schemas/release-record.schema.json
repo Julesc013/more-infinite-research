@@ -10,9 +10,25 @@
     "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "candidate_id": {"type": "string", "minLength": 1},
     "candidate_floor": {"type": "string", "pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*)$"},
+    "candidate_allocation": {
+      "type": "object",
+      "required": ["namespace", "predecessor_max_ordinal", "minimum_next_ordinal", "assigned_id", "assignment_condition"],
+      "properties": {
+        "namespace": {"type": "string", "minLength": 1},
+        "predecessor_max_ordinal": {"type": "integer", "minimum": 0},
+        "minimum_next_ordinal": {"type": "integer", "minimum": 1},
+        "assigned_id": {"type": ["string", "null"]},
+        "assigned_at": {"type": "string", "format": "date-time"},
+        "candidate_ref": {"type": "string", "pattern": "^refs/heads/candidate/"},
+        "candidate_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "assignment_condition": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
     "target": {"type": "string", "minLength": 1},
     "branch": {"type": "string", "minLength": 1},
-    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
+    "development_branch": {"type": "string", "minLength": 1},
+    "state": {"enum": ["planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]},
     "package": {
       "type": "object",
       "properties": {
@@ -41,6 +57,8 @@
     "assurance_exceptions": {"type": "array", "items": {"type": "object"}},
     "remaining_obligations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "source_release": {"type": "object"},
+    "portable_source_release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "programme": {"type": "string", "minLength": 1},
     "development_lineage": {
       "type": "object",
       "required": ["superseded_release", "superseded_candidate_id", "candidate_closure", "package_source_commit"],
@@ -74,7 +92,7 @@
       "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256"]}}}
     },
     {
-      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
+      "if": {"properties": {"state": {"enum": ["package-built", "focused-qualified", "candidate-qualified", "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published", "publicly-verified"]}}},
       "then": {"properties": {"package": {"required": ["source_commit", "source_tree", "source_sha256", "archive", "archive_sha256", "content_sha256", "bytes", "entries"]}}}
     }
   ],

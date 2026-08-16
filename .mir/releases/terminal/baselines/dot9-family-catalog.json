@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "kind": "Mir3Dot9TerminalBaselineFamilyCatalogV1",
+  "status": "all-nine-capture-ready-mod-portal-pending",
+  "package_visible": false,
+  "family": [
+    "3.2.9",
+    "2.5.9",
+    "1.9.9",
+    "1.8.9",
+    "1.7.9",
+    "1.6.9",
+    "1.5.9",
+    "1.4.9",
+    "1.3.9"
+  ],
+  "releases": [
+    {
+      "release": "3.2.9",
+      "target": "2.1",
+      "manifest": ".mir/releases/terminal/baselines/3.2.9/baseline-manifest.json",
+      "manifest_record_sha256": "98C4519832F147EAEC7014751DFE676FCECDB4C70CCEA9A967A3A6CF784A2172",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/3.2.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "C8E6D0A05C016CDF2A25444E8622AA0F011492240832C15561E81C0D91D69644",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "2.5.9",
+      "target": "2.0",
+      "manifest": ".mir/releases/terminal/baselines/2.5.9/baseline-manifest.json",
+      "manifest_record_sha256": "C0CE554091FA4D1E1B498C2AADDD5AB99A959FABA22E6A3F3627957C098DE40E",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "957FF3BC563227B2089219FE8939F2766B359E2B293C8583B8C2469404A21F81",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.9.9",
+      "target": "1.1",
+      "manifest": ".mir/releases/terminal/baselines/1.9.9/baseline-manifest.json",
+      "manifest_record_sha256": "BC728DF485E1F8B92BCAD22274F4474CD979381C424D112DCF2AE087A38C8669",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.9.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "75EB9FEF076D6C9A65776A3522A008173F8935F7962165E4B8672DD9E432063C",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.8.9",
+      "target": "1.0",
+      "manifest": ".mir/releases/terminal/baselines/1.8.9/baseline-manifest.json",
+      "manifest_record_sha256": "3649463A957ABA87751C045D33E6A271E2D1193A0B0225A93876D683D85F89FC",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.8.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "9A1B0AA1C9D717CF4EB9044737835F04D73CA71BA92057BB5D4C3DAAE5EFFFC2",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.7.9",
+      "target": "0.17",
+      "manifest": ".mir/releases/terminal/baselines/1.7.9/baseline-manifest.json",
+      "manifest_record_sha256": "2531BD90343C12615D9A029F28EAA70ADD586E199995F465BF18CE6A6E022534",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.7.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "17C7C1C73D3E6CA22FF116843ABCA475411FD28FCEE7EFCE040E0214F390B6B1",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.6.9",
+      "target": "0.16",
+      "manifest": ".mir/releases/terminal/baselines/1.6.9/baseline-manifest.json",
+      "manifest_record_sha256": "DF5CD42EB54A44C86FE060F26CD612ED385D0A43B82245618A42AC9CEFBC0B8F",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.6.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "CE6E8F094D932C2E8D848944B6226431AF98D774FD3A85662A6A7C63CCEC9C32",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.5.9",
+      "target": "0.15",
+      "manifest": ".mir/releases/terminal/baselines/1.5.9/baseline-manifest.json",
+      "manifest_record_sha256": "E95A3B9187FCECDDB8C98784FE644A0257D2FE5EAE1682970361E07E403D41A0",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "6B2A053C3D6923A06A6F882C5398751F8D405C6337E6E9987A3B2788B329183A",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.4.9",
+      "target": "0.14",
+      "manifest": ".mir/releases/terminal/baselines/1.4.9/baseline-manifest.json",
+      "manifest_record_sha256": "0546887957B32E1239561FCDA10316BBB67B07AD2702A60D5AF41F4A16F14F11",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.4.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "1DD04B872F6A469C3985BFFB320AA237E519927BF0F1FA71B7390159F5EED03B",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    },
+    {
+      "release": "1.3.9",
+      "target": "0.13",
+      "manifest": ".mir/releases/terminal/baselines/1.3.9/baseline-manifest.json",
+      "manifest_record_sha256": "071DE22E43BFFB1EB285BEE19822FCA7BC940FCD1B18B2CBC4B11A1DBED210BF",
+      "normalized_snapshot": ".mir/releases/terminal/baselines/1.3.9/normalized-snapshot.json",
+      "normalized_snapshot_record_sha256": "3DAC19F059738A45A5FFF326A5009DAFD83F11571EED0E7B174F3E0F906A6620",
+      "status": "capture-ready-mod-portal-pending",
+      "deterministic_build": null
+    }
+  ],
+  "public_custody": {
+    "github": 9,
+    "mod_portal_api_visible": 2,
+    "mod_portal_not_uploaded": 7,
+    "authenticated_redownloads_complete": 0
+  },
+  "record_sha256": "DAD99A589DF093626D627E61446402533CC26888C2E67B7E5C2827BD60A3EB22"
+}

@@ -25,6 +25,87 @@ foreach ($requiredPolicy in @(
   }
 }
 
+$atanScenarioOffset = $validationFacade.IndexOf('Invoke-RuntimeScenario -ScenarioName "atan-ash-separation"', [StringComparison]::Ordinal)
+$atanTileRiskOffset = $validationFacade.IndexOf('$atanAshTileRisk = Get-DiagnosticReportLineContaining', [StringComparison]::Ordinal)
+$atanSinkRiskOffset = $validationFacade.IndexOf('$atanAshSinkRisk = Get-DiagnosticReportLineContaining', [StringComparison]::Ordinal)
+$nextScenarioOffset = $validationFacade.IndexOf('Invoke-RuntimeScenario -ScenarioName "combination-atan-ash-big-mining-drill"', [StringComparison]::Ordinal)
+if ($atanScenarioOffset -lt 0 -or $atanTileRiskOffset -le $atanScenarioOffset -or $atanSinkRiskOffset -le $atanTileRiskOffset -or
+    $nextScenarioOffset -le $atanSinkRiskOffset) {
+  throw "ATAN runtime diagnostics must be asserted while the ATAN scenario still owns the shared Factorio log."
+}
+
+if ($validationFacade -notmatch [regex]::Escape('Assert-LogContains -Expected "spoilage preservation skipped: missing technology" -Context "Data-stage-disabled scripted spoilage runtime scenario"')) {
+  throw "A scripted stream disabled during the data stage must prove the runtime handler safely observes its omitted technology."
+}
+
+$k2ScenarioInvocation = @'
+Invoke-RuntimeScenario -ScenarioName "k2-science-phase-policy" -EnabledFixtureNames @(
+  "mir-fixture-assert-k2-science-phase-policy"
+)
+'@
+if (-not $validationFacade.Contains($k2ScenarioInvocation.Trim(), [StringComparison]::Ordinal)) {
+  throw "The manifest-required K2 science-phase policy scenario must be invoked by the complete validation facade."
+}
+
+$runtimeAuthoritySync = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\targets\Sync-MIRRuntimeScenarioAuthority.ps1")
+$expectedDynamicStart = $runtimeAuthoritySync.IndexOf('$expectedDynamic = @(', [StringComparison]::Ordinal)
+$expectedDynamicEnd = $runtimeAuthoritySync.IndexOf("`n)", $expectedDynamicStart, [StringComparison]::Ordinal)
+if ($expectedDynamicStart -lt 0 -or $expectedDynamicEnd -le $expectedDynamicStart) {
+  throw "Runtime scenario authority synchronizer does not expose its bounded manifest-driven scenario list."
+}
+$expectedDynamicBlock = $runtimeAuthoritySync.Substring($expectedDynamicStart, $expectedDynamicEnd - $expectedDynamicStart)
+if ($expectedDynamicBlock.Contains('"k2-science-phase-policy"', [StringComparison]::Ordinal)) {
+  throw "The directly invoked K2 science-phase policy scenario must not remain classified as manifest-driven."
+}
+
+foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
+  $currentSignature = 'schema=4|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
+  if (-not $validationFacade.Contains($currentSignature, [StringComparison]::Ordinal)) {
+    throw "Native-owner configuration-change validation must assert the current schema-4 cost-bound signature for $nativeOwnerStream."
+  }
+}
+
+$syntheticGraphFixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-synthetic-scale-graph\data-final-fixes.lua")
+$stressStart = $syntheticGraphFixture.IndexOf('local stress_operations = {}', [StringComparison]::Ordinal)
+$stressEnd = $syntheticGraphFixture.IndexOf('local stress = compiler_context.with_active(', [StringComparison]::Ordinal)
+if ($stressStart -lt 0 -or $stressEnd -le $stressStart) {
+  throw "Synthetic graph fixture does not preserve a bounded, inspectable stress-operation block."
+}
+$stressOperationBlock = $syntheticGraphFixture.Substring($stressStart, $stressEnd - $stressStart)
+foreach ($requiredGraphAuthority in @(
+  'local STRESS_TOTAL = 100000',
+  'local STRESS_LARGE_SCC = 25000',
+  'operation = "emit_base_extension"',
+  'technology_name = name',
+  'prerequisites = {string.format('
+)) {
+  if (-not $syntheticGraphFixture.Contains($requiredGraphAuthority, [StringComparison]::Ordinal)) {
+    throw "Synthetic graph fixture lost required 100000-scale graph authority: $requiredGraphAuthority"
+  }
+}
+foreach ($redundantPayloadPattern in @(
+  '(?m)^\s+key = name,?$',
+  '(?m)^\s+name = name,?$',
+  '(?m)^\s+effects = ',
+  '(?m)^\s+unit = ',
+  '(?m)^\s+max_level = '
+)) {
+  if ($stressOperationBlock -match $redundantPayloadPattern) {
+    throw "Synthetic graph stress operations must not duplicate non-graph prototype payload: $redundantPayloadPattern"
+  }
+}
+foreach ($requiredReclamation in @(
+  'stress_operations = nil',
+  'stress_components = nil',
+  'large_component = nil',
+  'stress = nil',
+  'collectgarbage("collect")'
+)) {
+  if (-not $syntheticGraphFixture.Contains($requiredReclamation, [StringComparison]::Ordinal)) {
+    throw "Synthetic graph fixture must reclaim its completed in-memory stress graph before prototype conversion: $requiredReclamation"
+  }
+}
+
 $factorioProcess = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\FactorioProcess.ps1")
 foreach ($requiredPolicy in @(
   'function Get-MIRCompactScenarioPathSegment {',

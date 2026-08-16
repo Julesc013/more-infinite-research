@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Entry-GateV1",
+  "status": "pre-eol-local-proof-authorized-publication-forbidden",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-entry-gate-v1",
+  "imports": [
+    ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
+    ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+    ".mir/releases/waves/mir4-r0/MIR3-to-MIR4-Governance-ReconciliationV1.json"
+  ],
+  "semantic_reads": ["mir3-eol-requirements", "mir3-successor-firewall"],
+  "semantic_writes": ["mir4-entry-permission", "mir4-publication-permission"],
+  "target_dispositions": {"factorio-2.1": "local-emergency-proof-first", "other-active-targets": "blocked-until-r1-and-eol", "museum": "not-admitted"},
+  "digest_classes": {"semantic": "behavior-equivalence-required", "authority": "entry-gate-v1", "qualification": "offline-seal-and-dry-run"},
+  "migration": {"from": "circular-mir3-eol-successor-wording", "to": "acyclic-local-proof-then-eol-then-publication", "state": "reconciled"},
+  "rollback": {"strategy": "retain-publication-forbidden-and-return-to-package-excluded-r0", "permitted_until": "first-public-mir4-tag"},
+  "parity_test": ["no-public-4x-before-eol", "local-4x-proof-required-before-eol", "publication-dry-run-idempotent"],
+  "sunset_condition": "mir3-eol-sealed-and-first-mir4-publication-authority-admitted",
+  "payload": {
+    "before_mir3_eol": ["import-terminal-baseline", "generate-local-behavior-equivalent-factorio-2.1-distribution", "prove-clean-install-and-direct-3.2.9-upgrade", "prove-reload-settings-profile-and-engine-equivalence", "seal-locally-offline", "generate-publication-bundle", "validate-publication-dry-run-idempotence"],
+    "mir3_eol_then_requires": ["terminal-public-custody", "terminal-dot9-baselines", "final-index", "museum-and-restore", "local-emergency-lane", "eol-record"],
+    "after_mir3_eol": ["allocate-public-distribution-identity", "authorize-source-seal-tag", "authorize-target-release-tags", "replicate-sealed-assets-to-public-channels"],
+    "public_version_4_before_eol": false
+  }
+}

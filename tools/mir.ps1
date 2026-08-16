@@ -24,6 +24,9 @@ Usage:
   .\tools\mir.ps1 docs check
   .\tools\mir.ps1 architecture check
   .\tools\mir.ps1 manifests check
+  .\tools\mir.ps1 mir4 capture-terminal-baselines [--check] [--build-bundles]
+  .\tools\mir.ps1 mir4 import-terminal-baselines [--output <path>] [--check]
+  .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
@@ -451,6 +454,31 @@ switch ($area) {
   "manifests" {
     if ($verb -ne "check") { throw "Unknown manifests command: $verb" }
     & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ManifestsOnly
+  }
+  "mir4" {
+    switch ($verb) {
+      "capture-terminal-baselines" {
+        $params = @{
+          RepoRoot = $repo.Path
+          Check = (Test-MIRArgSwitch -Items $Args -Name "--check")
+          BuildBundles = (Test-MIRArgSwitch -Items $Args -Name "--build-bundles")
+        }
+        & (Join-Path $repo "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1") @params
+      }
+      "import-terminal-baselines" {
+        $output = Get-MIRArgValue -Items $Args -Name "--output"
+        $params = @{ RepoRoot = $repo.Path; Check = (Test-MIRArgSwitch -Items $Args -Name "--check") }
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $params.OutputPath = $output }
+        & (Join-Path $repo "tools/commands/release/Import-MIR3TerminalBaselines.ps1") @params
+      }
+      "check" {
+        & (Join-Path $repo "tools/commands/release/Test-MIR4R0Bootstrap.ps1") `
+          -RepoRoot $repo.Path `
+          -Update:(Test-MIRArgSwitch -Items $Args -Name "--update") `
+          -BuildBundles:(Test-MIRArgSwitch -Items $Args -Name "--build-bundles")
+      }
+      default { throw "Unknown mir4 command: $verb" }
+    }
   }
   "technology" {
     $catalog = Get-MIRArgValue -Items $Args -Name "--catalog"

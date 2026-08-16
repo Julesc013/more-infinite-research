@@ -18,6 +18,27 @@ function Get-MIRCPReleaseByVersion {
   return Read-MIRCPJson -Path "path:releases.records/$Release.json" -RepoRoot $RepoRoot
 }
 
+function Get-MIRCPAuthoredDate {
+  param([Parameter(Mandatory)][string]$Timestamp)
+  if ($Timestamp -notmatch '^(?<date>\d{4}-\d{2}-\d{2})T') {
+    throw "Release timestamp is not an RFC 3339 date-time: $Timestamp"
+  }
+  return [string]$Matches.date
+}
+
+function Get-MIRCPReleaseAuthoredDate {
+  param(
+    [Parameter(Mandatory)][string]$Release,
+    [string]$RepoRoot = ""
+  )
+  $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
+  $relative = Resolve-MIRCPPathId -Id "releases.records" -Suffix "$Release.json" -RepoRoot $repo
+  $path = Join-Path $repo $relative
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Release record is absent: $Release" }
+  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -DateKind String
+  return Get-MIRCPAuthoredDate -Timestamp ([string]$record.updated_at)
+}
+
 function Get-MIRCPArrayProperty {
   param(
     [Parameter(Mandatory)]$Object,
@@ -172,7 +193,9 @@ function New-MIRCPLegacyReleaseLedger {
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.backport_calibration) -RepoRoot $repo
   $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_1) -RepoRoot $repo
   $publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.published_factorio_2_0) -RepoRoot $repo
-  $updated = @($canonical.updated_at, $backport.updated_at, $publishedModern.updated_at, $publishedBackport.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)
+  $updated = @($canonical, $backport, $publishedModern, $publishedBackport | ForEach-Object {
+    Get-MIRCPReleaseAuthoredDate -Release ([string]$_.release) -RepoRoot $repo
+  } | Sort-Object -Descending | Select-Object -First 1)
   return [pscustomobject][ordered]@{
     schema = 1
     authority = "canonical-release-ledger"
@@ -183,7 +206,7 @@ function New-MIRCPLegacyReleaseLedger {
       "path:releases.records/$($publishedModern.release).json",
       "path:releases.records/$($publishedBackport.release).json"
     ) | Select-Object -Unique
-    updated_at = ([datetimeoffset]$updated[0]).ToString("yyyy-MM-dd")
+    updated_at = [string]$updated[0]
     published_baselines = [pscustomobject][ordered]@{
       "factorio-2.1" = ConvertTo-MIRCPLegacyPublishedRelease -Release $publishedModern
       "factorio-2.0" = ConvertTo-MIRCPLegacyPublishedRelease -Release $publishedBackport
@@ -354,7 +377,7 @@ function New-MIRCPTodoLines {
   $lines.Add("")
   $lines.Add("## Canonical execution programme")
   $lines.Add("")
-  $lines.Add("The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; no .9 implementation begins before the unified finding inventory is frozen.")
+  $lines.Add("The ordered terminal release train, target dispositions, qualification boundaries, stop conditions, and MIR 4 handoff are defined in the [MIR 3 Terminal .9 Programme](docs/releases/mir-3-terminal-dot-9-programme.md). Published .5 tags and packages remain immutable; .6 through .8 are prohibited; the exact .9 family is source-frozen, qualified, maintainer-accepted, sealed, and ready for governed local tagging.")
   $lines.Add("")
   $lines.Add("Change-record IDs are identities, not execution order. Follow the terminal programme's workstreams and gates.")
   $lines.Add("")
@@ -365,11 +388,11 @@ function New-MIRCPTodoLines {
   $staticBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -in @("static-captured-realized-probes-pending", "complete") }).Count
   $completeBaselineCount = @($BaselineQueue.rows | Where-Object { [string]$_.semantic_inventory_status -eq "complete" }).Count
   $lines.Add("| ``T9-0`` immutable .5 semantic baselines | $staticBaselineCount/9 semantic captures; $completeBaselineCount/9 complete | Bind every exact public ZIP to declared, realized, and claimed inventories; classify contradictions; and double-build every final baseline bundle |")
-  $lines.Add("| ``T9-A`` retained .5 assurance debt | Open, package-excluded | Truthfully complete or reconcile the protected qualification, seal, promotion-admission, transport, downstream-guard, and public-audit obligations without changing a .5 package |")
-  $lines.Add("| ``T9-B`` terminal finding inventory | Not frozen | Every product, package, migration, compatibility, locale, documentation, performance, and assurance finding has an affected-target set, reproducible proposition, package visibility, migration impact, and one terminal disposition |")
-  $lines.Add("| ``T9-C`` all-nine fixed point | Planning only; implementation not admitted | Implement only admitted records, materialize all nine shadows, and accept a sweep with zero new shared/tooling/higher-target/package-governance fixes and zero unexplained drift |")
-  $lines.Add("| ``T9-D`` family qualification and seals | Planning only; every candidate unassigned | Freeze after fixed point, allocate candidates, independently qualify and seal all nine, then create one family-readiness seal before any public tag |")
-  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | Not started | Freeze the terminal indexes and hand complete local release authority requirements to MIR 4; no MIR 4 implementation is admitted here |")
+  $lines.Add("| ``T9-A`` retained .5 assurance debt | Complete and frozen | Reopen only for a false pass/failure, lost evidence, unsafe adoption, or nondeterministic seal |")
+  $lines.Add("| ``T9-B`` terminal finding inventory | Complete and sealed | Ordinary MIR 3 product intake is closed; only a reproduced release-blocking defect may reopen an affected target |")
+  $lines.Add("| ``T9-C`` all-nine fixed point | Accepted with independent confirmation | Zero portable-return findings and all 18 governed upgrade rows passed |")
+  $lines.Add("| ``T9-D`` family qualification and seals | Nine candidates qualified and sealed; family ready for local tagging | Preserve the exact candidate, qualification, review, target-seal, and family-readiness identities through publication |")
+  $lines.Add("| ``T9-E`` MIR 3 archive and MIR 4 handoff | GitHub publication verified; Mod Portal manual upload pending | Upload and verify the same sealed bytes on Mod Portal, complete terminal indexes, then hand sealed baselines to MIR 4 |")
   $lines.Add("")
   $plannedChanges = @($Changes | Where-Object { [string]$_.state -in @("proposed", "planned") } | Sort-Object id)
   if ($plannedChanges.Count -gt 0) {
@@ -482,7 +505,9 @@ function Update-MIRCPViews {
   $canonical = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$canonicalRole) -RepoRoot $repo
   $backport = Get-MIRCPReleaseByVersion -Release ([string]$pointer.roles.$backportRole) -RepoRoot $repo
   $terminalReleases = @($pointer.planned_releases | ForEach-Object { Get-MIRCPReleaseByVersion -Release ([string]$_) -RepoRoot $repo })
-  $reviewDate = (@($releases.updated_at | ForEach-Object { [datetimeoffset]$_ } | Sort-Object -Descending | Select-Object -First 1)[0]).ToString("yyyy-MM-dd")
+  $reviewDate = [string]@($releases | ForEach-Object {
+    Get-MIRCPReleaseAuthoredDate -Release ([string]$_.release) -RepoRoot $repo
+  } | Sort-Object -Descending | Select-Object -First 1)[0]
 
   Write-MIRCPJson -Path "path:releases.ledger" -Value (New-MIRCPLegacyReleaseLedger -RepoRoot $repo) -RepoRoot $repo -Check:$Check
   Set-MIRCPGeneratedText -Path ([string]$policy.outputs.current_candidate) -Lines (New-MIRCPCurrentCandidateLines -Release $canonical -ReviewDate $reviewDate -RepoRoot $repo) -RepoRoot $repo -Check:$Check
@@ -508,22 +533,30 @@ function Update-MIRCPViews {
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.branch_status) -Value $branchStatus -RepoRoot $repo -Check:$Check
 
+  $terminalProgrammeStatus = [string]$pointer.active_programme.status
+  $publicationAdmitted = $terminalProgrammeStatus -in @(
+    "ready-for-local-tagging",
+    "github-published-and-verified-mod-portal-pending"
+  )
   $publication = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-terminal-family-publication-checklist-v1"
     generated_from = @("path:releases.current", ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json", "path:releases.records/*.9.json")
     family = @($terminalReleases | ForEach-Object {
+      $targetSealPath = Join-Path $repo ".mir/releases/terminal/seals/$($_.release).json"
       [pscustomobject][ordered]@{
         release = [string]$_.release
         candidate_id = [string]$_.candidate_id
         state = [string]$_.state
         remaining_states = @(Get-MIRCPRemainingReleaseStates -Release $_ -RepoRoot $repo)
-        target_seal_present = $false
+        target_seal_present = (Test-Path -LiteralPath $targetSealPath -PathType Leaf)
       }
     })
-    family_readiness_seal_present = $false
-    first_public_tag_admitted = $false
-    publication_admitted = $false
+    family_readiness_seal_present = (Test-Path -LiteralPath (Join-Path $repo ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json") -PathType Leaf)
+    first_public_tag_admitted = $publicationAdmitted
+    publication_admitted = $publicationAdmitted
+    github_publication_complete = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
+    mod_portal_publication_pending = ($terminalProgrammeStatus -eq "github-published-and-verified-mod-portal-pending")
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check
 
@@ -539,7 +572,9 @@ function Update-MIRCPViews {
     remaining_obligations = @($backport.remaining_obligations)
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.backport_queue) -Value $backportQueue -RepoRoot $repo -Check:$Check
-  Set-MIRCPReleaseNoteIdentityBlock -Release $canonical -RepoRoot $repo -Check:$Check
+  foreach ($terminalRelease in $terminalReleases) {
+    Set-MIRCPReleaseNoteIdentityBlock -Release $terminalRelease -RepoRoot $repo -Check:$Check
+  }
 
   return [pscustomobject][ordered]@{status=if ($Check) { "current" } else { "updated" }; releases=$releases.Count; changes=$changes.Count; incidents=$incidents.Count; tasks=$tasks.Count}
 }

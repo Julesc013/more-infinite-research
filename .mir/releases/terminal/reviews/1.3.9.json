@@ -1,0 +1,23 @@
+{
+  "acceptance": {
+    "decision": "approved",
+    "path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+    "reviewer": "Julesc013",
+    "sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4"
+  },
+  "archive_sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A",
+  "candidate_id": "1.3-P1",
+  "kind": "Mir3TerminalQualificationReviewV1",
+  "qualification": {
+    "mutated": false,
+    "path": ".mir/releases/terminal/qualifications/1.3.9.json",
+    "sha256": "43FE0544E22B7AAFBCFBD19DFE4578B95DA902D9239BF714C3F1770DC7FF7533",
+    "status": "passed-automated-awaiting-human-review"
+  },
+  "record_sha256": "44339489E03952FE7A798577DC2C8CBB31FF05F29974EF541AE5533DFD01D14E",
+  "recorded_at": "2026-08-15T14:27:50+10:00",
+  "release": "1.3.9",
+  "schema": 1,
+  "scope": "maintainer-inspected-exact-frozen-distribution; automated-record-covers-engine-settings-compatibility-performance-and-upgrade-surfaces",
+  "status": "accepted-exact-package-inspection"
+}

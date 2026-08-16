@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/mir3-terminal-candidate-allocation.schema.json",
+  "title": "MIR 3 terminal candidate allocation authority",
+  "type": "object",
+  "required": ["schema", "kind", "status", "assigned_at", "assignment_condition", "source_freeze", "materialization", "allocations", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-Terminal-Candidate-AllocationV1"},
+    "status": {"const": "assigned-awaiting-candidate-reconstruction"},
+    "assigned_at": {"type": "string", "format": "date-time"},
+    "assignment_condition": {"type": "string", "minLength": 1},
+    "source_freeze": {
+      "type": "object",
+      "required": ["authority", "merge_commit", "merge_tree", "post_merge_runs", "result"],
+      "properties": {
+        "authority": {"const": ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json"},
+        "merge_commit": {"$ref": "#/$defs/gitObject"},
+        "merge_tree": {"$ref": "#/$defs/gitObject"},
+        "post_merge_runs": {
+          "type": "object",
+          "required": ["branch_policy", "mir", "emergency_package"],
+          "properties": {
+            "branch_policy": {"type": "integer", "minimum": 1},
+            "mir": {"type": "integer", "minimum": 1},
+            "emergency_package": {"type": "integer", "minimum": 1}
+          },
+          "additionalProperties": false
+        },
+        "result": {"const": "passed"}
+      },
+      "additionalProperties": false
+    },
+    "materialization": {
+      "type": "object",
+      "required": ["method", "author", "git_timestamp", "remote", "repository", "force_push_used", "tags_created"],
+      "properties": {
+        "method": {"const": "deterministic-git-commit-tree-v1"},
+        "author": {"type": "string", "minLength": 1},
+        "git_timestamp": {"type": "string", "format": "date-time"},
+        "remote": {"const": "origin"},
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "force_push_used": {"const": false},
+        "tags_created": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "allocations": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {"$ref": "#/$defs/allocation"}
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["candidate_packages_reconstructed", "final_qualification_complete", "manual_review_complete", "target_seals_created", "family_seal_created", "tags_created", "publication_permitted", "dot5_package_bytes_changed"],
+      "properties": {
+        "candidate_packages_reconstructed": {"const": false},
+        "final_qualification_complete": {"const": false},
+        "manual_review_complete": {"const": false},
+        "target_seals_created": {"const": false},
+        "family_seal_created": {"const": false},
+        "tags_created": {"const": false},
+        "publication_permitted": {"const": false},
+        "dot5_package_bytes_changed": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "allocation": {
+      "type": "object",
+      "required": ["release", "namespace", "predecessor_max_ordinal", "minimum_next_ordinal", "assigned_id", "candidate_ref", "candidate_commit", "candidate_tree", "parents", "package_source_commit", "package_source_tree", "package_source_sha256", "archive_sha256", "content_sha256", "bytes", "entries", "remote_exact"],
+      "properties": {
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+        "namespace": {"type": "string", "pattern": "^(?:C|[0-9]+\\.[0-9]+-P)$"},
+        "predecessor_max_ordinal": {"type": "integer", "minimum": 0},
+        "minimum_next_ordinal": {"type": "integer", "minimum": 1},
+        "assigned_id": {"type": "string", "pattern": "^(?:C[1-9][0-9]*|[0-9]+\\.[0-9]+-P[1-9][0-9]*)$"},
+        "candidate_ref": {"type": "string", "pattern": "^refs/heads/candidate/[0-9]+\\.[0-9]+\\.9-.+$"},
+        "candidate_commit": {"$ref": "#/$defs/gitObject"},
+        "candidate_tree": {"$ref": "#/$defs/gitObject"},
+        "parents": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/gitObject"}},
+        "package_source_commit": {"$ref": "#/$defs/gitObject"},
+        "package_source_tree": {"$ref": "#/$defs/gitObject"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1},
+        "remote_exact": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

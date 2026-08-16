@@ -82,14 +82,9 @@ for position = 1, STRESS_TOTAL do
   local name = string.format("mir-synthetic-technology-%06d", index)
   table.insert(stress_operations, {
     operation = "emit_base_extension",
-    key = name,
     technology_name = name,
     technology = {
-      name = name,
-      effects = {{type = "nothing"}},
-      prerequisites = {string.format("mir-synthetic-technology-%06d", stress_prerequisite(index))},
-      unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
-      max_level = "infinite"
+      prerequisites = {string.format("mir-synthetic-technology-%06d", stress_prerequisite(index))}
     }
   })
 end
@@ -99,7 +94,7 @@ local stress = compiler_context.with_active(
 if stress.node_count < STRESS_TOTAL or stress.edge_count < STRESS_TOTAL
   or stress.cyclic_component_count < 1001
   or stress.rejected_planned_technology_count ~= STRESS_TOTAL then
-  fail("in-memory compiler graph did not cover 100000 technologies, effects, and edges")
+  fail("in-memory compiler graph did not cover 100000 technologies and edges")
 end
 local stress_components, large_component = {}
 for _, component in ipairs(stress.cyclic_components or {}) do
@@ -130,6 +125,11 @@ local stress_fingerprint = fingerprint.of({
   rejected_planned_technology_count = stress.rejected_planned_technology_count,
   cyclic_components = stress_components
 })
+stress_operations = nil
+stress_components = nil
+large_component = nil
+stress = nil
+collectgarbage("collect")
 log("[mir-fixture] synthetic-graph fingerprints coverage=" .. tostring(prototype.data.coverage_fingerprint)
   .. " generation=" .. tostring(generation_plan.data.plan_fingerprint)
   .. " compilation=" .. tostring(compiler_output_fingerprint)

@@ -1,19 +1,66 @@
 {
-  "schema": 1,
-  "release": "1.4.9",
-  "candidate_id": "not-assigned",
-  "candidate_floor": "1.4-P1",
-  "candidate_allocation": {"namespace":"1.4-P","predecessor_max_ordinal":0,"minimum_next_ordinal":1,"assigned_id":null,"assignment_condition":"accepted-family-fixed-point-and-source-freeze"},
-  "target": "0.14",
+  "assurance_exceptions": [],
   "branch": "tag-only",
-  "state": "planned",
-  "source_release": { "release": "1.4.5", "tag": "1.4.5", "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47", "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4" },
+  "candidate_allocation": {
+    "assigned_at": "2026-08-14T18:05:46+10:00",
+    "assigned_id": "1.4-P1",
+    "assignment_condition": "accepted-family-fixed-point-and-source-freeze",
+    "candidate_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+    "candidate_ref": "refs/heads/candidate/1.4.9-1.4-P1",
+    "minimum_next_ordinal": 1,
+    "namespace": "1.4-P",
+    "predecessor_max_ordinal": 0
+  },
+  "candidate_floor": "1.4-P1",
+  "candidate_id": "1.4-P1",
+  "incident_ids": [],
+  "package": {
+    "archive": "dist/more-infinite-research_1.4.9.zip",
+    "archive_sha256": "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872",
+    "bytes": 386070,
+    "content_sha256": "26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA",
+    "entries": 177,
+    "source_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+    "source_sha256": "26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA",
+    "source_tree": "5a6e392711394c72ea1b7f0d1da508082b0812b2"
+  },
   "portable_source_release": "3.2.9",
   "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
-  "package": {},
-  "proofs": {},
-  "assurance_exceptions": [],
-  "remaining_obligations": ["bind-terminal-delta", "materialize-deterministic-integration", "qualify-factorio-0.14", "tag-publish-and-publicly-verify"],
-  "incident_ids": [],
-  "updated_at": "2026-08-08T18:00:00+10:00"
+  "proofs": {
+    "automated_qualification": ".mir/releases/terminal/qualifications/1.4.9.json",
+    "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "candidate_reconstruction": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+    "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+    "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/1.4.9.json",
+    "manual_acceptance": {
+      "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
+      "path": ".mir/releases/terminal/reviews/1.4.9.json",
+      "sha256": "20D6FD5D213AD1E370A94F48EF70E57BB1A428526D86D09353159B0E316A65C3",
+      "digest_policy": "utf8-lf"
+    },
+    "package_manifest": ".mir/releases/terminal/manifests/1.4.9-package.json",
+    "release_manifest": ".mir/releases/terminal/manifests/1.4.9-release.json",
+    "source_freeze": ".mir/releases/terminal/freezes/1.4.9.json",
+    "target_seal": ".mir/releases/terminal/seals/1.4.9.json",
+    "tag": {"kind":"annotated-tag","name":"1.4.9","commit":"8f75fa45d52a55650e74423a99f04a0252db429b","tag_object":"7b816e19a6007a6eb89f2519cc3722ab500c8ad4"}
+  },
+  "release": "1.4.9",
+  "release_notes": "docs/releases/notes/release-notes-1.4.9.md",
+  "remaining_obligations": [
+    "mod-portal-publish-and-publicly-verify",
+    "archive-and-mir4-handoff"
+  ],
+  "schema": 1,
+  "source_release": {
+    "archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47",
+    "content_sha256": "35BB3F593600BC3D5C9D71CEDF502E8480251F6F20C5F5976D91CAE1051145C4",
+    "release": "1.4.5",
+    "tag": "1.4.5"
+  },
+  "state": "publicly-verified",
+  "target": "0.14",
+  "updated_at": "2026-08-15T17:21:05+10:00"
 }

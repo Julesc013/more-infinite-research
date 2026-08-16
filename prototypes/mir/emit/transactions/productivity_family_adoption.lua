@@ -8,7 +8,7 @@ local transition_descriptor = require("prototypes.mir.domain.research_cost.trans
 
 local M = {}
 local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
-local VERSION = 3
+local VERSION = 4
 local function state()
   return compiler_context.current():state_view("productivity_family_adoption", function()
     return {bindings = {}, adopted_recipes = {}}
@@ -31,6 +31,7 @@ local function record(plan)
     owner = plan.owner,
     operation = plan.operation,
     configured_fields = deepcopy(plan.configured_fields or {}),
+    planned_max_level = plan.planned_max_level,
     input_descriptor = cost_descriptor(plan.cost_model and plan.cost_model.research_cost_model),
     output_descriptor = cost_descriptor(plan.research_cost_model),
     input_fingerprint = plan.input_fingerprint,
@@ -117,7 +118,8 @@ local function signature()
       .. "|effects=" .. tostring(entry.effect_count)
       .. "|input-cost=" .. tostring(entry.input_descriptor and entry.input_descriptor.semantic_digest or "unrecognized")
       .. "|output-cost=" .. tostring(entry.output_descriptor and entry.output_descriptor.semantic_digest or "unrecognized")
-      .. "|output=" .. tostring(entry.output_fingerprint))
+      .. "|output=" .. tostring(entry.output_fingerprint)
+      .. "|planned-max=" .. tostring(entry.planned_max_level))
   end
   table.sort(entries)
   return table.concat(entries, ";")

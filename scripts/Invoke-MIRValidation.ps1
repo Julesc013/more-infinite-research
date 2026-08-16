@@ -2556,7 +2556,7 @@ function Initialize-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "max-level-import", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
@@ -2698,7 +2698,7 @@ function Initialize-RuntimeScenario {
       "cost-linear" { $nativeOwnerOverrides["ips-cost-linear-increment-$key"] = 2500 }
       "cost-growth" { $nativeOwnerOverrides["ips-cost-growth-$key"] = 1.25 }
       "research-time" { $nativeOwnerOverrides["ips-research-time-$key"] = 90 }
-      "max-level" { $nativeOwnerOverrides["ips-max-level-$key"] = 7 }
+      "max-level" { $nativeOwnerOverrides["ips-max-level-$key"] = 5 }
       "effect" { $nativeOwnerOverrides["ips-effect-per-level-$key"] = 25 }
       "combined" {
         $nativeOwnerOverrides["ips-cost-base-$key"] = 2000
@@ -2717,6 +2717,13 @@ function Initialize-RuntimeScenario {
     $nativeOwnerOverrides[$name] = $StartupSettingOverrides[$name]
   }
   Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $nativeOwnerOverrides
+  if ($NativeOwnerSettingsProfile -eq "max-level-import") {
+    $profileSettings = @{}
+    foreach ($key in $nativeOwnerStreamKeys) {
+      $profileSettings["ips-max-level-$key"] = 5
+    }
+    Set-CopiedMIRSettingsProfileDefault -ModsDir $modsDir -Settings $profileSettings
+  }
   Complete-MIRSettingsOverrideMod -ModsDir $modsDir
 
   $mods = @(
@@ -2797,7 +2804,7 @@ function Invoke-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
-    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-linear", "cost-growth", "research-time", "max-level", "max-level-import", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
@@ -3544,9 +3551,35 @@ if ($selectionActive -and -not $checkpointActive) {
           Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity scenario"
         } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
           Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
+        } elseif ($declaration.name -eq "space-age-native-owner-settings-max-level-late-conflict") {
+          Assert-LogContains -Expected "Maximum-level conflict technology=processing-unit-productivity selected=5 planned=5 final-observed=9 binding-operation=configure_native_owner source=native-owner reason=late_prototype_mutation" -Context $declaration.name
         }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
+          "generated-maximum-level-lowering-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition") `
+              -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_copper" = 0 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_copper" = 5 }
+            Assert-LogContains -Expected "[mir-fixture] generated lowered cap retained completed levels and removed invalid research" -Context $declaration.name
+          }
+          "base-continuation-maximum-level-lowering-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @(
+                "mir-fixture-finite-base-extension-level",
+                "mir-fixture-assert-base-continuation-cap-transition"
+              ) `
+              -ChangedFixtureNames @(
+                "mir-fixture-finite-base-extension-level",
+                "mir-fixture-assert-base-continuation-cap-transition"
+              ) `
+              -InitialStartupSettingOverrides @{ "mir-max-level-research-speed" = 0 } `
+              -ChangedStartupSettingOverrides @{ "mir-max-level-research-speed" = 5 }
+            Assert-LogContains -Expected "[mir-fixture] base continuation survived a cap below its first level without losing completed research" -Context $declaration.name
+          }
           "space-age-native-owner-settings-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
               -ScenarioName $declaration.name `
@@ -3569,7 +3602,37 @@ if ($selectionActive -and -not $checkpointActive) {
           Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
           Assert-LogContains -Expected "[mir-fixture] research-cost transition matrix proof complete phase=configuration-changed rows=16" -Context $declaration.name
           Assert-NativeOwnerResearchWorkPreserved -Context $declaration.name
-          Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context $declaration.name
+          Assert-LogContains -Expected "schema=4|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context $declaration.name
+          }
+          "space-age-native-owner-cap-lowering-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-transition") `
+              -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-transition") `
+              -InitialNativeOwnerSettingsProfile "default" `
+              -ChangedNativeOwnerSettingsProfile "max-level" `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] native-owner lowered cap retained completed levels and removed invalid current/queued research" -Context $declaration.name
+          }
+          "space-age-native-owner-cap-raising-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+              -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 7 } `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] native-owner relaxed cap retained valid progress and restored future levels changed=7" -Context $declaration.name
+          }
+          "space-age-native-owner-cap-removal-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+              -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] native-owner relaxed cap retained valid progress and restored future levels changed=0" -Context $declaration.name
           }
           "space-age-vanilla-family-adoption-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -3577,7 +3640,7 @@ if ($selectionActive -and -not $checkpointActive) {
               -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
               -EnableSpaceAge
             Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
-            Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|input-cost=" -Context $declaration.name
+            Assert-LogContains -Expected "schema=4|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|input-cost=" -Context $declaration.name
           }
           "space-age-scripted-runtime-lifecycle" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -3976,6 +4039,10 @@ Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFix
   "mir-fixture-assert-generated-prerequisite-safety"
 ) -SciencePackIngredientPolicy "all"
 
+Invoke-RuntimeScenario -ScenarioName "k2-science-phase-policy" -EnabledFixtureNames @(
+  "mir-fixture-assert-k2-science-phase-policy"
+)
+
 Invoke-RuntimeScenario -ScenarioName "external-technology-cycle" -EnabledFixtureNames @(
   "mir-fixture-external-technology-cycle"
 )
@@ -4106,6 +4173,10 @@ $atanAshTileDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key 
 Assert-ReportLineContains -Line $atanAshTileDecision -Expected "decision=diagnose_only" -Context "ATAN Ash tile-surface deny decision scenario"
 $atanAshSinkDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
 Assert-ReportLineContains -Line $atanAshSinkDecision -Expected "decision=diagnose_only" -Context "ATAN Ash sink deny decision scenario"
+$atanAshTileRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
+Assert-ReportLineContains -Line $atanAshTileRisk -Expected "risks=tile_surface" -Context "ATAN Ash tile-surface loop-risk scenario"
+$atanAshSinkRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
+Assert-ReportLineContains -Line $atanAshSinkRisk -Expected "risks=ash_sink" -Context "ATAN Ash sink loop-risk scenario"
 
 Invoke-RuntimeScenario -ScenarioName "combination-atan-ash-big-mining-drill" -EnabledFixtureNames @(
   "mir-fixture-atan-ash",
@@ -4125,10 +4196,6 @@ Invoke-RuntimeScenario -ScenarioName "combination-space-age-big-mining-drill" -E
 ) -EnableSpaceAge
 $combinationSpaceAgeDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
 Assert-ReportLineGenerated -Line $combinationSpaceAgeDrillLine -Context "Space Age plus Big Mining Drill targeted interaction"
-$atanAshTileRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
-Assert-ReportLineContains -Line $atanAshTileRisk -Expected "risks=tile_surface" -Context "ATAN Ash tile-surface loop-risk scenario"
-$atanAshSinkRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
-Assert-ReportLineContains -Line $atanAshSinkRisk -Expected "risks=ash_sink" -Context "ATAN Ash sink loop-risk scenario"
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",
@@ -4380,7 +4447,7 @@ if ([bool]$targetProfile.features.scripted_techs -and [bool]$targetProfile.suppo
   }
   $defaultAgriculturalLine = Get-LastStreamReportLine -Key "research_agricultural_growth_speed"
   Assert-ReportLineGenerated -Line $defaultAgriculturalLine -Context "Default-enabled scripted agricultural runtime scenario"
-  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Explicitly disabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "spoilage preservation skipped: missing technology" -Context "Data-stage-disabled scripted spoilage runtime scenario"
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Default-enabled scripted agricultural runtime scenario"
 
   Invoke-RuntimeConfigurationChangeScenario `
@@ -4421,6 +4488,32 @@ if ([bool]$targetProfile.features.scripted_techs -and [bool]$targetProfile.suppo
     -Expected "[mir-fixture] scripted lifecycle enable proof complete" `
     -Context "Scripted runtime re-enable scenario"
 }
+
+Invoke-RuntimeConfigurationChangeScenario `
+  -ScenarioName "generated-maximum-level-lowering-config-change" `
+  -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition") `
+  -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition") `
+  -InitialStartupSettingOverrides @{ "ips-max-level-research_copper" = 0 } `
+  -ChangedStartupSettingOverrides @{ "ips-max-level-research_copper" = 5 }
+Assert-LogContains `
+  -Expected "[mir-fixture] generated lowered cap retained completed levels and removed invalid research" `
+  -Context "generated-maximum-level-lowering-config-change"
+
+Invoke-RuntimeConfigurationChangeScenario `
+  -ScenarioName "base-continuation-maximum-level-lowering-config-change" `
+  -InitialFixtureNames @(
+    "mir-fixture-finite-base-extension-level",
+    "mir-fixture-assert-base-continuation-cap-transition"
+  ) `
+  -ChangedFixtureNames @(
+    "mir-fixture-finite-base-extension-level",
+    "mir-fixture-assert-base-continuation-cap-transition"
+  ) `
+  -InitialStartupSettingOverrides @{ "mir-max-level-research-speed" = 0 } `
+  -ChangedStartupSettingOverrides @{ "mir-max-level-research-speed" = 5 }
+Assert-LogContains `
+  -Expected "[mir-fixture] base continuation survived a cap below its first level without losing completed research" `
+  -Context "base-continuation-maximum-level-lowering-config-change"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity",
@@ -4539,8 +4632,8 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
   ) `
   -EnableSpaceAge
 Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change preservation scenario"
-Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
-Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age steel family adoption configuration-change signature scenario"
+Assert-LogContains -Expected "schema=4|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|input-cost=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
+Assert-LogContains -Expected "schema=4|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|input-cost=" -Context "Space Age steel family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-owner-prepatched",
@@ -4613,8 +4706,41 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] research-cost transition matrix proof complete phase=configuration-changed rows=16" -Context "space-age-native-owner-settings-config-change"
   Assert-NativeOwnerResearchWorkPreserved -Context "space-age-native-owner-settings-config-change"
-  Assert-LogContains -Expected "schema=3|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
-  Assert-LogContains -Expected "schema=3|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=4|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=4|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|input-cost=" -Context "space-age-native-owner-settings-config-change"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-native-owner-cap-lowering-config-change" `
+    -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-transition") `
+    -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-transition") `
+    -InitialNativeOwnerSettingsProfile "default" `
+    -ChangedNativeOwnerSettingsProfile "max-level" `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] native-owner lowered cap retained completed levels and removed invalid current/queued research" `
+    -Context "space-age-native-owner-cap-lowering-config-change"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-native-owner-cap-raising-config-change" `
+    -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+    -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+    -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 } `
+    -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 7 } `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] native-owner relaxed cap retained valid progress and restored future levels changed=7" `
+    -Context "space-age-native-owner-cap-raising-config-change"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-native-owner-cap-removal-config-change" `
+    -InitialFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+    -ChangedFixtureNames @("mir-fixture-assert-native-owner-cap-relaxation") `
+    -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 } `
+    -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] native-owner relaxed cap retained valid progress and restored future levels changed=0" `
+    -Context "space-age-native-owner-cap-removal-config-change"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Emergency-LaneV1",
+  "status": "admitted-not-yet-proven",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-r1-local-emergency-lane-v1",
+  "imports": [".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json", ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json", ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json"],
+  "semantic_reads": ["3.2.9-terminal-baseline", "factorio-2.1-target-profile", "mir4-equivalence-policy"],
+  "semantic_writes": ["local-mir4-emergency-distribution", "local-offline-seal", "publication-dry-run-bundle"],
+  "target_dispositions": {"factorio-2.1": "first-local-proof", "other-active-targets": "not-in-r1", "museum": "not-applicable"},
+  "digest_classes": {"semantic": "must-equal-3.2.9-modulo-allowed-metadata", "authority": "local-candidate-and-seal", "qualification": "exact-factorio-2.1"},
+  "migration": {"from": "3.2.9", "to": "local-unpublished-4x-factorio-2.1", "state": "not-started"},
+  "rollback": {"strategy": "delete-local-build-output-and-retain-3.2.9", "permitted_until": "public-mir4-publication"},
+  "parity_test": ["deterministic-double-build", "clean-install", "direct-3.2.9-upgrade", "reload-and-second-reload", "settings-profile-preservation", "exact-engine-load", "offline-seal", "publication-dry-run-idempotence"],
+  "sunset_condition": "MIR4_R0_EMERGENCY_LANE_PROVEN-and-bound-into-mir3-eol",
+  "payload": {
+    "input_release": "3.2.9",
+    "target": "factorio-2.1",
+    "output_root": "build/mir4/emergency-lane",
+    "public_output_authorized": false,
+    "allowed_differences": ["version-and-distribution-metadata", "mir4-manifests", "successor-migration-metadata", "generated-root-name"],
+    "exit": "MIR4_R0_EMERGENCY_LANE_PROVEN"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalReleaseClosureV1",
+  "release": "3.2.9",
+  "status": "github-closed-mod-portal-pending",
+  "package_visible": false,
+  "frozen_manifest": {
+    "path": ".mir/releases/terminal/manifests/3.2.9-release.json",
+    "sha256": "C5C849A20B90CDA3C7688DB5D250605B54E3D263A4B870B69DF6490CF0AE7BA7"
+  },
+  "review": {
+    "path": ".mir/releases/terminal/reviews/3.2.9.json",
+    "sha256": "20D440AE72331923A8744E527CD59A2377DDB3563F382EEFAA61DE20F8C945E6",
+    "decision": "accepted-exact-package-inspection"
+  },
+  "seal": {
+    "path": ".mir/releases/terminal/seals/3.2.9.json",
+    "sha256": "16B979C48862A32882985318B88026B6EB708F4369935181F35650B287E87560",
+    "status": "sealed"
+  },
+  "tag": {
+    "name": "3.2.9",
+    "object_sha": "9b80a3be63fe540bec9aa8a43f5bb835f639b34f",
+    "peeled_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+    "immutable": true
+  },
+  "github": {
+    "receipt": ".mir/evidence/terminal-publication/2026-08-15/github/3.2.9.json",
+    "status": "published-and-verified",
+    "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.9",
+    "download_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20"
+  },
+  "mod_portal": {
+    "observation": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
+    "state": "api-visible",
+    "sha1": "602e98292508aa20ed3e1567da396ea5e4c29f7b",
+    "authenticated_redownload": "pending"
+  },
+  "final_channel_state": "github-published-and-verified-mod-portal-custody-pending",
+  "record_sha256": "FA66A913CB8898290BAE6CA7FFE7446C4C33A2ABCDE022304D82A87C4ED3714C"
+}

@@ -1,0 +1,41 @@
+{
+  "inventories": [
+    ".mir/releases/terminal/baselines/1.8.5/baseline-manifest.json",
+    ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"
+  ],
+  "kind": "Mir3TerminalPackageManifestV1",
+  "migration_watermark": {
+    "from": [
+      "1.8.5",
+      "1.8.2"
+    ],
+    "stable_ids": true,
+    "to": "1.8.9"
+  },
+  "mir4_successor_target": "MIR4-R0/1.0",
+  "release": "1.8.9",
+  "schema": 1,
+  "schemas": [
+    "spec/schemas/mir3-terminal-package-manifest.schema.json",
+    "spec/schemas/mir3-terminal-release-manifest.schema.json"
+  ],
+  "semantic_roots": [
+    ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+  ],
+  "source": {
+    "candidate_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+    "source_tree": "2d5599b1c31fbc5b35bce69ce651159d0877e7a4"
+  },
+  "target": "1.0",
+  "toolchain": {
+    "source_freeze": ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json",
+    "target_freeze": ".mir/releases/terminal/freezes/1.8.9.json"
+  },
+  "upgrade_obligation": [
+    "1.8.5-to-1.8.9",
+    "1.8.2-to-1.8.9"
+  ]
+}

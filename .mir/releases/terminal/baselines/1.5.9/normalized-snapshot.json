@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "kind": "MIR4TerminalNormalizedSnapshotV1",
+  "status": "importable-pre-eol-public-custody-pending",
+  "semantic_authority": false,
+  "release": "1.5.9",
+  "target": "0.15",
+  "successor_target": "MIR4-R0/0.15",
+  "source_identity": {
+    "candidate_id": "1.5-P1",
+    "candidate_commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+    "source_tree": "cdefcdc2f3bf74b806759374335b669746204912",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_1.5.9.zip",
+    "archive_sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E",
+    "content_sha256": "C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED",
+    "bytes": 385629,
+    "entries": 177,
+    "tag": "1.5.9"
+  },
+  "engine": {
+    "version": "0.15.40",
+    "executable_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+    "qualification": ".mir/releases/terminal/qualifications/1.5.9.json",
+    "status": "exact-engine-qualified"
+  },
+  "predecessors": [
+    {
+      "release": "1.5.5",
+      "role": "immutable-dot5",
+      "upgrade_id": "1.5.5-to-1.5.9"
+    },
+    {
+      "release": "1.5.0",
+      "role": "pre-dot5",
+      "upgrade_id": "1.5.0-to-1.5.9"
+    }
+  ],
+  "foundation": {
+    "release": "1.5.5",
+    "manifest": ".mir/releases/terminal/baselines/1.5.5/baseline-manifest.json",
+    "root_sha256": "81671E6577CBA23348AA0FDECAD653ED3675182175BF1B3B1413F3E9BF417E5D"
+  },
+  "inventories": {
+    "features": {
+      "package_manifest": ".mir/releases/terminal/manifests/1.5.9-package.json",
+      "package_composition": ".mir/releases/terminal/baselines/1.5.9/package-composition.json",
+      "disposition": "foundation-plus-sealed-terminal-delta"
+    },
+    "technologies": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/technologies.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "stable_ids_preserved": true
+    },
+    "settings": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/settings.json",
+      "terminal_audit": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+      "released_id_or_type_changes": 0,
+      "codec": "MIRSET1"
+    },
+    "owners_aliases_tombstones": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/owners-aliases-tombstones.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+    },
+    "migrations": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/migrations.json",
+      "watermark": {
+        "from": [
+          "1.5.5",
+          "1.5.0"
+        ],
+        "stable_ids": true,
+        "to": "1.5.9"
+      }
+    },
+    "locales": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/locales.json",
+      "package_composition": ".mir/releases/terminal/baselines/1.5.9/package-composition.json"
+    },
+    "runtime_profiles": {
+      "foundation": ".mir/releases/terminal/baselines/1.5.5/declared/runtime-profile-schemas.json",
+      "target_backend": "global"
+    },
+    "upgrades": {
+      "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "qualification": ".mir/releases/terminal/qualifications/1.5.9.json",
+      "required": [
+        "1.5.5-to-1.5.9",
+        "1.5.0-to-1.5.9"
+      ]
+    }
+  },
+  "capability_omissions": [
+    {
+      "field": "feature:compatibility_repairs",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:module_permissions",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:pipeline_extent",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:productivity_family_adoption",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:prototype_limits",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:recipe_productivity",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:scripted_techs",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:settings_profiles",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "feature:technology_constant_overlays",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "prototype-shape:mod_data",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "prototype-shape:quality",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "prototype-shape:surface_conditions",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    }
+  ],
+  "compatibility_import": {
+    "authority": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "level_counts": {
+      "COEXISTS_EXACT": 1,
+      "KNOWN_CONFLICT": 1,
+      "OBSERVED_ONLY": 9,
+      "UNQUALIFIED": 4,
+      "UPSTREAM_BLOCKED": 1
+    },
+    "public_claims_allowed": 1,
+    "promoted_claims": 0,
+    "rule": "preserve-level-envelope-dimensions-and-public-permission"
+  },
+  "record_sha256": "6B2A053C3D6923A06A6F882C5398751F8D405C6337E6E9987A3B2788B329183A"
+}

@@ -1,7 +1,7 @@
 schema: 1
 
 remote_topology:
-  recorded_at: 2026-08-08
+  recorded_at: 2026-08-16
   permanent_branches:
     - main
     - dev
@@ -21,14 +21,16 @@ remote_topology:
   rules:
     - main is the published Factorio 2.1 line rooted at immutable tag MIR 3.2.5 and may receive synchronized planning records or qualified promotion
     - dev owns the MIR 3 terminal .9 programme, the shared Control Plane and tooling, and canonical target-neutral corrections
-    - legacy is the published Factorio 2.0 maintenance line at immutable tag MIR 2.5.5 and advances only through governed 2.5.9 promotion
+    - legacy is a compatibility alias of the latest MIR 3 Factorio 2.1 release and is repointed to the exact published 3.2.10 commit under MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1
+    - immutable Factorio 2.0 release 2.5.9 remains preserved by its annotated tag and public release after the movable legacy branch changes role
     - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
     - main and dev must not be made identical to Factorio 2.0 target branches
+    - terminal main and legacy promotion requires the exact candidate SHA to pass the current package-excluded promotion controller through the registered Branch Policy dispatcher, which attaches the unique required GitHub Actions terminal-promotion-verification context only after allocation, archive, acceptance, seal, family-readiness, remote-ref, and fast-forward checks pass
 
 branches:
   main:
     remote_state: permanent
-    purpose: published MIR 3.2.5 Factorio 2.1 line, synchronized terminal planning, and qualified 3.2.9 promotion
+    purpose: published Factorio 2.1 line and accepted MIR 3.2.10 emergency-hotfix promotion target
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -42,7 +44,7 @@ branches:
 
   dev:
     remote_state: permanent
-    purpose: MIR 3 terminal .9 programme, shared Control Plane v5, validation tooling, governance, and canonical target-neutral corrections
+    purpose: corrected MIR 3.2.10 terminal authority, shared Control Plane v5, validation tooling, governance, and MIR 4 handoff integration
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -55,10 +57,10 @@ branches:
 
   legacy:
     remote_state: permanent
-    purpose: published MIR 2.5.5 Factorio 2.0 maintenance line; promotion-only until a fully qualified 2.5.9 candidate exists
-    factorio_version: "2.0"
+    purpose: movable compatibility alias of the latest MIR 3 Factorio 2.1 release; immutable 2.5.9 remains tag-addressable
+    factorio_version: "2.1"
     accepts:
-      - governed-2.5.x-promotion
+      - exact-main-release-alias
       - release-evidence
       - docs-correction
     rejects:
@@ -96,7 +98,6 @@ backport_rules:
     from: dev
     to:
       - main
-      - legacy
     requires:
       - fixture
       - no-stream-id-change
@@ -922,21 +923,21 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.2.9"
+      version: "3.2.10"
       branch: main
       development_branch: dev
       target_factorio: "2.1"
-      predecessor: "3.2.5"
-      candidate_floor: C33
-      purpose: planned canonical terminal stabilization release; no candidate or source freeze assigned
+      predecessor: "3.2.9"
+      candidate_floor: C34
+      purpose: accepted post-terminal maximum-level emergency hotfix
     factorio_2_0_companion:
-      version: "2.5.9"
-      branch: legacy
+      version: "2.5.10"
+      branch: no-permanent-branch-assigned
       development_branch: dev
       target_factorio: "2.0"
-      predecessor: "2.5.5"
-      candidate_floor: "2.5-P13"
-      purpose: planned terminal Factorio 2.0 projection after immutable 3.2.9
+      predecessor: "2.5.9"
+      candidate_floor: "2.5-P14"
+      purpose: conditional number retained but unpublished; no Factorio 2.0 applicability claim
     factorio_1_1_port:
       version: "1.9.9"
       branch: tmp/1.1
@@ -1005,21 +1006,20 @@ release_artifacts:
 
 target_lines:
   factorio_2_1:
-    version: "3.2.9"
-    predecessor: "3.2.5"
+    version: "3.2.10"
+    predecessor: "3.2.9"
     branch: dev
     promotion_branch: main
     target_factorio: "2.1"
     support_class: canonical-modern
-    publish_policy: planned-normal-gates
+    publish_policy: release-specific-maintainer-emergency-override
   factorio_2_0:
     version: "2.5.9"
     predecessor: "2.5.5"
-    branch: legacy
-    development_branch: dev
+    branch: immutable-tag/2.5.9
     target_factorio: "2.0"
-    support_class: maintained-projection
-    publish_policy: planned-normal-gates
+    support_class: immutable-historical-release
+    publish_policy: no-rebuild-no-retag-no-branch-ownership
   factorio_1_1:
     version: "1.9.9"
     predecessor: "1.9.5"

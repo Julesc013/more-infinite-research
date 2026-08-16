@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Target-RegistryV1",
+  "status": "accepted-pre-publication",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-target-registry-v1",
+  "imports": [".mir/targets.json", ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json", ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"],
+  "semantic_reads": ["mir3-target-profiles", "terminal-predecessors", "target-capabilities"],
+  "semantic_writes": ["mir4-target-identity", "portal-target-code", "mir4-predecessor-contract"],
+  "target_dispositions": {"active-nine": "admitted-for-4.0-parity", "factorio-0.18": "reserved-bridge", "factorio-0.12-through-0.6": "museum"},
+  "digest_classes": {"semantic": "target-capability-certificate-pending", "authority": "registry-v1", "qualification": "target-local"},
+  "migration": {"from": "mir3-target-profiles", "to": "mir4-target-registry-and-certificates", "state": "registry-seeded-certificates-pending"},
+  "rollback": {"strategy": "retain-mir3-target-profiles-as-canonical", "permitted_until": "target-registry-cutover"},
+  "parity_test": ["registry-id-unique", "portal-code-unique", "terminal-predecessor-exact", "target-profile-exists", "unsupported-capability-explicit"],
+  "sunset_condition": "superseded-by-qualified-mir4-target-capability-certificates",
+  "payload": {
+    "targets": [
+      {"id":"factorio-2.1","factorio":"2.1","portal_target_id":321,"state":"active","mir3_predecessor":"3.2.9"},
+      {"id":"factorio-2.0","factorio":"2.0","portal_target_id":320,"state":"active","mir3_predecessor":"2.5.9"},
+      {"id":"factorio-1.1","factorio":"1.1","portal_target_id":311,"state":"active","mir3_predecessor":"1.9.9"},
+      {"id":"factorio-1.0","factorio":"1.0","portal_target_id":310,"state":"active","mir3_predecessor":"1.8.9"},
+      {"id":"factorio-0.18","factorio":"0.18","portal_target_id":218,"state":"reserved-bridge","mir3_predecessor":null},
+      {"id":"factorio-0.17","factorio":"0.17","portal_target_id":217,"state":"active","mir3_predecessor":"1.7.9"},
+      {"id":"factorio-0.16","factorio":"0.16","portal_target_id":216,"state":"active","mir3_predecessor":"1.6.9"},
+      {"id":"factorio-0.15","factorio":"0.15","portal_target_id":215,"state":"active","mir3_predecessor":"1.5.9"},
+      {"id":"factorio-0.14","factorio":"0.14","portal_target_id":214,"state":"active","mir3_predecessor":"1.4.9"},
+      {"id":"factorio-0.13","factorio":"0.13","portal_target_id":213,"state":"active","mir3_predecessor":"1.3.9"},
+      {"id":"factorio-0.12","factorio":"0.12","portal_target_id":212,"state":"museum","mir3_predecessor":null},
+      {"id":"factorio-0.6","factorio":"0.6","portal_target_id":206,"state":"museum","mir3_predecessor":null}
+    ]
+  }
+}

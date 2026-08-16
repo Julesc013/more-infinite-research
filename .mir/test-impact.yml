@@ -133,6 +133,48 @@
       "tags": []
     },
     {
+      "pattern": ".mir/releases/waves/mir4-r0/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/baselines/*.9/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/closures/*.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/*MIR*TerminalBaseline*.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir4-*.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/control/Evidence.ps1",
       "groups": [],
       "scenarios": [],
@@ -197,6 +239,12 @@
       "groups": [],
       "scenarios": [],
       "tags": []
+    },
+    {
+      "pattern": "prototypes/mir/runtime/maximum_level_control.lua",
+      "groups": ["runtime-state", "space-age"],
+      "scenarios": ["generated-maximum-level-absolute", "generated-maximum-level-lowering-config-change", "base-continuation-maximum-level-lowering-config-change", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-max-level-1", "space-age-native-owner-settings-max-level-2", "space-age-native-owner-settings-max-level-7", "space-age-native-owner-settings-max-level-profile-import", "space-age-native-owner-settings-max-level-late-conflict", "space-age-native-owner-cap-lowering-config-change", "space-age-native-owner-cap-raising-config-change", "space-age-native-owner-cap-removal-config-change"],
+      "tags": ["maximum-level"]
     },
     {
       "pattern": "prototypes/mir/domain/native_owner/**",

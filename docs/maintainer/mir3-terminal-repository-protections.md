@@ -5,7 +5,7 @@ applies_to: "MIR 3 terminal programme"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
 ---
@@ -32,9 +32,17 @@ On failure, use the receipt classification: HTTP 401 is authentication, HTTP 403
 
 `dev` is pull-request-only terminal integration. It requires the exact successful GitHub Actions contexts `branch-policy` and `verification-gate`, both from App ID `15368`, resolved review threads, deletion protection, and non-fast-forward protection.
 
-`main` and `legacy` are promotion refs, not development branches. They must accept only an exact governed fast-forward promotion by the repository owner after the promotion commit has both required checks. Requiring a pull request on these refs would contradict the release topology: `main` advances to the immutable 3.2.9 commit, while `legacy` advances to the independently qualified dual-parent 2.5.9 integration. Their integrity/check rules have no bypass; a separate update restriction names the only actor allowed to perform the fast-forward.
+`main` and `legacy` are promotion refs, not development branches. They must accept only an exact governed fast-forward promotion by the repository owner after the promotion commit has both required checks: `branch-policy` and `terminal-promotion-verification`. Requiring a pull request on these refs would contradict the release topology: `main` advances to the immutable 3.2.9 commit, while `legacy` advances to the independently qualified dual-parent 2.5.9 integration. Their integrity/check rules have no bypass; a separate update restriction names the only actor allowed to perform the fast-forward.
 
 Integrity rules and actor/update rules are intentionally separate. An actor allowed to satisfy an update restriction cannot thereby bypass required checks, deletion protection, or non-fast-forward protection.
+
+For a source-frozen terminal candidate, dispatch the already registered `Branch Policy` workflow from the current green `dev` controller with `terminal_release` and the exact allocated `terminal_candidate_sha`. GitHub registers manual workflow identities from the default branch, so the promotion controller intentionally extends this existing dispatcher instead of relying on a new workflow path that exists only on `dev`. The promotion job validates all nine frozen ZIP identities and ceremony records, then validates the selected candidate commit, tree, parents, remote candidate ref, target seal, family-readiness authorization, and current fast-forward boundary. Only a passing run creates the required GitHub Actions `terminal-promotion-verification` check on the immutable candidate SHA.
+
+The promotion context is intentionally unique. GitHub requires every check and commit status sharing a required context name to succeed, so reusing the generic `verification-gate` name would allow an obsolete package-excluded controller failure to remain an unrelated promotion blocker even after the current sealed-candidate controller passes. The context amendment does not rewrite historical evidence or weaken protection: `dev` retains its ordinary `verification-gate`; `main` and `legacy` retain two strict App-ID-bound checks, deletion and non-fast-forward protection, no integrity bypass, and the exact owner-only update restriction.
+
+The required-context amendment was applied and read back on 15 August 2026. Its append-only receipt is `.mir/evidence/terminal-protections/2026-08-15/required-context-amendment-application-receipt.json`; it binds rulesets `20833408` and `20833410`, current controller commit `92ba00191fc511af6aa9445c8aa267e97d1cc8e5`, both successful candidate controller runs, and the exact App-ID-bound check runs attached to each immutable candidate.
+
+The controller publishes the same fail-closed result as both a Checks API check run and a commit status under the unique context name. GitHub may evaluate either transport when enforcing a ruleset required-status context. Because both records are emitted by the same GitHub Actions step with the same conclusion, GitHub's rule that every same-named check and status must pass preserves the fail-closed boundary; neither signal can mask a failure in the other.
 
 ## Tag model
 

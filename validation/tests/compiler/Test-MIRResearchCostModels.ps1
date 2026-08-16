@@ -100,6 +100,7 @@ $paths = @{
   NativeCost = "prototypes/mir/domain/native_owner/cost_model.lua"
   Native = "prototypes/mir/planner/native_owner_binding.lua"
   Continuations = "prototypes/mir/planner/base_continuations.lua"
+  MaximumLevel = "prototypes/mir/policy/max_level.lua"
 }
 $source = @{}
 foreach ($entry in $paths.GetEnumerator()) {
@@ -129,7 +130,7 @@ foreach ($digest in @("semantic_digest", "authority_digest", "qualification_dige
     throw "Research-cost identity layer is missing: $digest"
   }
 }
-if ($source.AdoptionEmitter -notmatch 'VERSION\s*=\s*3' -or
+if ($source.AdoptionEmitter -notmatch 'VERSION\s*=\s*4' -or
     $source.AdoptionEmitter -notmatch 'input_descriptor' -or $source.AdoptionEmitter -notmatch 'output_descriptor') {
   throw "Native-owner adoption does not emit versioned old/new research-cost descriptors."
 }
@@ -216,6 +217,11 @@ if ($source.NativeCost -match 'fixed_count_has_no_(growth_factor|linear_incremen
 }
 foreach ($route in @("Streams", "Native", "Continuations")) {
   if ($source[$route] -notmatch 'research_cost') { throw "$route does not consume the unified research-cost model." }
+}
+foreach ($route in @("Streams", "Native", "Continuations", "MaximumLevel")) {
+  if ($source[$route] -notmatch 'target_line\.mod_data_supported\(\)') {
+    throw "$route may not make prototypes infinite without the governed runtime maximum-level policy transport."
+  }
 }
 if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
     $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or

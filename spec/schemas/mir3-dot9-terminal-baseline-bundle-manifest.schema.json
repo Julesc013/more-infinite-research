@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json",
+  "title": "MIR 3 .9 terminal baseline bundle manifest",
+  "type": "object",
+  "required": ["schema", "kind", "release", "target", "status", "package_visible", "capture_tool", "foundation", "distribution", "input_root_sha256", "files", "normalized_snapshot", "deterministic_bundle", "public_custody", "completion", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "Mir3Dot9TerminalBaselineBundleManifestV1"},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+    "target": {"type": "string", "minLength": 1},
+    "status": {"enum": ["capture-ready-mod-portal-pending", "sealed-complete"]},
+    "package_visible": {"const": false},
+    "capture_tool": {"type": "object"},
+    "foundation": {"type": "object"},
+    "distribution": {"type": "object"},
+    "input_root_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "files": {"type": "array", "minItems": 25, "items": {"$ref": "#/$defs/file"}},
+    "normalized_snapshot": {"$ref": "#/$defs/file"},
+    "deterministic_bundle": {"type": "object"},
+    "public_custody": {"type": "object"},
+    "completion": {"type": "object"},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "file": {
+      "type": "object",
+      "required": ["logical_path", "source_path", "sha256", "bytes", "role"],
+      "properties": {
+        "logical_path": {"type": "string", "minLength": 1},
+        "source_path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "role": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  }
+}

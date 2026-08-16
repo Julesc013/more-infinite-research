@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-release-closure.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-release-closure.schema.json",
+  "title": "MIR 3 terminal release closure",
+  "type": "object",
+  "required": ["schema", "kind", "release", "status", "package_visible", "frozen_manifest", "review", "seal", "tag", "github", "mod_portal", "final_channel_state", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "Mir3TerminalReleaseClosureV1"},
+    "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+    "status": {"enum": ["github-closed-mod-portal-pending", "closed-all-required-channels"]},
+    "package_visible": {"const": false},
+    "frozen_manifest": {"$ref": "#/$defs/binding"},
+    "review": {"$ref": "#/$defs/binding"},
+    "seal": {"$ref": "#/$defs/binding"},
+    "tag": {"type": "object"},
+    "github": {"type": "object"},
+    "mod_portal": {"type": "object"},
+    "final_channel_state": {"type": "string", "minLength": 1},
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+      },
+      "additionalProperties": true
+    }
+  }
+}

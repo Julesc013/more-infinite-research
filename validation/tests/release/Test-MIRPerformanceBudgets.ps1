@@ -431,6 +431,23 @@ if ($qualificationSource -notmatch 'Copy-MIRPerformanceArtifactsVerified[\s\S]{0
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
 $compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+$boundedRuntimeRequirements = @(
+  '[string]$RuntimeRoot = $env:MIR_COMPAT_RUNTIME_ROOT',
+  'function New-MIRCompatRuntimeCampaignRoot',
+  'function Move-MIRCompatScenarioEvidence',
+  '$runtimeCampaign = New-MIRCompatRuntimeCampaignRoot -RequestedRoot $RuntimeRoot',
+  '$retainedRunRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")',
+  '$result = Move-MIRCompatScenarioEvidence -UserDataDir $userData -EvidenceRoot $retainedRunRoot -Result $result'
+)
+foreach ($requirement in $boundedRuntimeRequirements) {
+  if (-not $compatAuditSource.Contains($requirement)) {
+    throw "Compatibility audit load checks do not separate their bounded runtime root from the retained evidence root: $requirement"
+  }
+}
+if ($compatAuditSource.Contains('$runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")') -or
+    $compatAuditSource -notmatch 'maximumRuntimePathLength\s*=\s*240') {
+  throw "Compatibility audit load checks can regress past the Windows runtime path budget."
+}
 $durationProjectionCount = [regex]::Matches($compatAuditSource, 'duration_seconds\s*=\s*\[double\]\$result\.duration_seconds').Count
 if ($compatRunnerSource -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
     $durationProjectionCount -lt 2) {

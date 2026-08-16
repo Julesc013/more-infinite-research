@@ -1,0 +1,83 @@
+{
+  "archive_sha256": "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872",
+  "baseline_bundle": {
+    "path": ".mir/releases/terminal/baselines/1.4.5/baseline-manifest.json",
+    "root_sha256": "C0B7E4A9DE2968D778BB180AF3C93AF43D2ADCBEDF43315738897DACD795A672",
+    "sha256": "BB1B2AD8FA6107562CBF4104A4F693DDD9B7375D3C1EF7D5CBC247C7414FCD8D"
+  },
+  "bytes": 386070,
+  "candidate_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+  "candidate_id": "1.4-P1",
+  "candidate_settings_qualification": {
+    "path": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "sha256": "83D3A9EF7F592CE448DACCB0F6546FDBFB8BECDB3AE45FD37991D9AFA1B13319",
+    "status": "passed"
+  },
+  "content_sha256": "26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA",
+  "engine": {
+    "binary_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+    "version": "0.14.23"
+  },
+  "entries": 177,
+  "fixed_point_receipt": {
+    "path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9",
+    "status": "accepted-all-nine"
+  },
+  "kind": "Mir3TerminalTargetSealV1",
+  "package_manifest": {
+    "path": ".mir/releases/terminal/manifests/1.4.9-package.json",
+    "sha256": "075996B30FA9F2D0664BDA52E273F2811842AE1FB8849A746EE8CA2359E5F739"
+  },
+  "parents": [
+    "efa372c95517c0d224828e7362433fcd9eb0a91b",
+    "a60230a0695d2dd8fd1e727744614e746cda0bd8"
+  ],
+  "qualification": {
+    "path": ".mir/releases/terminal/qualifications/1.4.9.json",
+    "review_resolution": ".mir/releases/terminal/reviews/1.4.9.json",
+    "status": "passed-automated-awaiting-human-review"
+  },
+  "qualification_sha256": "1B81CE37021AE3BB3F774F06E4045A2BB6902937E02C36186FD5554612A6819F",
+  "record_sha256": "EA6961A0075FF7BDD2065DC8EA813E2A0AE156B89762DCE74B2CF59A0FF32BB8",
+  "release": "1.4.9",
+  "release_manifest": {
+    "path": ".mir/releases/terminal/manifests/1.4.9-release.json",
+    "sha256": "E1C289E24DAF0935ACBAE57C44511907286A7A35BC018F65BFDA3A628C502689"
+  },
+  "review": {
+    "decision": "approved",
+    "family_acceptance": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+    "path": ".mir/releases/terminal/reviews/1.4.9.json",
+    "reviewer": "Julesc013"
+  },
+  "review_sha256": "20D6FD5D213AD1E370A94F48EF70E57BB1A428526D86D09353159B0E316A65C3",
+  "schema": 1,
+  "seal_material_sha256": "39712611EEC71BDE9E9DC4DF758D37E661A4D8B6AA69BEF9015A6D0BC5991AA0",
+  "sealed_at": "2026-08-15T14:27:50+10:00",
+  "source_tree": "5a6e392711394c72ea1b7f0d1da508082b0812b2",
+  "status": "sealed",
+  "support_tier": "finite",
+  "tag_authority": {
+    "immutable": true,
+    "name": "1.4.9",
+    "target_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+    "update_or_delete": false
+  },
+  "target": "0.14",
+  "target_profile": {
+    "adapter": "factorio-0.14-finite-target-native-no-product-delta",
+    "freeze_path": ".mir/releases/terminal/freezes/1.4.9.json",
+    "id": "terminal-factorio-0.14.23-finite"
+  },
+  "upgrade_rows": [
+    {
+      "id": "1.4.5-to-1.4.9",
+      "status": "passed"
+    },
+    {
+      "id": "1.4.0-to-1.4.9",
+      "status": "passed"
+    }
+  ]
+}

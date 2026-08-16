@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalPublicationReceiptV1",
+  "release": "3.2.9",
+  "channel": "github",
+  "candidate_id": "C33",
+  "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+  "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+  "download_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+  "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+  "bytes": 1061572,
+  "entries": 303,
+  "tag": {"name":"3.2.9","object_sha":"9b80a3be63fe540bec9aa8a43f5bb835f639b34f","peeled_commit":"a60230a0695d2dd8fd1e727744614e746cda0bd8","kind":"annotated-unsigned","immutable":true},
+  "github_release": {"id":370983648,"url":"https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.9","draft":false,"prerelease":false},
+  "asset": {"id":515434905,"name":"more-infinite-research_3.2.9.zip","url":"https://github.com/Julesc013/more-infinite-research/releases/download/3.2.9/more-infinite-research_3.2.9.zip","digest":"sha256:0e833fcdda3017641ca99d0ebd2fa226938a1cee91d2ebb4007e94b29787ae20","bytes":1061572},
+  "download_verification": {"archive_sha256":"passed","content_sha256":"passed","bytes":"passed","entries":"passed","package_composition":"passed"},
+  "engine_smoke": {
+    "status": "passed-by-exact-byte-identity-and-supplementary-current-patch-smoke",
+    "locked_engine": {"version":"2.1.13","binary_sha256":"CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084","qualification":".mir/releases/terminal/qualifications/3.2.9.json#exact-engine-load"},
+    "identity_bridge": "The downloaded GitHub archive is byte-for-byte and normalized-content identical to C33, which passed the locked 2.1.13 exact-engine gate before publication.",
+    "supplementary_engine": {"version":"2.1.14","binary_sha256":"E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"},
+    "supplementary_result": {"scenario":"package-zip-base","status":"passed","completed_at":"2026-08-15T07:15:02.9968752Z","summary_sha256":"F3920BC55965FCD8BF5B9302CA2A45228AA4500A4446C67F8F922D3665768BA1","log_sha256":"BA76D99B705EA902C87BCC312EC04813EE6967C2AAB485A6EF57B09B8947C10F"}
+  },
+  "published_at": "2026-08-15T07:05:45Z",
+  "status": "published-and-verified"
+}

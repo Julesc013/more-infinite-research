@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalQualificationRecordV1",
+  "recorded_at": "2026-08-15T08:10:14+10:00",
+  "release": "3.2.9",
+  "target": "2.1",
+  "support_tier": "current",
+  "candidate_id": "C33",
+  "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+  "source_tree": "f423b351249f5f8d2a6164054f42ae166d8d066e",
+  "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+  "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+  "required_checks": [
+    "source-and-archive-identity",
+    "deterministic-triple-reconstruction",
+    "exact-engine-load",
+    "immutable-dot5-upgrade",
+    "pre-dot5-upgrade",
+    "clean-root-independent-confirmation",
+    "candidate-settings-contract",
+    "protected-exact-dist-admission",
+    "current-targeted-compatibility",
+    "candidate-ecosystem-and-performance"
+  ],
+  "results": [
+    {"id":"source-and-archive-identity","status":"passed","evidence":[".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json#3.2.9","protected-run:31843457458","receipt-sha256:D35F6D37198584753AD0B86880A40E68235BE79E6C176495B75904314984403B","archive-sha256:0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20"]},
+    {"id":"deterministic-triple-reconstruction","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json#3.2.9","receipt-raw-sha256:5241F90E6110CFC94D8688C6A20F949177BB420EAD09B084C06E9D882D93667F"]},
+    {"id":"exact-engine-load","status":"passed","evidence":["factorio-2.1.13-sha256:CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084","protected-summary-sha256:1E84067E12C77C419A1D5611C66E3A8377B533270CD4E4DA043A5582DE92D979"]},
+    {"id":"immutable-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#3.2.5-to-3.2.9","receipt-raw-sha256:C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"]},
+    {"id":"pre-dot5-upgrade","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#3.2.3-to-3.2.9","receipt-raw-sha256:C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9"]},
+    {"id":"clean-root-independent-confirmation","status":"passed","evidence":["plan-sha256:2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B","result-sha256:D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28","bundle-sha256:1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"]},
+    {"id":"candidate-settings-contract","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json#3.2.9"]},
+    {"id":"protected-exact-dist-admission","status":"passed","evidence":["protected-run:31843457458","controller-commit:a8408c3c8650335719bf77543d7c57c8e9195d65","candidate-commit:a60230a0695d2dd8fd1e727744614e746cda0bd8","protected-summary-sha256:1E84067E12C77C419A1D5611C66E3A8377B533270CD4E4DA043A5582DE92D979","scenarios-passed:124-of-124"]},
+    {"id":"current-targeted-compatibility","status":"passed","evidence":["release-targeted-summary-sha256:9F4F17799C25652EB182C658DA3382387121DE7C5272D19322F758A1D8A35A92","repair-smokes-report-sha256:4BA47A7A476668C8AF2868414AFD899A8ACD9ECED27F5F6D52FC0CD34A455359","repair-smokes-passed:9-of-9","representative-bz-report-sha256:643A8F21DA6790C481FA1E896EE788B41D6AE2075A0598A91FF0B1A0A6A21E5B","representative-bz-passed:1-of-1","unexpected-failures:0"]},
+    {"id":"candidate-ecosystem-and-performance","status":"passed","evidence":[".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json#3.2.9-confirmation","plan-sha256:2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B","result-sha256:D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28","bundle-sha256:1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"]}
+  ],
+  "manual_review": {"required":true,"status":"pending-maintainer-approval","candidate_hash_bound":true},
+  "status": "passed-automated-awaiting-human-review"
+}

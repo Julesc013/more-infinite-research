@@ -42,8 +42,8 @@ function Get-MIRAssuranceReleasePlanningAuthority {
 
   $states = @(
     "planned", "source-frozen", "package-built", "focused-qualified", "candidate-qualified",
-    "manually-accepted", "protected-qualified", "sealed", "promoted", "tagged", "published",
-    "publicly-verified"
+    "automated-qualified-awaiting-human-review", "manually-accepted", "protected-qualified",
+    "sealed", "promoted", "tagged", "published", "publicly-verified"
   )
   if ($states -notcontains [string]$record.state) {
     throw "Typed release authority state is invalid: $($record.state)"

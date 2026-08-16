@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixAuthorizationV1",
+  "recorded_at": "2026-08-16T00:00:00+10:00",
+  "status": "authorized-subject-to-release-gates",
+  "scope": "MIR3-TERM-0032 maximum-level contract only",
+  "historical_authority": {
+    "terminal_policy": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+    "disposition": "retained-unchanged-as-historical-authority",
+    "override": "The earlier prohibition on post-.9 releases is superseded only for MIR3-TERM-0032."
+  },
+  "immutable_releases": ["3.2.9", "2.5.9"],
+  "authorized_releases": [
+    {
+      "release": "3.2.10",
+      "target": "Factorio 2.1",
+      "candidate_floor": "C34",
+      "publication": "authorized-after-reproduction-fix-qualification-seal-and-public-verification"
+    },
+    {
+      "release": "2.5.10",
+      "target": "Factorio 2.0",
+      "candidate_floor": "2.5-P14",
+      "publication": "conditional-on-exact-2.5.9-defect-or-shared-package-visible-applicability"
+    }
+  ],
+  "immutability_rule": "Never replace, delete, retag, or mutate a public archive. Every correction requires a new version, candidate, tag, and release.",
+  "mir4": {
+    "r0": "preserve-package-excluded-governance",
+    "m4_003": "behavioral-qualification-paused-until-corrected-terminal-predecessor",
+    "public_4x": "forbidden-until-mir3-eol"
+  }
+}

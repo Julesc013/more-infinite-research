@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalCandidateSettingsQualificationV1",
+  "status": "passed-automated-awaiting-human-review",
+  "recorded_at": "2026-08-15T07:45:00+10:00",
+  "family": ["3.2.9","2.5.9","1.9.9","1.8.9","1.7.9","1.6.9","1.5.9","1.4.9","1.3.9"],
+  "source_authorities": {
+    "settings_scope_audit": {"path":".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json","canonical_text_sha256":"62D067B4AE2FA853EE716CA527C7214C7D7E4EB8FA691AE6972F1BB3EA46C7AC"},
+    "fixed_point": {"path":".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json","canonical_text_sha256":"6A8C39B9C3677EACDF9C965E83C2113B836957B9F29DA0ACD4143F9C841A9EA1"},
+    "candidate_reconstruction": {"path":".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json","canonical_text_sha256":"11F45C3F0B3AFF392B1F8391B56BC52F687D42510D28BF7364F33A47FF6E651F"},
+    "candidate_allocation": {"path":".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json","canonical_text_sha256":"A672B62BFCAC76A718B3AA11D48939E03CAFCD14BC7A878D0BE9715B4D58DFCA"},
+    "target_matrix": {"path":".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json","canonical_text_sha256":"3D5CFEDAB0067A0698B0EEC94F3FA0EBAD647DD2EE169B0C7547A92804D8B1B1"},
+    "foundation_identity": {"path":".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json","canonical_text_sha256":"574E6A5CE0D591F17F8DFA667F84A209117AEC04531BE7A5A2F54B3F79E0D9E5"}
+  },
+  "static_inventory": {
+    "method": "compare version-root-normalized ZIP entries whose relative path contains settings plus all locale CFG entries; compare path sets and exact entry text against each immutable .5 predecessor",
+    "targets": [
+      {"release":"3.2.9","predecessor":"3.2.5","candidate_archive_sha256":"0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20","predecessor_archive_sha256":"AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF","settings_entries":24,"locale_entries":50,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"2.5.9","predecessor":"2.5.5","candidate_archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","predecessor_archive_sha256":"03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C","settings_entries":24,"locale_entries":50,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.9.9","predecessor":"1.9.5","candidate_archive_sha256":"E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843","predecessor_archive_sha256":"9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.8.9","predecessor":"1.8.5","candidate_archive_sha256":"F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A","predecessor_archive_sha256":"10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.7.9","predecessor":"1.7.5","candidate_archive_sha256":"B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C","predecessor_archive_sha256":"D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.6.9","predecessor":"1.6.5","candidate_archive_sha256":"928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84","predecessor_archive_sha256":"8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.5.9","predecessor":"1.5.5","candidate_archive_sha256":"85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E","predecessor_archive_sha256":"E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.4.9","predecessor":"1.4.5","candidate_archive_sha256":"1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872","predecessor_archive_sha256":"BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0},
+      {"release":"1.3.9","predecessor":"1.3.5","candidate_archive_sha256":"CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A","predecessor_archive_sha256":"78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0","settings_entries":23,"locale_entries":9,"settings_path_delta":0,"settings_content_delta":0,"settings_locale_delta":0}
+    ],
+    "setting_path_deltas": 0,
+    "setting_content_deltas": 0,
+    "settings_locale_deltas": 0
+  },
+  "behavioural_matrix": {
+    "current": {
+      "release": "3.2.9",
+      "target": "2.1",
+      "status": "passed",
+      "fresh_rows": 127,
+      "failed_rows": 0,
+      "evidence": ["plan-sha256:2C85E4CC41C9E32B064CB597CCEA5A77507C1B5778CC34576AABC3C01A930C9B","result-sha256:D0849D8C23B00CE1809ADF607111D4F5FD23206EBF9F980735D5A5D5FFFAEC28","bundle-sha256:1469294B2419918A208D26FE1134B1A034F9F893C67FA54968016D1FA7C5985F"],
+      "covered_families": ["per-technology-enablement","base-cost","linear-increment","growth","maximum-level","research-time","effect-per-level","science-policy","lab-policy","owner-preference","automatic-compiler","productivity-and-prototype-caps","self-recycling-and-recycling-return","module-permissions","profile-import-MIRSET1","configuration-change-and-reload"]
+    },
+    "maintained": {
+      "release": "2.5.9",
+      "target": "2.0",
+      "status": "passed",
+      "fresh_rows": 90,
+      "failed_rows": 0,
+      "evidence": ["plan-sha256:22ADBC7A5C103BD1CE4FFB1FBA4F53973D862B65AF2C5D97C36FC12EE6C47994","result-sha256:16ED992A36A7D8097137C6E1E7916C1E6556D00DBBA2F84E88703DEF5BBA2349","bundle-sha256:F74783F4747F5BF83ED81CC03B4CE0F9696A9F51CB7D023816F00FCB4A441C0F","targeted-summary-sha256:ACBAF53C4393256DB6007D6DAC16CC1A4A0AA12CCAB0126D4457BF08956BD24F"],
+      "covered_families": ["per-technology-enablement","base-cost","linear-increment","growth","maximum-level","research-time","effect-per-level","science-policy","lab-policy","owner-and-weapon-overlap","automatic-compiler","productivity-and-prototype-caps","self-recycling-and-recycling-return","module-permissions","profile-import-MIRSET1","configuration-change-and-reload"]
+    }
+  },
+  "target_dispositions": [
+    {"release":"3.2.9","target":"2.1","status":"passed","basis":"exact independent candidate-byte settings matrix"},
+    {"release":"2.5.9","target":"2.0","status":"passed","basis":"exact independent candidate-byte settings matrix plus fresh targeted maintained smoke"},
+    {"release":"1.9.9","target":"1.1.110","status":"passed","basis":"byte-identical .5 settings surface, exact-engine confirmation, and both upgrade fixtures with representative weapon-overlap=always input"},
+    {"release":"1.8.9","target":"1.0.0-only","status":"passed","basis":"byte-identical .5 settings surface, exact-engine confirmation, and both upgrade fixtures with representative weapon-overlap=always input"},
+    {"release":"1.7.9","target":"0.17.79","status":"passed","basis":"byte-identical .5 settings surface, exact-engine confirmation, and both upgrade fixtures with representative weapon-overlap=always input"},
+    {"release":"1.6.9","target":"0.16.51","status":"passed","basis":"byte-identical .5 settings surface, exact-engine confirmation, and both upgrade fixtures with representative weapon-overlap=always input"},
+    {"release":"1.5.9","target":"0.15.40","status":"passed","basis":"byte-identical .5 settings surface, exact-engine confirmation, and both upgrade fixtures with representative weapon-overlap=always input"},
+    {"release":"1.4.9","target":"0.14.23","status":"passed","basis":"byte-identical target-native settings/locale surface and exact finite-graph engine and upgrade confirmation; unsupported later settings behaviours remain omitted"},
+    {"release":"1.3.9","target":"0.13.20","status":"passed","basis":"byte-identical target-native settings/locale surface and exact finite-graph engine and upgrade confirmation; unsupported later settings behaviours remain omitted"}
+  ],
+  "boundaries": {
+    "settings_scope_migrations": 0,
+    "runtime_settings_added": 0,
+    "profile_codec_changed": false,
+    "candidate_bytes_changed": false,
+    "manual_review_complete": false,
+    "tags_created": false,
+    "publication_permitted": false
+  }
+}

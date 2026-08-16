@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3-to-MIR4-Governance-ReconciliationV1",
+  "status": "accepted-append-only-reconciliation",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR3-to-MIR4-governance-reconciliation-v1",
+  "imports": [".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json", ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json"],
+  "semantic_reads": ["mir3-eol-gate", "successor-publication-firewall"],
+  "semantic_writes": ["acyclic-mir3-eol-mir4-entry-order"],
+  "target_dispositions": {"factorio-2.1": "local-pre-eol-proof", "public-4x": "post-eol-only", "terminal-dot9": "immutable"},
+  "digest_classes": {"semantic": "no-product-change", "authority": "append-only-precedence", "qualification": "local-proof-before-eol"},
+  "migration": {"from": "conflicting-literal-gates", "to": "local-proof-before-eol-publication-after-eol", "state": "reconciled"},
+  "rollback": {"strategy": "fail-closed-with-all-public-4x-forbidden", "permitted_until": "mir3-eol-seal"},
+  "parity_test": ["old-policies-unchanged", "no-public-4x-before-eol", "emergency-lane-still-required", "eol-graph-acyclic"],
+  "sunset_condition": "incorporated-into-sealed-mir3-eol-record-and-mir4-entry-authority",
+  "payload": {
+    "conflict": {
+      "eol_policy_clause": "publish-valid-4x-distribution",
+      "successor_policy_clause": "version-4-public-package-or-tag-forbidden-before-eol"
+    },
+    "resolution": "The EOL policy clause is satisfied by a valid locally sealed behavior-equivalent 4.x target distribution plus a complete idempotent publication dry run. It does not authorize or require public replication before EOL.",
+    "precedence": "This versioned reconciliation governs the relationship between the two imported records without mutating either historical authority.",
+    "ordered_gate": ["local-4x-proof", "terminal-custody-and-archive", "mir3-final-index", "mir3-eol-seal", "public-4x-allocation-and-replication"],
+    "public_4x_before_eol": false
+  }
+}

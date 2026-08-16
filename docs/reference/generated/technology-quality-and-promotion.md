@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-09
+last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
 ---

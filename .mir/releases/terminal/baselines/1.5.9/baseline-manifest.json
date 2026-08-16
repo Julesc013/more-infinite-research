@@ -1,0 +1,482 @@
+{
+  "schema": 1,
+  "kind": "Mir3Dot9TerminalBaselineBundleManifestV1",
+  "release": "1.5.9",
+  "target": "0.15",
+  "status": "capture-ready-mod-portal-pending",
+  "package_visible": false,
+  "capture_tool": {
+    "path": "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1",
+    "version": "1",
+    "sha256": "C5C068C5BB3CB30036873EA3C6759494763688198CD7075DCD12BB175E84A81E"
+  },
+  "foundation": {
+    "release": "1.5.5",
+    "manifest": ".mir/releases/terminal/baselines/1.5.5/baseline-manifest.json",
+    "root_sha256": "81671E6577CBA23348AA0FDECAD653ED3675182175BF1B3B1413F3E9BF417E5D"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_1.5.9.zip",
+    "archive_sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E",
+    "content_sha256": "C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED",
+    "bytes": 385629,
+    "entries": 177
+  },
+  "input_root_sha256": "5A95A7CC179A857882FB9BE70FEA139DFF4F85ACB6E777ACB6889120EEEC5CFB",
+  "files": [
+    {
+      "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-15/github/1.5.9.json",
+      "source_path": ".mir/evidence/terminal-publication/2026-08-15/github/1.5.9.json",
+      "sha256": "FB2552D903883C1E2478D1E577E504CB20336F908508FD955679D1162AA83DAB",
+      "bytes": 1805,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-15/MIR3-GitHub-Family-PublicationV1.json",
+      "source_path": ".mir/evidence/terminal-publication/2026-08-15/MIR3-GitHub-Family-PublicationV1.json",
+      "sha256": "849B23DDA6203AD590E314EDEAC04A6D749A99BEC3D230B6692A7076441260B1",
+      "bytes": 2190,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
+      "source_path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
+      "sha256": "13FC741342124F0EE93EAC8ADB27DECC3828C1D6028187131BB3CF8A555528AF",
+      "bytes": 4401,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/1.5.5/baseline-manifest.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/baseline-manifest.json",
+      "sha256": "0BC2643C47382A65676514D267C283B5D6AA3A6C7B2BB945849493D573F5C60C",
+      "bytes": 5444,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json",
+      "sha256": "D3D54A0C461D6F6AE8C30332FCD889B26557FA9C662D1F0258174E7AF330B452",
+      "bytes": 5868,
+      "role": "normalized-import-snapshot"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/1.5.9/package-composition.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.9/package-composition.json",
+      "sha256": "B1445290D54A240CF6A2756F178877F1511948F06018AFDC71C39CD891EA0583",
+      "bytes": 37466,
+      "role": "terminal-package-composition"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/closures/1.5.9.json",
+      "source_path": ".mir/releases/terminal/closures/1.5.9.json",
+      "sha256": "CEF4083FC46EAF77BF208FEA202D064F6714089BF0C97DFAB0218CD85606722C",
+      "bytes": 1658,
+      "role": "release-closure"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/freezes/1.5.9.json",
+      "source_path": ".mir/releases/terminal/freezes/1.5.9.json",
+      "sha256": "28E74E135750737C631B6452E550954B92F134D8535FD790339B8F2B980547C3",
+      "bytes": 1425,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/manifests/1.5.9-package.json",
+      "source_path": ".mir/releases/terminal/manifests/1.5.9-package.json",
+      "sha256": "940B6F28EAA7BBA93FBFA3350775BBBA1B92D11D66D8D0D2D661047A0E41164C",
+      "bytes": 1313,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/manifests/1.5.9-release.json",
+      "source_path": ".mir/releases/terminal/manifests/1.5.9-release.json",
+      "sha256": "10FA30A52658CBE4699A236A207B9F3D89864F46BE7EA49B9D743EDD456F5352",
+      "bytes": 1198,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+      "sha256": "2F11670241BD9724DB963999F331B2ACC1C8D3767523BC92CCA877192EA3E761",
+      "bytes": 12468,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json",
+      "source_path": ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json",
+      "sha256": "DD683F8AF324B96D7E034B4325E36DAD184002880070E9B78733C8BEC6A6217C",
+      "bytes": 28081,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Mod-Interaction-MatrixV1.json",
+      "sha256": "486DDA2DF4AF9F4883F554B218B8B616435F5B4B9E0A7A32B990C24EA6618A14",
+      "bytes": 5379,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json",
+      "sha256": "33E6D68D9FCBB0419B92751D9F3ED0F2647B8039AEDC38FF3C3C7950D4D75477",
+      "bytes": 19067,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+      "sha256": "62D067B4AE2FA853EE716CA527C7214C7D7E4EB8FA691AE6972F1BB3EA46C7AC",
+      "bytes": 7353,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+      "sha256": "622F0CDDCBAC62626C913B0E3E3A3E70977455FD8D4FC256D1EC5214F8C05010",
+      "bytes": 9644,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-EOL-PolicyV1.json",
+      "sha256": "778CA4835411E30CF5A1C2940D3FBF3FE659AA44994A7EDF3ABDA0677BFFAD5F",
+      "bytes": 684,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
+      "sha256": "A23866B49705F095DE8E429CB3681A37B15B8C7474B3D91737D38F0E0BE7B17C",
+      "bytes": 4218,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
+      "sha256": "8CB578F5275F12CA5A0C473B445E96372F7BDAF58CECF038962399343A723BA6",
+      "bytes": 803,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
+      "sha256": "B0A51244CFD429E7BF9298D6557B64A045B3F9CFBB749FF1C80D2A4DF4267B05",
+      "bytes": 25436,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json",
+      "source_path": ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json",
+      "sha256": "40798320044B5F0EEA001FFFE0C4D73939E138CCC50E0ED619BEEC9B6ACD6C50",
+      "bytes": 3599,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+      "sha256": "4A7354E58039CE927FF593148068C3D340B62D5241928FD51B70FEA987689EF2",
+      "bytes": 6828,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+      "sha256": "83D3A9EF7F592CE448DACCB0F6546FDBFB8BECDB3AE45FD37991D9AFA1B13319",
+      "bytes": 8851,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+      "sha256": "55FE3AB10B056C6BFB5A5A3F18E51C37312B1A9FEABE57BFB9319EC60D4DAE56",
+      "bytes": 12877,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9",
+      "bytes": 16835,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "sha256": "1459DAC0A9968D6D1F7466731F0A85E2ED958B66FEC8D392B9616A95E32491EF",
+      "bytes": 5284,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalProductAdmissionBundleV1.json",
+      "sha256": "92E43F964FE70AE93F5095D05C6DE2FDAD106DBC28FBA33F0BB59E6AB6E13DDE",
+      "bytes": 8021,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "sha256": "22ADEB099C7268ABEC6DFBDA94E9F8C70309AB5CA35E1683885BE0DDEA998A27",
+      "bytes": 9726,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalSourceFreezeV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json",
+      "sha256": "1CF60E9D1A691C3DC4B09453AB784A2D1ED49683EB897A8DC39D6B6D436F4DDF",
+      "bytes": 3690,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+      "source_path": ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+      "sha256": "E6192A56BBC4F418313D70C26E1CB4B796F63478DFCA5F944EEB0E0D2E23F968",
+      "bytes": 1930,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/mod-portal-descriptions/1.5.9.md",
+      "source_path": ".mir/releases/terminal/mod-portal-descriptions/1.5.9.md",
+      "sha256": "BE93B92B341AD5BE6AC9EB483295F8877999A553E9D214AAEEEAC6FACE9E7B04",
+      "bytes": 1332,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/qualifications/1.5.9.json",
+      "source_path": ".mir/releases/terminal/qualifications/1.5.9.json",
+      "sha256": "2D145F8947A84B3A99EA2A426639D278D4B74FF11BCA080C0DC2DD56F418F4A0",
+      "bytes": 2324,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/release-bodies/1.5.9.md",
+      "source_path": ".mir/releases/terminal/release-bodies/1.5.9.md",
+      "sha256": "54B43ECC86241D9F4D76384E25685C4C33624E4B507057D4F709512802FBE78A",
+      "bytes": 1130,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/reviews/1.5.9.json",
+      "source_path": ".mir/releases/terminal/reviews/1.5.9.json",
+      "sha256": "AC73B4A19C002AF65DE81206B79DF48DE195146EBDB0FB8BFBF8CCEA32EBAB15",
+      "bytes": 1045,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/seals/1.5.9.json",
+      "source_path": ".mir/releases/terminal/seals/1.5.9.json",
+      "sha256": "E9C1D7CD2A3CDBAB9B659F1563D81D9C4D9FE2B3FC01147AC92DF60740C5BAA4",
+      "bytes": 3300,
+      "role": "terminal-authority"
+    },
+    {
+      "logical_path": "foundation/declared/compatibility-claims.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/compatibility-claims.json",
+      "sha256": "D814985B26257C0154A85802369982172835E620A24C2653D5C3F0B2FAC1682F",
+      "bytes": 1183,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/features.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/features.json",
+      "sha256": "2EA650F61C1D6686595A20669143115F23858248E5B0FDD78322400AC78382C1",
+      "bytes": 3646,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/locales.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/locales.json",
+      "sha256": "E5B56DF63AF6A39AEF4357118635D02E7A282426E8C8A612F610CDBE392F13E3",
+      "bytes": 206563,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/migrations.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/migrations.json",
+      "sha256": "56D39765A2648418DAAC826311FDCC1C7922F27FD4DAEABE093E7A22B5F691C9",
+      "bytes": 1845,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/owners-aliases-tombstones.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/owners-aliases-tombstones.json",
+      "sha256": "F885FF7D856BEB4FEA457DAA291661768B84DF772087E9CB05BB488ADE6A3B2E",
+      "bytes": 55741,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/performance.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/performance.json",
+      "sha256": "7250E217A3C470D8C37E011DFDC04E7EDA94E0C88D2B89004125FCC859E9B1DA",
+      "bytes": 919,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/runtime-profile-schemas.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/runtime-profile-schemas.json",
+      "sha256": "6EE18ACE09691721DBE1350345C2AB318B94FE8DBF2DDE05CD38A6C1A769D745",
+      "bytes": 7052,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/settings.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/settings.json",
+      "sha256": "B0B4444F1E55654B63CA51A9A865A0FF50B08869B2B68B90295FEA4A37350085",
+      "bytes": 22109,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/technologies.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/technologies.json",
+      "sha256": "F68AC3DB63F30C6659EFA72C272256347FB5FA1C8713F1A25F5C0D98EAB37BAF",
+      "bytes": 72139,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/declared/upgrades.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/declared/upgrades.json",
+      "sha256": "24691851588AE8823AABAABB5AA0FE095AC65D3E0489406E9712B694F35E8486",
+      "bytes": 1016,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/engine-lock.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/engine-lock.json",
+      "sha256": "E4AF8804FFAFB9E1CB3A647E90789B3DC45F50E4A91BF7E019097F0C96397248",
+      "bytes": 736,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/identity.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/identity.json",
+      "sha256": "28A7424DFFBC972457E3424C48718280827D1CCFBB66E514293B638421A2F9F3",
+      "bytes": 948,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/package-composition.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/package-composition.json",
+      "sha256": "5C096677C07B620D3448549C365BE9F219FAE0F085E7F7A3F4CB9CDBE2788BF2",
+      "bytes": 37459,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/compatibility-observations.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/compatibility-observations.json",
+      "sha256": "1C462F9F3C5CA95F79E1C937EE70239BB5DE5E1CA255B76121F607182DCB85F1",
+      "bytes": 1122,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/effects-and-owners.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/effects-and-owners.json",
+      "sha256": "033D80CCDCD201C1784FDEE3D95F7FF9D9C8E26CD0793E86CAF012EB973D6F94",
+      "bytes": 3590,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/engine-observation.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/engine-observation.json",
+      "sha256": "807A7EAE8254406A26B6684794FAF9826D611F39B7B5C3139AA4869CCF20BF93",
+      "bytes": 2081,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/locales.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/locales.json",
+      "sha256": "2A6631879A5146FBE13B899413E7E5443B7EF01516E515B361621BBFD8AF07CB",
+      "bytes": 206856,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/migrations-observed.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/migrations-observed.json",
+      "sha256": "6A3AF2ADE0F89B58B0053ACB75E6E852451A23A392CDA76297036136E1F7D12C",
+      "bytes": 2355,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/performance-observations.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/performance-observations.json",
+      "sha256": "48E8D33C73EFCCEC0D4A8EACDFED44D921934890D3A14756B2A15AF52BECB5FB",
+      "bytes": 1240,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/runtime-profile-state.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/runtime-profile-state.json",
+      "sha256": "7FDB132A8024A4E06D2795E91FD228C404AB1448458197FEE6112DB03C8523BF",
+      "bytes": 7555,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/settings.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/settings.json",
+      "sha256": "33C92F4ADAF4DCE7DDD8C191075BB3ACE7A7558E8293C832E3B1053F74FE7F16",
+      "bytes": 51334,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/technologies.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/technologies.json",
+      "sha256": "577766DE5592384EF27BC5F9977DA515DD61AF5960B2C32BF661BC9247AECDF3",
+      "bytes": 5325,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/realized/upgrade-observations.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/realized/upgrade-observations.json",
+      "sha256": "BD1BB37A88966DE4DC33DC740CCC00A801D35A879B0B8EABC22E6BE433BA2AA3",
+      "bytes": 1292,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/reconciliation/claimed-vs-realized.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/reconciliation/claimed-vs-realized.json",
+      "sha256": "EF8FCE4F44931E8E58ADB6BC1A29CDB8A43ACC41D1F120FC4784161A17405DEA",
+      "bytes": 407,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/reconciliation/declared-vs-realized.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/reconciliation/declared-vs-realized.json",
+      "sha256": "E1AF366AA10D75AF1E65F718DBCF718DC46009A0DC0D18313C1570F480FB5815",
+      "bytes": 507,
+      "role": "immutable-dot5-foundation"
+    },
+    {
+      "logical_path": "foundation/reconciliation/unresolved-findings.json",
+      "source_path": ".mir/releases/terminal/baselines/1.5.5/reconciliation/unresolved-findings.json",
+      "sha256": "31B57C697479EDDF7F044CCA82C15B47D8B8BB1495376C5EB04E085AD15F2020",
+      "bytes": 341,
+      "role": "immutable-dot5-foundation"
+    }
+  ],
+  "normalized_snapshot": {
+    "logical_path": "authority/.mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json",
+    "source_path": ".mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json",
+    "sha256": "D3D54A0C461D6F6AE8C30332FCD889B26557FA9C662D1F0258174E7AF330B452",
+    "bytes": 5868,
+    "role": "normalized-import-snapshot"
+  },
+  "deterministic_bundle": {
+    "algorithm": "sorted-logical-path-fixed-time-deflate",
+    "builds_required": 2,
+    "build_location": "build/terminal/dot9-baselines/1.5.9",
+    "self_contained_logical_view": true
+  },
+  "public_custody": {
+    "github": "published-and-verified",
+    "mod_portal": "not-uploaded",
+    "authenticated_redownload": "not-possible-until-upload"
+  },
+  "completion": {
+    "state": "capture-ready-public-custody-pending",
+    "required_files_present": true,
+    "inventories_complete_or_capability_omitted": true,
+    "exact_engine_qualification_bound": true,
+    "contradictions_classified": true,
+    "mod_portal_custody_complete": false
+  },
+  "record_sha256": "E95A3B9187FCECDDB8C98784FE644A0257D2FE5EAE1682970361E07E403D41A0"
+}

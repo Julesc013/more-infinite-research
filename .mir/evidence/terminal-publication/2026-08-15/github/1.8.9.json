@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalPublicationReceiptV1",
+  "release": "1.8.9",
+  "channel": "github",
+  "candidate_id": "1.8-P1",
+  "candidate_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+  "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+  "download_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+  "content_sha256": "7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E",
+  "bytes": 397678,
+  "entries": 174,
+  "tag": {"name":"1.8.9","object_sha":"9e933200ddcbb2f8c391a7cf214c95364aa4f6db","peeled_commit":"8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309","kind":"annotated-unsigned","immutable":true},
+  "github_release": {"id":370983676,"url":"https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.9","draft":false,"prerelease":false},
+  "asset": {"id":515435107,"name":"more-infinite-research_1.8.9.zip","url":"https://github.com/Julesc013/more-infinite-research/releases/download/1.8.9/more-infinite-research_1.8.9.zip","digest":"sha256:f9a7c245a12763362fb4a838fd9560c3afe29fe0166e7e575617a26cb7f8b51a","bytes":397678},
+  "download_verification": {"archive_sha256":"passed","content_sha256":"passed","bytes":"passed","entries":"passed","package_composition":"passed"},
+  "engine_smoke": {"status":"passed-fresh-exact-engine","engine":{"version":"1.0.0","binary_sha256":"99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"},"scenario":"package-zip-base","completed_at":"2026-08-15T07:18:24.1868512Z","summary_sha256":"4FE0C70E81631D808C55BA0F248BB07F1455959DB731A79711B3B164EA28EE37","log_sha256":"93586EC968119C0B8EA6589D2CD05DAE690A966CB02B862F998C8300978EF1B1"},
+  "published_at": "2026-08-15T07:05:39Z",
+  "status": "published-and-verified"
+}

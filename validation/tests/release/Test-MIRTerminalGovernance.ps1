@@ -8,12 +8,56 @@ if ($LASTEXITCODE -ne 0) { throw "MIR terminal shadow projection validation fail
 & (Join-Path $RepoRoot "validation/tests/release/Test-MIRGitHubAdministration.ps1") -RepoRoot $RepoRoot
 if ($LASTEXITCODE -ne 0) { throw "MIR GitHub administration preflight validation failed." }
 
+$promotionToolPath = Join-Path $RepoRoot "tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1"
+$promotionWorkflowPath = Join-Path $RepoRoot ".github/workflows/branch-policy.yml"
+if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $promotionWorkflowPath -PathType Leaf)) {
+  throw "The terminal promotion controller or workflow is missing."
+}
+$promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
+$promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
+foreach ($snippet in @(
+  'ValidateSet("3.2.10", "3.2.9", "2.5.9")',
+  'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
+  'New-MIR3TerminalReleaseCeremony.ps1',
+  'Get-MIRZipContentFingerprint',
+  'candidate_ref',
+  'governed-fast-forward',
+  'github-publication-only'
+)) {
+  if (-not $promotionTool.Contains($snippet)) { throw "Terminal promotion controller omits required boundary: $snippet" }
+}
+foreach ($snippet in @(
+  "workflow_dispatch:",
+  "terminal_release:",
+  "terminal_candidate_sha:",
+  "checks: write",
+  "statuses: write",
+  "Test-MIR3TerminalPromotionCandidate.ps1",
+  "name: 'terminal-promotion-verification'",
+  "github.rest.repos.createCommitStatus",
+  "context: 'terminal-promotion-verification'",
+  "state: passed ? 'success' : 'failure'",
+  "head_sha: sha",
+  "if (!passed) core.setFailed"
+)) {
+  if (-not $promotionWorkflow.Contains($snippet)) { throw "Terminal promotion workflow omits required fail-closed behavior: $snippet" }
+}
+if ($promotionWorkflow -notmatch "(?m)^\s+if:\s+\$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.terminal_release != 'none' \}\}\s*$" -or
+    $promotionWorkflow -notmatch '(?m)^\s+checks:\s+write\s*$') {
+  throw "Terminal promotion verification must run only from the explicit dispatch path and must publish through GitHub Actions checks authority."
+}
+
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $authorityNames = @(
   "MIR3-Terminal-ProgrammeV1",
   "MIR3-Terminal-ScopeFirewallV1",
   "MIR3-Terminal-Target-MatrixV1",
   "MIR3-Terminal-Candidate-AllocationV1",
+  "MIR3TerminalCandidateReconstructionReceiptV1",
+  "MIR3TerminalCandidateSettingsQualificationV1",
+  "MIR3TerminalMaintainerAcceptanceV1",
+  "MIR3TerminalFamilyReadinessV1",
   "MIR3-Terminal-FixedPointPolicyV1",
   "MIR3TerminalFixedPointReceiptV1",
   "MIR3TerminalSourceFreezeV1",
@@ -30,6 +74,7 @@ $authorityNames = @(
   "MIR3-Compatibility-ClaimsV1",
   "MIR3-Effective-Mutation-Owner-ReportV1",
   "MIR3-FINAL-DEFECT-INDEX",
+  "MIR3FinalDefectQualificationReconciliationV1",
   "MIR3-Engine-Gap-AuditV1",
   "MIR3TerminalProductAdmissionBundleV1"
 )
@@ -88,12 +133,46 @@ foreach ($row in @($admission.stack)) {
   $expectedFirstParent = [string]$row.merge_commit
 }
 if ($expectedFirstParent -ne [string]$admission.foundation.commit) { throw "Foundation merge sequence does not terminate at the admitted commit." }
-if ((Get-FileHash -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.wave_index_sha256 -or
-    (Get-FileHash -LiteralPath (Join-Path $RepoRoot ".mir\distributions.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.distribution_ledger_sha256) {
+if ((Get-FileHash -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") -Algorithm SHA256).Hash -ne [string]$admission.dot5_identity_authority.wave_index_sha256) {
   throw "Foundation .5 authority files drifted after admission."
+}
+$foundationDistributionLedger = @(& git -C $RepoRoot show "$($admission.foundation.commit):.mir/distributions.json")
+$foundationDistributionLedgerBytes = [Text.Encoding]::UTF8.GetBytes(($foundationDistributionLedger -join "`r`n") + "`r`n")
+$foundationDistributionLedgerHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($foundationDistributionLedgerBytes))
+if ($LASTEXITCODE -ne 0 -or $foundationDistributionLedgerHash -ne [string]$admission.dot5_identity_authority.distribution_ledger_sha256) {
+  throw "Foundation .5 distribution authority is not preserved at the admitted commit."
 }
 . (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Get-MIRTerminalZipTextEntries {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][ValidateSet("settings", "locale")][string]$Kind
+  )
+
+  $entries = @{}
+  $zip = [IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    foreach ($entry in @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) })) {
+      $separator = $entry.FullName.IndexOf("/")
+      if ($separator -lt 0) { continue }
+      $relative = $entry.FullName.Substring($separator + 1)
+      $selected = if ($Kind -eq "settings") { $relative -match '(?i)settings' } else { $relative -match '^locale/.+\.cfg$' }
+      if (-not $selected) { continue }
+      $reader = [IO.StreamReader]::new($entry.Open())
+      try { $entries[$relative] = $reader.ReadToEnd() } finally { $reader.Dispose() }
+    }
+  } finally {
+    $zip.Dispose()
+  }
+  return $entries
+}
+function Get-MIRTerminalCanonicalTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
+}
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
   $row = @($wave.releases | Where-Object version -eq $identity.version)
@@ -227,9 +306,53 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
 if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
+$programmeStatus = [string]$programme.status
+$admittedProgrammeStatuses = @(
+  "ready-for-local-tagging",
+  "github-published-and-verified-mod-portal-pending"
+)
 if (@(Compare-Object $family @($programme.family)).Count -ne 0 -or -not $programme.implementation_admitted -or -not $programme.source_frozen -or
-    [string]$programme.status -ne "source-frozen-ready-for-candidate-allocation") {
-  throw "Terminal programme must bind the exact fixed-point-accepted, source-frozen nine-release family."
+    $programmeStatus -notin $admittedProgrammeStatuses) {
+  throw "Terminal programme must bind the exact qualified, accepted, and sealed nine-candidate family at an admitted publication phase."
+}
+if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending") {
+  $githubFamilyPublicationPath = Join-Path $RepoRoot ([string]$programme.authorities.github_family_publication)
+  $githubPublicationReceiptsPath = Join-Path $RepoRoot ([string]$programme.authorities.github_publication_receipts)
+  if (-not (Test-Path -LiteralPath $githubFamilyPublicationPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $githubPublicationReceiptsPath -PathType Container)) {
+    throw "GitHub-published terminal programme is missing its family or per-target publication authority."
+  }
+  $githubFamilyPublication = Get-Content -Raw -LiteralPath $githubFamilyPublicationPath | ConvertFrom-Json -Depth 100
+  $githubPublicationReceipts = @(Get-ChildItem -LiteralPath $githubPublicationReceiptsPath -Filter "*.json" -File)
+  if ([string]$githubFamilyPublication.kind -ne "MIR3GitHubFamilyPublicationV1" -or
+      [string]$githubFamilyPublication.status -ne "github-family-published-and-verified" -or
+      [int]$githubFamilyPublication.github_releases.published -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.redownloaded -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.archive_hashes_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.content_hashes_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.byte_counts_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_assets.entry_counts_passed -ne 9 -or
+      [int]$githubFamilyPublication.public_asset_smokes.failed -ne 0 -or
+      [string]$githubFamilyPublication.mod_portal.status -ne "pending-maintainer-manual-upload" -or
+      $githubPublicationReceipts.Count -ne 9) {
+    throw "GitHub-published terminal programme does not bind a complete and verified nine-target publication family."
+  }
+  foreach ($release in $family) {
+    $receiptPath = Join-Path $githubPublicationReceiptsPath "$release.json"
+    if (-not (Test-Path -LiteralPath $receiptPath -PathType Leaf)) {
+      throw "GitHub publication receipt is missing: $release"
+    }
+    $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
+    if ([string]$receipt.kind -ne "Mir3TerminalPublicationReceiptV1" -or [string]$receipt.release -ne $release -or
+        [string]$receipt.channel -ne "github" -or [string]$receipt.status -ne "published-and-verified" -or
+        [string]$receipt.download_verification.archive_sha256 -ne "passed" -or
+        [string]$receipt.download_verification.content_sha256 -ne "passed" -or
+        [string]$receipt.download_verification.bytes -ne "passed" -or
+        [string]$receipt.download_verification.entries -ne "passed" -or
+        [string]$receipt.download_verification.package_composition -ne "passed") {
+      throw "GitHub publication receipt is incomplete or invalid: $release"
+    }
+  }
 }
 $requiredOrder = @("baseline-capture", "bounded-change-admission", "implementation", "all-nine-shadow-materialization", "all-nine-fixed-point-sweeps", "source-freeze", "candidate-assignment", "all-nine-final-qualification-and-seals", "family-readiness-seal", "local-signed-annotated-tags", "controlled-publication")
 if (($programme.execution_order -join "|") -ne ($requiredOrder -join "|")) { throw "Terminal execution order is not canonical." }
@@ -243,9 +366,14 @@ $productIntakeSchemaByKind = @{
   "MIR3-Compatibility-ClaimsV1" = "mir3-compatibility-claims"
   "MIR3-Effective-Mutation-Owner-ReportV1" = "mir3-effective-mutation-owner-report"
   "MIR3-FINAL-DEFECT-INDEX" = "mir3-final-defect-index"
+  "MIR3FinalDefectQualificationReconciliationV1" = "mir3-final-defect-qualification-reconciliation"
   "MIR3-Engine-Gap-AuditV1" = "mir3-engine-gap-audit"
   "MIR3TerminalProductAdmissionBundleV1" = "mir3-terminal-product-admission-bundle"
   "MIR3TerminalFixedPointReceiptV1" = "mir3-terminal-fixed-point-receipt"
+  "MIR3TerminalCandidateReconstructionReceiptV1" = "mir3-terminal-candidate-reconstruction"
+  "MIR3TerminalCandidateSettingsQualificationV1" = "mir3-terminal-candidate-settings-qualification"
+  "Mir3TerminalMaintainerAcceptanceV1" = "mir3-terminal-maintainer-acceptance"
+  "Mir3TerminalFamilyReadinessV1" = "mir3-terminal-family-readiness"
 }
 foreach ($kind in @($productIntakeSchemaByKind.Keys)) {
   $authorityPath = Join-Path $RepoRoot ".mir\releases\terminal\$kind.json"
@@ -446,15 +574,289 @@ if ([string]$incidentReconciliation.kind -ne "MIR3-Terminal-Incident-Reconciliat
 }
 
 $allocation = $authorities["MIR3-Terminal-Candidate-AllocationV1"]
-if (@($allocation.allocations).Count -ne 9 -or @($allocation.allocations | Where-Object { $null -ne $_.assigned_id }).Count -ne 0) {
-  throw "Every terminal candidate allocation must remain unassigned."
+$allocationPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Candidate-AllocationV1.json"
+$allocationSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-candidate-allocation.schema.json"
+if (-not ((Get-Content -Raw -LiteralPath $allocationPath) | Test-Json -SchemaFile $allocationSchemaPath) -or
+    [string]$allocation.status -ne "assigned-awaiting-candidate-reconstruction" -or
+    [string]$allocation.source_freeze.result -ne "passed" -or
+    [string]$allocation.source_freeze.merge_commit -ne "0c0c1644f6eef53b4d527cd2162ef004f9ad4586" -or
+    [string]$allocation.source_freeze.merge_tree -ne "f423b351249f5f8d2a6164054f42ae166d8d066e" -or
+    [string]$allocation.materialization.method -ne "deterministic-git-commit-tree-v1" -or
+    [bool]$allocation.materialization.force_push_used -or [bool]$allocation.materialization.tags_created -or
+    @($allocation.allocations).Count -ne 9 -or (@($allocation.allocations.release) -join "|") -ne ($family -join "|") -or
+    @($allocation.allocations | Where-Object { -not $_.assigned_id -or -not $_.remote_exact }).Count -ne 0 -or
+    [bool]$allocation.boundaries.candidate_packages_reconstructed -or [bool]$allocation.boundaries.final_qualification_complete -or
+    [bool]$allocation.boundaries.manual_review_complete -or [bool]$allocation.boundaries.target_seals_created -or
+    [bool]$allocation.boundaries.family_seal_created -or [bool]$allocation.boundaries.tags_created -or
+    [bool]$allocation.boundaries.publication_permitted -or [bool]$allocation.boundaries.dot5_package_bytes_changed) {
+  throw "Terminal candidate allocation is incomplete, malformed, or crosses a later gate."
+}
+$expectedCandidates = @{
+  "3.2.9" = "C33"; "2.5.9" = "2.5-P13"; "1.9.9" = "1.9-P1"; "1.8.9" = "1.8-P1"; "1.7.9" = "1.7-P1"
+  "1.6.9" = "1.6-P1"; "1.5.9" = "1.5-P1"; "1.4.9" = "1.4-P1"; "1.3.9" = "1.3-P1"
+}
+$settingsQualification = $authorities["MIR3TerminalCandidateSettingsQualificationV1"]
+$settingsQualificationPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalCandidateSettingsQualificationV1.json"
+if ([string]$programme.authorities.candidate_settings_qualification -ne ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json" -or
+    [string]$programme.authorities.target_qualifications -ne ".mir/releases/terminal/qualifications" -or
+    [string]$settingsQualification.status -ne "passed-automated-awaiting-human-review" -or
+    (@($settingsQualification.family) -join "|") -ne ($family -join "|") -or
+    [int]$settingsQualification.static_inventory.setting_path_deltas -ne 0 -or
+    [int]$settingsQualification.static_inventory.setting_content_deltas -ne 0 -or
+    [int]$settingsQualification.static_inventory.settings_locale_deltas -ne 0 -or
+    @($settingsQualification.static_inventory.targets).Count -ne 9 -or
+    @($settingsQualification.target_dispositions).Count -ne 9 -or
+    [int]$settingsQualification.boundaries.settings_scope_migrations -ne 0 -or
+    [int]$settingsQualification.boundaries.runtime_settings_added -ne 0 -or
+    [bool]$settingsQualification.boundaries.profile_codec_changed -or
+    [bool]$settingsQualification.boundaries.candidate_bytes_changed -or
+    [string]$settingsQualification.behavioural_matrix.current.release -ne "3.2.9" -or
+    [string]$settingsQualification.behavioural_matrix.current.target -ne "2.1" -or
+    [string]$settingsQualification.behavioural_matrix.current.status -ne "passed" -or
+    [int]$settingsQualification.behavioural_matrix.current.fresh_rows -ne 127 -or
+    [int]$settingsQualification.behavioural_matrix.current.failed_rows -ne 0 -or
+    [string]$settingsQualification.behavioural_matrix.maintained.release -ne "2.5.9" -or
+    [string]$settingsQualification.behavioural_matrix.maintained.target -ne "2.0" -or
+    [string]$settingsQualification.behavioural_matrix.maintained.status -ne "passed" -or
+    [int]$settingsQualification.behavioural_matrix.maintained.fresh_rows -ne 90 -or
+    [int]$settingsQualification.behavioural_matrix.maintained.failed_rows -ne 0 -or
+    [bool]$settingsQualification.boundaries.manual_review_complete -or
+    [bool]$settingsQualification.boundaries.tags_created -or
+    [bool]$settingsQualification.boundaries.publication_permitted) {
+  throw "Terminal candidate settings qualification is incomplete or crosses the human-review boundary."
+}
+$settingsAuthorityPaths = @{
+  settings_scope_audit = ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json"
+  fixed_point = ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json"
+  candidate_reconstruction = ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json"
+  candidate_allocation = ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"
+  target_matrix = ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"
+  foundation_identity = ".mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json"
+}
+foreach ($name in @($settingsAuthorityPaths.Keys)) {
+  $binding = $settingsQualification.source_authorities.$name
+  $authorityPath = Join-Path $RepoRoot $settingsAuthorityPaths[$name]
+  if ([string]$binding.path -ne $settingsAuthorityPaths[$name] -or
+      (Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($authorityPath))) -ne [string]$binding.canonical_text_sha256) {
+    throw "Terminal candidate settings qualification authority drifted: $name"
+  }
+}
+$reconstruction = $authorities["MIR3TerminalCandidateReconstructionReceiptV1"]
+$reconstructionPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3TerminalCandidateReconstructionReceiptV1.json"
+$reconstructionSchemaPath = Join-Path $RepoRoot "spec\schemas\mir3-terminal-candidate-reconstruction.schema.json"
+if (-not ((Get-Content -Raw -LiteralPath $reconstructionPath) | Test-Json -SchemaFile $reconstructionSchemaPath) -or
+    [string]$programme.authorities.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
+    [string]$reconstruction.status -ne "passed-ready-for-automated-qualification" -or
+    [string]$reconstruction.source_authorities.allocation -ne ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json" -or
+    (Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($allocationPath))) -ne [string]$reconstruction.source_authorities.allocation_canonical_text_sha256 -or
+    [string]$reconstruction.source_authorities.allocation_merge.commit -ne "e2399afb117a641fa66c4043de41586dd15b7a67" -or
+    [string]$reconstruction.source_authorities.allocation_merge.tree -ne "d423e957e281371fb8ea69660b5f44f00588edc8" -or
+    [string]$reconstruction.source_authorities.post_merge_runs.result -ne "passed" -or
+    [int]$reconstruction.summary.targets -ne 9 -or [int]$reconstruction.summary.attempts -ne 27 -or
+    [int]$reconstruction.summary.passed -ne 27 -or [int]$reconstruction.summary.failed -ne 0 -or
+    [int]$reconstruction.summary.identity_mismatches -ne 0 -or [int]$reconstruction.summary.forbidden_package_entries -ne 0 -or
+    @($reconstruction.targets).Count -ne 9 -or (@($reconstruction.targets.release) -join "|") -ne ($family -join "|") -or
+    [bool]$reconstruction.boundaries.automated_qualification_complete -or [bool]$reconstruction.boundaries.manual_review_complete -or
+    [bool]$reconstruction.boundaries.target_seals_created -or [bool]$reconstruction.boundaries.family_seal_created -or
+    [bool]$reconstruction.boundaries.tags_created -or [bool]$reconstruction.boundaries.publication_permitted -or
+    [bool]$reconstruction.boundaries.dot5_package_bytes_changed) {
+  throw "Terminal candidate reconstruction receipt is incomplete, malformed, or crosses a later gate."
+}
+$canonicalCandidate = @($allocation.allocations | Where-Object release -eq "3.2.9")
+if ($canonicalCandidate.Count -ne 1) { throw "The canonical terminal candidate allocation is missing." }
+$matrix = $authorities["MIR3-Terminal-Target-MatrixV1"]
+$packageLockAuthority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\control-plane\package-locks.json") | ConvertFrom-Json -Depth 100
+if ([int]$packageLockAuthority.schema -ne 1 -or [string]$packageLockAuthority.authority -ne "mir-control-plane-v5-package-locks") {
+  throw "The package-lock authority is invalid."
 }
 foreach ($release in $family) {
   $row = @($allocation.allocations | Where-Object release -eq $release)
-  $record = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\$release.json") | ConvertFrom-Json
-  if ($row.Count -ne 1 -or [string]$record.state -ne "planned" -or [string]$record.candidate_id -ne "not-assigned" -or $null -ne $record.candidate_allocation.assigned_id -or
-      [string]$record.candidate_allocation.namespace -ne [string]$row[0].namespace -or [int]$record.candidate_allocation.minimum_next_ordinal -ne [int]$row[0].minimum_next_ordinal) {
+  $reconstructed = @($reconstruction.targets | Where-Object release -eq $release)
+  $packageLock = @($packageLockAuthority.locks | Where-Object release -eq $release)
+  $recordPath = Join-Path $RepoRoot ".mir\releases\records\$release.json"
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
+  $expectedReleaseRecordState = "sealed"
+  $githubPublicationReceipt = $null
+  if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending") {
+    $expectedReleaseRecordState = "publicly-verified"
+    $githubPublicationReceiptPath = Join-Path $githubPublicationReceiptsPath "$release.json"
+    $githubPublicationReceipt = Get-Content -Raw -LiteralPath $githubPublicationReceiptPath | ConvertFrom-Json -Depth 100
+  }
+  $qualificationPath = Join-Path $RepoRoot ".mir\releases\terminal\qualifications\$release.json"
+  $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json -Depth 100
+  $targetFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\freezes\$release.json") | ConvertFrom-Json -Depth 100
+  $matrixTarget = @($matrix.targets | Where-Object release -eq $release)
+  $dot5Identity = @($admission.dot5_identity_authority.releases | Where-Object version -eq ([string]$matrixTarget[0].immutable_dot5_predecessor))
+  if ($row.Count -ne 1 -or $reconstructed.Count -ne 1 -or $packageLock.Count -ne 1 -or
+      [string]$packageLock[0].target -ne [string]$record.target -or
+      [string]$packageLock[0].candidate_id -ne [string]$row[0].assigned_id -or
+      [string]$packageLock[0].package_source_commit -ne [string]$row[0].package_source_commit -or
+      [string]$packageLock[0].package_source_tree -ne [string]$row[0].package_source_tree -or
+      [string]$packageLock[0].package_source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$packageLock[0].archive -ne [string]$reconstructed[0].dist_path -or
+      [string]$packageLock[0].archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [long]$packageLock[0].archive_bytes -ne [long]$row[0].bytes -or
+      [int]$packageLock[0].archive_entries -ne [int]$row[0].entries -or
+      [string]$packageLock[0].mode -ne "frozen-terminal-candidate-awaiting-manual-approval" -or
+      [string]$record.state -ne $expectedReleaseRecordState -or [string]$record.candidate_id -ne [string]$expectedCandidates[$release] -or
+      [string]$record.candidate_allocation.assigned_id -ne [string]$row[0].assigned_id -or
+      [string]$record.candidate_allocation.candidate_ref -ne [string]$row[0].candidate_ref -or
+      [string]$record.candidate_allocation.candidate_commit -ne [string]$row[0].candidate_commit -or
+      [string]$record.candidate_allocation.namespace -ne [string]$row[0].namespace -or
+      [int]$record.candidate_allocation.minimum_next_ordinal -ne [int]$row[0].minimum_next_ordinal -or
+      [string]$record.package.source_commit -ne [string]$row[0].package_source_commit -or
+      [string]$record.package.source_tree -ne [string]$row[0].package_source_tree -or
+      [string]$record.package.source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$record.package.archive -ne [string]$reconstructed[0].dist_path -or
+      [string]$record.package.archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$record.package.content_sha256 -ne [string]$row[0].content_sha256 -or
+      [long]$record.package.bytes -ne [long]$row[0].bytes -or [int]$record.package.entries -ne [int]$row[0].entries -or
+      [string]$record.proofs.candidate_reconstruction -ne ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json" -or
+      [string]$record.proofs.candidate_settings_qualification -ne ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json" -or
+      [string]$record.proofs.automated_qualification -ne ".mir/releases/terminal/qualifications/$release.json" -or
+      ($release -eq "3.2.9" -and [string]$record.proofs.approved_delta -ne ".mir/releases/deltas/3.2.5-to-3.2.9.json") -or
+      [string]$reconstructed[0].candidate -ne [string]$row[0].assigned_id -or
+      [string]$reconstructed[0].candidate_commit -ne [string]$row[0].candidate_commit -or
+      [string]$reconstructed[0].candidate_tree -ne [string]$row[0].candidate_tree -or
+      [string]$reconstructed[0].package_source_sha256 -ne [string]$row[0].package_source_sha256 -or
+      [string]$reconstructed[0].archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$reconstructed[0].content_sha256 -ne [string]$row[0].content_sha256 -or
+      [long]$reconstructed[0].bytes -ne [long]$row[0].bytes -or [int]$reconstructed[0].entries -ne [int]$row[0].entries -or
+      (@($reconstructed[0].attempts) -join "|") -ne "A|B|C" -or [int]$reconstructed[0].clean_detached_roots -ne 3 -or
+      -not [bool]$reconstructed[0].identities_equal -or
+      [string]$row[0].archive_sha256 -ne [string]$targetFreeze.package.archive_sha256 -or
+      [string]$row[0].content_sha256 -ne [string]$targetFreeze.package.content_sha256 -or
+      [long]$row[0].bytes -ne [long]$targetFreeze.package.bytes -or [int]$row[0].entries -ne [int]$targetFreeze.package.entries) {
     throw "Terminal release/candidate authority disagrees for $release."
+  }
+  if ($programmeStatus -eq "github-published-and-verified-mod-portal-pending" -and
+      ([string]$record.proofs.github_publication -ne "$(([string]$programme.authorities.github_publication_receipts).TrimEnd('/', '\'))/$release.json" -or
+       [string]$record.proofs.tag.kind -ne "annotated-tag" -or [string]$record.proofs.tag.name -ne $release -or
+       [string]$record.proofs.tag.commit -ne [string]$row[0].candidate_commit -or
+       [string]$record.proofs.tag.tag_object -ne [string]$githubPublicationReceipt.tag.object_sha -or
+       (@($record.remaining_obligations) -join "|") -ne "mod-portal-publish-and-publicly-verify|archive-and-mir4-handoff")) {
+    throw "Published release record does not bind its exact GitHub receipt, annotated tag, and remaining obligations: $release"
+  }
+  if (-not ((Get-Content -Raw -LiteralPath $qualificationPath) | Test-Json -SchemaFile (Join-Path $RepoRoot "spec\schemas\mir3-terminal-qualification-record.schema.json")) -or
+      [string]$qualification.release -ne $release -or $matrixTarget.Count -ne 1 -or
+      [string]$qualification.target -ne [string]$matrixTarget[0].target -or
+      [string]$qualification.support_tier -ne [string]$matrixTarget[0].support_tier -or
+      [string]$qualification.candidate_id -ne [string]$row[0].assigned_id -or
+      [string]$qualification.candidate_commit -ne [string]$row[0].candidate_commit -or
+      [string]$qualification.source_tree -ne [string]$row[0].candidate_tree -or
+      [string]$qualification.archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$qualification.content_sha256 -ne [string]$row[0].content_sha256 -or
+      [string]$qualification.status -ne "passed-automated-awaiting-human-review" -or
+      @($qualification.results | Where-Object status -ne "passed").Count -ne 0 -or
+      -not [bool]$qualification.manual_review.required -or
+      [string]$qualification.manual_review.status -ne "pending-maintainer-approval" -or
+      -not [bool]$qualification.manual_review.candidate_hash_bound) {
+    throw "Terminal immutable automated qualification is absent, malformed, or not candidate-bound: $release"
+  }
+  $requiredChecks = @($qualification.required_checks)
+  $resultIds = @($qualification.results.id)
+  $expectedQualificationChecks = @(
+    "source-and-archive-identity",
+    "deterministic-triple-reconstruction",
+    "exact-engine-load",
+    "immutable-dot5-upgrade",
+    "pre-dot5-upgrade",
+    "clean-root-independent-confirmation",
+    "candidate-settings-contract"
+  )
+  if ([string]$qualification.support_tier -eq "current") {
+    $expectedQualificationChecks += @("protected-exact-dist-admission", "current-targeted-compatibility", "candidate-ecosystem-and-performance")
+  } elseif ([string]$qualification.support_tier -eq "maintained") {
+    $expectedQualificationChecks += @("maintained-targeted-compatibility", "candidate-ecosystem-and-performance")
+  }
+  if (@(Compare-Object $requiredChecks $resultIds).Count -ne 0 -or
+      @(Compare-Object $expectedQualificationChecks $requiredChecks).Count -ne 0 -or
+      @($requiredChecks | Select-Object -Unique).Count -ne $requiredChecks.Count -or
+      @($resultIds | Select-Object -Unique).Count -ne $resultIds.Count) {
+    throw "Terminal automated qualification check/result closure is incomplete or duplicated: $release"
+  }
+  $settingsTarget = @($settingsQualification.static_inventory.targets | Where-Object release -eq $release)
+  $settingsDisposition = @($settingsQualification.target_dispositions | Where-Object release -eq $release)
+  $dot5WaveRow = @($wave.releases | Where-Object version -eq ([string]$matrixTarget[0].immutable_dot5_predecessor))
+  if ($settingsTarget.Count -ne 1 -or $settingsDisposition.Count -ne 1 -or $dot5Identity.Count -ne 1 -or
+      [string]$settingsTarget[0].candidate_archive_sha256 -ne [string]$row[0].archive_sha256 -or
+      [string]$settingsTarget[0].predecessor -ne [string]$matrixTarget[0].immutable_dot5_predecessor -or
+      [string]$settingsTarget[0].predecessor_archive_sha256 -ne [string]$dot5Identity[0].archive_sha256 -or
+      [int]$settingsTarget[0].settings_path_delta -ne 0 -or
+      [int]$settingsTarget[0].settings_content_delta -ne 0 -or
+      [int]$settingsTarget[0].settings_locale_delta -ne 0 -or
+      [string]$settingsDisposition[0].target -ne [string]$matrixTarget[0].target -or
+      [string]$settingsDisposition[0].status -ne "passed" -or [string]::IsNullOrWhiteSpace([string]$settingsDisposition[0].basis)) {
+    throw "Terminal candidate settings evidence is absent or drifted: $release"
+  }
+  $candidateArchive = Join-Path $RepoRoot ([string]$reconstructed[0].dist_path)
+  if (-not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) { throw "Reconstructed candidate archive is missing: $release" }
+  if ($dot5WaveRow.Count -ne 1) { throw "Immutable .5 settings predecessor is missing from the wave index: $release" }
+  $predecessorArchive = Join-Path $RepoRoot ([string]$dot5WaveRow[0].dist)
+  foreach ($kind in @("settings", "locale")) {
+    $candidateText = Get-MIRTerminalZipTextEntries -Path $candidateArchive -Kind $kind
+    $predecessorText = Get-MIRTerminalZipTextEntries -Path $predecessorArchive -Kind $kind
+    if (@(Compare-Object @($candidateText.Keys) @($predecessorText.Keys)).Count -ne 0 -or
+        @($candidateText.Keys | Where-Object { $candidateText[$_] -cne $predecessorText[$_] }).Count -ne 0) {
+      throw "Terminal candidate $kind surface differs from its immutable .5 predecessor: $release"
+    }
+  }
+  if ($candidateText.Count -ne [int]$settingsTarget[0].locale_entries) {
+    throw "Terminal candidate locale entry count differs from settings qualification: $release"
+  }
+  $candidateSettings = Get-MIRTerminalZipTextEntries -Path $candidateArchive -Kind settings
+  if ($candidateSettings.Count -ne [int]$settingsTarget[0].settings_entries) {
+    throw "Terminal candidate settings entry count differs from settings qualification: $release"
+  }
+  $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidateArchive)
+  try {
+    $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) })
+    $forbiddenEntries = @($candidateEntries | Where-Object {
+      $_.FullName -match '/(docs|fixtures|scripts|tests|\.mir|\.codex|\.github|build|dist)/' -or
+      $_.FullName -match '/(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$'
+    })
+  } finally {
+    $candidateZip.Dispose()
+  }
+  if ((Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash -ne [string]$row[0].archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $candidateArchive) -ne [string]$row[0].content_sha256 -or
+      (Get-Item -LiteralPath $candidateArchive).Length -ne [long]$row[0].bytes -or
+      $candidateEntries.Count -ne [int]$row[0].entries -or $forbiddenEntries.Count -ne 0) {
+    throw "Reconstructed candidate archive identity or composition differs from authority: $release"
+  }
+  $candidateTree = (& git -C $RepoRoot rev-parse "$($row[0].candidate_commit)^{tree}").Trim()
+  $candidateParents = @((& git -C $RepoRoot rev-list --parents -n 1 ([string]$row[0].candidate_commit)).Trim() -split '\s+')
+  if ($LASTEXITCODE -ne 0 -or $candidateTree -ne [string]$row[0].candidate_tree -or $candidateParents.Count -ne 3 -or
+      $candidateParents[1] -ne [string]$row[0].parents[0] -or $candidateParents[2] -ne [string]$row[0].parents[1]) {
+    throw "Terminal candidate commit topology is invalid for $release."
+  }
+  if ($release -eq "3.2.9") {
+    if ([string]$row[0].parents[0] -ne "391684ffe5822dbadc0b6644d22fd9640ee0ffa8" -or
+        [string]$row[0].parents[1] -ne [string]$allocation.source_freeze.merge_commit -or
+        [string]$row[0].package_source_commit -ne "255a20df771ae5fa3a38007bd2268bab3e9e1eff") {
+      throw "The canonical C33 topology does not preserve main, frozen dev, and the frozen package source."
+    }
+  } else {
+    $dot5 = @($targetFreeze.predecessors | Where-Object role -eq "dot5")
+    if ($dot5.Count -ne 1 -or [string]$row[0].parents[0] -ne [string]$dot5[0].commit -or
+        [string]$row[0].parents[1] -ne [string]$canonicalCandidate[0].candidate_commit -or
+        [string]$row[0].package_source_commit -ne [string]$row[0].candidate_commit) {
+      throw "Lower terminal candidate topology is not target-.5-first/C33-second for $release."
+    }
+  }
+  & git -C $RepoRoot show-ref --verify --quiet "refs/tags/$release"
+  if ($programmeStatus -eq "ready-for-local-tagging") {
+    if ($LASTEXITCODE -eq 0) { throw "Terminal tag was created before manual approval: $release" }
+  } else {
+    if ($LASTEXITCODE -ne 0) { throw "Published terminal tag is missing: $release" }
+    $tagObject = (& git -C $RepoRoot rev-parse "refs/tags/$release").Trim()
+    $peeledCommit = (& git -C $RepoRoot rev-parse "refs/tags/$release^{}").Trim()
+    $tagType = (& git -C $RepoRoot cat-file -t "refs/tags/$release").Trim()
+    if ($LASTEXITCODE -ne 0 -or $tagType -ne "tag" -or $tagObject -ne [string]$githubPublicationReceipt.tag.object_sha -or
+        $peeledCommit -ne [string]$row[0].candidate_commit -or $peeledCommit -ne [string]$githubPublicationReceipt.tag.peeled_commit -or
+        -not [bool]$githubPublicationReceipt.tag.immutable) {
+      throw "Published terminal tag is not the exact immutable annotated tag bound by authority: $release"
+    }
   }
 }
 
@@ -541,12 +943,6 @@ if (-not ((Get-Content -Raw -LiteralPath $sourceFreezePath) | Test-Json -SchemaF
     [bool]$sourceFreeze.boundaries.tags_created -or [bool]$sourceFreeze.boundaries.publication_permitted -or
     [bool]$sourceFreeze.boundaries.dot5_package_bytes_changed) {
   throw "Terminal family source-freeze authority is invalid or crosses a later gate."
-}
-function Get-MIRTerminalCanonicalTextSha256 {
-  param([Parameter(Mandatory)][string]$Text)
-
-  $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
-  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
 }
 if ((Get-MIRTerminalCanonicalTextSha256 -Text "authority`nrow`n") -ne
     (Get-MIRTerminalCanonicalTextSha256 -Text "authority`r`nrow`r`n")) {
@@ -635,7 +1031,12 @@ if (@($publication.first_public_tag_requires).Count -lt 4 -or $publication.failu
 $protection = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-HandoffV1.json") | ConvertFrom-Json -Depth 100
 $dot5Tags = @("refs/tags/3.2.5", "refs/tags/2.5.5", "refs/tags/1.9.5", "refs/tags/1.8.5", "refs/tags/1.7.5", "refs/tags/1.6.5", "refs/tags/1.5.5", "refs/tags/1.4.5", "refs/tags/1.3.5")
 $dot9Tags = @($family | ForEach-Object { "refs/tags/$_" })
-$checkNames = @("branch-policy", "verification-gate")
+$devCheckNames = @("branch-policy", "verification-gate")
+$promotionCheckNames = @("branch-policy", "terminal-promotion-verification")
+$contextAmendmentPath = Join-Path $RepoRoot ".mir\releases\terminal\MIR3-Terminal-Protection-RequiredContext-AmendmentV1.json"
+$contextAmendment = Get-Content -Raw -LiteralPath $contextAmendmentPath | ConvertFrom-Json -Depth 100
+$contextApplicationPath = Join-Path $RepoRoot ([string]$contextAmendment.application_receipt)
+$contextApplication = Get-Content -Raw -LiteralPath $contextApplicationPath | ConvertFrom-Json -Depth 100
 if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     [string]$protection.status -ne "applied-and-verified" -or
     [string]$protection.application_receipt.status -ne "applied-and-verified" -or
@@ -647,8 +1048,53 @@ if ([string]$protection.kind -ne "MIR3-Terminal-Protection-HandoffV1" -or
     @($protection.application_receipt.negative_tests).Count -lt 8 -or
     (@($protection.immutable_dot5_tags) -join "|") -ne ($dot5Tags -join "|") -or
     (@($protection.future_terminal_tags) -join "|") -ne ($dot9Tags -join "|") -or
-    @($protection.observed_required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
-    @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0) {
+    @($protection.observed_required_checks | Where-Object { $_.context -notin $devCheckNames -or [int]$_.integration_id -ne 15368 -or $_.conclusion -ne "success" }).Count -ne 0 -or
+    @($protection.branches | Where-Object { $_.ref -in @("refs/heads/main", "refs/heads/legacy") -and $_.required_pull_request }).Count -ne 0 -or
+    [string]$contextAmendment.kind -ne "MIR3TerminalProtectionRequiredContextAmendmentV1" -or
+    [string]$contextAmendment.status -notin @("authorized-for-application", "applied-and-verified") -or
+    (@($contextAmendment.scope) -join "|") -ne "refs/heads/main|refs/heads/legacy" -or
+    (@($contextAmendment.ruleset_ids) -join "|") -ne "20833408|20833410" -or
+    [string]$contextAmendment.old_context.context -ne "verification-gate" -or
+    [string]$contextAmendment.new_context.context -ne "terminal-promotion-verification" -or
+    [int]$contextAmendment.old_context.integration_id -ne 15368 -or
+    [int]$contextAmendment.new_context.integration_id -ne 15368 -or
+    [int]$contextAmendment.invariants.required_check_count -ne 2 -or
+    -not [bool]$contextAmendment.invariants.strict_required_status_checks_policy -or
+    [int]$contextAmendment.invariants.integrity_bypass_actors -ne 0 -or
+    -not [bool]$contextAmendment.invariants.deletion_protection -or
+    -not [bool]$contextAmendment.invariants.non_fast_forward_protection -or
+    -not [bool]$contextAmendment.invariants.promotion_actor_restriction_unchanged -or
+    -not [bool]$contextAmendment.invariants.dev_required_checks_unchanged -or
+    -not [bool]$contextAmendment.invariants.frozen_candidate_bytes_unchanged -or
+    -not [bool]$contextAmendment.invariants.historical_check_evidence_unchanged -or
+    [string]$contextApplication.kind -ne "MIR3TerminalProtectionRequiredContextApplicationReceiptV1" -or
+    [string]$contextApplication.status -ne "applied-and-verified" -or
+    [string]$contextApplication.repository -ne [string]$contextAmendment.repository -or
+    [string]$contextApplication.controller_commit -ne "92ba00191fc511af6aa9445c8aa267e97d1cc8e5" -or
+    (@($contextApplication.application.ruleset_id) -join "|") -ne "20833408|20833410" -or
+    @($contextApplication.application | Where-Object {
+      [string]$_.ruleset_name -notmatch '^MIR3 terminal (main|legacy) integrity$' -or
+      (@($_.required_checks.context) -join "|") -ne ($promotionCheckNames -join "|") -or
+      @($_.required_checks | Where-Object { [int]$_.integration_id -ne 15368 }).Count -ne 0
+    }).Count -ne 0 -or
+    [string]$contextApplication.live_invariants.enforcement -ne "active" -or
+    -not [bool]$contextApplication.live_invariants.strict_required_status_checks_policy -or
+    [int]$contextApplication.live_invariants.required_check_count_per_branch -ne 2 -or
+    [int]$contextApplication.live_invariants.integrity_bypass_actors_per_branch -ne 0 -or
+    [string]$contextApplication.live_invariants.current_user_can_bypass -ne "never" -or
+    -not [bool]$contextApplication.live_invariants.deletion_protection -or
+    -not [bool]$contextApplication.live_invariants.non_fast_forward_protection -or
+    -not [bool]$contextApplication.live_invariants.promotion_actor_rulesets_unchanged -or
+    -not [bool]$contextApplication.live_invariants.dev_rulesets_unchanged -or
+    -not [bool]$contextApplication.live_invariants.frozen_candidate_bytes_unchanged -or
+    -not [bool]$contextApplication.live_invariants.historical_check_evidence_unchanged -or
+    @($contextApplication.candidate_verification).Count -ne 2 -or
+    @($contextApplication.candidate_verification | Where-Object {
+      [string]$_.release -notin @("3.2.9", "2.5.9") -or
+      [string]$_.conclusion -ne "success" -or
+      [long]$_.controller_run -le 0 -or [long]$_.controller_job -le 0 -or
+      [long]$_.branch_policy_check_run -le 0 -or [long]$_.promotion_check_run -le 0
+    }).Count -ne 0) {
   throw "Terminal protection handoff is incomplete, overclaims application, or contradicts promotion topology."
 }
 foreach ($field in @("applied_at", "verified_at")) {
@@ -678,7 +1124,7 @@ if ([string]$protectionApplication.kind -ne "MIR3TerminalProtectionApplicationRe
     @($protectionApplication.production_rulesets).Count -ne 9 -or
     @($protectionApplication.production_rulesets | Where-Object enforcement -ne "active").Count -ne 0 -or
     (@($protectionApplication.production_rulesets.id) -join "|") -ne (@($protection.application_receipt.production_ruleset_ids) -join "|") -or
-    @($protectionApplication.required_checks | Where-Object { $_.context -notin $checkNames -or [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
+    @($protectionApplication.required_checks | Where-Object { $_.context -notin $devCheckNames -or [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
     -not [bool]$protectionApplication.canary.rulesets_removed -or -not [bool]$protectionApplication.canary.refs_removed -or
     @($protectionApplication.canary.negative_tests | Where-Object result -ne "rejected-http-422").Count -ne 0 -or
     [string]$protectionEvidence.kind -ne "MIR3TerminalProtectionEvidenceManifestV1" -or
@@ -711,8 +1157,9 @@ foreach ($name in $payloadNames) {
 foreach ($name in @("dev-integrity.json", "main-integrity.json", "legacy-integrity.json")) {
   $payload = $payloads[$name]
   $statusRule = @($payload.rules | Where-Object type -eq "required_status_checks")
+  $expectedChecks = if ($name -eq "dev-integrity.json") { $devCheckNames } else { $promotionCheckNames }
   if (@($payload.bypass_actors).Count -ne 0 -or $statusRule.Count -ne 1 -or
-      (@($statusRule[0].parameters.required_status_checks.context) -join "|") -ne ($checkNames -join "|") -or
+      (@($statusRule[0].parameters.required_status_checks.context) -join "|") -ne ($expectedChecks -join "|") -or
       @($statusRule[0].parameters.required_status_checks | Where-Object { [int]$_.integration_id -ne 15368 }).Count -ne 0 -or
       @($payload.rules | Where-Object type -eq "deletion").Count -ne 1 -or @($payload.rules | Where-Object type -eq "non_fast_forward").Count -ne 1) {
     throw "Terminal branch integrity checks are bypassable or incomplete: $name"
@@ -740,7 +1187,7 @@ foreach ($name in @("canary-branch.json", "canary-tag.json")) {
 }
 
 $baselineSchemaNames = @("mir3-terminal-baseline-inventory-common", "mir3-terminal-baseline-identity", "mir3-terminal-baseline-engine-lock", "mir3-terminal-baseline-package-composition", "mir3-terminal-baseline-reconciliation", "mir3-terminal-baseline-feature-inventory", "mir3-terminal-baseline-technology-inventory", "mir3-terminal-baseline-setting-inventory", "mir3-terminal-baseline-locale-inventory", "mir3-terminal-baseline-ownership-inventory", "mir3-terminal-baseline-runtime-profile-inventory", "mir3-terminal-baseline-migration-inventory", "mir3-terminal-baseline-compatibility-inventory", "mir3-terminal-baseline-upgrade-inventory", "mir3-terminal-baseline-performance-inventory")
-$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
+$schemaNames = @("mir3-terminal-package-manifest", "mir3-terminal-release-manifest", "mir3-terminal-shadow-projection-profiles", "mir3-terminal-publication-receipt", "mir3-terminal-engine-observation", "mir3-terminal-finding", "mir3-terminal-experiment-receipt", "mir3-terminal-assurance-calibration-receipt", "mir3-terminal-baseline-bundle-manifest", "mir3-terminal-dot5-semantic-matrix", "mir3-terminal-qualification-record", "mir3-terminal-candidate-settings-qualification", "mir3-terminal-maintainer-acceptance", "mir3-terminal-qualification-review", "mir3-terminal-target-seal", "mir3-terminal-fixed-point-receipt", "mir3-terminal-family-readiness", "mir3-final-defect-qualification-reconciliation", "mir3-final-index", "mir3-eol-record", "mir3-terminal-authority", "mir3-museum-index", "mir3-terminal-018-feasibility-gate", "mir3-terminal-successor-bootstrap-policy", "mir3-settings-scope-audit", "mir3-mod-portal-compatibility-census", "mir3-mod-portal-discussion-reconciliation", "mir3-mod-interaction-matrix", "mir3-compatibility-claims", "mir3-effective-mutation-owner-report", "mir3-dot5-mod-portal-custody-recheck", "mir3-final-defect-index", "mir3-engine-gap-audit", "mir3-terminal-product-admission-bundle") + $baselineSchemaNames
 foreach ($name in $schemaNames) {
   $path = Join-Path $RepoRoot "spec\schemas\$name.schema.json"
   $schema = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
@@ -818,13 +1265,35 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
     $museum.artificial_dot9_versions_permitted -or @($museum.targets).Count -ne 7) { throw "0.18 or museum custody policy is invalid." }
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
-if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or -not $current.source_frozen -or
-    $current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
-    $current.roles.canonical -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.5" -or
-    $current.roles.planned_canonical -ne "3.2.9" -or $current.roles.planned_backport -ne "2.5.9" -or
-    $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or $current.active_programme.status -ne "source-frozen-ready-for-candidate-allocation") {
-  throw "Current release roles do not distinguish published .5 from source-frozen, candidate-unassigned .9."
+$terminalCurrent = (($current.planned_releases -join "|") -eq ($family -join "|") -and
+  $current.roles.canonical -eq "3.2.9" -and $current.roles.planned_canonical -eq "3.2.9" -and
+  $current.roles.planned_backport -eq "2.5.9" -and $current.active_programme.id -eq "MIR3-Terminal-ProgrammeV1" -and
+  [string]$current.active_programme.status -eq $programmeStatus)
+$emergencyFamily = @("3.2.10", "2.5.10") + $family
+$emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily -join "|") -and
+  $current.roles.canonical -eq "3.2.10" -and $current.roles.planned_canonical -eq "3.2.10" -and
+  $current.roles.planned_backport -eq "2.5.10" -and
+  $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV1" -and
+  [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json" -and
+  [string]$current.active_programme.status -in @("c34-package-built-qualification-in-progress", "c34-maintainer-accepted-promotion-authorized"))
+if (-not $current.implementation_admitted -or -not $current.source_frozen -or
+    (-not $terminalCurrent -and -not $emergencyCurrent)) {
+  throw "Current release roles do not bind the active terminal programme and canonical .9 family."
 }
+if ($programmeStatus -eq "ready-for-local-tagging") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.5" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.5" -or
+      $current.roles.backport_calibration -ne "2.5.5") {
+    throw "Pre-publication release roles do not distinguish published .5 from sealed .9 candidates ready for local tagging."
+  }
+} elseif ($current.roles.latest_published_factorio_2_1 -ne "3.2.9" -or $current.roles.latest_published_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.latest_tagged_factorio_2_1 -ne "3.2.9" -or $current.roles.latest_tagged_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.published_factorio_2_1 -ne "3.2.9" -or $current.roles.published_factorio_2_0 -ne "2.5.9" -or
+          $current.roles.tagged_factorio_2_1 -ne "3.2.9" -or $current.roles.backport_calibration -ne "2.5.9") {
+  throw "Post-publication release roles do not identify the tagged and published 3.2.9/2.5.9 authorities."
+}
+
+& (Join-Path $RepoRoot "tools/commands/release/New-MIR3TerminalReleaseCeremony.ps1") -RepoRoot $RepoRoot -Check
+if ($LASTEXITCODE -ne 0) { throw "MIR 3 terminal release-ceremony authority validation failed." }
 
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json
 if ([string]$wave.mod_portal_custody.authority -ne [string]$baselineQueue.source_authorities.mod_portal_custody -or

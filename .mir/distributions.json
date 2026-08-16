@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-08",
-  "distribution_count": 57,
+  "generated_at": "2026-08-16",
+  "distribution_count": 67,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -409,6 +409,86 @@
       "sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
       "kind": "tagged-publicly-verified",
       "source_ref": "3.2.5"
+    },
+    {
+      "version": "1.3.9",
+      "path": "dist/more-infinite-research_1.3.9.zip",
+      "bytes": 386160,
+      "sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.3.9-1.3-P1"
+    },
+    {
+      "version": "1.4.9",
+      "path": "dist/more-infinite-research_1.4.9.zip",
+      "bytes": 386070,
+      "sha256": "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.4.9-1.4-P1"
+    },
+    {
+      "version": "1.5.9",
+      "path": "dist/more-infinite-research_1.5.9.zip",
+      "bytes": 385629,
+      "sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.5.9-1.5-P1"
+    },
+    {
+      "version": "1.6.9",
+      "path": "dist/more-infinite-research_1.6.9.zip",
+      "bytes": 385315,
+      "sha256": "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.6.9-1.6-P1"
+    },
+    {
+      "version": "1.7.9",
+      "path": "dist/more-infinite-research_1.7.9.zip",
+      "bytes": 385310,
+      "sha256": "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.7.9-1.7-P1"
+    },
+    {
+      "version": "1.8.9",
+      "path": "dist/more-infinite-research_1.8.9.zip",
+      "bytes": 397678,
+      "sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.8.9-1.8-P1"
+    },
+    {
+      "version": "1.9.9",
+      "path": "dist/more-infinite-research_1.9.9.zip",
+      "bytes": 397677,
+      "sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/1.9.9-1.9-P1"
+    },
+    {
+      "version": "2.5.9",
+      "path": "dist/more-infinite-research_2.5.9.zip",
+      "bytes": 1058800,
+      "sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/2.5.9-2.5-P13"
+    },
+    {
+      "version": "3.2.9",
+      "path": "dist/more-infinite-research_3.2.9.zip",
+      "bytes": 1061572,
+      "sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+      "kind": "terminal-candidate-awaiting-manual-approval",
+      "source_ref": "candidate/3.2.9-C33"
+    },
+    {
+      "version": "3.2.10",
+      "path": "dist/more-infinite-research_3.2.10.zip",
+      "bytes": 1065178,
+      "sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "kind": "maintainer-accepted-emergency-candidate",
+      "source_ref": "19ddb7db4c960f77aef53d2bb47d23e0f311918f"
     }
   ]
 }

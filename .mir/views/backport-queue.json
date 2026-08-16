@@ -2,21 +2,22 @@
   "authority": "mir-generated-backport-queue-v1",
   "candidate_id": "not-assigned",
   "generated_from": [
-    "path:releases.records/2.5.9.json",
+    "path:releases.records/2.5.10.json",
     ""
   ],
-  "release": "2.5.9",
+  "release": "2.5.10",
   "remaining_obligations": [
-    "reconcile-2.5.5-protected-post-publication-debt",
-    "bind-final-terminal-delta",
-    "materialize-and-qualify-factorio-2.0-projection",
-    "normal-manual-protected-seal-promotion-publication-gates"
+    "focused-qualification",
+    "exact-2.5.9-reproduction-on-2.0.77",
+    "shared-fix-package-visibility-decision",
+    "publish-only-if-applicable"
   ],
   "remaining_states": [
     "source-frozen",
     "package-built",
     "focused-qualified",
     "candidate-qualified",
+    "automated-qualified-awaiting-human-review",
     "manually-accepted",
     "protected-qualified",
     "sealed",
