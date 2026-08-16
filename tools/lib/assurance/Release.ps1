@@ -1,5 +1,6 @@
 . (Join-Path $PSScriptRoot "Hashing.ps1")
 . (Join-Path (Split-Path -Parent $PSScriptRoot) "validation\ReleaseAttestations.ps1")
+. (Join-Path (Split-Path -Parent $PSScriptRoot) "mir4\BootstrapMaterialization.ps1")
 
 function Get-MIRAssuranceCandidateArchiveIdentity {
   param([Parameter(Mandatory)][string]$Path)
@@ -25,8 +26,112 @@ function Test-MIRAssuranceReleaseCandidateId {
   return $CandidateId -match '^(?:C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)$'
 }
 
+function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  $targetMap = @{
+    "2.0" = [ordered]@{ target_key = "f200"; distribution_version = "4.0.20000" }
+    "1.1" = [ordered]@{ target_key = "f110"; distribution_version = "4.0.11000" }
+    "1.0" = [ordered]@{ target_key = "f100"; distribution_version = "4.0.10000" }
+  }
+  $binding = $targetMap[[string]$Context.target]
+  if ($null -eq $binding) { return $null }
+
+  $laneRoot = Join-Path $repo "build\mir4\local-playtest-shadow"
+  $manifestPath = Join-Path $laneRoot "manifests\$($binding.target_key).json"
+  $authorityPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Local-Playtest-Shadow-AuthorizationV1.json"
+  if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
+    throw "Exact MIR 4 local-playtest planning authority is missing for target $($Context.target)."
+  }
+
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+  if (-not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $authority)) {
+    throw "MIR 4 local-playtest planning authority or candidate manifest self-hash is invalid."
+  }
+  if ([string]$authority.kind -ne "MIR4LocalPlaytestShadowAuthorizationV1" -or
+      [string]$authority.authority_family -ne "MIRLocalArtifactLaneAuthorizationV1" -or
+      [bool]$authority.package_visible -or
+      [bool]$authority.release_admission_authorized -or
+      [bool]$authority.public_identity_authorized -or
+      [bool]$authority.public_output_authorized -or
+      [bool]$authority.signing_or_sealing_authorized -or
+      [bool]$authority.publication_authorized -or
+      [bool]$authority.wildcard_targets_authorized -or
+      [bool]$authority.gate_waivers_authorized) {
+    throw "MIR 4 local-playtest authority does not preserve the private, release-orthogonal boundary."
+  }
+
+  $targetRows = @($authority.authorized_targets | Where-Object {
+    [string]$_.target_key -eq [string]$binding.target_key -and
+    [string]$_.factorio_line -eq [string]$Context.target -and
+    [string]$_.distribution_version -eq [string]$binding.distribution_version
+  })
+  if ($targetRows.Count -ne 1) {
+    throw "MIR 4 local-playtest authority does not bind exactly one row for target $($Context.target)."
+  }
+  $targetRow = $targetRows[0]
+  if ([string]$manifest.kind -ne "MIR4LocalPlaytestCandidateManifestV1" -or
+      [string]$manifest.status -notin @(
+        "built-unqualified-local-playtest-candidate",
+        "locally-smoke-qualified-playtest-candidate",
+        "locally-upgrade-qualified-playtest-candidate"
+      ) -or
+      [string]$manifest.lane -ne "local-playtest-shadow" -or
+      [string]$manifest.target_key -ne [string]$binding.target_key -or
+      [string]$manifest.factorio_line -ne [string]$Context.target -or
+      [string]$manifest.distribution_version -ne [string]$binding.distribution_version -or
+      [string]$manifest.admission -ne "non-authoritative-shadow-blocked-by-eol" -or
+      [bool]$manifest.public_output_authorized -or
+      [bool]$manifest.release_claim_permitted -or
+      [string]$manifest.local_lane_authority.record_sha256 -ne [string]$authority.record_sha256) {
+    throw "MIR 4 local-playtest manifest is not an exact private planning input."
+  }
+
+  $expectedCandidate = Join-Path $laneRoot ([string]$manifest.local_distribution.path)
+  if (-not (Test-Path -LiteralPath $expectedCandidate -PathType Leaf) -or
+      [string]::IsNullOrWhiteSpace([string]$Context.candidate) -or
+      -not [IO.Path]::GetFullPath($expectedCandidate).Equals(
+        [IO.Path]::GetFullPath([string]$Context.candidate),
+        [StringComparison]::OrdinalIgnoreCase
+      )) {
+    throw "MIR 4 local-playtest plan must use the exact governed candidate path."
+  }
+  $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $expectedCandidate
+  if ([string]$candidateIdentity.sha256 -ne [string]$manifest.local_distribution.archive_sha256 -or
+      [string]$candidateIdentity.content_sha256 -ne [string]$manifest.local_distribution.content_sha256 -or
+      [long]$candidateIdentity.bytes -ne [long]$manifest.local_distribution.bytes -or
+      [int]$candidateIdentity.entries -ne [int]$manifest.local_distribution.entry_count) {
+    throw "MIR 4 local-playtest candidate bytes do not match the governed manifest."
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$Context.factorio) -or
+      -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf) -or
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $Context.factorio).Hash -ne [string]$targetRow.engine_sha256) {
+    throw "MIR 4 local-playtest plan requires the exact target-bound Factorio engine."
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$Context.prior_release) -or
+      -not (Test-Path -LiteralPath $Context.prior_release -PathType Leaf) -or
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $Context.prior_release).Hash -ne [string]$targetRow.predecessor_archive_sha256) {
+    throw "MIR 4 local-playtest plan requires the exact target-bound predecessor archive."
+  }
+
+  return [pscustomobject][ordered]@{
+    release = [string]$binding.distribution_version
+    target = [string]$Context.target
+    state = [string]$manifest.status
+    authority_class = "private-local-artifact-testing-only"
+    candidate_id = [string]$binding.target_key
+    package_source_commit = [string]$targetRow.source_commit
+  }
+}
+
 function Get-MIRAssuranceReleasePlanningAuthority {
   param([Parameter(Mandatory)]$Context)
+
+  $localPlaytest = Get-MIRAssuranceLocalPlaytestPlanningAuthority -Context $Context
+  if ($null -ne $localPlaytest) { return $localPlaytest }
 
   $version = [string]$Context.info.version
   $recordPath = Join-Path $repo ".mir\releases\records\$version.json"
