@@ -3,6 +3,7 @@ param(
   [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$CandidateSha,
   [ValidateSet("promotion", "post-publication-sync")][string]$Operation = "promotion",
   [string]$CandidateRef = "",
+  [ValidateSet("main", "legacy")][string]$PromotionBranch = "main",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [string]$OutputPath = "",
   [switch]$SkipRemote
@@ -129,13 +130,34 @@ if ($Release -eq "3.2.10") {
 
     $candidateRemote = "not-checked"
     $mainRemote = "not-checked"
+    $legacyRemote = "not-checked"
     if (-not $SkipRemote) {
       $candidateRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin $CandidateRef)
       $candidateRemote = if ($candidateRemoteLine.Count -eq 1) { ([string]$candidateRemoteLine[0] -split '\s+')[0] } else { "" }
       $mainRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin refs/heads/main)
       $mainRemote = if ($mainRemoteLine.Count -eq 1) { ([string]$mainRemoteLine[0] -split '\s+')[0] } else { "" }
-      if ($candidateRemote -ne $CandidateSha -or $mainRemote -notin @($releaseCommit, $CandidateSha)) {
-        throw "Remote candidate head or protected main authority is not at an admitted post-publication boundary."
+      if ($candidateRemote -ne $CandidateSha) {
+        throw "Remote candidate head is not the exact requested post-publication commit."
+      }
+
+      if ($PromotionBranch -eq "main") {
+        Invoke-MIRPromotionGit merge-base --is-ancestor $releaseCommit $mainRemote | Out-Null
+        Invoke-MIRPromotionGit merge-base --is-ancestor $mainRemote $CandidateSha | Out-Null
+      }
+      else {
+        $legacyRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin refs/heads/legacy)
+        $legacyRemote = if ($legacyRemoteLine.Count -eq 1) { ([string]$legacyRemoteLine[0] -split '\s+')[0] } else { "" }
+        if ($legacyRemote -ne "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb" -or
+            $resolvedParents.Count -ne 2 -or $resolvedParents[0] -ne $legacyRemote -or
+            $resolvedParents[1] -ne $mainRemote) {
+          throw "Legacy alias promotion must preserve exact 2.5.9 as first parent and protected main as second parent."
+        }
+        $mainTree = (Invoke-MIRPromotionGit rev-parse "$mainRemote`^{tree}" | Select-Object -First 1).Trim()
+        Invoke-MIRPromotionGit merge-base --is-ancestor $releaseCommit $mainRemote | Out-Null
+        Invoke-MIRPromotionGit merge-base --is-ancestor $mainRemote $CandidateSha | Out-Null
+        if ($resolvedTree -ne $mainTree) {
+          throw "Legacy alias promotion tree must be exactly identical to protected main."
+        }
       }
     }
 
@@ -153,8 +175,9 @@ if ($Release -eq "3.2.10") {
       tag_object = $tagObject
       package_source_commit = $packageSourceCommit
       package_visible_changes_after_release = @($releasePackageChanges)
-      promotion_branch = "main"
-      promotion_branch_remote = $mainRemote
+      promotion_branch = $PromotionBranch
+      promotion_branch_remote = if ($PromotionBranch -eq "legacy") { $legacyRemote } else { $mainRemote }
+      protected_main_commit = $mainRemote
       archive = [ordered]@{path=$zipRelative;sha256=$archiveSha;content_sha256=$contentSha;bytes=$bytes;entries=$entries}
       publication_receipt = ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json"
       deferred_finding = "MIR3-TERM-0033"

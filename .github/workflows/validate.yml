@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.ref == 'refs/heads/legacy' || github.head_ref == 'tmp/2.0' || github.head_ref == 'legacy' || github.base_ref == 'tmp/2.0' || github.base_ref == 'legacy') && '2.0' || '2.1' }}
+  MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.head_ref == 'tmp/2.0' || github.base_ref == 'tmp/2.0') && '2.0' || '2.1' }}
 
 jobs:
   plan:
