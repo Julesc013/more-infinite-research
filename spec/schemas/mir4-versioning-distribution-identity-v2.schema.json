@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-versioning-distribution-identity-v2.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json",
+  "title": "MIR 4 source and distribution identity authority V2",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "package_visible",
+    "authority_id",
+    "imports",
+    "semantic_reads",
+    "semantic_writes",
+    "target_dispositions",
+    "digest_classes",
+    "migration",
+    "rollback",
+    "parity_test",
+    "sunset_condition",
+    "payload"
+  ],
+  "properties": {
+    "schema": {
+      "const": 2
+    },
+    "kind": {
+      "const": "MIR4-Versioning-and-Distribution-Identity-ADRv2"
+    },
+    "status": {
+      "const": "accepted-pre-publication-current"
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "package_visible": {
+      "const": false
+    },
+    "authority_id": {
+      "const": "MIR4-versioning-distribution-identity-v2"
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "semantic_reads": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "semantic_writes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "target_dispositions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "digest_classes": {
+      "type": "object",
+      "required": [
+        "semantic",
+        "authority",
+        "qualification"
+      ],
+      "properties": {
+        "semantic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualification": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "state"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "rollback": {
+      "type": "object",
+      "required": [
+        "strategy",
+        "permitted_until"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permitted_until": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "parity_test": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "sunset_condition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "source_major",
+        "source_version_pattern",
+        "source_patch_range",
+        "source_tag_pattern",
+        "distribution_formula",
+        "decode_formula",
+        "distribution_target_code_width",
+        "encoded_component_width",
+        "distribution_version_pattern",
+        "distribution_tag_pattern",
+        "package_name_pattern",
+        "component_maximum",
+        "maximum_internal_distribution_target_code",
+        "maximum_internal_encoded_component",
+        "leading_zero_policy",
+        "cross_target_ordering",
+        "overflow",
+        "public_allocation",
+        "v1_disposition",
+        "conformance_fixture_kind"
+      ],
+      "properties": {
+        "source_major": {
+          "const": 4
+        },
+        "source_version_pattern": {
+          "const": "4.MINOR.PATCH"
+        },
+        "source_patch_range": {
+          "type": "object",
+          "required": [
+            "minimum",
+            "maximum"
+          ],
+          "properties": {
+            "minimum": {
+              "const": 0
+            },
+            "maximum": {
+              "const": 99
+            }
+          },
+          "additionalProperties": false
+        },
+        "source_tag_pattern": {
+          "const": "v4.MINOR.PATCH"
+        },
+        "distribution_formula": {
+          "const": "encoded_component = decimal(distribution_target_code) * 100 + source_patch"
+        },
+        "decode_formula": {
+          "type": "object",
+          "required": [
+            "distribution_target_code",
+            "source_patch"
+          ],
+          "properties": {
+            "distribution_target_code": {
+              "const": "leftmost-three-digits-of-five-digit-encoded-component"
+            },
+            "source_patch": {
+              "const": "rightmost-two-digits-of-five-digit-encoded-component"
+            }
+          },
+          "additionalProperties": false
+        },
+        "distribution_target_code_width": {
+          "const": 3
+        },
+        "encoded_component_width": {
+          "const": 5
+        },
+        "distribution_version_pattern": {
+          "const": "4.MINOR.ENCODED_COMPONENT"
+        },
+        "distribution_tag_pattern": {
+          "const": "dist/f<distribution_target_code>/v<distribution_version>"
+        },
+        "package_name_pattern": {
+          "const": "more-infinite-research_<distribution_version>.zip"
+        },
+        "component_maximum": {
+          "const": 65535
+        },
+        "maximum_internal_distribution_target_code": {
+          "const": "654"
+        },
+        "maximum_internal_encoded_component": {
+          "const": "65499"
+        },
+        "leading_zero_policy": {
+          "const": "preserve-three-digit-code-and-five-digit-encoded-component-as-decimal-text-never-octal"
+        },
+        "cross_target_ordering": {
+          "const": "undefined-use-source-release-version"
+        },
+        "overflow": {
+          "const": "increment-source-minor-and-reset-source-patch-to-zero;never-carry-inside-encoded-component"
+        },
+        "public_allocation": {
+          "const": "blocked-until-mir3-eol"
+        },
+        "v1_disposition": {
+          "const": "historical-evidence-only-non-executable"
+        },
+        "conformance_fixture_kind": {
+          "const": "MIR4-Distribution-Version-Codec-VectorsV2"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

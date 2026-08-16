@@ -1,0 +1,1 @@
+{"kind":"MIR4ProfileV0","schema":0,"target":{"id":"f210","factorio_line":"2.1","transport":"build-time-static"},"versions":{"source":"4.0.0","distribution":"4.0.21000"},"capabilities":[],"canonicalization":"mir-canonical-json-v0","extensions":{},"payload":{},"digest":"sha256:0000000000000000000000000000000000000000000000000000000000000000","expected_diagnostic":"mir4-api-digest"}

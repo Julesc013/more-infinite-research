@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "kind": "MIR4-Versioning-and-Distribution-Identity-ADRv2",
+  "status": "accepted-pre-publication-current",
+  "recorded_at": "2026-08-16T10:00:00+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-versioning-distribution-identity-v2",
+  "imports": [
+    ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json"
+  ],
+  "semantic_reads": [
+    "source-release-version",
+    "distribution-target-code"
+  ],
+  "semantic_writes": [
+    "distribution-version",
+    "source-seal-tag",
+    "distribution-tag"
+  ],
+  "target_dispositions": {
+    "registered": "deterministic-direct-code-projection",
+    "unregistered": "fail-closed",
+    "deferred": "no-distribution-unless-readmitted"
+  },
+  "digest_classes": {
+    "semantic": "source-version",
+    "authority": "registry-v2-and-codec-v2",
+    "qualification": "exhaustive-round-trip-tags-ordering-bounds-negatives"
+  },
+  "migration": {
+    "from": "MIR4-Versioning-and-Distribution-Identity-ADRv1",
+    "to": "MIR4-Versioning-and-Distribution-Identity-ADRv2",
+    "state": "identity-corrected-before-public-allocation"
+  },
+  "rollback": {
+    "strategy": "replace-v2-before-public-allocation-never-reactivate-v1",
+    "permitted_until": "first-public-mir4-source-seal"
+  },
+  "parity_test": [
+    "all-public-target-patches-00-01-08-09-99",
+    "projection-round-trip",
+    "leading-zero-preservation",
+    "component-bounds",
+    "negative-cases-fail-closed",
+    "final-tag-forms"
+  ],
+  "sunset_condition": "superseded-by-versioned-mir4-public-release-identity-authority-with-identical-published-codec",
+  "payload": {
+    "source_major": 4,
+    "source_version_pattern": "4.MINOR.PATCH",
+    "source_patch_range": {
+      "minimum": 0,
+      "maximum": 99
+    },
+    "source_tag_pattern": "v4.MINOR.PATCH",
+    "distribution_formula": "encoded_component = decimal(distribution_target_code) * 100 + source_patch",
+    "decode_formula": {
+      "distribution_target_code": "leftmost-three-digits-of-five-digit-encoded-component",
+      "source_patch": "rightmost-two-digits-of-five-digit-encoded-component"
+    },
+    "distribution_target_code_width": 3,
+    "encoded_component_width": 5,
+    "distribution_version_pattern": "4.MINOR.ENCODED_COMPONENT",
+    "distribution_tag_pattern": "dist/f<distribution_target_code>/v<distribution_version>",
+    "package_name_pattern": "more-infinite-research_<distribution_version>.zip",
+    "component_maximum": 65535,
+    "maximum_internal_distribution_target_code": "654",
+    "maximum_internal_encoded_component": "65499",
+    "leading_zero_policy": "preserve-three-digit-code-and-five-digit-encoded-component-as-decimal-text-never-octal",
+    "cross_target_ordering": "undefined-use-source-release-version",
+    "overflow": "increment-source-minor-and-reset-source-patch-to-zero;never-carry-inside-encoded-component",
+    "public_allocation": "blocked-until-mir3-eol",
+    "v1_disposition": "historical-evidence-only-non-executable",
+    "conformance_fixture_kind": "MIR4-Distribution-Version-Codec-VectorsV2"
+  }
+}

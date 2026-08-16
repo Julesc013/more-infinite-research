@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-capsule-manifest.schema.json",
+  "title": "MIR 4 bootstrap capsule-internal manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "canonicalization", "lane", "target", "package_membership_authority", "member_count", "members", "payload_root_sha256", "authority_closure_root_sha256", "git_source_proof_record_sha256", "toolchain_lock_record_sha256", "canonical_builder_sha256", "reconstruction_runner_sha256", "record_sha256"],
+  "properties": {
+    "schema": { "const": 2 },
+    "kind": { "const": "MIR4BootstrapCapsuleManifestV2" },
+    "status": { "const": "local-unpublished-closed-construction-input" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "lane": { "enum": ["emergency", "local-playtest-shadow"] },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_key", "factorio_line", "distribution_version", "source", "predecessor"],
+      "properties": {
+        "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
+        "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
+        "distribution_version": { "enum": ["4.0.21000", "4.0.20000", "4.0.11000", "4.0.10000"] },
+        "source": { "type": "object" },
+        "predecessor": { "type": "object" },
+        "correction_authority": { "$ref": "#/$defs/correctionAuthority" }
+        ,"local_lane_authority": { "$ref": "#/$defs/laneAuthority" }
+      }
+    },
+    "package_membership_authority": { "const": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots" },
+    "member_count": { "type": "integer", "minimum": 1, "maximum": 4095 },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4095,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role", "bytes", "sha256"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(?!\\.mir/capsule/manifest\\.json$)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" },
+          "role": { "enum": ["package-source", "authority", "schema", "canonical-package-builder", "reconstruction-tool", "git-object-proof", "toolchain-lock", "reconstruction-instructions"] },
+          "bytes": { "type": "integer", "minimum": 0, "maximum": 268435456 },
+          "sha256": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    "payload_root_sha256": { "$ref": "#/$defs/sha256" },
+    "authority_closure_root_sha256": { "$ref": "#/$defs/sha256" },
+    "git_source_proof_record_sha256": { "$ref": "#/$defs/sha256" },
+    "toolchain_lock_record_sha256": { "$ref": "#/$defs/sha256" },
+    "canonical_builder_sha256": { "$ref": "#/$defs/sha256" },
+    "reconstruction_runner_sha256": { "$ref": "#/$defs/sha256" },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "allOf": [
+    { "if": { "properties": { "lane": { "const": "emergency" } }, "required": ["lane"] }, "then": { "properties": { "target": { "required": ["correction_authority"], "not": { "required": ["local_lane_authority"] }, "properties": { "target_key": { "const": "f210" }, "factorio_line": { "const": "2.1" }, "distribution_version": { "const": "4.0.21000" } } } } } },
+    { "if": { "properties": { "lane": { "const": "local-playtest-shadow" } }, "required": ["lane"] }, "then": { "properties": { "target": { "required": ["local_lane_authority"], "not": { "required": ["correction_authority"] }, "properties": { "target_key": { "enum": ["f200", "f110", "f100"] } } } } } },
+    { "if": { "properties": { "target": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] } } }, "then": { "properties": { "target": { "properties": { "factorio_line": { "const": "2.0" }, "distribution_version": { "const": "4.0.20000" } } } } } },
+    { "if": { "properties": { "target": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] } } }, "then": { "properties": { "target": { "properties": { "factorio_line": { "const": "1.1" }, "distribution_version": { "const": "4.0.11000" } } } } } },
+    { "if": { "properties": { "target": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] } } }, "then": { "properties": { "target": { "properties": { "factorio_line": { "const": "1.0" }, "distribution_version": { "const": "4.0.10000" } } } } } }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "finding": { "const": "MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+    ,"laneAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "authority_family", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json" },
+        "kind": { "const": "MIR4LocalPlaytestShadowAuthorizationV1" },
+        "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

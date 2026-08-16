@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-local-candidate-plan.schema.json",
+  "title": "MIR 4 bootstrap local candidate plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "canonicalization", "source_version", "public_output_authorized", "imports", "compiler_host_adapter", "targets", "package_policy", "record_sha256"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4BootstrapLocalCandidatePlanV1" },
+    "status": { "const": "local-unpublished-package-construction-only" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "source_version": { "const": "4.0.0" },
+    "public_output_authorized": { "const": false },
+    "imports": {
+      "const": [
+        ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
+        ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+        ".mir/releases/waves/mir4-r0/bootstrap-root-set.json"
+      ]
+    },
+    "compiler_host_adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "maturity", "semantic_authority", "operations", "forbidden_operations"],
+      "properties": {
+        "kind": { "const": "LegacyCompilerHostAdapterV1" },
+        "maturity": { "const": "bootstrap-private" },
+        "semantic_authority": { "const": "terminal-target-snapshot-and-sealed-package-source" },
+        "operations": { "const": ["capture-exact-package-source", "project-distribution-version", "emit-deterministic-target-package"] },
+        "forbidden_operations": { "const": ["semantic-rewrite", "manual-backport", "prototype-mutation-outside-existing-emission", "public-allocation", "publication"] }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "$ref": "#/$defs/target" },
+      "allOf": [
+        { "contains": { "type": "object", "properties": { "target_key": { "const": "f210" } }, "required": ["target_key"] }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "minContains": 1, "maxContains": 1 },
+        { "contains": { "type": "object", "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "minContains": 1, "maxContains": 1 }
+      ]
+    },
+    "package_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["membership_authority", "allowed_differences", "shipped_sidecars", "evidence_inside_package", "output_root"],
+      "properties": {
+        "membership_authority": { "const": "tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots" },
+        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "shipped_sidecars": { "const": [] },
+        "evidence_inside_package": { "const": false },
+        "output_root": { "const": "build/mir4/emergency-lane" }
+      }
+    },
+    "record_sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "sourceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_commit", "source_tree", "common_source_commit"],
+      "properties": {
+        "candidate_commit": { "$ref": "#/$defs/gitSha1" },
+        "source_tree": { "$ref": "#/$defs/gitSha1" },
+        "common_source_commit": { "$ref": "#/$defs/gitSha1" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_key", "target_id", "factorio_line", "distribution_target_code", "distribution_version", "release_role", "admission", "source", "predecessor", "engine_lock", "dispositions"],
+      "properties": {
+        "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
+        "target_id": { "enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"] },
+        "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
+        "distribution_target_code": { "enum": ["210", "200", "110", "100"] },
+        "distribution_version": { "type": "string", "pattern": "^4\\.0\\.(21000|20000|11000|10000)$" },
+        "release_role": { "enum": ["mandatory", "conditional-same-source"] },
+        "admission": { "enum": ["admitted-local-emergency-lane", "non-authoritative-shadow-blocked-by-eol"] },
+        "predecessor_source": { "$ref": "#/$defs/sourceIdentity" },
+        "source": { "$ref": "#/$defs/sourceIdentity" },
+        "correction_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "record_sha256"],
+          "properties": {
+            "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
+            "record_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "predecessor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["release", "archive_path", "archive_sha256", "content_sha256", "bytes", "entry_count", "baseline_manifest", "baseline_record_sha256", "normalized_snapshot", "snapshot_record_sha256"],
+          "properties": {
+            "release": { "type": "string", "pattern": "^[1-3]\\.[0-9]+\\.[0-9]+$" },
+            "archive_path": { "type": "string", "pattern": "^dist/more-infinite-research_[1-3]\\.[0-9]+\\.[0-9]+\\.zip$" },
+            "archive_sha256": { "$ref": "#/$defs/sha256" },
+            "content_sha256": { "$ref": "#/$defs/sha256" },
+            "bytes": { "type": "integer", "minimum": 1 },
+            "entry_count": { "type": "integer", "minimum": 1 },
+            "baseline_manifest": { "type": "string", "pattern": "^\\.mir/releases/terminal/baselines/.+/baseline-manifest\\.json$" },
+            "baseline_record_sha256": { "$ref": "#/$defs/sha256" },
+            "normalized_snapshot": { "type": "string", "pattern": "^\\.mir/releases/terminal/baselines/.+/normalized-snapshot\\.json$" },
+            "snapshot_record_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "engine_lock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "executable_sha256", "qualification_status"],
+          "properties": {
+            "version": { "type": "string", "minLength": 3 },
+            "executable_sha256": { "$ref": "#/$defs/sha256" },
+            "qualification_status": { "const": "required-not-reusable-across-distribution-identity" }
+          }
+        },
+        "dispositions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["semantic_change", "features", "settings", "locales", "runtime", "migrations", "package", "capability_omissions"],
+          "properties": {
+            "semantic_change": { "enum": ["none-bootstrap-fixed-point", "approved-exact-correction-MIR3-TERM-0033"] },
+            "features": { "const": "preserve-predecessor-target-local-inventory" },
+            "settings": { "const": "preserve-ids-types-defaults-and-scopes" },
+            "locales": { "const": "preserve-predecessor-package-inventory" },
+            "runtime": { "const": "preserve-target-local-state-owner-and-schema" },
+            "migrations": { "const": "direct-predecessor-version-identity-only" },
+            "package": { "enum": ["metadata-only-version-and-root-difference", "metadata-plus-approved-MIR3-TERM-0033-exact-delta"] },
+            "capability_omissions": { "type": "string", "pattern": "^\\.mir/releases/terminal/baselines/.+/normalized-snapshot\\.json#/capability_omissions$" }
+          }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "target_key": { "const": "f210" } }, "required": ["target_key"] }, "then": { "required": ["predecessor_source", "correction_authority"], "properties": { "target_id": { "const": "factorio-2.1" }, "factorio_line": { "const": "2.1" }, "distribution_target_code": { "const": "210" }, "distribution_version": { "const": "4.0.21000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "admitted-local-emergency-lane" }, "predecessor_source": { "const": { "candidate_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f", "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff" } }, "source": { "const": { "candidate_commit": "01b7cb1f70e085a942580a5e3fbe74b93150ab3d", "source_tree": "5ccc59c384c0e9bba32a57291d64dea247218fb4", "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff" } }, "correction_authority": { "const": { "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json", "record_sha256": "989FB0DB9E07140053BA3188A5A808AA825B4C4D0441F6683D3ED5BA35B087E1" } }, "dispositions": { "properties": { "semantic_change": { "const": "approved-exact-correction-MIR3-TERM-0033" }, "package": { "const": "metadata-plus-approved-MIR3-TERM-0033-exact-delta" } } } } } },
+        { "if": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-2.0" }, "factorio_line": { "const": "2.0" }, "distribution_target_code": { "const": "200" }, "distribution_version": { "const": "4.0.20000" }, "release_role": { "const": "mandatory" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
+        { "if": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-1.1" }, "factorio_line": { "const": "1.1" }, "distribution_target_code": { "const": "110" }, "distribution_version": { "const": "4.0.11000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } },
+        { "if": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "then": { "not": { "anyOf": [{ "required": ["predecessor_source"] }, { "required": ["correction_authority"] }] }, "properties": { "target_id": { "const": "factorio-1.0" }, "factorio_line": { "const": "1.0" }, "distribution_target_code": { "const": "100" }, "distribution_version": { "const": "4.0.10000" }, "release_role": { "const": "conditional-same-source" }, "admission": { "const": "non-authoritative-shadow-blocked-by-eol" } } } }
+      ]
+    }
+  }
+}

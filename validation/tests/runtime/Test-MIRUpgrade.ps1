@@ -203,7 +203,13 @@ if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
 
   $stagedControlPath = Join-Path $stagedFixture "control.lua"
   $stagedControlText = Get-Content -Raw -LiteralPath $stagedControlPath
-  $stagedControlText = $stagedControlText.Replace("3.2.9", $FromVersion).Replace("3.2.10", $ToVersion)
+  # Use collision-proof placeholders because the requested predecessor may be
+  # the template's target (for example 3.2.10 -> 4.0.21000).
+  $fromPlaceholder = "__MIR_UPGRADE_FROM_VERSION__"
+  $toPlaceholder = "__MIR_UPGRADE_TO_VERSION__"
+  $stagedControlText = $stagedControlText.Replace("3.2.9", $fromPlaceholder).Replace("3.2.10", $toPlaceholder)
+  $stagedControlText = $stagedControlText.Replace($fromPlaceholder, $FromVersion).Replace($toPlaceholder, $ToVersion)
+  $stagedControlText = $stagedControlText.Replace("mir-3210-upgraded", "mir-$($ToVersion.Replace('.', ''))-upgraded")
   Set-Content -LiteralPath $stagedControlPath -Value $stagedControlText -Encoding UTF8
 }
 if ($Archetype) {
@@ -264,7 +270,10 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-3-to-3-2-5",
   "assert-upgrade-3-2-3-to-3-2-9",
   "assert-upgrade-3-2-5-to-3-2-9",
-  "assert-upgrade-3-2-9-to-3-2-10"
+  "assert-upgrade-3-2-9-to-3-2-10",
+  "assert-upgrade-2-5-9-to-4-0-20000",
+  "assert-upgrade-1-9-9-to-4-0-11000",
+  "assert-upgrade-1-8-9-to-4-0-10000"
 )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"

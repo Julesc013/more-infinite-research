@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-restoration-receipt.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-restoration-receipt.schema.json",
+  "title": "MIR4RestorationReceiptV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "mode",
+    "status",
+    "publication_authority",
+    "output_was_empty",
+    "candidate",
+    "seal",
+    "publication_dry_runs",
+    "source",
+    "restored",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4RestorationReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "mode": {"const": "restore"},
+    "status": {"const": "passed"},
+    "publication_authority": {"const": false},
+    "output_was_empty": {"const": true},
+    "candidate": {"$ref": "#/$defs/candidate"},
+    "seal": {"$ref": "#/$defs/sealBinding"},
+    "publication_dry_runs": {"$ref": "#/$defs/publicationDryRunBindings"},
+    "source": {"$ref": "#/$defs/archiveDigest"},
+    "restored": {
+      "type": "object",
+      "required": ["archive_name", "archive_sha256", "bytes"],
+      "properties": {
+        "archive_name": {"$ref": "#/$defs/archiveName"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"$ref": "#/$defs/bytes"}
+      },
+      "additionalProperties": false
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "archiveName": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.zip$"},
+    "candidate": {
+      "type": "object",
+      "required": ["candidate_id", "target_id", "distribution_version", "archive_name", "archive_sha256", "bytes"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]},
+        "distribution_version": {"type": "string", "pattern": "^4\\.[0-9]+\\.[0-9]{5}$"},
+        "archive_name": {"$ref": "#/$defs/archiveName"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"$ref": "#/$defs/bytes"}
+      },
+      "additionalProperties": false
+    },
+    "sealBinding": {
+      "type": "object",
+      "required": ["kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "kind": {"const": "MIR4OfflineSealV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "publicationDryRunBindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "allOf": [
+        {"contains": {"type": "object", "properties": {"run_id": {"const": "A"}}, "required": ["run_id"]}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "properties": {"run_id": {"const": "B"}}, "required": ["run_id"]}, "minContains": 1, "maxContains": 1}
+      ],
+      "items": {"$ref": "#/$defs/publicationDryRunBinding"}
+    },
+    "publicationDryRunBinding": {
+      "type": "object",
+      "required": ["run_id", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "run_id": {"enum": ["A", "B"]},
+        "kind": {"const": "MIR4PublicationDryRunBundleV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "archiveDigest": {
+      "type": "object",
+      "required": ["archive_sha256", "bytes"],
+      "properties": {
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"$ref": "#/$defs/bytes"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -167,6 +167,65 @@ function Get-MIRCPCommitPackageSourceHash {
   }
 }
 
+function Test-MIRCPApprovedBootstrapCorrection {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Lock,
+    [Parameter(Mandatory)][string]$ObservedPackageSourceSha256
+  )
+
+  $recordPath = Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json"
+  if (-not (Test-Path -LiteralPath $recordPath -PathType Leaf)) { return $false }
+  . (Join-Path $RepoRoot "tools\lib\mir4\BootstrapMaterialization.ps1")
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+  if (-not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      [string]$record.kind -cne "MIR4ApprovedBootstrapCorrectionDeltaV1" -or
+      [string]$record.authority_family -cne "MIRApprovedDeltaV1" -or
+      [string]$record.finding -cne "MIR3-TERM-0033" -or
+      [string]$record.target_key -cne "f210" -or
+      [bool]$record.public_output_authorized -or
+      [bool]$record.authority_scope.release_admission_authorized -or
+      [bool]$record.authority_scope.signing_or_sealing_authorized -or
+      [bool]$record.authority_scope.publication_authorized -or
+      [bool]$record.authority_scope.transitive_target_inheritance_authorized) {
+    return $false
+  }
+  if ([string]$record.predecessor.release -cne [string]$Lock.release -or
+      [string]$record.predecessor.archive_sha256 -cne [string]$Lock.archive_sha256 -or
+      [string]$record.predecessor.content_sha256 -cne [string]$Lock.package_source_sha256 -or
+      [string]$record.base_source.commit -cne [string]$Lock.package_source_commit -or
+      [string]$record.base_source.tree -cne [string]$Lock.package_source_tree -or
+      @($record.deltas).Count -ne 2) {
+    return $false
+  }
+
+  $roots = @(Get-MIRPackageSourceRoots)
+  $changed = @(& git -C $RepoRoot diff --name-only ([string]$Lock.package_source_commit) -- @roots)
+  if ($LASTEXITCODE -ne 0) { return $false }
+  $changed = @($changed | ForEach-Object { ([string]$_).Replace('\', '/') } | Sort-Object -Unique)
+  $expected = @($record.deltas.path | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  if ($changed.Count -ne 2 -or ($changed -join '|') -cne ($expected -join '|')) { return $false }
+
+  foreach ($delta in @($record.deltas)) {
+    $path = [string]$delta.path
+    $currentPath = Join-Path $RepoRoot $path
+    if (-not (Test-Path -LiteralPath $currentPath -PathType Leaf) -or
+        (Get-FileHash -Algorithm SHA256 -LiteralPath $currentPath).Hash -cne [string]$delta.after_sha256 -or
+        [long](Get-Item -LiteralPath $currentPath).Length -ne [long]$delta.after_bytes) {
+      return $false
+    }
+    $beforeBlob = @(& git -C $RepoRoot rev-parse "$([string]$Lock.package_source_commit):$path" 2>$null)
+    $afterBlob = @(& git -C $RepoRoot hash-object -- $currentPath 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $beforeBlob.Count -ne 1 -or $afterBlob.Count -ne 1 -or
+        [string]$beforeBlob[0] -cne [string]$delta.before_blob -or
+        [string]$afterBlob[0] -cne [string]$delta.after_blob) {
+      return $false
+    }
+  }
+
+  return -not [string]::IsNullOrWhiteSpace($ObservedPackageSourceSha256)
+}
+
 function Assert-MIRCPPackageFreeze {
   param(
     [string]$RepoRoot = "",
@@ -196,7 +255,9 @@ function Assert-MIRCPPackageFreeze {
   }
   $currentHash = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   if ($currentHash -ne [string]$active[0].package_source_sha256) {
-    throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
+    if (-not (Test-MIRCPApprovedBootstrapCorrection -RepoRoot $repo -Lock $active[0] -ObservedPackageSourceSha256 $currentHash)) {
+      throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
+    }
   }
   $archivePath = Join-Path $repo ([string]$active[0].archive)
   if (Test-Path -LiteralPath $archivePath -PathType Leaf) {

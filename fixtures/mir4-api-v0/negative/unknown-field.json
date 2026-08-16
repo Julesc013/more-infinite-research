@@ -1,0 +1,20 @@
+{
+  "kind": "MIR4QuerySnapshotV0",
+  "schema": 0,
+  "target": {
+    "id": "f210",
+    "factorio_line": "2.1",
+    "transport": "build-time-static"
+  },
+  "versions": {
+    "source": "4.0.0",
+    "distribution": "4.0.21000"
+  },
+  "capabilities": [],
+  "canonicalization": "mir-canonical-json-v0",
+  "extensions": {},
+  "payload": {},
+  "digest": "sha256:88aa2a97952fbe04e7f20fdaf94a308da15ccaea802397090aeb9c7217d9e9eb",
+  "unknown_required_field": "must-fail",
+  "expected_diagnostic": "mir4-api-schema"
+}

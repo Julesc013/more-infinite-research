@@ -81,7 +81,8 @@ $requiredKinds = @(
   "MIR4-Equivalence-PolicyV1",
   "MIR4-Emergency-LaneV1",
   "MIR4-Offline-Release-AuthorityV1",
-  "MIR3-to-MIR4-Governance-ReconciliationV1"
+  "MIR3-to-MIR4-Governance-ReconciliationV1",
+  "MIR4-Terminal-Predecessor-RefreshV1"
 )
 $authorityFiles = @($requiredKinds | ForEach-Object { "$authorityDirectory/$_.json" })
 foreach ($path in $authorityFiles) {
@@ -109,8 +110,10 @@ $allInputs = [Collections.Generic.List[object]]::new()
 foreach ($path in @($authorityFiles + @(
   $catalogPath,
   "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1",
+  "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
   "tools/commands/release/Import-MIR3TerminalBaselines.ps1",
   "spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json",
+  "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json",
   "spec/schemas/mir4-terminal-normalized-snapshot.schema.json",
   "spec/schemas/mir4-terminal-baseline-import.schema.json",
   "spec/schemas/mir4-r0-authority.schema.json"
@@ -170,6 +173,58 @@ foreach ($catalogRow in @($catalog.releases)) {
   }
 }
 
+# The immutable .9 family remains fully captured above. For the current Factorio
+# 2.1 predecessor only, replace the executable import row with the append-only
+# 3.2.10 emergency continuation. The historical 3.2.9 files remain bound inputs.
+$continuationVersion = "3.2.10"
+$continuationManifestPath = ".mir/releases/terminal/baselines/$continuationVersion/baseline-manifest.json"
+$continuationSnapshotPath = ".mir/releases/terminal/baselines/$continuationVersion/normalized-snapshot.json"
+$continuationClosurePath = ".mir/releases/terminal/closures/$continuationVersion.json"
+$continuationManifest = Read-Json $continuationManifestPath
+$continuationSnapshot = Read-Json $continuationSnapshotPath
+$continuationClosure = Read-Json $continuationClosurePath
+Assert-RecordSha256 $continuationManifest "$continuationVersion continuation manifest"
+Assert-RecordSha256 $continuationSnapshot "$continuationVersion normalized snapshot"
+Assert-RecordSha256 $continuationClosure "$continuationVersion release closure"
+if ([string]$continuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV1" -or
+    [string]$continuationManifest.status -cne "captured-public-custody-pending-open-mir4-follow-up" -or
+    [bool]$continuationSnapshot.semantic_authority -or
+    [string]$continuationSnapshot.status -cne "importable-pre-eol-public-custody-pending" -or
+    [string]$continuationClosure.status -cne "github-closed-mod-portal-pending") {
+  throw "The 3.2.10 continuation is not import-ready."
+}
+foreach ($file in @($continuationManifest.files)) {
+  $path = Join-Path $RepoRoot ([string]$file.source_path)
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$file.sha256 -or
+      [long](Get-Item -LiteralPath $path).Length -ne [long]$file.bytes) {
+    throw "Logical continuation input drift for ${continuationVersion}: $($file.source_path)"
+  }
+  $allInputs.Add((Get-AuthorityIdentity ([string]$file.source_path)))
+}
+$continuationDistPath = Join-Path $RepoRoot ([string]$continuationManifest.distribution.path)
+if ((Get-FileHash -LiteralPath $continuationDistPath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$continuationManifest.distribution.archive_sha256 -or
+    (Get-MIRZipContentFingerprint -Path $continuationDistPath) -cne [string]$continuationManifest.distribution.content_sha256 -or
+    [long](Get-Item -LiteralPath $continuationDistPath).Length -ne [long]$continuationManifest.distribution.bytes -or
+    (Get-ZipEntryCount $continuationDistPath) -ne [int]$continuationManifest.distribution.entries) {
+  throw "Published distribution drift for $continuationVersion."
+}
+foreach ($path in @($continuationManifestPath, $continuationSnapshotPath, $continuationClosurePath)) {
+  $allInputs.Add((Get-AuthorityIdentity $path))
+}
+$continuationRow = [ordered]@{
+  release = $continuationVersion
+  target = [string]$continuationSnapshot.target
+  successor_target = [string]$continuationSnapshot.successor_target
+  baseline_manifest = [ordered]@{path=$continuationManifestPath;record_sha256=[string]$continuationManifest.record_sha256;input_root_sha256=[string]$continuationManifest.input_root_sha256;status=[string]$continuationManifest.status}
+  normalized_snapshot = [ordered]@{path=$continuationSnapshotPath;record_sha256=[string]$continuationSnapshot.record_sha256;semantic_authority=[bool]$continuationSnapshot.semantic_authority}
+  release_closure = [ordered]@{path=$continuationClosurePath;record_sha256=[string]$continuationClosure.record_sha256;status=[string]$continuationClosure.status}
+  distribution = $continuationSnapshot.distribution
+  import_disposition = "normalized-shadow-input-no-semantic-authority-before-eol"
+  snapshot = $continuationSnapshot
+}
+$rows = @($continuationRow) + @($rows | Where-Object { [string]$_.release -cne "3.2.9" })
+
 $inputRows = @($allInputs.ToArray() | Sort-Object path -Unique)
 $inputMaterial = ($inputRows | ForEach-Object { "$($_.path)`0$($_.sha256)" }) -join "`n"
 $material = [ordered]@{
@@ -185,8 +240,10 @@ $material = [ordered]@{
   inputs = $inputRows
   releases = @($rows)
   guarantees = @(
-    "all-nine-sealed-distributions-exact",
-    "all-nine-logical-baseline-views-self-contained",
+    "all-nine-historical-dot9-distributions-remain-exact-and-bound",
+    "factorio-2.1-predecessor-continues-at-exact-public-3.2.10",
+    "factorio-2.0-and-older-predecessors-remain-dot9",
+    "all-nine-current-import-views-self-contained",
     "terminal-claim-maturity-not-promoted",
     "unsupported-target-fields-explicitly-omitted",
     "mir3-remains-semantic-authority-until-eol",
