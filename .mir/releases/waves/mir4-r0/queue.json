@@ -34,7 +34,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
-      "sha256": "13F99A0559CDAF42DBBDDC02A45D998E9A18D5B13F68D59CBD41273EC17DA96B"
+      "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
@@ -155,5 +155,5 @@
       }
     ]
   },
-  "record_sha256": "BB7C155C609E0A6E2FE799FA8792A5688263950F132F876EDEDBCDCAED647F3E"
+  "record_sha256": "9264DD86BA23BD51DD2ACD0C8C4D15E62E86E0B2D3FF51E6A9EAD985C1C6382C"
 }
