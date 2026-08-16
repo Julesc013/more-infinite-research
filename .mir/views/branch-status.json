@@ -33,6 +33,16 @@
     },
     {
       "branch": "legacy",
+      "candidate_floor": "2.5-P14",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "2.5.10",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
       "candidate_floor": "",
       "candidate_id": "2.5-P12",
       "effective_status": "publicly-verified",
@@ -59,6 +69,16 @@
       "release": "3.2.1",
       "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
       "state": "published",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "C34",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "3.2.10",
+      "source_commit": "",
+      "state": "planned",
       "target": "2.1"
     },
     {

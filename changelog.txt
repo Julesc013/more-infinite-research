@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.10
+Date: 2026-08-16
+
+  Bugfixes:
+
+    - Removed current and queued research that is above a newly lowered maximum level.
+    - Retained completed technology levels and valid fractional research progress while applying a lower cap.
+    - Reported late prototype mutations that prevent a configured native-owner maximum from becoming active.
+
+  Compatibility:
+
+    - Applied the same absolute maximum-level contract to generated streams and base continuations.
+    - Applied that contract to all five Space Age native productivity owners.
+    - Preserved every 3.2.9 technology identity, cost, effect, science route, and unrelated force state.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.2.9
 Date: 2026-08-12
 

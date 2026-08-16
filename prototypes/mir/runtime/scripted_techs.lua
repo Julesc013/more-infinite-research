@@ -1,6 +1,7 @@
 local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
 local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
+local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
 local planet_discovery_recovery = require("prototypes.mir.runtime.planet_discovery_recovery")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local runtime_state = require("prototypes.mir.runtime.state")
@@ -12,6 +13,7 @@ local features = {
   spoilage,
   agricultural_growth,
   productivity_family_adoption,
+  maximum_level_control,
   planet_discovery_recovery
 }
 
@@ -52,7 +54,7 @@ local function run_matching_research(method, event)
 
   ensure_storage()
   for _, feature in ipairs(features) do
-    if feature.technology_name == event.research.name then
+    if feature.technology_name == nil or feature.technology_name == event.research.name then
       local handler = feature[method]
       if handler then
         handler(event, log_debug)
@@ -84,8 +86,20 @@ function M.register()
     run_matching_research("on_research_reversed", event)
   end)
 
+  register_event(defines.events.on_research_queued, function(event)
+    run_matching_research("on_research_queued", event)
+  end)
+
   register_event(defines.events.on_technology_effects_reset, function(event)
     run_all("on_technology_effects_reset", event)
+  end)
+
+  register_event(defines.events.on_force_created, function(event)
+    run_all("on_force_created", event)
+  end)
+
+  register_event(defines.events.on_forces_merged, function(event)
+    run_all("on_forces_merged", event)
   end)
 
   register_event(defines.events.on_tower_planted_seed, function(event)

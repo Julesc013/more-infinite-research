@@ -1,12 +1,14 @@
 {
   "active_programme": {
-    "authority": ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
-    "id": "MIR3-Terminal-ProgrammeV1",
-    "status": "github-published-and-verified-mod-portal-pending"
+    "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+    "id": "MIR3PostTerminalEmergencyHotfixProgrammeV1",
+    "status": "implementation-and-qualification-in-progress"
   },
   "authority": "mir-current-release-roles-v2",
   "implementation_admitted": true,
   "planned_releases": [
+    "3.2.10",
+    "2.5.10",
     "3.2.9",
     "2.5.9",
     "1.9.9",
@@ -19,17 +21,17 @@
   ],
   "roles": {
     "backport_calibration": "2.5.9",
-    "canonical": "3.2.9",
+    "canonical": "3.2.10",
     "latest_published_factorio_2_0": "2.5.9",
     "latest_published_factorio_2_1": "3.2.9",
     "latest_tagged_factorio_2_0": "2.5.9",
     "latest_tagged_factorio_2_1": "3.2.9",
-    "planned_backport": "2.5.9",
-    "planned_canonical": "3.2.9",
+    "planned_backport": "2.5.10",
+    "planned_canonical": "3.2.10",
     "published_factorio_2_0": "2.5.9",
     "published_factorio_2_1": "3.2.9",
     "tagged_factorio_2_1": "3.2.9"
   },
   "schema": 1,
-  "source_frozen": true
+  "source_frozen": false
 }

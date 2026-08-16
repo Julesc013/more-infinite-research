@@ -1,11 +1,11 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.9"
+applies_to: "3.2.10"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-15
+last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
 ---
@@ -16,27 +16,38 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.9` |
-| Candidate identity | `C33` |
+| MIR version | `3.2.10` |
+| Candidate identity | `not-assigned` |
 | Candidate namespace | `C` |
-| Predecessor maximum ordinal | `32` |
-| Minimum next ordinal | `33` |
-| Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
+| Predecessor maximum ordinal | `33` |
+| Minimum next ordinal | `34` |
+| Assignment condition | `emergency-fixed-point-and-source-freeze` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
-| Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
-| Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
-| Archive | `dist/more-infinite-research_3.2.9.zip` |
-| Archive bytes | `1061572` |
-| Archive entries | `303` |
-| Archive SHA-256 | `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20` |
-| Package content SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
+| State | `planned` |
+| Package source commit | `pending` |
+| Package source tree | `pending` |
+| Package source SHA-256 | `pending` |
+| Archive | `pending` |
+| Archive bytes | `pending` |
+| Archive entries | `pending` |
+| Archive SHA-256 | `pending` |
+| Package content SHA-256 | `pending` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `source-frozen`
+- [ ] `package-built`
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `automated-qualified-awaiting-human-review`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 

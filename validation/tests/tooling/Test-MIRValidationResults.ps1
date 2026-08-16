@@ -59,9 +59,9 @@ if ($expectedDynamicBlock.Contains('"k2-science-phase-policy"', [StringCompariso
 }
 
 foreach ($nativeOwnerStream in @("research_rocket_fuel", "research_steel")) {
-  $currentSignature = 'schema=3|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
+  $currentSignature = 'schema=4|stream=' + $nativeOwnerStream + '|owner=' + $(if ($nativeOwnerStream -eq "research_rocket_fuel") { "rocket-fuel-productivity" } else { "steel-plate-productivity" }) + '|operation=adopt_native_owner_effects|configured=|effects=1|input-cost='
   if (-not $validationFacade.Contains($currentSignature, [StringComparison]::Ordinal)) {
-    throw "Native-owner configuration-change validation must assert the current schema-3 cost-bound signature for $nativeOwnerStream."
+    throw "Native-owner configuration-change validation must assert the current schema-4 cost-bound signature for $nativeOwnerStream."
   }
 }
 

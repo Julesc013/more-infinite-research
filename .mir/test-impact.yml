@@ -241,6 +241,12 @@
       "tags": []
     },
     {
+      "pattern": "prototypes/mir/runtime/maximum_level_control.lua",
+      "groups": ["runtime-state", "space-age"],
+      "scenarios": ["generated-maximum-level-absolute", "generated-maximum-level-lowering-config-change", "base-continuation-maximum-level-lowering-config-change", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-max-level-1", "space-age-native-owner-settings-max-level-2", "space-age-native-owner-settings-max-level-7", "space-age-native-owner-settings-max-level-profile-import", "space-age-native-owner-settings-max-level-late-conflict", "space-age-native-owner-cap-lowering-config-change", "space-age-native-owner-cap-raising-config-change", "space-age-native-owner-cap-removal-config-change"],
+      "tags": ["maximum-level"]
+    },
+    {
       "pattern": "prototypes/mir/domain/native_owner/**",
       "groups": ["space-age"],
       "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]

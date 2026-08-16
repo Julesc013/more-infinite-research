@@ -701,6 +701,30 @@ fixtures:
       - atomic-base-increment-growth-setting-semantics
       - settings-profile-compatible-stable-ids
 
+  maximum-level-runtime-control:
+    requires_features: [scripted_techs]
+    path: fixtures/assert-generated-max-level
+    supplemental_paths:
+      - fixtures/assert-generated-cap-transition
+      - fixtures/assert-base-continuation-cap-transition
+      - fixtures/assert-native-owner-cap-transition
+      - fixtures/assert-native-owner-cap-relaxation
+      - fixtures/late-native-owner-max-level
+    validates:
+      - zero-means-infinite
+      - positive-value-is-absolute-highest-level
+      - generated-stream-cap-enforcement
+      - generated-base-continuation-cap-enforcement
+      - five-native-owner-cap-enforcement
+      - completed-levels-retained-above-lowered-cap
+      - valid-fractional-progress-retained
+      - invalid-current-and-queued-research-removed
+      - cap-raise-restores-future-research
+      - cap-removal-restores-infinite-research
+      - MIRSET1-effective-cap-projection
+      - late-prototype-conflict-reported-and-refused
+      - repeated-reload-idempotence
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
