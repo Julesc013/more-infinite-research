@@ -20,6 +20,7 @@ on:
         type: choice
         options:
           - none
+          - 3.2.10
           - 3.2.9
           - 2.5.9
       terminal_candidate_sha:
@@ -94,7 +95,7 @@ jobs:
               output: {
                 title: `MIR 3 ${process.env.RELEASE} terminal promotion verification`,
                 summary: passed
-                  ? 'The exact allocated candidate, archive, maintainer acceptance, target seal, family readiness, remote candidate ref, and fast-forward boundary passed the current package-excluded promotion controller.'
+                  ? 'The exact admitted candidate, archive, acceptance authority, remote candidate ref, and release-specific promotion boundary passed the current package-excluded controller.'
                   : 'Terminal promotion verification failed closed. Inspect the workflow evidence; branch promotion is forbidden.'
               }
             });
@@ -106,7 +107,7 @@ jobs:
               context: 'terminal-promotion-verification',
               target_url: runUrl,
               description: passed
-                ? 'Exact sealed MIR 3 terminal candidate passed promotion verification.'
+                ? 'Exact admitted MIR 3 candidate passed promotion verification.'
                 : 'Terminal promotion verification failed closed.'
             });
             if (!passed) core.setFailed('Terminal promotion verification did not pass.');
