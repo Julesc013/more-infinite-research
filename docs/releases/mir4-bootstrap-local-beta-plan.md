@@ -14,7 +14,7 @@ superseded_by: []
 
 ## Verdict
 
-The repository can construct one admitted deterministic f210 local beta candidate from the exact public 3.2.10 continuation and reserves the other three projections, but it cannot yet qualify, seal, allocate, tag, or publish MIR 4 distributions.
+The repository can construct one admitted deterministic f210 local candidate from the exact public 3.2.10 continuation plus the exact approved `MIR3-TERM-0033` correction. A separate private shadow lane can construct deterministic f200, f110, and f100 local-playtest candidates without changing their release admission. The repository cannot yet seal, allocate, tag, publish, or make public MIR 4 release or beta claims.
 
 The current f210 lock is the maintainer-accepted Steam Factorio `2.1.14.87180` executable with SHA-256 `E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F`. The earlier 2.1.13 availability observation remains historical evidence and no longer controls M4-003. MIR 3 portal custody and EOL remain open, production signing custody is unresolved, and MIR 4 release acceptance remains a later gate.
 
@@ -42,22 +42,22 @@ For each admitted target, the materializer captures byte-identical source capsul
 
 This closes the checkout-independent capsule-only C reconstruction required for local package construction. It does not claim an operating-system ACL/container denial of the original checkout or a network-denied runtime campaign; those stronger environmental observations remain outside the package-construction result.
 
-Candidate packages and evidence remain beneath ignored `build/mir4/emergency-lane`; no file is written to `dist`, no repository package source is changed, and no Git or public release identity is created.
+The f210 candidate and evidence remain beneath ignored `build/mir4/emergency-lane`. The three lower-target playtest candidates remain beneath ignored `build/mir4/local-playtest-shadow`. Neither lane writes `dist`, changes repository package source, creates Git identities, or performs public transfer. The lower lane is governed by `MIR4LocalPlaytestShadowAuthorizationV1`; it authorizes construction and local testing only, and its numeric-version artifacts may move only between maintainer-controlled private machines.
 
 ## Target ledger
 
 | Target | Local version | Exact predecessor | Admission | Required exact engine | Dated executable observation |
 | --- | --- | --- | --- | --- | --- |
 | f210 | `4.0.21000` | `3.2.10` | emergency lane; MIR3-TERM-0033 required | Factorio 2.1.14.87180 | Exact maintainer-accepted Steam lock bound |
-| f200 | `4.0.20000` | `2.5.9` | reserved; executable construction blocked until EOL admission | Factorio 2.0.77.84539 | Exact executable lock match |
-| f110 | `4.0.11000` | `1.9.9` | reserved conditional target; blocked until EOL admission | Factorio 1.1.110.62357 | Exact executable lock match |
-| f100 | `4.0.10000` | `1.8.9` | reserved conditional target; blocked until EOL admission | Factorio 1.0.0.54889 only | Exact executable lock match |
+| f200 | `4.0.20000` | `2.5.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 2.0.77.84539 | Exact executable lock match |
+| f110 | `4.0.11000` | `1.9.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 1.1.110.62357 | Exact executable lock match |
+| f100 | `4.0.10000` | `1.8.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 1.0.0.54889 only | Exact executable lock match |
 
 ## Dated readiness correction
 
 The `2026-08-16` 2.1.13 engine observation is retained unchanged as historical readiness evidence. `MIR4-Terminal-Predecessor-RefreshV1` supersedes it for current f210 planning by binding 3.2.10 and the Steam 2.1.14 executable identity. Neither record substitutes for candidate-bound M4-003 runtime evidence or admits f200, f110, or f100 construction.
 
-`MIR4BootstrapTargetReadinessV1` remains a package-excluded historical observation. Its f210 2.1.13 mismatch is superseded by the predecessor refresh; its unresolved f200 stream-count conflict (`73` in the current canonical profile versus `74` in the terminal f200 authority), absent positive capability-allowlist fields in the current f110/f100 profiles, and missing target projections remain unresolved.
+`MIR4BootstrapTargetReadinessV1` remains package-excluded and does not grant construction or release admission. Its f210 2.1.13 mismatch is superseded by the predecessor refresh. The canonical f200 stream count is reconciled to the exact terminal value `74`; f110 and f100 now carry the exact terminal positive allowlists of zero required mods and twelve supported effect types. Target-local direct-upgrade fixtures are defined, while candidate-bound runtime evidence, MIR 3 custody, and formal admission remain separate blockers.
 
 The historical visibility recheck binds 3.2.9 and 2.5.9. The 3.2.10 continuation is GitHub-published and publicly byte-verified, while its Mod Portal upload is recorded only from the maintainer report until an independent authenticated redownload receipt is captured. That remaining custody work, the final index, archive and rights records, and the EOL seal remain open.
 
@@ -68,6 +68,13 @@ Build and re-check the admitted local candidate without a network or publication
 ```powershell
 .\tools\mir.ps1 mir4 build-local-beta --target f210
 .\tools\mir.ps1 mir4 check-local-beta --target f210
+```
+
+Construct or re-check all three private lower-target artifacts. These commands have a fixed output root and do not authorize release claims.
+
+```powershell
+.\tools\mir.ps1 mir4 build-local-playtest --target all
+.\tools\mir.ps1 mir4 check-local-playtest --target all
 ```
 
 Materialize and inspect an exact verification plan bound to the built MIR 4 candidate before invoking repository tests.

@@ -2573,6 +2573,17 @@ docs:
       - mir4-bootstrap-canonical-json-v1
       - mir4-bootstrap-seal-restoration-order
       - mir4-bootstrap-capsule-reconstruction-boundary
+  - path: docs/architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md
+    title: "ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-local-artifact-lane-authorization-v1
+      - mir-approved-delta-v1
+      - mir4-local-playtest-shadow-boundary
+      - mir4-approved-bootstrap-correction-boundary
   - path: docs/architecture/mir4-r0-bootstrap.md
     title: "MIR 4 R0 Bootstrap"
     status: current
@@ -2613,6 +2624,7 @@ docs:
       - mir4-final-programme-reconciliation-status
       - mir4-terminal-predecessor-refresh
       - mir4-m4-003-required-follow-up
+      - mir4-private-local-playtest-shadow-operations
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current

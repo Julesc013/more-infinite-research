@@ -141,7 +141,7 @@ foreach ($targetKey in $expectedTargetKeys) {
     $readiness.projection.canonical_source_proven -eq $false -and
     $readiness.projection.complete_target_dispositions -eq $false -and
     $readiness.projection.provider_contract_proven -eq $false) "Readiness falsely claims a completed projection for $targetKey."
-  Assert-True ($readiness.transition.fixture_state -ceq "not-defined" -and
+  Assert-True ($readiness.transition.fixture_state -ceq "defined-package-excluded" -and
     $readiness.transition.candidate_bound_evidence_present -eq $false -and
     $readiness.transition.historical_evidence_substitution_allowed -eq $false) "Readiness falsely claims transition evidence for $targetKey."
 
@@ -158,18 +158,22 @@ foreach ($targetKey in $expectedTargetKeys) {
 }
 
 $f200 = @($readinessTargets | Where-Object { [string]$_.target_key -ceq "f200" })[0]
-Assert-True ($f200.capability.state -ceq "blocked-stream-count-conflict" -and
-  [int]$f200.capability.canonical_expected_stream_count -eq 73 -and
-  [int]$f200.capability.terminal_expected_stream_count -eq 74) "f200 stream-count drift is no longer represented fail-closed."
+Assert-True ($f200.capability.state -ceq "terminal-authority-reconciled" -and
+  [int]$f200.capability.canonical_expected_stream_count -eq 74 -and
+  [int]$f200.capability.terminal_expected_stream_count -eq 74 -and
+  @($f200.capability.drift).Count -eq 0) "f200 stream-count authority was not reconciled to the exact terminal value 74."
 Assert-True (@($f200.blockers | Where-Object { [string]$_ -match 'rendering-discrepancy' }).Count -eq 0 -and
   @($f200.blockers | Where-Object { [string]$_ -ceq 'mir3-authenticated-redownload-and-eol-custody-pending' }).Count -eq 1) "f200 readiness retains the disproven portal-rendering discrepancy or drops the real custody blocker."
 
 foreach ($targetKey in @("f110", "f100")) {
   $readiness = @($readinessTargets | Where-Object { [string]$_.target_key -ceq $targetKey })[0]
   $currentProfile = $targetProfilesRecord.Value.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
-  Assert-True ($null -eq $currentProfile.PSObject.Properties['supported_required_mods'] -and
-    $null -eq $currentProfile.PSObject.Properties['supported_effect_types'] -and
-    [string]$readiness.capability.state -ceq "blocked-missing-positive-allowlists") "Missing canonical positive capability fields are not represented for $targetKey."
+  $expectedEffects = @('character-build-distance', 'character-crafting-speed', 'character-inventory-slots-bonus', 'character-item-drop-distance', 'character-logistic-trash-slots', 'character-mining-speed', 'character-reach-distance', 'character-resource-reach-distance', 'character-running-speed', 'gun-speed', 'laboratory-productivity', 'worker-robot-battery')
+  Assert-True (@($currentProfile.supported_required_mods).Count -eq 0 -and
+    (@($currentProfile.supported_effect_types) -join '|') -ceq ($expectedEffects -join '|') -and
+    [string]$readiness.capability.state -ceq "terminal-positive-allowlists-reconciled" -and
+    [string]$readiness.capability.current_positive_allowlist_state -ceq 'present' -and
+    @($readiness.capability.drift).Count -eq 0) "Canonical positive capability allowlists are not exact for $targetKey."
 }
 
 $badReadiness = $readinessRecord.Text | ConvertFrom-Json

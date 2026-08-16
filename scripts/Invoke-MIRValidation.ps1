@@ -193,6 +193,7 @@ Invoke-RepoCheck "MIR 4 bootstrap materialization and offline custody are determ
   & (Join-Path $repo "validation\tests\release\Test-MIR4FinalProgrammeReconciliation.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR3Dot9ModPortalVisibilityRecheck.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapTargetReadiness.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4LocalPlaytestShadow.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapMaterialization.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4OfflineCandidateCustody.ps1") -RepoRoot $repo
 }

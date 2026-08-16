@@ -26,7 +26,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
-      "sha256": "8AF7009969B4911A209785FD6315CD013A52C74C5925C5CD1E0E8B32782B4711"
+      "sha256": "46AE9D0A4F5C433B3B38BB9ED15C050D1D6E1CF40668D4EC37995493D4BAAC8D"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json",
@@ -34,7 +34,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
-      "sha256": "C67BD4C8BFF3A2CCEE30F3DFE7590295E739A825AEFDA112DBAEDA0AFEDF26EA"
+      "sha256": "13F99A0559CDAF42DBBDDC02A45D998E9A18D5B13F68D59CBD41273EC17DA96B"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
@@ -155,5 +155,5 @@
       }
     ]
   },
-  "record_sha256": "AADE6C723C033FAD2D10F6423B89E3D82BEFC5C87C07D64BC1FDF3F9A6BCA41D"
+  "record_sha256": "BB7C155C609E0A6E2FE799FA8792A5688263950F132F876EDEDBCDCAED647F3E"
 }

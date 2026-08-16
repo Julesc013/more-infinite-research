@@ -4,19 +4,21 @@
   "title": "MIR 4 bootstrap source capsule V2 detached envelope",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "public_output_authorized", "target_key", "factorio_line", "distribution_version", "source", "predecessor", "correction_authority", "package_membership", "closure", "bootstrap_runner", "capsule", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "public_output_authorized", "lane", "target_key", "factorio_line", "distribution_version", "source", "predecessor", "package_membership", "closure", "bootstrap_runner", "capsule", "record_sha256"],
   "properties": {
     "schema": { "const": 2 },
     "kind": { "const": "MIR4BootstrapSourceCapsuleV2" },
     "status": { "const": "local-unpublished-input" },
     "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
     "public_output_authorized": { "const": false },
-    "target_key": { "const": "f210" },
-    "factorio_line": { "const": "2.1" },
-    "distribution_version": { "const": "4.0.21000" },
+    "lane": { "enum": ["emergency", "local-playtest-shadow"] },
+    "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
+    "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
+    "distribution_version": { "enum": ["4.0.21000", "4.0.20000", "4.0.11000", "4.0.10000"] },
     "source": { "$ref": "#/$defs/source" },
     "predecessor": { "$ref": "#/$defs/predecessor" },
     "correction_authority": { "$ref": "#/$defs/correctionAuthority" },
+    "local_lane_authority": { "$ref": "#/$defs/laneAuthority" },
     "package_membership": {
       "type": "object",
       "additionalProperties": false,
@@ -59,6 +61,13 @@
     "capsule": { "$ref": "#/$defs/artifact" },
     "record_sha256": { "$ref": "#/$defs/sha256" }
   },
+  "allOf": [
+    { "if": { "properties": { "lane": { "const": "emergency" } }, "required": ["lane"] }, "then": { "required": ["correction_authority"], "not": { "required": ["local_lane_authority"] }, "properties": { "target_key": { "const": "f210" }, "factorio_line": { "const": "2.1" }, "distribution_version": { "const": "4.0.21000" } } } },
+    { "if": { "properties": { "lane": { "const": "local-playtest-shadow" } }, "required": ["lane"] }, "then": { "required": ["local_lane_authority"], "not": { "required": ["correction_authority"] }, "properties": { "target_key": { "enum": ["f200", "f110", "f100"] } } } },
+    { "if": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "2.0" }, "distribution_version": { "const": "4.0.20000" } } } },
+    { "if": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "1.1" }, "distribution_version": { "const": "4.0.11000" } } } },
+    { "if": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "1.0" }, "distribution_version": { "const": "4.0.10000" } } } }
+  ],
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
     "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
@@ -83,13 +92,24 @@
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }
     },
+    "laneAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "authority_family", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json" },
+        "kind": { "const": "MIR4LocalPlaytestShadowAuthorizationV1" },
+        "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
     "predecessor": {
       "type": "object",
       "additionalProperties": false,
       "required": ["release", "archive_path", "archive_sha256", "content_sha256", "bytes", "entry_count", "baseline_manifest", "baseline_record_sha256", "normalized_snapshot", "snapshot_record_sha256"],
       "properties": {
-        "release": { "const": "3.2.10" },
-        "archive_path": { "const": "dist/more-infinite-research_3.2.10.zip" },
+        "release": { "enum": ["3.2.10", "2.5.9", "1.9.9", "1.8.9"] },
+        "archive_path": { "pattern": "^dist/more-infinite-research_(3\\.2\\.10|2\\.5\\.9|1\\.9\\.9|1\\.8\\.9)\\.zip$" },
         "archive_sha256": { "$ref": "#/$defs/sha256" },
         "content_sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 1 },

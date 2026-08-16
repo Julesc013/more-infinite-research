@@ -29,6 +29,8 @@ Usage:
   .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
   .\tools\mir.ps1 mir4 build-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>] [--repetitions <n>]
   .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 build-local-playtest [--target <all|f200|f110|f100>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-playtest [--target <all|f200|f110|f100>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
@@ -492,9 +494,33 @@ switch ($area) {
         & (Join-Path $repo "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1") `
           -RepoRoot $repo.Path `
           -Target $target `
+          -Lane emergency `
           -OutputRoot $output `
           -Repetitions $repetitions `
           -Check:($verb -eq "check-local-beta")
+      }
+      { $_ -in @("build-local-playtest", "check-local-playtest") } {
+        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        if ($target -notin @('all', 'f200', 'f110', 'f100')) {
+          throw "--target must be one of all, f200, f110, or f100 for the private local-playtest lane."
+        }
+        $explicitOutput = Get-MIRArgValue -Items $Args -Name "--output"
+        if (-not [string]::IsNullOrWhiteSpace($explicitOutput) -and
+            [string]$explicitOutput -cne 'build/mir4/local-playtest-shadow') {
+          throw "The private local-playtest lane has the fixed output root build/mir4/local-playtest-shadow."
+        }
+        $repetitionsText = Get-MIRArgValue -Items $Args -Name "--repetitions" -Default "3"
+        $repetitions = 0
+        if (-not [int]::TryParse($repetitionsText, [ref]$repetitions) -or $repetitions -ne 3) {
+          throw "--repetitions must be exactly 3 for the A/B/C bootstrap profile."
+        }
+        & (Join-Path $repo "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1") `
+          -RepoRoot $repo.Path `
+          -Target $target `
+          -Lane local-playtest-shadow `
+          -OutputRoot 'build/mir4/local-playtest-shadow' `
+          -Repetitions $repetitions `
+          -Check:($verb -eq "check-local-playtest")
       }
       { $_ -in @("api", "sdk") } {
         if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }

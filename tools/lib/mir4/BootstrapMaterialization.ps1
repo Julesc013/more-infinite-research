@@ -1177,7 +1177,9 @@ function Get-MIR4BootstrapCapsuleControllerPaths {
 }
 
 function Get-MIR4BootstrapCapsuleAuthorityPaths {
-  return @(
+  param([ValidateSet('emergency', 'local-playtest-shadow')][string]$Lane = 'emergency')
+
+  $paths = @(
     '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
@@ -1198,10 +1200,32 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     '.mir/releases/emergency/findings/MIR3-TERM-0033.json',
     '.mir/releases/terminal/baselines/3.2.9/baseline-manifest.json'
   )
+  if ($Lane -ceq 'local-playtest-shadow') {
+    $paths += @(
+      '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json',
+      '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json',
+      '.mir/targets.json',
+      '.mir/releases/terminal/baselines/2.5.9/baseline-manifest.json',
+      '.mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json',
+      '.mir/releases/terminal/baselines/2.5.9/package-composition.json',
+      '.mir/releases/records/2.5.9.json',
+      '.mir/releases/terminal/baselines/1.9.9/baseline-manifest.json',
+      '.mir/releases/terminal/baselines/1.9.9/normalized-snapshot.json',
+      '.mir/releases/terminal/baselines/1.9.9/package-composition.json',
+      '.mir/releases/records/1.9.9.json',
+      '.mir/releases/terminal/baselines/1.8.9/baseline-manifest.json',
+      '.mir/releases/terminal/baselines/1.8.9/normalized-snapshot.json',
+      '.mir/releases/terminal/baselines/1.8.9/package-composition.json',
+      '.mir/releases/records/1.8.9.json'
+    )
+  }
+  return $paths
 }
 
 function Get-MIR4BootstrapCapsuleSchemaPaths {
-  return @(
+  param([ValidateSet('emergency', 'local-playtest-shadow')][string]$Lane = 'emergency')
+
+  $paths = @(
     'spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json',
     'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json',
     'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json',
@@ -1216,19 +1240,28 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
     'spec/schemas/mir4-target-registry-v2.schema.json',
     'spec/schemas/mir4-versioning-distribution-identity-v2.schema.json'
   )
+  if ($Lane -ceq 'local-playtest-shadow') {
+    $paths += @(
+      'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json',
+      'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json',
+      'spec/schemas/mir4-bootstrap-target-readiness.schema.json'
+    )
+  }
+  return $paths
 }
 
 function Assert-MIR4BootstrapCapsuleManifestClosure {
   param(
     [Parameter(Mandatory)]$Manifest,
-    [Parameter(Mandatory)]$GitProof
+    [Parameter(Mandatory)]$GitProof,
+    [ValidateSet('emergency', 'local-playtest-shadow')][string]$Lane = 'emergency'
   )
 
   $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   foreach ($relative in @(
     (Get-MIR4BootstrapCapsuleControllerPaths) +
-    (Get-MIR4BootstrapCapsuleAuthorityPaths) +
-    (Get-MIR4BootstrapCapsuleSchemaPaths) +
+    (Get-MIR4BootstrapCapsuleAuthorityPaths -Lane $Lane) +
+    (Get-MIR4BootstrapCapsuleSchemaPaths -Lane $Lane) +
     @(
       '.mir/capsule/toolchain-lock.json',
       '.mir/capsule/RECONSTRUCT.md',
@@ -1296,6 +1329,8 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   }
   $envelope = $envelopeText | ConvertFrom-Json -Depth 100
   if (-not (Test-MIR4BootstrapRecordHash -Record $envelope)) { throw "MIR 4 source capsule envelope self-hash mismatch: $EnvelopePath" }
+  $lane = [string]$envelope.lane
+  if ($lane -cnotin @('emergency', 'local-playtest-shadow')) { throw 'MIR 4 source capsule has an unknown construction lane.' }
   $inventory = Get-MIR4ArchiveInventory -Path $CapsulePath
   if ([string]$inventory.root -cne 'mir4-source-capsule') { throw 'Unexpected MIR 4 source capsule archive root.' }
   foreach ($field in @('archive_sha256', 'content_sha256', 'bytes', 'entry_count')) {
@@ -1316,7 +1351,8 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   if ([string]$manifest.record_sha256 -cne [string]$envelope.closure.internal_manifest_record_sha256) {
     throw 'MIR 4 capsule internal-manifest binding differs from its envelope.'
   }
-  if ([string]$manifest.target.target_key -cne [string]$envelope.target_key -or
+  if ([string]$manifest.lane -cne $lane -or
+      [string]$manifest.target.target_key -cne [string]$envelope.target_key -or
       [string]$manifest.target.factorio_line -cne [string]$envelope.factorio_line -or
       [string]$manifest.target.distribution_version -cne [string]$envelope.distribution_version -or
       (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.target.source) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $envelope.source) -or
@@ -1406,7 +1442,7 @@ function Assert-MIR4BootstrapCapsuleArtifact {
       [string]$gitProof.source_tree -cne [string]$envelope.source.source_tree) {
     throw 'MIR 4 capsule Git source proof binding mismatch.'
   }
-  $null = Assert-MIR4BootstrapCapsuleManifestClosure -Manifest $manifest -GitProof $gitProof
+  $null = Assert-MIR4BootstrapCapsuleManifestClosure -Manifest $manifest -GitProof $gitProof -Lane $lane
   $commitBytes = Read-MIR4ArchiveBytes -Path $CapsulePath -RelativePath ([string]$gitProof.commit.payload_path)
   if ((Get-MIR4GitObjectSha1 -Type commit -Bytes $commitBytes) -cne [string]$gitProof.commit.sha1 -or
       (Get-MIR4Sha256Bytes -Bytes $commitBytes) -cne [string]$gitProof.commit.sha256 -or
@@ -1478,6 +1514,8 @@ function New-MIR4BootstrapSourceCapsule {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)]$Target,
     [Parameter(Mandatory)][string]$OutputRoot,
+    [ValidateSet('emergency', 'local-playtest-shadow')]
+    [string]$Lane = 'emergency',
     [ValidatePattern('^[A-Z]$')]
     [string]$CapsuleId = 'A'
   )
@@ -1487,8 +1525,13 @@ function New-MIR4BootstrapSourceCapsule {
   $output = Assert-MIR4DescendantPath -Root (Join-Path $repo 'build/mir4') -Path $output
   $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $output
   if (-not (Test-Path -LiteralPath $output -PathType Container)) { New-Item -ItemType Directory -Force -Path $output | Out-Null }
-  if ([string]$Target.target_key -cne 'f210' -or [string]$Target.admission -cne 'admitted-local-emergency-lane') {
-    throw '[mir4-entry-gate] Capsule V2 construction remains limited to the local f210 emergency lane.'
+  $validTarget = if ($Lane -ceq 'emergency') {
+    [string]$Target.target_key -ceq 'f210' -and [string]$Target.admission -ceq 'admitted-local-emergency-lane'
+  } else {
+    [string]$Target.target_key -cin @('f200', 'f110', 'f100') -and [string]$Target.admission -ceq 'non-authoritative-shadow-blocked-by-eol'
+  }
+  if (-not $validTarget) {
+    throw "[mir4-entry-gate] Capsule V2 construction target is not admitted by lane '$Lane'."
   }
   $targetRoot = Join-Path $output "capsules\$($Target.target_key)\$CapsuleId"
   $workRoot = Join-Path $targetRoot 'work'
@@ -1522,7 +1565,7 @@ function New-MIR4BootstrapSourceCapsule {
   $capsuleRoot = Join-Path $extractContainer 'source'
   Assert-MIR4SourceTreeSafe -SourceRoot $capsuleRoot
 
-  foreach ($relative in @((Get-MIR4BootstrapCapsuleControllerPaths) + (Get-MIR4BootstrapCapsuleAuthorityPaths) + (Get-MIR4BootstrapCapsuleSchemaPaths))) {
+  foreach ($relative in @((Get-MIR4BootstrapCapsuleControllerPaths) + (Get-MIR4BootstrapCapsuleAuthorityPaths -Lane $Lane) + (Get-MIR4BootstrapCapsuleSchemaPaths -Lane $Lane))) {
     Copy-MIR4CapsuleClosureFile -RepoRoot $repo -CapsuleRoot $capsuleRoot -RelativePath $relative
   }
 
@@ -1593,11 +1636,39 @@ function New-MIR4BootstrapSourceCapsule {
     }
     $targetDescriptor.correction_authority = $correctionBinding
   }
+  $laneBinding = $null
+  if ($Lane -ceq 'local-playtest-shadow') {
+    $laneRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+    $lanePath = Join-Path $repo $laneRelativePath
+    $laneText = Get-Content -Raw -LiteralPath $lanePath
+    if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'))) {
+      throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.'
+    }
+    $laneAuthority = $laneText | ConvertFrom-Json -Depth 100
+    if (-not (Test-MIR4BootstrapRecordHash -Record $laneAuthority)) {
+      throw '[mir4-local-playtest-shadow] The lane authorization self-hash is stale.'
+    }
+    $laneTargets = @($laneAuthority.authorized_targets | Where-Object { [string]$_.target_key -ceq [string]$Target.target_key })
+    if ($laneTargets.Count -ne 1 -or
+        [string]$laneTargets[0].source_commit -cne [string]$Target.source.candidate_commit -or
+        [string]$laneTargets[0].source_tree -cne [string]$Target.source.source_tree -or
+        [string]$laneTargets[0].predecessor_archive_sha256 -cne [string]$Target.predecessor.archive_sha256) {
+      throw '[mir4-local-playtest-shadow] The target is not exactly bound by the private lane authorization.'
+    }
+    $laneBinding = [pscustomobject][ordered]@{
+      path = $laneRelativePath
+      kind = [string]$laneAuthority.kind
+      authority_family = [string]$laneAuthority.authority_family
+      record_sha256 = [string]$laneAuthority.record_sha256
+    }
+    $targetDescriptor.local_lane_authority = $laneBinding
+  }
   $manifest = [pscustomobject][ordered]@{
     schema = 2
     kind = 'MIR4BootstrapCapsuleManifestV2'
     status = 'local-unpublished-closed-construction-input'
     canonicalization = 'MIR4BootstrapCanonicalJsonV1'
+    lane = $Lane
     target = [pscustomobject]$targetDescriptor
     package_membership_authority = 'tools/lib/validation/PackageIdentity.ps1#Get-MIRPackageSourceRoots'
     member_count = [int]$members.Count
@@ -1631,6 +1702,7 @@ function New-MIR4BootstrapSourceCapsule {
     status = 'local-unpublished-input'
     canonicalization = 'MIR4BootstrapCanonicalJsonV1'
     public_output_authorized = $false
+    lane = $Lane
     target_key = [string]$Target.target_key
     factorio_line = [string]$Target.factorio_line
     distribution_version = [string]$Target.distribution_version
@@ -1669,6 +1741,7 @@ function New-MIR4BootstrapSourceCapsule {
     }
   }
   if ($null -ne $correctionBinding) { $recordFields.correction_authority = $correctionBinding }
+  if ($null -ne $laneBinding) { $recordFields.local_lane_authority = $laneBinding }
   $recordFields.record_sha256 = ''
   $record = [pscustomobject]$recordFields
   $recordPath = Join-Path $targetRoot 'source-capsule.json'

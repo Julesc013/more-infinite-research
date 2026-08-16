@@ -136,7 +136,7 @@ local M = {
         "scripted-effect"
       },
       asset_policy = "factorio-2.0-dlc",
-      expected_stream_count = 73,
+      expected_stream_count = 74,
       features = {
         compatibility_repairs = true,
         pipeline_extent = true,
@@ -221,6 +221,21 @@ local M = {
         technology_constant_overlays = false,
         productivity_family_adoption = false
       },
+      supported_required_mods = {},
+      supported_effect_types = {
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      },
       required_validation_groups = {
         "static",
         "package",
@@ -274,6 +289,21 @@ local M = {
         scripted_techs = false,
         technology_constant_overlays = false,
         productivity_family_adoption = false
+      },
+      supported_required_mods = {},
+      supported_effect_types = {
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
       },
       required_validation_groups = {
         "static",

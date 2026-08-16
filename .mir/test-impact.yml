@@ -199,6 +199,12 @@
       "tags": []
     },
     {
+      "pattern": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
       "groups": [],
       "scenarios": [],

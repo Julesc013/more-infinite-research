@@ -182,12 +182,27 @@ if (((Get-Item -LiteralPath $output -Force).Attributes -band [IO.FileAttributes]
 $envelopeText = [IO.File]::ReadAllText($envelopeFile, [Text.UTF8Encoding]::new($false, $true))
 $envelope = $envelopeText | ConvertFrom-Json -Depth 100
 Assert-Record $envelope 'MIR4BootstrapSourceCapsuleV2'
+$lane = [string]$envelope.lane
+$validTarget = if ($lane -ceq 'emergency') {
+  [string]$envelope.target_key -ceq 'f210'
+} elseif ($lane -ceq 'local-playtest-shadow') {
+  [string]$envelope.target_key -cin @('f200', 'f110', 'f100')
+} else { $false }
 if ([int]$envelope.schema -ne 2 -or [string]$envelope.status -cne 'local-unpublished-input' -or
-    [bool]$envelope.public_output_authorized -ne $false -or [string]$envelope.target_key -cne 'f210') {
-  throw 'The capsule runner admits only the unpublished f210 bootstrap envelope.'
+    [bool]$envelope.public_output_authorized -ne $false -or -not $validTarget) {
+  throw 'The capsule runner received an envelope outside the two bounded unpublished construction lanes.'
 }
-if ($null -eq $envelope.PSObject.Properties['correction_authority']) {
+if ($lane -ceq 'emergency' -and $null -eq $envelope.PSObject.Properties['correction_authority']) {
   throw 'The f210 capsule envelope must bind the approved MIR3-TERM-0033 correction.'
+}
+if ($lane -ceq 'local-playtest-shadow' -and $null -ne $envelope.PSObject.Properties['correction_authority']) {
+  throw 'A lower-target local-playtest capsule cannot inherit the f210 correction authority.'
+}
+if ($lane -ceq 'local-playtest-shadow' -and $null -eq $envelope.PSObject.Properties['local_lane_authority']) {
+  throw 'A lower-target local-playtest capsule must bind the private lane authority.'
+}
+if ($lane -ceq 'emergency' -and $null -ne $envelope.PSObject.Properties['local_lane_authority']) {
+  throw 'The f210 emergency capsule cannot inherit the lower-target private lane authority.'
 }
 Assert-Exact (Get-RawSha256 $capsule) $envelope.capsule.archive_sha256 'Capsule archive hash'
 Assert-Exact (Get-Item -LiteralPath $capsule).Length $envelope.capsule.bytes 'Capsule byte count'
@@ -226,14 +241,23 @@ try {
   $manifestText = [Text.UTF8Encoding]::new($false, $true).GetString($manifestBytes)
   $manifest = $manifestText | ConvertFrom-Json -Depth 100
   Assert-Record $manifest 'MIR4BootstrapCapsuleManifestV2'
-  if ([int]$manifest.schema -ne 2 -or [string]$manifest.target.target_key -cne 'f210') { throw 'Unexpected capsule-internal manifest authority.' }
+  if ([int]$manifest.schema -ne 2 -or [string]$manifest.lane -cne $lane -or [string]$manifest.target.target_key -cne [string]$envelope.target_key) { throw 'Unexpected capsule-internal manifest authority.' }
   Assert-Exact $manifest.record_sha256 $envelope.closure.internal_manifest_record_sha256 'Internal manifest binding'
   Assert-Exact $manifest.target.target_key $envelope.target_key 'Internal manifest target'
   Assert-Exact $manifest.target.factorio_line $envelope.factorio_line 'Internal manifest Factorio line'
   Assert-Exact $manifest.target.distribution_version $envelope.distribution_version 'Internal manifest distribution version'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.source) (ConvertTo-CanonicalJson $envelope.source) 'Internal manifest source authority'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.predecessor) (ConvertTo-CanonicalJson $envelope.predecessor) 'Internal manifest predecessor authority'
-  Assert-Exact (ConvertTo-CanonicalJson $manifest.target.correction_authority) (ConvertTo-CanonicalJson $envelope.correction_authority) 'Internal manifest correction authority'
+  if ($lane -ceq 'emergency') {
+    Assert-Exact (ConvertTo-CanonicalJson $manifest.target.correction_authority) (ConvertTo-CanonicalJson $envelope.correction_authority) 'Internal manifest correction authority'
+  } elseif ($null -ne $manifest.target.PSObject.Properties['correction_authority']) {
+    throw 'The lower-target internal manifest inherited an f210 correction binding.'
+  }
+  if ($lane -ceq 'local-playtest-shadow') {
+    Assert-Exact (ConvertTo-CanonicalJson $manifest.target.local_lane_authority) (ConvertTo-CanonicalJson $envelope.local_lane_authority) 'Internal manifest local lane authority'
+  } elseif ($null -ne $manifest.target.PSObject.Properties['local_lane_authority']) {
+    throw 'The f210 internal manifest inherited a lower-target lane binding.'
+  }
 
   $expectedPaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   $null = $expectedPaths.Add($manifestRelative)
@@ -286,23 +310,55 @@ if (-not (Test-MIR4BootstrapRecordHash -Record $envelope)) {
   throw 'The detached envelope differs under the capsule-owned canonicalization authority.'
 }
 
-$correctionRelativePath = [string]$envelope.correction_authority.path
-Assert-SafeRelativePath $correctionRelativePath
-$correctionPath = Assert-Descendant $workspace (Join-Path $workspace $correctionRelativePath)
-if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
-  throw 'The capsule omits its bound approved correction authority.'
+$correction = $null
+if ($lane -ceq 'emergency') {
+  $correctionRelativePath = [string]$envelope.correction_authority.path
+  Assert-SafeRelativePath $correctionRelativePath
+  $correctionPath = Assert-Descendant $workspace (Join-Path $workspace $correctionRelativePath)
+  if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
+    throw 'The capsule omits its bound approved correction authority.'
+  }
+  $correctionText = Get-Content -Raw -LiteralPath $correctionPath
+  if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta.schema.json'))) {
+    throw 'The capsule approved correction authority fails its exact schema.'
+  }
+  $correction = $correctionText | ConvertFrom-Json -Depth 100
+  Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV1'
+  Assert-Exact $correction.finding 'MIR3-TERM-0033' 'Approved correction finding'
+  Assert-Exact $correction.target_key $envelope.target_key 'Approved correction target'
+  Assert-Exact $correction.record_sha256 $envelope.correction_authority.record_sha256 'Approved correction record binding'
+  Assert-Exact $correction.kind $envelope.correction_authority.kind 'Approved correction kind binding'
+  Assert-Exact $correction.finding $envelope.correction_authority.finding 'Approved correction finding binding'
 }
-$correctionText = Get-Content -Raw -LiteralPath $correctionPath
-if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta.schema.json'))) {
-  throw 'The capsule approved correction authority fails its exact schema.'
+$laneAuthority = $null
+if ($lane -ceq 'local-playtest-shadow') {
+  $laneRelativePath = [string]$envelope.local_lane_authority.path
+  Assert-SafeRelativePath $laneRelativePath
+  $lanePath = Assert-Descendant $workspace (Join-Path $workspace $laneRelativePath)
+  $laneText = Get-Content -Raw -LiteralPath $lanePath
+  if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-local-playtest-shadow-authorization.schema.json'))) {
+    throw 'The private local-playtest lane authority fails its exact schema.'
+  }
+  $laneAuthority = $laneText | ConvertFrom-Json -Depth 100
+  Assert-Record $laneAuthority 'MIR4LocalPlaytestShadowAuthorizationV1'
+  Assert-Exact $laneAuthority.authority_family 'MIRLocalArtifactLaneAuthorizationV1' 'Local lane authority family'
+  Assert-Exact $laneAuthority.record_sha256 $envelope.local_lane_authority.record_sha256 'Local lane record binding'
+  Assert-Exact $laneAuthority.kind $envelope.local_lane_authority.kind 'Local lane kind binding'
+  Assert-Exact $laneAuthority.authority_family $envelope.local_lane_authority.authority_family 'Local lane family binding'
+  $laneTargets = @($laneAuthority.authorized_targets | Where-Object { [string]$_.target_key -ceq [string]$envelope.target_key })
+  if ($laneTargets.Count -ne 1) { throw 'The private lane does not uniquely authorize this target.' }
+  Assert-Exact $laneTargets[0].source_commit $envelope.source.candidate_commit 'Local lane source commit'
+  Assert-Exact $laneTargets[0].source_tree $envelope.source.source_tree 'Local lane source tree'
+  Assert-Exact $laneTargets[0].predecessor_archive_sha256 $envelope.predecessor.archive_sha256 'Local lane predecessor archive'
+  foreach ($import in @($laneAuthority.imports.PSObject.Properties.Value)) {
+    $importPath = Assert-Descendant $workspace (Join-Path $workspace ([string]$import.path))
+    Assert-Exact (Get-RawSha256 $importPath) $import.file_sha256 "Local lane import $($import.path)"
+    if ($null -ne $import.PSObject.Properties['record_sha256']) {
+      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100
+      Assert-Exact $importRecord.record_sha256 $import.record_sha256 "Local lane record import $($import.path)"
+    }
+  }
 }
-$correction = $correctionText | ConvertFrom-Json -Depth 100
-Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV1'
-Assert-Exact $correction.finding 'MIR3-TERM-0033' 'Approved correction finding'
-Assert-Exact $correction.target_key $envelope.target_key 'Approved correction target'
-Assert-Exact $correction.record_sha256 $envelope.correction_authority.record_sha256 'Approved correction record binding'
-Assert-Exact $correction.kind $envelope.correction_authority.kind 'Approved correction kind binding'
-Assert-Exact $correction.finding $envelope.correction_authority.finding 'Approved correction finding binding'
 
 $capsuleInventory = Get-MIR4ArchiveInventory -Path $capsule
 Assert-Exact $capsuleInventory.root 'mir4-source-capsule' 'Capsule archive root'
@@ -408,7 +464,7 @@ if (-not ($gitProofText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-boo
 }
 $gitProof = $gitProofText | ConvertFrom-Json -Depth 100
 $null = Assert-MIR4GitSourceProof -CapsuleRoot $workspace -Proof $gitProof
-$null = Assert-MIR4BootstrapCapsuleManifestClosure -Manifest $manifest -GitProof $gitProof
+$null = Assert-MIR4BootstrapCapsuleManifestClosure -Manifest $manifest -GitProof $gitProof -Lane $lane
 Assert-Exact $gitProof.record_sha256 $manifest.git_source_proof_record_sha256 'Manifest Git source proof'
 Assert-Exact $gitProof.record_sha256 $envelope.closure.git_source_proof_record_sha256 'Envelope Git source proof'
 Assert-Exact $gitProof.candidate_commit $envelope.source.candidate_commit 'Envelope source commit'
@@ -436,28 +492,35 @@ $packageName = "more-infinite-research_$($envelope.distribution_version)"
 $builtPath = Join-Path $workspace "build/capsule-output/$packageName.zip"
 if (-not (Test-Path -LiteralPath $builtPath -PathType Leaf)) { throw 'The canonical package builder did not emit the expected candidate.' }
 $candidateInventory = Get-MIR4ArchiveInventory -Path $builtPath
-$equivalence = Compare-MIR4BootstrapCorrectedCandidate `
-  -CandidatePath $builtPath `
-  -PredecessorPath $predecessor `
-  -ExpectedCandidateVersion ([string]$envelope.distribution_version) `
-  -ExpectedPredecessorVersion ([string]$envelope.predecessor.release) `
-  -ExpectedCandidateRoot $packageName `
-  -ExpectedPredecessorRoot "more-infinite-research_$($envelope.predecessor.release)" `
-  -Correction $correction `
-  -ThrowOnDifference
+$equivalenceArguments = @{
+  CandidatePath = $builtPath
+  PredecessorPath = $predecessor
+  ExpectedCandidateVersion = [string]$envelope.distribution_version
+  ExpectedPredecessorVersion = [string]$envelope.predecessor.release
+  ExpectedCandidateRoot = $packageName
+  ExpectedPredecessorRoot = "more-infinite-research_$($envelope.predecessor.release)"
+  ThrowOnDifference = $true
+}
+$equivalence = if ($null -ne $correction) {
+  Compare-MIR4BootstrapCorrectedCandidate @equivalenceArguments -Correction $correction
+} else {
+  Compare-MIR4BootstrapCandidate @equivalenceArguments
+}
 
 $candidatePath = Join-Path $output 'candidate.zip'
 Copy-Item -LiteralPath $builtPath -Destination $candidatePath
 $packageRows = @($candidateInventory.entries | ForEach-Object { "$($_.path)|$($_.bytes)|$($_.raw_sha256)" })
 $packageManifestSha256 = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.package-manifest.v1' -Fields ([ordered]@{ entries = $packageRows })
 $equivalenceSha256 = Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $equivalence)
-$inputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v1' -Fields ([ordered]@{
+$inputFields = [ordered]@{
   capsule_content_root_sha256 = [string]$envelope.closure.capsule_content_root_sha256
   envelope_record_sha256 = [string]$envelope.record_sha256
   predecessor_archive_sha256 = [string]$predecessorInventory.archive_sha256
   toolchain_lock_record_sha256 = [string]$toolchainLock.record_sha256
-  correction_record_sha256 = [string]$correction.record_sha256
-})
+}
+if ($null -ne $correction) { $inputFields.correction_record_sha256 = [string]$correction.record_sha256 }
+if ($null -ne $laneAuthority) { $inputFields.local_lane_authority_record_sha256 = [string]$laneAuthority.record_sha256 }
+$inputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v1' -Fields $inputFields
 $resultRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-result.v1' -Fields ([ordered]@{
   candidate_archive_sha256 = [string]$candidateInventory.archive_sha256
   candidate_content_sha256 = [string]$candidateInventory.content_sha256
@@ -469,15 +532,10 @@ $receipt = [pscustomobject][ordered]@{
   kind = 'MIR4BootstrapCapsuleReconstructionReceiptV1'
   status = 'passed'
   canonicalization = 'MIR4BootstrapCanonicalJsonV1'
+  lane = $lane
   target_key = [string]$envelope.target_key
   factorio_line = [string]$envelope.factorio_line
   distribution_version = [string]$envelope.distribution_version
-  correction_authority = [pscustomobject][ordered]@{
-    path = [string]$envelope.correction_authority.path
-    kind = [string]$correction.kind
-    finding = [string]$correction.finding
-    record_sha256 = [string]$correction.record_sha256
-  }
   mode = 'capsule-local-fresh-process'
   capsule_only = $true
   checkout_argument_supplied = $false
@@ -503,6 +561,22 @@ $receipt = [pscustomobject][ordered]@{
   input_root_sha256 = $inputRoot
   result_root_sha256 = $resultRoot
   record_sha256 = ''
+}
+if ($null -ne $correction) {
+  $receipt | Add-Member -NotePropertyName correction_authority -NotePropertyValue ([pscustomobject][ordered]@{
+    path = [string]$envelope.correction_authority.path
+    kind = [string]$correction.kind
+    finding = [string]$correction.finding
+    record_sha256 = [string]$correction.record_sha256
+  })
+}
+if ($null -ne $laneAuthority) {
+  $receipt | Add-Member -NotePropertyName local_lane_authority -NotePropertyValue ([pscustomobject][ordered]@{
+    path = [string]$envelope.local_lane_authority.path
+    kind = [string]$laneAuthority.kind
+    authority_family = [string]$laneAuthority.authority_family
+    record_sha256 = [string]$laneAuthority.record_sha256
+  })
 }
 $receiptPath = Join-Path $output 'reconstruction.json'
 $null = Write-MIR4BootstrapRecord -Record $receipt -Path $receiptPath

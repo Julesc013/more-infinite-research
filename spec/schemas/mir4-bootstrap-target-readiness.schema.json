@@ -130,7 +130,7 @@
         "drift"
       ],
       "properties": {
-        "state": {"enum": ["no-known-field-drift-readiness-only", "blocked-stream-count-conflict", "blocked-missing-positive-allowlists"]},
+        "state": {"enum": ["no-known-field-drift-readiness-only", "terminal-authority-reconciled", "terminal-positive-allowlists-reconciled"]},
         "canonical_expected_stream_count": {"type": "integer", "minimum": 1},
         "terminal_expected_stream_count": {"type": "integer", "minimum": 1},
         "current_positive_allowlist_state": {"enum": ["present", "missing-required-fields"]},
@@ -165,7 +165,7 @@
       "required": ["direct_predecessor", "fixture_state", "candidate_bound_evidence_present", "historical_evidence_substitution_allowed"],
       "properties": {
         "direct_predecessor": {"enum": ["3.2.9", "2.5.9", "1.9.9", "1.8.9"]},
-        "fixture_state": {"const": "not-defined"},
+        "fixture_state": {"const": "defined-package-excluded"},
         "candidate_bound_evidence_present": {"const": false},
         "historical_evidence_substitution_allowed": {"const": false}
       },
@@ -258,16 +258,11 @@
               },
               "capability": {
                 "properties": {
-                  "state": {"const": "blocked-stream-count-conflict"},
-                  "canonical_expected_stream_count": {"const": 73},
+                  "state": {"const": "terminal-authority-reconciled"},
+                  "canonical_expected_stream_count": {"const": 74},
                   "terminal_expected_stream_count": {"const": 74},
                   "current_positive_allowlist_state": {"const": "present"},
-                  "drift": {
-                    "minItems": 1,
-                    "maxItems": 1,
-                    "prefixItems": [{"const": "expected-stream-count-current-73-terminal-74"}],
-                    "items": false
-                  }
+                  "drift": {"maxItems": 0}
                 }
               },
               "transition": {"properties": {"direct_predecessor": {"const": "2.5.9"}}}
@@ -293,19 +288,11 @@
               },
               "capability": {
                 "properties": {
-                  "state": {"const": "blocked-missing-positive-allowlists"},
+                  "state": {"const": "terminal-positive-allowlists-reconciled"},
                   "canonical_expected_stream_count": {"const": 11},
                   "terminal_expected_stream_count": {"const": 11},
-                  "current_positive_allowlist_state": {"const": "missing-required-fields"},
-                  "drift": {
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "prefixItems": [
-                      {"const": "supported-required-mods-field-absent"},
-                      {"const": "supported-effect-types-field-absent"}
-                    ],
-                    "items": false
-                  }
+                  "current_positive_allowlist_state": {"const": "present"},
+                  "drift": {"maxItems": 0}
                 }
               },
               "transition": {"properties": {"direct_predecessor": {"const": "1.9.9"}}}
@@ -331,19 +318,11 @@
               },
               "capability": {
                 "properties": {
-                  "state": {"const": "blocked-missing-positive-allowlists"},
+                  "state": {"const": "terminal-positive-allowlists-reconciled"},
                   "canonical_expected_stream_count": {"const": 11},
                   "terminal_expected_stream_count": {"const": 11},
-                  "current_positive_allowlist_state": {"const": "missing-required-fields"},
-                  "drift": {
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "prefixItems": [
-                      {"const": "supported-required-mods-field-absent"},
-                      {"const": "supported-effect-types-field-absent"}
-                    ],
-                    "items": false
-                  }
+                  "current_positive_allowlist_state": {"const": "present"},
+                  "drift": {"maxItems": 0}
                 }
               },
               "transition": {"properties": {"direct_predecessor": {"const": "1.8.9"}}}

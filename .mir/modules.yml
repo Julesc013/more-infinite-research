@@ -794,6 +794,10 @@ validation_tooling:
     mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
     mir4_bootstrap_approved_correction: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json
     mir4_bootstrap_approved_correction_schema: spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json
+    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json
+    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-local-playtest-shadow-authorization.schema.json
+    mir4_local_playtest_candidate_manifest_schema: spec/schemas/mir4-local-playtest-candidate-manifest.schema.json
+    mir4_local_artifact_lane_gate: validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
     mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
     mir4_bootstrap_capsule_manifest_schema: spec/schemas/mir4-bootstrap-capsule-manifest.schema.json

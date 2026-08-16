@@ -3,6 +3,8 @@ param(
   [string]$PlanPath = ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
   [ValidateSet("all", "f210", "f200", "f110", "f100")]
   [string]$Target = "f210",
+  [ValidateSet('emergency', 'local-playtest-shadow')]
+  [string]$Lane = 'emergency',
   [string]$OutputRoot = "build/mir4/emergency-lane",
   [ValidateRange(3, 3)]
   [int]$Repetitions = 3,
@@ -162,6 +164,35 @@ function Get-MIR4PlanCorrection {
   return $correction
 }
 
+function Get-MIR4LocalPlaytestAuthority {
+  $relativePath = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+  $path = Join-Path $RepoRoot $relativePath
+  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'
+  $text = Get-Content -Raw -LiteralPath $path
+  if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.' }
+  $authority = $text | ConvertFrom-Json -Depth 100
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      [string]$authority.authority_family -cne 'MIRLocalArtifactLaneAuthorizationV1' -or
+      [bool]$authority.semantic_difference_authorized -ne $false -or
+      [bool]$authority.release_admission_authorized -ne $false -or
+      [bool]$authority.public_output_authorized -ne $false -or
+      [bool]$authority.signing_or_sealing_authorized -ne $false -or
+      [bool]$authority.publication_authorized -ne $false -or
+      [bool]$authority.wildcard_targets_authorized -ne $false -or
+      [bool]$authority.gate_waivers_authorized -ne $false) {
+    throw '[mir4-local-playtest-shadow] The lane authorization crossed a construction-only boundary.'
+  }
+  foreach ($import in @($authority.imports.PSObject.Properties.Value)) {
+    $importPath = Join-Path $RepoRoot ([string]$import.path)
+    Assert-Equal (Get-MIR4BootstrapTextSha256 -Path $importPath) ([string]$import.file_sha256) "local lane canonical-text import $($import.path)"
+    if ($null -ne $import.PSObject.Properties['record_sha256']) {
+      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100
+      Assert-Equal ([string]$importRecord.record_sha256) ([string]$import.record_sha256) "local lane record import $($import.path)"
+    }
+  }
+  return $authority
+}
+
 function Compare-MIR4PlanCandidate {
   param(
     [Parameter(Mandatory)]$PlanTarget,
@@ -194,7 +225,12 @@ function Test-MIR4ExistingCandidate {
   $null = Assert-MIR4NoReparseAncestors -Root $OutputRoot -Path $manifestPath
   if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) { throw "Candidate manifest is missing: $manifestPath" }
   $manifestText = Get-Content -Raw -LiteralPath $manifestPath
-  $manifestSchema = Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json'
+  $manifestSchemaRelative = if ($Lane -ceq 'emergency') {
+    'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json'
+  } else {
+    'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json'
+  }
+  $manifestSchema = Join-Path $RepoRoot $manifestSchemaRelative
   if (-not ($manifestText | Test-Json -SchemaFile $manifestSchema)) { throw "Candidate manifest schema validation failed: $manifestPath" }
   $manifest = $manifestText | ConvertFrom-Json
   if (-not (Test-MIR4BootstrapRecordHash -Record $manifest)) { throw "Candidate manifest self-hash mismatch: $manifestPath" }
@@ -203,13 +239,25 @@ function Test-MIR4ExistingCandidate {
   Assert-Equal ([string]$manifest.factorio_line) ([string]$PlanTarget.factorio_line) "candidate Factorio line"
   Assert-Equal ([string]$manifest.distribution_version) ([string]$PlanTarget.distribution_version) "candidate version"
   Assert-Equal ([string]$manifest.admission) ([string]$PlanTarget.admission) "candidate admission"
+  Assert-Equal ([string]$manifest.lane) $Lane 'candidate construction lane'
   Assert-Equal ([string]$manifest.identity_roots.semantic) ([string]$RootRow.roots.semantic.sha256) "candidate semantic root"
   $correction = Get-MIR4PlanCorrection -PlanTarget $PlanTarget
-  if ($null -eq $correction) { throw '[mir4-approved-delta] The f210 candidate plan does not bind its required correction.' }
-  Assert-Equal ([string]$manifest.correction_authority.path) ([string]$PlanTarget.correction_authority.path) 'candidate correction path'
-  Assert-Equal ([string]$manifest.correction_authority.kind) ([string]$correction.kind) 'candidate correction kind'
-  Assert-Equal ([string]$manifest.correction_authority.finding) ([string]$correction.finding) 'candidate correction finding'
-  Assert-Equal ([string]$manifest.correction_authority.record_sha256) ([string]$correction.record_sha256) 'candidate correction record'
+  if ($Lane -ceq 'emergency') {
+    if ($null -eq $correction) { throw '[mir4-approved-delta] The f210 candidate plan does not bind its required correction.' }
+    Assert-Equal ([string]$manifest.correction_authority.path) ([string]$PlanTarget.correction_authority.path) 'candidate correction path'
+    Assert-Equal ([string]$manifest.correction_authority.kind) ([string]$correction.kind) 'candidate correction kind'
+    Assert-Equal ([string]$manifest.correction_authority.finding) ([string]$correction.finding) 'candidate correction finding'
+    Assert-Equal ([string]$manifest.correction_authority.record_sha256) ([string]$correction.record_sha256) 'candidate correction record'
+  } else {
+    if ($null -ne $correction -or $null -ne $manifest.PSObject.Properties['correction_authority']) {
+      throw '[mir4-local-playtest-shadow] A lower-target candidate cannot inherit the f210 correction authority.'
+    }
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.local_lane_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $laneBinding) 'candidate local lane authority'
+    if ([bool]$manifest.release_claim_permitted -ne $false -or
+        [string]$manifest.transfer_policy -cne 'maintainer-controlled-private-machines-only') {
+      throw '[mir4-local-playtest-shadow] Candidate transfer or release-claim policy crossed the private lane boundary.'
+    }
+  }
 
   $archivePath = Resolve-MIR4ArtifactPath -OutputRoot $OutputRoot -RelativePath ([string]$manifest.local_distribution.path)
   $inventory = Get-MIR4ArchiveInventory -Path $archivePath
@@ -232,22 +280,28 @@ function Test-MIR4ExistingCandidate {
   }
   $capsuleRecord = $capsuleArtifact.envelope
   Assert-Equal ([string]$capsuleRecord.record_sha256) ([string]$manifest.source_capsule_record_sha256) "source capsule record binding"
+  Assert-Equal ([string]$capsuleRecord.lane) $Lane 'source capsule lane'
   Assert-Equal ([string]$capsuleRecord.target_key) ([string]$PlanTarget.target_key) "source capsule target"
   Assert-Equal ([string]$capsuleRecord.factorio_line) ([string]$PlanTarget.factorio_line) "source capsule Factorio line"
   Assert-Equal ([string]$capsuleRecord.source.candidate_commit) ([string]$PlanTarget.source.candidate_commit) "source capsule commit"
   Assert-Equal ([string]$capsuleRecord.source.source_tree) ([string]$PlanTarget.source.source_tree) "source capsule tree"
   Assert-Equal ([string]$capsuleRecord.source.common_source_commit) ([string]$PlanTarget.source.common_source_commit) "source capsule common source"
   Assert-Equal ([string]$capsuleRecord.predecessor.archive_sha256) ([string]$PlanTarget.predecessor.archive_sha256) "source capsule predecessor archive"
-  Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleRecord.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'source capsule correction binding'
-  Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleArtifact.manifest.target.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'internal capsule correction binding'
+  if ($Lane -ceq 'emergency') {
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleRecord.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'source capsule correction binding'
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleArtifact.manifest.target.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) 'internal capsule correction binding'
+  } else {
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleRecord.local_lane_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.local_lane_authority) 'source capsule local lane binding'
+    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $capsuleArtifact.manifest.target.local_lane_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.local_lane_authority) 'internal capsule local lane binding'
+  }
   Assert-Equal ([string]$capsuleRecord.capsule.archive_sha256) ([string]$capsuleInventory.archive_sha256) "source capsule record archive"
   Assert-Equal ([string]$capsuleRecord.capsule.content_sha256) ([string]$capsuleInventory.content_sha256) "source capsule record content"
   Assert-Equal ([string]$capsuleRecord.package_membership.authority_sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')) "package membership tool hash"
   Assert-Equal ([string]$capsuleRecord.package_membership.capsule_tool_sha256) (Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')) "source capsule tool hash"
   foreach ($governedRelative in @(
     (Get-MIR4BootstrapCapsuleControllerPaths) +
-    (Get-MIR4BootstrapCapsuleAuthorityPaths) +
-    (Get-MIR4BootstrapCapsuleSchemaPaths)
+    (Get-MIR4BootstrapCapsuleAuthorityPaths -Lane $Lane) +
+    (Get-MIR4BootstrapCapsuleSchemaPaths -Lane $Lane)
   )) {
     $memberRows = @($capsuleArtifact.manifest.members | Where-Object { [string]$_.path -ceq [string]$governedRelative })
     if ($memberRows.Count -ne 1) { throw "Source capsule omits governed closure input: $governedRelative" }
@@ -316,20 +370,30 @@ function Test-MIR4ExistingCandidate {
     Assert-Equal ([string]$receipt.target_key) ([string]$PlanTarget.target_key) "reconstruction $($row.id) receipt target"
     Assert-Equal ([string]$receipt.factorio_line) ([string]$PlanTarget.factorio_line) "reconstruction $($row.id) receipt Factorio line"
     Assert-Equal ([string]$receipt.distribution_version) ([string]$PlanTarget.distribution_version) "reconstruction $($row.id) receipt version"
-    Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) "reconstruction $($row.id) correction binding"
+    Assert-Equal ([string]$receipt.lane) $Lane "reconstruction $($row.id) lane"
+    if ($Lane -ceq 'emergency') {
+      Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.correction_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.correction_authority) "reconstruction $($row.id) correction binding"
+    } else {
+      Assert-Equal (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.local_lane_authority) (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.local_lane_authority) "reconstruction $($row.id) local lane binding"
+    }
     $packageRows = @($rowInventory.entries | ForEach-Object { "$($_.path)|$($_.bytes)|$($_.raw_sha256)" })
     $expectedPackageManifest = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.package-manifest.v1' -Fields ([ordered]@{ entries = $packageRows })
     $expectedEquivalenceSha = Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.equivalence)
     if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.equivalence) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison)) {
       throw "Reconstruction $($row.id) receipt equivalence differs from the freshly verified candidate."
     }
-    $expectedInputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v1' -Fields ([ordered]@{
+    $inputFields = [ordered]@{
       capsule_content_root_sha256 = [string]$rowCapsuleRecord.closure.capsule_content_root_sha256
       envelope_record_sha256 = [string]$rowCapsuleRecord.record_sha256
       predecessor_archive_sha256 = [string]$PlanTarget.predecessor.archive_sha256
       toolchain_lock_record_sha256 = [string]$rowCapsuleArtifact.toolchain_lock.record_sha256
-      correction_record_sha256 = [string]$correction.record_sha256
-    })
+    }
+    if ($Lane -ceq 'emergency') {
+      $inputFields.correction_record_sha256 = [string]$correction.record_sha256
+    } else {
+      $inputFields.local_lane_authority_record_sha256 = [string]$laneAuthority.record_sha256
+    }
+    $expectedInputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-input.v1' -Fields $inputFields
     $expectedResultRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.reconstruction-result.v1' -Fields ([ordered]@{
       candidate_archive_sha256 = [string]$rowInventory.archive_sha256
       candidate_content_sha256 = [string]$rowInventory.content_sha256
@@ -350,7 +414,7 @@ function Test-MIR4ExistingCandidate {
       @($rows.equivalence_sha256 | Sort-Object -Unique).Count -ne 1) {
     throw "A/B/C candidate or source-capsule identities differ."
   }
-  $expectedAuthorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields ([ordered]@{
+  $authorityFields = [ordered]@{
     terminal_authority_root = [string]$RootRow.roots.authority.sha256
     root_set_record_sha256 = [string]$rootSet.record_sha256
     plan_record_sha256 = [string]$plan.record_sha256
@@ -364,8 +428,13 @@ function Test-MIR4ExistingCandidate {
     capsule_content_root_sha256 = [string]$manifest.capsule_closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$inventory.archive_sha256
     candidate_content_sha256 = [string]$inventory.content_sha256
-    correction_record_sha256 = [string]$correction.record_sha256
-  })
+  }
+  if ($Lane -ceq 'emergency') {
+    $authorityFields.correction_record_sha256 = [string]$correction.record_sha256
+  } else {
+    $authorityFields.local_lane_authority_record_sha256 = [string]$laneAuthority.record_sha256
+  }
+  $expectedAuthorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields $authorityFields
   Assert-Equal ([string]$manifest.identity_roots.candidate_authority) $expectedAuthorityRoot "candidate authority root"
   $expectedQualificationRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.qualification-input.v1' -Fields ([ordered]@{
     candidate_authority_root = $expectedAuthorityRoot
@@ -395,10 +464,20 @@ if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) { throw "Test-Js
 if (-not ((Get-Content -Raw -LiteralPath $PlanPath) | Test-Json -SchemaFile $schemaPath)) {
   throw "MIR4 local candidate plan does not satisfy its schema."
 }
-$governedOutputRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot ([string]$plan.package_policy.output_root)))
+$laneAuthority = if ($Lane -ceq 'local-playtest-shadow') { Get-MIR4LocalPlaytestAuthority } else { $null }
+$laneBinding = if ($null -ne $laneAuthority) {
+  [pscustomobject][ordered]@{
+    path = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+    kind = [string]$laneAuthority.kind
+    authority_family = [string]$laneAuthority.authority_family
+    record_sha256 = [string]$laneAuthority.record_sha256
+  }
+} else { $null }
+$governedOutputRelative = if ($Lane -ceq 'emergency') { [string]$plan.package_policy.output_root } else { [string]$laneAuthority.output_root }
+$governedOutputRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot $governedOutputRelative))
 $outputComparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
 if (-not [string]::Equals($OutputRoot, $governedOutputRoot, $outputComparison)) {
-  throw "[mir4-output-root] MIR4BootstrapLocalCandidateV1 must write beneath the governed emergency-lane root: $governedOutputRoot"
+  throw "[mir4-output-root] MIR4 bootstrap materialization must use the exact governed '$Lane' output root: $governedOutputRoot"
 }
 $expectedImports = @(
   '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
@@ -494,14 +573,34 @@ if ([int]$equivalencePolicy.schema -ne 1 -or
   throw '[mir4-equivalence-policy] The current target-local shadow equivalence authority is absent or has drifted.'
 }
 
-$targets = if ($Target -eq 'all') { @($plan.targets) } else { @($plan.targets | Where-Object { $_.target_key -eq $Target }) }
+$laneTargets = if ($Lane -ceq 'emergency') {
+  @($plan.targets | Where-Object { [string]$_.target_key -ceq 'f210' })
+} else {
+  @($plan.targets | Where-Object { [string]$_.target_key -cin @('f200', 'f110', 'f100') })
+}
+$targets = if ($Target -eq 'all') { $laneTargets } else { @($laneTargets | Where-Object { $_.target_key -eq $Target }) }
 if ($targets.Count -eq 0) { throw "No target selected." }
 $blockedTargets = @($targets | Where-Object {
-  [string]$_.target_key -cne 'f210' -or
-  [string]$_.admission -cne 'admitted-local-emergency-lane'
+  if ($Lane -ceq 'emergency') {
+    [string]$_.target_key -cne 'f210' -or [string]$_.admission -cne 'admitted-local-emergency-lane'
+  } else {
+    [string]$_.target_key -cnotin @('f200', 'f110', 'f100') -or [string]$_.admission -cne 'non-authoritative-shadow-blocked-by-eol'
+  }
 })
 if ($blockedTargets.Count -gt 0) {
-  throw "[mir4-entry-gate] MIR4BootstrapLocalCandidateV1 admits only the local f210 emergency-lane plan row; blocked: $(@($blockedTargets.target_key) -join ', ')."
+  throw "[mir4-entry-gate] Lane '$Lane' does not admit: $(@($blockedTargets.target_key) -join ', ')."
+}
+if ($Lane -ceq 'local-playtest-shadow') {
+  foreach ($targetPlan in $targets) {
+    $authorizedRows = @($laneAuthority.authorized_targets | Where-Object { [string]$_.target_key -ceq [string]$targetPlan.target_key })
+    if ($authorizedRows.Count -ne 1 -or
+        [string]$authorizedRows[0].source_commit -cne [string]$targetPlan.source.candidate_commit -or
+        [string]$authorizedRows[0].source_tree -cne [string]$targetPlan.source.source_tree -or
+        [string]$authorizedRows[0].predecessor_archive_sha256 -cne [string]$targetPlan.predecessor.archive_sha256 -or
+        [string]$authorizedRows[0].engine_sha256 -cne [string]$targetPlan.engine_lock.executable_sha256) {
+      throw "[mir4-local-playtest-shadow] The private lane does not exactly bind $($targetPlan.target_key)."
+    }
+  }
 }
 if (-not (Test-Path -LiteralPath $OutputRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null }
 
@@ -530,7 +629,7 @@ foreach ($targetPlan in $targets) {
   $candidatePaths = @()
   $capsules = [ordered]@{}
   foreach ($id in @('A', 'B')) {
-    $capture = New-MIR4BootstrapSourceCapsule -RepoRoot $RepoRoot -Target $targetPlan -OutputRoot $OutputRoot -CapsuleId $id
+    $capture = New-MIR4BootstrapSourceCapsule -RepoRoot $RepoRoot -Target $targetPlan -OutputRoot $OutputRoot -CapsuleId $id -Lane $Lane
     $artifact = Assert-MIR4BootstrapCapsuleArtifact `
       -CapsulePath $capture.archive_path `
       -EnvelopePath $capture.record_path `
@@ -705,7 +804,7 @@ foreach ($targetPlan in $targets) {
   Copy-Item -LiteralPath $candidatePaths[2] -Destination $distributionPath
   $distribution = Get-MIR4ArchiveInventory -Path $distributionPath
   $equivalence = Compare-MIR4PlanCandidate -PlanTarget $targetPlan -CandidatePath $distributionPath -PredecessorPath $predecessorPath
-  $authorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields ([ordered]@{
+  $authorityFields = [ordered]@{
     terminal_authority_root = [string]$rootRow.roots.authority.sha256
     root_set_record_sha256 = [string]$rootSet.record_sha256
     plan_record_sha256 = [string]$plan.record_sha256
@@ -719,8 +818,13 @@ foreach ($targetPlan in $targets) {
     capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
     candidate_archive_sha256 = [string]$distribution.archive_sha256
     candidate_content_sha256 = [string]$distribution.content_sha256
-    correction_record_sha256 = [string]$targetPlan.correction_authority.record_sha256
-  })
+  }
+  if ($Lane -ceq 'emergency') {
+    $authorityFields.correction_record_sha256 = [string]$targetPlan.correction_authority.record_sha256
+  } else {
+    $authorityFields.local_lane_authority_record_sha256 = [string]$laneAuthority.record_sha256
+  }
+  $authorityRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.authority.v1' -Fields $authorityFields
   $qualificationInputRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.candidate.qualification-input.v1' -Fields ([ordered]@{
     candidate_authority_root = $authorityRoot
     terminal_qualification_root = [string]$rootRow.roots.qualification.sha256
@@ -728,31 +832,39 @@ foreach ($targetPlan in $targets) {
     engine_sha256 = [string]$targetPlan.engine_lock.executable_sha256
   })
 
-  $manifest = [pscustomobject][ordered]@{
+  $manifestFields = [ordered]@{
     schema = 1
-    kind = 'MIR4BootstrapLocalCandidateManifestV1'
-    status = 'built-unqualified-local-package-candidate'
+    kind = if ($Lane -ceq 'emergency') { 'MIR4BootstrapLocalCandidateManifestV1' } else { 'MIR4LocalPlaytestCandidateManifestV1' }
+    status = if ($Lane -ceq 'emergency') { 'built-unqualified-local-package-candidate' } else { 'built-unqualified-local-playtest-candidate' }
     canonicalization = 'MIR4BootstrapCanonicalJsonV1'
+    lane = $Lane
     target_key = [string]$targetPlan.target_key
     factorio_line = [string]$targetPlan.factorio_line
     distribution_version = [string]$targetPlan.distribution_version
     admission = [string]$targetPlan.admission
     public_output_authorized = $false
-    correction_authority = [pscustomobject][ordered]@{
+  }
+  if ($Lane -ceq 'emergency') {
+    $manifestFields.correction_authority = [pscustomobject][ordered]@{
       path = [string]$targetPlan.correction_authority.path
       kind = [string]$capsule.record.correction_authority.kind
       finding = [string]$capsule.record.correction_authority.finding
       record_sha256 = [string]$targetPlan.correction_authority.record_sha256
     }
-    source_capsule = [pscustomobject][ordered]@{
+  } else {
+    $manifestFields.release_claim_permitted = $false
+    $manifestFields.local_lane_authority = $laneBinding
+    $manifestFields.transfer_policy = 'maintainer-controlled-private-machines-only'
+  }
+  $manifestFields.source_capsule = [pscustomobject][ordered]@{
       path = Get-MIR4PortablePath -Root $OutputRoot -Path $capsule.archive_path
       archive_sha256 = $capsuleInventory.archive_sha256
       content_sha256 = $capsuleInventory.content_sha256
       bytes = $capsuleInventory.bytes
       entry_count = $capsuleInventory.entry_count
-    }
-    source_capsule_record_sha256 = [string]$capsule.record.record_sha256
-    capsule_closure = [pscustomobject][ordered]@{
+  }
+  $manifestFields.source_capsule_record_sha256 = [string]$capsule.record.record_sha256
+  $manifestFields.capsule_closure = [pscustomobject][ordered]@{
       internal_manifest_record_sha256 = [string]$capsule.record.closure.internal_manifest_record_sha256
       payload_root_sha256 = [string]$capsule.record.closure.payload_root_sha256
       capsule_content_root_sha256 = [string]$capsule.record.closure.capsule_content_root_sha256
@@ -766,30 +878,30 @@ foreach ($targetPlan in $targets) {
       separate_processes = $true
       complete_ab_workspaces_deleted_before_c = $true
       c_reconstruction_source = 'copied-canonical-capsule-no-checkout'
-    }
-    identity_roots = [pscustomobject][ordered]@{
+  }
+  $manifestFields.identity_roots = [pscustomobject][ordered]@{
       semantic = [string]$rootRow.roots.semantic.sha256
       candidate_authority = $authorityRoot
       qualification_input = $qualificationInputRoot
-    }
-    reconstructions = $reconstructions
-    equivalence = $equivalence
-    local_distribution = [pscustomobject][ordered]@{
+  }
+  $manifestFields.reconstructions = $reconstructions
+  $manifestFields.equivalence = $equivalence
+  $manifestFields.local_distribution = [pscustomobject][ordered]@{
       path = Get-MIR4PortablePath -Root $OutputRoot -Path $distributionPath
       archive_sha256 = $distribution.archive_sha256
       content_sha256 = $distribution.content_sha256
       bytes = $distribution.bytes
       entry_count = $distribution.entry_count
-    }
-    qualification = [pscustomobject][ordered]@{
+  }
+  $manifestFields.qualification = [pscustomobject][ordered]@{
       status = 'blocked-exact-engine-not-provided'
       required_engine_version = [string]$targetPlan.engine_lock.version
       required_engine_sha256 = [string]$targetPlan.engine_lock.executable_sha256
       runtime_claim_permitted = $false
       release_claim_permitted = $false
-    }
-    record_sha256 = ''
   }
+  $manifestFields.record_sha256 = ''
+  $manifest = [pscustomobject]$manifestFields
   Assert-MIR4BootstrapCandidateArtifactLayout -Manifest $manifest
   $manifestPath = Join-Path $OutputRoot "manifests\$($targetPlan.target_key).json"
   $null = Assert-MIR4NoReparseAncestors -Root $OutputRoot -Path $manifestPath
@@ -798,7 +910,12 @@ foreach ($targetPlan in $targets) {
   }
   $null = Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath
   $manifestText = Get-Content -Raw -LiteralPath $manifestPath
-  if (-not ($manifestText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json'))) {
+  $manifestSchemaRelative = if ($Lane -ceq 'emergency') {
+    'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json'
+  } else {
+    'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json'
+  }
+  if (-not ($manifestText | Test-Json -SchemaFile (Join-Path $RepoRoot $manifestSchemaRelative))) {
     throw "Generated MIR 4 local candidate manifest failed schema validation for $($targetPlan.target_key)."
   }
   $manifests += $manifest
