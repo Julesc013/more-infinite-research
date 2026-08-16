@@ -13,6 +13,13 @@ superseded_by: []
 
 Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read-only experimental tooling, not stable MEP 1.0 or a public support contract.
 
+## Quickstart
+
+- `.\tools\mir.ps1 mir4 sdk generate`
+- `.\tools\mir.ps1 mir4 sdk check`
+- `.\tools\mir.ps1 mir4 api check`
+- `.\tools\mir.ps1 mir4 api conformance`
+
 | Kind | Purpose |
 | --- | --- |
 | `MIR4HostManifestV0` | Host identity and advertised read-only capabilities. |
