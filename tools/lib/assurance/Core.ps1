@@ -397,7 +397,15 @@ function Get-MIRAssuranceContext {
   $sourceTree = @(& git -C $repo rev-parse "HEAD^{tree}" 2>$null)
   if ($LASTEXITCODE -ne 0 -or $sourceTree.Count -ne 1) { throw "Unable to resolve the development source tree." }
   $defaultCandidate = Get-MIRAssuranceDevelopmentCandidatePath -Info $info -SourceTree ([string]$sourceTree[0])
-  $candidate = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--candidate" -Default $defaultCandidate)
+  $candidateOption = Get-MIRAssuranceOption -Name "--candidate"
+  if ([string]::IsNullOrWhiteSpace([string]$candidateOption) -and
+      [string]$target -eq "2.1" -and
+      [string]$info.version -eq "3.2.10" -and
+      (Test-Path -LiteralPath (Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json") -PathType Leaf)) {
+    $candidateOption = Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }
+  $candidate = Resolve-MIRAssurancePath -Path $candidateOption
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")

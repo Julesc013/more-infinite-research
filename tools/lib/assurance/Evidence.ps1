@@ -2420,8 +2420,10 @@ function Invoke-MIRAssuranceBuild {
   if ($candidateFullPath.StartsWith($distRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Assurance builds may not write through immutable published dist authority: $candidateFullPath"
   }
+  $mir4BootstrapCandidate = [IO.Path]::GetFullPath((Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"))
+  $isMir4BootstrapBuild = $candidateFullPath.Equals($mir4BootstrapCandidate, [StringComparison]::OrdinalIgnoreCase)
   $recordPath = Join-Path $repo ".mir\releases\records\$($Context.info.version).json"
-  if (Test-Path -LiteralPath $recordPath -PathType Leaf) {
+  if (-not $isMir4BootstrapBuild -and (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
     $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
     if ([string]$record.state -in @("tagged", "published", "publicly-verified")) {
       $observedSource = Get-MIRAssurancePackageSourceHash
@@ -2430,9 +2432,30 @@ function Invoke-MIRAssuranceBuild {
       }
     }
   }
-  $candidateRoot = Split-Path -Parent $candidateFullPath
-  $candidateOutputDir = Get-MIRAssuranceRepoRelativePath -Path $candidateRoot
-  & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $candidateOutputDir | Out-Host
+  if ($isMir4BootstrapBuild) {
+    . (Join-Path $repo "tools\lib\mir4\BootstrapMaterialization.ps1")
+    $correctionPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json"
+    if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
+      throw "MIR 4 bootstrap assurance build requires the exact approved correction authority."
+    }
+    $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json
+    if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
+        [string]$correction.kind -ne "MIR4ApprovedBootstrapCorrectionDeltaV1" -or
+        [string]$correction.finding -ne "MIR3-TERM-0033" -or
+        [string]$correction.target_key -ne "f210" -or
+        [bool]$correction.public_output_authorized -or
+        [bool]$correction.authority_scope.release_admission_authorized -or
+        [bool]$correction.authority_scope.signing_or_sealing_authorized -or
+        [bool]$correction.authority_scope.publication_authorized) {
+      throw "MIR 4 bootstrap assurance build correction authority is invalid or release-capable."
+    }
+    & (Join-Path $repo "tools\commands\release\New-MIR4BootstrapLocalCandidate.ps1") `
+      -Target f210 -Lane emergency -OutputRoot (Join-Path $repo "build\mir4\emergency-lane") -Repetitions 3 | Out-Host
+  } else {
+    $candidateRoot = Split-Path -Parent $candidateFullPath
+    $candidateOutputDir = Get-MIRAssuranceRepoRelativePath -Path $candidateRoot
+    & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $candidateOutputDir | Out-Host
+  }
   if ($LASTEXITCODE -ne 0) { throw "Candidate build failed." }
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate was not created: $($Context.candidate)" }
   $receipt = [ordered]@{
