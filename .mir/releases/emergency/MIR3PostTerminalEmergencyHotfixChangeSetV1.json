@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixChangeSetV1",
+  "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+  "status": "one-finding-admitted",
+  "finding_records": [
+    ".mir/releases/emergency/findings/MIR3-TERM-0032.json"
+  ],
+  "allowed_product_scope": [
+    "lossless-absolute-maximum-level-runtime-control",
+    "generated-stream-cap-policy",
+    "base-continuation-cap-policy",
+    "five-native-owner-cap-policy",
+    "MIRSET1-effective-setting-projection",
+    "configuration-change-recovery",
+    "late-finalizer-conflict-diagnostics"
+  ],
+  "forbidden_scope": [
+    "unrelated-MIR3-product-work",
+    "lower-historical-target-reruns-without-package-impact",
+    "MIR4-semantic-activation",
+    "mutation-of-any-dot9-release"
+  ]
+}

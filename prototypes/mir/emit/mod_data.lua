@@ -50,6 +50,16 @@ function M.emit_generation_plan(artifact)
   })
 end
 
+function M.emit_maximum_level_policy(artifact)
+  if not artifact then return end
+  return emit({
+    type = "mod-data",
+    name = "more-infinite-research-maximum-level-policy",
+    data_type = "more-infinite-research.maximum-level-policy-v1",
+    data = artifact
+  })
+end
+
 function M.emit_internal_generation_plan(artifact)
   if not artifact then return end
   return emit({

@@ -87,9 +87,9 @@ local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
 
-if not (adoption_data and adoption_data.version == 3 and adoption_data.binding_count == 5
+if not (adoption_data and adoption_data.version == 4 and adoption_data.binding_count == 5
     and adoption_data.adopted == true and adoption_data.adopted_count >= 5) then
-  fail("expected schema-3 adoption mod-data to report five bindings and at least five adopted recipes.")
+  fail("expected schema-4 adoption mod-data to report five bindings and at least five adopted recipes.")
 end
 
 local signature = tostring(adoption_data.signature or "")
@@ -100,7 +100,7 @@ for _, expectation in ipairs({
   { stream = "research_processing_unit", owner = "processing-unit-productivity" },
   { stream = "research_steel", owner = "steel-plate-productivity" }
 }) do
-  local prefix = "schema=3|stream=" .. expectation.stream
+  local prefix = "schema=4|stream=" .. expectation.stream
     .. "|owner=" .. expectation.owner
     .. "|operation=adopt_native_owner_effects|configured=|effects=1|input-cost="
   local entry_start, prefix_end = string.find(signature, prefix, 1, true)
@@ -109,7 +109,7 @@ for _, expectation in ipairs({
   end
   local separator = string.find(signature, ";", prefix_end + 1, true)
   local entry = string.sub(signature, entry_start, separator and (separator - 1) or #signature)
-  for _, marker in ipairs({ "|input-cost=", "|output-cost=", "|output=" }) do
+  for _, marker in ipairs({ "|input-cost=", "|output-cost=", "|output=", "|planned-max=" }) do
     local _, marker_end = string.find(entry, marker, 1, true)
     if not marker_end or marker_end == #entry or string.sub(entry, marker_end + 1, marker_end + 1) == "|" then
       fail("expected non-empty " .. marker .. " field in adoption signature entry " .. entry)

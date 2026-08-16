@@ -1,11 +1,11 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.9"
+applies_to: "3.2.10"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-15
+last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
 ---
@@ -16,27 +16,36 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.9` |
-| Candidate identity | `C33` |
+| MIR version | `3.2.10` |
+| Candidate identity | `C34` |
 | Candidate namespace | `C` |
-| Predecessor maximum ordinal | `32` |
-| Minimum next ordinal | `33` |
-| Assignment condition | `accepted-family-fixed-point-and-source-freeze` |
+| Predecessor maximum ordinal | `33` |
+| Minimum next ordinal | `34` |
+| Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `255a20df771ae5fa3a38007bd2268bab3e9e1eff` |
-| Package source tree | `10ab16096578a8070851d26c5e812fb215b6aafa` |
-| Package source SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
-| Archive | `dist/more-infinite-research_3.2.9.zip` |
-| Archive bytes | `1061572` |
-| Archive entries | `303` |
-| Archive SHA-256 | `0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20` |
-| Package content SHA-256 | `FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25` |
+| State | `package-built` |
+| Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
+| Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
+| Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
+| Archive | `build/candidates/3.2.10/C34/more-infinite-research_3.2.10.zip` |
+| Archive bytes | `1065178` |
+| Archive entries | `304` |
+| Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
+| Package content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `automated-qualified-awaiting-human-review`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 

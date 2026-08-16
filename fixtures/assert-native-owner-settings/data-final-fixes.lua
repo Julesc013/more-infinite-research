@@ -2,9 +2,22 @@ local function fail(message)
   error("MIR native-owner settings validation failed: " .. message)
 end
 
+local profile
+do
+  local row = settings.startup["mir-settings-profile-import"]
+  local text = row and tostring(row.value or "") or ""
+  if text ~= "" then
+    local json = text
+    if string.sub(text, 1, 8) == "MIRSET1:" then json = helpers.decode_string(string.sub(text, 9)) end
+    profile = json and helpers.json_to_table(json) or nil
+  end
+end
+
 local function setting(name)
   local row = settings.startup[name]
   if not row then fail("missing visible startup setting " .. name) end
+  local imported = profile and profile.settings and profile.settings[name]
+  if imported ~= nil then return imported end
   return row.value
 end
 
@@ -48,8 +61,8 @@ local streams = {
 local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
-if not adoption_data or adoption_data.version ~= 3 then
-  fail("expected native-owner binding mod-data schema 3")
+if not adoption_data or adoption_data.version ~= 4 then
+  fail("expected native-owner binding mod-data schema 4")
 end
 local signature = tostring(adoption_data.signature or "")
 local expected_binding_count = 0
@@ -76,7 +89,7 @@ for _, stream in ipairs(streams) do
   local max_changed = max_level ~= 0
   local effect_changed = effect_percent ~= 10
   local safely_rejected = enabled and unrecognized and cost_changed
-  local signature_prefix = "schema=3|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
+  local signature_prefix = "schema=4|stream=" .. stream.key .. "|owner=" .. stream.owner .. "|operation="
 
   if not enabled then
     if string.find(signature, signature_prefix, 1, true) then
@@ -144,10 +157,14 @@ for _, stream in ipairs(streams) do
     if not close(owner.unit.time, expected_time) then
       fail(stream.owner .. " research time differs")
     end
-    local expected_max = max_changed and math.floor(max_level) or "infinite"
+    local expected_max = "infinite"
     if owner.max_level ~= expected_max then
-      fail(stream.owner .. " max level differs; expected " .. tostring(expected_max)
+      fail(stream.owner .. " prototype maximum must remain infinite for lossless runtime capping; expected " .. tostring(expected_max)
         .. " got " .. tostring(owner.max_level))
+    end
+    local planned_max = max_changed and math.floor(max_level) or "infinite"
+    if not string.find(signature, "|planned-max=" .. tostring(planned_max), 1, true) then
+      fail(stream.owner .. " binding signature omitted selected runtime maximum " .. tostring(planned_max))
     end
 
     local relevant = 0

@@ -1264,10 +1264,19 @@ if ($gate.default_1_8_9_target -ne "Factorio 1.0.0 only" -or $gate.blocks_termin
     $museum.artificial_dot9_versions_permitted -or @($museum.targets).Count -ne 7) { throw "0.18 or museum custody policy is invalid." }
 
 $current = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\current.json") | ConvertFrom-Json
-if (($current.planned_releases -join "|") -ne ($family -join "|") -or -not $current.implementation_admitted -or -not $current.source_frozen -or
-    $current.roles.canonical -ne "3.2.9" -or $current.roles.planned_canonical -ne "3.2.9" -or
-    $current.roles.planned_backport -ne "2.5.9" -or $current.active_programme.id -ne "MIR3-Terminal-ProgrammeV1" -or
-    [string]$current.active_programme.status -ne $programmeStatus) {
+$terminalCurrent = (($current.planned_releases -join "|") -eq ($family -join "|") -and
+  $current.roles.canonical -eq "3.2.9" -and $current.roles.planned_canonical -eq "3.2.9" -and
+  $current.roles.planned_backport -eq "2.5.9" -and $current.active_programme.id -eq "MIR3-Terminal-ProgrammeV1" -and
+  [string]$current.active_programme.status -eq $programmeStatus)
+$emergencyFamily = @("3.2.10", "2.5.10") + $family
+$emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily -join "|") -and
+  $current.roles.canonical -eq "3.2.10" -and $current.roles.planned_canonical -eq "3.2.10" -and
+  $current.roles.planned_backport -eq "2.5.10" -and
+  $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV1" -and
+  [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json" -and
+  [string]$current.active_programme.status -eq "c34-package-built-qualification-in-progress")
+if (-not $current.implementation_admitted -or -not $current.source_frozen -or
+    (-not $terminalCurrent -and -not $emergencyCurrent)) {
   throw "Current release roles do not bind the active terminal programme and canonical .9 family."
 }
 if ($programmeStatus -eq "ready-for-local-tagging") {

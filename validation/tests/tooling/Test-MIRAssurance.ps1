@@ -325,20 +325,26 @@ foreach ($target in @("2.0", "2.1")) {
   }
 }
 $publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
-$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
+$terminalRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.10.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
 if ($currentReleaseBoundary -notin @(
-      "planned|not-assigned", "source-frozen|C33", "package-built|C33",
-      "focused-qualified|C33", "candidate-qualified|C33", "manually-accepted|C33",
-      "automated-qualified-awaiting-human-review|C33",
-      "protected-qualified|C33", "sealed|C33", "promoted|C33", "tagged|C33",
-      "published|C33", "publicly-verified|C33"
-    ) -or [string]$currentRelease.candidate_floor -ne "C33" -or
+      "planned|not-assigned", "source-frozen|C34", "package-built|C34",
+      "focused-qualified|C34", "candidate-qualified|C34", "manually-accepted|C34",
+      "automated-qualified-awaiting-human-review|C34",
+      "protected-qualified|C34", "sealed|C34", "promoted|C34", "tagged|C34",
+      "published|C34", "publicly-verified|C34"
+    ) -or [string]$currentRelease.candidate_floor -ne "C34" -or
     [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
     [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
     [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current planned 3.2.9 upgrade authority."
+  throw "Factorio 2.1 assurance profile must bind the current 3.2.10 hotfix upgrade authority."
+}
+if ([string]$terminalRelease.state -ne "publicly-verified" -or
+    [string]$terminalRelease.candidate_id -ne "C33" -or
+    [string]$terminalRelease.package.archive_sha256 -ne "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20") {
+  throw "The immutable 3.2.9 public release authority changed while advancing the 3.2.10 upgrade profile."
 }
 if ([string]$publishedRelease.state -ne "publicly-verified" -or
     [string]$publishedRelease.candidate_id -ne "C32" -or
@@ -392,6 +398,27 @@ foreach ($requiredUpgradeText in @(
 )) {
   if (-not $terminalUpgradeControl.Contains($requiredUpgradeText)) {
     throw "3.2.9 upgrade fixture is missing governed runtime contract: $requiredUpgradeText"
+  }
+}
+
+$hotfixUpgradeFixtureRoot = Join-Path $RepoRoot "fixtures\assert-upgrade-3-2-9-to-3-2-10"
+$hotfixUpgradeSettings = Get-Content -Raw -LiteralPath (Join-Path $hotfixUpgradeFixtureRoot "settings.lua")
+$hotfixUpgradeControl = Get-Content -Raw -LiteralPath (Join-Path $hotfixUpgradeFixtureRoot "control.lua")
+foreach ($archetype in @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")) {
+  if (-not $hotfixUpgradeSettings.Contains(('"' + $archetype + '"')) -or
+      -not $hotfixUpgradeControl.Contains(('[' + '"' + $archetype + '"' + ']'))) {
+    throw "3.2.10 upgrade fixture does not bind archetype $archetype."
+  }
+}
+foreach ($requiredUpgradeText in @(
+  'script.active_mods["more-infinite-research"] ~= "3.2.9"',
+  'script.active_mods["more-infinite-research"] ~= "3.2.10"',
+  'tech.prototype.max_level < 4294967295',
+  'game.server_save("mir-3210-upgraded")',
+  '3.2.10 upgraded save reload proof complete'
+)) {
+  if (-not $hotfixUpgradeControl.Contains($requiredUpgradeText)) {
+    throw "3.2.10 upgrade fixture is missing governed runtime contract: $requiredUpgradeText"
   }
 }
 
@@ -518,7 +545,9 @@ $candidateRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/rel
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
 $candidatePathIdentity = if ([string]$candidateRelease.state -eq "planned") { "unassigned" } else { [regex]::Escape([string]$candidateRelease.candidate_id) }
-if ($candidatePath -notmatch "/build/candidates/3\.2\.9/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_3\.2\.9\.zip$" -or
+$candidateVersionPattern = [regex]::Escape([string]$candidateInfo.version)
+$expectedCandidatePattern = "/build/candidates/$candidateVersionPattern/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_$candidateVersionPattern\.zip$"
+if ($candidatePath -notmatch $expectedCandidatePattern -or
     $candidatePath -match "/dist/") {
   throw "Default assurance candidates must be release/candidate/source-tree addressed outside immutable dist."
 }

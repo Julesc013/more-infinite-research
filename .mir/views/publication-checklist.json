@@ -2,6 +2,44 @@
   "authority": "mir-generated-terminal-family-publication-checklist-v1",
   "family": [
     {
+      "candidate_id": "C34",
+      "release": "3.2.10",
+      "remaining_states": [
+        "focused-qualified",
+        "candidate-qualified",
+        "automated-qualified-awaiting-human-review",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "package-built",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "not-assigned",
+      "release": "2.5.10",
+      "remaining_states": [
+        "source-frozen",
+        "package-built",
+        "focused-qualified",
+        "candidate-qualified",
+        "automated-qualified-awaiting-human-review",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "planned",
+      "target_seal_present": false
+    },
+    {
       "candidate_id": "C33",
       "release": "3.2.9",
       "remaining_states": [],
@@ -66,14 +104,14 @@
     }
   ],
   "family_readiness_seal_present": true,
-  "first_public_tag_admitted": true,
+  "first_public_tag_admitted": false,
   "generated_from": [
     "path:releases.current",
     ".mir/releases/terminal/MIR3-Terminal-PublicationPolicyV1.json",
     "path:releases.records/*.9.json"
   ],
-  "github_publication_complete": true,
-  "mod_portal_publication_pending": true,
-  "publication_admitted": true,
+  "github_publication_complete": false,
+  "mod_portal_publication_pending": false,
+  "publication_admitted": false,
   "schema": 1
 }
