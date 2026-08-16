@@ -688,6 +688,86 @@ function Compare-MIR4BootstrapCandidate {
   return $result
 }
 
+function Compare-MIR4BootstrapCorrectedCandidate {
+  param(
+    [Parameter(Mandatory)][string]$CandidatePath,
+    [Parameter(Mandatory)][string]$PredecessorPath,
+    [Parameter(Mandatory)][string]$ExpectedCandidateRoot,
+    [Parameter(Mandatory)][string]$ExpectedPredecessorRoot,
+    [Parameter(Mandatory)][string]$ExpectedCandidateVersion,
+    [Parameter(Mandatory)][string]$ExpectedPredecessorVersion,
+    [Parameter(Mandatory)]$Correction,
+    [switch]$ThrowOnDifference
+  )
+
+  if ([string]$Correction.kind -cne 'MIR4ApprovedBootstrapCorrectionDeltaV1' -or
+      [string]$Correction.finding -cne 'MIR3-TERM-0033' -or
+      [string]$Correction.target_key -cne 'f210' -or
+      [bool]$Correction.public_output_authorized -ne $false -or
+      -not (Test-MIR4BootstrapRecordHash -Record $Correction)) {
+    throw 'The approved bootstrap correction record is absent, malformed, or not self-bound.'
+  }
+  $candidate = Get-MIR4ArchiveInventory -Path $CandidatePath
+  $predecessor = Get-MIR4ArchiveInventory -Path $PredecessorPath
+  if ([string]$predecessor.archive_sha256 -cne [string]$Correction.predecessor.archive_sha256 -or
+      [string]$predecessor.content_sha256 -cne [string]$Correction.predecessor.content_sha256) {
+    throw 'The predecessor archive does not match the approved correction base.'
+  }
+  $candidateMap = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($entry in $candidate.entries) { $candidateMap.Add([string]$entry.path, $entry) }
+  $predecessorMap = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($entry in $predecessor.entries) { $predecessorMap.Add([string]$entry.path, $entry) }
+  $added = @($candidateMap.Keys | Where-Object { -not $predecessorMap.ContainsKey($_) } | Sort-Object)
+  $removed = @($predecessorMap.Keys | Where-Object { -not $candidateMap.ContainsKey($_) } | Sort-Object)
+  $changed = @($candidateMap.Keys | Where-Object {
+    $predecessorMap.ContainsKey($_) -and $candidateMap[$_].raw_sha256 -cne $predecessorMap[$_].raw_sha256
+  } | Sort-Object)
+  $expectedChanged = @(('info.json') + @($Correction.deltas.path) | Sort-Object)
+  $exactDelta = $added.Count -eq 0 -and $removed.Count -eq 0 -and
+    ($changed -join '|') -ceq ($expectedChanged -join '|')
+  foreach ($delta in @($Correction.deltas)) {
+    $path = [string]$delta.path
+    $exactDelta = $exactDelta -and $predecessorMap.ContainsKey($path) -and $candidateMap.ContainsKey($path)
+    if ($predecessorMap.ContainsKey($path) -and $candidateMap.ContainsKey($path)) {
+      $exactDelta = $exactDelta -and
+        [string]$predecessorMap[$path].raw_sha256 -ceq [string]$delta.before_sha256 -and
+        [long]$predecessorMap[$path].bytes -eq [long]$delta.before_bytes -and
+        [string]$candidateMap[$path].raw_sha256 -ceq [string]$delta.after_sha256 -and
+        [long]$candidateMap[$path].bytes -eq [long]$delta.after_bytes
+    }
+  }
+  $candidateInfoText = [Text.UTF8Encoding]::new($false, $true).GetString([byte[]](Read-MIR4ArchiveBytes -Path $CandidatePath -RelativePath 'info.json'))
+  $predecessorInfoText = [Text.UTF8Encoding]::new($false, $true).GetString([byte[]](Read-MIR4ArchiveBytes -Path $PredecessorPath -RelativePath 'info.json'))
+  $candidateInfo = $candidateInfoText | ConvertFrom-Json
+  $predecessorInfo = $predecessorInfoText | ConvertFrom-Json
+  $expectedInfo = ConvertTo-MIR4InfoVersionProjection -Text $predecessorInfoText -Version $ExpectedCandidateVersion
+  $metadataEquivalent = [string]$candidate.root -ceq $ExpectedCandidateRoot -and
+    [string]$predecessor.root -ceq $ExpectedPredecessorRoot -and
+    [string]$candidateInfo.version -ceq $ExpectedCandidateVersion -and
+    [string]$predecessorInfo.version -ceq $ExpectedPredecessorVersion -and
+    $candidateInfoText -ceq $expectedInfo -and
+    (Get-MIR4ComparableInfoJson -Json $candidateInfoText) -ceq (Get-MIR4ComparableInfoJson -Json $predecessorInfoText)
+  $equivalent = $exactDelta -and $metadataEquivalent
+  $result = [pscustomobject][ordered]@{
+    equivalent = $equivalent
+    policy = 'MIR4BootstrapApprovedCorrectionEquivalenceV1'
+    correction_kind = [string]$Correction.kind
+    correction_record_sha256 = [string]$Correction.record_sha256
+    finding = [string]$Correction.finding
+    added = $added
+    removed = $removed
+    changed = $changed
+    metadata_equivalent = $metadataEquivalent
+    exact_correction_delta = $exactDelta
+    candidate = [pscustomobject][ordered]@{ archive_sha256=$candidate.archive_sha256; content_sha256=$candidate.content_sha256; bytes=$candidate.bytes; entry_count=$candidate.entry_count }
+    predecessor = [pscustomobject][ordered]@{ archive_sha256=$predecessor.archive_sha256; content_sha256=$predecessor.content_sha256; bytes=$predecessor.bytes; entry_count=$predecessor.entry_count }
+  }
+  if ($ThrowOnDifference -and -not $equivalent) {
+    throw "Candidate differs outside the exact approved MIR3-TERM-0033 correction (added=$($added -join ','), removed=$($removed -join ','), changed=$($changed -join ','))."
+  }
+  return $result
+}
+
 function Expand-MIR4SafeArchive {
   param(
     [Parameter(Mandatory)][string]$ArchivePath,
