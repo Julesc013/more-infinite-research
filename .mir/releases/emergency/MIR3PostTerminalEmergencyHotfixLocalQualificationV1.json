@@ -25,6 +25,15 @@
   ],
   "passed": 13,
   "failed": 0,
+  "primary_upgrade_matrix": {
+    "baseline": "3.2.9",
+    "target": "3.2.10",
+    "archetypes_passed": 5,
+    "first_reload_passed": true,
+    "second_reload_passed": true,
+    "local_result": "build/results/hotfix/3.2.10-upgrade-matrix-first-second-reload-2.1.14.json",
+    "local_result_sha256": "97660ADA9871E233D2AB9D5766FB88F232E7ECC81D309B2E6044E96EDAF7D697"
+  },
   "boundaries": {
     "exact_target_qualification_complete": false,
     "governed_upgrade_matrix_complete": false,

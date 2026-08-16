@@ -249,7 +249,8 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-3-to-3-2-4",
   "assert-upgrade-3-2-3-to-3-2-5",
   "assert-upgrade-3-2-3-to-3-2-9",
-  "assert-upgrade-3-2-5-to-3-2-9"
+  "assert-upgrade-3-2-5-to-3-2-9",
+  "assert-upgrade-3-2-9-to-3-2-10"
 )
 $governedSaveName = "mir-$($ToVersion.Replace('.', ''))-upgraded.zip"
 $governedUpgradedSave = Join-Path $userdata "saves\$governedSaveName"

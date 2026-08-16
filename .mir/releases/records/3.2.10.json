@@ -44,6 +44,11 @@
     "target-seal",
     "publication-and-public-byte-verification"
   ],
+  "upgrade": {
+    "fixture": "assert-upgrade-3-2-9-to-3-2-10",
+    "from_version": "3.2.9",
+    "to_version": "3.2.10"
+  },
   "source_release": {
     "release": "3.2.9",
     "candidate_id": "C33",

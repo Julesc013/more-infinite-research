@@ -58,7 +58,7 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
-  if ($FixtureName -eq "assert-upgrade-3-2-3-to-3-2-5" -and
+  if ($FixtureName -in @("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10") -and
       ("upgraded-save-reload-passed" -notin $assertions -or
        "upgraded-save-second-reload-passed" -notin $assertions -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or
