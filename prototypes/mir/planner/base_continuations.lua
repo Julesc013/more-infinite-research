@@ -403,8 +403,7 @@ local function plan_chain(key)
   if max_level_value == "infinite" then
     max_level_value = coerce_max_level_value(spec.max_level)
   end
-  if not (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
-      and max_level_value ~= "infinite" and max_level_value < desired_new_level then
+  if max_level_value ~= "infinite" and max_level_value < desired_new_level then
     D.extension(D.extension_fields(key, "skipped", "max_level_below_first_extension"))
     return rejected_candidate(key, "max_level_below_first_extension", "progression_safe")
   end
