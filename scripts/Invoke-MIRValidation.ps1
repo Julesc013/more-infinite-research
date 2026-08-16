@@ -2549,7 +2549,9 @@ function Get-FixtureInfos {
   $infos = @()
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
-    $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
+    $infoPath = Join-Path $fixture.FullName "info.json"
+    if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { continue }
+    $info = Get-Content -Raw $infoPath | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name
       Version = $info.version
