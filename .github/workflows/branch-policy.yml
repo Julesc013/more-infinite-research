@@ -28,6 +28,19 @@ on:
         required: false
         default: ""
         type: string
+      terminal_operation:
+        description: Exact governed operation performed by the terminal controller
+        required: false
+        default: promotion
+        type: choice
+        options:
+          - promotion
+          - post-publication-sync
+      terminal_candidate_ref:
+        description: Exact refs/heads remote authority for post-publication synchronization
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -53,6 +66,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.terminal_candidate_sha }}
       - id: validate
         name: Validate exact candidate, archive, acceptance, seals, and promotion boundary
         shell: pwsh
@@ -60,6 +74,8 @@ jobs:
           ./tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1 `
             -Release '${{ inputs.terminal_release }}' `
             -CandidateSha '${{ inputs.terminal_candidate_sha }}' `
+            -Operation '${{ inputs.terminal_operation }}' `
+            -CandidateRef '${{ inputs.terminal_candidate_ref }}' `
             -OutputPath 'build/results/terminal-promotion/${{ inputs.terminal_release }}.json'
       - name: Preserve exact promotion verification
         if: always()
@@ -75,6 +91,7 @@ jobs:
           VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
           CANDIDATE_SHA: ${{ inputs.terminal_candidate_sha }}
           RELEASE: ${{ inputs.terminal_release }}
+          OPERATION: ${{ inputs.terminal_operation }}
         with:
           script: |
             const sha = process.env.CANDIDATE_SHA;
@@ -93,9 +110,9 @@ jobs:
               conclusion: passed ? 'success' : 'failure',
               details_url: runUrl,
               output: {
-                title: `MIR 3 ${process.env.RELEASE} terminal promotion verification`,
+                title: `MIR 3 ${process.env.RELEASE} ${process.env.OPERATION} verification`,
                 summary: passed
-                  ? 'The exact admitted candidate, archive, acceptance authority, remote candidate ref, and release-specific promotion boundary passed the current package-excluded controller.'
+                  ? 'The exact candidate, archive, release authority, remote candidate ref, and requested terminal boundary passed the current package-excluded controller.'
                   : 'Terminal promotion verification failed closed. Inspect the workflow evidence; branch promotion is forbidden.'
               }
             });
@@ -107,7 +124,7 @@ jobs:
               context: 'terminal-promotion-verification',
               target_url: runUrl,
               description: passed
-                ? 'Exact admitted MIR 3 candidate passed promotion verification.'
+                ? `Exact MIR 3 candidate passed ${process.env.OPERATION} verification.`
                 : 'Terminal promotion verification failed closed.'
             });
             if (!passed) core.setFailed('Terminal promotion verification did not pass.');

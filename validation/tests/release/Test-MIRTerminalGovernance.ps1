@@ -22,6 +22,10 @@ foreach ($snippet in @(
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
   'candidate_ref',
+  'post-publication-sync',
+  'post-publication-authority-sync-only',
+  'Mir3PostTerminalEmergencyPublicationReceiptV1',
+  'MIR3-TERM-0033',
   'governed-fast-forward',
   'github-publication-only'
 )) {
@@ -31,6 +35,9 @@ foreach ($snippet in @(
   "workflow_dispatch:",
   "terminal_release:",
   "terminal_candidate_sha:",
+  "terminal_operation:",
+  "terminal_candidate_ref:",
+  "ref: `${{ inputs.terminal_candidate_sha }}",
   "checks: write",
   "statuses: write",
   "Test-MIR3TerminalPromotionCandidate.ps1",

@@ -1,6 +1,8 @@
 param(
   [Parameter(Mandatory)][ValidateSet("3.2.10", "3.2.9", "2.5.9")][string]$Release,
   [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$CandidateSha,
+  [ValidateSet("promotion", "post-publication-sync")][string]$Operation = "promotion",
+  [string]$CandidateRef = "",
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [string]$OutputPath = "",
   [switch]$SkipRemote
@@ -58,7 +60,8 @@ if ($Release -eq "3.2.10") {
     throw "Accepted C34 ZIP identity differs from the ReleaseRecord."
   }
 
-  if ([string]$releaseRecord.state -ne "manually-accepted" -or [string]$releaseRecord.candidate_id -ne "C34" -or
+  if ($Operation -eq "promotion" -and
+      ([string]$releaseRecord.state -ne "manually-accepted" -or [string]$releaseRecord.candidate_id -ne "C34" -or
       [string]$override.status -ne "accepted-for-immediate-promotion" -or
       [string]$override.release -ne "3.2.10" -or [string]$override.candidate_id -ne "C34" -or
       [string]$override.candidate.archive_sha256 -ne $archiveSha -or
@@ -66,7 +69,7 @@ if ($Release -eq "3.2.10") {
       [string]$override.maintainer_decision.factorio_2_1_13_gate -ne "waived and superseded for 3.2.10 only" -or
       [string]$delta.status -ne "approved-under-release-specific-maintainer-override" -or
       [string]$delta.candidate.archive_sha256 -ne $archiveSha -or
-      [string]$delta.transition.from_version -ne "3.2.9" -or [string]$delta.transition.to_version -ne "3.2.10") {
+      [string]$delta.transition.from_version -ne "3.2.9" -or [string]$delta.transition.to_version -ne "3.2.10")) {
     throw "Emergency acceptance, approved delta, or release identity does not authorize C34 promotion."
   }
 
@@ -76,6 +79,96 @@ if ($Release -eq "3.2.10") {
   )) {
     $historicalCommit = (Invoke-MIRPromotionGit rev-parse "$($historical.tag)^{commit}" | Select-Object -First 1).Trim()
     if ($historicalCommit -ne [string]$historical.commit) { throw "Historical tag $($historical.tag) moved." }
+  }
+
+  if ($Operation -eq "post-publication-sync") {
+    if ($CandidateRef -notmatch '^refs/heads/[A-Za-z0-9._/-]+$' -or $CandidateRef.Contains('..')) {
+      throw "Post-publication synchronization requires an exact safe refs/heads candidate ref."
+    }
+
+    $receiptPath = Join-Path $repo ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json"
+    if (-not (Test-Path -LiteralPath $receiptPath -PathType Leaf)) {
+      throw "The append-only 3.2.10 GitHub publication receipt is missing."
+    }
+    $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
+    $releaseCommit = [string]$releaseRecord.proofs.tag.commit
+    $tagObject = (Invoke-MIRPromotionGit rev-parse refs/tags/3.2.10 | Select-Object -First 1).Trim()
+    $tagCommit = (Invoke-MIRPromotionGit rev-parse 'refs/tags/3.2.10^{commit}' | Select-Object -First 1).Trim()
+    Invoke-MIRPromotionGit merge-base --is-ancestor $releaseCommit $CandidateSha | Out-Null
+
+    if ([string]$releaseRecord.state -ne "publicly-verified" -or
+        [string]$releaseRecord.candidate_id -ne "C34" -or
+        $releaseCommit -ne "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6" -or
+        $tagObject -ne [string]$releaseRecord.proofs.tag.tag_object -or
+        $tagCommit -ne $releaseCommit -or
+        [string]$receipt.kind -ne "Mir3PostTerminalEmergencyPublicationReceiptV1" -or
+        [string]$receipt.status -ne "published-and-verified" -or
+        [string]$receipt.candidate_commit -ne $releaseCommit -or
+        [string]$receipt.tag.object_sha -ne $tagObject -or
+        [string]$receipt.tag.peeled_commit -ne $releaseCommit -or
+        -not [bool]$receipt.tag.immutable -or
+        [string]$receipt.archive_sha256 -ne $archiveSha -or
+        [string]$receipt.download_sha256 -ne $archiveSha -or
+        [string]$receipt.content_sha256 -ne $contentSha -or
+        [long]$receipt.bytes -ne $bytes -or [int]$receipt.entries -ne $entries -or
+        [long]$receipt.github_release.id -ne 371323367 -or
+        [bool]$receipt.github_release.draft -or [bool]$receipt.github_release.prerelease -or
+        -not [bool]$receipt.github_release.latest -or
+        [long]$receipt.asset.id -ne 516809271 -or
+        [string]$receipt.post_publication_validation.finding -ne ".mir/releases/emergency/findings/MIR3-TERM-0033.json" -or
+        [string]$receipt.post_publication_validation.disposition -ne "deferred-to-mir4-under-maintainer-direction" -or
+        [string]$override.status -ne "accepted-for-immediate-promotion" -or
+        [string]$delta.status -ne "approved-under-release-specific-maintainer-override") {
+      throw "Published 3.2.10 authority, immutable tag, public receipt, or package identity is not exact."
+    }
+
+    $releasePackageChanges = @(Invoke-MIRPromotionGit diff --name-only $releaseCommit $CandidateSha -- @packageRoots)
+    if ($releasePackageChanges.Count -ne 0) {
+      throw "Package-visible source changed after the immutable 3.2.10 release commit."
+    }
+
+    $candidateRemote = "not-checked"
+    $mainRemote = "not-checked"
+    if (-not $SkipRemote) {
+      $candidateRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin $CandidateRef)
+      $candidateRemote = if ($candidateRemoteLine.Count -eq 1) { ([string]$candidateRemoteLine[0] -split '\s+')[0] } else { "" }
+      $mainRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin refs/heads/main)
+      $mainRemote = if ($mainRemoteLine.Count -eq 1) { ([string]$mainRemoteLine[0] -split '\s+')[0] } else { "" }
+      if ($candidateRemote -ne $CandidateSha -or $mainRemote -notin @($releaseCommit, $CandidateSha)) {
+        throw "Remote candidate head or protected main authority is not at an admitted post-publication boundary."
+      }
+    }
+
+    $result = [ordered]@{
+      schema = 1
+      status = "passed"
+      operation = "post-publication-authority-sync-verification"
+      release = $Release
+      candidate_commit = $CandidateSha
+      candidate_tree = $resolvedTree
+      parents = $resolvedParents
+      candidate_ref = $CandidateRef
+      candidate_remote = $candidateRemote
+      release_commit = $releaseCommit
+      tag_object = $tagObject
+      package_source_commit = $packageSourceCommit
+      package_visible_changes_after_release = @($releasePackageChanges)
+      promotion_branch = "main"
+      promotion_branch_remote = $mainRemote
+      archive = [ordered]@{path=$zipRelative;sha256=$archiveSha;content_sha256=$contentSha;bytes=$bytes;entries=$entries}
+      publication_receipt = ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json"
+      deferred_finding = "MIR3-TERM-0033"
+      authorization = "post-publication-authority-sync-only"
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
+      $resolvedOutput = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $repo $OutputPath }
+      $parent = Split-Path -Parent $resolvedOutput
+      if (-not (Test-Path -LiteralPath $parent -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $parent) }
+      [IO.File]::WriteAllText($resolvedOutput, (($result | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
+    }
+    $result | ConvertTo-Json -Depth 20
+    exit 0
   }
 
   $candidateRef = "refs/heads/hotfix/mir3-native-owner-max-level"
