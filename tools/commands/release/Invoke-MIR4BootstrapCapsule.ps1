@@ -438,7 +438,10 @@ Assert-Exact ([Environment]::Version) $toolchainLock.dotnet_runtime_version '.NE
 Assert-Exact ([Environment]::OSVersion.Platform) $toolchainLock.os_platform 'OS platform'
 Assert-Exact ([Environment]::OSVersion.Version) $toolchainLock.os_version 'OS version'
 Assert-Exact ([Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) $toolchainLock.process_architecture 'Process architecture'
-Assert-Exact ([IO.Path]::GetFileName((Get-Process -Id $PID).Path)) $toolchainLock.executable 'PowerShell executable'
+$executingPwshName = [IO.Path]::GetFileName((Get-Process -Id $PID).Path)
+if (-not [string]::Equals($executingPwshName, [string]$toolchainLock.executable, $comparison)) {
+  throw 'PowerShell executable mismatch.'
+}
 Assert-Exact $toolchainLock.execution_culture 'InvariantCulture' 'Reconstruction execution culture authority'
 Assert-Exact ([Threading.Thread]::CurrentThread.CurrentCulture.Name) '' 'Reconstruction current culture'
 Assert-Exact ([Threading.Thread]::CurrentThread.CurrentUICulture.Name) '' 'Reconstruction current UI culture'
