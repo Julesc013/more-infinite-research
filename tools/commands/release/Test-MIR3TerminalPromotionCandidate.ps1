@@ -141,9 +141,8 @@ if ($Release -eq "3.2.10") {
       }
 
       if ($PromotionBranch -eq "main") {
-        if ($mainRemote -notin @($releaseCommit, $CandidateSha)) {
-          throw "Protected main is not at an admitted post-publication synchronization boundary."
-        }
+        Invoke-MIRPromotionGit merge-base --is-ancestor $releaseCommit $mainRemote | Out-Null
+        Invoke-MIRPromotionGit merge-base --is-ancestor $mainRemote $CandidateSha | Out-Null
       }
       else {
         $legacyRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin refs/heads/legacy)

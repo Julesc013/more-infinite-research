@@ -26,6 +26,7 @@ foreach ($snippet in @(
   'post-publication-authority-sync-only',
   'ValidateSet("main", "legacy")',
   'Legacy alias promotion tree must be exactly identical to protected main.',
+  'merge-base --is-ancestor $mainRemote $CandidateSha',
   'Mir3PostTerminalEmergencyPublicationReceiptV1',
   'MIR3-TERM-0033',
   'governed-fast-forward',
