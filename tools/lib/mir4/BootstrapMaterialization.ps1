@@ -77,12 +77,59 @@ function Get-MIR4GitBlobSha1File {
   return Get-MIR4GitObjectSha1 -Type blob -Bytes ([IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $Path).Path))
 }
 
+function ConvertTo-MIR4BootstrapCanonicalValue {
+  param([Parameter(Mandatory)]$Value)
+
+  if ($Value -is [string]) {
+    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?Z$') {
+      return [DateTime]::Parse(
+        $Value,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [Globalization.DateTimeStyles]::RoundtripKind
+      )
+    }
+    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?[+-]\d{2}:\d{2}$') {
+      return [DateTimeOffset]::Parse(
+        $Value,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [Globalization.DateTimeStyles]::RoundtripKind
+      )
+    }
+    return $Value
+  }
+  if ($Value -is [Collections.IDictionary]) {
+    $result = [ordered]@{}
+    foreach ($key in $Value.Keys) {
+      $result[$key] = ConvertTo-MIR4BootstrapCanonicalValue -Value $Value[$key]
+    }
+    return $result
+  }
+  if ($Value -is [pscustomobject]) {
+    $result = [ordered]@{}
+    foreach ($property in $Value.PSObject.Properties) {
+      $result[$property.Name] = ConvertTo-MIR4BootstrapCanonicalValue -Value $property.Value
+    }
+    return [pscustomobject]$result
+  }
+  if ($Value -is [Collections.IEnumerable]) {
+    $items = [Collections.Generic.List[object]]::new()
+    foreach ($item in $Value) {
+      $items.Add((ConvertTo-MIR4BootstrapCanonicalValue -Value $item))
+    }
+    return ,$items.ToArray()
+  }
+  return $Value
+}
+
 function ConvertTo-MIR4BootstrapCanonicalJson {
   param([Parameter(Mandatory)]$Value)
 
   # BootstrapCanonicalJsonV1 is intentionally narrow: tool-created ordered objects,
-  # integer numbers, arrays in authority order, UTF-8, no BOM, no insignificant space.
-  return (($Value | ConvertTo-Json -Depth 100 -Compress) -replace "`r`n", "`n" -replace "`r", "`n")
+  # integer numbers, arrays in authority order, lexical RFC 3339 timestamps,
+  # UTF-8, no BOM, and no insignificant space. Timestamp normalization preserves
+  # an explicit offset (or Z) so record hashes cannot depend on the runner timezone.
+  $canonicalValue = ConvertTo-MIR4BootstrapCanonicalValue -Value $Value
+  return (($canonicalValue | ConvertTo-Json -Depth 100 -Compress) -replace "`r`n", "`n" -replace "`r", "`n")
 }
 
 function Get-MIR4BootstrapRecordSha256 {
@@ -594,14 +641,14 @@ function ConvertTo-MIR4InfoVersionProjection {
   $matches = [Text.RegularExpressions.Regex]::Matches($Text, $pattern)
   if ($matches.Count -ne 1) { throw "Expected one info.json version property; found $($matches.Count)." }
   $updated = [Text.RegularExpressions.Regex]::Replace($Text, $pattern, "`${1}$Version`${2}")
-  $null = $updated | ConvertFrom-Json
+  $null = $updated | ConvertFrom-Json -DateKind String
   return $updated
 }
 
 function Get-MIR4ComparableInfoJson {
   param([Parameter(Mandatory)][string]$Json)
 
-  $value = $Json | ConvertFrom-Json
+  $value = $Json | ConvertFrom-Json -DateKind String
   if ($null -eq $value.PSObject.Properties['version']) { throw "info.json is missing version." }
   $value.PSObject.Properties.Remove('version')
   return ConvertTo-MIR4BootstrapCanonicalJson -Value $value
@@ -642,8 +689,8 @@ function Compare-MIR4BootstrapCandidate {
   } catch {
     throw "MIR 4 bootstrap info.json entries must be valid UTF-8: $($_.Exception.Message)"
   }
-  $candidateInfo = $candidateInfoText | ConvertFrom-Json
-  $predecessorInfo = $predecessorInfoText | ConvertFrom-Json
+  $candidateInfo = $candidateInfoText | ConvertFrom-Json -DateKind String
+  $predecessorInfo = $predecessorInfoText | ConvertFrom-Json -DateKind String
   $expectedCandidateInfoText = ConvertTo-MIR4InfoVersionProjection `
     -Text $predecessorInfoText `
     -Version $ExpectedCandidateVersion
@@ -738,8 +785,8 @@ function Compare-MIR4BootstrapCorrectedCandidate {
   }
   $candidateInfoText = [Text.UTF8Encoding]::new($false, $true).GetString([byte[]](Read-MIR4ArchiveBytes -Path $CandidatePath -RelativePath 'info.json'))
   $predecessorInfoText = [Text.UTF8Encoding]::new($false, $true).GetString([byte[]](Read-MIR4ArchiveBytes -Path $PredecessorPath -RelativePath 'info.json'))
-  $candidateInfo = $candidateInfoText | ConvertFrom-Json
-  $predecessorInfo = $predecessorInfoText | ConvertFrom-Json
+  $candidateInfo = $candidateInfoText | ConvertFrom-Json -DateKind String
+  $predecessorInfo = $predecessorInfoText | ConvertFrom-Json -DateKind String
   $expectedInfo = ConvertTo-MIR4InfoVersionProjection -Text $predecessorInfoText -Version $ExpectedCandidateVersion
   $metadataEquivalent = [string]$candidate.root -ceq $ExpectedCandidateRoot -and
     [string]$predecessor.root -ceq $ExpectedPredecessorRoot -and
@@ -1327,7 +1374,7 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   if (-not ($envelopeText | Test-Json -SchemaFile (Join-Path $SchemaRoot 'mir4-bootstrap-source-capsule.schema.json'))) {
     throw "MIR 4 source capsule envelope schema validation failed: $EnvelopePath"
   }
-  $envelope = $envelopeText | ConvertFrom-Json -Depth 100
+  $envelope = $envelopeText | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $envelope)) { throw "MIR 4 source capsule envelope self-hash mismatch: $EnvelopePath" }
   $lane = [string]$envelope.lane
   if ($lane -cnotin @('emergency', 'local-playtest-shadow')) { throw 'MIR 4 source capsule has an unknown construction lane.' }
@@ -1346,7 +1393,7 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   if (-not ($manifestText | Test-Json -SchemaFile (Join-Path $SchemaRoot 'mir4-bootstrap-capsule-manifest.schema.json'))) {
     throw 'MIR 4 capsule-internal manifest schema validation failed.'
   }
-  $manifest = $manifestText | ConvertFrom-Json -Depth 100
+  $manifest = $manifestText | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $manifest)) { throw 'MIR 4 capsule-internal manifest self-hash mismatch.' }
   if ([string]$manifest.record_sha256 -cne [string]$envelope.closure.internal_manifest_record_sha256) {
     throw 'MIR 4 capsule internal-manifest binding differs from its envelope.'
@@ -1424,7 +1471,7 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   if (-not ($toolchainText | Test-Json -SchemaFile (Join-Path $SchemaRoot 'mir4-bootstrap-toolchain-lock.schema.json'))) {
     throw 'MIR 4 capsule toolchain lock schema validation failed.'
   }
-  $toolchain = $toolchainText | ConvertFrom-Json -Depth 100
+  $toolchain = $toolchainText | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $toolchain) -or
       [string]$toolchain.record_sha256 -cne [string]$manifest.toolchain_lock_record_sha256 -or
       [string]$toolchain.record_sha256 -cne [string]$envelope.closure.toolchain_lock_record_sha256) {
@@ -1434,7 +1481,7 @@ function Assert-MIR4BootstrapCapsuleArtifact {
   if (-not ($gitText | Test-Json -SchemaFile (Join-Path $SchemaRoot 'mir4-bootstrap-git-source-proof.schema.json'))) {
     throw 'MIR 4 capsule Git source proof schema validation failed.'
   }
-  $gitProof = $gitText | ConvertFrom-Json -Depth 100
+  $gitProof = $gitText | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $gitProof) -or
       [string]$gitProof.record_sha256 -cne [string]$manifest.git_source_proof_record_sha256 -or
       [string]$gitProof.record_sha256 -cne [string]$envelope.closure.git_source_proof_record_sha256 -or
@@ -1623,7 +1670,7 @@ function New-MIR4BootstrapSourceCapsule {
   $correctionBinding = $null
   if ($null -ne $Target.PSObject.Properties['correction_authority']) {
     $correctionPath = Join-Path $repo ([string]$Target.correction_authority.path)
-    $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json -Depth 100
+    $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json -Depth 100 -DateKind String
     if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
         [string]$correction.record_sha256 -cne [string]$Target.correction_authority.record_sha256) {
       throw '[mir4-approved-delta] Capsule construction received a stale correction binding.'
@@ -1644,7 +1691,7 @@ function New-MIR4BootstrapSourceCapsule {
     if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'))) {
       throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.'
     }
-    $laneAuthority = $laneText | ConvertFrom-Json -Depth 100
+    $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String
     if (-not (Test-MIR4BootstrapRecordHash -Record $laneAuthority)) {
       throw '[mir4-local-playtest-shadow] The lane authorization self-hash is stale.'
     }

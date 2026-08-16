@@ -21,7 +21,7 @@ function Assert-Throws([scriptblock]$Action, [string]$Message) {
 
 $planPath = Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 $planText = Get-Content -Raw -LiteralPath $planPath
-$plan = $planText | ConvertFrom-Json
+$plan = $planText | ConvertFrom-Json -DateKind String
 Assert-True ($plan.kind -eq "MIR4BootstrapLocalCandidatePlanV1") "Unexpected MIR4 bootstrap plan kind."
 Assert-True ($plan.public_output_authorized -eq $false) "MIR4 bootstrap plan must remain publication-forbidden."
 Assert-True (Test-MIR4BootstrapRecordHash -Record $plan) "MIR4 bootstrap plan self-hash is stale."
@@ -52,7 +52,7 @@ foreach ($schemaName in @(
 )) {
   $schemaFile = Join-Path $RepoRoot "spec/schemas/$schemaName"
   Assert-True (Test-Path -LiteralPath $schemaFile -PathType Leaf) "MIR4 capsule schema is absent: $schemaName"
-  $null = Get-Content -Raw -LiteralPath $schemaFile | ConvertFrom-Json -Depth 100
+  $null = Get-Content -Raw -LiteralPath $schemaFile | ConvertFrom-Json -Depth 100 -DateKind String
 }
 $runnerPath = Join-Path $RepoRoot 'tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1'
 $runnerTokens = $null
@@ -67,7 +67,7 @@ Assert-True (((ConvertTo-MIR4BootstrapCanonicalJson -Value $toolchainLock) | Tes
 
 $entryGateText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json')
 Assert-True ($entryGateText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-r0-authority.schema.json')) "MIR4 entry gate does not satisfy the R0 authority schema."
-$entryGate = $entryGateText | ConvertFrom-Json
+$entryGate = $entryGateText | ConvertFrom-Json -DateKind String
 Assert-True ($entryGate.kind -ceq 'MIR4-Entry-GateV1') "Unexpected MIR4 entry-gate kind."
 Assert-True ($entryGate.status -ceq 'pre-eol-local-proof-authorized-publication-forbidden') "Unexpected MIR4 entry-gate state."
 Assert-True ($entryGate.package_visible -eq $false -and $entryGate.payload.public_version_4_before_eol -eq $false) "MIR4 entry gate must remain package- and publication-forbidden."
@@ -80,7 +80,7 @@ $f210 = @($plan.targets | Where-Object { [string]$_.target_key -ceq 'f210' })[0]
 $correctionPath = Join-Path $RepoRoot ([string]$f210.correction_authority.path)
 $correctionText = Get-Content -Raw -LiteralPath $correctionPath
 Assert-True ($correctionText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json')) 'The exact MIR3-TERM-0033 correction authority fails its schema.'
-$correction = $correctionText | ConvertFrom-Json -Depth 100
+$correction = $correctionText | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-True (Test-MIR4BootstrapRecordHash -Record $correction) 'The exact MIR3-TERM-0033 correction authority self-hash is stale.'
 Assert-True ([string]$correction.record_sha256 -ceq [string]$f210.correction_authority.record_sha256) 'The f210 plan correction binding is stale.'
 Assert-True ([string]$correction.authority_family -ceq 'MIRApprovedDeltaV1') 'The correction does not use the reusable exact-delta authority family.'
@@ -221,7 +221,7 @@ try {
 
   $reformattedInfoCandidate = Join-Path $testRoot 'reformatted-info-candidate.zip'
   $projectedInfo = $predecessorInfo -replace '3\.2\.9', '4.0.21000'
-  $reformattedInfo = $projectedInfo | ConvertFrom-Json | ConvertTo-Json -Compress
+  $reformattedInfo = $projectedInfo | ConvertFrom-Json -DateKind String | ConvertTo-Json -Compress
   New-RawProbeZip -Path $reformattedInfoCandidate -Entries @(
     [pscustomobject]@{name='mir4-probe_4.0.21000/info.json';content=$reformattedInfo},
     [pscustomobject]@{name='mir4-probe_4.0.21000/data.lua';content="return true`n"}
@@ -271,7 +271,7 @@ try {
 $governedRoot = Join-Path $RepoRoot 'build/mir4/emergency-lane'
 $governedManifest = Join-Path $governedRoot 'manifests/f210.json'
 if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
-  $governedManifestObject = Get-Content -Raw -LiteralPath $governedManifest | ConvertFrom-Json -Depth 100
+  $governedManifestObject = Get-Content -Raw -LiteralPath $governedManifest | ConvertFrom-Json -Depth 100 -DateKind String
   if ($null -eq $governedManifestObject.PSObject.Properties['correction_authority'] -or
       [string]$governedManifestObject.correction_authority.record_sha256 -cne [string]$correction.record_sha256) {
     Assert-Throws {
@@ -299,7 +299,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
       Assert-MIR4BootstrapCapsuleArtifact -CapsulePath $capsuleA -EnvelopePath $envelopeA -RunnerPath $tamperedRunner -SchemaRoot (Join-Path $RepoRoot 'spec/schemas')
     } 'A tampered detached capsule runner was accepted.'
     $tamperedEnvelope = Join-Path $tamperRoot 'source-capsule.json'
-    $envelopeObject = Get-Content -Raw -LiteralPath $envelopeA | ConvertFrom-Json -Depth 100
+    $envelopeObject = Get-Content -Raw -LiteralPath $envelopeA | ConvertFrom-Json -Depth 100 -DateKind String
     $envelopeObject.closure.payload_root_sha256 = 'A' * 64
     $null = Write-MIR4BootstrapRecord -Record $envelopeObject -Path $tamperedEnvelope
     Assert-Throws {
@@ -317,7 +317,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
       try { $aliasWriter.Write('device alias probe') } finally { $aliasWriter.Dispose() }
     } finally { $aliasZip.Dispose(); $aliasStream.Dispose() }
     $aliasEnvelope = Join-Path $tamperRoot 'alias-source-capsule.json'
-    $aliasEnvelopeObject = Get-Content -Raw -LiteralPath $envelopeA | ConvertFrom-Json -Depth 100
+    $aliasEnvelopeObject = Get-Content -Raw -LiteralPath $envelopeA | ConvertFrom-Json -Depth 100 -DateKind String
     $aliasEnvelopeObject.capsule.archive_sha256 = Get-MIR4Sha256File -Path $aliasCapsule
     $aliasEnvelopeObject.capsule.bytes = [long](Get-Item -LiteralPath $aliasCapsule).Length
     $null = Write-MIR4BootstrapRecord -Record $aliasEnvelopeObject -Path $aliasEnvelope

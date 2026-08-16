@@ -21,15 +21,16 @@ $recordRelativePath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/
 $recordPath = Join-Path $RepoRoot $recordRelativePath
 $schemaPath = Join-Path $RepoRoot "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json"
 $recordText = Get-Content -Raw -LiteralPath $recordPath
-$record = $recordText | ConvertFrom-Json
+$record = $recordText | ConvertFrom-Json -DateKind String
 
+Assert-True ($record.observed_at -is [string]) "Governed portal timestamps must remain lexical strings during canonical hash validation."
 Assert-True ($recordText | Test-Json -SchemaFile $schemaPath) "MIR 3 .9 Mod Portal visibility recheck schema validation failed."
 Assert-True (Test-MIR4BootstrapRecordHash -Record $record) "MIR 3 .9 Mod Portal visibility recheck self-hash is stale."
 
 $priorPath = Join-Path $RepoRoot ([string]$record.prior_custody_observation.path)
 Assert-True (Test-Path -LiteralPath $priorPath -PathType Leaf) "The prior custody observation bound by the visibility recheck is absent."
 Assert-True ((Get-MIR4Sha256File -Path $priorPath) -ceq [string]$record.prior_custody_observation.sha256) "The prior custody observation binding is stale."
-$prior = Get-Content -Raw -LiteralPath $priorPath | ConvertFrom-Json
+$prior = Get-Content -Raw -LiteralPath $priorPath | ConvertFrom-Json -DateKind String
 
 Assert-True ((@($record.sources.surface) -join '|') -ceq "official-full-api|official-rendered-download-table") "Visibility source order or coverage drifted."
 Assert-True ((@($record.releases.version) -join '|') -ceq "3.2.9|2.5.9") "Terminal release order or coverage drifted."
@@ -60,12 +61,12 @@ Assert-True ([string]$record.claim_disposition.api_ui_visibility_discrepancy -ce
 $authorityValues = @($record.authority.PSObject.Properties | ForEach-Object { [bool]$_.Value })
 Assert-True ((@($authorityValues | Where-Object { $_ }).Count) -eq 0) "The visibility recheck grants mutation or release authority."
 
-$badRecord = $recordText | ConvertFrom-Json
+$badRecord = $recordText | ConvertFrom-Json -DateKind String
 $badRecord.authority.upload = $true
 $badRecordText = $badRecord | ConvertTo-Json -Depth 100
 Assert-True (-not ($badRecordText | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue)) "Visibility schema admitted upload authority."
 
-$badRecord = $recordText | ConvertFrom-Json
+$badRecord = $recordText | ConvertFrom-Json -DateKind String
 $badRecord.releases[1].rendered_table_visible = $false
 $badRecordText = $badRecord | ConvertTo-Json -Depth 100
 Assert-True (-not ($badRecordText | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue)) "Visibility schema admitted the disproven 2.5.9 rendered-table omission."

@@ -18,7 +18,7 @@ function Get-JsonRecord([string]$RelativePath) {
   return [pscustomobject]@{
     Path = $path
     Text = Get-Content -Raw -LiteralPath $path
-    Value = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+    Value = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -DateKind String
   }
 }
 
@@ -40,6 +40,7 @@ $targetProfilesRecord = Get-JsonRecord ".mir/targets.json"
 $visibilityRecord = Get-JsonRecord ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
 $refreshRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json"
 
+Assert-True ($engineRecord.Value.observed_at -is [string]) "MIR 4 governed timestamps must remain lexical strings during canonical hash validation."
 Assert-True ($engineRecord.Text | Test-Json -SchemaFile $engineSchemaPath) "MIR 4 engine-availability observation schema validation failed."
 Assert-True ($readinessRecord.Text | Test-Json -SchemaFile $readinessSchemaPath) "MIR 4 target-readiness record schema validation failed."
 Assert-True (Test-MIR4BootstrapRecordHash -Record $engineRecord.Value) "MIR 4 engine-availability observation self-hash is stale."
@@ -150,7 +151,7 @@ foreach ($targetKey in $expectedTargetKeys) {
 
   $terminalTargetsText = (& git -C $RepoRoot show "$($plan.source.candidate_commit):.mir/targets.json") -join "`n"
   if ($LASTEXITCODE -ne 0) { throw "Could not read terminal target profile authority for $targetKey." }
-  $terminalTargets = $terminalTargetsText | ConvertFrom-Json
+  $terminalTargets = $terminalTargetsText | ConvertFrom-Json -DateKind String
   $terminalProfile = $terminalTargets.profiles.PSObject.Properties[[string]$readiness.factorio_line].Value
   Assert-True ([int]$terminalProfile.expected_stream_count -eq [int]$readiness.capability.terminal_expected_stream_count) "Terminal target profile stream count drifted for $targetKey."
   Assert-True ($null -ne $terminalProfile.PSObject.Properties['supported_required_mods'] -and
@@ -176,13 +177,13 @@ foreach ($targetKey in @("f110", "f100")) {
     @($readiness.capability.drift).Count -eq 0) "Canonical positive capability allowlists are not exact for $targetKey."
 }
 
-$badReadiness = $readinessRecord.Text | ConvertFrom-Json
+$badReadiness = $readinessRecord.Text | ConvertFrom-Json -DateKind String
 $badF200 = @($badReadiness.targets | Where-Object { [string]$_.target_key -ceq "f200" })[0]
 $badF200.local_construction_admitted = $true
 $badReadinessText = $badReadiness | ConvertTo-Json -Depth 100
 Assert-True (-not ($badReadinessText | Test-Json -SchemaFile $readinessSchemaPath -ErrorAction SilentlyContinue)) "Readiness schema admitted f200 construction."
 
-$badEngine = $engineRecord.Text | ConvertFrom-Json
+$badEngine = $engineRecord.Text | ConvertFrom-Json -DateKind String
 $badEngine.targets[0].observed_engine | Add-Member -NotePropertyName local_path -NotePropertyValue "D:\\Programs\\Factorio\\factorio.exe"
 $badEngineText = $badEngine | ConvertTo-Json -Depth 100
 Assert-True (-not ($badEngineText | Test-Json -SchemaFile $engineSchemaPath -ErrorAction SilentlyContinue)) "Engine observation schema accepted an absolute local path field."

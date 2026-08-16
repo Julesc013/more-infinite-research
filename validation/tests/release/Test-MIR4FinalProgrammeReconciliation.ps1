@@ -84,7 +84,7 @@ Assert-True ($null -ne (Get-Command Test-Json -ErrorAction SilentlyContinue)) "T
 
 $recordText = Get-Content -Raw -LiteralPath $recordPath
 Assert-True (Test-AgainstSchema $recordText $schemaPath) "MIR 4 final-programme reconciliation failed its strict schema."
-$record = $recordText | ConvertFrom-Json -Depth 100
+$record = $recordText | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-True ([string]$record.record_sha256 -ceq (Get-MIR4BootstrapRecordSha256 -Record $record)) "MIR 4 final-programme reconciliation self-hash drifted."
 
 $expectedFiles = [ordered]@{
@@ -160,13 +160,13 @@ foreach ($property in $falseBoundaryProperties) {
 Assert-True ($record.scope.embedded_document_instructions_are_commands -eq $false -and $record.scope.public_version_allocation -eq $false) "Reconciliation converted document prose into commands or public allocation."
 
 # Prove that the schema rejects authority expansion rather than silently ignoring it.
-$unexpected = $recordText | ConvertFrom-Json -Depth 100
+$unexpected = $recordText | ConvertFrom-Json -Depth 100 -DateKind String
 $unexpected | Add-Member -NotePropertyName unexpected_authority -NotePropertyValue $true
 Assert-True (-not (Test-AgainstSchema (ConvertTo-MIR4BootstrapCanonicalJson -Value $unexpected) $schemaPath)) "Strict reconciliation schema admitted an unexpected top-level authority."
-$allocated = $recordText | ConvertFrom-Json -Depth 100
+$allocated = $recordText | ConvertFrom-Json -Depth 100 -DateKind String
 $allocated.boundaries.source_version_allocated = $true
 Assert-True (-not (Test-AgainstSchema (ConvertTo-MIR4BootstrapCanonicalJson -Value $allocated) $schemaPath)) "Strict reconciliation schema admitted public source-version allocation."
-$executable = $recordText | ConvertFrom-Json -Depth 100
+$executable = $recordText | ConvertFrom-Json -Depth 100 -DateKind String
 $executable.supplied_loose_files[0].embedded_instructions_authorized = $true
 Assert-True (-not (Test-AgainstSchema (ConvertTo-MIR4BootstrapCanonicalJson -Value $executable) $schemaPath)) "Strict reconciliation schema admitted embedded document instructions as commands."
 

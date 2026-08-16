@@ -15,7 +15,7 @@ function Assert-True([bool]$Condition, [string]$Message) {
 }
 
 function Copy-Record($Record) {
-  return ($Record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100)
+  return ($Record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String)
 }
 
 function Assert-SchemaRejects($Record, [string]$Context) {
@@ -32,7 +32,7 @@ $authorityPath = Join-Path $RepoRoot $authorityRelative
 $authoritySchema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'
 $manifestSchema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json'
 $text = Get-Content -Raw -LiteralPath $authorityPath
-$authority = $text | ConvertFrom-Json -Depth 100
+$authority = $text | ConvertFrom-Json -Depth 100 -DateKind String
 
 Assert-True ($text | Test-Json -SchemaFile $authoritySchema) 'Local-playtest shadow authorization schema validation failed.'
 Assert-True (Test-MIR4BootstrapRecordHash -Record $authority) 'Local-playtest shadow authorization self-hash is stale.'
@@ -58,13 +58,13 @@ foreach ($import in @($authority.imports.PSObject.Properties.Value)) {
   $importPath = Join-Path $RepoRoot ([string]$import.path)
   Assert-True ((Get-MIR4BootstrapTextSha256 -Path $importPath) -ceq [string]$import.file_sha256) "Local-playtest canonical-text import hash drifted: $($import.path)"
   if ($null -ne $import.PSObject.Properties['record_sha256']) {
-    $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100
+    $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100 -DateKind String
     Assert-True ([string]$importRecord.record_sha256 -ceq [string]$import.record_sha256) "Local-playtest imported record drifted: $($import.path)"
   }
 }
 
-$plan = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$authority.imports.candidate_plan.path)) | ConvertFrom-Json -Depth 100
-$readiness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$authority.imports.release_readiness.path)) | ConvertFrom-Json -Depth 100
+$plan = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$authority.imports.candidate_plan.path)) | ConvertFrom-Json -Depth 100 -DateKind String
+$readiness = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$authority.imports.release_readiness.path)) | ConvertFrom-Json -Depth 100 -DateKind String
 foreach ($target in @($authority.authorized_targets)) {
   $planRows = @($plan.targets | Where-Object { [string]$_.target_key -ceq [string]$target.target_key })
   $readinessRows = @($readiness.targets | Where-Object { [string]$_.target_key -ceq [string]$target.target_key })

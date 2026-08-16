@@ -171,7 +171,7 @@ function Assert-MIRCustodyIsolation {
     [Parameter(Mandatory)][Collections.Specialized.OrderedDictionary]$Original
   )
 
-  $probe = $ImportRow | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+  $probe = $ImportRow | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $probe.baseline_manifest.status = "custody-isolation-probe"
   $probe.baseline_manifest.record_sha256 = "A" * 64
   $probe.normalized_snapshot.record_sha256 = "B" * 64
@@ -199,7 +199,7 @@ $inputRaw = Get-Content -Raw -LiteralPath $inputPath
 if (-not ($inputRaw | Test-Json -SchemaFile (Join-Path $RepoRoot "spec/schemas/mir4-terminal-baseline-import.schema.json") -ErrorAction Stop)) {
   throw "Terminal baseline import schema validation failed."
 }
-$import = $inputRaw | ConvertFrom-Json -Depth 100
+$import = $inputRaw | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIRRecordSha256 -Record $import -Context "Terminal baseline import"
 if ([string]$import.kind -cne "MIR4TerminalBaselineImportV1" -or
     [bool]$import.semantic_authority -or

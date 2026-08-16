@@ -72,7 +72,7 @@ function Invoke-MIR4CapsuleChildProcess {
   if ($exitCode -ne 0) { throw "Detached MIR 4 capsule reconstruction failed with exit code $exitCode`: $stderr" }
   $summaryLines = @($stdout -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
   if ($summaryLines.Count -ne 1) { throw "Detached MIR 4 capsule reconstruction emitted an unexpected stdout protocol: $stdout" }
-  $summary = $summaryLines[0] | ConvertFrom-Json
+  $summary = $summaryLines[0] | ConvertFrom-Json -DateKind String
   if ([string]$summary.status -cne 'passed' -or [string]$summary.candidate_path -cne 'candidate.zip' -or
       [string]$summary.receipt_path -cne 'reconstruction.json') {
     throw 'Detached MIR 4 capsule reconstruction returned an invalid summary.'
@@ -147,7 +147,7 @@ function Get-MIR4PlanCorrection {
   $schema = Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json'
   $text = Get-Content -Raw -LiteralPath $path
   if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-approved-delta] The correction authority fails its exact schema.' }
-  $correction = $text | ConvertFrom-Json -Depth 100
+  $correction = $text | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
       [string]$correction.record_sha256 -cne [string]$PlanTarget.correction_authority.record_sha256) {
     throw '[mir4-approved-delta] The correction authority record binding is stale.'
@@ -170,7 +170,7 @@ function Get-MIR4LocalPlaytestAuthority {
   $schema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'
   $text = Get-Content -Raw -LiteralPath $path
   if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.' }
-  $authority = $text | ConvertFrom-Json -Depth 100
+  $authority = $text | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
       [string]$authority.authority_family -cne 'MIRLocalArtifactLaneAuthorizationV1' -or
       [bool]$authority.semantic_difference_authorized -ne $false -or
@@ -186,7 +186,7 @@ function Get-MIR4LocalPlaytestAuthority {
     $importPath = Join-Path $RepoRoot ([string]$import.path)
     Assert-Equal (Get-MIR4BootstrapTextSha256 -Path $importPath) ([string]$import.file_sha256) "local lane canonical-text import $($import.path)"
     if ($null -ne $import.PSObject.Properties['record_sha256']) {
-      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100
+      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100 -DateKind String
       Assert-Equal ([string]$importRecord.record_sha256) ([string]$import.record_sha256) "local lane record import $($import.path)"
     }
   }
@@ -232,7 +232,7 @@ function Test-MIR4ExistingCandidate {
   }
   $manifestSchema = Join-Path $RepoRoot $manifestSchemaRelative
   if (-not ($manifestText | Test-Json -SchemaFile $manifestSchema)) { throw "Candidate manifest schema validation failed: $manifestPath" }
-  $manifest = $manifestText | ConvertFrom-Json
+  $manifest = $manifestText | ConvertFrom-Json -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $manifest)) { throw "Candidate manifest self-hash mismatch: $manifestPath" }
   Assert-MIR4BootstrapCandidateArtifactLayout -Manifest $manifest
   Assert-Equal ([string]$manifest.target_key) ([string]$PlanTarget.target_key) "candidate target"
@@ -352,7 +352,7 @@ function Test-MIR4ExistingCandidate {
     if (-not ($receiptText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json'))) {
       throw "Reconstruction $($row.id) receipt schema validation failed."
     }
-    $receipt = $receiptText | ConvertFrom-Json -Depth 100
+    $receipt = $receiptText | ConvertFrom-Json -Depth 100 -DateKind String
     if (-not (Test-MIR4BootstrapRecordHash -Record $receipt)) { throw "Reconstruction $($row.id) receipt self-hash mismatch." }
     foreach ($field in @('record_sha256', 'source_capsule_record_sha256', 'source_capsule_archive_sha256', 'capsule_content_root_sha256', 'toolchain_lock_record_sha256', 'package_manifest_sha256', 'equivalence_sha256', 'input_root_sha256', 'result_root_sha256')) {
       $rowField = if ($field -eq 'record_sha256') { 'reconstruction_record_sha256' } else { $field }
@@ -453,7 +453,7 @@ function Test-MIR4ExistingCandidate {
   return $manifest
 }
 
-$plan = Get-Content -Raw -LiteralPath $PlanPath | ConvertFrom-Json
+$plan = Get-Content -Raw -LiteralPath $PlanPath | ConvertFrom-Json -DateKind String
 if ($plan.kind -ne 'MIR4BootstrapLocalCandidatePlanV1' -or $plan.public_output_authorized -ne $false) {
   throw "The input is not a publication-forbidden MIR4 bootstrap local candidate plan."
 }
@@ -506,13 +506,13 @@ $emergencyLanePath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Emerg
 $equivalencePolicyPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json'
 $importPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/terminal-baseline-import.json'
 $rootSetPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/bootstrap-root-set.json'
-$registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
-$versionAuthority = Get-Content -Raw -LiteralPath $versionAuthorityPath | ConvertFrom-Json
+$registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json -DateKind String
+$versionAuthority = Get-Content -Raw -LiteralPath $versionAuthorityPath | ConvertFrom-Json -DateKind String
 $entryGateText = Get-Content -Raw -LiteralPath $entryGatePath
 if (-not ($entryGateText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-r0-authority.schema.json'))) {
   throw '[mir4-entry-gate] The MIR 4 entry gate does not satisfy the governed R0 authority schema.'
 }
-$entryGate = $entryGateText | ConvertFrom-Json
+$entryGate = $entryGateText | ConvertFrom-Json -DateKind String
 $emergencyLaneText = Get-Content -Raw -LiteralPath $emergencyLanePath
 $equivalencePolicyText = Get-Content -Raw -LiteralPath $equivalencePolicyPath
 foreach ($authorityText in @($emergencyLaneText, $equivalencePolicyText)) {
@@ -520,10 +520,10 @@ foreach ($authorityText in @($emergencyLaneText, $equivalencePolicyText)) {
     throw '[mir4-r0-authority] An imported emergency-lane or equivalence authority fails its governed schema.'
   }
 }
-$emergencyLane = $emergencyLaneText | ConvertFrom-Json
-$equivalencePolicy = $equivalencePolicyText | ConvertFrom-Json
-$terminalImport = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json
-$rootSet = Get-Content -Raw -LiteralPath $rootSetPath | ConvertFrom-Json
+$emergencyLane = $emergencyLaneText | ConvertFrom-Json -DateKind String
+$equivalencePolicy = $equivalencePolicyText | ConvertFrom-Json -DateKind String
+$terminalImport = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -DateKind String
+$rootSet = Get-Content -Raw -LiteralPath $rootSetPath | ConvertFrom-Json -DateKind String
 $null = Assert-MIR4R0DistributionIdentity -RepoRoot $RepoRoot
 & (Join-Path $RepoRoot 'tools/commands/release/New-MIR4BootstrapRootSet.ps1') -RepoRoot $RepoRoot -Check
 Assert-Equal ([string]$rootSet.derived_from.path) '.mir/releases/waves/mir4-r0/terminal-baseline-import.json' 'root-set derivation path'
@@ -656,7 +656,7 @@ foreach ($targetPlan in $targets) {
       archive_path = $capsuleCPath
       record_path = $envelopeCPath
       runner_path = $runnerCPath
-      record = (Get-Content -Raw -LiteralPath $envelopeCPath | ConvertFrom-Json -Depth 100)
+      record = (Get-Content -Raw -LiteralPath $envelopeCPath | ConvertFrom-Json -Depth 100 -DateKind String)
     }
     artifact = Assert-MIR4BootstrapCapsuleArtifact `
       -CapsulePath $capsuleCPath `
@@ -749,7 +749,7 @@ foreach ($targetPlan in $targets) {
     if (-not ($receiptText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json'))) {
       throw "Generated reconstruction receipt failed schema validation for $id."
     }
-    $receipt = $receiptText | ConvertFrom-Json -Depth 100
+    $receipt = $receiptText | ConvertFrom-Json -Depth 100 -DateKind String
     if (-not (Test-MIR4BootstrapRecordHash -Record $receipt)) { throw "Generated reconstruction receipt self-hash mismatch for $id." }
     $reconstructions += [pscustomobject][ordered]@{
       id = $id

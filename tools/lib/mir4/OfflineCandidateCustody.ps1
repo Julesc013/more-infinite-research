@@ -74,7 +74,7 @@ function Assert-MIR4BootstrapRecordFileV1 {
   $decoder = [Text.UTF8Encoding]::new($false, $true)
   try { $text = $decoder.GetString($bytes) } catch { throw "MIR 4 custody record is not strict UTF-8: $Path" }
   if ($text.StartsWith([char]0xFEFF)) { throw "MIR 4 custody records must not contain a UTF-8 BOM: $Path" }
-  try { $record = $text | ConvertFrom-Json -Depth 100 } catch { throw "MIR 4 custody record is invalid JSON: $Path" }
+  try { $record = $text | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "MIR 4 custody record is invalid JSON: $Path" }
   if (-not (Test-MIR4BootstrapRecordHash -Record $record)) {
     throw "MIR 4 custody record hash is invalid: $Path"
   }
@@ -103,7 +103,7 @@ function Assert-MIR4GovernedBootstrapRecordFileV1 {
   $decoder = [Text.UTF8Encoding]::new($false, $true)
   try { $text = $decoder.GetString($bytes) } catch { throw "MIR 4 governed record is not strict UTF-8: $Path" }
   if ($text.StartsWith([char]0xFEFF)) { throw "MIR 4 governed records must not contain a UTF-8 BOM: $Path" }
-  try { $record = $text | ConvertFrom-Json -Depth 100 } catch { throw "MIR 4 governed record is invalid JSON: $Path" }
+  try { $record = $text | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "MIR 4 governed record is invalid JSON: $Path" }
   if (-not (Test-MIR4BootstrapRecordHash -Record $record)) { throw "MIR 4 governed record hash is invalid: $Path" }
   if (-not ($text | Test-Json -SchemaFile $SchemaPath -ErrorAction Stop)) {
     throw "MIR 4 governed record does not satisfy its strict schema: $Path"
@@ -132,7 +132,7 @@ function Assert-MIR4CheckedRootSetFileV1 {
   if (-not ($text | Test-Json -SchemaFile $SchemaPath -ErrorAction Stop)) {
     throw "MIR 4 bootstrap root set does not satisfy its strict schema: $Path"
   }
-  return $text | ConvertFrom-Json -Depth 100
+  return $text | ConvertFrom-Json -Depth 100 -DateKind String
 }
 
 function New-MIR4CustodyRecordBindingV1 {

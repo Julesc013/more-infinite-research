@@ -18,7 +18,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 function Read-Json([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Required MIR 4 R0 input is absent: $RelativePath" }
-  return Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
+  return Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String
 }
 
 function Get-Sha256Bytes([byte[]]$Bytes) {

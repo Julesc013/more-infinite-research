@@ -22,8 +22,37 @@ function Get-BytesSha256([byte[]]$Bytes) {
   finally { $algorithm.Dispose() }
 }
 
+function ConvertTo-CanonicalValue($Value) {
+  if ($Value -is [string]) {
+    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?Z$') {
+      return [DateTime]::Parse($Value, [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::RoundtripKind)
+    }
+    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?[+-]\d{2}:\d{2}$') {
+      return [DateTimeOffset]::Parse($Value, [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::RoundtripKind)
+    }
+    return $Value
+  }
+  if ($Value -is [Collections.IDictionary]) {
+    $result = [ordered]@{}
+    foreach ($key in $Value.Keys) { $result[$key] = ConvertTo-CanonicalValue $Value[$key] }
+    return $result
+  }
+  if ($Value -is [pscustomobject]) {
+    $result = [ordered]@{}
+    foreach ($property in $Value.PSObject.Properties) { $result[$property.Name] = ConvertTo-CanonicalValue $property.Value }
+    return [pscustomobject]$result
+  }
+  if ($Value -is [Collections.IEnumerable]) {
+    $items = [Collections.Generic.List[object]]::new()
+    foreach ($item in $Value) { $items.Add((ConvertTo-CanonicalValue $item)) }
+    return ,$items.ToArray()
+  }
+  return $Value
+}
+
 function ConvertTo-CanonicalJson($Value) {
-  return (($Value | ConvertTo-Json -Depth 100 -Compress) -replace "`r`n", "`n" -replace "`r", "`n")
+  $canonicalValue = ConvertTo-CanonicalValue $Value
+  return (($canonicalValue | ConvertTo-Json -Depth 100 -Compress) -replace "`r`n", "`n" -replace "`r", "`n")
 }
 
 function Get-RecordSha256($Record) {
@@ -180,7 +209,7 @@ if (((Get-Item -LiteralPath $output -Force).Attributes -band [IO.FileAttributes]
 }
 
 $envelopeText = [IO.File]::ReadAllText($envelopeFile, [Text.UTF8Encoding]::new($false, $true))
-$envelope = $envelopeText | ConvertFrom-Json -Depth 100
+$envelope = $envelopeText | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-Record $envelope 'MIR4BootstrapSourceCapsuleV2'
 $lane = [string]$envelope.lane
 $validTarget = if ($lane -ceq 'emergency') {
@@ -239,7 +268,7 @@ try {
   if (-not $entryMap.ContainsKey($manifestRelative)) { throw 'The capsule-internal manifest is absent.' }
   $manifestBytes = Get-EntryBytes -Entry $entryMap[$manifestRelative] -MaximumBytes 8388608
   $manifestText = [Text.UTF8Encoding]::new($false, $true).GetString($manifestBytes)
-  $manifest = $manifestText | ConvertFrom-Json -Depth 100
+  $manifest = $manifestText | ConvertFrom-Json -Depth 100 -DateKind String
   Assert-Record $manifest 'MIR4BootstrapCapsuleManifestV2'
   if ([int]$manifest.schema -ne 2 -or [string]$manifest.lane -cne $lane -or [string]$manifest.target.target_key -cne [string]$envelope.target_key) { throw 'Unexpected capsule-internal manifest authority.' }
   Assert-Exact $manifest.record_sha256 $envelope.closure.internal_manifest_record_sha256 'Internal manifest binding'
@@ -322,7 +351,7 @@ if ($lane -ceq 'emergency') {
   if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta.schema.json'))) {
     throw 'The capsule approved correction authority fails its exact schema.'
   }
-  $correction = $correctionText | ConvertFrom-Json -Depth 100
+  $correction = $correctionText | ConvertFrom-Json -Depth 100 -DateKind String
   Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV1'
   Assert-Exact $correction.finding 'MIR3-TERM-0033' 'Approved correction finding'
   Assert-Exact $correction.target_key $envelope.target_key 'Approved correction target'
@@ -339,7 +368,7 @@ if ($lane -ceq 'local-playtest-shadow') {
   if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-local-playtest-shadow-authorization.schema.json'))) {
     throw 'The private local-playtest lane authority fails its exact schema.'
   }
-  $laneAuthority = $laneText | ConvertFrom-Json -Depth 100
+  $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String
   Assert-Record $laneAuthority 'MIR4LocalPlaytestShadowAuthorizationV1'
   Assert-Exact $laneAuthority.authority_family 'MIRLocalArtifactLaneAuthorizationV1' 'Local lane authority family'
   Assert-Exact $laneAuthority.record_sha256 $envelope.local_lane_authority.record_sha256 'Local lane record binding'
@@ -354,7 +383,7 @@ if ($lane -ceq 'local-playtest-shadow') {
     $importPath = Assert-Descendant $workspace (Join-Path $workspace ([string]$import.path))
     Assert-Exact (Get-RawSha256 $importPath) $import.file_sha256 "Local lane import $($import.path)"
     if ($null -ne $import.PSObject.Properties['record_sha256']) {
-      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100
+      $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json -Depth 100 -DateKind String
       Assert-Exact $importRecord.record_sha256 $import.record_sha256 "Local lane record import $($import.path)"
     }
   }
@@ -368,7 +397,7 @@ $internalRunnerPath = Join-Path $workspace 'tools/commands/release/Invoke-MIR4Bo
 Assert-Exact (Get-RawSha256 $internalRunnerPath) $envelope.closure.reconstruction_runner_sha256 'Capsule-internal runner hash'
 
 $manifestPath = Join-Path $workspace '.mir/capsule/manifest.json'
-$manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
+$manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100 -DateKind String
 if (-not (Test-MIR4BootstrapRecordHash -Record $manifest)) { throw 'Capsule-internal manifest self-hash mismatch after extraction.' }
 if ([int]$manifest.member_count -ne @($manifest.members).Count) { throw 'Capsule-internal manifest member count is inconsistent.' }
 $memberFields = [ordered]@{}
@@ -394,7 +423,7 @@ $capsuleContentRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.capsule-conte
 Assert-Exact $capsuleContentRoot $envelope.closure.capsule_content_root_sha256 'Capsule content root'
 
 $toolchainLockPath = Join-Path $workspace '.mir/capsule/toolchain-lock.json'
-$toolchainLock = Get-Content -Raw -LiteralPath $toolchainLockPath | ConvertFrom-Json -Depth 100
+$toolchainLock = Get-Content -Raw -LiteralPath $toolchainLockPath | ConvertFrom-Json -Depth 100 -DateKind String
 $toolchainLockText = Get-Content -Raw -LiteralPath $toolchainLockPath
 if (-not ($toolchainLockText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-bootstrap-toolchain-lock.schema.json')) -or
     [string]$toolchainLock.kind -cne 'MIR4BootstrapToolchainLockV1' -or -not (Test-MIR4BootstrapRecordHash -Record $toolchainLock)) {
@@ -462,7 +491,7 @@ $gitProofText = Get-Content -Raw -LiteralPath $gitProofPath
 if (-not ($gitProofText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-bootstrap-git-source-proof.schema.json'))) {
   throw 'Capsule Git source proof schema validation failed.'
 }
-$gitProof = $gitProofText | ConvertFrom-Json -Depth 100
+$gitProof = $gitProofText | ConvertFrom-Json -Depth 100 -DateKind String
 $null = Assert-MIR4GitSourceProof -CapsuleRoot $workspace -Proof $gitProof
 $null = Assert-MIR4BootstrapCapsuleManifestClosure -Manifest $manifest -GitProof $gitProof -Lane $lane
 Assert-Exact $gitProof.record_sha256 $manifest.git_source_proof_record_sha256 'Manifest Git source proof'
@@ -476,7 +505,7 @@ Assert-Exact (Get-RawSha256 $packageIdentityPath) $envelope.package_membership.a
 Assert-Exact (Get-RawSha256 $capsuleAuthorityPath) $envelope.package_membership.capsule_tool_sha256 'Capsule authority member hash'
 
 $infoPath = Join-Path $workspace 'info.json'
-$info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+$info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json -DateKind String
 Assert-Exact $info.version $envelope.predecessor.release 'Capsule predecessor version'
 Assert-Exact $info.factorio_version $envelope.factorio_line 'Capsule Factorio line'
 $predecessorInventory = Get-MIR4ArchiveInventory -Path $predecessor
