@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-qualification-review.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-qualification-review.schema.json",
+  "title": "Mir3TerminalQualificationReviewV1",
+  "type": "object",
+  "required": ["schema", "kind", "recorded_at", "release", "candidate_id", "archive_sha256", "qualification", "acceptance", "scope", "record_sha256", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "Mir3TerminalQualificationReviewV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "archive_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "record_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$", "description": "SHA-256 of canonical final record with record_sha256 omitted."},
+    "status": {"const": "accepted-exact-package-inspection"}
+  },
+  "additionalProperties": true
+}

@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -54,13 +54,13 @@ Released identity changes require a migration strategy: `retain-hidden-alias`, `
 Validate and copy the exact compiler-produced catalog artifact without reconstructing semantics:
 
 ```powershell
-.\scripts\Export-MIRTechnologyCatalog.ps1 -CatalogPath out\technology-catalog.compiler.json -OutputPath out\technology-catalog.json
+.\tools\commands\technology\Export-MIRTechnologyCatalog.ps1 -CatalogPath out\technology-catalog.compiler.json -OutputPath out\technology-catalog.json
 ```
 
 For PREVIEW or diagnostics-enabled runs, export the exact full catalog beside deterministic JSON and Markdown reviewer summaries. Supplying internal compiler evidence adds provider/ecosystem decisions and observed public-artifact budget status:
 
 ```powershell
-.\scripts\Export-MIRCompilerPreview.ps1 -CatalogPath out\technology-catalog.compiler.json -EvidencePath out\compiler-evidence.internal.json -OutputDirectory out\compiler-preview
+.\tools\commands\technology\Export-MIRCompilerPreview.ps1 -CatalogPath out\technology-catalog.compiler.json -EvidencePath out\compiler-evidence.internal.json -OutputDirectory out\compiler-preview
 ```
 
 The summary calls out selected alternatives, ambiguous or review-required cases, rejected designs and reasons, ecosystem-dependent provider decisions, public artifact limits, and provider budget reviews. It is reviewer evidence, not mutation or promotion authority.
@@ -68,21 +68,21 @@ The summary calls out selected alternatives, ambiguous or review-required cases,
 Evaluate the selected alternative against a governed profile, produce a deterministic review dossier, and enforce promotion admission:
 
 ```powershell
-.\scripts\New-MIRTechnologyQualityAssessment.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -ProfileId release -MetricsPath metrics.json -EvidencePath evidence.json -OutputPath assessment.json
-.\scripts\New-MIRTechnologyReviewDossier.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -OutputPath dossier.json
-.\scripts\Test-MIRTechnologyPromotionAdmission.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -ApprovalPath approval.json -PromotionPath promotion.json -EvidencePath evidence.json -OutputPath admission.json
+.\tools\commands\technology\New-MIRTechnologyQualityAssessment.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -ProfileId release -MetricsPath metrics.json -OutputPath assessment.json
+.\tools\commands\technology\New-MIRTechnologyReviewDossier.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -OutputPath dossier.json
+.\validation\tests\compiler\Test-MIRTechnologyPromotionAdmission.ps1 -CatalogPath out\technology-catalog.json -CandidateId <candidate> -AssessmentPath assessment.json -ApprovalPath approval.json -PromotionPath promotion.json -EvidencePath evidence.json -OutputPath admission.json
 ```
 
 Compare leaf-field values and enforce an approval's locks:
 
 ```powershell
-.\scripts\Compare-MIRTechnologyDesigns.ps1 -BeforePath before.json -AfterPath after.json -ApprovalPath approval.json -OutputPath diff.json
+.\tools\commands\technology\Compare-MIRTechnologyDesigns.ps1 -BeforePath before.json -AfterPath after.json -ApprovalPath approval.json -OutputPath diff.json
 ```
 
 Create deterministic approval, quarantine, demotion, promotion, or migration records from a review request:
 
 ```powershell
-.\scripts\New-MIRTechnologyLifecycleRecord.ps1 -Kind Approval -InputPath request.json -OutputPath approval.json
+.\tools\commands\technology\New-MIRTechnologyLifecycleRecord.ps1 -Kind Approval -InputPath request.json -OutputPath approval.json
 ```
 
 Exact approved design fingerprints return `APPROVED`. Unchanged designs return `UNCHANGED`; adaptive changes return `TARGETED_REVIEW`; unreviewed changes return `REVIEW_REQUIRED`; locked drift returns `REJECTED_LOCK_VIOLATION`.

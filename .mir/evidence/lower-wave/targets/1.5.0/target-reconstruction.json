@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "branch": "tmp/0.15",
+  "release": "1.5.0",
+  "factorio": {
+    "line": "0.15",
+    "qualified_version": "0.15.40",
+    "binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+    "baseline_runtime_scenarios": 4
+  },
+  "prior_release": {"status": "not-applicable-no-legitimate-prior-release"},
+  "classification": {
+    "native": ["minimal target-supported direct-effect streams", "stable stream and setting identifiers", "existing migrations"],
+    "adapted": ["target-era science mapping", "iterative prerequisite graph traversal", "target-filtered settings and emission", "legacy technology icons", "deterministic package qualification"],
+    "generated_fallback": [],
+    "finite_reconstruction": [],
+    "omitted_by_capability": ["unproven direct-effect modifiers", "all change-recipe-productivity streams and settings", "2.x owner adoption and repair", "Space Age, quality, elevated-rails, recycler, scripted and cargo-only capabilities"]
+  },
+  "settings_policy": "Expose only settings backed by effects accepted by Factorio 0.15.",
+  "release_actions": "maintainer-only"
+}

@@ -1,0 +1,58 @@
+{
+  "schema": 2,
+  "run_id": "52c607ea-a6d5-48bc-aef1-1d541b362859",
+  "mir_version": "3.2.3",
+  "factorio_version": "2.1",
+  "factorio_binary_version": "2.1.12",
+  "git_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "D58E0E414C12B939049F3948267FDFF4B0A937C1791FE382CC2E8285616D4595",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "AB8106985CAA0D95560B6231CC1142E84A1AF8B0655D8A9865378A65BE6EAEBA",
+  "expected_scenarios": [
+    "aai-loader-belt-productivity"
+  ],
+  "target_profile_sha256": "9C22F859CF0FEB368A0EADCABF13FB83998B76E3DCAB9CBC85DFF66E8EE925A0",
+  "required_groups_sha256": "B50D175872D6CA4F85A6490C03434B3555944FBA92B659B32FBA4AA6BF9980CE",
+  "package_source_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+  "validation_package_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+  "validation_package_content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+  "status": "passed",
+  "started_at": "2026-07-30T18:28:47.7317046Z",
+  "completed_at": "2026-07-30T18:28:54.6377482Z",
+  "duration_seconds": 6.906,
+  "current_scenario": null,
+  "required_groups": [
+    "local-mod-library"
+  ],
+  "groups": [
+    {
+      "name": "local-mod-library",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 6.891,
+      "scenarios": [
+        "aai-loader-belt-productivity"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "4e551a15-ebf3-40a1-9490-277a14b50275",
+      "name": "aai-loader-belt-productivity",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-30T18:28:47.7400782Z",
+      "completed_at": "2026-07-30T18:28:54.6315305Z",
+      "duration_seconds": 6.891,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-c7bb835928cd46dab5b1d15a531f3a63\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

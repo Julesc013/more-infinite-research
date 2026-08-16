@@ -5,37 +5,37 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
 # Developer Tools
 
-This repository has a small MIR developer test harness. It is not a separate product or a second framework. The goal is to keep common release, audit, package, and report tasks behind short commands while preserving the existing scripts as the implementation engines.
+This repository has a small MIR developer test harness. It is not a separate product or a second framework. The goal is to keep common release, audit, package, and report tasks behind short commands with implementations organized by domain under `tools/commands/` and reusable internals under `tools/lib/`.
 
 ## Preferred Commands
 
-Use `scripts/mir.ps1` first:
+Use `tools/mir.ps1` first:
 
 ```powershell
-.\scripts\mir.ps1 docs check
-.\scripts\mir.ps1 architecture check
-.\scripts\mir.ps1 manifests check
-.\scripts\mir.ps1 release gate
-.\scripts\mir.ps1 release docs-only
-.\scripts\mir.ps1 release docs-refresh
-.\scripts\mir.ps1 overnight local
-.\scripts\mir.ps1 audit local
-.\scripts\mir.ps1 audit top25 --space-age
-.\scripts\mir.ps1 storage audit --all-worktrees
-.\scripts\mir.ps1 storage clean --all-worktrees --apply
-.\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 report missing-deps --run <path>
-.\scripts\mir.ps1 report observations --run <path>
-.\scripts\mir.ps1 package build
-.\scripts\mir.ps1 local-index build --mods <path>
-.\scripts\Test-MIRPolicyLints.ps1
-.\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
+.\tools\mir.ps1 docs check
+.\tools\mir.ps1 architecture check
+.\tools\mir.ps1 manifests check
+.\tools\mir.ps1 release gate
+.\tools\mir.ps1 release docs-only
+.\tools\mir.ps1 release docs-refresh
+.\tools\mir.ps1 overnight local
+.\tools\mir.ps1 audit local
+.\tools\mir.ps1 audit top25 --space-age
+.\tools\mir.ps1 storage audit --all-worktrees
+.\tools\mir.ps1 storage clean --all-worktrees --apply
+.\tools\mir.ps1 report latest
+.\tools\mir.ps1 report missing-deps --run <path>
+.\tools\mir.ps1 report observations --run <path>
+.\tools\mir.ps1 package build
+.\tools\mir.ps1 local-index build --mods <path>
+.\validation\tests\tooling\Test-MIRPolicyLints.ps1
+.\tools\commands\planner\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
 
 Common overrides:
@@ -49,7 +49,7 @@ Common overrides:
 --profile <profile-name-or-path>
 ```
 
-`mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+`mir.ps1` delegates to canonical commands. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it. Historical `scripts/` command paths are parameter-compatible read-only wrappers during the 3.2.5 migration window.
 
 `storage audit` reports protected, recent, and cleanup-eligible artifact roots without deleting anything. `storage clean` is also a preview unless `--apply` is explicit. See [local artifact retention and storage](artifact-retention.md) for the protected storage classes, seven-day default, immediate post-run cleanup, hardlink accounting, and deletion safeguards.
 
@@ -94,7 +94,7 @@ For an exact release-archive compatibility gate, pass `-ModUnderTestZip` to `Inv
 Use a writable dependency-cache library for downloaded prerequisites instead of changing the read-only mod collection. For large local audits, prefer an output path on a roomy drive and choose a staging mode explicitly:
 
 ```powershell
-.\scripts\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1 --link-mode Copy
+.\tools\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1 --link-mode Copy
 ```
 
 `--link-mode Hardlink` can reduce copy time and disk usage when source zips and scenario folders are on the same drive. `Copy` is the safest cross-drive mode.
@@ -104,7 +104,7 @@ Use a writable dependency-cache library for downloaded prerequisites instead of 
 Preferred public front door:
 
 ```text
-scripts/mir.ps1
+tools/mir.ps1
 ```
 
 Stable direct commands:
@@ -113,24 +113,24 @@ Stable direct commands:
 scripts/Invoke-MIRReleaseTargetedGate.ps1
 scripts/Start-MIROvernightLocalSweep.ps1
 scripts/Show-MIROvernightSummary.ps1
-scripts/Build-MIRPackage.ps1
+tools/commands/package/Build-MIRPackage.ps1
 scripts/Invoke-MIRValidation.ps1
-scripts/Test-MIRArchitecture.ps1
+validation/tests/architecture/Test-MIRArchitecture.ps1
 ```
 
 Advanced engines:
 
 ```text
 scripts/Invoke-MIRExtendedTests.ps1
-scripts/Invoke-MIRCompatAudit.ps1
-scripts/Convert-MIRCompatAuditResults.ps1
-scripts/New-MIRCompatProfileStub.ps1
-scripts/Test-MIRPolicyLints.ps1
-scripts/Compare-MIRPlannerReports.ps1
-scripts/Export-MIRPlannerSnapshot.ps1
-scripts/Compare-MIRPlannerSnapshots.ps1
-scripts/Minimize-MIRPlannerSnapshot.ps1
-scripts/New-MIRCompatibilityPack.ps1
+tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1
+tools/commands/compatibility/New-MIRCompatProfileStub.ps1
+validation/tests/tooling/Test-MIRPolicyLints.ps1
+tools/commands/planner/Compare-MIRPlannerReports.ps1
+tools/commands/planner/Export-MIRPlannerSnapshot.ps1
+tools/commands/planner/Compare-MIRPlannerSnapshots.ps1
+tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
+tools/commands/compatibility/New-MIRCompatibilityPack.ps1
 ```
 
 `Export-MIRPlannerSnapshot.ps1` converts one or more MIR audit logs into a deterministic target/source/archive-bound JSON snapshot with separate plan and coverage rows. `Compare-MIRPlannerSnapshots.ps1` reports added, removed, and changed plan identities and can require different target profiles for a target-plan diff. `Minimize-MIRPlannerSnapshot.ps1` extracts the rows tied to named recipes, streams, rules, capabilities, or subjects for a focused fixture packet. `New-MIRCompatibilityPack.ps1` creates a non-public, review-required schema-2 pack scaffold and refuses to overwrite an existing file. Static validation runs `Test-MIRPlannerTools.ps1` against all five workflows.
@@ -140,23 +140,23 @@ scripts/New-MIRCompatibilityPack.ps1
 Example target-plan workflow:
 
 ```powershell
-.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.1.log -TargetProfile 2.1 -OutputPath .\plan-2.1.json
-.\scripts\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.0.log -TargetProfile 2.0 -OutputPath .\plan-2.0.json
-.\scripts\Compare-MIRPlannerSnapshots.ps1 -Before .\plan-2.1.json -After .\plan-2.0.json -RequireDifferentTargets
+.\tools\commands\planner\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.1.log -TargetProfile 2.1 -OutputPath .\plan-2.1.json
+.\tools\commands\planner\Export-MIRPlannerSnapshot.ps1 -AuditLogPaths .\factorio-2.0.log -TargetProfile 2.0 -OutputPath .\plan-2.0.json
+.\tools\commands\planner\Compare-MIRPlannerSnapshots.ps1 -Before .\plan-2.1.json -After .\plan-2.0.json -RequireDifferentTargets
 ```
 
 Private helpers:
 
 ```text
-scripts/MIRCli/*.ps1
-scripts/MIRCompatAudit/*.ps1
+tools/lib/cli/*.ps1
+tools/lib/compatibility/*.ps1
 ```
 
 The helper folders are not an architecture project to finish before useful work can happen. Use them when two or more scripts need the same behavior. Avoid creating new wrapper scripts unless a new human workflow genuinely needs one.
 
 ## Quality Checks
 
-`scripts/Test-MIRPowerShellQuality.ps1` validates the PowerShell tooling surface:
+`validation/tests/tooling/Test-MIRPowerShellQuality.ps1` validates the PowerShell tooling surface:
 
 - every `scripts/**/*.ps1` file parses;
 - parameter blocks do not contain duplicate parameter names;
@@ -173,13 +173,13 @@ Static validation runs this check:
 Legacy inventory thresholds are also part of static validation. Run the standalone checked inventory when changing module ownership:
 
 ```powershell
-.\scripts\mir.ps1 legacy inventory --check
+.\tools\mir.ps1 legacy inventory --check
 ```
 
 Run it directly when working only on tooling:
 
 ```powershell
-.\scripts\Test-MIRPowerShellQuality.ps1
+.\validation\tests\tooling\Test-MIRPowerShellQuality.ps1
 ```
 
 ## Design Rule
@@ -190,7 +190,7 @@ Keep the system boring:
 mir.ps1 = user-facing command names
 run profiles = reusable defaults
 existing scripts = engines
-MIRCli = small private helper folder
+CLI helpers = small private library under tools/lib/cli
 ```
 
 Do not add more scenario types, reports, or framework modules until a real repeated pain point requires them.

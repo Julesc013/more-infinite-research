@@ -1,12 +1,12 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$CampaignPath = ".mir\performance-campaign.json",
-  [string]$Candidate = "dist\more-infinite-research_3.2.0.zip",
-  [string]$PriorRelease = "dist\more-infinite-research_3.1.9.zip",
+  [string]$Candidate = "dist\more-infinite-research_3.2.1.zip",
+  [string]$PriorRelease = "dist\more-infinite-research_3.2.0.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [Parameter(Mandatory)][string]$ExpectedSourceCommit,
   [string]$LocalModZipDir = "C:\Projects\Factorio\testmods_2.1",
-  [string]$OutputPath = ".mir\evidence\3.2.0-performance-regression.json",
+  [string]$OutputPath = ".mir\evidence\3.2.1-performance-regression.json",
   [string]$ArtifactRoot = "",
   [ValidateRange(1, 10)][int]$WarmupRuns = 1,
   [ValidateRange(5, 25)][int]$MeasuredRuns = 5,
@@ -97,7 +97,8 @@ function Assert-MIRCampaignPackage {
 function New-MIRCampaignSettingsOverrideMod {
   param(
     [Parameter(Mandatory)][string]$ModsDir,
-    [Parameter(Mandatory)]$Settings
+    [Parameter(Mandatory)]$Settings,
+    [Parameter(Mandatory)][string]$FactorioLine
   )
   $properties = @($Settings.PSObject.Properties | Sort-Object Name)
   if ($properties.Count -eq 0) { return $false }
@@ -108,7 +109,7 @@ function New-MIRCampaignSettingsOverrideMod {
     version = "0.1.0"
     title = "MIR Performance Settings Overrides"
     author = "MIR performance harness"
-    factorio_version = [string]$script:CampaignFactorioLine
+    factorio_version = $FactorioLine
     dependencies = @("more-infinite-research")
   } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $modDir "info.json") -Encoding UTF8
   $lines = @(
@@ -148,7 +149,10 @@ function Copy-MIRCampaignProbe {
 }
 
 function Get-MIRCampaignProbeFromLog {
-  param([Parameter(Mandatory)][string]$LogPath)
+  param(
+    [Parameter(Mandatory)][string]$LogPath,
+    [string[]]$RequiredPhases = @()
+  )
   $marker = "[MIR_PERFORMANCE_PROBE]"
   $match = Select-String -LiteralPath $LogPath -Pattern $marker -SimpleMatch | Select-Object -Last 1
   if ($null -eq $match) { throw "Performance probe marker is absent from $LogPath" }
@@ -179,11 +183,13 @@ function Get-MIRCampaignProbeFromLog {
     }
   }
   if ($starts.Count -ne 0) { throw "Performance phase markers are incomplete in $LogPath" }
-  foreach ($phase in @("snapshot", "graph", "planning", "postconditions")) {
+  foreach ($phase in @($RequiredPhases | Sort-Object -Unique)) {
+    if ($phase -notin @("snapshot", "graph", "planning", "postconditions")) {
+      throw "Performance campaign requires unsupported probe phase '$phase'."
+    }
     $probe.phases.$phase.runs = [int]$phaseRows[$phase].runs
     $probe.phases.$phase.seconds = [Math]::Round([double]$phaseRows[$phase].seconds, 6)
-    if ($script:RequirePerformancePhases -and
-        ([int]$probe.phases.$phase.runs -lt 1 -or [double]$probe.phases.$phase.seconds -lt 0)) {
+    if ([int]$probe.phases.$phase.runs -lt 1 -or [double]$probe.phases.$phase.seconds -lt 0) {
       throw "Performance probe phase '$phase' is absent or invalid in $LogPath"
     }
   }
@@ -198,14 +204,16 @@ function Invoke-MIRExactPackagePerformanceRun {
   param(
     [Parameter(Mandatory)]$Lane,
     [Parameter(Mandatory)][string]$PackagePath,
-    [Parameter(Mandatory)][string]$RunRoot
+    [Parameter(Mandatory)][string]$RunRoot,
+    [Parameter(Mandatory)][bool]$RequireProbeTelemetry,
+    [string[]]$RequiredProbePhases = @()
   )
   $modsDir = Join-Path $RunRoot "mods"
   $savesDir = Join-Path $RunRoot "saves"
   New-Item -ItemType Directory -Force -Path $modsDir, $savesDir | Out-Null
   Copy-Item -LiteralPath $PackagePath -Destination (Join-Path $modsDir (Split-Path -Leaf $PackagePath)) -Force
-  Copy-MIRCampaignProbe -ModsDir $modsDir
-  $hasOverride = New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings
+  if ($RequireProbeTelemetry) { Copy-MIRCampaignProbe -ModsDir $modsDir }
+  $hasOverride = New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine ([string]$campaign.factorio_line)
 
   $knownOfficial = @("elevated-rails", "quality", "recycler", "space-age")
   $enabledOfficial = @($Lane.official_mods | ForEach-Object { [string]$_ })
@@ -214,7 +222,7 @@ function Invoke-MIRExactPackagePerformanceRun {
     $mods += [ordered]@{name=$name; enabled=($enabledOfficial -contains $name)}
   }
   $mods += [ordered]@{name="more-infinite-research"; enabled=$true}
-  $mods += [ordered]@{name="mir-fixture-performance-regression-probe"; enabled=$true}
+  if ($RequireProbeTelemetry) { $mods += [ordered]@{name="mir-fixture-performance-regression-probe"; enabled=$true} }
   if ($hasOverride) { $mods += [ordered]@{name="mir-performance-settings-overrides"; enabled=$true} }
   [ordered]@{mods=$mods} | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Encoding UTF8
 
@@ -268,7 +276,9 @@ disable-blueprint-storage=true
       throw "Performance diagnostics setting was not effective for $($Lane.id)."
     }
   }
-  $probe = Get-MIRCampaignProbeFromLog -LogPath $stdoutPath
+  $probe = if ($RequireProbeTelemetry) {
+    Get-MIRCampaignProbeFromLog -LogPath $stdoutPath -RequiredPhases $RequiredProbePhases
+  } else { $null }
   return [pscustomobject][ordered]@{
     seconds = [Math]::Round($timer.Elapsed.TotalSeconds, 6)
     closure_rows = @()
@@ -309,13 +319,13 @@ function Invoke-MIRCompatPerformanceRun {
     [Parameter(Mandatory)][string]$PackageLabel,
     [Parameter(Mandatory)][string]$RunRoot
   )
-  $compatScript = Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1"
+  $compatScript = Join-Path $executionRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1"
   $outputDir = Join-Path $RunRoot "compat"
   $logPath = Join-Path $RunRoot "compat-audit.log"
   $parameters = @{
     FactorioBin = $script:FactorioPath
-    FactorioLine = [string]$script:CampaignFactorioLine
-    FactorioVersions = @([string]$script:CampaignFactorioLine)
+    FactorioLine = [string]$campaign.factorio_line
+    FactorioVersions = @([string]$campaign.factorio_line)
     OutputDir = $outputDir
     MaxCandidates = 0
     CatalogPages = 0
@@ -329,6 +339,7 @@ function Invoke-MIRCompatPerformanceRun {
     LinkMode = "Hardlink"
     ScenarioNames = @([string]$Lane.scenario)
     ManualScenariosPath = $script:ManualScenariosPath
+    SanitationBudgetPath = (Join-Path $RepoRoot ".mir\sanitation-budgets.json")
   }
   if ($PackageLabel -eq "candidate") { $parameters.ModUnderTestSourceCommit = $ExpectedSourceCommit }
   $harnessTimer = [Diagnostics.Stopwatch]::StartNew()
@@ -374,7 +385,10 @@ function Invoke-MIRCampaignLaneRun {
   New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
   Write-Host ("[performance] lane={0} phase={1} index={2} package={3} starting" -f $Lane.id, $Phase, $Index, $PackageLabel)
   $result = switch ([string]$Lane.runner) {
-    "exact-package-load" { Invoke-MIRExactPackagePerformanceRun -Lane $Lane -PackagePath $packagePath -RunRoot $runRoot }
+    "exact-package-load" {
+      Invoke-MIRExactPackagePerformanceRun -Lane $Lane -PackagePath $packagePath -RunRoot $runRoot `
+        -RequireProbeTelemetry $script:RequiresProbeTelemetry -RequiredProbePhases $script:RequiredProbePhases
+    }
     "compat-audit" { Invoke-MIRCompatPerformanceRun -Lane $Lane -PackagePath $packagePath -PackageLabel $PackageLabel -RunRoot $runRoot }
     default { throw "Unknown performance runner '$($Lane.runner)' for $($Lane.id)." }
   }
@@ -422,7 +436,7 @@ $script:LocalLibraryPath = Resolve-MIRCampaignPath -Path $LocalModZipDir
 $outputFile = Resolve-MIRCampaignPath -Path $OutputPath
 if (-not (Test-Path -LiteralPath $campaignFile -PathType Leaf)) { throw "Performance campaign manifest is absent: $campaignFile" }
 if (-not (Test-Path -LiteralPath $script:FactorioPath -PathType Leaf)) { throw "Factorio binary is absent: $script:FactorioPath" }
-if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) { throw "Local Factorio mod library is absent: $script:LocalLibraryPath" }
+if (-not (Test-Path -LiteralPath $script:LocalLibraryPath -PathType Container)) { throw "Local Factorio 2.1 mod library is absent: $script:LocalLibraryPath" }
 if ($ExpectedSourceCommit -notmatch '^[0-9A-Fa-f]{40}$') { throw "ExpectedSourceCommit must be a full Git commit." }
 
 $campaign = Get-Content -Raw -LiteralPath $campaignFile | ConvertFrom-Json
@@ -432,21 +446,26 @@ if ([int]$campaign.schema -ne 2 -or [string]::IsNullOrWhiteSpace([string]$campai
     -or [string]$campaign.candidate.version -ne [string]$campaign.release) {
   throw "Performance campaign manifest does not declare a coherent governed target and candidate."
 }
-$script:CampaignFactorioLine = [string]$campaign.factorio_line
+
 $lanes = @($campaign.lanes)
 $phaseLanes = @($campaign.phase_lanes)
-$script:RequirePerformancePhases = $phaseLanes.Count -gt 0
-$artifactVolumePolicy = [string]$campaign.artifact_volume_policy
-if ([string]::IsNullOrWhiteSpace($artifactVolumePolicy)) { $artifactVolumePolicy = 'required' }
-if ($artifactVolumePolicy -notin @('required', 'omitted-by-capability')) {
-  throw "Performance campaign artifact-volume policy is invalid: $artifactVolumePolicy"
-}
-$targetManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\targets.json') | ConvertFrom-Json
-$targetProfile = $targetManifest.profiles.PSObject.Properties[$script:CampaignFactorioLine].Value
-if ($null -eq $targetProfile) { throw "Performance campaign target profile is absent: $script:CampaignFactorioLine" }
-$artifactVolumeSupported = $artifactVolumePolicy -eq 'required'
-if (-not $artifactVolumeSupported -and ($targetProfile.prototype_shapes.mod_data -ne $false -or $phaseLanes.Count -ne 0)) {
-  throw "Artifact-volume omission is permitted only for a target without mod-data and without phase lanes."
+$script:RequiredProbePhases = @(
+  foreach ($phaseLane in @($phaseLanes)) {
+    $phase = [string]$phaseLane.probe_phase
+    if (-not [string]::IsNullOrWhiteSpace($phase)) { $phase }
+  }
+) | Sort-Object -Unique
+$artifactVolumePolicy = Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $campaign
+$script:RequiresArtifactVolume = $artifactVolumePolicy -eq "required"
+$script:ArtifactVolumeLaneIds = @(
+  foreach ($laneId in @($campaign.artifact_volume_lanes)) {
+    $value = [string]$laneId
+    if (-not [string]::IsNullOrWhiteSpace($value)) { $value }
+  }
+) | Sort-Object -Unique
+$script:RequiresProbeTelemetry = $script:RequiredProbePhases.Count -gt 0 -or $script:RequiresArtifactVolume
+if ($script:RequiresArtifactVolume -and $script:ArtifactVolumeLaneIds.Count -eq 0) {
+  throw "Performance campaign requires artifact-volume telemetry but declares no artifact-volume lanes."
 }
 $budgets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-budgets.json") | ConvertFrom-Json
 $expectedLaneIds = @($budgets.regression_lanes.id | Sort-Object)
@@ -465,24 +484,43 @@ if (-not $factorioVersion.StartsWith([string]$campaign.factorio_version)) {
 }
 $sourceExists = (& git -C $RepoRoot cat-file -t $ExpectedSourceCommit 2>$null) -eq "commit"
 if (-not $sourceExists) { throw "Package source commit is unavailable: $ExpectedSourceCommit" }
-& git -C $RepoRoot merge-base --is-ancestor $ExpectedSourceCommit HEAD
-if ($LASTEXITCODE -ne 0) { throw "Package source commit is not an ancestor of the current branch." }
 $packageRoots = @(Get-MIRPackageSourceRoots)
-$packageChanges = @(& git -C $RepoRoot diff --name-only "$ExpectedSourceCommit..HEAD" -- @packageRoots)
-if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -gt 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot)) {
-  throw "Package-visible files differ from the exact candidate source authority."
+$campaignSourceCommit = [string]$campaign.candidate.package_source_commit
+if ($campaignSourceCommit -notmatch '^[0-9A-Fa-f]{40}$') {
+  throw "Performance campaign candidate must declare an exact package_source_commit."
+}
+$campaignSourceExists = (& git -C $RepoRoot cat-file -t $campaignSourceCommit 2>$null) -eq "commit"
+if (-not $campaignSourceExists) { throw "Performance campaign package source is unavailable: $campaignSourceCommit" }
+
+& git -C $RepoRoot merge-base --is-ancestor $ExpectedSourceCommit HEAD
+if ($LASTEXITCODE -eq 0) {
+  $packageChanges = @(& git -C $RepoRoot diff --name-only "$ExpectedSourceCommit..HEAD" -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -gt 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot)) {
+    throw "Package-visible files differ from the exact candidate source authority."
+  }
+} else {
+  # Legacy dual-parent projections are not dev ancestors.  Their exact archive and
+  # campaign identities have already been verified above; permit them only when the
+  # release source supplied by the caller is package-root equivalent to the campaign
+  # source.  This never treats a merely similar or current dev tree as evidence.
+  & git -C $RepoRoot diff --quiet $campaignSourceCommit $ExpectedSourceCommit -- @packageRoots
+  if ($LASTEXITCODE -ne 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $RepoRoot)) {
+    throw "Historical target package source is neither a current ancestor nor package-root equivalent to the governed performance campaign source."
+  }
+  Write-Host "[info] historical target package source accepted through exact package-root equivalence: campaign=$campaignSourceCommit release=$ExpectedSourceCommit"
 }
 
 $manualScenariosRelative = [string]$campaign.manual_scenarios
 $script:ManualScenariosPath = Resolve-MIRCampaignPath -Path $manualScenariosRelative
 if (-not (Test-Path -LiteralPath $script:ManualScenariosPath -PathType Leaf)) { throw "Manual scenario authority is absent." }
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-  $ArtifactRoot = "artifacts\performance\$([string]$campaign.baseline.version)-to-$([string]$campaign.release)-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
+  $ArtifactRoot = "build\results\performance\3.2.0-to-3.2.1-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))"
 }
 $script:RunRoot = Resolve-MIRCampaignPath -Path $ArtifactRoot
 New-Item -ItemType Directory -Force -Path $script:RunRoot | Out-Null
 
 if ($ProbeSmokeOnly) {
+  if (-not $script:RequiresProbeTelemetry) { throw "Performance campaign omits probe telemetry by governed target capability." }
   $lane = @($lanes | Where-Object id -eq $campaign.phase_source_lane)[0]
   if ($null -eq $lane) { throw "Performance campaign phase-source lane is absent." }
   $baselineProbe = Invoke-MIRCampaignLaneRun -Lane $lane -PackageLabel baseline -Phase "probe-smoke" -Index 1
@@ -534,21 +572,31 @@ if (-not [string]::IsNullOrWhiteSpace($CompatSmokeLaneId)) {
 }
 
 $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $script:FactorioPath))
-$declaredOfficialMods = @(
-  $lanes |
-    ForEach-Object { @($_.official_mods) } |
-    ForEach-Object { [string]$_ } |
-    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
-    Sort-Object -Unique
-)
-$officialRoots = @("data\core", "data\base") + @(
-  $declaredOfficialMods | ForEach-Object { "data\$_" }
-)
+$permittedOfficialModules = @("elevated-rails", "quality", "recycler", "space-age")
+$declaredOfficialModules = @(
+  foreach ($lane in @($lanes + $phaseLanes)) {
+    foreach ($module in @($lane.official_mods)) {
+      $name = [string]$module
+      if (-not [string]::IsNullOrWhiteSpace($name)) { $name }
+    }
+  }
+) | Sort-Object -Unique
+$unexpectedOfficialModules = @($declaredOfficialModules | Where-Object { $_ -notin $permittedOfficialModules })
+if ($unexpectedOfficialModules.Count -ne 0) {
+  throw "Performance campaign declares unsupported official module(s): $($unexpectedOfficialModules -join ', ')."
+}
+$officialRoots = @("data\core", "data\base") + @($declaredOfficialModules | ForEach-Object { "data\$_" })
+$missingOfficialRoots = @($officialRoots | Where-Object { -not (Test-Path -LiteralPath (Join-Path $factorioRoot $_) -PathType Container) })
+if ($missingOfficialRoots.Count -ne 0) {
+  throw "Performance campaign declares official module data absent from the governed Factorio installation: $($missingOfficialRoots -join ', ')."
+}
 $machineSha = Get-MIRCampaignMachineSha256
 $officialModsSha = Get-MIRCampaignTreeSha256 -Root $factorioRoot -RelativeRoots $officialRoots
 $settingsSha = Get-MIRPerformanceSettingsFingerprint -Campaign $campaign
 $scenariosSha = Get-MIRFileSha256 -Path $campaignFile
-$harnessSha = Get-MIRPerformanceHarnessFingerprint -RepoRoot $RepoRoot
+$manualScenariosSha = Get-MIRFileSha256 -Path $script:ManualScenariosPath
+$executionRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+$harnessSha = Get-MIRPerformanceHarnessFingerprint -ExecutionRoot $executionRoot -TargetAuthorityRoot $RepoRoot -ManualScenariosRelativePath $manualScenariosRelative
 $factorioSha = Get-MIRFileSha256 -Path $script:FactorioPath
 
 $raw = [ordered]@{
@@ -560,6 +608,7 @@ $raw = [ordered]@{
   baseline_sha256 = $baselineIdentity.archive_sha256
   factorio_sha256 = $factorioSha
   campaign_sha256 = $scenariosSha
+  manual_scenarios_sha256 = $manualScenariosSha
   harness_sha256 = $harnessSha
   warmup_runs = $WarmupRuns
   measured_runs = $MeasuredRuns
@@ -578,11 +627,7 @@ $laneResults = @()
 $allClosureRows = @()
 $phaseSamples = [ordered]@{baseline=[ordered]@{}; candidate=[ordered]@{}}
 foreach ($packageLabel in @("baseline", "candidate")) {
-  foreach ($phaseLane in $phaseLanes) {
-    $phase = [string]$phaseLane.probe_phase
-    if ([string]::IsNullOrWhiteSpace($phase)) { throw "Performance phase lane has no probe phase." }
-    $phaseSamples[$packageLabel][$phase] = @()
-  }
+  foreach ($phase in $script:RequiredProbePhases) { $phaseSamples[$packageLabel][$phase] = @() }
 }
 $volumeSamples = [ordered]@{"diagnostics-off"=@(); "diagnostics-on"=@()}
 foreach ($lane in $lanes) {
@@ -608,17 +653,16 @@ foreach ($lane in $lanes) {
     $allClosureRows += @($result.closure_rows | ForEach-Object { "$($lane.id)`t$_" })
     if ($packageLabel -eq "baseline") { $baselineRuns += [double]$result.seconds }
     else { $candidateRuns += [double]$result.seconds }
-    if ([string]$lane.id -eq [string]$campaign.phase_source_lane) {
+    if ($script:RequiredProbePhases.Count -gt 0 -and [string]$lane.id -eq [string]$campaign.phase_source_lane) {
       if ($null -eq $result.probe) { throw "Phase-source run lacks the exact-archive performance probe." }
-      foreach ($phaseLane in $phaseLanes) {
-        $phase = [string]$phaseLane.probe_phase
+      foreach ($phase in $script:RequiredProbePhases) {
         $phaseSamples[$packageLabel][$phase] += [double]$result.probe.phases.$phase.seconds
       }
     }
-    if ($artifactVolumeSupported -and $packageLabel -eq "candidate") {
+    if ($script:RequiresArtifactVolume -and $packageLabel -eq "candidate") {
       $surface = switch ([string]$lane.id) {
-        "diagnostics-off.factorio-total" { "diagnostics-off" }
-        "diagnostics-on.factorio-total" { "diagnostics-on" }
+        "diagnostics-off.factorio-total" { if ($script:ArtifactVolumeLaneIds -contains [string]$lane.id) { "diagnostics-off" } }
+        "diagnostics-on.factorio-total" { if ($script:ArtifactVolumeLaneIds -contains [string]$lane.id) { "diagnostics-on" } }
         default { $null }
       }
       if ($null -ne $surface) {
@@ -674,8 +718,14 @@ foreach ($phaseLane in $phaseLanes) {
 }
 
 $volumeMeasurements = @()
-if ($artifactVolumeSupported) {
-  foreach ($surface in @("diagnostics-off", "diagnostics-on")) {
+if ($script:RequiresArtifactVolume) {
+  $surfaceByLane = [ordered]@{
+    "diagnostics-off.factorio-total" = "diagnostics-off"
+    "diagnostics-on.factorio-total" = "diagnostics-on"
+  }
+  foreach ($laneId in $script:ArtifactVolumeLaneIds) {
+    if (-not $surfaceByLane.Contains($laneId)) { throw "Artifact-volume campaign lane is unsupported: $laneId" }
+    $surface = [string]$surfaceByLane[$laneId]
     $samples = @($volumeSamples[$surface])
     if ($samples.Count -ne $MeasuredRuns) { throw "Artifact-volume surface '$surface' lacks measured candidate runs." }
     $counterNames = @($samples[0].counters.PSObject.Properties.Name | Sort-Object)
@@ -737,10 +787,12 @@ $evidence = [ordered]@{
   }
   comparability = [ordered]@{
     machine_sha256 = $machineSha
+    official_data_roots = @($officialRoots | ForEach-Object { $_.Replace("\", "/") })
     official_mods_sha256 = $officialModsSha
     third_party_closure_sha256 = $thirdPartyClosureSha
     settings_sha256 = $settingsSha
     scenarios_sha256 = $scenariosSha
+    manual_scenarios_sha256 = $manualScenariosSha
     harness_sha256 = $harnessSha
   }
   run_policy = [ordered]@{
@@ -750,10 +802,11 @@ $evidence = [ordered]@{
   }
   run_order = $runOrder
   lanes = $laneResults
-  artifact_volume = if ($artifactVolumeSupported) {
-    [ordered]@{ telemetry_schema=1; aggregation='maximum-observed'; measurements=$volumeMeasurements }
-  } else {
-    [ordered]@{ telemetry_schema=0; aggregation='omitted-by-capability'; capability='mod_data'; measurements=@() }
+  artifact_volume = [ordered]@{
+    policy = $artifactVolumePolicy
+    telemetry_schema = if ($script:RequiresArtifactVolume) { 1 } else { 0 }
+    aggregation = if ($script:RequiresArtifactVolume) { "maximum-observed" } else { "omitted-by-capability" }
+    measurements = $volumeMeasurements
   }
 }
 $outputParent = Split-Path -Parent $outputFile

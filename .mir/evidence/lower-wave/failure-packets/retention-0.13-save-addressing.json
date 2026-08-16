@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.13 exact-candidate retention fresh reload",
+  "failed_command": ".\\scripts\\Test-MIRCandidateRetention.ps1 -FactorioBin D:\\Programs\\Factorio\\0.13\\bin\\x64\\factorio.exe -CandidateZip dist\\more-infinite-research_1.3.0.zip",
+  "exit_code": "timeout-killed-after-engine-load-error",
+  "error": "Factorio 0.13 interpreted the absolute --benchmark path as a save name, prefixed user/saves, appended .zip, and failed to open the resulting invalid path",
+  "target_branch": "rebuild/0.13",
+  "factorio_binary_version": "0.13.20",
+  "target_candidate_sha256": "B07136627C913BA50C36B4F9453D972047F4FD3666BB9B8A79AB0EEFC9CA1749",
+  "root_cause_classification": "portable-target-capability-adapter",
+  "root_cause": "Factorio 0.13 --benchmark addresses saves by name relative to write-data/saves rather than accepting the absolute save paths supported by later target binaries.",
+  "fix": "For Factorio 0.13, stage the exact created save under write-data/saves and pass its basename to --benchmark.",
+  "regression": "Test-MIRPowerShellQuality requires an explicit Factorio 0.13 benchmarkMap staging boundary.",
+  "process_lifecycle": {
+    "timed_out_process_tree_killed": true,
+    "surviving_factorio_processes": 0
+  },
+  "candidate_implication": "The 1.3.0 candidate requires a corrected retention rerun and fresh seal; no published version is affected."
+}

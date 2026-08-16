@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-finding.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-finding.schema.json",
+  "title": "MIR 3 terminal finding",
+  "type": "object",
+  "required": ["schema", "kind", "id", "title", "source_observation", "reproducer", "severity", "visibility", "stable_id_and_migration_impact", "affected_targets", "target_dispositions", "regression_obligations", "fixed_point_restart_scope", "admission", "closure"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalFindingV1"},
+    "id": {"pattern": "^MIR3-TERM-[0-9]{4}$"},
+    "title": {"type": "string", "minLength": 1},
+    "source_observation": {
+      "type": "object",
+      "required": ["observed_at", "environment", "fact"],
+      "properties": {
+        "observed_at": {"type": "string", "format": "date-time"},
+        "environment": {"type": "string", "minLength": 1},
+        "fact": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "reproducer": {
+      "type": "object",
+      "required": ["status", "command", "expected", "observed"],
+      "properties": {
+        "status": {"enum": ["reproduced", "not-reproduced", "blocked"]},
+        "command": {"type": "string", "minLength": 1},
+        "expected": {"type": "string", "minLength": 1},
+        "observed": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "severity": {"enum": ["P0", "P1", "P2", "P3", "assurance"]},
+    "visibility": {
+      "type": "object",
+      "required": ["package", "gameplay", "assurance"],
+      "properties": {
+        "package": {"type": "boolean"},
+        "gameplay": {"type": "boolean"},
+        "assurance": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "stable_id_and_migration_impact": {"type": "string", "minLength": 1},
+    "affected_targets": {
+      "type": "array",
+      "items": {"enum": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"]},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "target_dispositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target", "disposition", "reason"],
+        "properties": {
+          "target": {"enum": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"]},
+          "disposition": {"enum": ["portable", "portable-with-adapter", "target-local", "package-excluded-assurance", "mir4-deferred", "rejected", "not-applicable"]},
+          "reason": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      },
+      "minItems": 9,
+      "maxItems": 9
+    },
+    "regression_obligations": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+    "fixed_point_restart_scope": {"type": "string", "minLength": 1},
+    "admission": {
+      "type": "object",
+      "required": ["class", "status", "reason"],
+      "properties": {
+        "class": {"enum": ["DOT9_REQUIRED", "DOT9_APPROVED_POLISH", "NO_PACKAGE_CHANGE", "TARGET_NOT_APPLICABLE", "REJECTED_WITH_REASON", "MIR4_DEFERRED"]},
+        "status": {"enum": ["pending", "admitted", "rejected", "deferred"]},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "closure": {
+      "type": "object",
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"enum": ["open", "implemented-awaiting-proof", "closed", "rejected", "deferred"]},
+        "evidence": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-18T15:16:13+10:00",
+  "audit_dir": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\ecosystem-qualification\\pymodpack",
+  "missing_dependency_count": 1,
+  "total_missing_dependency_rows": 1,
+  "missing_dependencies": [
+    {
+      "mod": "pymodpack",
+      "count": 1,
+      "phases": [
+        "metadata"
+      ],
+      "scenarios": [
+        "pymodpack"
+      ],
+      "sample_error": "Offline mode is enabled and mod 'pymodpack' is not present in local mod zip roots or libraries."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "run_id": "34508227-9338-4bdf-ac96-2649bedf67fe",
+  "scenario": "package-zip-base",
+  "kind": "package",
+  "group": "exact-dist",
+  "command": ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe' -Tier full -MaxParallel 1 -ValidationSummaryPath '.mir\\evidence\\lower-wave\\dev-lower-wave-anchor-qualification.json'",
+  "exit_code": 1,
+  "target_branch": "dev",
+  "factorio_binary": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+  "factorio_binary_version": "2.0.77",
+  "factorio_binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "error": "Factorio package zip smoke package-zip-base exited with code 1",
+  "root_cause_classification": "operator-binary-selection",
+  "root_cause": "The MIR 3.1.9 dev package requires Factorio 2.1, but the selected local archive path contained Factorio 2.0.77.",
+  "corrective_command": ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Scenario package-zip-base -MaxParallel 1 -ValidationSummaryPath 'build\\fixed-point-package-zip-base.json'",
+  "corrective_binary_version": "2.1.10",
+  "corrective_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "corrective_result": "passed",
+  "started_at": "2026-07-14T21:31:12.1131720Z",
+  "completed_at": "2026-07-14T21:31:12.3094274Z",
+  "duration_seconds": 0.196,
+  "assertions_executed": 0,
+  "evidence_paths": [
+    "C:\\Projects\\Factorio\\more-infinite-research-3.1.9\\build\\validation-dist\\more-infinite-research_3.1.9.zip",
+    "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-c412b5c725984069a6cf089b7bef2c01\\factorio-current.log"
+  ],
+  "package_sha256": "12E439451D69634A27E8C3817BA3F1D89B295F654EECADB16AA5FDEE74558888",
+  "source_commit": "846b78aa8e24ae45519377c90d0b549a5d335868"
+}

@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalCandidateReconstructionReceiptV1",
+  "status": "passed-ready-for-automated-qualification",
+  "reconstruction_window": {
+    "started_at": "2026-08-14T19:04:19+10:00",
+    "completed_at": "2026-08-14T19:05:57+10:00"
+  },
+  "source_authorities": {
+    "allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "allocation_canonical_text_sha256": "A672B62BFCAC76A718B3AA11D48939E03CAFCD14BC7A878D0BE9715B4D58DFCA",
+    "allocation_merge": {
+      "commit": "e2399afb117a641fa66c4043de41586dd15b7a67",
+      "tree": "d423e957e281371fb8ea69660b5f44f00588edc8"
+    },
+    "post_merge_runs": {
+      "branch_policy": 31786113295,
+      "mir": 31786113255,
+      "emergency_package": 31786113279,
+      "result": "passed"
+    }
+  },
+  "method": {
+    "id": "three-clean-detached-git-worktrees-deterministic-package-v1",
+    "clean_detached_roots_per_target": 3,
+    "compression": "Optimal",
+    "fixed_zip_timestamp": "1980-01-01T00:00:00Z",
+    "package_roots_clean": true,
+    "dist_overwrite_used": false
+  },
+  "summary": {
+    "targets": 9,
+    "attempts": 27,
+    "passed": 27,
+    "failed": 0,
+    "identity_mismatches": 0,
+    "forbidden_package_entries": 0
+  },
+  "targets": [
+    {"release":"3.2.9","candidate":"C33","candidate_commit":"a60230a0695d2dd8fd1e727744614e746cda0bd8","candidate_tree":"f423b351249f5f8d2a6164054f42ae166d8d066e","package_source_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","archive_sha256":"0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20","content_sha256":"FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25","bytes":1061572,"entries":303,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_3.2.9.zip"},
+    {"release":"2.5.9","candidate":"2.5-P13","candidate_commit":"89719eb8ea5c938b6a0e9d816e6324d4d59b87bb","candidate_tree":"45a3487a28847736d3e25f9a13294cef6c23e5b3","package_source_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","archive_sha256":"B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35","content_sha256":"D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C","bytes":1058800,"entries":301,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_2.5.9.zip"},
+    {"release":"1.9.9","candidate":"1.9-P1","candidate_commit":"2243cfd31c0d6c575782c5b004514c3845d1907c","candidate_tree":"cd8704581f5cd8f8da6238fd76f2b0c5ee7e56ff","package_source_sha256":"3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064","archive_sha256":"E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843","content_sha256":"3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064","bytes":397677,"entries":174,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.9.9.zip"},
+    {"release":"1.8.9","candidate":"1.8-P1","candidate_commit":"8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309","candidate_tree":"2d5599b1c31fbc5b35bce69ce651159d0877e7a4","package_source_sha256":"7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E","archive_sha256":"F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A","content_sha256":"7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E","bytes":397678,"entries":174,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.8.9.zip"},
+    {"release":"1.7.9","candidate":"1.7-P1","candidate_commit":"215ccced7018aac70919221c73e15d795f9d1653","candidate_tree":"7b430b8cabd5555f43cdae9136bc141ca866b084","package_source_sha256":"3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014","archive_sha256":"B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C","content_sha256":"3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014","bytes":385310,"entries":177,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.7.9.zip"},
+    {"release":"1.6.9","candidate":"1.6-P1","candidate_commit":"595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d","candidate_tree":"30f2eab0ac7624d14f4630e76aaff79e2d81b92f","package_source_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493","archive_sha256":"928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84","content_sha256":"09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493","bytes":385315,"entries":177,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.6.9.zip"},
+    {"release":"1.5.9","candidate":"1.5-P1","candidate_commit":"8098510acc3530321a2dc32b8d2292aa814bb9c3","candidate_tree":"cdefcdc2f3bf74b806759374335b669746204912","package_source_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED","archive_sha256":"85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E","content_sha256":"C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED","bytes":385629,"entries":177,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.5.9.zip"},
+    {"release":"1.4.9","candidate":"1.4-P1","candidate_commit":"8f75fa45d52a55650e74423a99f04a0252db429b","candidate_tree":"5a6e392711394c72ea1b7f0d1da508082b0812b2","package_source_sha256":"26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA","archive_sha256":"1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872","content_sha256":"26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA","bytes":386070,"entries":177,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.4.9.zip"},
+    {"release":"1.3.9","candidate":"1.3-P1","candidate_commit":"b9459906a0971e237aed66855b51231e9b6bf028","candidate_tree":"0aa837a71c7d8ebac4ca0d73c9c96bc06ce3fddf","package_source_sha256":"AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B","archive_sha256":"CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A","content_sha256":"AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B","bytes":386160,"entries":177,"attempts":["A","B","C"],"clean_detached_roots":3,"identities_equal":true,"dist_path":"dist/more-infinite-research_1.3.9.zip"}
+  ],
+  "boundaries": {
+    "automated_qualification_complete": false,
+    "manual_review_complete": false,
+    "target_seals_created": false,
+    "family_seal_created": false,
+    "tags_created": false,
+    "publication_permitted": false,
+    "dot5_package_bytes_changed": false
+  }
+}

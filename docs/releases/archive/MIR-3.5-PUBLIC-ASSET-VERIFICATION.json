@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5PublicAssetVerificationV1",
+  "status": "passed-nine-of-nine",
+  "releases": [
+    { "version": "3.2.5", "download": "build/results/public-verification/3.2.5/more-infinite-research_3.2.5.zip", "asset_digest": "sha256:ac81cad1ac37f20e27a46bfad243611db251caccf52e1ab4da5d06cfdaa11adf", "factorio_executable_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084", "smokes": ["base", "space-age"], "result": "passed" },
+    { "version": "2.5.5", "download": "build/results/public-verification/2.5.5/more-infinite-research_2.5.5.zip", "asset_digest": "sha256:03dfc05f94435faacb86f19d1bf0bcd160c515c46b8372c483eebaeb5208a41c", "factorio_executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B", "smokes": ["base", "space-age"], "result": "passed" },
+    { "version": "1.9.5", "download": "build/results/public-verification/1.9.5/more-infinite-research_1.9.5.zip", "asset_digest": "sha256:9f044a476500cb72a0c6a9a6254cc702e6621b2cdaeda04a1188579adf4aadcc", "factorio_executable_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1", "smokes": ["base"], "result": "passed" },
+    { "version": "1.8.5", "download": "build/results/public-verification/1.8.5/more-infinite-research_1.8.5.zip", "asset_digest": "sha256:10ba1f1d0efded559f447a05164e8865ee35f527c0a7d65d6cb7b1f8c1c4c1cd", "factorio_executable_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70", "smokes": ["base"], "result": "passed", "factorio_0_18_support_claim": false },
+    { "version": "1.7.5", "download": "build/results/public-verification/1.7.5/more-infinite-research_1.7.5.zip", "asset_digest": "sha256:d1b3a3348c8a92c29a43c5d0a495686e3acf21b186bf3df9d301b63ab0feda0a", "factorio_executable_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06", "smokes": ["base"], "result": "passed" },
+    { "version": "1.6.5", "download": "build/results/public-verification/1.6.5/more-infinite-research_1.6.5.zip", "asset_digest": "sha256:8ec9e38e091be82cc4596414c3b6ffdb3e818feea4054547c497f7125fcc99cb", "factorio_executable_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966", "smokes": ["base"], "result": "passed" },
+    { "version": "1.5.5", "download": "build/results/public-verification/1.5.5/more-infinite-research_1.5.5.zip", "asset_digest": "sha256:e2060a153b8715755e450aecc825b6c119e2354847d3b041d22dd2e0b5d6fbbd", "factorio_executable_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6", "smokes": ["base"], "result": "passed" },
+    { "version": "1.4.5", "download": "build/results/public-verification/1.4.5/more-infinite-research_1.4.5.zip", "asset_digest": "sha256:bd866c6d9c13a2adfb08f7d3ef1d19912fae3af2c6bbde6feb8a956e3a1bab47", "factorio_executable_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F", "smokes": ["base"], "result": "passed" },
+    { "version": "1.3.5", "download": "build/results/public-verification/1.3.5/more-infinite-research_1.3.5.zip", "asset_digest": "sha256:78cf6b08e87ac92827926536f3420ddf5695d05e3ca59d83faf41ebc2e505fb0", "factorio_executable_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856", "smokes": ["base"], "result": "passed" }
+  ]
+}

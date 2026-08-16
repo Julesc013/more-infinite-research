@@ -1,45 +1,105 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.9
+Version: 3.2.10
+Date: 2026-08-16
+
+  Bugfixes:
+
+    - Removed current and queued research that is above a newly lowered maximum level.
+    - Retained completed technology levels and valid fractional research progress while applying a lower cap.
+    - Reported late prototype mutations that prevent a configured native-owner maximum from becoming active.
+
+  Compatibility:
+
+    - Applied the same absolute maximum-level contract to generated streams and base continuations.
+    - Applied that contract to all five Space Age native productivity owners.
+    - Preserved every 3.2.9 technology identity, cost, effect, science route, and unrelated force state.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.2.9
 Date: 2026-08-12
 
   Bugfixes:
 
-    - Prevented a later alternate recipe for an existing science pack from delaying generated research behind that route.
+    - Chose the earliest safe science route so later alternatives cannot delay already-producible packs.
+    - Normalized MIR-owned technology science cards after the K2 phase pass for exact K2 2.1.2 and K2SO 2.0.13.
 
   Compatibility:
 
-    - Added deterministic earliest-safe science production route selection for Factorio 2.0.
+    - Preserved stable technology IDs, research progress, lab-valid ingredients, and the earlier K2SO load-order repair.
+    - Kept the K2 science-phase correction inactive when the exact admitted K2/K2SO envelope is absent.
+    - Added generic alternate-route regression coverage without claiming unmodified Cubium support on Factorio 2.1.
 
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.5
-Date: 2026-08-07
+Version: 3.2.5
+Date: 2026-08-04
 
   Changes:
 
-    - Added per-level linear increments for fixed, linear, exponential, and hybrid research-cost curves.
-    - Added bounded target-native research-cost transition descriptors for Factorio 2.0.
-    - Preserved the established Factorio 2.0 compiler, settings, stream, and package capability profile.
+    - Added a per-level linear cost increment setting for every MIR research stream and base continuation.
+    - Unified fixed, linear, exponential, and hybrid costs under one numeric research-cost contract.
+    - Clarified the existing growth setting as the exponential multiplier; no model dropdown was added.
+    - Consolidated the unpublished 3.2.4 work into the direct public upgrade from 3.2.3 to 3.2.5.
+    - Bound hosted worker evidence to an exact verification-plan receipt before deterministic aggregate import.
 
   Bugfixes:
 
-    - Preserved completed science-unit work when research-cost settings change.
-    - Preserved 2.5.0 neutral defaults, base-continuation anchors, and historical numeric precision.
-    - Rejected malformed or unknown transition descriptors without resetting unrelated force state.
+    - Stopped native-owner cost changes from converting Factorio-normalized research progress a second time.
+    - Replaced runtime formula reparsing with bounded versioned old/new cost descriptors.
+    - Refused malformed, tampered, unknown, or over-budget transition descriptors without guessing or resetting force state.
+    - Corrected packaged guidance: productivity-family adoption preserves effects without a force-wide technology reset.
+    - Preserved 3.2.3 base-continuation costs by projecting stable level-one coefficients to the new curve anchor.
+    - Classified Ice productivity as Space Age-only before science-pack selection in Base-only modsets.
 
   Compatibility:
 
-    - Projected the MIR 3.2.5 cost contract onto Factorio 2.0 without requiring Factorio 2.1 mod-data prototypes.
-    - Kept unsupported productivity-family adoption compiled out under the Factorio 2.0 target profile.
+    - Preserved recognized native and modded research formulas byte-for-byte when settings stay at defaults.
+    - Canonicalized explicit overrides and rejected unknown external formulas instead of guessing their meaning.
+    - Preserved completed research work, selection, level, queue, completed levels, and unrelated force state.
 
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.0
-Date: 2026-08-01
+Version: 3.2.3
+Date: 2026-07-30
 
   Changes:
 
-    - Added separate Platform productivity with +10% ice platform and +5% space platform foundation per level.
-    - Added generic structural productivity discovery for modded belt and inserter recipes.
-    - Indexed entity, item, module, and stream matches once per compiler context.
+    - Added Platform productivity with +10% ice-platform and +5% space-platform-foundation productivity per level.
+    - Gated Platform productivity with cryogenic science replacing Landfill's metallurgic science requirement.
+
+  Bugfixes:
+
+    - Required cryogenic science for Ice productivity so Aquilo ice recipes are not researchable from Nauvis progression alone.
+    - Added name-independent discovery for modded belts, underground belts, splitters, lane splitters, loaders, and inserters.
+    - Added structural Advanced Belts coverage for all three post-Turbo logistics tiers.
+    - Preserved productivity-ignored cryogenic fluid returns; AdvancedBeltsSA 2.3.3 remains a Factorio 2.0 archive.
+    - Preserved explicit recipe productivity denials when applying structural logistics compatibility.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.2.2
+Date: 2026-07-27
+
+  Bugfixes:
+
+    - Ordered MIR after Pyanodons Post-processing so sanitation runs against Py's final rebuilt technology tree.
+    - Fixed casting-mk02 referencing the removed casting-gear recipe after Pyanodons finalization.
+    - Restored valid researched planet discoveries damaged by MIR 3.2.0 or 3.2.1.
+    - Kept the upgrade repair narrow; unrelated technology effects are not reset.
+---------------------------------------------------------------------------------------------------
+Version: 3.2.1
+Date: 2026-07-26
+
+  Bugfixes:
+
+    - Preserved unlock-space-location effects for concrete planet prototypes.
+    - Restored discovered Space Age and modded planets, starmap connections, and platform travel.
+    - Continued pruning only genuinely missing space-location targets.
+    - Kept force-wide technology-effect resetting disabled.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2026-07-25
+
+  Changes:
+
     - Completed all 50 Factorio-supported locales and added source-hash-bound generation and regression checks.
     - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
     - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
@@ -47,8 +107,7 @@ Date: 2026-08-01
     - Reused trusted passing evidence only when every declared effective input has the same fingerprint.
     - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
     - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
-    - Rebuilt the MIR 3.2 compiler architecture through the Factorio 2.0 target-capability profile.
-    - Revalidated compatibility scenarios independently against Factorio 2.0 and its supported mod ecosystem.
+    - Added target-specific verification profiles so Factorio 2.0 backports recalculate their own fingerprints.
     - Added canonical schema-4 plans, structured test results, immutable attempt capsules, trust classes, and strict JSON schemas.
     - Enforced protected F0 through F4 release layers and made candidate sealing invoke the canonical aggregate gate.
     - Bound mod archives, the Factorio installation, verifier, policy, and producer trust to evidence reuse.
@@ -58,8 +117,8 @@ Date: 2026-08-01
     - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
     - Kept additional automatic recipe-family generation disabled by default.
-    - Preserved every MIR 2.4.9 technology while moving design and lifecycle handling behind common contracts.
-    - Retained the Factorio 2.0 science-pack, stream, effect, emitter, and prototype-shape cuts.
+    - Added steel plate productivity: base games receive one MIR chain, while Space Age keeps and extends its native owner.
+    - Preserved every MIR 3.1.9 technology while moving design and lifecycle handling behind common contracts.
     - Removed redundant transient technology-catalog materialization while retaining one validated authoritative final catalog.
     - Reduced final catalog construction cost with trusted copy-on-write diagnostic designs and gate-only qualification snapshots.
     - Generated the packaged effective stream-default table directly from the canonical Lua defaults.
@@ -70,17 +129,10 @@ Date: 2026-08-01
     - Added default-on +10% Nutrients productivity for exact forward Space Age nutrient recipes.
     - Added default-on +10% Capture bot rocket productivity for its exact Space Age recipe.
     - Proved pentapod egg remains in Breeding productivity with a seed-safe +10% effect.
-    - Raised the Factorio, Recycler, and Space Age dependency floor to 2.0.77, the independently qualified patch.
+    - Supports Factorio, Recycler, and Space Age 2.1.8 or newer; release qualification continues on newer 2.1 builds.
 
   Bugfixes:
 
-    - Required cryogenic science for Ice and Platform productivity and removed Platform's metallurgic pack.
-    - Removed ice platform and space platform foundation from Landfill productivity ownership.
-    - Honored disabled automatic-productivity actions in structural logistics fallback matching.
-    - Preserved explicit productivity denials and productivity-ignored returned fluids for modded logistics recipes.
-    - Ordered MIR after Pyanodons Post-processing so sanitation runs against Py's final rebuilt technology tree.
-    - Fixed casting-mk02 referencing the removed casting-gear recipe after Pyanodons finalization.
-    - Preserved researched planets and starmap connections by resolving unlock-space-location targets across planet prototypes.
     - Requalified the exact realized technology graph after safe competing-technology replacement and prerequisite rewiring.
     - Fixed competing productivity preparation when a recognized overhaul owner is eligible for MIR replacement.
     - Ordered MIR after Krastorio 2 and K2SO final science/lab rewrites so generated research no longer collapses to red science.
@@ -94,8 +146,6 @@ Date: 2026-08-01
     - Corrected four stable stream manifest policies to match native-owner binding for their Space Age families.
     - Preserved exact singleton CompatibilityPack candidate seeds instead of incorrectly classifying every seed as ambiguous.
     - Corrected packaged documentation for the enabled agricultural-growth, cargo-landing-pad-count, and character-reach defaults.
-    - Preserved Factorio 2.0 native-owner settings and fractional research progress across the 2.4.9 upgrade.
-    - Retained Factorio 2.0.77 mod-data and safe productivity-family adoption proven by published 2.4.9.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.9

@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "authority": "mir-maintainer-timeboxed-publication-decision",
+  "decision_id": "C32-TIMEBOXED-PUBLICATION-2026-08-08",
+  "release": "3.2.5",
+  "candidate_id": "C32",
+  "status": "authorized-for-immediate-publication",
+  "authorized_by": "Julesc013",
+  "authorized_at": "2026-08-07T18:25:18.3882405Z",
+  "authorization_source": "maintainer directive authorizing immediate publication of the exact frozen C32 bytes under a release-specific publication exception",
+  "qualification_judgment": {
+    "product_qualification": "passed",
+    "deterministic_package_identity": "passed",
+    "manual_3_2_5_playtest": "passed",
+    "exact_factorio_2_1_13_environment": "verified",
+    "fresh_protected_github_qualification": "not-completed",
+    "reason": "external GitHub transport failures",
+    "publication": "maintainer-authorized-exception",
+    "post_publication_protected_debt": "retained"
+  },
+  "candidate": {
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "archive": "dist/more-infinite-research_3.2.5.zip",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301,
+    "rebuild_after_freeze": false
+  },
+  "factorio_installation": {
+    "version": "2.1.13",
+    "build": 87164,
+    "executable": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "executable_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+    "official_data_sha256": "11C677CA4A308362BD681CA966BE13241741CE6E7429CC2CD7F3A53EFA67E703",
+    "installation_sha256": "5F026A28175FAED6434A2A231F6AB529732E1A6641BA76437422A8E8388DA2B9"
+  },
+  "completed_evidence": [
+    {
+      "kind": "deterministic-reconstruction",
+      "status": "passed-two-fresh-rebuilds-equal-frozen-zip",
+      "path": "scripts/Test-MIRDeterministicPackage.ps1"
+    },
+    {
+      "kind": "fresh-candidate-qualification",
+      "status": "passed-135-of-135-no-reuse",
+      "path": ".mir/evidence/3.2.5-c32-candidate-qualification.json",
+      "sha256": "3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "upgrade-and-transition-proof",
+      "status": "passed",
+      "path": ".mir/evidence/3.2.5-upgrade-proof.json",
+      "sha256": "121EF12D510256E17F01B1BBD7E03708D82DD70D2F4C4B656A2C145B0483EDE1",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "ecosystem-qualification",
+      "status": "passed",
+      "path": ".mir/evidence/3.2.5-ecosystem-campaign.json",
+      "sha256": "2BDF602D37F3016D2E720D3B0F404B359DBC1723031762C0DDF8794D6EB7DC41",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "performance-qualification",
+      "status": "passed",
+      "path": ".mir/evidence/3.2.5-performance-regression.json",
+      "sha256": "D249D32480E128150428C3789AB27612B5D845510810A4A06BA357DD43120239",
+      "digest_policy": "utf8-lf"
+    },
+    {
+      "kind": "exact-hash-maintainer-playtest",
+      "status": "passed",
+      "path": ".mir/evidence/3.2.5-manual-review-attestation.json",
+      "sha256": "8F5D300715972DFFB2EEE9D0D00171B22BD48AF439021F946B1552D052F01BD3",
+      "digest_policy": "utf8-lf"
+    }
+  ],
+  "promotion_admissions": [
+    {
+      "pull_request": 62,
+      "head_commit": "7a889c8d9f4c8221114a5c0247f03c6b34682514",
+      "merge_commit": "7e03095a76068a31a79bdb05277e95af7a661a41",
+      "status": "exact-head-admitted"
+    },
+    {
+      "pull_request": 63,
+      "head_commit": "dd34117644976d68c7cecc376573c6dde1e36eee",
+      "merge_commit": "dc0013249e118bf40eec31fd3766cbdf5b37e24a",
+      "merge_tree": "197c06539b334e7833a3bb837bfd06800620eab0",
+      "status": "exact-head-admitted"
+    }
+  ],
+  "protected_attempts": [
+    {
+      "run_id": 31177224221,
+      "state": "cancelled-terminal",
+      "evidence_disposition": "admitted-none",
+      "failure_classification": "external-transport-action-cdn-download-timeout",
+      "qualification_claim": "not-passed"
+    },
+    {
+      "run_id": 31179787020,
+      "state": "cancelled-terminal",
+      "evidence_disposition": "admitted-none",
+      "failure_classification": "external-transport-nested-source-checkout-stall",
+      "qualification_claim": "not-passed"
+    }
+  ],
+  "normal_gates_waived_for_publication_only": true,
+  "generic_policy_changed": false,
+  "protected_qualification": "pending-post-publication",
+  "protected_seal": "pending-post-publication",
+  "package_change_permitted": false,
+  "corrective_release": "3.2.9",
+  "post_publication_obligations": [
+    "protected-qualification",
+    "protected-seal-and-reconciliation",
+    "normal-promotion-admission-reconciliation",
+    "downstream-always-guard-correction",
+    "transport-robustness-correction",
+    "stage-b-public-asset-audit"
+  ],
+  "statement": "This is a release-specific, exact-byte, time-boxed maintainer publication exception. It is not a protected qualification or protected seal and does not weaken generic release policy."
+}

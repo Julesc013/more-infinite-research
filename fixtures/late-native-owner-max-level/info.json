@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-late-native-owner-max-level",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Late Native Owner Maximum Level",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "space-age >= 2.1.8",
+    "more-infinite-research >= 3.2.10"
+  ]
+}

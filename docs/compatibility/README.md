@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-22
+last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
 ---
@@ -72,7 +72,7 @@ The current maintainer-authorized cadence is tentative but intentional: ship val
 - Recipe-productivity ownership is classified through `prototypes/mir/index/productivity_owners.lua`, so generation, adoption, diagnostics, and known-competitor cleanup use the same owner vocabulary.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup prepares only known infinite technologies declared by active compatibility profiles whose recipe-productivity effects are all covered by enabled MIR streams with matching productivity `change` values, lab-compatible replacement science, and no other blocking external owner. MIR ignores only those prepared owners during exact-owner filtering and removes them only after generated MIR effects prove the same recipe and `change` replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
-- Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic; Quality is hidden so quality module recipes are visible before module productivity is generated. Space Exploration is also a hidden optional ordering dependency because it removes recipes during `data-final-fixes.lua`; MIR must compile after that finalized recipe set. Pyanodons Post-processing has the same hidden optional ordering boundary because it can reconstruct technology unlocks late; MIR sanitizes the final Py technology tree, including the reviewed `casting-mk02` reference to removed `casting-gear`. These startup-integrity edges do not advertise those mods as required or recommended and are not broad overhaul support claims. Other third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
+- Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic; Quality is hidden so quality module recipes are visible before module productivity is generated. Space Exploration is also a hidden optional ordering dependency because it removes recipes during `data-final-fixes.lua`; MIR must compile after that finalized recipe set. Pyanodons Post-processing has the same hidden optional ordering boundary because it can reconstruct technology unlocks late; MIR sanitizes the final Py technology tree. The exact current Py 3.1 closure removes both `casting-gear` and its dangling `casting-mk02` unlock before MIR, while the synthetic late-finalizer fixture proves MIR removes exactly that reviewed stale reference when it is reconstructed. These startup-integrity edges do not advertise those mods as required or recommended and are not broad overhaul support claims. Other third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - The generation report also emits parser-friendly `audit schema=1` rows for stream decisions, native modifier overlaps, recipe-owner skips, compatibility planner observations, and recipe-cap warnings.
@@ -95,18 +95,18 @@ The broad skip/warn/prefer/allow native-modifier policy is deferred from `v2.1.0
 
 The broad mod-portal audit is local/manual because it can require Factorio credentials, large third-party downloads, and a local Factorio binary. The committed surfaces are:
 
-- `scripts/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
-- `scripts/MIRCompatAudit/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
+- `tools/commands/compatibility/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
+- `tools/lib/compatibility/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
 - `scripts/Invoke-MIRExtendedTests.ps1`: tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat runs.
-- `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
-- `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
-- `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
-- `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
-- `fixtures/compat-matrix/local-library-scenarios-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
-- `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
-- `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
+- `tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
+- `tools/commands/compatibility/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
+- `validation/scenarios/manual.json`: curated high-risk scenarios that should not be inferred from downloads alone.
+- `validation/scenarios/local-2.1.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
+- `validation/scenarios/local-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
+- `validation/assertions/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
+- `validation/adapters/portal-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
-All three curated scenario manifests use schema 2. Each scenario owns its target lines, kind, group, setup mode, official Space Age selection, roots, settings, expected plan boundary, timeout, and claim level. `Invoke-MIRCompatAudit.ps1` loads the shared manifest plus the selected Factorio line's local manifest automatically, filters records by target, applies the record timeout, and carries the complete declaration into reports and campaign evidence. An offline manual run no longer inherits the catalog-candidate default. `scripts/Test-MIRScenarioManifests.ps1` fails static validation when a record falls back to schema-1 `mods` or top-level `include_space_age` fields.
+All three curated scenario manifests use schema 2. Each scenario owns its target lines, kind, group, setup mode, official Space Age selection, roots, settings, expected plan boundary, timeout, and claim level. `Invoke-MIRCompatAudit.ps1` loads the shared manifest plus the selected Factorio line's local manifest automatically, filters records by target, applies the record timeout, and carries the complete declaration into reports and campaign evidence. An offline manual run no longer inherits the catalog-candidate default. `validation/tests/compatibility/Test-MIRScenarioManifests.ps1` fails static validation when a record falls back to schema-1 `mods` or top-level `include_space_age` fields.
 
 Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. Local dependency libraries can be supplied separately with `-LocalModLibraryDirs` or `-LocalModLibraryZips`. The audit runner reads each zip's `info.json`, creates local lock entries with `source_path`, copies local archives into isolated Factorio runs directly from disk, and resolves missing third-party dependencies from the local library before falling back to the normal Mod Portal path. Pass `-Offline` to make missing local metadata or archives fail as dependency-resolution evidence instead of calling the Mod Portal. Pass `-ModUnderTestZip` for release gates that must load immutable MIR candidate bytes instead of an instrumented source copy.
 
@@ -117,7 +117,7 @@ Use `-FactorioLine 2.1` or `-FactorioLine 2.0` to keep one audit toolchain point
 Catalog and lockfile only:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -MinDownloads 10000 `
   -FactorioLine 2.1 `
   -FactorioVersions @("2.0", "2.1") `
@@ -127,7 +127,7 @@ Catalog and lockfile only:
 Download and load-test mode requires credentials and a local binary:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin "C:\path\to\factorio.exe" `
   -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
@@ -140,7 +140,7 @@ Download and load-test mode requires credentials and a local binary:
 Manual scenarios can now be executed with `-RunManualScenarios`:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin $env:FACTORIO_BIN `
   -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
@@ -151,7 +151,7 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
   -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
-  -OutputDir .\artifacts\compat-audit-manual
+  -OutputDir .\build\results\compat-audit-manual
 ```
 
 Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSourceCommit`. A load-tested run then writes `campaign-evidence.json` with the candidate SHA-256, dependency-lock fingerprint, actual roots, closure versions and SHA-256 values, result, timeout state, and claim level. See [modpack campaigns](../maintainer/modpack-campaigns.md).
@@ -159,8 +159,8 @@ Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSo
 Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`:
 
 ```powershell
-.\scripts\Invoke-MIRCompatAudit.ps1 `
-  -FromLockfile .\artifacts\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
+.\tools\commands\compatibility\Invoke-MIRCompatAudit.ps1 `
+  -FromLockfile .\build\results\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
   -FactorioLine 2.1 `
   -StartIndex 25 `
   -Count 25 `
@@ -170,35 +170,35 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
   -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
-  -OutputDir .\artifacts\compat-audit-2.1-spaceage-all-10k-shard-25
+  -OutputDir .\build\results\compat-audit-2.1-spaceage-all-10k-shard-25
 ```
 
 Grouped summaries and profile-candidate evidence are generated with:
 
 ```powershell
-.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\artifacts\compat-audit-manual
+.\tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\results\compat-audit-manual
 ```
 
 Review-only profile stubs can be generated from grouped failures:
 
 ```powershell
-.\scripts\New-MIRCompatProfileStub.ps1 `
-  -GroupedFailures .\artifacts\compat-audit-manual\compat-failures.grouped.json `
+.\tools\commands\compatibility\New-MIRCompatProfileStub.ps1 `
+  -GroupedFailures .\build\results\compat-audit-manual\compat-failures.grouped.json `
   -GroupId FG0001
 ```
 
 Use `mir.ps1` as the preferred human entry point for repeatable local and self-hosted runs:
 
 ```powershell
-.\scripts\mir.ps1 release gate
-.\scripts\mir.ps1 overnight local
-.\scripts\mir.ps1 audit local
-.\scripts\mir.ps1 audit top25 --space-age
-.\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 report missing-deps --run <path>
-.\scripts\mir.ps1 package build
-.\scripts\mir.ps1 run -Profile local-audit-2.1
-.\scripts\mir.ps1 run -Profile local-audit-2.0
+.\tools\mir.ps1 release gate
+.\tools\mir.ps1 overnight local
+.\tools\mir.ps1 audit local
+.\tools\mir.ps1 audit top25 --space-age
+.\tools\mir.ps1 report latest
+.\tools\mir.ps1 report missing-deps --run <path>
+.\tools\mir.ps1 package build
+.\tools\mir.ps1 run -Profile local-audit-2.1
+.\tools\mir.ps1 run -Profile local-audit-2.0
 ```
 
 `--factorio-line <2.0|2.1>` can override a profile when you need the same command shape on a different Factorio line. For local overnight work, `overnight-local-2.1` uses the 2.1 library/scenario defaults and `overnight-local-2.0` uses the 2.0 defaults.
@@ -212,7 +212,7 @@ Use the underlying scripts directly only when debugging or composing a narrower 
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
 .\scripts\Start-MIROvernightLocalSweep.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\build\results\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
 
 `Invoke-MIRReleaseTargetedGate.ps1` is the narrow release command. It resolves the Factorio binary, picks a local mod library for the current Factorio line unless one is passed, optionally pulls the current branch, and then runs:
@@ -227,7 +227,7 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 
 `mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `report observations`, `profile stub`, and `local-index build`. Use `--factorio`, `--mods`, `--output`, `--timeout`, and `--profile` for common overrides instead of editing scripts.
 
-`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
+`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `validation/scenarios/local-2.1.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
 Use `Test-MIRLocalModLibraryCatalog.ps1` before a local sweep when you need a metadata-only gate. It reads local zip `info.json` files, catalogs available mod names, and fails if committed local-library scenario roots are missing from the library.
 
@@ -257,7 +257,7 @@ The grouped converter writes `missing-dependencies.md`, `missing-dependencies.js
 
 Do not immediately patch code from the first local-library failure. First classify the evidence: missing local zip, known modset incompatibility, benign external owner suppression, repeated split-family pattern, MIR-generated prototype crash, or timeout. Download missing dependencies and rerun affected scenarios before promoting a failure to MIR compatibility work.
 
-Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
+Expected failures should be added only after review to `validation/assertions/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 
 Some audit observations are expected by policy even without a scenario-specific expected-failure rule. In particular, a successful load test where MIR skips a stream because a required prototype is absent is a normal compatibility gate, and a successful load test where MIR suppresses recipe productivity under an unknown external infinite owner is conservative behavior rather than a release-blocking failure. Those rows stay visible in `compat-failures.grouped.json` and can still produce review-only profile candidates, but they do not increment `unexpected_count`.
 
@@ -334,7 +334,7 @@ Known legacy `1.9.x` exclusions:
 
 Keep these architecture pieces from the tested current-line source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
 
-Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.11` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build from the active `1.9.x` metadata.
+Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build from the active `1.9.x` metadata.
 
 ## Opportunistic Integrations
 
@@ -362,7 +362,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 
 MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
 
-Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json` and `fixtures/compat-matrix/claims.json`. Static validation lints those files so current fixture-backed claims list fixtures, generated streams have manifest rows, and public text stays narrower than "full support" unless a separate external load profile proves that claim.
+Machine-readable support data lives in `spec/compatibility/support-lanes.json` and `spec/compatibility/claims.json`. Static validation lints those files so current fixture-backed claims list fixtures, generated streams have manifest rows, and public text stays narrower than "full support" unless a separate external load profile proves that claim.
 
 Claims must stay precise:
 
@@ -378,7 +378,7 @@ Claims must stay precise:
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, rocket fuel, and steel plate. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
-- The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod that changes the adopted recipe set can therefore trigger one technology-effect reset for the affected save.
+- The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod can therefore update the stored adoption binding and invoke bounded recognized research-cost conversion, but MIR does not call a force-wide technology-effect reset or reapply unrelated mod effects.
 - Module productivity can include Quality modules because the current Factorio `2.1` line uses a hidden optional Quality dependency for load order. The dependency is hidden to avoid presenting Quality as a required or recommended mod-page dependency.
 - Existing prototype IDs are kept stable unless a tested migration is provided. `v2.0.5` provides a JSON migration for the intentional trash-slot-to-inventory technology consolidation and adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
@@ -393,9 +393,9 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 3. Recycler only.
 4. Quality enabled with its dependencies.
 5. Base-only with default `research_cargo_landing_pad_count`, verifying the generated technology is skipped because Space Age is absent.
-6. Space Age 2.1.11+ enabled, verifying cargo bay unloading distance and cargo landing pad count research appear after their required unlocks.
-7. Space Age 2.1.11+ with `research_cargo_landing_pad_count` disabled, verifying the checkbox skips the generated technology cleanly.
-8. Space Age 2.1.11+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
+6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance and cargo landing pad count research appear after their required unlocks.
+7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` disabled, verifying the checkbox skips the generated technology cleanly.
+8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
 9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant recipe ownership.
 10. Startup pipeline extent fixture runs with non-default dropdown multipliers, verifying common fluid boxes are mutated only when enabled.
 11. Space Age with Panglia or a Panglia-like fixture, verifying extra rocket fuel and low density structure recipes adopt into vanilla productivity technologies.
@@ -613,12 +613,12 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 
 ## Release Checklist
 
-- Run `.\scripts\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
+- Run `.\tools\commands\package\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's 99-dash format and one-line bullets at or below 132 characters.
-- Confirm `info.json` declares `base >= 2.0.77`, hidden optional Elevated Rails, Quality, Pyanodons Post-processing, and Space Exploration ordering, and visible optional Recycler and Space Age ordering dependencies only.
+- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails, Quality, Pyanodons Post-processing, and Space Exploration ordering, and visible optional Recycler and Space Age ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included runtime source, locale, migrations, README, changelog, license, thumbnail, and no forbidden artifacts for the archive built from the current source tree.
 - Confirm package validation reports packaged source and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.

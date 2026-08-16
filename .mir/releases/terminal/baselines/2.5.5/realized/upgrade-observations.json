@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineUpgradeInventoryV1",
+  "release": "2.5.5",
+  "target": "2.0",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/2.5.5-engine-observation.json",
+    "dist/more-infinite-research_2.5.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-2.5.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "2.5.0-to-2.5.5",
+      "target": "2.0",
+      "state": "qualified-by-target-campaign",
+      "origin": "release-record",
+      "observed_release": "2.5.5",
+      "source_evidence": [
+        ".mir/releases/records/2.5.5.json",
+        "714FC0F54F316C89C478D946BC24DEAAC8E0389C5CB72C2DC5961753115524FE"
+      ],
+      "target_disposition": "direct-public-upgrade",
+      "mir4_transition_rule": "import-direct-transition-fixture",
+      "attributes": []
+    }
+  ],
+  "omissions": []
+}

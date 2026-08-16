@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-12T17:51:21.6581780Z",
+  "factorio_line": "2.1",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\more-infinite-research_3.1.0.zip",
+    "sha256": "3F4A3A042F8486922397C1048D068745431257790F73FEDFE275BA0BF6F15780",
+    "source_commit": "aa05c4e93fe37f64e4d8004b8ba83d9fad274922",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\validation\\main-exact-dist\\compat-candidates.lock.json",
+    "sha256": "23E43DC9ABEB4A5CB4F75D271FA6BE17D33C89E7B315EBC5DDBED470162CA3A1"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "base-baseline",
+      "requested_roots": [
+        "more-infinite-research"
+      ],
+      "actual_executed_roots": [],
+      "resolved_mods": [],
+      "official_mods": [],
+      "dependency_closure": [],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "fixtures\\compat-matrix\\manual-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "space-age-baseline",
+      "requested_roots": [
+        "more-infinite-research"
+      ],
+      "actual_executed_roots": [],
+      "resolved_mods": [],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "fixtures\\compat-matrix\\manual-scenarios.json",
+      "claim_level": "loads"
+    }
+  ]
+}
+

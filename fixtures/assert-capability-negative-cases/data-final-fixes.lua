@@ -8,6 +8,7 @@ local denied_recipes = {
   ["mir-loader-like-container"] = true,
   ["mir-drill-like-container"] = true,
   ["mir-hidden-placeable-machine"] = true,
+  ["mir-parameter-placeable-machine"] = true,
   ["mir-productivity-disabled-machine"] = true,
   ["mir-zero-cap-placeable-machine"] = true,
   ["mir-recycling-placeable-machine"] = true,
@@ -40,6 +41,12 @@ local expected_hard = {
   ["mir-nondeterministic-placeable-machine"] = "non_deterministic_output",
   ["mir-ambiguous-placeable-machine"] = "ambiguous_placeable_output"
 }
+local expected_fact_only = {
+  -- Parameter recipes cannot own concrete results in Factorio 2.1, so this
+  -- prototype proves canonical risk classification without pretending it can
+  -- also be a concrete placeable-output family candidate.
+  ["mir-parameter-placeable-machine"] = "parameter_recipe"
+}
 local expected_review = {
   ["mir-voiding-placeable-machine"] = "voiding_or_destruction",
   ["mir-matter-transmutation-placeable-machine"] = "matter_or_transmutation",
@@ -64,6 +71,17 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
       or not decision or decision.risk_fingerprint ~= risk.risk_fingerprint
       or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose" then
       error("MIR hard RecipeRiskFact was not enforced by the family planner: " .. recipe_name .. "/" .. expected)
+    end
+  end
+  for recipe_name, expected in pairs(expected_fact_only) do
+    local risk = risk_facts.view(recipe_name)
+    local decision = decisions[recipe_name]
+    if not risk or not contains(risk.hard_flags, expected) then
+      error("MIR hard RecipeRiskFact was not classified: " .. recipe_name .. "/" .. expected)
+    end
+    if decision and (decision.risk_fingerprint ~= risk.risk_fingerprint
+      or decision.risk_disposition ~= "HARD_REJECTED" or decision.decision ~= "diagnose") then
+      error("MIR parameter RecipeRiskFact reached planning without hard rejection: " .. recipe_name)
     end
   end
   for recipe_name, expected in pairs(expected_review) do

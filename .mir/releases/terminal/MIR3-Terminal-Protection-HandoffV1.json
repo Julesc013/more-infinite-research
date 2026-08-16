@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-Protection-HandoffV1",
+  "status": "applied-and-verified",
+  "application_result": "Nine production rulesets are active at the governed definitions. Disposable branch and tag canaries rejected all six mutation classes, direct and force dev updates were rejected, and all canary rulesets and refs were removed.",
+  "repository": "Julesc013/more-infinite-research",
+  "precondition": "Archive current rulesets and branch protections, create disposable canary refs, apply and pass canary negative tests, then apply production payloads and verify returned ruleset state.",
+  "observed_required_checks": [
+    {"context":"branch-policy","integration_id":15368,"app_slug":"github-actions","observed_commit":"bd27b41be3277a5cd92a7d48ededdb95fe77401a","workflow_run":31268931599,"conclusion":"success"},
+    {"context":"verification-gate","integration_id":15368,"app_slug":"github-actions","observed_commit":"bd27b41be3277a5cd92a7d48ededdb95fe77401a","workflow_run":31268931281,"conclusion":"success"}
+  ],
+  "administrator_actor": {"login":"Julesc013","actor_type":"User","actor_id":30209022,"authority":"observed repository owner; application still requires authenticated ruleset administration"},
+  "branches": [
+    {"ref":"refs/heads/dev","role":"terminal-integration","update_model":"pull-request-only","required_pull_request":true,"minimum_approvals":0,"require_thread_resolution":true,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["dev-integrity.json","dev-workflow.json"]},
+    {"ref":"refs/heads/main","role":"3.2.x-promotion-line","update_model":"exact-fast-forward-promotion-only","required_pull_request":false,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["main-integrity.json","main-promotion.json"]},
+    {"ref":"refs/heads/legacy","role":"2.5.x-dual-parent-promotion-line","update_model":"exact-fast-forward-promotion-only","required_pull_request":false,"block_non_fast_forward":true,"block_deletion":true,"required_checks":["branch-policy","verification-gate"],"payloads":["legacy-integrity.json","legacy-promotion.json"]}
+  ],
+  "immutable_dot5_tags": ["refs/tags/3.2.5","refs/tags/2.5.5","refs/tags/1.9.5","refs/tags/1.8.5","refs/tags/1.7.5","refs/tags/1.6.5","refs/tags/1.5.5","refs/tags/1.4.5","refs/tags/1.3.5"],
+  "future_terminal_tags": ["refs/tags/3.2.9","refs/tags/2.5.9","refs/tags/1.9.9","refs/tags/1.8.9","refs/tags/1.7.9","refs/tags/1.6.9","refs/tags/1.5.9","refs/tags/1.4.9","refs/tags/1.3.9"],
+  "tag_lifecycle": {
+    "dot5": "immutable-now-no-bypass",
+    "dot9_precreation": "creation-restricted-to-exact-maintainer-actor-and-governed-family-readiness-receipt; update-and-deletion-non-bypassable",
+    "dot9_postcreation": "create-once refs remain update-and-deletion-non-bypassable; creation-gate is removed after all nine returned refs are verified"
+  },
+  "payload_root": ".mir/releases/terminal/protections",
+  "canary": {"branch_pattern":"refs/heads/canary/mir3-terminal-protection-*","tag_pattern":"refs/tags/canary/mir3-terminal-protection-*","real_release_refs_permitted":false,"payloads":["canary-branch.json","canary-tag.json"]},
+  "emergency_bypass": {"dev":"repository-owner pull-request bypass only for the PR workflow rule; integrity and required-check rules have no bypass","main_legacy":"repository-owner may satisfy only the update restriction; integrity and required-check rules have no bypass","receipt_required":true,"package_change_requires_new_candidate":true},
+  "application_receipt": {
+    "path": ".mir/evidence/terminal-protections/2026-08-14/application-receipt.json",
+    "sha256": "C8A6F4003F31D133BD111510FB7D64AC79E19EE48C167D8CC9414E3F28847877",
+    "evidence_manifest_path": ".mir/evidence/terminal-protections/2026-08-14/artifact-manifest.json",
+    "evidence_manifest_sha256": "76887308475F0F4A93F5862ADF87E4AA93804F96885564CF2FA4B59140C0B466",
+    "ruleset_snapshot_before_sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+    "ruleset_snapshot_after_sha256": "6C344081638BCCDE01B83B7D3EF2CA81C4B26CC94F87444EFDB25DFB3925485C",
+    "branch_protection_snapshot_sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+    "canary_ruleset_ids": [20833388, 20833389],
+    "production_ruleset_ids": [20833400, 20833401, 20833404, 20833406, 20833407, 20833408, 20833409, 20833410, 20833412],
+    "applied_by": {"login":"Julesc013","actor_id":30209022},
+    "applied_at": "2026-08-14T06:05:32.8261753Z",
+    "verified_at": "2026-08-14T06:07:59.6939367Z",
+    "negative_tests": [
+      "branch-fast-forward-update-rejected",
+      "branch-non-fast-forward-update-rejected",
+      "branch-deletion-rejected",
+      "tag-creation-rejected",
+      "tag-update-rejected",
+      "tag-deletion-rejected",
+      "dev-direct-same-sha-rejected",
+      "dev-force-same-sha-rejected"
+    ],
+    "status": "applied-and-verified"
+  }
+}

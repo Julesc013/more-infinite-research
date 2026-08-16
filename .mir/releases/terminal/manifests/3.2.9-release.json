@@ -1,0 +1,31 @@
+{
+  "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+  "bytes": 1061572,
+  "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+  "candidate_id": "C33",
+  "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+  "entries": 303,
+  "github_release_body": ".mir/releases/terminal/release-bodies/3.2.9.md",
+  "kind": "Mir3TerminalReleaseManifestV1",
+  "mod_portal_description": ".mir/releases/terminal/mod-portal-descriptions/3.2.9.md",
+  "qualification": {
+    "path": ".mir/releases/terminal/qualifications/3.2.9.json",
+    "status": "passed-automated-awaiting-human-review"
+  },
+  "release": "3.2.9",
+  "review": {
+    "path": ".mir/releases/terminal/reviews/3.2.9.json",
+    "sha256": "413A917A678C66A50ABD34A137CF07710909DDBFE6E336137F9DB3566FAD0EF8",
+    "status": "accepted-exact-package-inspection"
+  },
+  "schema": 1,
+  "seal": {
+    "path": ".mir/releases/terminal/seals/3.2.9.json",
+    "status": "created-after-manifest-root"
+  },
+  "tag": {
+    "name": "3.2.9",
+    "status": "authorized-pending-creation",
+    "target_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8"
+  }
+}

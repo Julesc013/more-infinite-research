@@ -1,0 +1,5 @@
+Version: 0.8.8 (Build 8138, win64)
+Binary version: 64
+Map input version: 0.4.0-0
+Map output version: 0.8.8-0
+

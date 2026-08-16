@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir3-terminal-candidate-reconstruction.schema.json",
+  "title": "MIR 3 terminal candidate reconstruction receipt",
+  "type": "object",
+  "required": ["schema", "kind", "status", "reconstruction_window", "source_authorities", "method", "summary", "targets", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalCandidateReconstructionReceiptV1"},
+    "status": {"const": "passed-ready-for-automated-qualification"},
+    "reconstruction_window": {
+      "type": "object",
+      "required": ["started_at", "completed_at"],
+      "properties": {
+        "started_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "source_authorities": {
+      "type": "object",
+      "required": ["allocation", "allocation_canonical_text_sha256", "allocation_merge", "post_merge_runs"],
+      "properties": {
+        "allocation": {"const": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"},
+        "allocation_canonical_text_sha256": {"$ref": "#/$defs/sha256"},
+        "allocation_merge": {
+          "type": "object",
+          "required": ["commit", "tree"],
+          "properties": {
+            "commit": {"$ref": "#/$defs/commit"},
+            "tree": {"$ref": "#/$defs/commit"}
+          },
+          "additionalProperties": false
+        },
+        "post_merge_runs": {
+          "type": "object",
+          "required": ["branch_policy", "mir", "emergency_package", "result"],
+          "properties": {
+            "branch_policy": {"type": "integer", "minimum": 1},
+            "mir": {"type": "integer", "minimum": 1},
+            "emergency_package": {"type": "integer", "minimum": 1},
+            "result": {"const": "passed"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "method": {
+      "type": "object",
+      "required": ["id", "clean_detached_roots_per_target", "compression", "fixed_zip_timestamp", "package_roots_clean", "dist_overwrite_used"],
+      "properties": {
+        "id": {"const": "three-clean-detached-git-worktrees-deterministic-package-v1"},
+        "clean_detached_roots_per_target": {"const": 3},
+        "compression": {"const": "Optimal"},
+        "fixed_zip_timestamp": {"const": "1980-01-01T00:00:00Z"},
+        "package_roots_clean": {"const": true},
+        "dist_overwrite_used": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": ["targets", "attempts", "passed", "failed", "identity_mismatches", "forbidden_package_entries"],
+      "properties": {
+        "targets": {"const": 9},
+        "attempts": {"const": 27},
+        "passed": {"const": 27},
+        "failed": {"const": 0},
+        "identity_mismatches": {"const": 0},
+        "forbidden_package_entries": {"const": 0}
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {"$ref": "#/$defs/target"}
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["automated_qualification_complete", "manual_review_complete", "target_seals_created", "family_seal_created", "tags_created", "publication_permitted", "dot5_package_bytes_changed"],
+      "properties": {
+        "automated_qualification_complete": {"const": false},
+        "manual_review_complete": {"const": false},
+        "target_seals_created": {"const": false},
+        "family_seal_created": {"const": false},
+        "tags_created": {"const": false},
+        "publication_permitted": {"const": false},
+        "dot5_package_bytes_changed": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "target": {
+      "type": "object",
+      "required": ["release", "candidate", "candidate_commit", "candidate_tree", "package_source_sha256", "archive_sha256", "content_sha256", "bytes", "entries", "attempts", "clean_detached_roots", "identities_equal", "dist_path"],
+      "properties": {
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+        "candidate": {"type": "string", "minLength": 1},
+        "candidate_commit": {"$ref": "#/$defs/commit"},
+        "candidate_tree": {"$ref": "#/$defs/commit"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entries": {"type": "integer", "minimum": 1},
+        "attempts": {"const": ["A", "B", "C"]},
+        "clean_detached_roots": {"const": 3},
+        "identities_equal": {"const": true},
+        "dist_path": {"type": "string", "pattern": "^dist/more-infinite-research_[0-9]+\\.[0-9]+\\.9\\.zip$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

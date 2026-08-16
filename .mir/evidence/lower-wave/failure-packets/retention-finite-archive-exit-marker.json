@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.14 exact-candidate retention fresh reload proof grammar",
+  "exit_code": 0,
+  "harness_error": "Factorio fresh-reload exited without benchmarked loaded-map proof",
+  "target_branch": "rebuild/0.14",
+  "factorio_binary_version": "0.14.23",
+  "target_candidate_sha256": "69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1",
+  "positive_proof": [
+    "Loading mod more-infinite-research 1.4.0",
+    "Loading map",
+    "Map version 0.14.23-0",
+    "Checksum for script __more-infinite-research__/control.lua",
+    "process exit code 0",
+    "zero surviving Factorio processes"
+  ],
+  "root_cause_classification": "portable-retention-proof-grammar",
+  "root_cause": "Factorio 0.14 completes a one-tick benchmarked load without emitting the Goodbye marker used by newer target lines.",
+  "fix": "For Factorio 0.13 and 0.14, accept exact MIR load, Loading map, Map version, and process exit code 0 without requiring Goodbye.",
+  "regression": "Test-MIRPowerShellQuality requires the shared harness to carry an explicit requiresGoodbye capability boundary.",
+  "affected_targets": [
+    "0.14",
+    "0.13"
+  ],
+  "candidate_implication": "The 1.4.0 and 1.3.0 candidates require corrected retention reruns and fresh seals; no published version is affected."
+}

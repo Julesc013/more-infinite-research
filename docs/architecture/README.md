@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
 ---
@@ -15,7 +15,7 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 Use the [current compiler architecture matrix](current-architecture-matrix.md) for the active fact, decision, lifecycle, graph, emission, and evidence authorities. Historical checkpoint reports do not override that matrix.
 
-Use the [MIR 3.3 and 2.6 semantic platform roadmap](3.3-2.6-semantic-platform-roadmap.md) for future control-plane, compiler, target-projection, repository, test, and ecosystem work. That roadmap begins only after MIR 3.2.2 and MIR 2.5.0 are frozen; it does not alter the C24 or P9 package boundary.
+Use the [MIR 3 terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md) for current release sequencing, target projection, assurance debt, and the MIR 4 handoff. The former 3.3/2.6 platform roadmaps and [MIR Extension Protocol v1 roadmap](mir-extension-protocol-v1.md) are historical design inputs only. They do not authorize a MIR 3.3 or 2.6 release or package-visible implementation; viable platform ideas must be re-admitted under MIR 4 after the terminal `.9` wave.
 
 ## Data Stage Flow
 
@@ -73,6 +73,7 @@ Current control files:
 - `control.lua`: loads the runtime registration stage.
 - `prototypes/mir/runtime/scripted_techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
 - `prototypes/mir/runtime/settings_profile.lua`: exports current effective MIR startup settings to a profile string, validates pasted profile strings, and exposes a small remote interface for tools. It does not mutate startup settings at runtime.
+- `prototypes/mir/runtime/planet_discovery_recovery.lua`: performs the version-gated 3.2.2 repair for valid researched space locations left locked by 3.2.0 or 3.2.1; it never resets force-wide technology effects.
 - `prototypes/mir/runtime/effects/spoilage_preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `prototypes/mir/runtime/effects/agricultural_growth_speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 
@@ -210,9 +211,9 @@ The kernel now has enforceable platform pieces:
 - resolver contract validation in `prototypes/mir/capabilities/contract.lua`;
 - capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
 - generated stream manifest metadata in `prototypes/mir/streams/generated_stream_manifest.json`;
-- machine-readable claims in `fixtures/compat-matrix/claims.json`;
-- static linting through `scripts/Test-MIRPolicyLints.ps1`;
-- report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
+- machine-readable claims in `spec/compatibility/claims.json`;
+- static linting through `validation/tests/tooling/Test-MIRPolicyLints.ps1`;
+- report drift comparison through `tools/commands/planner/Compare-MIRPlannerReports.ps1`;
 - negative capability fixtures for loop risks, hidden recipes, cap-zero recipes, and structural loader/drill decoys.
 
 New mod support should add policy and fixtures first. New behavior classes should add or extend a capability resolver. New false positives should become classifier or policy fixes. New bug reports should become negative fixtures.
@@ -237,7 +238,7 @@ Unreleased MIR 3.1.0 automatic-compiler development is governed by `docs/archite
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
-When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, lab-matrix, and capability decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, lab-matrix, and capability decisions in a parser-friendly key/value format for `tools/commands/compatibility/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
 
 Recipe-cap diagnostics compare generated recipe-productivity effects with the recipe's `maximum_productivity` value. Default caps stay quiet except for the summary row. Lowered, raised, zero, unusual, or effectively uncapped values are reported as diagnostics so players and compatibility audits can see when an infinite stream may become misleading. `v2.2.0` also reports a useful-level estimate for warning rows. MIR does not change recipe caps by default.
 
@@ -260,27 +261,27 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
-Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, generates local-library stress scenarios with `-RunGeneratedLocalScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, resolves supplied local root/library zips before Mod Portal metadata, supports `-Offline` for read-only local library sweeps, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, checkpoints load results after each scenario, and downloads third-party mods only when credentials are provided explicitly.
+Use `tools/commands/compatibility/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `validation/scenarios/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, generates local-library stress scenarios with `-RunGeneratedLocalScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, resolves supplied local root/library zips before Mod Portal metadata, supports `-Offline` for read-only local library sweeps, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, checkpoints load results after each scenario, and downloads third-party mods only when credentials are provided explicitly.
 
 The compatibility runner writes isolated mod lists rather than inheriting the user's normal Factorio enabled-mod state. Official built-ins are listed explicitly and disabled unless the scenario needs them; requiring `space-age` expands to the full official bundle. Parsed audit rows are tolerant of blank log lines so checkpointed overnight results can still be converted after interrupted runs.
 
-Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record planner rows, recipe-cap warnings, compiler decisions, rule-surface rows, loop-risk rows, fact summaries, and lab matrices without turning them into failures. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
+Use `tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record planner rows, recipe-cap warnings, compiler decisions, rule-surface rows, loop-risk rows, fact summaries, and lab matrices without turning them into failures. Expected failures mostly come from reviewed rules in `validation/assertions/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
 
-Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
+Use `tools/commands/compatibility/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
 
 Use `scripts/Invoke-MIRExtendedTests.ps1` as the wrapper for repeatable tiers such as `Static`, `Runtime`, `AuditSmoke`, `Top25Base`, `Top25SpaceAge`, `ManualScenarios`, `LocalModZips`, `LocalLibraryScenarios`, `GeneratedLocalScenarios`, and opt-in sharded `Full10K*` runs. `scripts/Start-MIROvernightLocalSweep.ps1` is the safer human-facing entrypoint for the local Factorio `2.1` offline zip-library sweep; it validates paths, starts a transcript, runs the strict release gate, then delegates to the extended wrapper for the prioritized local tiers. Both wrappers now emit self-describing run artifacts: `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. `scripts/Show-MIROvernightSummary.ps1` is the matching morning triage helper for grouped failures, missing dependencies, profile-candidate counts, and artifact paths. `AuditSmoke` uses the deterministic `space-age-baseline` manual-scenario metadata path so strict gates do not depend on volatile catalog ordering. `-CollectAll` is the exploratory/overnight mode. `-FailFast -FailOnAuditFailures` is the strict gate mode, where grouped unexpected audit failures make the wrapper fail. The self-hosted workflow calls this wrapper rather than duplicating audit logic in YAML.
 
-Use `scripts/mir.ps1` as the stable developer-facing command facade. It keeps existing scripts as implementation details and adds memorable verbs for release gates, overnight local sweeps, local/top-25 audits, reports, package builds, profile stubs, run profiles, and local mod-library indexing. Shared operational helpers live under `scripts/MIRCli/`; treat them as a private helper folder, not as a framework that must be expanded before useful testing work can continue.
+Use `tools/mir.ps1` as the stable developer-facing command facade. It keeps existing scripts as implementation details and adds memorable verbs for release gates, overnight local sweeps, local/top-25 audits, reports, package builds, profile stubs, run profiles, and local mod-library indexing. Shared operational helpers live under `tools/lib/cli/`; treat them as a private helper folder, not as a framework that must be expanded before useful testing work can continue.
 
-Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
+Use `tools/commands/package/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. The release zip intentionally excludes developer-only docs, fixtures, scripts, and task ledgers; those remain repository evidence, not shipped mod payload. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 
-Use `scripts/mir.ps1 release docs-only` or `scripts/mir.ps1 release docs-refresh` for documentation-only refreshes after a clean full release gate. The command runs the fast package/static validation path and rejects non-doc/package changes so prototype, script, fixture, locale, or runtime behavior changes still require the full gate.
+Use `tools/mir.ps1 release docs-only` or `tools/mir.ps1 release docs-refresh` for documentation-only refreshes after a clean full release gate. The command runs the fast package/static validation path and rejects non-doc/package changes so prototype, script, fixture, locale, or runtime behavior changes still require the full gate.
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 
-Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation. Settings visibility linting also verifies the hidden-setting readability fixture is present.
+Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/run-profiles/` are excluded from fixture-mod validation; scenarios and assertions live under `validation/` instead of masquerading as fixture mods. Settings visibility linting also verifies the hidden-setting readability fixture is present.
 
 Static validation rejects runtime tick handlers in `control.lua` and `prototypes/mir/runtime/**/*.lua`.
 

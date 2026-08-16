@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0055",
+  "title": "Generated execution registry uses stale checkout-dependent source hashes",
+  "external_issue": "internal://control-plane/execution-registry-source-hash-drift",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.5",
+    "source_commit": "1af927d964f3386ff357fa3e292cd2f1af5fcfe0",
+    "checkout": "Windows isolated worktree",
+    "failed_check": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+    "observed": "Update-MIRCPExecutionRegistry -Check reports validation/generated/execution-registry.json stale even though the scenario catalog and runner are unmodified by CHG-2026-0016."
+  },
+  "reproduction": {
+    "status": "reproduced-after-package-excluded-phase-a-slice",
+    "observed": "The tracked registry records stale catalog and runner source hashes and 89 runner-literal AST line locations. Scenario IDs, assertions, environment signatures, batches, and metrics remain identical."
+  },
+  "root_cause": {
+    "status": "proven-noncanonical-source-digest-and-stale-view",
+    "summary": "The registry was not regenerated after an earlier runner edit shifted AST source lines, and registry source metadata used raw checkout-byte hashes through Get-MIRCPSha256File. The stale line locations break generated-view freshness, while the raw-byte digest contract is sensitive to checkout line endings rather than canonical repository text."
+  },
+  "repair_changes": [
+    "CHG-2026-0016:portable-UTF-8-LF-execution-registry-source-digests",
+    "CHG-2026-0016:LF-CRLF-regression-assertion",
+    "CHG-2026-0016:regenerated-execution-registry-metadata"
+  ],
+  "regression_propositions": [
+    "execution-registry generation is identical in LF and CRLF checkouts",
+    "catalog and runner source digests use an explicit portable digest policy",
+    "scenario assertion batch and process metrics remain semantically unchanged",
+    "Update-MIRCPExecutionRegistry -Check passes on clean Windows and hosted checkouts",
+    "the repair does not modify MIR package bytes or candidate identity"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "not-frozen",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "repair-implemented-pending-hosted-regression-proof",
+    "proof_required": "local portable LF/CRLF registry equality and control-plane static pass plus a fresh hosted MIR pass; development package content identity must remain unchanged"
+  }
+}

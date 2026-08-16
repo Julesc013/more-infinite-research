@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "REL-2.5.0-focused-qualified",
+  "release": "2.5.0",
+  "from": "package-built",
+  "to": "focused-qualified",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "package-lock",
+      "path": ".mir/control-plane/package-locks.json",
+      "candidate_id": "2.5-P9"
+    },
+    {
+      "kind": "backport-contract",
+      "path": "path:releases.backports/2.5.0.json"
+    }
+  ],
+  "recorded_at": "2026-07-28T12:00:00Z"
+}

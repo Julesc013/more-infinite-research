@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-terminal-successor-bootstrap-policy.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-terminal-successor-bootstrap-policy.schema.json",
+  "title": "MIR 3 terminal successor bootstrap policy",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "scope", "production_plane", "successor_plane", "terminal_import_authorities", "permitted_before_eol", "shadow_only_before_eol", "forbidden_before_eol", "equivalence_dimensions", "cutover_gate"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3TerminalSuccessorBootstrapPolicyV1"},
+    "status": {"const": "active-package-excluded"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "mir3-dot9-successor-bootstrap-firewall"},
+    "production_plane": {
+      "type": "object",
+      "required": ["authority", "release_bytes_may_be_changed_by_successor_work", "cutover_before_mir3_eol"],
+      "properties": {
+        "authority": {"const": "current-mir3-source-and-bounded-materializer"},
+        "release_bytes_may_be_changed_by_successor_work": {"const": false},
+        "cutover_before_mir3_eol": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "successor_plane": {
+      "type": "object",
+      "required": ["authority", "may_import_terminal_authorities", "may_generate_comparison_trees", "may_publish_version_4"],
+      "properties": {
+        "authority": {"const": "package-excluded-shadow-only"},
+        "may_import_terminal_authorities": {"const": true},
+        "may_generate_comparison_trees": {"const": true},
+        "may_publish_version_4": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "terminal_import_authorities": {"const": ["semantic", "target", "transition", "distribution"]},
+    "permitted_before_eol": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "shadow_only_before_eol": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "forbidden_before_eol": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "equivalence_dimensions": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "cutover_gate": {
+      "type": "object",
+      "required": ["requires_mir3_eol_seal", "requires_exact_equivalence", "mir4_shadow_completion_blocks_dot9"],
+      "properties": {
+        "requires_mir3_eol_seal": {"const": true},
+        "requires_exact_equivalence": {"const": true},
+        "mir4_shadow_completion_blocks_dot9": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

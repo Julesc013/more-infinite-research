@@ -1,0 +1,1 @@
+{"name":"MIR3 published dot5 immutable tags","target":"tag","enforcement":"active","bypass_actors":[],"conditions":{"ref_name":{"include":["refs/tags/3.2.5","refs/tags/2.5.5","refs/tags/1.9.5","refs/tags/1.8.5","refs/tags/1.7.5","refs/tags/1.6.5","refs/tags/1.5.5","refs/tags/1.4.5","refs/tags/1.3.5"],"exclude":[]}},"rules":[{"type":"update"},{"type":"deletion"}]}

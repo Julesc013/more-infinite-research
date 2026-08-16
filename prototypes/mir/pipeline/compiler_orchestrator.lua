@@ -28,6 +28,45 @@ local technology_catalog_contract = require("prototypes.mir.planner.technology_c
 
 local M = {}
 
+local function maximum_level_policy(plan)
+  local bindings = {}
+  for _, row in ipairs(plan.stream_plan.rows or {}) do
+    if row.action == "emit" then
+      table.insert(bindings, {
+        technology = row.technology_name,
+        setting = "ips-max-level-" .. tostring(row.stream_key),
+        selected = row.planned_max_level,
+        source = "generated-stream",
+        operation = "emit"
+      })
+    elseif row.action == "adopt" and row.adoption then
+      table.insert(bindings, {
+        technology = row.adoption.owner,
+        setting = "ips-max-level-" .. tostring(row.stream_key),
+        selected = row.adoption.planned_max_level,
+        source = "native-owner",
+        operation = row.adoption.operation
+      })
+    end
+  end
+  for _, operation in ipairs(plan.base_extension_operations or {}) do
+    table.insert(bindings, {
+      technology = operation.technology_name,
+      setting = "mir-max-level-" .. tostring(operation.key),
+      selected = operation.planned_max_level,
+      source = "base-continuation",
+      operation = operation.operation
+    })
+  end
+  table.sort(bindings, function(left, right) return left.technology < right.technology end)
+  return {
+    schema = 1,
+    kind = "MIRMaximumLevelPolicyV1",
+    semantics = "absolute-highest-technology-level",
+    bindings = bindings
+  }
+end
+
 local function now()
   return os and type(os.clock) == "function" and os.clock() or 0
 end
@@ -306,6 +345,7 @@ function M.publish(context)
   telemetry.count("technology_design_count", design_count)
   telemetry.count("technology_design_canonical_bytes", design_bytes)
   mod_data.emit_generation_plan(public_plan)
+  mod_data.emit_maximum_level_policy(maximum_level_policy(plan))
   mod_data.emit_technology_catalog(public_catalog)
   if include_internal then
     telemetry.count("generation_plan_internal_bytes", #fingerprint.canonical(plan.stream_plan))

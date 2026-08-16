@@ -1,0 +1,74 @@
+{
+  "assurance_exceptions": [],
+  "branch": "main",
+  "candidate_allocation": {
+    "assigned_at": "2026-08-14T18:05:46+10:00",
+    "assigned_id": "C33",
+    "assignment_condition": "accepted-family-fixed-point-and-source-freeze",
+    "candidate_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+    "candidate_ref": "refs/heads/candidate/3.2.9-C33",
+    "minimum_next_ordinal": 33,
+    "namespace": "C",
+    "predecessor_max_ordinal": 32
+  },
+  "candidate_floor": "C33",
+  "candidate_id": "C33",
+  "development_branch": "dev",
+  "incident_ids": [],
+  "package": {
+    "archive": "dist/more-infinite-research_3.2.9.zip",
+    "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+    "bytes": 1061572,
+    "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+    "entries": 303,
+    "source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+    "source_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+    "source_tree": "10ab16096578a8070851d26c5e812fb215b6aafa"
+  },
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "proofs": {
+    "approved_delta": ".mir/releases/deltas/3.2.5-to-3.2.9.json",
+    "automated_qualification": ".mir/releases/terminal/qualifications/3.2.9.json",
+    "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "candidate_reconstruction": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+    "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+    "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/3.2.9.json",
+    "manual_acceptance": {
+      "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
+      "path": ".mir/releases/terminal/reviews/3.2.9.json",
+      "sha256": "413A917A678C66A50ABD34A137CF07710909DDBFE6E336137F9DB3566FAD0EF8",
+      "digest_policy": "utf8-lf"
+    },
+    "package_manifest": ".mir/releases/terminal/manifests/3.2.9-package.json",
+    "release_manifest": ".mir/releases/terminal/manifests/3.2.9-release.json",
+    "source_freeze": ".mir/releases/terminal/freezes/3.2.9.json",
+    "target_seal": ".mir/releases/terminal/seals/3.2.9.json",
+    "tag": {"kind":"annotated-tag","name":"3.2.9","commit":"a60230a0695d2dd8fd1e727744614e746cda0bd8","tag_object":"9b80a3be63fe540bec9aa8a43f5bb835f639b34f"}
+  },
+  "release": "3.2.9",
+  "release_notes": "docs/releases/notes/release-notes-3.2.9.md",
+  "remaining_obligations": [
+    "mod-portal-publish-and-publicly-verify",
+    "archive-and-mir4-handoff"
+  ],
+  "schema": 1,
+  "source_release": {
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "candidate_id": "C32",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "release": "3.2.5",
+    "tag": "3.2.5",
+    "tag_commit": "62fddd86b51db7c0238731815d15ca26a4b45857"
+  },
+  "state": "publicly-verified",
+  "target": "2.1",
+  "updated_at": "2026-08-15T17:21:05+10:00",
+  "upgrade": {
+    "fixture": "assert-upgrade-3-2-5-to-3-2-9",
+    "from_version": "3.2.5",
+    "to_version": "3.2.9"
+  }
+}

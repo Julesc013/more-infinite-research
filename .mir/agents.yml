@@ -19,7 +19,7 @@ context_sets:
       - .mir/modules.yml
       - docs/architecture/module-boundaries.md
     validate:
-      - powershell: .\scripts\mir.ps1 architecture check
+      - powershell: .\tools\mir.ps1 architecture check
       - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 
   compatibility-change:
@@ -44,5 +44,5 @@ context_sets:
       - .mir/branches.yml
       - docs/maintainer/backporting.md
     validate:
-      - powershell: .\scripts\Test-MIRBranchPolicy.ps1 -SkipFetch
+      - powershell: .\validation\tests\release\Test-MIRBranchPolicy.ps1 -SkipFetch
 

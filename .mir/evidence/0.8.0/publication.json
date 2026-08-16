@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "0.8.0",
+  "target": "0.8",
+  "tag_commit": "080fa92ea38b4b40156f26429bc7cba54948aef0",
+  "tag_object": "2d4bb13259a9558194ffde294dae72432033aff3",
+  "archive": "dist/more-infinite-research_0.8.0.zip",
+  "archive_sha256": "60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6",
+  "github": {
+    "status": "published-and-verified-historical-archive",
+    "release_id": 354545739,
+    "asset_id": 478097628,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/0.8.0",
+    "asset_digest": "sha256:60ba156874cc3ee0c93b93c032bdec6d8432b5f692009a3277c1890e6d9bf3e6",
+    "redownload_sha256": "60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6",
+    "published_at": "2026-07-15T15:45:10Z"
+  },
+  "mod_portal": {
+    "status": "maintainer-upload-pending",
+    "reason": "The metadata-corrected archive is RC-ready; Mod Portal upload and acceptance remain a maintainer action."
+  },
+  "manual_visual_review": "PENDING-MAINTAINER"
+}

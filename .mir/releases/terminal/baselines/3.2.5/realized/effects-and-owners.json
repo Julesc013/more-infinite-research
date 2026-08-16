@@ -1,0 +1,4975 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineOwnershipInventoryV1",
+  "release": "3.2.5",
+  "target": "2.1",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json",
+    "dist/more-infinite-research_3.2.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-3.2.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "recipe-prod-research_advanced_circuit-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_advanced_circuit-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "advanced-circuit"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"advanced-circuit\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_agricultural_growth_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_agricultural_growth_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "nothing"
+        },
+        {
+          "name": "target",
+          "value": null
+        },
+        {
+          "name": "effect",
+          "value": "{effect_description = {\"modifier-description.more-infinite-research.agricultural_growth_speed\", \"1\"}, icons = {{icon = \"__space-age__/graphics/technology/agriculture.png\", icon_size = 256}}, type = \"nothing\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_artificial_soil-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_artificial_soil-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "artificial-jellynut-soil"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"artificial-jellynut-soil\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_artificial_soil-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_artificial_soil-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "artificial-yumako-soil"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"artificial-yumako-soil\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_artificial_soil-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_artificial_soil-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "overgrowth-jellynut-soil"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"overgrowth-jellynut-soil\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_artificial_soil-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_artificial_soil-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "overgrowth-yumako-soil"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"overgrowth-yumako-soil\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bacteria_cultivation-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bacteria_cultivation-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "copper-bacteria-cultivation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"copper-bacteria-cultivation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bacteria_cultivation-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bacteria_cultivation-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "iron-bacteria-cultivation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"iron-bacteria-cultivation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_batteries-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_batteries-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "battery"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"battery\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "splitter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"splitter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "transport-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"transport-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "underground-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"underground-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "fast-splitter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"fast-splitter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "fast-transport-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"fast-transport-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "fast-underground-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"fast-underground-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-007",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "express-splitter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"express-splitter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-008",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "express-transport-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"express-transport-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-009",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "express-underground-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"express-underground-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-010",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "turbo-splitter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"turbo-splitter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-011",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "turbo-transport-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"turbo-transport-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_belts-1#effect-012",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_belts-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "turbo-underground-belt"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"turbo-underground-belt\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bioflux-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bioflux-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "bioflux"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"bioflux\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_breeding-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_breeding-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "biter-egg"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"biter-egg\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_breeding-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_breeding-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "fish-breeding"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"fish-breeding\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_breeding-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_breeding-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "pentapod-egg"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"pentapod-egg\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "firearm-magazine"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"firearm-magazine\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "shotgun-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"shotgun-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "piercing-rounds-magazine"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"piercing-rounds-magazine\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "piercing-shotgun-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"piercing-shotgun-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_bullets-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_bullets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "uranium-rounds-magazine"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"uranium-rounds-magazine\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cannon_shooting_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_cannon_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"cannon-shell\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_capture_robot_rockets-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_capture_robot_rockets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "capture-robot-rocket"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"capture-robot-rocket\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon_fiber-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_carbon_fiber-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "carbon-fiber"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"carbon-fiber\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_carbon-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "carbon"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"carbon\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_carbon-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "burnt-spoilage"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"burnt-spoilage\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_carbon-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_carbon-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "coal-synthesis"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"coal-synthesis\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cargo_bay_unloading_distance-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_cargo_bay_unloading_distance-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "max-cargo-bay-unloading-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"max-cargo-bay-unloading-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_cargo_landing_pad_count-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_cargo_landing_pad_count-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "cargo-landing-pad-count"
+        },
+        {
+          "name": "target",
+          "value": "1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 1, type = \"cargo-landing-pad-count\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_crafting_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-crafting-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-crafting-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_mining_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-mining-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-mining-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-reach-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-reach-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-build-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-build-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-resource-reach-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-resource-reach-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_reach-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-item-drop-distance"
+        },
+        {
+          "name": "target",
+          "value": "10"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 10, type = \"character-item-drop-distance\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_character_walking_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-running-speed"
+        },
+        {
+          "name": "target",
+          "value": "0.05"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.05, type = \"character-running-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "stone-brick"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"stone-brick\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "concrete"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"concrete\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "concrete-from-molten-iron"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"concrete-from-molten-iron\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "hazard-concrete"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"hazard-concrete\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "refined-concrete"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"refined-concrete\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_concrete-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_concrete-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "refined-hazard-concrete"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"refined-hazard-concrete\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper_cable-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_copper_cable-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "casting-copper-cable"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"casting-copper-cable\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper_cable-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_copper_cable-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "copper-cable"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"copper-cable\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_copper-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "casting-copper"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"casting-copper\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_copper-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_copper-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "copper-plate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"copper-plate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_energy-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_energy-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "accumulator"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"accumulator\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_energy-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_energy-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "solar-panel"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"solar-panel\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_engine-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_engine-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "electric-engine-unit"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"electric-engine-unit\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "tesla"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"tesla\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electric_shooting_speed-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "electric"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"electric\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_electronic_circuit-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_electronic_circuit-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "electronic-circuit"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"electronic-circuit\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_engine-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_engine-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "engine-unit"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"engine-unit\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_explosives-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_explosives-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "explosives"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"explosives\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flamethrower_shooting_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_flamethrower_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "flamethrower"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"flamethrower\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_flying_robot_frame-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_flying_robot_frame-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "flying-robot-frame"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"flying-robot-frame\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_furnace-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_furnace-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "stone-furnace"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.2, recipe = \"stone-furnace\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_furnace-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_furnace-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "steel-furnace"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"steel-furnace\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_furnace-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_furnace-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "electric-furnace"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"electric-furnace\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_furnace-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_furnace-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "foundry"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"foundry\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_gears-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_gears-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "casting-iron-gear-wheel"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"casting-iron-gear-wheel\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_gears-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_gears-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "iron-gear-wheel"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"iron-gear-wheel\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_grenades-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_grenades-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "grenade"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"grenade\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_grenades-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_grenades-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "cluster-grenade"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"cluster-grenade\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"cannon-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "explosive-cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"explosive-cannon-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "explosive-uranium-cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"explosive-uranium-cannon-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "uranium-cannon-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"uranium-cannon-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "artillery-shell"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"artillery-shell\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_heavy_ammo-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_heavy_ammo-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "railgun-ammo"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"railgun-ammo\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_holmium-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_holmium-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "holmium-plate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"holmium-plate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_ice-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_ice-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "ammoniacal-solution-separation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"ammoniacal-solution-separation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "burner-inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"burner-inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "fast-inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"fast-inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "long-handed-inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"long-handed-inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "bulk-inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"bulk-inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inserters-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inserters-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "stack-inserter"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.01, recipe = \"stack-inserter\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-inventory-slots-bonus"
+        },
+        {
+          "name": "target",
+          "value": "1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 1, type = \"character-inventory-slots-bonus\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_inventory_capacity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "character-logistic-trash-slots"
+        },
+        {
+          "name": "target",
+          "value": "1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 1, type = \"character-logistic-trash-slots\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron_sticks-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_iron_sticks-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "casting-iron-stick"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"casting-iron-stick\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron_sticks-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_iron_sticks-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "iron-stick"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"iron-stick\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_iron-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "casting-iron"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"casting-iron\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_iron-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_iron-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "iron-plate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"iron-plate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_landfill-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_landfill-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "landfill"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"landfill\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_landfill-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_landfill-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "foundation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"foundation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lithium-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_lithium-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "lithium-plate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"lithium-plate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lithium-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_lithium-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "lithium"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"lithium\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lubricant_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_lubricant_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "biolubricant"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"biolubricant\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_lubricant_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_lubricant_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "lubricant"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"lubricant\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_mining_drill-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_mining_drill-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "burner-mining-drill"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.2, recipe = \"burner-mining-drill\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_mining_drill-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_mining_drill-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "electric-mining-drill"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"electric-mining-drill\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_mining_drill-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_mining_drill-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "big-mining-drill"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"big-mining-drill\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "efficiency-module"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"efficiency-module\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "productivity-module"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"productivity-module\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "quality-module"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"quality-module\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "speed-module"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"speed-module\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "efficiency-module-2"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"efficiency-module-2\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "productivity-module-2"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"productivity-module-2\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-007",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "quality-module-2"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"quality-module-2\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-008",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "speed-module-2"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"speed-module-2\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-009",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "efficiency-module-3"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"efficiency-module-3\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-010",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "productivity-module-3"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"productivity-module-3\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-011",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "quality-module-3"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"quality-module-3\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_modules-1#effect-012",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_modules-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "speed-module-3"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"speed-module-3\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_molten_metals-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_molten_metals-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "molten-copper-from-lava"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"molten-copper-from-lava\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_molten_metals-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_molten_metals-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "molten-iron-from-lava"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"molten-iron-from-lava\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_molten_metals-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_molten_metals-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "copper-ore-melting"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"copper-ore-melting\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_molten_metals-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_molten_metals-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "iron-ore-melting"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"iron-ore-melting\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_nutrients-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_nutrients-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "nutrients-from-bioflux"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"nutrients-from-bioflux\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_nutrients-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_nutrients-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "nutrients-from-biter-egg"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"nutrients-from-biter-egg\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_nutrients-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_nutrients-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "nutrients-from-yumako-mash"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"nutrients-from-yumako-mash\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_cracking_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_cracking_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "heavy-oil-cracking"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"heavy-oil-cracking\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_cracking_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_cracking_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "light-oil-cracking"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"light-oil-cracking\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_processing_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_processing_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "advanced-oil-processing"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"advanced-oil-processing\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_processing_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_processing_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "basic-oil-processing"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"basic-oil-processing\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_processing_productivity-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_processing_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "coal-liquefaction"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"coal-liquefaction\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_oil_processing_productivity-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_oil_processing_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "simple-coal-liquefaction"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"simple-coal-liquefaction\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_platform-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_platform-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "ice-platform"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"ice-platform\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_platform-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_platform-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "space-platform-foundation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"space-platform-foundation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_quantum_processor-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_quantum_processor-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "quantum-processor"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"quantum-processor\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rails-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rails-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "rail"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"rail\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rails-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rails-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "rail-support"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"rail-support\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rails-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rails-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "rail-ramp"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"rail-ramp\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_robot_battery-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_robot_battery-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "worker-robot-battery"
+        },
+        {
+          "name": "target",
+          "value": "0.1"
+        },
+        {
+          "name": "effect",
+          "value": "{modifier = 0.1, type = \"worker-robot-battery\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rocket_shooting_speed-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rocket_shooting_speed-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "gun-speed"
+        },
+        {
+          "name": "target",
+          "value": "rocket"
+        },
+        {
+          "name": "effect",
+          "value": "{ammo_category = \"rocket\", modifier = 0.1, type = \"gun-speed\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rockets-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rockets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "rocket"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"rocket\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rockets-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rockets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "explosive-rocket"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"explosive-rocket\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_rockets-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_rockets-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "atomic-bomb"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.02, recipe = \"atomic-bomb\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "agricultural-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"agricultural-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "automation-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"automation-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-003",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "chemical-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"chemical-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-004",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "cryogenic-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"cryogenic-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-005",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "electromagnetic-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"electromagnetic-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-006",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "logistic-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"logistic-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-007",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "metallurgic-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"metallurgic-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-008",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "military-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"military-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-009",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "production-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"production-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-010",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "promethium-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"promethium-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-011",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "space-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"space-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_science_pack_productivity-1#effect-012",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_science_pack_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "utility-science-pack"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"utility-science-pack\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_spoilage_preservation-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_spoilage_preservation-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "nothing"
+        },
+        {
+          "name": "target",
+          "value": null
+        },
+        {
+          "name": "effect",
+          "value": "{effect_description = {\"modifier-description.more-infinite-research.spoilage_preservation\", \"1\"}, icons = {{icon = \"__space-age__/graphics/icons/spoilage.png\", icon_size = 64}}, type = \"nothing\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfur-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_sulfur-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "biosulfur"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"biosulfur\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfur-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_sulfur-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "sulfur"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"sulfur\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfuric_acid_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_sulfuric_acid_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "acid-neutralisation"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"acid-neutralisation\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_sulfuric_acid_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_sulfuric_acid_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "sulfuric-acid"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"sulfuric-acid\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_supercapacitor-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_supercapacitor-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "supercapacitor"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"supercapacitor\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_superconductor-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_superconductor-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "superconductor"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"superconductor\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_fuel_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_thruster_fuel_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "advanced-thruster-fuel"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"advanced-thruster-fuel\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_fuel_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_thruster_fuel_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "thruster-fuel"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"thruster-fuel\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_oxidizer_productivity-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_thruster_oxidizer_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "advanced-thruster-oxidizer"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"advanced-thruster-oxidizer\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_thruster_oxidizer_productivity-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_thruster_oxidizer_productivity-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "thruster-oxidizer"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"thruster-oxidizer\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_tungsten-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_tungsten-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "tungsten-carbide"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"tungsten-carbide\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_tungsten-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_tungsten-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "tungsten-plate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"tungsten-plate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_walls-1#effect-001",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_walls-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "stone-wall"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.1, recipe = \"stone-wall\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    },
+    {
+      "stable_id": "recipe-prod-research_walls-1#effect-002",
+      "target": "2.1",
+      "state": "realized",
+      "origin": "exact-engine-read-only-observer",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json"
+      ],
+      "target_disposition": "realized-owner-effect",
+      "mir4_transition_rule": "import-owner-and-effect-as-terminal-baseline",
+      "attributes": [
+        {
+          "name": "technology",
+          "value": "recipe-prod-research_walls-1"
+        },
+        {
+          "name": "effect_type",
+          "value": "change-recipe-productivity"
+        },
+        {
+          "name": "target",
+          "value": "gate"
+        },
+        {
+          "name": "effect",
+          "value": "{change = 0.05, recipe = \"gate\", type = \"change-recipe-productivity\"}"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

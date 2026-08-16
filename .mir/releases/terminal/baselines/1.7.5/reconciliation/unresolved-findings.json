@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "1.7.5",
+  "comparison": "unresolved-findings",
+  "status": "reconciled",
+  "agreements": [
+    "all baseline realization findings closed by exact observation or explicit target-capability disposition"
+  ],
+  "contradictions": [],
+  "unresolved_findings": []
+}

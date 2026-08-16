@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalExperimentReceiptV1",
+  "finding": "MIR3-TERM-0012",
+  "authority_class": "reproduced-experiment",
+  "experiment": {
+    "branch": "codex/mir3-term-0011-2.5.5-calibration",
+    "commit": "a1ceee060c4f0abd0a9fdd203564df4e9f081d98",
+    "merge_base": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+    "reference_dev_commit": "930c06cad9dc619d5b186d3b9f6b5d7b3758b628",
+    "dev_ahead": 181,
+    "experiment_ahead": 351
+  },
+  "package": {
+    "release": "2.5.5",
+    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+    "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+    "bytes": 1055047
+  },
+  "engine": {
+    "factorio_version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "observation": {
+    "reproduced_failure": "Deep normal performance staging projected temporary Factorio paths of 257 to 259 characters, exceeding the conservative 240-character budget and causing an infrastructure failure despite exact immutable package inputs.",
+    "successful_control": "The identical 2.5.5 package inputs passed when compact staging was used, isolating the defect to assurance execution-path depth rather than product behavior.",
+    "useful_behaviour": [
+      "deterministic compact lane naming",
+      "pre-launch path-budget enforcement"
+    ],
+    "nonportable_implementation": [
+      "old scripts ownership",
+      "obsolete test paths",
+      "stale control-plane integration"
+    ]
+  },
+  "integration": {
+    "merge_allowed": false,
+    "cherry_pick_allowed": false,
+    "reason": "The experiment is hundreds of commits divergent from current dev and implements the useful behavior in superseded paths; canonical code must be ported test-first under current ownership."
+  },
+  "canonical_port": {
+    "required": true,
+    "implementation_owner": "tools/lib/validation/PerformanceCampaign.ps1",
+    "regression_owner": "validation/tests/release/Test-MIRPerformanceBudgets.ps1",
+    "entrypoint_role": "scripts/Measure-MIRPerformanceRegression.ps1 remains a thin compatibility/orchestration entrypoint",
+    "final_evidence_status": "diagnostic-only-until-repeated-under-current-canonical-implementation"
+  },
+  "evidence": {
+    "archived_artifacts": [
+      {
+        "path": ".mir/evidence/archive/mir3-term-experiments/MIR3-TERM-0012/2.5.5-plan-v5-deep-path-reproduction.json",
+        "sha256": "0DF6A6BC2E20C01C6002DF78A8D84C4BBEDD5D765BA08CD246981DDA51466E0F",
+        "purpose": "Exact plan material for the deep-path reproduction campaign before compact staging."
+      },
+      {
+        "path": ".mir/evidence/archive/mir3-term-experiments/MIR3-TERM-0012/2.5.5-plan-v6-compact-control.json",
+        "sha256": "18B42CD7FAF2D2D2A5B9B52A8451BF97B11148D780BB1E30E64C974FD6C89357",
+        "purpose": "Exact plan material for the compact-staging control campaign."
+      }
+    ],
+    "raw_process_log_status": "No independent durable raw Factorio process-log set was retained outside the disposable calibration worktree; the archived plans and immutable experiment commit preserve diagnostic provenance, but fresh canonical runs are required for final evidence."
+  },
+  "retention": {
+    "active_branch_required_until_finding_closed": true,
+    "archive_after_mir3_closure": "retain-commit-in-git-bundle-or-archive-tag"
+  }
+}

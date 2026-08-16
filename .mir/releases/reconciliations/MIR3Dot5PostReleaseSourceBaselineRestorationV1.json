@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5PostReleaseSourceBaselineRestorationV1",
+  "status": "complete",
+  "recorded_at": "2026-08-08T23:16:10.9199769+10:00",
+  "release": "3.2.5",
+  "candidate_id": "C32",
+  "purpose": "Restore the development line's package-visible roots to the immutable published C32 source after package-excluded post-release documentation work changed README.md.",
+  "published_baseline": {
+    "package_source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+    "package_source_tree": "a038ba1bcce347c53ee906d466279854c5a8d485",
+    "package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "bytes": 1056249,
+    "entries": 301
+  },
+  "observed_drift": {
+    "base_commit": "391684ffe5822dbadc0b6644d22fd9640ee0ffa8",
+    "package_source_sha256": "82E0B23334C468898AD333B1469B583FD5CC17E82724105A15181248A637F791",
+    "changed_package_paths": [
+      "README.md"
+    ],
+    "classification": "package-visible-documentation-drift-with-no-published-archive-mutation"
+  },
+  "restoration": {
+    "commit": "a49fd446d39f80971a5afb32fe83a7b8d48ad595",
+    "tree": "ddc95a44ccfa1bf485d5c4d57a5eeb504b538b71",
+    "restored_package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "package_root_delta_from_c32": [],
+    "published_archive_replaced": false
+  },
+  "proof": {
+    "regression": "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+    "regression_red_observation": {
+      "expected_package_source_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "observed_package_source_sha256": "82E0B23334C468898AD333B1469B583FD5CC17E82724105A15181248A637F791"
+    },
+    "deterministic_rebuilds": 2,
+    "rebuild_archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+    "rebuild_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+    "rebuild_bytes": 1056249,
+    "rebuild_entries": 301,
+    "matches_committed_dist": true
+  },
+  "scope_firewall": {
+    "product_change": false,
+    "candidate_assigned": false,
+    "release_history_rewritten": false,
+    "future_package_visible_release_documentation_permitted": false,
+    "override_policy": "A published-current-version source mismatch is never a normal validation override. A future restoration must use an explicit package-excluded restoration authority, reproduce the drift, restore the recorded source exactly, and prove deterministic equality to the immutable public archive."
+  }
+}

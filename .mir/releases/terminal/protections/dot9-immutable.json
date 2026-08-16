@@ -1,0 +1,1 @@
+{"name":"MIR3 terminal dot9 immutable tags","target":"tag","enforcement":"active","bypass_actors":[],"conditions":{"ref_name":{"include":["refs/tags/3.2.9","refs/tags/2.5.9","refs/tags/1.9.9","refs/tags/1.8.9","refs/tags/1.7.9","refs/tags/1.6.9","refs/tags/1.5.9","refs/tags/1.4.9","refs/tags/1.3.9"],"exclude":[]}},"rules":[{"type":"update"},{"type":"deletion"}]}

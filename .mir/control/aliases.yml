@@ -1,0 +1,392 @@
+schema: 1
+authority: mir-repository-path-aliases-v1
+
+aliases:
+  - from: approved-delta/
+    to: releases.deltas
+    mode: historical-read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/candidate-closures/
+    to: releases.closures
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/release-transitions/
+    to: releases.transitions
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/backports/
+    to: releases.backports
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/generated/
+    to: views.root
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/changes/
+    to: lifecycle.changes
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/incidents/
+    to: lifecycle.incidents
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/tasks/
+    to: lifecycle.tasks
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/2.4.9.json
+    to: releases.records
+    suffix: 2.4.9.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/2.5.0.json
+    to: releases.records
+    suffix: 2.5.0.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/3.2.1.json
+    to: releases.records
+    suffix: 3.2.1.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/3.2.2.json
+    to: releases.records
+    suffix: 3.2.2.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/3.2.3.json
+    to: releases.records
+    suffix: 3.2.3.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/3.2.4.json
+    to: releases.records
+    suffix: 3.2.4.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/3.2.5.json
+    to: releases.records
+    suffix: 3.2.5.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/releases/current.json
+    to: releases.records
+    suffix: current.json
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: verification/schema/
+    to: spec.schemas
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/claims.json
+    to: spec.compatibility.claims
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/support-lanes.json
+    to: spec.compatibility.lanes
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/expected-failures.json
+    to: validation.assertions.expected-failures
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/known-exclusions.json
+    to: validation.adapters.portal-exclusions
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/expected-scenarios.json
+    to: validation.scenarios.runtime
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/manual-scenarios.json
+    to: validation.scenarios.manual
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/local-library-scenarios.json
+    to: validation.scenarios.local-2.1
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: fixtures/compat-matrix/local-library-scenarios-2.0.json
+    to: validation.scenarios.local-2.0
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: .mir/control-plane/baselines/
+    to: validation.baselines.control
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/MIRAssurance/
+    to: tools.lib.assurance
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/MIRCli/
+    to: tools.lib.cli
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/MIRCompatAudit/
+    to: tools.lib.compatibility
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/MIRControlPlane/
+    to: tools.lib.control
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/localization/
+    to: tools.lib.localization
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Museum/
+    to: tools.lib.museum
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/validation/
+    to: tools.lib.validation
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/mir.ps1
+    to: tools.cli
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Build-MIRPackage.ps1
+    to: tools.commands.package.build
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Measure-MIRPackageComposition.ps1
+    to: tools.commands.package.composition
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Get-MIRLegacyInventory.ps1
+    to: tools.commands.workspace.inventory
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Remove-MIRStaleArtifacts.ps1
+    to: tools.commands.workspace.cleanup
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Format-MIRMarkdown.ps1
+    to: tools.commands.docs.format
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRGeneratedAuthorityDocs.ps1
+    to: tools.commands.docs.authority
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRPipelineDocumentation.ps1
+    to: tools.commands.docs.pipeline
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRREADMEStreamDefaults.ps1
+    to: tools.commands.docs.defaults
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Compare-MIRPlannerReports.ps1
+    to: tools.commands.planner.report-diff
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Compare-MIRPlannerSnapshots.ps1
+    to: tools.commands.planner.snapshot-diff
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Export-MIRPlannerSnapshot.ps1
+    to: tools.commands.planner.snapshot-export
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Minimize-MIRPlannerSnapshot.ps1
+    to: tools.commands.planner.snapshot-minimize
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRCompatibilityPack.ps1
+    to: tools.commands.compatibility.pack
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Convert-MIRCompatAuditResults.ps1
+    to: tools.commands.compatibility.results
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Invoke-MIRCompatAudit.ps1
+    to: tools.commands.compatibility.audit
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRCompatProfileStub.ps1
+    to: tools.commands.compatibility.profile-stub
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRFactorioLineTestAdapter.ps1
+    to: tools.commands.compatibility.line-adapter
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRModInteractionGraph.ps1
+    to: tools.commands.compatibility.interaction-graph
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Build-MIRMuseumTarget.ps1
+    to: tools.commands.museum.build
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRMuseumQualification.ps1
+    to: tools.commands.museum.qualification
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRMuseumSeal.ps1
+    to: tools.commands.museum.seal
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Compare-MIRTechnologyDesigns.ps1
+    to: tools.commands.technology.design-diff
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Export-MIRCompilerPreview.ps1
+    to: tools.commands.technology.preview-export
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Export-MIRTechnologyCatalog.ps1
+    to: tools.commands.technology.catalog-export
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRTechnologyLifecycleRecord.ps1
+    to: tools.commands.technology.lifecycle-record
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRTechnologyQualityAssessment.ps1
+    to: tools.commands.technology.quality-assessment
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRTechnologyReviewDossier.ps1
+    to: tools.commands.technology.review-dossier
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRTechnologyGovernance.ps1
+    to: tools.commands.technology.governance
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Invoke-MIRRuleSynthesis.ps1
+    to: tools.commands.technology.rule-synthesis
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Invoke-MIRControlPlane.ps1
+    to: tools.commands.control.facade
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Invoke-MIRControlPlaneWork.ps1
+    to: tools.commands.control.work
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/New-MIRVerificationContext.ps1
+    to: tools.commands.control.context
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRExecutionRegistry.ps1
+    to: tools.commands.control.registry
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRObservationReplay.ps1
+    to: tools.commands.control.replay
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRShadowAnalysis.ps1
+    to: tools.commands.control.shadow-analysis
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRShadowBaselines.ps1
+    to: tools.commands.control.shadow-baselines
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Sync-MIRTargetProfiles.ps1
+    to: tools.commands.targets.sync
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRCompilerAuthorities.ps1
+    to: tools.commands.compiler.authorities
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: scripts/Update-MIRLocales.ps1
+    to: tools.commands.localization.update
+    mode: read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: artifacts/
+    to: workspace.build.results
+    mode: local-read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: out/
+    to: workspace.build.results
+    mode: local-read-only
+    introduced: 3.2.5
+    sunset: 3.3.0
+  - from: tmp/
+    to: workspace.build.tmp
+    mode: local-read-only
+    introduced: 3.2.5
+    sunset: 3.3.0

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.15 exact-candidate retention fresh reload proof grammar",
+  "exit_code": 0,
+  "harness_error": "Factorio fresh-reload exited without benchmarked loaded-map proof",
+  "target_branch": "rebuild/0.15",
+  "factorio_binary_version": "0.15.40",
+  "target_candidate_sha256": "131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB",
+  "positive_proof": [
+    "Loading mod more-infinite-research 1.5.0",
+    "Loading map",
+    "Map version 0.15.40-0",
+    "Checksum for script __more-infinite-research__/control.lua",
+    "Goodbye",
+    "process exit code 0",
+    "zero surviving Factorio processes"
+  ],
+  "root_cause_classification": "portable-retention-proof-grammar",
+  "root_cause": "Factorio 0.15 completes a one-tick benchmarked load without emitting the newer Performed 1 updates console line into factorio-current.log.",
+  "fix": "Use version-stable loaded-map markers: MIR load, Loading map, Map version, Goodbye, and process exit code 0.",
+  "candidate_implication": "Retention must be rerun before the 1.5.0 candidate is resealed; no published version is affected."
+}

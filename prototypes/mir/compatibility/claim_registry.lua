@@ -120,7 +120,7 @@ M.claims = {
     mod = "AdvancedBeltsSA",
     doc = "docs/compatibility/targets/advanced-belts-sa.md",
     claim_level = "partial-support",
-    maturity = "unverified",
+    maturity = "fixture-qualified",
     behavior = "generated",
     scope = "partial-family",
     public_claim = "belt-family crafting productivity only",
@@ -137,7 +137,7 @@ M.claims = {
     diagnostic_only = {
       "belt-throughput",
       "upgrade-planner",
-      "native-factorio-2.0-load-pending"
+      "factorio-2.1-full-archive-load"
     }
   },
   {

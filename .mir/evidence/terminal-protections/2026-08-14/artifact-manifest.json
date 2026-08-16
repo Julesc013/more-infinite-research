@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalProtectionEvidenceManifestV1",
+  "captured_at": "2026-08-14T06:07:59.6939367Z",
+  "repository": "Julesc013/more-infinite-research",
+  "artifacts": [
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-branch-ruleset-response.json",
+      "sha256": "F79AE2B3ABA66E30643F7F71AED7BFEA1C22EEED21804A0A26234B7C930A950E",
+      "bytes": 738
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-branch-deletion.txt",
+      "sha256": "269192A9427AC879290DCE25753F301D68331D9BF03B9C7231E4A4AF2AF4F3CE",
+      "bytes": 257
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-branch-fast-forward-update.txt",
+      "sha256": "0B718A29BB6DA5B9585212693AF0D4C18EBA8A8E5FC63F9A79C8D4CA90D759CB",
+      "bytes": 273
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-branch-non-fast-forward-update.txt",
+      "sha256": "EC4A0B204ADC49920AB060F1876E51196BC5C5179F1C7B11DC3460B4E09A6482",
+      "bytes": 345
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-tag-creation.txt",
+      "sha256": "CFCB4F72799C8E17EE4F76848E3A4FCE61BBC06D8C26E221EB4029CC873A4373",
+      "bytes": 173
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-tag-deletion.txt",
+      "sha256": "A93D8B883F304D6AD2C5EAFCA3878093B2BFFEF2B6139AE69BB164E4AB995FD8",
+      "bytes": 251
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-negative-tag-update.txt",
+      "sha256": "0B718A29BB6DA5B9585212693AF0D4C18EBA8A8E5FC63F9A79C8D4CA90D759CB",
+      "bytes": 273
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/canary-tag-ruleset-response.json",
+      "sha256": "2FAC48EB3366130FBB719122589FA177E28846AE6FC9CA001427D3AD13F2AE4E",
+      "bytes": 723
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/dev-before.txt",
+      "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+      "bytes": 188
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/effective-dev-rules.json",
+      "sha256": "C68FDA0A3CCB8C149E14D70F6CFB2B25E000F7377A6A17B8D0ACA34F7F1E50DE",
+      "bytes": 1043
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/effective-legacy-rules.json",
+      "sha256": "2B65135D9358D4499E61C471A54EEB13CA7DE48E2D338CB9D1B2AE16721B133A",
+      "bytes": 763
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/effective-main-rules.json",
+      "sha256": "ABC64159218B3D89C3D575A97137FF4A6528ABF619BE529CE94049DBAB5A29FA",
+      "bytes": 763
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/legacy-before.txt",
+      "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+      "bytes": 188
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-dev-integrity.json",
+      "sha256": "880A20083B2B789C50825A8009AA8388053DACF08833DBA36A98E558B604616D",
+      "bytes": 937
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-dev-workflow.json",
+      "sha256": "3095B89C2EE4A896B3BD64544A327624B2A572B8D0BC3C6614E0AC13892BB03C",
+      "bytes": 1024
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-dot5-immutable.json",
+      "sha256": "DEE89A186C1C7DEAC86FB8F42EB5CCF1FFB16415C47CE34D191EA9E8B82AC8A4",
+      "bytes": 818
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-dot9-creation-gate.json",
+      "sha256": "C6F00AB5E001AB06424C6A55CDD2B31B25BBCC68078FEEBD7D24FAE29E05792E",
+      "bytes": 863
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-dot9-immutable.json",
+      "sha256": "25552A3C69A60974A703884AA5558C775CC9E1BE11C8FE854B3AEAC4FE23DE4E",
+      "bytes": 817
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-legacy-integrity.json",
+      "sha256": "8129FB841B976727FE96938CEE7A29B5A4672210F7A0F79FFB8215C57F76060F",
+      "bytes": 943
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-legacy-promotion.json",
+      "sha256": "2D1EF3D6E32AB1E20586A415F1444860FAD9119B6E3DDE6F1F58BCE0D935900B",
+      "bytes": 726
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-main-integrity.json",
+      "sha256": "B1A6D7AC39E4C0E99DEF4847EFC65E906219C88703E3F41B0E1EC1CA0896FC8D",
+      "bytes": 939
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/live-main-promotion.json",
+      "sha256": "5474BA20884B1683C0BB1EC5AC6F3171E01E5676514E88B3EC92D020154FDB79",
+      "bytes": 722
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/main-before.txt",
+      "sha256": "D3D7146DD313CCA44090629D39432983C0700F80B24E77B295609CEB4EF4D26A",
+      "bytes": 188
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/production-dev-direct-same-sha.txt",
+      "sha256": "93420EEC95AF6BC6548118B1D1E02EB741BB1FA383579346AE111CF2AD06290E",
+      "bytes": 295
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/production-dev-force-same-sha.txt",
+      "sha256": "93420EEC95AF6BC6548118B1D1E02EB741BB1FA383579346AE111CF2AD06290E",
+      "bytes": 295
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/production-dot5-update-same-object.txt",
+      "sha256": "503985EC29DB003A5F10DEBA43BEA70DC4F67BF4300CDECBB6B55AA541573F34",
+      "bytes": 358
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/rulesets-after.json",
+      "sha256": "6C344081638BCCDE01B83B7D3EF2CA81C4B26CC94F87444EFDB25DFB3925485C",
+      "bytes": 4517
+    },
+    {
+      "path": ".mir/evidence/terminal-protections/2026-08-14/rulesets-before.json",
+      "sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "bytes": 4
+    }
+  ]
+}

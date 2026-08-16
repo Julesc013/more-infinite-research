@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0016",
+  "title": "Historical target performance proof required current-dev package-source ancestry",
+  "source_observation": {
+    "observed_at": "2026-08-09T13:54:00+10:00",
+    "environment": "Exact immutable 2.5.5 archive on Factorio 2.0.77 under the current canonical performance executor",
+    "fact": "The 2.5.5 historical campaign binds source commit 689940f436b004cf4e5981f1944ddb04eaa17367, while the final dual-parent release record binds 1def5da0d0791149770f84d8bbc4c164c426b7ce. Neither is a dev ancestor, but their package roots have no differences and both independently produce the exact released content SHA-256 047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154. The current runner rejected the proof before Factorio launch solely because it required dev ancestry."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -ExpectedSourceCommit 1def5da0d0791149770f84d8bbc4c164c426b7ce -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "A current-source executor accepts a historical target only when the exact archive, campaign identity, declared campaign source, and released source are package-root equivalent; current campaigns retain their ancestor and dirty-tree checks.",
+    "observed": "The runner rejected the immutable legacy target before execution with 'Package source commit is not an ancestor of the current branch.'"
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; immutable historical target source-authority interpretation only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "current campaigns retain strict ancestry and dirty-tree checks"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "dual-parent historical target proof may use only exact package-root equivalence"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "historical target source authorities remain explicit"}
+  ],
+  "regression_obligations": [
+    "current performance campaigns retain strict package-source ancestry and dirty-tree checks",
+    "a historical target requires exact campaign archive and content identity",
+    "the historical campaign source and released target source have no package-root differences",
+    "both historical source commits independently reproduce the governed package-content SHA-256",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The failure is reproduced before Factorio launch, is limited to immutable historical source authority interpretation, and is correctable without modifying package source or public package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

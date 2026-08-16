@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0022",
+  "title": "Historical compatibility performance invocation omitted its target-era sanitation authority",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:53:00.0000000Z",
+    "environment": "Exact immutable 2.5.0 baseline and 2.5.5 candidate on trusted Factorio 2.0.77",
+    "fact": "The large 2.0 AAI scenario completed its Factorio load successfully, but the current compatibility command defaulted its sanitation budget to the active 2.1 repository authority. The immutable 2.0 worktree has the governed local-2-0-aai-suite budget; it was simply not passed to the command."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "Every historical compatibility lane passes both its declared target-era manual scenario and target-era sanitation policy to the current execution command.",
+    "observed": "After a passing Factorio process, compatibility audit reported no governed sanitation budget for local-2-0-aai-suite because it read the active default authority."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; target-era compatibility policy binding only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "active target continues to use its own sanitation authority"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "Factorio 2.0 compatibility proof receives its immutable sanitation authority explicitly"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "historical compatibility campaigns bind their own policy authority"}
+  ],
+  "regression_obligations": [
+    "historical compatibility invocations pass the target worktree sanitation budget explicitly",
+    "the harness fingerprint records target-era performance budget, sanitation budget, and manual scenario inputs in target scope",
+    "a missing target sanitation policy fails before a claim is accepted",
+    "a governed historical scenario can complete its sanitation claim under the exact target-era policy",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target compatibility performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "This is a missing argument to an existing verifier command. Binding the immutable target policy strengthens evidence and cannot modify package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

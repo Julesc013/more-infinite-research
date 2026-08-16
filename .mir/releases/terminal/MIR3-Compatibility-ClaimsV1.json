@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Compatibility-ClaimsV1",
+  "status": "prequalification-classification-complete",
+  "recorded_at": "2026-08-12T02:30:14.6116953+10:00",
+  "census": ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json",
+  "levels": ["SUPPORTED_EXACT", "COEXISTS_EXACT", "COEXISTS_WITH_INTENTIONAL_STACKING", "LOAD_ONLY", "KNOWN_CONFLICT", "UPSTREAM_BLOCKED", "OBSERVED_ONLY", "UNQUALIFIED"],
+  "dimensions": ["LOAD", "INTEGRITY", "SEMANTIC", "PROGRESSION", "UPGRADE", "CONFIGURATION_CHANGE", "RECOVERY", "INTERACTIVE", "PERFORMANCE"],
+  "claims": [
+    {
+      "id": "tier-a-k2-k2so-2.1-finding-envelope",
+      "mods": ["Krastorio2@2.1.2", "Krastorio2-spaced-out@2.0.13"],
+      "factorio": "2.1.13",
+      "level": "KNOWN_CONFLICT",
+      "dimension_status": {"LOAD": "passed", "INTEGRITY": "failed-semantic-output", "SEMANTIC": "failed", "PROGRESSION": "failed", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["MIR3-TERM-0027", "exact immutable 3.2.5 capture: 73 of 76 generated streams retain an early science pack"],
+      "public_claim_allowed": false,
+      "consequence": "bounded K2SciencePhasePolicyV1 implementation and exact requalification required"
+    },
+    {
+      "id": "tier-a-cubium-2.1",
+      "mods": ["cubium@1.0.30"],
+      "factorio": "2.1.13",
+      "level": "UPSTREAM_BLOCKED",
+      "dimension_status": {"LOAD": "blocked-upstream", "INTEGRITY": "blocked-upstream", "SEMANTIC": "diagnostic-source-only", "PROGRESSION": "diagnostic-source-only", "UPGRADE": "blocked-upstream", "CONFIGURATION_CHANGE": "blocked-upstream", "RECOVERY": "blocked-upstream", "INTERACTIVE": "blocked-upstream", "PERFORMANCE": "blocked-upstream"},
+      "evidence": ["https://github.com/ZacharyDK/Cubium/issues/27", "local exact portal archive source lock E7282BF8DF12A5D256934B84B84711703B17A5224FB1D7409202411C9FD54FB4"],
+      "public_claim_allowed": false,
+      "consequence": "a 2.1 shim may be diagnostic only; no unmodified 2.1 support claim"
+    },
+    {
+      "id": "tier-a-cubium-2.0",
+      "mods": ["cubium@1.0.28"],
+      "factorio": "2.0",
+      "level": "UNQUALIFIED",
+      "dimension_status": {"LOAD": "pending-exact-archive", "INTEGRITY": "pending", "SEMANTIC": "pending", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "pending", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["portal SHA-1 ed180a11e7cfecc7d1f21395b10e0965e89dd494; authenticated acquisition pending"],
+      "public_claim_allowed": false,
+      "consequence": "generic MIR-owned alternate-route fixtures do not substitute for direct Cubium proof"
+    },
+    {
+      "id": "tier-a-productivity-through-science-1.1.0-static",
+      "mods": ["productivity-through-science@1.1.0"],
+      "factorio": "2.1",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "not-tested-current-census", "INTEGRITY": "static-source-observed", "SEMANTIC": "intentional-stacking-pending", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "pending", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact portal SHA-1 matched local archive; runtime force recipe.productivity_bonus and pts-resync surfaces observed"],
+      "public_claim_allowed": false,
+      "consequence": "COEXISTS_WITH_INTENTIONAL_STACKING requires exact multi-force, reset, save/reload, cap, and owner qualification"
+    },
+    {
+      "id": "tier-a-productivity-research-for-everyone-1.0.9-static",
+      "mods": ["ProductivityResearchForEveryone@1.0.9"],
+      "factorio": "2.1",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-owner-deduplication", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive BF5843B4DD7763EE352DC3D55FA59D650AC500C52690C56C4E5A157478411920"],
+      "public_claim_allowed": false,
+      "consequence": "late external technology creation may overlap MIR recipe effects and requires exact owner qualification"
+    },
+    {
+      "id": "tier-a-productivity-research-for-everyone-fg-1.2.0-static",
+      "mods": ["ProductivityResearchForEveryoneFG@1.2.0"],
+      "factorio": "2.0",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-owner-deduplication", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive 5FF87277B4CE238931967792BA4030A9BBDDEA8A5489A04DFC6CB2D172F50739"],
+      "public_claim_allowed": false,
+      "consequence": "fork remains mutually exclusive with upstream and unqualified with MIR"
+    },
+    {
+      "id": "tier-a-expanded-productivity-research-1.3.8-static",
+      "mods": ["ExpandedProductivityResearch@1.3.8"],
+      "factorio": "2.0",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-owner-deduplication", "PROGRESSION": "pending-prerequisite-and-science-overlap", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive 181F8D1AB93B5ABBBD81BAF8931AC0A93639F263DFD4C8BE9EE865D02CE442EF"],
+      "public_claim_allowed": false,
+      "consequence": "broad technology generation and existing-effect mutation require exact matrix qualification"
+    },
+    {
+      "id": "tier-a-crafting-efficiency-0.3.0-static",
+      "mods": ["crafting-efficiency-2@0.3.0"],
+      "factorio": "2.1",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-owner-deduplication", "PROGRESSION": "pending-prerequisite-selection", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive 06AB1391722C54F3AD44277AA48C859453A303090005DB3695874533E98F16EE", "published changelog regression inputs"],
+      "public_claim_allowed": false,
+      "consequence": "multiple recipe effects and cap bypass remain explicit qualification dimensions"
+    },
+    {
+      "id": "tier-a-remove-productivity-cap-current",
+      "mods": ["remove-productivity-cap@1.2.0-or-1.1.1"],
+      "factorio": "2.1-or-2.0",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending-combination", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-precedence", "PROGRESSION": "pending-cap-derived-levels", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact current archives 9E2094D83ACF335C03AF0CC7254B9F5F56DF53F4ABB15441BB32BE32AABFAA94 and D3819F57F88C7D3B6CC8A2127A79F9438222626A062F8BB5BD654F634EFB53B7"],
+      "public_claim_allowed": false,
+      "consequence": "late all-recipe cap writer must be final owner or classified conflict when MIR override is non-neutral"
+    },
+    {
+      "id": "tier-a-modified-productivity-cap-1.2.2-static",
+      "mods": ["modified-productivity-cap@1.2.2"],
+      "factorio": "2.0",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending-combination", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-precedence-and-recycler-policy", "PROGRESSION": "pending-cap-derived-levels", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive AAFC6805CB9DD7A46B77B6E03059412A549CC6BEED34A6A072180FD667B1CF2E"],
+      "public_claim_allowed": false,
+      "consequence": "neutral MIR must preserve its preexisting cap/recycler result; non-neutral overlap needs explicit precedence"
+    },
+    {
+      "id": "tier-a-unlimited-productivity-fork-2.1.0-static",
+      "mods": ["UnlimitedProductivityFork@2.1.0"],
+      "factorio": "2.1",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending-combination", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-cap-module-beacon-precedence", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive E590095F00EA58BABE920493DB3A44ED8D30B99626D5D51BBD2E4904ED9ECD85"],
+      "public_claim_allowed": false,
+      "consequence": "late broad permissions writer requires exact final-owner and positive-loop qualification"
+    },
+    {
+      "id": "tier-a-fair-unlimited-productivity-current",
+      "mods": ["fair-unlimited-productivity@1.0.5-or-1.0.3"],
+      "factorio": "2.1-or-2.0",
+      "level": "UNQUALIFIED",
+      "dimension_status": {"LOAD": "pending-exact-archive", "INTEGRITY": "pending", "SEMANTIC": "pending", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "pending", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["portal metadata only"],
+      "public_claim_allowed": false,
+      "consequence": "no compatibility inference from the mod summary"
+    },
+    {
+      "id": "tier-a-science-not-invited-current",
+      "mods": ["science-not-invited@2.1.0-or-2.0.2"],
+      "factorio": "2.1-or-2.0",
+      "level": "UNQUALIFIED",
+      "dimension_status": {"LOAD": "pending-exact-archive", "INTEGRITY": "pending", "SEMANTIC": "pending", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "pending", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["portal metadata only"],
+      "public_claim_allowed": false,
+      "consequence": "science removal and cost redistribution need exact post-MIR ordering proof"
+    },
+    {
+      "id": "tier-a-science-cost-tweaker-current",
+      "mods": ["ScienceCostTweakerM@2.1.0-or-2.0.4"],
+      "factorio": "2.1-or-2.0",
+      "level": "UNQUALIFIED",
+      "dimension_status": {"LOAD": "pending-exact-archive", "INTEGRITY": "pending", "SEMANTIC": "pending", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "pending", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["portal metadata only"],
+      "public_claim_allowed": false,
+      "consequence": "no generic research-cost or science-overhaul claim"
+    },
+    {
+      "id": "tier-a-productivity-technology-limit-0.0.2-static",
+      "mods": ["productivity-technology-limit@0.0.2"],
+      "factorio": "2.0",
+      "level": "OBSERVED_ONLY",
+      "dimension_status": {"LOAD": "pending-combination", "INTEGRITY": "static-source-observed", "SEMANTIC": "pending-final-max-level", "PROGRESSION": "pending", "UPGRADE": "pending", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "pending", "INTERACTIVE": "pending", "PERFORMANCE": "pending"},
+      "evidence": ["exact archive A547595D6DADD05EE4330AE070DC2FF99F2520C1DE3F7F8AB4F242D0F6DCDC14"],
+      "public_claim_allowed": false,
+      "consequence": "post-MIR max-level ownership must be observed in an exact 2.0 combination"
+    },
+    {
+      "id": "tier-a-finite-prod-techs-0.1.1-narrow",
+      "mods": ["finite_prod_techs@0.1.1"],
+      "factorio": "2.1.9",
+      "level": "COEXISTS_EXACT",
+      "dimension_status": {"LOAD": "passed", "INTEGRITY": "passed", "SEMANTIC": "passed-narrow-load-after-max-level", "PROGRESSION": "not-broadly-claimed", "UPGRADE": "not-broadly-claimed", "CONFIGURATION_CHANGE": "not-applicable", "RECOVERY": "not-broadly-claimed", "INTERACTIVE": "not-broadly-claimed", "PERFORMANCE": "not-broadly-claimed"},
+      "evidence": ["spec/compatibility/claims.json", "docs/compatibility/targets/finite-prod-techs.md"],
+      "public_claim_allowed": true,
+      "consequence": "claim is limited to upstream hidden load-after post-processing; MIR does not own the finite-level formula"
+    }
+  ],
+  "publication_rule": "only rows with public_claim_allowed true may be represented publicly, with their exact envelope and dimensions"
+}

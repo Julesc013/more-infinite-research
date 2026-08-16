@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-018-FeasibilityGateV1",
+  "status": "not-run-nonblocking",
+  "default_1_8_9_target": "Factorio 1.0.0 only",
+  "preferred_bridge_condition": "One exact 1.8.9 ZIP passes both complete Factorio 1.0 and 0.18 target contracts without weakening either.",
+  "success_disposition": "record-dual-target-claim-with-exact-evidence",
+  "fallback_disposition": "retain-1.8.9-as-1.0-only-and-record-0.18-retirement-or-archive",
+  "may_create_0_18_dot9_package": false,
+  "blocks_terminal_family": false
+}

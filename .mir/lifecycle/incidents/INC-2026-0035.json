@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0035",
+  "title": "Pyanodon casting unlock startup failure",
+  "external_issue": "https://github.com/Julesc013/more-infinite-research/issues/35",
+  "state": "released",
+  "failing_environment": {
+    "target": "2.1",
+    "candidate": "3.2.1",
+    "closure": "Pyanodon 15-mod exact lock"
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "evidence": ".mir/evidence/3.2.2-py-exact-lock.json"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "MIR finalized before Pyanodon postprocessing removed the recipe, leaving a stale technology unlock target."
+  },
+  "repair_changes": [
+    "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  ],
+  "regression_propositions": [
+    "casting-gear recipe is absent",
+    "casting-mk02 has no dangling casting-gear unlock",
+    "all remaining technology effects are valid",
+    "external sanitation prunes remain zero"
+  ],
+  "affected_releases": [
+    "3.2.2",
+    "2.5.0"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "evidence": ".mir/evidence/3.2.2-py-exact.json",
+    "evidence_sha256": "32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00"
+  },
+  "closure": {
+    "status": "pending-external-issue-close",
+    "proof_required": "exact release identity and exact Py lock"
+  }
+}

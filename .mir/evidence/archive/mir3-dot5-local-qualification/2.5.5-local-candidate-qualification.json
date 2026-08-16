@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MirLocalCandidateQualificationV1",
+  "status": "local-candidate-qualified",
+  "release": "2.5.5",
+  "candidate_id": "2.5-P12",
+  "target": "2.0",
+  "qualified_at": "2026-08-07T01:16:40.1310572Z",
+  "package_source_commit": "689940f436b004cf4e5981f1944ddb04eaa17367",
+  "package_source_tree": "512f6d74d67f99526211247e7ede09b8619f7f3f",
+  "qualification_source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
+  "qualification_source_tree": "723201b02bdf8707f40fa7fbfcf83e738934fd69",
+  "candidate": {
+    "path": "build/candidates/2.5.5/a/more-infinite-research_2.5.5.zip",
+    "archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+    "content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+    "bytes": 1055047,
+    "entries": 300,
+    "deterministic_double_build": true
+  },
+  "engine": {
+    "version": "2.0.77.84539",
+    "path": "D:/Programs/Factorio/2.0/bin/x64/factorio.exe",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "predecessor": {
+    "version": "2.5.0",
+    "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+    "archive": "dist/more-infinite-research_2.5.0.zip",
+    "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1"
+  },
+  "verification": {
+    "plan_material_sha256": "EB83B35135C3C0DBF171726F63FB6A0850A56C4DD8585960E73715E28A9E5E48",
+    "plan_path": "build/reports/release/2.5.5/verification-plan.json",
+    "plan_sha256": "E362C65F344B4027444A32EA298A4E1BE58AB99DB61622801810B626DF21B51B",
+    "result_path": "build/reports/release/2.5.5/verification-result.json",
+    "result_sha256": "AD31BE832BB185C24AB36D161B5E68CA7213F1A5F9EDF0314100D28167AB7647",
+    "expected": 98,
+    "executed": 98,
+    "reused": 0,
+    "failed": 0,
+    "incomplete": 0,
+    "unexpected": 0
+  },
+  "performance": {
+    "status": "passed",
+    "path": "build/reports/release/2.5.5/performance-regression.json",
+    "sha256": "9F853427EBA2C3538D37E3F12A554AC2612707142AAAD6C8C3EEF166EA6F40CA",
+    "lanes": 6,
+    "telemetry": "omitted-by-capability:mod_data"
+  },
+  "upgrade": {
+    "status": "passed",
+    "archetypes": 5,
+    "path": "build/reports/release/2.5.5/upgrade-matrix-focused.json",
+    "sha256": "7EB53116214F61B23DAC3D9A57DF9153818AE24BD0A110122B8A99AA6873CE33"
+  },
+  "approved_delta": {
+    "status": "passed",
+    "intentional": 709,
+    "unapproved": 0,
+    "path": "approved-delta/2.5.0-to-2.5.5.json",
+    "sha256": "C55C5BB8DBE6C161337F1D13C296288E354F5AB63E44F59DF03C390E7B2C8A5E"
+  },
+  "target_disposition": {
+    "path": ".mir/backport-portable-delta-3.2.5-to-2.5.5.json",
+    "sha256": "9DE2BEC9BAEA11D17C1515C3FB1EA2185903851553DE1F8989FCA308C863663E"
+  },
+  "qualification_root_sha256": "714FC0F54F316C89C478D946BC24DEAAC8E0389C5CB72C2DC5961753115524FE",
+  "protected_qualification": "pending-post-outage",
+  "public_verification": "pending",
+  "final_tag": "blocked-pending-immutable-local-3.2.5-source-parent"
+}

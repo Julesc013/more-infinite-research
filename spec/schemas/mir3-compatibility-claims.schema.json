@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-compatibility-claims.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-compatibility-claims.schema.json",
+  "title": "MIR 3 terminal compatibility claims",
+  "type": "object",
+  "required": ["schema", "kind", "status", "recorded_at", "census", "levels", "dimensions", "claims", "publication_rule"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-Compatibility-ClaimsV1"},
+    "status": {"const": "prequalification-classification-complete"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "census": {"const": ".mir/releases/terminal/MIR3-ModPortal-Compatibility-CensusV1.json"},
+    "levels": {"const": ["SUPPORTED_EXACT", "COEXISTS_EXACT", "COEXISTS_WITH_INTENTIONAL_STACKING", "LOAD_ONLY", "KNOWN_CONFLICT", "UPSTREAM_BLOCKED", "OBSERVED_ONLY", "UNQUALIFIED"]},
+    "dimensions": {"const": ["LOAD", "INTEGRITY", "SEMANTIC", "PROGRESSION", "UPGRADE", "CONFIGURATION_CHANGE", "RECOVERY", "INTERACTIVE", "PERFORMANCE"]},
+    "claims": {"type": "array", "minItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/claim"}},
+    "publication_rule": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "dimensionStatus": {"type": "object", "required": ["LOAD", "INTEGRITY", "SEMANTIC", "PROGRESSION", "UPGRADE", "CONFIGURATION_CHANGE", "RECOVERY", "INTERACTIVE", "PERFORMANCE"], "properties": {"LOAD": {"type": "string"}, "INTEGRITY": {"type": "string"}, "SEMANTIC": {"type": "string"}, "PROGRESSION": {"type": "string"}, "UPGRADE": {"type": "string"}, "CONFIGURATION_CHANGE": {"type": "string"}, "RECOVERY": {"type": "string"}, "INTERACTIVE": {"type": "string"}, "PERFORMANCE": {"type": "string"}}, "additionalProperties": false},
+    "claim": {"type": "object", "required": ["id", "mods", "factorio", "level", "dimension_status", "evidence", "public_claim_allowed", "consequence"], "properties": {"id": {"type": "string"}, "mods": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}, "factorio": {"type": "string"}, "level": {"enum": ["SUPPORTED_EXACT", "COEXISTS_EXACT", "COEXISTS_WITH_INTENTIONAL_STACKING", "LOAD_ONLY", "KNOWN_CONFLICT", "UPSTREAM_BLOCKED", "OBSERVED_ONLY", "UNQUALIFIED"]}, "dimension_status": {"$ref": "#/$defs/dimensionStatus"}, "evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "public_claim_allowed": {"type": "boolean"}, "consequence": {"type": "string"}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

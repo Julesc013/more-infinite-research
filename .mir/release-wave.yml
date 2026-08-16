@@ -297,42 +297,149 @@ waves:
 
   mir_3_2_0:
     version: "3.2.0"
-    branch: dev
+    branch: main
+    development_branch: dev
     target_factorio: "2.1"
     source_anchor: mir_3_1_9
-    candidate_id: C16
+    candidate_id: C20
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
-    archive_class: development-candidate
-    archive_bytes: 1014593
-    archive_sha256: 4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D
-    package_content_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
-    package_source_sha256: 10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7
-    package_source_commit: 0448ceb8d3992082718e2df83bd6a42c56955636
-    superseded_candidate_id: C15
-    superseded_candidate_sha256: 89158F34FF5C46C133A832E15AB6872925F87A481C49457DEBD61D1B808CBFAA
+    archive_class: tagged-published-immutable
+    archive_bytes: 1029464
+    archive_sha256: 35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32
+    package_content_sha256: 26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18
+    package_source_sha256: 26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18
+    package_source_commit: 303de261629149af5f50bd210368e61423f1a299
+    superseded_candidate_id: C19
+    superseded_candidate_sha256: 6592D46C2F3F293770A69C21A59A4CB7A9012D759F2E6D078E62F26BA9BBA6C6
     assurance_policy: mir-verification-v4
     superseded_c11_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
-    superseded_c4_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: pending-exact-c16
-    superseded_c4_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: pending-exact-c16
-    locale_gate: passed-source-unchanged-50-locales-21250-values
-    locale_runtime_gate: pending-exact-c16
+    superseded_c16_approved_delta_evidence: .mir/releases/deltas/3.1.9-to-3.2.0.json
+    exact_approved_delta_gate: not-recorded-exact-c20-before-publication
+    superseded_c16_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+    exact_upgrade_gate: not-recorded-exact-c20-before-publication
+    locale_gate: passed-source-current-50-locales-21300-values
+    locale_runtime_gate: not-recorded-exact-c20-before-publication
     superseded_c4_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
     superseded_c15_runtime_performance_failure: .mir/evidence/3.2.0-c15-performance-campaign-failure.json
-    focused_c16_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
-    c15_to_c16_semantic_parity_evidence: .mir/evidence/3.2.0-c15-to-c16-semantic-parity.json
-    runtime_performance_gate: passed-exact-c16-focused-formal-10-of-10-full-plan-refresh-pending
+    superseded_c16_focused_runtime_performance_evidence: .mir/evidence/3.2.0-c16-focused-performance-regression.json
+    superseded_c16_full_runtime_performance_evidence: .mir/evidence/3.2.0-performance-regression.json
+    superseded_c16_local_automated_qualification: .mir/evidence/3.2.0-c16-local-automated-qualification.json
+    runtime_performance_gate: not-recorded-exact-c20-before-publication
+    ecosystem_gate: not-recorded-exact-c20-before-publication
+    automated_gate: not-recorded-exact-c20-before-publication
     minimum_factorio_gate: passed-floor-raised-to-2.1.11
-    protected_release_gate: pending
-    interactive_gate: pending-exact-c16
-    assurance_seal: pending
-    release_gate: blocked-exact-c16-full-no-reuse-manual-and-protected-qualification
-    publication_status: unreleased
-    status: c16-automated-playtest-candidate-focused-performance-and-semantic-parity-passed
+    protected_release_gate: not-run-before-maintainer-publication
+    interactive_gate: not-recorded-before-maintainer-publication
+    assurance_seal: not-created-before-maintainer-publication
+    superseded_c18_hosted_branch_policy_gate: passed-run-30155405708
+    superseded_c18_hosted_mir_gate: passed-run-30155405710
+    maintainer_release_decision: published-exact-c20-after-fast-validation
+    package_delta_from_c19: journaled-competitor-replacement-realized-graph-requalification-and-productivity-preparation-fix
+    release_gate: maintainer-published-with-recorded-assurance-exceptions
+    publication_status: published-github-asset-verified
+    tag: "3.2.0"
+    tag_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+    release_commit: c8f3d8248cc89b8636cf1ee485fd8889422c6124
+    publication_evidence: .mir/evidence/3.2.0/publication.json
+    status: published-frozen
 
+  mir_3_2_1:
+    version: "3.2.1"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    minimum_factorio: "2.1.8"
+    source_anchor: mir_3_2_0
+    candidate_id: C21
+    canonical_ledger: .mir/releases.json
+    archive: dist/more-infinite-research_3.2.1.zip
+    archive_class: mod-portal-published-github-tag-pending
+    archive_bytes: 1029716
+    archive_entries: 290
+    archive_sha256: 4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6
+    package_content_sha256: 5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188
+    package_source_sha256: 5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188
+    package_source_commit: f3f8cabd0f84be674d5cc190343a9b7df5ba65c5
+    package_source_tree: f3ba606fb152fbf07951f8af52da129c819f0672
+    focused_planet_discovery_gate: passed
+    package_determinism_gate: passed-exact-bytes
+    manual_attestation_gate: maintainer-playtest-approved
+    local_automated_qualification: .mir/evidence/3.2.1-local-automated-qualification.json
+    local_automated_qualification_sha256: EBC221AFC714141476C48954ADA8945DE363978389477895A68357C3CF7C11A2
+    performance_evidence: .mir/evidence/3.2.1-performance-regression.json
+    performance_evidence_sha256: 5D77412F5DFA6782F54178027BD2A9AD08DC184304C393E80F68C896A30DE726
+    automated_gate: passed-local-129-of-129-no-reuse
+    protected_release_gate: failed-run-30229114461-harness-defects-repaired-rerun-pending
+    release_gate: protected-qualification-and-seal-rerun-pending
+    publication_status: published-mod-portal-github-tag-pending
+    status: c21-protected-qualification-rerun-pending
+  mir_3_2_2:
+    version: "3.2.2"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    minimum_factorio: "2.1.8"
+    source_anchor: mir_3_2_1
+    candidate_id: C24
+    canonical_ledger: .mir/releases.json
+    archive: dist/more-infinite-research_3.2.2.zip
+    archive_class: immutable-tagged-release-with-assurance-exception
+    archive_bytes: 1030817
+    archive_entries: 291
+    archive_sha256: 8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8
+    package_content_sha256: 25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F
+    package_source_sha256: 25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F
+    package_source_commit: 29f81addc0eec9b571afd6428c9e3529c4497a1b
+    package_source_tree: afe3959e40c868578f3182bea5b4ce725dcfd222
+    py_finalizer_order_gate: focused-passed
+    affected_planet_recovery_gate: focused-passed
+    package_determinism_gate: passed-exact-bytes
+    minimum_factorio_gate: passed-exact-2.1.8-base-and-space-age
+    minimum_factorio_evidence: .mir/evidence/3.2.2-factorio-2.1.8-floor-smokes.json
+    upgrade_gate: passed-exact-six-archetype-3.2.1-to-3.2.2
+    upgrade_evidence: .mir/evidence/3.2.2-upgrade-proof.json
+    performance_gate: passed-exact-paired-3.2.1-to-3.2.2
+    performance_evidence: .mir/evidence/3.2.2-performance-regression.json
+    performance_evidence_sha256: 4E62CB3BBE25DB26935C7D94D7A8A77C80DE8D857B267611620D67CB8AEFF86B
+    approved_delta: .mir/releases/deltas/3.2.1-to-3.2.2.json
+    exact_py_gate: passed-exact-15-mod-closure-zero-prune
+    exact_py_evidence: .mir/evidence/3.2.2-py-exact.json
+    exact_py_evidence_sha256: 32EC946E955F1D2DED2928CCB5BA2DFFFAE56B2894E4CCA9CAEB161E9FABDA00
+    automated_gate: passed-full-local-no-reuse
+    local_automated_qualification: .mir/evidence/3.2.2-local-automated-qualification.json
+    local_automated_qualification_sha256: AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF
+    manual_attestation_gate: maintainer-patch-review-approved
+    protected_release_gate: not-recorded-before-tag
+    release_gate: immutable-tag-with-recorded-assurance-exception
+    publication_status: tagged
+    tag: "3.2.2"
+    tag_commit: 1138ed55ad7ad42e38cf9e821d1d4e7de5df6378
+    assurance_exception: C24-PROTECTED-SEAL-ABSENT
+    status: c24-tagged-control-plane-calibration-baseline
+  mir_3_2_3:
+    version: "3.2.3"
+    branch: main
+    development_branch: dev
+    target_factorio: "2.1"
+    source_anchor: mir_3_2_2
+    candidate_id: C30
+    archive: dist/more-infinite-research_3.2.3.zip
+    archive_class: immutable-published-release
+    archive_bytes: 1034824
+    archive_entries: 292
+    archive_sha256: 0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2
+    package_content_sha256: 2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9
+    package_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
+    package_source_tree: 222848c6bb3c96fe4641c67cdea12b3581576185
+    publication_evidence: .mir/evidence/3.2.3-publication.json
+    protected_release_gate: pending-post-publication
+    release_gate: timeboxed-maintainer-publication-with-recorded-assurance-exceptions
+    publication_status: published-public-identities-verified
+    tag: "3.2.3"
+    tag_commit: 1abe07573cde814c3cacf6153b5ae64dee4038ba
+    status: published-frozen
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy
@@ -382,7 +489,7 @@ waves:
     size_bytes: 893263
     entries: 209
     forbidden_entries: 0
-    approved_delta_evidence: approved-delta/2.4.5-to-2.4.9.json
+    approved_delta_evidence: .mir/releases/deltas/2.4.5-to-2.4.9.json
     automated_qualification: .mir/evidence/2.4.9-local-automated-qualification.json
     runtime_performance_evidence: .mir/evidence/2.4.9-performance-regression.json
     automated_gate: passed-106-machine-verifiable-92-runtime
@@ -396,31 +503,27 @@ waves:
 
   mir_2_5_0:
     version: "2.5.0"
-    candidate_id: "2.5-P11"
-    branch: tmp/2.0
+    branch: legacy
     target_factorio: "2.0"
     source_anchor: mir_3_2_3
-    portable_source_commit: c1fd8b932c8d916a14925678056e08893b87b2db
-    portable_delta_ledger: .mir/backport-portable-delta-3.2.3-to-2.5.0.json
-    package_source_commit: 493e71a6c883c2e191e1e13c7647cf38a8a8b261
     prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
+    candidate_id: "2.5-P11"
     archive: dist/more-infinite-research_2.5.0.zip
-    sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
+    archive_class: immutable-published-release
+    archive_bytes: 1033875
+    archive_entries: 291
+    archive_sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
     package_content_sha256: 5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1
-    size_bytes: 1033875
-    entries: 291
-    archive_class: automated-playtest-candidate
+    package_source_commit: 493e71a6c883c2e191e1e13c7647cf38a8a8b261
+    package_source_tree: c8c84c7c1797a9378c76984908f516aef2d6d685
     automated_qualification: .mir/evidence/2.5.0-local-automated-qualification.json
-    focused_runtime_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
-    upgrade_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
-    exact_py_evidence: .mir/evidence/2.5.0-local-automated-qualification.json
-    runtime_performance_evidence: .mir/evidence/2.5.0-performance-regression.json
-    approved_delta_evidence: approved-delta/2.4.9-to-2.5.0.json
-    automated_gate: local-automated-passed-exact-p11
-    release_gate: timeboxed-maintainer-publication-authorized-protected-seal-pending-post-publication-exact-p11
     manual_review: .mir/evidence/2.5.0-manual-review-attestation.json
-    protected_qualification: running-post-publication-run-30740083663
     publication_decision: .mir/evidence/2.5.0-timeboxed-publication-decision.json
-    publication_status: timeboxed-maintainer-authorized-awaiting-tag
-    status: exact-p11-local-automated-and-manual-passed-timeboxed-publication-authorized-protected-running-post-publication
+    publication_evidence: .mir/evidence/2.5.0-publication.json
+    protected_release_gate: running-post-publication-run-30740083663
+    release_gate: timeboxed-maintainer-publication-protected-follow-up-running
+    publication_status: published-public-identities-verified
+    tag: "2.5.0"
+    tag_commit: bea21b068fb38dc26479b619454e50d5b4cf4793
+    status: published-frozen-protected-follow-up-running

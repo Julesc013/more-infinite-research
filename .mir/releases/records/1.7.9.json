@@ -1,0 +1,66 @@
+{
+  "assurance_exceptions": [],
+  "branch": "tag-only",
+  "candidate_allocation": {
+    "assigned_at": "2026-08-14T18:05:46+10:00",
+    "assigned_id": "1.7-P1",
+    "assignment_condition": "accepted-family-fixed-point-and-source-freeze",
+    "candidate_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+    "candidate_ref": "refs/heads/candidate/1.7.9-1.7-P1",
+    "minimum_next_ordinal": 1,
+    "namespace": "1.7-P",
+    "predecessor_max_ordinal": 0
+  },
+  "candidate_floor": "1.7-P1",
+  "candidate_id": "1.7-P1",
+  "incident_ids": [],
+  "package": {
+    "archive": "dist/more-infinite-research_1.7.9.zip",
+    "archive_sha256": "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C",
+    "bytes": 385310,
+    "content_sha256": "3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014",
+    "entries": 177,
+    "source_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+    "source_sha256": "3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014",
+    "source_tree": "7b430b8cabd5555f43cdae9136bc141ca866b084"
+  },
+  "portable_source_release": "3.2.9",
+  "programme": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "proofs": {
+    "automated_qualification": ".mir/releases/terminal/qualifications/1.7.9.json",
+    "candidate_allocation": ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json",
+    "candidate_reconstruction": ".mir/releases/terminal/MIR3TerminalCandidateReconstructionReceiptV1.json",
+    "candidate_settings_qualification": ".mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json",
+    "family_readiness": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json",
+    "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-15/github/1.7.9.json",
+    "manual_acceptance": {
+      "family_acceptance_path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+      "family_acceptance_sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4",
+      "path": ".mir/releases/terminal/reviews/1.7.9.json",
+      "sha256": "EA1782D0B2E53DD18193CAB8126CC4BCF4ED76DEEF733078A5685B68DCAA3AE0",
+      "digest_policy": "utf8-lf"
+    },
+    "package_manifest": ".mir/releases/terminal/manifests/1.7.9-package.json",
+    "release_manifest": ".mir/releases/terminal/manifests/1.7.9-release.json",
+    "source_freeze": ".mir/releases/terminal/freezes/1.7.9.json",
+    "target_seal": ".mir/releases/terminal/seals/1.7.9.json",
+    "tag": {"kind":"annotated-tag","name":"1.7.9","commit":"215ccced7018aac70919221c73e15d795f9d1653","tag_object":"e361a73c63ee602764537795de39c9ed28bb9485"}
+  },
+  "release": "1.7.9",
+  "release_notes": "docs/releases/notes/release-notes-1.7.9.md",
+  "remaining_obligations": [
+    "mod-portal-publish-and-publicly-verify",
+    "archive-and-mir4-handoff"
+  ],
+  "schema": 1,
+  "source_release": {
+    "archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A",
+    "content_sha256": "FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D",
+    "release": "1.7.5",
+    "tag": "1.7.5"
+  },
+  "state": "publicly-verified",
+  "target": "0.17",
+  "updated_at": "2026-08-15T17:21:05+10:00"
+}

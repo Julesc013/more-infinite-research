@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0057",
+  "title": "Base-continuation cost migration changes stable coefficient semantics",
+  "external_issue": "internal://upgrade/base-continuation-cost-anchor",
+  "state": "repaired",
+  "failing_environment": {
+    "target": "2.1",
+    "release_line": "3.2.3-to-planned-3.2.5",
+    "surface": "finite-chain base continuation upgrade",
+    "runtime_campaign": "direct five-archetype 3.2.3-to-3.2.5 development upgrade matrix",
+    "observed": "The inserter-capacity-bonus-8 source research cost was 914488. The first 3.2.5 development build interpreted the saved base value 200 as the anchor cost; the first projection repair used raw growth 3.333333333333 and produced 914494 instead of the historical six-significant-digit realization 3.33333."
+  },
+  "reproduction": {
+    "status": "reproduced-by-exact-source-archive-and-engine-execution",
+    "observed": "MIR 3.2.3 emitted coefficient * growth ^ (L - 1) after serializing numeric operands with six significant digits. The unified 3.2.5 planner first copied the stable coefficient directly into anchor base_cost, then an incomplete repair projected the raw unrounded growth value."
+  },
+  "root_cause": {
+    "status": "proven-setting-abi-to-model-anchor-mismatch",
+    "summary": "The stable mir-cost-base-* continuation setting stores a level-one coefficient, and the old emitter defined its realized curve through six-significant-digit operands. ResearchCostModel stores the exact cost at its first controlled level. The migration omitted both the historical numeric boundary and the required coefficient-to-anchor projection."
+  },
+  "repair_changes": [
+    "CHG-2026-0007:project-stable-continuation-coefficient-to-anchor",
+    "CHG-2026-0007:retain-six-significant-digit-continuation-operands",
+    "CHG-2026-0007:retain-neutral-increment-default-parity",
+    "CHG-2026-0007:exact-3.2.3-base-continuation-upgrade-regression"
+  ],
+  "regression_propositions": [
+    "the stable continuation base setting retains its pre-3.2.5 level-one coefficient meaning",
+    "continuation coefficient and growth operands retain their pre-3.2.5 six-significant-digit realization",
+    "the coefficient is projected to the first controlled level before canonical formula compilation",
+    "a zero additive increment reproduces the exact 3.2.3 realized continuation cost",
+    "a nonzero additive increment begins at the projected anchor",
+    "direct 3.2.3-to-3.2.5 upgrade preserves selection level fractional progress and completed unit-equivalent work",
+    "the complete five-archetype upgrade campaign passes against one exact development package"
+  ],
+  "affected_releases": [
+    "3.2.5"
+  ],
+  "candidate_binding": {
+    "planned_candidate_floor": "C32",
+    "candidate_id": "not-assigned",
+    "package_identity": "not-frozen",
+    "package_bytes_changed": true
+  },
+  "closure": {
+    "status": "local-exact-upgrade-proof-passed-pending-hosted-and-breadth",
+    "development_archive_sha256": "E176263EC5AF411D1C77EFBEC959120BA9C22C10D06A53E6B49B09E2B2E276E3",
+    "development_content_sha256": "911DE8D1B427D24B1BAB301E2681F2F44EF040DDDD8CBBA272A29D471DA334C6",
+    "development_plan_material_sha256": "169A1C467E8E85B878B174D36774A61D08BF3DAB934C9E5AF047F6F6DC6534D7",
+    "local_result": "passed deterministic static admission, all five direct 3.2.3-to-3.2.5 upgrade archetypes, exact 914488-to-914488 base-continuation parity, and the independent Space Age native-owner configuration-change scenario",
+    "proof_required": "committed-head focused admission, source-bound hosted regression, and the remaining breadth and release gates before candidate freeze"
+  }
+}

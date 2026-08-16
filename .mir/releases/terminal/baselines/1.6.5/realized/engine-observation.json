@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineFeatureInventoryV1",
+  "release": "1.6.5",
+  "target": "0.16.51",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/1.6.5-engine-observation.json",
+    "dist/more-infinite-research_1.6.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-1.6.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "exact-engine-semantic-observation",
+      "target": "0.16.51",
+      "state": "passed",
+      "origin": "read-only-post-final-fixes-observer",
+      "observed_release": "1.6.5",
+      "source_evidence": [
+        ".mir/evidence/terminal/baselines/1.6.5-engine-observation.json",
+        "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json"
+      ],
+      "target_disposition": "accepted-exact-engine-semantic-observation",
+      "mir4_transition_rule": "retain-as-terminal-input-not-substitute-for-mir4-proof",
+      "attributes": [
+        {
+          "name": "engine_sha256",
+          "value": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"
+        },
+        {
+          "name": "official_data_sha256",
+          "value": "6AF85A0D46F322C656A6B6B5D6C2A5046E878A6572072B1F3A63EAEC4F813D5A"
+        },
+        {
+          "name": "installation_sha256",
+          "value": "549DFB5E6BAE01DD5C535E4F7558C71EF18FC30EF4A9BF85756392B41B2A2E9A"
+        },
+        {
+          "name": "semantic_observation_sha256",
+          "value": "FDA9E1D881655A68530AB80DEB2730B4D1F70E40190D636A7791A702C75EEA7D"
+        },
+        {
+          "name": "smokes",
+          "value": [
+            "base"
+          ]
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

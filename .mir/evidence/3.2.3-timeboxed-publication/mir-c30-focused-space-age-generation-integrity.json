@@ -1,0 +1,58 @@
+{
+  "schema": 2,
+  "run_id": "c246c862-3582-45a4-8dbb-169eb61019b0",
+  "mir_version": "3.2.3",
+  "factorio_version": "2.1",
+  "factorio_binary_version": "2.1.12",
+  "git_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "D58E0E414C12B939049F3948267FDFF4B0A937C1791FE382CC2E8285616D4595",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "AB8106985CAA0D95560B6231CC1142E84A1AF8B0655D8A9865378A65BE6EAEBA",
+  "expected_scenarios": [
+    "space-age-generation-integrity"
+  ],
+  "target_profile_sha256": "9C22F859CF0FEB368A0EADCABF13FB83998B76E3DCAB9CBC85DFF66E8EE925A0",
+  "required_groups_sha256": "AD07C32720FDD9A91F197D4A1419A114AE0BF6110FCE33AC73DDA222E22457A8",
+  "package_source_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+  "validation_package_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+  "validation_package_content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+  "status": "passed",
+  "started_at": "2026-07-30T18:29:22.4002872Z",
+  "completed_at": "2026-07-30T18:29:32.8582806Z",
+  "duration_seconds": 10.458,
+  "current_scenario": null,
+  "required_groups": [
+    "space-age"
+  ],
+  "groups": [
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 10.381,
+      "scenarios": [
+        "space-age-generation-integrity"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "226d943f-9592-455b-8af1-c7b8be3b3e6c",
+      "name": "space-age-generation-integrity",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-30T18:29:22.4117974Z",
+      "completed_at": "2026-07-30T18:29:32.7926251Z",
+      "duration_seconds": 10.381,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-6c45a23e092b46cf954688c2380810c9\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

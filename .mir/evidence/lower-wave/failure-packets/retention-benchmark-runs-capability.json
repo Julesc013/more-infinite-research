@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.16 exact-candidate retention fresh reload",
+  "failed_command": ".\\scripts\\Test-MIRCandidateRetention.ps1 -FactorioBin D:\\Programs\\Factorio\\0.16\\bin\\x64\\factorio.exe -CandidateZip dist\\more-infinite-research_1.6.0.zip",
+  "exit_code": 1,
+  "error": "Option 'benchmark-runs' does not exist",
+  "target_branch": "rebuild/0.16",
+  "factorio_binary_version": "0.16.51",
+  "target_candidate_sha256": "18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544",
+  "root_cause_classification": "portable-target-capability-adapter",
+  "root_cause": "The shared retention harness passed the Factorio 0.17 --benchmark-runs option to earlier binaries that support --benchmark and --benchmark-ticks but not --benchmark-runs.",
+  "fix": "Emit --benchmark-runs only when the declared target line is Factorio 0.17.",
+  "regression": "Test-MIRPowerShellQuality requires benchmark-runs to be gated by the target profile's Factorio line.",
+  "affected_targets": [
+    "0.16",
+    "0.15",
+    "0.14",
+    "0.13"
+  ],
+  "candidate_implication": "The affected candidates require corrected retention reruns and fresh seals; no published version is affected."
+}

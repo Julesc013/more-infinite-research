@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "status": "target-locally-qualified",
+  "release_status": "not-released",
+  "version": "1.7.5",
+  "target": "0.17",
+  "source_commit": "c87818b34ccddb6b0166aeb6aec42887f420e86f",
+  "source_tree": "14464e7220adbebe1d00107e896fc7790932dcc5",
+  "candidate": {
+    "path": "build/candidates/1.7.5/final-a/more-infinite-research_1.7.5.zip",
+    "archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A",
+    "content_sha256": "FC636473B31B428C895D14ADB32122235D603CF7ADEC120C50729F572CFD7C2D",
+    "bytes": 385229,
+    "entries": 177,
+    "deterministic_double_build": true
+  },
+  "factorio": {
+    "version": "0.17.79.47865",
+    "binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"
+  },
+  "plan": {
+    "path": "build/reports/release/1.7.5/verification-plan.json",
+    "sha256": "954DDB0F9C1EBBA93B48C67733764F732964A7990F7BC3F96740E11F3874D1FE",
+    "selected": 12,
+    "unknown_paths": 0,
+    "no_reuse": true
+  },
+  "result": {
+    "path": "build/reports/release/1.7.5/verify-summary.json",
+    "status": "passed",
+    "evidence_rows": 11,
+    "executed": 11,
+    "reused": 0,
+    "failed": 0,
+    "exact_zip_subsumed_by_runtime_full": true,
+    "direct_upgrade": "1.7.1-to-1.7.5-passed",
+    "factorio_processes_after_gate": 0
+  },
+  "promotion": {
+    "local_tag_created": false,
+    "dist_promoted": false,
+    "blocked_on": "immutable-3.2.5-release-lineage"
+  }
+}

@@ -1,0 +1,607 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineCompatibilityInventoryV1",
+  "release": "3.2.5",
+  "target": "2.1",
+  "view": "realized",
+  "observation_capability": "exact-public-asset-read-only-observer-plus-retained-qualified-evidence",
+  "fields_observed": [
+    "archive-identity",
+    "evaluated-setting-defaults-or-explicit-engine-omission",
+    "exact-engine-load",
+    "post-data-final-fixes-prototypes"
+  ],
+  "fields_unavailable": [],
+  "source_evidence": [
+    ".mir/evidence/terminal/baselines/3.2.5-engine-observation.json",
+    "dist/more-infinite-research_3.2.5.zip",
+    "docs/releases/archive/MIR-3.5-PUBLIC-ASSET-VERIFICATION.json",
+    "docs/releases/notes/release-notes-3.2.5.md",
+    "prototypes/mir/streams/generated_stream_manifest.json"
+  ],
+  "items": [
+    {
+      "stable_id": "aai-containers",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "storage content coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "aai-industry",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "mini-overhaul tuning profile"
+        },
+        {
+          "name": "maturity",
+          "value": "observed"
+        },
+        {
+          "name": "behavior",
+          "value": "diagnostic"
+        },
+        {
+          "name": "scope",
+          "value": "single-observation"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "aai-loaders",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "loader crafting productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-aai-loaders",
+            "mir-fixture-assert-aai-loader-belt-productivity"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "AdvancedBeltsSA",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "belt-family crafting productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-assert-advanced-belts-sa-productivity",
+            "mir-fixture-assert-semantic-family-attach",
+            "mir-fixture-semantic-family-attach"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.12"
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-air-scrubbing",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "full family support: clean-filter crafting only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-air-scrubbing",
+            "mir-fixture-assert-air-scrubbing-clean-filter"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-ash",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "ash separation productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-assert-atan-ash-separation",
+            "mir-fixture-atan-ash"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "atan-nuclear-science",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "science-pack recipe productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-assert-atan-nuclear-science-productivity",
+            "mir-fixture-atan-nuclear-science"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "big-mining-drill",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "mining drill recipe productivity only"
+        },
+        {
+          "name": "maturity",
+          "value": "fixture-qualified"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-assert-big-mining-drill-productivity",
+            "mir-fixture-big-mining-drill"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "equipment-gantry",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "equipment-grid automation coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "finite_prod_techs",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "load-after finite productivity cap cooperation"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "finite_prod_techs_0.1.1 source archive load check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "FluidMustFlow",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "pipeline coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "diagnostic"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "jetpack",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "equipment content coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "modules-t4",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "module recipe productivity by final prototype tier"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "generated"
+        },
+        {
+          "name": "scope",
+          "value": "partial-family"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "mir-fixture-assert-prototype-limits",
+            "modules-t4_2.2.2 source archive load check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    },
+    {
+      "stable_id": "robot_attrition",
+      "target": "2.1",
+      "state": "fixture-qualified-at-package-source",
+      "origin": "candidate-bound-claim-evidence",
+      "observed_release": "3.2.5",
+      "source_evidence": [
+        ".mir/evidence/3.2.5-c32-candidate-qualification.json#3F898009131219FC69E661D07701BF061816FA1720B4075A42E76AFBBDEE67E0",
+        "a3bfbc4524b52cede425900e775384eb9c1fc4b3:spec/compatibility/claims.json"
+      ],
+      "target_disposition": "claim-evidence-bound",
+      "mir4_transition_rule": "import-qualified-claim-with-exact-scope",
+      "attributes": [
+        {
+          "name": "claim_level",
+          "value": "runtime balance coexistence only"
+        },
+        {
+          "name": "maturity",
+          "value": "load-checked"
+        },
+        {
+          "name": "behavior",
+          "value": "coexistence"
+        },
+        {
+          "name": "scope",
+          "value": "named-behavior"
+        },
+        {
+          "name": "fixtures",
+          "value": [
+            "release-targeted local repair check"
+          ]
+        },
+        {
+          "name": "tested_factorio",
+          "value": "2.1.9"
+        }
+      ]
+    }
+  ],
+  "omissions": []
+}

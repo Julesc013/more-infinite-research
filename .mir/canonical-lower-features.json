@@ -26,7 +26,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"inserter-stack-size-bonus.png","prerequisite":"inserter-stack-size-bonus-4","evidence_file":"prototypes/technology/technology.lua"},
-      "implementation_paths": {"modern":"prototypes/mir/emit/base_extensions.lua#inserter-capacity-bonus","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"prototypes/mir/emit/base_extensions.lua#inserter-capacity-bonus","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "gun-turret-damage": {
       "stream_id": "finite-direct-effect.gun-turret-damage",
@@ -51,7 +51,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"gun-turret-damage.png","prerequisite":"gun-turret-damage-6","evidence_file":"prototypes/technology/gun-turret-upgrades.lua"},
-      "implementation_paths": {"modern":"omitted-by-capability","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"omitted-by-capability","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "bullet-shooting-speed": {
       "stream_id": "finite-direct-effect.bullet-shooting-speed",
@@ -76,7 +76,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"bullet-speed.png","prerequisite":"bullet-speed-6","evidence_file":"prototypes/technology/bullet-upgrades.lua"},
-      "implementation_paths": {"modern":"omitted-by-capability","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"omitted-by-capability","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "bullet-damage": {
       "stream_id": "finite-direct-effect.bullet-damage",
@@ -101,7 +101,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"bullet-damage.png","prerequisite":"bullet-damage-6","evidence_file":"prototypes/technology/bullet-upgrades.lua"},
-      "implementation_paths": {"modern":"omitted-by-capability","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"omitted-by-capability","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "toolbelt": {
       "stream_id": "finite-direct-effect.toolbelt",
@@ -126,7 +126,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"toolbelt.png","prerequisite":"toolbelt","evidence_file":"prototypes/technology/technology.lua"},
-      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_inventory_capacity","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_inventory_capacity","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "logistic-trash-slots": {
       "stream_id": "finite-direct-effect.logistic-trash-slots",
@@ -151,7 +151,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip"],
       "finite_reconstruction": {"icon":"character-logistic-trash-slots.png","prerequisite":"character-logistic-trash-slots-2","evidence_file":"prototypes/technology/logistic-robot.lua"},
-      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_inventory_capacity","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_inventory_capacity","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "rocket-shooting-speed": {
       "stream_id": "direct-effect.rocket-shooting-speed",
@@ -176,7 +176,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip","weapon-owner.finite"],
       "finite_reconstruction": {"icon":"rocket-speed.png","prerequisite":"rocket-speed-5","evidence_file":"prototypes/technology/technology.lua"},
-      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_rocket_shooting_speed","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"prototypes/streams/direct-effects.lua#research_rocket_shooting_speed","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     },
     "rocket-damage": {
       "stream_id": "finite-direct-effect.rocket-damage",
@@ -201,7 +201,7 @@
       "balance_invariants": ["positive count","nonnegative linear step","positive modifier","bounded finite graph"],
       "tests": ["static.museum","runtime.exact-zip","weapon-owner.finite"],
       "finite_reconstruction": {"icon":"rocket-damage.png","prerequisite":"rocket-damage-5","evidence_file":"prototypes/technology/technology.lua"},
-      "implementation_paths": {"modern":"omitted-by-capability","finite":"scripts/Museum/MuseumCompiler.psm1","museum":"scripts/Museum/MuseumCompiler.psm1"}
+      "implementation_paths": {"modern":"omitted-by-capability","finite":"tools/lib/museum/MuseumCompiler.psm1","museum":"tools/lib/museum/MuseumCompiler.psm1"}
     }
   },
   "projections": {

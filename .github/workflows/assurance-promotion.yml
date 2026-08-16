@@ -9,7 +9,7 @@ on:
       seal_path:
         description: "Tracked candidate seal path"
         required: true
-        default: ".mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json"
+        default: ".mir/evidence/candidate-seals/mir-3.2.1-factorio-2.1.json"
 
 permissions:
   contents: read
@@ -24,4 +24,4 @@ jobs:
           fetch-depth: 0
       - name: Verify sealed bytes and evidence only
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance check-seal --seal '${{ inputs.seal_path }}' --json
+        run: ./tools/mir.ps1 assurance check-seal --seal '${{ inputs.seal_path }}' --json

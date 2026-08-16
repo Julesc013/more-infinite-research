@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalBaselineBundleManifestV1",
+  "release": "1.8.5",
+  "target": "1.0.0-only",
+  "capture_tool": {
+    "path": "scripts/Export-MIRTerminalBaseline.ps1",
+    "version": "2",
+    "sha256": "F1B9B8156A0F26DEB871032FECF5645F3FA0CACA9BF7CB6914A6941F5C528A4C"
+  },
+  "input_identity_sha256": "10A6EC2131365599DCB314BA449376D780A64A09AD6ACD7697C986ED318DF106",
+  "baseline_root_sha256": "2193441BFC20C491234EA0A57EDEA64DFDD483EA97471E209DC3578529DCBB2A",
+  "files": [
+    {
+      "path": "declared/compatibility-claims.json",
+      "sha256": "698511F1C927D425BFB02F0534AC3789447C496A4A9191F22FB3831E828A368F",
+      "bytes": 1186
+    },
+    {
+      "path": "declared/features.json",
+      "sha256": "5B31671E449BFA52DAD8F90434F3B34B47297F0AC91A1D2C9A57BC099420A630",
+      "bytes": 3667
+    },
+    {
+      "path": "declared/locales.json",
+      "sha256": "4E1C7D64AB4161E85251F6F64D0CEECE56B27743527D14A85CBE1F1570973D7B",
+      "bytes": 301963
+    },
+    {
+      "path": "declared/migrations.json",
+      "sha256": "B87EA1C3AA2D52CFB87F9D04858334A9ABA12E1D926BF83DCECBB28B7B39D6FF",
+      "bytes": 1854
+    },
+    {
+      "path": "declared/owners-aliases-tombstones.json",
+      "sha256": "A4C8DB433F97D0AEE3FEF0BA6CABA4CDC1EABE18BEE700F4A659D36C8920DE1D",
+      "bytes": 57576
+    },
+    {
+      "path": "declared/performance.json",
+      "sha256": "8A026834535CC0F5EDF72610A05908ABFBBED1BD0AA7C1A1F9F8310F7B134803",
+      "bytes": 925
+    },
+    {
+      "path": "declared/runtime-profile-schemas.json",
+      "sha256": "829EAABA342959F4BC588B00EC3C1012897FDD3A19798C285EF6BD892FB492AF",
+      "bytes": 7086
+    },
+    {
+      "path": "declared/settings.json",
+      "sha256": "111341DDABA9A0477F050BDA4E403387D0B04C90788B829088EECFC466B87A39",
+      "bytes": 29646
+    },
+    {
+      "path": "declared/technologies.json",
+      "sha256": "D4DBE71318504CBD21B1B73DC4BBAC82EC8CEB9ED5D7F84DD020296D4C20EAB9",
+      "bytes": 74421
+    },
+    {
+      "path": "declared/upgrades.json",
+      "sha256": "C1C3A5ECBD5C6D254B5C05F6623B07321D84D64264E52DB84A70B524A357240D",
+      "bytes": 1022
+    },
+    {
+      "path": "engine-lock.json",
+      "sha256": "F62345C9566D9CF3BE2FE53CBFFBE762D1F9755CBE1A9FB7F763AC7F763EBE67",
+      "bytes": 742
+    },
+    {
+      "path": "identity.json",
+      "sha256": "10A6EC2131365599DCB314BA449376D780A64A09AD6ACD7697C986ED318DF106",
+      "bytes": 951
+    },
+    {
+      "path": "package-composition.json",
+      "sha256": "72404F1A44B986A760863F91F87C51CBFABABA86DEE13920083BFDF1D61A2B3C",
+      "bytes": 36830
+    },
+    {
+      "path": "realized/compatibility-observations.json",
+      "sha256": "4FAA52EB262E2053882B5C82F5D8E2ABA88AA503C9702DBE5F5D49AB515F5635",
+      "bytes": 1125
+    },
+    {
+      "path": "realized/effects-and-owners.json",
+      "sha256": "2D2C9CA432B765BD0B0059C29333A43999A4BE27E340B1066428BA8A8F4967C7",
+      "bytes": 14607
+    },
+    {
+      "path": "realized/engine-observation.json",
+      "sha256": "4011E7F13F4023FCB4DFB02F36B4C42BDB453187E09F14560D2675318C1E9B01",
+      "bytes": 2087
+    },
+    {
+      "path": "realized/locales.json",
+      "sha256": "3D93A09B9C6BAC6EC09AA70AA2B185D84A8C614E4A6CFC4CD07FB8146B9840E6",
+      "bytes": 302256
+    },
+    {
+      "path": "realized/migrations-observed.json",
+      "sha256": "9887C3EFF83B2E1B6CED5D066349FE3246051DE843DD2EA7095535CFC783F2C3",
+      "bytes": 2364
+    },
+    {
+      "path": "realized/performance-observations.json",
+      "sha256": "38F20084F93C2141F72034C7097874F24B5EB84E3F47F50493C84688345F532C",
+      "bytes": 1246
+    },
+    {
+      "path": "realized/runtime-profile-state.json",
+      "sha256": "52BD4708211259C436CA3BCA0178946A00FF54C64E5AF008175734B7373A9EDB",
+      "bytes": 7589
+    },
+    {
+      "path": "realized/settings.json",
+      "sha256": "6DBB7B45395FC99436B4DE02CC77A6F0F8D7A39EAB53A0E34EDCB90FA06D15B8",
+      "bytes": 57472
+    },
+    {
+      "path": "realized/technologies.json",
+      "sha256": "3210D44B8C47787C7B6E82161D8B5878C56750970D9989A924B0150BCBFD55BB",
+      "bytes": 17059
+    },
+    {
+      "path": "realized/upgrade-observations.json",
+      "sha256": "38246F6E62605FA727174F63E2B1FDF6E3B279B2AE9FF2429DA37C0BE0A4A853",
+      "bytes": 1298
+    },
+    {
+      "path": "reconciliation/claimed-vs-realized.json",
+      "sha256": "EB089EDFB5AE728B69D70F3609021370F3C30B058AF913287E1757E5A2DCA6A2",
+      "bytes": 407
+    },
+    {
+      "path": "reconciliation/declared-vs-realized.json",
+      "sha256": "96EABCF7E545F0527907A9FC5015930C714062C92EC2DC06E59EB9EBF4143F3D",
+      "bytes": 507
+    },
+    {
+      "path": "reconciliation/unresolved-findings.json",
+      "sha256": "AC245D02D5021A1213852FF3BD73A8BD92BF4EDC3303E78A87B625D0BDD179FC",
+      "bytes": 341
+    }
+  ],
+  "deterministic_bundle": {
+    "algorithm": "sorted-path-fixed-time-deflate",
+    "builds_required": 2,
+    "build_location": "build/terminal/baselines/1.8.5"
+  },
+  "completion": {
+    "state": "complete",
+    "public_identities_reconciled": true,
+    "required_files_present": true,
+    "inventories_complete_or_capability_omitted": true,
+    "exact_engine_observation_passed": true,
+    "contradictions_classified": true
+  },
+  "record_sha256": "35EE1A00EEB052CD7D39118813EB2C526B9A0CFFA27F55D762E8A86E5C992BE2"
+}

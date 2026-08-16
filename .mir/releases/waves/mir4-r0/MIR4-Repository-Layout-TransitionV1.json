@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Repository-Layout-TransitionV1",
+  "status": "shadow-design-no-physical-cutover",
+  "recorded_at": "2026-08-16T00:15:41.6162739+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-repository-layout-v3-transition",
+  "imports": ["spec/architecture/repository-layout-v2.md", "docs/architecture/current-architecture-matrix.md", ".mir/control/paths.yml", ".mir/control-plane/ownership.json"],
+  "semantic_reads": ["mir3-package-shaped-source", "logical-path-catalog", "module-ownership"],
+  "semantic_writes": ["mir4-layout-transition-graph"],
+  "target_dispositions": {"current-root-package": "canonical-until-parity-cutover", "generated-target-packages": "build-only-shadow", "historical-aliases": "read-only"},
+  "digest_classes": {"semantic": "unchanged-until-owner-cutover", "authority": "layout-transition-record", "qualification": "two-clean-reconstructions-per-cutover"},
+  "migration": {"from": "repository-layout-v2", "to": "repository-layout-v3", "state": "strangler-shadow"},
+  "rollback": {"strategy": "restore-old-writer-and-logical-path-owner", "permitted_until": "old-owner-sunset-receipt"},
+  "parity_test": ["package-tree-equivalence", "semantic-digest-equivalence", "one-writable-owner", "two-clean-reconstructions"],
+  "sunset_condition": "every-live-path-has-v3-owner-and-all-v2-writers-have-sealed-sunset-receipts",
+  "payload": {
+    "stable_cli": "tools/mir.ps1",
+    "target_layout": ["src/semantic", "src/compiler", "src/policy", "src/runtime", "src/presentation", "src/extensions", "platforms/factorio/settings", "platforms/factorio/prototype", "platforms/factorio/runtime", "platforms/factorio/package", "targets", "spec", "tools", "validation", "fixtures", "docs", "archive", ".mir", "build", "dist"],
+    "generated_package_root": "build/packages/<target>/<mod-name>_<distribution-version>",
+    "cutover_fields": ["old-owner", "new-owner", "logical-path-id", "semantic-reads", "semantic-writes", "generated-mapping", "parity-proof", "rollback", "legacy-alias-lifetime", "sunset-condition"],
+    "big_bang_move": false,
+    "src4_parallel_tree": false
+  }
+}

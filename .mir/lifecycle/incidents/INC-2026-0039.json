@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0039",
+  "title": "Static image governance scanned ignored control-plane source overlays",
+  "external_issue": "internal://control-plane/governed-file-enumeration",
+  "state": "regression-proven",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.2",
+    "candidate": "C24",
+    "context_id": "local-static-validation-after-performance-overlay",
+    "task": "static.full"
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "error": "Local image asset is missing an explicit source/license note for out/control-plane-v5/source-overlays/<context>/performance/thumbnail.png.",
+    "failed_after": "control-plane, release-controller, shadow-contract, workflow, documentation, architecture, settings, and legacy-inventory checks passed"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "The image-license check recursively enumerated the physical repository directory instead of Git-governed tracked and non-ignored untracked files. Context-addressed source overlays are intentionally ignored execution staging, so copied package assets were incorrectly reclassified as new repository assets."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:governed-repository-file-enumeration-v1"
+  ],
+  "regression_propositions": [
+    "repository asset validation enumerates git ls-files --cached --others --exclude-standard",
+    "ignored control-plane overlays cannot create false asset-governance failures",
+    "tracked and non-ignored untracked image assets still require explicit source and license records",
+    "complete static validation passes while context-addressed source overlays exist"
+  ],
+  "affected_releases": [
+    "3.2.2"
+  ],
+  "regression_proof": {
+    "repair_commit": "f09bd72ce02000a9ba7f916ba8e92f7a0065bbd5",
+    "plan_id": "A06026D7E353AE948BEAAB4C326B76540E1EDF9A46AB3B827D3803261E0E54B7",
+    "command": "scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+    "overlay_context": "02900F07660DA50D734FE67FEEDD8B88FCF27DC91EE10AEBD6F06B3BA840922F",
+    "result": "passed",
+    "package_archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8"
+  },
+  "candidate_binding": {
+    "candidate_id": "C24",
+    "archive_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+    "content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+    "package_source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b"
+  },
+  "closure": {
+    "status": "closed",
+    "proof_required": "satisfied by complete static validation with populated context-addressed source overlays"
+  }
+}

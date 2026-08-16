@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "release": "3.2.0-dev",
+  "recorded_at": "2026-07-18",
+  "source_commit": "3d4ee88f580fecf5bca9b962a22e42dc06ba0e63",
+  "factorio_version": "2.1.10",
+  "validation": {
+    "run_id": "ba88f682-cb3d-48a9-9333-4bdfaec69724",
+    "status": "passed",
+    "duration_seconds": 264.974,
+    "package_source_git_dirty": false,
+    "validation_harness_git_dirty": false,
+    "package_source_sha256": "B79A896680A529A4C3F4465A266B3D63665160EBA9ED0FB076AE17FAF6F2EE9C",
+    "validation_package_sha256": "BB5CE229BA911FCBE3F30D1ACA834BF81862AFD5B1F807F624E0770C07019448",
+    "validation_package_content_sha256": "B79A896680A529A4C3F4465A266B3D63665160EBA9ED0FB076AE17FAF6F2EE9C",
+    "deterministic_package_sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C"
+  },
+  "scenarios": [
+    {
+      "name": "synthetic-scale-graph",
+      "status": "passed",
+      "duration_seconds": 65.08
+    },
+    {
+      "name": "synthetic-scale-graph-random-order",
+      "status": "passed",
+      "duration_seconds": 69.83
+    },
+    {
+      "name": "synthetic-scale-recipes",
+      "status": "passed",
+      "duration_seconds": 64.84
+    },
+    {
+      "name": "synthetic-scale-recipes-random-order",
+      "status": "passed",
+      "duration_seconds": 65.10
+    }
+  ],
+  "order_invariance": {
+    "graph": {
+      "status": "passed",
+      "coverage_fingerprint": "mir32-e51fd940",
+      "generation_fingerprint": "mir32-3830906e",
+      "compilation_fingerprint": "mir32-52b899ae",
+      "in_memory_fingerprint": "mir32-89b60e19"
+    },
+    "recipes": {
+      "status": "passed",
+      "coverage_fingerprint": "mir32-8f13cfc9",
+      "generation_fingerprint": "mir32-a8af78f3",
+      "compilation_fingerprint": "mir32-c474a4cc",
+      "in_memory_fingerprint": "mir32-e31bb2d9"
+    }
+  },
+  "scale": {
+    "materialized_technology_prototypes": 60000,
+    "materialized_technology_effects": 60000,
+    "materialized_technology_edges": 60000,
+    "in_memory_technology_operations": 100000,
+    "in_memory_technology_effects": 100000,
+    "in_memory_technology_edges": 100000,
+    "large_scc_nodes": 25000,
+    "small_scc_count": 1000,
+    "scc_witness_node_limit": 64,
+    "materialized_structural_candidate_recipes": 1000,
+    "in_memory_canonical_recipe_facts": 100000
+  },
+  "engine_boundaries": {
+    "technology_prototype_id_limit": 65535,
+    "materialized_graph_topology": "shallow-acyclic",
+    "adversarial_scc_execution": "mir-in-memory-iterative-graph-validator",
+    "recipe_scale_execution": "mir-explicit-input-production-canonicalizer"
+  },
+  "claim_level": "development-scale-evidence-not-release-qualification"
+}

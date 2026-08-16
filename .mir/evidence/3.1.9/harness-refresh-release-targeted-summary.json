@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-14T21:26:23+10:00",
+  "repo": "C:\\Projects\\Factorio\\more-infinite-research",
+  "output_root": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\release-targeted-3.1.9-final-harness",
+  "package_output_dir": "dist",
+  "factorio_bin": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_2.1",
+  "repair_smoke_mod_names": [
+    "big-mining-drill",
+    "biolabs-in-space"
+  ],
+  "representative_scenario_name": "local-2-1-bz-suite-space-age",
+  "manual_scenarios_path": "C:\\Projects\\Factorio\\more-infinite-research\\fixtures\\compat-matrix\\local-library-scenarios.json",
+  "audit_factorio_versions": [
+    "2.1"
+  ],
+  "factorio_line": "2.1",
+  "scenario_timeout_seconds": 900,
+  "skip_build": false,
+  "skip_strict_gate": true,
+  "skip_repair_smokes": true,
+  "skip_representative_scenario": false,
+  "no_git_pull": true,
+  "dry_run": false,
+  "git_branch": "main",
+  "git_commit": "d2d6ea086360d0749260d8d36e8558c9971dc523",
+  "git_status": [],
+  "results": [
+    {
+      "name": "representative-local-scenario",
+      "status": "passed",
+      "message": "",
+      "seconds": 129.69
+    },
+    {
+      "name": "package-build",
+      "status": "passed",
+      "message": "",
+      "seconds": 1.17
+    },
+    {
+      "name": "clean-git-status",
+      "status": "passed",
+      "message": "",
+      "seconds": 0.1
+    }
+  ],
+  "failure_message": ""
+}

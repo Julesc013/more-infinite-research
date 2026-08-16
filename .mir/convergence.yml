@@ -1,20 +1,13 @@
 schema: 1
 
 release:
-  version: "2.5.9"
-  branch: candidate/2.5.9-projection
-  factorio_version: "2.0"
-  baseline_commit: 27877275854eb131efeb42672d3676c9c513c85e
-  baseline_tag: "2.5.5"
-  pre_dot5_public_predecessor: "2.5.0"
-  portable_source_release: "3.2.9"
-  portable_source_commit: 5496896914666158ad4056026819528395861540
-  target_profile: "factorio-2.0"
-  target_adapter: "factorio-2.0-science-route-policy"
-  target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64,factorio-2.0-terminal-shadow-qualification-v1@98182f4aa303d7f48339b5e3cf50e56f4dbeb53c,factorio-2.0-terminal-shadow-performance-authority-v1@85598cb326502e6707c1d9d1101dfd42aab56978,factorio-2.0-terminal-shadow-review-authority-v1@0568025c6776470eb96fa0f597be656af406076c,factorio-2.0-validation-userdata-v1@02af30d18db2988a6b1ba724fb56a22317a18474,factorio-2.0-scenario-authority-parity-v1@49daec6d9ce1f20861ca73d28bfe584333433125,factorio-2.0-py-proof-transport-v1@e2bd416e6a38805f221a719f119de22c2a79d516,factorio-2.0-combined-effect-ownership-v1@ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b,factorio-2.0-late-p0-authority-reconciliation-v1@bde8eda3b3ccc59bfe50016a3729531d6dbed44f"
-  objective: target-port-behavioral-subset
+  version: "3.2.10"
+  branch: dev
+  factorio_version: "2.1"
+  baseline_commit: a60230a0695d2dd8fd1e727744614e746cda0bd8
+  baseline_tag: "3.2.9"
+  objective: bounded-correctness-and-contract-modernization
   public_contract_change: patch-compatible
-  terminal_shadow_status: source-unfrozen-candidate-unassigned
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
@@ -164,13 +157,62 @@ superseded_candidates:
     reason: Factorio 2.1.11 dependency floor and stable stream-manifest policy corrections required new package bytes
     status: superseded-locally-qualified-candidate
 
-candidate:
-  artifact: dist/more-infinite-research_3.2.0.zip
-  source_commit: pending
-  automated_gate: pending
-  manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  - source_commit: a3f52a8c5e6c1717bb8f238115b58aa747a08037
+    candidate_id: C25
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 9CFBD0487DCABE05CD09F6EEDC8B9AE80C0A9E49C1C1E24A229DB96F0410EEED
+    package_content_sha256: 4EEAB83CDEAD418E9EBDCC8F43FECA9FAD255F6632A5CF557FFE9E8619B5E793
+    size_bytes: 1032412
+    entries: 291
+    reason: Factorio changelog line-length validation required package-visible source correction
+    status: superseded-unqualified-candidate
 
+  - source_commit: c101f7cfafae8be154b0780142873233a25acd2a
+    candidate_id: C26
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 4DB5B3F8A4CE14CC1A4AEE889103316DAF34F03F19AAFB80C58F2575C5AE444F
+    package_content_sha256: 40060D97708C77E15FD17E67A9030B1F9A2EB70D353345B0AE10A3EE74721223
+    size_bytes: 1032397
+    entries: 291
+    reason: Platform science changed from additive cryogenic to metallurgic-to-cryogenic replacement
+    status: superseded-focused-qualified-candidate
+
+  - source_commit: f5724fe9fd022efe96596264d454ee05a5c9d208
+    candidate_id: C27
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 1562E42208F609AB19CD294415648D035A6E48F16A864988B064AF788AD49310
+    package_content_sha256: 6D39CD382D954E7C524F22AD966B8D1783333F777CF84197E03E042C8D918188
+    size_bytes: 1032404
+    entries: 291
+    reason: bounded structural matching optimization and final progression safety invariants required new package bytes
+    status: superseded-pre-optimization-candidate
+
+  - source_commit: 35b41fdb9969b72c7c5256a42eed4a25de1e9e85
+    candidate_id: C28
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: 662E19300F980EC0BC8890E50C5D446B1B42DCEF22D97B4D77E22E334154D6C1
+    package_content_sha256: 51FB3D79C0B745EE75F00E74A07F2B41DC26F8B5542E9206F77ADD2D98BCF7EB
+    size_bytes: 1034738
+    entries: 292
+    reason: exact Base runtime integrity exposed a stale shipped 2.1 stream-count authority
+    status: superseded-runtime-fixture-rejected-candidate
+  - source_commit: c5d11aab76ffee479ca4aaba3bb8fa4387918762
+    candidate_id: C29
+    artifact: dist/more-infinite-research_3.2.3.zip
+    sha256: BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1
+    package_content_sha256: 4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4
+    size_bytes: 1034738
+    entries: 292
+    reason: exact full runtime validation proved structural fallback ignored the disabled automatic-productivity action
+    status: superseded-runtime-fixture-rejected-candidate
+
+candidate:
+  artifact: dist/more-infinite-research_3.2.10.zip
+  source_commit: 19ddb7db4c960f77aef53d2bb47d23e0f311918f
+  package_source_commit: 19ddb7db4c960f77aef53d2bb47d23e0f311918f
+  automated_gate: passed-local-2.1.14-release-exception
+  manual_gate: accepted-for-publication
+  status: maintainer-accepted-emergency
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

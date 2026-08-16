@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0021",
+  "title": "Exact-load performance proof enforced unavailable compiler telemetry on a target that declares it omitted",
+  "source_observation": {
+    "observed_at": "2026-08-09T14:38:00.0000000Z",
+    "environment": "Exact immutable 2.5.0 baseline launched on trusted Factorio 2.0.77 during the 2.5.5 calibration campaign",
+    "fact": "The exact base load completed successfully and emitted no required MIR_PERFORMANCE_PHASE log events. The 2.0 campaign explicitly has phase_lanes: [] and artifact_volume_policy: omitted-by-capability. The generic runner nevertheless required snapshot, graph, planning, and postconditions phase events; its evidence validator also required modern artifact-volume surfaces, and its settings override declared Factorio 2.1 rather than the governed line."
+  },
+  "reproducer": {
+    "status": "reproduced",
+    "command": ".\\scripts\\Invoke-MIRPerformanceQualification.ps1 -Candidate <exact-2.5.5> -PriorRelease <exact-2.5.0> -FactorioBin <exact-2.0.77> -CampaignPath <immutable-2.5.5-campaign>",
+    "expected": "A campaign requires probe phases and compiler artifact volume only when its governed target capabilities declare them; exact package and compatibility lanes remain mandatory for a target that omits those telemetry capabilities.",
+    "observed": "Factorio created the exact baseline save successfully, then the runner failed with 'Performance probe phase snapshot is absent or invalid'."
+  },
+  "severity": "assurance",
+  "visibility": {"package": false, "gameplay": false, "assurance": true},
+  "stable_id_and_migration_impact": "none; target-tier telemetry interpretation and evidence validation only",
+  "affected_targets": ["3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9"],
+  "target_dispositions": [
+    {"target": "3.2.9", "disposition": "package-excluded-assurance", "reason": "modern declared phase and artifact-volume telemetry remain required"},
+    {"target": "2.5.9", "disposition": "package-excluded-assurance", "reason": "Factorio 2.0 exact load and compatibility proof remain required while unsupported telemetry is honestly omitted"},
+    {"target": "1.9.9", "disposition": "package-excluded-assurance", "reason": "LTS telemetry obligations are governed by target capabilities"},
+    {"target": "1.8.9", "disposition": "package-excluded-assurance", "reason": "LTS telemetry obligations are governed by target capabilities"},
+    {"target": "1.7.9", "disposition": "package-excluded-assurance", "reason": "historical telemetry obligations are governed by target capabilities"},
+    {"target": "1.6.9", "disposition": "package-excluded-assurance", "reason": "historical telemetry obligations are governed by target capabilities"},
+    {"target": "1.5.9", "disposition": "package-excluded-assurance", "reason": "historical telemetry obligations are governed by target capabilities"},
+    {"target": "1.4.9", "disposition": "package-excluded-assurance", "reason": "finite-target telemetry obligations are governed by target capabilities"},
+    {"target": "1.3.9", "disposition": "package-excluded-assurance", "reason": "finite-target telemetry obligations are governed by target capabilities"}
+  ],
+  "regression_obligations": [
+    "a campaign with declared phase lanes requires exactly those probe phases",
+    "a campaign with no phase lanes runs exact package and compatibility lanes without a null or implicit phase requirement",
+    "settings override metadata uses the campaign's declared Factorio line",
+    "a required artifact-volume policy requires only its declared artifact lanes and telemetry counter bounds",
+    "an omitted-by-capability policy records zero artifact-volume measurements and validates as such",
+    "an unsupported telemetry policy or lane fails before release evidence is accepted",
+    "all published .5 archive and normalized-content identities remain unchanged"
+  ],
+  "fixed_point_restart_scope": "historical target performance and assurance proofs only; no package shadow restart",
+  "admission": {
+    "class": "NO_PACKAGE_CHANGE",
+    "status": "admitted",
+    "reason": "The correction aligns the verifier with the already-governed target capability contract; it does not suppress any required Factorio load, compatibility, or package proof and cannot modify package bytes."
+  },
+  "closure": {
+    "status": "closed",
+    "evidence": ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json"
+  }
+}

@@ -41,14 +41,12 @@ end
 
 local function normalized_technology(technology)
   local unit = technology.unit or {}
-  local count_formula = unit.count_formula
-  if count_formula then count_formula = string.gsub(count_formula, "%s+", "") end
   return {
     name = technology.name,
     effects = normalize(technology.effects or {}),
     prerequisites = normalized_names(technology.prerequisites),
     science_ingredients = normalized_ingredients(unit.ingredients),
-    count_formula = count_formula,
+    count_formula = unit.count_formula,
     count = unit.count,
     research_time = unit.time,
     maximum_level = technology.max_level,
@@ -195,7 +193,7 @@ elseif mods and (mods["more-infinite-research"] == "2.4.9"
 elseif mods and mods["more-infinite-research"] == "3.1.9" then
   -- The frozen 3.1.9 baseline predates finalized compiler artifacts and its
   -- registry is not context-scoped. This exact-version adapter exists only to
-  -- reproduce a published baseline side of the governed delta.
+  -- reproduce the sealed baseline side of the governed delta.
   local legacy_registry = require(
     "__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry"
   )

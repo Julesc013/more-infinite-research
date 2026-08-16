@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-23
+last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
 ---
 # Maintainer Guide
 
-Updated: 2026-07-23
+Updated: 2026-08-08
 
 This guide describes the intended 3.0 workflow for adding compatibility without copying generator logic into per-mod files.
 
@@ -20,6 +20,8 @@ Use `docs/architecture/module-boundaries.md` for where new files belong. New shi
 Use [settings governance](settings-governance.md) for startup setting IDs, visibility metadata, provider-gated settings, visible official technology settings, and backport behavior.
 
 Use [local artifact retention and storage](artifact-retention.md) to preserve the shared `testmods_*` libraries while removing completed run staging data safely.
+
+Use the [MIR 3 terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md) as the single release-planning authority. The `.5` packages are immutable; `.6` through `.8` are prohibited; every later MIR 3 correction needs one target disposition before implementation. The archived [follow-up prompt](ultimate-convergence-follow-up-prompt.md) and audit register remain historical context, not executable instructions.
 
 ## Adding Or Moving Shipped Lua
 

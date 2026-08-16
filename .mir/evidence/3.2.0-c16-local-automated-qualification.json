@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "mir-local-automated-playtest-qualification",
+  "candidate_id": "C16",
+  "release": "3.2.0",
+  "target": "2.1",
+  "status": "automated-passed-manual-pending",
+  "package_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
+  "qualification_source_commit": "071a68f827c1ac9c88aa92c6f814e5880d300fa7",
+  "qualification_source_tree": "03342aadcd6f7b7267ccaabebe52f9e0252a3979",
+  "candidate_archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D",
+  "candidate_content_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7",
+  "candidate_bytes": 1014593,
+  "candidate_entries": 288,
+  "plan": {
+    "profile": "full",
+    "reuse_enabled": false,
+    "generated_at": "2026-07-25T01:48:26.7032573Z",
+    "completed_at": "2026-07-25T03:25:44.6880422Z",
+    "plan_file": "out/verification-plan-c16-full-q2.json",
+    "plan_file_sha256": "929972824EA05F3545860BBF53AD254140848CE2583E3A2BDFCD1B4E47DF1B3E",
+    "summary_file": "artifacts/assurance/c16-full-no-reuse-q2-summary.json",
+    "summary_file_sha256": "7FFDBC8A15909BF30FA91FF3B57F7C86A81A61C49D072DFACF5401770A2284EB",
+    "plan_material_sha256": "34EBDEEE9C0FECDC807A4DBE00525306569E402E23A334F1B426BE08534F493F",
+    "required_test_set_sha256": "9CF5D2E1DA18385C05DAB119571F151D81C9F1E05B8156652FCDFC64D6228820",
+    "candidate_descriptor_sha256": "405E3B33C1374F52F7BDD1B6355BC2474916B04CA92DF13F45937CF92635A355",
+    "test_catalog_sha256": "4424AA8F244901A174729D23B853916C9E2D1A7245432E7E8ED82562F23A6609",
+    "validation_harness_sha256": "85E6E0073FA94179943E25203616EA9B82824FD18019B6E0EF3CF9D2B8AAD8BB",
+    "verification_profile_sha256": "39AE389B00CFD2F3B9FB4538C0011C5C2787410460C9D8C5F64E3E0E6DB0BC34",
+    "trust_policy_sha256": "B8D150BC6219C6824C13861361C6BD7ECC43BBFB97D14BA3680601A03C9AE1B0",
+    "domain_policy_sha256": "A0444A1EE9E3A26D87D2B4264FD583FD14562480C58C4E92B0A2E4B61371CBAB",
+    "policy_sha256": "C5AF42687CF31D3755C894EC3E20320291E82C39D0736023321C1E80FE91F7DC"
+  },
+  "result_counts": {
+    "required": 129,
+    "executed": 129,
+    "reused": 0,
+    "automated_passed": 128,
+    "manual_pending": 1,
+    "unexpected": 0
+  },
+  "manual_row": {
+    "test_id": "manual.release-review",
+    "input_key": "13B542654591E77C0AC8FE848AF3D912A3D3ED9FF4095CEAA66EAA4A2C708131",
+    "status": "pending-missing-attestation"
+  },
+  "performance": {
+    "evidence": ".mir/evidence/3.2.0-performance-regression.json",
+    "evidence_sha256": "40399795278C233ADD55FD4D2FC886FA9261F2A7FFE38B8EF1F3655FAB3D1446",
+    "status": "passed",
+    "lanes_passed": 10,
+    "lanes_required": 10
+  },
+  "remaining_gates": [
+    "exact-candidate-gameplay-and-presentation-review",
+    "schema-2-manual-attestation",
+    "protected-no-reuse-qualification",
+    "schema-4-seal-and-independent-check",
+    "promotion-tag-publication-and-download-verification"
+  ]
+}

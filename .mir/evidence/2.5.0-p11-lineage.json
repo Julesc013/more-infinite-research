@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "mir-backport-integrated-successor-lineage",
+  "status": "passed",
+  "target_release": "2.5.0",
+  "target_candidate": "2.5-P11",
+  "target_factorio": "2.0",
+  "baseline_tag": "2.4.9",
+  "baseline_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+  "source_tag": "3.2.3",
+  "source_tag_commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+  "integration_commit": "110290598aadd269dad6aa749ebb38495851b4f2",
+  "integration_parents": [
+    "df669ceb10f3fa703bd2df978a1b51fbfa68ebe3",
+    "1abe07573cde814c3cacf6153b5ae64dee4038ba"
+  ],
+  "integration_tree": "378f65de5699bbf8d2d0c9b4a421d5c5cf7e6b49",
+  "package_source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+  "package_source_tree": "c8c84c7c1797a9378c76984908f516aef2d6d685",
+  "package_source_is_integration_successor": true,
+  "release_tag": "2.5.0",
+  "release_tag_commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+  "archive_sha256": "65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1",
+  "package_content_sha256": "5BBE4D09FD4F65D8A91D2F4AF1664D1C68B846288B9BEF7858162F3F156158F1",
+  "bytes": 1033875,
+  "entries": 291,
+  "statement": "P11 is an exact package source descendant of the target-first 3.2.3 integration and retains both immutable 2.4.9 and 3.2.3 ancestry."
+}

@@ -155,10 +155,12 @@ local function row_fingerprint_material(row)
       owner = adoption.owner,
       operation = adoption.operation,
       configured_fields = adoption.configured_fields,
+      planned_max_level = adoption.planned_max_level,
       effects = adoption.effects,
       input_fingerprint = adoption.input_fingerprint,
       output_fingerprint = adoption.output_fingerprint
     } or nil,
+    planned_max_level = row.planned_max_level,
     technology_design = row.technology_design and {
       schema = design.schema,
       candidate_id = design.candidate_id,

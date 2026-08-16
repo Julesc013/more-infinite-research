@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot5ModPortalCustodyV1",
+  "observed_at": "2026-08-09T01:00:58+10:00",
+  "status": "partial-two-api-visible-redownload-pending-seven-not-uploaded",
+  "portal_api": "https://mods.factorio.com/api/mods/more-infinite-research/full",
+  "identity_policy": {
+    "api_sha1_match_is_upload-observation-not-public-byte-verification": true,
+    "redownload_required_for_archive_sha256-content-sha256-bytes-and-entries": true,
+    "exact_target_engine_smoke_required_after-redownload": true,
+    "published_package_mutation_permitted": false
+  },
+  "observations": [
+    {
+      "version": "3.2.5",
+      "state": "api-visible-sha1-matches-frozen-archive-redownload-pending",
+      "released_at": "2026-08-08T07:39:17Z",
+      "file_name": "more-infinite-research_3.2.5.zip",
+      "download_url": "/download/more-infinite-research/6a76dd2551ecf92677c66406",
+      "portal_sha1": "692639eb08ad104de6468f8b11d009d8d8784378",
+      "frozen_archive_sha1": "692639eb08ad104de6468f8b11d009d8d8784378",
+      "expected_archive_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+      "expected_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+      "expected_bytes": 1056249,
+      "expected_entries": 301,
+      "redownload_verification": "pending-authenticated-operator-download",
+      "exact_engine_smoke": "pending-redownload"
+    },
+    {
+      "version": "2.5.5",
+      "state": "api-visible-sha1-matches-frozen-archive-redownload-pending",
+      "released_at": "2026-08-08T11:47:47.268Z",
+      "file_name": "more-infinite-research_2.5.5.zip",
+      "download_url": "/download/more-infinite-research/6a7717638fa6a8630ec10924",
+      "portal_sha1": "a4b5fa32ac29dd3091ad567dc2f9cedda77c808a",
+      "frozen_archive_sha1": "a4b5fa32ac29dd3091ad567dc2f9cedda77c808a",
+      "expected_archive_sha256": "03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C",
+      "expected_content_sha256": "047B3442067FEA6D43EEE8DE4C79BE6FD265B92A059B546F6EC4D5C986CCF154",
+      "expected_bytes": 1055047,
+      "expected_entries": 300,
+      "redownload_verification": "pending-authenticated-operator-download",
+      "exact_engine_smoke": "pending-redownload"
+    },
+    { "version": "1.9.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "9F044A476500CB72A0C6A9A6254CC702E6621B2CDAEDA04A1188579ADF4AADCC" },
+    { "version": "1.8.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "10BA1F1D0EFDED559F447A05164E8865EE35F527C0A7D65D6CB7B1F8C1C4C1CD" },
+    { "version": "1.7.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "D1B3A3348C8A92C29A43C5D0A495686E3ACF21B186BF3DF9D301B63AB0FEDA0A" },
+    { "version": "1.6.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "8EC9E38E091BE82CC4596414C3B6FFDB3E818FEEA4054547C497F7125FCC99CB" },
+    { "version": "1.5.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "E2060A153B8715755E450AECC825B6C119E2354847D3B041D22DD2E0B5D6FBBD" },
+    { "version": "1.4.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "BD866C6D9C13A2ADFB08F7D3EF1D19912FAE3AF2C6BBDE6FEB8A956E3A1BAB47" },
+    { "version": "1.3.5", "state": "not-uploaded-as-of-observation", "expected_archive_sha256": "78CF6B08E87AC92827926536F3420DDF5695D05E3CA59D83FAF41EBC2E505FB0" }
+  ],
+  "download_attempt": {
+    "performed_at": "2026-08-09T01:00:00+10:00",
+    "result": "blocked-before-artifact",
+    "reason": "portal-download-requires-authenticated-Factorio-session-and-Cloudflare-browser-challenge",
+    "artifact_created": false,
+    "admitted_as_byte_evidence": false
+  },
+  "completion_gate": [
+    "upload-the-seven-absent-exact-dist-archives",
+    "redownload-all-nine-through-an-authenticated-operator-session",
+    "verify-archive-sha256-content-sha256-bytes-and-entries",
+    "run-each-redownloaded-archive-on-its-exact-target-engine",
+    "append-final-portal-publication-receipts-without-replacing-this-observation"
+  ]
+}

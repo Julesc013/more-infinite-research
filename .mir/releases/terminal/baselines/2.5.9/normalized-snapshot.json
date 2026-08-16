@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "kind": "MIR4TerminalNormalizedSnapshotV1",
+  "status": "importable-pre-eol-public-custody-pending",
+  "semantic_authority": false,
+  "release": "2.5.9",
+  "target": "2.0",
+  "successor_target": "MIR4-R0/2.0",
+  "source_identity": {
+    "candidate_id": "2.5-P13",
+    "candidate_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+    "source_tree": "45a3487a28847736d3e25f9a13294cef6c23e5b3",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_2.5.9.zip",
+    "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+    "content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+    "bytes": 1058800,
+    "entries": 301,
+    "tag": "2.5.9"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "qualification": ".mir/releases/terminal/qualifications/2.5.9.json",
+    "status": "exact-engine-qualified"
+  },
+  "predecessors": [
+    {
+      "release": "2.5.5",
+      "role": "immutable-dot5",
+      "upgrade_id": "2.5.5-to-2.5.9"
+    },
+    {
+      "release": "2.5.0",
+      "role": "pre-dot5",
+      "upgrade_id": "2.5.0-to-2.5.9"
+    }
+  ],
+  "foundation": {
+    "release": "2.5.5",
+    "manifest": ".mir/releases/terminal/baselines/2.5.5/baseline-manifest.json",
+    "root_sha256": "6B74589F413C010AA4BF7F8B178C07054315169802EC1A12AA19FAECD3316FF6"
+  },
+  "inventories": {
+    "features": {
+      "package_manifest": ".mir/releases/terminal/manifests/2.5.9-package.json",
+      "package_composition": ".mir/releases/terminal/baselines/2.5.9/package-composition.json",
+      "disposition": "foundation-plus-sealed-terminal-delta"
+    },
+    "technologies": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/technologies.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json",
+      "stable_ids_preserved": true
+    },
+    "settings": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/settings.json",
+      "terminal_audit": ".mir/releases/terminal/MIR3-Settings-Scope-AuditV1.json",
+      "released_id_or_type_changes": 0,
+      "codec": "MIRSET1"
+    },
+    "owners_aliases_tombstones": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/owners-aliases-tombstones.json",
+      "terminal_delta": ".mir/releases/terminal/MIR3TerminalProductImplementationReconciliationV1.json"
+    },
+    "migrations": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/migrations.json",
+      "watermark": {
+        "from": [
+          "2.5.5",
+          "2.5.0"
+        ],
+        "stable_ids": true,
+        "to": "2.5.9"
+      }
+    },
+    "locales": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/locales.json",
+      "package_composition": ".mir/releases/terminal/baselines/2.5.9/package-composition.json"
+    },
+    "runtime_profiles": {
+      "foundation": ".mir/releases/terminal/baselines/2.5.5/declared/runtime-profile-schemas.json",
+      "target_backend": "storage"
+    },
+    "upgrades": {
+      "fixed_point": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+      "qualification": ".mir/releases/terminal/qualifications/2.5.9.json",
+      "required": [
+        "2.5.5-to-2.5.9",
+        "2.5.0-to-2.5.9"
+      ]
+    }
+  },
+  "capability_omissions": [
+    {
+      "field": "feature:productivity_family_adoption",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "prototype-shape:mod_data",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    }
+  ],
+  "compatibility_import": {
+    "authority": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "level_counts": {
+      "COEXISTS_EXACT": 1,
+      "KNOWN_CONFLICT": 1,
+      "OBSERVED_ONLY": 9,
+      "UNQUALIFIED": 4,
+      "UPSTREAM_BLOCKED": 1
+    },
+    "public_claims_allowed": 1,
+    "promoted_claims": 0,
+    "rule": "preserve-level-envelope-dimensions-and-public-permission"
+  },
+  "record_sha256": "957FF3BC563227B2089219FE8939F2766B359E2B293C8583B8C2469404A21F81"
+}

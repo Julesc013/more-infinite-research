@@ -1,0 +1,305 @@
+{
+  "schema": 2,
+  "scenarios": [
+    {
+      "name": "local-2-0-base-baseline",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Base Factorio 2.0 local-library baseline. This loads MIR without third-party local roots."
+    },
+    {
+      "name": "local-2-0-space-age-baseline-if-installed",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Space Age baseline for Factorio 2.0 binaries that include Space Age. If not installed, the audit reports an official-mod dependency failure."
+    },
+    {
+      "name": "local-2-0-bz-suite",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Factorio 2.0 BZ resource suite without assuming the Space Age bundle."
+    },
+    {
+      "name": "local-2-0-bob-core-suite",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "boblibrary",
+        "bobplates",
+        "bobelectronics",
+        "bobtech"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Core Bob scenario for legacy recipe-productivity compatibility checks."
+    },
+    {
+      "name": "local-2-0-angels-core-suite",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "angelsrefining",
+        "angelssmelting",
+        "angelspetrochem",
+        "angelsindustries"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Core Angel scenario for legacy overhaul compatibility checks."
+    },
+    {
+      "name": "local-2-0-bob-angels",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "boblibrary",
+        "bobplates",
+        "bobelectronics",
+        "bobtech",
+        "angelsrefining",
+        "angelssmelting",
+        "angelspetrochem",
+        "angelsindustries"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Combined Bob and Angel legacy scenario. Dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
+    },
+    {
+      "name": "local-2-0-krastorio2",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "Krastorio2"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Krastorio 2 legacy scenario without Space Age assumptions."
+    },
+    {
+      "name": "local-2-0-space-exploration",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "space-exploration"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Space Exploration legacy scenario, resolved from the local 2.0 library if present."
+    },
+    {
+      "name": "local-2-0-pymodpack",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "pymodpack"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "pY pack wrapper scenario for legacy dependency and load evidence."
+    },
+    {
+      "name": "local-2-0-nullius",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "nullius"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Nullius legacy scenario, expected to classify overhaul ownership conservatively."
+    },
+    {
+      "name": "local-2-0-ultracube",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "Ultracube"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Ultracube legacy scenario, resolved from local archives if present."
+    }
+  ]
+}

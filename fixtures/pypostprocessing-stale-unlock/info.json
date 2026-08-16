@@ -4,8 +4,8 @@
   "title": "MIR Fixture - Py Postprocessing Stale Unlock",
   "author": "MIR maintainers",
   "description": "Synthetic ordering fixture that recreates a stale Py unlock in data-final-fixes before MIR sanitation.",
-  "factorio_version": "2.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.0.77"
+    "base >= 2.1.8"
   ]
 }

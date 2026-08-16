@@ -1,0 +1,36 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "generated_at": "2026-07-22T03:17:26.7663324Z",
+  "git_commit": "30b983cdb3f4a6321a8c850dab32dd354c1c75c2",
+  "archetype": "mod-set-configuration-change",
+  "factorio_binary_version": "2.1.11.86962",
+  "factorio_binary_sha256": "E38B9FB580C4DEBF4B5BBB4E76FCF328D667E72792CD29CB52CAB4AB3935FDD3",
+  "from": {
+    "version": "3.1.9",
+    "path": ".\\dist\\more-infinite-research_3.1.9.zip",
+    "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+  },
+  "to": {
+    "version": "3.2.0",
+    "path": ".\\dist\\more-infinite-research_3.2.0.zip",
+    "sha256": "C4B08D603C4F2C5FF74FC956FA2A09C86F216CC5C43AA69E9748DCB21C27A08B"
+  },
+  "source_only_fixtures": [
+    "upgrade-modset-source"
+  ],
+  "assertions": [
+    "startup-profile-retained",
+    "technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load",
+    "source-only-mod-removed",
+    "removed-recipe-target-sanitized"
+  ],
+  "create_log": "3.2.0-upgrade-mod-set-configuration-change-from-3.1.9-create.txt",
+  "create_log_sha256": "58EB4850F7C8926E4B3AE848FE4A10C510AA9314C5F948025E8F6F3E94134DD0",
+  "load_log": "3.2.0-upgrade-mod-set-configuration-change-from-3.1.9-load.txt",
+  "load_log_sha256": "0628972F490CCB1A0A52FC781D11674606B686059A8DB29C6B193F48F446F205"
+}

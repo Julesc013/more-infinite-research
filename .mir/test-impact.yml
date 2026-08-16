@@ -19,13 +19,175 @@
       "tags": []
     },
     {
-      "pattern": ".mir/backport-source-lock.json",
+      "pattern": ".mir/modules.yml",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": ".mir/backport-portable-delta-*.json",
+      "pattern": ".mir/views/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/lifecycle/incidents/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/records/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/reconciliations/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/waves/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/control/paths.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/architecture/repository-layout-v2.md",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/research-cost-contract-3.2.5.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/control/Views.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/validate.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/assurance-*.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".github/workflows/control-plane-v5.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/tooling/Test-MIRVerificationContext.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIRCandidateFreshness.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/control/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/waves/mir4-r0/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/baselines/*.9/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/releases/terminal/closures/*.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/*MIR*TerminalBaseline*.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir4-*.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/control/Evidence.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/mir.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/maintenance/**",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -37,16 +199,52 @@
       "tags": []
     },
     {
-      "pattern": "scripts/Test-MIRAssurance.ps1",
+      "pattern": "validation/tests/tooling/Test-MIRAssurance.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "scripts/Test-MIRReleaseAuthority.ps1",
+      "pattern": "validation/tests/tooling/Test-MIRLayout.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
+    },
+    {
+      "pattern": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/package/Test-MIRArtifactCleanup.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIRGitHubAdministration.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "prototypes/mir/runtime/maximum_level_control.lua",
+      "groups": ["runtime-state", "space-age"],
+      "scenarios": ["generated-maximum-level-absolute", "generated-maximum-level-lowering-config-change", "base-continuation-maximum-level-lowering-config-change", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-max-level-1", "space-age-native-owner-settings-max-level-2", "space-age-native-owner-settings-max-level-7", "space-age-native-owner-settings-max-level-profile-import", "space-age-native-owner-settings-max-level-late-conflict", "space-age-native-owner-cap-lowering-config-change", "space-age-native-owner-cap-raising-config-change", "space-age-native-owner-cap-removal-config-change"],
+      "tags": ["maximum-level"]
     },
     {
       "pattern": "prototypes/mir/domain/native_owner/**",
@@ -108,7 +306,7 @@
       "tags": ["smoke"]
     },
     {
-      "pattern": "scripts/validation/**",
+      "pattern": "tools/lib/validation/**",
       "tags": ["smoke"]
     }
   ]

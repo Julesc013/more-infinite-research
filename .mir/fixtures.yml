@@ -1,7 +1,7 @@
 schema: 1
 
 scenario_manifest:
-  path: fixtures/compat-matrix/expected-scenarios.json
+  path: validation/scenarios/runtime.json
   schema: 3
   declarations: full-records
   record_owns:
@@ -51,8 +51,8 @@ verification_manifests:
       - same-class-reuse
   evidence:
     schema: 4
-    root: artifacts/assurance/evidence
-    schemas: verification/schema
+    root: build/results/assurance/evidence
+    schemas: spec/schemas
     dispositions:
       - REUSE
       - WAIT
@@ -62,14 +62,14 @@ verification_manifests:
 compiler_contract_coverage:
   path: .mir/compiler-contract-coverage.yml
   schema: 1
-  validator: scripts/Test-MIRCompilerContractCoverage.ps1
+  validator: validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1
 
 offline_rule_synthesis:
   authority: .mir/rule-synthesis.json
   corpus: .mir/technology-review-corpus.json
   snapshots: .mir/technology-review-snapshots.json
-  synthesizer: scripts/Invoke-MIRRuleSynthesis.ps1
-  validator: scripts/Test-MIRRuleSynthesis.ps1
+  synthesizer: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
+  validator: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
   validates:
     - all-positive-coverage
     - all-negative-rejection
@@ -82,7 +82,7 @@ mod_interaction_campaigns:
   policy: .mir/mod-interaction-policy.json
   graph: .mir/mod-interaction-graph.json
   campaigns: .mir/combination-campaigns.json
-  validator: scripts/Test-MIRModInteractions.ps1
+  validator: validation/tests/compatibility/Test-MIRModInteractions.ps1
   runtime_scenarios:
     - combination-atan-ash-big-mining-drill
     - combination-space-age-big-mining-drill
@@ -95,11 +95,11 @@ mod_interaction_campaigns:
     - zero-uncovered-overlapping-pairs
 
 local_campaign_manifest:
-  path: fixtures/compat-matrix/local-library-scenarios.json
-  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
-  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
+  path: validation/scenarios/local-2.1.json
+  factorio_2_0_path: validation/scenarios/local-2.0.json
+  shared_manual_path: validation/scenarios/manual.json
   schema: 2
-  validator: scripts/Test-MIRScenarioManifests.ps1
+  validator: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
   record_owns:
     - targets
     - kind
@@ -114,7 +114,7 @@ local_campaign_manifest:
   sanitation_budget:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
-    validator: scripts/Test-MIRSanitationBudgets.ps1
+    validator: validation/tests/release/Test-MIRSanitationBudgets.ps1
     scopes:
       manifest_scenarios: campaigns
       release_targeted_repair_smokes: local_mod_zips
@@ -125,45 +125,31 @@ local_campaign_manifest:
     - local-2-1-aai-loaders-industry
     - local-2-1-aai-representative-extensions
 
-expected_failure_manifest:
-  path: fixtures/compat-matrix/expected-failures.json
-  schema: 1
-  matcher: scripts/Convert-MIRCompatAuditResults.ps1
-  match_fields:
-    - scenario
-    - mod
-    - kind
-    - stream
-    - reason
-  exact_target_observations:
-    - target: "2.0"
-      scenario: local-2-0-base-baseline
-      stream: research_ice
-      reason: no_lab_compatible_science
-      disposition: expected-safe-skip
-
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
     baseline: published-3.0.5
     expected_count: 70
-    validator: scripts/Test-MIRGoldenPlans.ps1
+    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
     release: "3.1.0"
     expected_count: 2
-    validator: scripts/Test-MIRGoldenPlans.ps1
+    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
   release_3_2_technology_ids:
     path: fixtures/golden-plans/3.2.0-technology-ids.json
     release: "3.2.0"
     identity_state: stable-unreleased
     expected_count: 1
-    validator: scripts/Test-MIRGoldenPlans.ps1
+    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
 
 fixture_roots:
   synthetic: fixtures
-  compatibility_matrix: fixtures/compat-matrix
   run_profiles: fixtures/run-profiles
+  local_archive_libraries:
+    factorio_2_1: 'C:\Projects\Factorio\testmods\2.1'
+    factorio_2_0: 'C:\Projects\Factorio\testmods\2.0'
+    factorio_1_1: 'C:\Projects\Factorio\testmods\1.1'
 
 real_mod_gates:
   factorio-2.1-crucible-rigor:
@@ -191,11 +177,9 @@ fixtures:
     path: fixtures/performance-regression-probe
     shipped: false
     validates:
-      - exact-archive-paired-total-load-timing
+      - exact-archive-paired-phase-timing
       - diagnostics-artifact-volume-export
-      - baseline-candidate-symmetric-load
-      - exact-2.4.9-and-2.5.0-version-guard
-      - target-native-telemetry-with-total-load-fallback
+      - baseline-candidate-symmetric-instrumentation
 
   space-exploration-recipe-removal:
     requires_features: [recipe_productivity]
@@ -218,7 +202,7 @@ fixtures:
     assertion_path: fixtures/assert-py-postprocessing-stale-unlock
     external_mod_identity: pypostprocessing
     exact_real_campaign: py-casting-finalizer-repair
-    exact_real_roots: [pypetroleumhandling, pypostprocessing, pyrawores]
+    exact_real_roots: [pyalienlife, pypetroleumhandling, pypostprocessing, pyrawores]
     validates:
       - pypostprocessing-final-fixes-runs-before-mir
       - late-casting-mk02-stale-unlock-reconstruction
@@ -227,8 +211,7 @@ fixtures:
       - exact-single-reviewed-external-sanitation-row
       - zero-additional-unreviewed-prunes
       - final-unlock-recipe-target-integrity
-      - full-sanitation-ledger-when-mod-data-supported
-      - target-native-no-mod-data-transport-when-unsupported
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
@@ -262,6 +245,24 @@ fixtures:
       - shared-pack-production-reachability-cache
       - isolated-context-science-facade-validation
       - closed-compiler-context-assertion-safety
+
+  k2-science-phase-policy:
+    requires_features: []
+    assertion_path: fixtures/assert-k2-science-phase-policy
+    external_mod_identity: Krastorio2-spaced-out
+    exact_real_campaign: local-2-1-krastorio-spaced-out
+    exact_version_envelope:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+    validates:
+      - exact-version-envelope
+      - no-behavior-when-k2-is-absent
+      - no-behavior-outside-the-exact-version-envelope
+      - idempotent-mir-owned-technology-normalization
+      - ingredient-order-shape-and-amount-preservation
+      - nonempty-normalized-ingredient-lists
+      - production-and-utility-basic-card-removal
+      - advanced-space-matter-and-singularity-early-pack-removal
 
   external-technology-cycle:
     requires_features: []
@@ -321,6 +322,9 @@ fixtures:
   effect-scaling:
     requires_features: []
     assertion_path: fixtures/assert-generation-integrity
+    supplemental_paths:
+      - fixtures/assert-base-research-cost
+      - fixtures/assert-stream-research-cost
     validates:
       - primary-base-tier-default-anchor
       - vanilla-continuation-default-anchors
@@ -330,6 +334,8 @@ fixtures:
       - retained-non-default-base-effect-settings
       - typed-stream-effect-contracts
       - declaration-order-invariant-defaults
+      - vanilla-continuation-anchored-linear-cost
+      - generated-stream-anchored-hybrid-cost
       - canonical-descriptor-copy-isolation
       - duplicate-stream-id-rejection
       - overlay-descriptor-injection-rejection
@@ -439,7 +445,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-0
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
     archetypes:
       - base-default
       - space-age-native-owner
@@ -459,13 +465,12 @@ fixtures:
       - independent-result-row-per-upgrade-archetype
       - exact-3-2-0-candidate-normal-mod-directory-load
 
-  upgrade-2-5-0-to-2-5-5:
+  upgrade-3-1-9-to-3-2-1:
     requires_features: [recipe_productivity]
-    targets: ["2.0"]
-    assertion_path: fixtures/assert-upgrade-2-5-0-to-2-5-5
+    assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-1
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
     archetypes:
       - base-default
       - space-age-native-owner
@@ -473,26 +478,119 @@ fixtures:
       - base-continuations
       - mod-set-configuration-change
     validates:
-      - exact-2-5-0-source-archive
+      - exact-3-1-9-source-archive-for-3-2-1
       - base-default-profile-retention
-      - completed-research-unit-work-retention
+      - native-owner-setting-retention
       - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
       - automatic-family-generation-retention
       - base-continuation-retention
       - source-only-compatibility-mod-removal
       - removed-recipe-target-sanitation
       - independent-result-row-per-upgrade-archetype
-      - exact-2-5-5-candidate-normal-mod-directory-load
+      - exact-3-2-1-candidate-normal-mod-directory-load
 
-  upgrade-2-5-5-to-2-5-9:
+  upgrade-3-2-0-to-3-2-1:
     requires_features: [recipe_productivity]
-    targets: ["2.0"]
-    assertion_path: fixtures/assert-upgrade-2-5-5-to-2-5-9
+    assertion_path: fixtures/assert-upgrade-3-2-0-to-3-2-1
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: scripts/Test-MIRUpgradeMatrix.ps1
-    primary_source_version: "2.5.5"
-    additional_source_versions: ["2.5.0"]
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-0-source-archive-for-3-2-1
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-1-candidate-normal-mod-directory-load
+
+  upgrade-3-2-1-to-3-2-2:
+    requires_features: [recipe_productivity, scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-2-1-to-3-2-2
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.1"
+    additional_recovery_source_versions: ["3.2.0"]
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+      - affected-planet-discovery
+    validates:
+      - exact-3-2-1-source-archive-for-3-2-2
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - researched-planet-discovery-restoration
+      - direct-3-2-0-affected-save-planet-restoration
+      - direct-3-2-1-affected-save-planet-restoration
+      - affected-save-starmap-and-travel-recovery
+      - no-force-wide-technology-effect-reset
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-2-candidate-normal-mod-directory-load
+
+  upgrade-3-2-2-to-3-2-3:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-2-to-3-2-3
+    harness: validation/tests/runtime/Test-MIRUpgrade.ps1
+    primary_source_version: "3.2.2"
+    target_candidate: C30
+    archetypes:
+      - space-age-native-owner
+    validates:
+      - exact-3-2-2-source-archive-for-3-2-3
+      - Landfill-and-Ice-level-retention
+      - current-Ice-research-and-fractional-progress-retention
+      - no-automatic-Platform-level-grant
+      - exact-Platform-owner-transfer
+      - no-duplicate-productivity-owner
+      - startup-setting-retention
+      - upgraded-save-reload
+
+  upgrade-3-2-3-to-3-2-4:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-4
+    harness: validation/tests/runtime/Test-MIRUpgrade.ps1
+    primary_source_version: "3.2.3"
+    target_candidate: C31
+    archetypes:
+      - space-age-native-owner
+    validates:
+      - exact-3-2-3-source-archive-for-3-2-4
+      - existing-base-and-growth-setting-retention
+      - zero-default-linear-increment-settings
+      - default-cost-formula-preservation
+      - technology-level-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-storage-retention
+      - upgraded-save-reload
+
+  upgrade-3-2-3-to-3-2-5:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-5
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.3"
     target_candidate: not-assigned
     archetypes:
       - base-default
@@ -501,12 +599,71 @@ fixtures:
       - base-continuations
       - mod-set-configuration-change
     validates:
-      - exact-2-5-5-source-archive-for-2-5-9
-      - exact-2-5-0-source-archive-for-2-5-9
+      - exact-3-2-3-source-archive-for-3-2-5
+      - base-default-profile-retention
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - existing-base-and-growth-setting-retention
+      - zero-default-linear-increment-settings
+      - default-cost-formula-preservation
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - independent-result-row-per-upgrade-archetype
+      - exact-3-2-5-development-archive-normal-mod-directory-load
+      - upgraded-save-reload
+
+  upgrade-3-2-5-to-3-2-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-5-to-3-2-9
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.5"
+    target_candidate: not-assigned
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-5-source-archive-for-3-2-9
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention-without-exact-K2-envelope
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - upgraded-save-reload
+
+  upgrade-3-2-9-to-3-2-10:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-2-9-to-3-2-10
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.9"
+    target_candidate: C34
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-9-source-archive-for-3-2-10
       - stable-generated-technology-identities
       - technology-level-retention
       - current-research-and-completed-work-retention
       - science-ingredient-retention
+      - native-owner-runtime-cap-policy-installation
       - automatic-family-generation-retention
       - base-continuation-retention
       - source-only-compatibility-mod-removal
@@ -522,13 +679,14 @@ fixtures:
       - scaled-known-productivity-competitor
       - external-recipe-productivity-prefix-owner
       - technology-prerequisite-rewire
-      - cross-target-compatibility-pack-applicability
 
   native-owner-settings:
     requires_features: [recipe_productivity]
     path: fixtures/native-owner-settings-source
     assertion_path: fixtures/assert-native-owner-settings
     supplemental_paths:
+      - fixtures/native-owner-fixed-count
+      - fixtures/native-owner-linear-formula
       - fixtures/native-owner-unrecognized-formula
       - fixtures/assert-native-owner-progress
     validates:
@@ -536,10 +694,10 @@ fixtures:
       - unchanged-defaults-preserve-final-owner-snapshots
       - enable-false-leaves-external-owners-untouched
       - base-cost-override
+      - linear-cost-increment-override
       - cost-growth-override
       - research-time-override
       - finite-max-level-override
-      - target-line-compatible-mir-dependency-floor
       - infinite-max-level-default
       - effect-per-level-override
       - combined-owner-override
@@ -552,16 +710,48 @@ fixtures:
       - steel-plate-native-owner
       - fully-covered-owner-still-produces-binding-row
       - target-native-formula-classification
+      - external-fixed-count-default-preservation
+      - external-fixed-count-canonical-override
+      - external-linear-formula-default-preservation
+      - external-linear-formula-canonical-override
       - unrecognized-modded-formula-default-preservation
       - unsafe-unrecognized-formula-override-rejection
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
       - configuration-change-signature-without-global-effect-reset
+      - versioned-research-cost-transition-descriptors
+      - fixed-linear-exponential-hybrid-sixteen-row-transition-matrix
+      - completed-research-unit-work-preservation
+      - malformed-and-over-budget-transition-fail-closed
       - external-give-item-connected-player-manual-review-surface
       - other-mod-configuration-change-recipe-state-preserved
       - configuration-change-current-research-progress-retention
-      - paired-base-growth-setting-semantics
+      - atomic-base-increment-growth-setting-semantics
       - settings-profile-compatible-stable-ids
+
+  maximum-level-runtime-control:
+    requires_features: [scripted_techs]
+    path: fixtures/assert-generated-max-level
+    supplemental_paths:
+      - fixtures/assert-generated-cap-transition
+      - fixtures/assert-base-continuation-cap-transition
+      - fixtures/assert-native-owner-cap-transition
+      - fixtures/assert-native-owner-cap-relaxation
+      - fixtures/late-native-owner-max-level
+    validates:
+      - zero-means-infinite
+      - positive-value-is-absolute-highest-level
+      - generated-stream-cap-enforcement
+      - generated-base-continuation-cap-enforcement
+      - five-native-owner-cap-enforcement
+      - completed-levels-retained-above-lowered-cap
+      - valid-fractional-progress-retained
+      - invalid-current-and-queued-research-removed
+      - cap-raise-restores-future-research
+      - cap-removal-restores-infinite-research
+      - MIRSET1-effective-cap-projection
+      - late-prototype-conflict-reported-and-refused
+      - repeated-reload-idempotence
 
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
@@ -682,15 +872,17 @@ fixtures:
       mod_version: 2.3.3
       source_factorio_line: "2.0"
       source_archive_sha256: A5D62D3EB189442574209625369E60EBFB04956921D7704A354823A80AAF241A
-      target_factorio: 2.0.77
-      status: pending-native-factorio-2.0-qualification
+      factorio_2_1_adapter_sha256: B0CFF99215E17C28E9176523CA2F6FE1E4E5A697709602849755A853CBA7E53F
+      unchanged_payload_sha256: 1781F4D17C23927B335451051AA25949F20ED74386775D1FFAC71F7103B04ABB
+      observed: mir-twelve-recipe-data-stage-assertions-passed
+      terminal_blocker: upstream-recipe-prototypes-use-factorio-2.0-category-schema
     validates:
       - name-independent-place-result-belt-discovery
       - exact-twelve-recipe-belt-stream-coverage
       - omitted-productivity-flag-compatibility
       - explicit-productivity-denial-preservation
       - cryogenic-fluid-return-productivity-exclusion
-      - exact-native-factorio-2.0-archive-load
+      - external-archive-data-stage-assertion-before-upstream-engine-rejection
 
   big-mining-drill:
     requires_features: [recipe_productivity]
@@ -710,7 +902,6 @@ fixtures:
       - canonical-recipe-risk-hard-flags
       - canonical-recipe-risk-review-flags
       - plausible-placeable-output-negative-cases
-      - factorio-2.0-invalid-parameter-recipe-omission
       - hard-risk-cannot-be-overridden
       - review-risk-requires-exact-pack-or-review
       - planner-risk-fingerprint-parity
@@ -724,8 +915,7 @@ fixtures:
       - effect-count
 
   semantic-family-attach:
-    requires_features: [recipe_productivity, productivity_family_adoption]
-    targets: ["2.0", "2.1"]
+    requires_features: [recipe_productivity]
     path: fixtures/semantic-family-attach
     assertion_path: fixtures/assert-semantic-family-attach
     validates:
@@ -743,9 +933,9 @@ fixtures:
   approved-delta-3.1.9-to-3.2.0:
     requires_features: [recipe_productivity]
     path: fixtures/export-approved-delta
-    artifact: approved-delta/3.1.9-to-3.2.0.json
+    artifact: .mir/releases/deltas/3.1.9-to-3.2.0.json
     producer: scripts/Export-MIRApprovedDelta.ps1
-    validator: scripts/Test-MIRApprovedDelta.ps1
+    validator: validation/tests/release/Test-MIRApprovedDelta.ps1
     exact_baseline_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
     validates:
       - base-normalized-technology-parity
@@ -768,64 +958,6 @@ fixtures:
       - runtime-namespace-parity
       - migration-contract-parity
       - governed-mod-data-schema-delta
-
-  approved-delta-2.4.9-to-2.5.0:
-    requires_features: [recipe_productivity]
-    path: fixtures/export-approved-delta
-    artifact: approved-delta/2.4.9-to-2.5.0.json
-    producer: scripts/Export-MIRApprovedDelta.ps1
-    validator: scripts/Test-MIRApprovedDelta.ps1
-    exact_baseline_sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
-    validates:
-      - exact-factorio-2.0.77-seven-scenario-delta
-      - exact-2.4.9-generated-identity-projection
-      - package-source-and-qualification-source-separation
-      - unchanged-package-roots-through-qualification
-      - inserter-capacity-default-enablement-and-risk-retention
-      - nutrients-productivity-settings-and-technology
-      - capture-robot-rocket-productivity-settings-and-technology
-      - spoilage-preservation-default-enablement-and-risk-retention
-      - breeding-biter-fish-and-pentapod-effect-expansion
-      - landfill-foundation-ice-and-space-platform-effect-expansion
-      - exact-2.0-adoption-contract-shape
-      - zero-unreviewed-normalized-differences
-
-  approved-delta-2.5.0-to-2.5.5:
-    requires_features: [recipe_productivity]
-    path: fixtures/export-approved-delta
-    artifact: approved-delta/2.5.0-to-2.5.5.json
-    producer: scripts/Export-MIRApprovedDelta.ps1
-    validator: scripts/Test-MIRApprovedDelta.ps1
-    exact_baseline_sha256: 65C1610BAE120F135E328583899672E3636EAAD6D946DF104FD045B2D9AB10F1
-    validates:
-      - exact-factorio-2.0.77-seven-scenario-delta
-      - exact-2.5.0-tagged-predecessor
-      - unified-four-model-cost-settings
-      - native-continuation-anchor-preservation
-      - compiled-out-productivity-family-adoption
-      - bounded-target-log-report-transport
-      - exact-target-owned-replacement-identities
-      - package-source-and-qualification-source-separation
-      - unchanged-package-roots-through-qualification
-      - zero-unreviewed-normalized-differences
-
-  approved-delta-2.5.5-to-2.5.9:
-    requires_features: [recipe_productivity]
-    path: fixtures/export-approved-delta
-    artifact: approved-delta/2.5.5-to-2.5.9.json
-    producer: scripts/Export-MIRApprovedDelta.ps1
-    validator: scripts/Test-MIRApprovedDelta.ps1
-    exact_baseline_sha256: 03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C
-    validates:
-      - exact-factorio-2.0.77-fourteen-load-delta
-      - exact-immutable-2.5.5-predecessor
-      - unfrozen-candidate-unassigned-2.5.9-shadow
-      - package-source-and-qualification-source-separation
-      - unchanged-package-roots-through-qualification
-      - seven-scenario-technology-prerequisite-setting-registry-parity
-      - zero-technology-differences
-      - ten-identity-only-differences
-      - zero-unreviewed-normalized-differences
 
   compiler-contracts:
     requires_features: [recipe_productivity]
@@ -868,6 +1000,12 @@ fixtures:
       - separate-compilation-run-telemetry-fingerprint
       - split-subject-design-prototype-qualification-fingerprints
       - content-addressed-compiler-evidence-publication
+      - neutral-default-research-cost-compatibility-slice
+      - terminal-research-cost-disposition
+      - typed-research-cost-proof-assertion
+      - bounded-privacy-safe-research-cost-support
+      - factorio-2-0-research-cost-transport-disposition
+      - research-cost-support-tamper-rejection
       - pre-index-and-post-emission-sanitation-order
       - sanitation-retained-effect-order-ledger
       - sanitation-content-fingerprints
@@ -1023,7 +1161,7 @@ fixtures:
       - no-settings-reset-required
 
   semantic-family-generate:
-    requires_features: [recipe_productivity, productivity_family_adoption]
+    requires_features: [recipe_productivity]
     path: fixtures/semantic-family-attach
     assertion_path: fixtures/assert-semantic-family-generate
     validates:
@@ -1037,7 +1175,7 @@ fixtures:
       - shared-unreviewed-provider-budget-remains-fail-closed
 
   semantic-family-modes:
-    requires_features: [recipe_productivity, productivity_family_adoption]
+    requires_features: [recipe_productivity]
     path: fixtures/semantic-family-attach
     assertion_paths:
       - fixtures/assert-semantic-family-off
@@ -1064,13 +1202,14 @@ fixtures:
       - published-compiler-telemetry-with-isolated-stress-context
       - shallow-acyclic-factorio-engine-graph
       - 100000-in-memory-compiler-technologies
-      - 100000-in-memory-compiler-effects
+      - 100000-in-memory-minimal-graph-authority-operations
       - 100000-in-memory-compiler-graph-edges
       - 25000-node-in-memory-strongly-connected-component
       - 1000-small-in-memory-strongly-connected-components
       - deterministic-randomized-insertion-order
       - operation-set-output-invariance-excludes-environment-identity
       - bounded-64-node-scc-diagnostics
+      - explicit-post-stress-lua-heap-reclamation
       - 900-second-portable-graph-stress-budget
       - high-family-candidate-fanout
       - single-recipe-fact-scan

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
 ---
@@ -53,11 +53,13 @@ The order describes increasing automatic action, not increasing safety or qualit
 
 ## Existing Infinite Research Owners
 
-Processing units, plastic, low-density structures, and rocket fuel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR 3.1.9 binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, cost growth, maximum level, research time, and effect per level.
+Every generated research row has three cost controls: base cost, additive cost per later controlled level, and an exponential multiplier. For generated streams and recognized existing owners, base cost is the cost at the first controlled level. Base-continuation setting IDs retain their older profile meaning as the level-one coefficient; MIR projects that coefficient to the first new continuation level before applying the new additive increment. Additive cost defaults to `0`, so existing 3.2.3 continuation curves and saved profiles do not change unless you opt in. Multiplier `1` with additive cost `0` is fixed; multiplier `1` with a positive additive cost is linear; a multiplier above `1` can be purely exponential or combined with the additive value. MIR derives the curve from these numbers, so there is no separate model dropdown.
 
-Leaving the settings at their defaults preserves the final existing technology exactly, including values changed by another mod. Turning Enable off also leaves the external technology untouched. A deliberate non-default value configures the recognized existing owner instead of silently ignoring the setting. Effect values use percentage points and change only recipe-productivity effects in that stream's product family; unrelated technology effects remain intact. Maximum level `0` means infinite.
+Processing units, plastic, low-density structures, rocket fuel, and steel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, additive cost per level, exponential multiplier, maximum level, research time, and effect per level.
 
-MIR preserves recognized native and MIR exponential formula styles when applying cost changes. If another mod supplies a formula MIR cannot safely interpret, defaults still preserve it, but an explicit base-cost or growth override is rejected and reported rather than approximated. Changes are startup settings and require a restart.
+Leaving the settings at their defaults preserves the final existing technology exactly, including values changed by another mod. Turning Enable off also leaves the external technology untouched. A deliberate non-default value configures the recognized existing owner instead of silently ignoring the setting. Effect values use percentage points and change only recipe-productivity effects in that stream's product family; unrelated technology effects remain intact. Maximum level `0` means infinite. A positive maximum is the absolute highest technology level, not a number of extra levels. If you lower it below completed research, MIR retains those completed levels but removes current or queued research that is no longer valid. Raising the maximum or returning it to `0` makes future levels available again.
+
+MIR preserves every unchanged external formula byte-for-byte. When you explicitly change a cost control, MIR can safely recognize fixed, linear, exponential, and hybrid arithmetic formulas and emits the equivalent canonical curve. If another mod supplies a formula MIR cannot safely interpret, defaults still preserve it, but an explicit base, additive, or multiplier override is rejected and reported rather than approximated. Changes are startup settings and require a restart.
 
 Visible generated technology settings are ordered by explicit attention policy: factory-disruptive risky rows come first, other default-off rows come next, enabled special rows follow, and ordinary enabled rows come last. Spoilage preservation and inserter capacity bonus are enabled by default but remain in the first bucket because their risk classification is independent of enablement. MIR automatically appends their governed risk warning to the enable-setting tooltip and emitted technology description unless that exact localized warning is already present. Disable either technology before loading a save when preserving existing spoilage timing, inserter hand-stack counts, circuit behavior, or blueprint assumptions matters.
 
@@ -89,7 +91,7 @@ The consistent broad ladders reach 1000% for pipeline extent, +100000% for produ
 
 Advanced portable profiles can use any valid decimal percentage within the setting's safe bounds even when that value is not listed in the dropdown. Use a JSON number in displayed percentage units, such as `123.45` or `-83.25`; invalid or out-of-range values are ignored. The in-game dropdown remains curated for easy selection.
 
-For the exact option list and a count of every checkbox, dropdown, numeric field, and text setting in 3.0.5, see the [3.0.5 settings inventory](../releases/3.0.5-settings-inventory.md).
+For historical context, the exact option list and a count of every checkbox, dropdown, numeric field, and text setting in 3.0.5 remain in the [archived 3.0.5 settings inventory](../releases/archive/3.0.5-settings-inventory.md).
 
 Module productivity discovers final `module` prototypes by their declared tier. Tiers 1, 2, and 3 keep the existing +10%, +5%, and +2% per-level values; tier 4 and later module recipes receive +1% per level. This includes modded module categories without requiring name patterns or a per-mod checkbox.
 

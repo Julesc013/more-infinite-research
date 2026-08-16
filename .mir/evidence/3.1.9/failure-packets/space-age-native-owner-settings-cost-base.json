@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "run_id": "ad79ddd5-690b-40b8-9fba-571637848dae",
+  "scenario": "space-age-native-owner-settings-cost-base",
+  "kind": "runtime",
+  "group": "space-age",
+  "error": "Factorio runtime validation scenario space-age-native-owner-settings-cost-base exited with code 1",
+  "started_at": "2026-07-13T22:44:28.1133142Z",
+  "completed_at": "2026-07-13T22:44:42.6745346Z",
+  "duration_seconds": 14.561,
+  "assertions_executed": 0,
+  "evidence_paths": [
+    "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-820d466820c54039a149c770cf87b96e\\factorio-current.log"
+  ],
+  "package_sha256": "B37AEA1F42D2ADC66C6EE7DEAC5A8C8D73EF06BCDADA2B910FFDDB136A8380E9",
+  "source_commit": "a0bd5a070de33a59d60de1623539bfb2c31ac525"
+}

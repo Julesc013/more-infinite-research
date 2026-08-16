@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-mod-portal-discussion-reconciliation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-mod-portal-discussion-reconciliation.schema.json",
+  "title": "MIR 3 Mod Portal discussion reconciliation",
+  "type": "object",
+  "required": ["schema", "kind", "status", "observed_at", "scope", "public_index", "allowed_states", "threads", "summary", "boundaries"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3-ModPortal-Discussion-ReconciliationV1"},
+    "status": {"const": "all-public-threads-terminally-disposed-fixed-point-accepted"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "every-public-discussion-visible-on-the-more-infinite-research-mod-portal-index"},
+    "public_index": {
+      "type": "object",
+      "required": ["url", "http_status", "utf8_bytes", "sha256", "thread_count", "thread_ids"],
+      "properties": {
+        "url": {"const": "https://mods.factorio.com/mod/more-infinite-research/discussion"},
+        "http_status": {"const": 200},
+        "utf8_bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "thread_count": {"const": 24},
+        "thread_ids": {"type": "array", "minItems": 24, "maxItems": 24, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-f0-9]{24}$"}}
+      },
+      "additionalProperties": false
+    },
+    "allowed_states": {"const": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
+    "threads": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": ["id", "url", "category", "title", "source_class", "state", "completion", "linked_authorities", "evidence", "rationale", "release_blocking"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-f0-9]{24}$"},
+          "url": {"type": "string", "format": "uri"},
+          "category": {"enum": ["Bugs", "General", "Ideas"]},
+          "title": {"type": "string", "minLength": 1},
+          "source_class": {"enum": ["bug-report", "feature-request", "compatibility-request", "mixed-thread", "contribution-request"]},
+          "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
+          "completion": {"enum": ["historical-verified", "implemented-fixed-point-accepted-awaiting-final-candidate-qualification", "not-a-product-fix"]},
+          "linked_authorities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "rationale": {"type": "string", "minLength": 1},
+          "release_blocking": {"type": "boolean"},
+          "topics": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["topic", "state", "evidence"],
+              "properties": {
+                "topic": {"type": "string", "minLength": 1},
+                "state": {"enum": ["fixed-in-dot9", "already-fixed-regression-retained", "not-applicable", "upstream-blocked", "not-reproduced", "support-claim-narrowed", "rejected-with-reason", "mir4-deferred"]},
+                "evidence": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["threads", "already_fixed_regression_retained", "fixed_in_dot9", "support_claim_narrowed", "not_reproduced", "rejected_with_reason", "mir4_deferred", "unclassified", "additional_product_findings_admitted"],
+      "properties": {
+        "threads": {"const": 24},
+        "already_fixed_regression_retained": {"const": 12},
+        "fixed_in_dot9": {"const": 4},
+        "support_claim_narrowed": {"const": 4},
+        "not_reproduced": {"const": 1},
+        "rejected_with_reason": {"const": 2},
+        "mir4_deferred": {"const": 1},
+        "unclassified": {"const": 0},
+        "additional_product_findings_admitted": {"const": 0}
+      },
+      "additionalProperties": false
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["ordinary_intake_closed", "source_frozen", "candidate_assigned", "dot5_package_mutation_permitted", "broad_support_inferred_from_thread", "portal_status_substitutes_for_regression_evidence"],
+      "properties": {
+        "ordinary_intake_closed": {"const": true},
+        "source_frozen": {"const": false},
+        "candidate_assigned": {"const": false},
+        "dot5_package_mutation_permitted": {"const": false},
+        "broad_support_inferred_from_thread": {"const": false},
+        "portal_status_substitutes_for_regression_evidence": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

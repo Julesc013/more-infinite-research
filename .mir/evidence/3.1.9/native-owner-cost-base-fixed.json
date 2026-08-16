@@ -1,0 +1,136 @@
+{
+  "schema": 2,
+  "run_id": "51fc18cc-b6e8-47d5-a2d3-a43725825d42",
+  "mir_version": "3.1.9",
+  "factorio_version": "2.1",
+  "factorio_binary_version": "2.1.10",
+  "git_commit": "1e3e75b2527e3135a9f68a4025a5e45d5ee24655",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "5120E3CACADCF9E06AAB9776598FDF8273F8F04AFB336AB47C24FE76EA218E95",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "D70C414B8291FBB0B09E273B1ACCA54AFC994218206C35BEFE7737C2B33CBA34",
+  "expected_scenarios": [
+    "package-build",
+    "runtime-state-contract",
+    "space-age-native-owner-settings-cost-base",
+    "static-validation"
+  ],
+  "target_profile_sha256": "F415D66E21D47DC95B7465A63CF45788CA00BE2BE9984EA28238D1FD2C739F91",
+  "required_groups_sha256": "3298C4D8D40054B8445B800616294BD2868E94A5A7556CFA9AAE9AF8BA042724",
+  "package_source_sha256": "6588B18BA29CBB76E284803C81EE502F3E8E85B7722B790DE0AFE6051C6663C5",
+  "validation_package_sha256": "CC0110269146A6AF7D5831009AEEC49DA034BAEBED89F3C203DB7ADFDA239DB7",
+  "validation_package_content_sha256": "6588B18BA29CBB76E284803C81EE502F3E8E85B7722B790DE0AFE6051C6663C5",
+  "status": "passed",
+  "started_at": "2026-07-13T22:48:30.8889928Z",
+  "completed_at": "2026-07-13T22:48:48.0081685Z",
+  "duration_seconds": 17.119,
+  "current_scenario": null,
+  "required_groups": [
+    "package",
+    "runtime-state",
+    "space-age",
+    "static"
+  ],
+  "groups": [
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.011,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.011,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 17.021,
+      "scenarios": [
+        "space-age-native-owner-settings-cost-base"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.008,
+      "scenarios": [
+        "static-validation"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "47c7101b-4ea2-4e84-b4b6-7a1b3efb492e",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-13T22:48:30.8947545Z",
+      "completed_at": "2026-07-13T22:48:30.9022551Z",
+      "duration_seconds": 0.008,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "804a2ff7-3ae1-4bfa-b145-9d03fe775255",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-13T22:48:30.9102271Z",
+      "completed_at": "2026-07-13T22:48:30.9212356Z",
+      "duration_seconds": 0.011,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2f2b6ab8-e3ab-490e-ba8a-695f50d3dc77",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-13T22:48:30.9293015Z",
+      "completed_at": "2026-07-13T22:48:30.9406090Z",
+      "duration_seconds": 0.011,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "8d0bed98-860d-4e1b-98f9-7f28e7fef5f8",
+      "name": "space-age-native-owner-settings-cost-base",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-13T22:48:30.9787419Z",
+      "completed_at": "2026-07-13T22:48:47.9993767Z",
+      "duration_seconds": 17.021,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-cd5d20ec0a644290a7f618cd8cf02e97\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

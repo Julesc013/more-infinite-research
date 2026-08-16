@@ -6,7 +6,7 @@ param(
   [string]$LocalModDir = $env:MIR_LOCAL_MOD_DIR,
   [string[]]$RepairSmokeModNames = @("big-mining-drill", "biolabs-in-space"),
   [string]$RepresentativeScenarioName = "local-2-1-bz-suite-space-age",
-  [string]$ManualScenariosPath = "fixtures\compat-matrix\local-library-scenarios.json",
+  [string]$ManualScenariosPath = "validation\scenarios\local-2.1.json",
   [string[]]$AuditFactorioVersions = @(),
   [string]$PullRemote = "origin",
   [string]$PullBranch = "",
@@ -268,7 +268,7 @@ if ($needsLocalModDir) {
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = ".\artifacts\release-targeted-$stamp"
+  $OutputRoot = ".\build\results\release-targeted-$stamp"
 }
 $script:resolvedOutputRoot = Resolve-MIRReleaseGatePath -Path $OutputRoot
 New-Item -ItemType Directory -Force -Path $script:resolvedOutputRoot | Out-Null
@@ -346,7 +346,7 @@ try {
   if (-not $SkipBZSuite) {
     Invoke-MIRReleaseGateStep -Name "representative-local-scenario" -Action {
       $representativeDir = Join-Path $script:resolvedOutputRoot "representative-local-scenario"
-      & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
+      & (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1") `
         -FactorioBin $script:resolvedFactorioBin `
         -FactorioLine $FactorioLine `
         -FactorioVersions @($AuditFactorioVersions) `
@@ -364,14 +364,14 @@ try {
         -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
         -OutputDir $representativeDir
 
-      & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $representativeDir
+      & (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1") -AuditDir $representativeDir
       Assert-MIRReleaseGateNoUnexpectedFailures -Name $RepresentativeScenarioName -AuditDir $representativeDir
     }
   }
 
   if (-not $SkipBuild) {
     Invoke-MIRReleaseGateStep -Name "package-build" -Action {
-      & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
+      & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
       & git -C $repo diff --check
     }
   }

@@ -1,0 +1,578 @@
+{
+  "schema": 1,
+  "authority": "mir-control-plane-path-migration-v1",
+  "migration": "dual-read-single-write",
+  "source_commit": "81bd4bf016dbee1035cf4bf28ab6e203afe977b7",
+  "package_bytes_changed": false,
+  "entry_count": 113,
+  "aggregate_sha256": "EEF53B0D3B71C2D61432AE5E30A76180F3D2B2ED2AA17CFF600FEC633B19E60F",
+  "aliases": ".mir/control/aliases.yml",
+  "canonical_paths": ".mir/control/paths.yml",
+  "entries": [
+    {
+      "from": ".mir/backports/2.5.0.json",
+      "to": ".mir/releases/backports/2.5.0.json",
+      "sha256": "B05922AE427062D575DC8E8E827507858D18F9959036188777B3A6F9D530253D"
+    },
+    {
+      "from": ".mir/candidate-closures/3.2.4-C31.json",
+      "to": ".mir/releases/closures/3.2.4-C31.json",
+      "sha256": "6DF997D953F87FB05D30D24711A8B0F8BB47780A69A7AF61C5F53346D4692956"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0001.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0001.json",
+      "sha256": "7A6B593E2987B29B2474DB58C1558D26942A2AC72BE3F6381E733E3A49CD25FF"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0002.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0002.json",
+      "sha256": "05CE7CF18709799FB71C55C23D6B70ABA5D2BAE9532F4E174D4F592D25832327"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0003.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0003.json",
+      "sha256": "033D16BCB914A1EF9D10BD82132C5AC246A0A92C6E81965FC2EE47F0DA3FB53D"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0004.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0004.json",
+      "sha256": "ECA72523E6B3F3F23DD05BE25BEA56429A8D160094C2AC9D27FCAE34EEBD96A6"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0005.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0005.json",
+      "sha256": "93D2BC6C26FC9CDD22B7D046C578380C6DF58D884F35D078F08D2C974638E5C4"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0006.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0006.json",
+      "sha256": "3488892689C767163FB9990E9EDE08FCBD4E67AB932DED30EB80335C4F4BE6F5"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0007.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0007.json",
+      "sha256": "473D98DD0A1498CAA69B89D988890790366538959591573417BCF0CADDDBFEC9"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0008.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0008.json",
+      "sha256": "379C0CFFFD1BE0020A641A1E3B5037DBE26C2EF39E4E0527DA288D306400D145"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0009.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0009.json",
+      "sha256": "3AFD69D39FF716895BE6E9571E33B4E70B5C1C9EA801730A5D41B5B75538510B"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0010.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0010.json",
+      "sha256": "D8432283A5F7C493684B38635DCD7FD0375D5C88A4E6D6C5BBC33A000A7E2F81"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0011.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0011.json",
+      "sha256": "15A43C12F2AB806BD81913A078EB1D016F2F42DCF38EDB42469AE9D5A50956FC"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0012.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0012.json",
+      "sha256": "BE47BFF52881A88E04912E0365DBB4D38D0678500CC06627517F1BA2587EB501"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0013.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0013.json",
+      "sha256": "E214AD3F4EBD8EF37D4E15BA191D091EF3B960ADF82DFC12CC9C14AEBF549C33"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0014.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0014.json",
+      "sha256": "65FF58E49BA169C67AA9B9B0B73D5665961EEFAA624CE2B018743F9EC214856A"
+    },
+    {
+      "from": ".mir/changes/CHG-2026-0015.json",
+      "to": ".mir/lifecycle/changes/CHG-2026-0015.json",
+      "sha256": "A217A005D8EAD6E31CC0427AD557459AFA9362E8F751D9E0276B20EA653F6AB4"
+    },
+    {
+      "from": ".mir/generated/backport-queue.json",
+      "to": ".mir/views/backport-queue.json",
+      "sha256": "08D4A1800ED191B9A4F7E09390D4A5D161BF35CCA922F6E30BBF92AE4941C48E"
+    },
+    {
+      "from": ".mir/generated/branch-status.json",
+      "to": ".mir/views/branch-status.json",
+      "sha256": "FC73902137DBB18E458AC7DBEA9F469F7AB0D096A450653BC489F0F0136B344A"
+    },
+    {
+      "from": ".mir/generated/publication-checklist.json",
+      "to": ".mir/views/publication-checklist.json",
+      "sha256": "305B82F7E4D17CF7DDEB6013C8D40F351915620971248FA037B378128DCB9214"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0035.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0035.json",
+      "sha256": "AAB0DA976DE637A7DC66B217E9962E6B5EAA661ECAEE6C93E6660B714BBBFD01"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0036.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0036.json",
+      "sha256": "85B411D11D346009877A7612E063DF6981FA651F288D185F6F0A0712004D45C6"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0037.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0037.json",
+      "sha256": "42337E509FA90725441777ABBC73B03CA9F6D76A0F8C0121492C9BE9D22EC304"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0038.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0038.json",
+      "sha256": "23C9169FC7BE285965ECF6BE8A0E11DA4CDEF131FF4796EB05BF9380CD29F655"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0039.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0039.json",
+      "sha256": "04068854198E6C7D90B681A136DC46F3536DC701F7AC0D232685AE06247A6D54"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0040.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0040.json",
+      "sha256": "8A4F9E1EC76DFA294BB99F5B7650A4F3A2E3C927F695A35225EEE3709288A446"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0041.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0041.json",
+      "sha256": "CC943806C8A5578F4C773E036B96DC8FAA24779564851CB0408083097384BAB7"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0042.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0042.json",
+      "sha256": "5B3A679501B06A1C053203F94B63A48CAAB58924818278FADD493458C2D70503"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0043.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0043.json",
+      "sha256": "4F29BF75BE0F85A9310FFF4727281C8223DB1C81DE5D49BA5C949551F4465D5F"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0044.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0044.json",
+      "sha256": "D45433D603FC9445A15739E5A466D6E989764EEE009AA3A210A29057212C28A9"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0045.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0045.json",
+      "sha256": "520B1458F843D36AA18AB50E447354439105D33296CE50636EA5E47CE93BC091"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0046.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0046.json",
+      "sha256": "5BE7ABB464B8B6D896671B2EFDD9E73FA3376AE0A159B13D1F2E6474614485FF"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0047.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0047.json",
+      "sha256": "3706D8EE06B983DE36903C0A7A7478E2A4BBEF7F0421D58049C1566A667E774C"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0048.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0048.json",
+      "sha256": "A597CD32D69300C3EDCF5BD4DD0065A2FA69FCC4E8969798D1D942DFF43039CD"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0049.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0049.json",
+      "sha256": "4D4CD86FC6C1F720742C76219167397B8A930CCA119C7144CE0D72C268FB2153"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0050.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0050.json",
+      "sha256": "92FBC2A674E566FBCDD0C2FF3DF422813806BE9AC0AADBAD79DC628DBD6D9FCA"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0051.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0051.json",
+      "sha256": "CF2E414A004196F828D94A181DC4EA2295001B619B8BD9581D8F64CAC63B926F"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0052.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0052.json",
+      "sha256": "1DE522FBBAAAEAB15C15CA2347D12A2EBEAC055789F2B0BCBB9C96BF55465562"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0053.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0053.json",
+      "sha256": "C0D56B63E132AAB8F451DB91CF53B470DCE337E9D91E5FF81BD1B1B973DA174A"
+    },
+    {
+      "from": ".mir/incidents/INC-2026-0054.json",
+      "to": ".mir/lifecycle/incidents/INC-2026-0054.json",
+      "sha256": "0820D70F3E165A9BADEB0A397A0D7539E98C2437FFCF5C8E8B35D2989F47BB57"
+    },
+    {
+      "from": ".mir/release-transitions/2.5.0-focused-qualified.json",
+      "to": ".mir/releases/transitions/2.5.0-focused-qualified.json",
+      "sha256": "B9EA6C24872DC1A1815AAC958244CC2A915E78BFF0BB9B8D4954341E3A590DA3"
+    },
+    {
+      "from": ".mir/release-transitions/2.5.0-publicly-verified.json",
+      "to": ".mir/releases/transitions/2.5.0-publicly-verified.json",
+      "sha256": "A0A814C78D5C0BCA719DA8665745E0CB5A6A4CBF96F4E4EFDFDCD2E4D414B5BB"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.2-tagged.json",
+      "to": ".mir/releases/transitions/3.2.2-tagged.json",
+      "sha256": "29C0787273E9F5DE22CFF0CD23549557DD296F459B5D3D03242664D0DDE18F76"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c26-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-c26-package-built.json",
+      "sha256": "3DCD3804D2EF035705C62D0FE663029E7D9C792572CF9632C8AEEEBF280FD2E8"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c26-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-c26-source-frozen.json",
+      "sha256": "B94EDA667C53542C6CC6D1BC25C30D114078DCB82939F755CD725C4299204522"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c27-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-c27-package-built.json",
+      "sha256": "687DF499533436BA23C253421D23C8F5543602E2BA6B76BA5B030F6DECCE5E53"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c27-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-c27-source-frozen.json",
+      "sha256": "47122032D63884A9EF5602B799D0BA77CBABA65325A1EBF088F11093098FE1B0"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c28-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-c28-package-built.json",
+      "sha256": "5F84FE78B3C357D1131216085694CE57B50F1D8B7279076548496439361CE5CB"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c28-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-c28-source-frozen.json",
+      "sha256": "A63FC7C4544683D5F40EA2AF579C25B0E73A7EFAB236CBDCB3DD97D6FA5D46E4"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c29-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-c29-package-built.json",
+      "sha256": "431FE25D4A5EAE255C1B7832E70AE14D021C2C62018F44B39B2F01760DA232B1"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c29-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-c29-source-frozen.json",
+      "sha256": "E3E214FB7B00A2E22739DF789AF7692AD4D3B67DC4990660F559B2808DDE9BCA"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c30-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-c30-package-built.json",
+      "sha256": "D1D2B9311FEA15F3651CEFF3937CA7C58E1E8D66A82DCDA0F211E9C75A0F3598"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-c30-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-c30-source-frozen.json",
+      "sha256": "19AB086D63BB19BC21687A670840A9DC33D7411046F0E944A10A28813943D648"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-package-built.json",
+      "to": ".mir/releases/transitions/3.2.3-package-built.json",
+      "sha256": "0E83DBFA6F4556442A70567E7C6BD12B481DFBDDAE4974AEDB06A8FA1547FC85"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-publicly-verified.json",
+      "to": ".mir/releases/transitions/3.2.3-publicly-verified.json",
+      "sha256": "317F3058F53196E8C15309970062D6C13BAE174E4EB68ACAE1822C451DB5EB51"
+    },
+    {
+      "from": ".mir/release-transitions/3.2.3-source-frozen.json",
+      "to": ".mir/releases/transitions/3.2.3-source-frozen.json",
+      "sha256": "E026C1A02DE40DB0B0C9199AF7AD6DCFC5B016BF04B48D5C8D21DD55FF281D21"
+    },
+    {
+      "from": ".mir/releases/2.4.9.json",
+      "to": ".mir/releases/records/2.4.9.json",
+      "sha256": "13CB33EDD5A9A2D8255089700DE2A329ABF1312DFC03C5C7C0530F0E416E6EB6"
+    },
+    {
+      "from": ".mir/releases/2.5.0.json",
+      "to": ".mir/releases/records/2.5.0.json",
+      "sha256": "C7C9D48381D56519E97DCE8AA6EC06900A5B3FFCC940B2F89E3F909E40079398"
+    },
+    {
+      "from": ".mir/releases/3.2.1.json",
+      "to": ".mir/releases/records/3.2.1.json",
+      "sha256": "37B5DFC303EF9B07F0B97CC43323A72D1780B121F2F1698BA3DD631AF0668E98"
+    },
+    {
+      "from": ".mir/releases/3.2.2.json",
+      "to": ".mir/releases/records/3.2.2.json",
+      "sha256": "9CF01E442228C2DE1BDAC4CAE92FE1BE50E083FEE8D26A38B321AE69E6FB1DBF"
+    },
+    {
+      "from": ".mir/releases/3.2.3.json",
+      "to": ".mir/releases/records/3.2.3.json",
+      "sha256": "8282D081E48505FEBD0F413FF4234B04B27A5D1B51946490E69EA8A3E6B3F05B"
+    },
+    {
+      "from": ".mir/releases/3.2.4.json",
+      "to": ".mir/releases/records/3.2.4.json",
+      "sha256": "9CE200F86A4F6C404D92211AE91D9E63C646E9BC62160B03A9768AB49D7EC586"
+    },
+    {
+      "from": ".mir/releases/3.2.5.json",
+      "to": ".mir/releases/records/3.2.5.json",
+      "sha256": "370D2D8759A98670265843A265B35F40104D59201DA6A8D89F2098F9C88FD132"
+    },
+    {
+      "from": ".mir/releases/current.json",
+      "to": ".mir/releases/records/current.json",
+      "sha256": "E5D48141256FF8948E505605EE5BF7B2D108FFF8B0D0C074722A39EFA8912B69"
+    },
+    {
+      "from": ".mir/tasks/approved-delta.measurement.json",
+      "to": ".mir/lifecycle/tasks/approved-delta.measurement.json",
+      "sha256": "4AF6F84E967BE3C897292909C4B55B8E1A97A52C7BC5FD1ABD6B6D27874F1A02"
+    },
+    {
+      "from": ".mir/tasks/architecture.dependencies.json",
+      "to": ".mir/lifecycle/tasks/architecture.dependencies.json",
+      "sha256": "FE599137CCC5F9A2B2BCC8281161045BF6866C2AC4A50ED64D9F69C3FCD64178"
+    },
+    {
+      "from": ".mir/tasks/architecture.files.json",
+      "to": ".mir/lifecycle/tasks/architecture.files.json",
+      "sha256": "E588968ACF029561D3FDFDCD1675D94C18C14CD73D51A419CB60A7D09B1479F9"
+    },
+    {
+      "from": ".mir/tasks/architecture.layout.json",
+      "to": ".mir/lifecycle/tasks/architecture.layout.json",
+      "sha256": "81D134C7F97433133A5179DAE8BDC5D75CDF183683BB7BFA37187551CD657D38"
+    },
+    {
+      "from": ".mir/tasks/assurance.self-test.json",
+      "to": ".mir/lifecycle/tasks/assurance.self-test.json",
+      "sha256": "1C656CC204B3AE863679E3B027AEBDD01CEA69AD1671607CA66EAD087B4ED86C"
+    },
+    {
+      "from": ".mir/tasks/backport.contract.json",
+      "to": ".mir/lifecycle/tasks/backport.contract.json",
+      "sha256": "D2BF45FAAC4124C54FDC79F7612EF44700E90AF5C7462665140EF0A67D0A0518"
+    },
+    {
+      "from": ".mir/tasks/backport.reconstruction.json",
+      "to": ".mir/lifecycle/tasks/backport.reconstruction.json",
+      "sha256": "327779874464B73FEFF784E14EA1CB1B19D567C9A62812E5396FB21D82D74B32"
+    },
+    {
+      "from": ".mir/tasks/balance.contract.json",
+      "to": ".mir/lifecycle/tasks/balance.contract.json",
+      "sha256": "53110D9FA1C0FF7FB50C28307161B39F71DEFECA02268D56F4D7343A00854539"
+    },
+    {
+      "from": ".mir/tasks/ci.workflow.json",
+      "to": ".mir/lifecycle/tasks/ci.workflow.json",
+      "sha256": "A09318AD363CFF24A220D31FDA0A440448604B361ED5DE59B34D41FCE6FDAFF0"
+    },
+    {
+      "from": ".mir/tasks/compiler.contract.json",
+      "to": ".mir/lifecycle/tasks/compiler.contract.json",
+      "sha256": "3159D16AF35031B7D996502AF8ACBBE0317AE988ACEC8F7DD9C537D0AC8DDF34"
+    },
+    {
+      "from": ".mir/tasks/compiler.schema.json",
+      "to": ".mir/lifecycle/tasks/compiler.schema.json",
+      "sha256": "38A286D5647E9F77A323097685FB2C02ECC1195558E8D1096D998AEC9A958D87"
+    },
+    {
+      "from": ".mir/tasks/control-plane.records.json",
+      "to": ".mir/lifecycle/tasks/control-plane.records.json",
+      "sha256": "B42057EE546F724916102999AB68DB7886711CE02651F3F3ABCBE1061AF49FD2"
+    },
+    {
+      "from": ".mir/tasks/docs.generated.json",
+      "to": ".mir/lifecycle/tasks/docs.generated.json",
+      "sha256": "88624E7AD2028928739BCCF7F11976FB6CA7863791B509F93522789CC13178B6"
+    },
+    {
+      "from": ".mir/tasks/docs.schema.json",
+      "to": ".mir/lifecycle/tasks/docs.schema.json",
+      "sha256": "79EE2393088343625868F02B6158623E17992E956827CBA8A92EE3C410496272"
+    },
+    {
+      "from": ".mir/tasks/ecosystem.measurement.json",
+      "to": ".mir/lifecycle/tasks/ecosystem.measurement.json",
+      "sha256": "191852EAB92CE269564F7C5B63163D7D97B84BCDD6C26BF1B1D11F82C3F79D02"
+    },
+    {
+      "from": ".mir/tasks/evidence.store.json",
+      "to": ".mir/lifecycle/tasks/evidence.store.json",
+      "sha256": "BAD9684B7527E2DF3DBB2A0A7279FEA5B877A9D668FFEA4591519BF11AE49D33"
+    },
+    {
+      "from": ".mir/tasks/executor.contract.json",
+      "to": ".mir/lifecycle/tasks/executor.contract.json",
+      "sha256": "6F99B061870C8E78D4F01DD441356443907736742AB3346A52F913E8EE7FF774"
+    },
+    {
+      "from": ".mir/tasks/harness.quality.json",
+      "to": ".mir/lifecycle/tasks/harness.quality.json",
+      "sha256": "18896192C80D4DB1A58EDC365E6E0034EB47C53B30A41919B816A922E06BB96D"
+    },
+    {
+      "from": ".mir/tasks/harness.schemas.json",
+      "to": ".mir/lifecycle/tasks/harness.schemas.json",
+      "sha256": "2E272F3CD8740FB5F625EC2DC40ED61482D14B6A7E4DEA509EFCB1C4858D6BA6"
+    },
+    {
+      "from": ".mir/tasks/locale.contract.json",
+      "to": ".mir/lifecycle/tasks/locale.contract.json",
+      "sha256": "088EE9F389CE057D0C3C7BD5F59D5AD0CDE7C52F7C8775F4E6D3C8450D35E911"
+    },
+    {
+      "from": ".mir/tasks/manual.acceptance.json",
+      "to": ".mir/lifecycle/tasks/manual.acceptance.json",
+      "sha256": "A4610743FB301317282D6A56ACED5DEA556DFD3F75A918022EB5FB5B27D6BC5D"
+    },
+    {
+      "from": ".mir/tasks/museum.compiler.json",
+      "to": ".mir/lifecycle/tasks/museum.compiler.json",
+      "sha256": "63C86350997E7AFA1EBE8B13B1D3BB58E7C8150AD9DDF42331850287387C54B0"
+    },
+    {
+      "from": ".mir/tasks/observation.evaluation.json",
+      "to": ".mir/lifecycle/tasks/observation.evaluation.json",
+      "sha256": "31108A0AF1665FB603F8E7B8F68DBBB7688C160C75EA727F18F25C16FE2829AA"
+    },
+    {
+      "from": ".mir/tasks/package.composition.json",
+      "to": ".mir/lifecycle/tasks/package.composition.json",
+      "sha256": "A1FA73BFAFDC35859E02036194895A1FC3B7F76C1FF92FAE6F020DD04B107EC5"
+    },
+    {
+      "from": ".mir/tasks/package.determinism.json",
+      "to": ".mir/lifecycle/tasks/package.determinism.json",
+      "sha256": "BA44AAEAA170403FC35484E88A5C63E63395174BDADC10C589D64D74DB76D347"
+    },
+    {
+      "from": ".mir/tasks/package.identity.json",
+      "to": ".mir/lifecycle/tasks/package.identity.json",
+      "sha256": "1179634D735B60555EE31E8FBF6674C39E1B0800B1D099E0F1E3A281BD1C2FFB"
+    },
+    {
+      "from": ".mir/tasks/performance.contract.json",
+      "to": ".mir/lifecycle/tasks/performance.contract.json",
+      "sha256": "FF6069CC2EC6E3A43E9812B074DF001BBB09A2585FC8EA24A06AF9A1DE0E1601"
+    },
+    {
+      "from": ".mir/tasks/performance.measurement.json",
+      "to": ".mir/lifecycle/tasks/performance.measurement.json",
+      "sha256": "AB39B1D1AC2A1213761A25B24022DB9E01E5614531167BB4B32212D57C39A17A"
+    },
+    {
+      "from": ".mir/tasks/promotion.json",
+      "to": ".mir/lifecycle/tasks/promotion.json",
+      "sha256": "E161C2131D0C73B0D70FD96288AA2ECF2E0D72DDB5A1F3CB977FE6159B41BF3F"
+    },
+    {
+      "from": ".mir/tasks/protected.qualification.json",
+      "to": ".mir/lifecycle/tasks/protected.qualification.json",
+      "sha256": "56B0200C5574606D4BF55DE68156E945816DE46C480B0C4BDCA14870CDF53F30"
+    },
+    {
+      "from": ".mir/tasks/public-byte-verification.json",
+      "to": ".mir/lifecycle/tasks/public-byte-verification.json",
+      "sha256": "0A75C2F5E2C5130B82252A5B742CD6D1CC53B7AC6BAFC30F59C3E8B281525199"
+    },
+    {
+      "from": ".mir/tasks/publication.json",
+      "to": ".mir/lifecycle/tasks/publication.json",
+      "sha256": "32033D20CDD0EEF3928E26EC9065DB1606C0E836E0E7E69B4890627C023C6F8D"
+    },
+    {
+      "from": ".mir/tasks/qualification.full.json",
+      "to": ".mir/lifecycle/tasks/qualification.full.json",
+      "sha256": "410266F465F4802882A30B3BFF6E04F75AC19948ED3F65F1B7B469B1DF675CC1"
+    },
+    {
+      "from": ".mir/tasks/release-history.integrity.json",
+      "to": ".mir/lifecycle/tasks/release-history.integrity.json",
+      "sha256": "CE75E32D70FB4970A15E8708E288451159AC54C93E1B6BCDED8F7E45AB6F8369"
+    },
+    {
+      "from": ".mir/tasks/release.authority.json",
+      "to": ".mir/lifecycle/tasks/release.authority.json",
+      "sha256": "A6C372EE56B9B0FDE138A315098BA2CFB34C03A1FFAA6D306DC7C4CAAEEA1232"
+    },
+    {
+      "from": ".mir/tasks/release.controller.json",
+      "to": ".mir/lifecycle/tasks/release.controller.json",
+      "sha256": "633942C27449572B58030F0BC4A006C4BC22093461669AE024BA82E58DB4147E"
+    },
+    {
+      "from": ".mir/tasks/scenario.registry.json",
+      "to": ".mir/lifecycle/tasks/scenario.registry.json",
+      "sha256": "55A3EBAD491401E73440FEF1D567245424B54B7E7534838D1AD4B867872012FA"
+    },
+    {
+      "from": ".mir/tasks/seal.json",
+      "to": ".mir/lifecycle/tasks/seal.json",
+      "sha256": "3D56C40F9124C104E3BB53612FA61E2C28D3C28D0E76BF28F3C5069B73EF94C1"
+    },
+    {
+      "from": ".mir/tasks/settings.contract.json",
+      "to": ".mir/lifecycle/tasks/settings.contract.json",
+      "sha256": "A5D07738045D0CE46320F0DA2773E001A3511B8E22DE9C267D2796BDBFDE3898"
+    },
+    {
+      "from": ".mir/tasks/shadow.equivalence.json",
+      "to": ".mir/lifecycle/tasks/shadow.equivalence.json",
+      "sha256": "B28B0BBC733E21D8D6663D092C1C9018978EAC405E99CABD45E010DEBF265B28"
+    },
+    {
+      "from": ".mir/tasks/shadow.structural.json",
+      "to": ".mir/lifecycle/tasks/shadow.structural.json",
+      "sha256": "886FEFBCE1FF765FAB572B00DF1271D8E2E154B45F3B7B898E2EFDF3FCAADD84"
+    },
+    {
+      "from": ".mir/tasks/static.full.json",
+      "to": ".mir/lifecycle/tasks/static.full.json",
+      "sha256": "743DE94152ED8225353B964270167BF073BE083EAEAB6F39F665E534B6BCCEE4"
+    },
+    {
+      "from": ".mir/tasks/tag.json",
+      "to": ".mir/lifecycle/tasks/tag.json",
+      "sha256": "5EFAF2444B07A7B36E63A066145C81726CEBAB93AF8EFD1C4155B3BB7D5630BB"
+    },
+    {
+      "from": ".mir/tasks/upgrade.measurement.json",
+      "to": ".mir/lifecycle/tasks/upgrade.measurement.json",
+      "sha256": "063B9DCA90D6E7AF1A80B1E591A975DE310DE00ABD01BF60EF0F5E4FC238753F"
+    },
+    {
+      "from": ".mir/tasks/verification.context.json",
+      "to": ".mir/lifecycle/tasks/verification.context.json",
+      "sha256": "164979F270A3434162E12452C71854B97C4B1816142986AEDAD3858BEAF7CF80"
+    },
+    {
+      "from": "approved-delta/2.4.5-to-2.4.9.json",
+      "to": ".mir/releases/deltas/2.4.5-to-2.4.9.json",
+      "sha256": "516F4FFA272AA793BDEEA8CA8055B789C0072F4FF2ACB14BCDA504DEEEF6DDBA"
+    },
+    {
+      "from": "approved-delta/3.1.9-to-3.2.0.json",
+      "to": ".mir/releases/deltas/3.1.9-to-3.2.0.json",
+      "sha256": "D8152B27EDA5F922FD6C99FC6E3D8ECC9153581688A33F9AE965525E22192F36"
+    },
+    {
+      "from": "approved-delta/3.2.0-to-3.2.1.json",
+      "to": ".mir/releases/deltas/3.2.0-to-3.2.1.json",
+      "sha256": "39C0CF7753F0733B44C83829417C566BC2FC0313F297B7AFDE93C607F7235CEB"
+    },
+    {
+      "from": "approved-delta/3.2.1-to-3.2.2.json",
+      "to": ".mir/releases/deltas/3.2.1-to-3.2.2.json",
+      "sha256": "C7452A606CD36EFD33DFBE4BBBBFF3C4AC4613F19553066D76ABA781B1CABAFE"
+    }
+  ]
+}

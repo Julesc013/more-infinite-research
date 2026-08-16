@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-08-03
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -23,11 +23,20 @@ Governed technology settings preserve the same keys:
 ```text
 ips-enable-<stream>
 ips-cost-base-<stream>
+ips-cost-linear-increment-<stream>
 ips-cost-growth-<stream>
 ips-max-level-<stream>
 ips-research-time-<stream>
 ips-effect-per-level-<stream>
 ```
+
+Research costs use the schema-1 `mir-research-cost-v1` contract:
+
+```text
+cost(L) = (B + A * (L - S)) * G ^ (L - S)
+```
+
+`S` is the first controlled level, `B >= 1` is its base cost, `A >= 0` is the integer additive increment, and `G >= 1` is the exponential multiplier. The derived kind is fixed, linear, exponential, or hybrid; it is not a setting. Base extensions use the corresponding `mir-cost-base-<technology>`, `mir-cost-linear-increment-<technology>`, and stable `mir-cost-growth-<technology>` IDs. Their base setting retains its pre-3.2.5 meaning as the global coefficient in `coefficient * G ^ (L - 1)`. MIR first retains the historical six-significant-digit formula operands, then projects the coefficient to `B` at level `S`; the new additive increment begins from that anchor. This preserves saved profiles and the 3.2.3 realized curve when the increment remains zero. Unchanged external formulas are preserved verbatim, supported formulas are canonicalized only after an explicit override, and unknown formulas reject override rather than executing or approximating third-party text.
 
 MIR uses `hidden = true` for provider-specific or unsupported stream settings and for retained migration-only setting IDs. It does not use `forced_value` for those settings, because saved and imported values must remain readable.
 
@@ -140,6 +149,10 @@ Every generated stream and base continuation also has an `ips-effect-per-level-<
 The Factorio 2.1 streams `research_processing_unit`, `research_plastic`, `research_low_density_structure`, `research_rocket_fuel`, and `research_steel` bind to `processing-unit-productivity`, `plastic-bar-productivity`, `low-density-structure-productivity`, `rocket-fuel-productivity`, and `steel-plate-productivity`. Generated, adopted, already-covered, and fallback outcomes keep the same six `ips-*` setting IDs.
 
 An unchanged setting group produces `preserve_native_owner` and retains the final owner snapshot exactly; MIR's catalog defaults are not applied over a native or modded balance. `ips-enable-<stream> = false` skips owner planning and performs no external mutation. Explicit non-default cost, growth, time, maximum-level, or effect values produce a configuration plan only for a recognized infinite, reachable owner. Cost base and growth form one visible cost-model pair: changing either applies both displayed values, matching generated-stream settings behavior. Effect overrides touch only relevant `change-recipe-productivity` rows and preserve unrelated effects.
+
+Maximum level `0` means infinite. A positive integer is the absolute highest technology level permitted, not a count of additional levels. On script-capable targets, MIR keeps the managed prototype infinite and enforces the selected finite cap from a compiler-published runtime policy. This prevents Factorio from discarding completed levels before configuration-change recovery runs. Lowering a cap retains completed levels, removes invalid current or queued research, and preserves fractional progress when the research remains valid. Raising the cap or returning it to `0` restores future research. This contract is identical for generated streams, generated base continuations, native owners, direct startup values, and effective MIRSET1 imports.
+
+If a later data-stage finalizer changes a managed prototype to a finite maximum, MIR refuses lossless runtime enforcement and logs the setting, selected and planned cap, final observed maximum, binding operation, source, and conflict reason. It does not claim that the user's cap is active.
 
 Recognized cost shapes are `growth^L*base`, `base*growth^(L-1)`, and fixed count for base-only changes. An unknown formula remains valid for default preservation but rejects explicit cost changes. Plans carry immutable input and expected-output fingerprints, whole-plan validation rejects duplicate owner bindings, and emission verifies the input before applying one transaction. See [native owner binding](../architecture/native-owner-binding.md) and `.mir/native-owner-cost-models.json`.
 

@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "MIR4R0DashboardV1",
+  "status": "READY_FOR_MIR4_R0_IMPLEMENTATION",
+  "package_visible": false,
+  "generated_from": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-ProgrammeV1.json",
+      "sha256": "8B1C761D8DAC4E482CEE8434869166AE5CAFBABBFF2B9ADF7E1B918A6923AA9A"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
+      "sha256": "50A495A3474C0877AC425B2E518E278D399E8409E285DC0C82C3E4C8F5F68523"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json",
+      "sha256": "E0DC9EF324EE8930D282AFBC222785344F8ACE288B3FDFC5D31046B9156FD01C"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Repository-Layout-TransitionV1.json",
+      "sha256": "A9DC6B0E779F43DAD146B2919F55378A2C01A741E4A5158503E575C75FDDEDF7"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json",
+      "sha256": "617D620628C4308C0402874907DC90127CD3770887D6089E34E6EF2AF1EA7607"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json",
+      "sha256": "F7389E10AA9BF03F2A18962DDBD7342724A61C78C944A432E0B70503956188B2"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json",
+      "sha256": "34EFFACBE0F7B56C48D72484D5511D86B057E602FBBF52E835761A1C337EC708"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json",
+      "sha256": "0A2CA7C042D79915B181F637497F1FAB1E391F7421A0665CFF1B68C656AD0E22"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Offline-Release-AuthorityV1.json",
+      "sha256": "2F9D33CFEDEBA3C20A6F5199F76DD9714186320E8EBEE88AD7BB802167D95816"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR3-to-MIR4-Governance-ReconciliationV1.json",
+      "sha256": "4E9185C0C8992C01F830AE6E9FF8950713E04EC1ED94C62135D2FC47980B91FC"
+    },
+    {
+      "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
+      "sha256": "CF2142297FF4971378780C747523905B546A84FDA4191FDFDA6108E456551F56"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+      "sha256": "7F9478E2F6875B35A43349879D476D35026912CA4BDD8BB94FC907987606582C"
+    },
+    {
+      "path": ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
+      "sha256": "A23866B49705F095DE8E429CB3681A37B15B8C7474B3D91737D38F0E0BE7B17C"
+    },
+    {
+      "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
+      "sha256": "13FC741342124F0EE93EAC8ADB27DECC3828C1D6028187131BB3CF8A555528AF"
+    }
+  ],
+  "payload": {
+    "mir3": {
+      "product_development": "closed",
+      "github_publication": "complete",
+      "mod_portal_custody": "partial-two-visible-seven-not-uploaded",
+      "terminal_dot9_baselines": "capture-ready-custody-pending",
+      "final_index": "pending",
+      "museum_and_restore": "pending",
+      "eol": "pending"
+    },
+    "mir4": {
+      "r0": "active-package-excluded",
+      "semantic_authority": false,
+      "public_4x": "forbidden-until-mir3-eol",
+      "emergency_lane": "admitted-not-yet-proven"
+    },
+    "package_delta": 0,
+    "next_executable_task": "M4-003-local-offline-emergency-lane"
+  },
+  "record_sha256": "E7A39B436BA3B92854CFDAB0B4E92C83DF7FFFB43406CCE7B05A97F1D76165A6"
+}

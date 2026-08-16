@@ -1,8 +1,6 @@
 local techs = data.raw.technology or {}
 local recipes = data.raw.recipe or {}
 local is_space_age = mods and mods["space-age"] ~= nil
-local factorio_2_0 = mods and type(mods.base) == "string"
-  and string.match(mods.base, "^2%.0%.") ~= nil
 local use_installed_space_age_icons =
   settings
   and settings.startup
@@ -203,15 +201,6 @@ local function assert_compiler_evidence()
   end
 end
 
-local function assert_mod_data_omitted()
-  for name, _ in pairs(data.raw["mod-data"] or {}) do
-    if string.match(name, "^more%-infinite%-research%-")
-      and name ~= "more-infinite-research-compatibility-pack" then
-      fail("target without mod-data support published MIR artifact " .. name)
-    end
-  end
-end
-
 local function assert_decision_record_v2()
   local decision_record = require("__more-infinite-research__.prototypes.mir.domain.decisions.decision_record")
   local confidence = decision_record.confidence({identity = 1, family = 0.95, loop_safety = 0.25, total = 0.75})
@@ -341,15 +330,7 @@ local function assert_recipe_fact_contracts()
 
   local complete_shape = canonical_recipe_facts.get("mir-fixture-complete-product-shape")
   local product = complete_shape and complete_shape.variants[1] and complete_shape.variants[1].results[1]
-  if not product or product.independent_probability ~= 0.5 or product.extra_count_fraction ~= 0.25 then
-    fail("RecipeFactV2 did not normalize the target product probability shape")
-  end
-  if factorio_2_0 then
-    if product.declared_probability ~= 0.5 or product.declared_independent_probability ~= nil
-      or product.percent_spoiled ~= nil or product.quality_min ~= nil then
-      fail("RecipeFactV2 did not preserve the Factorio 2.0 product shape")
-    end
-  elseif product.declared_independent_probability ~= 0.5 or product.declared_probability ~= nil
+  if not product or product.independent_probability ~= 0.5 or product.extra_count_fraction ~= 0.25
     or product.percent_spoiled ~= 0.1 or product.always_fresh ~= true
     or product.reset_freshness_on_craft ~= true or product.quality_min ~= "normal"
     or product.quality_max ~= "normal" or product.quality_change ~= 0
@@ -371,17 +352,8 @@ local function assert_recipe_fact_contracts()
   for _, field in ipairs(target_profile.prototype_shapes.product_probability_fields or {}) do
     probability_fields[field] = true
   end
-  local required_probability_fields = factorio_2_0
-    and {"probability", "extra_count_fraction", "ignored_by_productivity", "ignored_by_stats"}
-    or {"independent_probability", "shared_probability", "extra_count_fraction", "quality_min", "quality_max"}
-  for _, field in ipairs(required_probability_fields) do
+  for _, field in ipairs({"independent_probability", "shared_probability", "extra_count_fraction", "quality_min", "quality_max"}) do
     if not probability_fields[field] then fail("target profile omits product field " .. field) end
-  end
-  local forbidden_probability_fields = factorio_2_0
-    and {"independent_probability", "shared_probability", "percent_spoiled", "quality_min", "quality_max"}
-    or {"probability"}
-  for _, field in ipairs(forbidden_probability_fields) do
-    if probability_fields[field] then fail("target profile admits foreign product field " .. field) end
   end
 end
 
@@ -533,13 +505,9 @@ local base_extension_defaults = {
 }
 
 assert_no_blocked_pickup_effects()
-if target_profile.prototype_shapes.mod_data then
-  assert_generation_plan_v3()
-  assert_compiler_telemetry()
-  assert_compiler_evidence()
-else
-  assert_mod_data_omitted()
-end
+assert_generation_plan_v3()
+assert_compiler_telemetry()
+assert_compiler_evidence()
 assert_decision_record_v2()
 assert_setting_target_ownership()
 
@@ -996,6 +964,39 @@ local function assert_accepting_lab(technology_name)
   end
   fail("technology " .. technology_name .. " has no lab accepting its final science set.")
 end
+
+local function assert_native_follower_robot_continuation()
+  local technology = techs["follower-robot-count-5"]
+  if not technology or technology.max_level ~= "infinite" or technology.upgrade ~= true then
+    fail("vanilla follower-robot-count-5 must remain the native infinite continuation.")
+  end
+  if not technology.unit or technology.unit.count_formula ~= "1000*(L-4)" or technology.unit.time ~= 30 then
+    fail("vanilla follower robot infinite cost contract changed unexpectedly.")
+  end
+  local matching_effects = 0
+  for _, effect in ipairs(technology.effects or {}) do
+    if effect.type == "maximum-following-robots-count" then
+      matching_effects = matching_effects + 1
+      if effect.modifier ~= 25 then
+        fail("vanilla follower robot infinite modifier must remain +25 per level.")
+      end
+    end
+  end
+  if matching_effects ~= 1 then
+    fail("vanilla follower robot infinite continuation must retain one exact count effect.")
+  end
+  assert_technology_has_science("follower-robot-count-5", {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "military-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack"
+  })
+end
+
+assert_native_follower_robot_continuation()
 
 local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
   local owner = techs[owner_name]

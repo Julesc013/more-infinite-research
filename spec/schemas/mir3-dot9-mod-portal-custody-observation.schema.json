@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+  "title": "MIR 3 .9 Mod Portal custody observation",
+  "type": "object",
+  "required": ["schema", "kind", "status", "observed_at", "api", "identity_authority", "observations", "summary", "hard_boundary"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3Dot9ModPortalCustodyObservationV1"},
+    "status": {"const": "partial-two-api-visible-sha1-matched-seven-not-uploaded"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "api": {"type": "string", "format": "uri"},
+    "identity_authority": {"const": ".mir/releases/terminal/MIR3TerminalFamilyReadinessV1.json"},
+    "observations": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"type": "object"}},
+    "summary": {"type": "object"},
+    "hard_boundary": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}

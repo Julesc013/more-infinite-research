@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "CHG-2026-0020",
+  "title": "Deliver the unified MIR 3 terminal .9 stabilization wave",
+  "kind": "release",
+  "package_visible": true,
+  "domains_read": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "product.compatibility",
+    "runtime.migration",
+    "assurance.plan"
+  ],
+  "domains_written": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "product.compatibility",
+    "runtime.migration",
+    "assurance.plan"
+  ],
+  "affected_targets": [
+    "factorio-2.1",
+    "factorio-2.0",
+    "factorio-1.1",
+    "factorio-1.0",
+    "factorio-0.17",
+    "factorio-0.16",
+    "factorio-0.15",
+    "factorio-0.14",
+    "factorio-0.13"
+  ],
+  "migration_impact": "Use immutable .5 releases as the only public predecessors; admit only defect correction, stabilization, archival, and MIR 4 handoff work; assign candidate identities only after exact source freeze; preserve stable public identities unless an admitted defect requires a governed migration; independently materialize and qualify every lower target; prohibit .6 through .8; and route feature or platform redesign to MIR 4.",
+  "release_note_impact": "MIR 3.2.9 and the corresponding lower .9 releases are planned final MIR 3 stabilization releases. The .5 releases remain current until exact .9 candidates complete normal qualification and publication.",
+  "test_obligations": [
+    "release.authority",
+    "release.presentation",
+    "release.distribution",
+    "docs.schema",
+    "docs.generated",
+    "package.identity",
+    "package.composition",
+    "package.determinism",
+    "runtime.upgrade",
+    "runtime.target-engine",
+    "manual.acceptance",
+    "protected.qualification",
+    "public-byte-verification"
+  ],
+  "backport_disposition": {
+    "factorio-2.1": "implement admitted portable corrections canonically on dev and qualify 3.2.9 first",
+    "factorio-2.0": "project from exact portable 3.2.9 source onto immutable 2.5.5 with bounded adapters",
+    "historical-targets": "materialize each .9 directly from its immutable .5 predecessor plus the exact portable source; never use a lower-target waterfall"
+  },
+  "planning_authority": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json",
+  "state": "planned"
+}

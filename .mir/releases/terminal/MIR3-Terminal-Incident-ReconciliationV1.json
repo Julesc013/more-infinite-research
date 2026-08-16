@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR3-Terminal-Incident-ReconciliationV1",
+  "purpose": "Preserve candidate-era incident history while projecting truthful terminal execution state.",
+  "rules": {
+    "history_mutation_permitted": false,
+    "dot5_package_mutation_permitted": false,
+    "retained_debt_may_feed_dot9_only_after_reproduction": true
+  },
+  "items": [
+    {"incident":"INC-2026-0035","terminal_state":"closed","display_status":"closed-by-reporter-confirmed-3.2.2-and-github-issue-close","destination":"history-and-retained-regressions"},
+    {"incident":"INC-2026-0041","terminal_state":"closed","display_status":"closed-by-publicly-verified-3.2.3","destination":"history"},
+    {"incident":"INC-2026-0042","terminal_state":"closed","display_status":"closed-by-publicly-verified-3.2.3","destination":"history"},
+    {"incident":"INC-2026-0045","terminal_state":"closed","display_status":"closed-by-publicly-verified-3.2.3","destination":"history"},
+    {"incident":"INC-2026-0046","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0047","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0048","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0049","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0052","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0054","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0055","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0057","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0058","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0059","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"},
+    {"incident":"INC-2026-0060","terminal_state":"closed","display_status":"closed-by-terminal-assurance-calibration","destination":"MIR3TerminalAssuranceCalibrationReceiptV1"}
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0047",
+  "title": "C30 context selected the stale C24 upgrade transition",
+  "external_issue": "internal://control-plane/release-specific-upgrade-profile",
+  "state": "regression-proven-pending-qualification",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C30",
+    "context_id": "0EAB6078DF65AF9937A26D674B3168723DD87922B294910419CB5596F408A02D",
+    "context_abi": 3,
+    "target_profile_sha256": "5B68D750052001BC74550899A3CB204B4307DB4C9311333EA1A0AC1D534DB554"
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "observed": "The first ABI-3 C30 context bound the generic Factorio 2.1 profile's historical 3.2.1-to-3.2.2 transition instead of the required exact 3.2.2-to-3.2.3 C30 transition.",
+    "selected_from_version": "3.2.1",
+    "selected_to_version": "3.2.2",
+    "selected_fixture": "assert-upgrade-3-2-1-to-3-2-2"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "The target-line profile combined stable engine identity with release-specific upgrade authority. Context creation copied that mutable historical default verbatim, so later releases on the same Factorio line inherited the wrong baseline and fixture."
+  },
+  "repair_changes": [
+    "CHG-2026-0001:release-specific-upgrade-profile-projection"
+  ],
+  "regression_propositions": [
+    "the ReleaseRecord optionally binds an exact typed from-version, to-version, and upgrade fixture",
+    "context materialization projects release-specific upgrade authority over the stable target-line profile",
+    "the projected profile's to-version equals the candidate release",
+    "the projected baseline exists on the same Factorio target",
+    "the named fixture exists",
+    "environment-locks.json binds the exact staged target-profile.json digest",
+    "C30 selects only the exact 3.2.2-to-3.2.3 transition while C24 calibration retains 3.2.1-to-3.2.2"
+  ],
+  "affected_releases": [
+    "3.2.3"
+  ],
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "package_bytes_changed": false
+  },
+  "closure": {
+    "status": "pending-exact-c30-upgrade-and-complete-qualification",
+    "proof_required": "a new immutable C30 context whose target profile binds 3.2.2 to 3.2.3, followed by the exact upgrade measurement and complete candidate qualification"
+  }
+}

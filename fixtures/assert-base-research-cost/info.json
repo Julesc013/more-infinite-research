@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-base-research-cost",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Base Research Cost",
+  "author": "Julesc013",
+  "description": "Asserts a vanilla continuation uses the unified anchored linear research-cost model.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

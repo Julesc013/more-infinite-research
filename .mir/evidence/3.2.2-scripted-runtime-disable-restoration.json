@@ -1,0 +1,136 @@
+{
+  "schema": 2,
+  "run_id": "05156815-498b-46f4-986f-da0f3ad06bcb",
+  "mir_version": "3.2.2",
+  "factorio_version": "2.1",
+  "factorio_binary_version": "2.1.12",
+  "git_commit": "9c282fafbd0704738931d7368ccc52b21116f2ff",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "34EBD9A8689E80DD0F5A5CE957A9BE6623FF27E4E46785D15196F42295F1C3E8",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "AB8106985CAA0D95560B6231CC1142E84A1AF8B0655D8A9865378A65BE6EAEBA",
+  "expected_scenarios": [
+    "package-build",
+    "runtime-state-contract",
+    "space-age-scripted-runtime-disable-restoration",
+    "static-validation"
+  ],
+  "target_profile_sha256": "448635489298A02FF3B26BF83E5AAB7120806A10500EB0F3FA4D9C64D28EE1D4",
+  "required_groups_sha256": "3298C4D8D40054B8445B800616294BD2868E94A5A7556CFA9AAE9AF8BA042724",
+  "package_source_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+  "validation_package_sha256": "8A08758EECEEE3A930DE58A36395DD011F9BC2FB69D214CCAFFC065276ECF8D8",
+  "validation_package_content_sha256": "25E05F748E5B33748F16F78C66DDE4FD11CB48DB5F499BBE232668746981C87F",
+  "status": "passed",
+  "started_at": "2026-07-27T16:08:27.936538Z",
+  "completed_at": "2026-07-27T16:08:59.164149Z",
+  "duration_seconds": 31.228,
+  "current_scenario": null,
+  "required_groups": [
+    "package",
+    "runtime-state",
+    "space-age",
+    "static"
+  ],
+  "groups": [
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.012,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.013,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 31.094,
+      "scenarios": [
+        "space-age-scripted-runtime-disable-restoration"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.014,
+      "scenarios": [
+        "static-validation"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "f86692ec-2618-4461-bc24-d1b701f138b5",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-27T16:08:27.9441083Z",
+      "completed_at": "2026-07-27T16:08:27.9585902Z",
+      "duration_seconds": 0.014,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "34c90a0e-df5a-4eed-9592-e63288ef884d",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-27T16:08:27.9655894Z",
+      "completed_at": "2026-07-27T16:08:27.9778214Z",
+      "duration_seconds": 0.012,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2f3e7240-6a2c-4e72-9cfb-901102e2b60c",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-27T16:08:27.986973Z",
+      "completed_at": "2026-07-27T16:08:28.0004408Z",
+      "duration_seconds": 0.013,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "99ca29d7-6693-4143-a745-a5d09988c18d",
+      "name": "space-age-scripted-runtime-disable-restoration",
+      "kind": "configuration-change",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-27T16:08:28.0257614Z",
+      "completed_at": "2026-07-27T16:08:59.1197133Z",
+      "duration_seconds": 31.094,
+      "evidence_paths": [
+        "<ephemeral:factorio-current.log>"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

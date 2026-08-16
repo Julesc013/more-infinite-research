@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "mir-approved-patch-delta",
+  "status": "approved",
+  "baseline": {
+    "version": "3.2.0",
+    "archive": "dist/more-infinite-research_3.2.0.zip",
+    "source_commit": "303de261629149af5f50bd210368e61423f1a299",
+    "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+    "package_content_sha256": "26CBE7A12FA30C3352343B77A0062FE07426284992EFCBA8DCB82C221CE2DD18"
+  },
+  "current": {
+    "version": "3.2.1",
+    "archive": "dist/more-infinite-research_3.2.1.zip",
+    "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+    "package_source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "package_content_sha256": "5C6621B2C7A55780EC6F1FB26B1C1FB7B2E88A34604FC997D8A87FE189381188"
+  },
+  "allowed_changed_paths": [
+    "README.md",
+    "changelog.txt",
+    "info.json",
+    "prototypes/mir/platform/factorio/effect_target_inventory.lua",
+    "prototypes/mir/platform/factorio/prototype_lookup.lua"
+  ],
+  "reason": "Preserve concrete planet unlock-space-location effects while retaining fail-closed sanitation for genuinely missing targets.",
+  "migration_impact": "No runtime-state migration; corrected data-stage technology effects restore Space Age discovery semantics on load."
+}

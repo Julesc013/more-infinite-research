@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalBaselineReconciliationV1",
+  "release": "1.5.5",
+  "comparison": "declared-vs-realized",
+  "status": "reconciled",
+  "agreements": [
+    "archive identity exact",
+    "exact engine and official-data identities locked",
+    "post-data-final-fixes technology and effect inventory captured",
+    "setting defaults captured or explicitly capability-omitted",
+    "packaged locale and migration files reconciled"
+  ],
+  "contradictions": [],
+  "unresolved_findings": []
+}

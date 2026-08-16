@@ -6,11 +6,9 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.11`.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0.77` for the maintained `2.5.9` compiler backport.
-
-MIR `2.5.9` preserves the MIR 3.2.5 research-cost contract and adds deterministic earliest-safe selection across alternate science-pack production routes. It retains the Factorio 2.0 capability profile: science packs remain `tool` prototypes, unsupported `mod-data` emission and productivity-family adoption are compiled out, bounded research-cost support is reported through the target log adapter, Factorio 2.1-only modifiers are omitted, and every runtime claim is requalified on the 2.0 binary and mod line.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
@@ -33,7 +31,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are enabled by default. Spoilage preservation remains explicitly classified as factory-disruptive, stays at the top of the settings list, and warns that existing spoilable stacks may retain their current deadlines; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
-- **Conservative 3.2 scope:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
+- **Verified defaults:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
 
 Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 

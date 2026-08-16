@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0045",
+  "title": "C29 structural fallback ignored the disabled automatic-productivity action",
+  "external_issue": "internal://control-plane/c29-semantic-family-off-structural-fallback",
+  "state": "regression-proven-pending-release-qualification",
+  "failing_environment": {
+    "target": "2.1",
+    "release": "3.2.3",
+    "candidate": "C29",
+    "factorio_version": "2.1.12",
+    "scenario": "semantic-family-off",
+    "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1"
+  },
+  "reproduction": {
+    "status": "reproduced",
+    "error": "disabled action attached an automatic recipe",
+    "observed": "The reviewed stable Belt Productivity stream retained its explicit recipes, but the new structural fallback also attached the fixture recipe assemble-alpha while mir-automatic-productivity-action was disabled.",
+    "failure_packet_path": "C:/tmp/failure-packets/semantic-family-off.json",
+    "failure_packet_sha256": "7B362A144B1FC41054D9B0174FB824D3212F826B1095614D429D58503289EE9C",
+    "failed_run_summary_path": "C:/tmp/mir-c29-offline-full-validation-summary.json",
+    "failed_run_summary_sha256": "65E0F1CAEC88ABEEB3EEFF954A6B908DE798F7CE450DE901317BBC9B347B3D1B"
+  },
+  "root_cause": {
+    "status": "proven",
+    "summary": "Structural fallback groups were resolved independently of the automatic compiler policy. The stream-match cache identity also omitted the automatic action, so a cached structural result could not safely distinguish disabled, report, attach, and generate modes."
+  },
+  "repair_changes": [
+    "CHG-2026-0002:automatic-action-structural-fallback-c30"
+  ],
+  "regression_propositions": [
+    "disabled automatic-productivity action never attaches structural fallback recipes",
+    "report action does not mutate emitted technology effects",
+    "attach and generate actions retain their authorized structural behavior",
+    "reviewed explicit vanilla and provider attachments remain available when automatic structural discovery is disabled",
+    "stream-match identity includes the exact automatic-productivity action",
+    "exact C30 semantic-family off, report, attach, generate, and exact-pack scenarios pass"
+  ],
+  "affected_releases": [
+    "3.2.3"
+  ],
+  "superseded_candidate": {
+    "candidate_id": "C29",
+    "archive_sha256": "BC5898FC3BE09BAC0F55C751D21E05BF1F82132C98B2FA92A39BC9809D7647A1",
+    "content_sha256": "4AA68E4E381D691F97B4A8721AFF8BFEA9E992E9A8423D972990F0DCA66309B4",
+    "package_source_commit": "c5d11aab76ffee479ca4aaba3bb8fa4387918762"
+  },
+  "candidate_binding": {
+    "candidate_id": "C30",
+    "archive_sha256": "0DD4048F1DA65B506DBCCD67D2B0D08A89DFBE54169C1497563093B8F55F51F2",
+    "content_sha256": "2935EE1C77619DF90821658A6C42A1F428D87BE858BB10746E792760A40928B9",
+    "package_source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+    "focused_result_path": "C:/tmp/mir-c30-focused-semantic-family-off.json",
+    "focused_result_sha256": "5CD6919EC7BD867F105DCD018EEFB4200DD161C9A3FC38176D88E4DC09498A0B",
+    "focused_queue_sha256": "3622CA04A188C738105C8AB95D70BD62A2F52ED91A70F673D38CBD2BFCC73827"
+  },
+  "closure": {
+    "status": "pending-complete-c30-release-qualification",
+    "proof_required": "complete exact C30 runtime closure, candidate aggregate, manual acceptance, protected qualification, seal, promotion, and published 3.2.3 bytes"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0033",
+  "title": "Base-extension cap rollback deletes an external owner before skipped generation",
+  "source_observation": {
+    "observed_at": "2026-08-16T23:07:09+10:00",
+    "environment": "Exact public 3.2.10 archive SHA-256 5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7 on Steam Factorio 2.1.14.87180.",
+    "fact": "With mir-max-level-worker-robots-storage=3, below the first MIR continuation level 4, MIR skips its replacement but the external owner better-worker-robots-storage-infinite has already been removed."
+  },
+  "reproducer": {
+    "status": "reproduced-exact-public-package-exact-accepted-engine",
+    "scenario": "base-competitor-rollback",
+    "evidence": ".mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json",
+    "expected": "Retain the external owner and original dependent prerequisite when absolute cap policy makes MIR generation inapplicable.",
+    "observed": "The external owner is deleted before MIR declines to generate the replacement."
+  },
+  "severity": "P1",
+  "visibility": {
+    "package": true,
+    "gameplay": true,
+    "assurance": true
+  },
+  "affected_contract_family": [
+    "generated-base-continuations",
+    "external-owner-transaction-rollback",
+    "absolute-maximum-level-policy"
+  ],
+  "target_dispositions": [
+    {
+      "target": "3.2.10",
+      "disposition": "immutable-published-release-no-byte-rewrite"
+    },
+    {
+      "target": "MIR4",
+      "disposition": "required-m4-003-follow-up"
+    },
+    {
+      "target": "2.5.10",
+      "disposition": "not-authorized-without-independent-2.0-applicability"
+    }
+  ],
+  "required_correction": "Make external-owner removal transactional with the complete replacement plan, so a cap-based skipped generation leaves the owner and every dependent prerequisite untouched.",
+  "closure": {
+    "status": "open-deferred-to-mir4-under-maintainer-direction",
+    "release_blocking": false,
+    "reason": "3.2.10 is already immutable on GitHub; the maintainer directed remaining issues to MIR 4.0.0."
+  }
+}

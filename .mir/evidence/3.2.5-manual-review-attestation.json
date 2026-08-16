@@ -1,0 +1,58 @@
+{
+  "schema": 2,
+  "kind": "mir-manual-release-review",
+  "candidate_sha256": "AC81CAD1AC37F20E27A46BFAD243611DB251CACCF52E1AB4DA5D06CFDAA11ADF",
+  "candidate_content_sha256": "1A2A37380FDE8EA0C260F90414ECB2BF70314341369D816FDD74D59B50535A7D",
+  "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+  "checklist_version": "mir-manual-release-review-v1",
+  "factorio_version": "2.1.13",
+  "factorio_binary_sha256": "CA89D178A82D705BD570F46CE8CCF83E50503D3C5AFDECCD77A6061FBC985084",
+  "reviewer": "Julesc013",
+  "reviewed_at": "2026-08-06T09:07:40.9699842Z",
+  "items": [
+    {
+      "id": "technology-tree-visual",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go; no technology-tree defect or package change was requested.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "icon-visual",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go; no icon or presentation defect was requested.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "locale-fit-and-truncation",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go; no visible locale-fit defect was requested.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "settings-ux",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go; no settings UX defect or package change was requested.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "save-ui",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go, with the existing candidate-bound upgrade and transition campaign retained as supporting evidence.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "human-balance",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go; no balance correction or candidate replacement was requested.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    },
+    {
+      "id": "configuration-change-give-item-safety",
+      "status": "passed",
+      "notes": "Accepted by the maintainer's exact-C32 playtest and release go/no-go, with the existing exact configuration-change campaign retained as supporting evidence.",
+      "artifacts": [{"path": ".mir/evidence/3.2.5-c32-maintainer-playtest-acceptance.md", "sha256": "EC0FF158EB8A5BCAF5F459A209FF33EC2D9B8ED5612722810CFF82C0A4234170"}]
+    }
+  ],
+  "status": "passed",
+  "attestation_sha256": "7EE7F97DDCDEAC0C9B9D368FF3D6609734DFA5661C606702C37702A4F5C5D1FE"
+}

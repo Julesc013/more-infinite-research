@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "release": "3.2.0-dev",
+  "recorded_at": "2026-07-18",
+  "factorio_version": "2.1.10",
+  "candidate": {
+    "source_commit": "565e68398315762af653daf2ed6c1d40b93a4136",
+    "archive_sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C",
+    "source_commit_binding": "declared"
+  },
+  "campaigns": [
+    {
+      "id": "available-closures",
+      "campaign_evidence": ".mir/evidence/3.2.0-ecosystem-qualification/available-closures/campaign-evidence.json",
+      "campaign_evidence_sha256": "2D1E80430E8E6728980778213565DA6D1662BB9EEE2F25067E9B5C8BB4BBFB74",
+      "dependency_lock": ".mir/evidence/3.2.0-ecosystem-qualification/available-closures/compat-candidates.lock.json",
+      "dependency_lock_sha256": "45AE42FF967CBD2BF446DDCD0C8BF2C8550AF083738C9C7B4EDB8CD2358D1014"
+    },
+    {
+      "id": "krastorio-spaced-out",
+      "campaign_evidence": ".mir/evidence/3.2.0-ecosystem-qualification/krastorio-spaced-out/campaign-evidence.json",
+      "campaign_evidence_sha256": "B81FE982471AC4B876A4F14FE912D38C1AA199AA7CACDAA21BDFAA13CCE56A51",
+      "dependency_lock": ".mir/evidence/3.2.0-ecosystem-qualification/krastorio-spaced-out/compat-candidates.lock.json",
+      "dependency_lock_sha256": "957BBB1B7E134CEDDB2CD8B181ED6E753FC92C889EDBCCEEE4D3C5E7863C3DEB"
+    },
+    {
+      "id": "pymodpack",
+      "campaign_evidence": ".mir/evidence/3.2.0-ecosystem-qualification/pymodpack/campaign-evidence.json",
+      "campaign_evidence_sha256": "1670386E6092B0589824F285ABC3478444EB623C43A76C0FCEABBAEA049763B6",
+      "dependency_lock": ".mir/evidence/3.2.0-ecosystem-qualification/pymodpack/compat-candidates.lock.json",
+      "dependency_lock_sha256": "E716CBFB3BBE794C2ED5FAB3BC8BDFD489A0E73F86B992BE5C47B58B67E6E4EE"
+    }
+  ],
+  "summary": {
+    "passed_load_claims": 7,
+    "blocked_missing_dependency_closures": 2,
+    "mir_runtime_failures": 0,
+    "complete_named_ecosystem_campaign": false
+  },
+  "scenarios": [
+    {
+      "name": "local-2-1-crucible-rigor-exact-dist",
+      "status": "passed",
+      "resolved_mods": 8,
+      "official_mods": 4,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-space-age-planet-cluster",
+      "status": "passed",
+      "resolved_mods": 46,
+      "official_mods": 4,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-aai-representative-extensions",
+      "status": "passed",
+      "resolved_mods": 3,
+      "official_mods": 0,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-bz-suite-space-age",
+      "status": "passed",
+      "resolved_mods": 6,
+      "official_mods": 4,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-krastorio-base",
+      "status": "passed",
+      "resolved_mods": 7,
+      "official_mods": 0,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-bob-suite",
+      "status": "passed",
+      "resolved_mods": 14,
+      "official_mods": 0,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-krastorio-spaced-out",
+      "status": "passed",
+      "resolved_mods": 7,
+      "official_mods": 4,
+      "dependency_failures": 0,
+      "claim_level": "loads"
+    },
+    {
+      "name": "local-2-1-krastorio-space-exploration",
+      "status": "blocked_missing_dependency_closure",
+      "resolved_mods": 19,
+      "official_mods": 0,
+      "dependency_failures": 3,
+      "missing": [
+        "space-exploration-graphics-2",
+        "space-exploration-menu-simulations",
+        "space-exploration-postprocess"
+      ],
+      "claim_level": "none"
+    },
+    {
+      "name": "pymodpack",
+      "status": "blocked_missing_dependency_closure",
+      "resolved_mods": 0,
+      "official_mods": 0,
+      "dependency_failures": 1,
+      "missing": [
+        "pymodpack"
+      ],
+      "claim_level": "none"
+    }
+  ],
+  "input_boundary": {
+    "local_library_archives": 602,
+    "offline_resolution": true,
+    "mod_portal_download_token_available": false,
+    "blocked_results_are_not_mir_runtime_failures": true
+  },
+  "claim_level": "development-load-evidence-not-release-qualification"
+}

@@ -1,0 +1,356 @@
+{
+  "archive_destination_preflight": {
+    "path": ".mir/evidence/terminal-publication",
+    "repository_excluded_from_packages": true,
+    "status": "ready"
+  },
+  "authorization": {
+    "github_publication": true,
+    "mod_portal_upload": false,
+    "path": ".mir/releases/terminal/MIR3TerminalMaintainerAcceptanceV1.json",
+    "reviewer": "Julesc013",
+    "sha256": "12FDFD70F1F1937B0C6E0C1262FA7133DF7E7AABF40A32BFA2665025392AFEC4"
+  },
+  "branch_promotion_preflight": {
+    "legacy": {
+      "from": "27877275854eb131efeb42672d3676c9c513c85e",
+      "mode": "governed-fast-forward",
+      "status": "ready",
+      "to": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb"
+    },
+    "lower_targets": "immutable-tag-only-no-permanent-branches",
+    "main": {
+      "from": "391684ffe5822dbadc0b6644d22fd9640ee0ffa8",
+      "mode": "governed-fast-forward",
+      "status": "ready",
+      "to": "a60230a0695d2dd8fd1e727744614e746cda0bd8"
+    }
+  },
+  "checksum_file": {
+    "path": "docs/releases/SHA256SUMS-MIR-3.txt",
+    "sha256": "42274E22196384566D4BDADE5872D1A7AC19BB6D0883CD6E7634F752A2F8600D"
+  },
+  "defect_index": {
+    "path": ".mir/releases/terminal/MIR3-FINAL-DEFECT-INDEX.json",
+    "sha256": "DD683F8AF324B96D7E034B4325E36DAD184002880070E9B78733C8BEC6A6217C"
+  },
+  "defect_qualification_reconciliation": {
+    "path": ".mir/releases/terminal/MIR3FinalDefectQualificationReconciliationV1.json",
+    "sha256": "6A22A95C26F6C3C46FF47B616C44631FFF4E51DA0C3E6D16489BFCF61432A7C2",
+    "status": "final-candidates-qualified-and-sealed"
+  },
+  "fixed_point_receipt": {
+    "path": ".mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json",
+    "sha256": "C6506E53E543AE9AACA0B404E2B10480A6CAB8E1C765DFA9A9A652F5154D78D9",
+    "status": "accepted-all-nine"
+  },
+  "kind": "Mir3TerminalFamilyReadinessV1",
+  "mod_portal_descriptions": [
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/3.2.9.md",
+      "release": "3.2.9",
+      "sha256": "DC249DD896C9F1CDFA1547CA74FF7B3EB1FB6CBED98CC6419F594806E73160CF"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/2.5.9.md",
+      "release": "2.5.9",
+      "sha256": "F72816F7A19455C24E7D8C6166ACBF711CCE9296916505C1C504263D7F4E9C58"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.9.9.md",
+      "release": "1.9.9",
+      "sha256": "883A00B89F00FD03AAF0CB5EAC4644C85A108304A8E76AD9515B6601F27BD40C"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.8.9.md",
+      "release": "1.8.9",
+      "sha256": "3E8648496FE2E927B48635FFEAB702BA4A789153EDD0923806C8CD54F7DADFC0"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.7.9.md",
+      "release": "1.7.9",
+      "sha256": "8D33BB2EB3E390DE976A5B8463007A3A376E250207DFC8081BCC3467B6D35F88"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.6.9.md",
+      "release": "1.6.9",
+      "sha256": "F1A14D8E87A71227FC6FFB7718C8C5DBAF98DFE9EA567BA3C2DB860A178DAF27"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.5.9.md",
+      "release": "1.5.9",
+      "sha256": "F1AA7E1D272ED5D92A28A649BB2EB093D845048C0F8EC2208EE0C1A6555D8EB1"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.4.9.md",
+      "release": "1.4.9",
+      "sha256": "BA34A50B6E6A628ABDE2AE606F77ECAF69E60D34EAA804FDDE3A6146821FA56C"
+    },
+    {
+      "path": ".mir/releases/terminal/mod-portal-descriptions/1.3.9.md",
+      "release": "1.3.9",
+      "sha256": "D9BB15DB848C6E11622930E328AFCAF86DD145B2C700215506DDF3EA88F7EDDE"
+    }
+  ],
+  "publication_credentials": {
+    "actor": "Julesc013",
+    "admin": true,
+    "checked_at": "2026-08-15T14:27:50+10:00",
+    "provider": "github",
+    "push": true,
+    "repository": "Julesc013/more-infinite-research",
+    "status": "ready"
+  },
+  "record_sha256": "7568D972D501BA51B1C3E613E4376CDB8453821EDC0B5C2B0B2ADD49DC404973",
+  "release_bodies": [
+    {
+      "path": ".mir/releases/terminal/release-bodies/3.2.9.md",
+      "release": "3.2.9",
+      "sha256": "CCC4B742D2E34F820E81053D31942EA68909075DCB44CEAF5AA6A28BD69760C8"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/2.5.9.md",
+      "release": "2.5.9",
+      "sha256": "68CD062C7160AB35ABE2928A530DB3A1114396ADC8EF6E1C66C6F7CFCFAC992F"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.9.9.md",
+      "release": "1.9.9",
+      "sha256": "97BE14D60403F7A8767D9AC88B903F4463DB6BD316BC639BA64B31FBEF0FFC4A"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.8.9.md",
+      "release": "1.8.9",
+      "sha256": "1BFFC8D87FDA41A2EC94A4E32988400247EC1378D8CCA3220202609318878962"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.7.9.md",
+      "release": "1.7.9",
+      "sha256": "FADAAE43112F9C19034B571BA0372D8C101AA2405919FD238D5C76A72E79521F"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.6.9.md",
+      "release": "1.6.9",
+      "sha256": "007EBF7DC8ECFDB5452374FDE281879DD618518E223A1263136ABBC2A03321AB"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.5.9.md",
+      "release": "1.5.9",
+      "sha256": "2E9F5F503723B7AB7D219FAF7806DA0ED693AA4969609009FDBF8D8A42FE8DBA"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.4.9.md",
+      "release": "1.4.9",
+      "sha256": "5582CD846BB754E189D460FA042329520889BD61AD39D607EC776B0A56B44AF3"
+    },
+    {
+      "path": ".mir/releases/terminal/release-bodies/1.3.9.md",
+      "release": "1.3.9",
+      "sha256": "429158CC7DDDF09E1B941C40613C9213DB403FD9EC44856AA9831E46D93E8386"
+    }
+  ],
+  "releases": [
+    "3.2.9",
+    "2.5.9",
+    "1.9.9",
+    "1.8.9",
+    "1.7.9",
+    "1.6.9",
+    "1.5.9",
+    "1.4.9",
+    "1.3.9"
+  ],
+  "schema": 1,
+  "seal_material_sha256": "AA08A79A63577301D9E7CBF3FBFEA48C917E61AF11A7706E7A580CE571AF3A1F",
+  "sealed_archives": [
+    {
+      "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+      "bytes": 1061572,
+      "candidate_id": "C33",
+      "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25",
+      "entries": 303,
+      "release": "3.2.9"
+    },
+    {
+      "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
+      "bytes": 1058800,
+      "candidate_id": "2.5-P13",
+      "content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C",
+      "entries": 301,
+      "release": "2.5.9"
+    },
+    {
+      "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843",
+      "bytes": 397677,
+      "candidate_id": "1.9-P1",
+      "content_sha256": "3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064",
+      "entries": 174,
+      "release": "1.9.9"
+    },
+    {
+      "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A",
+      "bytes": 397678,
+      "candidate_id": "1.8-P1",
+      "content_sha256": "7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E",
+      "entries": 174,
+      "release": "1.8.9"
+    },
+    {
+      "archive_sha256": "B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C",
+      "bytes": 385310,
+      "candidate_id": "1.7-P1",
+      "content_sha256": "3D70E21D6AAD6CBE724E155468AD22683FA2D9D947FF9B6BD66462974C621014",
+      "entries": 177,
+      "release": "1.7.9"
+    },
+    {
+      "archive_sha256": "928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84",
+      "bytes": 385315,
+      "candidate_id": "1.6-P1",
+      "content_sha256": "09C7793955E99A6A29DA97618BA4D7EB2AF988C59FD4A0C8FF651FC54F522493",
+      "entries": 177,
+      "release": "1.6.9"
+    },
+    {
+      "archive_sha256": "85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E",
+      "bytes": 385629,
+      "candidate_id": "1.5-P1",
+      "content_sha256": "C4C445B776B5B9734EFA85DA0FA62E5090A237A5141089CC110CBF5D331A47ED",
+      "entries": 177,
+      "release": "1.5.9"
+    },
+    {
+      "archive_sha256": "1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872",
+      "bytes": 386070,
+      "candidate_id": "1.4-P1",
+      "content_sha256": "26C6A1AFB4EFEE5FE8ABBAE7B90B69BBFCA9419698AFEE376BBFE7B38ABF54EA",
+      "entries": 177,
+      "release": "1.4.9"
+    },
+    {
+      "archive_sha256": "CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A",
+      "bytes": 386160,
+      "candidate_id": "1.3-P1",
+      "content_sha256": "AEC9838347AE6FC408D0829FEFF26FF658ABBE602F8F465EA8A0EB1C9DB5FA3B",
+      "entries": 177,
+      "release": "1.3.9"
+    }
+  ],
+  "sealed_at": "2026-08-15T14:27:50+10:00",
+  "signing_disposition": {
+    "mode": "annotated-unsigned",
+    "reason": "no-stable-release-signing-key-configured",
+    "unrelated_key_permitted": false
+  },
+  "status": "ready-for-local-tagging",
+  "tag_preflight": {
+    "existing_terminal_tags": 0,
+    "names": [
+      "3.2.9",
+      "2.5.9",
+      "1.9.9",
+      "1.8.9",
+      "1.7.9",
+      "1.6.9",
+      "1.5.9",
+      "1.4.9",
+      "1.3.9"
+    ],
+    "status": "ready",
+    "targets": [
+      {
+        "commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+        "name": "3.2.9"
+      },
+      {
+        "commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+        "name": "2.5.9"
+      },
+      {
+        "commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+        "name": "1.9.9"
+      },
+      {
+        "commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+        "name": "1.8.9"
+      },
+      {
+        "commit": "215ccced7018aac70919221c73e15d795f9d1653",
+        "name": "1.7.9"
+      },
+      {
+        "commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+        "name": "1.6.9"
+      },
+      {
+        "commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+        "name": "1.5.9"
+      },
+      {
+        "commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+        "name": "1.4.9"
+      },
+      {
+        "commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+        "name": "1.3.9"
+      }
+    ]
+  },
+  "target_seals": [
+    {
+      "path": ".mir/releases/terminal/seals/3.2.9.json",
+      "record_sha256": "BD1371FD08A6E87D9DB3220A9B6F5F89FA657644235D7A3996EE90B430D31723",
+      "release": "3.2.9",
+      "sha256": "A098AC1F487BE702114F480C7BFEECA9BA19168DEB2B50FC69D8C36455C9B9EF"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/2.5.9.json",
+      "record_sha256": "A3DD1C36FAAC7D5EE79D8BFA19108E5A9C570A0CD17548B320A47D36A04B88E9",
+      "release": "2.5.9",
+      "sha256": "8A49DF73690EC53F3161959D53517898887DAE75336F22BFE6A34AE2EE8E8565"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.9.9.json",
+      "record_sha256": "7BAEA7B09CA55007EA913E1745D5913DB01A2A134A14FAB0BAF35899E2C47B39",
+      "release": "1.9.9",
+      "sha256": "E3353EB81AB538D0732E3A092AB9DD0E8C88FAF161409F8FEA6E124B13864A14"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.8.9.json",
+      "record_sha256": "4B2C18E8D19F76798EA8C2613A1C5330632BC358635BD368BD0EDF9D6A170496",
+      "release": "1.8.9",
+      "sha256": "12C94FE381100B2D3421A808D2F2FDF602D055567ACDF9CD9071FA19D057E3B9"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.7.9.json",
+      "record_sha256": "84CBEF99D17F4722CD250616715A7C227A1C753F03A81550B51F83B09829AACC",
+      "release": "1.7.9",
+      "sha256": "0E98BC0E5FC77D66802A6BEA67208925AC47BE9A493D4CEB184C824DA6548564"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.6.9.json",
+      "record_sha256": "E34DBBE77AFD93B1105853F5D20DBED3581F311BBB4C94CA1FE729F668A8A999",
+      "release": "1.6.9",
+      "sha256": "FBCF04C327DD303D3DEBF26FD04F134BDB08497CF72FD70721DED33D9FA6063E"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.5.9.json",
+      "record_sha256": "5A44447BDBFB4C786EED12E05B36492D1CF2FA714E16FBA636F37987E044FF94",
+      "release": "1.5.9",
+      "sha256": "3CFE3F30AD33B1A3CDDED6E22277736CFDD38D4AF0E6167AD8EC6DD43D0215C4"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.4.9.json",
+      "record_sha256": "EA6961A0075FF7BDD2065DC8EA813E2A0AE156B89762DCE74B2CF59A0FF32BB8",
+      "release": "1.4.9",
+      "sha256": "61C2555DD6E5DF6FE38C3FAFF70E0FBCEC24D070F2B6A0B90A355CAA8407215E"
+    },
+    {
+      "path": ".mir/releases/terminal/seals/1.3.9.json",
+      "record_sha256": "F41067FE163C1AF7DA9A49FDDA83C63CFAF5150686344D421D5CB30A365F1080",
+      "release": "1.3.9",
+      "sha256": "9F740293F7F48FBDB3E50CF1320EED922C7BF16C2B969574329164AFC3CB43E3"
+    }
+  ],
+  "unresolved_release_blockers": 0
+}

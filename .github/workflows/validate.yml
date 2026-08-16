@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.head_ref == 'tmp/2.0' || github.base_ref == 'tmp/2.0') && '2.0' || '2.1' }}
+
 jobs:
   plan:
     name: verification-plan
@@ -18,28 +21,39 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Build deterministic terminal shadow archive
-        shell: pwsh
-        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
       - name: Diagnose verifier
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
+        run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
+      - name: Build byte-bound development archive
+        shell: pwsh
+        run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET --output build/results/assurance/development-build.json
+      - name: Resolve content-addressed development candidate
+        shell: pwsh
+        run: |
+          $receipt = Get-Content -Raw -LiteralPath build/results/assurance/development-build.json | ConvertFrom-Json
+          $candidate = Join-Path $PWD ([string]$receipt.candidate)
+          $relative = [IO.Path]::GetRelativePath($PWD, $candidate).Replace("\", "/")
+          if ($relative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$' -or
+              -not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            throw "Development candidate is not present at its governed content-addressed path: $relative"
+          }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.0 --profile fast --candidate '.\dist\more-infinite-research_2.5.9.zip' --output out/verification-plan.json
+        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           $work = @($plan.work)
           if ($work.Count -eq 0) {
             $work = @([ordered]@{
@@ -53,8 +67,15 @@ jobs:
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@v4
         with:
-          name: mir-verification-plan
-          path: out/verification-plan.json
+          include-hidden-files: true
+          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/results/assurance/verification-plan.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}
           if-no-files-found: error
 
   tests:
@@ -72,34 +93,40 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
-      - name: Build deterministic terminal shadow archive
-        if: ${{ matrix.no_op != true }}
-        shell: pwsh
-        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
-      - name: Reconstruct immutable 2.5.5 archive
-        if: ${{ matrix.test_id == 'static.release-history' }}
-        shell: pwsh
-        run: |
-          $lock = Get-Content -Raw -LiteralPath .mir/backport-source-lock.json | ConvertFrom-Json
-          $sourceRoot = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source'
-          $sourceArchive = Join-Path $env:RUNNER_TEMP 'mir-immutable-2.5.5-source.zip'
-          if (Test-Path -LiteralPath $sourceRoot) { Remove-Item -LiteralPath $sourceRoot -Recurse -Force }
-          if (Test-Path -LiteralPath $sourceArchive) { Remove-Item -LiteralPath $sourceArchive -Force }
-          git archive --format=zip "--output=$sourceArchive" ([string]$lock.projection.package_source_commit)
-          if ($LASTEXITCODE -ne 0) { throw 'Unable to export immutable 2.5.5 package source.' }
-          Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
-          & (Join-Path $sourceRoot 'scripts/Build-MIRPackage.ps1') -OutputDir dist
-          Copy-Item -LiteralPath (Join-Path $sourceRoot 'dist/more-infinite-research_2.5.5.zip') -Destination dist -Force
       - uses: actions/download-artifact@v4
         if: ${{ matrix.no_op != true }}
         with:
-          name: mir-verification-plan
-          path: out
+          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/results/assurance
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.no_op != true }}
+        with:
+          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/candidate-transfer
+      - name: Resolve exact development candidate
+        if: ${{ matrix.no_op != true }}
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
+          if ([IO.Path]::IsPathRooted($candidateRelative) -or
+              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
+            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
+          }
+          $candidate = Join-Path $PWD $candidateRelative
+          $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
+          if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
+          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null
+          Copy-Item -LiteralPath $transferred[0].FullName -Destination $candidate -Force
+          if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
+            throw "Transferred development candidate does not match the plan-bound archive identity."
+          }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
@@ -107,7 +134,7 @@ jobs:
       - name: Reuse, adopt, or run exact test instance
         if: ${{ matrix.no_op != true }}
         shell: pwsh
-        run: ./scripts/mir.ps1 verify run-one --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+        run: ./tools/mir.ps1 verify run-one --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
       - name: Confirm reuse-only plan needs no worker
         if: ${{ matrix.no_op == true }}
         shell: pwsh
@@ -115,13 +142,46 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ always() && matrix.no_op != true }}
         with:
-          name: mir-evidence-${{ matrix.safe_test_id }}
-          path: artifacts/assurance/evidence
+          include-hidden-files: true
+          name: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+          path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
+
+  upstream-plan-failure:
+    name: upstream-plan-failed
+    if: ${{ always() && needs.plan.result != 'success' }}
+    needs:
+      - plan
+    runs-on: windows-latest
+    steps:
+      - name: Record typed upstream failure
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build/results/assurance | Out-Null
+          $status = [ordered]@{
+            schema = 1
+            status = "upstream-plan-failed"
+            run_id = "${{ github.run_id }}"
+            run_attempt = "${{ github.run_attempt }}"
+            plan_result = "${{ needs.plan.result }}"
+          }
+          [IO.File]::WriteAllText(
+            "build/results/assurance/workflow-status.json",
+            (($status | ConvertTo-Json -Depth 10) + "`n"),
+            [Text.UTF8Encoding]::new($false)
+          )
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-verification-status-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/results/assurance/workflow-status.json
+          if-no-files-found: error
+      - name: Fail with the upstream classification
+        shell: pwsh
+        run: throw "upstream-plan-failed"
 
   verification-gate:
     name: verification-gate
-    if: always()
+    if: ${{ always() && needs.plan.result == 'success' }}
     needs:
       - plan
       - tests
@@ -130,71 +190,83 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Build deterministic terminal shadow archive
-        shell: pwsh
-        run: .\scripts\Build-MIRPackage.ps1 -OutputDir dist
       - uses: actions/download-artifact@v4
         with:
-          name: mir-verification-plan
-          path: out
+          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/results/assurance
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/candidate-transfer
+      - name: Resolve exact development candidate
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          $candidateRelative = ([string]$plan.candidate_descriptor.path).Replace("\", "/")
+          if ([IO.Path]::IsPathRooted($candidateRelative) -or
+              $candidateRelative -notmatch '^build/candidates/[0-9]+\.[0-9]+\.[0-9]+/(?:unassigned|C[1-9][0-9]*|[0-9]+\.[0-9]+-P[1-9][0-9]*)/[0-9a-f]{40}/[^/]+\.zip$') {
+            throw "Plan candidate descriptor is not a governed repository-relative path: $candidateRelative"
+          }
+          $candidate = Join-Path $PWD $candidateRelative
+          $transferred = @(Get-ChildItem -LiteralPath build/candidate-transfer -Recurse -File -Filter *.zip)
+          if ($transferred.Count -ne 1) { throw "Expected one exact transferred candidate, found $($transferred.Count)." }
+          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $candidate) | Out-Null
+          Copy-Item -LiteralPath $transferred[0].FullName -Destination $candidate -Force
+          if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
+            throw "Transferred development candidate does not match the plan-bound archive identity."
+          }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
       - name: Download isolated worker evidence
+        id: download-workers
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
-          pattern: mir-evidence-*
-          path: artifacts/assurance/worker-evidence
-      - name: Import exact worker evidence deterministically
+          pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: build/results/assurance/worker-evidence
+      - name: Record artifact transport classification
         shell: pwsh
         run: |
-          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
-          $workerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/worker-evidence'))
-          $ledgerRoot = [IO.Path]::GetFullPath((Join-Path $PWD 'artifacts/assurance/evidence'))
-          New-Item -ItemType Directory -Force -Path $ledgerRoot | Out-Null
-          foreach ($row in @($plan.work)) {
-            $safeTestId = [string]$row.safe_test_id
-            $fingerprint = [string]$row.fingerprint
-            if ($safeTestId -notmatch '^[A-Za-z0-9._-]+$' -or $fingerprint -notmatch '^[A-Fa-f0-9]{64}$') {
-              throw "Unsafe planned worker identity: $safeTestId / $fingerprint"
-            }
-            $artifactRoot = [IO.Path]::GetFullPath((Join-Path $workerRoot "mir-evidence-$safeTestId"))
-            $source = [IO.Path]::GetFullPath((Join-Path $artifactRoot (Join-Path $safeTestId $fingerprint)))
-            $destinationParent = [IO.Path]::GetFullPath((Join-Path $ledgerRoot $safeTestId))
-            $destination = [IO.Path]::GetFullPath((Join-Path $destinationParent $fingerprint))
-            if (-not $source.StartsWith($artifactRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
-                -not $destination.StartsWith($ledgerRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
-              throw "Planned worker evidence escaped its bounded root: $safeTestId"
-            }
-            if (-not (Test-Path -LiteralPath $source -PathType Container)) {
-              throw "Exact worker evidence is missing: $source"
-            }
-            New-Item -ItemType Directory -Force -Path $destinationParent | Out-Null
-            if (Test-Path -LiteralPath $destination) {
-              Remove-Item -LiteralPath $destination -Recurse -Force
-            }
-            Copy-Item -LiteralPath $source -Destination $destination -Recurse
+          $transport = "${{ steps.download-workers.outcome }}"
+          $status = [ordered]@{
+            schema = 1
+            status = if ($transport -eq "success") { "worker-artifacts-received" } else { "infrastructure-failed" }
+            run_id = "${{ github.run_id }}"
+            run_attempt = "${{ github.run_attempt }}"
+            transport_outcome = $transport
           }
+          [IO.File]::WriteAllText(
+            "build/results/assurance/workflow-status.json",
+            (($status | ConvertTo-Json -Depth 10) + "`n"),
+            [Text.UTF8Encoding]::new($false)
+          )
+      - name: Import exact worker evidence deterministically
+        shell: pwsh
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --workers build/results/assurance/worker-evidence --artifact-prefix mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: ./scripts/mir.ps1 verify gate --target 2.0 --candidate '.\dist\more-infinite-research_2.5.9.zip' --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+        run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --output build/results/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: artifacts/assurance/evidence
+          path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mir-verification-evidence
+          include-hidden-files: true
+          name: mir-verification-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            out/verification-plan.json
-            artifacts/assurance/evidence-bundle.json
+            build/results/assurance/verification-plan.json
+            build/results/assurance/worker-import.json
+            build/results/assurance/evidence-bundle.json
+            build/results/assurance/workflow-status.json
           if-no-files-found: warn
