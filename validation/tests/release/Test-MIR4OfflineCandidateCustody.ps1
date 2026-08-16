@@ -74,7 +74,7 @@ try {
     $observations += [pscustomobject][ordered]@{id=$observationId;status="passed";result_artifact=[pscustomobject][ordered]@{relative_path="artifacts/$observationId.json";sha256=Get-MIR4Sha256File $artifactPath;bytes=[long](Get-Item $artifactPath).Length}}
   }
   $syntheticEnginePath=Join-Path $testRoot "synthetic-factorio-engine.exe"
-  [IO.File]::WriteAllText($syntheticEnginePath,"synthetic engine; not Factorio 2.1.13",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($syntheticEnginePath,"synthetic engine; not Factorio 2.1.14",[Text.UTF8Encoding]::new($false))
   $evidencePayload=[pscustomobject][ordered]@{
     schema=1;kind="MIR4ExactEngineQualificationEvidencePayloadV1";canonicalization="MIR4BootstrapCanonicalJsonV1"
     evidence_class="exact-engine-observation-bundle";qualification_scope="local-offline-f210-exact-engine";publication_authority=$false

@@ -1108,12 +1108,14 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     '.mir/releases/waves/mir4-r0/bootstrap-root-set.json',
     '.mir/releases/waves/mir4-r0/MIR4-Offline-Release-AuthorityV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json',
-    '.mir/releases/terminal/baselines/3.2.9/baseline-manifest.json',
-    '.mir/releases/terminal/baselines/3.2.9/normalized-snapshot.json',
-    '.mir/releases/terminal/baselines/3.2.9/package-composition.json',
-    '.mir/releases/terminal/manifests/3.2.9-package.json',
-    '.mir/releases/terminal/qualifications/3.2.9.json',
-    '.mir/releases/terminal/seals/3.2.9.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json',
+    '.mir/releases/terminal/baselines/3.2.10/baseline-manifest.json',
+    '.mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json',
+    '.mir/releases/terminal/baselines/3.2.10/package-composition.json',
+    '.mir/releases/records/3.2.10.json',
+    '.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json',
+    '.mir/releases/emergency/findings/MIR3-TERM-0033.json',
+    '.mir/releases/terminal/baselines/3.2.9/baseline-manifest.json'
   )
 }
 
@@ -1125,6 +1127,7 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
     'spec/schemas/mir4-bootstrap-source-capsule.schema.json',
     'spec/schemas/mir4-bootstrap-capsule-manifest.schema.json',
     'spec/schemas/mir4-bootstrap-toolchain-lock.schema.json',
+    'spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json',
     'spec/schemas/mir4-bootstrap-git-source-proof.schema.json',
     'spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json',
     'spec/schemas/mir4-r0-authority.schema.json',

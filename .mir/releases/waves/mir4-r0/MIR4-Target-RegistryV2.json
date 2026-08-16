@@ -9,7 +9,8 @@
     ".mir/targets.json",
     ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json",
     ".mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json",
-    ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json"
+    ".mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json"
   ],
   "semantic_reads": [
     "historical-v1-target-registry",
@@ -66,7 +67,7 @@
         "support_tier": "current",
         "disposition": "bootstrap-mandatory",
         "release_blocking": true,
-        "mir3_predecessor": "3.2.9"
+        "mir3_predecessor": "3.2.10"
       },
       {
         "id": "factorio-2.0",

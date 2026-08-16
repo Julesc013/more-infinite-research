@@ -1579,7 +1579,6 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "shard_local_mod_zips" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "scenario_timeout_seconds" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/tmp/2.0'" },
-    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/legacy'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.head_ref == 'tmp/2.0'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.base_ref == 'tmp/2.0'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "--target `$env:MIR_VALIDATION_TARGET" },
@@ -1609,6 +1608,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing compatibility audit automation wiring in $($check.File): $($check.Snippet)"
     }
+  }
+  if ($validateWorkflowText.Contains("refs/heads/legacy")) {
+    throw "The movable legacy terminal alias must use the Factorio 2.1 validation role; only tmp/2.0 selects Factorio 2.0."
   }
 }
 

@@ -2603,6 +2603,8 @@ docs:
       - mir4-bootstrap-local-candidate-execution-plan
       - mir4-bootstrap-local-candidate-status
       - mir4-final-programme-reconciliation-status
+      - mir4-terminal-predecessor-refresh
+      - mir4-m4-003-required-follow-up
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current

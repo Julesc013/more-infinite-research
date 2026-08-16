@@ -64,15 +64,18 @@ function Assert-Schema([string]$RelativePath, [string]$SchemaPath) {
 }
 
 $captureScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Dot9TerminalBaselines.ps1"
+$continuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3PostTerminalHotfixBaselineContinuation.ps1"
 $importScript = Join-Path $RepoRoot "tools\commands\release\Import-MIR3TerminalBaselines.ps1"
 $bootstrapRootSetScript = Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapRootSet.ps1"
 if ($Update) {
   $captureParams = @{ RepoRoot=$RepoRoot }
   if ($BuildBundles) { $captureParams.BuildBundles = $true }
   & $captureScript @captureParams
+  & $continuationScript -RepoRoot $RepoRoot
   & $importScript -RepoRoot $RepoRoot
 } else {
   & $captureScript -RepoRoot $RepoRoot -Check
+  & $continuationScript -RepoRoot $RepoRoot -Check
   & $importScript -RepoRoot $RepoRoot -Check
 }
 if ($Update) {
@@ -93,6 +96,7 @@ $executableKinds = @(
   "MIR4-Emergency-LaneV1",
   "MIR4-Offline-Release-AuthorityV1",
   "MIR3-to-MIR4-Governance-ReconciliationV1"
+  "MIR4-Terminal-Predecessor-RefreshV1"
 )
 foreach ($kind in $executableKinds) {
   $path = "$authorityDirectory/$kind.json"
@@ -128,7 +132,8 @@ $catalogPath = ".mir/releases/terminal/baselines/dot9-family-catalog.json"
 $importPath = "$authorityDirectory/terminal-baseline-import.json"
 $catalog = Read-Json $catalogPath
 $import = Read-Json $importPath
-if (@($catalog.releases).Count -ne 9 -or @($import.releases).Count -ne 9 -or [bool]$import.semantic_authority) {
+if (@($catalog.releases).Count -ne 9 -or @($import.releases).Count -ne 9 -or [bool]$import.semantic_authority -or
+    (@($import.releases.release) -join "|") -cne "3.2.10|2.5.9|1.9.9|1.8.9|1.7.9|1.6.9|1.5.9|1.4.9|1.3.9") {
   throw "All-nine terminal baseline import is incomplete or prematurely authoritative."
 }
 foreach ($row in @($catalog.releases)) {
@@ -136,6 +141,9 @@ foreach ($row in @($catalog.releases)) {
   Assert-Schema ([string]$row.normalized_snapshot) "spec/schemas/mir4-terminal-normalized-snapshot.schema.json"
   Assert-Schema ".mir/releases/terminal/closures/$($row.release).json" "spec/schemas/mir3-terminal-release-closure.schema.json"
 }
+Assert-Schema ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json" "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json"
+Assert-Schema ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json" "spec/schemas/mir4-terminal-normalized-snapshot.schema.json"
+Assert-Schema ".mir/releases/terminal/closures/3.2.10.json" "spec/schemas/mir3-terminal-release-closure.schema.json"
 Assert-Schema $importPath "spec/schemas/mir4-terminal-baseline-import.schema.json"
 
 $bootstrapRootSetPath = "$authorityDirectory/bootstrap-root-set.json"
@@ -155,6 +163,14 @@ if ([string]$bootstrapRootSet.kind -ne "MIR4BootstrapRootSetV1" -or
 }
 $bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
+$bootstrapCandidatePlan = Read-Json $bootstrapCandidatePlanPath
+$f210Plan = @($bootstrapCandidatePlan.targets | Where-Object target_key -eq "f210")
+if ($f210Plan.Count -ne 1 -or [string]$f210Plan[0].predecessor.release -cne "3.2.10" -or
+    [string]$f210Plan[0].engine_lock.version -cne "2.1.14" -or
+    [string]$f210Plan[0].engine_lock.executable_sha256 -cne "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F" -or
+    -not (Test-MIR4BootstrapRecordHash -Record $bootstrapCandidatePlan)) {
+  throw "The local MIR 4 f210 plan does not bind the 3.2.10 / Steam 2.1.14 predecessor refresh."
+}
 
 $finalProgrammeReconciliationPath = "$authorityDirectory/MIR4-Final-Programme-ReconciliationV1.json"
 Assert-Schema $finalProgrammeReconciliationPath "spec/schemas/mir4-final-programme-reconciliation.schema.json"
@@ -237,6 +253,8 @@ $generatedSources += Get-Binding $engineObservationPath
 $generatedSources += Get-Binding ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json"
 $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json"
 $generatedSources += Get-Binding $portalVisibilityPath
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-RefreshV1.json"
+$generatedSources += Get-Binding ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json"
 $generatedSources = @($generatedSources | Sort-Object path)
 
 $dashboard = Add-RecordSha256 ([ordered]@{
@@ -246,8 +264,8 @@ $dashboard = Add-RecordSha256 ([ordered]@{
   package_visible = $false
   generated_from = $generatedSources
   payload = [ordered]@{
-    mir3 = [ordered]@{ product_development="closed"; github_publication="complete"; mod_portal_custody="two-public-visible-nine-authenticated-redownloads-pending"; terminal_dot9_baselines="captured-and-imported-custody-pending"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v2-direct-factorio-line-codes"; historical_v1_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="non-emitting-four-target-blockers-recorded"; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
+    mir3 = [ordered]@{ product_development="closed-except-immutable-post-terminal-3.2.10"; github_publication="3.2.10-latest-complete"; mod_portal_custody="3.2.10-maintainer-upload-not-independently-redownload-verified"; terminal_dot9_baselines="retained-immutable"; terminal_2_1_continuation="3.2.10-captured-and-imported"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
+    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v2-direct-factorio-line-codes-with-predecessor-refresh"; historical_v1_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-refresh-ready-mir3-term-0033-required"; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
     package_delta = 0
     next_executable_task = "M4-003-local-offline-emergency-lane"
   }
@@ -261,9 +279,9 @@ $queue = Add-RecordSha256 ([ordered]@{
   payload = [ordered]@{
     tasks = @(
       [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-and-import";state="completed-captured-and-imported";blocked_by=@()},
+      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-3.2.10-continuation-import";state="completed-captured-and-imported";blocked_by=@()},
       [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
-      [ordered]@{id="M4-003";scope="local-offline-emergency-lane";state="ready";blocked_by=@()},
+      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="ready-with-required-follow-up";blocked_by=@()},
       [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
       [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
       [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
@@ -278,4 +296,4 @@ if (-not $Update) {
 }
 
 Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: M4-003-local-offline-emergency-lane"
+Write-Host "[ok] next executable task: M4-003-local-offline-emergency-lane (MIR3-TERM-0033 required)"

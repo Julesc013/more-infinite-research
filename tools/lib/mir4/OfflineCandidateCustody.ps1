@@ -17,7 +17,7 @@ $script:MIR4OfflineSealNamespaceV1 = "mir4-offline-candidate-seal-v1"
 $script:MIR4ExactEngineEvidenceNamespaceV1 = "mir4-exact-engine-qualification-v1"
 $script:MIR4ExactEngineObservationIdsV1 = @(
   "clean-install",
-  "direct-upgrade-from-3.2.9",
+  "direct-upgrade-from-3.2.10",
   "reload-after-upgrade-1",
   "reload-after-upgrade-2",
   "settings-profile-state-preservation",

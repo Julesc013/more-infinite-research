@@ -196,14 +196,14 @@ function Assert-MIR4R0DistributionIdentity {
   $version = Import-MIR4IdentityJson -RepoRoot $RepoRoot -RelativePath $script:MIR4VersionAuthorityV2Path
   $vectors = Import-MIR4IdentityJson -RepoRoot $RepoRoot -RelativePath $script:MIR4CodecVectorsV2Path
 
-  if ((@($registry.imports) -join "|") -ne ".mir/targets.json|.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json|.mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json|.mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json" -or
+  if ((@($registry.imports) -join "|") -ne ".mir/targets.json|.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json|.mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json|.mir/releases/terminal/MIR3-Terminal-Target-MatrixV1.json|.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json" -or
       (@($version.imports) -join "|") -ne ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json|.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json" -or
       [string]$version.payload.conformance_fixture_kind -ne "MIR4-Distribution-Version-Codec-VectorsV2") {
     throw "[mir4-authority-lineage] V2 identity authority does not bind the exact historical and current lineage."
   }
 
   $expected = @(
-    [ordered]@{id="factorio-2.1";factorio="2.1";code="210";support="current";disposition="bootstrap-mandatory";blocking=$true;predecessor="3.2.9"},
+    [ordered]@{id="factorio-2.1";factorio="2.1";code="210";support="current";disposition="bootstrap-mandatory";blocking=$true;predecessor="3.2.10"},
     [ordered]@{id="factorio-2.0";factorio="2.0";code="200";support="maintained";disposition="bootstrap-mandatory";blocking=$true;predecessor="2.5.9"},
     [ordered]@{id="factorio-1.1";factorio="1.1";code="110";support="lts";disposition="bootstrap-conditional";blocking=$false;predecessor="1.9.9"},
     [ordered]@{id="factorio-1.0";factorio="1.0";code="100";support="lts";disposition="bootstrap-conditional";blocking=$false;predecessor="1.8.9"},

@@ -51,7 +51,7 @@
           "type": "object",
           "required": ["version", "executable_sha256", "network_denied"],
           "properties": {
-            "version": {"const": "2.1.13"},
+            "version": {"const": "2.1.14"},
             "executable_sha256": {"$ref": "#/$defs/sha256"},
             "network_denied": {"const": true}
           },
@@ -64,7 +64,7 @@
           "uniqueItems": true,
           "allOf": [
             {"contains": {"type": "object", "properties": {"id": {"const": "clean-install"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
-            {"contains": {"type": "object", "properties": {"id": {"const": "direct-upgrade-from-3.2.9"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "direct-upgrade-from-3.2.10"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
             {"contains": {"type": "object", "properties": {"id": {"const": "reload-after-upgrade-1"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
             {"contains": {"type": "object", "properties": {"id": {"const": "reload-after-upgrade-2"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
             {"contains": {"type": "object", "properties": {"id": {"const": "settings-profile-state-preservation"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
@@ -133,7 +133,7 @@
       "type": "object",
       "required": ["id", "status", "result_artifact"],
       "properties": {
-        "id": {"enum": ["clean-install", "direct-upgrade-from-3.2.9", "reload-after-upgrade-1", "reload-after-upgrade-2", "settings-profile-state-preservation", "target-compatibility"]},
+        "id": {"enum": ["clean-install", "direct-upgrade-from-3.2.10", "reload-after-upgrade-1", "reload-after-upgrade-2", "settings-profile-state-preservation", "target-compatibility"]},
         "status": {"const": "passed"},
         "result_artifact": {"$ref": "#/$defs/artifact"}
       },

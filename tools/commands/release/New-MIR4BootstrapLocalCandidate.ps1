@@ -413,13 +413,15 @@ if ([int]$emergencyLane.schema -ne 1 -or
     [bool]$emergencyLane.package_visible -ne $false -or
     [string]$emergencyLane.target_dispositions.'factorio-2.1' -cne 'first-local-proof' -or
     [string]$emergencyLane.target_dispositions.'other-active-targets' -cne 'not-in-r1' -or
-    [string]$emergencyLane.payload.input_release -cne '3.2.9' -or
+    [string]$emergencyLane.payload.input_release -cne '3.2.10' -or
     [string]$emergencyLane.payload.target -cne 'factorio-2.1' -or
     [string]$emergencyLane.payload.output_root -cne 'build/mir4/emergency-lane' -or
     [bool]$emergencyLane.payload.public_output_authorized -ne $false -or
     @($emergencyAllowedDifferences | Where-Object { $_ -ceq 'version-and-distribution-metadata' }).Count -ne 1 -or
     @($emergencyAllowedDifferences | Where-Object { $_ -ceq 'generated-root-name' }).Count -ne 1 -or
-    @($emergencyParity | Where-Object { $_ -ceq 'deterministic-double-build' }).Count -ne 1) {
+    @($emergencyParity | Where-Object { $_ -ceq 'deterministic-double-build' }).Count -ne 1 -or
+    @($emergencyParity | Where-Object { $_ -ceq 'mir3-term-0033-transactional-owner-rollback' }).Count -ne 1 -or
+    [string]$emergencyLane.payload.required_finding -cne 'MIR3-TERM-0033') {
   throw '[mir4-emergency-lane] The exact admitted, unpublished f210 emergency-lane authority is absent or has drifted.'
 }
 $permittedDifferences = @($equivalencePolicy.payload.permitted_differences)

@@ -47,7 +47,7 @@
               "properties": {
                 "target_id": {"const": "f210"},
                 "factorio_line": {"const": "2.1"},
-                "predecessor_release": {"const": "3.2.9"}
+                "predecessor_release": {"const": "3.2.10"}
               }
             }
           ]
@@ -107,7 +107,7 @@
       "type": "object",
       "required": ["path", "record_sha256"],
       "properties": {
-        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.9/.+\\.json$"},
+        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.[0-9]+/.+\\.json$"},
         "record_sha256": {"$ref": "#/$defs/sha256"}
       },
       "additionalProperties": false
@@ -116,7 +116,7 @@
       "type": "object",
       "required": ["path", "record_sha256", "input_root_sha256"],
       "properties": {
-        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.9/baseline-manifest\\.json$"},
+        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.[0-9]+/baseline-manifest\\.json$"},
         "record_sha256": {"$ref": "#/$defs/sha256"},
         "input_root_sha256": {"$ref": "#/$defs/sha256"}
       },
@@ -147,7 +147,7 @@
       "properties": {
         "target_id": {"enum": ["f210", "f200", "f110", "f100"]},
         "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]},
-        "predecessor_release": {"enum": ["3.2.9", "2.5.9", "1.9.9", "1.8.9"]},
+        "predecessor_release": {"enum": ["3.2.10", "2.5.9", "1.9.9", "1.8.9"]},
         "source_identity": {
           "type": "object",
           "required": ["candidate_commit", "candidate_tree", "common_source_commit"],
