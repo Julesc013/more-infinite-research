@@ -295,7 +295,7 @@ function Get-MIRAssuranceCandidateDescriptor {
   if (-not $Context.candidate -or -not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) {
     $descriptor = [ordered]@{
       state="missing"
-      path=[string]$Context.candidate
+      path=if ($Context.candidate) { Get-MIRAssuranceRepoRelativePath -Path ([string]$Context.candidate) } else { "" }
       sha256=(Get-MIRAssuranceTextHash -Text "MISSING:candidate")
       content_sha256=(Get-MIRAssuranceTextHash -Text "MISSING:candidate-content")
       bytes=0

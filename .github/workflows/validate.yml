@@ -146,7 +146,7 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          if ([string]$plan.candidate_descriptor.state -ne 'absent' -or
+          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
               [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
             throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
           }
@@ -253,7 +253,7 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
-          if ([string]$plan.candidate_descriptor.state -ne 'absent' -or
+          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
               [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
             throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
           }
