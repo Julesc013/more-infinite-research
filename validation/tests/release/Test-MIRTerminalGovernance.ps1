@@ -1289,13 +1289,26 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
   [string]$current.active_programme.status -in @(
     "c34-package-built-qualification-in-progress",
     "c34-maintainer-accepted-promotion-authorized",
-    "3.2.10-published-publicly-verified-branch-and-mir4-handoff"
+    "3.2.10-published-publicly-verified-branch-and-mir4-handoff",
+    "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff"
   ))
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
     (-not $terminalCurrent -and -not $emergencyCurrent)) {
   throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
+if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.tagged_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.backport_calibration -ne "2.5.10") {
+    throw "Post-terminal publication roles do not identify the immutable 3.2.10 and 2.5.10 authorities."
+  }
+} elseif ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
       $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
       $current.roles.published_factorio_2_1 -ne "3.2.10" -or

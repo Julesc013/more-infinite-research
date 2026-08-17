@@ -210,7 +210,7 @@ if ([string]$import.kind -cne "MIR4TerminalBaselineImportV1" -or
 
 $expectedTargets = @(
   [ordered]@{target_id="f210";factorio_line="2.1";import_successor_target="MIR4-R0/2.1";predecessor_release="3.2.10"},
-  [ordered]@{target_id="f200";factorio_line="2.0";import_successor_target="MIR4-R0/2.0";predecessor_release="2.5.9"},
+  [ordered]@{target_id="f200";factorio_line="2.0";import_successor_target="MIR4-R0/2.0";predecessor_release="2.5.10"},
   [ordered]@{target_id="f110";factorio_line="1.1";import_successor_target="MIR4-R0/1.1";predecessor_release="1.9.9"},
   [ordered]@{target_id="f100";factorio_line="1.0";import_successor_target="MIR4-R0/1.0";predecessor_release="1.8.9"}
 )

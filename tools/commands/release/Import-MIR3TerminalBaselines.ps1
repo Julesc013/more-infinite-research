@@ -78,11 +78,13 @@ $requiredKinds = @(
   "MIR4-Repository-Layout-TransitionV1",
   "MIR4-Target-RegistryV1",
   "MIR4-Terminal-Import-ContractV1",
+  "MIR4-Terminal-Import-ContractV2",
   "MIR4-Equivalence-PolicyV1",
   "MIR4-Emergency-LaneV1",
   "MIR4-Offline-Release-AuthorityV1",
   "MIR3-to-MIR4-Governance-ReconciliationV1",
-  "MIR4-Terminal-Predecessor-RefreshV1"
+  "MIR4-Terminal-Predecessor-RefreshV1",
+  "MIR4-Terminal-Predecessor-RefreshV2"
 )
 $authorityFiles = @($requiredKinds | ForEach-Object { "$authorityDirectory/$_.json" })
 foreach ($path in $authorityFiles) {
@@ -111,12 +113,16 @@ foreach ($path in @($authorityFiles + @(
   $catalogPath,
   "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1",
   "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
+  "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1",
   "tools/commands/release/Import-MIR3TerminalBaselines.ps1",
   "spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json",
   "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json",
+  "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json",
   "spec/schemas/mir4-terminal-normalized-snapshot.schema.json",
   "spec/schemas/mir4-terminal-baseline-import.schema.json",
-  "spec/schemas/mir4-r0-authority.schema.json"
+  "spec/schemas/mir4-r0-authority.schema.json",
+  ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
+  "spec/schemas/mir4-target-registry-v3.schema.json"
 ))) { $allInputs.Add((Get-AuthorityIdentity $path)) }
 
 $rows = @()
@@ -225,6 +231,60 @@ $continuationRow = [ordered]@{
 }
 $rows = @($continuationRow) + @($rows | Where-Object { [string]$_.release -cne "3.2.9" })
 
+# The Factorio 2.0 predecessor advanced independently after exact applicability,
+# deterministic reconstruction, and public-byte verification. Replace only the
+# executable f200 import row; retain the immutable 2.5.9 bundle as a bound input.
+$f200ContinuationVersion = "2.5.10"
+$f200ContinuationManifestPath = ".mir/releases/terminal/baselines/$f200ContinuationVersion/baseline-manifest.json"
+$f200ContinuationSnapshotPath = ".mir/releases/terminal/baselines/$f200ContinuationVersion/normalized-snapshot.json"
+$f200ContinuationClosurePath = ".mir/releases/terminal/closures/$f200ContinuationVersion.json"
+$f200ContinuationManifest = Read-Json $f200ContinuationManifestPath
+$f200ContinuationSnapshot = Read-Json $f200ContinuationSnapshotPath
+$f200ContinuationClosure = Read-Json $f200ContinuationClosurePath
+Assert-RecordSha256 $f200ContinuationManifest "$f200ContinuationVersion continuation manifest"
+Assert-RecordSha256 $f200ContinuationSnapshot "$f200ContinuationVersion normalized snapshot"
+Assert-RecordSha256 $f200ContinuationClosure "$f200ContinuationVersion release closure"
+if ([string]$f200ContinuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV1" -or
+    [string]$f200ContinuationManifest.status -cne "captured-public-custody-pending-open-mir4-follow-up" -or
+    [bool]$f200ContinuationSnapshot.semantic_authority -or
+    [string]$f200ContinuationSnapshot.target -cne "2.0" -or
+    [string]$f200ContinuationSnapshot.status -cne "importable-pre-eol-public-custody-pending" -or
+    [string]$f200ContinuationClosure.status -cne "github-closed-mod-portal-pending") {
+  throw "The 2.5.10 continuation is not import-ready."
+}
+foreach ($file in @($f200ContinuationManifest.files)) {
+  $path = Join-Path $RepoRoot ([string]$file.source_path)
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
+      (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$file.sha256 -or
+      [long](Get-Item -LiteralPath $path).Length -ne [long]$file.bytes) {
+    throw "Logical continuation input drift for ${f200ContinuationVersion}: $($file.source_path)"
+  }
+  $allInputs.Add((Get-AuthorityIdentity ([string]$file.source_path)))
+}
+$f200ContinuationDistPath = Join-Path $RepoRoot ([string]$f200ContinuationManifest.distribution.path)
+if ((Get-FileHash -LiteralPath $f200ContinuationDistPath -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$f200ContinuationManifest.distribution.archive_sha256 -or
+    (Get-MIRZipContentFingerprint -Path $f200ContinuationDistPath) -cne [string]$f200ContinuationManifest.distribution.content_sha256 -or
+    [long](Get-Item -LiteralPath $f200ContinuationDistPath).Length -ne [long]$f200ContinuationManifest.distribution.bytes -or
+    (Get-ZipEntryCount $f200ContinuationDistPath) -ne [int]$f200ContinuationManifest.distribution.entries) {
+  throw "Published distribution drift for $f200ContinuationVersion."
+}
+foreach ($path in @($f200ContinuationManifestPath, $f200ContinuationSnapshotPath, $f200ContinuationClosurePath)) {
+  $allInputs.Add((Get-AuthorityIdentity $path))
+}
+$f200ContinuationRow = [ordered]@{
+  release = $f200ContinuationVersion
+  target = [string]$f200ContinuationSnapshot.target
+  successor_target = [string]$f200ContinuationSnapshot.successor_target
+  baseline_manifest = [ordered]@{path=$f200ContinuationManifestPath;record_sha256=[string]$f200ContinuationManifest.record_sha256;input_root_sha256=[string]$f200ContinuationManifest.input_root_sha256;status=[string]$f200ContinuationManifest.status}
+  normalized_snapshot = [ordered]@{path=$f200ContinuationSnapshotPath;record_sha256=[string]$f200ContinuationSnapshot.record_sha256;semantic_authority=[bool]$f200ContinuationSnapshot.semantic_authority}
+  release_closure = [ordered]@{path=$f200ContinuationClosurePath;record_sha256=[string]$f200ContinuationClosure.record_sha256;status=[string]$f200ContinuationClosure.status}
+  distribution = $f200ContinuationSnapshot.distribution
+  import_disposition = "normalized-shadow-input-no-semantic-authority-before-eol"
+  snapshot = $f200ContinuationSnapshot
+}
+$rows = @($rows | Where-Object { [string]$_.release -ceq "3.2.10" }) + @($f200ContinuationRow) +
+  @($rows | Where-Object { [string]$_.release -cnotin @("3.2.10", "2.5.9") })
+
 $inputRows = @($allInputs.ToArray() | Sort-Object path -Unique)
 $inputMaterial = ($inputRows | ForEach-Object { "$($_.path)`0$($_.sha256)" }) -join "`n"
 $material = [ordered]@{
@@ -242,7 +302,8 @@ $material = [ordered]@{
   guarantees = @(
     "all-nine-historical-dot9-distributions-remain-exact-and-bound",
     "factorio-2.1-predecessor-continues-at-exact-public-3.2.10",
-    "factorio-2.0-and-older-predecessors-remain-dot9",
+    "factorio-2.0-predecessor-continues-at-exact-public-2.5.10",
+    "factorio-1.x-and-older-predecessors-remain-dot9",
     "all-nine-current-import-views-self-contained",
     "terminal-claim-maturity-not-promoted",
     "unsupported-target-fields-explicitly-omitted",

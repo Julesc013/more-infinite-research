@@ -590,6 +590,20 @@ $blockedTargets = @($targets | Where-Object {
 if ($blockedTargets.Count -gt 0) {
   throw "[mir4-entry-gate] Lane '$Lane' does not admit: $(@($blockedTargets.target_key) -join ', ')."
 }
+$currentRegistryPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json'
+$currentRegistrySchemaPath = Join-Path $RepoRoot 'spec/schemas/mir4-target-registry-v3.schema.json'
+$currentRegistryText = Get-Content -Raw -LiteralPath $currentRegistryPath
+if (-not ($currentRegistryText | Test-Json -SchemaFile $currentRegistrySchemaPath)) {
+  throw '[mir4-current-registry] Target Registry V3 does not satisfy its governed schema.'
+}
+$currentRegistry = $currentRegistryText | ConvertFrom-Json -DateKind String
+foreach ($targetPlan in $targets) {
+  $currentRows = @($currentRegistry.payload.targets | Where-Object { [string]$_.id -ceq [string]$targetPlan.target_id })
+  if ($currentRows.Count -ne 1 -or
+      [string]$currentRows[0].mir3_predecessor -cne [string]$targetPlan.predecessor.release) {
+    throw "[mir4-stale-predecessor-plan] $($targetPlan.target_key) still binds $($targetPlan.predecessor.release); the current registry requires $($currentRows[0].mir3_predecessor). Create a new append-only candidate plan and lane authorization before materialization."
+  }
+}
 if ($Lane -ceq 'local-playtest-shadow') {
   foreach ($targetPlan in $targets) {
     $authorizedRows = @($laneAuthority.authorized_targets | Where-Object { [string]$_.target_key -ceq [string]$targetPlan.target_key })

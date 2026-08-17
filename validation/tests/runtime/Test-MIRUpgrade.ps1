@@ -271,6 +271,7 @@ $requiresReloadProof = $FixtureName -in @(
   "assert-upgrade-3-2-3-to-3-2-9",
   "assert-upgrade-3-2-5-to-3-2-9",
   "assert-upgrade-3-2-9-to-3-2-10",
+  "assert-upgrade-2-5-10-to-4-0-20000",
   "assert-upgrade-2-5-9-to-4-0-20000",
   "assert-upgrade-1-9-9-to-4-0-11000",
   "assert-upgrade-1-8-9-to-4-0-10000"

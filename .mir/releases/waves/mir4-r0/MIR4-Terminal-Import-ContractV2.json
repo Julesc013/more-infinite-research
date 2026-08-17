@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Terminal-Import-ContractV2",
+  "status": "accepted-current-pre-eol-package-excluded",
+  "recorded_at": "2026-08-17T11:50:00+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-terminal-import-contract-v2",
+  "imports": [
+    ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json",
+    ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
+    ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
+    "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json",
+    "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json"
+  ],
+  "semantic_reads": [
+    "nine-immutable-dot9-historical-bundles",
+    "factorio-2.1-3.2.10-continuation",
+    "factorio-2.0-2.5.10-continuation"
+  ],
+  "semantic_writes": [
+    "normalized-current-terminal-import",
+    "current-mir4-upgrade-predecessors"
+  ],
+  "target_dispositions": {
+    "factorio-2.1": "import-current-3.2.10-preserve-3.2.9-history",
+    "factorio-2.0": "import-current-2.5.10-preserve-2.5.9-history",
+    "factorio-1.x-and-older": "retain-dot9-current-predecessors"
+  },
+  "digest_classes": {
+    "semantic": "normalized-terminal-snapshots",
+    "authority": "append-only-import-contract-v2",
+    "qualification": "target-local-public-byte-and-engine-proof"
+  },
+  "migration": {
+    "from": "nine-mir3-dot9-terminal-bundles-plus-3.2.10-continuation",
+    "to": "nine-historical-dot9-bundles-plus-3.2.10-and-2.5.10-current-continuations",
+    "state": "capture-ready-public-custody-pending"
+  },
+  "rollback": {
+    "strategy": "retain-all-historical-and-continuation-bundles-and-block-on-any-digest-mismatch",
+    "permitted_until": "mir4-semantic-authority-cutover"
+  },
+  "parity_test": [
+    "all-nine-historical-dot9-present",
+    "3.2.10-f210-continuation-present",
+    "2.5.10-f200-continuation-present",
+    "all-source-hashes-exact",
+    "no-package-generation"
+  ],
+  "sunset_condition": "superseded-by-qualified-target-specific-mir4-import-certificates",
+  "payload": {
+    "current_predecessors": {
+      "factorio-2.1": "3.2.10",
+      "factorio-2.0": "2.5.10"
+    },
+    "historical_baselines_retained": ["3.2.9", "2.5.9"],
+    "semantic_authority": false,
+    "public_4x_authorized": false
+  }
+}

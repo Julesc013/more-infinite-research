@@ -3614,6 +3614,15 @@ if ($selectionActive -and -not $checkpointActive) {
               -ChangedStartupSettingOverrides @{ "ips-max-level-research_copper" = 5 }
             Assert-LogContains -Expected "[mir-fixture] generated lowered cap retained completed levels and removed invalid research" -Context $declaration.name
           }
+          "generated-maximum-level-lowering-config-change-2-0" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 }
+            Assert-LogContains -Expected "[mir-fixture] Factorio 2.0 lowered cap retained completed levels and removed invalid research" -Context $declaration.name
+          }
           "base-continuation-maximum-level-lowering-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
               -ScenarioName $declaration.name `

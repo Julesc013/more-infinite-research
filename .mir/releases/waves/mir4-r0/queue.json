@@ -9,6 +9,26 @@
       "sha256": "8B1C761D8DAC4E482CEE8434869166AE5CAFBABBFF2B9ADF7E1B918A6923AA9A"
     },
     {
+      "path": ".mir/releases/records/2.5.10.json",
+      "sha256": "E0306AF363CADA74293A0C40FC834AB7BF7C4361732E2EC0A59796699D55B71C"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
+      "sha256": "30384EBDE2888EEEB2CA44B987B36FBFE32754299B76BB25B78DA055BED95053"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json",
+      "sha256": "6119292EB80D3727EAB7308D0A786D8D1E3482702941B7C0C3700062A8C6FE6A"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json",
+      "sha256": "2A7BDA93D66F5A9EC674C5AAC82840570F10BC676EDC5C7E9D2C5E55E1D2B313"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json",
+      "sha256": "AB537D42345AB83578E52C21F67B452F38976CF3290EF66A4191B1B7441660AC"
+    },
+    {
       "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
       "sha256": "AE47F7D195AE1D940F388D3CFDCDDC057B2E26A493C7E7B456408C57EE8100A3"
     },
@@ -37,12 +57,12 @@
       "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
     },
     {
-      "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "286CB52B4E6AC76BE1D0FFC9F867ACDC5941333549E8C0C283DA58FF1FC7BF6F"
+      "path": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+      "sha256": "9F6F062BAB178789314B4484F88F9DD413F3D7C19F50D12DF403379566F9F2FE"
     },
     {
-      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "1E7FA40D7C627057D383230C3DB1ED3E8617FA642D4A185BF9F5ED14551F39C2"
+      "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
+      "sha256": "43161F404D317F3F3346B7629D51A1CE1AAE28BDCA7B5824147547C253B3C9C5"
     },
     {
       "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
@@ -93,8 +113,8 @@
       "sha256": "96662013142D5CEADF24381DFD7A87F119E5C8708111CB0CD35485EB76C1F703"
     },
     {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json",
-      "sha256": "AB537D42345AB83578E52C21F67B452F38976CF3290EF66A4191B1B7441660AC"
+      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+      "sha256": "F86348116276015EFFEE33816338605A0977B056AEA8D8D3CBED614C039BCFE6"
     },
     {
       "path": ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
@@ -111,9 +131,11 @@
       },
       {
         "id": "M4-001",
-        "scope": "dot9-baseline-capture-plus-3.2.10-continuation-import",
-        "state": "completed-captured-and-imported",
-        "blocked_by": []
+        "scope": "dot9-baseline-capture-plus-post-terminal-continuations",
+        "state": "2.5.10-predecessor-bound-normalized-continuation-pending",
+        "blocked_by": [
+          "f200-plan-v2-and-baseline-continuation"
+        ]
       },
       {
         "id": "M4-002",
@@ -124,8 +146,10 @@
       {
         "id": "M4-003",
         "scope": "local-offline-emergency-lane-plus-mir3-term-0033",
-        "state": "ready-with-required-follow-up",
-        "blocked_by": []
+        "state": "f210-ready-f200-plan-refresh-required",
+        "blocked_by": [
+          "f200-plan-v2-and-lane-authorization-refresh"
+        ]
       },
       {
         "id": "M4-004A",
@@ -155,5 +179,5 @@
       }
     ]
   },
-  "record_sha256": "9264DD86BA23BD51DD2ACD0C8C4D15E62E86E0B2D3FF51E6A9EAD985C1C6382C"
+  "record_sha256": "041660A2B618D61F9264E959D30F5AC7AF6A4905FC71E081F005947C2E7B620B"
 }

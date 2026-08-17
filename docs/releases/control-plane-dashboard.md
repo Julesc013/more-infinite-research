@@ -5,7 +5,7 @@ applies_to: "release-engineering"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-16
+last_reviewed: 2026-08-17
 supersedes: []
 superseded_by: []
 ---
@@ -25,7 +25,7 @@ superseded_by: []
 | `3.2.3` | `C30` | `pending` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.2` | `C24` | `pending` | `2.1` | `main` | `tagged` | `tagged` | 1 |
 | `3.2.1` | `C21` | `pending` | `2.1` | `main` | `published` | `published` | 1 |
-| `2.5.10` | `not-assigned` | `2.5-P / 14` | `2.0` | `legacy` | `planned` | `planned` | 0 |
+| `2.5.10` | `2.5-P14` | `2.5-P / 14` | `2.0` | `hotfix/mir3-max-level-2.5.10` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.9` | `2.5-P13` | `2.5-P / 13` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.5` | `2.5-P12` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
 | `2.5.0` | `2.5-P11` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |
