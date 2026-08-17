@@ -1,13 +1,13 @@
 schema: 1
 
-release: 2.5.10
+release: 2.5.11
 factorio_line: "2.0"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: retained-2.5.9-performance-plus-targeted-2.5.10-exact-engine-smoke
+accepted_evidence: retained-2.5.10-performance-plus-targeted-2.5.11-exact-engine-smoke-pending
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.
-  - The emergency lane retains the immutable published 2.5.9 performance baseline and runs targeted 2.5.10 exact-engine smoke on the same Factorio 2.0.77 installation.
+  - The emergency lane retains immutable published 2.5.10 performance evidence and requires targeted 2.5.11 exact-engine smoke on Factorio 2.0.77 before release.
   - At least five measured runs per package follow one warm-up and a paired balanced baseline-candidate order.
   - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
   - Runtime scenario timings include Factorio process startup and save creation.
@@ -132,6 +132,6 @@ compiler_telemetry:
   witness_node_limit: 64
 
 regression_policy:
-  qualified_baseline: "2.5.9"
+  qualified_baseline: "2.5.10"
   absolute_budgets: .mir/performance-budgets.json
   maximum_regression_percent: 20

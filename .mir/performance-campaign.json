@@ -1,22 +1,22 @@
 {
   "schema": 2,
-  "phase": "post-terminal-emergency-hotfix",
-  "release": "2.5.10",
+  "phase": "post-terminal-emergency-hotfix-v2",
+  "release": "2.5.11",
   "factorio_line": "2.0",
   "factorio_version": "2.0.77",
   "baseline": {
-    "version": "2.5.9",
-    "archive_sha256": "B5EF300A12F1DE7F130ADAE8A2D368CD879D56FE7141879A807698F9B0EBBF35",
-    "package_content_sha256": "D6B81E450E6F84262C91EEF0F942730FE8326EACA931DCDC03930A07F3507B8C"
-  },
-  "candidate": {
-    "state": "sealed-awaiting-publication",
-    "candidate_id": "2.5-P14",
     "version": "2.5.10",
-    "package_source_commit": "release-commit-assigned-at-seal",
-    "package_source_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
     "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
     "package_content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
+  },
+  "candidate": {
+    "state": "package-built",
+    "candidate_id": "2.5-P15",
+    "version": "2.5.11",
+    "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
+    "package_source_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+    "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+    "package_content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
   },
   "run_policy": {
     "warmup_runs": 1,
