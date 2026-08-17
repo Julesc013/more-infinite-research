@@ -208,10 +208,11 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.2.11.zip
-  source_commit: pending
-  automated_gate: pending
-  manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
+  package_source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
+  automated_gate: pending-qualification
+  manual_gate: pending-exact-candidate-review
+  status: package-built
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

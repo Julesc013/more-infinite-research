@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.11-c35-package-built",
+  "release": "3.2.11",
+  "from": "source-frozen",
+  "to": "package-built",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "three-build-deterministic-package",
+      "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json",
+      "archive": "dist/more-infinite-research_3.2.11.zip",
+      "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+      "archive_bytes": 1067720,
+      "archive_entries": 305,
+      "builds": 3
+    }
+  ],
+  "recorded_at": "2026-08-17T23:50:00+10:00"
+}

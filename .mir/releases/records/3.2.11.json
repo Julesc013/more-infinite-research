@@ -1,23 +1,43 @@
 {
   "schema": 1,
   "release": "3.2.11",
-  "candidate_id": "not-assigned",
+  "candidate_id": "C35",
   "candidate_floor": "C35",
+  "candidate_allocation": {
+    "namespace": "C",
+    "predecessor_max_ordinal": 34,
+    "minimum_next_ordinal": 35,
+    "assigned_id": "C35",
+    "assigned_at": "2026-08-17T23:50:00+10:00",
+    "candidate_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "assignment_condition": "exact-source-freeze-and-three-build-reconstruction-satisfied"
+  },
   "target": "2.1",
   "branch": "main",
   "development_branch": "dev",
-  "state": "planned",
-  "package": {},
+  "state": "package-built",
+  "package": {
+    "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+    "source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "archive": "dist/more-infinite-research_3.2.11.zip",
+    "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "bytes": 1067720,
+    "entries": 305
+  },
   "proofs": {
     "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
-    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json",
+    "source_freeze": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV2.json",
+    "package_build": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json",
+    "local_factorio_2_1_14_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json"
   },
   "remaining_obligations": [
     "focused-qualification",
     "root-cause-regression",
     "exact-engine-qualification",
-    "deterministic-reconstruction",
     "protected-promotion",
     "tag-and-publication"
   ],
@@ -40,5 +60,5 @@
     "MIR3-TERM-0033",
     "MIR3-TERM-0034"
   ],
-  "updated_at": "2026-08-17T16:00:00+10:00"
+  "updated_at": "2026-08-17T23:50:00+10:00"
 }

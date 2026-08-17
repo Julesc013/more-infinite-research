@@ -2,11 +2,9 @@
   "authority": "mir-generated-terminal-family-publication-checklist-v1",
   "family": [
     {
-      "candidate_id": "not-assigned",
+      "candidate_id": "C35",
       "release": "3.2.11",
       "remaining_states": [
-        "source-frozen",
-        "package-built",
         "focused-qualified",
         "candidate-qualified",
         "automated-qualified-awaiting-human-review",
@@ -18,7 +16,7 @@
         "published",
         "publicly-verified"
       ],
-      "state": "planned",
+      "state": "package-built",
       "target_seal_present": false
     },
     {

@@ -8,7 +8,7 @@ Generated: 2026-08-17
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.11` | `not-assigned` | `C35` | `planned` | `source-frozen` |
+| `3.2.11` | `C35` | `C / 35` | `package-built` | `focused-qualified` |
 | `2.5.11` | `not-assigned` | `2.5-P15` | `planned` | `source-frozen` |
 | `3.2.10` | `C34` | `C / 34` | `publicly-verified` | `complete` |
 | `2.5.10` | `2.5-P14` | `2.5-P / 14` | `publicly-verified` | `complete` |
@@ -104,7 +104,6 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 - [ ] `focused-qualification` for `3.2.11`
 - [ ] `root-cause-regression` for `3.2.11`
 - [ ] `exact-engine-qualification` for `3.2.11`
-- [ ] `deterministic-reconstruction` for `3.2.11`
 - [ ] `protected-promotion` for `3.2.11`
 - [ ] `tag-and-publication` for `3.2.11`
 - [ ] `focused-qualification` for `2.5.11`

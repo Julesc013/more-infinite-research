@@ -17,27 +17,25 @@ superseded_by: []
 | Field | Authority |
 | --- | --- |
 | MIR version | `3.2.11` |
-| Candidate identity | `not-assigned` |
-| Candidate namespace | `pending` |
-| Predecessor maximum ordinal | `pending` |
-| Minimum next ordinal | `C35` |
-| Assignment condition | `pending` |
+| Candidate identity | `C35` |
+| Candidate namespace | `C` |
+| Predecessor maximum ordinal | `34` |
+| Minimum next ordinal | `35` |
+| Assignment condition | `exact-source-freeze-and-three-build-reconstruction-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `planned` |
-| Package source commit | `pending` |
-| Package source tree | `pending` |
-| Package source SHA-256 | `pending` |
-| Archive | `pending` |
-| Archive bytes | `pending` |
-| Archive entries | `pending` |
-| Archive SHA-256 | `pending` |
-| Package content SHA-256 | `pending` |
+| State | `package-built` |
+| Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
+| Package source tree | `b6102e8ed616955fc335d784a98357b62111322a` |
+| Package source SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
+| Archive | `dist/more-infinite-research_3.2.11.zip` |
+| Archive bytes | `1067720` |
+| Archive entries | `305` |
+| Archive SHA-256 | `5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A` |
+| Package content SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
 
 ## Remaining state transitions
 
-- [ ] `source-frozen`
-- [ ] `package-built`
 - [ ] `focused-qualified`
 - [ ] `candidate-qualified`
 - [ ] `automated-qualified-awaiting-human-review`

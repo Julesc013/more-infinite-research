@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixLocalQualificationV2",
+  "status": "focused-exact-engine-passed",
+  "release": "3.2.11",
+  "candidate_id": "C35",
+  "candidate": {
+    "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+  },
+  "engine": {
+    "version": "2.1.14",
+    "file_version": "2.1.14.87180",
+    "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "installation_sha256": "E40E8D699338BD6E21B069C40223524E9436074720F113F2DD477E0F5921AC2D"
+  },
+  "plan": {
+    "path": "build/results/assurance/3.2.11-c35-edit-plan.json",
+    "material_sha256": "03A465AF04B2312522E45C7D5664C5B113A07B5155C7EE87966F202D95331156",
+    "required_test_set_sha256": "9165AB8D0545EED526BF2DE0730A30C8352BBCE44B5D1E89E0B3DFA9DE8CFE2E",
+    "reuse": false
+  },
+  "focused_tests": [
+    {"id": "scenario/2.1/generated-maximum-level-absolute", "fingerprint_sha256": "F7AD288ECC4C3DDA1242CF0E4396EA71D9929A56F76B4D5A5043BE5490DC88B7", "status": "passed"},
+    {"id": "scenario/2.1/generated-maximum-level-lowering-config-change", "fingerprint_sha256": "2DC221C11E8A0E5348E25BD2F10EC377A77B6B97F371C179725B4BF3220DCBBA", "status": "passed"},
+    {"id": "scenario/2.1/base-continuation-maximum-level-lowering-config-change", "fingerprint_sha256": "51AB3EEE14A068706531B0A06C37B6E1E69F9511F60F4C3231F7FBE6B5D255DE", "status": "passed"},
+    {"id": "scenario/2.1/base-competitor-rollback", "fingerprint_sha256": "C6B480463D0A6A472DC2DF601C6C1249E5E98E81A5E835986679013C5DEBA1DB", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level", "fingerprint_sha256": "B596AC9E581B51205166548B3CE5238F22C603570DCCB039E4D3FB613A270C7D", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level-1", "fingerprint_sha256": "C0CF49C6C17EC6AAA050178644C93E36ABDF873E9A0AD8EEFC4316CA11BA3174", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level-2", "fingerprint_sha256": "E8D16564690BBDEF87648DBF74FB65311AAB0D36A74284D37A6EC293EE342CD2", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level-7", "fingerprint_sha256": "D7861D5810DBF568B4F27A89D3A3368E5D92FFBFB64F3BFC48687ADF26531032", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-cap-lowering-config-change", "fingerprint_sha256": "8C4F85DA62566691ACFE9841FC4EC690221572684811E8A137AC6829D34EB449", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-cap-raising-config-change", "fingerprint_sha256": "2983D78C8B4A428411E8B8597DF03B7DAFAE92F86ECF4A99546EDC466B112A80", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-cap-removal-config-change", "fingerprint_sha256": "947ECCE1E3F95F5012CC89EE75292611F2C6919CAA9216C5BB9C3E3C71C8A910", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level-profile-import", "fingerprint_sha256": "828F89694193E7F28F97469B19159812BD674F12FF8608B66B7429B1C6E05DE1", "status": "passed"},
+    {"id": "scenario/2.1/space-age-native-owner-settings-max-level-late-conflict", "fingerprint_sha256": "BCEA3EA11E7659F70D1D34623E3E859FBC6E76F070FC1FDB3D05C6B0E23ED3B6", "status": "passed"}
+  ],
+  "static_validation": {
+    "command": ".\\scripts\\Invoke-MIRValidation.ps1 -StaticOnly",
+    "status": "passed",
+    "deterministic_build_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
+  },
+  "remaining": [
+    "complete-governed-upgrade-and-ecosystem-qualification",
+    "protected-promotion-and-publication"
+  ],
+  "recorded_at": "2026-08-17T23:50:00+10:00"
+}
