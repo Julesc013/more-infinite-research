@@ -14,6 +14,7 @@
     "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
   },
   "remaining_obligations": [
+    "focused-qualification",
     "root-cause-regression",
     "exact-engine-qualification",
     "deterministic-reconstruction",
