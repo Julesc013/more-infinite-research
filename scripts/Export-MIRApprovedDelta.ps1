@@ -708,12 +708,88 @@ function Get-MIR255DifferenceDisposition {
   return $null
 }
 
+function Get-MIR2511DifferenceDisposition {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
+
+  $evidence = @(
+    'fourteen exact Factorio 2.0.77 runtime exports',
+    '2.5.10 to 2.5.11 governed upgrade matrix',
+    'MIR3-TERM-0033 and MIR3-TERM-0034'
+  )
+  if ($Path -eq 'package.version' -and [string]$Before -eq '2.5.10' -and [string]$After -eq '2.5.11') {
+    return [ordered]@{ reason='The package version advances from immutable 2.5.10 to the corrected 2.5.11 emergency release.'; intentional=$true; migration_impact='Factorio performs the governed package upgrade.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.archive_sha256' -and
+      [string]$Before -eq '251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB' -and
+      [string]$After -eq '4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C') {
+    return [ordered]@{ reason='The archive identity advances to the deterministic 2.5-P15 package.'; intentional=$true; migration_impact='Package custody changes; semantic rows remain independently classified.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.package_content_sha256' -and
+      [string]$Before -eq '55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66' -and
+      [string]$After -eq 'F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D') {
+    return [ordered]@{ reason='The normalized package identity advances to the exact 2.5-P15 projection.'; intentional=$true; migration_impact='All observed prototype differences remain independently classified.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.runtime_source_fingerprints.prototypes/mir/runtime/maximum_level_control.lua' -and
+      [string]$Before -eq '0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9' -and
+      [string]$After -eq '687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA') {
+    return [ordered]@{ reason='The bounded runtime controller correction makes cap-boundary enforcement and visibility restoration explicit.'; intentional=$true; migration_impact='Invalid current or queued research remains rejected while completed levels and valid progress remain preserved.'; required_evidence=@('maximum-level transition fixtures', 'configuration-change proof', 'first and second reload proof') }
+  }
+
+  $scenarios = @(
+    'approved-delta-automatic-family-controls',
+    'approved-delta-base',
+    'approved-delta-base-continuations',
+    'approved-delta-compat-atan',
+    'approved-delta-compat-space-age-galore',
+    'approved-delta-native-owner-adoption',
+    'approved-delta-space-age'
+  )
+  if ($Path -match '^scenarios\.(?<scenario>[^.]+)\.active_mods\.more-infinite-research$' -and
+      $scenarios -contains $Matches.scenario -and [string]$Before -eq '2.5.10' -and [string]$After -eq '2.5.11') {
+    return [ordered]@{ reason='The scenario binds the exact predecessor and candidate package versions.'; intentional=$true; migration_impact='Package version transition only.'; required_evidence=$evidence }
+  }
+
+  $continuations = @(
+    'braking-force-8',
+    'inserter-capacity-bonus-8',
+    'laser-shooting-speed-8',
+    'research-speed-7',
+    'weapon-shooting-speed-7',
+    'worker-robots-storage-4'
+  )
+  if ($Path -match '^scenarios\.(?<scenario>[^.]+)\.technologies\.(?<technology>[^.]+)\.presentation\.hidden$' -and
+      $scenarios -contains $Matches.scenario -and $continuations -contains $Matches.technology -and
+      $null -eq $Before -and $After -eq $false) {
+    return [ordered]@{
+      reason = 'The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.'
+      intentional = $true
+      migration_impact = 'The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.'
+      required_evidence = @('base-continuation boundary fixture', 'exact seven-scenario prototype delta', 'zero technology identity, effect, prerequisite, science, setting, or maximum-level drift')
+    }
+  }
+  return $null
+}
+
 function Get-DifferenceDisposition {
   param(
     [Parameter(Mandatory)][string]$Path,
     $Before,
     $After
   )
+  if ($script:IsFactorio20MaxLevel2511Delta) {
+    $mir2511Disposition = Get-MIR2511DifferenceDisposition -Path $Path -Before $Before -After $After
+    if ($null -ne $mir2511Disposition) { return $mir2511Disposition }
+    return [ordered]@{
+      reason = 'Unreviewed 2.5.11 emergency normalized difference.'
+      intentional = $false
+      migration_impact = 'Unknown until independently classified against MIR3-TERM-0033 and MIR3-TERM-0034.'
+      required_evidence = @('maintainer classification', 'exact 2.5.10 to 2.5.11 runtime delta', 'focused maximum-level regression')
+    }
+  }
   if ($script:IsFactorio20DotFiveReleaseDelta) {
     $mir255Disposition = Get-MIR255DifferenceDisposition -Path $Path -Before $Before -After $After
     if ($null -ne $mir255Disposition) { return $mir255Disposition }
